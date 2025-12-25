@@ -1,15 +1,30 @@
-*.d
+# Copyrighted files that should not be committed
+Amiga/kickstart.rom
+Amiga/myamiga.cfg
+Amiga/BlankPFS3-*
+Amiga/amiga.cfg
+Amiga/Workbench2.04-PS3-8GB.hdf
+pistorm/amiga.cfg
+pistorm/myamiga.cfg
+pistorm/Workbench2.04-PS3-8GB.hdf
+pistorm/BlankPFS3-*
+
+# Build artifacts
+emulator
+buptest
+m68kmake
 *.o
-*.img
-*.hdf
-*.rom
-*.dll
-*.bin
-*.exe
-*.stackdump
-!/platforms/amiga/piscsi/*.rom
-/m68kmake
-/m68kmake.exe
-/m68kops.c
-/m68kops.h
-/emulator
+*.d
+*.a
+
+# Generated files
+m68kops.c
+m68kops.h
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+qwen.resume
