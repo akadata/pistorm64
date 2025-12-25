@@ -58,15 +58,15 @@ static unsigned char ac_a314_rom[] = {
 
 extern unsigned int a314_base;
 
-int ac_z2_current_pic = 0;
-int ac_z2_pic_count = 0;
+uint32_t ac_z2_current_pic = 0;
+uint32_t ac_z2_pic_count = 0;
 int ac_z2_done = 0;
 int ac_z2_type[AC_PIC_LIMIT];
 int ac_z2_index[AC_PIC_LIMIT];
 unsigned int ac_base[AC_PIC_LIMIT];
 
-int ac_z3_current_pic = 0;
-int ac_z3_pic_count = 0;
+uint32_t ac_z3_current_pic = 0;
+uint32_t ac_z3_pic_count = 0;
 int ac_z3_done = 0;
 int ac_z3_type[AC_PIC_LIMIT];
 int ac_z3_index[AC_PIC_LIMIT];
