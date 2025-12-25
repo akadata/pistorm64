@@ -386,7 +386,7 @@ void piscsi_map_drive(char *filename, uint8_t index) {
     d->fs = file_size;
     d->fd = tmp_fd;
     lseek(tmp_fd, 0, SEEK_SET);
-    printf("[PISCSI] Map %d: [%s] - %llu bytes.\n", index, filename, file_size);
+    printf("[PISCSI] Map %d: [%s] - %lu bytes.\n", index, filename, (unsigned long)file_size);
 
     if (piscsi_parse_rdb(d) == -1) {
         DEBUG("[PISCSI] No RDB found on disk, making up some CHS values.\n");

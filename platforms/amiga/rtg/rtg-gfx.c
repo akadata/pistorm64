@@ -765,7 +765,7 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
 		}
 		dptr += pitch;
         for (int i = 0; i < bm->Depth; i++) {
-            if (plane_ptr[i] && (uint32_t)plane_ptr[i] != 0xFFFFFFFF)
+            if (plane_ptr[i] && (uint32_t)(uintptr_t)plane_ptr[i] != 0xFFFFFFFF)
                 plane_ptr[i] += src_pitch;
             if (plane_addr[i] && plane_addr[i] != 0xFFFFFFFF)
                 plane_addr[i] += src_pitch;
