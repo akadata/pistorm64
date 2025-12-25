@@ -40,9 +40,9 @@ This document outlines the tasks required to fix the build issues in the PiStorm
 - **Priority**: Medium
 
 ### Task 5: Verify Runtime Functionality
-- **Status**: Pending
+- **Status**: Completed
 - **Description**: Ensure the emulator runs correctly after build fixes
-- **Solution**: Test basic functionality of the emulator with timeout command
+- **Solution**: Test basic functionality of the emulator with timeout command - emulator runs successfully
 - **Priority**: Medium
 
 ### Task 6: Add Copyrighted Files to .gitignore
@@ -51,9 +51,25 @@ This document outlines the tasks required to fix the build issues in the PiStorm
 - **Solution**: Updated .gitignore with copyrighted files
 - **Priority**: High
 
+### Task 7: Organize Changes into Separate Git Branches
+- **Status**: Pending
+- **Description**: Create separate branches for each feature following one-change-per-branch principle
+- **Solution**: Follow the plan in COMMIT_PLAN.md to create separate branches for:
+  - m68kcpu inline function fix
+  - 64-bit platform support
+  - Documentation
+  - Default 64-bit build
+- **Priority**: High
+
+### Task 8: Document aarch64 Build Environment
+- **Status**: Completed
+- **Description**: Document exact GCC and Make options needed for systemd-nspawn aarch64 build environment
+- **Solution**: Created AARCH64_BUILD_ENV.md with complete build environment documentation
+- **Priority**: High
+
 ## Dependencies
 - Task 4 can be done independently
-- Task 5 requires successful build completion (completed)
+- Task 7 requires all changes to be properly organized
 
 ## Expected Outcomes
 - Successful compilation on 64-bit ARM systems (Raspberry Pi Zero W2)
@@ -61,3 +77,4 @@ This document outlines the tasks required to fix the build issues in the PiStorm
 - 64-bit compatibility for PiSCSI module
 - Maintained functionality of the emulator
 - No copyrighted material committed to repository
+- Clean Git history with one feature per branch
