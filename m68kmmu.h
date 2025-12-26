@@ -12,14 +12,14 @@
 
 
 struct m68ki_cpu_core;
-#if 0
-#define MMULOG(A) printf A
+#include "log.h"
+#ifdef PISTORM_PMMU_LOG
+#define MMULOG(A) do { LOG_DEBUG A; } while (0)
+#define MMUERR(A) do { LOG_WARN A; } while (0)
+#define logerror(...) LOG_WARN(__VA_ARGS__)
 #else
 #define MMULOG(...)
-#endif
-#if 1
-#define logerror printf
-#else
+#define MMUERR(...)
 #define logerror(...)
 #endif
 
@@ -128,6 +128,10 @@ void pmmu_set_buserror(m68ki_cpu_core *state, uint32 addr_in)
 		state->mmu_tmp_buserror_rw = state->mmu_tmp_rw;
 		state->mmu_tmp_buserror_fc = state->mmu_tmp_fc;
 		state->mmu_tmp_buserror_sz = state->mmu_tmp_sz;
+#ifdef PISTORM_PMMU_LOG
+		MMUERR(("[PMMU] buserror addr=0x%08X sr=0x%04X rw=%u fc=%u sz=%u\n",
+			addr_in, state->mmu_tmp_sr, state->mmu_tmp_rw, state->mmu_tmp_fc, state->mmu_tmp_sz));
+#endif
 	}
 }
 
