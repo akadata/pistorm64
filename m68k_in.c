@@ -773,6 +773,8 @@ pack      16  mm    ay7   1000...101001111  ..........  . . U U U   .   .  13  1
 pack      16  mm    axy7  1000111101001111  ..........  . . U U U   .   .  13  13  13
 pack      16  mm    .     1000...101001...  ..........  . . U U U   .   .  13  13  13
 pea       32  .     .     0100100001......  A..DXWLdx.  U U U U U   6   6   5   5   5
+pflushn   32  .     .     1111010100000...  ..........  . . . . S   .   .   .   .   4   TODO: correct timing
+pflush    32  .     .     1111010100001...  ..........  . . . . S   .   .   .   .   4   TODO: correct timing
 pflusha   32  .     .     1111010100011...  ..........  . . . . S   .   .   .   .   4   TODO: correct timing
 pflushan  32  .     .     1111010100010...  ..........  . . . . S   .   .   .   .   4   TODO: correct timing
 pmmu      32  .     .     1111000.........  ..........  . . S S S   .   .   8   8   8
@@ -8510,11 +8512,46 @@ M68KMAKE_OP(pea, 32, ., .)
 	m68ki_push_32(state, ea);
 }
 
+M68KMAKE_OP(pflushn, 32, ., .)
+{
+	if (HAS_PMMU)
+	{
+		if (!FLAG_S)
+		{
+			m68ki_exception_privilege_violation(state);
+			return;
+		}
+		m68851_mmu_ops(state);
+		return;
+	}
+	m68ki_exception_1111(state);
+}
+
+M68KMAKE_OP(pflush, 32, ., .)
+{
+	if (HAS_PMMU)
+	{
+		if (!FLAG_S)
+		{
+			m68ki_exception_privilege_violation(state);
+			return;
+		}
+		m68851_mmu_ops(state);
+		return;
+	}
+	m68ki_exception_1111(state);
+}
+
 M68KMAKE_OP(pflusha, 32, ., .)
 {
 	if (HAS_PMMU)
 	{
-		fprintf(stderr,"68040: unhandled PFLUSHA (ir=%04x)\n", REG_IR);
+		if (!FLAG_S)
+		{
+			m68ki_exception_privilege_violation(state);
+			return;
+		}
+		m68851_mmu_ops(state);
 		return;
 	}
 	m68ki_exception_1111(state);
@@ -8524,7 +8561,12 @@ M68KMAKE_OP(pflushan, 32, ., .)
 {
 	if (HAS_PMMU)
 	{
-		fprintf(stderr,"68040: unhandled PFLUSHAN (ir=%04x)\n", REG_IR);
+		if (!FLAG_S)
+		{
+			m68ki_exception_privilege_violation(state);
+			return;
+		}
+		m68851_mmu_ops(state);
 		return;
 	}
 	m68ki_exception_1111(state);
