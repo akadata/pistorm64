@@ -1,6 +1,7 @@
 EXENAME          = emulator
 
 MAINFILES        = emulator.c \
+	log.c \
 	memory_mapped.c \
 	config_file/config_file.c \
 	config_file/rominfo.c \

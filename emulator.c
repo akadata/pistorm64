@@ -20,6 +20,7 @@
 #include "platforms/amiga/pistorm-dev/pistorm-dev.h"
 #include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
 #include "gpio/ps_protocol.h"
+#include "log.h"
 
 #include <assert.h>
 #include <dirent.h>
@@ -526,10 +527,34 @@ int main(int argc, char *argv[]) {
 
   ps_setup_protocol();
 
+  log_set_level(LOG_LEVEL_INFO);
+
   //const struct sched_param priority = {99};
 
   // Some command line switch stuffles
   for (g = 1; g < argc; g++) {
+    if (strcmp(argv[g], "--log") == 0) {
+      const char *path = "amiga.log";
+      if (g + 1 < argc && argv[g + 1][0] != '-') {
+        g++;
+        path = argv[g];
+      }
+      if (log_set_file(path) != 0) {
+        printf("Failed to open log file %s.\n", path);
+      }
+    }
+    else if (strcmp(argv[g], "--log-level") == 0 || strcmp(argv[g], "-l") == 0) {
+      if (g + 1 >= argc) {
+        printf("%s switch found, but no log level specified.\n", argv[g]);
+      } else {
+        int level = log_parse_level(argv[++g]);
+        if (level < 0) {
+          printf("Invalid log level %s (use error|warn|info|debug).\n", argv[g]);
+        } else {
+          log_set_level(level);
+        }
+      }
+    }
     if (strcmp(argv[g], "--cpu_type") == 0 || strcmp(argv[g], "--cpu") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no CPU type specified.\n", argv[g]);

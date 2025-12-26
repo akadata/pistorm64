@@ -452,6 +452,7 @@ FSRExists:
             move.l #31,PiSCSIDebugMe
             move.l PiSCSIAddr2,a0
             move.l PiSCSIGetFS,d0
+            move.l d0,d7
             cmp.l #0,d0
             beq.w FSDone
 
