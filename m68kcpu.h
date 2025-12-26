@@ -53,6 +53,12 @@ extern "C" {
 #define EXCLOG(...)
 #endif
 
+#ifdef PISTORM_SR_LOG
+#define SRLOG(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define SRLOG(...)
+#endif
+
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
 /* ======================================================================== */
@@ -1817,12 +1823,17 @@ static inline void m68ki_branch_32(m68ki_cpu_core *state, uint offset)
  */
 static inline void m68ki_set_s_flag(m68ki_cpu_core *state, uint value)
 {
+	uint old_s = FLAG_S;
+	uint old_m = FLAG_M;
+	uint old_sp = REG_SP;
 	/* Backup the old stack pointer */
 	REG_SP_BASE[FLAG_S | ((FLAG_S>>1) & FLAG_M)] = REG_SP;
 	/* Set the S flag */
 	FLAG_S = value;
 	/* Set the new stack pointer */
 	REG_SP = REG_SP_BASE[FLAG_S | ((FLAG_S>>1) & FLAG_M)];
+	SRLOG("[SR] set_s_flag pc=0x%08X s:%u->%u m:%u sp:0x%08X->0x%08X\n",
+	      REG_PC, old_s, FLAG_S, old_m, old_sp, REG_SP);
 }
 
 /* Set the S and M flags and change the active stack pointer.
@@ -1830,6 +1841,9 @@ static inline void m68ki_set_s_flag(m68ki_cpu_core *state, uint value)
  */
 static inline void m68ki_set_sm_flag(m68ki_cpu_core *state, uint value)
 {
+	uint old_s = FLAG_S;
+	uint old_m = FLAG_M;
+	uint old_sp = REG_SP;
 	/* Backup the old stack pointer */
 	REG_SP_BASE[FLAG_S | ((FLAG_S>>1) & FLAG_M)] = REG_SP;
 	/* Set the S and M flags */
@@ -1837,14 +1851,20 @@ static inline void m68ki_set_sm_flag(m68ki_cpu_core *state, uint value)
 	FLAG_M = value & MFLAG_SET;
 	/* Set the new stack pointer */
 	REG_SP = REG_SP_BASE[FLAG_S | ((FLAG_S>>1) & FLAG_M)];
+	SRLOG("[SR] set_sm_flag pc=0x%08X s:%u->%u m:%u->%u sp:0x%08X->0x%08X\n",
+	      REG_PC, old_s, FLAG_S, old_m, FLAG_M, old_sp, REG_SP);
 }
 
 /* Set the S and M flags.  Don't touch the stack pointer. */
 static inline void m68ki_set_sm_flag_nosp(m68ki_cpu_core *state, uint value)
 {
+	uint old_s = FLAG_S;
+	uint old_m = FLAG_M;
 	/* Set the S and M flags */
 	FLAG_S = value & SFLAG_SET;
 	FLAG_M = value & MFLAG_SET;
+	SRLOG("[SR] set_sm_flag_nosp pc=0x%08X s:%u->%u m:%u->%u\n",
+	      REG_PC, old_s, FLAG_S, old_m, FLAG_M);
 }
 
 
@@ -1861,6 +1881,9 @@ static inline void m68ki_set_ccr(m68ki_cpu_core *state, uint value)
 /* Set the status register but don't check for interrupts */
 static inline void m68ki_set_sr_noint(m68ki_cpu_core *state, uint value)
 {
+	uint old_sr = m68ki_get_sr();
+	uint old_s = FLAG_S;
+	uint old_m = FLAG_M;
 	/* Mask out the "unimplemented" bits */
 	value &= CPU_SR_MASK;
 
@@ -1870,6 +1893,8 @@ static inline void m68ki_set_sr_noint(m68ki_cpu_core *state, uint value)
 	FLAG_INT_MASK = value & 0x0700;
 	m68ki_set_ccr(state, value);
 	m68ki_set_sm_flag(state, (value >> 11) & 6);
+	SRLOG("[SR] set_sr_noint pc=0x%08X sr:0x%04X->0x%04X s:%u->%u m:%u->%u\n",
+	      REG_PC, old_sr, value, old_s, FLAG_S, old_m, FLAG_M);
 }
 
 /* Set the status register but don't check for interrupts nor
@@ -1877,6 +1902,9 @@ static inline void m68ki_set_sr_noint(m68ki_cpu_core *state, uint value)
  */
 static inline void m68ki_set_sr_noint_nosp(m68ki_cpu_core *state, uint value)
 {
+	uint old_sr = m68ki_get_sr();
+	uint old_s = FLAG_S;
+	uint old_m = FLAG_M;
 	/* Mask out the "unimplemented" bits */
 	value &= CPU_SR_MASK;
 
@@ -1886,13 +1914,17 @@ static inline void m68ki_set_sr_noint_nosp(m68ki_cpu_core *state, uint value)
 	FLAG_INT_MASK = value & 0x0700;
 	m68ki_set_ccr(state, value);
 	m68ki_set_sm_flag_nosp(state, (value >> 11) & 6);
+	SRLOG("[SR] set_sr_noint_nosp pc=0x%08X sr:0x%04X->0x%04X s:%u->%u m:%u->%u\n",
+	      REG_PC, old_sr, value, old_s, FLAG_S, old_m, FLAG_M);
 }
 
 /* Set the status register and check for interrupts */
 static inline void m68ki_set_sr(m68ki_cpu_core *state, uint value)
 {
+	uint old_sr = m68ki_get_sr();
 	m68ki_set_sr_noint(state, value);
 	m68ki_check_interrupts(state);
+	SRLOG("[SR] set_sr pc=0x%08X sr:0x%04X->0x%04X\n", REG_PC, old_sr, value & CPU_SR_MASK);
 }
 
 
@@ -1909,6 +1941,8 @@ static inline uint m68ki_init_exception(m68ki_cpu_core *state)
 	m68ki_clear_trace();
 	/* Enter supervisor mode */
 	m68ki_set_s_flag(state, SFLAG_SET);
+	SRLOG("[SR] init_exception pc=0x%08X sr_old=0x%04X sr_new=0x%04X\n",
+	      REG_PC, sr, m68ki_get_sr());
 
 	return sr;
 }
