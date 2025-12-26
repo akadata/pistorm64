@@ -28,3 +28,4 @@ m68kops.h
 .vscode/
 .idea/
 qwen.resume
+*.log
