@@ -3,10 +3,11 @@
 #include "platforms/platforms.h"
 #include "pistorm-dev/pistorm-dev-enums.h"
 #include "amiga-autoconf.h"
+#include "a314/a314.h"
+#include "log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "a314/a314.h"
 
 #define Z2_Z2      0xC
 #define Z2_FAST    0x2
@@ -107,7 +108,7 @@ unsigned char get_autoconf_size_ext(int size) {
 extern void adjust_ranges_amiga(struct emulator_config *cfg);
 
 void autoconfig_reset_all() {
-  printf("[AUTOCONF] Resetting all autoconf data.\n");
+  LOG_INFO("[AUTOCONF] Resetting all autoconf data.\n");
   for (int i = 0; i < AC_PIC_LIMIT; i++) {
     ac_z2_type[i] = ACTYPE_NONE;
     ac_z3_type[i] = ACTYPE_NONE;
@@ -233,7 +234,7 @@ void autoconfig_write_memory_z3_8(struct emulator_config *cfg, unsigned int addr
 
   if (done) {
     nib_latch = 0;
-    printf("[AUTOCONF] Address of Z3 autoconf RAM assigned to $%.8x [B]\n", ac_base[ac_z3_current_pic]);
+    LOG_INFO("[AUTOCONF] Address of Z3 autoconf RAM assigned to $%.8x [B]\n", ac_base[ac_z3_current_pic]);
     cfg->map_offset[index] = ac_base[ac_z3_current_pic];
     cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
     m68k_add_ram_range(cfg->map_offset[index], cfg->map_high[index], cfg->map_data[index]);
@@ -259,13 +260,13 @@ void autoconfig_write_memory_z3_16(struct emulator_config *cfg, unsigned int add
       done = 1;
       break;
     default:
-      printf("Unknown WORD write to Z3 autoconf address $%.2X", address & 0xFF);
+      LOG_WARN("[AUTOCONF] Unknown WORD write to Z3 autoconf address $%.2X\n", address & 0xFF);
       //stop_cpu_emulation();
       break;
   }
 
   if (done) {
-    printf("[AUTOCONF] Address of Z3 autoconf RAM assigned to $%.8x [W]\n", ac_base[ac_z3_current_pic]);
+    LOG_INFO("[AUTOCONF] Address of Z3 autoconf RAM assigned to $%.8x [W]\n", ac_base[ac_z3_current_pic]);
     cfg->map_offset[index] = ac_base[ac_z3_current_pic];
     cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
     m68k_add_ram_range(cfg->map_offset[index], cfg->map_high[index], cfg->map_data[index]);
@@ -286,7 +287,7 @@ void add_z2_pic(uint8_t type, uint8_t index) {
     ac_z2_pic_count++;
     return;
   }
-  printf("[AUTOCONF] Failed to add Z2 PIC of type %d, limit exceeded.\n", type);
+  LOG_WARN("[AUTOCONF] Failed to add Z2 PIC of type %d, limit exceeded.\n", type);
 }
 
 void remove_z2_pic(uint8_t type, uint8_t index) {
@@ -309,7 +310,7 @@ void remove_z2_pic(uint8_t type, uint8_t index) {
     ac_z2_pic_count--;
   }
   else {
-    printf("[AUTOCONF] Tried to remove Z2 PIC of type %d, but it wasn't found.\n", type);
+    LOG_WARN("[AUTOCONF] Tried to remove Z2 PIC of type %d, but it wasn't found.\n", type);
   }
 }
 
@@ -402,22 +403,24 @@ void autoconfig_write_memory_8(struct emulator_config *cfg, unsigned int address
       case ACTYPE_MAPFAST_Z2:
         cfg->map_offset[index] = ac_base[ac_z2_current_pic];
         cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
-        printf("[AUTOCONF] Address of Z2 autoconf RAM assigned to $%.8X\n", ac_base[ac_z2_current_pic]);
+        LOG_INFO("[AUTOCONF] Address of Z2 autoconf RAM assigned to $%.8X\n", ac_base[ac_z2_current_pic]);
         m68k_add_ram_range(cfg->map_offset[index], cfg->map_high[index], cfg->map_data[index]);
-        printf("[AUTOCONF] Z2 PIC %d at $%.8lX-%.8lX, Size: %d MB\n", ac_z2_current_pic, cfg->map_offset[index], cfg->map_high[index], cfg->map_size[index] / SIZE_MEGA);
+        LOG_INFO("[AUTOCONF] Z2 PIC %d at $%.8lX-%.8lX, Size: %d MB\n",
+                 ac_z2_current_pic, cfg->map_offset[index], cfg->map_high[index],
+                 cfg->map_size[index] / SIZE_MEGA);
         break;
       case ACTYPE_PISCSI:
-        printf("[AUTOCONF] PiSCSI Z2 device assigned to $%.8X\n", piscsi_base);
+        LOG_INFO("[AUTOCONF] PiSCSI Z2 device assigned to $%.8X\n", piscsi_base);
         //m68k_add_rom_range(piscsi_base + (16 * SIZE_KILO), piscsi_base + (32 * SIZE_KILO), piscsi_rom_ptr);
         break;
       case ACTYPE_A314:
-        printf("[AUTOCONF] A314 emulation device assigned to $%.8X\n", a314_base);
+        LOG_INFO("[AUTOCONF] A314 emulation device assigned to $%.8X\n", a314_base);
         break;
       case ACTYPE_PISTORM_DEV:
-        printf("[AUTOCONF] PiStorm Interaction Z2 device assigned to $%.8X\n", pistorm_dev_base);
+        LOG_INFO("[AUTOCONF] PiStorm Interaction Z2 device assigned to $%.8X\n", pistorm_dev_base);
         break;
       default:
-        printf("[!!!AUTOCONF] Some strange unknown Z2 device has been assigned to $%.8X?", *base);
+        LOG_WARN("[AUTOCONF] Unknown Z2 device assigned to $%.8X?\n", *base);
         break;
     }
     ac_z2_current_pic++;

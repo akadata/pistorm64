@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "log.h"
 #include "amiga-autoconf.h"
 #include "amiga-registers.h"
 #include "amiga-interrupts.h"
@@ -25,7 +26,7 @@
 //#define DEBUG_AMIGA_PLATFORM
 
 #ifdef DEBUG_AMIGA_PLATFORM
-#define DEBUG printf
+#define DEBUG LOG_DEBUG
 #else
 #define DEBUG(...)
 #endif
@@ -89,14 +90,14 @@ inline int custom_read_amiga(struct emulator_config *cfg, unsigned int addr, uns
                 DEBUG("[AUTOCONF] Read from AC_Z2_BASE: %.2X\n", zchk);
                 if (((zchk & BOARDTYPE_Z2) == BOARDTYPE_Z2) || ((zchk & BOARDTYPE_Z3) == BOARDTYPE_Z3)) {
                     if (!ac_waiting_for_physical_pic) {
-                        printf("[AUTOCONF] Found physical Zorro board, pausing processing until done.\n");
+                        LOG_INFO("[AUTOCONF] Found physical Zorro board, pausing processing until done.\n");
                         ac_waiting_for_physical_pic = 1;
                     }
                     *val = zchk;
                     return 1;
                 } else {
                     if (ac_waiting_for_physical_pic) {
-                        printf("[AUTOCONF] Resuming virtual Zorro board processing.\n");
+                        LOG_INFO("[AUTOCONF] Resuming virtual Zorro board processing.\n");
                         ac_waiting_for_physical_pic = 0;
                     }
                 }
@@ -110,7 +111,7 @@ inline int custom_read_amiga(struct emulator_config *cfg, unsigned int addr, uns
                 *val = autoconfig_read_memory_8(cfg, addr - AC_Z2_BASE);
                 return 1;
             }
-            printf("Unexpected %s read from Z2 autoconf addr %.X\n", op_type_names[type], addr - AC_Z2_BASE);
+            LOG_WARN("[AUTOCONF] Unexpected %s read from Z2 autoconf addr %.X\n", op_type_names[type], addr - AC_Z2_BASE);
             return -1;
         }
         if (!ac_z3_done && ac_z3_current_pic < ac_z3_pic_count) {
@@ -122,7 +123,7 @@ inline int custom_read_amiga(struct emulator_config *cfg, unsigned int addr, uns
                 *val = autoconfig_read_memory_z3_8(cfg, addr_ - AC_Z2_BASE);
                 return 1;
             }
-            printf("Unexpected %s read from Z3 autoconf addr %.X\n", op_type_names[type], addr - AC_Z2_BASE);
+            LOG_WARN("[AUTOCONF] Unexpected %s read from Z3 autoconf addr %.X\n", op_type_names[type], addr - AC_Z2_BASE);
             return -1;
         }
     }
@@ -136,7 +137,7 @@ inline int custom_read_amiga(struct emulator_config *cfg, unsigned int addr, uns
             *val = autoconfig_read_memory_z3_8(cfg, addr - AC_Z3_BASE);
             return 1;
         }
-        printf("Unexpected %s read from Z3 autoconf addr %.X\n", op_type_names[type], addr - AC_Z3_BASE);
+        LOG_WARN("[AUTOCONF] Unexpected %s read from Z3 autoconf addr %.X\n", op_type_names[type], addr - AC_Z3_BASE);
         return -1;
     }
 
@@ -189,7 +190,7 @@ inline int custom_write_amiga(struct emulator_config *cfg, unsigned int addr, un
                 autoconfig_write_memory_8(cfg, addr - AC_Z2_BASE, val);
                 return 1;
             }
-            printf("Unexpected %s write to Z2 autoconf addr %.X\n", op_type_names[type], addr - AC_Z2_BASE);
+            LOG_WARN("[AUTOCONF] Unexpected %s write to Z2 autoconf addr %.X\n", op_type_names[type], addr - AC_Z2_BASE);
             return -1;
         }
         if (!ac_z3_done && ac_z3_current_pic < ac_z3_pic_count) {
@@ -205,7 +206,7 @@ inline int custom_write_amiga(struct emulator_config *cfg, unsigned int addr, un
                 autoconfig_write_memory_z3_16(cfg, addr_ - AC_Z2_BASE, val);
                 return 1;
             }
-            printf("Unexpected %s write to Z3 autoconf addr %.X\n", op_type_names[type], addr - AC_Z2_BASE);
+            LOG_WARN("[AUTOCONF] Unexpected %s write to Z3 autoconf addr %.X\n", op_type_names[type], addr - AC_Z2_BASE);
             return -1;
         }
     }
@@ -226,7 +227,7 @@ inline int custom_write_amiga(struct emulator_config *cfg, unsigned int addr, un
             return 1;
         }
         else {
-            printf("Unexpected %s write to Z3 autoconf addr %.X\n", op_type_names[type], addr - AC_Z3_BASE);
+            LOG_WARN("[AUTOCONF] Unexpected %s write to Z3 autoconf addr %.X\n", op_type_names[type], addr - AC_Z3_BASE);
             //stop_emulation();
         }
     }
@@ -329,31 +330,31 @@ void adjust_ranges_amiga(struct emulator_config *cfg) {
         cfg->custom_high = max(cfg->custom_high, PINET_UPPER);
     }
 
-    printf("Platform custom range: %.8X-%.8X\n", cfg->custom_low, cfg->custom_high);
-    printf("Platform mapped range: %.8X-%.8X\n", cfg->mapped_low, cfg->mapped_high);
+    LOG_INFO("[AMIGA] Platform custom range: %.8X-%.8X\n", cfg->custom_low, cfg->custom_high);
+    LOG_INFO("[AMIGA] Platform mapped range: %.8X-%.8X\n", cfg->mapped_low, cfg->mapped_high);
 }
 
 int setup_platform_amiga(struct emulator_config *cfg) {
-    printf("Performing setup for Amiga platform.\n");
+    LOG_INFO("[AMIGA] Performing setup for Amiga platform.\n");
 
     if (strlen(cfg->platform->subsys)) {
-        printf("Subsystem is [%s]\n", cfg->platform->subsys);
+        LOG_INFO("[AMIGA] Subsystem is [%s]\n", cfg->platform->subsys);
         if (strcmp(cfg->platform->subsys, "4000") == 0 || strcmp(cfg->platform->subsys, "3000") == 0) {
-            printf("Adjusting Gayle accesses for A3000/4000 Kickstart.\n");
+            LOG_INFO("[AMIGA] Adjusting Gayle accesses for A3000/4000 Kickstart.\n");
             adjust_gayle_4000();
         }
         else if (strcmp(cfg->platform->subsys, "1200") == 0 || strcmp(cfg->platform->subsys, "cd32") == 0) {
-            printf("Adjusting Gayle accesses for A1200/CD32 Kickstart.\n");
+            LOG_INFO("[AMIGA] Adjusting Gayle accesses for A1200/CD32 Kickstart.\n");
             adjust_gayle_1200();
         }
         else if (strcmp(cfg->platform->subsys, "cdtv") == 0) {
-            printf("Configuring platform for CDTV emulation.\n");
+            LOG_INFO("[AMIGA] Configuring platform for CDTV emulation.\n");
             cdtv_mode = 1;
             rtc_type = RTC_TYPE_MSM;
         }
     }
     else
-        printf("No sub system specified.\n");
+        LOG_INFO("[AMIGA] No sub system specified.\n");
 
     // Look for Z2 autoconf Fast RAM by id
     int index = get_named_mapped_item(cfg, z2_autoconf_id);
@@ -363,32 +364,32 @@ int setup_platform_amiga(struct emulator_config *cfg) {
         cfg->map_id[index][0] = '^';
         int resize_data = 0;
         if (cfg->map_size[index] > 8 * SIZE_MEGA) {
-            printf("Attempted to configure more than 8MB of Z2 Fast RAM, downsizing to 8MB.\n");
+            LOG_WARN("[AMIGA] Attempted to configure more than 8MB of Z2 Fast RAM, downsizing to 8MB.\n");
             resize_data = 8 * SIZE_MEGA;
         }
         else if(cfg->map_size[index] != 2 * SIZE_MEGA && cfg->map_size[index] != 4 * SIZE_MEGA && cfg->map_size[index] != 8 * SIZE_MEGA) {
-            printf("Z2 Fast RAM may only provision 2, 4 or 8MB of memory, resizing to ");
             if (cfg->map_size[index] > 8 * SIZE_MEGA)
                 resize_data = 8 * SIZE_MEGA;
             else if (cfg->map_size[index] > 4 * SIZE_MEGA)
                 resize_data = 4 * SIZE_MEGA;
             else
                 resize_data = 2 * SIZE_MEGA;
-            printf("%dMB.\n", resize_data / SIZE_MEGA);
+            LOG_WARN("[AMIGA] Z2 Fast RAM may only provision 2, 4 or 8MB of memory, resizing to %dMB.\n",
+                     resize_data / SIZE_MEGA);
         }
         if (resize_data) {
             free(cfg->map_data[index]);
             cfg->map_size[index] = resize_data;
             cfg->map_data[index] = (unsigned char *)malloc(cfg->map_size[index]);
         }
-        printf("%dMB of Z2 Fast RAM configured at $%lx\n", cfg->map_size[index] / SIZE_MEGA, cfg->map_offset[index]);
+        LOG_INFO("[AMIGA] %dMB of Z2 Fast RAM configured at $%lx\n", cfg->map_size[index] / SIZE_MEGA, cfg->map_offset[index]);
         add_z2_pic(ACTYPE_MAPFAST_Z2, index);
         //ac_z2_type[ac_z2_pic_count] = ACTYPE_MAPFAST_Z2;
         //ac_z2_index[ac_z2_pic_count] = index;
         //ac_z2_pic_count++;
     }
     else
-        printf("No Z2 Fast RAM configured.\n");
+        LOG_INFO("[AMIGA] No Z2 Fast RAM configured.\n");
 
     index = get_named_mapped_item(cfg, z2_autoconf_id);
     if (index != -1)
@@ -405,13 +406,13 @@ int setup_platform_amiga(struct emulator_config *cfg) {
     more_z3_fast:;
     if (index != -1) {
         cfg->map_id[index][0] = '^';
-        printf("%dMB of Z3 Fast RAM configured at $%lx\n", cfg->map_size[index] / SIZE_MEGA, cfg->map_offset[index]);
+        LOG_INFO("[AMIGA] %dMB of Z3 Fast RAM configured at $%lx\n", cfg->map_size[index] / SIZE_MEGA, cfg->map_offset[index]);
         ac_z3_type[ac_z3_pic_count] = ACTYPE_MAPFAST_Z3;
         ac_z3_index[ac_z3_pic_count] = index;
         ac_z3_pic_count++;
     }
     else
-        printf("No Z3 Fast RAM configured.\n");
+        LOG_INFO("[AMIGA] No Z3 Fast RAM configured.\n");
     index = get_named_mapped_item(cfg, z3_autoconf_id);
     if (index != -1)
         goto more_z3_fast;
@@ -431,7 +432,7 @@ int setup_platform_amiga(struct emulator_config *cfg) {
     if (cdtv_mode) {
         FILE *in = fopen("data/cdtv.sram", "rb");
         if (in != NULL) {
-            printf("Loaded CDTV SRAM.\n");
+            LOG_INFO("[AMIGA] Loaded CDTV SRAM.\n");
             fread(cdtv_sram, 32 * SIZE_KILO, 1, in);
             fclose(in);
         }
@@ -470,51 +471,51 @@ void setvar_amiga(struct emulator_config *cfg, char *var, char *val) {
             set_hard_drive_image_file_amiga(1, val);
     }
     if CHKVAR("cdtv") {
-        printf("[AMIGA] CDTV mode enabled.\n");
+        LOG_INFO("[AMIGA] CDTV mode enabled.\n");
         cdtv_mode = 1;
     }
     if (CHKVAR("rtg") && !rtg_enabled) {
         if (init_rtg_data(cfg)) {
-            printf("[AMIGA] RTG Enabled.\n");
+            LOG_INFO("[AMIGA] RTG Enabled.\n");
             rtg_enabled = 1;
             adjust_ranges_amiga(cfg);
         }
         else
-            printf("[AMIGA] Failed to enable RTG.\n");
+            LOG_WARN("[AMIGA] Failed to enable RTG.\n");
     }
     if (CHKVAR("rtg-dpms")) {
         rtg_dpms = 1;
-        printf("[AMIGA] DPMS enabled for RTG.\n");
+        LOG_INFO("[AMIGA] DPMS enabled for RTG.\n");
     }
     if (CHKVAR("rtg-width")) {
         if (val && strlen(val) != 0) {
             uint32_t rtg_width = get_int(val);
             rtg_set_screen_width(rtg_width);
-            printf("[AMIGA] RTG screen width set to %d.\n", rtg_width);
+            LOG_INFO("[AMIGA] RTG screen width set to %d.\n", rtg_width);
         }
     }
     if (CHKVAR("rtg-height")) {
         if (val && strlen(val) != 0) {
             uint32_t rtg_height = get_int(val);
             rtg_set_screen_height(rtg_height);
-            printf("[AMIGA] RTG screen height set to %d.\n", rtg_height);
+            LOG_INFO("[AMIGA] RTG screen height set to %d.\n", rtg_height);
         }
     }
     if CHKVAR("kick13") {
-        printf("[AMIGA] Kickstart 1.3 mode enabled, Z3 PICs will not be enumerated.\n");
+        LOG_INFO("[AMIGA] Kickstart 1.3 mode enabled, Z3 PICs will not be enumerated.\n");
         kick13_mode = 1;
     }
     if CHKVAR("physical-z2-first") {
-        printf("[AMIGA] Explicitly initializing physical Z2 devices before virtual ones.\n");
+        LOG_INFO("[AMIGA] Explicitly initializing physical Z2 devices before virtual ones.\n");
         physical_z2_first = 1;
     }
     if CHKVAR("a314") {
         if (!a314_initialized) {
             int32_t res = a314_init();
             if (res != 0) {
-                printf("[AMIGA] Failed to enable A314 emulation, error return code: %d.\n", res);
+                LOG_WARN("[AMIGA] Failed to enable A314 emulation, error return code: %d.\n", res);
             } else {
-                printf("[AMIGA] A314 emulation enabled.\n");
+                LOG_INFO("[AMIGA] A314 emulation enabled.\n");
                 add_z2_pic(ACTYPE_A314, 0);
                 a314_emulation_enabled = 1;
                 a314_initialized = 1;
@@ -532,7 +533,7 @@ void setvar_amiga(struct emulator_config *cfg, char *var, char *val) {
 
     // PiSCSI stuff
     if (CHKVAR("piscsi") && !piscsi_enabled) {
-        printf("[AMIGA] PISCSI Interface Enabled.\n");
+        LOG_INFO("[AMIGA] PISCSI Interface Enabled.\n");
         piscsi_enabled = 1;
         piscsi_init();
         add_z2_pic(ACTYPE_PISCSI, 0);
@@ -564,7 +565,7 @@ void setvar_amiga(struct emulator_config *cfg, char *var, char *val) {
 
     // Pi-Net stuff
     if (CHKVAR("pi-net") && !pinet_enabled) {
-        printf("[AMIGA] PI-NET Interface Enabled.\n");
+        LOG_INFO("[AMIGA] PI-NET Interface Enabled.\n");
         pinet_enabled = 1;
         pinet_init(val);
         adjust_ranges_amiga(cfg);
@@ -572,7 +573,7 @@ void setvar_amiga(struct emulator_config *cfg, char *var, char *val) {
 
     // Pi-AHI stuff
     if (CHKVAR("pi-ahi") && !pi_ahi_enabled) {
-        printf("[AMIGA] PI-AHI Audio Card Enabled.\n");
+        LOG_INFO("[AMIGA] PI-AHI Audio Card Enabled.\n");
         uint32_t res = 1;
         if (val && strlen(val) != 0)
             res = pi_ahi_init(val);
@@ -582,7 +583,7 @@ void setvar_amiga(struct emulator_config *cfg, char *var, char *val) {
             pi_ahi_enabled = 1;
             adjust_ranges_amiga(cfg);
         } else {
-            printf("[AMIGA] Failed to enable PI-AHI.\n");
+            LOG_WARN("[AMIGA] Failed to enable PI-AHI.\n");
         }
     }
     if (CHKVAR("pi-ahi-samplerate")) {
@@ -593,18 +594,18 @@ void setvar_amiga(struct emulator_config *cfg, char *var, char *val) {
 
     if CHKVAR("no-pistorm-dev") {
         pistorm_dev_enabled = 0;
-        printf("[AMIGA] Disabling PiStorm interaction device.\n");
+        LOG_INFO("[AMIGA] Disabling PiStorm interaction device.\n");
     }
 
     // RTC stuff
     if CHKVAR("rtc_type") {
         if (val && strlen(val) != 0) {
             if (strcmp(val, "msm") == 0) {
-                printf("[AMIGA] RTC type set to MSM.\n");
+                LOG_INFO("[AMIGA] RTC type set to MSM.\n");
                 rtc_type = RTC_TYPE_MSM;
             }
             else {
-                printf("[AMIGA] RTC type set to Ricoh.\n");
+                LOG_INFO("[AMIGA] RTC type set to Ricoh.\n");
                 rtc_type = RTC_TYPE_RICOH;
             }
         }
@@ -613,18 +614,18 @@ void setvar_amiga(struct emulator_config *cfg, char *var, char *val) {
     if CHKVAR("swap-df0-df")  {
         if (val && strlen(val) != 0 && get_int(val) >= 1 && get_int(val) <= 3) {
            swap_df0_with_dfx = get_int(val);
-           printf("[AMIGA] DF0 and DF%d swapped.\n",swap_df0_with_dfx);
+           LOG_INFO("[AMIGA] DF0 and DF%d swapped.\n",swap_df0_with_dfx);
         }
     }
 
     if CHKVAR("move-slow-to-chip") {
         move_slow_to_chip = 1;
-        printf("[AMIGA] Slow ram moved to Chip.\n");
+        LOG_INFO("[AMIGA] Slow ram moved to Chip.\n");
     }
 
     if CHKVAR("force-move-slow-to-chip") {
         force_move_slow_to_chip = 1;
-        printf("[AMIGA] Forcing slowram move to chip, bypassing Agnus version check.\n");
+        LOG_INFO("[AMIGA] Forcing slowram move to chip, bypassing Agnus version check.\n");
     }
 }
 
@@ -648,7 +649,7 @@ void handle_reset_amiga(struct emulator_config *cfg) {
       int agnus_rev = ((ps_read_16(VPOSR) >> 8) & 0x6F);
       if (agnus_rev != 0x20) {
         move_slow_to_chip = 0;
-        printf("[AMIGA] Requested move slow ram to chip but 8372 Agnus not found - Disabling.\n");
+        LOG_WARN("[AMIGA] Requested move slow ram to chip but 8372 Agnus not found - Disabling.\n");
       }
     }
 
@@ -657,17 +658,17 @@ void handle_reset_amiga(struct emulator_config *cfg) {
 }
 
 void shutdown_platform_amiga(struct emulator_config *cfg) {
-    printf("[AMIGA] Performing Amiga platform shutdown.\n");
+    LOG_INFO("[AMIGA] Performing Amiga platform shutdown.\n");
     if (cfg) {}
     if (cdtv_mode) {
         FILE *out = fopen("data/cdtv.sram", "wb+");
         if (out != NULL) {
-            printf("Saving CDTV SRAM.\n");
+            LOG_INFO("[AMIGA] Saving CDTV SRAM.\n");
             fwrite(cdtv_sram, 32 * SIZE_KILO, 1, out);
             fclose(out);
         }
         else {
-            printf("Failed to write CDTV SRAM to disk.\n");
+            LOG_WARN("[AMIGA] Failed to write CDTV SRAM to disk.\n");
         }
     }
     if (cfg->platform->subsys) {
@@ -707,7 +708,7 @@ void shutdown_platform_amiga(struct emulator_config *cfg) {
     ac_waiting_for_physical_pic = 0;
 
     autoconfig_reset_all();
-    printf("[AMIGA] Platform shutdown completed.\n");
+    LOG_INFO("[AMIGA] Platform shutdown completed.\n");
 }
 
 void create_platform_amiga(struct platform_config *cfg, char *subsys) {
