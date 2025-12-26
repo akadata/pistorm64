@@ -904,6 +904,13 @@ uint32 pmmu_translate_addr(m68ki_cpu_core *state, uint32 addr_in, uint16 rw)
 		addr_out = pmmu_translate_addr_with_fc(state, addr_in, state->mmu_tmp_fc, rw, 7, 0, 0);
 		MMULOG(("ADDRIN %08X, ADDROUT %08X\n", addr_in, addr_out));
 	}
+#ifdef PISTORM_PMMU_LOG
+	if (state->mmu_tmp_sr & (M68K_MMU_SR_BUS_ERROR | M68K_MMU_SR_INVALID |
+	                         M68K_MMU_SR_SUPERVISOR_ONLY | M68K_MMU_SR_WRITE_PROTECT)) {
+		MMUERR(("[PMMU] translate addr=0x%08X -> 0x%08X sr=0x%04X rw=%u fc=%u\n",
+			addr_in, addr_out, state->mmu_tmp_sr, rw, state->mmu_tmp_fc));
+	}
+#endif
 	return addr_out;
 }
 
