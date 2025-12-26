@@ -9395,6 +9395,18 @@ M68KMAKE_OP(rte, 32, ., .)
 
 		m68ki_rte_callback();		   /* auto-disable (see m68kcpu.h) */
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
+		{
+			uint32 sp = REG_A[7];
+			uint16 stacked_sr = m68ki_read_16(state, sp);
+			uint32 stacked_pc = m68ki_read_32(state, sp + 2);
+			uint16 fmt = 0xffff;
+			if (!CPU_TYPE_IS_000(CPU_TYPE))
+			{
+				fmt = m68ki_read_16(state, sp + 6);
+			}
+			RTELOG("[RTE] pc=0x%08X sp=0x%08X sr=0x%04X pcstk=0x%08X fmt=0x%04X s=%u cpu=%u\n",
+				REG_PC, sp, stacked_sr, stacked_pc, fmt, FLAG_S ? 1 : 0, CPU_TYPE);
+		}
 
 		if(CPU_TYPE_IS_000(CPU_TYPE))
 		{
