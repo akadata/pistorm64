@@ -1,3 +1,5 @@
+#pragma pack(push, 2)
+
 struct P96Line {
     int16_t     X, Y;
     uint16_t    Length;
@@ -12,7 +14,6 @@ struct P96Line {
     uint16_t    Xorigin, Yorigin;
 };
 
-#pragma pack(2)
 struct P96Template {
     uint32_t _p_Memory;
     uint16_t BytesPerRow;
@@ -22,7 +23,6 @@ struct P96Template {
     uint32_t BgPen;
 };
 
-#pragma pack(2)
 struct P96Pattern {
     uint32_t _p_Memory;
     uint16_t XOffset, YOffset;
@@ -36,7 +36,6 @@ struct MinNode_placeholder {
     uint32_t _p_mln_Pred;
 };
 
-#pragma pack(2)
 struct Node_placeholder {
     uint32_t _p_ln_Succ;
     uint32_t _p_ln_Pred;
@@ -325,3 +324,5 @@ struct P96BoardInfo{
     uint32_t MaxBMWidth;
     uint32_t MaxBMHeight;
 };
+
+#pragma pack(pop)

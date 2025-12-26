@@ -514,8 +514,8 @@ void sigint_handler(int sig_num) {
     usleep(0);
   }
 
-  printf("IRQs triggered: %lld\n", trig_irq);
-  printf("IRQs serviced: %lld\n", serv_irq);
+  printf("IRQs triggered: %lu\n", (unsigned long)trig_irq);
+  printf("IRQs serviced: %lu\n", (unsigned long)serv_irq);
   printf("Last serviced IRQ: %d\n", last_last_irq);
 
   exit(0);

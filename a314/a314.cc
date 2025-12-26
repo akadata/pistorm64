@@ -420,8 +420,13 @@ uint8_t manual_read_buf[64 * SIZE_KILO];
 
 static void handle_msg_read_mem_req(ClientConnection *cc)
 {
-    uint32_t address = *(uint32_t *)&(cc->payload[0]);
-    uint32_t length = *(uint32_t *)&(cc->payload[4]);
+    uint32_t address = 0;
+    uint32_t length = 0;
+
+    memcpy(&address, &(cc->payload[0]), sizeof(address));
+    memcpy(&length, &(cc->payload[4]), sizeof(length));
+    address = ntohl(address);
+    length = ntohl(length);
 
     if (get_mapped_item_by_address(cfg, address) != -1) {
         int32_t index = get_mapped_item_by_address(cfg, address);
@@ -439,7 +444,10 @@ static void handle_msg_read_mem_req(ClientConnection *cc)
 
 static void handle_msg_write_mem_req(ClientConnection *cc)
 {
-    uint32_t address = *(uint32_t *)&(cc->payload[0]);
+    uint32_t address = 0;
+
+    memcpy(&address, &(cc->payload[0]), sizeof(address));
+    address = ntohl(address);
     uint32_t length = cc->payload.size() - 4;
 
     if (get_mapped_item_by_address(cfg, address) != -1) {
