@@ -47,18 +47,18 @@ CXX       = g++
 WARNINGS  = -Wall -Wextra -pedantic
 
 # Default to 64-bit settings if no platform specified
-CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
+CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
 LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
 
 ifeq ($(PLATFORM),PI_64BIT)
 	LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
-	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
+	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
 else ifeq ($(PLATFORM),PI3_BULLSEYE)
 	LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
-	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
+	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
 else ifeq ($(PLATFORM),PI4)
 	LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_pi4_test -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
-	CFLAGS    = $(WARNINGS) -DRPI4_TEST -I. -I./raylib_pi4_test -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
+	CFLAGS    = $(WARNINGS) -DRPI4_TEST -I. -I./raylib_pi4_test -I/opt/vc/include/ -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
 endif
 
 TARGET = $(EXENAME)$(EXE)
@@ -73,7 +73,7 @@ clean:
 
 # Ensure generated m68k files are built before other files that depend on them
 $(TARGET):  $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) a314/a314.o
-	$(CC) -o $@ $^ -O3 -pthread $(LFLAGS) -lm -lstdc++
+	$(CC) -o $@ $^ -Os -pthread $(LFLAGS) -lm -lstdc++
 
 # Explicit dependency: any .o file that might need m68kops.h should depend on it
 # Files that include m68kops.h (like emulator.c and m68kcpu.c) need to wait for it to be generated
@@ -83,10 +83,10 @@ m68kdasm.o: m68kops.h
 m68kops.o: m68kops.h
 
 buptest: buptest.c gpio/ps_protocol.c
-	$(CC) $^ -o $@ -I./ -march=armv8-a -O0
+	$(CC) $^ -o $@ -I./ -march=native -Os
 
 a314/a314.o: a314/a314.cc a314/a314.h
-	$(CXX) -MMD -MP -c -o a314/a314.o -O3 a314/a314.cc -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -I. -I..
+	$(CXX) -MMD -MP -c -o a314/a314.o -O3 a314/a314.cc -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -I. -I..
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 	$(EXEPATH)$(MUSASHIGENERATOR)$(EXE)

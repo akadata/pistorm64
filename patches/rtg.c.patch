@@ -1,0 +1,65 @@
+diff --git a/platforms/amiga/rtg/rtg.c b/platforms/amiga/rtg/rtg.c
+index f123c02..0222969 100644
+--- a/platforms/amiga/rtg/rtg.c
++++ b/platforms/amiga/rtg/rtg.c
+@@ -1,11 +1,13 @@
+ // SPDX-License-Identifier: MIT
+ 
+ #include <stdint.h>
++#include <inttypes.h>
+ #include <endian.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <time.h>
++#include <stddef.h>
+ #include "config_file/config_file.h"
+ #include "gpio/ps_protocol.h"
+ #include "platforms/amiga/rtg/irtg_structs.h"
+@@ -420,12 +422,12 @@ static void handle_irtg_command(uint32_t cmd) {
+                 draw_mode = t->DrawMode;
+                 src_addr = be32toh(t->_p_Memory);
+             } else {
+-                t_pitch = be16toh(ps_read_16(src_addr + (uint32_t)&t->BytesPerRow));
+-                fgcol = be32toh(ps_read_32(src_addr + (uint32_t)&t->FgPen));
+-                bgcol = be32toh(ps_read_32(src_addr + (uint32_t)&t->BgPen));
+-                x_offset = ps_read_8(src_addr + (uint32_t)&t->XOffset);
+-                draw_mode = ps_read_8(src_addr + (uint32_t)&t->DrawMode);
+-                src_addr = be32toh(ps_read_32(src_addr + (uint32_t)&t->_p_Memory));
++                t_pitch = be16toh(ps_read_16(src_addr + (uint32_t)offsetof(struct P96Template, BytesPerRow)));
++                fgcol = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Template, FgPen)));
++                bgcol = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Template, BgPen)));
++                x_offset = ps_read_8(src_addr + (uint32_t)offsetof(struct P96Template, XOffset));
++                draw_mode = ps_read_8(src_addr + (uint32_t)offsetof(struct P96Template, DrawMode));
++                src_addr = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Template, _p_Memory)));
+             }
+ 
+             cmd_mask = (uint8_t)M68KR(M68K_REG_D4);
+@@ -459,12 +461,12 @@ static void handle_irtg_command(uint32_t cmd) {
+                 loop_rows = 1 << p->Size;
+                 src_addr = be32toh(p->_p_Memory);
+             } else {
+-                fgcol = be32toh(ps_read_32(src_addr + (uint32_t)&p->FgPen));
+-                bgcol = be32toh(ps_read_32(src_addr + (uint32_t)&p->BgPen));
+-                x_offset = be16toh(ps_read_16(src_addr + (uint32_t)&p->XOffset));
+-                y_offset = be16toh(ps_read_16(src_addr + (uint32_t)&p->YOffset));
+-                draw_mode = ps_read_8(src_addr + (uint32_t)&p->DrawMode);
+-                loop_rows = 1 << ps_read_8(src_addr + (uint32_t)&p->Size);
++                fgcol = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Pattern, FgPen)));
++                bgcol = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Pattern, BgPen)));
++                x_offset = be16toh(ps_read_16(src_addr + (uint32_t)offsetof(struct P96Pattern, XOffset)));
++                y_offset = be16toh(ps_read_16(src_addr + (uint32_t)offsetof(struct P96Pattern, YOffset)));
++                draw_mode = ps_read_8(src_addr + (uint32_t)offsetof(struct P96Pattern, DrawMode));
++                loop_rows = 1 << ps_read_8(src_addr + (uint32_t)offsetof(struct P96Pattern, Size));
+                 src_addr = be32toh(p->_p_Memory);
+             }
+ 
+@@ -495,7 +497,7 @@ static void handle_irtg_command(uint32_t cmd) {
+             }
+ 
+             if (realtime_graphics_debug) {
+-                printf("bm: %.8X r: %.8X\n", (uint32_t)bm, (uint32_t)r);
++                printf("bm: 0x%" PRIxPTR " r: 0x%" PRIxPTR "\n", (uintptr_t)bm, (uintptr_t)r);
+                 if (bm)
+                     printf("bm pitch: %d\n", be16toh(bm->BytesPerRow));
+                 if (r)
