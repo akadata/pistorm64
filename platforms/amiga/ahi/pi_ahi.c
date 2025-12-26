@@ -258,7 +258,6 @@ void pi_ahi_do_cmd(uint32_t val) {
         case AHI_CMD_PLAY: {
             int32_t res = 0;
             uint8_t *bufptr = get_mapped_data_pointer_by_address(cfg, ahi_addr[0]);
-            uint16_t *bepptr = (uint16_t *)get_mapped_data_pointer_by_address(cfg, ahi_addr[0]);
             //printf("[PI-AHI] Driver sent PLAY command: %d samples @$%.8X ($%.8X).\n", ahi_u32[0], ahi_addr[0], (uint32_t)bufptr);
             if (ahi_u32[0] != 0 && ahi_addr[0] != 0) {
                 uint32_t bsize = ahi_u32[0] * get_ahi_sample_size(ahi_u32[3]) * get_ahi_channels(ahi_u32[3]);
@@ -300,7 +299,7 @@ void pi_ahi_do_cmd(uint32_t val) {
                         }
                         bsize = dst_bsize;
                     } else {
-                        uint16_t *u16ptr = (uint16_t *)bufptr;
+                        // uint16_t *u16ptr = (uint16_t *)bufptr;  // Unused variable removed
                     }
                 }
                 sndbuf_offset += bsize;
