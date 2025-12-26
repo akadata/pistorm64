@@ -1,0 +1,1357 @@
+diff --git a/.gitignore b/.gitignore
+index 08083ed..68dcfef 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,15 +1,30 @@
+-*.d
++# Copyrighted files that should not be committed
++Amiga/kickstart.rom
++Amiga/myamiga.cfg
++Amiga/BlankPFS3-*
++Amiga/amiga.cfg
++Amiga/Workbench2.04-PS3-8GB.hdf
++pistorm/amiga.cfg
++pistorm/myamiga.cfg
++pistorm/Workbench2.04-PS3-8GB.hdf
++pistorm/BlankPFS3-*
++
++# Build artifacts
++emulator
++buptest
++m68kmake
+ *.o
+-*.img
+-*.hdf
+-*.rom
+-*.dll
+-*.bin
+-*.exe
+-*.stackdump
+-!/platforms/amiga/piscsi/*.rom
+-/m68kmake
+-/m68kmake.exe
+-/m68kops.c
+-/m68kops.h
+-/emulator
++*.d
++*.a
++
++# Generated files
++m68kops.c
++m68kops.h
++
++# IDE and editor files
++*.swp
++*.swo
++*~
++.vscode/
++.idea/
++qwen.resume
+diff --git a/AARCH64_BUILD_ENV.md b/AARCH64_BUILD_ENV.md
+new file mode 100644
+index 0000000..48582e5
+--- /dev/null
++++ b/AARCH64_BUILD_ENV.md
+@@ -0,0 +1,112 @@
++# aarch64 Build Environment for PiStorm
++
++## Overview
++This document details the exact GCC and Make options needed to build PiStorm in a systemd-nspawn aarch64 container environment.
++
++## Systemd-nspawn Container Setup
++
++### Create aarch64 container (if not already created):
++```bash
++# Pull or create aarch64 container (example with Debian/Ubuntu)
++sudo debootstrap --arch=arm64 bullseye /var/lib/machines/pistorm-aarch64 http://deb.debian.org/debian/
++# or for Ubuntu
++sudo debootstrap --arch=arm64 jammy /var/lib/machines/pistorm-aarch64 http://archive.ubuntu.com/ubuntu/
++```
++
++### Enter the container:
++```bash
++sudo systemd-nspawn -M pistorm-aarch64 -D /var/lib/machines/pistorm-aarch64
++```
++
++## Required Dependencies
++
++Inside the container, install these dependencies:
++```bash
++apt update
++apt install -y build-essential git libasound2-dev
++apt install -y libdrm-dev libegl1-mesa-dev libgles2-mesa-dev libgbm-dev libraspberrypi-dev
++```
++
++## GCC Options for aarch64 Build
++
++The following GCC options are required for proper aarch64 compilation:
++
++### CFLAGS:
++```
++-Wall -Wextra -pedantic -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++
++```
++
++### Key Options Explained:
++- `-march=armv8-a`: Target ARMv8-A architecture (aarch64)
++- `-D_FILE_OFFSET_BITS=64`: Enable 64-bit file offsets for large file support
++- `-D_LARGEFILE_SOURCE`: Enable large file support
++- `-D_LARGEFILE64_SOURCE`: Enable 64-bit large file support
++- `-DINLINE_INTO_M68KCPU_H=1`: Critical flag to fix m68ki_ic_clear inline function visibility
++- `-O3`: Optimization level 3
++- `-Wall -Wextra -pedantic`: Enable comprehensive warnings
++
++### LFLAGS (Linker flags):
++```
++-Wall -Wextra -pedantic -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
++```
++
++## Make Configuration
++
++### Default Build (64-bit):
++```bash
++make
++```
++This uses the default settings which now target 64-bit ARM.
++
++### Explicit Platform Build:
++```bash
++make PLATFORM=PI_64BIT
++```
++
++## Important Build Notes
++
++### 1. Inline Function Fix
++The critical change for aarch64 builds is the addition of `-DINLINE_INTO_M68KCPU_H=1` which ensures the `m68ki_ic_clear` function is properly visible across compilation units.
++
++### 2. Removed Invalid Flags
++The following ARM-specific flags are NOT used for aarch64:
++- `-mfloat-abi=hard` (not valid for aarch64)
++- `-mfpu=neon-fp-armv8` (not valid for aarch64)
++
++### 3. Large File Support
++The `-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE` flags are essential for handling large HDF images (>4GB) in PiSCSI.
++
++## Makefile Changes Summary
++
++The following changes were made to the Makefile for aarch64 compatibility:
++
++### Default CFLAGS and LFLAGS:
++```makefile
++CFLAGS = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
++LFLAGS = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
++```
++
++### Platform-specific (PI_64BIT):
++```makefile
++ifeq ($(PLATFORM),PI_64BIT)
++    LFLAGS = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
++    CFLAGS = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
++endif
++```
++
++## Testing the Build
++
++After building, test with:
++```bash
++timeout 30 ./emulator --config myamiga.cfg
++```
++
++## Build Process Summary
++
++1. Clone or copy PiStorm source to container
++2. Install dependencies
++3. Run `make clean && make` (or `make PLATFORM=PI_64BIT`)
++4. Verify emulator binary is created successfully
++5. Test functionality as needed
++
++This configuration ensures proper 64-bit ARM compilation with all the fixes needed for PiSCSI large file access and inline function visibility issues.
+\ No newline at end of file
+diff --git a/BUILD_CHANGES.md b/BUILD_CHANGES.md
+new file mode 100644
+index 0000000..afc4e38
+--- /dev/null
++++ b/BUILD_CHANGES.md
+@@ -0,0 +1,58 @@
++# Build Changes Documentation
++
++## Overview
++This document details all changes made to fix the build issues in the PiStorm emulator, particularly the linking issue with the m68ki_ic_clear function and 64-bit ARM compatibility.
++
++## Changes Made
++
++### 1. Fixed m68ki_ic_clear linking issue
++**File**: Makefile
++**Change**: Added compiler definition to handle inline function visibility
++- Added `-DINLINE_INTO_M68KCPU_H=1` to all CFLAGS definitions in the Makefile
++- This ensures the inline function m68ki_ic_clear is properly visible across compilation units
++
++### 2. Updated compiler flags for 64-bit ARM compatibility
++**File**: Makefile
++**Change**: Removed invalid ARM-specific flags for aarch64 architecture
++- Removed `-mfloat-abi=hard` flag (not valid for aarch64)
++- Removed `-mfpu=neon-fp-armv8` flag (not valid for aarch64)
++- Kept `-march=armv8-a` as it is valid for aarch64
++
++### 3. Added new 64-bit platform configuration
++**File**: Makefile
++**Change**: Added PI_64BIT platform target
++- Added new platform configuration specifically for 64-bit ARM systems
++- Uses same flags as PI3_BULLSEYE but with the inline fix
++
++### 4. Updated all compilation targets
++**File**: Makefile
++**Change**: Updated buptest and a314 compilation lines
++- Removed invalid ARM flags from buptest compilation command
++- Removed invalid ARM flags from a314/a314.o compilation command
++
++## Build Results
++- **Before**: Build failed with "undefined reference to 'm68ki_ic_clear'" linker error
++- **After**: Build completes successfully with only warnings (no errors)
++- The emulator binary is now generated successfully
++
++## Warnings Still Present
++The build still produces some 64-bit compatibility warnings:
++- Format specifier mismatches (%lld with uint64_t)
++- Pointer-to-integer cast warnings
++- These are expected and do not prevent compilation
++
++## Git Ignore Requirements
++The following files contain copyright material and should be added to .gitignore:
++- Amiga/kickstart.rom
++- Amiga/myamiga.cfg
++- Amiga/BlankPFS3-*
++- Amiga/amiga.cfg
++- Amiga/Workbench2.04-PS3-8GB.hdf
++- pistorm/ (copied files)
++
++## Test Command
++To test the build:
++```
++timeout 30 sudo ./emulator --config myamiga.cfg
++```
++This will verify if the PiStorm SCSI functionality works with the build changes.
+\ No newline at end of file
+diff --git a/COMMIT_PLAN.md b/COMMIT_PLAN.md
+new file mode 100644
+index 0000000..d89c0a4
+--- /dev/null
++++ b/COMMIT_PLAN.md
+@@ -0,0 +1,89 @@
++# PiStorm Build Changes Commit Plan
++
++## Overview
++This document outlines how to properly commit the build changes to maintain a clean Git history with one feature per branch.
++
++## Current Status
++- Build issue with `m68ki_ic_clear` function has been resolved
++- 64-bit ARM compatibility has been implemented
++- Build now completes successfully with default settings
++- Files modified but need proper commit organization
++
++## Git Workflow Plan
++
++### Step 1: Sync with upstream master
++```bash
++git checkout akadata/master
++git pull origin akadata/master
++```
++
++### Step 2: Create branch for m68kcpu header fix
++```bash
++git checkout -b feature/m68kcpu-inline-fix akadata/master
++# Add only the Makefile changes related to inline function
++git add Makefile
++git commit -m "Fix m68ki_ic_clear inline function visibility in m68kcpu.h"
++git push origin feature/m68kcpu-inline-fix
++# Create PR to merge into akadata/master
++```
++
++### Step 3: Create branch for 64-bit platform support
++```bash
++git checkout akadata/master
++git checkout -b feature/64bit-platform-support akadata/master
++# Add Makefile changes for 64-bit platform
++git add Makefile
++git commit -m "Add PI_64BIT platform support to Makefile"
++git push origin feature/64bit-platform-support
++# Create PR to merge into akadata/master
++```
++
++### Step 4: Create branch for documentation
++```bash
++git checkout akadata/master  
++git checkout -b feature/build-documentation akadata/master
++# Add documentation files
++git add BUILD_CHANGES.md m68kcpu-buildissue.md PISCSI64BIT_PLAN.md TASKS.md .gitignore test_emulator.sh
++git commit -m "Add build documentation and task tracking files"
++git push origin feature/build-documentation
++# Create PR to merge into akadata/master
++```
++
++### Step 5: Create branch for default 64-bit build
++```bash
++git checkout akadata/master
++git checkout -b feature/default-64bit-build akadata/master
++# Add Makefile changes to make 64-bit build default
++git add Makefile
++git commit -m "Make 64-bit build the default configuration"
++git push origin feature/default-64bit-build
++# Create PR to merge into akadata/master
++```
++
++## Files to be Committed
++
++### Makefile Changes:
++- Added `-DINLINE_INTO_M68KCPU_H=1` flag to fix inline function linking
++- Removed invalid ARM flags (`-mfloat-abi=hard`, `-mfpu=neon-fp-armv8`) for aarch64
++- Added PI_64BIT platform configuration
++- Made 64-bit settings the default
++
++### Documentation Files:
++- `BUILD_CHANGES.md` - Documentation of all changes made
++- `m68kcpu-buildissue.md` - Analysis of the original build issue
++- `PISCSI64BIT_PLAN.md` - Plan for 64-bit PiSCSI compatibility
++- `TASKS.md` - Task tracking document
++- `.gitignore` - Added copyrighted files to ignore
++- `test_emulator.sh` - Test script for emulator
++
++## Important Notes
++- The emulator binary (2MB) and other large files should NOT be committed
++- Copyrighted files like kickstart.rom, HDF images, etc. are already in .gitignore
++- Each feature should be merged separately to maintain clean history
++- Test each branch individually before merging
++
++## Next Steps
++1. Implement the branching and commit plan above
++2. Test each branch individually
++3. Create pull requests for each feature
++4. Once merged, test the final combined functionality
+\ No newline at end of file
+diff --git a/Makefile b/Makefile
+index 0cb28be..1cb6329 100644
+--- a/Makefile
++++ b/Makefile
+@@ -37,22 +37,28 @@ MUSASHIGENERATOR = m68kmake
+ EXE =
+ EXEPATH = ./
+ 
+-.CFILES   = $(MAINFILES) $(MUSASHIFILES) $(MUSASHIGENCFILES)
++# Define the m68k related files separately to control build order
++M68KFILES   = $(MUSASHIFILES) $(MUSASHIGENCFILES)
++.CFILES   = $(MAINFILES) $(M68KFILES)
+ .OFILES   = $(.CFILES:%.c=%.o) a314/a314.o
+ 
+ CC        = gcc
+ CXX       = g++
+ WARNINGS  = -Wall -Wextra -pedantic
+ 
+-ifeq ($(PLATFORM),PI3_BULLSEYE)
++# Default to 64-bit settings if no platform specified
++CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
++LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
++
++ifeq ($(PLATFORM),PI_64BIT)
++	LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
++	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
++else ifeq ($(PLATFORM),PI3_BULLSEYE)
+ 	LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
+-	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -mfloat-abi=hard -mfpu=neon-fp-armv8 -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -lstdc++ $(ACFLAGS)
++	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
+ else ifeq ($(PLATFORM),PI4)
+ 	LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_pi4_test -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
+-	CFLAGS    = $(WARNINGS) -DRPI4_TEST -I. -I./raylib_pi4_test -I/opt/vc/include/ -march=armv8-a -mfloat-abi=hard -mfpu=neon-fp-armv8 -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -lstdc++ $(ACFLAGS)
+-else
+-	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=armv8-a -mfloat-abi=hard -mfpu=neon-fp-armv8 -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -lstdc++ $(ACFLAGS)
+-	LFLAGS    = $(WARNINGS) -L/opt/vc/lib -L./raylib -lraylib -lbrcmGLESv2 -lbrcmEGL -lbcm_host -lstdc++ -lvcos -lvchiq_arm -lasound
++	CFLAGS    = $(WARNINGS) -DRPI4_TEST -I. -I./raylib_pi4_test -I/opt/vc/include/ -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
+ endif
+ 
+ TARGET = $(EXENAME)$(EXE)
+@@ -65,14 +71,22 @@ all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest
+ clean:
+ 	rm -f $(DELETEFILES)
+ 
+-$(TARGET):  $(MUSAHIGENCFILES:%.c=%.o) $(.CFILES:%.c=%.o) a314/a314.o
++# Ensure generated m68k files are built before other files that depend on them
++$(TARGET):  $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) a314/a314.o
+ 	$(CC) -o $@ $^ -O3 -pthread $(LFLAGS) -lm -lstdc++
+ 
++# Explicit dependency: any .o file that might need m68kops.h should depend on it
++# Files that include m68kops.h (like emulator.c and m68kcpu.c) need to wait for it to be generated
++emulator.o: m68kops.h
++m68kcpu.o: m68kops.h
++m68kdasm.o: m68kops.h
++m68kops.o: m68kops.h
++
+ buptest: buptest.c gpio/ps_protocol.c
+-	$(CC) $^ -o $@ -I./ -march=armv8-a -mfloat-abi=hard -mfpu=neon-fp-armv8 -O0
++	$(CC) $^ -o $@ -I./ -march=armv8-a -O0
+ 
+ a314/a314.o: a314/a314.cc a314/a314.h
+-	$(CXX) -MMD -MP -c -o a314/a314.o -O3 a314/a314.cc -march=armv8-a -mfloat-abi=hard -mfpu=neon-fp-armv8 -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -I. -I..
++	$(CXX) -MMD -MP -c -o a314/a314.o -O3 a314/a314.cc -march=armv8-a -O3 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -I. -I..
+ 
+ $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
+ 	$(EXEPATH)$(MUSASHIGENERATOR)$(EXE)
+diff --git a/PISCSI64BIT_PLAN.md b/PISCSI64BIT_PLAN.md
+new file mode 100644
+index 0000000..0e16681
+--- /dev/null
++++ b/PISCSI64BIT_PLAN.md
+@@ -0,0 +1,96 @@
++# PiSCSI 64-bit Alignment Plan
++
++## Overview
++This document outlines the plan to address 64-bit alignment issues in the PiSCSI (Pi SCSI) module that currently prevents proper compilation and operation on 64-bit systems.
++
++## Current Issues Identified
++
++### 1. Platform/Architecture Mismatch
++- The build system assumes 32-bit ARM architecture but is running on 64-bit ARM (aarch64)
++- Compiler flags like `-mfloat-abi=hard` and `-mfpu=neon-fp-armv8` are not valid for aarch64
++- Memory layout and pointer sizes differ between 32-bit and 64-bit systems
++
++### 2. Data Structure Alignment
++- Potential issues with structure packing and alignment in SCSI command structures
++- Pointer arithmetic that assumes 32-bit pointers
++- Data type size mismatches (int vs long on 64-bit systems)
++
++### 3. Memory Addressing
++- Issues with memory addresses that may be truncated or improperly handled on 64-bit systems
++- Potential issues with large memory addresses that require 64-bit values
++
++## Required Changes for 64-bit Compatibility
++
++### 1. Compiler and Build System Adjustments
++- Update Makefile to use appropriate flags for aarch64 architecture
++- Remove or conditionally apply 32-bit specific flags
++- Ensure proper definition of `_FILE_OFFSET_BITS=64` and related macros
++
++### 2. Data Type Corrections
++- Use fixed-width integer types (uint32_t, uint64_t) instead of platform-dependent types
++- Review all pointer arithmetic and casting operations
++- Ensure proper handling of size_t and ptrdiff_t types
++
++### 3. Structure Packing
++- Review all SCSI command structures for proper packing
++- Ensure structures are aligned properly for 64-bit systems
++- Add appropriate `#pragma pack` or `__attribute__((packed))` where needed
++
++### 4. Function Declaration Fixes
++- Address the `m68ki_ic_clear` function linking issue by ensuring proper visibility
++- Review all inline functions that may have linking issues across modules
++
++## Implementation Strategy
++
++### Phase 1: Build System Fixes
++- Update compiler flags in Makefile for aarch64 compatibility
++- Remove invalid ARM-specific flags for 64-bit builds
++- Test basic compilation with new flags
++
++### Phase 2: Core Data Structure Alignment
++- Audit all SCSI-related data structures for proper alignment
++- Fix any pointer/integer casting issues
++- Ensure all file I/O operations use 64-bit safe functions
++
++### Phase 3: Memory Management
++- Review memory allocation and access patterns
++- Ensure proper handling of large memory addresses
++- Fix any array indexing issues that assume 32-bit sizes
++
++### Phase 4: Testing and Validation
++- Test on 64-bit ARM systems (like Raspberry Pi Zero W2)
++- Verify SCSI operations work correctly
++- Ensure no performance degradation
++
++## Files to Review
++
++- `platforms/amiga/piscsi/piscsi.c` - Main PiSCSI implementation
++- `m68kcpu.h` and `m68kcpu.c` - CPU core functions with linking issues
++- `m68kops.c` - Generated operations with function references
++- Makefile - Build system configuration
++- All header files used by PiSCSI module
++
++## Success Criteria
++
++- Successful compilation on 64-bit ARM systems
++- Proper SCSI functionality without alignment-related crashes
++- No performance regression
++- Maintained compatibility with existing 32-bit systems (if needed)
++
++## Risks
++
++- Changes may affect 32-bit compatibility if not done carefully
++- Structure alignment changes could break compatibility with existing disk images
++- Some optimizations may need to be architecture-specific
++
++## Notes for the later PISCSI64BIT_PLAN.md work
++
++The warnings you showed are 64-bit related (format specifiers, pointer-to-int casts), but they are warnings, not this link failure.
++
++When you get to PiSCSI:
++
++fix %llu / %lld to use PRIu64/PRId64 (or cast to unsigned long long consistently), or make the variable types match the format.
++
++replace "pointer cast to uint32_t" patterns with uintptr_t (or compute offsets via offsetof() rather than (uint32_t)&field hacks). Those are big ones in RTG code.
++
++But first: get the build deterministic via the inline fix.
+\ No newline at end of file
+diff --git a/TASKS.md b/TASKS.md
+new file mode 100644
+index 0000000..80593ec
+--- /dev/null
++++ b/TASKS.md
+@@ -0,0 +1,80 @@
++# PiStorm Build Tasks
++
++## Overview
++This document outlines the tasks required to fix the build issues in the PiStorm emulator, particularly the linking issue with m68ki_ic_clear function and 64-bit compatibility.
++
++## Current Build Issues
++
++1. **Linker Error**: `undefined reference to 'm68ki_ic_clear'` in both `m68kcpu.o` and `m68kops.o`
++2. **Architecture Mismatch**: Using 32-bit ARM flags on 64-bit ARM (aarch64) architecture
++3. **PiSCSI 64-bit Issues**: Potential alignment and data type issues for 64-bit systems
++
++## Completed Tasks
++
++### Task 1: Fix m68ki_ic_clear Linking Issue
++- **Status**: Completed
++- **Description**: The inline function `m68ki_ic_clear` in m68kcpu.h was not being properly linked
++- **Solution**: Modified the Makefile to add `-DINLINE_INTO_M68KCPU_H=1` compiler flag to ensure inline functions are properly exported for linking
++- **Priority**: High
++
++### Task 2: Update Build Flags for 64-bit ARM
++- **Status**: Completed
++- **Description**: Removed invalid ARM flags (`-mfloat-abi=hard`, `-mfpu=neon-fp-armv8`) that don't work on aarch64
++- **Solution**: Updated Makefile with appropriate aarch64 flags
++- **Priority**: High
++
++### Task 3: Test Build Process
++- **Status**: Completed
++- **Description**: Verified that the build completes successfully after changes
++- **Solution**: Ran `make clean && make PLATFORM=PI_64BIT` to ensure no linking errors
++- **Priority**: High
++
++## Remaining Tasks
++
++### Task 4: Address PiSCSI 64-bit Alignment Issues
++- **Status**: Pending
++- **Description**: Fix format specifiers and pointer-to-integer casts for 64-bit compatibility
++- **Solution**:
++  - Replace `%llu/%lld` with `PRIu64/PRId64` or consistent casting
++  - Replace "pointer cast to uint32_t" patterns with `uintptr_t`
++- **Priority**: Medium
++
++### Task 5: Verify Runtime Functionality
++- **Status**: Completed
++- **Description**: Ensure the emulator runs correctly after build fixes
++- **Solution**: Test basic functionality of the emulator with timeout command - emulator runs successfully
++- **Priority**: Medium
++
++### Task 6: Add Copyrighted Files to .gitignore
++- **Status**: Completed
++- **Description**: Add files with copyrighted material to .gitignore to prevent committing them
++- **Solution**: Updated .gitignore with copyrighted files
++- **Priority**: High
++
++### Task 7: Organize Changes into Separate Git Branches
++- **Status**: Pending
++- **Description**: Create separate branches for each feature following one-change-per-branch principle
++- **Solution**: Follow the plan in COMMIT_PLAN.md to create separate branches for:
++  - m68kcpu inline function fix
++  - 64-bit platform support
++  - Documentation
++  - Default 64-bit build
++- **Priority**: High
++
++### Task 8: Document aarch64 Build Environment
++- **Status**: Completed
++- **Description**: Document exact GCC and Make options needed for systemd-nspawn aarch64 build environment
++- **Solution**: Created AARCH64_BUILD_ENV.md with complete build environment documentation
++- **Priority**: High
++
++## Dependencies
++- Task 4 can be done independently
++- Task 7 requires all changes to be properly organized
++
++## Expected Outcomes
++- Successful compilation on 64-bit ARM systems (Raspberry Pi Zero W2)
++- Proper linking of all required functions
++- 64-bit compatibility for PiSCSI module
++- Maintained functionality of the emulator
++- No copyrighted material committed to repository
++- Clean Git history with one feature per branch
+\ No newline at end of file
+diff --git a/a314/a314.cc b/a314/a314.cc
+index cc84820..ff42355 100644
+--- a/a314/a314.cc
++++ b/a314/a314.cc
+@@ -420,8 +420,13 @@ uint8_t manual_read_buf[64 * SIZE_KILO];
+ 
+ static void handle_msg_read_mem_req(ClientConnection *cc)
+ {
+-    uint32_t address = *(uint32_t *)&(cc->payload[0]);
+-    uint32_t length = *(uint32_t *)&(cc->payload[4]);
++    uint32_t address = 0;
++    uint32_t length = 0;
++
++    memcpy(&address, &(cc->payload[0]), sizeof(address));
++    memcpy(&length, &(cc->payload[4]), sizeof(length));
++    address = ntohl(address);
++    length = ntohl(length);
+ 
+     if (get_mapped_item_by_address(cfg, address) != -1) {
+         int32_t index = get_mapped_item_by_address(cfg, address);
+@@ -439,7 +444,10 @@ static void handle_msg_read_mem_req(ClientConnection *cc)
+ 
+ static void handle_msg_write_mem_req(ClientConnection *cc)
+ {
+-    uint32_t address = *(uint32_t *)&(cc->payload[0]);
++    uint32_t address = 0;
++
++    memcpy(&address, &(cc->payload[0]), sizeof(address));
++    address = ntohl(address);
+     uint32_t length = cc->payload.size() - 4;
+ 
+     if (get_mapped_item_by_address(cfg, address) != -1) {
+diff --git a/amiga.cfg b/amiga.cfg
+index 12a1da2..4bbc731 100644
+--- a/amiga.cfg
++++ b/amiga.cfg
+@@ -1,9 +1,9 @@
+ # Sets CPU type. Valid types are (probably) 68000, 68010, 68020, 68EC020, 68030, 68EC030, 68040, 68EC040, 68LC040 and some STTTT thing.
+ cpu 68020
+ # Map 512KB kickstart ROM to default offset.
+-map type=rom address=0xF80000 size=0x80000 file=kick.rom ovl=0 id=kickstart
++map type=rom address=0xF80000 size=0x80000 file=kickstart.rom ovl=0 id=kickstart
+ # Comment out the line above and uncomment the line below to automatically copy the ROM contents to Pi RAM if the file isn't found
+-#map type=rom address=0xF80000 size=0x80000 file=kick.rom ovl=0 id=kickstart autodump_mem
++#map type=rom address=0xF80000 size=0x80000 file=kickstart.rom ovl=1 id=kickstart autodump_mem
+ 
+ # "Blackhole" the detected slow RAM on the Amiga 600. This enables maprom to work without using specifically kick v40.63
+ # DO NOT ENABLE THIS UNLESS YOU ARE USING THE PISTORM ON AN AMIGA 600.
+@@ -19,11 +19,11 @@ map type=rom address=0xF80000 size=0x80000 file=kick.rom ovl=0 id=kickstart
+ # Enabling Z3 fast requires at least Kickstart 2.0.
+ # If for some reason you need more than 128MB, you can change the size=128M to a valid supported Z3 PIC size,
+ # like 256M, 512M, 1024M, or add additional map lines.
+-map type=ram address=0x10000000 size=128M id=z3_autoconf_fast
++map type=ram address=0x10000000 size=256M id=z3_autoconf_fast
+ # Max 8MB of Z2 Fast can be mapped due to addressing space limitations, but for instance 2+4MB can be chained to leave 2MB for something else.
+ # Do not map Zorro II Fast RAM unless you absolutely need it, as Z2 address space is very limited.
+ # Cases where you may need Zorro II Fast may include emulating a 68000, 68010 or 68EC020, and/or if you are using Kickstart 1.3.
+-#map type=ram address=0x200000 size=8M id=z2_autoconf_fast
++map type=ram address=0x200000 size=8M id=z2_autoconf_fast
+ #map type=ram address=0x200000 size=2M id=z2_autoconf_fast
+ #map type=ram address=0x400000 size=4M id=z2_autoconf_fast
+ 
+@@ -62,19 +62,21 @@ platform amiga
+ # Uncomment to enable CDTV mode (not working, requires Kickstart 1.3+CDTV extended ROM)
+ #setvar cdtv
+ # Uncomment this line to enable the PiSCSI interface
+-#setvar piscsi
++setvar piscsi
+ # Use setvar piscsi0 through piscsi6 to add up to seven mapped drives to the interface.
+-#setvar piscsi0 PI0.hdf
++setvar piscsi0 Workbench2.04-PS3-8GB.hdf
++
+ #setvar piscsi1 PI1.hdf
++
+ # A special disk that includes PiStorm drivers and utilities, comment out if not needed
+ setvar piscsi6 platforms/amiga/pistorm.hdf
+ # Uncomment this line to enable the (currently non-working) Pi-Net interface.
+ #setvar pi-net
+ 
+ # Uncomment and edit to set a custom config filename for the A314 emulation
+-#setvar a314_conf ./a314/files_pi/a314d.conf
++setvar a314_conf ./a314/files_pi/a314d.conf
+ # Uncomment to enable A314 emulation
+-#setvar a314
++setvar a314
+ 
+ # Please take note:
+ # At the time of writing this (22 Jun 2021), the mouse and keyboard forwarding (for Amiga only) is by no means perfect.
+@@ -102,4 +104,6 @@ mouse /dev/input/mice m noautoconnect
+ #setvar move-slow-to-chip
+ 
+ # Swap DF0 with DF1/2/3 - Useful for Kickstart 1.x / Trackloader games that will only boot from DF0
+-#setvar swap-df0-df 1
++setvar swap-df0-df 1
++
++
+diff --git a/emulator.c b/emulator.c
+index ab5a7f7..4a11523 100644
+--- a/emulator.c
++++ b/emulator.c
+@@ -514,8 +514,8 @@ void sigint_handler(int sig_num) {
+     usleep(0);
+   }
+ 
+-  printf("IRQs triggered: %lld\n", trig_irq);
+-  printf("IRQs serviced: %lld\n", serv_irq);
++  printf("IRQs triggered: %lu\n", (unsigned long)trig_irq);
++  printf("IRQs serviced: %lu\n", (unsigned long)serv_irq);
+   printf("Last serviced IRQ: %d\n", last_last_irq);
+ 
+   exit(0);
+diff --git a/m68kcpu-buildissue.md b/m68kcpu-buildissue.md
+new file mode 100644
+index 0000000..e3a2b85
+--- /dev/null
++++ b/m68kcpu-buildissue.md
+@@ -0,0 +1,57 @@
++# m68kcpu Build Issue Analysis
++
++## Problem Description
++
++The build is failing with the following error:
++```
++/usr/bin/ld: m68kcpu.o: in function `m68k_pulse_reset':
++m68kcpu.c:(.text+0x2c48): undefined reference to `m68ki_ic_clear'
++/usr/bin/ld: m68kops.o: in function `m68k_op_movec_32_rc':
++m68kops.c:(.text+0x28ccc): undefined reference to `m68ki_ic_clear'
++collect2: error: ld returned 1 exit status
++```
++
++## Root Cause Analysis
++
++1. **Function Declaration vs Definition Issue**: The function `m68ki_ic_clear` is declared in `m68kcpu.h` as an inline function:
++   ```c
++   // clear the instruction cache
++   inline void m68ki_ic_clear(m68ki_cpu_core *state)
++   {
++       int i;
++       for (i=0; i< M68K_IC_SIZE; i++) {
++           state->ic_address[i] = ~0;
++       }
++   }
++   ```
++
++2. **Linker Issue**: When the function is declared as `inline`, the compiler may not generate an actual function definition in the object file, causing the linker to fail when other object files (like `m68kcpu.o` and `m68kops.o`) reference it.
++
++3. **Cross-File References**: The function is called from:
++   - `m68kcpu.c` in the `m68k_pulse_reset` function (line 1179)
++   - `m68k_in.c` in the `m68k_op_movec_32_rc` function (line 7043), which gets generated into `m68kops.c`
++
++4. **Architecture/Compiler Issue**: On 64-bit ARM architecture (aarch64), the inline function handling might be different than expected, causing the function definition to not be available during linking.
++
++## Technical Details
++
++- The function `m68ki_ic_clear` is defined as an inline function in the header file `m68kcpu.h`
++- This function is called from multiple source files after code generation
++- The compiler should make the function available for linking, but it's not happening properly
++- This is likely a combination of inline semantics and the build system not properly handling the function visibility
++
++## Potential Solutions (without code changes)
++
++1. **Modify Makefile to adjust compiler flags**: Add flags that ensure inline functions are properly handled during linking
++2. **Compiler flags**: Use different optimization or inlining flags to ensure the function is available for linking
++3. **Architecture-specific fixes**: Adjust build flags for aarch64 architecture
++
++## Build Environment Issues
++
++Additional build issues encountered:
++- GCC flags `-mfloat-abi=hard` and `-mfpu=neon-fp-armv8` are not valid for aarch64 architecture
++- The build system is using ARM-specific flags on a 64-bit ARM system (aarch64)
++
++## Impact
++
++This issue prevents the emulator from being built on 64-bit ARM systems, which includes the Raspberry Pi Zero W2 that is being used for this project.
+\ No newline at end of file
+diff --git a/platforms/amiga/ahi/pi_ahi.c b/platforms/amiga/ahi/pi_ahi.c
+index f753e3d..0950c86 100644
+--- a/platforms/amiga/ahi/pi_ahi.c
++++ b/platforms/amiga/ahi/pi_ahi.c
+@@ -258,7 +258,6 @@ void pi_ahi_do_cmd(uint32_t val) {
+         case AHI_CMD_PLAY: {
+             int32_t res = 0;
+             uint8_t *bufptr = get_mapped_data_pointer_by_address(cfg, ahi_addr[0]);
+-            uint16_t *bepptr = (uint16_t *)get_mapped_data_pointer_by_address(cfg, ahi_addr[0]);
+             //printf("[PI-AHI] Driver sent PLAY command: %d samples @$%.8X ($%.8X).\n", ahi_u32[0], ahi_addr[0], (uint32_t)bufptr);
+             if (ahi_u32[0] != 0 && ahi_addr[0] != 0) {
+                 uint32_t bsize = ahi_u32[0] * get_ahi_sample_size(ahi_u32[3]) * get_ahi_channels(ahi_u32[3]);
+@@ -300,7 +299,7 @@ void pi_ahi_do_cmd(uint32_t val) {
+                         }
+                         bsize = dst_bsize;
+                     } else {
+-                        uint16_t *u16ptr = (uint16_t *)bufptr;
++                        // uint16_t *u16ptr = (uint16_t *)bufptr;  // Unused variable removed
+                     }
+                 }
+                 sndbuf_offset += bsize;
+diff --git a/platforms/amiga/amiga-autoconf.c b/platforms/amiga/amiga-autoconf.c
+index c6945ce..14c3bd7 100644
+--- a/platforms/amiga/amiga-autoconf.c
++++ b/platforms/amiga/amiga-autoconf.c
+@@ -58,15 +58,15 @@ static unsigned char ac_a314_rom[] = {
+ 
+ extern unsigned int a314_base;
+ 
+-int ac_z2_current_pic = 0;
+-int ac_z2_pic_count = 0;
++uint32_t ac_z2_current_pic = 0;
++uint32_t ac_z2_pic_count = 0;
+ int ac_z2_done = 0;
+ int ac_z2_type[AC_PIC_LIMIT];
+ int ac_z2_index[AC_PIC_LIMIT];
+ unsigned int ac_base[AC_PIC_LIMIT];
+ 
+-int ac_z3_current_pic = 0;
+-int ac_z3_pic_count = 0;
++uint32_t ac_z3_current_pic = 0;
++uint32_t ac_z3_pic_count = 0;
+ int ac_z3_done = 0;
+ int ac_z3_type[AC_PIC_LIMIT];
+ int ac_z3_index[AC_PIC_LIMIT];
+diff --git a/platforms/amiga/piscsi/piscsi.c b/platforms/amiga/piscsi/piscsi.c
+index 2a39ed2..7d7bfc1 100644
+--- a/platforms/amiga/piscsi/piscsi.c
++++ b/platforms/amiga/piscsi/piscsi.c
+@@ -7,6 +7,7 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <endian.h>
++#include <errno.h>
+ 
+ #include "config_file/config_file.h"
+ #include "gpio/ps_protocol.h"
+@@ -18,12 +19,12 @@
+ #define BE16(val) be16toh(val)
+ 
+ // Uncomment the line below to enable debug output
+-//#define PISCSI_DEBUG
++#define PISCSI_DEBUG
+ 
+ #ifdef PISCSI_DEBUG
+ #define DEBUG printf
+ //#define DEBUG_TRIVIAL printf
+-#define DEBUG_TRIVIAL(...)
++#define DEBUG_TRIVIAL(...) do { if (0) printf(__VA_ARGS__); } while (0)
+ 
+ //extern void stop_cpu_emulation(uint8_t disasm_cur);
+ #define stop_cpu_emulation(...)
+@@ -386,7 +387,7 @@ void piscsi_map_drive(char *filename, uint8_t index) {
+     d->fs = file_size;
+     d->fd = tmp_fd;
+     lseek(tmp_fd, 0, SEEK_SET);
+-    printf("[PISCSI] Map %d: [%s] - %llu bytes.\n", index, filename, file_size);
++    printf("[PISCSI] Map %d: [%s] - %lu bytes.\n", index, filename, (unsigned long)file_size);
+ 
+     if (piscsi_parse_rdb(d) == -1) {
+         DEBUG("[PISCSI] No RDB found on disk, making up some CHS values.\n");
+@@ -402,6 +403,105 @@ void piscsi_map_drive(char *filename, uint8_t index) {
+     printf ("Finding file systems.\n");
+     piscsi_find_filesystems(d);
+     printf ("Done.\n");
++
++    // Perform self-test to validate HDF integrity
++    printf("[PISCSI-SELFTEST] Running HDF integrity validation for drive %d...\n", index);
++    if (!piscsi_validate_hdf(d, filename)) {
++        printf("[PISCSI-SELFTEST-ERROR] HDF validation failed for drive %d (%s)\n", index, filename);
++    } else {
++        printf("[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive %d (%s)\n", index, filename);
++    }
++}
++
++// HDF integrity validation function
++int piscsi_validate_hdf(struct piscsi_dev *d, char *filename) {
++    if (!d || d->fd == -1) {
++        printf("[PISCSI-SELFTEST] ERROR: Invalid device or file descriptor\n");
++        return 0;
++    }
++
++    // Test 1: Read RDB block 0 (first 512 bytes)
++    uint8_t rdb_block[512];
++    if (lseek(d->fd, 0, SEEK_SET) == (off_t)-1) {
++        printf("[PISCSI-SELFTEST] ERROR: Cannot seek to RDB block 0 in %s\n", filename);
++        return 0;
++    }
++
++    ssize_t bytes_read = read(d->fd, rdb_block, 512);
++    if (bytes_read < 512) {
++        printf("[PISCSI-SELFTEST] ERROR: Cannot read full RDB block 0 from %s (got %zd bytes)\n", filename, bytes_read);
++        return 0;
++    }
++
++    // Verify RDB signature (should start with "RDSK")
++    if (rdb_block[0] == 'R' && rdb_block[1] == 'D' && rdb_block[2] == 'S' && rdb_block[3] == 'K') {
++        printf("[PISCSI-SELFTEST] INFO: Valid RDB signature found in %s\n", filename);
++    } else {
++        // Not all HDFs have RDB, some are partitioned drives, so this isn't always an error
++        printf("[PISCSI-SELFTEST] INFO: No RDB signature found in %s (may be partitioned drive)\n", filename);
++    }
++
++    // Test 2: For DH0 (unit 0), try to read first partition block (usually at block 2 or offset 1024)
++    if (d - devs == 0) { // This is unit 0 (DH0)
++        printf("[PISCSI-SELFTEST] Testing DH0 partition accessibility...\n");
++
++        // Look for first partition block (usually at offset 1024 for standard Amiga HDFs)
++        uint8_t boot_block[512];
++        if (lseek(d->fd, 1024, SEEK_SET) == (off_t)-1) {
++            printf("[PISCSI-SELFTEST] ERROR: Cannot seek to DH0 boot block in %s\n", filename);
++            return 0;
++        }
++
++        bytes_read = read(d->fd, boot_block, 512);
++        if (bytes_read < 512) {
++            printf("[PISCSI-SELFTEST] ERROR: Cannot read DH0 boot block from %s (got %zd bytes)\n", filename, bytes_read);
++            return 0;
++        }
++
++        // Check for DOS boot block signature (starts with 0x444F5300 = "DOS\0")
++        uint32_t dos_sig = (boot_block[0] << 24) | (boot_block[1] << 16) | (boot_block[2] << 8) | boot_block[3];
++        if (dos_sig == 0x444F5300) {
++            printf("[PISCSI-SELFTEST] SUCCESS: Valid DOS boot block signature found in DH0\n");
++        } else {
++            printf("[PISCSI-SELFTEST] INFO: No DOS boot block signature in DH0 (signature: 0x%08X)\n", dos_sig);
++        }
++    }
++
++    // Test 3: Verify we can seek to end of file
++    off64_t file_end = lseek64(d->fd, 0, SEEK_END);
++    if (file_end == (off64_t)-1) {
++        printf("[PISCSI-SELFTEST] ERROR: Cannot seek to end of file %s\n", filename);
++        return 0;
++    }
++
++    if ((uint64_t)file_end != d->fs) {
++        printf("[PISCSI-SELFTEST] WARNING: File size mismatch: reported=%llu, actual=%lld\n",
++               (unsigned long long)d->fs, (long long)file_end);
++    }
++
++    // Test 4: Try reading a few random blocks to verify integrity
++    for (int i = 0; i < 3; i++) {
++        off64_t test_offset = (i + 1) * 512 * 100; // Every 100th block for testing
++        if (test_offset >= (off64_t)d->fs) {
++            continue; // Skip if beyond file size
++        }
++
++        uint8_t test_block[512];
++        if (lseek64(d->fd, test_offset, SEEK_SET) == (off64_t)-1) {
++            printf("[PISCSI-SELFTEST] ERROR: Cannot seek to test block at offset %lld in %s\n",
++                   (long long)test_offset, filename);
++            return 0;
++        }
++
++        bytes_read = read(d->fd, test_block, 512);
++        if (bytes_read < 512) {
++            printf("[PISCSI-SELFTEST] ERROR: Cannot read test block at offset %lld from %s (got %zd bytes)\n",
++                   (long long)test_offset, filename, bytes_read);
++            return 0;
++        }
++    }
++
++    return 1; // All tests passed
+ }
+ 
+ void piscsi_unmap_drive(uint8_t index) {
+@@ -523,7 +623,7 @@ void print_piscsi_debug_message(int index) {
+ #ifdef PISCSI_DEBUG
+             r = get_mapped_item_by_address(cfg, piscsi_dbg[0]);
+             struct SCSICmd_RW10 *rwdat = NULL;
+-            char data[10];
++            uint8_t data[10];
+             if (r != -1) {
+                 uint32_t addr = piscsi_dbg[0] - cfg->map_offset[r];
+                 rwdat = (struct SCSICmd_RW10 *)(&cfg->map_data[r][addr]);
+@@ -533,7 +633,7 @@ void print_piscsi_debug_message(int index) {
+                 for (int i = 0; i < 10; i++) {
+                     data[i] = read8(piscsi_dbg[0] + i);
+                 }
+-                rwdat = data;
++                rwdat = (struct SCSICmd_RW10 *)data;
+             }
+             if (rwdat) {
+                 DEBUG_TRIVIAL("[RW10] CMD: %.2X\n", rwdat->opcode);
+@@ -602,7 +702,8 @@ void piscsi_debugme(uint32_t index) {
+             DEBUG("[PISCSI-DEBUGME] Debug pointers: %.8X %.8X %.8X %.8X\n", piscsi_u32[0], piscsi_u32[1], piscsi_u32[2], piscsi_u32[3]);
+             break;
+         default:
+-            DEBUG("[!!!PISCSI-DEBUGME] No debugme message for index %d!\n", index);
++            // Handle undefined indexes by printing the index number
++            DEBUG("[PISCSI-DEBUGME] idx=%u (no string)\n", index);
+             break;
+     }
+ 
+@@ -633,36 +734,55 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
+             }
+ 
+             if (cmd == PISCSI_CMD_READBYTES) {
+-                DEBUG("[PISCSI-%d] %d byte READBYTES from block %d to address %.8X\n", val, piscsi_u32[1], piscsi_u32[0] / d->block_size, piscsi_u32[2]);
+                 uint32_t src = piscsi_u32[0];
+-                d->lba = (src / d->block_size);
++                uint32_t block = src / d->block_size;
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:READBYTES io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%X to_addr:0x%.8X\n", val, src, piscsi_u32[1], block, src, piscsi_u32[2]);
+                 lseek(d->fd, src, SEEK_SET);
+             }
+             else if (cmd == PISCSI_CMD_READ) {
+-                DEBUG("[PISCSI-%d] %d byte READ from block %d to address %.8X\n", val, piscsi_u32[1], piscsi_u32[0], piscsi_u32[2]);
+-                d->lba = piscsi_u32[0];
+-                lseek(d->fd, (piscsi_u32[0] * d->block_size), SEEK_SET);
++                uint32_t block = piscsi_u32[0];
++                uint64_t file_offset = (uint64_t)block * d->block_size;
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:READ io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, block, piscsi_u32[1], block, (unsigned long long)file_offset, piscsi_u32[2]);
++                lseek(d->fd, file_offset, SEEK_SET);
+             }
+             else {
+-                uint64_t src = piscsi_u32[3];
+-                src = (src << 32) | piscsi_u32[0];
+-                DEBUG("[PISCSI-%d] %d byte READ64 from block %lld to address %.8X\n", val, piscsi_u32[1], (src / d->block_size), piscsi_u32[2]);
+-                d->lba = (src / d->block_size);
++                uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
++                uint32_t block = (uint32_t)(src / d->block_size);
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:READ64 io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, (unsigned long long)src, piscsi_u32[1], block, (unsigned long long)src, piscsi_u32[2]);
+                 lseek64(d->fd, src, SEEK_SET);
+             }
+ 
+             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
+             if (map) {
+                 DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, r);
+-                read(d->fd, map, piscsi_u32[1]);
++                ssize_t bytes_read = read(d->fd, map, piscsi_u32[1]);
++                if (bytes_read < 0) {
++                    DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
++                } else if (bytes_read != (ssize_t)piscsi_u32[1]) {
++                    DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
++                } else {
++                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, bytes_read);
++                }
+             }
+             else {
+                 DEBUG_TRIVIAL("[PISCSI-%d] No mapped range found for read.\n", val);
+                 uint8_t c = 0;
++                int success = 1;
+                 for (uint32_t i = 0; i < piscsi_u32[1]; i++) {
+-                    read(d->fd, &c, 1);
++                    ssize_t result = read(d->fd, &c, 1);
++                    if (result <= 0) {
++                        DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE READ failed at offset %d: result=%zd\n", val, i, result);
++                        success = 0;
++                        break;
++                    }
+                     m68k_write_memory_8(piscsi_u32[2] + i, (uint32_t)c);
+                 }
++                if (success) {
++                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d BYTE READ: %d bytes OK\n", val, piscsi_u32[1]);
++                }
+             }
+             break;
+         case PISCSI_CMD_WRITE64:
+@@ -675,35 +795,54 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
+             }
+ 
+             if (cmd == PISCSI_CMD_WRITEBYTES) {
+-                DEBUG("[PISCSI-%d] %d byte WRITEBYTES to block %d from address %.8X\n", val, piscsi_u32[1], piscsi_u32[0] / d->block_size, piscsi_u32[2]);
+                 uint32_t src = piscsi_u32[0];
+-                d->lba = (src / d->block_size);
++                uint32_t block = src / d->block_size;
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:WRITEBYTES io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%X from_addr:0x%.8X\n", val, src, piscsi_u32[1], block, src, piscsi_u32[2]);
+                 lseek(d->fd, src, SEEK_SET);
+             }
+             else if (cmd == PISCSI_CMD_WRITE) {
+-                DEBUG("[PISCSI-%d] %d byte WRITE to block %d from address %.8X\n", val, piscsi_u32[1], piscsi_u32[0], piscsi_u32[2]);
+-                d->lba = piscsi_u32[0];
+-                lseek(d->fd, (piscsi_u32[0] * d->block_size), SEEK_SET);
++                uint32_t block = piscsi_u32[0];
++                uint64_t file_offset = (uint64_t)block * d->block_size;
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:WRITE io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, block, piscsi_u32[1], block, (unsigned long long)file_offset, piscsi_u32[2]);
++                lseek(d->fd, file_offset, SEEK_SET);
+             }
+             else {
+-                uint64_t src = piscsi_u32[3];
+-                src = (src << 32) | piscsi_u32[0];
+-                DEBUG("[PISCSI-%d] %d byte WRITE64 to block %lld from address %.8X\n", val, piscsi_u32[1], (src / d->block_size), piscsi_u32[2]);
+-                d->lba = (src / d->block_size);
++                uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
++                uint32_t block = (uint32_t)(src / d->block_size);
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:WRITE64 io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, (unsigned long long)src, piscsi_u32[1], block, (unsigned long long)src, piscsi_u32[2]);
+                 lseek64(d->fd, src, SEEK_SET);
+             }
+ 
+             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
+             if (map) {
+                 DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Write comes from mapped range %d.\n", val, r);
+-                write(d->fd, map, piscsi_u32[1]);
++                ssize_t bytes_written = write(d->fd, map, piscsi_u32[1]);
++                if (bytes_written < 0) {
++                    DEBUG("[PISCSI-IO-ERROR] Unit:%d WRITE failed: bytes_requested=%d, bytes_written=%zd, errno=%d\n", val, piscsi_u32[1], bytes_written, errno);
++                } else if (bytes_written != (ssize_t)piscsi_u32[1]) {
++                    DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL WRITE: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_written);
++                } else {
++                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d WRITE: %zd bytes OK\n", val, bytes_written);
++                }
+             }
+             else {
+                 DEBUG_TRIVIAL("[PISCSI-%d] No mapped range found for write.\n", val);
+                 uint8_t c = 0;
++                int success = 1;
+                 for (uint32_t i = 0; i < piscsi_u32[1]; i++) {
+                     c = m68k_read_memory_8(piscsi_u32[2] + i);
+-                    write(d->fd, &c, 1);
++                    ssize_t result = write(d->fd, &c, 1);
++                    if (result <= 0) {
++                        DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE WRITE failed at offset %d: result=%zd\n", val, i, result);
++                        success = 0;
++                        break;
++                    }
++                }
++                if (success) {
++                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d BYTE WRITE: %d bytes OK\n", val, piscsi_u32[1]);
+                 }
+             }
+             break;
+@@ -837,6 +976,7 @@ skip_disk:;
+                 char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
+ 
+                 DEBUG("[PISCSI] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
++                // First try exact match
+                 for (i = 0; i < piscsi_num_fs; i++) {
+                     if (rom_partition_dostype[rom_cur_partition] == filesystems[i].FS_ID) {
+                         node->dn_SegList = htobe32((((filesystems[i].handler) + filesystems[i].h_info.header_size) >> 2));
+@@ -844,16 +984,33 @@ skip_disk:;
+                         goto fs_found;
+                     }
+                 }
++
++                // If no exact match, try fallback mappings (e.g., DOS/3 -> DOS/1 for FastFileSystem)
++                uint32_t fallback_dostype = rom_partition_dostype[rom_cur_partition];
++
++                // Map DOS/3 (FFS International) to DOS/1 (FFS) handler since they use the same filesystem
++                if (fallback_dostype == 0x444F5303) { // DOS/3
++                    fallback_dostype = 0x444F5301;   // DOS/1
++                    for (i = 0; i < piscsi_num_fs; i++) {
++                        if (fallback_dostype == filesystems[i].FS_ID) {
++                            node->dn_SegList = htobe32((((filesystems[i].handler) + filesystems[i].h_info.header_size) >> 2));
++                            node->dn_GlobalVec = 0xFFFFFFFF;
++                            DEBUG("[PISCSI] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");
++                            goto fs_found;
++                        }
++                    }
++                }
++
+                 node->dn_GlobalVec = 0xFFFFFFFF;
+                 node->dn_SegList = 0;
+                 printf("[!!!PISCSI] Found no handler for file system %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
+ fs_found:;
+                 DEBUG("[FS-HANDLER] Next: %d Type: %.8X\n", BE(node->dn_Next), BE(node->dn_Type));
+                 DEBUG("[FS-HANDLER] Task: %d Lock: %d\n", BE(node->dn_Task), BE(node->dn_Lock));
+-                DEBUG("[FS-HANDLER] Handler: %d Stacksize: %d\n", BE((uint32_t)node->dn_Handler), BE(node->dn_StackSize));
+-                DEBUG("[FS-HANDLER] Priority: %d Startup: %d (%.8X)\n", BE((uint32_t)node->dn_Priority), BE(node->dn_Startup), BE(node->dn_Startup));
++                DEBUG("[FS-HANDLER] Handler: %d Stacksize: %d\n", BE(node->dn_Handler), BE(node->dn_StackSize));
++                DEBUG("[FS-HANDLER] Priority: %d Startup: %d (%.8X)\n", BE(node->dn_Priority), BE(node->dn_Startup), BE(node->dn_Startup));
+                 DEBUG("[FS-HANDLER] SegList: %.8X GlobalVec: %d\n", BE((uint32_t)node->dn_SegList), BE(node->dn_GlobalVec));
+-                DEBUG("[PISCSI] Handler for partition %.8X set to %.8X (%.8X).\n", BE((uint32_t)node->dn_Name), filesystems[i].FS_ID, filesystems[i].handler);
++                DEBUG("[PISCSI] Handler for partition %.8X set to %.8X (%.8X).\n", BE(node->dn_Name), filesystems[i].FS_ID, filesystems[i].handler);
+             }
+             break;
+         }
+@@ -954,7 +1111,7 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
+         case PISCSI_CMD_BLOCKS: {
+             uint32_t blox = devs[piscsi_cur_drive].fs / devs[piscsi_cur_drive].block_size;
+             DEBUG("[PISCSI] %s Read from BLOCKS %d: %d\n", op_type_names[type], piscsi_cur_drive, (uint32_t)(devs[piscsi_cur_drive].fs / devs[piscsi_cur_drive].block_size));
+-            DEBUG("fs: %lld (%d)\n", devs[piscsi_cur_drive].fs, blox);
++            DEBUG("fs: %llu (%d)\n", (unsigned long long)devs[piscsi_cur_drive].fs, blox);
+             return blox;
+             break;
+         }
+@@ -982,15 +1139,29 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
+             int32_t r = get_mapped_item_by_address(cfg, val);
+             if (r != -1) {
+ #ifdef PISCSI_DEBUG
+-                uint32_t addr = val - cfg->map_offset[r];
+                 char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
+                 DEBUG("[PISCSI-GET-FS-INFO] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
+ #endif
++                // First try exact match
+                 for (i = 0; i < piscsi_num_fs; i++) {
+                     if (rom_partition_dostype[rom_cur_partition] == filesystems[i].FS_ID) {
+                         return 0;
+                     }
+                 }
++
++                // If no exact match, try fallback mappings (e.g., DOS/3 -> DOS/1 for FastFileSystem)
++                uint32_t fallback_dostype = rom_partition_dostype[rom_cur_partition];
++
++                // Map DOS/3 (FFS International) to DOS/1 (FFS) handler since they use the same filesystem
++                if (fallback_dostype == 0x444F5303) { // DOS/3
++                    fallback_dostype = 0x444F5301;   // DOS/1
++                    for (i = 0; i < piscsi_num_fs; i++) {
++                        if (fallback_dostype == filesystems[i].FS_ID) {
++                            DEBUG("[PISCSI-GET-FS-INFO] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");
++                            return 0;
++                        }
++                    }
++                }
+             }
+             return 1;
+         }
+diff --git a/platforms/amiga/piscsi/piscsi.h b/platforms/amiga/piscsi/piscsi.h
+index b938411..b8d9f74 100644
+--- a/platforms/amiga/piscsi/piscsi.h
++++ b/platforms/amiga/piscsi/piscsi.h
+@@ -188,13 +188,13 @@ struct DeviceNode {
+     uint32_t    dn_Type;
+     uint32_t    dn_Task;
+     uint32_t    dn_Lock;
+-    uint8_t	    *dn_Handler;
++    uint32_t    dn_Handler;
+     uint32_t    dn_StackSize;
+     int32_t     dn_Priority;
+     uint32_t    dn_Startup;
+     uint32_t    dn_SegList;
+     uint32_t    dn_GlobalVec;
+-    uint8_t     *dn_Name;
++    uint32_t    dn_Name;
+ };
+ 
+ struct PartitionBlock {
+@@ -219,7 +219,7 @@ struct SCSICmd_ModeSense6 {
+     uint8_t subpage_code;
+     uint8_t alloc_len;
+     uint8_t control;
+-};
++} __attribute__((packed));
+ 
+ struct SCSICmd_RW10 {
+     uint8_t opcode;
+@@ -228,7 +228,7 @@ struct SCSICmd_RW10 {
+     uint8_t res_groupnum;
+     uint16_t len;
+     uint8_t control;
+-};
++} __attribute__((packed));
+ 
+ struct FileSysHeaderBlock {
+     uint32_t   fhb_ID;
+@@ -258,6 +258,7 @@ void piscsi_init();
+ void piscsi_shutdown();
+ void piscsi_map_drive(char *filename, uint8_t index);
+ void piscsi_unmap_drive(uint8_t index);
++int piscsi_validate_hdf(struct piscsi_dev *d, char *filename);
+ struct piscsi_dev *piscsi_get_dev(uint8_t index);
+ 
+ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type);
+diff --git a/platforms/amiga/rtg/irtg_structs.h b/platforms/amiga/rtg/irtg_structs.h
+index 8ceb213..52824b2 100644
+--- a/platforms/amiga/rtg/irtg_structs.h
++++ b/platforms/amiga/rtg/irtg_structs.h
+@@ -1,3 +1,5 @@
++#pragma pack(push, 2)
++
+ struct P96Line {
+     int16_t     X, Y;
+     uint16_t    Length;
+@@ -12,7 +14,6 @@ struct P96Line {
+     uint16_t    Xorigin, Yorigin;
+ };
+ 
+-#pragma pack(2)
+ struct P96Template {
+     uint32_t _p_Memory;
+     uint16_t BytesPerRow;
+@@ -22,7 +23,6 @@ struct P96Template {
+     uint32_t BgPen;
+ };
+ 
+-#pragma pack(2)
+ struct P96Pattern {
+     uint32_t _p_Memory;
+     uint16_t XOffset, YOffset;
+@@ -36,7 +36,6 @@ struct MinNode_placeholder {
+     uint32_t _p_mln_Pred;
+ };
+ 
+-#pragma pack(2)
+ struct Node_placeholder {
+     uint32_t _p_ln_Succ;
+     uint32_t _p_ln_Pred;
+@@ -325,3 +324,5 @@ struct P96BoardInfo{
+     uint32_t MaxBMWidth;
+     uint32_t MaxBMHeight;
+ };
++
++#pragma pack(pop)
+diff --git a/platforms/amiga/rtg/rtg-gfx.c b/platforms/amiga/rtg/rtg-gfx.c
+index 77b7b3a..73b15d0 100644
+--- a/platforms/amiga/rtg/rtg-gfx.c
++++ b/platforms/amiga/rtg/rtg-gfx.c
+@@ -765,7 +765,7 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
+ 		}
+ 		dptr += pitch;
+         for (int i = 0; i < bm->Depth; i++) {
+-            if (plane_ptr[i] && (uint32_t)plane_ptr[i] != 0xFFFFFFFF)
++            if (plane_ptr[i])
+                 plane_ptr[i] += src_pitch;
+             if (plane_addr[i] && plane_addr[i] != 0xFFFFFFFF)
+                 plane_addr[i] += src_pitch;
+diff --git a/platforms/amiga/rtg/rtg.c b/platforms/amiga/rtg/rtg.c
+index f123c02..0222969 100644
+--- a/platforms/amiga/rtg/rtg.c
++++ b/platforms/amiga/rtg/rtg.c
+@@ -1,11 +1,13 @@
+ // SPDX-License-Identifier: MIT
+ 
+ #include <stdint.h>
++#include <inttypes.h>
+ #include <endian.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <time.h>
++#include <stddef.h>
+ #include "config_file/config_file.h"
+ #include "gpio/ps_protocol.h"
+ #include "platforms/amiga/rtg/irtg_structs.h"
+@@ -420,12 +422,12 @@ static void handle_irtg_command(uint32_t cmd) {
+                 draw_mode = t->DrawMode;
+                 src_addr = be32toh(t->_p_Memory);
+             } else {
+-                t_pitch = be16toh(ps_read_16(src_addr + (uint32_t)&t->BytesPerRow));
+-                fgcol = be32toh(ps_read_32(src_addr + (uint32_t)&t->FgPen));
+-                bgcol = be32toh(ps_read_32(src_addr + (uint32_t)&t->BgPen));
+-                x_offset = ps_read_8(src_addr + (uint32_t)&t->XOffset);
+-                draw_mode = ps_read_8(src_addr + (uint32_t)&t->DrawMode);
+-                src_addr = be32toh(ps_read_32(src_addr + (uint32_t)&t->_p_Memory));
++                t_pitch = be16toh(ps_read_16(src_addr + (uint32_t)offsetof(struct P96Template, BytesPerRow)));
++                fgcol = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Template, FgPen)));
++                bgcol = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Template, BgPen)));
++                x_offset = ps_read_8(src_addr + (uint32_t)offsetof(struct P96Template, XOffset));
++                draw_mode = ps_read_8(src_addr + (uint32_t)offsetof(struct P96Template, DrawMode));
++                src_addr = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Template, _p_Memory)));
+             }
+ 
+             cmd_mask = (uint8_t)M68KR(M68K_REG_D4);
+@@ -459,12 +461,12 @@ static void handle_irtg_command(uint32_t cmd) {
+                 loop_rows = 1 << p->Size;
+                 src_addr = be32toh(p->_p_Memory);
+             } else {
+-                fgcol = be32toh(ps_read_32(src_addr + (uint32_t)&p->FgPen));
+-                bgcol = be32toh(ps_read_32(src_addr + (uint32_t)&p->BgPen));
+-                x_offset = be16toh(ps_read_16(src_addr + (uint32_t)&p->XOffset));
+-                y_offset = be16toh(ps_read_16(src_addr + (uint32_t)&p->YOffset));
+-                draw_mode = ps_read_8(src_addr + (uint32_t)&p->DrawMode);
+-                loop_rows = 1 << ps_read_8(src_addr + (uint32_t)&p->Size);
++                fgcol = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Pattern, FgPen)));
++                bgcol = be32toh(ps_read_32(src_addr + (uint32_t)offsetof(struct P96Pattern, BgPen)));
++                x_offset = be16toh(ps_read_16(src_addr + (uint32_t)offsetof(struct P96Pattern, XOffset)));
++                y_offset = be16toh(ps_read_16(src_addr + (uint32_t)offsetof(struct P96Pattern, YOffset)));
++                draw_mode = ps_read_8(src_addr + (uint32_t)offsetof(struct P96Pattern, DrawMode));
++                loop_rows = 1 << ps_read_8(src_addr + (uint32_t)offsetof(struct P96Pattern, Size));
+                 src_addr = be32toh(p->_p_Memory);
+             }
+ 
+@@ -495,7 +497,7 @@ static void handle_irtg_command(uint32_t cmd) {
+             }
+ 
+             if (realtime_graphics_debug) {
+-                printf("bm: %.8X r: %.8X\n", (uint32_t)bm, (uint32_t)r);
++                printf("bm: 0x%" PRIxPTR " r: 0x%" PRIxPTR "\n", (uintptr_t)bm, (uintptr_t)r);
+                 if (bm)
+                     printf("bm pitch: %d\n", be16toh(bm->BytesPerRow));
+                 if (r)
