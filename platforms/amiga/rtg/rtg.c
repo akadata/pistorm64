@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <stdint.h>
+#include <inttypes.h>
 #include <endian.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -496,7 +497,7 @@ static void handle_irtg_command(uint32_t cmd) {
             }
 
             if (realtime_graphics_debug) {
-                printf("bm: %.8X r: %.8X\n", (uint32_t)(uintptr_t)bm, (uint32_t)(uintptr_t)r);
+                printf("bm: 0x%" PRIxPTR " r: 0x%" PRIxPTR "\n", (uintptr_t)bm, (uintptr_t)r);
                 if (bm)
                     printf("bm pitch: %d\n", be16toh(bm->BytesPerRow));
                 if (r)
