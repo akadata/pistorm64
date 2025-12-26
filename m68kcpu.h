@@ -45,6 +45,13 @@ extern "C" {
 #include <setjmp.h>
 #include <stdio.h>
 #include "gpio/ps_protocol.h"
+#include "log.h"
+
+#ifdef PISTORM_EXC_LOG
+#define EXCLOG(...) LOG_ERROR(__VA_ARGS__)
+#else
+#define EXCLOG(...)
+#endif
 
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
@@ -2251,6 +2258,8 @@ static inline void m68ki_exception_trace(m68ki_cpu_core *state)
 static inline void m68ki_exception_privilege_violation(m68ki_cpu_core *state)
 {
 	uint sr = m68ki_init_exception(state);
+	EXCLOG("[EXC] PRIVILEGE VIOLATION pc=0x%08X ppc=0x%08X ir=0x%04X sr=0x%04X\n",
+	       REG_PC, REG_PPC, REG_IR, sr);
 
 	#if M68K_EMULATE_ADDRESS_ERROR == OPT_ON
 	if(CPU_TYPE_IS_000(CPU_TYPE))
@@ -2281,6 +2290,8 @@ static inline void m68ki_exception_bus_error(m68ki_cpu_core *state)
 	 */
 	if(CPU_RUN_MODE == RUN_MODE_BERR_AERR_RESET)
 	{
+		EXCLOG("[EXC] BUS ERROR (nested) pc=0x%08X ppc=0x%08X ir=0x%04X\n",
+		       REG_PC, REG_PPC, REG_IR);
 		m68k_read_memory_8(0x00ffff01);
 		CPU_STOPPED = STOP_LEVEL_HALT;
 		return;
@@ -2295,6 +2306,8 @@ static inline void m68ki_exception_bus_error(m68ki_cpu_core *state)
 	}
 
 	uint sr = m68ki_init_exception(state);
+	EXCLOG("[EXC] BUS ERROR pc=0x%08X ppc=0x%08X ir=0x%04X sr=0x%04X aerr=0x%08X rw=%u fc=%u\n",
+	       REG_PC, REG_PPC, REG_IR, sr, m68ki_aerr_address, m68ki_aerr_write_mode, m68ki_aerr_fc);
 	m68ki_stack_frame_1000(state, REG_PPC, sr, EXCEPTION_BUS_ERROR);
 
 	m68ki_jump_vector(state, EXCEPTION_BUS_ERROR);
@@ -2314,6 +2327,8 @@ static inline void m68ki_exception_1010(m68ki_cpu_core *state)
 #endif
 
 	sr = m68ki_init_exception(state);
+	EXCLOG("[EXC] 1010 LINE-A pc=0x%08X ppc=0x%08X ir=0x%04X sr=0x%04X\n",
+	       REG_PC, REG_PPC, REG_IR, sr);
 	m68ki_stack_frame_0000(state, REG_PPC, sr, EXCEPTION_1010);
 	m68ki_jump_vector(state, EXCEPTION_1010);
 
@@ -2333,6 +2348,8 @@ static inline void m68ki_exception_1111(m68ki_cpu_core *state)
 #endif
 
 	sr = m68ki_init_exception(state);
+	EXCLOG("[EXC] 1111 LINE-F pc=0x%08X ppc=0x%08X ir=0x%04X sr=0x%04X\n",
+	       REG_PC, REG_PPC, REG_IR, sr);
 	m68ki_stack_frame_0000(state, REG_PPC, sr, EXCEPTION_1111);
 	m68ki_jump_vector(state, EXCEPTION_1111);
 
@@ -2356,6 +2373,8 @@ static inline void m68ki_exception_illegal(m68ki_cpu_core *state)
 	    return;
 
 	sr = m68ki_init_exception(state);
+	EXCLOG("[EXC] ILLEGAL INSTR pc=0x%08X ppc=0x%08X ir=0x%04X sr=0x%04X\n",
+	       REG_PC, REG_PPC, REG_IR, sr);
 
 	#if M68K_EMULATE_ADDRESS_ERROR == OPT_ON
 	if(CPU_TYPE_IS_000(CPU_TYPE))
@@ -2375,6 +2394,8 @@ static inline void m68ki_exception_illegal(m68ki_cpu_core *state)
 static inline void m68ki_exception_format_error(m68ki_cpu_core *state)
 {
 	uint sr = m68ki_init_exception(state);
+	EXCLOG("[EXC] FORMAT ERROR pc=0x%08X ppc=0x%08X ir=0x%04X sr=0x%04X\n",
+	       REG_PC, REG_PPC, REG_IR, sr);
 	m68ki_stack_frame_0000(state, REG_PC, sr, EXCEPTION_FORMAT_ERROR);
 	m68ki_jump_vector(state, EXCEPTION_FORMAT_ERROR);
 
@@ -2393,6 +2414,8 @@ static inline void m68ki_exception_address_error(m68ki_cpu_core *state)
 	 */
 	if(CPU_RUN_MODE == RUN_MODE_BERR_AERR_RESET_WSF)
 	{
+		EXCLOG("[EXC] ADDRESS ERROR (nested) pc=0x%08X ppc=0x%08X ir=0x%04X\n",
+		       REG_PC, REG_PPC, REG_IR);
 		m68k_read_memory_8(0x00ffff01);
 		CPU_STOPPED = STOP_LEVEL_HALT;
 		return;
@@ -2420,6 +2443,8 @@ static inline void m68ki_exception_address_error(m68ki_cpu_core *state)
 	}
 
 	m68ki_jump_vector(state, EXCEPTION_ADDRESS_ERROR);
+	EXCLOG("[EXC] ADDRESS ERROR pc=0x%08X ppc=0x%08X ir=0x%04X sr=0x%04X aerr=0x%08X rw=%u fc=%u\n",
+	       REG_PC, REG_PPC, REG_IR, sr, m68ki_aerr_address, m68ki_aerr_write_mode, m68ki_aerr_fc);
 
 	state->run_mode = RUN_MODE_BERR_AERR_RESET;
 
