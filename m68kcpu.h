@@ -38,6 +38,9 @@ extern "C" {
 #endif
 
 #include "m68k.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <limits.h>
 #include <endian.h>
@@ -54,9 +57,40 @@ extern "C" {
 #endif
 
 #ifdef PISTORM_SR_LOG
-#define SRLOG(...) LOG_DEBUG(__VA_ARGS__)
+static inline void srlog_throttled(const char *fmt, ...)
+{
+	static char last[256];
+	static unsigned int repeat;
+	char buf[256];
+	va_list ap;
+
+	va_start(ap, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, ap);
+	va_end(ap);
+
+	if (strcmp(buf, last) == 0)
+	{
+		repeat++;
+		return;
+	}
+	if (repeat > 0)
+	{
+		LOG_DEBUG("[SR] previous line repeated %u times\n", repeat);
+		repeat = 0;
+	}
+	strncpy(last, buf, sizeof(last));
+	last[sizeof(last) - 1] = '\0';
+	LOG_DEBUG("%s", buf);
+}
+#define SRLOG(...) srlog_throttled(__VA_ARGS__)
 #else
 #define SRLOG(...)
+#endif
+
+#ifdef PISTORM_RTE_LOG
+#define RTELOG(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define RTELOG(...)
 #endif
 
 /* ======================================================================== */
