@@ -266,11 +266,12 @@ static inline void m68k_execute_bef(m68ki_cpu_core *state, int num_cycles)
 	return;
 }
 
-void *cpu_task() {
-	m68ki_cpu_core *state = &m68ki_cpu;
+void *cpu_task(void *arg) {
+  (void)arg;
+  m68ki_cpu_core *state = &m68ki_cpu;
   state->ovl = ovl;
   state->gpio = gpio;
-	m68k_pulse_reset(state);
+  m68k_pulse_reset(state);
 
 cpu_loop:
   if (mouse_hook_enabled) {
@@ -354,7 +355,8 @@ stop_cpu_emulation:
   return (void *)NULL;
 }
 
-void *keyboard_task() {
+void *keyboard_task(void *arg) {
+  (void)arg;
   struct pollfd kbdpoll[1];
   int kpollrc;
   char c = 0, c_code = 0, c_type = 0;
@@ -523,13 +525,15 @@ void sigint_handler(int sig_num) {
 
 int main(int argc, char *argv[]) {
   int g;
-
-  ps_setup_protocol();
+  int gpio_probe_only = 0;
 
   //const struct sched_param priority = {99};
 
   // Some command line switch stuffles
   for (g = 1; g < argc; g++) {
+    if (strcmp(argv[g], "--gpio-probe") == 0) {
+      gpio_probe_only = 1;
+    }
     if (strcmp(argv[g], "--cpu_type") == 0 || strcmp(argv[g], "--cpu") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no CPU type specified.\n", argv[g]);
@@ -562,6 +566,12 @@ int main(int argc, char *argv[]) {
       }
     }
   }
+
+  if (gpio_probe_only) {
+    return ps_probe_protocol() == 0 ? 0 : 1;
+  }
+
+  ps_setup_protocol();
 
 switch_config:
   srand(clock());
@@ -661,8 +671,9 @@ switch_config:
   usleep(1500);
 
   m68k_init();
+  ps_dump_protocol_state("pre-m68k-set-cpu");
   printf("Setting CPU type to %d.\n", cpu_type);
-	m68k_set_cpu_type(&m68ki_cpu, cpu_type);
+		m68k_set_cpu_type(&m68ki_cpu, cpu_type);
   cpu_pulse_reset();
 
   pthread_t ipl_tid = 0, cpu_tid, kbd_tid;

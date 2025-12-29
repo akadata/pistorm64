@@ -168,6 +168,8 @@ unsigned int ps_read_status_reg();
 void ps_write_status_reg(unsigned int value);
 
 void ps_setup_protocol();
+int ps_probe_protocol();
+void ps_dump_protocol_state(const char *tag);
 void ps_reset_state_machine();
 void ps_pulse_reset();
 

@@ -6,6 +6,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <endian.h>
+#include <stdlib.h>
+#include <string.h>
 #include "config_file/config_file.h"
 #include <pthread.h>
 #include "gpio/ps_protocol.h"
@@ -40,7 +42,6 @@ static const char *op_type_names[4] = {
 #define DEBUG(...)
 void print_ahi_sample_type(uint16_t type);
 #endif
-
 uint32_t tmp, dir, buff_size;
 uint32_t playback_rate = 48000;
 int32_t channels = 2, seconds;

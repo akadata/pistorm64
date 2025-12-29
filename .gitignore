@@ -42,3 +42,5 @@ tags.*
 *.iso
 *.rom
 *.bin
+
+artifacts/

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <endian.h>
 #include "config_file/config_file.h"
 
 uint8_t dmac_reg_idx = 0;

@@ -13,8 +13,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <endian.h>
 
+#if defined(HAVE_VC_TVSERVICE)
 #include "interface/vmcs_host/vc_tvservice.h"
+#endif
 
 #define RTG_INIT_ERR(a) { printf(a); *data->running = 0; }
 
@@ -460,7 +463,9 @@ void rtg_init_display() {
 
     if (!rtg_initialized) {
         if (rtg_dpms) {
-            vc_tv_hdmi_power_on_preferred();
+#if defined(HAVE_VC_TVSERVICE)
+        vc_tv_hdmi_power_on_preferred();
+#endif
         }
         err = pthread_create(&thread_id, NULL, &rtgThread, (void *)&rtg_share_data);
         if (err != 0) {
@@ -481,7 +486,9 @@ void rtg_shutdown_display() {
     printf("RTG display disabled.\n");
     if (rtg_dpms) {
         raylib_shutdown_requested = 1;
+#if defined(HAVE_VC_TVSERVICE)
         vc_tv_power_off();
+#endif
         pthread_join(thread_id, NULL);
     }
 

@@ -1,118 +1,207 @@
+# Makefile - replacement
+# Target: build PiStorm emulator cleanly on Alpine (musl) for Pi 5 64-bit
+# Also keeps existing PI_64BIT / PI3_BULLSEYE / PI4 branches.
+#
+# Key musl fixes:
+#  - Threading: use -pthread (compile + link)
+#  - Keep libraries OUT of CFLAGS (compile flags)
+#  - Suppress generated m68kops.c warning only for that object
+#
+# Usage:
+#   make clean
+#   make PLATFORM=PI5_ALPINE_64BIT
+#
+# Note: emulator.c must have thread entrypoints with signature:
+#   void *cpu_task(void *arg) { (void)arg; ... return NULL; }
+#   void *keyboard_task(void *arg) { (void)arg; ... return NULL; }
+
 EXENAME          = emulator
 
 MAINFILES        = emulator.c \
-	memory_mapped.c \
-	config_file/config_file.c \
-	config_file/rominfo.c \
-	input/input.c \
-	gpio/ps_protocol.c \
-	platforms/platforms.c \
-	platforms/amiga/amiga-autoconf.c \
-	platforms/amiga/amiga-platform.c \
-	platforms/amiga/amiga-registers.c \
-	platforms/amiga/amiga-interrupts.c \
-	platforms/mac68k/mac68k-platform.c \
-	platforms/dummy/dummy-platform.c \
-	platforms/dummy/dummy-registers.c \
-	platforms/amiga/Gayle.c \
-	platforms/amiga/hunk-reloc.c \
-	platforms/amiga/cdtv-dmac.c \
-	platforms/amiga/rtg/rtg.c \
-	platforms/amiga/rtg/rtg-output-raylib.c \
-	platforms/amiga/rtg/rtg-gfx.c \
-	platforms/amiga/piscsi/piscsi.c \
-	platforms/amiga/ahi/pi_ahi.c \
-	platforms/amiga/pistorm-dev/pistorm-dev.c \
-	platforms/amiga/net/pi-net.c \
-	platforms/shared/rtc.c \
-	platforms/shared/common.c
+                  memory_mapped.c \
+                  config_file/config_file.c \
+                  config_file/rominfo.c \
+                  input/input.c \
+                  gpio/ps_protocol.c \
+                  platforms/platforms.c \
+                  platforms/amiga/amiga-autoconf.c \
+                  platforms/amiga/amiga-platform.c \
+                  platforms/amiga/amiga-registers.c \
+                  platforms/amiga/amiga-interrupts.c \
+                  platforms/mac68k/mac68k-platform.c \
+                  platforms/dummy/dummy-platform.c \
+                  platforms/dummy/dummy-registers.c \
+                  platforms/amiga/Gayle.c \
+                  platforms/amiga/hunk-reloc.c \
+                  platforms/amiga/cdtv-dmac.c \
+                  platforms/amiga/rtg/rtg.c \
+                  platforms/amiga/rtg/rtg-output-raylib.c \
+                  platforms/amiga/rtg/rtg-gfx.c \
+                  platforms/amiga/piscsi/piscsi.c \
+                  platforms/amiga/ahi/pi_ahi.c \
+                  platforms/amiga/pistorm-dev/pistorm-dev.c \
+                  platforms/amiga/net/pi-net.c \
+                  platforms/shared/rtc.c \
+                  platforms/shared/common.c
 
 MUSASHIFILES     = m68kcpu.c m68kdasm.c softfloat/softfloat.c softfloat/softfloat_fpsp.c
 MUSASHIGENCFILES = m68kops.c
 MUSASHIGENHFILES = m68kops.h
 MUSASHIGENERATOR = m68kmake
 
-# EXE = .exe
-# EXEPATH = .\\
-EXE =
-EXEPATH = ./
+EXE              =
+EXEPATH          = ./
 
-# Define the m68k related files separately to control build order
-M68KFILES   = $(MUSASHIFILES) $(MUSASHIGENCFILES)
-.CFILES   = $(MAINFILES) $(M68KFILES)
-.OFILES   = $(.CFILES:%.c=%.o) a314/a314.o
+# Build order control
+M68KFILES        = $(MUSASHIFILES) $(MUSASHIGENCFILES)
+CFILES           = $(MAINFILES) $(M68KFILES)
+OFILES           = $(CFILES:%.c=%.o) a314/a314.o
+DFILES           = $(OFILES:%.o=%.d) $(MUSASHIGENERATOR).d
 
-CC        = gcc
-CXX       = g++
-WARNINGS  = -Wall -Wextra -pedantic
+CC               = gcc
+CXX              = g++
 
-# Default to 64-bit settings if no platform specified
-CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
-LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
+# Common flags
+PTHREAD          = -pthread
+WARNINGS_COMMON  = -Wall -Wextra -Wpedantic -Wformat=2 -Wundef
+DEFS_COMMON      = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1
 
-ifeq ($(PLATFORM),PI_64BIT)
+# Defaults (overridden per PLATFORM)
+WARNINGS         = $(WARNINGS_COMMON)
+MARCH            = -march=native
+MCPU             = -mcpu=native
+OPT              = -O3 -pipe -fno-strict-aliasing -fno-plt
 
-  # Warnings: keep useful ones, drop -Wshadow if the noise is too high
-  WARNINGS  = -Wall -Wextra -Wpedantic -Wformat=2 -Wundef
+# Include paths - default to legacy raylib path; platforms override as needed
+INCLUDES         = -I. -I./raylib
 
-  # Pi Zero 2 W (Cortex-A53). Use ONE of these approaches; this one is safe and clear.
-  MARCH     = -march=native
-  MCPU      = -mcpu=native
+# Link search paths
+LIBDIRS          = -L/usr/local/lib -L/opt/vc/lib
 
-  # Let GCC decide LTO worker count; fixes "serial compilation of LTRANS jobs"
-  OPT       = -O3 -pipe -fno-strict-aliasing -fno-plt 
-  LDFLAGS   = -Wl,-O2 -Wl,--as-needed
+# Libraries (link-time only)
+LDLIBS           = -lm -ldl -lstdc++
 
-  CFLAGS    = $(WARNINGS) -I. -I./raylib_drm $(MARCH) $(MCPU) $(OPT) \
-              -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
-              -DINLINE_INTO_M68KCPU_H=1 $(ACFLAGS)
+# Graphics/audio stack for raylib DRM
+RAYLIB_DIR       = ./raylib_drm
+RAYLIB_LIBDIRS   = -L$(RAYLIB_DIR)
+RAYLIB_LIBS      = -lraylib -lGLESv2 -lEGL -lgbm -ldrm -lasound
 
-  LFLAGS    = $(WARNINGS) $(LDFLAGS) -L/usr/local/lib -L./raylib_drm \
-              -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ \
-              -lvcos -lvchiq_arm -lvchostif -lasound
+# Optional VideoCore libs (may not exist on Alpine; keep them only where needed)
+VCHIQ_LIBS       = -lvcos -lvchiq_arm -lvchostif
+
+# Final flags (set after PLATFORM selection)
+CFLAGS           =
+CPPFLAGS         =
+LDFLAGS          =
+LFLAGS           =
+
+# -----------------------------------------------------------------------------
+# PLATFORM selection
+# -----------------------------------------------------------------------------
+
+ifeq ($(PLATFORM),PI5_ALPINE_64BIT)
+
+# Alpine/musl on Pi 5: avoid /opt/vc assumptions; prefer the system raylib (aarch64).
+INCLUDES   = -I.
+LIBDIRS    = -L/usr/local/lib
+
+CFLAGS     = $(WARNINGS) $(INCLUDES) $(MARCH) $(MCPU) $(OPT) $(DEFS_COMMON) $(ACFLAGS) $(PTHREAD) -DHAVE_LIBGPIOD -DPISTORM_RP1=1
+CPPFLAGS   =
+LDFLAGS    = $(PTHREAD) -Wl,-O2 -Wl,--as-needed
+
+# No vcos/vchiq by default on Alpine unless explicitly present
+LFLAGS     = $(WARNINGS) $(LDFLAGS) $(LIBDIRS) $(RAYLIB_LIBS) -lgpiod $(LDLIBS)
+
+else ifeq ($(PLATFORM),PI_64BIT)
+
+# Existing 64-bit Raspberry Pi Linux: raylib_drm + VideoCore libs
+INCLUDES   = -I. -I$(RAYLIB_DIR)
+LIBDIRS    = -L/usr/local/lib
+
+CFLAGS     = $(WARNINGS) $(INCLUDES) $(MARCH) $(MCPU) $(OPT) $(DEFS_COMMON) $(ACFLAGS) $(PTHREAD)
+LDFLAGS    = $(PTHREAD) -Wl,-O2 -Wl,--as-needed
+
+LFLAGS     = $(WARNINGS) $(LDFLAGS) $(LIBDIRS) $(RAYLIB_LIBDIRS) $(RAYLIB_LIBS) $(VCHIQ_LIBS) $(LDLIBS)
 
 else ifeq ($(PLATFORM),PI3_BULLSEYE)
-	LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
-	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
+
+# Legacy Pi3 Bullseye build (kept compatible with original structure)
+INCLUDES   = -I. -I./raylib -I/opt/vc/include/
+LIBDIRS    = -L/usr/local/lib -L/opt/vc/lib -L$(RAYLIB_DIR)
+
+CFLAGS     = -Wall -Wextra -pedantic $(INCLUDES) -march=native -Os $(DEFS_COMMON) $(ACFLAGS)
+LDFLAGS    =
+LFLAGS     = -Wall -Wextra -pedantic $(LIBDIRS) $(RAYLIB_LIBS) $(VCHIQ_LIBS) $(LDLIBS)
+
 else ifeq ($(PLATFORM),PI4)
-	LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_pi4_test -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
-	CFLAGS    = $(WARNINGS) -DRPI4_TEST -I. -I./raylib_pi4_test -I/opt/vc/include/ -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
+
+INCLUDES   = -Wall -Wextra -pedantic -DRPI4_TEST -I. -I./raylib_pi4_test -I/opt/vc/include/
+LIBDIRS    = -L/usr/local/lib -L/opt/vc/lib -L./raylib_pi4_test
+
+CFLAGS     = -Wall -Wextra -pedantic -DRPI4_TEST -I. -I./raylib_pi4_test -I/opt/vc/include/ -march=native -Os $(DEFS_COMMON) $(ACFLAGS)
+LDFLAGS    =
+LFLAGS     = -Wall -Wextra -pedantic $(LIBDIRS) -lraylib -lGLESv2 -lEGL -lgbm -ldrm -lasound $(VCHIQ_LIBS) $(LDLIBS)
+
+else
+
+# Default: build using raylib (non-drm) include path; keep safe.
+CFLAGS     = -Wall -Wextra -pedantic $(INCLUDES) -march=native -Os $(DEFS_COMMON) $(ACFLAGS)
+LDFLAGS    =
+LFLAGS     = -Wall -Wextra -pedantic $(LIBDIRS) $(RAYLIB_LIBS) $(VCHIQ_LIBS) $(LDLIBS)
+
 endif
+
+# -----------------------------------------------------------------------------
+# Targets
+# -----------------------------------------------------------------------------
 
 TARGET = $(EXENAME)$(EXE)
 
-DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) $(MUSASHIGENERATOR)$(EXE)
-
+DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(OFILES) $(DFILES) $(TARGET) $(MUSASHIGENERATOR)$(EXE)
 
 all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest
 
 clean:
 	rm -f $(DELETEFILES)
 
-# Ensure generated m68k files are built before other files that depend on them
-$(TARGET):  $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) a314/a314.o
-	$(CC) -o $@ $^ -Os -pthread $(LFLAGS) -lm -lstdc++
+# Ensure generated files are built before compiling dependents
+$(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) a314/a314.o
+	$(CC) -o $@ $^ -Os $(PTHREAD) $(LFLAGS)
 
-# Explicit dependency: any .o file that might need m68kops.h should depend on it
-# Files that include m68kops.h (like emulator.c and m68kcpu.c) need to wait for it to be generated
+# Dependency: files that include m68kops.h must wait for generation
 emulator.o: m68kops.h
 m68kcpu.o: m68kops.h
 m68kdasm.o: m68kops.h
 m68kops.o: m68kops.h
+
+# Generated file: keep strict warnings elsewhere, silence only here.
+# (The generator emits a NOP handler where the 'state' argument is unused.)
+m68kops.o: CFLAGS += -Wno-unused-parameter
 
 buptest: buptest.c gpio/ps_protocol.c
 	$(CC) $^ -o $@ -I./ -march=native -Os
 
 a314/a314.o: a314/a314.cc a314/a314.h
 	$(CXX) -MMD -MP -c -o $@ a314/a314.cc \
-		$(OPT) $(MARCH) $(MCPU) \
-		-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
-		-I. -I..
+	$(OPT) $(MARCH) $(MCPU) \
+	$(DEFS_COMMON) \
+	-I. -I..
+
+# -----------------------------------------------------------------------------
+# Musashi generator and generated files
+# -----------------------------------------------------------------------------
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 	$(EXEPATH)$(MUSASHIGENERATOR)$(EXE)
 
-$(MUSASHIGENERATOR)$(EXE):  $(MUSASHIGENERATOR).c
-	$(CC) -o  $(MUSASHIGENERATOR)$(EXE)  $(MUSASHIGENERATOR).c
+$(MUSASHIGENERATOR)$(EXE): $(MUSASHIGENERATOR).c
+	$(CC) -o $(MUSASHIGENERATOR)$(EXE) $(MUSASHIGENERATOR).c
 
--include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) a314/a314.d $(MUSASHIGENERATOR).d
+# -----------------------------------------------------------------------------
+# Generic compile rules + dependency generation
+# -----------------------------------------------------------------------------
+
+%.o: %.c
+	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
+
+-include $(DFILES)

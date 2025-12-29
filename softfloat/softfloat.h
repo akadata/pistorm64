@@ -86,9 +86,12 @@ this code that are retained.
 #define SOFTFLOAT_H
 
 #if defined(CONFIG_SOLARIS) && defined(CONFIG_NEEDS_LIBSUNMATH)
-#include <sunmath.h>
+  #include <sunmath.h>
 #endif
 
+#ifndef __cplusplus
+  #include <stdbool.h>
+#endif
 
 /* This 'flag' type must be able to hold at least 0 and 1. It should
  * probably be replaced with 'bool' but the uses would need to be audited
@@ -96,7 +99,11 @@ this code that are retained.
  */
 
 typedef uint64_t flag;
-typedef uint8_t bool;
+
+#ifndef __cplusplus
+  #include <stdbool.h>
+#endif
+
 
 #define LIT64( a ) a##ULL
 

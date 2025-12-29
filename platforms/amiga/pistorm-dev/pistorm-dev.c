@@ -18,7 +18,9 @@
 #include <sys/reboot.h>
 #include <endian.h>
 
+#if defined(HAVE_VC_GENCMD)
 #include <interface/vmcs_host/vc_vchi_gencmd.h>
+#endif
 
 #define DEBUG_PISTORM_DEVICE
 
@@ -60,10 +62,13 @@ static uint32_t pi_dbg_string[32];
 static uint32_t pi_cmd_result = 0, shutdown_confirm = 0xFFFFFFFF;
 
 static bool pi_cmd_init = false;
+#if defined(HAVE_VC_GENCMD)
 static VCHI_INSTANCE_T vchi_instance;
 static VCHI_CONNECTION_T *vchi_connection = NULL;
+#endif
 
 static uint32_t grab_pi_temperature() {
+#if defined(HAVE_VC_GENCMD)
     if (!pi_cmd_init) {
         vcos_init();
         if (vchi_initialise(&vchi_instance) != 0) {
@@ -88,6 +93,9 @@ static uint32_t grab_pi_temperature() {
        return 0;
    }
    return atoi(ptr+1);
+#else
+    return 0;
+#endif
 }
 
 int32_t grab_amiga_string(uint32_t addr, uint8_t *dest, uint32_t str_max_len) {
