@@ -28,3 +28,17 @@ m68kops.h
 .vscode/
 .idea/
 qwen.resume
+
+# Editor/ctags
+tags
+tags.*
+
+
+# Amiga / emulator disk images
+*.hdf
+*.hdd
+*.img
+*.adf
+*.iso
+*.rom
+*.bin

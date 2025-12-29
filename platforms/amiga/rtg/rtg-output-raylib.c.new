@@ -26,8 +26,7 @@
 #define DEBUG(...)
 #endif
 
-uint8_t busy = 0, rtg_on = 0, rtg_initialized = 0, emulator_exiting = 0, rtg_output_in_vblank = 0, rtg_dpms = 0, raylib_shutdown_requested = 0;
-
+uint8_t busy = 0, rtg_on = 0, rtg_initialized = 0, emulator_exiting = 0, rtg_output_in_vblank = 0, rtg_dpms = 0, rtg_shutdown = 0;
 extern uint8_t *rtg_mem, display_enabled;
 extern uint32_t framebuffer_addr;
 extern uint32_t framebuffer_addr_adj;
@@ -410,12 +409,12 @@ reinit_raylib:;
         if (emulator_exiting) {
             goto shutdown_raylib;
         }
-        if (raylib_shutdown_requested) {
+        if (rtg_shutdown) {
             break;
         }
     }
 
-    raylib_shutdown_requested = 0;
+    rtg_shutdown = 0;
     rtg_initialized = 0;
     printf("RTG thread shut down.\n");
 
@@ -480,7 +479,7 @@ void rtg_init_display() {
 void rtg_shutdown_display() {
     printf("RTG display disabled.\n");
     if (rtg_dpms) {
-        raylib_shutdown_requested = 1;
+        rtg_shutdown = 1;
         vc_tv_power_off();
         pthread_join(thread_id, NULL);
     }

@@ -51,8 +51,26 @@ CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=native -Os -D_F
 LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
 
 ifeq ($(PLATFORM),PI_64BIT)
-	LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
-	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
+
+  # Warnings: keep useful ones, drop -Wshadow if the noise is too high
+  WARNINGS  = -Wall -Wextra -Wpedantic -Wformat=2 -Wundef
+
+  # Pi Zero 2 W (Cortex-A53). Use ONE of these approaches; this one is safe and clear.
+  MARCH     = -march=native
+  MCPU      = -mcpu=native
+
+  # Let GCC decide LTO worker count; fixes "serial compilation of LTRANS jobs"
+  OPT       = -O3 -pipe -fno-strict-aliasing -fno-plt 
+  LDFLAGS   = -Wl,-O2 -Wl,--as-needed
+
+  CFLAGS    = $(WARNINGS) -I. -I./raylib_drm $(MARCH) $(MCPU) $(OPT) \
+              -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
+              -DINLINE_INTO_M68KCPU_H=1 $(ACFLAGS)
+
+  LFLAGS    = $(WARNINGS) $(LDFLAGS) -L/usr/local/lib -L./raylib_drm \
+              -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ \
+              -lvcos -lvchiq_arm -lvchostif -lasound
+
 else ifeq ($(PLATFORM),PI3_BULLSEYE)
 	LFLAGS    = $(WARNINGS) -L/usr/local/lib -L/opt/vc/lib -L./raylib_drm -lraylib -lGLESv2 -lEGL -lgbm -ldrm -ldl -lstdc++ -lvcos -lvchiq_arm -lvchostif -lasound
 	CFLAGS    = $(WARNINGS) -I. -I./raylib -I/opt/vc/include/ -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 -lstdc++ $(ACFLAGS)
@@ -86,7 +104,10 @@ buptest: buptest.c gpio/ps_protocol.c
 	$(CC) $^ -o $@ -I./ -march=native -Os
 
 a314/a314.o: a314/a314.cc a314/a314.h
-	$(CXX) -MMD -MP -c -o a314/a314.o -O3 a314/a314.cc -march=native -Os -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -I. -I..
+	$(CXX) -MMD -MP -c -o $@ a314/a314.cc \
+		$(OPT) $(MARCH) $(MCPU) \
+		-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
+		-I. -I..
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 	$(EXEPATH)$(MUSASHIGENERATOR)$(EXE)
