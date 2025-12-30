@@ -1,0 +1,499 @@
+diff --git a/DEBUGGING_PI5.md b/DEBUGGING_PI5.md
+index 98e1657..e6db6bc 100644
+--- a/DEBUGGING_PI5.md
++++ b/DEBUGGING_PI5.md
+@@ -3,6 +3,7 @@
+ ## Safe first checks
+ 
+ - `sudo ./emulator --gpio-probe`
++- `sudo ./emulator --gpclk-probe` (attempts to enable GPCLK0 and prints `clk_transitions`; no CPLD transactions)
+ 
+ ## Run under gdb (logs to `gdb.log`)
+ 
+@@ -19,3 +20,13 @@
+ - Set `PISTORM_TXN_TIMEOUT_US` (microseconds) to control how long we wait for `PIN_TXN_IN_PROGRESS` to clear before dumping GPIO state and exiting.
+   - Example: `sudo env PISTORM_TXN_TIMEOUT_US=2000000 ./emulator --config basic.cfg`
+ 
++## GPCLK0 on GPIO4 (PiStorm clock)
++
++- The CPLD design expects a clock on GPIO4 (`PI_CLK` in `rtl/pistorm.v`).
++- The Pi 5 RP1 path tries to enable GPCLK0 via `/dev/mem` by default; you can control it with:
++  - Disable: `PISTORM_ENABLE_GPCLK=0`
++  - Source select: `PISTORM_GPCLK_SRC` (default `5`)
++  - Integer divisor: `PISTORM_GPCLK_DIV_INT` (default `6`)
++  - Extra log: `PISTORM_GPCLK_DEBUG=1`
++  - Clock-manager base overrides (Pi 5): `PISTORM_GPCLK_CM_CHILD` (e.g. `0x7c700000`) or `PISTORM_GPCLK_CM_PHYS` (e.g. `0x107c700000`)
++  - By default, the base is derived from the DT symbol `dvp` (`/sys/firmware/devicetree/base/__symbols__/dvp`).
+diff --git a/STATUS.md b/STATUS.md
+index 6656e62..abe131f 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -3,6 +3,7 @@ Status
+ Context
+ - Goal: Run `sudo ./emulator --config basic.cfg` on Pi 5 Alpine without hard-crashing the system, and get useful diagnostics when GPIO/CPLD handshakes fail.
+ - Branch base: akadata/master; patches directory exists but most patches do not apply cleanly (likely already integrated or diverged).
++- Alpine snapshot report: `ALPINE_PI5_REPORT.md`
+ 
+ What I did last
+ - Built successfully with `make PLATFORM=PI5_ALPINE_64BIT`.
+@@ -17,7 +18,7 @@ Key findings
+ - `gpioinfo` works only under `sudo`.
+ 
+ Current hypothesis
+-- RP1 GPIO MMIO mapping works, but CPLD handshakes can hang if GPCLK is not running or pin muxing is wrong.
++- RP1 GPIO MMIO mapping works, but CPLD handshakes can hang if GPCLK is not running or if we accidentally drive pins that the CPLD drives.
+ 
+ Next steps
+ - Confirm GPCLK is actually present on GPIO4 (PiStorm clock) and the CPLD responds (TXN_IN_PROGRESS clears).
+@@ -30,14 +31,39 @@ Update
+ - Added RP1 transaction timeout: if `PIN_TXN_IN_PROGRESS` never clears, the emulator now dumps GPIO state and exits instead of hanging forever.
+   - Tune via `PISTORM_TXN_TIMEOUT_US` (default 500000).
+ - RP1 pinmux: GPIO4 is now left as `GPCLK[0]` (FUNCSEL a0/0) while the other protocol pins use `SYS_RIO[n]` (a5/5).
++- Important: the CPLD drives GPIO5 (`PI_RESET` is an output on GPIO5 in `rtl/pistorm.v`), so Pi-side code must not enable output drive on GPIO5.
++- RP1 GPCLK0: the Pi 5 build now attempts to enable GPCLK0 for GPIO4 via `/dev/mem` (disable with `PISTORM_ENABLE_GPCLK=0`; tune with `PISTORM_GPCLK_SRC` / `PISTORM_GPCLK_DIV_INT`).
++  - On Pi 5 the clock-manager MMIO base is derived from the DT symbol `dvp` (typically `/soc@107c000000/clock@7c700000`, seen in `/proc/iomem` as `107c700000.clock`).
++  - Overrides (if needed): `PISTORM_GPCLK_CM_CHILD` (32-bit child address, e.g. `0x7c700000`) or `PISTORM_GPCLK_CM_PHYS` (full physical address, e.g. `0x107c700000`).
++  - Extra log: `PISTORM_GPCLK_DEBUG=1` prints the raw `ctl/div` values before/after programming.
++- Added `sudo ./emulator --gpclk-probe` to attempt GPCLK enable and print `[GPIO] gpclk-probe ... clk_transitions=...` without doing any CPLD transactions.
++- Current blocker: on this Pi 5 kernel, mapping the SoC clock block via `/dev/mem` fails with `errno=1 (EPERM)`:
++  - Example: `GPCLK: mmap failed @ 0x107c700000, errno=1; skipping GPCLK setup.`
++  - `/proc/iomem` shows the region is extremely small (`107c700000-107c70000f`), which likely causes `/dev/mem` to deny mapping a full page.
++  - This means GPCLK0 probably must be enabled via kernel clock framework / DT overlay (boot-time), not by direct userspace MMIO.
+ - If a crash leaves build artifacts corrupted (e.g., empty `.o` files / many link undefined refs), run `make clean` and rebuild.
+ 
+ Current safe command to run first
+ - `sudo ./emulator --gpio-probe`
++  - Then: `sudo ./emulator --gpclk-probe` (expect `clk_transitions` to be non-zero if the clock is actually running).
++
++Latest observations (gpiochip probe)
++- `sudo ./emulator --gpio-probe` currently shows lines 0-7 reading `1` and lines 8-23 reading `0` on `/dev/gpiochip0`.
++  - Note: `line 0 (ID_SDA)` and `line 1 (ID_SCL)` are GPIO0/GPIO1 (HAT ID pins) and are normally pulled high on the Pi; if the CPLD is alive and driving `PI_TXN_IN_PROGRESS`/`PI_IPL_ZERO`, these levels may change.
++- Manual libgpiod tests on `/dev/gpiochip0`:
++  - `sudo gpioinfo -c /dev/gpiochip0 17/22/23` initially reported `input`.
++  - `sudo gpioset -c /dev/gpiochip0 -t 200ms,0 17=1` / `17=0` resulted in `GPIO17` showing `output` in `gpioinfo`.
++  - Caution: GPIO17 is within the PiStorm protocol pin range on legacy builds (GPIO8..23 = data bus); avoid `gpioset` on protocol pins when the PiStorm is connected to the Amiga/CPLD unless you explicitly intend to drive the bus.
++
++Monitoring for edges (libgpiod tools)
++- `gpiomon` does not support `-r`; use edges selection instead, e.g.:
++  - `sudo gpiomon -c /dev/gpiochip0 -e both 0 1` (watch GPIO0/GPIO1 transitions)
++  - `sudo gpiomon -c /dev/gpiochip0 -e both 0 --idle-timeout 2000ms` (exit after 2s of no edges)
+ 
+ GDB quickstart (logs to `gdb.log`)
+ - `sudo gdb -q -x gdb_pistorm_init.gdb --args ./emulator --config basic.cfg`
+ - In gdb: `run`, then if it stalls `Ctrl-C`, then `bt` / `thread apply all bt`
++  - If you type commands manually: prefer `set logging enabled on` (the older `set logging on` alias is deprecated and can be confusing).
+ 
+ Legacy backend reference
+ - `LEGACY_GPIO_BACKEND.md` describes the pre–Pi 5 `/dev/mem` BCM GPIO path, pin roles, and where the timings/handshakes live.
+diff --git a/emulator.c b/emulator.c
+index d396f91..92e91b4 100644
+--- a/emulator.c
++++ b/emulator.c
+@@ -526,6 +526,7 @@ void sigint_handler(int sig_num) {
+ int main(int argc, char *argv[]) {
+   int g;
+   int gpio_probe_only = 0;
++  int gpclk_probe_only = 0;
+ 
+   //const struct sched_param priority = {99};
+ 
+@@ -534,6 +535,9 @@ int main(int argc, char *argv[]) {
+     if (strcmp(argv[g], "--gpio-probe") == 0) {
+       gpio_probe_only = 1;
+     }
++    if (strcmp(argv[g], "--gpclk-probe") == 0) {
++      gpclk_probe_only = 1;
++    }
+     if (strcmp(argv[g], "--cpu_type") == 0 || strcmp(argv[g], "--cpu") == 0) {
+       if (g + 1 >= argc) {
+         printf("%s switch found, but no CPU type specified.\n", argv[g]);
+@@ -570,6 +574,9 @@ int main(int argc, char *argv[]) {
+   if (gpio_probe_only) {
+     return ps_probe_protocol() == 0 ? 0 : 1;
+   }
++  if (gpclk_probe_only) {
++    return ps_gpclk_probe() == 0 ? 0 : 1;
++  }
+ 
+   ps_setup_protocol();
+ 
+diff --git a/gpio/ps_protocol.c b/gpio/ps_protocol.c
+index 1255fb6..2534edd 100644
+--- a/gpio/ps_protocol.c
++++ b/gpio/ps_protocol.c
+@@ -43,6 +43,10 @@ static size_t rp1_io_bank0_size;
+ static size_t rp1_sys_rio0_size;
+ static int rp1_mem_fd = -1;
+ 
++static uint32_t be32(const uint8_t *p) {
++  return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) | ((uint32_t)p[2] << 8) | ((uint32_t)p[3] << 0);
++}
++
+ static uint64_t be64(const uint8_t *p) {
+   return ((uint64_t)p[0] << 56) | ((uint64_t)p[1] << 48) | ((uint64_t)p[2] << 40) | ((uint64_t)p[3] << 32) |
+          ((uint64_t)p[4] << 24) | ((uint64_t)p[5] << 16) | ((uint64_t)p[6] << 8) | ((uint64_t)p[7] << 0);
+@@ -201,13 +205,17 @@ static inline uint32_t rp1_rio_sync_in() {
+   return rp1_sys_rio0[RP1_RIO_SYNC_IN_OFF / 4];
+ }
+ 
++static inline unsigned int rp1_gpio_infrompad(unsigned int gpio_n);
++static inline unsigned int rp1_gpio_outtopad(unsigned int gpio_n);
++static inline unsigned int rp1_gpio_oetopad(unsigned int gpio_n);
++
+ static int rp1_wait_txn_clear(uint32_t *final_sync_in) {
+   const uint64_t start = rp1_now_ns();
+   const uint64_t deadline = start + rp1_txn_timeout_ns();
+   uint32_t v = 0;
+   for (;;) {
+     v = rp1_rio_sync_in();
+-    if ((v & (1u << PIN_TXN_IN_PROGRESS)) == 0) {
++    if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS) == 0) {
+       if (final_sync_in) {
+         *final_sync_in = v;
+       }
+@@ -228,7 +236,7 @@ static void rp1_txn_timeout_fatal(const char *where) {
+ 
+   // Best-effort release of the protocol lines before exiting.
+   const uint32_t ctrl_mask =
+-      (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
++      (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
+   const uint32_t data_mask = (0xFFFFu << 8);
+   rp1_rio_out_clr(0xFFFFECu);
+   rp1_rio_oe_clr(ctrl_mask | data_mask);
+@@ -241,6 +249,25 @@ static inline uint32_t rp1_gpio_ctrl_index(unsigned int gpio_n) {
+   return (0x004u + (gpio_n * 8u)) / 4u;
+ }
+ 
++static inline uint32_t rp1_gpio_status_index(unsigned int gpio_n) {
++  return (0x000u + (gpio_n * 8u)) / 4u;
++}
++
++static inline unsigned int rp1_gpio_infrompad(unsigned int gpio_n) {
++  // IO_BANK0_GPIOx_STATUS.INFROMPAD is bit 17 (RP1 peripherals doc Table 7).
++  return (rp1_io_bank0[rp1_gpio_status_index(gpio_n)] >> 17) & 1u;
++}
++
++static inline unsigned int rp1_gpio_outtopad(unsigned int gpio_n) {
++  // IO_BANK0_GPIOx_STATUS.OUTTOPAD is bit 9.
++  return (rp1_io_bank0[rp1_gpio_status_index(gpio_n)] >> 9) & 1u;
++}
++
++static inline unsigned int rp1_gpio_oetopad(unsigned int gpio_n) {
++  // IO_BANK0_GPIOx_STATUS.OETOPAD is bit 13.
++  return (rp1_io_bank0[rp1_gpio_status_index(gpio_n)] >> 13) & 1u;
++}
++
+ static void rp1_configure_sys_rio_funcsel() {
+   // FUNCSEL encodes the 'aN' columns in the RP1 GPIO function table.
+   // - a5 == SYS_RIO[n] (fast GPIO via SYS_RIO0)
+@@ -248,7 +275,8 @@ static void rp1_configure_sys_rio_funcsel() {
+   const uint32_t funcsel_sys_rio = 5u;
+   const uint32_t funcsel_gpclk0 = 0u;
+   const uint32_t funcsel_mask = 0x1fu;
+-  for (unsigned int i = 0; i < 28; i++) {
++  // Only touch the PiStorm protocol pin range (GPIO0..GPIO23). Avoid configuring 24..27.
++  for (unsigned int i = 0; i < 24; i++) {
+     uint32_t idx = rp1_gpio_ctrl_index(i);
+     uint32_t v = rp1_io_bank0[idx];
+     const uint32_t funcsel = (i == PIN_CLK) ? funcsel_gpclk0 : funcsel_sys_rio;
+@@ -303,8 +331,163 @@ static void setup_io() {
+ 
+ static void setup_gpclk() {
+ #if defined(PISTORM_RP1)
+-  // TODO: PiStorm on Pi 5 needs an RP1/BCM2712 clock implementation for GPCLK on GPIO4.
+-  // For now, leave clock configuration to firmware/OS and continue without touching it.
++  // Attempt to configure GPCLK0 on GPIO4 on Pi 5.
++  //
++  // GPIO4 is muxed to GPCLK[0] via RP1 IO_BANK0 (see RP1 peripherals Table 4: GPIO4 a0 == GPCLK[0]).
++  // The clock generator itself is still controlled via a SoC clock manager block; on BCM2712 this is
++  // *not* at the legacy BCM283x offset (0x101000). Derive the correct MMIO base from the DT symbol
++  // 'dvp' (which points at the clock manager node on Pi 5 kernels).
++  // Required by the CPLD design (`rtl/pistorm.v` uses PI_CLK on GPIO4).
++  //
++  // Disable by setting: PISTORM_ENABLE_GPCLK=0
++  const char *enable_env = getenv("PISTORM_ENABLE_GPCLK");
++  if (enable_env && *enable_env == '0') {
++    return;
++  }
++
++  const int gpclk_debug = (getenv("PISTORM_GPCLK_DEBUG") != NULL);
++
++  // Derive SoC peripheral physical base from DT bus ranges:
++  // `/sys/firmware/devicetree/base/soc@107c000000/ranges` maps child 0x00000000 -> parent 0x1000000000.
++  uint8_t ranges[16];
++  if (read_file_bytes("/sys/firmware/devicetree/base/soc@107c000000/ranges", ranges, sizeof(ranges)) != 0) {
++    printf("GPCLK: failed to read DT ranges for SoC base; skipping GPCLK setup.\n");
++    return;
++  }
++  const uint64_t soc_phys_base = be64(&ranges[4]);  // parent address (2 cells)
++
++  // Derive clock manager child base (32-bit bus address) from DT, or allow overriding.
++  uint64_t cm_phys_base = 0;
++  const char *cm_phys_env = getenv("PISTORM_GPCLK_CM_PHYS");
++  if (cm_phys_env && *cm_phys_env) {
++    char *end = NULL;
++    unsigned long long v = strtoull(cm_phys_env, &end, 0);
++    if (end != cm_phys_env && v != 0) {
++      cm_phys_base = (uint64_t)v;
++    }
++  }
++
++  if (cm_phys_base == 0) {
++    uint32_t cm_child = 0;
++    const char *cm_child_env = getenv("PISTORM_GPCLK_CM_CHILD");
++    if (cm_child_env && *cm_child_env) {
++      char *end = NULL;
++      unsigned long v = strtoul(cm_child_env, &end, 0);
++      if (end != cm_child_env) {
++        cm_child = (uint32_t)v;
++      }
++    } else {
++      // DT symbol 'dvp' typically resolves to `/soc@107c000000/clock@7c700000` on Pi 5.
++      char dvp_path[256];
++      if (read_dt_string("/sys/firmware/devicetree/base/__symbols__/dvp", dvp_path, sizeof(dvp_path)) == 0) {
++        char reg_path[512];
++        snprintf(reg_path, sizeof(reg_path), "/sys/firmware/devicetree/base%s/reg", dvp_path);
++        uint8_t reg[8];
++        if (read_file_bytes(reg_path, reg, sizeof(reg)) == 0) {
++          cm_child = be32(&reg[0]);
++        }
++      }
++    }
++
++    if (cm_child == 0) {
++      // Fallback for older kernels/boards: legacy BCM283x clock manager offset.
++      cm_child = (uint32_t)GPCLK_ADDR;
++      printf("GPCLK: could not resolve DT clock base, falling back to legacy child base 0x%08x.\n", cm_child);
++    }
++
++    cm_phys_base = soc_phys_base + (uint64_t)cm_child;
++  }
++
++  const char *src_env = getenv("PISTORM_GPCLK_SRC");
++  const char *div_env = getenv("PISTORM_GPCLK_DIV_INT");
++  unsigned int src = 5;   // legacy default (pi3 used 5=pllc)
++  unsigned int divi = 6;  // legacy default (6 -> ~200MHz on older Pis)
++  if (src_env && *src_env) {
++    char *end = NULL;
++    unsigned long v = strtoul(src_env, &end, 0);
++    if (end != src_env && v <= 15) {
++      src = (unsigned int)v;
++    }
++  }
++  if (div_env && *div_env) {
++    char *end = NULL;
++    unsigned long v = strtoul(div_env, &end, 0);
++    if (end != div_env && v >= 1 && v <= 4095) {
++      divi = (unsigned int)v;
++    }
++  }
++
++  const uint64_t map_base = cm_phys_base & ~0xfffull;
++  const size_t map_len = 0x1000;
++  const size_t page_off = (size_t)(cm_phys_base - map_base);
++
++  int fd = open("/dev/mem", O_RDWR | O_SYNC);
++  if (fd < 0) {
++    perror("open(/dev/mem)");
++    printf("GPCLK: cannot open /dev/mem; skipping GPCLK setup.\n");
++    return;
++  }
++
++  void *m = mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)map_base);
++  close(fd);
++  if (m == MAP_FAILED) {
++    const int e = errno;
++    printf("GPCLK: mmap failed @ 0x%llx, errno=%d; skipping GPCLK setup.\n",
++           (unsigned long long)map_base, e);
++    if (e == EPERM) {
++      printf("GPCLK: kernel denied /dev/mem mapping of the clock block (CONFIG_STRICT_DEVMEM or resource size too small).\n");
++      printf("GPCLK: workaround: configure GPCLK0 at boot (DT overlay / firmware config), then run with PISTORM_ENABLE_GPCLK=0.\n");
++    }
++    return;
++  }
++
++  volatile uint32_t *cm = (volatile uint32_t *)((volatile uint8_t *)m + page_off);
++  const uint32_t ctl_idx = CLK_GP0_CTL / 4;
++  const uint32_t div_idx = CLK_GP0_DIV / 4;
++
++  if (gpclk_debug) {
++    printf("GPCLK: pre ctl=0x%08x div=0x%08x (cm_base=0x%llx)\n",
++           cm[ctl_idx], cm[div_idx], (unsigned long long)cm_phys_base);
++  }
++
++  // Disable GPCLK0.
++  cm[ctl_idx] = CLK_PASSWD | (1u << 5);
++  usleep(10);
++
++  const uint64_t t0 = rp1_now_ns();
++  while ((cm[ctl_idx] & (1u << 7)) != 0) {
++    if (rp1_now_ns() - t0 > 200000000ull) { // 200ms
++      printf("GPCLK: BUSY did not clear; skipping GPCLK setup.\n");
++      munmap(m, map_len);
++      return;
++    }
++  }
++  usleep(100);
++
++  // Set divisor (integer; fractional left at 0).
++  cm[div_idx] = CLK_PASSWD | (divi << 12);
++  usleep(10);
++
++  // Enable with requested source and MASH=1 (legacy used bit4).
++  cm[ctl_idx] = CLK_PASSWD | (src & 0x0fu) | (1u << 4);
++  usleep(10);
++
++  if (gpclk_debug) {
++    printf("GPCLK: post ctl=0x%08x div=0x%08x\n", cm[ctl_idx], cm[div_idx]);
++  }
++
++  const uint64_t t1 = rp1_now_ns();
++  while ((cm[ctl_idx] & (1u << 7)) == 0) {
++    if (rp1_now_ns() - t1 > 200000000ull) { // 200ms
++      printf("GPCLK: BUSY did not assert; GPCLK may not be running.\n");
++      break;
++    }
++  }
++  usleep(100);
++
++  printf("GPCLK: configured GPCLK0 on GPIO4 (src=%u div_int=%u) using cm_base=0x%llx (soc_base=0x%llx)\n",
++         src, divi, (unsigned long long)cm_phys_base, (unsigned long long)soc_phys_base);
++  munmap(m, map_len);
+   return;
+ #else
+   // Enable 200MHz CLK output on GPIO4, adjust divider and pll source depending
+@@ -429,6 +612,24 @@ int ps_probe_protocol() {
+ #endif
+ }
+ 
++int ps_gpclk_probe() {
++#if defined(PISTORM_RP1)
++  // Map RP1 GPIO blocks and attempt to start the GPCLK. Do not touch protocol OE/data direction.
++  setup_io();
++  setup_gpclk();
++  for (int i = 0; i < 5; i++) {
++    ps_dump_protocol_state("gpclk-probe");
++    usleep(200000);
++  }
++  return 0;
++#else
++  setup_io();
++  setup_gpclk();
++  ps_dump_protocol_state("gpclk-probe");
++  return 0;
++#endif
++}
++
+ void ps_dump_protocol_state(const char *tag) {
+   const char *t = tag ? tag : "state";
+ #if defined(PISTORM_RP1)
+@@ -438,8 +639,8 @@ void ps_dump_protocol_state(const char *tag) {
+   }
+ 
+   const uint32_t sync = rp1_rio_sync_in();
+-  const uint32_t out = rp1_sys_rio0[RP1_RIO_OUT_OFF / 4];
+-  const uint32_t oe = rp1_sys_rio0[RP1_RIO_OE_OFF / 4];
++  const uint32_t out = rp1_sys_rio0[RP1_RIO_OUT_OFF / 4] & 0x0FFFFFFFul;
++  const uint32_t oe = rp1_sys_rio0[RP1_RIO_OE_OFF / 4] & 0x0FFFFFFFul;
+ 
+   const unsigned int txn = (sync >> PIN_TXN_IN_PROGRESS) & 1u;
+   const unsigned int ipl0 = (sync >> PIN_IPL_ZERO) & 1u;
+@@ -454,18 +655,26 @@ void ps_dump_protocol_state(const char *tag) {
+   const uint32_t clk_ctrl = rp1_io_bank0[rp1_gpio_ctrl_index(PIN_CLK)];
+   const unsigned int clk_funcsel = clk_ctrl & 0x1fu;
+ 
++  const unsigned int txn_pad = rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS);
++  const unsigned int ipl0_pad = rp1_gpio_infrompad(PIN_IPL_ZERO);
++  const unsigned int clk_pad = rp1_gpio_infrompad(PIN_CLK);
++  const unsigned int rst_pad = rp1_gpio_infrompad(PIN_RESET);
++  const unsigned int rst_oetopad = rp1_gpio_oetopad(PIN_RESET);
++  const unsigned int rst_outtopad = rp1_gpio_outtopad(PIN_RESET);
++
+   unsigned int clk_transitions = 0;
+-  unsigned int last = clk;
++  unsigned int last = clk_pad;
+   for (unsigned int i = 0; i < 128; i++) {
+-    unsigned int cur = (rp1_rio_sync_in() >> PIN_CLK) & 1u;
++    unsigned int cur = rp1_gpio_infrompad(PIN_CLK);
+     if (cur != last) {
+       clk_transitions++;
+       last = cur;
+     }
+   }
+ 
+-  printf("[GPIO] %s: sync_in=0x%08x txn=%u ipl0=%u a0=%u a1=%u clk=%u rst=%u rd=%u wr=%u d=0x%04x | out=0x%08x oe=0x%08x | gpio4_funcsel=%u clk_transitions=%u/128\n",
+-         t, sync, txn, ipl0, a0, a1, clk, rst, rd, wr, data, out, oe, clk_funcsel, clk_transitions);
++  printf("[GPIO] %s: sync_in=0x%08x txn=%u/%u ipl0=%u/%u a0=%u a1=%u clk=%u/%u rst=%u/%u rd=%u wr=%u d=0x%04x | out=0x%08x oe=0x%08x | gpio4_funcsel=%u clk_transitions=%u/128 | gpio5(oetopad=%u outtopad=%u)\n",
++         t, sync, txn, txn_pad, ipl0, ipl0_pad, a0, a1, clk, clk_pad, rst, rst_pad, rd, wr, data, out, oe, clk_funcsel,
++         clk_transitions, rst_oetopad, rst_outtopad);
+ #else
+   if (!gpio) {
+     printf("[GPIO] %s: legacy GPIO not mapped.\n", t);
+@@ -495,7 +704,9 @@ void ps_setup_protocol() {
+ #if defined(PISTORM_RP1)
+   // Inputs: PIN_TXN_IN_PROGRESS (0), PIN_IPL_ZERO (1)
+   // Outputs: all other protocol pins; default to inputs on D[0..15] until needed.
+-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
++  // NOTE: GPIO5 (PIN_RESET) is driven by the CPLD (`rtl/pistorm.v` defines PI_RESET as an output on GPIO5),
++  // so do not ever enable output drive on it from the Pi side.
++  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
+   const uint32_t data_mask = (0xFFFFu << 8);
+   rp1_rio_oe_clr(ctrl_mask | data_mask);
+   rp1_rio_out_clr(0xFFFFECu);
+@@ -511,7 +722,7 @@ void ps_setup_protocol() {
+ 
+ void ps_write_16(unsigned int address, unsigned int data) {
+ #if defined(PISTORM_RP1)
+-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
++  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
+   const uint32_t data_mask = (0xFFFFu << 8);
+   rp1_rio_oe_set(ctrl_mask | data_mask);
+ 
+@@ -572,7 +783,7 @@ void ps_write_8(unsigned int address, unsigned int data) {
+   else
+     data = data & 0xff;  // ODD , A0=1,LDS
+ 
+-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
++  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
+   const uint32_t data_mask = (0xFFFFu << 8);
+   rp1_rio_oe_set(ctrl_mask | data_mask);
+ 
+@@ -640,7 +851,7 @@ void ps_write_32(unsigned int address, unsigned int value) {
+ 
+ unsigned int ps_read_16(unsigned int address) {
+ #if defined(PISTORM_RP1)
+-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
++  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
+   const uint32_t data_mask = (0xFFFFu << 8);
+   rp1_rio_oe_set(ctrl_mask | data_mask);
+ 
+@@ -702,7 +913,7 @@ unsigned int ps_read_16(unsigned int address) {
+ 
+ unsigned int ps_read_8(unsigned int address) {
+ #if defined(PISTORM_RP1)
+-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
++  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
+   const uint32_t data_mask = (0xFFFFu << 8);
+   rp1_rio_oe_set(ctrl_mask | data_mask);
+ 
+@@ -777,7 +988,7 @@ unsigned int ps_read_32(unsigned int address) {
+ 
+ void ps_write_status_reg(unsigned int value) {
+ #if defined(PISTORM_RP1)
+-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
++  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
+   const uint32_t data_mask = (0xFFFFu << 8);
+   rp1_rio_oe_set(ctrl_mask | data_mask);
+ 
+diff --git a/gpio/ps_protocol.h b/gpio/ps_protocol.h
+index 7f4186a..4bd5fa7 100644
+--- a/gpio/ps_protocol.h
++++ b/gpio/ps_protocol.h
+@@ -169,6 +169,7 @@ void ps_write_status_reg(unsigned int value);
+ 
+ void ps_setup_protocol();
+ int ps_probe_protocol();
++int ps_gpclk_probe();
+ void ps_dump_protocol_state(const char *tag);
+ void ps_reset_state_machine();
+ void ps_pulse_reset();

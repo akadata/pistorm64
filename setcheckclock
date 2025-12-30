@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ./setcheckclock [freq_hz] [--force-high] [--no-emulator-probe] [--bus-probe] [--protocol <new|old>] [--timeout-us <us>]
+
+Examples:
+  ./setcheckclock                # defaults to 2MHz
+  ./setcheckclock 1000000        # 1MHz (good for validating with gpiomon)
+  ./setcheckclock 50000000       # 50MHz (xosc max)
+  ./setcheckclock 200000000 --force-high
+  ./setcheckclock 2000000 --bus-probe --timeout-us 200000
+
+Notes:
+  - This uses `./tools/pi5_gpclk0_enable.sh` (DT overlay + kernel module).
+  - Avoid running `gpiomon` on GPIO4 while expecting GPCLK0 output; requesting the line can override pinmux.
+EOF
+}
+
+freq="2000000"
+force_high=0
+emulator_probe=1
+bus_probe=0
+protocol=""
+timeout_us="200000"
+
+if [[ $# -ge 1 ]]; then
+  case "${1:-}" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --force-high|--no-emulator-probe)
+      ;;
+    *)
+      freq="${1:-}"
+      shift
+      ;;
+  esac
+fi
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --force-high)
+      force_high=1
+      shift
+      ;;
+    --no-emulator-probe)
+      emulator_probe=0
+      shift
+      ;;
+    --bus-probe)
+      bus_probe=1
+      shift
+      ;;
+    --protocol)
+      protocol="${2:-}"
+      shift 2
+      ;;
+    --timeout-us)
+      timeout_us="${2:-}"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown arg: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+if [[ -n "${freq:-}" && ! "${freq}" =~ ^[0-9]+$ ]]; then
+  echo "Invalid freq_hz: ${freq}" >&2
+  usage >&2
+  exit 2
+fi
+if [[ -n "${timeout_us:-}" && ! "${timeout_us}" =~ ^[0-9]+$ ]]; then
+  echo "Invalid --timeout-us value: ${timeout_us}" >&2
+  usage >&2
+  exit 2
+fi
+if [[ -n "${protocol:-}" && "${protocol}" != "new" && "${protocol}" != "old" ]]; then
+  echo "Invalid --protocol value: ${protocol} (expected: new|old)" >&2
+  usage >&2
+  exit 2
+fi
+
+enable_args=(--freq "${freq}")
+if [[ "${force_high}" -eq 1 ]]; then
+  enable_args+=(--force-high)
+fi
+if [[ "${emulator_probe}" -eq 0 ]]; then
+  enable_args+=(--no-emulator-probe)
+fi
+
+./tools/pi5_gpclk0_enable.sh "${enable_args[@]}"
+
+echo
+echo "[pi5] Overlay state:"
+sudo dtoverlay -l || true
+
+echo
+echo "[pi5] GPIO4 mux:"
+gpio4_mux="$(sudo pinctrl get 4 2>/dev/null || true)"
+echo "${gpio4_mux:-"(pinctrl not available?)"}"
+if [[ -n "${gpio4_mux:-}" && "${gpio4_mux}" != *"GPCLK0"* ]]; then
+  cat <<'EOF'
+[pi5] WARNING: GPIO4 is not currently muxed to GPCLK0.
+  - If you ran `gpiomon`/`gpioset` on GPIO4, it can request the line as GPIO and override pinmux.
+  - If another overlay/driver claimed GPIO4, remove it and re-run this script.
+EOF
+fi
+
+echo
+echo "[pi5] Clock debugfs:"
+sudo mount -t debugfs none /sys/kernel/debug 2>/dev/null || true
+sudo sh -c 'test -d /sys/kernel/debug/clk/clk_gp0 && { \
+  cat /sys/kernel/debug/clk/clk_gp0/clk_parent; \
+  cat /sys/kernel/debug/clk/clk_gp0/clk_rate; \
+  cat /sys/kernel/debug/clk/clk_gp0/clk_enable_count 2>/dev/null || true; \
+  cat /sys/kernel/debug/clk/clk_gp0/regdump 2>/dev/null || true; \
+} || echo "clk_gp0 debugfs node not available."'
+
+if [[ "${emulator_probe}" -eq 1 ]]; then
+  echo
+  echo "[pi5] Emulator gpclk-probe (no CPLD transactions):"
+  sudo env PISTORM_ENABLE_GPCLK=0 PISTORM_RP1_LEAVE_CLK_PIN=1 ./emulator --gpclk-probe | head -n 2 || true
+fi
+
+if [[ "${bus_probe}" -eq 1 ]]; then
+  echo
+  echo "[pi5] Emulator bus-probe (bounded CPLD transactions):"
+  env_args=(PISTORM_ENABLE_GPCLK=0 PISTORM_RP1_LEAVE_CLK_PIN=1 "PISTORM_TXN_TIMEOUT_US=${timeout_us}")
+  if [[ -n "${protocol:-}" ]]; then
+    env_args+=("PISTORM_PROTOCOL=${protocol}")
+  fi
+  sudo env "${env_args[@]}" ./emulator --bus-probe || true
+fi

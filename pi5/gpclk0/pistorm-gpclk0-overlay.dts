@@ -1,0 +1,37 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2712";
+
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			pistorm_gpclk0: pistorm-gpclk0 {
+				compatible = "pistorm,gpclk0";
+				status = "okay";
+
+				pinctrl-names = "default";
+				pinctrl-0 = <&rp1_gpclksrc0_gpio4>;
+
+				/* RP1 clocks provider: see dt-bindings/clock/rp1.h */
+				clocks = <&rp1_clocks 33>, /* RP1_CLK_GP0 */
+					 <&rp1_clocks 3>;  /* RP1_PLL_SYS */
+				clock-names = "gpclk", "parent";
+
+				/* Requested output frequency (module applies it via clk API). */
+				clock-frequency = <200000000>;
+			};
+		};
+	};
+
+	/*
+	 * Overlay parameters
+	 *
+	 * Example:
+	 *   sudo dtoverlay -d /home/smalley/pistorm/pi5/gpclk0 pistorm-gpclk0 freq=1000000
+	 */
+	__overrides__ {
+		freq = <&pistorm_gpclk0>,"clock-frequency:0";
+	};
+};

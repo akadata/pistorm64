@@ -61,7 +61,9 @@ static uint32_t pi_dbg_string[32];
 
 static uint32_t pi_cmd_result = 0, shutdown_confirm = 0xFFFFFFFF;
 
+#if defined(HAVE_VC_GENCMD)
 static bool pi_cmd_init = false;
+#endif
 #if defined(HAVE_VC_GENCMD)
 static VCHI_INSTANCE_T vchi_instance;
 static VCHI_CONNECTION_T *vchi_connection = NULL;

@@ -1,0 +1,11 @@
+Open On-Chip Debugger 0.12.0+dev-snapshot (2025-07-16-14:06)
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+DEPRECATED! use 'bcm2835gpio peripheral_base' not 'bcm2835gpio_peripheral_base'
+DEPRECATED! use 'bcm2835gpio speed_coeffs' not 'bcm2835gpio_speed_coeffs'
+DEPRECATED! use 'adapter gpio tck; adapter gpio tms; adapter gpio tdi; adapter gpio tdo' not 'bcm2835gpio_jtag_nums'
+DEPRECATED! use 'adapter gpio srst' not 'bcm2835gpio_srst_num'
+Info : BCM2835 GPIO JTAG/SWD bitbang driver
+Error: open /dev/gpiomem: No such file or directory
+

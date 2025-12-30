@@ -1,0 +1,10 @@
+crw-rw---- 1 root root  254,   0 Jan  1  1970 gpiochip0
+crw-rw---- 1 root root  254,  10 Jan  1  1970 gpiochip10
+crw-rw---- 1 root root  254,  11 Jan  1  1970 gpiochip11
+crw-rw---- 1 root root  254,  12 Jan  1  1970 gpiochip12
+crw-rw---- 1 root root  254,  13 Jan  1  1970 gpiochip13
+crw-rw---- 1 root root  234,   0 Jan  1  1970 gpiomem0
+crw-rw---- 1 root root  238,   0 Jan  1  1970 gpiomem1
+crw-rw---- 1 root root  237,   0 Jan  1  1970 gpiomem2
+crw-rw---- 1 root root  236,   0 Jan  1  1970 gpiomem3
+crw-rw---- 1 root root  235,   0 Jan  1  1970 gpiomem4

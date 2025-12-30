@@ -1,0 +1,26 @@
+Starting program: /home/smalley/pistorm/emulator --gpio-probe
+[Inferior 1 (process 4033) exited normally]
+No stack.
+The program has no registers now.
+From                To                  Syms Read   Shared Object Library
+0x0000007ff7f505e0  0x0000007ff7faaa0c  Yes         /lib/ld-musl-aarch64.so.1
+Starting program: /home/smalley/pistorm/emulator --config basic.cfg
+[Inferior 1 (process 4039) exited with code 0377]
+Already logging to gdb.log.
+Already logging to gdb.log.
+Already logging to gdb.log.
+Already logging to gdb.log.
+Starting program: /home/smalley/pistorm/emulator --gpio-probe
+[Inferior 1 (process 5095) exited normally]
+Starting program: /home/smalley/pistorm/emulator --config basic.cfg
+
+Program received signal SIGINT, Interrupt.
+0x00000055555e4aa8 in ps_read_16 ()
+#0  0x00000055555e4aa8 in ps_read_16 ()
+#1  0x0000005555611d54 in m68k_pulse_reset ()
+#2  0x000000555556333c in main ()
+
+Thread 1 (process 5097 "emulator"):
+#0  0x00000055555e4aa8 in ps_read_16 ()
+#1  0x0000005555611d54 in m68k_pulse_reset ()
+#2  0x000000555556333c in main ()

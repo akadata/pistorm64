@@ -30,6 +30,12 @@ This document details all changes made to fix the build issues in the PiStorm em
 - Removed invalid ARM flags from buptest compilation command
 - Removed invalid ARM flags from a314/a314.o compilation command
 
+### 5. Added headless build option (no raylib)
+**File**: Makefile, platforms/amiga/rtg/rtg-output-headless.c
+**Change**: Added `WITH_RAYLIB=0` support
+- Allows building the emulator without linking `-lraylib` / `-lasound` (useful on fresh Raspberry Pi OS installs where raylib may not be packaged)
+- Replaces `platforms/amiga/rtg/rtg-output-raylib.c` with a headless stub backend to satisfy RTG symbols without creating a display
+
 ## Build Results
 - **Before**: Build failed with "undefined reference to 'm68ki_ic_clear'" linker error
 - **After**: Build completes successfully with only warnings (no errors)

@@ -1,0 +1,43 @@
+/dts-v1/;
+/plugin/;
+
+/*
+ * GPCLK0 on GPIO4 driven from RP1 PLL_SYS via a fixed /5 divisor (~200 MHz).
+ * If the kernel refuses the parent/divider, clk_rate will stay lower (check debugfs).
+ */
+
+/ {
+	compatible = "brcm,bcm2712";
+
+	/* Try to reparent clksrc_gp0 to pll_sys and request 200 MHz */
+	fragment@0 {
+		target = <&clksrc_gp0>;
+		__overlay__ {
+			assigned-clock-parents = <&rp1_clocks 3>; /* RP1_PLL_SYS */
+			assigned-clock-rates   = <200000000>;
+		};
+	};
+
+	fragment@2 {
+		target-path = "/";
+		__overlay__ {
+			pistorm_gpclk0_pll5ff: pistorm-gpclk0-pll5ff {
+				compatible = "pistorm,gpclk0";
+				status = "okay";
+
+				pinctrl-names = "default";
+				pinctrl-0 = <&rp1_gpclksrc0_gpio4>;
+
+				/* Use gpclk0 with the reassigned parent */
+				clocks = <&rp1_clocks 33>, /* RP1_CLK_GP0 */
+					 <&rp1_clocks 3>;  /* RP1_PLL_SYS */
+				clock-names = "gpclk", "parent";
+				clock-frequency = <200000000>;
+			};
+		};
+	};
+
+	__overrides__ {
+		freq = <&pistorm_gpclk0_pll5ff>,"clock-frequency:0";
+	};
+};

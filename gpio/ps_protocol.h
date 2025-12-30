@@ -169,7 +169,9 @@ void ps_write_status_reg(unsigned int value);
 
 void ps_setup_protocol();
 int ps_probe_protocol();
+int ps_gpclk_probe();
 void ps_dump_protocol_state(const char *tag);
+uint32_t ps_read_gpio_state();
 void ps_reset_state_machine();
 void ps_pulse_reset();
 

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -43,6 +44,10 @@ static size_t rp1_io_bank0_size;
 static size_t rp1_sys_rio0_size;
 static int rp1_mem_fd = -1;
 
+static uint32_t be32(const uint8_t *p) {
+  return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) | ((uint32_t)p[2] << 8) | ((uint32_t)p[3] << 0);
+}
+
 static uint64_t be64(const uint8_t *p) {
   return ((uint64_t)p[0] << 56) | ((uint64_t)p[1] << 48) | ((uint64_t)p[2] << 40) | ((uint64_t)p[3] << 32) |
          ((uint64_t)p[4] << 24) | ((uint64_t)p[5] << 16) | ((uint64_t)p[6] << 8) | ((uint64_t)p[7] << 0);
@@ -72,8 +77,58 @@ static int read_dt_string(const char *path, char *buf, size_t buf_len) {
   return 0;
 }
 
+static int rp1_load_gpio_bases_from_iomem(uint64_t *io_bank0_addr, size_t *io_bank0_len, uint64_t *sys_rio0_addr,
+                                         size_t *sys_rio0_len) {
+  FILE *f = fopen("/proc/iomem", "r");
+  if (!f) {
+    return -1;
+  }
+
+  // On Pi 5, the RP1 GPIO block is typically exposed as:
+  //   1f000d0000-1f000dbfff : ... gpio@d0000
+  //   1f000e0000-1f000ebfff : ... gpio@d0000
+  //   1f000f0000-1f000fbfff : ... gpio@d0000
+  // where the first range is IO_BANK0 and the second is SYS_RIO0.
+  uint64_t starts[3] = {0, 0, 0};
+  uint64_t ends[3] = {0, 0, 0};
+  unsigned int found = 0;
+
+  char line[512];
+  while (fgets(line, sizeof(line), f)) {
+    if (!strstr(line, "gpio@d0000")) {
+      continue;
+    }
+    unsigned long long start = 0, end = 0;
+    if (sscanf(line, "%llx-%llx", &start, &end) != 2) {
+      continue;
+    }
+    if (found < 3) {
+      starts[found] = (uint64_t)start;
+      ends[found] = (uint64_t)end;
+      found++;
+    }
+  }
+  fclose(f);
+
+  if (found < 2 || starts[0] == 0 || starts[1] == 0 || ends[0] < starts[0] || ends[1] < starts[1]) {
+    return -1;
+  }
+
+  *io_bank0_addr = starts[0];
+  *io_bank0_len = (size_t)(ends[0] - starts[0] + 1);
+  *sys_rio0_addr = starts[1];
+  *sys_rio0_len = (size_t)(ends[1] - starts[1] + 1);
+  return 0;
+}
+
 static int rp1_load_gpio_bases(uint64_t *io_bank0_addr, size_t *io_bank0_len, uint64_t *sys_rio0_addr,
                                size_t *sys_rio0_len) {
+  // Prefer /proc/iomem (CPU physical) when available, because DT reg values for RP1 peripherals are
+  // BAR-relative (PCIe view) and not always suitable for /dev/mem mmap on every distro/kernel.
+  if (rp1_load_gpio_bases_from_iomem(io_bank0_addr, io_bank0_len, sys_rio0_addr, sys_rio0_len) == 0) {
+    return 0;
+  }
+
   char alias_path[256];
   if (read_dt_string("/proc/device-tree/aliases/gpio0", alias_path, sizeof(alias_path)) != 0) {
     return -1;
@@ -201,13 +256,177 @@ static inline uint32_t rp1_rio_sync_in() {
   return rp1_sys_rio0[RP1_RIO_SYNC_IN_OFF / 4];
 }
 
+typedef enum {
+  RP1_PROTO_REGSEL = 0,  // PI_A[1:0] selects REG_* (as in rtl/pistorm.v in this repo)
+  RP1_PROTO_SA3 = 1,     // SA0/SA1/SA2 selects op type (as in gpio/gpio_old.c and docs/RPI5_HEADER_MAP.md)
+} rp1_proto_mode_t;
+
+static rp1_proto_mode_t rp1_proto_mode = RP1_PROTO_REGSEL;
+
+static void rp1_select_protocol_from_env() {
+  const char *env = getenv("PISTORM_PROTOCOL");
+  if (!env || !*env) {
+    return;
+  }
+  if (strcmp(env, "old") == 0 || strcmp(env, "sa3") == 0 || strcmp(env, "gpio_old") == 0) {
+    rp1_proto_mode = RP1_PROTO_SA3;
+  } else if (strcmp(env, "new") == 0 || strcmp(env, "regsel") == 0 || strcmp(env, "pistormv") == 0) {
+    rp1_proto_mode = RP1_PROTO_REGSEL;
+  } else {
+    printf("RP1: unknown PISTORM_PROTOCOL=%s (expected: old/sa3 or new/regsel); defaulting to regsel.\n", env);
+  }
+}
+
+static unsigned int rp1_strobe_reps() {
+  static unsigned int cached = 0;
+  if (cached != 0) {
+    return cached;
+  }
+  // Default: keep strobes asserted for multiple posted writes so the CPLD's
+  // 200MHz synchronizer reliably sees them (RP1 writes can be extremely fast).
+  unsigned int reps = 4;
+  const char *env = getenv("PISTORM_RP1_STROBE_REPS");
+  if (env && *env) {
+    char *end = NULL;
+    unsigned long v = strtoul(env, &end, 10);
+    if (end != env && v >= 1 && v <= 64) {
+      reps = (unsigned int)v;
+    }
+  }
+  cached = reps;
+  return cached;
+}
+
+static inline void rp1_wr_strobe() {
+  const unsigned int reps = rp1_strobe_reps();
+  for (unsigned int i = 0; i < reps; i++) {
+    rp1_rio_out_set(1u << PIN_WR);
+  }
+  rp1_rio_out_clr(1u << PIN_WR);
+}
+
+static inline void rp1_rd_strobe() {
+  const unsigned int reps = rp1_strobe_reps();
+  for (unsigned int i = 0; i < reps; i++) {
+    rp1_rio_out_set(1u << PIN_RD);
+  }
+  // Note: callers typically clear RD via rp1_rio_out_clr(0xFFFFECu) at end-of-transaction.
+}
+
+// Old SA0/SA1/SA2 protocol helpers (gpio/gpio_old.c).
+static inline void rp1_sa_set(unsigned int sa0, unsigned int sa1, unsigned int sa2) {
+  const uint32_t m0 = 1u << 5;  // SA0 on GPIO5
+  const uint32_t m1 = 1u << 3;  // SA1 on GPIO3
+  const uint32_t m2 = 1u << 2;  // SA2 on GPIO2
+
+  if (sa0) rp1_rio_out_set(m0); else rp1_rio_out_clr(m0);
+  if (sa1) rp1_rio_out_set(m1); else rp1_rio_out_clr(m1);
+  if (sa2) rp1_rio_out_set(m2); else rp1_rio_out_clr(m2);
+}
+
+static inline void rp1_sa_mode_status() { rp1_sa_set(0, 0, 1); } // STATUSREGADDR
+static inline void rp1_sa_mode_w16() { rp1_sa_set(0, 0, 0); }    // W16
+static inline void rp1_sa_mode_r16() { rp1_sa_set(1, 0, 0); }    // R16
+static inline void rp1_sa_mode_w8() { rp1_sa_set(0, 1, 0); }     // W8
+static inline void rp1_sa_mode_r8() { rp1_sa_set(1, 1, 0); }     // R8
+
+static inline void rp1_set_bus16(uint16_t v) {
+  const uint32_t set_mask = ((uint32_t)v << 8);
+  const uint32_t clr_mask = ((uint32_t)(~v) << 8) & (0xFFFFu << 8);
+  rp1_rio_out_set(set_mask);
+  rp1_rio_out_clr(clr_mask);
+}
+
+static inline void rp1_swe_pulse_low_high() {
+  // SWE is GPIO7 in the Rev B schematic mapping; keep it high when idle, pulse low then high.
+  const unsigned int reps = rp1_strobe_reps();
+  rp1_rio_out_clr(1u << PIN_WR);
+  for (unsigned int i = 0; i < reps; i++) {
+    asm volatile("nop");
+  }
+  rp1_rio_out_set(1u << PIN_WR);
+}
+
+static inline void rp1_soe_assert_low() {
+  // SOE is GPIO6; active-low enable.
+  rp1_rio_out_clr(1u << PIN_RD);
+}
+static inline void rp1_soe_deassert_high() { rp1_rio_out_set(1u << PIN_RD); }
+
+static int rp1_old_no_handshake() {
+  const char *env = getenv("PISTORM_OLD_NO_HANDSHAKE");
+  return (env && *env == '1') ? 1 : 0;
+}
+
+static unsigned int rp1_old_sample_nops() {
+  const char *env = getenv("PISTORM_OLD_SAMPLE_NOPS");
+  unsigned int n = 16;
+  if (env && *env) {
+    char *end = NULL;
+    unsigned long v = strtoul(env, &end, 10);
+    if (end != env && v <= 1000000ul) {
+      n = (unsigned int)v;
+    }
+  }
+  return n;
+}
+
+static inline unsigned int rp1_gpio_infrompad(unsigned int gpio_n);
+static inline unsigned int rp1_gpio_outtopad(unsigned int gpio_n);
+static inline unsigned int rp1_gpio_oetopad(unsigned int gpio_n);
+
 static int rp1_wait_txn_clear(uint32_t *final_sync_in) {
   const uint64_t start = rp1_now_ns();
   const uint64_t deadline = start + rp1_txn_timeout_ns();
   uint32_t v = 0;
   for (;;) {
     v = rp1_rio_sync_in();
-    if ((v & (1u << PIN_TXN_IN_PROGRESS)) == 0) {
+    if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS) == 0) {
+      if (final_sync_in) {
+        *final_sync_in = v;
+      }
+      return 0;
+    }
+    if (rp1_now_ns() > deadline) {
+      if (final_sync_in) {
+        *final_sync_in = v;
+      }
+      return -1;
+    }
+    asm volatile("yield");
+  }
+}
+
+// Many PiStorm operations assert PI_TXN_IN_PROGRESS (GPIO0) only *after* the CPLD has
+// synchronized the PI_WR strobe. If we check for "clear" too early (while txn is still low),
+// we can return immediately and read stale SYNC_IN data (often all zeros).
+//
+// For operations that are expected to trigger a transaction (address/data reads/writes),
+// first wait for txn to go high (start), then wait for it to return low (done).
+static int rp1_wait_txn_start_then_clear(uint32_t *final_sync_in) {
+  const uint64_t start = rp1_now_ns();
+  const uint64_t deadline = start + rp1_txn_timeout_ns();
+  uint32_t v = 0;
+
+  // Wait for txn to assert.
+  for (;;) {
+    v = rp1_rio_sync_in();
+    if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS) != 0) {
+      break;
+    }
+    if (rp1_now_ns() > deadline) {
+      if (final_sync_in) {
+        *final_sync_in = v;
+      }
+      return -1;
+    }
+    asm volatile("yield");
+  }
+
+  // Wait for txn to clear.
+  for (;;) {
+    v = rp1_rio_sync_in();
+    if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS) == 0) {
       if (final_sync_in) {
         *final_sync_in = v;
       }
@@ -226,14 +445,21 @@ static int rp1_wait_txn_clear(uint32_t *final_sync_in) {
 static void rp1_txn_timeout_fatal(const char *where) {
   printf("RP1: timeout waiting for CPLD transaction to complete (%s).\n", where ? where : "unknown");
 
-  // Best-effort release of the protocol lines before exiting.
-  const uint32_t ctrl_mask =
-      (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
-  const uint32_t data_mask = (0xFFFFu << 8);
-  rp1_rio_out_clr(0xFFFFECu);
-  rp1_rio_oe_clr(ctrl_mask | data_mask);
+  // Dump state before we mutate OUT/OE, otherwise we lose the most useful context.
+  ps_dump_protocol_state("txn-timeout-pre-release");
 
-  ps_dump_protocol_state("txn-timeout");
+  // Best-effort release of the protocol lines before exiting.
+  //
+  // IMPORTANT: the RP1 SYS_RIO OUT/OE state is global to the SoC, not per-process. If we leave
+  // any bits enabled, subsequent runs can start with pins still being actively driven.
+  //
+  // Release the entire PiStorm protocol pin range (GPIO0..GPIO23). GPIO4 may be muxed to GPCLK0
+  // and will continue to output clock independent of SYS_RIO OE.
+  const uint32_t proto_mask = 0x00FFFFFFu;
+  rp1_rio_out_clr(0xFFFFECu);
+  rp1_rio_oe_clr(proto_mask);
+
+  ps_dump_protocol_state("txn-timeout-post-release");
   exit(1);
 }
 
@@ -241,17 +467,97 @@ static inline uint32_t rp1_gpio_ctrl_index(unsigned int gpio_n) {
   return (0x004u + (gpio_n * 8u)) / 4u;
 }
 
+static inline uint32_t rp1_gpio_status_index(unsigned int gpio_n) {
+  return (0x000u + (gpio_n * 8u)) / 4u;
+}
+
+static inline unsigned int rp1_gpio_infrompad(unsigned int gpio_n) {
+  // IO_BANK0_GPIOx_STATUS.INFROMPAD is bit 17 (RP1 peripherals doc Table 7).
+  return (rp1_io_bank0[rp1_gpio_status_index(gpio_n)] >> 17) & 1u;
+}
+
+static inline unsigned int rp1_gpio_outtopad(unsigned int gpio_n) {
+  // IO_BANK0_GPIOx_STATUS.OUTTOPAD is bit 9.
+  return (rp1_io_bank0[rp1_gpio_status_index(gpio_n)] >> 9) & 1u;
+}
+
+static inline unsigned int rp1_gpio_oetopad(unsigned int gpio_n) {
+  // IO_BANK0_GPIOx_STATUS.OETOPAD is bit 13.
+  return (rp1_io_bank0[rp1_gpio_status_index(gpio_n)] >> 13) & 1u;
+}
+
 static void rp1_configure_sys_rio_funcsel() {
   // FUNCSEL encodes the 'aN' columns in the RP1 GPIO function table.
-  // - a5 == SYS_RIO[n] (fast GPIO via SYS_RIO0)
+  // - a6 == PROC_RIO[n] (fast GPIO via RIO block; writable via pinctrl on Pi 5)
+  // - a5 == SYS_RIO[n] (appears to be non-selectable on some Pi 5 kernels; see STATUS.md)
   // - a0 == GPCLK[0] on GPIO4 (PiStorm clock output)
   const uint32_t funcsel_sys_rio = 5u;
+  const uint32_t funcsel_proc_rio = 6u;
   const uint32_t funcsel_gpclk0 = 0u;
   const uint32_t funcsel_mask = 0x1fu;
-  for (unsigned int i = 0; i < 28; i++) {
+
+  // Determine which RIO function is actually selectable. On Raspberry Pi 5 (RP1),
+  // pinctrl commonly accepts PROC_RIO (a6) but ignores SYS_RIO (a5), leaving GPIOs as inputs.
+  // Prefer an explicit override, otherwise probe by writing a candidate funcsel and reading it back.
+  uint32_t funcsel_rio = funcsel_proc_rio;
+  const char *rio_funcsel_env = getenv("PISTORM_RP1_RIO_FUNCSEL");
+  if (rio_funcsel_env && *rio_funcsel_env) {
+    char *end = NULL;
+    unsigned long v = strtoul(rio_funcsel_env, &end, 0);
+    if (end != rio_funcsel_env && v <= 8) {
+      funcsel_rio = (uint32_t)v;
+    }
+  } else {
+    // Probe on a protocol pin we will reconfigure anyway (GPIO2/PIN_A0).
+    const uint32_t probe_gpio = PIN_A0;
+    const uint32_t idx = rp1_gpio_ctrl_index(probe_gpio);
+    const uint32_t orig = rp1_io_bank0[idx];
+    rp1_io_bank0[idx] = (orig & ~funcsel_mask) | funcsel_sys_rio;
+    rp1_dmb_oshst();
+    const uint32_t rb = rp1_io_bank0[idx] & funcsel_mask;
+    if (rb == funcsel_sys_rio) {
+      funcsel_rio = funcsel_sys_rio;
+    } else {
+      funcsel_rio = funcsel_proc_rio;
+    }
+  }
+
+  // By default, set GPIO4 to GPCLK[0] (a0/0). On some kernels, enabling GPCLK0
+  // from userspace is blocked; in that case, you can provide the clock via a
+  // kernel overlay (e.g. `pwm-pio`) and tell PiStorm to either:
+  // - leave GPIO4 alone: `PISTORM_RP1_LEAVE_CLK_PIN=1`, or
+  // - force a specific ALT funcsel: `PISTORM_RP1_CLK_FUNCSEL=<0..8>`
+  //   (PIO is usually a7 -> funcsel 7 on RP1).
+  int leave_clk_pin = 0;
+  const char *leave_env = getenv("PISTORM_RP1_LEAVE_CLK_PIN");
+  if (leave_env && *leave_env == '1') {
+    leave_clk_pin = 1;
+  }
+
+  int have_clk_override = 0;
+  uint32_t clk_override = funcsel_gpclk0;
+  const char *clk_funcsel_env = getenv("PISTORM_RP1_CLK_FUNCSEL");
+  if (clk_funcsel_env && *clk_funcsel_env) {
+    char *end = NULL;
+    unsigned long v = strtoul(clk_funcsel_env, &end, 0);
+    if (end != clk_funcsel_env && v <= 8) {
+      have_clk_override = 1;
+      clk_override = (uint32_t)v;
+      leave_clk_pin = 0;
+    }
+  }
+
+  // Only touch the PiStorm protocol pin range (GPIO0..GPIO23). Avoid configuring 24..27.
+  for (unsigned int i = 0; i < 24; i++) {
+    if (i == PIN_CLK && leave_clk_pin) {
+      continue;
+    }
     uint32_t idx = rp1_gpio_ctrl_index(i);
     uint32_t v = rp1_io_bank0[idx];
-    const uint32_t funcsel = (i == PIN_CLK) ? funcsel_gpclk0 : funcsel_sys_rio;
+    uint32_t funcsel = funcsel_rio;
+    if (i == PIN_CLK) {
+      funcsel = have_clk_override ? clk_override : funcsel_gpclk0;
+    }
     v = (v & ~funcsel_mask) | funcsel;
     rp1_io_bank0[idx] = v;
   }
@@ -263,6 +569,7 @@ static void setup_io_rp1() {
     printf("RP1: GPIO MMIO setup failed.\n");
     exit(-1);
   }
+  rp1_select_protocol_from_env();
   rp1_configure_sys_rio_funcsel();
 }
 #endif
@@ -303,8 +610,164 @@ static void setup_io() {
 
 static void setup_gpclk() {
 #if defined(PISTORM_RP1)
-  // TODO: PiStorm on Pi 5 needs an RP1/BCM2712 clock implementation for GPCLK on GPIO4.
-  // For now, leave clock configuration to firmware/OS and continue without touching it.
+  // Attempt to configure GPCLK0 on GPIO4 on Pi 5.
+  //
+  // GPIO4 is muxed to GPCLK[0] via RP1 IO_BANK0 (see RP1 peripherals Table 4: GPIO4 a0 == GPCLK[0]).
+  // The clock generator itself is still controlled via a SoC clock manager block; on BCM2712 this is
+  // *not* at the legacy BCM283x offset (0x101000). Derive the correct MMIO base from the DT symbol
+  // 'dvp' (which points at the clock manager node on Pi 5 kernels).
+  // Required by the CPLD design (`rtl/pistorm.v` uses PI_CLK on GPIO4).
+  //
+  // Disable by setting: PISTORM_ENABLE_GPCLK=0
+  const char *enable_env = getenv("PISTORM_ENABLE_GPCLK");
+  if (enable_env && *enable_env == '0') {
+    return;
+  }
+
+  const int gpclk_debug = (getenv("PISTORM_GPCLK_DEBUG") != NULL);
+
+  // Derive SoC peripheral physical base from DT bus ranges:
+  // `/sys/firmware/devicetree/base/soc@107c000000/ranges` maps child 0x00000000 -> parent 0x1000000000.
+  uint8_t ranges[16];
+  if (read_file_bytes("/sys/firmware/devicetree/base/soc@107c000000/ranges", ranges, sizeof(ranges)) != 0) {
+    printf("GPCLK: failed to read DT ranges for SoC base; skipping GPCLK setup.\n");
+    return;
+  }
+  const uint64_t soc_phys_base = be64(&ranges[4]);  // parent address (2 cells)
+
+  // Derive clock manager child base (32-bit bus address) from DT, or allow overriding.
+  uint64_t cm_phys_base = 0;
+  const char *cm_phys_env = getenv("PISTORM_GPCLK_CM_PHYS");
+  if (cm_phys_env && *cm_phys_env) {
+    char *end = NULL;
+    unsigned long long v = strtoull(cm_phys_env, &end, 0);
+    if (end != cm_phys_env && v != 0) {
+      cm_phys_base = (uint64_t)v;
+    }
+  }
+
+  if (cm_phys_base == 0) {
+    uint32_t cm_child = 0;
+    const char *cm_child_env = getenv("PISTORM_GPCLK_CM_CHILD");
+    if (cm_child_env && *cm_child_env) {
+      char *end = NULL;
+      unsigned long v = strtoul(cm_child_env, &end, 0);
+      if (end != cm_child_env) {
+        cm_child = (uint32_t)v;
+      }
+    } else {
+      // DT symbol 'dvp' typically resolves to `/soc@107c000000/clock@7c700000` on Pi 5.
+      char dvp_path[256];
+      if (read_dt_string("/sys/firmware/devicetree/base/__symbols__/dvp", dvp_path, sizeof(dvp_path)) == 0) {
+        char reg_path[512];
+        snprintf(reg_path, sizeof(reg_path), "/sys/firmware/devicetree/base%s/reg", dvp_path);
+        uint8_t reg[8];
+        if (read_file_bytes(reg_path, reg, sizeof(reg)) == 0) {
+          cm_child = be32(&reg[0]);
+        }
+      }
+    }
+
+    if (cm_child == 0) {
+      // Fallback for older kernels/boards: legacy BCM283x clock manager offset.
+      cm_child = (uint32_t)GPCLK_ADDR;
+      printf("GPCLK: could not resolve DT clock base, falling back to legacy child base 0x%08x.\n", cm_child);
+    }
+
+    cm_phys_base = soc_phys_base + (uint64_t)cm_child;
+  }
+
+  const char *src_env = getenv("PISTORM_GPCLK_SRC");
+  const char *div_env = getenv("PISTORM_GPCLK_DIV_INT");
+  unsigned int src = 5;   // legacy default (pi3 used 5=pllc)
+  unsigned int divi = 6;  // legacy default (6 -> ~200MHz on older Pis)
+  if (src_env && *src_env) {
+    char *end = NULL;
+    unsigned long v = strtoul(src_env, &end, 0);
+    if (end != src_env && v <= 15) {
+      src = (unsigned int)v;
+    }
+  }
+  if (div_env && *div_env) {
+    char *end = NULL;
+    unsigned long v = strtoul(div_env, &end, 0);
+    if (end != div_env && v >= 1 && v <= 4095) {
+      divi = (unsigned int)v;
+    }
+  }
+
+  const uint64_t map_base = cm_phys_base & ~0xfffull;
+  const size_t map_len = 0x1000;
+  const size_t page_off = (size_t)(cm_phys_base - map_base);
+
+  int fd = open("/dev/mem", O_RDWR | O_SYNC);
+  if (fd < 0) {
+    perror("open(/dev/mem)");
+    printf("GPCLK: cannot open /dev/mem; skipping GPCLK setup.\n");
+    return;
+  }
+
+  void *m = mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)map_base);
+  close(fd);
+  if (m == MAP_FAILED) {
+    const int e = errno;
+    printf("GPCLK: mmap failed @ 0x%llx, errno=%d; skipping GPCLK setup.\n",
+           (unsigned long long)map_base, e);
+    if (e == EPERM) {
+      printf("GPCLK: kernel denied /dev/mem mapping of the clock block (CONFIG_STRICT_DEVMEM or resource size too small).\n");
+      printf("GPCLK: workaround: configure GPCLK0 at boot (DT overlay / firmware config), then run with PISTORM_ENABLE_GPCLK=0.\n");
+      printf("GPCLK: repo helper for Pi 5: see pi5/gpclk0/README.md (or run ./tools/pi5_gpclk0_enable.sh).\n");
+    }
+    return;
+  }
+
+  volatile uint32_t *cm = (volatile uint32_t *)((volatile uint8_t *)m + page_off);
+  const uint32_t ctl_idx = CLK_GP0_CTL / 4;
+  const uint32_t div_idx = CLK_GP0_DIV / 4;
+
+  if (gpclk_debug) {
+    printf("GPCLK: pre ctl=0x%08x div=0x%08x (cm_base=0x%llx)\n",
+           cm[ctl_idx], cm[div_idx], (unsigned long long)cm_phys_base);
+  }
+
+  // Disable GPCLK0.
+  cm[ctl_idx] = CLK_PASSWD | (1u << 5);
+  usleep(10);
+
+  const uint64_t t0 = rp1_now_ns();
+  while ((cm[ctl_idx] & (1u << 7)) != 0) {
+    if (rp1_now_ns() - t0 > 200000000ull) { // 200ms
+      printf("GPCLK: BUSY did not clear; skipping GPCLK setup.\n");
+      munmap(m, map_len);
+      return;
+    }
+  }
+  usleep(100);
+
+  // Set divisor (integer; fractional left at 0).
+  cm[div_idx] = CLK_PASSWD | (divi << 12);
+  usleep(10);
+
+  // Enable with requested source and MASH=1 (legacy used bit4).
+  cm[ctl_idx] = CLK_PASSWD | (src & 0x0fu) | (1u << 4);
+  usleep(10);
+
+  if (gpclk_debug) {
+    printf("GPCLK: post ctl=0x%08x div=0x%08x\n", cm[ctl_idx], cm[div_idx]);
+  }
+
+  const uint64_t t1 = rp1_now_ns();
+  while ((cm[ctl_idx] & (1u << 7)) == 0) {
+    if (rp1_now_ns() - t1 > 200000000ull) { // 200ms
+      printf("GPCLK: BUSY did not assert; GPCLK may not be running.\n");
+      break;
+    }
+  }
+  usleep(100);
+
+  printf("GPCLK: configured GPCLK0 on GPIO4 (src=%u div_int=%u) using cm_base=0x%llx (soc_base=0x%llx)\n",
+         src, divi, (unsigned long long)cm_phys_base, (unsigned long long)soc_phys_base);
+  munmap(m, map_len);
   return;
 #else
   // Enable 200MHz CLK output on GPIO4, adjust divider and pll source depending
@@ -353,9 +816,16 @@ int ps_probe_protocol() {
          gpiod_chip_info_get_name(cinfo),
          gpiod_chip_info_get_num_lines(cinfo));
 
-  unsigned int offsets[24];
+  struct gpiod_line_info *line_infos[24] = {0};
+  const char *names[24] = {0};
+  const char *consumers[24] = {0};
+  unsigned int is_used[24] = {0};
+
   for (unsigned int i = 0; i < 24; i++) {
-    offsets[i] = i;
+    line_infos[i] = gpiod_chip_get_line_info(chip, i);
+    names[i] = line_infos[i] ? gpiod_line_info_get_name(line_infos[i]) : NULL;
+    is_used[i] = line_infos[i] ? (unsigned int)gpiod_line_info_is_used(line_infos[i]) : 0u;
+    consumers[i] = line_infos[i] ? gpiod_line_info_get_consumer(line_infos[i]) : NULL;
   }
 
   struct gpiod_line_settings *settings = gpiod_line_settings_new();
@@ -366,6 +836,9 @@ int ps_probe_protocol() {
     gpiod_request_config_free(req_cfg);
     gpiod_line_config_free(line_cfg);
     gpiod_line_settings_free(settings);
+    for (unsigned int i = 0; i < 24; i++) {
+      gpiod_line_info_free(line_infos[i]);
+    }
     gpiod_chip_info_free(cinfo);
     gpiod_chip_close(chip);
     return -1;
@@ -374,51 +847,93 @@ int ps_probe_protocol() {
   (void)gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_AS_IS);
   gpiod_request_config_set_consumer(req_cfg, "pistorm-probe");
 
-  if (gpiod_line_config_add_line_settings(line_cfg, offsets, 24, settings) != 0) {
+  unsigned int free_offsets[24];
+  unsigned int free_count = 0;
+  for (unsigned int i = 0; i < 24; i++) {
+    if (!is_used[i]) {
+      free_offsets[free_count++] = i;
+    }
+  }
+
+  if (free_count == 0) {
+    printf("GPIO probe: lines 0-23 are all busy; printing line info only.\n");
+    for (unsigned int i = 0; i < 24; i++) {
+      printf("line %2u (%s): %s%s%s\n",
+             i,
+             names[i] ? names[i] : "-",
+             is_used[i] ? "busy" : "free",
+             (is_used[i] && consumers[i] && consumers[i][0]) ? " consumer=" : "",
+             (is_used[i] && consumers[i] && consumers[i][0]) ? consumers[i] : "");
+    }
+    gpiod_request_config_free(req_cfg);
+    gpiod_line_config_free(line_cfg);
+    gpiod_line_settings_free(settings);
+    for (unsigned int i = 0; i < 24; i++) {
+      gpiod_line_info_free(line_infos[i]);
+    }
+    gpiod_chip_info_free(cinfo);
+    gpiod_chip_close(chip);
+    return 0;
+  }
+
+  if (gpiod_line_config_add_line_settings(line_cfg, free_offsets, free_count, settings) != 0) {
     perror("gpiod_line_config_add_line_settings");
     gpiod_request_config_free(req_cfg);
     gpiod_line_config_free(line_cfg);
     gpiod_line_settings_free(settings);
+    for (unsigned int i = 0; i < 24; i++) {
+      gpiod_line_info_free(line_infos[i]);
+    }
     gpiod_chip_info_free(cinfo);
     gpiod_chip_close(chip);
     return -1;
   }
 
   struct gpiod_line_request *req = gpiod_chip_request_lines(chip, req_cfg, line_cfg);
-  if (!req) {
-    perror("gpiod_chip_request_lines");
-    printf("GPIO probe: could not request lines 0-23 on %s.\n", chip_path);
-    gpiod_request_config_free(req_cfg);
-    gpiod_line_config_free(line_cfg);
-    gpiod_line_settings_free(settings);
-    gpiod_chip_info_free(cinfo);
-    gpiod_chip_close(chip);
-    return -1;
+  enum gpiod_line_value values_by_offset[24];
+  for (unsigned int i = 0; i < 24; i++) {
+    values_by_offset[i] = GPIOD_LINE_VALUE_ERROR;
   }
 
-  enum gpiod_line_value values[24];
-  if (gpiod_line_request_get_values(req, values) != 0) {
-    perror("gpiod_line_request_get_values");
+  if (!req) {
+    perror("gpiod_chip_request_lines");
+    printf("GPIO probe: could not request %u free line(s) in 0-23 on %s; printing line info only.\n",
+           free_count, chip_path);
+  } else {
+    enum gpiod_line_value values[24];
+    if (gpiod_line_request_get_values(req, values) != 0) {
+      perror("gpiod_line_request_get_values");
+    } else {
+      for (unsigned int i = 0; i < free_count; i++) {
+        const unsigned int off = free_offsets[i];
+        values_by_offset[off] = values[i];
+      }
+    }
     gpiod_line_request_release(req);
-    gpiod_request_config_free(req_cfg);
-    gpiod_line_config_free(line_cfg);
-    gpiod_line_settings_free(settings);
-    gpiod_chip_info_free(cinfo);
-    gpiod_chip_close(chip);
-    return -1;
   }
 
   for (unsigned int i = 0; i < 24; i++) {
-    struct gpiod_line_info *li = gpiod_chip_get_line_info(chip, i);
-    const char *name = li ? gpiod_line_info_get_name(li) : NULL;
-    printf("line %2u (%s): %d\n", i, name ? name : "-", values[i]);
-    gpiod_line_info_free(li);
+    if (values_by_offset[i] == GPIOD_LINE_VALUE_ERROR) {
+      if (is_used[i]) {
+        printf("line %2u (%s): busy%s%s\n",
+               i,
+               names[i] ? names[i] : "-",
+               (consumers[i] && consumers[i][0]) ? " consumer=" : "",
+               (consumers[i] && consumers[i][0]) ? consumers[i] : "");
+      } else {
+        printf("line %2u (%s): unreadable\n", i, names[i] ? names[i] : "-");
+      }
+    } else {
+      printf("line %2u (%s): %d\n", i, names[i] ? names[i] : "-", values_by_offset[i]);
+    }
   }
 
-  gpiod_line_request_release(req);
   gpiod_request_config_free(req_cfg);
   gpiod_line_config_free(line_cfg);
   gpiod_line_settings_free(settings);
+  for (unsigned int i = 0; i < 24; i++) {
+    gpiod_line_info_free(line_infos[i]);
+  }
   gpiod_chip_info_free(cinfo);
   gpiod_chip_close(chip);
   printf("GPIO probe OK (gpiochip backend).\n");
@@ -426,6 +941,24 @@ int ps_probe_protocol() {
 #else
   printf("GPIO probe unavailable: built without libgpiod (HAVE_LIBGPIOD not set).\n");
   return -1;
+#endif
+}
+
+int ps_gpclk_probe() {
+#if defined(PISTORM_RP1)
+  // Map RP1 GPIO blocks and attempt to start the GPCLK. Do not touch protocol OE/data direction.
+  setup_io();
+  setup_gpclk();
+  for (int i = 0; i < 5; i++) {
+    ps_dump_protocol_state("gpclk-probe");
+    usleep(200000);
+  }
+  return 0;
+#else
+  setup_io();
+  setup_gpclk();
+  ps_dump_protocol_state("gpclk-probe");
+  return 0;
 #endif
 }
 
@@ -438,34 +971,125 @@ void ps_dump_protocol_state(const char *tag) {
   }
 
   const uint32_t sync = rp1_rio_sync_in();
-  const uint32_t out = rp1_sys_rio0[RP1_RIO_OUT_OFF / 4];
-  const uint32_t oe = rp1_sys_rio0[RP1_RIO_OE_OFF / 4];
+  const uint32_t out = rp1_sys_rio0[RP1_RIO_OUT_OFF / 4] & 0x0FFFFFFFul;
+  const uint32_t oe = rp1_sys_rio0[RP1_RIO_OE_OFF / 4] & 0x0FFFFFFFul;
 
-  const unsigned int txn = (sync >> PIN_TXN_IN_PROGRESS) & 1u;
-  const unsigned int ipl0 = (sync >> PIN_IPL_ZERO) & 1u;
-  const unsigned int a0 = (sync >> PIN_A0) & 1u;
-  const unsigned int a1 = (sync >> PIN_A1) & 1u;
-  const unsigned int clk = (sync >> PIN_CLK) & 1u;
-  const unsigned int rst = (sync >> PIN_RESET) & 1u;
-  const unsigned int rd = (sync >> PIN_RD) & 1u;
-  const unsigned int wr = (sync >> PIN_WR) & 1u;
   const unsigned int data = (sync >> 8) & 0xffffu;
 
   const uint32_t clk_ctrl = rp1_io_bank0[rp1_gpio_ctrl_index(PIN_CLK)];
   const unsigned int clk_funcsel = clk_ctrl & 0x1fu;
 
-  unsigned int clk_transitions = 0;
-  unsigned int last = clk;
-  for (unsigned int i = 0; i < 128; i++) {
-    unsigned int cur = (rp1_rio_sync_in() >> PIN_CLK) & 1u;
-    if (cur != last) {
-      clk_transitions++;
-      last = cur;
+  const unsigned int clk_in = rp1_gpio_infrompad(PIN_CLK);
+  const unsigned int clk_out = rp1_gpio_outtopad(PIN_CLK);
+  const unsigned int clk_oe = rp1_gpio_oetopad(PIN_CLK);
+  const char *proto = (rp1_proto_mode == RP1_PROTO_SA3) ? "sa3" : "regsel";
+
+  unsigned int clk_transitions_out = 0;
+  unsigned int clk_transitions_in = 0;
+  unsigned int clk_samples = 128;
+  unsigned int last_out = clk_out;
+  unsigned int last_in = clk_in;
+  unsigned int sample_us = 0;
+  const char *sample_env = getenv("PISTORM_CLK_SAMPLE_US");
+  if (sample_env && *sample_env) {
+    char *end = NULL;
+    unsigned long v = strtoul(sample_env, &end, 10);
+    if (end != sample_env && v > 0 && v <= 1000000ul) {
+      sample_us = (unsigned int)v;
+      clk_samples = 64;
+    }
+  }
+  for (unsigned int i = 0; i < clk_samples; i++) {
+    unsigned int cur_in = rp1_gpio_infrompad(PIN_CLK);
+    unsigned int cur_out = rp1_gpio_outtopad(PIN_CLK);
+    if (cur_in != last_in) {
+      clk_transitions_in++;
+      last_in = cur_in;
+    }
+    if (cur_out != last_out) {
+      clk_transitions_out++;
+      last_out = cur_out;
+    }
+    if (sample_us) {
+      usleep(sample_us);
     }
   }
 
-  printf("[GPIO] %s: sync_in=0x%08x txn=%u ipl0=%u a0=%u a1=%u clk=%u rst=%u rd=%u wr=%u d=0x%04x | out=0x%08x oe=0x%08x | gpio4_funcsel=%u clk_transitions=%u/128\n",
-         t, sync, txn, ipl0, a0, a1, clk, rst, rd, wr, data, out, oe, clk_funcsel, clk_transitions);
+  if (rp1_proto_mode == RP1_PROTO_SA3) {
+    // gpio/gpio_old.c style naming (docs/RPI5_HEADER_MAP.md)
+    const unsigned int busy = (sync >> 0) & 1u;
+    const unsigned int irq = (sync >> 1) & 1u;
+    const unsigned int sa2 = (sync >> 2) & 1u;
+    const unsigned int sa1 = (sync >> 3) & 1u;
+    const unsigned int clk = (sync >> 4) & 1u;
+    const unsigned int sa0 = (sync >> 5) & 1u;
+    const unsigned int soe = (sync >> 6) & 1u;
+    const unsigned int swe = (sync >> 7) & 1u;
+
+    const unsigned int busy_pad = rp1_gpio_infrompad(0);
+    const unsigned int irq_pad = rp1_gpio_infrompad(1);
+
+    const unsigned int sa2_funcsel = rp1_io_bank0[rp1_gpio_ctrl_index(2)] & 0x1fu;
+    const unsigned int sa1_funcsel = rp1_io_bank0[rp1_gpio_ctrl_index(3)] & 0x1fu;
+    const unsigned int sa0_funcsel = rp1_io_bank0[rp1_gpio_ctrl_index(5)] & 0x1fu;
+    const unsigned int soe_funcsel = rp1_io_bank0[rp1_gpio_ctrl_index(6)] & 0x1fu;
+    const unsigned int swe_funcsel = rp1_io_bank0[rp1_gpio_ctrl_index(7)] & 0x1fu;
+
+    const unsigned int sa0_oetopad = rp1_gpio_oetopad(5);
+    const unsigned int sa0_outtopad = rp1_gpio_outtopad(5);
+    const unsigned int soe_oetopad = rp1_gpio_oetopad(6);
+    const unsigned int soe_outtopad = rp1_gpio_outtopad(6);
+    const unsigned int swe_oetopad = rp1_gpio_oetopad(7);
+    const unsigned int swe_outtopad = rp1_gpio_outtopad(7);
+
+    printf("[GPIO] %s: proto=%s sync_in=0x%08x busy=%u/%u irq=%u/%u sa2=%u sa1=%u sa0=%u clk=%u/%u/%u/%u soe=%u swe=%u d=0x%04x | out=0x%08x oe=0x%08x | fsel(sa2,sa1,sa0,soe,swe)=%u,%u,%u,%u,%u gpio4_funcsel=%u clk_transitions_out=%u/%u clk_transitions_in=%u/%u | gpio5(oetopad=%u outtopad=%u) gpio6(oetopad=%u outtopad=%u) gpio7(oetopad=%u outtopad=%u)\n",
+           t, proto, sync,
+           busy, busy_pad, irq, irq_pad,
+           sa2, sa1, sa0,
+           clk, clk_in, clk_out, clk_oe,
+           soe, swe, data,
+           out, oe,
+           sa2_funcsel, sa1_funcsel, sa0_funcsel, soe_funcsel, swe_funcsel,
+           clk_funcsel, clk_transitions_out, clk_samples, clk_transitions_in, clk_samples,
+           sa0_oetopad, sa0_outtopad, soe_oetopad, soe_outtopad, swe_oetopad, swe_outtopad);
+  } else {
+    // rtl/pistorm.v style naming (reg-select protocol)
+    const unsigned int txn = (sync >> PIN_TXN_IN_PROGRESS) & 1u;
+    const unsigned int ipl0 = (sync >> PIN_IPL_ZERO) & 1u;
+    const unsigned int a0 = (sync >> PIN_A0) & 1u;
+    const unsigned int a1 = (sync >> PIN_A1) & 1u;
+    const unsigned int clk = (sync >> PIN_CLK) & 1u;
+    const unsigned int rst = (sync >> PIN_RESET) & 1u;
+    const unsigned int rd = (sync >> PIN_RD) & 1u;
+    const unsigned int wr = (sync >> PIN_WR) & 1u;
+
+    const unsigned int txn_pad = rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS);
+    const unsigned int ipl0_pad = rp1_gpio_infrompad(PIN_IPL_ZERO);
+    const unsigned int rst_pad = rp1_gpio_infrompad(PIN_RESET);
+    const unsigned int rst_oetopad = rp1_gpio_oetopad(PIN_RESET);
+    const unsigned int rst_outtopad = rp1_gpio_outtopad(PIN_RESET);
+
+    const unsigned int a0_funcsel = rp1_io_bank0[rp1_gpio_ctrl_index(PIN_A0)] & 0x1fu;
+    const unsigned int a1_funcsel = rp1_io_bank0[rp1_gpio_ctrl_index(PIN_A1)] & 0x1fu;
+    const unsigned int rd_funcsel = rp1_io_bank0[rp1_gpio_ctrl_index(PIN_RD)] & 0x1fu;
+    const unsigned int wr_funcsel = rp1_io_bank0[rp1_gpio_ctrl_index(PIN_WR)] & 0x1fu;
+
+    const unsigned int a0_oetopad = rp1_gpio_oetopad(PIN_A0);
+    const unsigned int a0_outtopad = rp1_gpio_outtopad(PIN_A0);
+    const unsigned int wr_oetopad = rp1_gpio_oetopad(PIN_WR);
+    const unsigned int wr_outtopad = rp1_gpio_outtopad(PIN_WR);
+
+    printf("[GPIO] %s: proto=%s sync_in=0x%08x txn=%u/%u ipl0=%u/%u regsel(a0,a1)=%u,%u clk=%u/%u/%u/%u rst=%u/%u rd=%u wr=%u d=0x%04x | out=0x%08x oe=0x%08x | fsel(gpio2,gpio3,gpio6,gpio7)=%u,%u,%u,%u gpio4_funcsel=%u clk_transitions_out=%u/%u clk_transitions_in=%u/%u | gpio2(oetopad=%u outtopad=%u) gpio7(oetopad=%u outtopad=%u) gpio5(oetopad=%u outtopad=%u)\n",
+           t, proto, sync,
+           txn, txn_pad, ipl0, ipl0_pad,
+           a0, a1,
+           clk, clk_in, clk_out, clk_oe,
+           rst, rst_pad, rd, wr, data,
+           out, oe,
+           a0_funcsel, a1_funcsel, rd_funcsel, wr_funcsel,
+           clk_funcsel, clk_transitions_out, clk_samples, clk_transitions_in, clk_samples,
+           a0_oetopad, a0_outtopad, wr_oetopad, wr_outtopad, rst_oetopad, rst_outtopad);
+  }
 #else
   if (!gpio) {
     printf("[GPIO] %s: legacy GPIO not mapped.\n", t);
@@ -488,18 +1112,57 @@ void ps_dump_protocol_state(const char *tag) {
 #endif
 }
 
+uint32_t ps_read_gpio_state() {
+#if defined(PISTORM_RP1)
+  if (!rp1_sys_rio0) {
+    return 0;
+  }
+  return rp1_rio_sync_in();
+#else
+  if (!gpio) {
+    return 0;
+  }
+  return *(gpio + 13);
+#endif
+}
+
 void ps_setup_protocol() {
   setup_io();
   setup_gpclk();
 
 #if defined(PISTORM_RP1)
-  // Inputs: PIN_TXN_IN_PROGRESS (0), PIN_IPL_ZERO (1)
-  // Outputs: all other protocol pins; default to inputs on D[0..15] until needed.
-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
-  const uint32_t data_mask = (0xFFFFu << 8);
-  rp1_rio_oe_clr(ctrl_mask | data_mask);
-  rp1_rio_out_clr(0xFFFFECu);
-  rp1_rio_oe_set(ctrl_mask);
+  // The RIO OE/OUT registers are global; always start by releasing the entire PiStorm pin range so
+  // a previous crashed run can't leave pins actively driven (common cause: GPIO5 left as output).
+  const uint32_t proto_mask = 0x00FFFFFFu;
+  rp1_rio_oe_clr(proto_mask);
+  rp1_rio_out_clr(proto_mask);
+
+  if (rp1_proto_mode == RP1_PROTO_SA3) {
+    // Old SA0/SA1/SA2 protocol:
+    // - GPIO2/3/5 are SA2/SA1/SA0 outputs
+    // - GPIO6 (SOE) + GPIO7 (SWE) are strobes
+    // - GPIO0 is handshake/busy, GPIO1 is IRQ
+    // Default: data bus inputs, strobes deasserted high.
+    const uint32_t sa_mask = (1u << 2) | (1u << 3) | (1u << 5);
+    const uint32_t strobe_mask = (1u << 6) | (1u << 7);
+    const uint32_t data_mask = (0xFFFFu << 8);
+    rp1_rio_oe_clr(sa_mask | strobe_mask | data_mask);
+    rp1_rio_oe_set(sa_mask | strobe_mask);
+    rp1_sa_mode_w16();
+    rp1_soe_deassert_high();
+    rp1_rio_out_set(1u << PIN_WR);
+    rp1_rio_oe_clr(data_mask);
+  } else {
+    // New reg-select protocol (rtl/pistorm.v in this repo):
+    // Inputs: PIN_TXN_IN_PROGRESS (0), PIN_IPL_ZERO (1)
+    // Outputs: all other protocol pins; default to inputs on D[0..15] until needed.
+    // NOTE: GPIO5 (PIN_RESET) is driven by the CPLD in this RTL, so do not enable output drive on it from the Pi side.
+    const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
+    const uint32_t data_mask = (0xFFFFu << 8);
+    rp1_rio_oe_clr(ctrl_mask | data_mask);
+    rp1_rio_out_clr(0xFFFFECu);
+    rp1_rio_oe_set(ctrl_mask);
+  }
 #else
   *(gpio + 10) = 0xffffec;
 
@@ -511,28 +1174,50 @@ void ps_setup_protocol() {
 
 void ps_write_16(unsigned int address, unsigned int data) {
 #if defined(PISTORM_RP1)
-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
+  if (rp1_proto_mode == RP1_PROTO_SA3) {
+    // gpio/gpio_old.c write16
+    const uint32_t sa_mask = (1u << 2) | (1u << 3) | (1u << 5);
+    const uint32_t strobe_mask = (1u << 6) | (1u << 7);
+    const uint32_t data_mask = (0xFFFFu << 8);
+    rp1_sa_mode_w16();
+    rp1_rio_oe_set(sa_mask | strobe_mask | data_mask);
+
+    rp1_set_bus16((uint16_t)(address & 0xffffu));
+    rp1_swe_pulse_low_high();
+
+    rp1_set_bus16((uint16_t)((address >> 16) & 0xffffu));
+    rp1_swe_pulse_low_high();
+
+    rp1_set_bus16((uint16_t)(data & 0xffffu));
+    rp1_swe_pulse_low_high();
+
+    rp1_rio_oe_clr(data_mask);
+    // Wait for txn to complete if it asserts; avoid hanging if it doesn't.
+    if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS)) {
+      (void)rp1_wait_txn_start_then_clear(NULL);
+    }
+    return;
+  }
+
+  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
   const uint32_t data_mask = (0xFFFFu << 8);
   rp1_rio_oe_set(ctrl_mask | data_mask);
 
   rp1_rio_out_set(((data & 0xffff) << 8) | (REG_DATA << PIN_A0));
-  rp1_rio_out_set(1u << PIN_WR);
-  rp1_rio_out_clr(1u << PIN_WR);
+  rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
   rp1_rio_out_set(((address & 0xffff) << 8) | (REG_ADDR_LO << PIN_A0));
-  rp1_rio_out_set(1u << PIN_WR);
-  rp1_rio_out_clr(1u << PIN_WR);
+  rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
   rp1_rio_out_set(((0x0000 | (address >> 16)) << 8) | (REG_ADDR_HI << PIN_A0));
-  rp1_rio_out_set(1u << PIN_WR);
-  rp1_rio_out_clr(1u << PIN_WR);
+  rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
   rp1_rio_oe_clr(data_mask);
 
-  if (rp1_wait_txn_clear(NULL) != 0) {
+  if (rp1_wait_txn_start_then_clear(NULL) != 0) {
     char where[64];
     snprintf(where, sizeof(where), "ps_write_16 addr=0x%08x", address);
     rp1_txn_timeout_fatal(where);
@@ -567,33 +1252,59 @@ void ps_write_16(unsigned int address, unsigned int data) {
 
 void ps_write_8(unsigned int address, unsigned int data) {
 #if defined(PISTORM_RP1)
+  if (rp1_proto_mode == RP1_PROTO_SA3) {
+    // gpio/gpio_old.c write8
+    if ((address & 1) == 0)
+      data = data + (data << 8);  // EVEN, A0=0,UDS
+    else
+      data = data & 0xff;  // ODD , A0=1,LDS
+
+    const uint32_t sa_mask = (1u << 2) | (1u << 3) | (1u << 5);
+    const uint32_t strobe_mask = (1u << 6) | (1u << 7);
+    const uint32_t data_mask = (0xFFFFu << 8);
+    rp1_sa_mode_w8();
+    rp1_rio_oe_set(sa_mask | strobe_mask | data_mask);
+
+    rp1_set_bus16((uint16_t)(address & 0xffffu));
+    rp1_swe_pulse_low_high();
+
+    rp1_set_bus16((uint16_t)((address >> 16) & 0xffffu));
+    rp1_swe_pulse_low_high();
+
+    rp1_set_bus16((uint16_t)(data & 0xffffu));
+    rp1_swe_pulse_low_high();
+
+    rp1_rio_oe_clr(data_mask);
+    if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS)) {
+      (void)rp1_wait_txn_start_then_clear(NULL);
+    }
+    return;
+  }
+
   if ((address & 1) == 0)
     data = data + (data << 8);  // EVEN, A0=0,UDS
   else
     data = data & 0xff;  // ODD , A0=1,LDS
 
-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
+  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
   const uint32_t data_mask = (0xFFFFu << 8);
   rp1_rio_oe_set(ctrl_mask | data_mask);
 
   rp1_rio_out_set(((data & 0xffff) << 8) | (REG_DATA << PIN_A0));
-  rp1_rio_out_set(1u << PIN_WR);
-  rp1_rio_out_clr(1u << PIN_WR);
+  rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
   rp1_rio_out_set(((address & 0xffff) << 8) | (REG_ADDR_LO << PIN_A0));
-  rp1_rio_out_set(1u << PIN_WR);
-  rp1_rio_out_clr(1u << PIN_WR);
+  rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
   rp1_rio_out_set(((0x0100 | (address >> 16)) << 8) | (REG_ADDR_HI << PIN_A0));
-  rp1_rio_out_set(1u << PIN_WR);
-  rp1_rio_out_clr(1u << PIN_WR);
+  rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
   rp1_rio_oe_clr(data_mask);
 
-  if (rp1_wait_txn_clear(NULL) != 0) {
+  if (rp1_wait_txn_start_then_clear(NULL) != 0) {
     char where[64];
     snprintf(where, sizeof(where), "ps_write_8 addr=0x%08x", address);
     rp1_txn_timeout_fatal(where);
@@ -640,27 +1351,61 @@ void ps_write_32(unsigned int address, unsigned int value) {
 
 unsigned int ps_read_16(unsigned int address) {
 #if defined(PISTORM_RP1)
-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
+  if (rp1_proto_mode == RP1_PROTO_SA3) {
+    // gpio/gpio_old.c read16
+    const uint32_t sa_mask = (1u << 2) | (1u << 3) | (1u << 5);
+    const uint32_t strobe_mask = (1u << 6) | (1u << 7);
+    const uint32_t data_mask = (0xFFFFu << 8);
+    rp1_sa_mode_r16();
+    rp1_rio_oe_set(sa_mask | strobe_mask | data_mask);
+
+    rp1_set_bus16((uint16_t)(address & 0xffffu));
+    rp1_swe_pulse_low_high();
+
+    rp1_set_bus16((uint16_t)((address >> 16) & 0xffffu));
+    rp1_swe_pulse_low_high();
+
+    rp1_rio_oe_clr(data_mask);
+    rp1_soe_assert_low();
+
+    // Some SA0/SA1/SA2 variants do not provide a usable handshake on GPIO0.
+    // Allow bypassing the wait to see whether the data bus is being driven at all.
+    if (!rp1_old_no_handshake()) {
+      if (rp1_wait_txn_start_then_clear(NULL) != 0) {
+        char where[64];
+        snprintf(where, sizeof(where), "old_read_16 addr=0x%08x (no txn)", address);
+        rp1_txn_timeout_fatal(where);
+      }
+    } else {
+      const unsigned int nops = rp1_old_sample_nops();
+      for (unsigned int i = 0; i < nops; i++) {
+        asm volatile("nop");
+      }
+    }
+    const uint32_t v = rp1_rio_sync_in();
+    rp1_soe_deassert_high();
+    return (unsigned int)((v >> 8) & 0xffffu);
+  }
+
+  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
   const uint32_t data_mask = (0xFFFFu << 8);
   rp1_rio_oe_set(ctrl_mask | data_mask);
 
   rp1_rio_out_set(((address & 0xffff) << 8) | (REG_ADDR_LO << PIN_A0));
-  rp1_rio_out_set(1u << PIN_WR);
-  rp1_rio_out_clr(1u << PIN_WR);
+  rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
   rp1_rio_out_set(((0x0200 | (address >> 16)) << 8) | (REG_ADDR_HI << PIN_A0));
-  rp1_rio_out_set(1u << PIN_WR);
-  rp1_rio_out_clr(1u << PIN_WR);
+  rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
   rp1_rio_oe_clr(data_mask);
 
   rp1_rio_out_set(REG_DATA << PIN_A0);
-  rp1_rio_out_set(1u << PIN_RD);
+  rp1_rd_strobe();
 
   uint32_t value = 0;
-  if (rp1_wait_txn_clear(&value) != 0) {
+  if (rp1_wait_txn_start_then_clear(&value) != 0) {
     char where[64];
     snprintf(where, sizeof(where), "ps_read_16 addr=0x%08x", address);
     rp1_txn_timeout_fatal(where);
@@ -702,27 +1447,64 @@ unsigned int ps_read_16(unsigned int address) {
 
 unsigned int ps_read_8(unsigned int address) {
 #if defined(PISTORM_RP1)
-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
+  if (rp1_proto_mode == RP1_PROTO_SA3) {
+    // gpio/gpio_old.c read8
+    const uint32_t sa_mask = (1u << 2) | (1u << 3) | (1u << 5);
+    const uint32_t strobe_mask = (1u << 6) | (1u << 7);
+    const uint32_t data_mask = (0xFFFFu << 8);
+    rp1_sa_mode_r8();
+    rp1_rio_oe_set(sa_mask | strobe_mask | data_mask);
+
+    rp1_set_bus16((uint16_t)(address & 0xffffu));
+    rp1_swe_pulse_low_high();
+
+    rp1_set_bus16((uint16_t)((address >> 16) & 0xffffu));
+    rp1_swe_pulse_low_high();
+
+    rp1_rio_oe_clr(data_mask);
+    rp1_soe_assert_low();
+
+    if (!rp1_old_no_handshake()) {
+      if (rp1_wait_txn_start_then_clear(NULL) != 0) {
+        char where[64];
+        snprintf(where, sizeof(where), "old_read_8 addr=0x%08x (no txn)", address);
+        rp1_txn_timeout_fatal(where);
+      }
+    } else {
+      const unsigned int nops = rp1_old_sample_nops();
+      for (unsigned int i = 0; i < nops; i++) {
+        asm volatile("nop");
+      }
+    }
+    uint32_t v = rp1_rio_sync_in();
+    rp1_soe_deassert_high();
+
+    v = (v >> 8) & 0xffffu;
+    if ((address & 1) == 0)
+      return (v >> 8) & 0xff;  // EVEN
+    else
+      return v & 0xff;  // ODD
+  }
+
+  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
   const uint32_t data_mask = (0xFFFFu << 8);
   rp1_rio_oe_set(ctrl_mask | data_mask);
 
   rp1_rio_out_set(((address & 0xffff) << 8) | (REG_ADDR_LO << PIN_A0));
-  rp1_rio_out_set(1u << PIN_WR);
-  rp1_rio_out_clr(1u << PIN_WR);
+  rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
   rp1_rio_out_set(((0x0300 | (address >> 16)) << 8) | (REG_ADDR_HI << PIN_A0));
-  rp1_rio_out_set(1u << PIN_WR);
-  rp1_rio_out_clr(1u << PIN_WR);
+  rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
   rp1_rio_oe_clr(data_mask);
 
   rp1_rio_out_set(REG_DATA << PIN_A0);
-  rp1_rio_out_set(1u << PIN_RD);
+  rp1_rd_strobe();
 
   uint32_t value = 0;
-  if (rp1_wait_txn_clear(&value) != 0) {
+  if (rp1_wait_txn_start_then_clear(&value) != 0) {
     char where[64];
     snprintf(where, sizeof(where), "ps_read_8 addr=0x%08x", address);
     rp1_txn_timeout_fatal(where);
@@ -777,7 +1559,19 @@ unsigned int ps_read_32(unsigned int address) {
 
 void ps_write_status_reg(unsigned int value) {
 #if defined(PISTORM_RP1)
-  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RESET) | (1u << PIN_RD) | (1u << PIN_WR);
+  if (rp1_proto_mode == RP1_PROTO_SA3) {
+    const uint32_t sa_mask = (1u << 2) | (1u << 3) | (1u << 5);
+    const uint32_t strobe_mask = (1u << 6) | (1u << 7);
+    const uint32_t data_mask = (0xFFFFu << 8);
+    rp1_sa_mode_status();
+    rp1_rio_oe_set(sa_mask | strobe_mask | data_mask);
+    rp1_set_bus16((uint16_t)(value & 0xffffu));
+    rp1_swe_pulse_low_high();
+    rp1_rio_oe_clr(data_mask);
+    return;
+  }
+
+  const uint32_t ctrl_mask = (1u << PIN_A0) | (1u << PIN_A1) | (1u << PIN_RD) | (1u << PIN_WR);
   const uint32_t data_mask = (0xFFFFu << 8);
   rp1_rio_oe_set(ctrl_mask | data_mask);
 
@@ -814,6 +1608,20 @@ void ps_write_status_reg(unsigned int value) {
 
 unsigned int ps_read_status_reg() {
 #if defined(PISTORM_RP1)
+  if (rp1_proto_mode == RP1_PROTO_SA3) {
+    const uint32_t sa_mask = (1u << 2) | (1u << 3) | (1u << 5);
+    const uint32_t strobe_mask = (1u << 6) | (1u << 7);
+    const uint32_t data_mask = (0xFFFFu << 8);
+    rp1_sa_mode_status();
+    rp1_rio_oe_set(sa_mask | strobe_mask);
+    rp1_rio_oe_clr(data_mask);
+    rp1_soe_assert_low();
+    // No handshake wait here (matches gpio_old.c read_reg).
+    const uint32_t v = rp1_rio_sync_in();
+    rp1_soe_deassert_high();
+    return (unsigned int)((v >> 8) & 0xffffu);
+  }
+
   rp1_rio_out_set(REG_STATUS << PIN_A0);
   rp1_rio_out_set(1u << PIN_RD);
   rp1_rio_out_set(1u << PIN_RD);

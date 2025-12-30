@@ -128,7 +128,7 @@ void *ipl_task(void *args) {
   uint32_t value;
 
   while (1) {
-    value = *(gpio + 13);
+    value = ps_read_gpio_state();
     if (value & (1 << PIN_TXN_IN_PROGRESS))
       goto noppers;
 
@@ -526,6 +526,8 @@ void sigint_handler(int sig_num) {
 int main(int argc, char *argv[]) {
   int g;
   int gpio_probe_only = 0;
+  int gpclk_probe_only = 0;
+  int bus_probe_only = 0;
 
   //const struct sched_param priority = {99};
 
@@ -533,6 +535,12 @@ int main(int argc, char *argv[]) {
   for (g = 1; g < argc; g++) {
     if (strcmp(argv[g], "--gpio-probe") == 0) {
       gpio_probe_only = 1;
+    }
+    if (strcmp(argv[g], "--gpclk-probe") == 0) {
+      gpclk_probe_only = 1;
+    }
+    if (strcmp(argv[g], "--bus-probe") == 0 || strcmp(argv[g], "--txn-probe") == 0) {
+      bus_probe_only = 1;
     }
     if (strcmp(argv[g], "--cpu_type") == 0 || strcmp(argv[g], "--cpu") == 0) {
       if (g + 1 >= argc) {
@@ -570,8 +578,34 @@ int main(int argc, char *argv[]) {
   if (gpio_probe_only) {
     return ps_probe_protocol() == 0 ? 0 : 1;
   }
+  if (gpclk_probe_only) {
+    return ps_gpclk_probe() == 0 ? 0 : 1;
+  }
 
   ps_setup_protocol();
+
+  if (bus_probe_only) {
+    printf("[BUS] Starting PiStorm bus probe (no threads, no video).\n");
+    ps_reset_state_machine();
+    ps_pulse_reset();
+    usleep(1500);
+
+    ps_dump_protocol_state("bus-probe-pre");
+
+    unsigned int status = ps_read_status_reg();
+    printf("[BUS] ps_read_status_reg() = 0x%04x\n", status & 0xFFFFu);
+
+    uint32_t initial_sp = ps_read_32(0x00000000);
+    uint32_t initial_pc = ps_read_32(0x00000004);
+    printf("[BUS] reset vectors: SP=0x%08x PC=0x%08x\n", initial_sp, initial_pc);
+
+    if (initial_pc == 0 || initial_pc == 0xFFFFFFFFu) {
+      printf("[BUS] WARNING: PC vector looks invalid; bus reads may not be working or OVL/ROM mapping is not active.\n");
+    }
+
+    ps_dump_protocol_state("bus-probe-post");
+    return 0;
+  }
 
 switch_config:
   srand(clock());

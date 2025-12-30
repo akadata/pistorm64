@@ -17,6 +17,28 @@
 
 EXENAME          = emulator
 
+WITH_RAYLIB      ?= 1
+WITH_ALSA        ?= 1
+DEBUG            ?= 0
+
+DBGFLAGS         =
+ifeq ($(DEBUG),1)
+DBGFLAGS         = -g3 -ggdb -fno-omit-frame-pointer -fno-optimize-sibling-calls
+OPT              = -O0 -pipe -fno-strict-aliasing -fno-plt $(DBGFLAGS)
+else
+OPT              = -O3 -pipe -fno-strict-aliasing -fno-plt
+endif
+
+RTG_OUTPUT_SRC   = platforms/amiga/rtg/rtg-output-raylib.c
+ifeq ($(WITH_RAYLIB),0)
+RTG_OUTPUT_SRC   = platforms/amiga/rtg/rtg-output-headless.c
+endif
+
+AHI_SRC          = platforms/amiga/ahi/pi_ahi.c
+ifeq ($(WITH_ALSA),0)
+AHI_SRC          = platforms/amiga/ahi/pi_ahi_stub.c
+endif
+
 MAINFILES        = emulator.c \
                   memory_mapped.c \
                   config_file/config_file.c \
@@ -35,10 +57,10 @@ MAINFILES        = emulator.c \
                   platforms/amiga/hunk-reloc.c \
                   platforms/amiga/cdtv-dmac.c \
                   platforms/amiga/rtg/rtg.c \
-                  platforms/amiga/rtg/rtg-output-raylib.c \
+                  $(RTG_OUTPUT_SRC) \
                   platforms/amiga/rtg/rtg-gfx.c \
                   platforms/amiga/piscsi/piscsi.c \
-                  platforms/amiga/ahi/pi_ahi.c \
+                  $(AHI_SRC) \
                   platforms/amiga/pistorm-dev/pistorm-dev.c \
                   platforms/amiga/net/pi-net.c \
                   platforms/shared/rtc.c \
@@ -70,7 +92,6 @@ DEFS_COMMON      = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOU
 WARNINGS         = $(WARNINGS_COMMON)
 MARCH            = -march=native
 MCPU             = -mcpu=native
-OPT              = -O3 -pipe -fno-strict-aliasing -fno-plt
 
 # Include paths - default to legacy raylib path; platforms override as needed
 INCLUDES         = -I. -I./raylib
@@ -85,6 +106,13 @@ LDLIBS           = -lm -ldl -lstdc++
 RAYLIB_DIR       = ./raylib_drm
 RAYLIB_LIBDIRS   = -L$(RAYLIB_DIR)
 RAYLIB_LIBS      = -lraylib -lGLESv2 -lEGL -lgbm -ldrm -lasound
+ifeq ($(WITH_RAYLIB),0)
+RAYLIB_LIBDIRS   =
+RAYLIB_LIBS      =
+endif
+ifeq ($(WITH_ALSA),0)
+RAYLIB_LIBS      := $(filter-out -lasound,$(RAYLIB_LIBS))
+endif
 
 # Optional VideoCore libs (may not exist on Alpine; keep them only where needed)
 VCHIQ_LIBS       = -lvcos -lvchiq_arm -lvchostif
@@ -110,6 +138,18 @@ CPPFLAGS   =
 LDFLAGS    = $(PTHREAD) -Wl,-O2 -Wl,--as-needed
 
 # No vcos/vchiq by default on Alpine unless explicitly present
+LFLAGS     = $(WARNINGS) $(LDFLAGS) $(LIBDIRS) $(RAYLIB_LIBS) -lgpiod $(LDLIBS)
+
+else ifeq ($(PLATFORM),PI5_DEBIAN_64BIT)
+
+# Debian/Raspberry Pi OS on Pi 5: same flags as Alpine for now; the important part is RP1 + libgpiod.
+INCLUDES   = -I.
+LIBDIRS    = -L/usr/local/lib
+
+CFLAGS     = $(WARNINGS) $(INCLUDES) $(MARCH) $(MCPU) $(OPT) $(DEFS_COMMON) $(ACFLAGS) $(PTHREAD) -DHAVE_LIBGPIOD -DPISTORM_RP1=1
+CPPFLAGS   =
+LDFLAGS    = $(PTHREAD) -Wl,-O2 -Wl,--as-needed
+
 LFLAGS     = $(WARNINGS) $(LDFLAGS) $(LIBDIRS) $(RAYLIB_LIBS) -lgpiod $(LDLIBS)
 
 else ifeq ($(PLATFORM),PI_64BIT)
@@ -166,7 +206,7 @@ clean:
 
 # Ensure generated files are built before compiling dependents
 $(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) a314/a314.o
-	$(CC) -o $@ $^ -Os $(PTHREAD) $(LFLAGS)
+	$(CC) -o $@ $^ $(LFLAGS)
 
 # Dependency: files that include m68kops.h must wait for generation
 emulator.o: m68kops.h
@@ -179,7 +219,7 @@ m68kops.o: m68kops.h
 m68kops.o: CFLAGS += -Wno-unused-parameter
 
 buptest: buptest.c gpio/ps_protocol.c
-	$(CC) $^ -o $@ -I./ -march=native -Os
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^ $(WARNINGS) $(LDFLAGS) $(LIBDIRS) -lgpiod $(LDLIBS)
 
 a314/a314.o: a314/a314.cc a314/a314.h
 	$(CXX) -MMD -MP -c -o $@ a314/a314.cc \

@@ -1,26 +1,411 @@
-Starting program: /home/smalley/pistorm/emulator --gpio-probe
-[Inferior 1 (process 4033) exited normally]
-No stack.
-The program has no registers now.
-From                To                  Syms Read   Shared Object Library
-0x0000007ff7f505e0  0x0000007ff7faaa0c  Yes         /lib/ld-musl-aarch64.so.1
+Breakpoint 1 at 0x8e884: file gpio/ps_protocol.c, line 446.
+Breakpoint 2 at 0x9149c: file gpio/ps_protocol.c, line 1671.
+Breakpoint 3 at 0xc513c: file m68kcpu.c, line 1131.
+[ gdb ] Ready. Use `run` to start, Ctrl-C to interrupt.
+[ gdb ] After Ctrl-C, run: `pistorm_threads` and `pistorm_state`.
+[ gdb ] Note: `pistorm_watch_vectors` is a gdb command; run it as `pistorm_watch_vectors` (not `run pistorm_watch_vectors`).
+Breakpoint 4 at 0x90e1c: file gpio/ps_protocol.c, line 1354.
+[ gdb ] Vector watch enabled (ps_read_16 addr 0/4).
 Starting program: /home/smalley/pistorm/emulator --config basic.cfg
-[Inferior 1 (process 4039) exited with code 0377]
-Already logging to gdb.log.
-Already logging to gdb.log.
-Already logging to gdb.log.
-Already logging to gdb.log.
-Starting program: /home/smalley/pistorm/emulator --gpio-probe
-[Inferior 1 (process 5095) exited normally]
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1".
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] m68k_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_read_16(0x00000000) hit (1)
+#0  ps_read_16 (address=0) at gpio/ps_protocol.c:1354
+#1  0x00005555555d8470 in m68k_read_memory_16 (address=0) at emulator.c:1012
+#2  0x00005555556087bc in m68ki_read_16_fc (state=0x55555590deb0 <m68ki_cpu>, address=0, fc=6) at /home/smalley/pistorm/m68kcpu.h:1334
+#3  0x0000555555608154 in m68ki_ic_readimm16 (state=0x55555590deb0 <m68ki_cpu>, address=0) at /home/smalley/pistorm/m68kcpu.h:1167
+#4  0x0000555555608364 in m68ki_read_imm_32 (state=0x55555590deb0 <m68ki_cpu>) at /home/smalley/pistorm/m68kcpu.h:1223
+#5  0x00005555556151f4 in m68k_pulse_reset (state=0x55555590deb0 <m68ki_cpu>) at m68kcpu.c:1165
+#6  0x00005555555d7914 in cpu_pulse_reset () at emulator.c:782
+#7  0x00005555555d7560 in main (argc=3, argv=0x7ffffffff3b8) at emulator.c:711
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] rp1_txn_timeout_fatal hit.
+
+[ gdb ] ps_dump_protocol_state("gdb"):
+
+[ gdb ] clk_gp0 debugfs:
+
+[ gdb ] threads:
+  Id   Target Id                                    Frame 
+* 1    Thread 0x7ffff7fb51a0 (LWP 17029) "emulator" rp1_txn_timeout_fatal (where=0x7ffffffff048 "ps_read_16 addr=0x00000000") at gpio/ps_protocol.c:446
+
+[ gdb ] thread backtraces:
+
+Thread 1 (Thread 0x7ffff7fb51a0 (LWP 17029) "emulator"):
+#0  rp1_txn_timeout_fatal (where=0x7ffffffff048 "ps_read_16 addr=0x00000000") at gpio/ps_protocol.c:446
+        proto_mask = 0
+#1  0x00005555555e0ff0 in ps_read_16 (address=0) at gpio/ps_protocol.c:1411
+        where = "ps_read_16 addr=0x00000000\000\001\000\000\000\000\340*\233UUU\000\000\370\027hU\b", '\000' <repeats 11 times>, "\260\360\377\377\377\177\000"
+        ctrl_mask = 204
+        data_mask = 16776960
+        value = 2
+#2  0x00005555555d8470 in m68k_read_memory_16 (address=0) at emulator.c:1012
+No locals.
+#3  0x00005555556087bc in m68ki_read_16_fc (state=0x55555590deb0 <m68ki_cpu>, address=0, fc=6) at /home/smalley/pistorm/m68kcpu.h:1334
+        cache = 0x55555590e7a8 <m68ki_cpu+2296>
+#4  0x0000555555608154 in m68ki_ic_readimm16 (state=0x55555590deb0 <m68ki_cpu>, address=0) at /home/smalley/pistorm/m68kcpu.h:1167
+No locals.
+#5  0x0000555555608364 in m68ki_read_imm_32 (state=0x55555590deb0 <m68ki_cpu>) at /home/smalley/pistorm/m68kcpu.h:1223
+        address = 0
+        temp_val = 0
+#6  0x00005555556151f4 in m68k_pulse_reset (state=0x55555590deb0 <m68ki_cpu>) at m68kcpu.c:1165
+No locals.
+#7  0x00005555555d7914 in cpu_pulse_reset () at emulator.c:782
+        state = 0x55555590deb0 <m68ki_cpu>
+#8  0x00005555555d7560 in main (argc=3, argv=0x7ffffffff3b8) at emulator.c:711
+        g = 3
+        gpio_probe_only = 0
+        gpclk_probe_only = 0
+        bus_probe_only = 0
+        ipl_tid = 0
+        cpu_tid = 0
+        kbd_tid = 18158513697560985600
+        err = -139255208
+[Inferior 1 (process 17029) exited with code 01]
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+Breakpoint 5 at 0x5555555e0e1c: file gpio/ps_protocol.c, line 1354.
+[ gdb ] Vector watch enabled (ps_read_16 addr 0/4).
+Breakpoint 6 at 0x5555555e0e1c: file gpio/ps_protocol.c, line 1354.
+[ gdb ] Vector watch enabled (ps_read_16 addr 0/4).
 Starting program: /home/smalley/pistorm/emulator --config basic.cfg
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1".
 
-Program received signal SIGINT, Interrupt.
-0x00000055555e4aa8 in ps_read_16 ()
-#0  0x00000055555e4aa8 in ps_read_16 ()
-#1  0x0000005555611d54 in m68k_pulse_reset ()
-#2  0x000000555556333c in main ()
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
 
-Thread 1 (process 5097 "emulator"):
-#0  0x00000055555e4aa8 in ps_read_16 ()
-#1  0x0000005555611d54 in m68k_pulse_reset ()
-#2  0x000000555556333c in main ()
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] m68k_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_read_16(0x00000000) hit (1)
+#0  ps_read_16 (address=0) at gpio/ps_protocol.c:1354
+#1  0x00005555555d8470 in m68k_read_memory_16 (address=0) at emulator.c:1012
+#2  0x00005555556087bc in m68ki_read_16_fc (state=0x55555590deb0 <m68ki_cpu>, address=0, fc=6) at /home/smalley/pistorm/m68kcpu.h:1334
+#3  0x0000555555608154 in m68ki_ic_readimm16 (state=0x55555590deb0 <m68ki_cpu>, address=0) at /home/smalley/pistorm/m68kcpu.h:1167
+#4  0x0000555555608364 in m68ki_read_imm_32 (state=0x55555590deb0 <m68ki_cpu>) at /home/smalley/pistorm/m68kcpu.h:1223
+#5  0x00005555556151f4 in m68k_pulse_reset (state=0x55555590deb0 <m68ki_cpu>) at m68kcpu.c:1165
+#6  0x00005555555d7914 in cpu_pulse_reset () at emulator.c:782
+#7  0x00005555555d7560 in main (argc=3, argv=0x7ffffffff3b8) at emulator.c:711
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] rp1_txn_timeout_fatal hit.
+
+[ gdb ] ps_dump_protocol_state("gdb"):
+
+[ gdb ] clk_gp0 debugfs:
+
+[ gdb ] threads:
+  Id   Target Id                                    Frame 
+* 1    Thread 0x7ffff7fb51a0 (LWP 17111) "emulator" rp1_txn_timeout_fatal (where=0x7ffffffff048 "ps_read_16 addr=0x00000000") at gpio/ps_protocol.c:446
+
+[ gdb ] thread backtraces:
+
+Thread 1 (Thread 0x7ffff7fb51a0 (LWP 17111) "emulator"):
+#0  rp1_txn_timeout_fatal (where=0x7ffffffff048 "ps_read_16 addr=0x00000000") at gpio/ps_protocol.c:446
+        proto_mask = 0
+#1  0x00005555555e0ff0 in ps_read_16 (address=0) at gpio/ps_protocol.c:1411
+        where = "ps_read_16 addr=0x00000000\000\001\000\000\000\000\340*\233UUU\000\000\370\027hU\b", '\000' <repeats 11 times>, "\260\360\377\377\377\177\000"
+        ctrl_mask = 204
+        data_mask = 16776960
+        value = 2
+#2  0x00005555555d8470 in m68k_read_memory_16 (address=0) at emulator.c:1012
+No locals.
+#3  0x00005555556087bc in m68ki_read_16_fc (state=0x55555590deb0 <m68ki_cpu>, address=0, fc=6) at /home/smalley/pistorm/m68kcpu.h:1334
+        cache = 0x55555590e7a8 <m68ki_cpu+2296>
+#4  0x0000555555608154 in m68ki_ic_readimm16 (state=0x55555590deb0 <m68ki_cpu>, address=0) at /home/smalley/pistorm/m68kcpu.h:1167
+No locals.
+#5  0x0000555555608364 in m68ki_read_imm_32 (state=0x55555590deb0 <m68ki_cpu>) at /home/smalley/pistorm/m68kcpu.h:1223
+        address = 0
+        temp_val = 0
+#6  0x00005555556151f4 in m68k_pulse_reset (state=0x55555590deb0 <m68ki_cpu>) at m68kcpu.c:1165
+No locals.
+#7  0x00005555555d7914 in cpu_pulse_reset () at emulator.c:782
+        state = 0x55555590deb0 <m68ki_cpu>
+#8  0x00005555555d7560 in main (argc=3, argv=0x7ffffffff3b8) at emulator.c:711
+        g = 3
+        gpio_probe_only = 0
+        gpclk_probe_only = 0
+        bus_probe_only = 0
+        ipl_tid = 0
+        cpu_tid = 0
+        kbd_tid = 18158513697560985600
+        err = -139255208
+[Inferior 1 (process 17111) exited with code 01]
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+Starting program: /home/smalley/pistorm/emulator --config basic.cfg
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1".
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] m68k_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_read_16(0x00000000) hit (2)
+#0  ps_read_16 (address=0) at gpio/ps_protocol.c:1354
+#1  0x00005555555d8470 in m68k_read_memory_16 (address=0) at emulator.c:1012
+#2  0x00005555556087bc in m68ki_read_16_fc (state=0x55555590deb0 <m68ki_cpu>, address=0, fc=6) at /home/smalley/pistorm/m68kcpu.h:1334
+#3  0x0000555555608154 in m68ki_ic_readimm16 (state=0x55555590deb0 <m68ki_cpu>, address=0) at /home/smalley/pistorm/m68kcpu.h:1167
+#4  0x0000555555608364 in m68ki_read_imm_32 (state=0x55555590deb0 <m68ki_cpu>) at /home/smalley/pistorm/m68kcpu.h:1223
+#5  0x00005555556151f4 in m68k_pulse_reset (state=0x55555590deb0 <m68ki_cpu>) at m68kcpu.c:1165
+#6  0x00005555555d7914 in cpu_pulse_reset () at emulator.c:782
+#7  0x00005555555d7560 in main (argc=3, argv=0x7ffffffff3b8) at emulator.c:711
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] rp1_txn_timeout_fatal hit.
+
+[ gdb ] ps_dump_protocol_state("gdb"):
+
+[ gdb ] clk_gp0 debugfs:
+
+[ gdb ] threads:
+  Id   Target Id                                    Frame 
+* 1    Thread 0x7ffff7fb51a0 (LWP 17136) "emulator" rp1_txn_timeout_fatal (where=0x7ffffffff048 "ps_read_16 addr=0x00000000") at gpio/ps_protocol.c:446
+
+[ gdb ] thread backtraces:
+
+Thread 1 (Thread 0x7ffff7fb51a0 (LWP 17136) "emulator"):
+#0  rp1_txn_timeout_fatal (where=0x7ffffffff048 "ps_read_16 addr=0x00000000") at gpio/ps_protocol.c:446
+        proto_mask = 0
+#1  0x00005555555e0ff0 in ps_read_16 (address=0) at gpio/ps_protocol.c:1411
+        where = "ps_read_16 addr=0x00000000\000\001\000\000\000\000\340*\233UUU\000\000\370\027hU\b", '\000' <repeats 11 times>, "\260\360\377\377\377\177\000"
+        ctrl_mask = 204
+        data_mask = 16776960
+        value = 2
+#2  0x00005555555d8470 in m68k_read_memory_16 (address=0) at emulator.c:1012
+No locals.
+#3  0x00005555556087bc in m68ki_read_16_fc (state=0x55555590deb0 <m68ki_cpu>, address=0, fc=6) at /home/smalley/pistorm/m68kcpu.h:1334
+        cache = 0x55555590e7a8 <m68ki_cpu+2296>
+#4  0x0000555555608154 in m68ki_ic_readimm16 (state=0x55555590deb0 <m68ki_cpu>, address=0) at /home/smalley/pistorm/m68kcpu.h:1167
+No locals.
+#5  0x0000555555608364 in m68ki_read_imm_32 (state=0x55555590deb0 <m68ki_cpu>) at /home/smalley/pistorm/m68kcpu.h:1223
+        address = 0
+        temp_val = 0
+#6  0x00005555556151f4 in m68k_pulse_reset (state=0x55555590deb0 <m68ki_cpu>) at m68kcpu.c:1165
+No locals.
+#7  0x00005555555d7914 in cpu_pulse_reset () at emulator.c:782
+        state = 0x55555590deb0 <m68ki_cpu>
+#8  0x00005555555d7560 in main (argc=3, argv=0x7ffffffff3b8) at emulator.c:711
+        g = 3
+        gpio_probe_only = 0
+        gpclk_probe_only = 0
+        bus_probe_only = 0
+        ipl_tid = 0
+        cpu_tid = 0
+        kbd_tid = 18158513697560985600
+        err = -139255208
+[Inferior 1 (process 17136) exited with code 01]
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+Breakpoint 7 at 0x5555555e0e1c: file gpio/ps_protocol.c, line 1354.
+[ gdb ] Vector watch enabled (ps_read_16 addr 0/4).
+Starting program: /home/smalley/pistorm/emulator --config basic.cfg
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1".
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] m68k_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_read_16(0x00000000) hit (1)
+#0  ps_read_16 (address=0) at gpio/ps_protocol.c:1354
+#1  0x00005555555d8470 in m68k_read_memory_16 (address=0) at emulator.c:1012
+#2  0x00005555556087bc in m68ki_read_16_fc (state=0x55555590deb0 <m68ki_cpu>, address=0, fc=6) at /home/smalley/pistorm/m68kcpu.h:1334
+#3  0x0000555555608154 in m68ki_ic_readimm16 (state=0x55555590deb0 <m68ki_cpu>, address=0) at /home/smalley/pistorm/m68kcpu.h:1167
+#4  0x0000555555608364 in m68ki_read_imm_32 (state=0x55555590deb0 <m68ki_cpu>) at /home/smalley/pistorm/m68kcpu.h:1223
+#5  0x00005555556151f4 in m68k_pulse_reset (state=0x55555590deb0 <m68ki_cpu>) at m68kcpu.c:1165
+#6  0x00005555555d7914 in cpu_pulse_reset () at emulator.c:782
+#7  0x00005555555d7560 in main (argc=3, argv=0x7ffffffff3b8) at emulator.c:711
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] rp1_txn_timeout_fatal hit.
+
+[ gdb ] ps_dump_protocol_state("gdb"):
+
+[ gdb ] clk_gp0 debugfs:
+
+[ gdb ] threads:
+  Id   Target Id                                    Frame 
+* 1    Thread 0x7ffff7fb51a0 (LWP 17143) "emulator" rp1_txn_timeout_fatal (where=0x7ffffffff048 "ps_read_16 addr=0x00000000") at gpio/ps_protocol.c:446
+
+[ gdb ] thread backtraces:
+
+Thread 1 (Thread 0x7ffff7fb51a0 (LWP 17143) "emulator"):
+#0  rp1_txn_timeout_fatal (where=0x7ffffffff048 "ps_read_16 addr=0x00000000") at gpio/ps_protocol.c:446
+        proto_mask = 0
+#1  0x00005555555e0ff0 in ps_read_16 (address=0) at gpio/ps_protocol.c:1411
+        where = "ps_read_16 addr=0x00000000\000\001\000\000\000\000\340*\233UUU\000\000\370\027hU\b", '\000' <repeats 11 times>, "\260\360\377\377\377\177\000"
+        ctrl_mask = 204
+        data_mask = 16776960
+        value = 2
+#2  0x00005555555d8470 in m68k_read_memory_16 (address=0) at emulator.c:1012
+No locals.
+#3  0x00005555556087bc in m68ki_read_16_fc (state=0x55555590deb0 <m68ki_cpu>, address=0, fc=6) at /home/smalley/pistorm/m68kcpu.h:1334
+        cache = 0x55555590e7a8 <m68ki_cpu+2296>
+#4  0x0000555555608154 in m68ki_ic_readimm16 (state=0x55555590deb0 <m68ki_cpu>, address=0) at /home/smalley/pistorm/m68kcpu.h:1167
+No locals.
+#5  0x0000555555608364 in m68ki_read_imm_32 (state=0x55555590deb0 <m68ki_cpu>) at /home/smalley/pistorm/m68kcpu.h:1223
+        address = 0
+        temp_val = 0
+#6  0x00005555556151f4 in m68k_pulse_reset (state=0x55555590deb0 <m68ki_cpu>) at m68kcpu.c:1165
+No locals.
+#7  0x00005555555d7914 in cpu_pulse_reset () at emulator.c:782
+        state = 0x55555590deb0 <m68ki_cpu>
+#8  0x00005555555d7560 in main (argc=3, argv=0x7ffffffff3b8) at emulator.c:711
+        g = 3
+        gpio_probe_only = 0
+        gpclk_probe_only = 0
+        bus_probe_only = 0
+        ipl_tid = 0
+        cpu_tid = 0
+        kbd_tid = 18158513697560985600
+        err = -139255208
+[Inferior 1 (process 17143) exited with code 01]
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+Breakpoint 8 at 0x5555555e0e1c: file gpio/ps_protocol.c, line 1354.
+[ gdb ] Vector watch enabled (ps_read_16 addr 0/4).
+Starting program: /home/smalley/pistorm/emulator --config basic.cfg
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1".
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] m68k_pulse_reset()
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] ps_read_16(0x00000000) hit (1)
+#0  ps_read_16 (address=0) at gpio/ps_protocol.c:1354
+#1  0x00005555555d8470 in m68k_read_memory_16 (address=0) at emulator.c:1012
+#2  0x00005555556087bc in m68ki_read_16_fc (state=0x55555590deb0 <m68ki_cpu>, address=0, fc=6) at /home/smalley/pistorm/m68kcpu.h:1334
+#3  0x0000555555608154 in m68ki_ic_readimm16 (state=0x55555590deb0 <m68ki_cpu>, address=0) at /home/smalley/pistorm/m68kcpu.h:1167
+#4  0x0000555555608364 in m68ki_read_imm_32 (state=0x55555590deb0 <m68ki_cpu>) at /home/smalley/pistorm/m68kcpu.h:1223
+#5  0x00005555556151f4 in m68k_pulse_reset (state=0x55555590deb0 <m68ki_cpu>) at m68kcpu.c:1165
+#6  0x00005555555d7914 in cpu_pulse_reset () at emulator.c:782
+#7  0x00005555555d7560 in main (argc=3, argv=0x7ffffffff3b8) at emulator.c:711
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
+
+[ gdb ] rp1_txn_timeout_fatal hit.
+
+[ gdb ] ps_dump_protocol_state("gdb"):
+
+[ gdb ] clk_gp0 debugfs:
+
+[ gdb ] threads:
+  Id   Target Id                                    Frame 
+* 1    Thread 0x7ffff7fb51a0 (LWP 17171) "emulator" rp1_txn_timeout_fatal (where=0x7ffffffff048 "ps_read_16 addr=0x00000000") at gpio/ps_protocol.c:446
+
+[ gdb ] thread backtraces:
+
+Thread 1 (Thread 0x7ffff7fb51a0 (LWP 17171) "emulator"):
+#0  rp1_txn_timeout_fatal (where=0x7ffffffff048 "ps_read_16 addr=0x00000000") at gpio/ps_protocol.c:446
+        proto_mask = 0
+#1  0x00005555555e0ff0 in ps_read_16 (address=0) at gpio/ps_protocol.c:1411
+        where = "ps_read_16 addr=0x00000000\000\001\000\000\000\000\340*\233UUU\000\000\370\027hU\b", '\000' <repeats 11 times>, "\260\360\377\377\377\177\000"
+        ctrl_mask = 204
+        data_mask = 16776960
+        value = 2
+#2  0x00005555555d8470 in m68k_read_memory_16 (address=0) at emulator.c:1012
+No locals.
+#3  0x00005555556087bc in m68ki_read_16_fc (state=0x55555590deb0 <m68ki_cpu>, address=0, fc=6) at /home/smalley/pistorm/m68kcpu.h:1334
+        cache = 0x55555590e7a8 <m68ki_cpu+2296>
+#4  0x0000555555608154 in m68ki_ic_readimm16 (state=0x55555590deb0 <m68ki_cpu>, address=0) at /home/smalley/pistorm/m68kcpu.h:1167
+No locals.
+#5  0x0000555555608364 in m68ki_read_imm_32 (state=0x55555590deb0 <m68ki_cpu>) at /home/smalley/pistorm/m68kcpu.h:1223
+        address = 0
+        temp_val = 0
+#6  0x00005555556151f4 in m68k_pulse_reset (state=0x55555590deb0 <m68ki_cpu>) at m68kcpu.c:1165
+No locals.
+#7  0x00005555555d7914 in cpu_pulse_reset () at emulator.c:782
+        state = 0x55555590deb0 <m68ki_cpu>
+#8  0x00005555555d7560 in main (argc=3, argv=0x7ffffffff3b8) at emulator.c:711
+        g = 3
+        gpio_probe_only = 0
+        gpclk_probe_only = 0
+        bus_probe_only = 0
+        ipl_tid = 0
+        cpu_tid = 0
+        kbd_tid = 18158513697560985600
+        err = -139255208
+[Inferior 1 (process 17171) exited with code 01]
+
+[ gdb ] stopped. Try: pistorm_threads, pistorm_state
