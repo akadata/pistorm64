@@ -44,3 +44,5 @@ tags.*
 *.bin
 
 artifacts/
+codex.*
+qwen.*
