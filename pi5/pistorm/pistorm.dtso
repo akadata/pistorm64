@@ -1,0 +1,36 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "brcm,bcm2712";
+
+    /*
+     * PiStorm "uplink" naming overlay. This assigns human-readable names to 
+     * RP1 GPIO lines that match the PiStorm CPLD interface.
+     */
+
+    fragment@0 {
+        target-path = "/axi/pcie@1000120000/rp1/gpio@d0000";
+        __overlay__ {
+            gpio-line-names = 
+                /* 0..7 */
+                "pistorm:PI_TXN_IN_PROGRESS", /* GPIO0 */
+                "pistorm:PI_IPL_ZERO",        /* GPIO1 */
+                "pistorm:PI_A0",              /* GPIO2 */
+                "pistorm:PI_A1",              /* GPIO3 */
+                "pistorm:PI_CLK",             /* GPIO4 (GPCLK0) */
+                "pistorm:PI_RESET",           /* GPIO5 */
+                "pistorm:PI_RD",              /* GPIO6 */
+                "pistorm:PI_WR",              /* GPIO7 */
+
+                /* 8..23 */
+                "pistorm:PI_D0",  "pistorm:PI_D1",  "pistorm:PI_D2",  "pistorm:PI_D3",
+                "pistorm:PI_D4",  "pistorm:PI_D5",  "pistorm:PI_D6",  "pistorm:PI_D7",
+                "pistorm:PI_D8",  "pistorm:PI_D9",  "pistorm:PI_D10", "pistorm:PI_D11",
+                "pistorm:PI_D12", "pistorm:PI_D13", "pistorm:PI_D14", "pistorm:PI_D15",
+
+                /* 24..27 */
+                "pistorm:GPIO24", "pistorm:GPIO25", "pistorm:GPIO26", "pistorm:GPIO27";
+        };
+    };
+};

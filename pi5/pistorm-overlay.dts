@@ -1,0 +1,25 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * PiStorm GPIO mapping overlay for Raspberry Pi 5
+ * Maps GPIO pins to match PiStorm CPLD interface names
+ */
+
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "brcm,bcm2712";
+
+    /* Fragment to configure GPIO4 for GPCLK0 */
+    fragment@0 {
+        target = <&gpio4>;
+        __overlay__ {
+            /* Configure GPIO4 for GPCLK0 function */
+            function = "gpclk0";
+            drive-push-pull;
+            bias-pull-up;
+        };
+    };
+};
+
+/* No parameters needed for this basic GPIO mapping overlay */
