@@ -1034,6 +1034,54 @@ deps_/home/smalley/pistorm/pi5/gpclk0/pistorm_gpclk0.o := \
   /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/pm_wakeup.h \
   /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/pinctrl/consumer.h \
   /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/pinctrl/pinctrl-state.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/io.h \
+    $(wildcard include/config/HAS_IOPORT_MAP) \
+    $(wildcard include/config/PCI) \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/arch/arm64/include/asm/io.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/pgtable.h \
+    $(wildcard include/config/HIGHPTE) \
+    $(wildcard include/config/ARCH_HAS_NONLEAF_PMD_YOUNG) \
+    $(wildcard include/config/ARCH_HAS_HW_PTE_YOUNG) \
+    $(wildcard include/config/GUP_GET_PXX_LOW_HIGH) \
+    $(wildcard include/config/ARCH_WANT_PMD_MKWRITE) \
+    $(wildcard include/config/HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD) \
+    $(wildcard include/config/HAVE_ARCH_SOFT_DIRTY) \
+    $(wildcard include/config/ARCH_ENABLE_THP_MIGRATION) \
+    $(wildcard include/config/ARCH_HAS_PTE_DEVMAP) \
+    $(wildcard include/config/HAVE_ARCH_HUGE_VMAP) \
+    $(wildcard include/config/X86_ESPFIX64) \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/arch/arm64/include/asm/pgtable.h \
+    $(wildcard include/config/ARCH_SUPPORTS_PMD_PFNMAP) \
+    $(wildcard include/config/ARCH_SUPPORTS_PUD_PFNMAP) \
+    $(wildcard include/config/PAGE_TABLE_CHECK) \
+    $(wildcard include/config/ARM64_CONTPTE) \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/arch/arm64/include/asm/proc-fns.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/arch/arm64/include/asm/tlbflush.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/mmu_notifier.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/mmap_lock.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/interval_tree.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/arch/arm64/include/asm/fixmap.h \
+    $(wildcard include/config/ACPI_APEI_GHES) \
+    $(wildcard include/config/ARM_SDE_INTERFACE) \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/asm-generic/fixmap.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/arch/arm64/include/asm/por.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/page_table_check.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/asm-generic/pgtable_uffd.h \
+  arch/arm64/include/generated/asm/early_ioremap.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/asm-generic/early_ioremap.h \
+    $(wildcard include/config/GENERIC_EARLY_IOREMAP) \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/asm-generic/io.h \
+    $(wildcard include/config/GENERIC_IOMAP) \
+    $(wildcard include/config/TRACE_MMIO_ACCESS) \
+    $(wildcard include/config/GENERIC_IOREMAP) \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/asm-generic/pci_iomap.h \
+    $(wildcard include/config/NO_GENERIC_PCI_IOPORT_MAP) \
+    $(wildcard include/config/GENERIC_PCI_IOMAP) \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/logic_pio.h \
+    $(wildcard include/config/INDIRECT_PIO) \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/linux/delay.h \
+  arch/arm64/include/generated/asm/delay.h \
+  /usr/src/linux-headers-6.12.47+rpt-common-rpi/include/asm-generic/delay.h \
 
 /home/smalley/pistorm/pi5/gpclk0/pistorm_gpclk0.o: $(deps_/home/smalley/pistorm/pi5/gpclk0/pistorm_gpclk0.o)
 
