@@ -1,0 +1,7 @@
+make clean
+make  PLATFORM=PI5_DEBIAN_64BIT DEBUG=1 WITH_RAYLIB=0 WITH_ALSA=0
+./setcheckclock 100000000 --no-emulator-probe --force-high
+sudo pinctrl set 4 a0
+sudo env PISTORM_PROTOCOL=old PISTORM_OLD_NO_HANDSHAKE=1 \
+PISTORM_RP1_CLK_FUNCSEL=0 PISTORM_ENABLE_GPCLK=0 \
+PISTORM_TXN_TIMEOUT_US=200000 ./emulator --bus-probe

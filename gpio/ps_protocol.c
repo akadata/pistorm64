@@ -303,6 +303,10 @@ static inline void rp1_wr_strobe() {
     rp1_rio_out_set(1u << PIN_WR);
   }
   rp1_rio_out_clr(1u << PIN_WR);
+  // Ensure the strobe edge is visible at RP1 before subsequent reads/polls.
+  rp1_dmb_oshst();
+  (void)rp1_rio_sync_in();  // posted write flush
+  rp1_dmb_oshst();
 }
 
 static inline void rp1_rd_strobe() {
@@ -311,6 +315,9 @@ static inline void rp1_rd_strobe() {
     rp1_rio_out_set(1u << PIN_RD);
   }
   // Note: callers typically clear RD via rp1_rio_out_clr(0xFFFFECu) at end-of-transaction.
+  rp1_dmb_oshst();
+  (void)rp1_rio_sync_in();  // posted write flush
+  rp1_dmb_oshst();
 }
 
 // Old SA0/SA1/SA2 protocol helpers (gpio/gpio_old.c).
@@ -345,6 +352,9 @@ static inline void rp1_swe_pulse_low_high() {
     asm volatile("nop");
   }
   rp1_rio_out_set(1u << PIN_WR);
+  rp1_dmb_oshst();
+  (void)rp1_rio_sync_in();  // posted write flush
+  rp1_dmb_oshst();
 }
 
 static inline void rp1_soe_assert_low() {
@@ -381,7 +391,8 @@ static int rp1_wait_txn_clear(uint32_t *final_sync_in) {
   uint32_t v = 0;
   for (;;) {
     v = rp1_rio_sync_in();
-    if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS) == 0) {
+    const int txn = (v & (1u << PIN_TXN_IN_PROGRESS)) != 0;
+    if (txn == 0) {
       if (final_sync_in) {
         *final_sync_in = v;
       }
@@ -411,7 +422,8 @@ static int rp1_wait_txn_start_then_clear(uint32_t *final_sync_in) {
   // Wait for txn to assert.
   for (;;) {
     v = rp1_rio_sync_in();
-    if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS) != 0) {
+    const int txn = (v & (1u << PIN_TXN_IN_PROGRESS)) != 0;
+    if (txn != 0) {
       break;
     }
     if (rp1_now_ns() > deadline) {
@@ -426,7 +438,8 @@ static int rp1_wait_txn_start_then_clear(uint32_t *final_sync_in) {
   // Wait for txn to clear.
   for (;;) {
     v = rp1_rio_sync_in();
-    if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS) == 0) {
+    const int txn = (v & (1u << PIN_TXN_IN_PROGRESS)) != 0;
+    if (txn == 0) {
       if (final_sync_in) {
         *final_sync_in = v;
       }
@@ -503,6 +516,18 @@ static void rp1_configure_sys_rio_funcsel() {
   const char *rio_funcsel_env = getenv("PISTORM_RP1_RIO_FUNCSEL");
   if (rio_funcsel_env && *rio_funcsel_env) {
     char *end = NULL;
+    for (unsigned int i = 0; i < 24; i++) {
+      uint32_t idx = rp1_gpio_ctrl_index(i);
+      uint32_t v = rp1_io_bank0[idx];
+      uint32_t funcsel = funcsel_rio;
+      if (i == PIN_CLK) {
+        funcsel = funcsel_gpclk0; // ALT0/GPCLK0 unconditionally
+      }
+      v = (v & ~funcsel_mask) | funcsel;
+      rp1_io_bank0[idx] = v;
+    }
+    rp1_dmb_oshst();
+
     unsigned long v = strtoul(rio_funcsel_env, &end, 0);
     if (end != rio_funcsel_env && v <= 8) {
       funcsel_rio = (uint32_t)v;
@@ -549,14 +574,16 @@ static void rp1_configure_sys_rio_funcsel() {
 
   // Only touch the PiStorm protocol pin range (GPIO0..GPIO23). Avoid configuring 24..27.
   for (unsigned int i = 0; i < 24; i++) {
-    if (i == PIN_CLK && leave_clk_pin) {
-      continue;
-    }
     uint32_t idx = rp1_gpio_ctrl_index(i);
     uint32_t v = rp1_io_bank0[idx];
     uint32_t funcsel = funcsel_rio;
     if (i == PIN_CLK) {
-      funcsel = have_clk_override ? clk_override : funcsel_gpclk0;
+      if (leave_clk_pin) {
+        // Force ALT0 GPCLK0 regardless of overlay state; CPLD must see a clock.
+        funcsel = funcsel_gpclk0;
+      } else {
+        funcsel = have_clk_override ? clk_override : funcsel_gpclk0;
+      }
     }
     v = (v & ~funcsel_mask) | funcsel;
     rp1_io_bank0[idx] = v;
@@ -978,6 +1005,7 @@ void ps_dump_protocol_state(const char *tag) {
 
   const uint32_t clk_ctrl = rp1_io_bank0[rp1_gpio_ctrl_index(PIN_CLK)];
   const unsigned int clk_funcsel = clk_ctrl & 0x1fu;
+  const uint32_t clk_ctrl_reg = clk_ctrl;
 
   const unsigned int clk_in = rp1_gpio_infrompad(PIN_CLK);
   const unsigned int clk_out = rp1_gpio_outtopad(PIN_CLK);
@@ -1042,7 +1070,7 @@ void ps_dump_protocol_state(const char *tag) {
     const unsigned int swe_oetopad = rp1_gpio_oetopad(7);
     const unsigned int swe_outtopad = rp1_gpio_outtopad(7);
 
-    printf("[GPIO] %s: proto=%s sync_in=0x%08x busy=%u/%u irq=%u/%u sa2=%u sa1=%u sa0=%u clk=%u/%u/%u/%u soe=%u swe=%u d=0x%04x | out=0x%08x oe=0x%08x | fsel(sa2,sa1,sa0,soe,swe)=%u,%u,%u,%u,%u gpio4_funcsel=%u clk_transitions_out=%u/%u clk_transitions_in=%u/%u | gpio5(oetopad=%u outtopad=%u) gpio6(oetopad=%u outtopad=%u) gpio7(oetopad=%u outtopad=%u)\n",
+    printf("[GPIO] %s: proto=%s sync_in=0x%08x busy=%u/%u irq=%u/%u sa2=%u sa1=%u sa0=%u clk=%u/%u/%u/%u soe=%u swe=%u d=0x%04x | out=0x%08x oe=0x%08x | fsel(sa2,sa1,sa0,soe,swe)=%u,%u,%u,%u,%u gpio4_funcsel=%u clk_transitions_out=%u/%u clk_transitions_in=%u/%u | gpio5(oetopad=%u outtopad=%u) gpio6(oetopad=%u outtopad=%u) gpio7(oetopad=%u outtopad=%u) | rp1_gpio4_ctrl=0x%08x rp1_gpio4_funcsel=%u\n",
            t, proto, sync,
            busy, busy_pad, irq, irq_pad,
            sa2, sa1, sa0,
@@ -1051,7 +1079,8 @@ void ps_dump_protocol_state(const char *tag) {
            out, oe,
            sa2_funcsel, sa1_funcsel, sa0_funcsel, soe_funcsel, swe_funcsel,
            clk_funcsel, clk_transitions_out, clk_samples, clk_transitions_in, clk_samples,
-           sa0_oetopad, sa0_outtopad, soe_oetopad, soe_outtopad, swe_oetopad, swe_outtopad);
+           sa0_oetopad, sa0_outtopad, soe_oetopad, soe_outtopad, swe_oetopad, swe_outtopad,
+           clk_ctrl_reg, clk_funcsel);
   } else {
     // rtl/pistorm.v style naming (reg-select protocol)
     const unsigned int txn = (sync >> PIN_TXN_IN_PROGRESS) & 1u;
@@ -1079,7 +1108,7 @@ void ps_dump_protocol_state(const char *tag) {
     const unsigned int wr_oetopad = rp1_gpio_oetopad(PIN_WR);
     const unsigned int wr_outtopad = rp1_gpio_outtopad(PIN_WR);
 
-    printf("[GPIO] %s: proto=%s sync_in=0x%08x txn=%u/%u ipl0=%u/%u regsel(a0,a1)=%u,%u clk=%u/%u/%u/%u rst=%u/%u rd=%u wr=%u d=0x%04x | out=0x%08x oe=0x%08x | fsel(gpio2,gpio3,gpio6,gpio7)=%u,%u,%u,%u gpio4_funcsel=%u clk_transitions_out=%u/%u clk_transitions_in=%u/%u | gpio2(oetopad=%u outtopad=%u) gpio7(oetopad=%u outtopad=%u) gpio5(oetopad=%u outtopad=%u)\n",
+    printf("[GPIO] %s: proto=%s sync_in=0x%08x txn=%u/%u ipl0=%u/%u regsel(a0,a1)=%u,%u clk=%u/%u/%u/%u rst=%u/%u rd=%u wr=%u d=0x%04x | out=0x%08x oe=0x%08x | fsel(gpio2,gpio3,gpio6,gpio7)=%u,%u,%u,%u gpio4_funcsel=%u clk_transitions_out=%u/%u clk_transitions_in=%u/%u | gpio2(oetopad=%u outtopad=%u) gpio7(oetopad=%u outtopad=%u) gpio5(oetopad=%u outtopad=%u) | rp1_gpio4_ctrl=0x%08x rp1_gpio4_funcsel=%u\n",
            t, proto, sync,
            txn, txn_pad, ipl0, ipl0_pad,
            a0, a1,
@@ -1088,7 +1117,8 @@ void ps_dump_protocol_state(const char *tag) {
            out, oe,
            a0_funcsel, a1_funcsel, rd_funcsel, wr_funcsel,
            clk_funcsel, clk_transitions_out, clk_samples, clk_transitions_in, clk_samples,
-           a0_oetopad, a0_outtopad, wr_oetopad, wr_outtopad, rst_oetopad, rst_outtopad);
+           a0_oetopad, a0_outtopad, wr_oetopad, wr_outtopad, rst_oetopad, rst_outtopad,
+           clk_ctrl_reg, clk_funcsel);
   }
 #else
   if (!gpio) {
@@ -1182,15 +1212,17 @@ void ps_write_16(unsigned int address, unsigned int data) {
     rp1_sa_mode_w16();
     rp1_rio_oe_set(sa_mask | strobe_mask | data_mask);
 
+    /* Working order for CPLD: data -> addr_lo -> addr_hi (txn). */
+    rp1_set_bus16((uint16_t)(data & 0xffffu));
+    rp1_swe_pulse_low_high();
+
     rp1_set_bus16((uint16_t)(address & 0xffffu));
     rp1_swe_pulse_low_high();
 
     rp1_set_bus16((uint16_t)((address >> 16) & 0xffffu));
     rp1_swe_pulse_low_high();
 
-    rp1_set_bus16((uint16_t)(data & 0xffffu));
-    rp1_swe_pulse_low_high();
-
+    /* Hold data driven until the transaction (if any) completes. */
     rp1_rio_oe_clr(data_mask);
     // Wait for txn to complete if it asserts; avoid hanging if it doesn't.
     if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS)) {
@@ -1203,6 +1235,7 @@ void ps_write_16(unsigned int address, unsigned int data) {
   const uint32_t data_mask = (0xFFFFu << 8);
   rp1_rio_oe_set(ctrl_mask | data_mask);
 
+  /* Put data on the bus before the high address word (which starts the txn). */
   rp1_rio_out_set(((data & 0xffff) << 8) | (REG_DATA << PIN_A0));
   rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
@@ -1215,13 +1248,12 @@ void ps_write_16(unsigned int address, unsigned int data) {
   rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
-  rp1_rio_oe_clr(data_mask);
-
   if (rp1_wait_txn_start_then_clear(NULL) != 0) {
     char where[64];
     snprintf(where, sizeof(where), "ps_write_16 addr=0x%08x", address);
     rp1_txn_timeout_fatal(where);
   }
+  rp1_rio_oe_clr(data_mask);
 #else
   *(gpio + 0) = GPFSEL0_OUTPUT;
   *(gpio + 1) = GPFSEL1_OUTPUT;
@@ -1265,19 +1297,21 @@ void ps_write_8(unsigned int address, unsigned int data) {
     rp1_sa_mode_w8();
     rp1_rio_oe_set(sa_mask | strobe_mask | data_mask);
 
+    /* Working order for CPLD: data -> addr_lo -> addr_hi (txn). */
+    rp1_set_bus16((uint16_t)(data & 0xffffu));
+    rp1_swe_pulse_low_high();
+
     rp1_set_bus16((uint16_t)(address & 0xffffu));
     rp1_swe_pulse_low_high();
 
     rp1_set_bus16((uint16_t)((address >> 16) & 0xffffu));
     rp1_swe_pulse_low_high();
 
-    rp1_set_bus16((uint16_t)(data & 0xffffu));
-    rp1_swe_pulse_low_high();
-
-    rp1_rio_oe_clr(data_mask);
+    /* Hold data OE until the transaction (if any) completes. */
     if (rp1_gpio_infrompad(PIN_TXN_IN_PROGRESS)) {
       (void)rp1_wait_txn_start_then_clear(NULL);
     }
+    rp1_rio_oe_clr(data_mask);
     return;
   }
 
@@ -1302,13 +1336,13 @@ void ps_write_8(unsigned int address, unsigned int data) {
   rp1_wr_strobe();
   rp1_rio_out_clr(0xFFFFECu);
 
-  rp1_rio_oe_clr(data_mask);
-
+  /* Keep data driven until the CPLD latches/clears the txn. */
   if (rp1_wait_txn_start_then_clear(NULL) != 0) {
     char where[64];
     snprintf(where, sizeof(where), "ps_write_8 addr=0x%08x", address);
     rp1_txn_timeout_fatal(where);
   }
+  rp1_rio_oe_clr(data_mask);
 #else
   if ((address & 1) == 0)
     data = data + (data << 8);  // EVEN, A0=0,UDS

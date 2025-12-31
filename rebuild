@@ -1,1 +1,13 @@
-make clean; make PLATFORM=PI5_ALPINE_64BIT WITH_RAYLIB=0 WITH_ALSA=0 DEBUG=1 -j4
+make clean; 
+make PLATFORM=PI5_DEBIAN_64BIT DEBUG=1 WITH_RAYLIB=0 WITH_ALSA=0 DEBUG=1
+
+
+./setcheckclock 100000000 --no-emulator-probe --force-high
+sudo pinctrl set 4 a0
+sudo cat /sys/kernel/debug/clk/clk_gp0/clk_parent /sys/kernel/debug/clk/clk_gp0/clk_rate
+# should show pll_sys, 100000000
+
+export PISTORM_RP1_STROBE_REPS=16
+sudo env PISTORM_PROTOCOL=new PISTORM_RP1_CLK_FUNCSEL=0 \
+PISTORM_ENABLE_GPCLK=0 PISTORM_TXN_TIMEOUT_US=200000 \
+./emulator --bus-probe

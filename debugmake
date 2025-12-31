@@ -1,0 +1,12 @@
+make clean 
+make -j8 PLATFORM=PI5_DEBIAN_64BIT DEBUG=1 WITH_RAYLIB=0 WITH_ALSA=0
+
+sudo ./tools/pi5_gpclk0_disable.sh
+
+# use emulator-driven clock/mux
+export PISTORM_ENABLE_GPCLK=1
+export PISTORM_RP1_STROBE_REPS=16
+
+sudo env PISTORM_PROTOCOL=new PISTORM_TXN_TIMEOUT_US=200000 \
+./emulator --bus-probe
+
