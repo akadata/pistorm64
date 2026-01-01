@@ -88,6 +88,13 @@ int mem_fd_gpclk;
 int irq;
 int gayleirq;
 
+#define CORE_AUTO   -1
+#define CORE_CPU     1
+#define CORE_IO      2
+#define CORE_INPUT   3
+
+#define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1,io=2,input=3"
+
 #define MUSASHI_HAX
 
 #ifdef MUSASHI_HAX
@@ -335,6 +342,7 @@ void *cpu_task() {
   state->ovl = ovl;
   state->gpio = gpio;
 	m68k_pulse_reset(state);
+  apply_affinity_from_env("cpu", CORE_CPU);
 
 cpu_loop:
   if (mouse_hook_enabled) {
@@ -427,6 +435,7 @@ void *keyboard_task() {
        ungrab_message[] = "[KBD] Ungrabbing keyboard";
 
   printf("[KBD] Keyboard thread started\n");
+  apply_affinity_from_env("input", CORE_INPUT);
 
   // because we permit the keyboard to be grabbed on startup, quickly check if we need to grab it
   if (kb_hook_enabled && cfg->keyboard_grab) {
@@ -788,6 +797,7 @@ switch_config:
     else {
       pthread_setname_np(ipl_tid, "pistorm: ipl");
       printf("IPL thread created successfully\n");
+      apply_affinity_from_env("io", CORE_IO);
     }
   }
 
@@ -798,6 +808,7 @@ switch_config:
   else {
     pthread_setname_np(kbd_tid, "pistorm: kbd");
     printf("[MAIN] Keyboard thread created successfully\n");
+    apply_affinity_from_env("input", CORE_INPUT);
   }
 
   // create cpu task
@@ -807,6 +818,7 @@ switch_config:
   else {
     pthread_setname_np(cpu_tid, "pistorm: cpu");
     printf("[MAIN] CPU thread created successfully\n");
+    apply_affinity_from_env("cpu", CORE_CPU);
   }
 
   // wait for cpu task to end before closing up and finishing
@@ -1285,4 +1297,40 @@ void m68k_write_memory_32(unsigned int address, unsigned int value) {
   ps_write_16((uint32_t)address, value >> 16);
   ps_write_16((uint32_t)address + 2, value);
   return;
+}
+static void set_affinity_for(const char *name, int core_id) {
+  if (core_id < 0)
+    return;
+
+  cpu_set_t set;
+  CPU_ZERO(&set);
+  CPU_SET(core_id, &set);
+  pthread_t self = pthread_self();
+  if (pthread_setaffinity_np(self, sizeof(set), &set) != 0) {
+    printf("[AFF] Failed to set affinity for %s to core %d\n", name, core_id);
+  } else {
+    printf("[AFF] %s pinned to core %d\n", name, core_id);
+  }
+}
+
+static void apply_affinity_from_env(const char *role, int default_core) {
+  int target = default_core;
+  const char *env = getenv(PI_AFFINITY_ENV);
+  if (env && strlen(env)) {
+    // parse simple comma list key=val
+    char *dup = strdup(env);
+    char *tok = strtok(dup, ",");
+    while (tok) {
+      char key[16];
+      int val = -1;
+      if (sscanf(tok, "%15[^=]=%d", key, &val) == 2) {
+        if (strcasecmp(key, "cpu") == 0 && strcmp(role, "cpu") == 0) target = val;
+        if (strcasecmp(key, "io") == 0 && strcmp(role, "io") == 0) target = val;
+        if (strcasecmp(key, "input") == 0 && strcmp(role, "input") == 0) target = val;
+      }
+      tok = strtok(NULL, ",");
+    }
+    free(dup);
+  }
+  set_affinity_for(role, target);
 }
