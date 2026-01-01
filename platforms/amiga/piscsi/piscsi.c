@@ -119,11 +119,11 @@ void piscsi_init() {
             snprintf(z2_desc, sizeof(z2_desc), "none");
         }
         if (piscsi_driver_dest) {
-            LOG_INFO("[PISCSI][INIT] cpu=%s autoconf_base=0x%08X z2_fast=%s rom_dest=0x%08X\n",
-                   cpu_name, piscsi_base, z2_desc, piscsi_driver_dest);
+            LOG_INFO("[PISCSI][INIT] cpu=%s(%u) autoconf_base=0x%08X z2_fast=%s rom_dest=0x%08X\n",
+                   cpu_name, eff_cpu, piscsi_base, z2_desc, piscsi_driver_dest);
         } else {
-            LOG_INFO("[PISCSI][INIT] cpu=%s autoconf_base=0x%08X z2_fast=%s rom_dest=pending\n",
-                   cpu_name, piscsi_base, z2_desc);
+            LOG_INFO("[PISCSI][INIT] cpu=%s(%u) autoconf_base=0x%08X z2_fast=%s rom_dest=pending\n",
+                   cpu_name, eff_cpu, piscsi_base, z2_desc);
         }
     }
 
