@@ -12,6 +12,10 @@ EXENAME          = emulator
 # CPUFLAGS   : per-platform tuning defaults below; override if needed.
 # RAYLIB_*   : raylib include/lib paths; adjust for custom builds.
 # USE_VC     : set to 0 to drop /opt/vc includes and Pi host support (vc_vchi_gencmd.h).
+# USE_LTO    : set to 1 to enable link-time optimisation (-flto) on build and link.
+# USE_NO_PLT : set to 1 to pass -fno-plt for direct calls (glibc-specific; default off).
+# OMIT_FP    : set to 1 to omit frame pointers (-fomit-frame-pointer) for perf.
+# USE_PIPE   : set to 1 to add -pipe to compile steps.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 WARNINGS   ?= -Wall -Wextra -pedantic
 OPT_LEVEL  ?= -O3
@@ -30,6 +34,11 @@ USE_PMMU   ?= 1
 USE_EC_FPU ?= 0
 # Toggle Pi host (/opt/vc) support for dev tools.
 USE_VC     ?= 1
+# Perf toggles
+USE_LTO    ?= 0
+USE_NO_PLT ?= 0
+OMIT_FP    ?= 1
+USE_PIPE   ?= 1
 # Quiet noisy-but-benign warnings from the generated 68k core.
 M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable
 # Default CPU flags; overridden by PLATFORM selections below.
@@ -117,6 +126,10 @@ CXX       = g++
 
 DEFINES   = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1
 LD_GOLD   = $(if $(filter 1,$(USE_GOLD)),-fuse-ld=gold,)
+LTO_FLAGS = $(if $(filter 1,$(USE_LTO)),-flto,)
+PLT_FLAGS = $(if $(filter 1,$(USE_NO_PLT)),-fno-plt,)
+FP_FLAGS  = $(if $(filter 1,$(OMIT_FP)),-fomit-frame-pointer,)
+PIPE_FLAGS= $(if $(filter 1,$(USE_PIPE)),-pipe,)
 
 # Platform-specific tuning and raylib variants.
 ifeq ($(PLATFORM),PI4)
@@ -165,9 +178,9 @@ endif
 INCLUDES  = -I. $(RAYLIB_INC) $(VC_INC)
 LDSEARCH  = -L/usr/local/lib $(VC_LIBDIR) $(RAYLIB_LIBDIR)
 
-CFLAGS   = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS)
+CFLAGS   = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS)
 M68K_CFLAGS = $(CFLAGS) $(M68K_WARN_SUPPRESS)
-LDFLAGS  = $(WARNINGS) $(LD_GOLD) $(LDSEARCH)
+LDFLAGS  = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS)
 
 LDLIBS   = $(LDLIBS_RAYLIB) $(LDLIBS_VC) $(LDLIBS_ALSA) -ldl -lstdc++ -lm -pthread
 
