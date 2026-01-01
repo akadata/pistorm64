@@ -99,7 +99,11 @@ void piscsi_init() {
     }
 
     {
-        const char *cpu_name = piscsi_cpu_type_name(cfg ? cfg->cpu_type : 0);
+        unsigned int eff_cpu = cpu_type;
+        if (cfg && cfg->cpu_type)
+            eff_cpu = cfg->cpu_type;
+        const char *cpu_name = piscsi_cpu_type_name(eff_cpu);
+
         int z2_idx = cfg ? get_named_mapped_item(cfg, "z2_autoconf_fast") : -1;
         char z2_desc[64];
         if (z2_idx >= 0) {
