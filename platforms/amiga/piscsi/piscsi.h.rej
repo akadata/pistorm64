@@ -1,0 +1,44 @@
+--- platforms/amiga/piscsi/piscsi.h
++++ platforms/amiga/piscsi/piscsi.h
+@@ -188,13 +188,13 @@ struct DeviceNode {
+     uint32_t    dn_Type;
+     uint32_t    dn_Task;
+     uint32_t    dn_Lock;
+-    uint8_t	    *dn_Handler;
++    uint32_t    dn_Handler;
+     uint32_t    dn_StackSize;
+     int32_t     dn_Priority;
+     uint32_t    dn_Startup;
+     uint32_t    dn_SegList;
+     uint32_t    dn_GlobalVec;
+-    uint8_t     *dn_Name;
++    uint32_t    dn_Name;
+ };
+ 
+ struct PartitionBlock {
+@@ -219,7 +219,7 @@ struct SCSICmd_ModeSense6 {
+     uint8_t subpage_code;
+     uint8_t alloc_len;
+     uint8_t control;
+-};
++} __attribute__((packed));
+ 
+ struct SCSICmd_RW10 {
+     uint8_t opcode;
+@@ -228,7 +228,7 @@ struct SCSICmd_RW10 {
+     uint8_t res_groupnum;
+     uint16_t len;
+     uint8_t control;
+-};
++} __attribute__((packed));
+ 
+ struct FileSysHeaderBlock {
+     uint32_t   fhb_ID;
+@@ -258,6 +258,7 @@ void piscsi_init();
+ void piscsi_shutdown();
+ void piscsi_map_drive(char *filename, uint8_t index);
+ void piscsi_unmap_drive(uint8_t index);
++int piscsi_validate_hdf(struct piscsi_dev *d, char *filename);
+ struct piscsi_dev *piscsi_get_dev(uint8_t index);
+ 
+ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type);
