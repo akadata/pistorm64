@@ -38,6 +38,7 @@ const char *config_item_names[CONFITEM_NUM] = {
   "map",
   "loopcycles",
   "jit",
+  "jitfpu",
   "mouse",
   "keyboard",
   "platform",
@@ -461,6 +462,18 @@ struct emulator_config *load_config_file(char *filename) {
         }
         cfg->enable_jit = enable;
         printf("[CFG] JIT backend %s via config.\n", cfg->enable_jit ? "enabled" : "disabled");
+        break;
+      }
+      case CONFITEM_JIT_FPU: {
+        get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+        unsigned char enable = 0;
+        if (strlen(cur_cmd)) {
+          if (!strcasecmp(cur_cmd, "1") || !strcasecmp(cur_cmd, "on") || !strcasecmp(cur_cmd, "yes") || !strcasecmp(cur_cmd, "true")) {
+            enable = 1;
+          }
+        }
+        cfg->enable_fpu_jit = enable;
+        printf("[CFG] FPU JIT %s via config.\n", cfg->enable_fpu_jit ? "enabled" : "disabled");
         break;
       }
       case CONFITEM_MOUSE:
