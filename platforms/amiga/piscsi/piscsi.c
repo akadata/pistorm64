@@ -48,6 +48,7 @@ static const char *op_type_names[4] = {
 
 extern struct emulator_config *cfg;
 extern uint32_t piscsi_base;
+extern unsigned int cpu_type;
 
 struct piscsi_dev devs[8];
 struct piscsi_fs filesystems[NUM_FILESYSTEMS];
