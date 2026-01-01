@@ -119,6 +119,7 @@ extern int m68ki_remaining_cycles;
 // Configurable emulator options
 unsigned int cpu_type = M68K_CPU_TYPE_68000;
 unsigned int loop_cycles = 300, irq_status = 0;
+static const unsigned int loop_cycles_cap = 10000; // cap slices to keep service latency reasonable
 struct emulator_config *cfg = NULL;
 char keyboard_file[256] = "/dev/input/event1";
 
@@ -353,10 +354,11 @@ cpu_loop:
   }
   else {
     if (cpu_emulation_running) {
+      unsigned int slice = loop_cycles > loop_cycles_cap ? loop_cycles_cap : loop_cycles;
 		if (irq)
 			cpu_backend_execute(state, 5);
 		else
-			cpu_backend_execute(state, loop_cycles);
+			cpu_backend_execute(state, slice);
     }
   }
 
@@ -702,6 +704,10 @@ switch_config:
   if (cfg) {
     if (cfg->cpu_type) cpu_type = cfg->cpu_type;
     if (cfg->loop_cycles) loop_cycles = cfg->loop_cycles;
+    if (loop_cycles > loop_cycles_cap) {
+      printf("[CFG] loop_cycles capped from %u to %u to reduce latency.\n", loop_cycles, loop_cycles_cap);
+      loop_cycles = loop_cycles_cap;
+    }
     if (!enable_jit_backend && cfg->enable_jit) {
       enable_jit_backend = 1;
       printf("[CFG] JIT backend enabled via config.\n");
