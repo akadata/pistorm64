@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <endian.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -33,6 +34,25 @@ unsigned int gpfsel2_o;
 
 #define NOP asm("nop"); asm("nop");
 
+static uint32_t detect_peri_base() {
+  uint32_t base = BCM2708_PERI_BASE; // default (Pi3/Zero2W)
+  const char *ranges = "/proc/device-tree/soc/ranges";
+  int fd = open(ranges, O_RDONLY);
+  if (fd >= 0) {
+    uint8_t buf[16] = {0};
+    ssize_t n = read(fd, buf, sizeof(buf));
+    close(fd);
+    if (n >= 8) {
+      // ranges: bus addr (4 bytes), cpu phys addr (4 bytes), size (4 bytes)...
+      uint32_t candidate = be32toh(*(uint32_t *)&buf[4]);
+      if (candidate != 0) {
+        base = candidate;
+      }
+    }
+  }
+  return base;
+}
+
 static void setup_io() {
   int fd = open("/dev/mem", O_RDWR | O_SYNC);
   if (fd < 0) {
@@ -40,13 +60,15 @@ static void setup_io() {
     exit(-1);
   }
 
+  uint32_t peri_base = detect_peri_base();
+
   void *gpio_map = mmap(
       NULL,                    // Any adddress in our space will do
       BCM2708_PERI_SIZE,       // Map length
       PROT_READ | PROT_WRITE,  // Enable reading & writting to mapped memory
       MAP_SHARED,              // Shared with other processes
       fd,                      // File to map
-      BCM2708_PERI_BASE        // Offset to GPIO peripheral
+      peri_base                // Offset to GPIO peripheral
   );
 
   close(fd);
