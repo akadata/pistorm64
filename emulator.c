@@ -96,6 +96,11 @@ int gayleirq;
 
 #define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1,io=2,input=3"
 
+// Forward declarations for helpers used before their definitions.
+static inline uint8_t opcode_is_fpu(uint16_t opcode);
+static void apply_affinity_from_env(const char *role, int default_core);
+static void set_realtime_priority(const char *name, int prio);
+
 #define MUSASHI_HAX
 
 #ifdef MUSASHI_HAX
