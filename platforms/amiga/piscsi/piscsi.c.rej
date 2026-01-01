@@ -1,0 +1,386 @@
+--- platforms/amiga/piscsi/piscsi.c
++++ platforms/amiga/piscsi/piscsi.c
+@@ -7,6 +7,7 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <endian.h>
++#include <errno.h>
+ 
+ #include "config_file/config_file.h"
+ #include "gpio/ps_protocol.h"
+@@ -18,12 +19,12 @@
+ #define BE16(val) be16toh(val)
+ 
+ // Uncomment the line below to enable debug output
+-//#define PISCSI_DEBUG
++#define PISCSI_DEBUG
+ 
+ #ifdef PISCSI_DEBUG
+ #define DEBUG printf
+ //#define DEBUG_TRIVIAL printf
+-#define DEBUG_TRIVIAL(...)
++#define DEBUG_TRIVIAL(...) do { if (0) printf(__VA_ARGS__); } while (0)
+ 
+ //extern void stop_cpu_emulation(uint8_t disasm_cur);
+ #define stop_cpu_emulation(...)
+@@ -386,7 +387,7 @@ void piscsi_map_drive(char *filename, uint8_t index) {
+     d->fs = file_size;
+     d->fd = tmp_fd;
+     lseek(tmp_fd, 0, SEEK_SET);
+-    printf("[PISCSI] Map %d: [%s] - %llu bytes.\n", index, filename, file_size);
++    printf("[PISCSI] Map %d: [%s] - %lu bytes.\n", index, filename, (unsigned long)file_size);
+ 
+     if (piscsi_parse_rdb(d) == -1) {
+         DEBUG("[PISCSI] No RDB found on disk, making up some CHS values.\n");
+@@ -402,6 +403,105 @@ void piscsi_map_drive(char *filename, uint8_t index) {
+     printf ("Finding file systems.\n");
+     piscsi_find_filesystems(d);
+     printf ("Done.\n");
++
++    // Perform self-test to validate HDF integrity
++    printf("[PISCSI-SELFTEST] Running HDF integrity validation for drive %d...\n", index);
++    if (!piscsi_validate_hdf(d, filename)) {
++        printf("[PISCSI-SELFTEST-ERROR] HDF validation failed for drive %d (%s)\n", index, filename);
++    } else {
++        printf("[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive %d (%s)\n", index, filename);
++    }
++}
++
++// HDF integrity validation function
++int piscsi_validate_hdf(struct piscsi_dev *d, char *filename) {
++    if (!d || d->fd == -1) {
++        printf("[PISCSI-SELFTEST] ERROR: Invalid device or file descriptor\n");
++        return 0;
++    }
++
++    // Test 1: Read RDB block 0 (first 512 bytes)
++    uint8_t rdb_block[512];
++    if (lseek(d->fd, 0, SEEK_SET) == (off_t)-1) {
++        printf("[PISCSI-SELFTEST] ERROR: Cannot seek to RDB block 0 in %s\n", filename);
++        return 0;
++    }
++
++    ssize_t bytes_read = read(d->fd, rdb_block, 512);
++    if (bytes_read < 512) {
++        printf("[PISCSI-SELFTEST] ERROR: Cannot read full RDB block 0 from %s (got %zd bytes)\n", filename, bytes_read);
++        return 0;
++    }
++
++    // Verify RDB signature (should start with "RDSK")
++    if (rdb_block[0] == 'R' && rdb_block[1] == 'D' && rdb_block[2] == 'S' && rdb_block[3] == 'K') {
++        printf("[PISCSI-SELFTEST] INFO: Valid RDB signature found in %s\n", filename);
++    } else {
++        // Not all HDFs have RDB, some are partitioned drives, so this isn't always an error
++        printf("[PISCSI-SELFTEST] INFO: No RDB signature found in %s (may be partitioned drive)\n", filename);
++    }
++
++    // Test 2: For DH0 (unit 0), try to read first partition block (usually at block 2 or offset 1024)
++    if (d - devs == 0) { // This is unit 0 (DH0)
++        printf("[PISCSI-SELFTEST] Testing DH0 partition accessibility...\n");
++
++        // Look for first partition block (usually at offset 1024 for standard Amiga HDFs)
++        uint8_t boot_block[512];
++        if (lseek(d->fd, 1024, SEEK_SET) == (off_t)-1) {
++            printf("[PISCSI-SELFTEST] ERROR: Cannot seek to DH0 boot block in %s\n", filename);
++            return 0;
++        }
++
++        bytes_read = read(d->fd, boot_block, 512);
++        if (bytes_read < 512) {
++            printf("[PISCSI-SELFTEST] ERROR: Cannot read DH0 boot block from %s (got %zd bytes)\n", filename, bytes_read);
++            return 0;
++        }
++
++        // Check for DOS boot block signature (starts with 0x444F5300 = "DOS\0")
++        uint32_t dos_sig = (boot_block[0] << 24) | (boot_block[1] << 16) | (boot_block[2] << 8) | boot_block[3];
++        if (dos_sig == 0x444F5300) {
++            printf("[PISCSI-SELFTEST] SUCCESS: Valid DOS boot block signature found in DH0\n");
++        } else {
++            printf("[PISCSI-SELFTEST] INFO: No DOS boot block signature in DH0 (signature: 0x%08X)\n", dos_sig);
++        }
++    }
++
++    // Test 3: Verify we can seek to end of file
++    off64_t file_end = lseek64(d->fd, 0, SEEK_END);
++    if (file_end == (off64_t)-1) {
++        printf("[PISCSI-SELFTEST] ERROR: Cannot seek to end of file %s\n", filename);
++        return 0;
++    }
++
++    if ((uint64_t)file_end != d->fs) {
++        printf("[PISCSI-SELFTEST] WARNING: File size mismatch: reported=%llu, actual=%lld\n",
++               (unsigned long long)d->fs, (long long)file_end);
++    }
++
++    // Test 4: Try reading a few random blocks to verify integrity
++    for (int i = 0; i < 3; i++) {
++        off64_t test_offset = (i + 1) * 512 * 100; // Every 100th block for testing
++        if (test_offset >= (off64_t)d->fs) {
++            continue; // Skip if beyond file size
++        }
++
++        uint8_t test_block[512];
++        if (lseek64(d->fd, test_offset, SEEK_SET) == (off64_t)-1) {
++            printf("[PISCSI-SELFTEST] ERROR: Cannot seek to test block at offset %lld in %s\n",
++                   (long long)test_offset, filename);
++            return 0;
++        }
++
++        bytes_read = read(d->fd, test_block, 512);
++        if (bytes_read < 512) {
++            printf("[PISCSI-SELFTEST] ERROR: Cannot read test block at offset %lld from %s (got %zd bytes)\n",
++                   (long long)test_offset, filename, bytes_read);
++            return 0;
++        }
++    }
++
++    return 1; // All tests passed
+ }
+ 
+ void piscsi_unmap_drive(uint8_t index) {
+@@ -523,7 +623,7 @@ void print_piscsi_debug_message(int index) {
+ #ifdef PISCSI_DEBUG
+             r = get_mapped_item_by_address(cfg, piscsi_dbg[0]);
+             struct SCSICmd_RW10 *rwdat = NULL;
+-            char data[10];
++            uint8_t data[10];
+             if (r != -1) {
+                 uint32_t addr = piscsi_dbg[0] - cfg->map_offset[r];
+                 rwdat = (struct SCSICmd_RW10 *)(&cfg->map_data[r][addr]);
+@@ -533,7 +633,7 @@ void print_piscsi_debug_message(int index) {
+                 for (int i = 0; i < 10; i++) {
+                     data[i] = read8(piscsi_dbg[0] + i);
+                 }
+-                rwdat = data;
++                rwdat = (struct SCSICmd_RW10 *)data;
+             }
+             if (rwdat) {
+                 DEBUG_TRIVIAL("[RW10] CMD: %.2X\n", rwdat->opcode);
+@@ -602,7 +702,8 @@ void piscsi_debugme(uint32_t index) {
+             DEBUG("[PISCSI-DEBUGME] Debug pointers: %.8X %.8X %.8X %.8X\n", piscsi_u32[0], piscsi_u32[1], piscsi_u32[2], piscsi_u32[3]);
+             break;
+         default:
+-            DEBUG("[!!!PISCSI-DEBUGME] No debugme message for index %d!\n", index);
++            // Handle undefined indexes by printing the index number
++            DEBUG("[PISCSI-DEBUGME] idx=%u (no string)\n", index);
+             break;
+     }
+ 
+@@ -633,36 +734,55 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
+             }
+ 
+             if (cmd == PISCSI_CMD_READBYTES) {
+-                DEBUG("[PISCSI-%d] %d byte READBYTES from block %d to address %.8X\n", val, piscsi_u32[1], piscsi_u32[0] / d->block_size, piscsi_u32[2]);
+                 uint32_t src = piscsi_u32[0];
+-                d->lba = (src / d->block_size);
++                uint32_t block = src / d->block_size;
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:READBYTES io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%X to_addr:0x%.8X\n", val, src, piscsi_u32[1], block, src, piscsi_u32[2]);
+                 lseek(d->fd, src, SEEK_SET);
+             }
+             else if (cmd == PISCSI_CMD_READ) {
+-                DEBUG("[PISCSI-%d] %d byte READ from block %d to address %.8X\n", val, piscsi_u32[1], piscsi_u32[0], piscsi_u32[2]);
+-                d->lba = piscsi_u32[0];
+-                lseek(d->fd, (piscsi_u32[0] * d->block_size), SEEK_SET);
++                uint32_t block = piscsi_u32[0];
++                uint64_t file_offset = (uint64_t)block * d->block_size;
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:READ io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, block, piscsi_u32[1], block, (unsigned long long)file_offset, piscsi_u32[2]);
++                lseek(d->fd, file_offset, SEEK_SET);
+             }
+             else {
+-                uint64_t src = piscsi_u32[3];
+-                src = (src << 32) | piscsi_u32[0];
+-                DEBUG("[PISCSI-%d] %d byte READ64 from block %lld to address %.8X\n", val, piscsi_u32[1], (src / d->block_size), piscsi_u32[2]);
+-                d->lba = (src / d->block_size);
++                uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
++                uint32_t block = (uint32_t)(src / d->block_size);
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:READ64 io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, (unsigned long long)src, piscsi_u32[1], block, (unsigned long long)src, piscsi_u32[2]);
+                 lseek64(d->fd, src, SEEK_SET);
+             }
+ 
+             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
+             if (map) {
+                 DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, r);
+-                read(d->fd, map, piscsi_u32[1]);
++                ssize_t bytes_read = read(d->fd, map, piscsi_u32[1]);
++                if (bytes_read < 0) {
++                    DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
++                } else if (bytes_read != (ssize_t)piscsi_u32[1]) {
++                    DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
++                } else {
++                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, bytes_read);
++                }
+             }
+             else {
+                 DEBUG_TRIVIAL("[PISCSI-%d] No mapped range found for read.\n", val);
+                 uint8_t c = 0;
++                int success = 1;
+                 for (uint32_t i = 0; i < piscsi_u32[1]; i++) {
+-                    read(d->fd, &c, 1);
++                    ssize_t result = read(d->fd, &c, 1);
++                    if (result <= 0) {
++                        DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE READ failed at offset %d: result=%zd\n", val, i, result);
++                        success = 0;
++                        break;
++                    }
+                     m68k_write_memory_8(piscsi_u32[2] + i, (uint32_t)c);
+                 }
++                if (success) {
++                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d BYTE READ: %d bytes OK\n", val, piscsi_u32[1]);
++                }
+             }
+             break;
+         case PISCSI_CMD_WRITE64:
+@@ -675,35 +795,54 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
+             }
+ 
+             if (cmd == PISCSI_CMD_WRITEBYTES) {
+-                DEBUG("[PISCSI-%d] %d byte WRITEBYTES to block %d from address %.8X\n", val, piscsi_u32[1], piscsi_u32[0] / d->block_size, piscsi_u32[2]);
+                 uint32_t src = piscsi_u32[0];
+-                d->lba = (src / d->block_size);
++                uint32_t block = src / d->block_size;
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:WRITEBYTES io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%X from_addr:0x%.8X\n", val, src, piscsi_u32[1], block, src, piscsi_u32[2]);
+                 lseek(d->fd, src, SEEK_SET);
+             }
+             else if (cmd == PISCSI_CMD_WRITE) {
+-                DEBUG("[PISCSI-%d] %d byte WRITE to block %d from address %.8X\n", val, piscsi_u32[1], piscsi_u32[0], piscsi_u32[2]);
+-                d->lba = piscsi_u32[0];
+-                lseek(d->fd, (piscsi_u32[0] * d->block_size), SEEK_SET);
++                uint32_t block = piscsi_u32[0];
++                uint64_t file_offset = (uint64_t)block * d->block_size;
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:WRITE io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, block, piscsi_u32[1], block, (unsigned long long)file_offset, piscsi_u32[2]);
++                lseek(d->fd, file_offset, SEEK_SET);
+             }
+             else {
+-                uint64_t src = piscsi_u32[3];
+-                src = (src << 32) | piscsi_u32[0];
+-                DEBUG("[PISCSI-%d] %d byte WRITE64 to block %lld from address %.8X\n", val, piscsi_u32[1], (src / d->block_size), piscsi_u32[2]);
+-                d->lba = (src / d->block_size);
++                uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
++                uint32_t block = (uint32_t)(src / d->block_size);
++                d->lba = block;
++                DEBUG("[PISCSI-IO] Unit:%d CMD:WRITE64 io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, (unsigned long long)src, piscsi_u32[1], block, (unsigned long long)src, piscsi_u32[2]);
+                 lseek64(d->fd, src, SEEK_SET);
+             }
+ 
+             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
+             if (map) {
+                 DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Write comes from mapped range %d.\n", val, r);
+-                write(d->fd, map, piscsi_u32[1]);
++                ssize_t bytes_written = write(d->fd, map, piscsi_u32[1]);
++                if (bytes_written < 0) {
++                    DEBUG("[PISCSI-IO-ERROR] Unit:%d WRITE failed: bytes_requested=%d, bytes_written=%zd, errno=%d\n", val, piscsi_u32[1], bytes_written, errno);
++                } else if (bytes_written != (ssize_t)piscsi_u32[1]) {
++                    DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL WRITE: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_written);
++                } else {
++                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d WRITE: %zd bytes OK\n", val, bytes_written);
++                }
+             }
+             else {
+                 DEBUG_TRIVIAL("[PISCSI-%d] No mapped range found for write.\n", val);
+                 uint8_t c = 0;
++                int success = 1;
+                 for (uint32_t i = 0; i < piscsi_u32[1]; i++) {
+                     c = m68k_read_memory_8(piscsi_u32[2] + i);
+-                    write(d->fd, &c, 1);
++                    ssize_t result = write(d->fd, &c, 1);
++                    if (result <= 0) {
++                        DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE WRITE failed at offset %d: result=%zd\n", val, i, result);
++                        success = 0;
++                        break;
++                    }
++                }
++                if (success) {
++                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d BYTE WRITE: %d bytes OK\n", val, piscsi_u32[1]);
+                 }
+             }
+             break;
+@@ -837,6 +976,7 @@ skip_disk:;
+                 char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
+ 
+                 DEBUG("[PISCSI] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
++                // First try exact match
+                 for (i = 0; i < piscsi_num_fs; i++) {
+                     if (rom_partition_dostype[rom_cur_partition] == filesystems[i].FS_ID) {
+                         node->dn_SegList = htobe32((((filesystems[i].handler) + filesystems[i].h_info.header_size) >> 2));
+@@ -844,16 +984,33 @@ skip_disk:;
+                         goto fs_found;
+                     }
+                 }
++
++                // If no exact match, try fallback mappings (e.g., DOS/3 -> DOS/1 for FastFileSystem)
++                uint32_t fallback_dostype = rom_partition_dostype[rom_cur_partition];
++
++                // Map DOS/3 (FFS International) to DOS/1 (FFS) handler since they use the same filesystem
++                if (fallback_dostype == 0x444F5303) { // DOS/3
++                    fallback_dostype = 0x444F5301;   // DOS/1
++                    for (i = 0; i < piscsi_num_fs; i++) {
++                        if (fallback_dostype == filesystems[i].FS_ID) {
++                            node->dn_SegList = htobe32((((filesystems[i].handler) + filesystems[i].h_info.header_size) >> 2));
++                            node->dn_GlobalVec = 0xFFFFFFFF;
++                            DEBUG("[PISCSI] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");
++                            goto fs_found;
++                        }
++                    }
++                }
++
+                 node->dn_GlobalVec = 0xFFFFFFFF;
+                 node->dn_SegList = 0;
+                 printf("[!!!PISCSI] Found no handler for file system %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
+ fs_found:;
+                 DEBUG("[FS-HANDLER] Next: %d Type: %.8X\n", BE(node->dn_Next), BE(node->dn_Type));
+                 DEBUG("[FS-HANDLER] Task: %d Lock: %d\n", BE(node->dn_Task), BE(node->dn_Lock));
+-                DEBUG("[FS-HANDLER] Handler: %d Stacksize: %d\n", BE((uint32_t)node->dn_Handler), BE(node->dn_StackSize));
+-                DEBUG("[FS-HANDLER] Priority: %d Startup: %d (%.8X)\n", BE((uint32_t)node->dn_Priority), BE(node->dn_Startup), BE(node->dn_Startup));
++                DEBUG("[FS-HANDLER] Handler: %d Stacksize: %d\n", BE(node->dn_Handler), BE(node->dn_StackSize));
++                DEBUG("[FS-HANDLER] Priority: %d Startup: %d (%.8X)\n", BE(node->dn_Priority), BE(node->dn_Startup), BE(node->dn_Startup));
+                 DEBUG("[FS-HANDLER] SegList: %.8X GlobalVec: %d\n", BE((uint32_t)node->dn_SegList), BE(node->dn_GlobalVec));
+-                DEBUG("[PISCSI] Handler for partition %.8X set to %.8X (%.8X).\n", BE((uint32_t)node->dn_Name), filesystems[i].FS_ID, filesystems[i].handler);
++                DEBUG("[PISCSI] Handler for partition %.8X set to %.8X (%.8X).\n", BE(node->dn_Name), filesystems[i].FS_ID, filesystems[i].handler);
+             }
+             break;
+         }
+@@ -954,7 +1111,7 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
+         case PISCSI_CMD_BLOCKS: {
+             uint32_t blox = devs[piscsi_cur_drive].fs / devs[piscsi_cur_drive].block_size;
+             DEBUG("[PISCSI] %s Read from BLOCKS %d: %d\n", op_type_names[type], piscsi_cur_drive, (uint32_t)(devs[piscsi_cur_drive].fs / devs[piscsi_cur_drive].block_size));
+-            DEBUG("fs: %lld (%d)\n", devs[piscsi_cur_drive].fs, blox);
++            DEBUG("fs: %llu (%d)\n", (unsigned long long)devs[piscsi_cur_drive].fs, blox);
+             return blox;
+             break;
+         }
+@@ -982,15 +1139,29 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
+             int32_t r = get_mapped_item_by_address(cfg, val);
+             if (r != -1) {
+ #ifdef PISCSI_DEBUG
+-                uint32_t addr = val - cfg->map_offset[r];
+                 char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
+                 DEBUG("[PISCSI-GET-FS-INFO] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
+ #endif
++                // First try exact match
+                 for (i = 0; i < piscsi_num_fs; i++) {
+                     if (rom_partition_dostype[rom_cur_partition] == filesystems[i].FS_ID) {
+                         return 0;
+                     }
+                 }
++
++                // If no exact match, try fallback mappings (e.g., DOS/3 -> DOS/1 for FastFileSystem)
++                uint32_t fallback_dostype = rom_partition_dostype[rom_cur_partition];
++
++                // Map DOS/3 (FFS International) to DOS/1 (FFS) handler since they use the same filesystem
++                if (fallback_dostype == 0x444F5303) { // DOS/3
++                    fallback_dostype = 0x444F5301;   // DOS/1
++                    for (i = 0; i < piscsi_num_fs; i++) {
++                        if (fallback_dostype == filesystems[i].FS_ID) {
++                            DEBUG("[PISCSI-GET-FS-INFO] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");
++                            return 0;
++                        }
++                    }
++                }
+             }
+             return 1;
+         }
