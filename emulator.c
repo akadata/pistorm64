@@ -75,6 +75,7 @@ uint8_t ipl_enabled[8];
 
 uint8_t end_signal = 0, load_new_config = 0;
 uint8_t enable_jit_backend = 0;
+uint8_t enable_fpu_jit_backend = 0;
 
 char disasm_buf[4096];
 
@@ -252,7 +253,11 @@ static inline void m68k_execute_bef(m68ki_cpu_core *state, int num_cycles)
 
 			/* Read an instruction and call its handler */
 			REG_IR = m68ki_read_imm_16(state);
-			m68ki_instruction_jump_table[REG_IR](state);
+      if (enable_fpu_jit_backend && opcode_is_fpu(REG_IR)) {
+        fpu_backend_execute(state, REG_IR);
+      } else {
+  			m68ki_instruction_jump_table[REG_IR](state);
+      }
 			USE_CYCLES(CYC_INSTRUCTION[REG_IR]);
 
 			/* Trace m68k_exception, if necessary */
@@ -276,6 +281,16 @@ void musashi_backend_execute(m68ki_cpu_core *state, int cycles) {
 
 void musashi_backend_set_irq(int level) {
     M68K_SET_IRQ(level);
+}
+
+// FPU backend stub: routes F-line opcodes through JIT path when enabled.
+static inline uint8_t opcode_is_fpu(uint16_t opcode) {
+    return ((opcode & 0xF000) == 0xF000);
+}
+
+static inline void fpu_backend_execute(m68ki_cpu_core *state, uint16_t opcode) {
+    // TODO: replace with real JIT FPU backend; currently uses Musashi path.
+    m68ki_instruction_jump_table[opcode](state);
 }
 
 void jit_backend_execute(m68ki_cpu_core *state, int cycles) {
@@ -617,6 +632,10 @@ int main(int argc, char *argv[]) {
       enable_jit_backend = 1;
       printf("[CLI] JIT backend enabled.\n");
     }
+    else if (strcmp(argv[g], "--enable-jit-fpu") == 0 || strcmp(argv[g], "--jit-fpu") == 0) {
+      enable_fpu_jit_backend = 1;
+      printf("[CLI] FPU JIT backend enabled.\n");
+    }
     else if (strcmp(argv[g], "--keyboard-file") == 0 || strcmp(argv[g], "--kbfile") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no keyboard device path specified.\n", argv[g]);
@@ -674,6 +693,10 @@ switch_config:
     if (!enable_jit_backend && cfg->enable_jit) {
       enable_jit_backend = 1;
       printf("[CFG] JIT backend enabled via config.\n");
+    }
+    if (!enable_fpu_jit_backend && cfg->enable_fpu_jit) {
+      enable_fpu_jit_backend = 1;
+      printf("[CFG] FPU JIT backend enabled via config.\n");
     }
 
     if (!cfg->platform)
