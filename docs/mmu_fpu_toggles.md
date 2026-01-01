@@ -9,5 +9,5 @@ Examples:
 - `make PLATFORM=ZEROW2_64 USE_EC_FPU=1 USE_PMMU=1`
 
 Notes:
-- These are compile-time toggles; runtime config still controls CPU type selection (`cpu_type` in the cfg).
-- PMMU is still experimental; keep logging on and validate memory-heavy workloads before relying on it.***
+- These are compile-time toggles; runtime config still controls CPU type selection (`cpu_type` in the cfg). Pick an MMU-capable CPU (68030/68040) if you want SysInfo to report an MMU.
+- PMMU is still experimental; keep logging on and validate memory-heavy workloads before relying on it.

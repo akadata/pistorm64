@@ -24,8 +24,8 @@ USE_GOLD   ?= 0
 USE_RAYLIB ?= 1
 # Toggle ALSA-based audio (Pi AHI). If 0, drop pi_ahi and -lasound.
 USE_ALSA   ?= 1
-# Toggle PMMU emulation (68030/040). Default off to avoid regressions.
-USE_PMMU   ?= 0
+# Toggle PMMU emulation (68030/040). Default on; disable with USE_PMMU=0 if needed.
+USE_PMMU   ?= 1
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0
 # Toggle Pi host (/opt/vc) support for dev tools.
