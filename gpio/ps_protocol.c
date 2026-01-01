@@ -31,6 +31,8 @@ unsigned int gpfsel0_o;
 unsigned int gpfsel1_o;
 unsigned int gpfsel2_o;
 
+#define NOP asm("nop"); asm("nop");
+
 static void setup_io() {
   int fd = open("/dev/mem", O_RDWR | O_SYNC);
   if (fd < 0) {
@@ -265,6 +267,7 @@ unsigned int ps_read_status_reg() {
 }
 
 void ps_reset_state_machine() {
+  // Set INIT high to disable the CPLD state machine while mapping IO
   ps_write_status_reg(STATUS_BIT_INIT);
   usleep(1500);
   ps_write_status_reg(0);
