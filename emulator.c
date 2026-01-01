@@ -31,6 +31,7 @@
 #include <pthread.h>
 #include <sched.h>
 #include <signal.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -345,10 +346,6 @@ void *cpu_task() {
   apply_affinity_from_env("cpu", CORE_CPU);
 
 cpu_loop:
-  if (mouse_hook_enabled) {
-    get_mouse_status(&mouse_dx, &mouse_dy, &mouse_buttons, &mouse_extra);
-  }
-
   if (realtime_disassembly && (do_disasm || cpu_emulation_running)) {
     m68k_disassemble(disasm_buf, m68k_get_reg(NULL, M68K_REG_PC), cpu_type);
     printf("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n", m68k_get_reg(NULL, M68K_REG_A0), m68k_get_reg(NULL, M68K_REG_A1), m68k_get_reg(NULL, M68K_REG_A2), m68k_get_reg(NULL, M68K_REG_A3), \
@@ -436,6 +433,7 @@ void *keyboard_task() {
 
   printf("[KBD] Keyboard thread started\n");
   apply_affinity_from_env("input", CORE_INPUT);
+  set_realtime_priority("kbd", 10);
 
   // because we permit the keyboard to be grabbed on startup, quickly check if we need to grab it
   if (kb_hook_enabled && cfg->keyboard_grab) {
@@ -550,6 +548,39 @@ key_end:
     release_device(keyboard_fd);
   }
   return (void*)NULL;
+}
+
+void *mouse_task() {
+  struct pollfd mpoll[1];
+  int mpollrc;
+
+  printf("[MOUSE] Mouse thread started\n");
+  apply_affinity_from_env("input", CORE_INPUT);
+  set_realtime_priority("mouse", 12);
+
+  mpoll[0].fd = mouse_fd;
+  mpoll[0].events = POLLIN;
+
+mouse_loop:
+  mpollrc = poll(mpoll, 1, 10);
+  if (mpollrc < 0 && errno == EINTR)
+    goto mouse_loop;
+
+  if (mpollrc > 0 && (mpoll[0].revents & POLLIN)) {
+    uint8_t x, y, b, e;
+    while (get_mouse_status(&x, &y, &b, &e)) {
+      mouse_buttons = b;
+      mouse_extra = e;
+      mouse_dx = x;
+      mouse_dy = y;
+    }
+  }
+
+  if (!emulator_exiting && !end_signal)
+    goto mouse_loop;
+
+  printf("[MOUSE] Mouse thread exiting\n");
+  return (void *)NULL;
 }
 
 void stop_cpu_emulation(uint8_t disasm_cur) {
@@ -788,7 +819,7 @@ switch_config:
 	m68k_set_cpu_type(&m68ki_cpu, cpu_type);
   cpu_pulse_reset();
 
-  pthread_t ipl_tid = 0, cpu_tid, kbd_tid;
+  pthread_t ipl_tid = 0, cpu_tid, kbd_tid, mouse_tid = 0;
   int err;
   if (ipl_tid == 0) {
     err = pthread_create(&ipl_tid, NULL, &ipl_task, NULL);
@@ -809,6 +840,18 @@ switch_config:
     pthread_setname_np(kbd_tid, "pistorm: kbd");
     printf("[MAIN] Keyboard thread created successfully\n");
     apply_affinity_from_env("input", CORE_INPUT);
+  }
+
+  // create mouse task if mouse is enabled
+  if (mouse_fd != -1) {
+    err = pthread_create(&mouse_tid, NULL, &mouse_task, NULL);
+    if (err != 0)
+      printf("[ERROR] Cannot create mouse thread: [%s]", strerror(err));
+    else {
+      pthread_setname_np(mouse_tid, "pistorm: mouse");
+      printf("[MAIN] Mouse thread created successfully\n");
+      apply_affinity_from_env("input", CORE_INPUT);
+    }
   }
 
   // create cpu task
@@ -1333,4 +1376,15 @@ static void apply_affinity_from_env(const char *role, int default_core) {
     free(dup);
   }
   set_affinity_for(role, target);
+}
+
+static void set_realtime_priority(const char *name, int prio) {
+  struct sched_param sp;
+  memset(&sp, 0, sizeof(sp));
+  sp.sched_priority = prio;
+  if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &sp) != 0) {
+    printf("[PRIO] Failed to set RT priority for %s (%s)\n", name, strerror(errno));
+  } else {
+    printf("[PRIO] %s set to SCHED_FIFO priority %d\n", name, prio);
+  }
 }
