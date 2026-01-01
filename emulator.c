@@ -140,7 +140,7 @@ void *ipl_task(void *args) {
       //NOP
       if (!irq) {
         M68K_END_TIMESLICE;
-        // NOP COMMENTED OUT (timing delay removed)
+        NOP
         irq = 1;
       }
       //usleep(0);
@@ -154,7 +154,7 @@ void *ipl_task(void *args) {
           irq = 0;
         }
         M68K_END_TIMESLICE;
-        // NOP COMMENTED OUT (timing delay removed)
+        NOP
         //usleep(0);
       }
     }
@@ -189,7 +189,7 @@ void *ipl_task(void *args) {
     //usleep(0);
     //NOP NOP
 noppers:
-    ; // NOP COMMENTED OUT (was NOP NOP NOP NOP NOP NOP NOP NOP)
+    NOP NOP NOP NOP NOP NOP NOP NOP
     //NOP NOP NOP NOP NOP NOP NOP NOP
     //NOP NOP NOP NOP NOP NOP NOP NOP
     /*NOP NOP NOP NOP NOP NOP NOP NOP
