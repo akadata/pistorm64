@@ -50,6 +50,14 @@ extern void m68ki_build_opcode_table(void);
 #include "m68kfpu.c"
 #include "m68kmmu.h" // uses some functions from m68kfpu.c which are static !
 
+#ifndef PISTORM_ENABLE_020_FPU
+#define PISTORM_ENABLE_020_FPU 0
+#endif
+
+#ifndef PISTORM_ENABLE_EC040_FPU
+#define PISTORM_ENABLE_EC040_FPU 0
+#endif
+
 /* ======================================================================== */
 /* ================================= DATA ================================= */
 /* ======================================================================== */
@@ -843,7 +851,7 @@ void m68k_set_cpu_type(struct m68ki_cpu_core *state, unsigned int cpu_type)
 			CYC_SHIFT        = 0;
 			CYC_RESET        = 518;
 			HAS_PMMU         = 0;
-			HAS_FPU          = 0;
+			HAS_FPU          = PISTORM_ENABLE_020_FPU ? 1 : 0;
 			return;
 		case M68K_CPU_TYPE_68020:
 			CPU_TYPE         = CPU_TYPE_020;
@@ -861,7 +869,7 @@ void m68k_set_cpu_type(struct m68ki_cpu_core *state, unsigned int cpu_type)
 			CYC_SHIFT        = 0;
 			CYC_RESET        = 518;
 			HAS_PMMU         = 0;
-			HAS_FPU          = 0;
+			HAS_FPU          = PISTORM_ENABLE_020_FPU ? 1 : 0;
 			return;
 		case M68K_CPU_TYPE_68030:
 			CPU_TYPE         = CPU_TYPE_030;
@@ -933,7 +941,7 @@ void m68k_set_cpu_type(struct m68ki_cpu_core *state, unsigned int cpu_type)
 			CYC_SHIFT        = 0;
 			CYC_RESET        = 518;
 			HAS_PMMU         = 0;
-			HAS_FPU          = 0;
+			HAS_FPU          = PISTORM_ENABLE_EC040_FPU ? 1 : 0;
 			return;
 		case M68K_CPU_TYPE_68LC040:
 			CPU_TYPE         = CPU_TYPE_LC040;
@@ -951,7 +959,7 @@ void m68k_set_cpu_type(struct m68ki_cpu_core *state, unsigned int cpu_type)
 			state->cyc_shift        = 0;
 			state->cyc_reset        = 518;
 			HAS_PMMU         = 1;
-			HAS_FPU          = 0;
+			HAS_FPU          = PISTORM_ENABLE_EC040_FPU ? 1 : 0;
 			return;
 	}
 }

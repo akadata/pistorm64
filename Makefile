@@ -6,6 +6,8 @@ EXENAME          = emulator
 # USE_GOLD   : set to 1 to prefer gold linker (if installed).
 # USE_RAYLIB : set to 0 to drop raylib/DRM deps and use a null RTG backend.
 # USE_ALSA   : set to 0 to drop ALSA/ahi builds and -lasound.
+# USE_PMMU   : set to 1 to enable Musashi PMMU support (experimental).
+# USE_EC_FPU : set to 1 to force FPU on EC/020/LC/EC040 variants (for 68881/68882 emu).
 # CPUFLAGS   : per-platform tuning defaults below; override if needed.
 # RAYLIB_*   : raylib include/lib paths; adjust for custom builds.
 # USE_VC     : set to 0 to drop /opt/vc includes and Pi host support (vc_vchi_gencmd.h).
@@ -18,6 +20,10 @@ USE_GOLD   ?= 0
 USE_RAYLIB ?= 1
 # Toggle ALSA-based audio (Pi AHI). If 0, drop pi_ahi and -lasound.
 USE_ALSA   ?= 1
+# Toggle PMMU emulation (68030/040). Default off to avoid regressions.
+USE_PMMU   ?= 0
+# Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
+USE_EC_FPU ?= 0
 # Toggle Pi host (/opt/vc) support for dev tools.
 USE_VC     ?= 1
 # Quiet noisy-but-benign warnings from the generated 68k core.
@@ -77,6 +83,14 @@ else
 	VC_INC    := -I/opt/vc/include/
 	VC_LIBDIR := -L/opt/vc/lib
 	LDLIBS_VC := -lvcos -lvchiq_arm -lvchostif
+endif
+
+ifeq ($(USE_PMMU),1)
+	DEFINES += -DPISTORM_EXPERIMENT_PMMU
+endif
+
+ifeq ($(USE_EC_FPU),1)
+	DEFINES += -DPISTORM_ENABLE_020_FPU -DPISTORM_ENABLE_EC040_FPU
 endif
 
 MUSASHIFILES     = m68kcpu.c m68kdasm.c softfloat/softfloat.c softfloat/softfloat_fpsp.c
