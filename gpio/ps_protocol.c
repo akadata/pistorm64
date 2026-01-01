@@ -83,23 +83,38 @@ static void setup_io() {
 }
 
 static void setup_gpclk() {
-  // Enable 200MHz CLK output on GPIO4, adjust divider and pll source depending
-  // on pi model
-  *(gpclk + (CLK_GP0_CTL / 4)) = CLK_PASSWD | (1 << 5);
+  /* Program GPCLK0 for ~200MHz from PLLD (500MHz / 2.5). */
+  const uint32_t ctl_idx = (CLK_GP0_CTL / 4);
+  const uint32_t div_idx = (CLK_GP0_DIV / 4);
+
+  /* Disable/kill and wait for BUSY to clear */
+  *(gpclk + ctl_idx) = CLK_PASSWD | (1 << 5);
   usleep(10);
-  while ((*(gpclk + (CLK_GP0_CTL / 4))) & (1 << 7))
-    ;
-  usleep(100);
-  *(gpclk + (CLK_GP0_DIV / 4)) =
-      CLK_PASSWD | (6 << 12);  // divider , 6=200MHz on pi3
-  usleep(10);
-  *(gpclk + (CLK_GP0_CTL / 4)) =
-      CLK_PASSWD | 5 | (1 << 4);  // pll? 6=plld, 5=pllc
-  usleep(10);
-  while (((*(gpclk + (CLK_GP0_CTL / 4))) & (1 << 7)) == 0)
-    ;
+  while ((*(gpclk + ctl_idx)) & (1 << 7)) {
+    usleep(10);
+  }
   usleep(100);
 
+  /* Divisor: 2.5 (2 + 0.5 fractional) -> 200MHz from 500MHz PLLD */
+  uint32_t div = (2 << 12) | 0x800;
+  *(gpclk + div_idx) = CLK_PASSWD | div;
+  usleep(10);
+
+  /* Enable: ENAB | src=PLLD (6) */
+  *(gpclk + ctl_idx) = CLK_PASSWD | 6 | (1 << 4);
+  usleep(10);
+
+  /* Wait for BUSY to assert, log current CTL/DIV for diagnostics */
+  int timeout = 1000;
+  while (((*(gpclk + ctl_idx)) & (1 << 7)) == 0 && timeout--) {
+    usleep(10);
+  }
+  uint32_t ctl = *(gpclk + ctl_idx);
+  uint32_t div_rd = *(gpclk + div_idx);
+  printf("[CLK] GP0CTL=0x%08X GP0DIV=0x%08X (target ~200MHz)\n", ctl, div_rd);
+
+  // Enable 200MHz CLK output on GPIO4, adjust divider and pll source depending
+  // on pi model
   SET_GPIO_ALT(PIN_CLK, 0);  // gpclk0
 }
 
