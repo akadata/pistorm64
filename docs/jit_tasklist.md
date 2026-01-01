@@ -3,8 +3,8 @@
 Planned sequence to add an optional ARM JIT backend while keeping Musashi as default:
 
 1. CPU backend abstraction (in progress)
-   - Add a backend switch with `ENABLE_JIT` (build/runtime) and keep Musashi as the default path.
-   - Stub JIT backend initially forwards to Musashi for correctness.
+   - Backend switch via `--jit`/`--enable-jit` or config `jit on|yes|1`; Musashi stays default.
+   - Stub JIT backend currently forwards to Musashi for correctness.
 2. Threading/affinity hooks (pending)
    - Pin CPU backend to one core; pin Pi I/O (PiSCSI/net/A314/RTG) to other cores.
    - Expose config knobs for affinities.
@@ -16,4 +16,4 @@ Planned sequence to add an optional ARM JIT backend while keeping Musashi as def
 5. Kernel module prototype (pending)
    - Mirror the backend interface in `emulator.ko`; keep Pi-side services on other cores.
 
-Status: Step 1 scaffolded (backend flag + stub). Steps 2–5 not started.***
+Status: Step 1 scaffolded (backend flag + stub, config toggle). Steps 2–5 not started.***

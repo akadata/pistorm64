@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 #include "rominfo.h"
 
@@ -36,6 +37,7 @@ const char *config_item_names[CONFITEM_NUM] = {
   "cpu",
   "map",
   "loopcycles",
+  "jit",
   "mouse",
   "keyboard",
   "platform",
@@ -449,6 +451,18 @@ struct emulator_config *load_config_file(char *filename) {
         cfg->loop_cycles = get_int(parse_line + str_pos);
         printf("[CFG] Set CPU loop cycles to %d.\n", cfg->loop_cycles);
         break;
+      case CONFITEM_JIT: {
+        get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+        unsigned char enable = 0;
+        if (strlen(cur_cmd)) {
+          if (!strcasecmp(cur_cmd, "1") || !strcasecmp(cur_cmd, "on") || !strcasecmp(cur_cmd, "yes") || !strcasecmp(cur_cmd, "true")) {
+            enable = 1;
+          }
+        }
+        cfg->enable_jit = enable;
+        printf("[CFG] JIT backend %s via config.\n", cfg->enable_jit ? "enabled" : "disabled");
+        break;
+      }
       case CONFITEM_MOUSE:
         get_next_string(parse_line, cur_cmd, &str_pos, ' ');
         cfg->mouse_file = (char *)calloc(1, strlen(cur_cmd) + 1);

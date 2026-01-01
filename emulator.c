@@ -615,6 +615,7 @@ int main(int argc, char *argv[]) {
     }
     else if (strcmp(argv[g], "--enable-jit") == 0 || strcmp(argv[g], "--jit") == 0) {
       enable_jit_backend = 1;
+      printf("[CLI] JIT backend enabled.\n");
     }
     else if (strcmp(argv[g], "--keyboard-file") == 0 || strcmp(argv[g], "--kbfile") == 0) {
       if (g + 1 >= argc) {
@@ -670,6 +671,10 @@ switch_config:
   if (cfg) {
     if (cfg->cpu_type) cpu_type = cfg->cpu_type;
     if (cfg->loop_cycles) loop_cycles = cfg->loop_cycles;
+    if (!enable_jit_backend && cfg->enable_jit) {
+      enable_jit_backend = 1;
+      printf("[CFG] JIT backend enabled via config.\n");
+    }
 
     if (!cfg->platform)
       cfg->platform = make_platform_config("none", "generic");
