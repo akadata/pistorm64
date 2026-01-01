@@ -579,7 +579,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
                 case PISCSI_CTRL_ENABLE:
                     DEBUG("ENABLE\n");
                     if (!piscsi_enabled) {
-                        piscsi_init();
+                        piscsi_init(cfg);
                         piscsi_enabled = 1;
                         piscsi_refresh_drives();
                         pi_cmd_result = PI_RES_OK;

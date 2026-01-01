@@ -254,7 +254,7 @@ struct FileSysHeaderBlock {
     uint8_t    fhb_FileSysName[84];
 };
 
-void piscsi_init();
+void piscsi_init(struct emulator_config *cfg);
 void piscsi_shutdown();
 void piscsi_map_drive(char *filename, uint8_t index);
 void piscsi_unmap_drive(uint8_t index);

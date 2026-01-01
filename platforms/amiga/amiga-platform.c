@@ -535,7 +535,7 @@ void setvar_amiga(struct emulator_config *cfg, char *var, char *val) {
     if (CHKVAR("piscsi") && !piscsi_enabled) {
         LOG_INFO("[AMIGA] PISCSI Interface Enabled.\n");
         piscsi_enabled = 1;
-        piscsi_init();
+        piscsi_init(cfg);
         add_z2_pic(ACTYPE_PISCSI, 0);
         adjust_ranges_amiga(cfg);
     }

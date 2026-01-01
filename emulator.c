@@ -1394,11 +1394,19 @@ static void apply_affinity_from_env(const char *role, int default_core) {
 }
 
 static void set_realtime_priority(const char *name, int prio) {
+  int maxp = sched_get_priority_max(SCHED_RR);
+  int minp = sched_get_priority_min(SCHED_RR);
+  if (prio < minp) prio = minp;
+  if (prio > maxp) prio = maxp;
+
   struct sched_param sp;
   memset(&sp, 0, sizeof(sp));
   sp.sched_priority = prio;
   if (pthread_setschedparam(pthread_self(), SCHED_RR, &sp) != 0) {
-    printf("[PRIO] Failed to set RT priority for %s (%s)\n", name, strerror(errno));
+    if (errno == EPERM)
+      printf("[PRIO] RT priority for %s denied (CAP_SYS_NICE/rtprio limit needed)\n", name);
+    else
+      printf("[PRIO] Failed to set RT priority for %s (%s)\n", name, strerror(errno));
   } else {
     printf("[PRIO] %s set to SCHED_RR priority %d\n", name, prio);
   }

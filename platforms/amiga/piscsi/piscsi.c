@@ -97,7 +97,7 @@ static const char *piscsi_cpu_type_name(unsigned int cpu_type) {
     return "unknown";
 }
 
-void piscsi_init() {
+void piscsi_init(struct emulator_config *local_cfg) {
     for (int i = 0; i < 8; i++) {
         devs[i].fd = -1;
         devs[i].lba = 0;
@@ -105,16 +105,17 @@ void piscsi_init() {
     }
 
     {
+        struct emulator_config *use_cfg = local_cfg ? local_cfg : cfg;
         unsigned int eff_cpu = cpu_type;
-        if (cfg && cfg->cpu_type)
-            eff_cpu = cfg->cpu_type;
+        if (use_cfg && use_cfg->cpu_type)
+            eff_cpu = use_cfg->cpu_type;
         const char *cpu_name = piscsi_cpu_type_name(eff_cpu);
 
-        int z2_idx = cfg ? get_named_mapped_item(cfg, "z2_autoconf_fast") : -1;
+        int z2_idx = use_cfg ? get_named_mapped_item(use_cfg, "z2_autoconf_fast") : -1;
         char z2_desc[64];
         if (z2_idx >= 0) {
             snprintf(z2_desc, sizeof(z2_desc), "0x%08lX+0x%X",
-                     (unsigned long)cfg->map_offset[z2_idx], cfg->map_size[z2_idx]);
+                     (unsigned long)use_cfg->map_offset[z2_idx], use_cfg->map_size[z2_idx]);
         } else {
             snprintf(z2_desc, sizeof(z2_desc), "none");
         }
