@@ -63,7 +63,7 @@ const char *mapcmd_names[MAPCMD_NUM] = {
 
 int get_config_item_type(char *cmd) {
   for (int i = 0; i < CONFITEM_NUM; i++) {
-    if (strcmp(cmd, config_item_names[i]) == 0) {
+    if (strcasecmp(cmd, config_item_names[i]) == 0) {
       return i;
     }
   }
