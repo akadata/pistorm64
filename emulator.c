@@ -93,13 +93,20 @@ int gayleirq;
 #define CORE_CPU     1
 #define CORE_IO      2
 #define CORE_INPUT   3
+#define CORE_IPL     0
 
-#define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1,io=2,input=3"
+#define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1,io=2,input=3,ipl=0"
+#define PI_RT_ENV       "PISTORM_RT"       // e.g. "cpu=60,io=40,input=80,ipl=70"
+#define RT_DEFAULT_CPU     60
+#define RT_DEFAULT_IO      40
+#define RT_DEFAULT_INPUT   80
+#define RT_DEFAULT_IPL     70
 
 // Forward declarations for helpers used before their definitions.
 static inline uint8_t opcode_is_fpu(uint16_t opcode);
 static void apply_affinity_from_env(const char *role, int default_core);
 static void set_realtime_priority(const char *name, int prio);
+static void apply_realtime_from_env(const char *role, int default_prio);
 
 #define MUSASHI_HAX
 
@@ -349,6 +356,7 @@ void *cpu_task() {
   state->gpio = gpio;
 	m68k_pulse_reset(state);
   apply_affinity_from_env("cpu", CORE_CPU);
+  apply_realtime_from_env("cpu", RT_DEFAULT_CPU);
 
 cpu_loop:
   if (realtime_disassembly && (do_disasm || cpu_emulation_running)) {
@@ -438,7 +446,7 @@ void *keyboard_task() {
 
   printf("[KBD] Keyboard thread started\n");
   apply_affinity_from_env("input", CORE_INPUT);
-  set_realtime_priority("kbd", 10);
+  apply_realtime_from_env("input", RT_DEFAULT_INPUT);
 
   // because we permit the keyboard to be grabbed on startup, quickly check if we need to grab it
   if (kb_hook_enabled && cfg->keyboard_grab) {
@@ -561,7 +569,7 @@ void *mouse_task() {
 
   printf("[MOUSE] Mouse thread started\n");
   apply_affinity_from_env("input", CORE_INPUT);
-  set_realtime_priority("mouse", 12);
+  apply_realtime_from_env("input", RT_DEFAULT_INPUT);
 
   mpoll[0].fd = mouse_fd;
   mpoll[0].events = POLLIN;
@@ -833,7 +841,8 @@ switch_config:
     else {
       pthread_setname_np(ipl_tid, "pistorm: ipl");
       printf("IPL thread created successfully\n");
-      apply_affinity_from_env("io", CORE_IO);
+      apply_affinity_from_env("ipl", CORE_IPL);
+      apply_realtime_from_env("ipl", RT_DEFAULT_IPL);
     }
   }
 
@@ -1375,6 +1384,7 @@ static void apply_affinity_from_env(const char *role, int default_core) {
         if (strcasecmp(key, "cpu") == 0 && strcmp(role, "cpu") == 0) target = val;
         if (strcasecmp(key, "io") == 0 && strcmp(role, "io") == 0) target = val;
         if (strcasecmp(key, "input") == 0 && strcmp(role, "input") == 0) target = val;
+        if (strcasecmp(key, "ipl") == 0 && strcmp(role, "ipl") == 0) target = val;
       }
       tok = strtok(NULL, ",");
     }
@@ -1387,9 +1397,32 @@ static void set_realtime_priority(const char *name, int prio) {
   struct sched_param sp;
   memset(&sp, 0, sizeof(sp));
   sp.sched_priority = prio;
-  if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &sp) != 0) {
+  if (pthread_setschedparam(pthread_self(), SCHED_RR, &sp) != 0) {
     printf("[PRIO] Failed to set RT priority for %s (%s)\n", name, strerror(errno));
   } else {
-    printf("[PRIO] %s set to SCHED_FIFO priority %d\n", name, prio);
+    printf("[PRIO] %s set to SCHED_RR priority %d\n", name, prio);
   }
+}
+
+static void apply_realtime_from_env(const char *role, int default_prio) {
+  int target = default_prio;
+  const char *env = getenv(PI_RT_ENV);
+  if (env && strlen(env)) {
+    char *dup = strdup(env);
+    char *tok = strtok(dup, ",");
+    while (tok) {
+      char key[16];
+      int val = -1;
+      if (sscanf(tok, "%15[^=]=%d", key, &val) == 2) {
+        if (strcasecmp(key, "cpu") == 0 && strcmp(role, "cpu") == 0) target = val;
+        if (strcasecmp(key, "io") == 0 && strcmp(role, "io") == 0) target = val;
+        if (strcasecmp(key, "input") == 0 && strcmp(role, "input") == 0) target = val;
+        if (strcasecmp(key, "ipl") == 0 && strcmp(role, "ipl") == 0) target = val;
+      }
+      tok = strtok(NULL, ",");
+    }
+    free(dup);
+  }
+  if (target > 0)
+    set_realtime_priority(role, target);
 }
