@@ -21,6 +21,7 @@
 #include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
 #include "gpio/ps_protocol.h"
 #include "log.h"
+#include "cpu_backend.h"
 
 #include <assert.h>
 #include <dirent.h>
@@ -73,6 +74,7 @@ uint32_t last_irq = 8, last_last_irq = 8;
 uint8_t ipl_enabled[8];
 
 uint8_t end_signal = 0, load_new_config = 0;
+uint8_t enable_jit_backend = 0;
 
 char disasm_buf[4096];
 
@@ -267,6 +269,39 @@ static inline void m68k_execute_bef(m68ki_cpu_core *state, int num_cycles)
 	return;
 }
 
+// Backend wrappers (Musashi default, JIT stub delegates to Musashi for now).
+void musashi_backend_execute(m68ki_cpu_core *state, int cycles) {
+    m68k_execute_bef(state, cycles);
+}
+
+void musashi_backend_set_irq(int level) {
+    M68K_SET_IRQ(level);
+}
+
+void jit_backend_execute(m68ki_cpu_core *state, int cycles) {
+    musashi_backend_execute(state, cycles);
+}
+
+void jit_backend_set_irq(int level) {
+    musashi_backend_set_irq(level);
+}
+
+static inline void cpu_backend_execute(m68ki_cpu_core *state, int cycles) {
+    if (enable_jit_backend) {
+        jit_backend_execute(state, cycles);
+    } else {
+        musashi_backend_execute(state, cycles);
+    }
+}
+
+static inline void cpu_backend_set_irq(int level) {
+    if (enable_jit_backend) {
+        jit_backend_set_irq(level);
+    } else {
+        musashi_backend_set_irq(level);
+    }
+}
+
 void *cpu_task() {
 	m68ki_cpu_core *state = &m68ki_cpu;
   state->ovl = ovl;
@@ -287,14 +322,14 @@ cpu_loop:
     printf("%.8X (%.8X)]] %s\n", m68k_get_reg(NULL, M68K_REG_PC), (m68k_get_reg(NULL, M68K_REG_PC) & 0xFFFFFF), disasm_buf);
     if (do_disasm)
       do_disasm--;
-	  m68k_execute_bef(state, 1);
+	  cpu_backend_execute(state, 1);
   }
   else {
     if (cpu_emulation_running) {
 		if (irq)
-			m68k_execute_bef(state, 5);
+			cpu_backend_execute(state, 5);
 		else
-			m68k_execute_bef(state, loop_cycles);
+			cpu_backend_execute(state, loop_cycles);
     }
   }
 
@@ -306,11 +341,11 @@ cpu_loop:
     }
     if (last_irq != 0 && last_irq != last_last_irq) {
       last_last_irq = last_irq;
-      M68K_SET_IRQ(last_irq);
+      cpu_backend_set_irq(last_irq);
     }
   }
   if (!irq && last_last_irq != 0) {
-    M68K_SET_IRQ(0);
+    cpu_backend_set_irq(0);
     last_last_irq = 0;
   }
 
@@ -577,6 +612,9 @@ int main(int argc, char *argv[]) {
           set_pistorm_devcfg_filename(argv[g]);
         }
       }
+    }
+    else if (strcmp(argv[g], "--enable-jit") == 0 || strcmp(argv[g], "--jit") == 0) {
+      enable_jit_backend = 1;
     }
     else if (strcmp(argv[g], "--keyboard-file") == 0 || strcmp(argv[g], "--kbfile") == 0) {
       if (g + 1 >= argc) {
