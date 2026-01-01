@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
 
 #include "platforms/platforms.h"
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <sys/mman.h>
 
 #include "rominfo.h"
 
@@ -293,6 +295,11 @@ skip_file_ops:
       displayRomInfo(cfg->map_data[index], cfg->rom_size[index]);
       if (cfg->map_size[index] == cfg->rom_size[index])
         m68k_add_rom_range(cfg->map_offset[index], cfg->map_high[index], cfg->map_data[index]);
+      if (cfg->map_data[index] && cfg->map_size[index]) {
+        if (mlock(cfg->map_data[index], cfg->map_size[index]) != 0) {
+          printf("[CFG] Warning: mlock on ROM mapping failed (%s)\n", strerror(errno));
+        }
+      }
       break;
     case MAPTYPE_REGISTER:
     default:

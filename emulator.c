@@ -76,6 +76,7 @@ uint8_t ipl_enabled[8];
 uint8_t end_signal = 0, load_new_config = 0;
 uint8_t enable_jit_backend = 0;
 uint8_t enable_fpu_jit_backend = 0;
+static int (*fpu_exec_hook)(m68ki_cpu_core *state, uint16_t opcode) = NULL;
 
 char disasm_buf[4096];
 
@@ -253,10 +254,10 @@ static inline void m68k_execute_bef(m68ki_cpu_core *state, int num_cycles)
 
 			/* Read an instruction and call its handler */
 			REG_IR = m68ki_read_imm_16(state);
-      if (enable_fpu_jit_backend && opcode_is_fpu(REG_IR)) {
-        fpu_backend_execute(state, REG_IR);
+      if (fpu_exec_hook && opcode_is_fpu(REG_IR)) {
+        fpu_exec_hook(state, REG_IR);
       } else {
-  			m68ki_instruction_jump_table[REG_IR](state);
+        m68ki_instruction_jump_table[REG_IR](state);
       }
 			USE_CYCLES(CYC_INSTRUCTION[REG_IR]);
 
@@ -288,9 +289,20 @@ static inline uint8_t opcode_is_fpu(uint16_t opcode) {
     return ((opcode & 0xF000) == 0xF000);
 }
 
-static inline void fpu_backend_execute(m68ki_cpu_core *state, uint16_t opcode) {
-    // TODO: replace with real JIT FPU backend; currently uses Musashi path.
+// Tiny fast-path placeholder: try a host-side translation first, otherwise fall back.
+static inline int fpu_translate_fastpath(m68ki_cpu_core *state, uint16_t opcode) {
+    // TODO: implement host-side float ops translation. Currently always fall back.
+    (void)state;
+    (void)opcode;
+    return 0;
+}
+
+static inline int fpu_backend_execute(m68ki_cpu_core *state, uint16_t opcode) {
+    if (fpu_translate_fastpath(state, opcode)) {
+        return 1;
+    }
     m68ki_instruction_jump_table[opcode](state);
+    return 1;
 }
 
 void jit_backend_execute(m68ki_cpu_core *state, int cycles) {
@@ -697,6 +709,11 @@ switch_config:
     if (!enable_fpu_jit_backend && cfg->enable_fpu_jit) {
       enable_fpu_jit_backend = 1;
       printf("[CFG] FPU JIT backend enabled via config.\n");
+    }
+    if (enable_fpu_jit_backend) {
+      fpu_exec_hook = fpu_backend_execute;
+    } else {
+      fpu_exec_hook = NULL;
     }
 
     if (!cfg->platform)
