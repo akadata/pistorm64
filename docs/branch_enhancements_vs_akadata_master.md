@@ -15,6 +15,7 @@ Summary of changes in this branch compared to `origin/akadata/master`.
 - Added PMMU/FPU enable knobs in Musashi init to force FPU on EC parts when desired.
 - Experimental JIT backend switch: `--jit` flag or config `jit on|yes|1` sets the backend to the (currently Musashi-backed) JIT path.
 - Optional FPU-only JIT hook (`--jit-fpu` or config `jitfpu on|yes|1`) routes F-line opcodes through the JIT hook (still Musashi underneath).
+- ROM (e.g., Kickstart) mappings are now mlock()'d on load to keep them resident; failure is warned but non-fatal.
 
 ## Documentation
 - New docs: `docs/mmu_fpu_toggles.md`, FC/backport notes, CPLD build notes, and comparison/reference docs in `docs/`.
