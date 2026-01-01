@@ -29,9 +29,14 @@
 #define STATUS_MASK_IPL 0xe000
 #define STATUS_SHIFT_IPL 13
 
+// Peripheral base addresses per Pi family:
+// Pi0/1        : 0x20000000
+// Pi2/3/Zero2W : 0x3F000000 (default below)
+// Pi4/400      : 0xFE000000 (RPi4-class)
+// Pi5          : RP1 southbridge (not supported here; needs RP1-specific path)
 //#define BCM2708_PERI_BASE 0x20000000  // pi0-1
-//#define BCM2708_PERI_BASE	0xFE000000  // pi4
-#define BCM2708_PERI_BASE 0x3F000000  // pi3
+//#define BCM2708_PERI_BASE 0xFE000000  // pi4/400 (RPi4-class)
+#define BCM2708_PERI_BASE 0x3F000000   // pi2/3/Zero2W default
 #define BCM2708_PERI_SIZE 0x01000000
 
 #define GPIO_ADDR 0x200000 /* GPIO controller */
