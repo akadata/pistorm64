@@ -76,19 +76,24 @@ struct hunk_info piscsi_hinfo;
 struct hunk_reloc piscsi_hreloc[256];
 
 static const char *piscsi_cpu_type_name(unsigned int cpu_type) {
-    switch (cpu_type) {
-        case M68K_CPU_TYPE_68000: return "68000";
-        case M68K_CPU_TYPE_68010: return "68010";
-        case M68K_CPU_TYPE_68EC020: return "68EC020";
-        case M68K_CPU_TYPE_68020: return "68020";
-        case M68K_CPU_TYPE_68EC030: return "68EC030";
-        case M68K_CPU_TYPE_68030: return "68030";
-        case M68K_CPU_TYPE_68EC040: return "68EC040";
-        case M68K_CPU_TYPE_68LC040: return "68LC040";
-        case M68K_CPU_TYPE_68040: return "68040";
-        case M68K_CPU_TYPE_SCC68070: return "SCC68070";
-        default: return "unknown";
-    }
+    // Map 1:1 to the config file CPU order to avoid mismatches.
+    static const char *cpu_names[] = {
+        "invalid",
+        "68000",
+        "68010",
+        "68EC020",
+        "68020",
+        "68EC030",
+        "68030",
+        "68EC040",
+        "68LC040",
+        "68040",
+        "SCC68070",
+    };
+
+    if (cpu_type < (sizeof(cpu_names) / sizeof(cpu_names[0])))
+        return cpu_names[cpu_type];
+    return "unknown";
 }
 
 void piscsi_init() {
