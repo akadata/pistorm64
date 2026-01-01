@@ -149,7 +149,10 @@ uint8_t mouse_x = 0, mouse_y = 0;
 
 int get_mouse_status(uint8_t *x, uint8_t *y, uint8_t *b, uint8_t *e) {
   uint8_t mouse_ev[4];
-  if (read(mouse_fd, &mouse_ev, 4) != -1) {
+  int read_any = 0;
+
+  // Drain all available mouse packets to avoid backlog during busy host activity.
+  while (read(mouse_fd, &mouse_ev, 4) == 4) {
     *b = ((uint8_t *)&mouse_ev)[0];
     *e = ((uint8_t *)&mouse_ev)[3];
 
@@ -157,10 +160,10 @@ int get_mouse_status(uint8_t *x, uint8_t *y, uint8_t *b, uint8_t *e) {
     *x = mouse_x;
     mouse_y += (-((uint8_t *)&mouse_ev)[2]);
     *y = mouse_y;
-    return 1;
+    read_any = 1;
   }
 
-  return 0;
+  return read_any;
 }
 
 static uint8_t queued_keypresses = 0, queue_output_pos = 0, queue_input_pos = 0;
