@@ -13,6 +13,7 @@ Summary of changes in this branch compared to `origin/akadata/master`.
 - Fixed CLI config handling for `--config/--config-file` even when `USE_VC=0` (stub now stores filename).
 - Added FC-enabled CPLD variant under `rtl/fc_amiga/` with BGACK tri-state gating and FC capture.
 - Added PMMU/FPU enable knobs in Musashi init to force FPU on EC parts when desired.
+- Experimental JIT backend switch: `--jit` flag or config `jit on|yes|1` sets the backend to the (currently Musashi-backed) JIT path.
 
 ## Documentation
 - New docs: `docs/mmu_fpu_toggles.md`, FC/backport notes, CPLD build notes, and comparison/reference docs in `docs/`.

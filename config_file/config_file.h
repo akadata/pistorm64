@@ -41,6 +41,7 @@ typedef enum {
   CONFITEM_CPUTYPE,
   CONFITEM_MAP,
   CONFITEM_LOOPCYCLES,
+  CONFITEM_JIT,
   CONFITEM_MOUSE,
   CONFITEM_KEYBOARD,
   CONFITEM_PLATFORM,
@@ -77,6 +78,7 @@ struct emulator_config {
   unsigned char mouse_enabled, mouse_autoconnect, keyboard_enabled, keyboard_grab, keyboard_autoconnect;
 
   unsigned int loop_cycles;
+  unsigned char enable_jit;
   unsigned int mapped_low, mapped_high;
   unsigned int custom_low, custom_high;
 };
