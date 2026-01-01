@@ -8,6 +8,7 @@ EXENAME          = emulator
 # USE_ALSA   : set to 0 to drop ALSA/ahi builds and -lasound.
 # USE_PMMU   : set to 1 to enable Musashi PMMU support (experimental).
 # USE_EC_FPU : set to 1 to force FPU on EC/020/LC/EC040 variants (for 68881/68882 emu).
+# ARCH_FEATURES : optional AArch64 feature modifiers (e.g. +crc+simd+fp16+lse).
 # CPUFLAGS   : per-platform tuning defaults below; override if needed.
 # RAYLIB_*   : raylib include/lib paths; adjust for custom builds.
 # USE_VC     : set to 0 to drop /opt/vc includes and Pi host support (vc_vchi_gencmd.h).
@@ -145,6 +146,13 @@ ifdef MCPU
 endif
 ifdef MTUNE
 	CPUFLAGS := $(filter-out -mtune=%,$(CPUFLAGS)) -mtune=$(MTUNE)
+endif
+
+# Optional AArch64 feature modifiers (e.g. +crc+simd+fp16+lse). Leave blank to keep defaults.
+ARCH_FEATURES ?=
+ifneq ($(strip $(ARCH_FEATURES)),)
+	CPUFLAGS := $(patsubst -march=%,-march=%$(ARCH_FEATURES),$(CPUFLAGS))
+	CPUFLAGS := $(patsubst -mcpu=%,-mcpu=%$(ARCH_FEATURES),$(CPUFLAGS))
 endif
 
 LDLIBS_RAYLIB = -lraylib -lGLESv2 -lEGL -lgbm -ldrm
