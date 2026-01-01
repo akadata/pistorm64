@@ -2,7 +2,7 @@ EXENAME          = emulator
 
 # Tunables: edit here instead of hunting through rule bodies.
 # WARNINGS   : compiler warnings; keep strict by default.
-# OPT_LEVEL  : optimisation level (-Os/-O2/-O3).
+# OPT_LEVEL  : optimisation level (-Os/-O2/-O3). Can also set O=2,3,...
 # USE_GOLD   : set to 1 to prefer gold linker (if installed).
 # USE_RAYLIB : set to 0 to drop raylib/DRM deps and use a null RTG backend.
 # USE_ALSA   : set to 0 to drop ALSA/ahi builds and -lasound.
@@ -13,7 +13,10 @@ EXENAME          = emulator
 # USE_VC     : set to 0 to drop /opt/vc includes and Pi host support (vc_vchi_gencmd.h).
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 WARNINGS   ?= -Wall -Wextra -pedantic
-OPT_LEVEL  ?= -Os
+OPT_LEVEL  ?= -O3
+ifdef O
+OPT_LEVEL := -O$(O)
+endif
 # Set USE_GOLD=1 to link with gold if available.
 USE_GOLD   ?= 0
 # Toggle RTG output backends: 1=raylib (default), 0=null stub.
@@ -131,6 +134,17 @@ else ifeq ($(PLATFORM),PI_64BIT)
 	CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
 else ifeq ($(PLATFORM),ZEROW2_64)
 	CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
+endif
+
+# Optional manual overrides for CPU tuning.
+ifdef MARCH
+	CPUFLAGS := $(filter-out -march=%,$(CPUFLAGS)) -march=$(MARCH)
+endif
+ifdef MCPU
+	CPUFLAGS := $(filter-out -mcpu=%,$(CPUFLAGS)) -mcpu=$(MCPU)
+endif
+ifdef MTUNE
+	CPUFLAGS := $(filter-out -mtune=%,$(CPUFLAGS)) -mtune=$(MTUNE)
 endif
 
 LDLIBS_RAYLIB = -lraylib -lGLESv2 -lEGL -lgbm -ldrm
