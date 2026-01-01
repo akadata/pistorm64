@@ -4,6 +4,8 @@
 
 #include "platforms/amiga/hunk-reloc.h"
 
+struct emulator_config;
+
 #define	TDF_EXTCOM (1<<15)
 
 #define CMD_INVALID	0
