@@ -962,7 +962,10 @@ typedef struct m68ki_cpu_core
 	uint cacr;         /* Cache Control Register (m68020, unemulated) */
 	uint caar;         /* Cache Address Register (m68020, unemulated) */
 	uint ir;           /* Instruction Register */
-	floatx80 fpr[8];     /* FPU Data Register (m68030/040) */
+
+	//floatx80 fpr[8];     /* FPU Data Register (m68030/040) */
+	floatx80 fpr[8] __attribute__((aligned(16)));     /* FPU Data Register (m68030/040) */
+
 	uint fpiar;        /* FPU Instruction Address Register (m68040) */
 	uint fpsr;         /* FPU Status Register (m68040) */
 	uint fpcr;         /* FPU Control Register (m68040) */
