@@ -47,31 +47,49 @@ CPUFLAGS   ?= -march=native -mtune=native
 RAYLIB_INC    ?= -I./raylib
 RAYLIB_LIBDIR ?= -L./raylib_drm
 
-MAINFILES        = emulator.c \
-	log.c \
-	memory_mapped.c \
-	config_file/config_file.c \
-	config_file/rominfo.c \
-	input/input.c \
-	gpio/ps_protocol.c \
-	platforms/platforms.c \
-	platforms/amiga/amiga-autoconf.c \
-	platforms/amiga/amiga-platform.c \
-	platforms/amiga/amiga-registers.c \
-	platforms/amiga/amiga-interrupts.c \
-	platforms/mac68k/mac68k-platform.c \
-	platforms/dummy/dummy-platform.c \
-	platforms/dummy/dummy-registers.c \
-	platforms/amiga/Gayle.c \
-	platforms/amiga/hunk-reloc.c \
-	platforms/amiga/cdtv-dmac.c \
-	platforms/amiga/rtg/rtg.c \
-	platforms/amiga/rtg/rtg-output-raylib.c \
-	platforms/amiga/rtg/rtg-gfx.c \
-	platforms/amiga/piscsi/piscsi.c \
-	platforms/amiga/net/pi-net.c \
-	platforms/shared/rtc.c \
-	platforms/shared/common.c
+
+MAINFILES =
+
+
+MAINFILES += emulator.c
+MAINFILES += log.c
+MAINFILES += memory_mapped.c
+
+MAINFILES += config_file/config_file.c
+MAINFILES += config_file/rominfo.c
+
+MAINFILES += input/input.c
+MAINFILES += gpio/ps_protocol.c
+
+MAINFILES += platforms/platforms.c
+
+MAINFILES += platforms/amiga/amiga-autoconf.c
+MAINFILES += platforms/amiga/amiga-platform.c
+MAINFILES += platforms/amiga/amiga-registers.c
+MAINFILES += platforms/amiga/amiga-interrupts.c
+
+MAINFILES += platforms/mac68k/mac68k-platform.c
+
+MAINFILES += platforms/dummy/dummy-platform.c
+MAINFILES += platforms/dummy/dummy-registers.c
+
+MAINFILES += platforms/amiga/Gayle.c
+MAINFILES += platforms/amiga/hunk-reloc.c
+MAINFILES += platforms/amiga/cdtv-dmac.c
+
+MAINFILES += platforms/amiga/rtg/rtg.c
+MAINFILES += platforms/amiga/rtg/rtg-output-raylib.c
+MAINFILES += platforms/amiga/rtg/rtg-gfx.c
+
+MAINFILES += platforms/amiga/piscsi/piscsi.c
+MAINFILES += platforms/amiga/net/pi-net.c
+
+MAINFILES += platforms/shared/rtc.c
+MAINFILES += platforms/shared/common.c
+
+# self-tests
+MAINFILES += selftest.c
+
 
 ifeq ($(USE_RAYLIB),0)
 	MAINFILES := $(filter-out platforms/amiga/rtg/rtg-output-raylib.c,$(MAINFILES))

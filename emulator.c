@@ -675,6 +675,8 @@ void sigint_handler(int sig_num) {
 int main(int argc, char* argv[]) {
   int g;
 
+  pistorm_selftest_alignment();
+
   ps_setup_protocol();
 
   log_set_level(LOG_LEVEL_INFO);

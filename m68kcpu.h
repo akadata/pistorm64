@@ -46,6 +46,11 @@ extern "C" {
 #include <stdio.h>
 #include "gpio/ps_protocol.h"
 
+/* included to ensure CPU is alligned (16) on fpr[8] */
+#include <stddef.h>
+#include <stdalign.h>
+
+
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
 /* ======================================================================== */
@@ -947,7 +952,7 @@ typedef struct
 
 
 
-typedef struct m68ki_cpu_core
+typedef struct __attribute__((aligned(16))) m68ki_cpu_core
 {
 	uint cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, 68020, 68EC030, 68030, 68EC040, or 68040 */
 	uint dar[16];      /* Data and Address Registers */
@@ -1073,6 +1078,18 @@ typedef struct m68ki_cpu_core
 
 	volatile unsigned int *gpio;
 } m68ki_cpu_core;
+
+/* 
+ * The softfloat FPU uses 80-bit (floatx80) values which must be
+ * naturally aligned for efficient and correct access on AArch64.
+ * 
+ * Explicitly enforce 16-byte alignment of the CPU core to guarantee
+ * proper alignment of the FPU register file across all allocation paths
+ * (global, stack, and heap).
+ */
+
+_Static_assert(_Alignof(m68ki_cpu_core) >= 16, "m68ki_cpu_core must be >= 16-byte aligned");
+_Static_assert(offsetof(m68ki_cpu_core, fpr) % 16 == 0, "fpr offset must be 16-byte aligned");
 
 
 extern m68ki_cpu_core m68ki_cpu;
