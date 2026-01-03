@@ -83,8 +83,11 @@ ifeq ($(USE_ALSA),0)
 	MAINFILES += platforms/amiga/ahi/pi_ahi_stub.c
 	LDLIBS_ALSA :=
 else
+	MAINFILES := $(filter-out platforms/amiga/ahi/pi_ahi_stub.c,$(MAINFILES))
+	MAINFILES += platforms/amiga/ahi/pi_ahi.c
 	LDLIBS_ALSA := -lasound
 endif
+
 
 ifeq ($(USE_VC),0)
 	MAINFILES := $(filter-out platforms/amiga/pistorm-dev/pistorm-dev.c,$(MAINFILES))

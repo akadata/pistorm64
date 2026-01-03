@@ -11,6 +11,8 @@
 
 #include "rtg_enums.h"
 
+struct emulator_config;
+
 void rtg_write(uint32_t address, uint32_t value, uint8_t mode);
 unsigned int rtg_read(uint32_t address, uint8_t mode);
 void rtg_set_clut_entry(uint8_t index, uint32_t xrgb);
@@ -36,7 +38,7 @@ void rtg_set_clut_cursor(uint8_t* bmp, uint32_t* pal, int16_t offs_x, int16_t of
 uint16_t rtg_get_scale_filter();
 void rtg_palette_debug(uint8_t enable);
 
-int init_rtg_data(struct emulator_config* cfg);
+int init_rtg_data(struct emulator_config *cfg);
 void shutdown_rtg();
 
 void rtg_fillrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color, uint16_t pitch,
