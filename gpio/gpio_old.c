@@ -13,8 +13,8 @@
 #include "gpio_old.h"
 
 // I/O access
-volatile unsigned int *gpio;
-volatile unsigned int *gpclk;
+volatile unsigned int* gpio;
+volatile unsigned int* gpclk;
 volatile unsigned int gpfsel0;
 volatile unsigned int gpfsel1;
 volatile unsigned int gpfsel2;
@@ -30,8 +30,8 @@ extern int mem_fd, mouse_fd, keyboard_fd;
 extern int mem_fd_gpclk;
 extern uint8_t gayle_int;
 
-void *gpio_map;
-void *gpclk_map;
+void* gpio_map;
+void* gpclk_map;
 
 unsigned char toggle;
 
@@ -39,8 +39,7 @@ static int g = 0;
 
 inline void write16(uint32_t address, uint32_t data) {
   //      asm volatile ("dmb" ::: "memory");
-  W16
-  *(gpio) = gpfsel0_o;
+  W16*(gpio) = gpfsel0_o;
   *(gpio + 1) = gpfsel1_o;
   *(gpio + 2) = gpfsel2_o;
 
@@ -70,13 +69,12 @@ inline void write16(uint32_t address, uint32_t data) {
 
 inline void write8(uint32_t address, uint32_t data) {
   if ((address & 1) == 0)
-    data = data + (data << 8);  // EVEN, A0=0,UDS
+    data = data + (data << 8); // EVEN, A0=0,UDS
   else
-    data = data & 0xff;  // ODD , A0=1,LDS
+    data = data & 0xff; // ODD , A0=1,LDS
 
   //   asm volatile ("dmb" ::: "memory");
-  W8
-  *(gpio) = gpfsel0_o;
+  W8*(gpio) = gpfsel0_o;
   *(gpio + 1) = gpfsel1_o;
   *(gpio + 2) = gpfsel2_o;
 
@@ -108,9 +106,8 @@ inline uint32_t read32(uint32_t address) {
   int val;
   int a;
   int b;
-  asm volatile ("dmb" ::: "memory");
-  R16
-  *(gpio) = gpfsel0_o;
+  asm volatile("dmb" ::: "memory");
+  R16*(gpio) = gpfsel0_o;
   *(gpio + 1) = gpfsel1_o;
   *(gpio + 2) = gpfsel2_o;
 
@@ -138,20 +135,21 @@ inline uint32_t read32(uint32_t address) {
   GPIO_SET = 1 << 6;
   //    asm volatile ("dmb" ::: "memory");
   a = (val >> 8) & 0xffff;
-  while (GET_GPIO(0));
-  //R16
+  while (GET_GPIO(0))
+    ;
+  // R16
   *(gpio) = gpfsel0_o;
   *(gpio + 1) = gpfsel1_o;
   *(gpio + 2) = gpfsel2_o;
 
-  *(gpio + 7) = (((address+2) & 0x0000ffff) << 8);
-  *(gpio + 10) = ((~(address+2) & 0x0000ffff) << 8);
+  *(gpio + 7) = (((address + 2) & 0x0000ffff) << 8);
+  *(gpio + 10) = ((~(address + 2) & 0x0000ffff) << 8);
   GPIO_CLR = 1 << 7;
   GPIO_CLR = 1 << 7;
   GPIO_SET = 1 << 7;
 
-  *(gpio + 7) = (((address+2) >> 16) << 8);
-  *(gpio + 10) = ((~(address+2) >> 16) << 8);
+  *(gpio + 7) = (((address + 2) >> 16) << 8);
+  *(gpio + 10) = ((~(address + 2) >> 16) << 8);
   GPIO_CLR = 1 << 7;
   GPIO_SET = 1 << 7;
 
@@ -167,7 +165,7 @@ inline uint32_t read32(uint32_t address) {
   val = *(gpio + 13);
   GPIO_SET = 1 << 6;
   b = (val >> 8) & 0xffff;
-  asm volatile ("dmb" ::: "memory");
+  asm volatile("dmb" ::: "memory");
 
   return (a << 16) | b;
 }
@@ -175,8 +173,7 @@ inline uint32_t read32(uint32_t address) {
 inline uint32_t read16(uint32_t address) {
   int val;
   //   asm volatile ("dmb" ::: "memory");
-  R16
-  *(gpio) = gpfsel0_o;
+  R16*(gpio) = gpfsel0_o;
   *(gpio + 1) = gpfsel1_o;
   *(gpio + 2) = gpfsel2_o;
 
@@ -208,8 +205,7 @@ inline uint32_t read16(uint32_t address) {
 inline uint32_t read8(uint32_t address) {
   int val;
   //    asm volatile ("dmb" ::: "memory");
-  R8
-  *(gpio) = gpfsel0_o;
+  R8*(gpio) = gpfsel0_o;
   *(gpio + 1) = gpfsel1_o;
   *(gpio + 2) = gpfsel2_o;
 
@@ -238,9 +234,9 @@ inline uint32_t read8(uint32_t address) {
 
   val = (val >> 8) & 0xffff;
   if ((address & 1) == 0)
-    return (val >> 8) & 0xff;  // EVEN, A0=0,UDS
+    return (val >> 8) & 0xff; // EVEN, A0=0,UDS
   else
-    return val & 0xff;  // ODD , A0=1,LDS
+    return val & 0xff; // ODD , A0=1,LDS
 }
 
 /******************************************************/
@@ -253,7 +249,7 @@ void write_reg(unsigned int value) {
   *(gpio + 7) = (value & 0xffff) << 8;
   *(gpio + 10) = (~value & 0xffff) << 8;
   GPIO_CLR = 1 << 7;
-  GPIO_CLR = 1 << 7;  // delay
+  GPIO_CLR = 1 << 7; // delay
   GPIO_SET = 1 << 7;
   GPIO_SET = 1 << 7;
   // Bus HIGH-Z
@@ -270,7 +266,7 @@ uint16_t read_reg(void) {
   *(gpio + 1) = gpfsel1;
   *(gpio + 2) = gpfsel2;
   GPIO_CLR = 1 << 6;
-  GPIO_CLR = 1 << 6;  // delay
+  GPIO_CLR = 1 << 6; // delay
   GPIO_CLR = 1 << 6;
   GPIO_CLR = 1 << 6;
   val = *(gpio + 13);
@@ -289,26 +285,25 @@ void setup_io() {
   }
 
   /* mmap GPIO */
-  gpio_map = mmap(
-      NULL,                    // Any adddress in our space will do
-      BCM2708_PERI_SIZE,       // Map length
-      PROT_READ | PROT_WRITE,  // Enable reading & writting to mapped memory
-      MAP_SHARED,              // Shared with other processes
-      mem_fd,                  // File to map
-      BCM2708_PERI_BASE        // Offset to GPIO peripheral
+  gpio_map = mmap(NULL,                   // Any adddress in our space will do
+                  BCM2708_PERI_SIZE,      // Map length
+                  PROT_READ | PROT_WRITE, // Enable reading & writting to mapped memory
+                  MAP_SHARED,             // Shared with other processes
+                  mem_fd,                 // File to map
+                  BCM2708_PERI_BASE       // Offset to GPIO peripheral
   );
 
-  close(mem_fd);  // No need to keep mem_fd open after mmap
+  close(mem_fd); // No need to keep mem_fd open after mmap
 
   if (gpio_map == MAP_FAILED) {
-    printf("gpio mmap error %d\n", (int)gpio_map);  // errno also set!
+    printf("gpio mmap error %d\n", (int)gpio_map); // errno also set!
     exit(-1);
   }
 
-  gpio = ((volatile unsigned *)gpio_map) + GPIO_ADDR / 4;
-  gpclk = ((volatile unsigned *)gpio_map) + GPCLK_ADDR / 4;
+  gpio = ((volatile unsigned*)gpio_map) + GPIO_ADDR / 4;
+  gpclk = ((volatile unsigned*)gpio_map) + GPCLK_ADDR / 4;
 
-}  // setup_io
+} // setup_io
 
 void gpio_enable_200mhz() {
   *(gpclk + (CLK_GP0_CTL / 4)) = CLK_PASSWD | (1 << 5);
@@ -316,17 +311,15 @@ void gpio_enable_200mhz() {
   while ((*(gpclk + (CLK_GP0_CTL / 4))) & (1 << 7))
     ;
   usleep(100);
-  *(gpclk + (CLK_GP0_DIV / 4)) =
-      CLK_PASSWD | (6 << 12);  // divider , 6=200MHz on pi3
+  *(gpclk + (CLK_GP0_DIV / 4)) = CLK_PASSWD | (6 << 12); // divider , 6=200MHz on pi3
   usleep(10);
-  *(gpclk + (CLK_GP0_CTL / 4)) =
-      CLK_PASSWD | 5 | (1 << 4);  // pll? 6=plld, 5=pllc
+  *(gpclk + (CLK_GP0_CTL / 4)) = CLK_PASSWD | 5 | (1 << 4); // pll? 6=plld, 5=pllc
   usleep(10);
   while (((*(gpclk + (CLK_GP0_CTL / 4))) & (1 << 7)) == 0)
     ;
   usleep(100);
 
-  SET_GPIO_ALT(4, 0);  // gpclk0
+  SET_GPIO_ALT(4, 0); // gpclk0
 
   // set SA to output
   INP_GPIO(2);
@@ -346,11 +339,11 @@ void gpio_enable_200mhz() {
     OUT_GPIO(g);
   }
   printf("Precalculate GPIO8-23 as Output\n");
-  gpfsel0_o = *(gpio);  // store gpio ddr
+  gpfsel0_o = *(gpio); // store gpio ddr
   printf("gpfsel0: %#x\n", gpfsel0_o);
-  gpfsel1_o = *(gpio + 1);  // store gpio ddr
+  gpfsel1_o = *(gpio + 1); // store gpio ddr
   printf("gpfsel1: %#x\n", gpfsel1_o);
-  gpfsel2_o = *(gpio + 2);  // store gpio ddr
+  gpfsel2_o = *(gpio + 2); // store gpio ddr
   printf("gpfsel2: %#x\n", gpfsel2_o);
 
   // Set GPIO pins 8-23 to input
@@ -358,11 +351,11 @@ void gpio_enable_200mhz() {
     INP_GPIO(g);
   }
   printf("Precalculate GPIO8-23 as Input\n");
-  gpfsel0 = *(gpio);  // store gpio ddr
+  gpfsel0 = *(gpio); // store gpio ddr
   printf("gpfsel0: %#x\n", gpfsel0);
-  gpfsel1 = *(gpio + 1);  // store gpio ddr
+  gpfsel1 = *(gpio + 1); // store gpio ddr
   printf("gpfsel1: %#x\n", gpfsel1);
-  gpfsel2 = *(gpio + 2);  // store gpio ddr
+  gpfsel2 = *(gpio + 2); // store gpio ddr
   printf("gpfsel2: %#x\n", gpfsel2);
 
   GPIO_CLR = 1 << 2;
@@ -381,9 +374,8 @@ inline void gpio_handle_irq() {
     if ((gayle_int & 0x80) && (get_ide(0)->drive[0].intrq || get_ide(0)->drive[1].intrq)) {
       write16(0xdff09c, 0x8008);
       m68k_set_irq(2);
-    }
-    else
-        m68k_set_irq(0);
+    } else
+      m68k_set_irq(0);
   };
 }
 

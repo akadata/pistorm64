@@ -20,8 +20,8 @@
 #include "ps_protocol.h"
 #include "m68k.h"
 
-volatile unsigned int *gpio;
-volatile unsigned int *gpclk;
+volatile unsigned int* gpio;
+volatile unsigned int* gpclk;
 
 unsigned int gpfsel0;
 unsigned int gpfsel1;
@@ -31,7 +31,9 @@ unsigned int gpfsel0_o;
 unsigned int gpfsel1_o;
 unsigned int gpfsel2_o;
 
-#define NOP asm("nop"); asm("nop");
+#define NOP                                                                                        \
+  asm("nop");                                                                                      \
+  asm("nop");
 
 static void setup_io() {
   int fd = open("/dev/mem", O_RDWR | O_SYNC);
@@ -40,13 +42,12 @@ static void setup_io() {
     exit(-1);
   }
 
-  void *gpio_map = mmap(
-      NULL,                    // Any adddress in our space will do
-      BCM2708_PERI_SIZE,       // Map length
-      PROT_READ | PROT_WRITE,  // Enable reading & writting to mapped memory
-      MAP_SHARED,              // Shared with other processes
-      fd,                      // File to map
-      BCM2708_PERI_BASE        // Offset to GPIO peripheral (Pi Zero W2 / Pi3)
+  void* gpio_map = mmap(NULL,                   // Any adddress in our space will do
+                        BCM2708_PERI_SIZE,      // Map length
+                        PROT_READ | PROT_WRITE, // Enable reading & writting to mapped memory
+                        MAP_SHARED,             // Shared with other processes
+                        fd,                     // File to map
+                        BCM2708_PERI_BASE       // Offset to GPIO peripheral (Pi Zero W2 / Pi3)
   );
 
   close(fd);
@@ -56,8 +57,8 @@ static void setup_io() {
     exit(-1);
   }
 
-  gpio = ((volatile unsigned *)gpio_map) + GPIO_ADDR / 4;
-  gpclk = ((volatile unsigned *)gpio_map) + GPCLK_ADDR / 4;
+  gpio = ((volatile unsigned*)gpio_map) + GPIO_ADDR / 4;
+  gpclk = ((volatile unsigned*)gpio_map) + GPCLK_ADDR / 4;
 }
 
 static void setup_gpclk() {
@@ -93,7 +94,7 @@ static void setup_gpclk() {
 
   // Enable 200MHz CLK output on GPIO4, adjust divider and pll source depending
   // on pi model
-  SET_GPIO_ALT(PIN_CLK, 0);  // gpclk0
+  SET_GPIO_ALT(PIN_CLK, 0); // gpclk0
 }
 
 void ps_setup_protocol() {
@@ -131,14 +132,15 @@ void ps_write_16(unsigned int address, unsigned int data) {
   *(gpio + 1) = GPFSEL1_INPUT;
   *(gpio + 2) = GPFSEL2_INPUT;
 
-  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {}
+  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {
+  }
 }
 
 void ps_write_8(unsigned int address, unsigned int data) {
   if ((address & 1) == 0)
-    data = data + (data << 8);  // EVEN, A0=0,UDS
+    data = data + (data << 8); // EVEN, A0=0,UDS
   else
-    data = data & 0xff;  // ODD , A0=1,LDS
+    data = data & 0xff; // ODD , A0=1,LDS
 
   *(gpio + 0) = GPFSEL0_OUTPUT;
   *(gpio + 1) = GPFSEL1_OUTPUT;
@@ -163,7 +165,8 @@ void ps_write_8(unsigned int address, unsigned int data) {
   *(gpio + 1) = GPFSEL1_INPUT;
   *(gpio + 2) = GPFSEL2_INPUT;
 
-  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {}
+  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {
+  }
 }
 
 void ps_write_32(unsigned int address, unsigned int value) {
@@ -171,7 +174,9 @@ void ps_write_32(unsigned int address, unsigned int value) {
   ps_write_16(address + 2, value);
 }
 
-#define NOP asm("nop"); asm("nop");
+#define NOP                                                                                        \
+  asm("nop");                                                                                      \
+  asm("nop");
 
 unsigned int ps_read_16(unsigned int address) {
   *(gpio + 0) = GPFSEL0_OUTPUT;
@@ -195,7 +200,8 @@ unsigned int ps_read_16(unsigned int address) {
   *(gpio + 7) = (REG_DATA << PIN_A0);
   *(gpio + 7) = 1 << PIN_RD;
 
-  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {}
+  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {
+  }
   unsigned int value = *(gpio + 13);
 
   *(gpio + 10) = 0xffffec;
@@ -225,7 +231,8 @@ unsigned int ps_read_8(unsigned int address) {
   *(gpio + 7) = (REG_DATA << PIN_A0);
   *(gpio + 7) = 1 << PIN_RD;
 
-  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {}
+  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {
+  }
   unsigned int value = *(gpio + 13);
 
   *(gpio + 10) = 0xffffec;
@@ -233,9 +240,9 @@ unsigned int ps_read_8(unsigned int address) {
   value = (value >> 8) & 0xffff;
 
   if ((address & 1) == 0)
-    return (value >> 8) & 0xff;  // EVEN, A0=0,UDS
+    return (value >> 8) & 0xff; // EVEN, A0=0,UDS
   else
-    return value & 0xff;  // ODD , A0=1,LDS
+    return value & 0xff; // ODD , A0=1,LDS
 }
 
 unsigned int ps_read_32(unsigned int address) {
@@ -274,8 +281,9 @@ unsigned int ps_read_status_reg() {
 #endif
 
   unsigned int value = *(gpio + 13);
-  while ((value=*(gpio + 13)) & (1 << PIN_TXN_IN_PROGRESS)) {}
-  
+  while ((value = *(gpio + 13)) & (1 << PIN_TXN_IN_PROGRESS)) {
+  }
+
   *(gpio + 10) = 0xffffec;
 
   return (value >> 8) & 0xffff;
@@ -297,7 +305,8 @@ void ps_pulse_reset() {
 
 unsigned int ps_get_ipl_zero() {
   unsigned int value = *(gpio + 13);
-  while ((value=*(gpio + 13)) & (1 << PIN_TXN_IN_PROGRESS)) {}
+  while ((value = *(gpio + 13)) & (1 << PIN_TXN_IN_PROGRESS)) {
+  }
   return value & (1 << PIN_IPL_ZERO);
 }
 

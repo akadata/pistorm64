@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 
 void configure_rtc_emulation_amiga(uint8_t enabled);
-void set_hard_drive_image_file_amiga(uint8_t index, char *filename);
-int custom_read_amiga(struct emulator_config *cfg, unsigned int addr, unsigned int *val, unsigned char type);
-int custom_write_amiga(struct emulator_config *cfg, unsigned int addr, unsigned int val, unsigned char type);
+void set_hard_drive_image_file_amiga(uint8_t index, char* filename);
+int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
+                      unsigned char type);
+int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int val,
+                       unsigned char type);
 
 void adjust_gayle_4000();
 void adjust_gayle_1200();
@@ -40,12 +42,12 @@ void adjust_gayle_1200();
 #define CIABPRA 0xBFD000
 #define CIABPRB 0xBFD100
 
-#define POTGOR  0xDFF016
-#define SERDAT  0xDFF030
+#define POTGOR 0xDFF016
+#define SERDAT 0xDFF030
 
-#define VPOSR   0xDFF004
-#define VPOSW   0xDFF02A
-#define DMACON  0xDFF096
+#define VPOSR 0xDFF004
+#define VPOSW 0xDFF02A
+#define DMACON 0xDFF096
 #define DMACONR 0xDFF002
 
 #define SEL0_BITNUM 3

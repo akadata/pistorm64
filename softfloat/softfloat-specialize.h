@@ -84,18 +84,17 @@ this code that are retained.
 | NaN; otherwise returns 0.
 *----------------------------------------------------------------------------*/
 
-flag floatx80_is_nan( floatx80 a );
+flag floatx80_is_nan(floatx80 a);
 
 /*----------------------------------------------------------------------------
 | The pattern for a default generated extended double-precision NaN.
 *----------------------------------------------------------------------------*/
-static inline floatx80 floatx80_default_nan(float_status *status)
-{
-	(void)status;
-    floatx80 r;
-    r.high = 0x7FFF;
-    r.low = LIT64( 0xFFFFFFFFFFFFFFFF );
-	return r;
+static inline floatx80 floatx80_default_nan(float_status* status) {
+  (void)status;
+  floatx80 r;
+  r.high = 0x7FFF;
+  r.low = LIT64(0xFFFFFFFFFFFFFFFF);
+  return r;
 }
 
 /*----------------------------------------------------------------------------
@@ -105,14 +104,14 @@ static inline floatx80 floatx80_default_nan(float_status *status)
 | should be simply `float_exception_flags |= flags;'.
 *----------------------------------------------------------------------------*/
 
-void float_raise(uint8_t flags, float_status *status);
+void float_raise(uint8_t flags, float_status* status);
 
 /*----------------------------------------------------------------------------
 | Internal canonical NaN format.
 *----------------------------------------------------------------------------*/
 typedef struct {
-    flag sign;
-    uint64_t high, low;
+  flag sign;
+  uint64_t high, low;
 } commonNaNT;
 
 /*----------------------------------------------------------------------------
@@ -120,11 +119,9 @@ typedef struct {
 | otherwise returns 0.
 *----------------------------------------------------------------------------*/
 
-static inline flag float32_is_nan( float32 a )
-{
+static inline flag float32_is_nan(float32 a) {
 
-    return ( 0xFF000000 < (uint32_t) ( a<<1 ) );
-
+  return (0xFF000000 < (uint32_t)(a << 1));
 }
 
 /*----------------------------------------------------------------------------
@@ -132,11 +129,9 @@ static inline flag float32_is_nan( float32 a )
 | NaN; otherwise returns 0.
 *----------------------------------------------------------------------------*/
 
-static inline flag float32_is_signaling_nan( float32 a )
-{
+static inline flag float32_is_signaling_nan(float32 a) {
 
-    return ( ( ( a>>22 ) & 0x1FF ) == 0x1FE ) && ( a & 0x003FFFFF );
-
+  return (((a >> 22) & 0x1FF) == 0x1FE) && (a & 0x003FFFFF);
 }
 
 /*----------------------------------------------------------------------------
@@ -145,16 +140,15 @@ static inline flag float32_is_signaling_nan( float32 a )
 | exception is raised.
 *----------------------------------------------------------------------------*/
 
-static inline commonNaNT float32ToCommonNaN( float32 a, float_status *status )
-{
-    commonNaNT z;
+static inline commonNaNT float32ToCommonNaN(float32 a, float_status* status) {
+  commonNaNT z;
 
-    if ( float32_is_signaling_nan( a ) ) float_raise( float_flag_signaling, status );
-    z.sign = a>>31;
-    z.low = 0;
-    z.high = ( (uint64_t) a )<<41;
-    return z;
-
+  if (float32_is_signaling_nan(a))
+    float_raise(float_flag_signaling, status);
+  z.sign = a >> 31;
+  z.low = 0;
+  z.high = ((uint64_t)a) << 41;
+  return z;
 }
 
 /*----------------------------------------------------------------------------
@@ -162,11 +156,9 @@ static inline commonNaNT float32ToCommonNaN( float32 a, float_status *status )
 | precision floating-point format.
 *----------------------------------------------------------------------------*/
 
-static inline float32 commonNaNToFloat32( commonNaNT a )
-{
+static inline float32 commonNaNToFloat32(commonNaNT a) {
 
-    return ( ( (uint32_t) a.sign )<<31 ) | 0x7FC00000 | ( a.high>>41 );
-
+  return (((uint32_t)a.sign) << 31) | 0x7FC00000 | (a.high >> 41);
 }
 
 /*----------------------------------------------------------------------------
@@ -175,24 +167,22 @@ static inline float32 commonNaNToFloat32( commonNaNT a )
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
 
-static inline float32 propagateFloat32NaN( float32 a, float32 b, float_status *status )
-{
-    flag aIsNaN, aIsSignalingNaN, bIsNaN, bIsSignalingNaN;
+static inline float32 propagateFloat32NaN(float32 a, float32 b, float_status* status) {
+  flag aIsNaN, aIsSignalingNaN, bIsNaN, bIsSignalingNaN;
 
-    aIsNaN = float32_is_nan( a );
-    aIsSignalingNaN = float32_is_signaling_nan( a );
-    bIsNaN = float32_is_nan( b );
-    bIsSignalingNaN = float32_is_signaling_nan( b );
-    a |= 0x00400000;
-    b |= 0x00400000;
-    if ( aIsSignalingNaN | bIsSignalingNaN ) float_raise( float_flag_signaling, status );
-    if ( aIsNaN ) {
-        return ( aIsSignalingNaN & bIsNaN ) ? b : a;
-    }
-    else {
-        return b;
-    }
-
+  aIsNaN = float32_is_nan(a);
+  aIsSignalingNaN = float32_is_signaling_nan(a);
+  bIsNaN = float32_is_nan(b);
+  bIsSignalingNaN = float32_is_signaling_nan(b);
+  a |= 0x00400000;
+  b |= 0x00400000;
+  if (aIsSignalingNaN | bIsSignalingNaN)
+    float_raise(float_flag_signaling, status);
+  if (aIsNaN) {
+    return (aIsSignalingNaN & bIsNaN) ? b : a;
+  } else {
+    return b;
+  }
 }
 
 /*----------------------------------------------------------------------------
@@ -200,11 +190,9 @@ static inline float32 propagateFloat32NaN( float32 a, float32 b, float_status *s
 | otherwise returns 0.
 *----------------------------------------------------------------------------*/
 
-static inline flag float64_is_nan( float64 a )
-{
+static inline flag float64_is_nan(float64 a) {
 
-    return ( LIT64( 0xFFE0000000000000 ) < (uint64_t) ( a<<1 ) );
-
+  return (LIT64(0xFFE0000000000000) < (uint64_t)(a << 1));
 }
 
 /*----------------------------------------------------------------------------
@@ -212,13 +200,9 @@ static inline flag float64_is_nan( float64 a )
 | NaN; otherwise returns 0.
 *----------------------------------------------------------------------------*/
 
-static inline flag float64_is_signaling_nan( float64 a )
-{
+static inline flag float64_is_signaling_nan(float64 a) {
 
-    return
-           ( ( ( a>>51 ) & 0xFFF ) == 0xFFE )
-        && ( a & LIT64( 0x0007FFFFFFFFFFFF ) );
-
+  return (((a >> 51) & 0xFFF) == 0xFFE) && (a & LIT64(0x0007FFFFFFFFFFFF));
 }
 
 /*----------------------------------------------------------------------------
@@ -227,17 +211,16 @@ static inline flag float64_is_signaling_nan( float64 a )
 | exception is raised.
 *----------------------------------------------------------------------------*/
 
-static inline commonNaNT float64ToCommonNaN(float64 a, float_status *status)
-{
-    commonNaNT z;
+static inline commonNaNT float64ToCommonNaN(float64 a, float_status* status) {
+  commonNaNT z;
 
-    if (float64_is_signaling_nan(a)) {
-        float_raise(float_flag_invalid, status);
-    }
-    z.sign = float64_val(a) >> 63;
-    z.low = 0;
-    z.high = float64_val(a) << 12;
-    return z;
+  if (float64_is_signaling_nan(a)) {
+    float_raise(float_flag_invalid, status);
+  }
+  z.sign = float64_val(a) >> 63;
+  z.low = 0;
+  z.high = float64_val(a) << 12;
+  return z;
 }
 
 /*----------------------------------------------------------------------------
@@ -245,13 +228,9 @@ static inline commonNaNT float64ToCommonNaN(float64 a, float_status *status)
 | precision floating-point format.
 *----------------------------------------------------------------------------*/
 
-static inline float64 commonNaNToFloat64(commonNaNT a, float_status *status)
-{
-	(void)status;
-     return
-          ( ( (uint64_t) a.sign )<<63 )
-        | LIT64( 0x7FF8000000000000 )
-        | ( a.high>>12 );
+static inline float64 commonNaNToFloat64(commonNaNT a, float_status* status) {
+  (void)status;
+  return (((uint64_t)a.sign) << 63) | LIT64(0x7FF8000000000000) | (a.high >> 12);
 }
 
 /*----------------------------------------------------------------------------
@@ -259,16 +238,11 @@ static inline float64 commonNaNToFloat64(commonNaNT a, float_status *status)
 | signaling NaN; otherwise returns 0.
 *----------------------------------------------------------------------------*/
 
-static inline flag floatx80_is_signaling_nan( floatx80 a )
-{
-    uint64_t aLow;
+static inline flag floatx80_is_signaling_nan(floatx80 a) {
+  uint64_t aLow;
 
-    aLow = a.low & ~ LIT64( 0x4000000000000000 );
-    return
-           ( ( a.high & 0x7FFF ) == 0x7FFF )
-        && (uint64_t) ( aLow<<1 )
-        && ( a.low == aLow );
-
+  aLow = a.low & ~LIT64(0x4000000000000000);
+  return ((a.high & 0x7FFF) == 0x7FFF) && (uint64_t)(aLow << 1) && (a.low == aLow);
 }
 
 /*----------------------------------------------------------------------------
@@ -277,16 +251,15 @@ static inline flag floatx80_is_signaling_nan( floatx80 a )
 | invalid exception is raised.
 *----------------------------------------------------------------------------*/
 
-static inline commonNaNT floatx80ToCommonNaN( floatx80 a, float_status *status )
-{
-    commonNaNT z;
+static inline commonNaNT floatx80ToCommonNaN(floatx80 a, float_status* status) {
+  commonNaNT z;
 
-    if ( floatx80_is_signaling_nan( a ) ) float_raise( float_flag_signaling, status );
-    z.sign = a.high>>15;
-    z.low = 0;
-    z.high = a.low<<1;
-    return z;
-
+  if (floatx80_is_signaling_nan(a))
+    float_raise(float_flag_signaling, status);
+  z.sign = a.high >> 15;
+  z.low = 0;
+  z.high = a.low << 1;
+  return z;
 }
 
 /*----------------------------------------------------------------------------
@@ -294,17 +267,16 @@ static inline commonNaNT floatx80ToCommonNaN( floatx80 a, float_status *status )
 | double-precision floating-point format.
 *----------------------------------------------------------------------------*/
 
-static inline floatx80 commonNaNToFloatx80(commonNaNT a, float_status *status)
-{
-	(void)status;
-    floatx80 z;
+static inline floatx80 commonNaNToFloatx80(commonNaNT a, float_status* status) {
+  (void)status;
+  floatx80 z;
 #ifdef SOFTFLOAT_68K
-    z.low = LIT64( 0x4000000000000000 ) | ( a.high>>1 );
+  z.low = LIT64(0x4000000000000000) | (a.high >> 1);
 #else
-    z.low = LIT64( 0xC000000000000000 ) | ( a.high>>1 );
+  z.low = LIT64(0xC000000000000000) | (a.high >> 1);
 #endif
-    z.high = ( ( (int16_t) a.sign )<<15 ) | 0x7FFF;
-    return z;
+  z.high = (((int16_t)a.sign) << 15) | 0x7FFF;
+  return z;
 }
 
 /*----------------------------------------------------------------------------
@@ -313,34 +285,33 @@ static inline floatx80 commonNaNToFloatx80(commonNaNT a, float_status *status)
 | `b' is a signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
 
-static inline floatx80 propagateFloatx80NaN( floatx80 a, floatx80 b, float_status *status )
-{
-    flag aIsNaN, aIsSignalingNaN, bIsSignalingNaN;
+static inline floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b, float_status* status) {
+  flag aIsNaN, aIsSignalingNaN, bIsSignalingNaN;
 #ifndef SOFTFLOAT_68K
-    flag bIsNaN;
-#endif 
-
-	aIsNaN = floatx80_is_nan( a );
-    aIsSignalingNaN = floatx80_is_signaling_nan( a );
-    bIsSignalingNaN = floatx80_is_signaling_nan( b );
-#ifdef SOFTFLOAT_68K
-    a.low |= LIT64( 0x4000000000000000 );
-    b.low |= LIT64( 0x4000000000000000 );
-    if ( aIsSignalingNaN | bIsSignalingNaN ) float_raise( float_flag_signaling, status );
-    return aIsNaN ? a : b;
-#else
-    bIsNaN = floatx80_is_nan( b );
-    a.low |= LIT64( 0xC000000000000000 );
-    b.low |= LIT64( 0xC000000000000000 );
-    if ( aIsSignalingNaN | bIsSignalingNaN ) float_raise( float_flag_signaling, status );
-    if ( aIsNaN ) {
-        return ( aIsSignalingNaN & bIsNaN ) ? b : a;
-    }
-    else {
-        return b;
-    }
+  flag bIsNaN;
 #endif
 
+  aIsNaN = floatx80_is_nan(a);
+  aIsSignalingNaN = floatx80_is_signaling_nan(a);
+  bIsSignalingNaN = floatx80_is_signaling_nan(b);
+#ifdef SOFTFLOAT_68K
+  a.low |= LIT64(0x4000000000000000);
+  b.low |= LIT64(0x4000000000000000);
+  if (aIsSignalingNaN | bIsSignalingNaN)
+    float_raise(float_flag_signaling, status);
+  return aIsNaN ? a : b;
+#else
+  bIsNaN = floatx80_is_nan(b);
+  a.low |= LIT64(0xC000000000000000);
+  b.low |= LIT64(0xC000000000000000);
+  if (aIsSignalingNaN | bIsSignalingNaN)
+    float_raise(float_flag_signaling, status);
+  if (aIsNaN) {
+    return (aIsSignalingNaN & bIsNaN) ? b : a;
+  } else {
+    return b;
+  }
+#endif
 }
 
 #ifdef SOFTFLOAT_68K
@@ -350,13 +321,12 @@ static inline floatx80 propagateFloatx80NaN( floatx80 a, floatx80 b, float_statu
  | is raised.
  *----------------------------------------------------------------------------*/
 
-static inline floatx80 propagateFloatx80NaNOneArg(floatx80 a, float_status *status)
-{
-    if ( floatx80_is_signaling_nan( a ) )
-        float_raise( float_flag_signaling, status );
-    a.low |= LIT64( 0x4000000000000000 );
-    
-    return a;
+static inline floatx80 propagateFloatx80NaNOneArg(floatx80 a, float_status* status) {
+  if (floatx80_is_signaling_nan(a))
+    float_raise(float_flag_signaling, status);
+  a.low |= LIT64(0x4000000000000000);
+
+  return a;
 }
 #endif
 
@@ -367,11 +337,9 @@ static inline floatx80 propagateFloatx80NaNOneArg(floatx80 a, float_status *stat
  | zero; otherwise returns 0.
  *----------------------------------------------------------------------------*/
 
-static inline flag floatx80_is_zero( floatx80 a )
-{
-    
-    return ( ( a.high & 0x7FFF ) < 0x7FFF ) && ( a.low == 0 );
-    
+static inline flag floatx80_is_zero(floatx80 a) {
+
+  return ((a.high & 0x7FFF) < 0x7FFF) && (a.low == 0);
 }
 
 /*----------------------------------------------------------------------------
@@ -379,11 +347,9 @@ static inline flag floatx80_is_zero( floatx80 a )
  | infinity; otherwise returns 0.
  *----------------------------------------------------------------------------*/
 
-static inline flag floatx80_is_infinity( floatx80 a )
-{
-    
-    return ( ( a.high & 0x7FFF ) == 0x7FFF ) && ( (uint64_t) ( a.low<<1 ) == 0 );
-    
+static inline flag floatx80_is_infinity(floatx80 a) {
+
+  return ((a.high & 0x7FFF) == 0x7FFF) && ((uint64_t)(a.low << 1) == 0);
 }
 
 /*----------------------------------------------------------------------------
@@ -391,23 +357,18 @@ static inline flag floatx80_is_infinity( floatx80 a )
  | negative; otherwise returns 0.
  *----------------------------------------------------------------------------*/
 
-static inline flag floatx80_is_negative( floatx80 a )
-{
-    
-    return ( ( a.high & 0x8000 ) == 0x8000 );
-    
+static inline flag floatx80_is_negative(floatx80 a) {
+
+  return ((a.high & 0x8000) == 0x8000);
 }
 
 /*----------------------------------------------------------------------------
  | Returns 1 if the extended double-precision floating-point value `a' is
  | unnormal; otherwise returns 0.
  *----------------------------------------------------------------------------*/
-static inline flag floatx80_is_unnormal( floatx80 a )
-{
-	return
-		( ( a.high & 0x7FFF ) > 0 )
-		&& ( ( a.high & 0x7FFF ) < 0x7FFF)
-		&& ( (uint64_t) ( a.low & LIT64( 0x8000000000000000 ) ) == LIT64( 0x0000000000000000 ) );
+static inline flag floatx80_is_unnormal(floatx80 a) {
+  return ((a.high & 0x7FFF) > 0) && ((a.high & 0x7FFF) < 0x7FFF) &&
+         ((uint64_t)(a.low & LIT64(0x8000000000000000)) == LIT64(0x0000000000000000));
 }
 
 /*----------------------------------------------------------------------------
@@ -415,12 +376,10 @@ static inline flag floatx80_is_unnormal( floatx80 a )
  | denormal; otherwise returns 0.
  *----------------------------------------------------------------------------*/
 
-static inline flag floatx80_is_denormal( floatx80 a )
-{
-	return
-		( ( a.high & 0x7FFF ) == 0 )
-		&& ( (uint64_t) ( a.low & LIT64( 0x8000000000000000 ) ) == LIT64( 0x0000000000000000 ) )
-		&& (uint64_t) ( a.low<<1 );
+static inline flag floatx80_is_denormal(floatx80 a) {
+  return ((a.high & 0x7FFF) == 0) &&
+         ((uint64_t)(a.low & LIT64(0x8000000000000000)) == LIT64(0x0000000000000000)) &&
+         (uint64_t)(a.low << 1);
 }
 
 /*----------------------------------------------------------------------------
@@ -428,11 +387,8 @@ static inline flag floatx80_is_denormal( floatx80 a )
  | normal; otherwise returns 0.
  *----------------------------------------------------------------------------*/
 
-static inline flag floatx80_is_normal( floatx80 a )
-{
-	return
-		( ( a.high & 0x7FFF ) < 0x7FFF )
-		&& ( (uint64_t) ( a.low & LIT64( 0x8000000000000000 ) ) == LIT64( 0x8000000000000000 ) );
+static inline flag floatx80_is_normal(floatx80 a) {
+  return ((a.high & 0x7FFF) < 0x7FFF) &&
+         ((uint64_t)(a.low & LIT64(0x8000000000000000)) == LIT64(0x8000000000000000));
 }
 // End of addition for Previous
-

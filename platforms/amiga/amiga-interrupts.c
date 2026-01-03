@@ -6,7 +6,7 @@
 #include "amiga-interrupts.h"
 #include "gpio/ps_protocol.h"
 
-static const uint8_t IPL[14] = {1, 1, 1, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 6 };
+static const uint8_t IPL[14] = {1, 1, 1, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 6};
 
 uint16_t emulated_irqs = 0x0000;
 uint8_t emulated_ipl;
@@ -33,7 +33,7 @@ void amiga_clear_emulating_irq() {
   emulated_ipl = 0;
 }
 
-inline int amiga_handle_intrqr_read(uint32_t *res) {
+inline int amiga_handle_intrqr_read(uint32_t* res) {
   if (emulated_irqs) {
     *res = ps_read_16(INTREQR) | emulated_irqs;
     return 1;

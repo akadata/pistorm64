@@ -1,28 +1,29 @@
 /**********************************************************************************************
-*
-*   raylib.uwp_events - Functions for bootstrapping UWP functionality within raylib's core.
-*
-*
-*   LICENSE: zlib/libpng
-*
-*   Copyright (c) 2020-2020 Reece Mackie (@Rover656)
-*
-*   This software is provided "as-is", without any express or implied warranty. In no event
-*   will the authors be held liable for any damages arising from the use of this software.
-*
-*   Permission is granted to anyone to use this software for any purpose, including commercial
-*   applications, and to alter it and redistribute it freely, subject to the following restrictions:
-*
-*     1. The origin of this software must not be misrepresented; you must not claim that you
-*     wrote the original software. If you use this software in a product, an acknowledgment
-*     in the product documentation would be appreciated but is not required.
-*
-*     2. Altered source versions must be plainly marked as such, and must not be misrepresented
-*     as being the original software.
-*
-*     3. This notice may not be removed or altered from any source distribution.
-*
-**********************************************************************************************/
+ *
+ *   raylib.uwp_events - Functions for bootstrapping UWP functionality within raylib's core.
+ *
+ *
+ *   LICENSE: zlib/libpng
+ *
+ *   Copyright (c) 2020-2020 Reece Mackie (@Rover656)
+ *
+ *   This software is provided "as-is", without any express or implied warranty. In no event
+ *   will the authors be held liable for any damages arising from the use of this software.
+ *
+ *   Permission is granted to anyone to use this software for any purpose, including commercial
+ *   applications, and to alter it and redistribute it freely, subject to the following
+ *restrictions:
+ *
+ *     1. The origin of this software must not be misrepresented; you must not claim that you
+ *     wrote the original software. If you use this software in a product, an acknowledgment
+ *     in the product documentation would be appreciated but is not required.
+ *
+ *     2. Altered source versions must be plainly marked as such, and must not be misrepresented
+ *     as being the original software.
+ *
+ *     3. This notice may not be removed or altered from any source distribution.
+ *
+ **********************************************************************************************/
 
 #ifndef UWP_EVENTS_H
 #define UWP_EVENTS_H
@@ -40,7 +41,7 @@ bool UWPIsConfigured();
 void UWPSetDataPath(const char* path);
 
 // Function for getting program time.
-typedef double(*UWPQueryTimeFunc)();
+typedef double (*UWPQueryTimeFunc)();
 UWPQueryTimeFunc UWPGetQueryTimeFunc(void);
 void UWPSetQueryTimeFunc(UWPQueryTimeFunc func);
 
@@ -50,12 +51,12 @@ UWPSleepFunc UWPGetSleepFunc(void);
 void UWPSetSleepFunc(UWPSleepFunc func);
 
 // Function for querying the display size
-typedef void(*UWPDisplaySizeFunc)(int* width, int* height);
+typedef void (*UWPDisplaySizeFunc)(int* width, int* height);
 UWPDisplaySizeFunc UWPGetDisplaySizeFunc(void);
 void UWPSetDisplaySizeFunc(UWPDisplaySizeFunc func);
 
 // Functions for mouse cursor control
-typedef void(*UWPMouseFunc)(void);
+typedef void (*UWPMouseFunc)(void);
 UWPMouseFunc UWPGetMouseLockFunc();
 void UWPSetMouseLockFunc(UWPMouseFunc func);
 UWPMouseFunc UWPGetMouseUnlockFunc();
@@ -70,8 +71,8 @@ typedef void (*UWPMouseSetPosFunc)(int x, int y);
 UWPMouseSetPosFunc UWPGetMouseSetPosFunc();
 void UWPSetMouseSetPosFunc(UWPMouseSetPosFunc func);
 
-// The below functions are implemented in core.c but are placed here so they can be called by user code.
-// This choice is made as platform-specific code is preferred to be kept away from raylib.h
+// The below functions are implemented in core.c but are placed here so they can be called by user
+// code. This choice is made as platform-specific code is preferred to be kept away from raylib.h
 
 // Call this when a Key is pressed or released.
 void UWPKeyDownEvent(int key, bool down, bool controlKey);

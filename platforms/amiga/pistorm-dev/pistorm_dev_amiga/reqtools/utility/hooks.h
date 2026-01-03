@@ -16,10 +16,10 @@
 #endif /* EXEC_NODES_H */
 
 struct Hook {
-   struct MinNode h_MinNode;
-   ULONG (*h_Entry)();
-   ULONG (*h_SubEntry)();
-   APTR h_Data;
-   };
+  struct MinNode h_MinNode;
+  ULONG (*h_Entry)();
+  ULONG (*h_SubEntry)();
+  APTR h_Data;
+};
 
 #endif /* UTILITY_HOOKS_H */

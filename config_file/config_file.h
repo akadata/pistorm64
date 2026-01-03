@@ -67,16 +67,17 @@ struct emulator_config {
   unsigned long map_high[MAX_NUM_MAPPED_ITEMS];
   unsigned int map_size[MAX_NUM_MAPPED_ITEMS];
   unsigned int rom_size[MAX_NUM_MAPPED_ITEMS];
-  unsigned char *map_data[MAX_NUM_MAPPED_ITEMS];
+  unsigned char* map_data[MAX_NUM_MAPPED_ITEMS];
   unsigned int map_mirror[MAX_NUM_MAPPED_ITEMS];
-  char *map_id[MAX_NUM_MAPPED_ITEMS];
+  char* map_id[MAX_NUM_MAPPED_ITEMS];
 
-  struct platform_config *platform;
+  struct platform_config* platform;
 
   char *mouse_file, *keyboard_file;
 
   char mouse_toggle_key, keyboard_toggle_key;
-  unsigned char mouse_enabled, mouse_autoconnect, keyboard_enabled, keyboard_grab, keyboard_autoconnect;
+  unsigned char mouse_enabled, mouse_autoconnect, keyboard_enabled, keyboard_grab,
+      keyboard_autoconnect;
 
   unsigned int loop_cycles;
   unsigned char enable_jit;
@@ -86,35 +87,41 @@ struct emulator_config {
 };
 
 struct platform_config {
-  char *subsys;
+  char* subsys;
   unsigned char id;
 
-  int (*custom_read)(struct emulator_config *cfg, unsigned int addr, unsigned int *val, unsigned char type);
-  int (*custom_write)(struct emulator_config *cfg, unsigned int addr, unsigned int val, unsigned char type);
+  int (*custom_read)(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
+                     unsigned char type);
+  int (*custom_write)(struct emulator_config* cfg, unsigned int addr, unsigned int val,
+                      unsigned char type);
 
-  int (*register_read)(unsigned int addr, unsigned char type, unsigned int *val);
+  int (*register_read)(unsigned int addr, unsigned char type, unsigned int* val);
   int (*register_write)(unsigned int addr, unsigned int value, unsigned char type);
 
-  int (*platform_initial_setup)(struct emulator_config *cfg);
-  void (*handle_reset)(struct emulator_config *cfg);
-  void (*shutdown)(struct emulator_config *cfg);
-  void (*setvar)(struct emulator_config *cfg, char *var, char *val);
+  int (*platform_initial_setup)(struct emulator_config* cfg);
+  void (*handle_reset)(struct emulator_config* cfg);
+  void (*shutdown)(struct emulator_config* cfg);
+  void (*setvar)(struct emulator_config* cfg, char* var, char* val);
 };
 
 #ifdef __cplusplus
-extern "C" int get_mapped_item_by_address(struct emulator_config *cfg, uint32_t address);
+extern "C" int get_mapped_item_by_address(struct emulator_config* cfg, uint32_t address);
 #else
-unsigned int get_m68k_cpu_type(char *name);
-struct emulator_config *load_config_file(char *filename);
-void free_config_file(struct emulator_config *cfg);
+unsigned int get_m68k_cpu_type(char* name);
+struct emulator_config* load_config_file(char* filename);
+void free_config_file(struct emulator_config* cfg);
 
-int handle_mapped_read(struct emulator_config *cfg, unsigned int addr, unsigned int *val, unsigned char type);
-int handle_mapped_write(struct emulator_config *cfg, unsigned int addr, unsigned int value, unsigned char type);
-int get_named_mapped_item(struct emulator_config *cfg, char *name);
-int get_mapped_item_by_address(struct emulator_config *cfg, uint32_t address);
-uint8_t *get_mapped_data_pointer_by_address(struct emulator_config *cfg, uint32_t address);
-void add_mapping(struct emulator_config *cfg, unsigned int type, unsigned int addr, unsigned int size, int mirr_addr, char *filename, char *map_id, unsigned int autodump);
-unsigned int get_int(char *str);
+int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
+                       unsigned char type);
+int handle_mapped_write(struct emulator_config* cfg, unsigned int addr, unsigned int value,
+                        unsigned char type);
+int get_named_mapped_item(struct emulator_config* cfg, char* name);
+int get_mapped_item_by_address(struct emulator_config* cfg, uint32_t address);
+uint8_t* get_mapped_data_pointer_by_address(struct emulator_config* cfg, uint32_t address);
+void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int addr,
+                 unsigned int size, int mirr_addr, char* filename, char* map_id,
+                 unsigned int autodump);
+unsigned int get_int(char* str);
 #endif
 
 #endif /* _CONFIG_FILE_H */

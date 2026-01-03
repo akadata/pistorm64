@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 
 //
 //  Gayle.h
@@ -25,14 +25,14 @@ uint16_t readGayle(unsigned int address);
 uint32_t readGayleL(unsigned int address);
 
 // Gayle Addresses
-#define GAYLE_IDE_BASE_A1200 0xDA2000 //16bit base
+#define GAYLE_IDE_BASE_A1200 0xDA2000 // 16bit base
 #define GAYLE_IDE_BASE_A4000 0xDD2020
 
 // Gayle IDE Reads
-#define GERROR 0xda2004   // Error
-#define GSTATUS 0xda201C  // Status
-#define GERROR_A4000 GAYLE_IDE_BASE_A4000 + 0x06   // Error
-#define GSTATUS_A4000 GAYLE_IDE_BASE_A4000 + 0x1E  // Status
+#define GERROR 0xda2004                           // Error
+#define GSTATUS 0xda201C                          // Status
+#define GERROR_A4000 GAYLE_IDE_BASE_A4000 + 0x06  // Error
+#define GSTATUS_A4000 GAYLE_IDE_BASE_A4000 + 0x1E // Status
 
 // Gayle IDE read offsets
 #define GERROR_OFFSET 0x04
@@ -52,32 +52,32 @@ uint32_t readGayleL(unsigned int address);
 #define GIRQ_4000_OFFSET 0x1002
 
 // Gayle IDE Writes
-#define GFEAT 0xda2004  // Write : Feature
-#define GCMD 0xda201c   // Write : Command
-#define GFEAT_A4000 GAYLE_IDE_BASE_A4000 + 0x06  // Write : Feature
-#define GCMD_A4000 GAYLE_IDE_BASE_A4000 + 0x1E   // Write : Command
-#define GMODEREG0_A4000 0x0DD1020   // D31, PIO modes (00,01,10)
-#define GMODEREG1_A4000 0x0DD1022   // D31, (MSB)
+#define GFEAT 0xda2004                          // Write : Feature
+#define GCMD 0xda201c                           // Write : Command
+#define GFEAT_A4000 GAYLE_IDE_BASE_A4000 + 0x06 // Write : Feature
+#define GCMD_A4000 GAYLE_IDE_BASE_A4000 + 0x1E  // Write : Command
+#define GMODEREG0_A4000 0x0DD1020               // D31, PIO modes (00,01,10)
+#define GMODEREG1_A4000 0x0DD1022               // D31, (MSB)
 
 // Gayle IDE RW
-#define GDATA 0xda2000     // Data - 16 bit
-#define GSECTCNT 0xda2008  // SectorCount
-#define GSECTNUM 0xda200c  // SectorNumber
-#define GCYLLOW 0xda2010   // CylinderLow
-#define GCYLHIGH 0xda2014  // CylinderHigh
-#define GDEVHEAD 0xda2018  // Device/Head
-#define GCTRL 0xda3018     // Control
+#define GDATA 0xda2000    // Data - 16 bit
+#define GSECTCNT 0xda2008 // SectorCount
+#define GSECTNUM 0xda200c // SectorNumber
+#define GCYLLOW 0xda2010  // CylinderLow
+#define GCYLHIGH 0xda2014 // CylinderHigh
+#define GDEVHEAD 0xda2018 // Device/Head
+#define GCTRL 0xda3018    // Control
 
-#define GDATA_A4000 GAYLE_IDE_BASE_A4000     // Data
-#define GSECTCNT_A4000 GAYLE_IDE_BASE_A4000 + 0x0a  // SectorCount
-#define GSECTNUM_A4000 GAYLE_IDE_BASE_A4000 + 0x0e  // SectorNumber
-#define GCYLLOW_A4000 GAYLE_IDE_BASE_A4000 + 0x12   // CylinderLow
-#define GCYLHIGH_A4000 GAYLE_IDE_BASE_A4000 + 0x16  // CylinderHigh
-#define GDEVHEAD_A4000 GAYLE_IDE_BASE_A4000 + 0x1a  // Device/Head
-#define GCTRL_A4000 GAYLE_IDE_BASE_A4000 + 0x101a     // Control
+#define GDATA_A4000 GAYLE_IDE_BASE_A4000           // Data
+#define GSECTCNT_A4000 GAYLE_IDE_BASE_A4000 + 0x0a // SectorCount
+#define GSECTNUM_A4000 GAYLE_IDE_BASE_A4000 + 0x0e // SectorNumber
+#define GCYLLOW_A4000 GAYLE_IDE_BASE_A4000 + 0x12  // CylinderLow
+#define GCYLHIGH_A4000 GAYLE_IDE_BASE_A4000 + 0x16 // CylinderHigh
+#define GDEVHEAD_A4000 GAYLE_IDE_BASE_A4000 + 0x1a // Device/Head
+#define GCTRL_A4000 GAYLE_IDE_BASE_A4000 + 0x101a  // Control
 
 // For A4000 there's no need to populate other areas, just GIRQ
-#define GIRQ_A4000 GAYLE_IDE_BASE_A4000 + 0x1000  // IRQ  0xDD3020
+#define GIRQ_A4000 GAYLE_IDE_BASE_A4000 + 0x1000 // IRQ  0xDD3020
 
 // Gayle Ident
 #define GIDENT 0xDE1000
@@ -86,7 +86,7 @@ uint32_t readGayleL(unsigned int address);
 #define GCS 0xDA8000   // Card Control
 #define GIRQ 0xDA9000  // IRQ
 #define GINT 0xDAA000  // Int enable
-#define GCONF 0xDAB000  // Gayle Config
+#define GCONF 0xDAB000 // Gayle Config
 
 /* DA8000 */
 #define GAYLE_CS_IDE 0x80   /* IDE int status */
