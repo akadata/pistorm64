@@ -31,4 +31,8 @@ void m68k_write_memory_32(unsigned int address, unsigned int value);
 
 void stop_cpu_emulation(uint8_t disasm_cur);
 
+
+void pistorm_selftest_alignment(void);
+
+
 #endif /* _EMULATOR_H */
