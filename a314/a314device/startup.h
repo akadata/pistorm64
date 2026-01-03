@@ -12,7 +12,7 @@
 #define SIGF_INT (1 << SIGB_INT)
 #define SIGF_MSGPORT (1 << SIGB_MSGPORT)
 
-extern struct Task *task;
+extern struct Task* task;
 extern struct MsgPort task_mp;
 
 extern BOOL task_start();

@@ -9,7 +9,7 @@ uint8_t dmac_reg_idx = 0;
 uint8_t dmac_reg_values[0xFFFF];
 
 uint8_t cdtv_dmac_reg_idx_read() {
-    return dmac_reg_idx;
+  return dmac_reg_idx;
 }
 
 /* DMAC Registers
@@ -42,32 +42,32 @@ W   0xA8?[W?]   - Something
 */
 
 void cdtv_dmac_reg_idx_write(uint8_t value) {
-    dmac_reg_idx = value;
+  dmac_reg_idx = value;
 }
 
 uint32_t cdtv_dmac_read(uint32_t address, uint8_t type) {
-    uint32_t ret = 0;
+  uint32_t ret = 0;
 
-    switch (type) {
-        case OP_TYPE_BYTE:
-            return dmac_reg_values[address];
-        case OP_TYPE_WORD:
-            return be16toh(*((uint16_t *)&dmac_reg_values[address]));
-        default:
-            break;
-    }
+  switch (type) {
+  case OP_TYPE_BYTE:
+    return dmac_reg_values[address];
+  case OP_TYPE_WORD:
+    return be16toh(*((uint16_t*)&dmac_reg_values[address]));
+  default:
+    break;
+  }
 
-    return ret;
+  return ret;
 }
 
 void cdtv_dmac_write(uint32_t address, uint32_t value, uint8_t type) {
-    switch (type) {
-        case OP_TYPE_BYTE:
-            dmac_reg_values[address] = (uint8_t)value;
-            return ;
-        case OP_TYPE_WORD:
-            printf("Help, it's a scary word write.\n");
-            *((uint16_t *)&dmac_reg_values[address]) = htobe16(value);
-            return;
-    }
+  switch (type) {
+  case OP_TYPE_BYTE:
+    dmac_reg_values[address] = (uint8_t)value;
+    return;
+  case OP_TYPE_WORD:
+    printf("Help, it's a scary word write.\n");
+    *((uint16_t*)&dmac_reg_values[address]) = htobe16(value);
+    return;
+  }
 }

@@ -51,7 +51,7 @@ typedef sint64 sbits64;
 | name for the 64-bit integer type.  Some compilers may allow `LIT64' to be
 | defined as the identity macro:  `#define LIT64( a ) a'.
 *----------------------------------------------------------------------------*/
-#define LIT64( a ) a##ULL
+#define LIT64(a) a##ULL
 
 /*----------------------------------------------------------------------------
 | The macro `INLINE' can be used before functions that should be inlined.  If

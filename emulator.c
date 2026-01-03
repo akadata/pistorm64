@@ -56,7 +56,8 @@ int spoof_df0_id = 0;
 int move_slow_to_chip = 0;
 int force_move_slow_to_chip = 0;
 
-uint8_t mouse_dx = 0, mouse_dy = 0;
+uint8_t mouse_dx = 0;
+uint8_t mouse_dy = 0;
 uint8_t mouse_buttons = 0;
 uint8_t mouse_extra = 0;
 
@@ -64,49 +65,58 @@ extern uint8_t gayle_int;
 extern uint8_t gayle_ide_enabled;
 extern uint8_t gayle_emulation_enabled;
 extern uint8_t gayle_a4k_int;
-extern volatile unsigned int *gpio;
+extern volatile unsigned int* gpio;
 extern volatile uint16_t srdata;
-extern uint8_t realtime_graphics_debug, emulator_exiting;
+extern uint8_t realtime_graphics_debug;
+extern uint8_t emulator_exiting;
 extern uint8_t rtg_on;
-uint8_t realtime_disassembly, int2_enabled = 0;
-uint32_t do_disasm = 0, old_level;
-uint32_t last_irq = 8, last_last_irq = 8;
+
+uint8_t realtime_disassembly;
+uint8_t int2_enabled = 0;
+
+uint32_t do_disasm = 0;
+uint32_t old_level;
+uint32_t last_irq = 8;
+uint32_t last_last_irq = 8;
 
 uint8_t ipl_enabled[8];
 
-uint8_t end_signal = 0, load_new_config = 0;
+uint8_t end_signal = 0;
+uint8_t load_new_config = 0;
 uint8_t enable_jit_backend = 0;
 uint8_t enable_fpu_jit_backend = 0;
-static int (*fpu_exec_hook)(m68ki_cpu_core *state, uint16_t opcode) = NULL;
+static int (*fpu_exec_hook)(m68ki_cpu_core* state, uint16_t opcode) = NULL;
 
 char disasm_buf[4096];
 
 #define KICKBASE 0xF80000
 #define KICKSIZE 0x7FFFF
 
-int mem_fd, mouse_fd = -1, keyboard_fd = -1;
+int mem_fd, mouse_fd = -1;
+int keyboard_fd = -1;
 int mem_fd_gpclk;
 int irq;
 int gayleirq;
 
-#define CORE_AUTO   -1
-#define CORE_CPU     1
-#define CORE_IO      2
-#define CORE_INPUT   3
-#define CORE_IPL     0
+#define CORE_AUTO -1
+#define CORE_CPU 1
+#define CORE_IO 2
+#define CORE_INPUT 3
+#define CORE_IPL 0
 
-#define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1,io=2,input=3,ipl=0"
-#define PI_RT_ENV       "PISTORM_RT"       // e.g. "cpu=60,io=40,input=80,ipl=70"
-#define RT_DEFAULT_CPU     60
-#define RT_DEFAULT_IO      40
-#define RT_DEFAULT_INPUT   80
-#define RT_DEFAULT_IPL     70
+#define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1, io=2, input=3, ipl=0"
+#define PI_RT_ENV "PISTORM_RT"             // e.g. "cpu=60, io=40, input=80, ipl=70"
+
+#define RT_DEFAULT_CPU 60
+#define RT_DEFAULT_IO 40
+#define RT_DEFAULT_INPUT 80
+#define RT_DEFAULT_IPL 70
 
 // Forward declarations for helpers used before their definitions.
 static inline uint8_t opcode_is_fpu(uint16_t opcode);
-static void apply_affinity_from_env(const char *role, int default_core);
-static void set_realtime_priority(const char *name, int prio);
-static void apply_realtime_from_env(const char *role, int default_prio);
+static void apply_affinity_from_env(const char* role, int default_core);
+static void set_realtime_priority(const char* name, int prio);
+static void apply_realtime_from_env(const char* role, int default_prio);
 
 #define MUSASHI_HAX
 
@@ -116,18 +126,24 @@ extern m68ki_cpu_core m68ki_cpu;
 extern int m68ki_initial_cycles;
 extern int m68ki_remaining_cycles;
 
-#define M68K_SET_IRQ(i) old_level = CPU_INT_LEVEL; \
-	CPU_INT_LEVEL = (i << 8); \
-	if(old_level != 0x0700 && CPU_INT_LEVEL == 0x0700) \
-		m68ki_cpu.nmi_pending = TRUE;
-#define M68K_END_TIMESLICE 	m68ki_initial_cycles = GET_CYCLES(); \
-	SET_CYCLES(0);
+#define M68K_SET_IRQ(i)                                                                            \
+  old_level = CPU_INT_LEVEL;                                                                       \
+  CPU_INT_LEVEL = (i << 8);                                                                        \
+  if (old_level != 0x0700 && CPU_INT_LEVEL == 0x0700)                                              \
+    m68ki_cpu.nmi_pending = TRUE;
+#define M68K_END_TIMESLICE                                                                         \
+  m68ki_initial_cycles = GET_CYCLES();                                                             \
+  SET_CYCLES(0);
 #else
 #define M68K_SET_IRQ m68k_set_irq
 #define M68K_END_TIMESLICE m68k_end_timeslice()
 #endif
 
-#define NOP asm("nop"); asm("nop"); asm("nop"); asm("nop");
+#define NOP                                                                                        \
+  asm("nop");                                                                                      \
+  asm("nop");                                                                                      \
+  asm("nop");                                                                                      \
+  asm("nop");
 
 #define DEBUG_EMULATOR
 #ifdef DEBUG_EMULATOR
@@ -138,83 +154,80 @@ extern int m68ki_remaining_cycles;
 
 // Configurable emulator options
 unsigned int cpu_type = M68K_CPU_TYPE_68000;
-unsigned int loop_cycles = 300, irq_status = 0;
+unsigned int loop_cycles = 300;
+unsigned int irq_status = 0;
+
 static const unsigned int loop_cycles_cap = 10000; // cap slices to keep service latency reasonable
-struct emulator_config *cfg = NULL;
+struct emulator_config* cfg = NULL;
 char keyboard_file[256] = "/dev/input/event1";
 
 uint64_t trig_irq = 0, serv_irq = 0;
 uint16_t irq_delay = 0;
-unsigned int amiga_reset=0, amiga_reset_last=0;
-unsigned int do_reset=0;
+unsigned int amiga_reset = 0;
+unsigned int amiga_reset_last = 0;
+unsigned int do_reset = 0;
 
-void *ipl_task(void *args) {
+void* ipl_task(void* args) {
   printf("IPL thread running\n");
   uint16_t old_irq = 0;
   uint32_t value;
 
   while (1) {
     value = *(gpio + 13);
-    if (value & (1 << PIN_TXN_IN_PROGRESS))
+    if (value & (1 << PIN_TXN_IN_PROGRESS)) {
       goto noppers;
+    }
 
     if (!(value & (1 << PIN_IPL_ZERO)) || ipl_enabled[amiga_emulated_ipl()]) {
       old_irq = irq_delay;
-      //NOP
+      // NOP
       if (!irq) {
         M68K_END_TIMESLICE;
-        NOP
-        irq = 1;
+        NOP irq = 1;
       }
-      //usleep(0);
-    }
-    else {
+      // usleep( 0 );
+    } else {
       if (irq) {
         if (old_irq) {
           old_irq--;
-        }
-        else {
+        } else {
           irq = 0;
         }
         M68K_END_TIMESLICE;
         NOP
-        //usleep(0);
+        // usleep( 0 );
       }
     }
-    if(do_reset==0)
-    {
-      amiga_reset=(value & (1 << PIN_RESET));
-      if(amiga_reset!=amiga_reset_last)
-      {
-        amiga_reset_last=amiga_reset;
-        if(amiga_reset==0)
-        {
+    if (do_reset == 0) {
+      amiga_reset = (value & (1 << PIN_RESET));
+      if (amiga_reset != amiga_reset_last) {
+        amiga_reset_last = amiga_reset;
+        if (amiga_reset == 0) {
           printf("Amiga Reset is down...\n");
-          do_reset=1;
+          do_reset = 1;
           M68K_END_TIMESLICE;
-        }
-        else
-        {
+        } else {
           printf("Amiga Reset is up...\n");
         }
       }
     }
 
-    /*if (gayle_ide_enabled) {
-      if (((gayle_int & 0x80) || gayle_a4k_int) && (get_ide(0)->drive[0].intrq || get_ide(0)->drive[1].intrq)) {
-        //get_ide(0)->drive[0].intrq = 0;
+    /*if ( gayle_ide_enabled ) {
+      if ( ( ( gayle_int & 0x80 ) || gayle_a4k_int ) && ( get_ide( 0 )->drive[0].intrq || get_ide( 0
+    )->drive[1].intrq ) ) {
+        //get_ide( 0 )->drive[0].intrq = 0;
         gayleirq = 1;
         M68K_END_TIMESLICE;
       }
       else
         gayleirq = 0;
     }*/
-    //usleep(0);
-    //NOP NOP
-noppers:
+    // usleep( 0 );
+    // NOP NOP
+  noppers:
     NOP NOP NOP NOP NOP NOP NOP NOP
-    //NOP NOP NOP NOP NOP NOP NOP NOP
-    //NOP NOP NOP NOP NOP NOP NOP NOP
+    // NOP NOP NOP NOP NOP NOP NOP NOP
+    // NOP NOP NOP NOP NOP NOP NOP NOP
     /*NOP NOP NOP NOP NOP NOP NOP NOP
     NOP NOP NOP NOP NOP NOP NOP NOP
     NOP NOP NOP NOP NOP NOP NOP NOP*/
@@ -222,161 +235,166 @@ noppers:
   return args;
 }
 
-static inline void m68k_execute_bef(m68ki_cpu_core *state, int num_cycles)
-{
-	/* eat up any reset cycles */
-	if (RESET_CYCLES) {
-	    int rc = RESET_CYCLES;
-	    RESET_CYCLES = 0;
-	    num_cycles -= rc;
-	    if (num_cycles <= 0)
-		return;
-	}
+static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
+  /* eat up any reset cycles */
+  if (RESET_CYCLES) {
+    int rc = RESET_CYCLES;
+    RESET_CYCLES = 0;
+    num_cycles -= rc;
+    if (num_cycles <= 0)
+      return;
+  }
 
-	/* Set our pool of clock cycles available */
-	SET_CYCLES(num_cycles);
-	m68ki_initial_cycles = num_cycles;
+  /* Set our pool of clock cycles available */
+  SET_CYCLES(num_cycles);
+  m68ki_initial_cycles = num_cycles;
 
-	/* See if interrupts came in */
-	m68ki_check_interrupts(state);
+  /* See if interrupts came in */
+  m68ki_check_interrupts(state);
 
-	/* Make sure we're not stopped */
-	if(!CPU_STOPPED)
-	{
-		/* Return point if we had an address error */
-		m68ki_set_address_error_trap(state); /* auto-disable (see m68kcpu.h) */
+  /* Make sure we're not stopped */
+  if (!CPU_STOPPED) {
+    /* Return point if we had an address error */
+    m68ki_set_address_error_trap(state); /* auto-disable ( see m68kcpu.h ) */
 
 #ifdef M68K_BUSERR_THING
-		m68ki_check_bus_error_trap();
+    m68ki_check_bus_error_trap();
 #endif
 
-		/* Main loop.  Keep going until we run out of clock cycles */
-		do
-		{
-			/* Set tracing according to T1. (T0 is done inside instruction) */
-			m68ki_trace_t1(); /* auto-disable (see m68kcpu.h) */
+    /* Main loop.  Keep going until we run out of clock cycles */
+    do {
+      /* Set tracing according to T1. ( T0 is done inside instruction ) */
+      m68ki_trace_t1(); /* auto-disable ( see m68kcpu.h ) */
 
-			/* Set the address space for reads */
-			m68ki_use_data_space(); /* auto-disable (see m68kcpu.h) */
+      /* Set the address space for reads */
+      m68ki_use_data_space(); /* auto-disable ( see m68kcpu.h ) */
 
-			/* Call external hook to peek at CPU */
-			m68ki_instr_hook(REG_PC); /* auto-disable (see m68kcpu.h) */
+      /* Call external hook to peek at CPU */
+      m68ki_instr_hook(REG_PC); /* auto-disable ( see m68kcpu.h ) */
 
-			/* Record previous program counter */
-			REG_PPC = REG_PC;
+      /* Record previous program counter */
+      REG_PPC = REG_PC;
 
-			/* Record previous D/A register state (in case of bus error) */
+      /* Record previous D/A register state ( in case of bus error ) */
 //#define M68K_BUSERR_THING
 #ifdef M68K_BUSERR_THING
-			for (int i = 15; i >= 0; i--){
-				REG_DA_SAVE[i] = REG_DA[i];
-			}
+      for (int i = 15; i >= 0; i--) {
+        REG_DA_SAVE[i] = REG_DA[i];
+      }
 #endif
 
-			/* Read an instruction and call its handler */
-			REG_IR = m68ki_read_imm_16(state);
+      /* Read an instruction and call its handler */
+      REG_IR = m68ki_read_imm_16(state);
       if (fpu_exec_hook && opcode_is_fpu(REG_IR)) {
         fpu_exec_hook(state, REG_IR);
       } else {
         m68ki_instruction_jump_table[REG_IR](state);
       }
-			USE_CYCLES(CYC_INSTRUCTION[REG_IR]);
+      USE_CYCLES(CYC_INSTRUCTION[REG_IR]);
 
-			/* Trace m68k_exception, if necessary */
-			m68ki_exception_if_trace(state); /* auto-disable (see m68kcpu.h) */
-		} while(GET_CYCLES() > 0);
+      /* Trace m68k_exception, if necessary */
+      m68ki_exception_if_trace(state); /* auto-disable ( see m68kcpu.h ) */
+    } while (GET_CYCLES() > 0);
 
-		/* set previous PC to current PC for the next entry into the loop */
-		REG_PPC = REG_PC;
-	}
-	else
-		SET_CYCLES(0);
+    /* set previous PC to current PC for the next entry into the loop */
+    REG_PPC = REG_PC;
+  } else {
+    SET_CYCLES(0);
+  }
 
-	/* return how many clocks we used */
-	return;
+  /* return how many clocks we used */
+  return;
 }
 
-// Backend wrappers (Musashi default, JIT stub delegates to Musashi for now).
-void musashi_backend_execute(m68ki_cpu_core *state, int cycles) {
-    m68k_execute_bef(state, cycles);
+// Backend wrappers ( Musashi default, JIT stub delegates to Musashi for now ).
+void musashi_backend_execute(m68ki_cpu_core* state, int cycles) {
+  m68k_execute_bef(state, cycles);
 }
 
 void musashi_backend_set_irq(int level) {
-    M68K_SET_IRQ(level);
+  M68K_SET_IRQ(level);
 }
 
 // FPU backend stub: routes F-line opcodes through JIT path when enabled.
 static inline uint8_t opcode_is_fpu(uint16_t opcode) {
-    return ((opcode & 0xF000) == 0xF000);
+  return ((opcode & 0xF000) == 0xF000);
 }
 
 // Tiny fast-path placeholder: try a host-side translation first, otherwise fall back.
-static inline int fpu_translate_fastpath(m68ki_cpu_core *state, uint16_t opcode) {
-    // TODO: implement host-side float ops translation. Currently always fall back.
-    (void)state;
-    (void)opcode;
-    return 0;
+static inline int fpu_translate_fastpath(m68ki_cpu_core* state, uint16_t opcode) {
+  // TODO: implement host-side float ops translation. Currently always fall back.
+  (void)state;
+  (void)opcode;
+  return 0;
 }
 
-static inline int fpu_backend_execute(m68ki_cpu_core *state, uint16_t opcode) {
-    if (fpu_translate_fastpath(state, opcode)) {
-        return 1;
-    }
-    m68ki_instruction_jump_table[opcode](state);
+static inline int fpu_backend_execute(m68ki_cpu_core* state, uint16_t opcode) {
+  if (fpu_translate_fastpath(state, opcode)) {
     return 1;
+  }
+  m68ki_instruction_jump_table[opcode](state);
+  return 1;
 }
 
-void jit_backend_execute(m68ki_cpu_core *state, int cycles) {
-    musashi_backend_execute(state, cycles);
+void jit_backend_execute(m68ki_cpu_core* state, int cycles) {
+  musashi_backend_execute(state, cycles);
 }
 
 void jit_backend_set_irq(int level) {
-    musashi_backend_set_irq(level);
+  musashi_backend_set_irq(level);
 }
 
-static inline void cpu_backend_execute(m68ki_cpu_core *state, int cycles) {
-    if (enable_jit_backend) {
-        jit_backend_execute(state, cycles);
-    } else {
-        musashi_backend_execute(state, cycles);
-    }
+static inline void cpu_backend_execute(m68ki_cpu_core* state, int cycles) {
+  if (enable_jit_backend) {
+    jit_backend_execute(state, cycles);
+  } else {
+    musashi_backend_execute(state, cycles);
+  }
 }
 
 static inline void cpu_backend_set_irq(int level) {
-    if (enable_jit_backend) {
-        jit_backend_set_irq(level);
-    } else {
-        musashi_backend_set_irq(level);
-    }
+  if (enable_jit_backend) {
+    jit_backend_set_irq(level);
+  } else {
+    musashi_backend_set_irq(level);
+  }
 }
 
-void *cpu_task() {
-	m68ki_cpu_core *state = &m68ki_cpu;
+void* cpu_task() {
+  m68ki_cpu_core* state = &m68ki_cpu;
   state->ovl = ovl;
   state->gpio = gpio;
-	m68k_pulse_reset(state);
+  m68k_pulse_reset(state);
   apply_affinity_from_env("cpu", CORE_CPU);
   apply_realtime_from_env("cpu", RT_DEFAULT_CPU);
 
 cpu_loop:
   if (realtime_disassembly && (do_disasm || cpu_emulation_running)) {
     m68k_disassemble(disasm_buf, m68k_get_reg(NULL, M68K_REG_PC), cpu_type);
-    printf("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n", m68k_get_reg(NULL, M68K_REG_A0), m68k_get_reg(NULL, M68K_REG_A1), m68k_get_reg(NULL, M68K_REG_A2), m68k_get_reg(NULL, M68K_REG_A3), \
-            m68k_get_reg(NULL, M68K_REG_A4), m68k_get_reg(NULL, M68K_REG_A5), m68k_get_reg(NULL, M68K_REG_A6), m68k_get_reg(NULL, M68K_REG_A7));
-    printf("REGD: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n", m68k_get_reg(NULL, M68K_REG_D0), m68k_get_reg(NULL, M68K_REG_D1), m68k_get_reg(NULL, M68K_REG_D2), m68k_get_reg(NULL, M68K_REG_D3), \
-            m68k_get_reg(NULL, M68K_REG_D4), m68k_get_reg(NULL, M68K_REG_D5), m68k_get_reg(NULL, M68K_REG_D6), m68k_get_reg(NULL, M68K_REG_D7));
-    printf("%.8X (%.8X)]] %s\n", m68k_get_reg(NULL, M68K_REG_PC), (m68k_get_reg(NULL, M68K_REG_PC) & 0xFFFFFF), disasm_buf);
-    if (do_disasm)
+    printf("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
+           m68k_get_reg(NULL, M68K_REG_A0), m68k_get_reg(NULL, M68K_REG_A1),
+           m68k_get_reg(NULL, M68K_REG_A2), m68k_get_reg(NULL, M68K_REG_A3),
+           m68k_get_reg(NULL, M68K_REG_A4), m68k_get_reg(NULL, M68K_REG_A5),
+           m68k_get_reg(NULL, M68K_REG_A6), m68k_get_reg(NULL, M68K_REG_A7));
+    printf("REGD: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
+           m68k_get_reg(NULL, M68K_REG_D0), m68k_get_reg(NULL, M68K_REG_D1),
+           m68k_get_reg(NULL, M68K_REG_D2), m68k_get_reg(NULL, M68K_REG_D3),
+           m68k_get_reg(NULL, M68K_REG_D4), m68k_get_reg(NULL, M68K_REG_D5),
+           m68k_get_reg(NULL, M68K_REG_D6), m68k_get_reg(NULL, M68K_REG_D7));
+    printf("%.8X ( %.8X )]] %s\n", m68k_get_reg(NULL, M68K_REG_PC),
+           (m68k_get_reg(NULL, M68K_REG_PC) & 0xFFFFFF), disasm_buf);
+    if (do_disasm) {
       do_disasm--;
-	  cpu_backend_execute(state, 1);
-  }
-  else {
+    }
+    cpu_backend_execute(state, 1);
+  } else {
     if (cpu_emulation_running) {
       unsigned int slice = loop_cycles > loop_cycles_cap ? loop_cycles_cap : loop_cycles;
-		if (irq)
-			cpu_backend_execute(state, 5);
-		else
-			cpu_backend_execute(state, slice);
+      if (irq) {
+        cpu_backend_execute(state, 5);
+      } else {
+        cpu_backend_execute(state, slice);
+      }
     }
   }
 
@@ -384,13 +402,14 @@ cpu_loop:
     last_irq = ((ps_read_status_reg() & 0xe000) >> 13);
     uint8_t amiga_irq = amiga_emulated_ipl();
     if (amiga_irq >= last_irq) {
-        last_irq = amiga_irq;
+      last_irq = amiga_irq;
     }
     if (last_irq != 0 && last_irq != last_last_irq) {
       last_last_irq = last_irq;
       cpu_backend_set_irq(last_irq);
     }
   }
+
   if (!irq && last_last_irq != 0) {
     cpu_backend_set_irq(0);
     last_last_irq = 0;
@@ -398,24 +417,25 @@ cpu_loop:
 
   if (do_reset) {
     cpu_pulse_reset();
-    do_reset=0;
+    do_reset = 0;
     usleep(1000000); // 1sec
-    rtg_on=0;
-//    while(amiga_reset==0);
-//    printf("CPU emulation reset.\n");
+    rtg_on = 0;
+    //    while( amiga_reset==0 );
+    //    printf( "CPU emulation reset.\n" );
   }
 
   if (mouse_hook_enabled && (mouse_extra != 0x00)) {
-    // mouse wheel events have occurred; unlike l/m/r buttons, these are queued as keypresses, so add to end of buffer
+    // mouse wheel events have occurred; unlike l/m/r buttons, these are queued as keypresses, so
+    // add to end of buffer
     switch (mouse_extra) {
-      case 0xff:
-        // wheel up
-        queue_keypress(0xfe, KEYPRESS_PRESS, PLATFORM_AMIGA);
-        break;
-      case 0x01:
-        // wheel down
-        queue_keypress(0xff, KEYPRESS_PRESS, PLATFORM_AMIGA);
-        break;
+    case 0xff:
+      // wheel up
+      queue_keypress(0xfe, KEYPRESS_PRESS, PLATFORM_AMIGA);
+      break;
+    case 0x01:
+      // wheel down
+      queue_keypress(0xff, KEYPRESS_PRESS, PLATFORM_AMIGA);
+      break;
     }
 
     // dampen the scroll wheel until next while loop iteration
@@ -427,17 +447,18 @@ cpu_loop:
     goto stop_cpu_emulation;
   }
 
-  if (end_signal)
-	  goto stop_cpu_emulation;
+  if (end_signal) {
+    goto stop_cpu_emulation;
+  }
 
   goto cpu_loop;
 
 stop_cpu_emulation:
   printf("[CPU] End of CPU thread\n");
-  return (void *)NULL;
+  return (void*)NULL;
 }
 
-void *keyboard_task() {
+void* keyboard_task() {
   struct pollfd kbdpoll[1];
   int kpollrc;
   char c = 0, c_code = 0, c_type = 0;
@@ -462,11 +483,12 @@ key_loop:
   if ((kpollrc > 0) && (kbdpoll[0].revents & POLLHUP)) {
     // in the event that a keyboard is unplugged, keyboard_task will whiz up to 100% utilisation
     // this is undesired, so if the keyboard HUPs, end the thread without ending the emulation
-    printf("[KBD] Keyboard node returned HUP (unplugged?)\n");
+    printf("[KBD] Keyboard node returned HUP ( unplugged? )\n");
     goto key_end;
   }
 
-  // if kpollrc > 0 then it contains number of events to pull, also check if POLLIN is set in revents
+  // if kpollrc > 0 then it contains number of events to pull, also check if POLLIN is set in
+  // revents
   if ((kpollrc <= 0) || !(kbdpoll[0].revents & POLLIN)) {
     if (cfg->platform->id == PLATFORM_AMIGA && last_irq != 2 && get_num_kb_queued()) {
       amiga_emulate_irq(PORTS);
@@ -499,7 +521,7 @@ key_loop:
       }
     }
 
-    // pause pressed; trigger nmi (int level 7)
+    // pause pressed; trigger nmi ( int level 7 )
     if (c == 0x01 && c_type) {
       printf("[INT] Sending NMI\n");
       M68K_SET_IRQ(7);
@@ -521,12 +543,12 @@ key_loop:
       }
       if (c == 'R') {
         cpu_pulse_reset();
-        //m68k_pulse_reset();
+        // m68k_pulse_reset(  );
         printf("CPU emulation reset.\n");
       }
       if (c == 'q') {
         printf("Quitting and exiting emulator.\n");
-	      end_signal = 1;
+        end_signal = 1;
         goto key_end;
       }
       if (c == 'd') {
@@ -538,7 +560,7 @@ key_loop:
         int r = get_mapped_item_by_address(cfg, 0x08000000);
         if (r != -1) {
           printf("Dumping first 16MB of mapped range %d.\n", r);
-          FILE *dmp = fopen("./memdmp.bin", "wb+");
+          FILE* dmp = fopen("./memdmp.bin", "wb+");
           fwrite(cfg->map_data[r], 16 * SIZE_MEGA, 1, dmp);
           fclose(dmp);
         }
@@ -563,7 +585,7 @@ key_end:
   return (void*)NULL;
 }
 
-void *mouse_task() {
+void* mouse_task() {
   struct pollfd mpoll[1];
   int mpollrc;
 
@@ -576,8 +598,9 @@ void *mouse_task() {
 
 mouse_loop:
   mpollrc = poll(mpoll, 1, 10);
-  if (mpollrc < 0 && errno == EINTR)
+  if (mpollrc < 0 && errno == EINTR) {
     goto mouse_loop;
+  }
 
   if (mpollrc > 0 && (mpoll[0].revents & POLLIN)) {
     uint8_t x, y, b, e;
@@ -589,22 +612,30 @@ mouse_loop:
     }
   }
 
-  if (!emulator_exiting && !end_signal)
+  if (!emulator_exiting && !end_signal) {
     goto mouse_loop;
+  }
 
   printf("[MOUSE] Mouse thread exiting\n");
-  return (void *)NULL;
+  return (void*)NULL;
 }
 
 void stop_cpu_emulation(uint8_t disasm_cur) {
   M68K_END_TIMESLICE;
   if (disasm_cur) {
     m68k_disassemble(disasm_buf, m68k_get_reg(NULL, M68K_REG_PC), cpu_type);
-    printf("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n", m68k_get_reg(NULL, M68K_REG_A0), m68k_get_reg(NULL, M68K_REG_A1), m68k_get_reg(NULL, M68K_REG_A2), m68k_get_reg(NULL, M68K_REG_A3), \
-            m68k_get_reg(NULL, M68K_REG_A4), m68k_get_reg(NULL, M68K_REG_A5), m68k_get_reg(NULL, M68K_REG_A6), m68k_get_reg(NULL, M68K_REG_A7));
-    printf("REGD: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n", m68k_get_reg(NULL, M68K_REG_D0), m68k_get_reg(NULL, M68K_REG_D1), m68k_get_reg(NULL, M68K_REG_D2), m68k_get_reg(NULL, M68K_REG_D3), \
-            m68k_get_reg(NULL, M68K_REG_D4), m68k_get_reg(NULL, M68K_REG_D5), m68k_get_reg(NULL, M68K_REG_D6), m68k_get_reg(NULL, M68K_REG_D7));
-    printf("%.8X (%.8X)]] %s\n", m68k_get_reg(NULL, M68K_REG_PC), (m68k_get_reg(NULL, M68K_REG_PC) & 0xFFFFFF), disasm_buf);
+    printf("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
+           m68k_get_reg(NULL, M68K_REG_A0), m68k_get_reg(NULL, M68K_REG_A1),
+           m68k_get_reg(NULL, M68K_REG_A2), m68k_get_reg(NULL, M68K_REG_A3),
+           m68k_get_reg(NULL, M68K_REG_A4), m68k_get_reg(NULL, M68K_REG_A5),
+           m68k_get_reg(NULL, M68K_REG_A6), m68k_get_reg(NULL, M68K_REG_A7));
+    printf("REGD: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
+           m68k_get_reg(NULL, M68K_REG_D0), m68k_get_reg(NULL, M68K_REG_D1),
+           m68k_get_reg(NULL, M68K_REG_D2), m68k_get_reg(NULL, M68K_REG_D3),
+           m68k_get_reg(NULL, M68K_REG_D4), m68k_get_reg(NULL, M68K_REG_D5),
+           m68k_get_reg(NULL, M68K_REG_D6), m68k_get_reg(NULL, M68K_REG_D7));
+    printf("%.8X ( %.8X )]] %s\n", m68k_get_reg(NULL, M68K_REG_PC),
+           (m68k_get_reg(NULL, M68K_REG_PC) & 0xFFFFFF), disasm_buf);
     realtime_disassembly = 1;
   }
 
@@ -613,15 +644,17 @@ void stop_cpu_emulation(uint8_t disasm_cur) {
 }
 
 void sigint_handler(int sig_num) {
-  //if (sig_num) { }
-  //cpu_emulation_running = 0;
+  // if ( sig_num ) { }
+  // cpu_emulation_running = 0;
 
-  //return;
+  // return;
   printf("Received sigint %d, exiting.\n", sig_num);
-  if (mouse_fd != -1)
+  if (mouse_fd != -1) {
     close(mouse_fd);
-  if (mem_fd)
+  }
+  if (mem_fd) {
     close(mem_fd);
+  }
 
   if (cfg->platform->shutdown) {
     cfg->platform->shutdown(cfg);
@@ -639,19 +672,19 @@ void sigint_handler(int sig_num) {
   exit(0);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   int g;
 
   ps_setup_protocol();
 
   log_set_level(LOG_LEVEL_INFO);
 
-  //const struct sched_param priority = {99};
+  // const struct sched_param priority = {99};
 
   // Some command line switch stuffles
   for (g = 1; g < argc; g++) {
     if (strcmp(argv[g], "--log") == 0) {
-      const char *path = "amiga.log";
+      const char* path = "amiga.log";
       if (g + 1 < argc && argv[g + 1][0] != '-') {
         g++;
         path = argv[g];
@@ -659,14 +692,13 @@ int main(int argc, char *argv[]) {
       if (log_set_file(path) != 0) {
         printf("Failed to open log file %s.\n", path);
       }
-    }
-    else if (strcmp(argv[g], "--log-level") == 0 || strcmp(argv[g], "-l") == 0) {
+    } else if (strcmp(argv[g], "--log-level") == 0 || strcmp(argv[g], "-l") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no log level specified.\n", argv[g]);
       } else {
         int level = log_parse_level(argv[++g]);
         if (level < 0) {
-          printf("Invalid log level %s (use error|warn|info|debug).\n", argv[g]);
+          printf("Invalid log level %s ( use error|warn|info|debug ).\n", argv[g]);
         } else {
           log_set_level(level);
         }
@@ -679,31 +711,29 @@ int main(int argc, char *argv[]) {
         g++;
         cpu_type = get_m68k_cpu_type(argv[g]);
       }
-    }
-    else if (strcmp(argv[g], "--config-file") == 0 || strcmp(argv[g], "--config") == 0) {
+    } else if (strcmp(argv[g], "--config-file") == 0 || strcmp(argv[g], "--config") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no config filename specified.\n", argv[g]);
       } else {
         g++;
-        FILE *chk = fopen(argv[g], "rb");
+        FILE* chk = fopen(argv[g], "rb");
         if (chk == NULL) {
-          printf("Config file %s does not exist, please check that you've specified the path correctly.\n", argv[g]);
+          printf("Config file %s does not exist, please check that you've specified the path "
+                 "correctly.\n",
+                 argv[g]);
         } else {
           fclose(chk);
           load_new_config = 1;
           set_pistorm_devcfg_filename(argv[g]);
         }
       }
-    }
-    else if (strcmp(argv[g], "--enable-jit") == 0 || strcmp(argv[g], "--jit") == 0) {
+    } else if (strcmp(argv[g], "--enable-jit") == 0 || strcmp(argv[g], "--jit") == 0) {
       enable_jit_backend = 1;
       printf("[CLI] JIT backend enabled.\n");
-    }
-    else if (strcmp(argv[g], "--enable-jit-fpu") == 0 || strcmp(argv[g], "--jit-fpu") == 0) {
+    } else if (strcmp(argv[g], "--enable-jit-fpu") == 0 || strcmp(argv[g], "--jit-fpu") == 0) {
       enable_fpu_jit_backend = 1;
       printf("[CLI] FPU JIT backend enabled.\n");
-    }
-    else if (strcmp(argv[g], "--keyboard-file") == 0 || strcmp(argv[g], "--kbfile") == 0) {
+    } else if (strcmp(argv[g], "--keyboard-file") == 0 || strcmp(argv[g], "--kbfile") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no keyboard device path specified.\n", argv[g]);
       } else {
@@ -729,14 +759,14 @@ switch_config:
       cfg = NULL;
     }
 
-    switch(config_action) {
-      case PICFG_LOAD:
-      case PICFG_RELOAD:
-        cfg = load_config_file(get_pistorm_devcfg_filename());
-        break;
-      case PICFG_DEFAULT:
-        cfg = load_config_file("default.cfg");
-        break;
+    switch (config_action) {
+    case PICFG_LOAD:
+    case PICFG_RELOAD:
+      cfg = load_config_file(get_pistorm_devcfg_filename());
+      break;
+    case PICFG_DEFAULT:
+      cfg = load_config_file("default.cfg");
+      break;
     }
   }
 
@@ -745,7 +775,7 @@ switch_config:
     cfg = load_config_file("default.cfg");
     if (!cfg) {
       printf("Couldn't load default.cfg, empty emulator config will be used.\n");
-      cfg = (struct emulator_config *)calloc(1, sizeof(struct emulator_config));
+      cfg = (struct emulator_config*)calloc(1, sizeof(struct emulator_config));
       if (!cfg) {
         printf("Failed to allocate memory for emulator config!\n");
         return 1;
@@ -755,10 +785,13 @@ switch_config:
   }
 
   if (cfg) {
-    if (cfg->cpu_type) cpu_type = cfg->cpu_type;
-    if (cfg->loop_cycles) loop_cycles = cfg->loop_cycles;
+    if (cfg->cpu_type)
+      cpu_type = cfg->cpu_type;
+    if (cfg->loop_cycles)
+      loop_cycles = cfg->loop_cycles;
     if (loop_cycles > loop_cycles_cap) {
-      printf("[CFG] loop_cycles capped from %u to %u to reduce latency.\n", loop_cycles, loop_cycles_cap);
+      printf("[CFG] loop_cycles capped from %u to %u to reduce latency.\n", loop_cycles,
+             loop_cycles_cap);
       loop_cycles = loop_cycles_cap;
     }
     if (!enable_jit_backend && cfg->enable_jit) {
@@ -775,8 +808,9 @@ switch_config:
       fpu_exec_hook = NULL;
     }
 
-    if (!cfg->platform)
+    if (!cfg->platform) {
       cfg->platform = make_platform_config("none", "generic");
+    }
     cfg->platform->platform_initial_setup(cfg);
   }
 
@@ -789,35 +823,43 @@ switch_config:
       /**
        * *-*-*-* magic numbers! *-*-*-*
        * great, so waaaay back in the history of the pc, the ps/2 protocol set the standard for mice
-       * and in the process, the mouse sample rate was defined as a way of putting mice into vendor-specific modes.
-       * as the ancient gpm command explains, almost everything except incredibly old mice talk the IntelliMouse
-       * protocol, which reports four bytes. by default, every mouse starts in 3-byte mode (don't report wheel or
-       * additional buttons) until imps2 magic is sent. so, command $f3 is "set sample rate", followed by a byte.
+       * and in the process, the mouse sample rate was defined as a way of putting mice into
+       * vendor-specific modes. as the ancient gpm command explains, almost everything except
+       * incredibly old mice talk the IntelliMouse protocol, which reports four bytes. by default,
+       * every mouse starts in 3-byte mode ( don't report wheel or additional buttons ) until imps2
+       * magic is sent. so, command $f3 is "set sample rate", followed by a byte.
        */
-      uint8_t mouse_init[] = { 0xf4, 0xf3, 0x64 }; // enable, then set sample rate 100
-      uint8_t imps2_init[] = { 0xf3, 0xc8, 0xf3, 0x64, 0xf3, 0x50 }; // magic sequence; set sample 200, 100, 80
+      uint8_t mouse_init[] = {0xf4, 0xf3, 0x64}; // enable, then set sample rate 100
+      uint8_t imps2_init[] = {0xf3, 0xc8, 0xf3,
+                              0x64, 0xf3, 0x50}; // magic sequence; set sample 200, 100, 80
       if (write(mouse_fd, mouse_init, sizeof(mouse_init)) != -1) {
-        if (write(mouse_fd, imps2_init, sizeof(imps2_init)) == -1)
+        if (write(mouse_fd, imps2_init, sizeof(imps2_init)) == -1) {
           printf("[MOUSE] Couldn't enable scroll wheel events; is this mouse from the 1980s?\n");
-      } else
-        printf("[MOUSE] Mouse didn't respond to normal PS/2 init; have you plugged a brick in by mistake?\n");
+        }
+      } else {
+        printf("[MOUSE] Mouse didn't respond to normal PS/2 init; have you plugged a brick in by "
+               "mistake?\n");
+      }
     }
   }
 
-  if (cfg->keyboard_file)
+  if (cfg->keyboard_file) {
     keyboard_fd = open(cfg->keyboard_file, O_RDONLY | O_NONBLOCK);
-  else
+  } else {
     keyboard_fd = open(keyboard_file, O_RDONLY | O_NONBLOCK);
+  }
 
   if (keyboard_fd == -1) {
     printf("Failed to open keyboard event source.\n");
   }
 
-  if (cfg->mouse_autoconnect)
+  if (cfg->mouse_autoconnect) {
     mouse_hook_enabled = 1;
+  }
 
-  if (cfg->keyboard_autoconnect)
+  if (cfg->keyboard_autoconnect) {
     kb_hook_enabled = 1;
+  }
 
   InitGayle();
 
@@ -829,16 +871,16 @@ switch_config:
 
   m68k_init();
   printf("Setting CPU type to %d.\n", cpu_type);
-	m68k_set_cpu_type(&m68ki_cpu, cpu_type);
+  m68k_set_cpu_type(&m68ki_cpu, cpu_type);
   cpu_pulse_reset();
 
   pthread_t ipl_tid = 0, cpu_tid, kbd_tid, mouse_tid = 0;
   int err;
   if (ipl_tid == 0) {
     err = pthread_create(&ipl_tid, NULL, &ipl_task, NULL);
-    if (err != 0)
+    if (err != 0) {
       printf("[ERROR] Cannot create IPL thread: [%s]", strerror(err));
-    else {
+    } else {
       pthread_setname_np(ipl_tid, "pistorm: ipl");
       printf("IPL thread created successfully\n");
       apply_affinity_from_env("ipl", CORE_IPL);
@@ -848,9 +890,9 @@ switch_config:
 
   // create keyboard task
   err = pthread_create(&kbd_tid, NULL, &keyboard_task, NULL);
-  if (err != 0)
+  if (err != 0) {
     printf("[ERROR] Cannot create keyboard thread: [%s]", strerror(err));
-  else {
+  } else {
     pthread_setname_np(kbd_tid, "pistorm: kbd");
     printf("[MAIN] Keyboard thread created successfully\n");
     apply_affinity_from_env("input", CORE_INPUT);
@@ -859,9 +901,9 @@ switch_config:
   // create mouse task if mouse is enabled
   if (mouse_fd != -1) {
     err = pthread_create(&mouse_tid, NULL, &mouse_task, NULL);
-    if (err != 0)
+    if (err != 0) {
       printf("[ERROR] Cannot create mouse thread: [%s]", strerror(err));
-    else {
+    } else {
       pthread_setname_np(mouse_tid, "pistorm: mouse");
       printf("[MAIN] Mouse thread created successfully\n");
       apply_affinity_from_env("input", CORE_INPUT);
@@ -870,9 +912,9 @@ switch_config:
 
   // create cpu task
   err = pthread_create(&cpu_tid, NULL, &cpu_task, NULL);
-  if (err != 0)
+  if (err != 0) {
     printf("[ERROR] Cannot create CPU thread: [%s]", strerror(err));
-  else {
+  } else {
     pthread_setname_np(cpu_tid, "pistorm: cpu");
     printf("[MAIN] CPU thread created successfully\n");
     apply_affinity_from_env("cpu", CORE_CPU);
@@ -886,16 +928,20 @@ switch_config:
     usleep(0);
   }
 
-  if (load_new_config == 0)
+  if (load_new_config == 0) {
     printf("[MAIN] All threads appear to have concluded; ending process\n");
+  }
 
-  if (mouse_fd != -1)
+  if (mouse_fd != -1) {
     close(mouse_fd);
-  if (mem_fd)
+  }
+  if (mem_fd) {
     close(mem_fd);
+  }
 
-  if (load_new_config != 0)
+  if (load_new_config != 0) {
     goto switch_config;
+  }
 
   if (cfg->platform->shutdown) {
     cfg->platform->shutdown(cfg);
@@ -905,7 +951,7 @@ switch_config:
 }
 
 void cpu_pulse_reset(void) {
-	m68ki_cpu_core *state = &m68ki_cpu;
+  m68ki_cpu_core* state = &m68ki_cpu;
   ps_pulse_reset();
 
   ovl = 1;
@@ -914,14 +960,15 @@ void cpu_pulse_reset(void) {
     ipl_enabled[i] = 0;
   }
 
-  if (cfg->platform->handle_reset)
+  if (cfg->platform->handle_reset) {
     cfg->platform->handle_reset(cfg);
+  }
 
-	m68k_pulse_reset(state);
+  m68k_pulse_reset(state);
 }
 
 unsigned int cpu_irq_ack(int level) {
-  //printf("cpu irq ack\n");
+  // printf( "cpu irq ack\n" );
   return 24 + level;
 }
 
@@ -937,12 +984,12 @@ unsigned int garbage = 0;
 
 static inline uint32_t ps_read(uint8_t type, uint32_t addr) {
   switch (type) {
-    case OP_TYPE_BYTE:
-      return ps_read_8(addr);
-    case OP_TYPE_WORD:
-      return ps_read_16(addr);
-    case OP_TYPE_LONGWORD:
-      return ps_read_32(addr);
+  case OP_TYPE_BYTE:
+    return ps_read_8(addr);
+  case OP_TYPE_WORD:
+    return ps_read_16(addr);
+  case OP_TYPE_LONGWORD:
+    return ps_read_32(addr);
   }
   // This shouldn't actually happen.
   return 0;
@@ -950,169 +997,174 @@ static inline uint32_t ps_read(uint8_t type, uint32_t addr) {
 
 static inline void ps_write(uint8_t type, uint32_t addr, uint32_t val) {
   switch (type) {
-    case OP_TYPE_BYTE:
-      ps_write_8(addr, val);
-      return;
-    case OP_TYPE_WORD:
-      ps_write_16(addr, val);
-      return;
-    case OP_TYPE_LONGWORD:
-      ps_write_32(addr, val);
-      return;
+  case OP_TYPE_BYTE:
+    ps_write_8(addr, val);
+    return;
+  case OP_TYPE_WORD:
+    ps_write_16(addr, val);
+    return;
+  case OP_TYPE_LONGWORD:
+    ps_write_32(addr, val);
+    return;
   }
   // This shouldn't actually happen.
   return;
 }
 
-static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t *res) {
+static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t* res) {
   switch (cfg->platform->id) {
-    case PLATFORM_AMIGA:
-      switch (addr) {
-        case INTREQR:
-          return amiga_handle_intrqr_read(res);
-          break;
-        case CIAAPRA:
-          if (mouse_hook_enabled && (mouse_buttons & 0x01)) {
-            rres = (uint32_t)ps_read(type, addr);
-            *res = (rres ^ 0x40);
-            return 1;
-          }
-          if (swap_df0_with_dfx && spoof_df0_id) {
-            // DF0 doesn't emit a drive type ID on RDY pin
-            // If swapping DF0 with DF1-3 we need to provide this ID so that DF0 continues to function.
-            rres = (uint32_t)ps_read(type, addr);
-            *res = (rres & 0xDF); // Spoof drive id for swapped DF0 by setting RDY low
-            return 1;
-          }
-          return 0;
-          break;
-        case CIAAICR:
-          if (kb_hook_enabled && get_num_kb_queued() && amiga_emulating_irq(PORTS)) {
-            *res = 0x88;
-            return 1;
-          }
-          return 0;
-          break;
-        case CIAADAT:
-          if (kb_hook_enabled && amiga_emulating_irq(PORTS)) {
-            uint8_t c = 0, t = 0;
-            pop_queued_key(&c, &t);
-            t ^= 0x01;
-            rres = ((c << 1) | t) ^ 0xFF;
-            *res = rres;
-            return 1;
-          }
-          return 0;
-          break;
-        case JOY0DAT:
-          if (mouse_hook_enabled) {
-            unsigned short result = (mouse_dy << 8) | (mouse_dx);
-            *res = (unsigned int)result;
-            return 1;
-          }
-          return 0;
-          break;
-        case INTENAR: {
-          // This code is kind of strange and should probably be reworked/revoked.
-          uint8_t enable = 1;
-          rres = (uint16_t)ps_read(type, addr);
-          uint16_t val = rres;
-          if (val & 0x0007) {
-            ipl_enabled[1] = enable;
-          }
-          if (val & 0x0008) {
-            ipl_enabled[2] = enable;
-          }
-          if (val & 0x0070) {
-            ipl_enabled[3] = enable;
-          }
-          if (val & 0x0780) {
-            ipl_enabled[4] = enable;
-          }
-          if (val & 0x1800) {
-            ipl_enabled[5] = enable;
-          }
-          if (val & 0x2000) {
-            ipl_enabled[6] = enable;
-          }
-          if (val & 0x4000) {
-            ipl_enabled[7] = enable;
-          }
-          //printf("Interrupts enabled: M:%d 0-6:%d%d%d%d%d%d\n", ipl_enabled[7], ipl_enabled[6], ipl_enabled[5], ipl_enabled[4], ipl_enabled[3], ipl_enabled[2], ipl_enabled[1]);
-          *res = rres;
-          return 1;
-          break;
-        }
-        case POTGOR:
-          if (mouse_hook_enabled) {
-            unsigned short result = (unsigned short)ps_read(type, addr);
-            // bit 1 rmb, bit 2 mmb
-            if (mouse_buttons & 0x06) {
-              *res = (unsigned int)((result ^ ((mouse_buttons & 0x02) << 9))   // move rmb to bit 10
-                                  & (result ^ ((mouse_buttons & 0x04) << 6))); // move mmb to bit 8
-              return 1;
-            }
-            *res = (unsigned int)(result & 0xfffd);
-            return 1;
-          }
-          return 0;
-          break;
-        case CIABPRB:
-          if (swap_df0_with_dfx) {
-            uint32_t result = (uint32_t)ps_read(type, addr);
-            // SEL0 = 0x80, SEL1 = 0x10, SEL2 = 0x20, SEL3 = 0x40
-            if (((result >> SEL0_BITNUM) & 1) != ((result >> (SEL0_BITNUM + swap_df0_with_dfx)) & 1)) { // If the value for SEL0/SELx differ
-              result ^= ((1 << SEL0_BITNUM) | (1 << (SEL0_BITNUM + swap_df0_with_dfx)));                // Invert both bits to swap them around
-            }
-            *res = result;
-            return 1;
-          }
-          return 0;
-          break;
-        default:
-          break;
-      }
-
-      if (move_slow_to_chip && addr >= 0x080000 && addr <= 0x0FFFFF) {
-        // A500 JP2 connects Agnus' A19 input to A23 instead of A19 by default, and decodes trapdoor memory at 0xC00000 instead of 0x080000.
-        // We can move the trapdoor to chipram simply by rewriting the address.
-        addr += 0xB80000;
-        *res = ps_read(type, addr);
+  case PLATFORM_AMIGA:
+    switch (addr) {
+    case INTREQR:
+      return amiga_handle_intrqr_read(res);
+      break;
+    case CIAAPRA:
+      if (mouse_hook_enabled && (mouse_buttons & 0x01)) {
+        rres = (uint32_t)ps_read(type, addr);
+        *res = (rres ^ 0x40);
         return 1;
       }
-
-      if (move_slow_to_chip && addr >= 0xC00000 && addr <= 0xC7FFFF) {
-        // Block accesses through to trapdoor at slow ram address, otherwise it will be detected at 0x080000 and 0xC00000.
-        *res = 0;
+      if (swap_df0_with_dfx && spoof_df0_id) {
+        // DF0 doesn't emit a drive type ID on RDY pin
+        // If swapping DF0 with DF1-3 we need to provide this ID so that DF0 continues to function.
+        rres = (uint32_t)ps_read(type, addr);
+        *res = (rres & 0xDF); // Spoof drive id for swapped DF0 by setting RDY low
         return 1;
       }
-
-      if (addr >= cfg->custom_low && addr < cfg->custom_high) {
-        if (addr >= PISCSI_OFFSET && addr < PISCSI_UPPER) {
-          *res = handle_piscsi_read(addr, type);
-          return 1;
-        }
-        if (addr >= PINET_OFFSET && addr < PINET_UPPER) {
-          *res = handle_pinet_read(addr, type);
-          return 1;
-        }
-        if (addr >= PIGFX_RTG_BASE && addr < PIGFX_UPPER) {
-          *res = rtg_read((addr & 0x0FFFFFFF), type);
-          return 1;
-        }
-        if (addr >= PI_AHI_OFFSET && addr < PI_AHI_UPPER) {
-          *res = handle_pi_ahi_read(addr, type);
-          return 1;
-        }
-        if (custom_read_amiga(cfg, addr, &target, type) != -1) {
-          *res = target;
-          return 1;
-        }
+      return 0;
+      break;
+    case CIAAICR:
+      if (kb_hook_enabled && get_num_kb_queued() && amiga_emulating_irq(PORTS)) {
+        *res = 0x88;
+        return 1;
       }
-
+      return 0;
+      break;
+    case CIAADAT:
+      if (kb_hook_enabled && amiga_emulating_irq(PORTS)) {
+        uint8_t c = 0, t = 0;
+        pop_queued_key(&c, &t);
+        t ^= 0x01;
+        rres = ((c << 1) | t) ^ 0xFF;
+        *res = rres;
+        return 1;
+      }
+      return 0;
+      break;
+    case JOY0DAT:
+      if (mouse_hook_enabled) {
+        unsigned short result = (mouse_dy << 8) | (mouse_dx);
+        *res = (unsigned int)result;
+        return 1;
+      }
+      return 0;
+      break;
+    case INTENAR: {
+      // This code is kind of strange and should probably be reworked/revoked.
+      uint8_t enable = 1;
+      rres = (uint16_t)ps_read(type, addr);
+      uint16_t val = rres;
+      if (val & 0x0007) {
+        ipl_enabled[1] = enable;
+      }
+      if (val & 0x0008) {
+        ipl_enabled[2] = enable;
+      }
+      if (val & 0x0070) {
+        ipl_enabled[3] = enable;
+      }
+      if (val & 0x0780) {
+        ipl_enabled[4] = enable;
+      }
+      if (val & 0x1800) {
+        ipl_enabled[5] = enable;
+      }
+      if (val & 0x2000) {
+        ipl_enabled[6] = enable;
+      }
+      if (val & 0x4000) {
+        ipl_enabled[7] = enable;
+      }
+      // printf( "Interrupts enabled: M:%d 0-6:%d%d%d%d%d%d\n", ipl_enabled[7], ipl_enabled[6],
+      // ipl_enabled[5], ipl_enabled[4], ipl_enabled[3], ipl_enabled[2], ipl_enabled[1] );
+      *res = rres;
+      return 1;
+      break;
+    }
+    case POTGOR:
+      if (mouse_hook_enabled) {
+        unsigned short result = (unsigned short)ps_read(type, addr);
+        // bit 1 rmb, bit 2 mmb
+        if (mouse_buttons & 0x06) {
+          *res = (unsigned int)((result ^ ((mouse_buttons & 0x02) << 9))     // move rmb to bit 10
+                                & (result ^ ((mouse_buttons & 0x04) << 6))); // move mmb to bit 8
+          return 1;
+        }
+        *res = (unsigned int)(result & 0xfffd);
+        return 1;
+      }
+      return 0;
+      break;
+    case CIABPRB:
+      if (swap_df0_with_dfx) {
+        uint32_t result = (uint32_t)ps_read(type, addr);
+        // SEL0 = 0x80, SEL1 = 0x10, SEL2 = 0x20, SEL3 = 0x40
+        if (((result >> SEL0_BITNUM) & 1) != ((result >> (SEL0_BITNUM + swap_df0_with_dfx)) & 1)) {
+          // If the value for SEL0/SELx differ
+          result ^= ((1 << SEL0_BITNUM) | (1 << (SEL0_BITNUM + swap_df0_with_dfx)));
+          // Invert both bits to swap them around
+        }
+        *res = result;
+        return 1;
+      }
+      return 0;
       break;
     default:
       break;
+    }
+
+    if (move_slow_to_chip && addr >= 0x080000 && addr <= 0x0FFFFF) {
+      // A500 JP2 connects Agnus' A19 input to A23 instead of A19 by default, and decodes trapdoor
+      // memory at 0xC00000 instead of 0x080000. We can move the trapdoor to chipram simply by
+      // rewriting the address.
+      addr += 0xB80000;
+      *res = ps_read(type, addr);
+      return 1;
+    }
+
+    if (move_slow_to_chip && addr >= 0xC00000 && addr <= 0xC7FFFF) {
+      // Block accesses through to trapdoor at slow ram address, otherwise it will be detected at
+      // 0x080000 and 0xC00000.
+      *res = 0;
+      return 1;
+    }
+
+    if (addr >= cfg->custom_low && addr < cfg->custom_high) {
+      if (addr >= PISCSI_OFFSET && addr < PISCSI_UPPER) {
+        *res = handle_piscsi_read(addr, type);
+        return 1;
+      }
+      if (addr >= PINET_OFFSET && addr < PINET_UPPER) {
+        *res = handle_pinet_read(addr, type);
+        return 1;
+      }
+      if (addr >= PIGFX_RTG_BASE && addr < PIGFX_UPPER) {
+        *res = rtg_read((addr & 0x0FFFFFFF), type);
+        return 1;
+      }
+      if (addr >= PI_AHI_OFFSET && addr < PI_AHI_UPPER) {
+        *res = handle_pi_ahi_read(addr, type);
+        return 1;
+      }
+      if (custom_read_amiga(cfg, addr, &target, type) != -1) {
+        *res = target;
+        return 1;
+      }
+    }
+
+    break;
+  default:
+    break;
   }
 
   if (ovl || (addr >= cfg->mapped_low && addr < cfg->mapped_high)) {
@@ -1130,8 +1182,9 @@ unsigned int m68k_read_memory_8(unsigned int address) {
     return platform_res;
   }
 
-  if (address & 0xFF000000)
+  if (address & 0xFF000000) {
     return 0;
+  }
 
   return (unsigned int)ps_read_8((uint32_t)address);
 }
@@ -1141,8 +1194,9 @@ unsigned int m68k_read_memory_16(unsigned int address) {
     return platform_res;
   }
 
-  if (address & 0xFF000000)
+  if (address & 0xFF000000) {
     return 0;
+  }
 
   if (address & 0x01) {
     return ((ps_read_8(address) << 8) | ps_read_8(address + 1));
@@ -1155,12 +1209,13 @@ unsigned int m68k_read_memory_32(unsigned int address) {
     return platform_res;
   }
 
-  if (address & 0xFF000000)
+  if (address & 0xFF000000) {
     return 0;
+  }
 
   if (address & 0x01) {
     uint32_t c = ps_read_8(address);
-    c |= (be16toh(ps_read_16(address+1)) << 8);
+    c |= (be16toh(ps_read_16(address + 1)) << 8);
     c |= (ps_read_8(address + 3) << 24);
     return htobe32(c);
   }
@@ -1171,133 +1226,139 @@ unsigned int m68k_read_memory_32(unsigned int address) {
 
 static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t val) {
   switch (cfg->platform->id) {
-    case PLATFORM_MAC:
-      switch (addr) {
-        case 0xEFFFFE: // VIA1?
-          if (val & 0x10 && !ovl) {
-              ovl = 1;
-              m68ki_cpu.ovl = 1;
-              printf("[MAC] OVL on.\n");
-              handle_ovl_mappings_mac68k(cfg);
-          } else if (ovl) {
-            ovl = 0;
-            m68ki_cpu.ovl = 0;
-            printf("[MAC] OVL off.\n");
-            handle_ovl_mappings_mac68k(cfg);
-          }
-          break;
+  case PLATFORM_MAC:
+    switch (addr) {
+    case 0xEFFFFE: // VIA1?
+      if (val & 0x10 && !ovl) {
+        ovl = 1;
+        m68ki_cpu.ovl = 1;
+        printf("[MAC] OVL on.\n");
+        handle_ovl_mappings_mac68k(cfg);
+      } else if (ovl) {
+        ovl = 0;
+        m68ki_cpu.ovl = 0;
+        printf("[MAC] OVL off.\n");
+        handle_ovl_mappings_mac68k(cfg);
       }
       break;
-    case PLATFORM_AMIGA:
-      switch (addr) {
-        case INTREQ:
-          return amiga_handle_intrq_write(val);
-          break;
-        case CIAAPRA:
-          if (ovl != (val & (1 << 0))) {
-            ovl = (val & (1 << 0));
-            m68ki_cpu.ovl = ovl;
-            printf("OVL:%x\n", ovl);
-          }
-          return 0;
-          break;
-        case SERDAT: {
-          char *serdat = (char *)&val;
-          // SERDAT word. see amiga dev docs appendix a; upper byte is control codes, and bit 0 is always 1.
-          // ignore this upper byte as it's not viewable data, only display lower byte.
-          printf("%c", serdat[0]);
-          return 0;
-          break;
-        }
-        case INTENA: {
-          // This code is kind of strange and should probably be reworked/revoked.
-          uint8_t enable = 1;
-          if (!(val & 0x8000))
-            enable = 0;
-          if (val & 0x0007) {
-            ipl_enabled[1] = enable;
-          }
-          if (val & 0x0008) {
-            ipl_enabled[2] = enable;
-          }
-          if (val & 0x0070) {
-            ipl_enabled[3] = 1;
-          }
-          if (val & 0x0780) {
-            ipl_enabled[4] = enable;
-          }
-          if (val & 0x1800) {
-            ipl_enabled[5] = enable;
-          }
-          if (val & 0x2000) {
-            ipl_enabled[6] = enable;
-          }
-          if (val & 0x4000 && enable) {
-            ipl_enabled[7] = 1;
-          }
-          //printf("Interrupts enabled: M:%d 0-6:%d%d%d%d%d%d\n", ipl_enabled[7], ipl_enabled[6], ipl_enabled[5], ipl_enabled[4], ipl_enabled[3], ipl_enabled[2], ipl_enabled[1]);
-          return 0;
-          break;
-        }
-        case CIABPRB:
-          if (swap_df0_with_dfx) {
-            if ((val & ((1 << (SEL0_BITNUM + swap_df0_with_dfx)) | 0x80)) == 0x80) {
-              // If drive selected but motor off, Amiga is reading drive ID.
-              spoof_df0_id = 1;
-            } else {
-              spoof_df0_id = 0;
-            }
-
-            if (((val >> SEL0_BITNUM) & 1) != ((val >> (SEL0_BITNUM + swap_df0_with_dfx)) & 1)) { // If the value for SEL0/SELx differ
-              val ^= ((1 << SEL0_BITNUM) | (1 << (SEL0_BITNUM + swap_df0_with_dfx)));             // Invert both bits to swap them around
-            }
-            ps_write(type,addr,val);
-            return 1;
-          }
-          return 0;
-          break;
-        default:
-          break;
+    }
+    break;
+  case PLATFORM_AMIGA:
+    switch (addr) {
+    case INTREQ:
+      return amiga_handle_intrq_write(val);
+      break;
+    case CIAAPRA:
+      if (ovl != (val & (1 << 0))) {
+        ovl = (val & (1 << 0));
+        m68ki_cpu.ovl = ovl;
+        printf("OVL:%x\n", ovl);
       }
+      return 0;
+      break;
+    case SERDAT: {
+      char* serdat = (char*)&val;
+      // SERDAT word. see amiga dev docs appendix a; upper byte is control codes, and bit 0 is
+      // always 1. ignore this upper byte as it's not viewable data, only display lower byte.
+      printf("%c", serdat[0]);
+      return 0;
+      break;
+    }
+    case INTENA: {
+      // This code is kind of strange and should probably be reworked/revoked.
+      uint8_t enable = 1;
+      if (!(val & 0x8000)) {
+        enable = 0;
+      }
+      if (val & 0x0007) {
+        ipl_enabled[1] = enable;
+      }
+      if (val & 0x0008) {
+        ipl_enabled[2] = enable;
+      }
+      if (val & 0x0070) {
+        ipl_enabled[3] = 1;
+      }
+      if (val & 0x0780) {
+        ipl_enabled[4] = enable;
+      }
+      if (val & 0x1800) {
+        ipl_enabled[5] = enable;
+      }
+      if (val & 0x2000) {
+        ipl_enabled[6] = enable;
+      }
+      if (val & 0x4000 && enable) {
+        ipl_enabled[7] = 1;
+      }
+      // printf( "Interrupts enabled: M:%d 0-6:%d%d%d%d%d%d\n", ipl_enabled[7], ipl_enabled[6],
+      // ipl_enabled[5], ipl_enabled[4], ipl_enabled[3], ipl_enabled[2], ipl_enabled[1] );
+      return 0;
+      break;
+    }
+    case CIABPRB:
+      if (swap_df0_with_dfx) {
+        if ((val & ((1 << (SEL0_BITNUM + swap_df0_with_dfx)) | 0x80)) == 0x80) {
+          // If drive selected but motor off, Amiga is reading drive ID.
+          spoof_df0_id = 1;
+        } else {
+          spoof_df0_id = 0;
+        }
 
-      if (move_slow_to_chip && addr >= 0x080000 && addr <= 0x0FFFFF) {
-        // A500 JP2 connects Agnus' A19 input to A23 instead of A19 by default, and decodes trapdoor memory at 0xC00000 instead of 0x080000.
-        // We can move the trapdoor to chipram simply by rewriting the address.
-        addr += 0xB80000;
-        ps_write(type,addr,val);
+        if (((val >> SEL0_BITNUM) & 1) != ((val >> (SEL0_BITNUM + swap_df0_with_dfx)) & 1)) {
+          // If the value for SEL0/SELx differ
+          val ^= ((1 << SEL0_BITNUM) | (1 << (SEL0_BITNUM + swap_df0_with_dfx)));
+          // Invert both bits to swap them around
+        }
+        ps_write(type, addr, val);
         return 1;
       }
-
-      if (move_slow_to_chip && addr >= 0xC00000 && addr <= 0xC7FFFF) {
-        // Block accesses through to trapdoor at slow ram address, otherwise it will be detected at 0x080000 and 0xC00000.
-        return 1;
-      }
-
-      if (addr >= cfg->custom_low && addr < cfg->custom_high) {
-        if (addr >= PISCSI_OFFSET && addr < PISCSI_UPPER) {
-          handle_piscsi_write(addr, val, type);
-          return 1;
-        }
-        if (addr >= PINET_OFFSET && addr < PINET_UPPER) {
-          handle_pinet_write(addr, val, type);
-          return 1;
-        }
-        if (addr >= PIGFX_RTG_BASE && addr < PIGFX_UPPER) {
-          rtg_write((addr & 0x0FFFFFFF), val, type);
-          return 1;
-        }
-        if (addr >= PI_AHI_OFFSET && addr < PI_AHI_UPPER) {
-          handle_pi_ahi_write(addr, val, type);
-          return 1;
-        }
-        if (custom_write_amiga(cfg, addr, val, type) != -1) {
-          return 1;
-        }
-      }
-
+      return 0;
       break;
     default:
       break;
+    }
+
+    if (move_slow_to_chip && addr >= 0x080000 && addr <= 0x0FFFFF) {
+      // A500 JP2 connects Agnus' A19 input to A23 instead of A19 by default, and decodes trapdoor
+      // memory at 0xC00000 instead of 0x080000. We can move the trapdoor to chipram simply by
+      // rewriting the address.
+      addr += 0xB80000;
+      ps_write(type, addr, val);
+      return 1;
+    }
+
+    if (move_slow_to_chip && addr >= 0xC00000 && addr <= 0xC7FFFF) {
+      // Block accesses through to trapdoor at slow ram address, otherwise it will be detected at
+      // 0x080000 and 0xC00000.
+      return 1;
+    }
+
+    if (addr >= cfg->custom_low && addr < cfg->custom_high) {
+      if (addr >= PISCSI_OFFSET && addr < PISCSI_UPPER) {
+        handle_piscsi_write(addr, val, type);
+        return 1;
+      }
+      if (addr >= PINET_OFFSET && addr < PINET_UPPER) {
+        handle_pinet_write(addr, val, type);
+        return 1;
+      }
+      if (addr >= PIGFX_RTG_BASE && addr < PIGFX_UPPER) {
+        rtg_write((addr & 0x0FFFFFFF), val, type);
+        return 1;
+      }
+      if (addr >= PI_AHI_OFFSET && addr < PI_AHI_UPPER) {
+        handle_pi_ahi_write(addr, val, type);
+        return 1;
+      }
+      if (custom_write_amiga(cfg, addr, val, type) != -1) {
+        return 1;
+      }
+    }
+
+    break;
+  default:
+    break;
   }
 
   if (ovl || (addr >= cfg->mapped_low && addr < cfg->mapped_high)) {
@@ -1310,22 +1371,26 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
 }
 
 void m68k_write_memory_8(unsigned int address, unsigned int value) {
-  if (platform_write_check(OP_TYPE_BYTE, address, value))
+  if (platform_write_check(OP_TYPE_BYTE, address, value)) {
     return;
+  }
 
-  if (address & 0xFF000000)
+  if (address & 0xFF000000) {
     return;
+  }
 
   ps_write_8((uint32_t)address, value);
   return;
 }
 
 void m68k_write_memory_16(unsigned int address, unsigned int value) {
-  if (platform_write_check(OP_TYPE_WORD, address, value))
+  if (platform_write_check(OP_TYPE_WORD, address, value)) {
     return;
+  }
 
-  if (address & 0xFF000000)
+  if (address & 0xFF000000) {
     return;
+  }
 
   if (address & 0x01) {
     ps_write_8((uint32_t)address, value & 0xFF);
@@ -1338,11 +1403,13 @@ void m68k_write_memory_16(unsigned int address, unsigned int value) {
 }
 
 void m68k_write_memory_32(unsigned int address, unsigned int value) {
-  if (platform_write_check(OP_TYPE_LONGWORD, address, value))
+  if (platform_write_check(OP_TYPE_LONGWORD, address, value)) {
     return;
+  }
 
-  if (address & 0xFF000000)
+  if (address & 0xFF000000) {
     return;
+  }
 
   if (address & 0x01) {
     ps_write_8((uint32_t)address, value & 0xFF);
@@ -1355,9 +1422,10 @@ void m68k_write_memory_32(unsigned int address, unsigned int value) {
   ps_write_16((uint32_t)address + 2, value);
   return;
 }
-static void set_affinity_for(const char *name, int core_id) {
-  if (core_id < 0)
+static void set_affinity_for(const char* name, int core_id) {
+  if (core_id < 0) {
     return;
+  }
 
   cpu_set_t set;
   CPU_ZERO(&set);
@@ -1370,67 +1438,79 @@ static void set_affinity_for(const char *name, int core_id) {
   }
 }
 
-static void apply_affinity_from_env(const char *role, int default_core) {
+static void apply_affinity_from_env(const char* role, int default_core) {
   int target = default_core;
-  const char *env = getenv(PI_AFFINITY_ENV);
+  const char* env = getenv(PI_AFFINITY_ENV);
   if (env && strlen(env)) {
     // parse simple comma list key=val
-    char *dup = strdup(env);
-    char *tok = strtok(dup, ",");
+    char* dup = strdup(env);
+    char* tok = strtok(dup, ", ");
     while (tok) {
       char key[16];
       int val = -1;
       if (sscanf(tok, "%15[^=]=%d", key, &val) == 2) {
-        if (strcasecmp(key, "cpu") == 0 && strcmp(role, "cpu") == 0) target = val;
-        if (strcasecmp(key, "io") == 0 && strcmp(role, "io") == 0) target = val;
-        if (strcasecmp(key, "input") == 0 && strcmp(role, "input") == 0) target = val;
-        if (strcasecmp(key, "ipl") == 0 && strcmp(role, "ipl") == 0) target = val;
+        if (strcasecmp(key, "cpu") == 0 && strcmp(role, "cpu") == 0)
+          target = val;
+        if (strcasecmp(key, "io") == 0 && strcmp(role, "io") == 0)
+          target = val;
+        if (strcasecmp(key, "input") == 0 && strcmp(role, "input") == 0)
+          target = val;
+        if (strcasecmp(key, "ipl") == 0 && strcmp(role, "ipl") == 0)
+          target = val;
       }
-      tok = strtok(NULL, ",");
+      tok = strtok(NULL, ", ");
     }
     free(dup);
   }
   set_affinity_for(role, target);
 }
 
-static void set_realtime_priority(const char *name, int prio) {
+static void set_realtime_priority(const char* name, int prio) {
   int maxp = sched_get_priority_max(SCHED_RR);
   int minp = sched_get_priority_min(SCHED_RR);
-  if (prio < minp) prio = minp;
-  if (prio > maxp) prio = maxp;
+  if (prio < minp)
+    prio = minp;
+  if (prio > maxp)
+    prio = maxp;
 
   struct sched_param sp;
   memset(&sp, 0, sizeof(sp));
   sp.sched_priority = prio;
   if (pthread_setschedparam(pthread_self(), SCHED_RR, &sp) != 0) {
-    if (errno == EPERM)
-      printf("[PRIO] RT priority for %s denied (CAP_SYS_NICE/rtprio limit needed)\n", name);
-    else
-      printf("[PRIO] Failed to set RT priority for %s (%s)\n", name, strerror(errno));
+    if (errno == EPERM) {
+      printf("[PRIO] RT priority for %s denied ( CAP_SYS_NICE/rtprio limit needed )\n", name);
+    } else {
+      printf("[PRIO] Failed to set RT priority for %s ( %s )\n", name, strerror(errno));
+    }
   } else {
     printf("[PRIO] %s set to SCHED_RR priority %d\n", name, prio);
   }
 }
 
-static void apply_realtime_from_env(const char *role, int default_prio) {
+static void apply_realtime_from_env(const char* role, int default_prio) {
   int target = default_prio;
-  const char *env = getenv(PI_RT_ENV);
+  const char* env = getenv(PI_RT_ENV);
   if (env && strlen(env)) {
-    char *dup = strdup(env);
-    char *tok = strtok(dup, ",");
+    char* dup = strdup(env);
+    char* tok = strtok(dup, ", ");
     while (tok) {
       char key[16];
       int val = -1;
       if (sscanf(tok, "%15[^=]=%d", key, &val) == 2) {
-        if (strcasecmp(key, "cpu") == 0 && strcmp(role, "cpu") == 0) target = val;
-        if (strcasecmp(key, "io") == 0 && strcmp(role, "io") == 0) target = val;
-        if (strcasecmp(key, "input") == 0 && strcmp(role, "input") == 0) target = val;
-        if (strcasecmp(key, "ipl") == 0 && strcmp(role, "ipl") == 0) target = val;
+        if (strcasecmp(key, "cpu") == 0 && strcmp(role, "cpu") == 0)
+          target = val;
+        if (strcasecmp(key, "io") == 0 && strcmp(role, "io") == 0)
+          target = val;
+        if (strcasecmp(key, "input") == 0 && strcmp(role, "input") == 0)
+          target = val;
+        if (strcasecmp(key, "ipl") == 0 && strcmp(role, "ipl") == 0)
+          target = val;
       }
-      tok = strtok(NULL, ",");
+      tok = strtok(NULL, ", ");
     }
     free(dup);
   }
-  if (target > 0)
+  if (target > 0) {
     set_realtime_priority(role, target);
+  }
 }
