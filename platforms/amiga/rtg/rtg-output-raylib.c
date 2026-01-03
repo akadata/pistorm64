@@ -468,10 +468,13 @@ void rtg_init_display() {
   rtg_on = 1;
 
   if (!rtg_initialized) {
+#if USE_VC
     if (rtg_dpms) {
       vc_tv_hdmi_power_on_preferred();
     }
-    err = pthread_create(&thread_id, NULL, &rtgThread, (void*)&rtg_share_data);
+#endif
+
+    err = pthread_create(&thread_id, NULL, &rtgThread, (void *)&rtg_share_data);
     if (err != 0) {
       rtg_on = 0;
       display_enabled = 0xFF;
@@ -485,17 +488,24 @@ void rtg_init_display() {
   printf("RTG display enabled.\n");
 }
 
+
 void rtg_shutdown_display() {
   printf("RTG display disabled.\n");
+
+  shutdown = 1;
+
+#if USE_VC
   if (rtg_dpms) {
-    shutdown = 1;
     vc_tv_power_off();
-    pthread_join(thread_id, NULL);
   }
+#endif
+
+  pthread_join(thread_id, NULL);
 
   rtg_on = 0;
   display_enabled = 0xFF;
 }
+
 
 void rtg_show_clut_cursor(uint8_t show) {
   if (clut_cursor_enabled != show) {
