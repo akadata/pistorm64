@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "ps_protocol.h"
 #include "m68k.h"
@@ -31,9 +32,9 @@ unsigned int gpfsel0_o;
 unsigned int gpfsel1_o;
 unsigned int gpfsel2_o;
 
-#define NOP                                                                                        \
-  asm("nop");                                                                                      \
-  asm("nop");
+
+#define NOP asm("nop"); asm("nop");
+
 
 static void setup_io() {
   int fd = open("/dev/mem", O_RDWR | O_SYNC);
@@ -49,8 +50,9 @@ static void setup_io() {
                         fd,                     // File to map
                         BCM2708_PERI_BASE       // Offset to GPIO peripheral (Pi Zero W2 / Pi3)
   );
-
+  printf("[CLK] setup_io Closing fd, = %d\n", fd);
   close(fd);
+  printf("[CLK] setup_io Closed fd, = %d\n", fd);
 
   if (gpio_map == MAP_FAILED) {
     printf("mmap failed, errno = %d\n", errno);
@@ -59,12 +61,21 @@ static void setup_io() {
 
   gpio = ((volatile unsigned*)gpio_map) + GPIO_ADDR / 4;
   gpclk = ((volatile unsigned*)gpio_map) + GPCLK_ADDR / 4;
+
+  printf("[CLK] mmap gpio_map  = %p\n", (void*)gpio_map);
+  printf("[CLK] gpio ptr       = %p (GPIO_BASE)\n", (void*)gpio);
+  printf("[CLK] gpclk ptr      = %p (GPCLK_BASE)\n", (void*)gpclk);
+  printf("[CLK] GP0CTL reg ptr  = %p\n", (void*)(gpclk + (CLK_GP0_CTL/4)));
+  printf("[CLK] GP0DIV reg ptr  = %p\n", (void*)(gpclk + (CLK_GP0_DIV/4)));
+
 }
 
 static void setup_gpclk() {
   /* Program GPCLK0 for ~200MHz from PLLD (500MHz / 2.5). */
   const uint32_t ctl_idx = (CLK_GP0_CTL / 4);
   const uint32_t div_idx = (CLK_GP0_DIV / 4);
+  printf("[CLK] setup_gpclk ctl_idx, = %d\n", ctl_idx);
+  printf("[CLK] setup_gpclk div_idx, = %d\n", div_idx);
 
   /* Disable/kill and wait for BUSY to clear */
   *(gpclk + ctl_idx) = CLK_PASSWD | (1 << 5);
@@ -88,16 +99,19 @@ static void setup_gpclk() {
   while (((*(gpclk + ctl_idx)) & (1 << 7)) == 0 && timeout--) {
     usleep(10);
   }
+  printf("[CLK] setup_gpclk timeout took 1000-, = %d\n", timeout);
   uint32_t ctl = *(gpclk + ctl_idx);
   uint32_t div_rd = *(gpclk + div_idx);
   printf("[CLK] GP0CTL=0x%08X GP0DIV=0x%08X (target ~200MHz)\n", ctl, div_rd);
 
   // Enable 200MHz CLK output on GPIO4, adjust divider and pll source depending
   // on pi model
+    printf("setup_gpclk PIN_CLK, = %d\n", PIN_CLK);
   SET_GPIO_ALT(PIN_CLK, 0); // gpclk0
 }
 
-void ps_setup_protocol() {
+
+void ps_setup_protocol()  {
   setup_io();
   setup_gpclk();
 
@@ -174,9 +188,7 @@ void ps_write_32(unsigned int address, unsigned int value) {
   ps_write_16(address + 2, value);
 }
 
-#define NOP                                                                                        \
-  asm("nop");                                                                                      \
-  asm("nop");
+#define NOP  asm("nop"); asm("nop");
 
 unsigned int ps_read_16(unsigned int address) {
   *(gpio + 0) = GPFSEL0_OUTPUT;
@@ -326,3 +338,6 @@ void ps_update_irq() {
 
   m68k_set_irq(ipl);
 }
+
+
+
