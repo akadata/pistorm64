@@ -6,6 +6,7 @@ MAINFILES        = emulator.c \
 	config_file/rominfo.c \
 	input/input.c \
 	gpio/ps_protocol.c \
+	gpio/rpi_peri.c \
 	platforms/platforms.c \
 	platforms/amiga/amiga-autoconf.c \
 	platforms/amiga/amiga-platform.c \
@@ -68,7 +69,7 @@ clean:
 $(TARGET):  $(MUSAHIGENCFILES:%.c=%.o) $(.CFILES:%.c=%.o) a314/a314.o
 	$(CC) -o $@ $^ -O3 -pthread $(LFLAGS) -lm -lstdc++
 
-buptest: buptest.c gpio/ps_protocol.c
+buptest: buptest.c gpio/ps_protocol.c gpio/rpi_peri.c
 	$(CC) $^ -o $@ -I./ -march=armv8-a -mfloat-abi=hard -mfpu=neon-fp-armv8 -O0
 
 a314/a314.o: a314/a314.cc a314/a314.h

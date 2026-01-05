@@ -29,20 +29,13 @@
 #define STATUS_MASK_IPL 0xe000
 #define STATUS_SHIFT_IPL 13
 
-//#define BCM2708_PERI_BASE 0x20000000  // pi0-1
-//#define BCM2708_PERI_BASE	0xFE000000  // pi4
-#define BCM2708_PERI_BASE 0x3F000000  // pi3
-#define BCM2708_PERI_SIZE 0x01000000
+// Peripheral offsets (no model-specific base addresses here).
+#define GPIO_OFFSET 0x00200000u /* GPIO controller */
+#define CM_OFFSET 0x00101000u
 
-#define GPIO_ADDR 0x200000 /* GPIO controller */
-#define GPCLK_ADDR 0x101000
-
-#define GPIO_BASE (BCM2708_PERI_BASE + 0x200000) /* GPIO controller */
-#define GPCLK_BASE (BCM2708_PERI_BASE + 0x101000)
-
-#define CLK_PASSWD 0x5a000000
-#define CLK_GP0_CTL 0x070
-#define CLK_GP0_DIV 0x074
+#define CLK_PASSWD 0x5a000000u
+#define CLK_GP0_CTL 0x070u
+#define CLK_GP0_DIV 0x074u
 
 // GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or
 // SET_GPIO_ALT(x,y)
@@ -168,6 +161,7 @@ unsigned int ps_read_status_reg();
 void ps_write_status_reg(unsigned int value);
 
 void ps_setup_protocol();
+void ps_cleanup_protocol();
 void ps_reset_state_machine();
 void ps_pulse_reset();
 
