@@ -60,6 +60,7 @@ MAINFILES += config_file/rominfo.c
 
 MAINFILES += input/input.c
 MAINFILES += gpio/ps_protocol.c
+MAINFILES += gpio/rpi_peri.c
 
 MAINFILES += platforms/platforms.c
 
@@ -239,8 +240,11 @@ m68kcpu.o: m68kops.h
 m68kdasm.o: m68kops.h
 m68kops.o: m68kops.h
 
-buptest: buptest.c gpio/ps_protocol.c
+buptest: buptest.c gpio/ps_protocol.c gpio/rpi_peri.c
 	$(CC) $(CFLAGS) -o $@ $^
+
+fb2ami: fb2ami.c gpio/ps_protocol.c gpio/rpi_peri.c
+	$(CC) -O3 -I. -o $@ $^ -lbcm_host
 
 a314/a314.o: a314/a314.cc a314/a314.h
 	$(CXX) -MMD -MP -c -o a314/a314.o $(OPT_LEVEL) a314/a314.cc $(CPUFLAGS) $(DEFINES) -I. -I..

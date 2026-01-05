@@ -38,17 +38,49 @@ uint8_t total_errors = 0;
 void sigint_handler(int sig_num) {
   printf("Received sigint %d, exiting.\n", sig_num);
   printf("Total number of transaction errors occured: %d\n", total_errors);
+  ps_cleanup_protocol();
   if (mem_fd) {
     close(mem_fd);
   }
   exit(0);
 }
 
-void ps_reinit() {
-  ps_reset_state_machine();
-  ps_pulse_reset();
+static int wait_txn_idle(const char* tag, int timeout_us) {
+  while (timeout_us > 0) {
+    if (!(*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))) {
+      return 0;
+    }
+    usleep(10);
+    timeout_us -= 10;
+  }
+  printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
+  return -1;
+}
 
-  usleep(1500);
+static void warmup_bus(void) {
+  for (int i = 0; i < 64; i++) {
+    (void)ps_read_status_reg();
+    if ((i & 0x0f) == 0) {
+      usleep(100);
+    }
+  }
+}
+
+static void reset_amiga(const char* tag) {
+  for (int attempt = 0; attempt < 3; attempt++) {
+    ps_reset_state_machine();
+    ps_pulse_reset();
+    usleep(1500);
+    if (wait_txn_idle(tag, 20000) == 0) {
+      warmup_bus();
+      return;
+    }
+    usleep(2000);
+  }
+}
+
+void ps_reinit() {
+  reset_amiga("reinit");
 
   write8(0xbfe201, 0x0101); // CIA OVL
   write8(0xbfe001, 0x0000); // CIA OVL LOW
@@ -158,10 +190,7 @@ int main(int argc, char* argv[]) {
   signal(SIGINT, sigint_handler);
 
   ps_setup_protocol();
-  ps_reset_state_machine();
-  ps_pulse_reset();
-
-  usleep(1500);
+  reset_amiga("startup");
 
   write8(0xbfe201, 0x0101); // CIA OVL
   write8(0xbfe001, 0x0000); // CIA OVL LOW
