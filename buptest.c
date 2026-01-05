@@ -56,14 +56,25 @@ static int wait_txn_idle(const char* tag, int timeout_us) {
   return -1;
 }
 
+static void warmup_bus(void) {
+  for (int i = 0; i < 64; i++) {
+    (void)ps_read_status_reg();
+    if ((i & 0x0f) == 0) {
+      usleep(100);
+    }
+  }
+}
+
 static void reset_amiga(const char* tag) {
-  for (int attempt = 0; attempt < 2; attempt++) {
+  for (int attempt = 0; attempt < 3; attempt++) {
     ps_reset_state_machine();
     ps_pulse_reset();
     usleep(1500);
     if (wait_txn_idle(tag, 20000) == 0) {
+      warmup_bus();
       return;
     }
+    usleep(2000);
   }
 }
 
