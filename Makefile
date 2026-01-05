@@ -240,7 +240,7 @@ m68kcpu.o: m68kops.h
 m68kdasm.o: m68kops.h
 m68kops.o: m68kops.h
 
-buptest: buptest.c gpio/ps_protocol.c
+buptest: buptest.c gpio/ps_protocol.c gpio/rpi_peri.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 a314/a314.o: a314/a314.cc a314/a314.h
