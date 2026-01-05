@@ -6,6 +6,7 @@
 */
 
 #ifndef _PS_PROTOCOL_H
+#include <stdint.h>
 #define _PS_PROTOCOL_H
 
 #define PIN_TXN_IN_PROGRESS 0

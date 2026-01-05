@@ -84,10 +84,125 @@ unsigned char planar[153600];
 unsigned char eight[153600];
 
 static volatile sig_atomic_t stop = 0;
+static int use_image = 0;
+static int image_converted = 0;
+static char image_path[512];
 
 static void sig_handler(int sig_num) {
   (void)sig_num;
   stop = 1;
+}
+
+static int read_token(FILE *fp, char *out, size_t out_len) {
+  int ch;
+  size_t n = 0;
+
+  while ((ch = fgetc(fp)) != EOF) {
+    if (ch == '#') {
+      while ((ch = fgetc(fp)) != EOF && ch != '\n') {
+      }
+      continue;
+    }
+    if (ch > ' ') {
+      ungetc(ch, fp);
+      break;
+    }
+  }
+
+  while ((ch = fgetc(fp)) != EOF && ch > ' ') {
+    if (n + 1 < out_len) {
+      out[n++] = (char)ch;
+    }
+  }
+  if (n == 0) {
+    return -1;
+  }
+  out[n] = '\0';
+  return 0;
+}
+
+static int load_ppm_rgb565(const char *path, uint16_t *dst, size_t px_count) {
+  FILE *fp = fopen(path, "rb");
+  if (!fp) {
+    perror("open PPM");
+    return -1;
+  }
+
+  char tok[64];
+  if (read_token(fp, tok, sizeof(tok)) < 0 || strcmp(tok, "P6") != 0) {
+    fclose(fp);
+    return -1;
+  }
+  if (read_token(fp, tok, sizeof(tok)) < 0) {
+    fclose(fp);
+    return -1;
+  }
+  int width = atoi(tok);
+  if (read_token(fp, tok, sizeof(tok)) < 0) {
+    fclose(fp);
+    return -1;
+  }
+  int height = atoi(tok);
+  if (read_token(fp, tok, sizeof(tok)) < 0) {
+    fclose(fp);
+    return -1;
+  }
+  int maxval = atoi(tok);
+  if (width * height != (int)px_count || maxval <= 0) {
+    fprintf(stderr, "PPM size %dx%d does not match %zu pixels\n", width, height, px_count);
+    fclose(fp);
+    return -1;
+  }
+
+  for (size_t i = 0; i < px_count; i++) {
+    int r = fgetc(fp);
+    int g = fgetc(fp);
+    int b = fgetc(fp);
+    if (r == EOF || g == EOF || b == EOF) {
+      fclose(fp);
+      return -1;
+    }
+    if (maxval != 255) {
+      r = r * 255 / maxval;
+      g = g * 255 / maxval;
+      b = b * 255 / maxval;
+    }
+    dst[i] = (uint16_t)(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b & 0xF8) >> 3));
+  }
+
+  fclose(fp);
+  return 0;
+}
+
+static int load_raw_rgb565(const char *path, uint16_t *dst, size_t px_count) {
+  FILE *fp = fopen(path, "rb");
+  if (!fp) {
+    perror("open RGB565");
+    return -1;
+  }
+  size_t need = px_count * 2;
+  size_t rd = fread(dst, 1, need, fp);
+  fclose(fp);
+  if (rd != need) {
+    fprintf(stderr, "RGB565 file size %zu does not match %zu bytes\n", rd, need);
+    return -1;
+  }
+  return 0;
+}
+
+static int load_image(uint16_t *dst, size_t px_count) {
+  FILE *fp = fopen(image_path, "rb");
+  if (!fp) {
+    perror("open image");
+    return -1;
+  }
+  int c1 = fgetc(fp);
+  int c2 = fgetc(fp);
+  fclose(fp);
+  if (c1 == 'P' && c2 == '6') {
+    return load_ppm_rgb565(image_path, dst, px_count);
+  }
+  return load_raw_rgb565(image_path, dst, px_count);
 }
 
 static int check_emulator(void) {
@@ -192,51 +307,72 @@ int process() {
   VC_RECT_T rect1;
   int ret;
 
-  bcm_host_init();
-
-  display = vc_dispmanx_display_open(0);
-  if (!display) {
-    syslog(LOG_ERR, "Unable to open primary display");
-    return -1;
-  }
-  ret = vc_dispmanx_display_get_info(display, &display_info);
-  if (ret) {
-    syslog(LOG_ERR, "Unable to get primary display information");
-    return -1;
-  }
-  syslog(LOG_INFO, "Primary display is %d x %d", display_info.width,
-         display_info.height);
-
-  screen_resource =
-      vc_dispmanx_resource_create(VC_IMAGE_RGB565, 320, 240, &image_prt);
-  if (!screen_resource) {
-    syslog(LOG_ERR, "Unable to create screen buffer");
-    vc_dispmanx_display_close(display);
-    return -1;
+  if (!use_image) {
+    bcm_host_init();
   }
 
-  vc_dispmanx_rect_set(&rect1, 0, 0, 320, 240);
+  if (!use_image) {
+    display = vc_dispmanx_display_open(0);
+    if (!display) {
+      syslog(LOG_ERR, "Unable to open primary display");
+      return -1;
+    }
+    ret = vc_dispmanx_display_get_info(display, &display_info);
+    if (ret) {
+      syslog(LOG_ERR, "Unable to get primary display information");
+      return -1;
+    }
+    syslog(LOG_INFO, "Primary display is %d x %d", display_info.width,
+           display_info.height);
+
+    screen_resource =
+        vc_dispmanx_resource_create(VC_IMAGE_RGB565, 320, 240, &image_prt);
+    if (!screen_resource) {
+      syslog(LOG_ERR, "Unable to create screen buffer");
+      vc_dispmanx_display_close(display);
+      return -1;
+    }
+
+    vc_dispmanx_rect_set(&rect1, 0, 0, 320, 240);
+  }
 
   while (!stop) {
 
-    ret = vc_dispmanx_snapshot(display, screen_resource, 0);
-    vc_dispmanx_resource_read_data(screen_resource, &rect1, fbdata,
-                                   320 * 16 / 8);
-    // usleep(25 * 1000);
+    if (use_image) {
+      if (!image_converted) {
+        uint16_t *src = (uint16_t *)fbdata;
+        for (int i = 0; i < 320 * 240; i++) {
+          eight[i] = rgb565_to_4bit(src[i]);
+        }
+        c2p(eight, planar, 320, 240, 4);
+        image_converted = 1;
+      }
+    } else {
+      ret = vc_dispmanx_snapshot(display, screen_resource, 0);
+      (void)ret;
+      vc_dispmanx_resource_read_data(screen_resource, &rect1, fbdata,
+                                     320 * 16 / 8);
 
-    uint16_t *src = (uint16_t *)fbdata;
-    for (int i = 0; i < 320 * 240; i++) {
-      eight[i] = rgb565_to_4bit(src[i]);
+      uint16_t *src = (uint16_t *)fbdata;
+      for (int i = 0; i < 320 * 240; i++) {
+        eight[i] = rgb565_to_4bit(src[i]);
+      }
+      c2p(eight, planar, 320, 240, 4);
     }
-    c2p(eight, planar, 320, 240, 4);
 
     for (uint32_t i = 0; i < (0x2580 * 4); i += 2)
       write16(BP1BASE + i, (planar[i + 1]) | planar[i] << 8);
+    if (use_image) {
+      usleep(10000);
+    }
   }
 
-  ret = vc_dispmanx_resource_delete(screen_resource);
-  vc_dispmanx_display_close(display);
-  return ret ? -1 : 0;
+  if (!use_image) {
+    ret = vc_dispmanx_resource_delete(screen_resource);
+    vc_dispmanx_display_close(display);
+    return ret ? -1 : 0;
+  }
+  return 0;
 }
 
 int main(int argc, char **argv) {
@@ -248,7 +384,22 @@ int main(int argc, char **argv) {
           mlockall(MCL_CURRENT);
   */
 
-  if (check_emulator()) {
+  for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "-i") == 0 && i + 1 < argc) {
+      strncpy(image_path, argv[++i], sizeof(image_path) - 1);
+      use_image = 1;
+    } else {
+      printf("Usage: %s [-i image.ppm|image.rgb565]\n", argv[0]);
+      return 1;
+    }
+  }
+
+  if (use_image) {
+    if (load_image((uint16_t *)fbdata, 320 * 240) < 0) {
+      printf("Failed to load image %s\n", image_path);
+      return 1;
+    }
+  } else if (check_emulator()) {
     printf("PiStorm emulator running, please stop this before running fb2ami\n");
     return 1;
   }
