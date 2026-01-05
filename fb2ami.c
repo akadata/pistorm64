@@ -307,34 +307,30 @@ int process() {
   VC_RECT_T rect1;
   int ret;
 
-  if (!use_image) {
-    bcm_host_init();
+  bcm_host_init();
+
+  display = vc_dispmanx_display_open(0);
+  if (!display) {
+    syslog(LOG_ERR, "Unable to open primary display");
+    return -1;
+  }
+  ret = vc_dispmanx_display_get_info(display, &display_info);
+  if (ret) {
+    syslog(LOG_ERR, "Unable to get primary display information");
+    return -1;
+  }
+  syslog(LOG_INFO, "Primary display is %d x %d", display_info.width,
+         display_info.height);
+
+  screen_resource =
+      vc_dispmanx_resource_create(VC_IMAGE_RGB565, 320, 240, &image_prt);
+  if (!screen_resource) {
+    syslog(LOG_ERR, "Unable to create screen buffer");
+    vc_dispmanx_display_close(display);
+    return -1;
   }
 
-  if (!use_image) {
-    display = vc_dispmanx_display_open(0);
-    if (!display) {
-      syslog(LOG_ERR, "Unable to open primary display");
-      return -1;
-    }
-    ret = vc_dispmanx_display_get_info(display, &display_info);
-    if (ret) {
-      syslog(LOG_ERR, "Unable to get primary display information");
-      return -1;
-    }
-    syslog(LOG_INFO, "Primary display is %d x %d", display_info.width,
-           display_info.height);
-
-    screen_resource =
-        vc_dispmanx_resource_create(VC_IMAGE_RGB565, 320, 240, &image_prt);
-    if (!screen_resource) {
-      syslog(LOG_ERR, "Unable to create screen buffer");
-      vc_dispmanx_display_close(display);
-      return -1;
-    }
-
-    vc_dispmanx_rect_set(&rect1, 0, 0, 320, 240);
-  }
+  vc_dispmanx_rect_set(&rect1, 0, 0, 320, 240);
 
   while (!stop) {
 
@@ -367,12 +363,9 @@ int process() {
     }
   }
 
-  if (!use_image) {
-    ret = vc_dispmanx_resource_delete(screen_resource);
-    vc_dispmanx_display_close(display);
-    return ret ? -1 : 0;
-  }
-  return 0;
+  ret = vc_dispmanx_resource_delete(screen_resource);
+  vc_dispmanx_display_close(display);
+  return ret ? -1 : 0;
 }
 
 int main(int argc, char **argv) {
