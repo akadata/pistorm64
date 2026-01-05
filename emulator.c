@@ -511,6 +511,9 @@ void* keyboard_task() {
   kbdpoll[0].events = POLLIN;
 
 key_loop:
+  if (emulator_exiting || end_signal) {
+    goto key_end;
+  }
   kpollrc = poll(kbdpoll, 1, KEY_POLL_INTERVAL_MSEC);
   if ((kpollrc > 0) && (kbdpoll[0].revents & POLLHUP)) {
     // in the event that a keyboard is unplugged, keyboard_task will whiz up to 100% utilisation
@@ -955,6 +958,13 @@ switch_config:
 
   if (load_new_config != 0) {
     goto switch_config;
+  }
+
+  if (kbd_tid) {
+    pthread_join(kbd_tid, NULL);
+  }
+  if (mouse_tid) {
+    pthread_join(mouse_tid, NULL);
   }
 
   if (cfg->platform->shutdown) {
