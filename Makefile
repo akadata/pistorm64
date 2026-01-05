@@ -60,6 +60,7 @@ MAINFILES += config_file/rominfo.c
 
 MAINFILES += input/input.c
 MAINFILES += gpio/ps_protocol.c
+MAINFILES += gpio/rpi_peri.c
 
 MAINFILES += platforms/platforms.c
 
