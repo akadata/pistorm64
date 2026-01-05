@@ -691,6 +691,8 @@ void sigint_handler(int sig_num) {
     cfg->platform->shutdown(cfg);
   }
 
+  ps_cleanup_protocol();
+
   while (!emulator_exiting) {
     emulator_exiting = 1;
     usleep(0);
@@ -975,6 +977,8 @@ switch_config:
   if (cfg->platform->shutdown) {
     cfg->platform->shutdown(cfg);
   }
+
+  ps_cleanup_protocol();
 
   return 0;
 }

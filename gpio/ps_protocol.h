@@ -162,6 +162,7 @@ unsigned int ps_read_status_reg();
 void ps_write_status_reg(unsigned int value);
 
 void ps_setup_protocol();
+void ps_cleanup_protocol();
 void ps_reset_state_machine();
 void ps_pulse_reset();
 
