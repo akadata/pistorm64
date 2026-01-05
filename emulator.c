@@ -117,6 +117,7 @@ static inline uint8_t opcode_is_fpu(uint16_t opcode);
 static void apply_affinity_from_env(const char* role, int default_core);
 static void set_realtime_priority(const char* name, int prio);
 static void apply_realtime_from_env(const char* role, int default_prio);
+static void amiga_reset_and_wait(const char* tag);
 
 #define MUSASHI_HAX
 
@@ -151,6 +152,24 @@ extern int m68ki_remaining_cycles;
 #else
 #define DEBUG(...)
 #endif
+
+static void amiga_reset_and_wait(const char* tag) {
+  for (int attempt = 0; attempt < 2; attempt++) {
+    ps_reset_state_machine();
+    ps_pulse_reset();
+    usleep(1500);
+
+    int timeout_us = 20000;
+    while (timeout_us > 0) {
+      if (!(*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))) {
+        return;
+      }
+      usleep(10);
+      timeout_us -= 10;
+    }
+  }
+  printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
+}
 
 // Configurable emulator options
 unsigned int cpu_type = M68K_CPU_TYPE_68000;
@@ -748,9 +767,7 @@ int main(int argc, char* argv[]) {
 switch_config:
   srand(clock());
 
-  ps_reset_state_machine();
-  ps_pulse_reset();
-  usleep(1500);
+  amiga_reset_and_wait("startup");
 
   if (load_new_config != 0) {
     uint8_t config_action = load_new_config - 1;
@@ -867,9 +884,7 @@ switch_config:
 
   signal(SIGINT, sigint_handler);
 
-  ps_reset_state_machine();
-  ps_pulse_reset();
-  usleep(1500);
+  amiga_reset_and_wait("pre-cpu");
 
   m68k_init();
   printf("Setting CPU type to %d.\n", cpu_type);

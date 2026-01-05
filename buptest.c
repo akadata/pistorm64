@@ -44,11 +44,31 @@ void sigint_handler(int sig_num) {
   exit(0);
 }
 
-void ps_reinit() {
-  ps_reset_state_machine();
-  ps_pulse_reset();
+static int wait_txn_idle(const char* tag, int timeout_us) {
+  while (timeout_us > 0) {
+    if (!(*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))) {
+      return 0;
+    }
+    usleep(10);
+    timeout_us -= 10;
+  }
+  printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
+  return -1;
+}
 
-  usleep(1500);
+static void reset_amiga(const char* tag) {
+  for (int attempt = 0; attempt < 2; attempt++) {
+    ps_reset_state_machine();
+    ps_pulse_reset();
+    usleep(1500);
+    if (wait_txn_idle(tag, 20000) == 0) {
+      return;
+    }
+  }
+}
+
+void ps_reinit() {
+  reset_amiga("reinit");
 
   write8(0xbfe201, 0x0101); // CIA OVL
   write8(0xbfe001, 0x0000); // CIA OVL LOW
@@ -158,10 +178,7 @@ int main(int argc, char* argv[]) {
   signal(SIGINT, sigint_handler);
 
   ps_setup_protocol();
-  ps_reset_state_machine();
-  ps_pulse_reset();
-
-  usleep(1500);
+  reset_amiga("startup");
 
   write8(0xbfe201, 0x0101); // CIA OVL
   write8(0xbfe001, 0x0000); // CIA OVL LOW
