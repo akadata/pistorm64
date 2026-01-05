@@ -144,16 +144,16 @@ uint8_t RGB565TORGB323(uint16_t COLOR) {
   return k;
 }
 
-void fb2grey(void *dest, uint16_t *src, uint16_t x, uint16_t y,
-             uint16_t shift) {
-  int i = 0;
-  for (i = 0; i < x * y; i++) {
-    int16_t R = ((src[i] & 0xF800) >> 11);
-    int16_t G = ((src[i] & 0x07E0) >> 5);
-    int16_t B = (src[i] & 0x001F);
-    uint8_t grey = R * 0.3 + G * 0.58 + B * 0.11;
-    *(uint8_t *)(dest + i) = grey >> shift;
-  }
+static inline uint8_t rgb565_to_4bit(uint16_t px) {
+  uint8_t r = (px >> 11) & 0x1F;
+  uint8_t g = (px >> 5) & 0x3F;
+  uint8_t b = px & 0x1F;
+
+  r >>= 3;
+  g >>= 4;
+  b >>= 3;
+
+  return (r << 2) | g;
 }
 
 static void c2p(unsigned char *source, unsigned char *dest, unsigned int width,
@@ -224,7 +224,10 @@ int process() {
                                    320 * 16 / 8);
     // usleep(25 * 1000);
 
-    fb2grey(eight, (uint16_t *)fbdata, 320, 240, 2);
+    uint16_t *src = (uint16_t *)fbdata;
+    for (int i = 0; i < 320 * 240; i++) {
+      eight[i] = rgb565_to_4bit(src[i]);
+    }
     c2p(eight, planar, 320, 240, 4);
 
     for (uint32_t i = 0; i < (0x2580 * 4); i += 2)
@@ -287,22 +290,22 @@ int main(int argc, char **argv) {
   write16(DIWSTRT, XSTRT + (YSTRT * 256));               // start window
   write16(DIWSTOP, (XSTOP - 256) + (YSTOP - 256) * 256); // stop window
 
-  write16(COLOR0, 0x0000);  // color0
-  write16(COLOR1, 0x1111);  // color1
-  write16(COLOR2, 0x2222);  // color1
-  write16(COLOR3, 0x3333);  // color1
-  write16(COLOR4, 0x4444);  // color1
-  write16(COLOR5, 0x5555);  // color1
-  write16(COLOR6, 0x6666);  // color1
-  write16(COLOR7, 0x7777);  // color1
-  write16(COLOR8, 0x8888);  // color0
-  write16(COLOR9, 0x9999);  // color1
-  write16(COLOR10, 0xAAAA); // color1
-  write16(COLOR11, 0xBBBB); // color1
-  write16(COLOR12, 0xCCCC); // color1
-  write16(COLOR13, 0xDDDD); // color1
-  write16(COLOR14, 0xEEEE); // color1
-  write16(COLOR15, 0xffff); // color1
+  write16(COLOR0,  0x0000); // black
+  write16(COLOR1,  0xF000); // red
+  write16(COLOR2,  0x0F00); // green
+  write16(COLOR3,  0x00F0); // blue
+  write16(COLOR4,  0xFF00); // yellow
+  write16(COLOR5,  0xF0F0); // magenta
+  write16(COLOR6,  0x0FF0); // cyan
+  write16(COLOR7,  0xFFF0); // white
+  write16(COLOR8,  0x7000); // dark red
+  write16(COLOR9,  0x0700); // dark green
+  write16(COLOR10, 0x0070); // dark blue
+  write16(COLOR11, 0x7700); // olive
+  write16(COLOR12, 0x7070); // purple
+  write16(COLOR13, 0x0770); // teal
+  write16(COLOR14, 0x7770); // light gray
+  write16(COLOR15, 0x8880); // gray
 
   // load copperlist into chipmem
   uint32_t addr = COPBASE; // 0x2000 looks like a fine place for it...
@@ -354,4 +357,9 @@ int main(int argc, char **argv) {
   ps_cleanup_protocol();
 
   return 0;
+}
+
+// fb2ami standalone tool does not run a 68k core.
+// ps_protocol links against m68k_set_irq() from the emulator, so provide a stub.
+void m68k_set_irq(unsigned int level __attribute__((unused))) {
 }
