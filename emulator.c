@@ -82,6 +82,7 @@ uint32_t last_last_irq = 8;
 uint8_t ipl_enabled[8];
 
 uint8_t end_signal = 0;
+static volatile sig_atomic_t sigint_seen = 0;
 uint8_t load_new_config = 0;
 uint8_t enable_jit_backend = 0;
 uint8_t enable_fpu_jit_backend = 0;
@@ -675,34 +676,10 @@ void stop_cpu_emulation(uint8_t disasm_cur) {
 }
 
 void sigint_handler(int sig_num) {
-  // if ( sig_num ) { }
-  // cpu_emulation_running = 0;
-
-  // return;
-  printf("Received sigint %d, exiting.\n", sig_num);
-  if (mouse_fd != -1) {
-    close(mouse_fd);
-  }
-  if (mem_fd) {
-    close(mem_fd);
-  }
-
-  if (cfg->platform->shutdown) {
-    cfg->platform->shutdown(cfg);
-  }
-
-  ps_cleanup_protocol();
-
-  while (!emulator_exiting) {
-    emulator_exiting = 1;
-    usleep(0);
-  }
-
-  printf("IRQs triggered: %lu\n", (unsigned long)trig_irq);
-  printf("IRQs serviced: %lu\n", (unsigned long)serv_irq);
-  printf("Last serviced IRQ: %d\n", last_last_irq);
-
-  exit(0);
+  (void)sig_num;
+  sigint_seen = 1;
+  end_signal = 1;
+  emulator_exiting = 1;
 }
 
 int main(int argc, char* argv[]) {
@@ -953,6 +930,12 @@ switch_config:
 
   // wait for cpu task to end before closing up and finishing
   pthread_join(cpu_tid, NULL);
+
+  if (sigint_seen) {
+    printf("IRQs triggered: %lu\n", (unsigned long)trig_irq);
+    printf("IRQs serviced: %lu\n", (unsigned long)serv_irq);
+    printf("Last serviced IRQ: %d\n", last_last_irq);
+  }
 
   while (!emulator_exiting) {
     emulator_exiting = 1;
