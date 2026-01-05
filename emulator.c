@@ -205,6 +205,9 @@ void* ipl_task(void* args) {
   uint32_t value;
 
   while (1) {
+    if (emulator_exiting || end_signal) {
+      break;
+    }
     value = *(gpio + 13);
     if (value & (1 << PIN_TXN_IN_PROGRESS)) {
       goto noppers;
@@ -264,6 +267,7 @@ void* ipl_task(void* args) {
     NOP NOP NOP NOP NOP NOP NOP NOP
     NOP NOP NOP NOP NOP NOP NOP NOP*/
   }
+  printf("IPL thread exiting\n");
   return args;
 }
 
@@ -965,6 +969,9 @@ switch_config:
   }
   if (mouse_tid) {
     pthread_join(mouse_tid, NULL);
+  }
+  if (ipl_tid) {
+    pthread_join(ipl_tid, NULL);
   }
 
   if (cfg->platform->shutdown) {
