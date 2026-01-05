@@ -336,6 +336,8 @@ int process() {
 
     if (use_image) {
       if (!image_converted) {
+        memset(planar, 0, sizeof(planar));
+        memset(eight, 0, sizeof(eight));
         uint16_t *src = (uint16_t *)fbdata;
         for (int i = 0; i < 320 * 240; i++) {
           eight[i] = rgb565_to_4bit(src[i]);
