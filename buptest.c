@@ -395,5 +395,5 @@ test_loop:;
     return 0;
 }
 
-void m68k_set_irq(unsigned int level) {
+void m68k_set_irq(unsigned int level __attribute__((unused))) {
 }
