@@ -72,6 +72,7 @@ uint32_t last_irq = 8, last_last_irq = 8;
 uint8_t ipl_enabled[8];
 
 uint8_t end_signal = 0, load_new_config = 0;
+static volatile sig_atomic_t sigint_seen = 0;
 
 char disasm_buf[4096];
 
@@ -128,6 +129,9 @@ void *ipl_task(void *args) {
   uint32_t value;
 
   while (1) {
+    if (emulator_exiting || end_signal) {
+      break;
+    }
     value = *(gpio + 13);
     if (value & (1 << PIN_TXN_IN_PROGRESS))
       goto noppers;
@@ -193,6 +197,7 @@ noppers:
     NOP NOP NOP NOP NOP NOP NOP NOP
     NOP NOP NOP NOP NOP NOP NOP NOP*/
   }
+  printf("IPL thread exiting\n");
   return args;
 }
 
@@ -373,6 +378,9 @@ void *keyboard_task() {
   kbdpoll[0].events = POLLIN;
 
 key_loop:
+  if (emulator_exiting || end_signal) {
+    goto key_end;
+  }
   kpollrc = poll(kbdpoll, 1, KEY_POLL_INTERVAL_MSEC);
   if ((kpollrc > 0) && (kbdpoll[0].revents & POLLHUP)) {
     // in the event that a keyboard is unplugged, keyboard_task will whiz up to 100% utilisation
@@ -495,30 +503,39 @@ void stop_cpu_emulation(uint8_t disasm_cur) {
 }
 
 void sigint_handler(int sig_num) {
-  //if (sig_num) { }
-  //cpu_emulation_running = 0;
+  (void)sig_num;
+  sigint_seen = 1;
+  end_signal = 1;
+  emulator_exiting = 1;
+}
 
-  //return;
-  printf("Received sigint %d, exiting.\n", sig_num);
-  if (mouse_fd != -1)
-    close(mouse_fd);
-  if (mem_fd)
-    close(mem_fd);
-
-  if (cfg->platform->shutdown) {
-    cfg->platform->shutdown(cfg);
+static void amiga_warmup_bus(void) {
+  for (int i = 0; i < 64; i++) {
+    (void)ps_read_status_reg();
+    if ((i & 0x0f) == 0) {
+      usleep(100);
+    }
   }
+}
 
-  while (!emulator_exiting) {
-    emulator_exiting = 1;
-    usleep(0);
+static void amiga_reset_and_wait(const char *tag) {
+  for (int attempt = 0; attempt < 3; attempt++) {
+    ps_reset_state_machine();
+    ps_pulse_reset();
+    usleep(1500);
+
+    int timeout_us = 20000;
+    while (timeout_us > 0) {
+      if (!(*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))) {
+        amiga_warmup_bus();
+        return;
+      }
+      usleep(10);
+      timeout_us -= 10;
+    }
+    usleep(2000);
   }
-
-  printf("IRQs triggered: %lld\n", trig_irq);
-  printf("IRQs serviced: %lld\n", serv_irq);
-  printf("Last serviced IRQ: %d\n", last_last_irq);
-
-  exit(0);
+  printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
 }
 
 int main(int argc, char *argv[]) {
@@ -566,9 +583,7 @@ int main(int argc, char *argv[]) {
 switch_config:
   srand(clock());
 
-  ps_reset_state_machine();
-  ps_pulse_reset();
-  usleep(1500);
+  amiga_reset_and_wait("startup");
 
   if (load_new_config != 0) {
     uint8_t config_action = load_new_config - 1;
@@ -656,9 +671,7 @@ switch_config:
 
   signal(SIGINT, sigint_handler);
 
-  ps_reset_state_machine();
-  ps_pulse_reset();
-  usleep(1500);
+  amiga_reset_and_wait("pre-cpu");
 
   m68k_init();
   printf("Setting CPU type to %d.\n", cpu_type);
@@ -698,6 +711,12 @@ switch_config:
   // wait for cpu task to end before closing up and finishing
   pthread_join(cpu_tid, NULL);
 
+  if (sigint_seen) {
+    printf("IRQs triggered: %llu\n", (unsigned long long)trig_irq);
+    printf("IRQs serviced: %llu\n", (unsigned long long)serv_irq);
+    printf("Last serviced IRQ: %d\n", last_last_irq);
+  }
+
   while (!emulator_exiting) {
     emulator_exiting = 1;
     usleep(0);
@@ -705,6 +724,13 @@ switch_config:
 
   if (load_new_config == 0)
     printf("[MAIN] All threads appear to have concluded; ending process\n");
+
+  if (kbd_tid) {
+    pthread_join(kbd_tid, NULL);
+  }
+  if (ipl_tid) {
+    pthread_join(ipl_tid, NULL);
+  }
 
   if (mouse_fd != -1)
     close(mouse_fd);
@@ -717,6 +743,8 @@ switch_config:
   if (cfg->platform->shutdown) {
     cfg->platform->shutdown(cfg);
   }
+
+  ps_cleanup_protocol();
 
   return 0;
 }
