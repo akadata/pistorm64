@@ -29,6 +29,12 @@ static uint32_t gpio_page_off;
 static uint32_t cm_page_off;
 static size_t map_len = 0x1000;
 static int mem_fd = -1;
+static volatile uint32_t* gpio_map_base;
+static volatile uint32_t* cm_map_base;
+static uint32_t saved_gp0ctl;
+static uint32_t saved_gp0div;
+static uint32_t saved_gpfsel0;
+static int cleanup_registered;
 
 unsigned int gpfsel0;
 unsigned int gpfsel1;
@@ -90,8 +96,14 @@ static int setup_io() {
   close(mem_fd);
   mem_fd = -1;
 
+  gpio_map_base = gpio_map;
+  cm_map_base = cm_map;
   gpio = (volatile unsigned int*)(((uint8_t*)gpio_map) + gpio_page_off);
   cm = (volatile uint32_t*)(((uint8_t*)cm_map) + cm_page_off);
+
+  saved_gp0ctl = *cm_reg(CLK_GP0_CTL);
+  saved_gp0div = *cm_reg(CLK_GP0_DIV);
+  saved_gpfsel0 = *gpio_reg(0x00u);
 
   printf("[CLK] PERI=0x%08x\n", peri);
   printf("[CLK] mmap gpio_map  = %p\n", (void*)gpio_map);
@@ -107,6 +119,7 @@ static int setup_io() {
 
 #define GPCLK_CTL_BUSY (1u << 7)
 #define GPCLK_CTL_ENAB (1u << 4)
+#define GPCLK_CTL_KILL (1u << 5)
 #define GPCLK_CTL_SRC_MASK 0xFu
 #define GPCLK_SRC_PLLD 6u
 
@@ -224,10 +237,47 @@ static void setup_gpclk() {
   }
 }
 
+void ps_cleanup_protocol() {
+  if (cm) {
+    volatile uint32_t* gp0ctl = cm_reg(CLK_GP0_CTL);
+    volatile uint32_t* gp0div = cm_reg(CLK_GP0_DIV);
+
+    uint32_t ctl = *gp0ctl;
+    *gp0ctl = CLK_PASSWD | (ctl & ~GPCLK_CTL_ENAB) | GPCLK_CTL_KILL;
+    if (wait_busy(gp0ctl, 0, 2000) < 0) {
+      fprintf(stderr, "[CLK] Warning: GPCLK0 BUSY did not clear on shutdown\n");
+    }
+
+    *gp0div = CLK_PASSWD | saved_gp0div;
+    *gp0ctl = CLK_PASSWD | (saved_gp0ctl & ~GPCLK_CTL_KILL);
+  }
+
+  if (gpio) {
+    uint32_t fsel0 = *gpio_reg(0x00u);
+    fsel0 &= ~(0x7u << 12);
+    fsel0 |= (saved_gpfsel0 & (0x7u << 12));
+    *gpio_reg(0x00u) = fsel0;
+  }
+
+  if (gpio_map_base && gpio_map_base != (volatile uint32_t*)MAP_FAILED) {
+    munmap((void*)gpio_map_base, map_len);
+  }
+  if (cm_map_base && cm_map_base != (volatile uint32_t*)MAP_FAILED) {
+    munmap((void*)cm_map_base, map_len);
+  }
+  gpio_map_base = NULL;
+  cm_map_base = NULL;
+  gpio = NULL;
+  cm = NULL;
+}
 
 void ps_setup_protocol()  {
   if (setup_io() < 0) {
     exit(-1);
+  }
+  if (!cleanup_registered) {
+    atexit(ps_cleanup_protocol);
+    cleanup_registered = 1;
   }
   setup_gpclk();
   usleep(5000);
@@ -455,4 +505,3 @@ void ps_update_irq() {
 
   m68k_set_irq(ipl);
 }
-
