@@ -20,7 +20,8 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
                 uint16_t src_pitch);
 
 uint8_t rtg_u8[4];
-uint16_t rtg_x[8], rtg_y[8];
+uint16_t rtg_x[8];
+uint16_t rtg_y[8];
 uint16_t rtg_user[8];
 uint16_t rtg_format;
 uint32_t rtg_address[8];
@@ -29,10 +30,13 @@ uint32_t rtg_rgb[8];
 
 uint8_t display_enabled = 0xFF;
 
-uint16_t rtg_display_width, rtg_display_height;
+uint16_t rtg_display_width;
+uint16_t rtg_display_height;
 uint16_t rtg_display_format;
-uint16_t rtg_pitch, rtg_total_rows;
-uint16_t rtg_offset_x, rtg_offset_y;
+uint16_t rtg_pitch;
+uint16_t rtg_total_rows;
+uint16_t rtg_offset_x;
+uint16_t rtg_offset_y;
 
 uint8_t* rtg_mem; // FIXME
 
@@ -45,7 +49,9 @@ static void handle_irtg_command(uint32_t cmd);
 uint8_t realtime_graphics_debug = 0;
 extern int cpu_emulation_running;
 extern struct emulator_config* cfg;
-extern uint8_t rtg_on, rtg_enabled, rtg_output_in_vblank;
+extern uint8_t rtg_on;
+extern uint8_t rtg_enabled;
+extern uint8_t rtg_output_in_vblank;
 
 //#define DEBUG_RTG
 

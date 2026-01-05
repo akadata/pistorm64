@@ -4,8 +4,13 @@
 #include <stdint.h>
 #include "rtg.h"
 
-uint8_t busy = 0, rtg_on = 0, rtg_initialized = 0, emulator_exiting = 0, rtg_output_in_vblank = 0,
-        rtg_dpms = 0, shutdown = 0;
+uint8_t busy = 0;
+uint8_t rtg_on = 0;
+uint8_t rtg_initialized = 0;
+uint8_t emulator_exiting = 0;
+uint8_t rtg_output_in_vblank = 0;
+uint8_t rtg_dpms = 0;
+uint8_t shutdown = 0;
 uint32_t cur_rtg_frame = 0;
 
 void rtg_init_display(void) {
