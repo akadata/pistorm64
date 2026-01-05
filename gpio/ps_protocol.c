@@ -230,6 +230,7 @@ void ps_setup_protocol()  {
     exit(-1);
   }
   setup_gpclk();
+  usleep(5000);
 
   *(gpio + 10) = 0xffffec;
 
@@ -454,5 +455,4 @@ void ps_update_irq() {
 
   m68k_set_irq(ipl);
 }
-
 

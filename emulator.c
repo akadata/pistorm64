@@ -118,6 +118,7 @@ static void apply_affinity_from_env(const char* role, int default_core);
 static void set_realtime_priority(const char* name, int prio);
 static void apply_realtime_from_env(const char* role, int default_prio);
 static void amiga_reset_and_wait(const char* tag);
+static void amiga_warmup_bus(void);
 
 #define MUSASHI_HAX
 
@@ -153,8 +154,17 @@ extern int m68ki_remaining_cycles;
 #define DEBUG(...)
 #endif
 
+static void amiga_warmup_bus(void) {
+  for (int i = 0; i < 64; i++) {
+    (void)ps_read_status_reg();
+    if ((i & 0x0f) == 0) {
+      usleep(100);
+    }
+  }
+}
+
 static void amiga_reset_and_wait(const char* tag) {
-  for (int attempt = 0; attempt < 2; attempt++) {
+  for (int attempt = 0; attempt < 3; attempt++) {
     ps_reset_state_machine();
     ps_pulse_reset();
     usleep(1500);
@@ -162,11 +172,13 @@ static void amiga_reset_and_wait(const char* tag) {
     int timeout_us = 20000;
     while (timeout_us > 0) {
       if (!(*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))) {
+        amiga_warmup_bus();
         return;
       }
       usleep(10);
       timeout_us -= 10;
     }
+    usleep(2000);
   }
   printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
 }
