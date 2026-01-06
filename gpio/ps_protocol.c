@@ -117,11 +117,13 @@ static int setup_io() {
 
 }
 
-#define GPCLK_CTL_BUSY (1u << 7)
-#define GPCLK_CTL_ENAB (1u << 4)
-#define GPCLK_CTL_KILL (1u << 5)
-#define GPCLK_CTL_SRC_MASK 0xFu
-#define GPCLK_SRC_PLLD 6u
+#define GPCLK_CTL_BUSY      (1u << 7)
+#define GPCLK_CTL_ENAB      (1u << 4)
+#define GPCLK_CTL_KILL      (1u << 5)
+#define GPCLK_CTL_SRC_MASK  0xFu
+#define GPCLK_CTL_MASH_MASK (3u << 9)   // bits 9..10
+#define GPCLK_SRC_PLLD      6u
+
 
 static int wait_busy(volatile uint32_t* ctl, int want_busy, int timeout_us) {
   struct timespec t0;
@@ -141,17 +143,6 @@ static int wait_busy(volatile uint32_t* ctl, int want_busy, int timeout_us) {
   }
 }
 
-static uint32_t cm_make_div(double d) {
-  if (d < 1.0) d = 1.0;
-  if (d > 4095.999) d = 4095.999;
-  uint32_t divi = (uint32_t)d;
-  uint32_t divf = (uint32_t)((d - (double)divi) * 4096.0 + 0.5);
-  if (divf >= 4096) {
-    divf = 0;
-    divi++;
-  }
-  return (divi << 12) | (divf & 0xFFF);
-}
 
 static uint32_t try_read_plld_hz_from_debugfs(void) {
   const char* paths[] = {
@@ -174,67 +165,94 @@ static uint32_t try_read_plld_hz_from_debugfs(void) {
 }
 
 static void setup_gpclk() {
-  const uint32_t target_hz = 200000000u;
-  volatile uint32_t* gp0ctl = cm_reg(CLK_GP0_CTL);
-  volatile uint32_t* gp0div = cm_reg(CLK_GP0_DIV);
+    /*
+      IMPORTANT:
+      - Use an integer divider (DIVF=0) and MASH=0.
+      - Do not inherit MASH/SRC from whatever firmware left in GP0CTL.
 
-  uint32_t plld_hz = try_read_plld_hz_from_debugfs();
-  uint32_t src_hz = plld_hz ? plld_hz : 500000000u;
+      Empirically on your Alpine boot, DIVI=2, DIVF=0 with SRC=PLLD is stable
+      (250MHz). The previous 200MHz path used DIVF=2048 and depended on MASH
+      state; if firmware leaves MASH=1, that can produce an unstable clock for
+      this external bus.
+    */
 
-  if (!plld_hz) {
-    fprintf(stderr, "[CLK] PLLD rate not found; assuming %u Hz\n", src_hz);
-  } else {
-    fprintf(stderr, "[CLK] PLLD rate: %u Hz\n", src_hz);
-  }
+    const uint32_t target_hz = 250000000u;   // stable on your captures
+    volatile uint32_t* gp0ctl = cm_reg(CLK_GP0_CTL);
+    volatile uint32_t* gp0div = cm_reg(CLK_GP0_DIV);
 
-  double div = (double)src_hz / (double)target_hz;
-  uint32_t div_reg = cm_make_div(div);
+    uint32_t plld_hz = try_read_plld_hz_from_debugfs();
+    uint32_t src_hz  = plld_hz ? plld_hz : 500000000u;
 
-  uint32_t ctl = *gp0ctl;
-  *gp0ctl = CLK_PASSWD | (ctl & ~GPCLK_CTL_ENAB);
-  if (wait_busy(gp0ctl, 0, 2000) < 0) {
-    fprintf(stderr, "[CLK] Warning: GPCLK0 BUSY did not clear (continuing)\n");
-  }
+    if (!plld_hz) {
+        fprintf(stderr, "[CLK] PLLD rate not found; assuming %u Hz\n", src_hz);
+    } else {
+        fprintf(stderr, "[CLK] PLLD rate: %u Hz\n", src_hz);
+    }
 
-  *gp0div = CLK_PASSWD | div_reg;
+    /*
+      Compute divider, but force integer divider and MASH=0.
+      For 500MHz/250MHz this becomes exactly DIVI=2, DIVF=0.
+    */
+    double div = (double)src_hz / (double)target_hz;
+    if (div < 1.0) div = 1.0;
+    if (div > 4095.0) div = 4095.0;
+    uint32_t divi = (uint32_t)(div + 0.5);   // nearest integer
+    if (divi < 1) divi = 1;
+    if (divi > 4095) divi = 4095;
+    uint32_t div_reg = (divi << 12);         // DIVF forced to 0
 
-  uint32_t newctl = *gp0ctl;
-  newctl &= ~GPCLK_CTL_SRC_MASK;
-  newctl |= (GPCLK_SRC_PLLD & GPCLK_CTL_SRC_MASK);
-  newctl |= GPCLK_CTL_ENAB;
-  *gp0ctl = CLK_PASSWD | newctl;
+    /*
+      Key change:
+      Clear GP0CTL first (PASSWD|0), do not preserve old bits.
+      This matches your proven devmem2 sequence (writing 0x5a000000).
+    */
+    *gp0ctl = CLK_PASSWD | 0u;
+    if (wait_busy(gp0ctl, 0, 2000) < 0) {
+        fprintf(stderr, "[CLK] Warning: GPCLK0 BUSY did not clear after clear\n");
+    }
 
-  if (wait_busy(gp0ctl, 1, 2000) < 0) {
-    fprintf(stderr, "[CLK] Warning: GPCLK0 BUSY did not assert (continuing)\n");
-  }
+    *gp0div = CLK_PASSWD | div_reg;
 
-  uint32_t rd_ctl = *gp0ctl;
-  uint32_t rd_div = *gp0div;
-  uint32_t rd_divi = (rd_div >> 12) & 0xFFF;
-  uint32_t rd_divf = rd_div & 0xFFF;
-  double rd_div_total = (double)rd_divi + ((double)rd_divf / 4096.0);
-  double actual_hz = src_hz / rd_div_total;
+    /*
+      Program SRC=PLLD, EN=1, MASH=0 explicitly.
+      (MASH=0 is critical because DIVF=0; also avoids inherited jitter states.)
+    */
+    uint32_t newctl = 0u;
+    newctl &= ~GPCLK_CTL_SRC_MASK;
+    newctl |= (GPCLK_SRC_PLLD & GPCLK_CTL_SRC_MASK);
+    newctl &= ~GPCLK_CTL_MASH_MASK;
+    newctl |= GPCLK_CTL_ENAB;
+    *gp0ctl = CLK_PASSWD | newctl;
 
-  if ((rd_ctl & GPCLK_CTL_SRC_MASK) != GPCLK_SRC_PLLD) {
-    fprintf(stderr, "[CLK] Warning: GPCLK0 SRC=%u (expected %u)\n",
-            rd_ctl & GPCLK_CTL_SRC_MASK, GPCLK_SRC_PLLD);
-  }
+    if (wait_busy(gp0ctl, 1, 2000) < 0) {
+        fprintf(stderr, "[CLK] Warning: GPCLK0 BUSY did not assert (continuing)\n");
+    }
 
-  fprintf(stderr,
-          "[CLK] GP0CTL=0x%08X GP0DIV=0x%08X (target %u Hz, ~%.1f MHz)\n",
-          rd_ctl, rd_div, target_hz, actual_hz / 1000000.0);
+    uint32_t rd_ctl = *gp0ctl;
+    uint32_t rd_div = *gp0div;
+    uint32_t rd_divi = (rd_div >> 12) & 0xFFF;
+    double actual_hz = (rd_divi ? ((double)src_hz / (double)rd_divi) : 0.0);
 
-  // Enable 200MHz CLK output on GPIO4
-  printf("setup_gpclk PIN_CLK, = %d\n", PIN_CLK);
-  SET_GPIO_ALT(PIN_CLK, 0); // gpclk0
+    if ((rd_ctl & GPCLK_CTL_SRC_MASK) != GPCLK_SRC_PLLD) {
+        fprintf(stderr, "[CLK] Warning: GPCLK0 SRC=%u (expected %u)\n",
+                rd_ctl & GPCLK_CTL_SRC_MASK, GPCLK_SRC_PLLD);
+    }
 
-  uint32_t fsel0 = *gpio_reg(0x00u);
-  uint32_t gpio4_f = (fsel0 >> 12) & 0x7;
-  if (gpio4_f != 4) {
     fprintf(stderr,
-            "[CLK] Warning: GPIO4 not ALT0 after setup (GPFSEL0=0x%08X gpio4_f=%u)\n",
-            fsel0, gpio4_f);
-  }
+            "[CLK] GP0CTL=0x%08X GP0DIV=0x%08X (target %u Hz, ~%.1f MHz)\n",
+            rd_ctl, rd_div, target_hz, actual_hz / 1000000.0);
+
+    // Enable CLK output on GPIO4
+    printf("setup_gpclk PIN_CLK, = %d\n", PIN_CLK);
+    SET_GPIO_ALT(PIN_CLK, 0); // gpclk0
+
+    uint32_t fsel0 = *gpio_reg(0x00u);
+    uint32_t gpio4_f = (fsel0 >> 12) & 0x7;
+    if (gpio4_f != 4) {
+        fprintf(stderr,
+                "[CLK] Warning: GPIO4 not ALT0 after setup (GPFSEL0=0x%08X gpio4_f=%u)\n",
+                fsel0, gpio4_f);
+    }
 }
 
 void ps_cleanup_protocol() {
