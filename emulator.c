@@ -396,7 +396,8 @@ static inline void cpu_backend_set_irq(int level) {
   }
 }
 
-void* cpu_task() {
+void* cpu_task(void *arg) {
+  (void)arg;
   m68ki_cpu_core* state = &m68ki_cpu;
   state->ovl = ovl;
   state->gpio = gpio;
@@ -494,7 +495,8 @@ stop_cpu_emulation:
   return (void*)NULL;
 }
 
-void* keyboard_task() {
+void* keyboard_task(void *arg) {
+  (void)arg;
   struct pollfd kbdpoll[1];
   int kpollrc;
   char c = 0, c_code = 0, c_type = 0;
@@ -624,7 +626,8 @@ key_end:
   return (void*)NULL;
 }
 
-void* mouse_task() {
+void* mouse_task(void *arg) {
+  (void)arg;
   struct pollfd mpoll[1];
   int mpollrc;
 
