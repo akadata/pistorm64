@@ -32,10 +32,16 @@ struct wait_stats {
 
 static volatile const char *g_smoke_phase = NULL;
 static uint32_t g_wait_timing_stride = 1;
+static int g_pacing_kind = 0;
 
 enum pacing_mode {
   PACING_TXN = 0,
   PACING_BURST = 1,
+};
+
+enum pacing_kind {
+  PACING_SLEEP = 0,
+  PACING_SPIN = 1,
 };
 
 struct region {
@@ -101,6 +107,28 @@ static void wait_txn_spin(void) {
   }
 }
 
+static void pacing_delay_us(int pacing_us) {
+  if (pacing_us <= 0) return;
+  if (g_pacing_kind == PACING_SLEEP) {
+    usleep((useconds_t)pacing_us);
+    return;
+  }
+
+  struct timespec t0, tn;
+  uint64_t target_ns = (uint64_t)pacing_us * 1000ull;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  for (;;) {
+    clock_gettime(CLOCK_MONOTONIC, &tn);
+    uint64_t elapsed_ns = (uint64_t)(tn.tv_sec - t0.tv_sec) * 1000000000ull;
+    if (tn.tv_nsec >= t0.tv_nsec) {
+      elapsed_ns += (uint64_t)(tn.tv_nsec - t0.tv_nsec);
+    } else {
+      elapsed_ns -= 1000000000ull;
+      elapsed_ns += (uint64_t)(1000000000ull + tn.tv_nsec - t0.tv_nsec);
+    }
+    if (elapsed_ns >= target_ns) break;
+  }
+}
 static void stats_init(struct wait_stats *st, uint64_t total_txns, uint32_t *samples, uint32_t max_samples) {
   st->count = 0;
   st->total_us = 0;
@@ -314,10 +342,10 @@ static double bench_write8(uint32_t base, uint32_t size, int burst, int pacing_u
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + i + j;
       write8_raw(addr, (uint8_t)(addr ^ 0xA5u), st);
-      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
+      if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
     }
     GPFSEL_INPUT;
-    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
+    if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -338,10 +366,10 @@ static double bench_read8(uint32_t base, uint32_t size, int burst, int pacing_us
       uint32_t addr = base + i + j;
       uint8_t v = read8_raw(addr, st);
       acc ^= v;
-      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
+      if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
     }
     GPFSEL_INPUT;
-    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
+    if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -360,10 +388,10 @@ static double bench_write16(uint32_t base, uint32_t size, int burst, int pacing_
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 2u);
       write16_raw(addr, (uint16_t)(addr ^ 0xA5A5u), st);
-      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
+      if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
     }
     GPFSEL_INPUT;
-    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
+    if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -384,10 +412,10 @@ static double bench_read16(uint32_t base, uint32_t size, int burst, int pacing_u
       uint32_t addr = base + ((i + j) * 2u);
       uint16_t v = read16_raw(addr, st);
       acc ^= v;
-      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
+      if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
     }
     GPFSEL_INPUT;
-    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
+    if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -406,10 +434,10 @@ static double bench_write32(uint32_t base, uint32_t size, int burst, int pacing_
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 4u);
       write32_raw(addr, addr ^ 0xA5A5A5A5u, st);
-      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
+      if (pacing_mode == PACING_TXN) pacing_delay_us(pacing_us);
     }
     GPFSEL_INPUT;
-    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
+    if (pacing_mode == PACING_BURST) pacing_delay_us(pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -628,7 +656,7 @@ static int parse_region_arg(const char *arg, struct region *out) {
 }
 
 static void usage(const char *prog) {
-  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N] [--pacing-mode txn|burst] [--pacing-sweep min:max:step] [--sweep-burst N] [--wait-sample N] [--smoke] [--memtest]\n", prog);
+  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N] [--pacing-mode txn|burst] [--pacing-kind sleep|spin] [--pacing-sweep min:max:step] [--sweep-burst N] [--wait-sample N] [--smoke] [--memtest]\n", prog);
   printf("Default: chip ram 1024 KB at base 0x000000\n");
   printf("Example: %s --chip-kb 1024 --region fast:0x200000:8192 --repeat 3\n", prog);
 }
@@ -684,6 +712,16 @@ int main(int argc, char *argv[]) {
         pacing_mode = PACING_BURST;
       } else {
         printf("Invalid --pacing-mode, expected txn|burst\n");
+        return 1;
+      }
+    } else if (!strcmp(argv[i], "--pacing-kind") && i + 1 < argc) {
+      const char *kind = argv[++i];
+      if (strcmp(kind, "sleep") == 0) {
+        g_pacing_kind = PACING_SLEEP;
+      } else if (strcmp(kind, "spin") == 0) {
+        g_pacing_kind = PACING_SPIN;
+      } else {
+        printf("Invalid --pacing-kind, expected sleep|spin\n");
         return 1;
       }
     } else if (!strcmp(argv[i], "--pacing-sweep") && i + 1 < argc) {
@@ -752,9 +790,10 @@ int main(int argc, char *argv[]) {
 
     uint32_t txns16 = size / 2u;
     uint32_t txns32 = size / 4u;
-    printf("[SWEEPDBG] min=%d max=%d step=%d burst=%d size_kb=%u repeat=%d wait_sample=%u mode=%s\n",
+    printf("[SWEEPDBG] min=%d max=%d step=%d burst=%d size_kb=%u repeat=%d wait_sample=%u mode=%s kind=%s\n",
            sweep_min, sweep_max, sweep_step, burst, size / SIZE_KILO, repeats, g_wait_timing_stride,
-           pacing_mode == PACING_BURST ? "burst" : "txn");
+           pacing_mode == PACING_BURST ? "burst" : "txn",
+           g_pacing_kind == PACING_SPIN ? "spin" : "sleep");
     printf("[SWEEP] region=%s base=0x%06X size=%u KB burst=%d repeat=%d wait_sample=%u\n",
            r->name, r->base, size / SIZE_KILO, burst, repeats, g_wait_timing_stride);
     printf("[SWEEP] pacing_us w16 r16 w32 r32 wait_p95 wait_max txns16 txns32\n");
