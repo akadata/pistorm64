@@ -7,7 +7,6 @@
 #include <string.h>
 
 #include "gpio/ps_protocol.h"
-#include "agnus.h"
 #include "paula.h"
 #include "cia.h"
 
@@ -15,6 +14,11 @@
 void m68k_set_irq(unsigned int level) {
   (void)level;
 }
+
+// Local DMAF bits (shared DMACON register; see agnus/paula docs).
+#define DMAF_SETCLR 0x8000
+#define DMAF_MASTER 0x0200
+#define DMAF_AUD0   0x0001
 
 static void usage(const char *prog) {
   fprintf(stderr,
@@ -36,8 +40,12 @@ static void usage(const char *prog) {
           "               [--audio-period <val>] [--audio-vol <val>]\n"
           "  --audio-stop\n"
           "\n"
-          "Keyboard LED (CIAA):\n"
-          "  --kbd-led <on|off>\n"
+          "Disk LED (CIAA port A, active low):\n"
+          "  --disk-led <on|off>\n"
+          "  --kbd-led <on|off>   (alias; same as --disk-led)\n"
+          "\n"
+          "Power LED:\n"
+          "  --power-led <on|off> (A500 power LED is not software controlled)\n"
           "\n"
           "Notes:\n"
           "- Use --force to allow writes.\n"
@@ -104,19 +112,24 @@ static void audio_stop(void) {
   ps_write_16(DMACON, DMAF_MASTER | DMAF_AUD0);
 }
 
-static void kbd_led(int on) {
+static void disk_led(int on) {
   uint8_t ddr = (uint8_t)ps_read_8(CIAADDR_A);
   uint8_t pra = (uint8_t)ps_read_8(CIAAPRA);
 
-  ddr |= CIAA_KEYLED;
+  ddr |= CIAA_LED;
   if (on) {
-    pra |= CIAA_KEYLED;
+    pra &= (uint8_t)~CIAA_LED;
   } else {
-    pra &= (uint8_t)~CIAA_KEYLED;
+    pra |= CIAA_LED;
   }
 
   ps_write_8(CIAADDR_A, ddr);
   ps_write_8(CIAAPRA, pra);
+}
+
+static void power_led(int on) {
+  (void)on;
+  fprintf(stderr, "power-led: not software controllable on A500 (no-op)\n");
 }
 
 int main(int argc, char **argv) {
@@ -259,6 +272,24 @@ int main(int argc, char **argv) {
       return 0;
     }
 
+    if (!strcmp(arg, "--disk-led")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      if (!force) {
+        fprintf(stderr, "disk-led requires --force\n");
+        return 1;
+      }
+      const char *mode = argv[++i];
+      if (!strcmp(mode, "on")) {
+        disk_led(1);
+      } else if (!strcmp(mode, "off")) {
+        disk_led(0);
+      } else {
+        fprintf(stderr, "disk-led expects on|off\n");
+        return 1;
+      }
+      return 0;
+    }
+
     if (!strcmp(arg, "--kbd-led")) {
       if (i + 1 >= argc) usage(argv[0]);
       if (!force) {
@@ -266,12 +297,29 @@ int main(int argc, char **argv) {
         return 1;
       }
       const char *mode = argv[++i];
+      fprintf(stderr, "kbd-led is an alias for disk-led on A500\n");
       if (!strcmp(mode, "on")) {
-        kbd_led(1);
+        disk_led(1);
       } else if (!strcmp(mode, "off")) {
-        kbd_led(0);
+        disk_led(0);
       } else {
         fprintf(stderr, "kbd-led expects on|off\n");
+        return 1;
+      }
+      return 0;
+    }
+
+    if (!strcmp(arg, "--power-led")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      if (!force) {
+        fprintf(stderr, "power-led requires --force\n");
+        return 1;
+      }
+      const char *mode = argv[++i];
+      if (!strcmp(mode, "on") || !strcmp(mode, "off")) {
+        power_led(!strcmp(mode, "on"));
+      } else {
+        fprintf(stderr, "power-led expects on|off\n");
         return 1;
       }
       return 0;

@@ -133,15 +133,15 @@
 #define CIAB_DSKDIREC  0x02  // Disk direction
 #define CIAB_DSKSTEP   0x01  // Disk step
 
-// CIA Port A (CIAAPRA) - input/output control:
-#define CIAA_CIAFIR    0x80  // CIA flags input/output
-#define CIAA_KEYLED    0x40  // Keyboard LED
-#define CIAA_KBDINT    0x20  // Keyboard interrupt
-#define CIAA_RESET     0x10  // Reset
-#define CIAA_POWER     0x08  // Power
-#define CIAA_INTEN     0x04  // Interrupt enable
-#define CIAA_RSVP2     0x02  // Reserved
-#define CIAA_RSVP1     0x01  // Reserved
+// CIAA Port A (CIAAPRA) - system control/input (bit numbers from hardware/cia.h)
+#define CIAA_GAMEPORT1 0x80  // Gameport 1, pin 6 (fire button*)
+#define CIAA_GAMEPORT0 0x40  // Gameport 0, pin 6 (fire button*)
+#define CIAA_DSKRDY    0x20  // Disk ready*
+#define CIAA_DSKTRACK0 0x10  // Disk on track 00*
+#define CIAA_DSKPROT   0x08  // Disk write protect*
+#define CIAA_DSKCHANGE 0x04  // Disk change*
+#define CIAA_LED       0x02  // LED control (0 == bright/on)
+#define CIAA_OVERLAY   0x01  // Memory overlay bit
 
 // CIA Port B (CIAAPRB) - keyboard matrix:
 // Bits 7-0 represent keyboard matrix columns
