@@ -1,0 +1,1 @@
+checkbox_gc.doc ]" border=0> --datasheet-- CHECKBOX_GetClass() [Back to Amiga Developer Docs ]

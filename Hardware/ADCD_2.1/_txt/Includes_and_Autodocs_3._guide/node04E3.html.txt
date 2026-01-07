@@ -1,0 +1,1 @@
+page_gc.doc ]" border=0> --datasheet-- PAGE_GetClass() RefreshPageGadget() SetPageGadgetAttrsA() [Back to Amiga Developer Docs ]

@@ -1,0 +1,1 @@
+scroller_gc.doc ]" border=0> --datasheet-- SCROLLER_GetClass() [Back to Amiga Developer Docs ]

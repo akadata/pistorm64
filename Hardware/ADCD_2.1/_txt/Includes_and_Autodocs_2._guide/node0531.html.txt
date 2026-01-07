@@ -1,0 +1,1 @@
+battclock.doc ]" border=0> ReadBattClock() ResetBattClock() WriteBattClock() [Back to Amiga Developer Docs ]

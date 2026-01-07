@@ -1,0 +1,1 @@
+K / Mechanical Specifications / Basic Zorro III PIC ]" border=0> This drawing shows the basic Zorro III PIC. All of the dimensions are in millimeters. | | | 7.62 -->| | | +---| 22.4 | | | | | | v v | | ----- +-------+ # # +--------------------------------+ -- | # # | ^ +------------------+ | | | | | Figure K-14: Basic Zorro III PIC [Back to Amiga Developer Docs ]

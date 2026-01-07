@@ -1,0 +1,1 @@
+mathieeesingtrans.library/IEEESPExp ]" border=0> NAME IEEESPExp -- compute the exponential of e SYNOPSIS x = IEEESPExp( y ); d0 d0 float x,y; FUNCTION Compute e^y in IEEE single precision INPUTS y - IEEE single precision floating point value RESULT x - IEEE single precision floating point value BUGS SEE ALSO IEEESPLog() [Back to Amiga Developer Docs ]

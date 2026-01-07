@@ -1,0 +1,1 @@
+Glossary / delay ]" border=0> In playfield horizontal scrolling, specifies how many pixels the picture will shift for each display field. Delay controls the speed of scrolling. [Back to Amiga Developer Docs ]

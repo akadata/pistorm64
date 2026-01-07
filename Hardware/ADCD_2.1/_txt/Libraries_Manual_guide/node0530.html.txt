@@ -1,0 +1,1 @@
+B / groupgclass / Changed Methods: GM_HITTEST ]" border=0> This method works its way through the list of group members, sending each a GM_HITTEST message, looking for the first member in the list that says it has been hit. This member gadget becomes the active member. [Back to Amiga Developer Docs ]

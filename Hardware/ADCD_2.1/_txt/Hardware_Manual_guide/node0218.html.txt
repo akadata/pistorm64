@@ -1,0 +1,1 @@
+Glossary / pointer register ]" border=0> Register that is continuously incremented to point to a series of memory locations. [Back to Amiga Developer Docs ]

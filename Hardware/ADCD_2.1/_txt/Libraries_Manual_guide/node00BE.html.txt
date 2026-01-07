@@ -1,0 +1,1 @@
+VideoControl() Index ]" border=0> VideoControl(), 59 , 63 , 86 , 545 , 550 , 553 , 564 , 603 , 608 , 611 ColorMap, 564 genlock, 607 ViewPort, 564 [Back to Amiga Developer Docs ]

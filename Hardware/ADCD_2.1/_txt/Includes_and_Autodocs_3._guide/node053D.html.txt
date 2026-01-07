@@ -1,0 +1,1 @@
+resource.doc ]" border=0> --background-- RL_CloseResource() RL_DisposeGroup() RL_DisposeObject() RL_GetObjectArray() RL_NewGroupA() RL_NewObjectA() RL_OpenResource() RL_SetResourceScreen() [Back to Amiga Developer Docs ]

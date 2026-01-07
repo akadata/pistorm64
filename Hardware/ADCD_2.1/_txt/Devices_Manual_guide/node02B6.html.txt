@@ -1,0 +1,1 @@
+Standard Data and Property Chunks / Obsolete Property INST ]" border=0> The chunk type "INST" is obsolete in SMUS . It was revised to form the "INS1" chunk. [Back to Amiga Developer Docs ]

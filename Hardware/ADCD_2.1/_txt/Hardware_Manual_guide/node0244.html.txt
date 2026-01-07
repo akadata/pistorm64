@@ -1,0 +1,1 @@
+8520 Index ]" border=0> 8520, 157 , 223 , 241 , 244 , 251 , 339 alarm, 344 handshaking, 341 input modes, 343 interval timers, 341 continuous, 342 force load, 342 one-shot, 342 PB on/off, 342 start/stop, 342 Toggle/pulse, 342 I/O ports, 341 read bit names, 343 register map, 340 signal assignments, 337 time-of-day clock, 344 write bit names, 343 [Back to Amiga Developer Docs ]

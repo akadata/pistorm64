@@ -1,0 +1,1 @@
+intuition.library/UnlockPubScreenList ]" border=0> NAME UnlockPubScreenList -- Release public screen list semaphore. (V36) SYNOPSIS UnlockPubScreenList() VOID UnlockPubScreenList( VOID ); FUNCTION Releases lock gotten by LockPubScreenList() . INPUTS None. RESULT None. BUGS SEE ALSO LockPubScreenList() [Back to Amiga Developer Docs ]

@@ -1,0 +1,1 @@
+amiga.lib/DeleteStdIO ]" border=0> NAME DeleteStdIO - return memory allocated for IOStdReq SYNOPSIS DeleteStdIO(ioReq); VOID DeleteStdIO(struct IOStdReq *); FUNCTION Frees up an IOStdReq as allocated by CreateStdIO() . INPUTS ioReq - the IORequest block to be freed, or NULL. SEE ALSO CreateStdIO() , DeleteExtIO() , exec.library/CreateIORequest() [Back to Amiga Developer Docs ]

@@ -1,0 +1,1 @@
+PAL Index ]" border=0> PAL, 3 , 62 audio, 140 , 141 , 158-159 beam position, 216 blitter, 193 clock, 2 playfield, 49 , 52 , 57 , 58 serial baud rate, 255 sprites, 100 vertical blank, 219 video, 3 , 24 , 34 , 40-41 , 45 , 304 [Back to Amiga Developer Docs ]

@@ -1,0 +1,1 @@
+B / strgclass / Attributes: STRINGA_LongVal (ISGNU) ]" border=0> This attribute tells strgclass that this gadget is an integer string gadget and the new value of the integer is this attribute's value. [Back to Amiga Developer Docs ]

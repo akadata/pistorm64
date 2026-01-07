@@ -1,0 +1,1 @@
+ILBM.DPPV.doc / Chunk Description ]" border=0> The DPPV chunk describes the perspective state in a DPaintII ILBM. [Back to Amiga Developer Docs ]

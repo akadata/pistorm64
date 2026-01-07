@@ -1,0 +1,1 @@
+2 Audio Device / A Simple Audio Example ]" border=0> The Amiga's audio software has a complex allocation and arbitration system which is described in detail in the sections below. At this point, though, it may be helpful to look at a simple audio example: Audio.c [Back to Amiga Developer Docs ]

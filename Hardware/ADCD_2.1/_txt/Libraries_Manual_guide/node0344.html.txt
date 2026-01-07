@@ -1,0 +1,1 @@
+27 Graphics Primitives / Advanced Topics ]" border=0> This section covers advanced display topics such as dual-playfield mode, double-buffering, EHB mode and HAM mode. Creating a Dual-Playfield Display Extra-Half-Brite Mode Creating a Double-Buffered Display Hold-And-Modify Mode [Back to Amiga Developer Docs ]

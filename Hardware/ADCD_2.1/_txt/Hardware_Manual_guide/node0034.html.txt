@@ -1,0 +1,1 @@
+A Register Summary / DSKSYNC ]" border=0> Agnus/ Read/ Denise/ Register Address Write Paula Function -------- ------- ----- ------- -------- DSKSYNC 07E W P Disk sync register holds the match code for disk read synchronization. See ADKCON bit 10. [Back to Amiga Developer Docs ]

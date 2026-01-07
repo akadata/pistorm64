@@ -64,6 +64,11 @@ map type=ram address=0x08000000 size=128M id=cpu_slot_ram
 map type=ram address=0x200000 size=8M id=z2_autoconf_fast
 ```
 
+Notes:
+- `z2_autoconf_fast` and `z3_autoconf_fast` are assigned final base addresses at runtime by
+  Autoconfig. The config addresses above are placeholders; use the `[AUTOCONF]` log lines to
+  see the final bases (e.g., Z3 often lands at `0x40000000`).
+
 ## Amiga-side (GPIO/CPLD) ranges
 
 Everything **not** matched by the above is Amiga-side and goes through:

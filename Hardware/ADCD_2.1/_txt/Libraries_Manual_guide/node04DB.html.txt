@@ -1,0 +1,1 @@
+B / imageclass / Attributes:IA_Left, IA_Top, IA_Width, IA_Height (ISG) ]" border=0> These attributes correspond to similarly named fields in the Intuition Image structure. The imageclass dispatcher stores these attributes in their corresponding fields in the image object's embedded Image structure. [Back to Amiga Developer Docs ]

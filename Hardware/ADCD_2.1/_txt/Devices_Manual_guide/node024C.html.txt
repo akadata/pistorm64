@@ -1,0 +1,1 @@
+The DR2D Chunks / The Global Drawing Attribute Chunks ]" border=0> The following chunks describe global attributes of a DR2D document. DRHD CMAP DASH FILL PPRF FONS AROW LAYR [Back to Amiga Developer Docs ]

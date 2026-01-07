@@ -1,0 +1,1 @@
+B / sysiclass / Attributes: SYSIA_Which (I) ]" border=0> This attribute identifies which of the system image glyphs the sysiclass object uses. It can be one of the 11 glyphs described above . [Back to Amiga Developer Docs ]
