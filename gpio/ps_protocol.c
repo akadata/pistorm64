@@ -36,6 +36,14 @@ static uint32_t saved_gp0div;
 static uint32_t saved_gpfsel0;
 static int cleanup_registered;
 static int bpl_log_enabled;
+static uint16_t bplw_cop1_hi;
+static uint16_t bplw_cop1_lo;
+static uint16_t bplw_cop2_hi;
+static uint16_t bplw_cop2_lo;
+static int bplw_cop1_hi_set;
+static int bplw_cop1_lo_set;
+static int bplw_cop2_hi_set;
+static int bplw_cop2_lo_set;
 
 unsigned int gpfsel0;
 unsigned int gpfsel1;
@@ -66,9 +74,41 @@ static void bpl_log_write(unsigned int address, unsigned int data, int width_bit
 
   switch (address) {
   case 0xDFF080: // COP1LCH
+    if (!bplw_cop1_hi_set || bplw_cop1_hi != (uint16_t)data) {
+      bplw_cop1_hi = (uint16_t)data;
+      bplw_cop1_hi_set = 1;
+      if (bplw_cop1_lo_set) {
+        fprintf(stderr, "[BPLW] COP1LC=0x%04X%04X\n", bplw_cop1_hi, bplw_cop1_lo);
+      }
+    }
+    break;
   case 0xDFF082: // COP1LCL
+    if (!bplw_cop1_lo_set || bplw_cop1_lo != (uint16_t)data) {
+      bplw_cop1_lo = (uint16_t)data;
+      bplw_cop1_lo_set = 1;
+      if (bplw_cop1_hi_set) {
+        fprintf(stderr, "[BPLW] COP1LC=0x%04X%04X\n", bplw_cop1_hi, bplw_cop1_lo);
+      }
+    }
+    break;
   case 0xDFF084: // COP2LCH
+    if (!bplw_cop2_hi_set || bplw_cop2_hi != (uint16_t)data) {
+      bplw_cop2_hi = (uint16_t)data;
+      bplw_cop2_hi_set = 1;
+      if (bplw_cop2_lo_set) {
+        fprintf(stderr, "[BPLW] COP2LC=0x%04X%04X\n", bplw_cop2_hi, bplw_cop2_lo);
+      }
+    }
+    break;
   case 0xDFF086: // COP2LCL
+    if (!bplw_cop2_lo_set || bplw_cop2_lo != (uint16_t)data) {
+      bplw_cop2_lo = (uint16_t)data;
+      bplw_cop2_lo_set = 1;
+      if (bplw_cop2_hi_set) {
+        fprintf(stderr, "[BPLW] COP2LC=0x%04X%04X\n", bplw_cop2_hi, bplw_cop2_lo);
+      }
+    }
+    break;
   case 0xDFF08E: // DIWSTRT
   case 0xDFF090: // DIWSTOP
   case 0xDFF092: // DDFSTRT
