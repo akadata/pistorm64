@@ -45,6 +45,50 @@ static int bplw_cop1_lo_set;
 static int bplw_cop2_hi_set;
 static int bplw_cop2_lo_set;
 
+struct bplw_reg_cache {
+  uint32_t addr;
+  uint16_t last;
+  int have;
+};
+
+static struct bplw_reg_cache bplw_regs[] = {
+    {0xDFF08E, 0, 0}, // DIWSTRT
+    {0xDFF090, 0, 0}, // DIWSTOP
+    {0xDFF092, 0, 0}, // DDFSTRT
+    {0xDFF094, 0, 0}, // DDFSTOP
+    {0xDFF100, 0, 0}, // BPLCON0
+    {0xDFF102, 0, 0}, // BPLCON1
+    {0xDFF104, 0, 0}, // BPLCON2
+    {0xDFF108, 0, 0}, // BPL1MOD
+    {0xDFF10A, 0, 0}, // BPL2MOD
+    {0xDFF0E0, 0, 0}, // BPL1PTH
+    {0xDFF0E2, 0, 0}, // BPL1PTL
+    {0xDFF0E4, 0, 0}, // BPL2PTH
+    {0xDFF0E6, 0, 0}, // BPL2PTL
+    {0xDFF0E8, 0, 0}, // BPL3PTH
+    {0xDFF0EA, 0, 0}, // BPL3PTL
+    {0xDFF0EC, 0, 0}, // BPL4PTH
+    {0xDFF0EE, 0, 0}, // BPL4PTL
+    {0xDFF0F0, 0, 0}, // BPL5PTH
+    {0xDFF0F2, 0, 0}, // BPL5PTL
+    {0xDFF0F4, 0, 0}, // BPL6PTH
+    {0xDFF0F6, 0, 0}, // BPL6PTL
+};
+
+static void bplw_log_changed(uint32_t address, uint16_t data, int width_bits) {
+  for (size_t i = 0; i < sizeof(bplw_regs) / sizeof(bplw_regs[0]); i++) {
+    if (bplw_regs[i].addr == address) {
+      if (!bplw_regs[i].have || bplw_regs[i].last != data) {
+        bplw_regs[i].last = data;
+        bplw_regs[i].have = 1;
+        fprintf(stderr, "[BPLW] addr=0x%06X data=0x%04X width=%d\n", address,
+                data & 0xFFFFu, width_bits);
+      }
+      return;
+    }
+  }
+}
+
 unsigned int gpfsel0;
 unsigned int gpfsel1;
 unsigned int gpfsel2;
@@ -130,8 +174,7 @@ static void bpl_log_write(unsigned int address, unsigned int data, int width_bit
   case 0xDFF0F2: // BPL5PTL
   case 0xDFF0F4: // BPL6PTH
   case 0xDFF0F6: // BPL6PTL
-    fprintf(stderr, "[BPLW] addr=0x%06X data=0x%04X width=%d\n", address,
-            data & 0xFFFFu, width_bits);
+    bplw_log_changed(address, (uint16_t)data, width_bits);
     break;
   default:
     break;
