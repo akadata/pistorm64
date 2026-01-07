@@ -79,6 +79,146 @@ uint32_t old_level;
 uint32_t last_irq = 8;
 uint32_t last_last_irq = 8;
 
+static int bpl_log_enabled = 0;
+static uint16_t bplcon0_last;
+static uint16_t bpl1mod_last;
+static uint16_t bpl2mod_last;
+static uint16_t diwstrt_last;
+static uint16_t diwstop_last;
+static uint16_t ddfstrt_last;
+static uint16_t ddfstop_last;
+static uint16_t bpl_pth_last[6];
+static uint16_t bpl_ptl_last[6];
+
+#define REG_BPLCON0 0xDFF100
+#define REG_BPL1MOD 0xDFF108
+#define REG_BPL2MOD 0xDFF10A
+#define REG_DIWSTRT 0xDFF08E
+#define REG_DIWSTOP 0xDFF090
+#define REG_DDFSTRT 0xDFF092
+#define REG_DDFSTOP 0xDFF094
+#define REG_BPL1PTH 0xDFF0E0
+#define REG_BPL1PTL 0xDFF0E2
+#define REG_BPL2PTH 0xDFF0E4
+#define REG_BPL2PTL 0xDFF0E6
+#define REG_BPL3PTH 0xDFF0E8
+#define REG_BPL3PTL 0xDFF0EA
+#define REG_BPL4PTH 0xDFF0EC
+#define REG_BPL4PTL 0xDFF0EE
+#define REG_BPL5PTH 0xDFF0F0
+#define REG_BPL5PTL 0xDFF0F2
+#define REG_BPL6PTH 0xDFF0F4
+#define REG_BPL6PTL 0xDFF0F6
+
+static void bpl_log_print(void) {
+  uint16_t bpu = (bplcon0_last >> 12) & 0x7;
+  uint16_t hires = (bplcon0_last & 0x8000) ? 1 : 0;
+  uint16_t ham = (bplcon0_last & 0x0800) ? 1 : 0;
+  uint16_t ehb = (bplcon0_last & 0x0400) ? 1 : 0;
+  uint16_t lace = (bplcon0_last & 0x0004) ? 1 : 0;
+
+  LOG_INFO("[BPL] BPLCON0=0x%04X bpu=%u hires=%u ham=%u ehb=%u lace=%u\n",
+           bplcon0_last, bpu, hires, ham, ehb, lace);
+  LOG_INFO("[BPL] BPL1MOD=0x%04X BPL2MOD=0x%04X\n", bpl1mod_last, bpl2mod_last);
+  LOG_INFO("[BPL] DIWSTRT=0x%04X DIWSTOP=0x%04X DDFSTRT=0x%04X DDFSTOP=0x%04X\n",
+           diwstrt_last, diwstop_last, ddfstrt_last, ddfstop_last);
+  LOG_INFO("[BPL] BPL1=0x%04X%04X BPL2=0x%04X%04X BPL3=0x%04X%04X\n",
+           bpl_pth_last[0], bpl_ptl_last[0], bpl_pth_last[1], bpl_ptl_last[1],
+           bpl_pth_last[2], bpl_ptl_last[2]);
+  LOG_INFO("[BPL] BPL4=0x%04X%04X BPL5=0x%04X%04X BPL6=0x%04X%04X\n",
+           bpl_pth_last[3], bpl_ptl_last[3], bpl_pth_last[4], bpl_ptl_last[4],
+           bpl_pth_last[5], bpl_ptl_last[5]);
+}
+
+static void bpl_log_update(uint32_t addr, uint16_t val) {
+  int changed = 0;
+
+  switch (addr) {
+  case REG_BPLCON0:
+    changed |= (bplcon0_last != val);
+    bplcon0_last = val;
+    break;
+  case REG_BPL1MOD:
+    changed |= (bpl1mod_last != val);
+    bpl1mod_last = val;
+    break;
+  case REG_BPL2MOD:
+    changed |= (bpl2mod_last != val);
+    bpl2mod_last = val;
+    break;
+  case REG_DIWSTRT:
+    changed |= (diwstrt_last != val);
+    diwstrt_last = val;
+    break;
+  case REG_DIWSTOP:
+    changed |= (diwstop_last != val);
+    diwstop_last = val;
+    break;
+  case REG_DDFSTRT:
+    changed |= (ddfstrt_last != val);
+    ddfstrt_last = val;
+    break;
+  case REG_DDFSTOP:
+    changed |= (ddfstop_last != val);
+    ddfstop_last = val;
+    break;
+  case REG_BPL1PTH:
+    changed |= (bpl_pth_last[0] != val);
+    bpl_pth_last[0] = val;
+    break;
+  case REG_BPL1PTL:
+    changed |= (bpl_ptl_last[0] != val);
+    bpl_ptl_last[0] = val;
+    break;
+  case REG_BPL2PTH:
+    changed |= (bpl_pth_last[1] != val);
+    bpl_pth_last[1] = val;
+    break;
+  case REG_BPL2PTL:
+    changed |= (bpl_ptl_last[1] != val);
+    bpl_ptl_last[1] = val;
+    break;
+  case REG_BPL3PTH:
+    changed |= (bpl_pth_last[2] != val);
+    bpl_pth_last[2] = val;
+    break;
+  case REG_BPL3PTL:
+    changed |= (bpl_ptl_last[2] != val);
+    bpl_ptl_last[2] = val;
+    break;
+  case REG_BPL4PTH:
+    changed |= (bpl_pth_last[3] != val);
+    bpl_pth_last[3] = val;
+    break;
+  case REG_BPL4PTL:
+    changed |= (bpl_ptl_last[3] != val);
+    bpl_ptl_last[3] = val;
+    break;
+  case REG_BPL5PTH:
+    changed |= (bpl_pth_last[4] != val);
+    bpl_pth_last[4] = val;
+    break;
+  case REG_BPL5PTL:
+    changed |= (bpl_ptl_last[4] != val);
+    bpl_ptl_last[4] = val;
+    break;
+  case REG_BPL6PTH:
+    changed |= (bpl_pth_last[5] != val);
+    bpl_pth_last[5] = val;
+    break;
+  case REG_BPL6PTL:
+    changed |= (bpl_ptl_last[5] != val);
+    bpl_ptl_last[5] = val;
+    break;
+  default:
+    return;
+  }
+
+  if (changed) {
+    bpl_log_print();
+  }
+}
+
 uint8_t ipl_enabled[8];
 
 uint8_t end_signal = 0;
@@ -731,6 +871,10 @@ int main(int argc, char* argv[]) {
   ps_setup_protocol();
 
   log_set_level(LOG_LEVEL_INFO);
+
+  if (getenv("PISTORM_BPL_LOG")) {
+    bpl_log_enabled = 1;
+  }
 
   // const struct sched_param priority = {99};
 
@@ -1452,6 +1596,9 @@ void m68k_write_memory_8(unsigned int address, unsigned int value) {
 }
 
 void m68k_write_memory_16(unsigned int address, unsigned int value) {
+  if (bpl_log_enabled && (address & 0xFFFF0000u) == 0xDFF00000u) {
+    bpl_log_update(address, (uint16_t)value);
+  }
   if (platform_write_check(OP_TYPE_WORD, address, value)) {
     return;
   }
@@ -1481,12 +1628,24 @@ void m68k_write_memory_32(unsigned int address, unsigned int value) {
 
   if (address & 0x01) {
     ps_write_8((uint32_t)address, value & 0xFF);
+    if (bpl_log_enabled && ((address + 1) & 0xFFFF0000u) == 0xDFF00000u) {
+      bpl_log_update(address + 1, (uint16_t)((value >> 8) & 0xFFFF));
+    }
     ps_write_16((uint32_t)address + 1, htobe16(((value >> 8) & 0xFFFF)));
+    if (bpl_log_enabled && ((address + 3) & 0xFFFF0000u) == 0xDFF00000u) {
+      bpl_log_update(address + 3, (uint16_t)(value >> 24));
+    }
     ps_write_8((uint32_t)address + 3, (value >> 24));
     return;
   }
 
+  if (bpl_log_enabled && (address & 0xFFFF0000u) == 0xDFF00000u) {
+    bpl_log_update(address, (uint16_t)(value >> 16));
+  }
   ps_write_16((uint32_t)address, value >> 16);
+  if (bpl_log_enabled && ((address + 2) & 0xFFFF0000u) == 0xDFF00000u) {
+    bpl_log_update(address + 2, (uint16_t)value);
+  }
   ps_write_16((uint32_t)address + 2, value);
   return;
 }
