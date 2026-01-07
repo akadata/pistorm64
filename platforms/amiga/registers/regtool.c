@@ -7,9 +7,9 @@
 #include <string.h>
 
 #include "gpio/ps_protocol.h"
+#include "agnus.h"
 #include "paula.h"
 #include "cia.h"
-#include "agnus.h"
 
 // ps_protocol.c expects this symbol from the emulator core.
 void m68k_set_irq(unsigned int level) {
