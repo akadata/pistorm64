@@ -15,6 +15,16 @@
 
 extern volatile unsigned int *gpio;
 
+struct wait_stats {
+  uint64_t count;
+  uint64_t total_us;
+  uint32_t max_us;
+  uint32_t *samples;
+  uint32_t sample_count;
+  uint32_t sample_stride;
+  uint32_t sample_next;
+};
+
 struct region {
   const char *name;
   uint32_t base;
@@ -57,6 +67,81 @@ static int check_emulator(void) {
   return 0;
 }
 
+static uint32_t wait_txn_timed_us(void) {
+  struct timespec t0, t1;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {
+  }
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  uint64_t us = (uint64_t)(t1.tv_sec - t0.tv_sec) * 1000000ull;
+  if (t1.tv_nsec >= t0.tv_nsec) {
+    us += (uint64_t)(t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  } else {
+    us -= 1000000ull;
+    us += (uint64_t)(1000000000ull + t1.tv_nsec - t0.tv_nsec) / 1000ull;
+  }
+  return (uint32_t)us;
+}
+
+static void stats_init(struct wait_stats *st, uint64_t total_txns, uint32_t *samples, uint32_t max_samples) {
+  st->count = 0;
+  st->total_us = 0;
+  st->max_us = 0;
+  st->samples = samples;
+  st->sample_count = 0;
+  if (total_txns > max_samples && max_samples > 0) {
+    st->sample_stride = (uint32_t)(total_txns / max_samples);
+    if (st->sample_stride == 0) st->sample_stride = 1;
+  } else {
+    st->sample_stride = 1;
+  }
+  st->sample_next = 0;
+}
+
+static void stats_update(struct wait_stats *st, uint32_t wait_us) {
+  st->count++;
+  st->total_us += wait_us;
+  if (wait_us > st->max_us) st->max_us = wait_us;
+  if (st->sample_stride > 0) {
+    if (st->sample_next == 0) {
+      if (st->samples) {
+        st->samples[st->sample_count++] = wait_us;
+      }
+      st->sample_next = st->sample_stride;
+    }
+    st->sample_next--;
+  }
+}
+
+static int cmp_u32(const void *a, const void *b) {
+  uint32_t va = *(const uint32_t *)a;
+  uint32_t vb = *(const uint32_t *)b;
+  if (va < vb) return -1;
+  if (va > vb) return 1;
+  return 0;
+}
+
+static void stats_report(const struct wait_stats *st, char *out, size_t outlen) {
+  if (st->count == 0 || st->sample_count == 0) {
+    snprintf(out, outlen, "avg=? p95=? max=?");
+    return;
+  }
+  uint32_t *sorted = malloc(sizeof(uint32_t) * st->sample_count);
+  if (!sorted) {
+    snprintf(out, outlen, "avg=? p95=? max=%u", st->max_us);
+    return;
+  }
+  memcpy(sorted, st->samples, sizeof(uint32_t) * st->sample_count);
+  qsort(sorted, st->sample_count, sizeof(uint32_t), cmp_u32);
+  uint32_t idx = (uint32_t)((st->sample_count * 95ull + 99ull) / 100ull);
+  if (idx == 0) idx = 1;
+  if (idx > st->sample_count) idx = st->sample_count;
+  uint32_t p95 = sorted[idx - 1];
+  free(sorted);
+  double avg = (double)st->total_us / (double)st->count;
+  snprintf(out, outlen, "avg=%.2f p95=%u max=%u", avg, p95, st->max_us);
+}
+
 static int wait_txn_idle(const char *tag, int timeout_us) {
   while (timeout_us > 0) {
     if (!(*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))) {
@@ -96,85 +181,217 @@ static double elapsed_sec(const struct timespec *a, const struct timespec *b) {
          (double)(b->tv_nsec - a->tv_nsec) / 1000000000.0;
 }
 
-static double bench_write8(uint32_t base, uint32_t size) {
+static void set_ctrl_pins_output(void) {
+  INP_GPIO(PIN_A0);
+  OUT_GPIO(PIN_A0);
+  INP_GPIO(PIN_A1);
+  OUT_GPIO(PIN_A1);
+  INP_GPIO(PIN_RD);
+  OUT_GPIO(PIN_RD);
+  INP_GPIO(PIN_WR);
+  OUT_GPIO(PIN_WR);
+}
+
+static void set_data_pins_output(void) {
+  for (int i = 0; i < 16; i++) {
+    int pin = PIN_D(i);
+    INP_GPIO(pin);
+    OUT_GPIO(pin);
+  }
+}
+
+static void set_data_pins_input(void) {
+  for (int i = 0; i < 16; i++) {
+    int pin = PIN_D(i);
+    INP_GPIO(pin);
+  }
+}
+
+static inline void write8_raw(uint32_t address, uint8_t data, struct wait_stats *st, int pacing_us) {
+  uint32_t v = (address & 0x01) ? (data & 0xFFu) : ((uint32_t)data | ((uint32_t)data << 8));
+  GPIO_WRITEREG(REG_DATA, (v & 0xFFFFu));
+  GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
+  GPIO_WRITEREG(REG_ADDR_HI, (0x0100u | (address >> 16)));
+  uint32_t wait_us = wait_txn_timed_us();
+  stats_update(st, wait_us);
+  if (pacing_us > 0) usleep((useconds_t)pacing_us);
+}
+
+static inline uint8_t read8_raw(uint32_t address, struct wait_stats *st, int pacing_us) {
+  GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
+  GPIO_WRITEREG(REG_ADDR_HI, (0x0300u | (address >> 16)));
+  GPIO_PIN_RD;
+  uint32_t wait_us = wait_txn_timed_us();
+  stats_update(st, wait_us);
+  uint32_t value = ((*(gpio + 13) >> 8) & 0xFFFFu);
+  END_TXN;
+  if (pacing_us > 0) usleep((useconds_t)pacing_us);
+  if (address & 0x01) return value & 0xFFu;
+  return (value >> 8) & 0xFFu;
+}
+
+static inline void write16_raw(uint32_t address, uint16_t data, struct wait_stats *st, int pacing_us) {
+  GPIO_WRITEREG(REG_DATA, (data & 0xFFFFu));
+  GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
+  GPIO_WRITEREG(REG_ADDR_HI, (0x0000u | (address >> 16)));
+  uint32_t wait_us = wait_txn_timed_us();
+  stats_update(st, wait_us);
+  if (pacing_us > 0) usleep((useconds_t)pacing_us);
+}
+
+static inline uint16_t read16_raw(uint32_t address, struct wait_stats *st, int pacing_us) {
+  GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
+  GPIO_WRITEREG(REG_ADDR_HI, (0x0200u | (address >> 16)));
+  GPIO_PIN_RD;
+  uint32_t wait_us = wait_txn_timed_us();
+  stats_update(st, wait_us);
+  uint16_t value = (uint16_t)(((*(gpio + 13) >> 8) & 0xFFFFu));
+  END_TXN;
+  if (pacing_us > 0) usleep((useconds_t)pacing_us);
+  return value;
+}
+
+static inline void write32_raw(uint32_t address, uint32_t data, struct wait_stats *st, int pacing_us) {
+  write16_raw(address, (uint16_t)(data >> 16), st, pacing_us);
+  write16_raw(address + 2u, (uint16_t)data, st, pacing_us);
+}
+
+static inline uint32_t read32_raw(uint32_t address, struct wait_stats *st, int pacing_us) {
+  uint32_t hi = read16_raw(address, st, pacing_us);
+  uint32_t lo = read16_raw(address + 2u, st, pacing_us);
+  return (hi << 16) | lo;
+}
+
+static double bench_write8(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st) {
   uint32_t bytes = size;
   struct timespec t0, t1;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < bytes; i++) {
-    uint32_t addr = base + i;
-    write8(addr, (uint8_t)(addr ^ 0xA5u));
+  for (uint32_t i = 0; i < bytes;) {
+    uint32_t todo = (uint32_t)burst;
+    if (todo > bytes - i) todo = bytes - i;
+    set_ctrl_pins_output();
+    set_data_pins_output();
+    for (uint32_t j = 0; j < todo; j++) {
+      uint32_t addr = base + i + j;
+      write8_raw(addr, (uint8_t)(addr ^ 0xA5u), st, pacing_us);
+    }
+    set_data_pins_input();
+    i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
   return elapsed_sec(&t0, &t1);
 }
 
-static double bench_read8(uint32_t base, uint32_t size, uint32_t *sink) {
+static double bench_read8(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st, uint32_t *sink) {
   uint32_t bytes = size;
   struct timespec t0, t1;
   uint32_t acc = 0;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < bytes; i++) {
-    uint32_t addr = base + i;
-    acc ^= read8(addr);
+  for (uint32_t i = 0; i < bytes;) {
+    uint32_t todo = (uint32_t)burst;
+    if (todo > bytes - i) todo = bytes - i;
+    set_ctrl_pins_output();
+    for (uint32_t j = 0; j < todo; j++) {
+      uint32_t addr = base + i + j;
+      set_data_pins_output();
+      uint8_t v = read8_raw(addr, st, pacing_us);
+      set_data_pins_input();
+      acc ^= v;
+    }
+    i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
   *sink = acc;
   return elapsed_sec(&t0, &t1);
 }
 
-static double bench_write16(uint32_t base, uint32_t size) {
+static double bench_write16(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st) {
   uint32_t words = size / 2u;
   struct timespec t0, t1;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < words; i++) {
-    uint32_t addr = base + (i * 2u);
-    write16(addr, (uint16_t)(addr ^ 0xA5A5u));
+  for (uint32_t i = 0; i < words;) {
+    uint32_t todo = (uint32_t)burst;
+    if (todo > words - i) todo = words - i;
+    set_ctrl_pins_output();
+    set_data_pins_output();
+    for (uint32_t j = 0; j < todo; j++) {
+      uint32_t addr = base + ((i + j) * 2u);
+      write16_raw(addr, (uint16_t)(addr ^ 0xA5A5u), st, pacing_us);
+    }
+    set_data_pins_input();
+    i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
   return elapsed_sec(&t0, &t1);
 }
 
-static double bench_read16(uint32_t base, uint32_t size, uint32_t *sink) {
+static double bench_read16(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st, uint32_t *sink) {
   uint32_t words = size / 2u;
   struct timespec t0, t1;
   uint32_t acc = 0;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < words; i++) {
-    uint32_t addr = base + (i * 2u);
-    acc ^= read16(addr);
+  for (uint32_t i = 0; i < words;) {
+    uint32_t todo = (uint32_t)burst;
+    if (todo > words - i) todo = words - i;
+    set_ctrl_pins_output();
+    for (uint32_t j = 0; j < todo; j++) {
+      uint32_t addr = base + ((i + j) * 2u);
+      set_data_pins_output();
+      uint16_t v = read16_raw(addr, st, pacing_us);
+      set_data_pins_input();
+      acc ^= v;
+    }
+    i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
   *sink = acc;
   return elapsed_sec(&t0, &t1);
 }
 
-static double bench_write32(uint32_t base, uint32_t size) {
+static double bench_write32(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st) {
   uint32_t words = size / 4u;
   struct timespec t0, t1;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < words; i++) {
-    uint32_t addr = base + (i * 4u);
-    write32(addr, addr ^ 0xA5A5A5A5u);
+  for (uint32_t i = 0; i < words;) {
+    uint32_t todo = (uint32_t)burst;
+    if (todo > words - i) todo = words - i;
+    set_ctrl_pins_output();
+    set_data_pins_output();
+    for (uint32_t j = 0; j < todo; j++) {
+      uint32_t addr = base + ((i + j) * 4u);
+      write32_raw(addr, addr ^ 0xA5A5A5A5u, st, pacing_us);
+    }
+    set_data_pins_input();
+    i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
   return elapsed_sec(&t0, &t1);
 }
 
-static double bench_read32(uint32_t base, uint32_t size, uint32_t *sink) {
+static double bench_read32(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st, uint32_t *sink) {
   uint32_t words = size / 4u;
   struct timespec t0, t1;
   uint32_t acc = 0;
   clock_gettime(CLOCK_MONOTONIC, &t0);
-  for (uint32_t i = 0; i < words; i++) {
-    uint32_t addr = base + (i * 4u);
-    acc ^= read32(addr);
+  for (uint32_t i = 0; i < words;) {
+    uint32_t todo = (uint32_t)burst;
+    if (todo > words - i) todo = words - i;
+    set_ctrl_pins_output();
+    for (uint32_t j = 0; j < todo; j++) {
+      uint32_t addr = base + ((i + j) * 4u);
+      set_data_pins_output();
+      uint32_t v = read32_raw(addr, st, pacing_us);
+      set_data_pins_input();
+      acc ^= v;
+    }
+    i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
   *sink = acc;
   return elapsed_sec(&t0, &t1);
 }
 
-static void run_region(const struct region *r, int repeats) {
+static void run_region(const struct region *r, int repeats, int burst, int pacing_us) {
   if (r->size < 4u) {
     printf("[SKIP] %s size too small\n", r->name);
     return;
@@ -184,15 +401,25 @@ static void run_region(const struct region *r, int repeats) {
   double best_w8 = 1e9, best_r8 = 1e9;
   double best_w16 = 1e9, best_r16 = 1e9;
   double best_w32 = 1e9, best_r32 = 1e9;
+  struct wait_stats st_w8, st_r8, st_w16, st_r16, st_w32, st_r32;
+  uint32_t samples_w8[10000], samples_r8[10000];
+  uint32_t samples_w16[10000], samples_r16[10000];
+  uint32_t samples_w32[10000], samples_r32[10000];
   uint32_t sink = 0;
 
   for (int i = 0; i < repeats; i++) {
-    double tw8 = bench_write8(r->base, size);
-    double tr8 = bench_read8(r->base, size, &sink);
-    double tw16 = bench_write16(r->base, size);
-    double tr16 = bench_read16(r->base, size, &sink);
-    double tw32 = bench_write32(r->base, size);
-    double tr32 = bench_read32(r->base, size, &sink);
+    stats_init(&st_w8, size, samples_w8, 10000);
+    stats_init(&st_r8, size, samples_r8, 10000);
+    stats_init(&st_w16, size / 2u, samples_w16, 10000);
+    stats_init(&st_r16, size / 2u, samples_r16, 10000);
+    stats_init(&st_w32, size / 4u, samples_w32, 10000);
+    stats_init(&st_r32, size / 4u, samples_r32, 10000);
+    double tw8 = bench_write8(r->base, size, burst, pacing_us, &st_w8);
+    double tr8 = bench_read8(r->base, size, burst, pacing_us, &st_r8, &sink);
+    double tw16 = bench_write16(r->base, size, burst, pacing_us, &st_w16);
+    double tr16 = bench_read16(r->base, size, burst, pacing_us, &st_r16, &sink);
+    double tw32 = bench_write32(r->base, size, burst, pacing_us, &st_w32);
+    double tr32 = bench_read32(r->base, size, burst, pacing_us, &st_r32, &sink);
     if (tw8 < best_w8) best_w8 = tw8;
     if (tr8 < best_r8) best_r8 = tr8;
     if (tw16 < best_w16) best_w16 = tw16;
@@ -208,9 +435,18 @@ static void run_region(const struct region *r, int repeats) {
   double r16_mbs = (best_r16 > 0.0) ? (mb / best_r16) : 0.0;
   double w32_mbs = (best_w32 > 0.0) ? (mb / best_w32) : 0.0;
   double r32_mbs = (best_r32 > 0.0) ? (mb / best_r32) : 0.0;
+  char w8_stats[96], r8_stats[96], w16_stats[96], r16_stats[96], w32_stats[96], r32_stats[96];
+  stats_report(&st_w8, w8_stats, sizeof(w8_stats));
+  stats_report(&st_r8, r8_stats, sizeof(r8_stats));
+  stats_report(&st_w16, w16_stats, sizeof(w16_stats));
+  stats_report(&st_r16, r16_stats, sizeof(r16_stats));
+  stats_report(&st_w32, w32_stats, sizeof(w32_stats));
+  stats_report(&st_r32, r32_stats, sizeof(r32_stats));
 
-  printf("[REG] %-8s base=0x%06X size=%u KB | w8=%.2f r8=%.2f w16=%.2f r16=%.2f w32=%.2f r32=%.2f MB/s (sink=0x%08X)\n",
-         r->name, r->base, size / SIZE_KILO, w8_mbs, r8_mbs, w16_mbs, r16_mbs, w32_mbs, r32_mbs, sink);
+  printf("[REG] %-8s burst=%u base=0x%06X size=%u KB | w8=%.2f r8=%.2f w16=%.2f r16=%.2f w32=%.2f r32=%.2f MB/s (sink=0x%08X)\n",
+         r->name, burst, r->base, size / SIZE_KILO, w8_mbs, r8_mbs, w16_mbs, r16_mbs, w32_mbs, r32_mbs, sink);
+  printf("       wait_us: w8[%s] r8[%s] w16[%s] r16[%s] w32[%s] r32[%s]\n",
+         w8_stats, r8_stats, w16_stats, r16_stats, w32_stats, r32_stats);
 }
 
 static int parse_region_arg(const char *arg, struct region *out) {
@@ -232,7 +468,7 @@ static int parse_region_arg(const char *arg, struct region *out) {
 }
 
 static void usage(const char *prog) {
-  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N]\n", prog);
+  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N]\n", prog);
   printf("Default: chip ram 1024 KB at base 0x000000\n");
   printf("Example: %s --chip-kb 1024 --region fast:0x200000:8192 --repeat 3\n", prog);
 }
@@ -247,6 +483,9 @@ int main(int argc, char *argv[]) {
   int region_count = 0;
   int repeats = 1;
   uint32_t chip_kb = 1024;
+  int burst_sizes[8] = {1, 4, 16, 64};
+  int burst_count = 4;
+  int pacing_us = 0;
 
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--chip-kb") && i + 1 < argc) {
@@ -263,6 +502,14 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(argv[i], "--repeat") && i + 1 < argc) {
       repeats = atoi(argv[++i]);
       if (repeats < 1) repeats = 1;
+    } else if (!strcmp(argv[i], "--burst") && i + 1 < argc) {
+      burst_count = 0;
+      int b = atoi(argv[++i]);
+      if (b < 1) b = 1;
+      burst_sizes[burst_count++] = b;
+    } else if (!strcmp(argv[i], "--pacing-us") && i + 1 < argc) {
+      pacing_us = atoi(argv[++i]);
+      if (pacing_us < 0) pacing_us = 0;
     } else {
       usage(argv[0]);
       return 1;
@@ -282,7 +529,9 @@ int main(int argc, char *argv[]) {
   }
 
   for (int i = 0; i < region_count; i++) {
-    run_region(&regions[i], repeats);
+    for (int b = 0; b < burst_count; b++) {
+      run_region(&regions[i], repeats, burst_sizes[b], pacing_us);
+    }
   }
 
   return 0;
