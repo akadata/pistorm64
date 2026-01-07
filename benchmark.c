@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <dirent.h>
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +26,8 @@ struct wait_stats {
   uint32_t sample_stride;
   uint32_t sample_next;
 };
+
+static volatile const char *g_smoke_phase = NULL;
 
 struct region {
   const char *name;
@@ -183,30 +186,38 @@ static double elapsed_sec(const struct timespec *a, const struct timespec *b) {
          (double)(b->tv_nsec - a->tv_nsec) / 1000000000.0;
 }
 
-static void set_ctrl_pins_output(void) {
-  INP_GPIO(PIN_A0);
-  OUT_GPIO(PIN_A0);
-  INP_GPIO(PIN_A1);
-  OUT_GPIO(PIN_A1);
-  INP_GPIO(PIN_RD);
-  OUT_GPIO(PIN_RD);
-  INP_GPIO(PIN_WR);
-  OUT_GPIO(PIN_WR);
+static uint32_t gpfsel0_data_in;
+static uint32_t gpfsel1_data_in;
+static uint32_t gpfsel2_data_in;
+static int gpfsel_data_in_ready = 0;
+
+static void init_gpfsel_data_in(void) {
+  if (gpfsel_data_in_ready) return;
+
+  gpfsel0_data_in = GPFSEL0_OUTPUT;
+  gpfsel1_data_in = GPFSEL1_OUTPUT;
+  gpfsel2_data_in = GPFSEL2_OUTPUT;
+
+  // Clear FSEL bits for data pins 8..23 to make them inputs.
+  for (int pin = 8; pin <= 23; pin++) {
+    uint32_t mask = 0x7u << ((pin % 10) * 3);
+    if (pin <= 9) {
+      gpfsel0_data_in &= ~mask;
+    } else if (pin <= 19) {
+      gpfsel1_data_in &= ~mask;
+    } else {
+      gpfsel2_data_in &= ~mask;
+    }
+  }
+
+  gpfsel_data_in_ready = 1;
 }
 
-static void set_data_pins_output(void) {
-  for (int i = 0; i < 16; i++) {
-    int pin = PIN_D(i);
-    INP_GPIO(pin);
-    OUT_GPIO(pin);
-  }
-}
-
-static void set_data_pins_input(void) {
-  for (int i = 0; i < 16; i++) {
-    int pin = PIN_D(i);
-    INP_GPIO(pin);
-  }
+static inline void set_gpfsel_data_in(void) {
+  init_gpfsel_data_in();
+  *(gpio + 0) = gpfsel0_data_in;
+  *(gpio + 1) = gpfsel1_data_in;
+  *(gpio + 2) = gpfsel2_data_in;
 }
 
 static inline void write8_raw(uint32_t address, uint8_t data, struct wait_stats *st, int pacing_us) {
@@ -271,13 +282,12 @@ static double bench_write8(uint32_t base, uint32_t size, int burst, int pacing_u
   for (uint32_t i = 0; i < bytes;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > bytes - i) todo = bytes - i;
-    set_ctrl_pins_output();
-    set_data_pins_output();
+    GPFSEL_OUTPUT;
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + i + j;
       write8_raw(addr, (uint8_t)(addr ^ 0xA5u), st, pacing_us);
     }
-    set_data_pins_input();
+    GPFSEL_INPUT;
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -292,13 +302,14 @@ static double bench_read8(uint32_t base, uint32_t size, int burst, int pacing_us
   for (uint32_t i = 0; i < bytes;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > bytes - i) todo = bytes - i;
-    set_ctrl_pins_output();
-    set_data_pins_input();
+    GPFSEL_OUTPUT;
+    set_gpfsel_data_in();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + i + j;
       uint8_t v = read8_raw(addr, st, pacing_us);
       acc ^= v;
     }
+    GPFSEL_INPUT;
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -313,13 +324,12 @@ static double bench_write16(uint32_t base, uint32_t size, int burst, int pacing_
   for (uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > words - i) todo = words - i;
-    set_ctrl_pins_output();
-    set_data_pins_output();
+    GPFSEL_OUTPUT;
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 2u);
       write16_raw(addr, (uint16_t)(addr ^ 0xA5A5u), st, pacing_us);
     }
-    set_data_pins_input();
+    GPFSEL_INPUT;
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -334,13 +344,14 @@ static double bench_read16(uint32_t base, uint32_t size, int burst, int pacing_u
   for (uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > words - i) todo = words - i;
-    set_ctrl_pins_output();
-    set_data_pins_input();
+    GPFSEL_OUTPUT;
+    set_gpfsel_data_in();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 2u);
       uint16_t v = read16_raw(addr, st, pacing_us);
       acc ^= v;
     }
+    GPFSEL_INPUT;
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -355,13 +366,12 @@ static double bench_write32(uint32_t base, uint32_t size, int burst, int pacing_
   for (uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > words - i) todo = words - i;
-    set_ctrl_pins_output();
-    set_data_pins_output();
+    GPFSEL_OUTPUT;
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 4u);
       write32_raw(addr, addr ^ 0xA5A5A5A5u, st, pacing_us);
     }
-    set_data_pins_input();
+    GPFSEL_INPUT;
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -376,13 +386,14 @@ static double bench_read32(uint32_t base, uint32_t size, int burst, int pacing_u
   for (uint32_t i = 0; i < words;) {
     uint32_t todo = (uint32_t)burst;
     if (todo > words - i) todo = words - i;
-    set_ctrl_pins_output();
-    set_data_pins_input();
+    GPFSEL_OUTPUT;
+    set_gpfsel_data_in();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 4u);
       uint32_t v = read32_raw(addr, st, pacing_us);
       acc ^= v;
     }
+    GPFSEL_INPUT;
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -448,6 +459,116 @@ static void run_region(const struct region *r, int repeats, int burst, int pacin
          w8_stats, r8_stats, w16_stats, r16_stats, w32_stats, r32_stats);
 }
 
+static void smoke_sig_handler(int sig) {
+  const char *phase = g_smoke_phase ? g_smoke_phase : "unknown";
+  fprintf(stderr, "[SMOKE] Crash during %s (signal %d)\n", phase, sig);
+  _exit(1);
+}
+
+static int run_smoke(uint32_t base, uint32_t size, int burst) {
+  struct wait_stats st;
+  uint32_t samples[2048];
+  uint32_t sink = 0;
+
+  signal(SIGSEGV, smoke_sig_handler);
+  signal(SIGBUS, smoke_sig_handler);
+
+  g_smoke_phase = "r16";
+  printf("[SMOKE] r16 burst=%d size=%u KB\n", burst, size / SIZE_KILO);
+  stats_init(&st, size / 2u, samples, 2048);
+  (void)bench_read16(base, size, burst, 0, &st, &sink);
+
+  g_smoke_phase = "w16";
+  printf("[SMOKE] w16 burst=%d size=%u KB\n", burst, size / SIZE_KILO);
+  stats_init(&st, size / 2u, samples, 2048);
+  (void)bench_write16(base, size, burst, 0, &st);
+
+  g_smoke_phase = NULL;
+  printf("[SMOKE] ok\n");
+  return 0;
+}
+
+static int report_error(uint32_t addr, uint16_t expected, uint16_t got, uint32_t *printed, uint32_t max_print) {
+  if (*printed < max_print) {
+    printf("  ERR @0x%06X exp=0x%04X got=0x%04X\n", addr, expected, got);
+    (*printed)++;
+  }
+  return 1;
+}
+
+static int memtest_region(const struct region *r) {
+  uint32_t size = r->size & ~1u;
+  uint32_t printed = 0;
+  uint32_t total_errors = 0;
+
+  printf("[MEMTEST] %s base=0x%06X size=%u KB\n", r->name, r->base, size / SIZE_KILO);
+
+  // Address test
+  printf("  Address test...\n");
+  for (uint32_t off = 0; off < size; off += 2) {
+    uint16_t v = (uint16_t)((r->base + off) >> 1);
+    write16(r->base + off, v);
+  }
+  for (uint32_t off = 0; off < size; off += 2) {
+    uint16_t exp = (uint16_t)((r->base + off) >> 1);
+    uint16_t got = read16(r->base + off);
+    if (got != exp) {
+      total_errors += report_error(r->base + off, exp, got, &printed, 16);
+    }
+  }
+
+  // Walking 1s/0s
+  printf("  Walking bits...\n");
+  for (int bit = 0; bit < 16; bit++) {
+    uint16_t pat = (uint16_t)(1u << bit);
+    for (uint32_t off = 0; off < size; off += 2) write16(r->base + off, pat);
+    for (uint32_t off = 0; off < size; off += 2) {
+      uint16_t got = read16(r->base + off);
+      if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
+    }
+    pat = (uint16_t)~pat;
+    for (uint32_t off = 0; off < size; off += 2) write16(r->base + off, pat);
+    for (uint32_t off = 0; off < size; off += 2) {
+      uint16_t got = read16(r->base + off);
+      if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
+    }
+  }
+
+  // Fixed patterns
+  const uint16_t patterns[] = {0x0000, 0xFFFF, 0xAAAA, 0x5555, 0xA5A5, 0x5A5A};
+  printf("  Fixed patterns...\n");
+  for (size_t p = 0; p < sizeof(patterns) / sizeof(patterns[0]); p++) {
+    uint16_t pat = patterns[p];
+    for (uint32_t off = 0; off < size; off += 2) write16(r->base + off, pat);
+    for (uint32_t off = 0; off < size; off += 2) {
+      uint16_t got = read16(r->base + off);
+      if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
+    }
+  }
+
+  // Random pattern (two-pass with seed)
+  unsigned int seed = (unsigned int)time(NULL);
+  printf("  Random pattern (seed=%u)...\n", seed);
+  srand(seed);
+  for (uint32_t off = 0; off < size; off += 2) {
+    uint16_t pat = (uint16_t)rand();
+    write16(r->base + off, pat);
+  }
+  srand(seed);
+  for (uint32_t off = 0; off < size; off += 2) {
+    uint16_t pat = (uint16_t)rand();
+    uint16_t got = read16(r->base + off);
+    if (got != pat) total_errors += report_error(r->base + off, pat, got, &printed, 16);
+  }
+
+  if (total_errors == 0) {
+    printf("  OK\n");
+  } else {
+    printf("  FAIL: %u errors (showing first %u)\n", total_errors, printed);
+  }
+  return (total_errors == 0) ? 0 : 1;
+}
+
 static int parse_region_arg(const char *arg, struct region *out) {
   // format: name:hex_base:size_kb (e.g., fast:0x200000:4096)
   char *tmp = strdup(arg);
@@ -467,7 +588,7 @@ static int parse_region_arg(const char *arg, struct region *out) {
 }
 
 static void usage(const char *prog) {
-  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N]\n", prog);
+  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N] [--smoke] [--memtest]\n", prog);
   printf("Default: chip ram 1024 KB at base 0x000000\n");
   printf("Example: %s --chip-kb 1024 --region fast:0x200000:8192 --repeat 3\n", prog);
 }
@@ -485,6 +606,8 @@ int main(int argc, char *argv[]) {
   int burst_sizes[8] = {1, 4, 16, 64};
   int burst_count = 4;
   int pacing_us = 0;
+  int smoke = 0;
+  int memtest = 0;
 
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--chip-kb") && i + 1 < argc) {
@@ -509,6 +632,10 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(argv[i], "--pacing-us") && i + 1 < argc) {
       pacing_us = atoi(argv[++i]);
       if (pacing_us < 0) pacing_us = 0;
+    } else if (!strcmp(argv[i], "--smoke")) {
+      smoke = 1;
+    } else if (!strcmp(argv[i], "--memtest")) {
+      memtest = 1;
     } else {
       usage(argv[0]);
       return 1;
@@ -525,6 +652,21 @@ int main(int argc, char *argv[]) {
     regions[0].base = 0x000000u;
     regions[0].size = chip_kb * SIZE_KILO;
     region_count = 1;
+  }
+
+  if (smoke) {
+    uint32_t size = 64 * SIZE_KILO;
+    int burst = 16;
+    printf("[SMOKE] starting\n");
+    return run_smoke(regions[0].base, size, burst);
+  }
+
+  if (memtest) {
+    int any_fail = 0;
+    for (int i = 0; i < region_count; i++) {
+      any_fail |= memtest_region(&regions[i]);
+    }
+    return any_fail ? 1 : 0;
   }
 
   for (int i = 0; i < region_count; i++) {
