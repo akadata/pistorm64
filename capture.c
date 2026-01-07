@@ -24,6 +24,7 @@ static void usage(const char *prog) {
           "          [--ehb] [--ham] [--info]\n"
           "          [--bpl1 <addr>] ... [--bpl6 <addr>] [--mod1 <val>] [--mod2 <val>]\n"
           "          [--rowbytes <val>] [--line-step <val>] [--coplist <addr>]\n"
+          "          [--dump-coplist <n>]\n"
           "          [--version]\n"
           "\n"
           "Defaults: width=320 height=256 planes=auto out=capture.ppm\n"
@@ -183,6 +184,24 @@ static void parse_copper_list(uint32_t addr, struct cop_state *st) {
   }
 }
 
+static void dump_copper_list(uint32_t addr, uint32_t count) {
+  addr &= CHIP_MASK;
+  for (uint32_t i = 0; i < count; i++) {
+    uint16_t w1 = (uint16_t)ps_read_16(addr + (uint32_t)(i * 4));
+    uint16_t w2 = (uint16_t)ps_read_16(addr + (uint32_t)(i * 4 + 2));
+    if (w1 == 0xFFFF && w2 == 0xFFFE) {
+      printf("COP[%u] END\n", i);
+      break;
+    }
+    if (w1 & 0x0001u) {
+      printf("COP[%u] WAIT/SKIP 0x%04X 0x%04X\n", i, w1, w2);
+    } else {
+      uint32_t reg = 0xDFF000u + (uint32_t)(w1 & 0x01FEu);
+      printf("COP[%u] MOVE 0x%06X = 0x%04X\n", i, reg, w2);
+    }
+  }
+}
+
 int main(int argc, char **argv) {
   const char *out_path = "capture.ppm";
   uint32_t width = 320;
@@ -194,6 +213,7 @@ int main(int argc, char **argv) {
   int auto_mode = 1;
   uint32_t coplist_addr = 0;
   int have_coplist = 0;
+  uint32_t dump_coplist = 0;
   uint32_t bpl_override[6] = {0};
   int have_bpl[6] = {0};
   int have_mod1 = 0;
@@ -239,6 +259,9 @@ int main(int argc, char **argv) {
       if (i + 1 >= argc) usage(argv[0]);
       coplist_addr = parse_u32(argv[++i]);
       have_coplist = 1;
+    } else if (!strcmp(arg, "--dump-coplist")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      dump_coplist = parse_u32(argv[++i]);
     } else if (!strcmp(arg, "--bpl1")) {
       if (i + 1 >= argc) usage(argv[0]);
       bpl_override[0] = parse_u32(argv[++i]);
@@ -302,6 +325,9 @@ int main(int argc, char **argv) {
   struct cop_state cop = {0};
   if (have_coplist) {
     parse_copper_list(coplist_addr, &cop);
+    if (dump_coplist) {
+      dump_copper_list(coplist_addr, dump_coplist);
+    }
     if (bplcon0 == 0xFFFF && cop.have_bplcon0) {
       bplcon0 = cop.bplcon0;
     }
@@ -349,7 +375,7 @@ int main(int argc, char **argv) {
     bpl2mod = 0;
   }
 
-  if (show_info) {
+  if (show_info || have_coplist) {
     printf("BPLCON0=0x%04X planes=%d\n", bplcon0, planes);
     printf("DIWSTRT=0x%04X DIWSTOP=0x%04X DDFSTRT=0x%04X DDFSTOP=0x%04X\n",
            diwstrt, diwstop, ddfstrt, ddfstop);
