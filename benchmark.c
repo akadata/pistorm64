@@ -33,6 +33,11 @@ struct wait_stats {
 static volatile const char *g_smoke_phase = NULL;
 static uint32_t g_wait_timing_stride = 1;
 
+enum pacing_mode {
+  PACING_TXN = 0,
+  PACING_BURST = 1,
+};
+
 struct region {
   const char *name;
   uint32_t base;
@@ -251,58 +256,54 @@ static inline void set_gpfsel_data_in(void) {
   *(gpio + 2) = gpfsel2_data_in;
 }
 
-static inline void write8_raw(uint32_t address, uint8_t data, struct wait_stats *st, int pacing_us) {
+static inline void write8_raw(uint32_t address, uint8_t data, struct wait_stats *st) {
   uint32_t v = (address & 0x01) ? (data & 0xFFu) : ((uint32_t)data | ((uint32_t)data << 8));
   GPIO_WRITEREG(REG_DATA, (v & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_HI, (0x0100u | (address >> 16)));
   stats_wait(st);
-  if (pacing_us > 0) usleep((useconds_t)pacing_us);
 }
 
-static inline uint8_t read8_raw(uint32_t address, struct wait_stats *st, int pacing_us) {
+static inline uint8_t read8_raw(uint32_t address, struct wait_stats *st) {
   GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_HI, (0x0300u | (address >> 16)));
   GPIO_PIN_RD;
   stats_wait(st);
   uint32_t value = ((*(gpio + 13) >> 8) & 0xFFFFu);
   END_TXN;
-  if (pacing_us > 0) usleep((useconds_t)pacing_us);
   if (address & 0x01) return value & 0xFFu;
   return (value >> 8) & 0xFFu;
 }
 
-static inline void write16_raw(uint32_t address, uint16_t data, struct wait_stats *st, int pacing_us) {
+static inline void write16_raw(uint32_t address, uint16_t data, struct wait_stats *st) {
   GPIO_WRITEREG(REG_DATA, (data & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_HI, (0x0000u | (address >> 16)));
   stats_wait(st);
-  if (pacing_us > 0) usleep((useconds_t)pacing_us);
 }
 
-static inline uint16_t read16_raw(uint32_t address, struct wait_stats *st, int pacing_us) {
+static inline uint16_t read16_raw(uint32_t address, struct wait_stats *st) {
   GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_HI, (0x0200u | (address >> 16)));
   GPIO_PIN_RD;
   stats_wait(st);
   uint16_t value = (uint16_t)(((*(gpio + 13) >> 8) & 0xFFFFu));
   END_TXN;
-  if (pacing_us > 0) usleep((useconds_t)pacing_us);
   return value;
 }
 
-static inline void write32_raw(uint32_t address, uint32_t data, struct wait_stats *st, int pacing_us) {
-  write16_raw(address, (uint16_t)(data >> 16), st, pacing_us);
-  write16_raw(address + 2u, (uint16_t)data, st, pacing_us);
+static inline void write32_raw(uint32_t address, uint32_t data, struct wait_stats *st) {
+  write16_raw(address, (uint16_t)(data >> 16), st);
+  write16_raw(address + 2u, (uint16_t)data, st);
 }
 
-static inline uint32_t read32_raw(uint32_t address, struct wait_stats *st, int pacing_us) {
-  uint32_t hi = read16_raw(address, st, pacing_us);
-  uint32_t lo = read16_raw(address + 2u, st, pacing_us);
+static inline uint32_t read32_raw(uint32_t address, struct wait_stats *st) {
+  uint32_t hi = read16_raw(address, st);
+  uint32_t lo = read16_raw(address + 2u, st);
   return (hi << 16) | lo;
 }
 
-static double bench_write8(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st) {
+static double bench_write8(uint32_t base, uint32_t size, int burst, int pacing_us, int pacing_mode, struct wait_stats *st) {
   uint32_t bytes = size;
   struct timespec t0, t1;
   clock_gettime(CLOCK_MONOTONIC, &t0);
@@ -312,16 +313,18 @@ static double bench_write8(uint32_t base, uint32_t size, int burst, int pacing_u
     GPFSEL_OUTPUT;
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + i + j;
-      write8_raw(addr, (uint8_t)(addr ^ 0xA5u), st, pacing_us);
+      write8_raw(addr, (uint8_t)(addr ^ 0xA5u), st);
+      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
     }
     GPFSEL_INPUT;
+    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
   return elapsed_sec(&t0, &t1);
 }
 
-static double bench_read8(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st, uint32_t *sink) {
+static double bench_read8(uint32_t base, uint32_t size, int burst, int pacing_us, int pacing_mode, struct wait_stats *st, uint32_t *sink) {
   uint32_t bytes = size;
   struct timespec t0, t1;
   uint32_t acc = 0;
@@ -333,10 +336,12 @@ static double bench_read8(uint32_t base, uint32_t size, int burst, int pacing_us
     set_gpfsel_data_in();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + i + j;
-      uint8_t v = read8_raw(addr, st, pacing_us);
+      uint8_t v = read8_raw(addr, st);
       acc ^= v;
+      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
     }
     GPFSEL_INPUT;
+    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -344,7 +349,7 @@ static double bench_read8(uint32_t base, uint32_t size, int burst, int pacing_us
   return elapsed_sec(&t0, &t1);
 }
 
-static double bench_write16(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st) {
+static double bench_write16(uint32_t base, uint32_t size, int burst, int pacing_us, int pacing_mode, struct wait_stats *st) {
   uint32_t words = size / 2u;
   struct timespec t0, t1;
   clock_gettime(CLOCK_MONOTONIC, &t0);
@@ -354,16 +359,18 @@ static double bench_write16(uint32_t base, uint32_t size, int burst, int pacing_
     GPFSEL_OUTPUT;
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 2u);
-      write16_raw(addr, (uint16_t)(addr ^ 0xA5A5u), st, pacing_us);
+      write16_raw(addr, (uint16_t)(addr ^ 0xA5A5u), st);
+      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
     }
     GPFSEL_INPUT;
+    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
   return elapsed_sec(&t0, &t1);
 }
 
-static double bench_read16(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st, uint32_t *sink) {
+static double bench_read16(uint32_t base, uint32_t size, int burst, int pacing_us, int pacing_mode, struct wait_stats *st, uint32_t *sink) {
   uint32_t words = size / 2u;
   struct timespec t0, t1;
   uint32_t acc = 0;
@@ -375,10 +382,12 @@ static double bench_read16(uint32_t base, uint32_t size, int burst, int pacing_u
     set_gpfsel_data_in();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 2u);
-      uint16_t v = read16_raw(addr, st, pacing_us);
+      uint16_t v = read16_raw(addr, st);
       acc ^= v;
+      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
     }
     GPFSEL_INPUT;
+    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -386,7 +395,7 @@ static double bench_read16(uint32_t base, uint32_t size, int burst, int pacing_u
   return elapsed_sec(&t0, &t1);
 }
 
-static double bench_write32(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st) {
+static double bench_write32(uint32_t base, uint32_t size, int burst, int pacing_us, int pacing_mode, struct wait_stats *st) {
   uint32_t words = size / 4u;
   struct timespec t0, t1;
   clock_gettime(CLOCK_MONOTONIC, &t0);
@@ -396,16 +405,18 @@ static double bench_write32(uint32_t base, uint32_t size, int burst, int pacing_
     GPFSEL_OUTPUT;
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 4u);
-      write32_raw(addr, addr ^ 0xA5A5A5A5u, st, pacing_us);
+      write32_raw(addr, addr ^ 0xA5A5A5A5u, st);
+      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
     }
     GPFSEL_INPUT;
+    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
   return elapsed_sec(&t0, &t1);
 }
 
-static double bench_read32(uint32_t base, uint32_t size, int burst, int pacing_us, struct wait_stats *st, uint32_t *sink) {
+static double bench_read32(uint32_t base, uint32_t size, int burst, int pacing_us, int pacing_mode, struct wait_stats *st, uint32_t *sink) {
   uint32_t words = size / 4u;
   struct timespec t0, t1;
   uint32_t acc = 0;
@@ -417,10 +428,12 @@ static double bench_read32(uint32_t base, uint32_t size, int burst, int pacing_u
     set_gpfsel_data_in();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 4u);
-      uint32_t v = read32_raw(addr, st, pacing_us);
+      uint32_t v = read32_raw(addr, st);
       acc ^= v;
+      if (pacing_mode == PACING_TXN && pacing_us > 0) usleep((useconds_t)pacing_us);
     }
     GPFSEL_INPUT;
+    if (pacing_mode == PACING_BURST && pacing_us > 0) usleep((useconds_t)pacing_us);
     i += todo;
   }
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -428,7 +441,7 @@ static double bench_read32(uint32_t base, uint32_t size, int burst, int pacing_u
   return elapsed_sec(&t0, &t1);
 }
 
-static void run_region(const struct region *r, int repeats, int burst, int pacing_us) {
+static void run_region(const struct region *r, int repeats, int burst, int pacing_us, int pacing_mode) {
   if (r->size < 4u) {
     printf("[SKIP] %s size too small\n", r->name);
     return;
@@ -451,12 +464,12 @@ static void run_region(const struct region *r, int repeats, int burst, int pacin
     stats_init(&st_r16, size / 2u, samples_r16, 10000);
     stats_init(&st_w32, size / 4u, samples_w32, 10000);
     stats_init(&st_r32, size / 4u, samples_r32, 10000);
-    double tw8 = bench_write8(r->base, size, burst, pacing_us, &st_w8);
-    double tr8 = bench_read8(r->base, size, burst, pacing_us, &st_r8, &sink);
-    double tw16 = bench_write16(r->base, size, burst, pacing_us, &st_w16);
-    double tr16 = bench_read16(r->base, size, burst, pacing_us, &st_r16, &sink);
-    double tw32 = bench_write32(r->base, size, burst, pacing_us, &st_w32);
-    double tr32 = bench_read32(r->base, size, burst, pacing_us, &st_r32, &sink);
+    double tw8 = bench_write8(r->base, size, burst, pacing_us, pacing_mode, &st_w8);
+    double tr8 = bench_read8(r->base, size, burst, pacing_us, pacing_mode, &st_r8, &sink);
+    double tw16 = bench_write16(r->base, size, burst, pacing_us, pacing_mode, &st_w16);
+    double tr16 = bench_read16(r->base, size, burst, pacing_us, pacing_mode, &st_r16, &sink);
+    double tw32 = bench_write32(r->base, size, burst, pacing_us, pacing_mode, &st_w32);
+    double tr32 = bench_read32(r->base, size, burst, pacing_us, pacing_mode, &st_r32, &sink);
     if (tw8 < best_w8) best_w8 = tw8;
     if (tr8 < best_r8) best_r8 = tr8;
     if (tw16 < best_w16) best_w16 = tw16;
@@ -503,12 +516,12 @@ static int run_smoke(uint32_t base, uint32_t size, int burst) {
   g_smoke_phase = "r16";
   printf("[SMOKE] r16 burst=%d size=%u KB\n", burst, size / SIZE_KILO);
   stats_init(&st, size / 2u, samples, 2048);
-  (void)bench_read16(base, size, burst, 0, &st, &sink);
+  (void)bench_read16(base, size, burst, 0, PACING_TXN, &st, &sink);
 
   g_smoke_phase = "w16";
   printf("[SMOKE] w16 burst=%d size=%u KB\n", burst, size / SIZE_KILO);
   stats_init(&st, size / 2u, samples, 2048);
-  (void)bench_write16(base, size, burst, 0, &st);
+  (void)bench_write16(base, size, burst, 0, PACING_TXN, &st);
 
   g_smoke_phase = NULL;
   printf("[SMOKE] ok\n");
@@ -615,7 +628,7 @@ static int parse_region_arg(const char *arg, struct region *out) {
 }
 
 static void usage(const char *prog) {
-  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N] [--pacing-sweep min:max:step] [--wait-sample N] [--smoke] [--memtest]\n", prog);
+  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N] [--pacing-mode txn|burst] [--pacing-sweep min:max:step] [--sweep-burst N] [--wait-sample N] [--smoke] [--memtest]\n", prog);
   printf("Default: chip ram 1024 KB at base 0x000000\n");
   printf("Example: %s --chip-kb 1024 --region fast:0x200000:8192 --repeat 3\n", prog);
 }
@@ -638,6 +651,7 @@ int main(int argc, char *argv[]) {
   int sweep_enabled = 0;
   int sweep_min = 0, sweep_max = 0, sweep_step = 1;
   int sweep_burst = 16;
+  int pacing_mode = PACING_TXN;
 
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--chip-kb") && i + 1 < argc) {
@@ -662,6 +676,16 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(argv[i], "--pacing-us") && i + 1 < argc) {
       pacing_us = atoi(argv[++i]);
       if (pacing_us < 0) pacing_us = 0;
+    } else if (!strcmp(argv[i], "--pacing-mode") && i + 1 < argc) {
+      const char *mode = argv[++i];
+      if (strcmp(mode, "txn") == 0) {
+        pacing_mode = PACING_TXN;
+      } else if (strcmp(mode, "burst") == 0) {
+        pacing_mode = PACING_BURST;
+      } else {
+        printf("Invalid --pacing-mode, expected txn|burst\n");
+        return 1;
+      }
     } else if (!strcmp(argv[i], "--pacing-sweep") && i + 1 < argc) {
       const char *spec = argv[++i];
       int a = 0, b = 0, c = 0;
@@ -726,11 +750,14 @@ int main(int argc, char *argv[]) {
     uint32_t samples_w32[10000], samples_r32[10000];
     int burst = sweep_burst;
 
-    printf("[SWEEPDBG] min=%d max=%d step=%d burst=%d size_kb=%u repeat=%d wait_sample=%u\n",
-           sweep_min, sweep_max, sweep_step, burst, size / SIZE_KILO, repeats, g_wait_timing_stride);
+    uint32_t txns16 = size / 2u;
+    uint32_t txns32 = size / 4u;
+    printf("[SWEEPDBG] min=%d max=%d step=%d burst=%d size_kb=%u repeat=%d wait_sample=%u mode=%s\n",
+           sweep_min, sweep_max, sweep_step, burst, size / SIZE_KILO, repeats, g_wait_timing_stride,
+           pacing_mode == PACING_BURST ? "burst" : "txn");
     printf("[SWEEP] region=%s base=0x%06X size=%u KB burst=%d repeat=%d wait_sample=%u\n",
            r->name, r->base, size / SIZE_KILO, burst, repeats, g_wait_timing_stride);
-    printf("[SWEEP] pacing_us w16 r16 w32 r32 wait_p95 wait_max\n");
+    printf("[SWEEP] pacing_us w16 r16 w32 r32 wait_p95 wait_max txns16 txns32\n");
 
     for (int p = sweep_min; p <= sweep_max; p += sweep_step) {
       double best_w16 = 1e9, best_r16 = 1e9, best_w32 = 1e9, best_r32 = 1e9;
@@ -741,10 +768,10 @@ int main(int argc, char *argv[]) {
         stats_init(&st_r16, size / 2u, samples_r16, 10000);
         stats_init(&st_w32, size / 4u, samples_w32, 10000);
         stats_init(&st_r32, size / 4u, samples_r32, 10000);
-        double tw16 = bench_write16(r->base, size, burst, p, &st_w16);
-        double tr16 = bench_read16(r->base, size, burst, p, &st_r16, &sink);
-        double tw32 = bench_write32(r->base, size, burst, p, &st_w32);
-        double tr32 = bench_read32(r->base, size, burst, p, &st_r32, &sink);
+        double tw16 = bench_write16(r->base, size, burst, p, pacing_mode, &st_w16);
+        double tr16 = bench_read16(r->base, size, burst, p, pacing_mode, &st_r16, &sink);
+        double tw32 = bench_write32(r->base, size, burst, p, pacing_mode, &st_w32);
+        double tr32 = bench_read32(r->base, size, burst, p, pacing_mode, &st_r32, &sink);
         if (tw16 < best_w16) best_w16 = tw16;
         if (tr16 < best_r16) best_r16 = tr16;
         if (tw32 < best_w32) best_w32 = tw32;
@@ -771,8 +798,8 @@ int main(int argc, char *argv[]) {
       double w32_mbs = (best_w32 > 0.0) ? (mb / best_w32) : 0.0;
       double r32_mbs = (best_r32 > 0.0) ? (mb / best_r32) : 0.0;
 
-      printf("%9d %.2f %.2f %.2f %.2f %8u %8u\n",
-             p, w16_mbs, r16_mbs, w32_mbs, r32_mbs, p95, max_us);
+      printf("%9d %.2f %.2f %.2f %.2f %8u %8u %7u %7u\n",
+             p, w16_mbs, r16_mbs, w32_mbs, r32_mbs, p95, max_us, txns16, txns32);
       fflush(stdout);
     }
     return 0;
@@ -780,7 +807,7 @@ int main(int argc, char *argv[]) {
 
   for (int i = 0; i < region_count; i++) {
     for (int b = 0; b < burst_count; b++) {
-      run_region(&regions[i], repeats, burst_sizes[b], pacing_us);
+      run_region(&regions[i], repeats, burst_sizes[b], pacing_us, pacing_mode);
     }
   }
 
