@@ -24,6 +24,7 @@ static void usage(const char *prog) {
           "          [--ehb] [--ham] [--info]\n"
           "          [--bpl1 <addr>] ... [--bpl6 <addr>] [--mod1 <val>] [--mod2 <val>]\n"
           "          [--rowbytes <val>] [--line-step <val>] [--coplist <addr>]\n"
+          "          [--version]\n"
           "\n"
           "Defaults: width=320 height=256 planes=auto out=capture.ppm\n"
           "Notes:\n"
@@ -205,6 +206,14 @@ int main(int argc, char **argv) {
 
   for (int i = 1; i < argc; i++) {
     const char *arg = argv[i];
+    if (!strcmp(arg, "--version")) {
+#ifdef BUILD_GIT_REV
+      printf("capture git=%s date=%s\n", BUILD_GIT_REV, BUILD_DATE);
+#else
+      printf("capture git=unknown date=unknown\n");
+#endif
+      return 0;
+    }
     if (!strcmp(arg, "--out")) {
       if (i + 1 >= argc) usage(argv[0]);
       out_path = argv[++i];

@@ -47,6 +47,9 @@ CPUFLAGS   ?= -march=native -mtune=native
 RAYLIB_INC    ?= -I./raylib
 RAYLIB_LIBDIR ?= -L./raylib_drm
 
+GIT_REV   := $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
+BUILD_UTC := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
+
 
 MAINFILES =
 
@@ -146,7 +149,8 @@ M68KFILES   = $(MUSASHIFILES) $(MUSASHIGENCFILES)
 CC        = gcc
 CXX       = g++
 
-DEFINES   = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1
+DEFINES   = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1 \
+            -DBUILD_GIT_REV=\"$(GIT_REV)\" -DBUILD_DATE=\"$(BUILD_UTC)\"
 LD_GOLD   = $(if $(filter 1,$(USE_GOLD)),-fuse-ld=gold,)
 LTO_FLAGS = $(if $(filter 1,$(USE_LTO)),-flto,)
 PLT_FLAGS = $(if $(filter 1,$(USE_NO_PLT)),-fno-plt,)
@@ -211,10 +215,13 @@ TARGET = $(EXENAME)$(EXE)
 DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) $(MUSASHIGENERATOR)$(EXE)
 
 
-all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest
+all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest BUILD_VERSION.txt
 
 clean:
 	rm -f $(DELETEFILES)
+
+BUILD_VERSION.txt:
+	@./tools/write_build_version.sh $(TARGET)
 
 # Ensure generated m68k files are built before other files that depend on them
 $(TARGET):  $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) a314/a314.o

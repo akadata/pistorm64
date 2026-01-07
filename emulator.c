@@ -904,6 +904,10 @@ int main(int argc, char* argv[]) {
     LOG_INFO("[BPL] logging enabled (CPU writes only)\n");
   }
 
+#ifdef BUILD_GIT_REV
+  printf("[BUILD] git=%s date=%s\n", BUILD_GIT_REV, BUILD_DATE);
+#endif
+
   // const struct sched_param priority = {99};
 
   // Some command line switch stuffles
