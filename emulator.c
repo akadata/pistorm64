@@ -364,6 +364,25 @@ static void bpl_snapshot_format_json(const struct bpl_state_snapshot* snap, char
       snap->bpl_valid[5]);
 }
 
+static void bpl_state_seed_from_hw(void) {
+  pthread_mutex_lock(&bpl_state_lock);
+  bplcon0_last = (uint16_t)ps_read_16(REG_BPLCON0);
+  bplcon1_last = (uint16_t)ps_read_16(REG_BPLCON1);
+  bplcon2_last = (uint16_t)ps_read_16(REG_BPLCON2);
+  bpl1mod_last = (uint16_t)ps_read_16(REG_BPL1MOD);
+  bpl2mod_last = (uint16_t)ps_read_16(REG_BPL2MOD);
+  diwstrt_last = (uint16_t)ps_read_16(REG_DIWSTRT);
+  diwstop_last = (uint16_t)ps_read_16(REG_DIWSTOP);
+  ddfstrt_last = (uint16_t)ps_read_16(REG_DDFSTRT);
+  ddfstop_last = (uint16_t)ps_read_16(REG_DDFSTOP);
+  cop1_pth_last = (uint16_t)ps_read_16(REG_COP1LCH);
+  cop1_ptl_last = (uint16_t)ps_read_16(REG_COP1LCL);
+  cop2_pth_last = (uint16_t)ps_read_16(REG_COP2LCH);
+  cop2_ptl_last = (uint16_t)ps_read_16(REG_COP2LCL);
+  bpl_last_update_us = monotonic_us();
+  pthread_mutex_unlock(&bpl_state_lock);
+}
+
 static void* state_socket_thread_fn(void* arg) {
   const char* path = (const char*)arg;
   struct sockaddr_un addr;
@@ -452,6 +471,7 @@ static void start_state_socket(const char* path) {
   state_sock_path[sizeof(state_sock_path) - 1] = '\0';
   state_sock_path_set = 1;
   bpl_state_enabled = 1;
+  bpl_state_seed_from_hw();
   if (pthread_create(&state_sock_thread, NULL, state_socket_thread_fn, state_sock_path) != 0) {
     perror("[STATE] pthread_create");
   } else {

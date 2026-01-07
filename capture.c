@@ -481,6 +481,12 @@ int main(int argc, char **argv) {
 
   if (state_sock_path && state_sock_path[0]) {
     have_snap = fetch_state_snapshot(state_sock_path, &snap);
+    if (have_snap && snap.ts_us == 0) {
+      fprintf(stderr,
+              "Warning: snapshot has no updates yet (ts_us=0). "
+              "Falling back to bus/copper reads.\n");
+      have_snap = 0;
+    }
     if (have_snap) {
       if (planes < 0) {
         int bpu = (snap.bplcon0 >> 12) & 0x7;
