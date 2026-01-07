@@ -1,0 +1,1 @@
+B / buttongclass / Changed Methods: GM_RENDER ]" border=0> All rendering is passed along to the GadgetRender.Image (the GA_Image attribute). This method can tell its image to render in any of four image states: IDS_INACTIVESELECTED , IDS_INACTIVENORMAL , IDS_SELECTED , or IDS_NORMAL . [Back to Amiga Developer Docs ]

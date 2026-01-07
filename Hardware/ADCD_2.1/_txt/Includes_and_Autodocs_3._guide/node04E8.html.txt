@@ -1,0 +1,1 @@
+palette_gc.doc ]" border=0> --datasheet-- --styleguide-- PALETTE_GetClass() [Back to Amiga Developer Docs ]

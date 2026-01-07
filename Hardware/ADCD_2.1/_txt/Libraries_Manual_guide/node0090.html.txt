@@ -1,0 +1,1 @@
+OM_SET Index ]" border=0> OM_SET, 305 , 307 , 309 Boopsi gadgets, 298 see also Appendix B and SetAttrs()/SetGadgetAttrs() [Back to Amiga Developer Docs ]

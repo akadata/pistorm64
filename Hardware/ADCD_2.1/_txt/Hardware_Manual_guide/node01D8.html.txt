@@ -1,0 +1,1 @@
+Glossary / copper ]" border=0> Display-synchronized coprocessor that resides on one of the Amiga custom chips and directs the graphics display. [Back to Amiga Developer Docs ]

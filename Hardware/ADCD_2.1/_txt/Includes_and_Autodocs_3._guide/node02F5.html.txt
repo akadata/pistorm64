@@ -1,0 +1,1 @@
+graphics.library/InitGMasks ]" border=0> NAME InitGMasks -- Initialize all of the masks of an AnimOb . SYNOPSIS InitGMasks(anOb) A0 void InitGMasks(struct AnimOb *); FUNCTION For every sequence of every component call InitMasks . INPUTS anOb = pointer to the AnimOb BUGS SEE ALSO InitMasks() graphics/gels.h [Back to Amiga Developer Docs ]

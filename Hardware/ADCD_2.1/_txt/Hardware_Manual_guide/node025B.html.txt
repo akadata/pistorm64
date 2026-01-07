@@ -1,0 +1,1 @@
+Controller Port Index ]" border=0> Controller Port connection chart, 228 joystick, 232 mouse, 229 output to, 240 registers, 229 trackball, 229 [Back to Amiga Developer Docs ]

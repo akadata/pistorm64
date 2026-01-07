@@ -1,0 +1,1 @@
+Genlock Index ]" border=0> Genlock, 2 , 49 , 51 , 89 , 159 , 260 effect on background color, 46 in ECS, 296 in playfield register, 89 [Back to Amiga Developer Docs ]

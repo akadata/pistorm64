@@ -1,0 +1,1 @@
+Color Index ]" border=0> Color attached sprites, 122 background color, 46 color indirection, 42 color table, 46 enabling, 63 in dual-playfield mode, 70 in hold-and-modify mode, 86 in SuperHires mode, 301 in the Enhanced Chip Set, 301 sample register contents, 92 sprites, 102 [Back to Amiga Developer Docs ]

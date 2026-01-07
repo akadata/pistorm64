@@ -1,0 +1,1 @@
+BitMap Structure Index ]" border=0> BitMap Structure, 39 , 98 , 111 , 213 , 226 , 703 , 705 , 706 in dual-playfield display, 579 in super bitmap layers, 706 preparing, 552 [Back to Amiga Developer Docs ]

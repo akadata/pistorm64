@@ -1,0 +1,1 @@
+Border Index ]" border=0> Border calculating window border size, 89 containing size gadget, 109 dimensions (from window), 105 gadgets in, 88 graphics offsets, 89 in requester, 204 in requester gadgets, 206 position, 224 rast port, 105 size precalculation, 41 using, 234 window 88-89 [Back to Amiga Developer Docs ]

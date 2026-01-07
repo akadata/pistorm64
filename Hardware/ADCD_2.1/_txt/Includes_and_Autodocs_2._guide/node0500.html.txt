@@ -1,0 +1,1 @@
+console.doc ]" border=0> CD_ASKDEFAULTKEYMAP CDInputHandler() OpenDevice() CD_ASKKEYMAP CMD_CLEAR RawKeyConvert() CD_SETDEFAULTKEYMAP CMD_READ CD_SETKEYMAP CMD_WRITE [Back to Amiga Developer Docs ]

@@ -1,0 +1,1 @@
+Audio Channels Index ]" border=0> Audio Channels, 13 allocation key, 24 allocation/arbitration commands, 22 allocation, 21 , 22 changing the precedence, 24 combinations, 22 freeing, 24 Lock, 22 multi-channel, 24 stealing, 21 , 22 [Back to Amiga Developer Docs ]

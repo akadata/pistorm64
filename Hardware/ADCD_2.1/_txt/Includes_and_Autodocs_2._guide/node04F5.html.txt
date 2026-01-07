@@ -1,0 +1,1 @@
+timer.doc ]" border=0> --background-- CmpTime() SubTime() TR_SETSYSTIME AbortIO() GetSysTime() TR_ADDREQUEST AddTime() ReadEClock() TR_GETSYSTIME [Back to Amiga Developer Docs ]

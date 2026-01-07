@@ -1,0 +1,1 @@
+IntuiMessage structure Index ]" border=0> IntuiMessage structure, 119 , 247 , 250 , 256 Class, 256-257 , 257 , 268 Code, 186 , 256 , 258 , 259-260 , 261 , 268 ExecMessage, 256 IAddress, 257 , 259 , 262 , 263 IDCMPWindow, 257 Micros, 257 MouseX, 256 , 268 , 273 MouseY, 256 , 268 , 273 Qualifier, 256 , 261 , 282 Seconds, 257 SpecialLink, 257 [Back to Amiga Developer Docs ]

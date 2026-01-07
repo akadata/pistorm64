@@ -1,0 +1,1 @@
+33 / / Other Parsing Modes / IFFPARSE_STEP ]" border=0> This mode is identical to IFFPARSE_RAWSTEP , except that, before control returns to your code, the chunk handler (if any) for the chunk is invoked. [Back to Amiga Developer Docs ]

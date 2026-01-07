@@ -1,0 +1,1 @@
+15 / GadTools Menus / Functions for GadTools Menus ]" border=0> In this section the basic GadTools menu functions are presented. See the listing above for an example of how to use these functions. Creating Menus Layout for Individual Menus Layout of the Menus Freeing Menus [Back to Amiga Developer Docs ]
