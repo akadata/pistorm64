@@ -161,6 +161,8 @@ static void bpl_log_print(void) {
   pthread_mutex_unlock(&bpl_state_lock);
 }
 
+static void bpl_update_cop_cache(uint32_t cop2lc);
+
 static uint64_t monotonic_us(void) {
   struct timespec ts;
   clock_gettime(CLOCK_MONOTONIC, &ts);
