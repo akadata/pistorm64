@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Get_Filesys.c" NODE="MAIN" TITLE="Devices/Dev_examples/Get_Filesys.c" -->
+<head>
+<title>Devices/Dev_examples/Get_Filesys.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01A3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01A5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+   /*
+    * Get_Filesys.c
+    *
+    * Example of examining the FileSysRes list
+    *
+    * Compile with SAS C 5.10  lc -b1 -cfistq -v -y -L
+    *
+    * Run from CLI only
+    */
+
+   #include &#060;exec/types.h&#062;
+   #include &#060;exec/memory.h&#062;
+   #include &#060;dos/dos.h&#062;
+   #include &#060;resources/filesysres.h&#062;
+
+   #include &#060;clib/exec_protos.h&#062;
+
+   #include &#060;stdio.h&#062;
+
+   #ifdef LATTICE
+   int CXBRK(void) { return(0); }  /* Disable SAS CTRL/C handling */
+   int chkabort(void) { return(0); }  /* really */
+   #endif
+
+   struct FileSysResource *FileSysResBase = NULL;
+
+   void main(int argc, char **argv)
+   {
+
+   struct FileSysEntry *fse;
+   int x;
+
+   /* NOTE - you should actually be in a Forbid while accessing any
+    * system list for which no other method of arbitration is available.
+    * However, for this example we will be printing the information
+    * (which would break a Forbid anyway) so we won't Forbid.
+    * In real life, you should Forbid, copy the information you need,
+    * Permit, then print the info.
+    */
+   if (!(FileSysResBase = (struct FileSysResource *)OpenResource(FSRNAME)))
+       printf(&#034;Cannot open %s\n&#034;,FSRNAME);
+   else
+       {
+       for ( fse = (struct FileSysEntry *)FileSysResBase-&#062;fsr_FileSysEntries.lh_Head;
+             fse-&#062;fse_Node.ln_Succ;
+             fse = (struct FileSysEntry *)fse-&#062;fse_Node.ln_Succ)
+            {
+            printf(&#034;Found filesystem creator: %s\n&#034;,fse-&#062;fse_Node.ln_Name);
+
+            printf(&#034;                 DosType: &#034;);
+            for (x=24; x&#062;=8; x-=8)
+                 putchar((fse-&#062;fse_DosType &#062;&#062; x) &#038; 0xFF);
+
+            putchar((fse-&#062;fse_DosType &#038; 0xFF) + 0x30);
+
+            printf(&#034;\n                 Version: %d&#034;,(fse-&#062;fse_Version &#062;&#062; 16));
+            printf(&#034;.%ld\n\n&#034;,(fse-&#062;fse_Version &#038; 0xFFFF));
+            }
+        }
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

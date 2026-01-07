@@ -1,0 +1,396 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/animtools.c" NODE="MAIN" TITLE="Lib_examples/animtools.c" -->
+<head>
+<title>Lib_examples/animtools.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node059B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node059D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* animtools.c
+**
+** This file is a collection of tools which are used with the VSprite, Bob and Animation
+** system software. It is intended as a useful EXAMPLE, and while it shows what must be
+** done, it is not the only way to do it.  If Not Enough Memory, or error return, each
+** cleans up after itself before returning.  NOTE that these routines assume a very specific
+** structure to the GEL lists.  Make sure that you use the correct pairs together
+** (i.e. makeOb()/freeOb(), etc.)
+**
+** Compile with SAS/C 5.10b: lc -b1 -cfist -v -y -oanimtools.o animtools.c
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;graphics/gfx.h&#062;
+#include &#060;graphics/gels.h&#062;
+#include &#060;graphics/clip.h&#062;
+#include &#060;graphics/rastport.h&#062;
+#include &#060;graphics/view.h&#062;
+#include &#060;graphics/gfxbase.h&#062;
+#include &#034;animtools.h&#034;
+
+<a name="line22"></a>
+/* Setup the GELs system.  After this call is made you can use VSprites, Bobs, AnimComps
+** and AnimObs.  Note that this links the GelsInfo structure into the RastPort, and calls
+** InitGels().  It uses information in your RastPort structure to establish boundary collision
+** defaults at the outer edges of the raster.  This routine sets up for everything - collision
+** detection and all. You must already have run LoadView before ReadyGelSys is called.
+<a name="line28">*/</a>
+struct GelsInfo *setupGelSys(struct RastPort *rPort, BYTE reserved)
+{
+struct GelsInfo *gInfo;
+struct VSprite  *vsHead;
+struct VSprite  *vsTail;
+
+if (NULL != (gInfo = (struct GelsInfo *)AllocMem(sizeof(struct GelsInfo), MEMF_CLEAR)))
+        {
+        if (NULL != (gInfo-&#062;nextLine = (WORD *)AllocMem(sizeof(WORD) * 8, MEMF_CLEAR)))
+            {
+            if (NULL != (gInfo-&#062;lastColor = (WORD **)AllocMem(sizeof(LONG) * 8, MEMF_CLEAR)))
+                {
+                if (NULL != (gInfo-&#062;collHandler = (struct collTable *)
+                        AllocMem(sizeof(struct collTable),MEMF_CLEAR)))
+                    {
+                    if (NULL != (vsHead = (struct VSprite *)
+                            AllocMem((LONG)sizeof(struct VSprite), MEMF_CLEAR)))
+                        {
+                        if (NULL != (vsTail = (struct VSprite *)
+                                AllocMem(sizeof(struct VSprite), MEMF_CLEAR)))
+                            {
+                            gInfo-&#062;sprRsrvd   = reserved;
+                            /* Set left- and top-most to 1 to better keep items */
+                            /* inside the display boundaries.                   */
+                            gInfo-&#062;leftmost   = gInfo-&#062;topmost    = 1;
+                            gInfo-&#062;rightmost  = (rPort-&#062;BitMap-&#062;BytesPerRow &#060;&#060; 3) - 1;
+                            gInfo-&#062;bottommost = rPort-&#062;BitMap-&#062;Rows - 1;
+                            rPort-&#062;GelsInfo = gInfo;
+                            InitGels(vsHead, vsTail, gInfo);
+                            return(gInfo);
+                            }
+                        FreeMem(vsHead, (LONG)sizeof(*vsHead));
+                        }
+                    FreeMem(gInfo-&#062;collHandler, (LONG)sizeof(struct collTable));
+                    }
+                FreeMem(gInfo-&#062;lastColor, (LONG)sizeof(LONG) * 8);
+                }
+            FreeMem(gInfo-&#062;nextLine, (LONG)sizeof(WORD) * 8);
+            }
+        FreeMem(gInfo, (LONG)sizeof(*gInfo));
+        }
+return(NULL);
+}
+
+<a name="line73"></a>
+/* Free all of the stuff allocated by setupGelSys().  Only call this routine if
+** setupGelSys() returned successfully.  The GelsInfo structure is the one returned
+** by setupGelSys().   It also unlinks the GelsInfo from the RastPort.
+*/
+VOID cleanupGelSys(struct GelsInfo *gInfo, struct RastPort *rPort)
+{
+rPort-&#062;GelsInfo = NULL;
+FreeMem(gInfo-&#062;collHandler, (LONG)sizeof(struct collTable));
+FreeMem(gInfo-&#062;lastColor, (LONG)sizeof(LONG) * 8);
+FreeMem(gInfo-&#062;nextLine, (LONG)sizeof(WORD) * 8);
+FreeMem(gInfo-&#062;gelHead, (LONG)sizeof(struct VSprite));
+FreeMem(gInfo-&#062;gelTail, (LONG)sizeof(struct VSprite));
+FreeMem(gInfo, (LONG)sizeof(*gInfo));
+}
+
+<a name="line89"></a>
+/* Create a VSprite from the information given in nVSprite.  Use freeVSprite()
+** to free this GEL.
+*/
+struct VSprite *makeVSprite(NEWVSPRITE *nVSprite)
+{
+struct VSprite *vsprite;
+LONG            line_size;
+LONG            plane_size;
+
+line_size = sizeof(WORD) * nVSprite-&#062;nvs_WordWidth;
+plane_size = line_size * nVSprite-&#062;nvs_LineHeight;
+
+if (NULL != (vsprite = (struct VSprite *)AllocMem((LONG)sizeof(struct VSprite), MEMF_CLEAR)))
+        {
+        if (NULL != (vsprite-&#062;BorderLine = (WORD *)AllocMem(line_size, MEMF_CHIP)))
+            {
+            if (NULL != (vsprite-&#062;CollMask = (WORD *)AllocMem(plane_size, MEMF_CHIP)))
+                {
+                vsprite-&#062;Y          = nVSprite-&#062;nvs_Y;
+                vsprite-&#062;X          = nVSprite-&#062;nvs_X;
+                vsprite-&#062;Flags      = nVSprite-&#062;nvs_Flags;
+                vsprite-&#062;Width      = nVSprite-&#062;nvs_WordWidth;
+                vsprite-&#062;Depth      = nVSprite-&#062;nvs_ImageDepth;
+                vsprite-&#062;Height     = nVSprite-&#062;nvs_LineHeight;
+                vsprite-&#062;MeMask     = nVSprite-&#062;nvs_MeMask;
+                vsprite-&#062;HitMask    = nVSprite-&#062;nvs_HitMask;
+                vsprite-&#062;ImageData  = nVSprite-&#062;nvs_Image;
+                vsprite-&#062;SprColors  = nVSprite-&#062;nvs_ColorSet;
+                vsprite-&#062;PlanePick  = vsprite-&#062;PlaneOnOff = 0x00;
+                InitMasks(vsprite);
+                return(vsprite);
+                }
+            FreeMem(vsprite-&#062;BorderLine, line_size);
+            }
+        FreeMem(vsprite, (LONG)sizeof(*vsprite));
+        }
+return(NULL);
+}
+
+<a name="line129"></a>
+/* Create a Bob from the information given in nBob.  Use freeBob() to free this GEL.
+** A VSprite is created for this bob.  This routine properly allocates all double
+** buffered information if it is required.
+*/
+struct Bob *makeBob(NEWBOB *nBob)
+{
+struct Bob         *bob;
+struct VSprite     *vsprite;
+NEWVSPRITE          nVSprite ;
+LONG                rassize;
+
+rassize = (LONG)sizeof(UWORD) * nBob-&#062;nb_WordWidth * nBob-&#062;nb_LineHeight * nBob-&#062;nb_RasDepth;
+
+if (NULL != (bob = (struct Bob *)AllocMem((LONG)sizeof(struct Bob), MEMF_CLEAR)))
+        {
+        if (NULL != (bob-&#062;SaveBuffer = (WORD *)AllocMem(rassize, MEMF_CHIP)))
+            {
+            nVSprite.nvs_WordWidth  = nBob-&#062;nb_WordWidth;
+            nVSprite.nvs_LineHeight = nBob-&#062;nb_LineHeight;
+            nVSprite.nvs_ImageDepth = nBob-&#062;nb_ImageDepth;
+            nVSprite.nvs_Image      = nBob-&#062;nb_Image;
+            nVSprite.nvs_X          = nBob-&#062;nb_X;
+            nVSprite.nvs_Y          = nBob-&#062;nb_Y;
+            nVSprite.nvs_ColorSet   = NULL;
+            nVSprite.nvs_Flags      = nBob-&#062;nb_BFlags;
+            /* Push the values into the NEWVSPRITE structure for use in makeVSprite(). */
+            nVSprite.nvs_MeMask     = nBob-&#062;nb_MeMask;
+            nVSprite.nvs_HitMask    = nBob-&#062;nb_HitMask;
+
+            if ((vsprite = makeVSprite(&#038;nVSprite)) != NULL)
+                {
+                vsprite-&#062;PlanePick = nBob-&#062;nb_PlanePick;
+                vsprite-&#062;PlaneOnOff = nBob-&#062;nb_PlaneOnOff;
+                vsprite-&#062;VSBob   = bob;
+                bob-&#062;BobVSprite  = vsprite;
+                bob-&#062;ImageShadow = vsprite-&#062;CollMask;
+                bob-&#062;Flags       = 0;
+                bob-&#062;Before      = NULL;
+                bob-&#062;After       = NULL;
+                bob-&#062;BobComp     = NULL;
+
+                if (nBob-&#062;nb_DBuf)
+                    {
+                    if (NULL != (bob-&#062;DBuffer = (struct DBufPacket *)
+                            AllocMem((LONG)sizeof(struct DBufPacket), MEMF_CLEAR)))
+                        {
+                        if (NULL != (bob-&#062;DBuffer-&#062;BufBuffer = (WORD *)AllocMem(rassize, MEMF_CHIP)))
+                            return(bob);
+                        FreeMem(bob-&#062;DBuffer, (LONG)sizeof(struct DBufPacket));
+                        }
+                    }
+                else
+                    {
+                    bob-&#062;DBuffer = NULL;
+                    return(bob);
+                    }
+                freeVSprite(vsprite);
+                }
+            FreeMem(bob-&#062;SaveBuffer, rassize);
+            }
+        FreeMem(bob, (LONG)sizeof(*bob));
+        }
+return(NULL);
+}
+
+
+<a name="line196">/*</a>
+** Create a Animation Component from the information given in nAnimComp and nBob.  Use
+** freeComp() to free this GEL.  makeComp() calls makeBob(), and links the Bob into an AnimComp.
+*/
+struct AnimComp *makeComp(NEWBOB *nBob, NEWANIMCOMP *nAnimComp)
+{
+struct Bob      *compBob;
+struct AnimComp *aComp;
+
+if ((aComp = AllocMem((LONG)sizeof(struct AnimComp),MEMF_CLEAR)) != NULL)
+        {
+        if ((compBob = makeBob(nBob)) != NULL)
+            {
+            compBob-&#062;After   = compBob-&#062;Before  = NULL;
+            compBob-&#062;BobComp = aComp;   /* Link 'em up. */
+            aComp-&#062;AnimBob      = compBob;
+            aComp-&#062;TimeSet      = nAnimComp-&#062;nac_Time; /* Num ticks active. */
+            aComp-&#062;YTrans       = nAnimComp-&#062;nac_Yt; /* Offset rel to HeadOb */
+            aComp-&#062;XTrans       = nAnimComp-&#062;nac_Xt;
+            aComp-&#062;AnimCRoutine = nAnimComp-&#062;nac_Routine;
+            aComp-&#062;Flags        = nAnimComp-&#062;nac_CFlags;
+            aComp-&#062;Timer        = 0;
+            aComp-&#062;NextSeq      = aComp-&#062;PrevSeq  = NULL;
+            aComp-&#062;NextComp     = aComp-&#062;PrevComp = NULL;
+            aComp-&#062;HeadOb       = NULL;
+            return(aComp);
+            }
+        FreeMem(aComp, (LONG)sizeof(struct AnimComp));
+        }
+return(NULL);
+}
+
+<a name="line228"></a>
+/* Create an Animation Sequence from the information given in nAnimSeq and nBob.  Use
+** freeSeq() to free this GEL.  This routine creates a linked list of animation components
+** which make up the animation sequence.  It links them all up, making a circular list of
+** the PrevSeq and NextSeq pointers. That is to say, the first component of the sequences'
+** PrevSeq points to the last component; the last component of * the sequences' NextSeq
+** points back to the first component.  If dbuf is on, the underlying Bobs will be set up
+** for double buffering.  If singleImage is non-zero, the pImages pointer is assumed to
+** point to an array of only one image, instead of an array of 'count' images, and all
+** Bobs will use the same image.
+*/
+struct AnimComp *makeSeq(NEWBOB *nBob, NEWANIMSEQ *nAnimSeq)
+{
+int seq;
+struct AnimComp *firstCompInSeq = NULL;
+struct AnimComp *seqComp = NULL;
+struct AnimComp *lastCompMade = NULL;
+LONG image_size;
+NEWANIMCOMP nAnimComp;
+
+/* get the initial image.  this is the only image that is used
+** if nAnimSeq-&#062;nas_SingleImage is non-zero.
+*/
+nBob-&#062;nb_Image = nAnimSeq-&#062;nas_Images;
+image_size = nBob-&#062;nb_LineHeight * nBob-&#062;nb_ImageDepth * nBob-&#062;nb_WordWidth;
+
+/* for each comp in the sequence */
+for (seq = 0; seq &#060; nAnimSeq-&#062;nas_Count; seq++)
+        {
+        nAnimComp.nac_Xt        = *(nAnimSeq-&#062;nas_Xt + seq);
+        nAnimComp.nac_Yt        = *(nAnimSeq-&#062;nas_Yt + seq);
+        nAnimComp.nac_Time      = *(nAnimSeq-&#062;nas_Times + seq);
+        nAnimComp.nac_Routine   = nAnimSeq-&#062;nas_Routines[seq];
+        nAnimComp.nac_CFlags    = nAnimSeq-&#062;nas_CFlags;
+        if ((seqComp = makeComp(nBob, &#038;nAnimComp)) == NULL)
+            {
+            if (firstCompInSeq != NULL)
+                freeSeq(firstCompInSeq, (LONG)nBob-&#062;nb_RasDepth);
+            return(NULL);
+            }
+        seqComp-&#062;HeadOb = nAnimSeq-&#062;nas_HeadOb;
+        /* Make a note of where the first component is. */
+        if (firstCompInSeq == NULL) firstCompInSeq = seqComp;
+        /* link the component into the list */
+        if (lastCompMade != NULL) lastCompMade-&#062;NextSeq = seqComp;
+        seqComp-&#062;NextSeq = NULL;
+        seqComp-&#062;PrevSeq = lastCompMade;
+        lastCompMade = seqComp;
+        /* If nAnimSeq-&#062;nas_SingleImage is zero, the image array has nAnimSeq-&#062;nas_Count images. */
+        if (!nAnimSeq-&#062;nas_SingleImage)
+            nBob-&#062;nb_Image += image_size;
+        }
+/* On The last component in the sequence, set Next/Prev to make */
+/* the linked list a loop of components.                        */
+lastCompMade-&#062;NextSeq = firstCompInSeq;
+firstCompInSeq-&#062;PrevSeq = lastCompMade;
+
+return(firstCompInSeq);
+}
+
+<a name="line288"></a>
+/* Free the data created by makeVSprite().  Assumes images deallocated elsewhere. */
+VOID freeVSprite(struct VSprite *vsprite)
+{
+LONG    line_size;
+LONG    plane_size;
+
+line_size = (LONG)sizeof(WORD) * vsprite-&#062;Width;
+plane_size = line_size * vsprite-&#062;Height;
+FreeMem(vsprite-&#062;BorderLine, line_size);
+FreeMem(vsprite-&#062;CollMask, plane_size);
+FreeMem(vsprite, (LONG)sizeof(*vsprite));
+}
+
+<a name="line302"></a>
+/* Free the data created by makeBob().  It's important that rasdepth match the depth you */
+/* passed to makeBob() when this gel was made. Assumes images deallocated elsewhere.     */
+VOID freeBob(struct Bob *bob, LONG rasdepth)
+{
+LONG    rassize =  sizeof(UWORD) * bob-&#062;BobVSprite-&#062;Width * bob-&#062;BobVSprite-&#062;Height * rasdepth;
+
+if (bob-&#062;DBuffer != NULL)
+        {
+        FreeMem(bob-&#062;DBuffer-&#062;BufBuffer, rassize);
+        FreeMem(bob-&#062;DBuffer, (LONG)sizeof(struct DBufPacket));
+        }
+FreeMem(bob-&#062;SaveBuffer, rassize);
+freeVSprite(bob-&#062;BobVSprite);
+FreeMem(bob, (LONG)sizeof(*bob));
+}
+
+
+/* Free the data created by makeComp().  It's important that rasdepth match the depth you */
+/* passed to makeComp() when this GEL was made. Assumes images deallocated elsewhere.    */
+VOID freeComp(struct AnimComp *myComp, LONG rasdepth)
+{
+freeBob(myComp-&#062;AnimBob, rasdepth);
+FreeMem(myComp, (LONG)sizeof(struct AnimComp));
+}
+
+
+/* Free the data created by makeSeq().  Complimentary to makeSeq(), this routine goes through
+** the NextSeq pointers and frees the Components.  This routine only goes forward through the
+** list, and so it must be passed the first component in the sequence, or the sequence must
+** be circular (which is guaranteed if you use makeSeq()).  It's important that rasdepth match
+** the depth you passed to makeSeq() when this gel was made.   Assumes images deallocated elsewhere!
+*/
+VOID freeSeq(struct AnimComp *headComp, LONG rasdepth)
+{
+struct AnimComp *curComp;
+struct AnimComp *nextComp;
+
+/* Break the NextSeq loop, so we get a NULL at the end of the list. */
+headComp-&#062;PrevSeq-&#062;NextSeq = NULL;
+
+curComp = headComp;         /* get the start of the list */
+while (curComp != NULL)
+        {
+        nextComp = curComp-&#062;NextSeq;
+        freeComp(curComp, rasdepth);
+        curComp = nextComp;
+        }
+}
+
+
+/* Free an animation object (list of sequences).  freeOb() goes through the NextComp
+** pointers, starting at the AnimObs' HeadComp, and frees every sequence.  It only
+** goes forward. It then frees the Object itself.  Assumes images deallocated elsewhere!
+*/
+VOID freeOb(struct AnimOb *headOb, LONG rasdepth)
+{
+struct AnimComp *curSeq;
+struct AnimComp *nextSeq;
+
+curSeq = headOb-&#062;HeadComp;          /* get the start of the list */
+while (curSeq != NULL)
+        {
+        nextSeq = curSeq-&#062;NextComp;
+        freeSeq(curSeq, rasdepth);
+        curSeq = nextSeq;
+        }
+FreeMem(headOb, sizeof(struct AnimOb));
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

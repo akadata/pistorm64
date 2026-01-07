@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/apps/ILBMLoad/ILBMLoad.c" NODE="MAIN" TITLE="Devices/apps/ILBMLoad/ILBMLoad.c" -->
+<head>
+<title>Devices/apps/ILBMLoad/ILBMLoad.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02FB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02FD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* ILBMLoad.c 05/91  C. Scheppner CBM
+ *
+ * Example which
+ *  - first queries an ILBM to determine size and mode
+ *  - then opens an appropriate screen and window
+ *  - then loads the ILBM into the already opened screen
+ *
+ * For clipboard, use filename -c[unit] (like -c, -c1, -c2, etc.)
+ *
+ * requires linkage with several IFF modules
+ * see Makefile
+ */
+
+#include &#034;iffp/ilbmapp.h&#034;
+
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+void cleanup(void);
+void bye(UBYTE *s,int error);
+
+#define MINARGS 2
+char *vers = &#034;\0$VER: ILBMLoad 37.5&#034;;
+char *Copyright = &#034;ILBMLoad v37.5 (Freely Redistributable)&#034;;
+char *usage = &#034;Usage: ILBMLoad ilbmname (-c[unit] for clipboard&#034;;
+
+
+struct Library *IntuitionBase  = NULL;
+struct Library *GfxBase        = NULL;
+struct Library *IFFParseBase   = NULL;
+
+/* Note - these fields are also available in the ILBMInfo structure */
+struct   Screen         *scr;         /* for ptr to screen structure */
+struct   Window         *win;         /* for ptr to window structure */
+struct   RastPort       *wrp;         /* for ptr to RastPort  */
+struct   ViewPort       *vp;          /* for ptr to Viewport  */
+
+struct   IntuiMessage   *msg;
+
+struct   NewWindow      mynw = {
+   0, 0,                                  /* LeftEdge and TopEdge */
+   0, 0,                          	  /* Width and Height */
+   -1, -1,                                /* DetailPen and BlockPen */
+   VANILLAKEY|MOUSEBUTTONS,               /* IDCMP Flags with Flags below */
+   BACKDROP|BORDERLESS|SMART_REFRESH|NOCAREREFRESH|ACTIVATE|RMBTRAP,
+   NULL, NULL,                            /* Gadget and Image pointers */
+   NULL,                                  /* Title string */
+   NULL,                                  /* Screen ptr null till opened */
+   NULL,                                  /* BitMap pointer */
+   50, 20,                                /* MinWidth and MinHeight */
+   0 , 0,                                 /* MaxWidth and MaxHeight */
+   CUSTOMSCREEN                           /* Type of window */
+   };
+
+
+BOOL   FromWb;
+
+
+/* ILBM Property chunks to be grabbed
+ * List BMHD, CMAP and CAMG first so we can skip them when we write
+ * the file back out (they will be written out with separate code)
+ */
+LONG	ilbmprops[] = {
+		ID_ILBM, ID_BMHD,
+		ID_ILBM, ID_CMAP,
+		ID_ILBM, ID_CAMG,
+		ID_ILBM, ID_CCRT,
+		ID_ILBM, ID_AUTH,
+		ID_ILBM, ID_Copyright,
+		TAG_DONE
+		};
+
+/* ILBM Collection chunks (more than one in file) to be gathered */
+LONG	ilbmcollects[] = {
+		ID_ILBM, ID_CRNG,
+		TAG_DONE
+		};
+
+/* ILBM Chunk to stop on */
+LONG	ilbmstops[] = {
+		ID_ILBM, ID_BODY,
+		TAG_DONE
+		};
+
+
+UBYTE nomem[]  = &#034;Not enough memory\n&#034;;
+UBYTE noiffh[] = &#034;Can't alloc iff\n&#034;;
+
+
+
+/* For our allocated ILBM frame */
+struct ILBMInfo  *ilbm;
+
+
+/*
+ * MAIN
+ */
+void main(int argc, char **argv)
+   {
+   UBYTE *ilbmname=NULL;
+   LONG error = 0L;
+
+   FromWb = argc ? FALSE : TRUE;
+
+   if((argc&#060;MINARGS)||(argv[argc-1][0]=='?'))
+	{
+	printf(&#034;%s\n%s\n&#034;,Copyright,usage);
+        bye(&#034;&#034;,RETURN_OK);
+	}
+
+   ilbmname = argv[1];
+
+   /* Open Libraries */
+
+   if(!(IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 0)))
+      bye(&#034;Can't open intuition library.\n&#034;,RETURN_WARN);
+
+   if(!(GfxBase = OpenLibrary(&#034;graphics.library&#034;,0)))
+      bye(&#034;Can't open graphics library.\n&#034;,RETURN_WARN);
+
+   if(!(IFFParseBase = OpenLibrary(&#034;iffparse.library&#034;,0)))
+      bye(&#034;Can't open iffparse library.\n&#034;,RETURN_WARN);
+
+
+
+/*
+ * Alloc one ILBMInfo struct
+ */
+    if(!(ilbm = (struct ILBMInfo *)
+	AllocMem(sizeof(struct ILBMInfo),MEMF_PUBLIC|MEMF_CLEAR)))
+		bye(nomem,RETURN_FAIL);
+
+/*
+ * Here we set up our ILBMInfo fields for our
+ * application.
+ * Above we have defined the propery and collection chunks
+ * we are interested in (some required like BMHD)
+ */
+
+    ilbm-&#062;ParseInfo.propchks	= ilbmprops;
+    ilbm-&#062;ParseInfo.collectchks	= ilbmcollects;
+    ilbm-&#062;ParseInfo.stopchks	= ilbmstops;
+
+    ilbm-&#062;windef	= &#038;mynw;
+
+/*
+ * Alloc IFF handle for frame
+ */
+    if(!(ilbm-&#062;ParseInfo.iff = AllocIFF())) bye(noiffh,RETURN_FAIL);
+
+/* Normally you would use showilbm() to open an appropriate acreen
+ * and display an ILBM in it.
+ *
+ * However, here we are demonstrating
+ *  - first querying an ILBM to get its BMHD and CAMG (real or computed)
+ *  - then opening our own display
+ *  - then loading the ILBM into it
+ */
+
+    if(!(error = queryilbm(ilbm,ilbmname)))
+	{
+	D(bug(&#034;ilbmload: after query, this ILBM is %ld x %ld x %ld, modeid=$%lx\n&#034;,
+		ilbm-&#062;Bmhd.w, ilbm-&#062;Bmhd.h, ilbm-&#062;Bmhd.nPlanes, ilbm-&#062;camg));
+
+	/* Note - you could use your own routines to open your
+	 * display, but if so, you must initialize ilbm-&#062;scr,
+	 * ilbm-&#062;win, ilbm-&#062;wrp, ilbm-&#062;srp, and ilbm-&#062;vp for your display.
+	 * Here we will use opendisplay() which will initialize
+	 * those fields.
+	 */
+	if(!(opendisplay(ilbm,
+			MAX(ilbm-&#062;Bmhd.pageWidth, ilbm-&#062;Bmhd.w),
+			MAX(ilbm-&#062;Bmhd.pageHeight,ilbm-&#062;Bmhd.h),
+			MIN(ilbm-&#062;Bmhd.nPlanes,MAXAMDEPTH),
+			ilbm-&#062;camg)))
+	    {
+	    printf(&#034;Failed to open display\n&#034;);
+	    }
+	else
+	    {
+	    D(bug(&#034;ilbmload: opendisplay successful\n&#034;));
+
+	    scr = ilbm-&#062;scr;
+	    win = ilbm-&#062;win;
+
+	    if(!(error = loadilbm(ilbm, ilbmname)))
+		{
+	    	D(bug(&#034;ilbmload: loadilbm successful\n&#034;));
+
+		/* Note - we don't need to examine or copy any
+		 * chunks from the file, so we will close file now
+		 */
+		closeifile(ilbm);
+		ScreenToFront(ilbm-&#062;scr);
+		Wait(1&#060;&#060;win-&#062;UserPort-&#062;mp_SigBit);
+		unloadilbm(ilbm);	/* deallocs colors, closeifile if needed */
+		}
+	    closedisplay(ilbm);
+ 	    }
+      	}
+
+    if(error)	printf(&#034;%s\n&#034;,IFFerr(error));
+
+    cleanup();
+    exit(RETURN_OK);
+    }
+
+
+void bye(UBYTE *s,int error)
+   {
+   if((*s)&#038;&#038;(!FromWb)) printf(&#034;%s\n&#034;,s);
+   cleanup();
+   exit(error);
+   }
+
+
+void cleanup()
+   {
+   if(ilbm)
+	{
+	if(ilbm-&#062;ParseInfo.iff) 	FreeIFF(ilbm-&#062;ParseInfo.iff);
+	FreeMem(ilbm,sizeof(struct ILBMInfo));
+	}
+
+   if(GfxBase) 	     	CloseLibrary(GfxBase);
+   if(IntuitionBase) 	CloseLibrary(IntuitionBase);
+   if(IFFParseBase)  	CloseLibrary(IFFParseBase);
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

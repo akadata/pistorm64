@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_7" NODE="7-2" TITLE="7 Intuition Requesters and Alerts / True Requesters" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>7 Intuition Requesters and Alerts / True Requesters</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01A0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01A2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The primary function of a requester is to display information to the user
+from which the user is to make a selection.  Conceptually, requesters are
+similar to menus since both menus and requesters offer options to the
+user.  Requesters, however, go beyond menus because they can have
+customized imagery, can be placed anywhere in a window, can be activated
+by the application and may have any type of gadget attached.
+
+For instance, to select a color for a given operation using a menu could
+be awkward, especially in an application that supports a large number of
+colors.  In that case a requester could be used instead (see figure).
+
+<a name="line13">     <a href="../Libraries_Manual_guide/node05D9.html">Figure 7-1: Requester Deluxe</a> </a>
+
+The ability of a true requester to block input to its parent window is
+important in understanding how requesters are used.  When input is blocked
+by a true requester (also known as a modal requester), the user must take
+some action before the program will proceed further, such as making a
+selection, correcting an error condition, or acknowledging a warning.
+These are situations where a true (modal) requester is appropriate,
+however, keep in mind that your application should try to be as
+user-responsive as possible.  Putting up a requester merely because you
+are in a phase of the program where it would be difficult to deal with
+user input is bad style.  Modal requesters should be used only when the
+program requires user interaction before proceeding.
+
+<a name="line27">True requesters can be created in a window in two different ways.</a>
+
+      * An application can display a requester at any time by calling
+<a name="line30">        the <a href="../Libraries_Manual_guide/node01A2.html#line12">Request()</a> function.</a>
+
+      * The application can declare a requester as the window's
+        <a href="../Libraries_Manual_guide/node01A9.html">double menu</a> requester, which the user can bring up with a
+        double-click of the menu button (this method is rarely used).
+
+ <a href="../Libraries_Manual_guide/node01A2.html">Creating Application Requesters</a> 
+ <a href="../Libraries_Manual_guide/node01A3.html">Requester I/O</a> 
+ <a href="../Libraries_Manual_guide/node01A4.html">Rendering Requesters</a> 
+ <a href="../Libraries_Manual_guide/node01A5.html">Requester Refresh Type</a> 
+ <a href="../Libraries_Manual_guide/node01A6.html">Requester Display Position</a> 
+ <a href="../Libraries_Manual_guide/node01A7.html">Gadgets in Requesters</a> 
+ <a href="../Libraries_Manual_guide/node01A8.html">Using a Requester to Block Window Input</a> 
+ <a href="../Libraries_Manual_guide/node01A9.html">Double Menu Requesters</a> 
+ <a href="../Libraries_Manual_guide/node01AA.html">IDCMP Requester Features</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

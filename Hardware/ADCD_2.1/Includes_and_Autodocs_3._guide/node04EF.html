@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="parallel" NODE="CMD_READ" TITLE="parallel.device/CMD_READ" -->
+<head>
+<title>parallel.device/CMD_READ</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04EE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04F0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> -- read input from parallel port
+
+<b>   FUNCTION</b>
+	This command causes a stream of characters to be read from the
+	parallel I/O register. The number of characters is specified in
+	io_Length. The EOF and EOL modes are supported, but be warned that
+	using these modes can result in a buffer overflow if the proper
+	EOL or EOF character is not received in time. These modes should
+	be used only when the sender and receiver have been designed to
+	cooperate. A safety guard can be implemented to EOF by setting
+	io_Length to a maximum allowed value. That cannot be done with EOL
+	since the EOL mode is identified by io_Length=-1.
+
+	The parallel.device has no internal buffer; if no read request has
+	been made, pending input (i.e. handshake request) is not
+	acknowledged.
+
+<b>   IO REQUEST</b>
+	io_Message      mn_ReplyPort initialized
+	io_Device       set by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Unit         set by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Command      CMD_READ (02)
+	io_Flags        If IOF_QUICK is set, driver will attempt Quick IO
+	io_Length       number of characters to receive.
+	io_Data         pointer where to put the data.
+
+<b>   RESULTS</b>
+	io_Error -- if the <a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> succeded, then io_Error will be null.
+	    If the <a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> failed, then io_Error will contain an error code.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node04F6.html">parallel.device/PDCMD_SETPARAMS</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

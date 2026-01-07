@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="WRITE_BYTE" TITLE="SAD/WRITE_BYTE" -->
+<head>
+<title>SAD/WRITE_BYTE</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0257.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0259.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+ WRITE <a href="../Includes_and_Autodocs_3._guide/node0654.html#line48">BYTE</a> - <a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a> the given data to the address given	(V40 SAD)
+
+ Command:	$AF $01
+ Data:		$ww $xx $yy $zz $qq
+
+ <a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a> the byte &#060;$qq&#062; to address &#060;$wwxxyyzz&#062;
+
+ Command will be ACK'ed when received.
+ Command ACK:	$00 $01
+ Command DONE:	$1F $01
+
+ BUGS
+	This command does not exists in pre-V40 EXEC.
+	This command can be emulated with the <a href="../Includes_and_Autodocs_3._guide/node0257.html">WRITE_ARRAY</a> command with
+	a length of 1.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

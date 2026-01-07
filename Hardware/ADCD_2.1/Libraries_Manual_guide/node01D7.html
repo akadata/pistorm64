@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_9" NODE="9-5-1" TITLE="9 / Using the IDCMP / Standard IntuiMessage Event Loop" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>9 / Using the IDCMP / Standard IntuiMessage Event Loop</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01D6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01D8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The application should handle events quickly.  Any delay in this handling
+will make the user interface appear sluggish to the user.  Additionally,
+certain events such as <a href="../Libraries_Manual_guide/node01E0.html#line28">IDCMP_SIZEVERIFY</a> may time-out if the application
+does not respond to them quickly  (this is to help prevent system
+deadlocks).  The action taken by Intuition when an event times-out may not
+match the action desired by the program.  When IDCMP_SIZEVERIFY times out,
+<a name="line8">the window sizing operation is cancelled by Intuition.</a>
+
+Code should be able to handle the case where there are multiple events
+waiting at the port.  When events are being generated quickly, Intuition
+may post many events to the IDCMP before the application regains control.
+This can happen regardless of how fast the application processes the
+messages waiting at the port.  Since messages queue up but signals do not,
+the application may not see a signal for each message posted.  Because of
+these facts, the code should remove all the messages waiting at the port,
+<a name="line17">regardless of the number, each time <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a> returns.</a>
+
+Code should also be able to handle the case where the signal is set but no
+events are waiting at the port.  This could happen if a new message
+arrives at the IDCMP while an application is still processing the previous
+message.  Since applications typically process all queued messages before
+returning to <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a>, the second message gets handled with the signal bit
+still set.  The subsequent call to Wait() will return immediately even
+though no message is present.  These cases should be quietly ignored.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

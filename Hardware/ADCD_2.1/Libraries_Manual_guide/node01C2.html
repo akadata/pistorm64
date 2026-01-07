@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-3-2" TITLE="8 / Creating Borders / Directly Drawing the Borders" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Borders / Directly Drawing the Borders</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01C1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01C3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Borders may be directly drawn by the application by calling the function
+<a href="../Includes_and_Autodocs_2._guide/node020F.html">DrawBorder()</a>.
+
+    void DrawBorder( struct RastPort *rp, struct Border *border,
+<a name="line6">                     long leftOffset, long topOffset );</a>
+
+The rp argument is a pointer to the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> into which the border should
+<a name="line9">be drawn.  This rastport may come from a <a href="../Libraries_Manual_guide/node0121.html">Window</a> or <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a> structure.</a>
+
+The border argument is a pointer to a list of <a href="../Libraries_Manual_guide/node01C1.html">Border</a> structures which are
+<a name="line12">to be rendered.  The list may contain a single Border structure.</a>
+
+The leftOffset and topOffset arguments are the external component, or base
+position, for this list of <a href="../Libraries_Manual_guide/node01C1.html">Border</a>s.  The <a href="../Libraries_Manual_guide/node01C1.html#line15">LeftEdge</a> and <a href="../Libraries_Manual_guide/node01C1.html#line15">TopEdge</a> values of
+each Border structure are added to these to determine the Border position.
+
+Borders may also be indirectly drawn by attaching them to gadgets, menus
+or requesters.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

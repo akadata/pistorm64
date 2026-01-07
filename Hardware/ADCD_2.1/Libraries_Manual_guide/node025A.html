@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-2" TITLE="15 / GadTools Gadgets / Creating Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / GadTools Gadgets / Creating Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0259.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node025B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The main call used to create a gadget with GadTools is <a href="../Includes_and_Autodocs_2._guide/node03E8.html">CreateGadget()</a>.
+This function can be used to create a single gadget or it can be called
+repeatedly to create a linked list of gadgets.  It takes three arguments
+followed by a set of tags:
+
+    struct Gadget *CreateGadget( ULONG kind, struct Gadget *prevgad,
+                                 struct NewGadget *newgad,
+                                 struct TagItem *taglist)
+    struct Gadget *CreateGadgetA(ULONG kind, struct Gadget *prevgad,
+                                 struct NewGadget *newgad,
+                                 struct Tag tag1, ...)
+
+Set the kind argument to one of the 12 gadget types supported by GadTools.
+Set the prevgad argument to the gadget address returned by <a href="../Libraries_Manual_guide/node026D.html">CreateContext()</a>
+if this is the first (or only) gadget in the list.  Subsequent calls to
+<a href="../Includes_and_Autodocs_2._guide/node03E8.html">CreateGadget()</a> can be used to create and link AutoDocs/gadgets together in a list
+in which case the prevgad argument is set to the address of the gadget
+returned by the preceding call to CreateGadget().
+
+Set the newgad argument to the address of the <a href="../Libraries_Manual_guide/node0259.html">NewGadget</a> structure
+describing the gadget to be created and set any special attributes for
+this gadget type using the tag arguments, tag1 or taglist.  For instance,
+the following code fragment might be used to create the color slider
+discussed earlier:
+
+    slidergad = CreateGadget(SLIDER_KIND, newgadget, prevgad,
+        GTSL_Min, 0,
+        GTSL_Max, 15,
+        GTSL_Level, 11,
+        TAG_END);
+
+<a href="../Includes_and_Autodocs_2._guide/node03E8.html">CreateGadget()</a> typically allocates and initializes all the necessary
+Intuition structures, including in this case the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>, <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> and
+<a href="../Libraries_Manual_guide/node0161.html">PropInfo</a> structures, as well as certain buffers.  For more about these
+underlying structures, see the &#034;<a href="../Libraries_Manual_guide/node012F.html">Intuition Gadgets</a>&#034; chapter.
+
+Since <a href="../Includes_and_Autodocs_2._guide/node03E8.html">CreateGadget()</a> is a tag-based function, it is easy to add more tags
+to get a fancier gadget.  For example, GadTools can optionally display the
+running level beside the slider.  The caller must supply a <a href="../Includes_and_Autodocs_2._guide/node0162.html">printf()</a>-style
+formatting string and the maximum length that the string will resolve to
+when the number is inserted:
+
+    slidergad = CreateGadget(SLIDER_KIND, newgadget, prevgad,
+        GTSL_Min, 0,
+        GTSL_Max, 15,
+        GTSL_Level, 11,
+        GTSL_LevelFormat, &#034;%2ld&#034; /* printf()-style formatting string */
+        GTSL_MaxLevelLen, 2,     /* maximum length of string         */
+        TAG_END);
+
+The level, 0 to 15 in this example, would then be displayed beside the
+slider.  The formatting string could instead be &#034;%2ld/15&#034;, so the level
+would be displayed as &#034;0/15&#034; through &#034;15/15&#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

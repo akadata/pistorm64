@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-6-3" TITLE="30 / / / Allocating and Deallocating Layer_Info" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / / / Allocating and Deallocating Layer_Info</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Use <a href="../Includes_and_Autodocs_2._guide/node03A1.html">NewLayerInfo()</a> to allocate and initialize a <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> structure and
+associated sub-structures.
+
+<a name="line5">    struct Layer_Info *NewLayerInfo( void );</a>
+
+You must call this function before attempting to use any of the other
+layers functions described below.  When you have finished with a
+<a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> structure, use <a href="../Includes_and_Autodocs_2._guide/node0395.html">DisposeLayerInfo()</a> to deallocate it.
+
+    void DisposeLayerInfo( struct Layer_Info *li );
+
+This function deallocates a <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> and associated structures
+previously allocated with <a href="../Includes_and_Autodocs_2._guide/node03A1.html">NewLayerInfo()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

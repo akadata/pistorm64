@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="AbortPkt()" TITLE="dos.library/AbortPkt" -->
+<head>
+<title>dos.library/AbortPkt</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0138.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node013A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AbortPkt -- Aborts an asynchronous packet, if possible. (V36)
+
+<b>   SYNOPSIS</b>
+	AbortPkt(port, pkt)
+		  D1    D2
+
+	void AbortPkt(struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05D9.html#line107">DosPacket</a> *)
+
+<b>   FUNCTION</b>
+	This attempts to abort a packet sent earlier with <a href="../Includes_and_Autodocs_3._guide/node01B0.html">SendPkt</a> to a
+	handler.  There is no guarantee that any given handler will allow
+	a packet to be aborted, or if it is aborted whether function
+	requested completed first or completely.  After calling AbortPkt(),
+	you must wait for the packet to return before reusing it or
+	deallocating it.
+
+<b>   INPUTS</b>
+	port - port the packet was sent to
+	pkt  - the packet you wish aborted
+
+<b>   BUGS</b>
+	As of V37, this function does nothing.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01B0.html">SendPkt()</a>, <a href="../Includes_and_Autodocs_3._guide/node0155.html">DoPkt()</a>, <a href="../Includes_and_Autodocs_3._guide/node01D0.html">WaitPkt()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

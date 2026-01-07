@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/reaction/reaction_class.h" NODE="MAIN" TITLE="include/reaction/reaction_class.h" -->
+<head>
+<title>include/reaction/reaction_class.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0613.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0615.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef REACTION_REACTION_CLASS_H
+#define REACTION_REACTION_CLASS_H
+/*
+**	$VER: reaction_class.h 44.1 (19.10.1999)
+**	Includes Release 44.1
+**
+**	reaction class author definitions
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef INTUITION_CGHOOKS_H
+#include &#060;intuition/cghooks.h&#062;
+#endif
+
+/*
+ * PRIVATE!
+<a name="line19"> */</a>
+struct SpecialPens
+{
+	WORD sp_Version;	/* Currently 0 */
+	LONG sp_DarkPen;	/* XEN/Thick extended locked pen */
+	LONG sp_LightPen;	/* XEN/Thick extended locked pen */
+	/* NOTE: This structure may grow! */
+};
+
+/*****************************************************************************
+ * Custom method defined and supported by some Reaction Gadgets
+ * When this method is supported by more (all?) Reaction Gadgets
+ * this structure may move to intuition/gadgetclass.h
+ */
+#define GM_CLIPRECT  (0x550001L)
+
+/* The GM_CLIPRECT method is used to pass a gadget a cliprect
+ * it should install before rendering to ObtainGIRPort() rastports
+ * to support proper usage within virtual groups.
+ */
+<a name="line39"></a>
+struct gpClipRect
+{
+	ULONG                MethodID;       /* GM_CLIPRECT              */
+	struct GadgetInfo   *gpc_GInfo;      /* GadgetInfo               */
+	struct Rectangle    *gpc_ClipRect;   /* Rectangle To Clip To     */
+	ULONG                gpc_Flags;      /* Flags                    */
+};
+
+/* Possible return values from GM_CLIPRECT
+ */
+#define GMC_VISIBLE			2
+#define GMC_PARTIAL			1
+#define GMC_INVISIBLE		0
+
+/**************************************************************************/
+
+#endif /* REACTION_REACTION_CLASS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

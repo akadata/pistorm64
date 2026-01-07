@@ -1,0 +1,311 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="XI-25/AppMap_demo.c" NODE="MAIN" TITLE="XI-25/AppMap_demo.c" -->
+<head>
+<title>XI-25/AppMap_demo.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0208.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node020A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* appmap_demo.c - Execute me to compile me with SAS/C 6.56
+sc data=far nominc strmer streq nostkchk saveds ign=73 appmap_demo.c
+slink FROM LIB:c.o,appmap_demo.o,appkeymap.o TO appmap_demo LIB LIB:SC.lib,LIB:Amiga.lib
+quit
+*/
+
+/* Appmap_demo uses the routines in appkeymap.o to clone the current  */
+/* task's console keymap.  Appmap_demo then modifies the keymap clone */
+/* by redefining some of the keypad keys.  It installs a string key,  */
+/* a &#034;normal&#034; key, and a NO OP key, which are acceptable replacements */
+/* for keypad keys on a console-based application.                    */
+/*                                                                    */
+/* This example also installs a dead/deadable key pair and a double   */
+/* dead/deadable key pair.  These are provided only as a means for    */
+/* understanding how dead-class keys work.  Do not use them as part   */
+/* of anything for public consumption.                                */
+
+#include       &#060;exec/types.h&#062;
+#include       &#060;exec/memory.h&#062;
+#include       &#060;exec/io.h&#062;
+#include       &#060;dos/dos.h&#062;
+#include       &#060;devices/console.h&#062;
+#include       &#060;devices/keymap.h&#062;
+
+#include       &#060;clib/exec_protos.h&#062;
+#include       &#060;clib/dos_protos.h&#062;
+
+#include       &#060;stdio.h&#062;
+#include       &#060;stdlib.h&#062;
+
+#ifdef  __SASC
+void __regargs __chkabort(void);
+void __regargs __chkabort(void){}
+#endif
+
+#include &#034;appkeymap.h&#034;
+
+#define MYKEYCOUNT 7
+
+far UBYTE deadmap[] =           /* The data for the dead key (the introducer) */
+{
+  0, '4',                       /* maps to '4' when keypad 4 is pressed alone */
+  DPF_DEAD, 1                   /* maps to a dead key when shift is down      */
+};
+
+far UBYTE deadablemap[] =
+{
+  0, '5',                       /* maps to '5' when keypad 5 is pressed alone */
+  DPF_MOD, 4,                   /* maps to a deadable key when shift is down  */
+  '5', 0xC2, '5', '5', '5'      /* Entry 1 in this table maps to 0xC2, the    */
+};                              /* others map to '5'.                         */
+
+far UBYTE doubledeadmap[] =
+{
+  0, '6',                              /* maps to '6' when keypad 6 is pressed alone */
+  DPF_DEAD, 1 | (2 &#060;&#060; DP_2DFACSHIFT)   /* maps to a dead key when shift is down      */
+};
+
+far UBYTE doubledeadablemap[] =
+{
+  0, '7',                       /* maps to '7' when keypad 7 is pressed alone */
+  DPF_MOD, 4,                   /* maps to a deadable key when shift is down  */
+  '7', '7', 0xA5, 0xA9, '7'     /* Entry 2 in this table maps to $A5, entry 3 */
+};                              /* to $A9, the others to '7'.                 */
+
+
+UBYTE strings[] =
+{
+        5,16,
+        5,21,
+        3,26,
+        9,29,
+        4,38,
+        10,42,
+        8,52,
+        14,60,
+        'p','l','a','i','n',
+        's','h','i','f','t',
+        'a','l','t',
+        's','h','i','f','t','+','a','l','t',
+        'c','t','r','l',
+        'c','t','r','l','+','s','h','i','f','t',
+        'c','t','r','l','+','a','l','t',
+        'c','t','r','l','+','a','l','t','+','s','h','i','f','t'
+};
+
+
+struct MyKey mykeys[MYKEYCOUNT] =
+{
+  { N1_KEY,                    /* The '1' from the numeric key pad                 */
+    KCF_STRING | KC_VANILLA,   /* This is a string key that accepts all qualifiers */
+    1, 1,                      /* Capsable and Repeatable                          */
+    (ULONG) strings            /* This points to the key's string data table       */
+  },
+
+
+  { N2_KEY,     /* The '2' from the numeric key pad                           */
+    KC_VANILLA, /* VANILLA key generating shift-alted, alted, shifted, plain  */
+    0, 0,       /* Non-Capsable, Non-Repeatable                               */
+    0x26252423  /* This long word is four ANSI codes: $26=&#038; $25=% $24=$ $23=# */
+  },
+
+
+  { N3_KEY,     /* The '3' from the numeric key pad */
+    KCF_NOP,    /* This key is a NO OPeration key   */
+    0, 0,       /* Non-Capsable, Non-Repeatable     */
+    0L
+  },
+
+
+  { N4_KEY,                /* The '4' from the numeric key pad */
+    KCF_DEAD | KCF_SHIFT,  /* A shiftable Dead-class key       */
+    0, 0,                  /* Non-Capsable, Non-Repeatable     */
+    (ULONG) deadmap        /* pointer to dead-class key data   */
+  },
+
+
+  { N5_KEY,                /* The '5' from the numeric key pad */
+    KCF_DEAD | KCF_SHIFT,  /* A shiftable Dead-class key       */
+    0, 0,                  /* Non-Capsable, Non-Repeatable     */
+    (ULONG) deadablemap    /* pointer to dead-class key data   */
+  },
+
+
+  { N6_KEY,                /* The '6' from the numeric key pad */
+    KCF_DEAD | KCF_SHIFT,  /* A shiftable Dead-class key       */
+    0, 0,                  /* Non-Capsable, Non-Repeatable     */
+    (ULONG) doubledeadmap  /* pointer to dead-class key data   */
+  },
+
+
+  { N7_KEY,                   /* The '7' from the numeric key pad */
+    KCF_DEAD | KCF_SHIFT,     /* A shiftable Dead-class key       */
+    0, 0,                     /* Non-Capsable, Non-Repeatable     */
+    (ULONG) doubledeadablemap /* pointer to dead-class key data   */
+  }
+};
+
+
+extern struct Library *SysBase;
+
+struct KeyMap *appkeymap, defkeymap;
+
+struct IOStdReq *conio = NULL;
+struct MsgPort *replyport = NULL;
+
+/* prototypes for our program functions */
+
+void closeall (void);
+void closeout (UBYTE * errstring, LONG rc);
+struct IOStdReq *makeio (void);
+void freeio (struct IOStdReq *ior);
+
+
+void
+main (int argc, char **argv)
+{
+  LONG rc = 0;
+
+/* This example is shell-only. It modifies a shell's keymap while running. */
+/* Alternately, you could modify this demo code to change the keymap       */
+/* of the console.device of another CON: window OR a console.device        */
+/* unit you've attached to your own Intuition window.  You need the        */
+/* device and unit pointers for the console unit you wish to affect.       */
+
+  if (!argc)
+    exit (RETURN_FAIL);
+
+  if (SysBase-&#062;lib_Version &#060; 37)
+    closeout (&#034;Kickstart 2.0 required&#034;, RETURN_FAIL);
+
+  conio = makeio ();
+  if (conio == NULL)
+    closeout (&#034;Can't create IORequest&#034;, RETURN_FAIL);
+
+
+  conio-&#062;io_Command = CD_ASKKEYMAP;          /* Obtain a copy of the    */
+  conio-&#062;io_Data = (APTR) &#038; defkeymap;       /* shell console's KeyMap. */
+  conio-&#062;io_Length = sizeof (struct KeyMap);
+  DoIO (conio);
+
+  appkeymap = CreateAppKeyMap (&#038;defkeymap);
+
+  if (appkeymap == NULL)
+    closeout (&#034;Can't create keymap&#034;, RETURN_FAIL);
+
+/* If we get here, all went OK.  We now have appkeymap and defkeymap, and  */
+/* conio IOStdRequest is init'd to talk to our shell's console device unit */
+
+  AlterAppKeyMap (appkeymap, mykeys, MYKEYCOUNT);
+
+  conio-&#062;io_Command = CD_SETKEYMAP;      /* Set the keymap for the console */
+  conio-&#062;io_Data = (APTR) appkeymap;     /* to be the modified clone.      */
+  conio-&#062;io_Length = sizeof (struct KeyMap);
+  DoIO (conio);
+
+  printf (&#034;Appkeymap installed for this console.\n&#034;);
+  printf (&#034;Changes for our keymap were specified in an array in appmap_demo.c\n\n&#034;);
+  printf (&#034;Numeric pad 1 is now a repeatable and capsable string key.  It\n&#034;);
+  printf (&#034;    also prints a different string for all qualifier combos.\n&#034;);
+  printf (&#034;Numeric pad 2 is different chars if normal, shifted, alted, shift-alted.\n&#034;);
+  printf (&#034;Numeric pad 3 is disabled.\n&#034;);
+  printf (&#034;Shift-Numeric pad 4 is a dead-key.  Shift-Numeric pad 5 is a deadable key.\n&#034;);
+  printf (&#034;    When you hit Shift-Numeric pad 4 then Shift-Numeric pad 5, this\n&#034;);
+  printf (&#034;    example prints '\302'\n&#034;);
+  printf (&#034;Shift-Numeric pad 6 is a double dead-key.  Shift-Numeric pad 7 is a deadable\n&#034;);
+  printf (&#034;    key.  When you hit Shift-Numeric pad 6 once then Shift-Numeric pad 7,\n&#034;);
+  printf (&#034;    this example prints '\245'.  When you hit Shift-Numeric pad 6 twice then\n&#034;);
+  printf (&#034;    Shift-Numeric pad 7, this example prints '\251'.\n&#034;);
+  printf (&#034;\nHit return to exit when done\n&#034;);
+  getchar ();
+  printf (&#034;Setting this console back to default keymap\n&#034;);
+
+  conio-&#062;io_Command = CD_SETKEYMAP;          /* Restore the shell's original keymap */
+  conio-&#062;io_Data = (APTR) &#038; defkeymap;
+  conio-&#062;io_Length = sizeof (struct KeyMap);
+  DoIO (conio);
+
+  closeall ();
+  exit (rc);
+}
+
+
+
+struct IOStdReq *
+makeio (void)
+{
+  struct MsgPort *conport;
+  struct IOStdReq *ior = NULL;
+  struct InfoData *id;
+  struct Process *proc;
+
+  proc = (struct Process *) FindTask (NULL);
+  conport = (struct MsgPort *) proc-&#062;pr_ConsoleTask;
+  if (!conport)
+    return (NULL);
+
+  if (id = (struct InfoData *)
+      AllocMem (sizeof (struct InfoData), MEMF_PUBLIC | MEMF_CLEAR))
+  {
+    if (DoPkt (conport, ACTION_DISK_INFO, ((ULONG) id) &#062;&#062; 2, 0L, 0L, 0L, 0L))
+    {
+      if (replyport = CreateMsgPort ())
+      {
+        if (ior = CreateIORequest (replyport, sizeof (struct IOStdReq)))
+        {
+          ior-&#062;io_Device = ((struct IOStdReq *) id-&#062;id_InUse)-&#062;io_Device;
+          ior-&#062;io_Unit = ((struct IOStdReq *) id-&#062;id_InUse)-&#062;io_Unit;
+        }
+      }
+    }
+    FreeMem (id, sizeof (struct InfoData));
+  }
+  return (ior);
+}
+
+void
+freeio (struct IOStdReq *ior)
+{
+  if (ior)
+  {
+    if (ior-&#062;io_Message.mn_ReplyPort)
+      DeleteMsgPort (ior-&#062;io_Message.mn_ReplyPort);
+    DeleteIORequest (ior);
+  }
+}
+
+void
+closeall ()
+{
+  if (conio)
+    freeio (conio);
+  if (appkeymap)
+    DeleteAppKeyMap (appkeymap);
+}
+
+
+void
+closeout (UBYTE * errstring, LONG rc)
+{
+  if (*errstring)
+    printf (&#034;%s\n&#034;, errstring);
+  closeall ();
+  exit (rc);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

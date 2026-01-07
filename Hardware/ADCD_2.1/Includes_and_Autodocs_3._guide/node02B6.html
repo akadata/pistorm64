@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="BltPattern()" TITLE="graphics.library/BltPattern" -->
+<head>
+<title>graphics.library/BltPattern</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02B5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02B7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	BltPattern --  Using standard drawing rules for areafill,
+					 blit through a mask.
+
+<b>   SYNOPSIS</b>
+       BltPattern(rp, mask, xl, yl, maxx, maxy, bytecnt)
+                  a1,  a0   d0  d1   d2   d3     d4
+
+	void BltPattern
+	   (struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, void *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line63">SHORT</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line63">SHORT</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line63">SHORT</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line63">SHORT</a>, SHORT);
+
+<b>   FUNCTION</b>
+       Blit using drawmode,areafill pattern, and mask
+       at position rectangle (xl,yl) (maxx,maxy).
+
+<b>   INPUTS</b>
+       rp    -  points to the destination <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> for the blit.
+       mask  -  points to 2 dimensional mask if needed
+                if mask == NULL then use a rectangle.
+       xl,yl -  coordinates of upper left of rectangular region in <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+       maxx,maxy - points to lower right of rectangular region in <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+       bytecnt - BytesPerRow for mask
+
+<b>   RESULT</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02AA.html">AreaEnd()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

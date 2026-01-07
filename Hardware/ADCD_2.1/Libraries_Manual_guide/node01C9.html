@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-4-3" TITLE="8 / Creating Text / Determining Text Length" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Text / Determining Text Length</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01C8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01CA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To determine the pixel length of a given <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> string, call the
+<a href="../Includes_and_Autodocs_2._guide/node0222.html">IntuiTextLength()</a> function.
+
+<a name="line5">    LONG IntuiTextLength( struct IntuiText *iText );</a>
+
+Set the iText argument to point to the <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structure whose length is
+to be found.  This function will return the length of the iText text
+string in pixels.  Note that if the <a href="../Libraries_Manual_guide/node01C7.html#line59">ITextFont</a> field of the given IntuiText
+is set to NULL, or Intuition cannot access the specified font, then
+<a href="../Includes_and_Autodocs_2._guide/node00AE.html#line24">GfxBase-&#062;DefaultFont</a> will be used in determining the length of the text.
+This may not be the same as the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> font with which the text would be
+printed.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

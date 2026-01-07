@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-8-2" TITLE="33 / Advanced Topics / Custom Chunk Handlers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Advanced Topics / Custom Chunk Handlers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0456.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0458.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Like custom stream handlers, custom chunk handlers are implemented using
+Release 2 <a href="../Libraries_Manual_guide/node04A3.html">Hook</a> structures.  See the <a href="../Libraries_Manual_guide/node0454.html">previous section</a> for details on how a
+handler function may be interfaced using a Hook structure.
+
+There are two types of chunk handlers:  entry handlers and exit handlers.
+Entry handlers are invoked just after the parser enters the chunk; the
+stream will be positioned to read the first byte in the chunk. (If the
+chunk is a <a href="../Libraries_Manual_guide/node042A.html#line7">FORM</a>, <a href="../Libraries_Manual_guide/node042A.html#line7">LIST</a>, <a href="../Libraries_Manual_guide/node042A.html#line7">CAT</a>, or <a href="../Libraries_Manual_guide/node042A.html#line7">PROP</a>, the longword type will be read by the
+parser; the stream will be positioned to read the byte immediately
+following the type.)  Exit handlers are invoked just before the parser
+leaves the chunk; the stream is not positioned predictably within the
+chunk.
+
+ <a href="../Libraries_Manual_guide/node0458.html">Installing a Custom Chunk Handler</a> 
+ <a href="../Libraries_Manual_guide/node0459.html">Inside a Custom Chunk Handler</a> 
+ <a href="../Libraries_Manual_guide/node045A.html">The Object Parameter</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

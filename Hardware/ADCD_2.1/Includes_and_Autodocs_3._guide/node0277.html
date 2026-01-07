@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="gadtools" NODE="DrawBevelBoxA()" TITLE="gadtools.library/DrawBevelBoxA" -->
+<head>
+<title>gadtools.library/DrawBevelBoxA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0276.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0278.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	DrawBevelBoxA -- draw a bevelled box. (V36)
+	DrawBevelBox -- varargs stub for DrawBevelBoxA(). (V36)
+
+<b>   SYNOPSIS</b>
+	DrawBevelBoxA(rport, left, top, width, height, tagList);
+	              A0     D0    D1   D2     D3      A1
+
+	VOID DrawBevelBoxA(struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, WORD, WORD, WORD, WORD,
+	                   struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *taglist);
+
+	DrawBevelBox(rport, left, top, width, height, firsttag, ...);
+
+	VOID DrawBevelBox(struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, WORD, WORD, WORD, WORD,
+	                  <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...);
+
+<b>   FUNCTION</b>
+	This function renders a bevelled box of specified dimensions
+	and type into the supplied <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+
+<b>   INPUTS</b>
+	rport - <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> into which the box is to be drawn.
+	left - left edge of the box.
+	top - top edge of the box.
+	width - width of the box.
+	height - height of the box.
+	tagList - pointer to an array of tags providing extra parameters
+
+<b>   TAGS</b>
+	GTBB_Recessed (BOOL) - Set to anything for a recessed-looking box.
+			If absent, the box defaults, it would be raised. (V36)
+
+	GTBB_FrameType (ULONG) - Determines what kind of box this function
+			renders. BBFT_BUTTON generates a box like what is
+			used around GadTools BUTTON_KIND gadgets. BBFT_RIDGE
+			generates a box like what is used around GadTools
+			STRING_KIND gadgets. Finally, BBFT_ICONDROPBOX
+			generates a box suitable for a standard icon drop
+			box imagery. (defaults to BBFT_BUTTON). (V39)
+
+	GT_VisualInfo (APTR) - You MUST supply the value you obtained
+			from an earlier call to <a href="../Includes_and_Autodocs_3._guide/node027B.html">GetVisualInfoA()</a> with this
+			tag. (V36)
+
+<b>   NOTES</b>
+	DrawBevelBox() is a rendering operation, not a gadget. That
+	means you must refresh it at the appropriate time, like any
+	other rendering operation.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node027B.html">GetVisualInfoA()</a>, <a href="../Includes_and_Autodocs_3._guide/node062A.html">&#060;libraries/gadtools.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

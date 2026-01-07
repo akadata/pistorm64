@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_17" NODE="17-3-2" TITLE="17 / Signals / Processing Signals Without Wait()ing" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>17 / Signals / Processing Signals Without Wait()ing</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node028A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node028C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In some cases an application may need to process signals but cannot go to
+sleep to wait for them.  For example, a compiler might want to check to
+see if the user hit Control-C, but it can't to go to sleep to check for
+the break because that will stop the compiler.  In this case, the task can
+periodically check its own signal bits for the Ctrl-C break signal using
+the Exec library function, <a href="../Includes_and_Autodocs_2._guide/node037E.html">SetSignal()</a>:
+
+    oldsignals = ULONG SetSignal(ULONG newsignals, ULONG signalmask);
+
+Although <a href="../Includes_and_Autodocs_2._guide/node037E.html">SetSignal()</a> can change a task's signal bits, it can also monitor
+them.  The following fragment illustrates using SetSignal() to poll a
+<a name="line13">task's signal bits for a Ctrl-C break:</a>
+
+    /* Get current state of signals */
+    signals = SetSignal(0L, 0L);
+
+    /* check for Ctrl-C */
+    if (signals &#038; SIGBREAKF_CTRL_C)
+    {
+        /* The Ctrl-C signal has been set, take care of processing it... */
+
+        /* ...then clear the Ctrl-C signal */
+        SetSignal(0L, SIGBREAKF_CTRL_C);
+    }
+
+If your task is waiting for signals, but is also waiting for other events
+that have no signal bit (such as input characters from standard input),
+you may need to use <a href="../Includes_and_Autodocs_2._guide/node037E.html">SetSignal()</a>.  In such cases, you must be careful not
+to poll in a tight loop (also known as busy-waiting).  Busy-waiting hogs
+CPU time and degrades the performance of other tasks.  One easy way around
+this is for a task to sleep briefly within its polling loop by using the
+timer.device, or the graphics function <a href="../Libraries_Manual_guide/node0390.html">WaitTOF()</a>, or (if the task is a
+<a href="../Libraries_Manual_guide/node0287.html#line51">Process</a>) the DOS library <a href="../Includes_and_Autodocs_2._guide/node0292.html">Delay()</a>) or <a href="../Includes_and_Autodocs_2._guide/node030E.html">WaitForChar()</a> functions.
+
+For more information on signals, see the &#034;<a href="../Libraries_Manual_guide/node02D1.html">Exec Signals</a>&#034; chapter of this
+manual.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,519 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/modules/parse.c" NODE="MAIN" TITLE="Devices/modules/parse.c" -->
+<head>
+<title>Devices/modules/parse.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02F9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02FB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * parse.c - iffparse file IO support module
+ *   based on some of looki.c by Leo Schwab
+ *
+ * The filename for clipboard is -c or -cUnit as in -c0 -c1 etc. (default 0)
+ */
+
+#include &#060;exec/types.h&#062;
+
+#include &#034;iffp/iff.h&#034;
+
+/* local function prototypes */
+
+LONG stdio_stream(struct Hook *, struct IFFHandle *, struct IFFStreamCmd *);
+
+UBYTE *omodes[2] = {&#034;r&#034;,&#034;w&#034;};
+
+
+/* openifile
+ *
+ * Passed a ParseInfo structure with a not-in-use IFFHandle, filename
+ *   (&#034;-c&#034; or -cUnit like &#034;-c1&#034; for clipboard), and IFF open mode
+ *   (IFFF_READ or IFFF_WRITE) opens file or clipboard for use with
+ *   iffparse.library support modules.
+ *
+ * Returns 0 for success or an IFFERR (libraries/iffparse.h)
+ */
+
+LONG openifile(struct ParseInfo *pi, UBYTE *filename, ULONG iffopenmode)
+{
+	struct IFFHandle	*iff;
+	BOOL	cboard;
+	ULONG 	unit = PRIMARY_CLIP;
+	LONG 	error;
+
+	if(!pi)			return(CLIENT_ERROR);
+        if(!(iff=pi-&#062;iff))	return(CLIENT_ERROR);
+
+	cboard = (*filename == '-'  &#038;&#038;  filename[1] == 'c');
+ 	if(cboard &#038;&#038; filename[2])	unit = atoi(&#038;filename[2]);
+
+	if (cboard)
+		{
+		/*
+		 * Set up IFFHandle for Clipboard I/O.
+		 */
+		pi-&#062;clipboard = TRUE;
+		if (!(iff-&#062;iff_Stream =
+				(ULONG)OpenClipboard(unit)))
+			{
+			message(&#034;Clipboard open of unit %ld failed.\n&#034;,unit);
+			return(NOFILE);
+			}
+		InitIFFasClip(iff);
+		}
+	else
+		{
+		pi-&#062;clipboard = FALSE;
+		/*
+		 * Set up IFFHandle for buffered stdio I/O.
+		 */
+		if (!(iff-&#062;iff_Stream = (ULONG)
+		   fopen(filename, omodes[iffopenmode &#038; 1])))
+			{
+			message(&#034;%s: File open failed.\n&#034;,filename);
+			return(NOFILE);
+			}
+		else initiffasstdio(iff);
+		}
+
+	D(bug(&#034;%s file opened: \n&#034;, cboard ? &#034;[Clipboard]&#034; : filename));
+
+	pi-&#062;filename = filename;
+
+	error=OpenIFF(iff, iffopenmode);
+
+	pi-&#062;opened = error ? FALSE : TRUE;	/* currently open handle */
+
+	D(bug(&#034;OpenIFF error = %ld\n&#034;,error));
+	return(error);
+}
+
+
+/* closeifile
+ *
+ * closes file or clipboard opened with openifile, and frees all
+ *   iffparse context parsed by parseifile.
+ *
+ * Note - You should closeifile as soon as possible if using clipboard
+ *   (&#034;-c[n]&#034;).  You also need to closeifile if, for example, you wish to
+ *   reopen the file to write changes back out.  See the copychunks.c
+ *   module for routines which allow you clone the chunks iffparse has
+ *   gathered so that you can closeifile and still be able to modify and
+ *   write back out gathered chunks.
+ *
+ */
+
+void closeifile(struct ParseInfo *pi)
+{
+struct IFFHandle *iff;
+
+	D(bug(&#034;closeifile:\n&#034;));
+
+	if(!pi)			return;
+    	if(!(iff=pi-&#062;iff))	return;
+
+	DD(bug(&#034;closeifile: About to CloseIFF if open, iff=$%lx, opened=%ld\n&#034;,
+			iff, pi-&#062;opened));
+
+	if(pi-&#062;opened)	CloseIFF(iff);
+
+	DD(bug(&#034;closeifile: About to close %s, stream=$%lx\n&#034;,
+			pi-&#062;clipboard ? &#034;clipboard&#034; : &#034;file&#034;, iff-&#062;iff_Stream));
+	if(iff-&#062;iff_Stream)
+		{
+		if (pi-&#062;clipboard)
+		   CloseClipboard((struct ClipHandle *)(iff-&#062;iff_Stream));
+		else
+		   fclose ((FILE *)(iff-&#062;iff_Stream));
+		}
+
+	iff-&#062;iff_Stream = NULL;
+	pi-&#062;clipboard = NULL;
+	pi-&#062;opened = NULL;
+}
+
+
+/* parseifile
+ *
+ * Passed a ParseInfo with an initialized and open IFFHandle,
+ *  grouptype (like ID_FORM), groupid (like ID_ILBM),
+ *  and TAG_DONE terminated longword arrays of type,id
+ *  for chunks to be grabbed, gathered, and stopped on
+ *  (like { ID_ILBM, ID_BMHD, ID_ILBM, ID_CAMG, TAG_DONE })
+ *  will parse an IFF file, grabbing/gathering and stopping
+ *  on specified chunk.
+ *
+ * Note - you can call getcontext() (to continue after a stop chunk) or
+ *  nextcontext() (after IFFERR_EOC, to parse next form in the same file)
+ *  if you wish to continue parsing the same IFF file.  If parseifile()
+ *  has to delve into a complex format to find your desired FORM, the
+ *  pi-&#062;hunt flag will be set.  This should be a signal to you that
+ *  you may not have the capability to simply modify and rewrite
+ *  the data you have gathered.
+ *
+ * Returns 0 for success else and IFFERR (libraries/iffparse.h)
+ */
+
+LONG parseifile(pi,groupid,grouptype,propchks,collectchks,stopchks)
+struct	ParseInfo *pi;
+LONG groupid, grouptype;
+LONG *propchks, *collectchks, *stopchks;
+{
+struct IFFHandle *iff;
+register struct ContextNode	*cn;
+LONG			error = 0L;
+
+
+    	if(!(iff=pi-&#062;iff))	return(CLIENT_ERROR);
+
+	if(!iff-&#062;iff_Stream)	return(IFFERR_READ);
+
+	pi-&#062;hunt = FALSE;
+
+	/*
+	 * Declare property, collection and stop chunks.
+	 */
+	if (propchks)
+	  if (error = PropChunks (iff, propchks, chkcnt(propchks)))
+		return (error);
+	if (collectchks)
+	  if (error =
+	      CollectionChunks(iff, collectchks, chkcnt(collectchks)))
+		return (error);
+	if (stopchks)
+	  if (error = StopChunks (iff, stopchks, chkcnt(stopchks)))
+		return (error);
+
+	/*
+	 * We want to stop at the end of an ILBM context.
+	 */
+	if (grouptype)
+	  if (error = StopOnExit (iff, grouptype, groupid))
+		return(error);
+
+	/*
+	 * Take first parse step to enter main chunk.
+	 */
+	if (error = ParseIFF (iff, IFFPARSE_STEP))
+		return(error);
+
+	/*
+	 * Test the chunk info to see if simple form of type we want (ILBM).
+	 */
+	if (!(cn = CurrentChunk (iff)))
+		{
+		/*
+		 * This really should never happen.  If it does, it means
+		 * our parser is broken.
+		 */
+		message(&#034;Parsing error; no top chunk!\n&#034;);
+		return(NOFILE);
+		}
+
+	if (cn-&#062;cn_ID != groupid  ||  cn-&#062;cn_Type != grouptype)
+		{
+
+		D(bug(&#034;This is a(n) %.4s.%.4s.  Looking for embedded %.4s's...\n&#034;,
+		  &#038;cn-&#062;cn_Type, &#038;cn-&#062;cn_ID, &#038;grouptype));
+
+		pi-&#062;hunt = TRUE;	/* Warning - this is a complex file */
+		}
+
+	if(!error)	error = getcontext(iff);
+	return(error);
+}
+
+/* chkcnt
+ *
+ * simply counts the number of chunk pairs (type,id) in array
+ */
+LONG chkcnt(LONG *taggedarray)
+{
+LONG k = 0;
+
+	while(taggedarray[k] != TAG_DONE) k++;
+	return(k&#062;&#062;1);
+}
+
+
+/* currentchunkis
+ *
+ * returns the ID of the current chunk (like ID_CAMG)
+ */
+LONG currentchunkis(struct IFFHandle *iff, LONG type, LONG id)
+{
+register struct ContextNode	*cn;
+LONG result = 0;
+
+	if (cn = CurrentChunk (iff))
+		{
+		if((cn-&#062;cn_Type == type)&#038;&#038;(cn-&#062;cn_ID == id)) result = 1;
+		}
+	return(result);
+}
+
+
+/* contextis
+ *
+ * returns the enclosing context of the current chunk (like ID_ILBM)
+ */
+LONG contextis(struct IFFHandle *iff, LONG type, LONG id)
+{
+register struct ContextNode	*cn;
+LONG result = 0;
+
+       if (cn = (CurrentChunk (iff)))
+           {
+           if (cn = (ParentChunk(cn)))
+               {
+               if((cn-&#062;cn_Type == type)&#038;&#038;(cn-&#062;cn_ID == id)) result = 1;
+               }
+	   }
+
+	D(bug(&#034;This is a %.4s %.4s\n&#034;,&#038;cn-&#062;cn_Type,&#038;cn-&#062;cn_ID));
+
+	return(result);
+}
+
+
+/* getcontext()
+ *
+ * Continues to gather the context which was specified to parseifile(),
+ *  stopping at specified stop chunk, or end of context, or EOF
+ *
+ * Returns 0 (stopped on a stop chunk)
+ *      or IFFERR_EOC (end of context, not an error)
+ *      or IFFER_EOF (end of file)
+ */
+LONG getcontext(iff)
+struct	IFFHandle *iff;
+{
+	LONG error = 0L;
+
+	/* Based on our parse initialization,
+	 * ParseIFF() will return on a stop chunk (error = 0)
+	 * or end of context for an ILBM FORM (error = IFFERR_EOC)
+	 * or end of file (error = IFFERR_EOF)
+	 */
+	return(error = ParseIFF(iff, IFFPARSE_SCAN));
+}
+
+
+/* nextcontext
+ *
+ * If you have finished parsing and reading your context (IFFERR_EOC),
+ *   nextcontext will enter the next context contained in the file
+ *   and parse it.
+ *
+ * Returns 0 or an IFFERR such as IFFERR_EOF (end of file)
+ */
+
+LONG nextcontext(iff)
+struct	IFFHandle *iff;
+{
+	LONG error = 0L;
+
+	error = ParseIFF(iff, IFFPARSE_STEP);
+
+	D(bug(&#034;nextcontext: Got through next step\n&#034;));
+
+	return(error);
+}
+
+
+/* findpropdata
+ *
+ * finds specified chunk parsed from IFF file, and
+ *   returns pointer to its sp_Data (or 0 for not found)
+ */
+UBYTE *findpropdata(iff, type, id)
+struct IFFHandle	*iff;
+LONG type, id;
+	{
+	register struct StoredProperty	*sp;
+
+	if(sp = FindProp (iff, type, id)) return(sp-&#062;sp_Data);
+	return(0);
+	}
+
+
+/*
+ * File I/O hook functions which the IFF library will call.
+ * A return of 0 indicates success (no error).
+ *
+ * Iffparse.library calls this code via struct Hook and Hook.asm
+ */
+static LONG
+stdio_stream (hook, iff, actionpkt)
+struct Hook		*hook;
+struct IFFHandle	*iff;
+struct IFFStreamCmd	*actionpkt;
+{
+	register FILE	*stream;
+	register LONG	nbytes;
+	register int	actual;
+	register UBYTE	*buf;
+	long	len;
+
+	stream	= (FILE *) iff-&#062;iff_Stream;
+	if(!stream)	return(1);
+
+	nbytes	= actionpkt-&#062;sc_NBytes;
+	buf	= (UBYTE *) actionpkt-&#062;sc_Buf;
+
+	switch (actionpkt-&#062;sc_Command) {
+	case IFFSCC_READ:
+		do {
+			actual = nbytes &#062; 32767 ? 32767 : nbytes;
+			if ((len=fread (buf, 1, actual, stream)) != actual)
+				break;
+			nbytes -= actual;
+			buf += actual;
+		} while (nbytes &#062; 0);
+		return (nbytes ? IFFERR_READ : 0 );
+
+	case IFFSCC_WRITE:
+		do {
+			actual = nbytes &#062; 32767 ? 32767 : nbytes;
+			if ((len=fwrite (buf, 1, actual, stream)) != actual)
+				break;
+			nbytes -= actual;
+			buf += actual;
+		} while (nbytes &#062; 0);
+		return (nbytes ? IFFERR_WRITE : 0);
+
+	case IFFSCC_SEEK:
+		return ((fseek (stream, nbytes, 1) == -1) ? IFFERR_SEEK : 0);
+
+	default:
+		/*  No _INIT or _CLEANUP required.  */
+		return (0);
+	}
+}
+
+/* initiffasstdio (ie. init iff as stdio)
+ *
+ * sets up hook callback for the file stream handler above
+ */
+void initiffasstdio (iff)
+struct IFFHandle *iff;
+{
+	extern LONG		HookEntry();
+	static struct Hook	stdiohook = {
+		{ NULL },
+		(ULONG (*)()) HookEntry,
+		(ULONG (*)()) stdio_stream,
+		NULL
+	};
+
+	/*
+	 * Initialize the IFF structure to point to the buffered I/O
+	 * routines.  Unbuffered I/O is terribly slow.
+	 */
+	InitIFF (iff, IFFF_FSEEK | IFFF_RSEEK, &#038;stdiohook);
+}
+
+
+/*
+ * IFFerr
+ *
+ * Returns pointer to IFF Error string or NULL (no error)
+ */
+UBYTE *IFFerr(error)
+LONG	error;
+{
+	/*
+	 * English error messages for possible IFFERR_#? returns from various
+	 * IFF routines.  To get the index into this array, take your IFFERR
+	 * code, negate it, and subtract one.
+	 *  idx = -error - 1;
+	 */
+	static UBYTE	*errormsgs[] = {
+		&#034;End of file (not an error).&#034;,
+		&#034;End of context (not an error).&#034;,
+		&#034;No lexical scope.&#034;,
+		&#034;Insufficient memory.&#034;,
+		&#034;Stream read error.&#034;,
+		&#034;Stream write error.&#034;,
+		&#034;Stream seek error.&#034;,
+		&#034;File is corrupt.&#034;,
+		&#034;IFF syntax error.&#034;,
+		&#034;Not an IFF file.&#034;,
+		&#034;Required hook vector missing.&#034;,
+		&#034;Return to client.&#034;
+	};
+	static UBYTE unknown[32];
+	static UBYTE client[] = &#034;Client error&#034;;
+	static UBYTE nofile[] = &#034;File not found or wrong type&#034;;
+
+	if (error &#060; 0)
+		{
+		return(errormsgs[(-error) - 1]);
+		}
+	else if(error = CLIENT_ERROR)
+		{
+		return(client);
+		}
+	else if(error = NOFILE)
+		{
+		return(nofile);
+		}
+	else if(error)
+		{
+		sprintf(unknown,&#034;Unknown error %ld&#034;,error);
+		return(unknown);
+		}
+	else return(NULL);
+}
+
+
+/*
+ * PutCk
+ *
+ * Writes one chunk of data to an iffhandle
+ *
+ */
+long PutCk(struct IFFHandle *iff, long id, long size, void *data)
+    {
+    long error = 0, wlen;
+
+    D(bug(&#034;PutCk: asked to push chunk \&#034;%.4s\&#034; ($%lx) length %ld\n&#034;,&#038;id,id,size));
+
+    if(error=PushChunk(iff, 0, id, size))
+	{
+	D(bug(&#034;PutCk: PushChunk of %.4s, error = %s, size = %ld\n&#034;,
+		id, IFFerr(error), id));
+	}
+    else
+	{
+	D(bug(&#034;PutCk: PushChunk of %.4s, error = %ld\n&#034;,&#038;id, error));
+
+	/* Write the actual data */
+	if((wlen = WriteChunkBytes(iff,data,size)) != size)
+	    {
+	    D(bug(&#034;WriteChunkBytes error: size = %ld, wrote %ld\n&#034;,size,wlen));
+	    error = IFFERR_WRITE;
+	    }
+	else error = PopChunk(iff);
+	D(bug(&#034;PutCk: After PopChunk - error = %ld\n&#034;,error));
+	}
+    return(error);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

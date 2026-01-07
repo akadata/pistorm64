@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/buildlist.c" NODE="MAIN" TITLE="Lib_examples/buildlist.c" -->
+<head>
+<title>Lib_examples/buildlist.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node058A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node058C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* buildlist.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 buildlist.c
+Blink FROM LIB:c.o,buildlist.o TO buildlist LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+
+** The code below demonstrates the concepts and functions discussed in this
+** chapter by building an application-defined Exec List.
+**
+** buildlist.c - example which uses an application-specific Exec list
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/lists.h&#062;
+#include &#060;exec/nodes.h&#062;
+#include &#060;exec/memory.h&#062;
+
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+
+#include &#060;string.h&#062;
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)  { return(0); }  /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }  /* really */
+#endif
+
+/* Our function prototypes */
+VOID AddName(struct List *, UBYTE *);
+VOID FreeNameNodes(struct List *);
+VOID DisplayNameList(struct List *);
+VOID DisplayName(struct List *, UBYTE *);
+
+struct NameNode {
+    struct Node nn_Node;        /* System Node structure */
+    UBYTE  nn_Data[62];         /* Node-specific data */
+};
+
+#define NAMENODE_ID   100       /* The type of &#034;NameNode&#034; */
+
+VOID main(VOID)
+{
+    struct  List    *NameList;    /* Note that a MinList would also work */
+
+    if (!( NameList = AllocMem(sizeof(struct List),MEMF_CLEAR)) )
+        printf(&#034;Out of memory\n&#034;);
+    else {
+        NewList(NameList);        /* Important: prepare header for use */
+
+        AddName(NameList,&#034;Name7&#034;);   AddName(NameList,&#034;Name6&#034;);
+        AddName(NameList,&#034;Name5&#034;);   AddName(NameList,&#034;Name4&#034;);
+        AddName(NameList,&#034;Name2&#034;);   AddName(NameList,&#034;Name0&#034;);
+
+        AddName(NameList,&#034;Name7&#034;);   AddName(NameList,&#034;Name5&#034;);
+        AddName(NameList,&#034;Name3&#034;);   AddName(NameList,&#034;Name1&#034;);
+
+        DisplayName(NameList,&#034;Name5&#034;);
+        DisplayNameList(NameList);
+
+        FreeNameNodes(NameList);
+        FreeMem(NameList,sizeof(struct List));  /* Free list header */
+    }
+}
+
+/* Allocate a NameNode structure, copy the given name into the structure,
+ * then add it the specified list.  This example does not provide an
+ * error return for the out of memory condition.
+*/
+VOID AddName(struct List *list, UBYTE *name)
+{
+    struct NameNode *namenode;
+
+    if (!( namenode = AllocMem(sizeof(struct NameNode),MEMF_CLEAR) ))
+        printf(&#034;Out of memory\n&#034;);
+    else {
+        strcpy(namenode-&#062;nn_Data,name);
+        namenode-&#062;nn_Node.ln_Name = namenode-&#062;nn_Data;
+        namenode-&#062;nn_Node.ln_Type = NAMENODE_ID;
+        namenode-&#062;nn_Node.ln_Pri  = 0;
+        AddHead((struct List *)list,(struct Node *)namenode);
+    }
+}
+
+/*
+ * Free the entire list, including the header.  The header is not updated
+ * as the list is freed.  This function demonstrates how to avoid
+ * referencing freed memory when deallocating nodes.
+ */
+VOID FreeNameNodes(struct List *list)
+{
+    struct NameNode *worknode;
+    struct NameNode *nextnode;
+
+    worknode = (struct NameNode *)(list-&#062;lh_Head); /* First node */
+    while (nextnode = (struct NameNode *)(worknode-&#062;nn_Node.ln_Succ)) {
+        FreeMem(worknode,sizeof(struct NameNode));
+        worknode = nextnode;
+    }
+
+}
+
+/*
+ * Print the names of each node in a list.
+ */
+VOID DisplayNameList(struct List *list)
+{
+struct Node *node;
+
+    if (list-&#062;lh_TailPred == (struct Node *)list)
+        printf(&#034;List is empty.\n&#034;);
+    else {
+        for (node = list-&#062;lh_Head ; node-&#062;ln_Succ ; node = node-&#062;ln_Succ)
+            printf(&#034;%lx -&#062; %s\n&#034;,node,node-&#062;ln_Name);
+    }
+}
+
+/*
+ * Print the location of all nodes with a specified name.
+ */
+VOID DisplayName(struct List *list, UBYTE *name)
+{
+struct Node *node;
+
+    if (node = FindName(list,name)) {
+        while (node) {
+            printf(&#034;Found a %s at location %lx\n&#034;,node-&#062;ln_Name,node);
+            node = FindName((struct List *)node,name);
+        }
+    } else printf(&#034;No node with name %s found.\n&#034;,name);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

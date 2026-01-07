@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-3-2" TITLE="3 / Custom Screen Functions / Screen Attributes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Custom Screen Functions / Screen Attributes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00E4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00E6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The sections above discuss only the basic functions and screen types that
+Intuition programmers need to understand to <a href="../Libraries_Manual_guide/node00E0.html">create a custom screen</a>.
+Intuition supports an astonishing number of additional display features
+and options.  In this section and the sections to follow, the finer points
+of screen attributes and the functions that control them are presented.
+
+Screen attributes are specified using the tag item scheme described in the
+&#034;<a href="../Libraries_Manual_guide/node0498.html">Utility Library</a>&#034; chapter.  Therefore, the screen attributes are listed
+here by tag values.  (In V34, the <a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a> structure was used to set
+screen attributes so many of the tag options listed here have a
+corresponding flag in NewScreen.)  In general, specifying a tag overrides
+the corresponding flag or field in the NewScreen structure if you supply
+<a name="line14">one.</a>
+
+SA_ErrorCode
+    Extended error code.  Data is a pointer to a long which will contain
+    the error code on return if <a href="../Libraries_Manual_guide/node00DE.html#line6">OpenScreenTagList()</a> returns NULL. The
+<a name="line19">    error codes are described above.</a>
+
+SA_Left, SA_Top
+    Initial screen position (left edge and top edge).  Data is a long,
+<a name="line23">    signed value.  Offsets are relative to the text overscan rectangle.</a>
+
+    If SA_Left is not specified and a <a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a> structure is not passed
+    in the <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreenTags/TagList()</a> call and SA_Width is not specified
+    or is specified as STDSCREENWIDTH, then the left edge of the screen
+    will default to the left edge of the actual display clip of the
+    screen.  If the other conditions are met but some explicit SA_Width
+    is specified, then the left edge defaults to zero (text overscan
+    rectangle left edge).  Likewise, the top edge may, independent of the
+    left edge value, default to zero or to the top edge of the actual
+    display clip.  If SA_Top is not specified and a NewScreen structure
+    is not passed in the OpenScreenTags/TagList() call and SA_Height is
+    not specified or specified as STDSCREENHEIGHT, then the top edge of
+    the screen will default to the top edge of the actual display clip of
+    the screen.  If the other conditions are met but some explicit
+    SA_Height is specified, then the top edge defaults to zero (text
+    overscan rectangle top edge).  Prior to V36, left edge positioning is
+    ignored and negative top edge positions are illegal.
+
+    When opening a full sized overscan screen, SA_Left should be set to
+    the MinX value of the display clip <a href="../Libraries_Manual_guide/node03DA.html#line49">Rectangle</a> used for the screen and
+    SA_Top should be set to the MinY value of the display clip.  This may
+    be taken from the defaults, as explained above, or explicitly set by
+    the application.  See the section below &#034;<a href="../Libraries_Manual_guide/node00EF.html">Overscan and the Display clip</a>&#034;
+    and the <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a> Autodoc for more details.
+
+    If your screen is larger than your display clip, you may wish to set
+    the SA_Left and SA_Top to values less than your display clip MinX and
+    MinY in order to center a large screen on a smaller display.  For an
+    example of how to open a centered overscan screen, see
+    module/<a href="../Libraries_Manual_guide/node05D2.html">screen.c</a> in the IFF Appendix of the Amiga ROM Kernel Reference
+<a name="line54">    Manual: Devices.</a>
+
+SA_Width, SA_Height
+    Screen dimensions.  Data is a long, unsigned value.  These may be
+    larger, smaller or the same as the dimensions of the display clip
+    <a href="../Libraries_Manual_guide/node03DA.html#line49">Rectangle</a>.  The use of STDSCREENWIDTH and STDSCREENHEIGHT will make
+    the screen size equal to the display clip size.
+
+    To calculate the width of the display clip <a href="../Libraries_Manual_guide/node03DA.html#line49">Rectangle</a>, subtract the
+    MinX value from the MaxX value plus one.  Similarly, the height of
+    the display clip may be calculated by subtracting the MinY value from
+<a name="line65">    the MaxY value plus one.</a>
+
+SA_Depth
+    Screen bitmap depth.  Data is a long, unsigned value.  The depth of
+    the screen determines the number of available colors.  See the
+    &#034;<a href="../Libraries_Manual_guide/node031E.html#line95">Graphics Primitives</a>&#034; for more information on hardware limitations of
+    the display.  Do not set the depth to a value greater than that
+    supported by the specific display mode.  This information is
+    available to the application through the graphics library display
+<a name="line74">    database.  The default is one bitplane.</a>
+
+SA_DisplayID
+    Extended display mode key for the screen.  Data is a long, unsigned
+    value.  By using Release 2 DisplayIDs and the display database,
+    applications can open a screen in any display mode available on a
+    user's system, including PAL and NTSC modes.  See the discussion of
+    the display database in the &#034;<a href="../Libraries_Manual_guide/node033C.html">Graphics Primitives</a>&#034; chapter and the
+<a name="line82">    include file &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00BD.html">displayinfo.h</a>&#062; for more information.</a>
+
+SA_Pens
+    Pen specification for the screen.  Data is a pointer to a UWORD array
+    terminated with ~0, as found in the <a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> structure.  Specifying
+    the SA_Pens tag informs the system that the application is prepared
+    to handle a screen rendered with the new 3D look of Intuition.  See
+    the section below on &#034;<a href="../Libraries_Manual_guide/node00EC.html">DrawInfo and the 3D Look</a>&#034;. Omitting this tag
+    produces a screen with a flat look, but whose color usage is more
+<a name="line91">    backwards compatible.</a>
+
+SA_DetailPen
+    Detail pen for the screen.  Data is a long, unsigned value.  Used for
+    rendering details in the screen title bar and menus.  Use SA_Pens
+    beginning with V36 for more control of pen specification.  If SA_Pens
+    is not specified, the screen will not get the new 3D look of
+    Intuition available in Release 2.  Instead this value will be used as
+<a name="line99">    the detail pen.</a>
+
+SA_BlockPen
+    Block pen for the screen.  Data is a long, unsigned value.  Used for
+    rendering block fills in the screen title bar and menus.  Use SA_Pens
+    beginning with V36 for more control of pen specification.  If SA_Pens
+    is not specified, the screen will not get the new 3D look and this
+<a name="line106">    value will be used as the block pen.</a>
+
+SA_Title
+    Default screen title.  Data is a pointer to a character string.  This
+    is the title displayed when the active window has no screen title or
+<a name="line111">    when no window is active on the screen.</a>
+
+SA_Colors
+    Specifies initial screen palette colors.  Data is a pointer to an
+    array of <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line1241">ColorSpec</a> structures, terminated by a ColorSpec structure
+    with ColorIndex=-1. Screen colors may be changed after the screen is
+    opened with the graphics library functions <a href="../Libraries_Manual_guide/node0331.html">SetRGB4()</a> and <a href="../Libraries_Manual_guide/node0331.html">LoadRGB4()</a>.
+<a name="line118">    ColorSpec colors are right-justified, four bits per gun.</a>
+
+SA_FullPalette
+    Initialize color table to entire preferences palette (32 colors
+    beginning with V36), rather than the subset from V34 and earlier,
+    namely pens 0-3, 17-19, with remaining palette as returned by
+    <a href="../Libraries_Manual_guide/node0331.html">GetColorMap()</a>.  Data is a boolean value (use TRUE to set the flag).
+<a name="line125">    Defaults to FALSE.</a>
+
+SA_Font
+    Data is a pointer to a <a href="../Libraries_Manual_guide/node03D6.html#line21">TextAttr</a> structure (defined in
+    &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00A8.html#line65">text.h</a>&#062; ) which specifies the font, size and style to use
+<a name="line130">    for the screen.  Equivalent to <a href="../Libraries_Manual_guide/node00DD.html#line76">NewScreen.Font</a>.</a>
+
+SA_SysFont
+    Alternative to SA_Font.  Selects one of the preferences system fonts.
+    Data is a long, unsigned value, with the following values defined:
+
+        0  Open screen with the user's preferred fixed width font
+           (the default).
+        1  Open screen with the user's preferred font, which may be
+           proportional.
+
+    The Workbench screen is opened with {SA_SysFont , 1}.  Table 3-4
+    summarizes how the font selected at <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreen()</a> time effects
+    subsequent text operations in screens and windows.
+
+
+                Table 3-4: Intuition Font Selection Chart
+
+       What you tell
+       <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreen()</a>            Screen font            Window.RPort font
+       -------------           -----------            -----------------
+    A. <a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a>.Font=myfont  myfont                  myfont
+    B. NewScreen.Font=NULL    GfxBase-&#062;DefaultFont    GfxBase-&#062;DefaultFont
+    C. {SA_Font, myfont}      myfont                  myfont
+    D. {SA_SysFont, 0}        GfxBase-&#062;DefaultFont    GfxBase-&#062;DefaultFont
+    E. {SA_SysFont, 1}        Font Prefs Screen text  GfxBase-&#062;DefaultFont
+
+       Notes:
+     * A and B are the options that existed in V34 and earlier OS versions.
+     * C and D are tags in Release 2 equivalent to A and B respectively.
+     * E is a new option for V36.  The Workbench screen uses this option.
+     * For `myfont', any font may be used including a proportional one.
+       This is true under all releases of the OS.
+     * GfxBase-&#062;DefaultFont is always monospace.  (This is the &#034;System
+       Default Text&#034; from Font Preferences.)
+     * Font Prefs Screen text (the &#034;Screen Text&#034; choice from Font
+       Preferences) can be monospace or proportional.
+
+
+    The screen's font may not legally be changed after a screen is
+    opened. The menu bar, window titles, menu items, and the contents of
+    a string gadget all use the screen's font.  The font used for menu
+    items can be overridden in the menu item's <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structure.
+    Under V36 and higher, the font used in a string gadget can be
+    overridden through the <a href="../Libraries_Manual_guide/node016D.html">StringExtend</a> structure.  The font of the menu
+    bar and window titles cannot be overridden.
+
+    The <a href="../Libraries_Manual_guide/node0121.html#line66">Window.RPort</a> font shown above is the initial font that Intuition
+    sets in your window's <a href="../Libraries_Manual_guide/node0102.html#line8">RastPort</a>.  It is legal to change that
+    subsequently with <a href="../Libraries_Manual_guide/node03D6.html">SetFont()</a>.  <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> rendered into a window
+    (either through <a href="../Libraries_Manual_guide/node01C8.html">PrintIText()</a> or as a gadget's <a href="../Libraries_Manual_guide/node0149.html#line111">GadgetText</a>) defaults to
+    the window's RastPort font, but can be overridden using its <a href="../Libraries_Manual_guide/node01C7.html#line59">ITextFont</a>
+    field.  Text rendered with the graphics library call <a href="../Libraries_Manual_guide/node03D5.html">Text()</a> uses the
+<a name="line183">    window's RastPort font.</a>
+
+SA_Type
+    Equivalent to the SCREENTYPE bits of the <a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a>.Type field.  Data
+    is a long, unsigned value which may be set to either CUSTOMSCREEN or
+    PUBLICSCREEN (WBENCHSCREEN is reserved for system use).  See the tags
+    SA_BitMap, SA_Behind, SA_Quiet, SA_ShowTitle and SA_AutoScroll for
+<a name="line190">    the other attributes of the NewScreen.Type field.</a>
+
+SA_BitMap
+    Use a custom bitmap for this screen.  Data is a pointer to a <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a>
+    structure.  This tag is equivalent to <a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a>.CustomBitMap and
+    implies the CUSTOMBITMAP flag of the NewScreen.Type field.  The
+    application is responsible for allocating and freeing the screen's
+<a name="line197">    bitmap.</a>
+
+SA_Behind
+    Open this screen behind all other screens in the system.  Data is a
+    boolean value (TRUE to set flag).  This tag is equivalent to the
+<a name="line202">    SCREENBEHIND flag of the <a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a>.Type field.</a>
+
+SA_Quiet
+    Disable Intuition rendering into screen.  Data is a boolean value
+    (TRUE to set flag).  This tag is equivalent to the SCREENQUIET flag
+    of the <a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a>.Type field.  The screen will have no visible title
+    bar or gadgets, but dragging and depth arrangement still function.
+    In order to completely prevent Intuition from rendering into the
+    screen, menu operations must be disabled for each window in the
+<a name="line211">    screen using WFLG_RMBTRAP.</a>
+
+SA_ShowTitle
+    Setting this flag places the screen's title bar in front of any
+    backdrop windows that are opened on the screen.  Data is a boolean
+    value (TRUE to set flag).  This tag is equivalent to the SHOWTITLE
+    flag of the <a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a>.Type field.  The title bar of the screen is
+    always displayed behind any non-backdrop windows on that screen.
+    This attribute can be changed after the screen is open with the
+<a name="line220">    <a href="../Libraries_Manual_guide/node00FC.html#line10">ShowTitle()</a> function.</a>
+
+SA_AutoScroll
+    Setting this flag will enable autoscroll for this screen when it is
+    the active screen.  (Currently, the screen may only be made active by
+    activating a window in that screen either under user or application
+    control.)  Data is a boolean value (TRUE to set flag).  This tag is
+    equivalent to the AUTOSCROLL flag of the <a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a>.Type field.
+
+    Autoscroll means that screens larger than the visible display will
+    automatically scroll when the user moves the mouse to the edge of the
+    screen.  Without this tag, the user moves the screen either by using
+    the screen drag bar, or by pressing the mouse select button anywhere
+    within the screen while holding down the left Amiga key and moving
+<a name="line234">    the mouse.</a>
+
+SA_PubName
+    Presence of this tag means that the screen is to be a <a href="../Libraries_Manual_guide/node00E9.html">public screen</a>.
+    Data is a pointer to a string.  The string is the name of the public
+    screen which is used by other applications to find the screen.  This
+<a name="line240">    tag is order dependent, specify before SA_PubSig and SA_PubTask.</a>
+
+SA_PubSig, SA_PubTask
+    Task ID (returned by <a href="../Libraries_Manual_guide/node02D0.html#line5">FindTask()</a>) and signal for notification that the
+    last window has closed on a <a href="../Libraries_Manual_guide/node00E6.html">public screen</a>. Data for SA_PubSig is a
+    long, unsigned value. Data for SA_PubTask is a pointer to a <a href="../Libraries_Manual_guide/node02BB.html">Task</a>
+    structure. These two tags are order dependent, and must be specified
+<a name="line247">    after the tag SA_PubName.</a>
+
+SA_Overscan
+    Set to one of the OSCAN_ specifiers to use a system standard overscan
+    display clip and screen dimensions (unless otherwise specified).
+    Data is a long, unsigned value.  Do not specify this tag and
+    SA_DClip.  SA_Overscan is used to get one of the standard overscan
+    dimensions, while SA_DClip is for custom dimensions.  If a display
+    clip is not specified with either SA_Overscan or SA_DClip, the
+    display clip defaults to <a href="../Libraries_Manual_guide/node00F0.html#line12">OSCAN_TEXT</a>.  See the section below on
+<a name="line257">    &#034;<a href="../Libraries_Manual_guide/node00F0.html">Overscan and the Display Clip</a>&#034; for more information.</a>
+
+SA_DClip
+    Custom display clip specification.  Data is a pointer to a <a href="../Libraries_Manual_guide/node03DA.html#line49">Rectangle</a>
+    structure that defines the screen display clip region.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

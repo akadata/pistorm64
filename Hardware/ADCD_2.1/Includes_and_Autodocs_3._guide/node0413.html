@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="keymap" NODE="SetKeyMapDefault()" TITLE="keymap.library/SetKeyMapDefault" -->
+<head>
+<title>keymap.library/SetKeyMapDefault</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0412.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0414.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetKeyMapDefault -- Set the current default keymap. (V36)
+
+<b>   SYNOPSIS</b>
+	SetKeyMapDefault(keyMap)
+
+	void SetKeyMapDefault( struct <a href="../Includes_and_Autodocs_3._guide/node0623.html#line20">KeyMap</a> * );
+
+<b>   FUNCTION</b>
+	A pointer to key map specified is cached by the keymap library
+	for use by <a href="../Includes_and_Autodocs_3._guide/node0412.html">MapRawKey</a> and <a href="../Includes_and_Autodocs_3._guide/node0411.html">MapANSI</a> when a keymap is not specified.
+
+<b>   INPUTS</b>
+	keyMap - a pointer to a keyMap structure.  This key map must be
+	    permanently allocated: it must remain in memory till the
+	    machine is reset.  It is appropriate that this keyMap be a
+	    node on the keymap.resource list.
+
+<b>   BUGS</b>
+	The keymap.h include file should be in the libraries/ or perhaps
+	resources/ directory, but is in the devices/ directory for
+	compatability reasons.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0623.html">devices/keymap.h</a>, <a href="../Includes_and_Autodocs_3._guide/node0410.html">keymap.library/AskKeyMapDefault()</a>,
+	console.device ...KEYMAP functions
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

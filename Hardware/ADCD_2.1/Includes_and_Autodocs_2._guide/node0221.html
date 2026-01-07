@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="InitRequester()" TITLE="intuition.library/InitRequester" -->
+<head>
+<title>intuition.library/InitRequester</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0220.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0222.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    InitRequester -- Initialize a <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> structure.
+
+SYNOPSIS
+    InitRequester( <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> )
+                   A0
+
+    VOID InitRequester( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> * );
+
+FUNCTION
+    Initializes a requester for general use.  After calling InitRequester,
+    you need fill in only those <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> values that fit your needs.
+    The other values are set to NULL--or zero--states.
+
+    Note that the example in the early versions of the Intuition
+    Reference Manual is flawed because the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> structure is
+    initialized BEFORE InitRequester is called.  Be sure to
+    perform your initialization AFTER calling InitRequester.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> = a pointer to a <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> structure
+
+RESULT
+    None
+
+BUGS
+    Since the publication of the first Intuition Manual to this
+    day, most people haven't used this function, and for
+    compatibility reasons, we'll never be able to assume that
+    they do.  Thus, this function is useless.
+
+SEE ALSO
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

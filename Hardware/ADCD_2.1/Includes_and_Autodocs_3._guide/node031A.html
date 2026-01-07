@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="ScrollRaster()" TITLE="graphics.library/ScrollRaster" -->
+<head>
+<title>graphics.library/ScrollRaster</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0319.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node031B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+<b>   ScrollRaster -- Push bits in rectangle in raster around by</b>
+                   dx,dy towards 0,0 inside rectangle.
+<b>   SYNOPSIS</b>
+<b>   ScrollRaster(rp, dx, dy, xmin, ymin, xmax, ymax)</b>
+                A1  D0  D1  D2    D3    D4    D5
+
+<b>   void ScrollRaster</b>
+        (struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, WORD, WORD, WORD, WORD, WORD, WORD);
+
+<b>   FUNCTION</b>
+<b>   <a href="../Includes_and_Autodocs_3._guide/node0301.html">Move</a> the bits in the raster by (dx,dy) towards (0,0)</b>
+<b>   The space vacated is RectFilled with BGPen.</b>
+<b>   Limit the scroll operation to the rectangle defined</b>
+<b>   by (xmin,ymin)(xmax,ymax). Bits outside will not be</b>
+<b>   affected. If xmax,ymax is outside the rastport then use</b>
+<b>   the lower right corner of the rastport.</b>
+<b>   If you are dealing with a SimpleRefresh layered <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> you</b>
+<b>   should check rp-&#062;Layer-&#062;Flags &#038; LAYERREFRESH to see if</b>
+<b>   there is any damage in the damage list.  If there is you should</b>
+<b>   call the appropriate BeginRefresh(Intuition) or BeginUpdate(graphics)</b>
+<b>   routine sequence.</b>
+
+<b>   INPUTS</b>
+<b>   rp - pointer to a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> structure</b>
+<b>   dx,dy are integers that may be positive, zero, or negative</b>
+<b>   xmin,ymin - upper left of bounding rectangle</b>
+<b>   xmax,ymax - lower right of bounding rectangle</b>
+
+<b>   EXAMPLE</b>
+<b>   ScrollRaster(rp,0,1,minx,miny,maxx,maxy) /* shift raster up by one row */</b>
+<b>   ScrollRaster(rp,-1,-1,minx,miny,maxx,maxy)</b>
+		  /* shift raster down and to the right by 1 pixel
+
+<b>   BUGS</b>
+<b>   In 1.2/V1.3 if you ScrollRaster a SUPERBITMAP exactly left or </b>
+<b>   right, and there is no <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line31">TmpRas</a> attached to the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, the system</b>
+<b>   will allocate one for you, but will never free it or record its </b>
+<b>   location. This bug has been fixed for V36.  The workaround for</b>
+   1.2/1.3 is to attach a valid <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line31">TmpRas</a> of size at least
+<b>   MAXBYTESPERROW to the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> before the call.</b>
+
+<b>   Beginning with V36 ScrollRaster adds the shifted areas into the </b>
+<b>   damage list for SIMPLE_REFRESH windows. Due to unacceptable </b>
+<b>   system overhead, the decision was made NOT to propagate this </b>
+<b>   shifted area damage for SMART_REFRESH windows.</b>
+
+<b>   SEE ALSO</b>
+<b>   <a href="../Includes_and_Autodocs_3._guide/node031B.html">ScrollRasterBF()</a> graphics/rastport.h</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/exec/io.h" NODE="MAIN" TITLE="include/exec/io.h" -->
+<head>
+<title>include/exec/io.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0620.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0622.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_IO_H
+#define	EXEC_IO_H
+/*
+**	$VER: io.h 39.0 (15.10.1991)
+**	Includes Release 44.1
+**
+**	Message structures used for device communication
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_PORTS_H
+#include &#060;exec/ports.h&#062;
+#endif /* EXEC_PORTS_H */
+
+<a name="line17"></a>
+struct IORequest {
+    struct  Message io_Message;
+    struct  Device  *io_Device;     /* device node pointer  */
+    struct  Unit    *io_Unit;	    /* unit (driver private)*/
+    UWORD   io_Command;	    /* device command */
+    UBYTE   io_Flags;
+    BYTE    io_Error;		    /* error or warning num */
+};
+<a name="line26"></a>
+struct IOStdReq {
+    struct  Message io_Message;
+    struct  Device  *io_Device;     /* device node pointer  */
+    struct  Unit    *io_Unit;	    /* unit (driver private)*/
+    UWORD   io_Command;	    /* device command */
+    UBYTE   io_Flags;
+    BYTE    io_Error;		    /* error or warning num */
+    ULONG   io_Actual;		    /* actual number of bytes transferred */
+    ULONG   io_Length;		    /* requested number bytes transferred*/
+    APTR    io_Data;		    /* points to data area */
+    ULONG   io_Offset;		    /* offset for block structured devices */
+};
+
+/* library vector offsets for device reserved vectors */
+#define DEV_BEGINIO	(-30)
+#define DEV_ABORTIO	(-36)
+
+/* io_Flags defined bits */
+#define IOB_QUICK	0
+#define IOF_QUICK	(1&#060;&#060;0)
+
+
+#define CMD_INVALID	0
+#define CMD_RESET	1
+#define CMD_READ	2
+#define CMD_WRITE	3
+#define CMD_UPDATE	4
+#define CMD_CLEAR	5
+#define CMD_STOP	6
+#define CMD_START	7
+#define CMD_FLUSH	8
+
+#define CMD_NONSTD	9
+
+#endif	/* EXEC_IO_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

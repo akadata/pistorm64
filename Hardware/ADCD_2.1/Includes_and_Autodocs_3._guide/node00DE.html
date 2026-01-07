@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="colorwheel_gc" NODE="ConvertRGBToHSB()" TITLE="colorwheel.gadget/ConvertRGBToHSB" -->
+<head>
+<title>colorwheel.gadget/ConvertRGBToHSB</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00DD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00DF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ConvertRGBToHSB -- convert from an RGB color space to an HSB color
+			   space. (V39)
+
+<b>   SYNOPSIS</b>
+	ConvertRGBToHSB(rgb, hsb);
+		        A0   A1
+
+	VOID ConvertRGBToHSB(struct <a href="../Includes_and_Autodocs_3._guide/node05EE.html#line30">ColorWheelRGB</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05EE.html#line22">ColorWheelHSB</a> *);
+
+<b>   FUNCTION</b>
+	Converts a color from an RGB representation to an HSB representation.
+
+<b>   INPUTS</b>
+	rgb - filled-in <a href="../Includes_and_Autodocs_3._guide/node05EE.html#line30">ColorWheelRGB</a> structure containing the values to
+	      convert
+	hsb - structure to receive the converted values
+
+<b>   BUGS</b>
+	Even though all communication with the color wheel is done using full
+	32-bit color components, color calculations are currently done using
+	16-bit math, which can cause certain rounding errors to appear.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-6-2" TITLE="5 / Gadget Refreshing / Gadget Refreshing by the Program" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / Gadget Refreshing / Gadget Refreshing by the Program</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0143.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0145.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node0133.html#line7">AddGList()</a> function adds gadgets to Intuition's internal lists but do
+not display their imagery.  Subsequently calls to <a href="../Libraries_Manual_guide/node0146.html">RefreshGList()</a> must be
+made to draw the gadgets into the window or requester.
+
+Programs may use <a href="../Libraries_Manual_guide/node0146.html">RefreshGList()</a> to update the display after making changes
+to their gadgets.  The supported changes include (not an exhaustive list):
+changing the <a href="../Libraries_Manual_guide/node014A.html#line63">GFLG_SELECTED</a> flag for <a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadgets to implement mutually
+exclusive gadgets, changing the <a href="../Libraries_Manual_guide/node0149.html#line111">GadgetText</a> of a gadget to change its
+label, changing the <a href="../Libraries_Manual_guide/node014A.html#line73">GFLG_DISABLED</a> flag, and changing the contents of the
+<a href="../Libraries_Manual_guide/node016B.html">StringInfo</a> structure <a href="../Libraries_Manual_guide/node016B.html#line19">Buffer</a> of a <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget.  When making changes to a
+gadget, be sure to remove the gadget from the system with <a href="../Libraries_Manual_guide/node0133.html#line27">RemoveGList()</a>
+before altering it.  Remember to add the gadget back and refresh its
+<a name="line14">imagery.</a>
+
+<a href="../Libraries_Manual_guide/node014C.html">Boolean</a> gadgets rendered with borders, instead of images, or highlighted
+with surrounding boxes (<a href="../Libraries_Manual_guide/node014A.html#line12">GFLG_GADGHBOX</a>) are handled very simply by
+Intuition, and complicated transitions done by the program can get the
+rendering out of phase.  Applications should avoid modifying the imagery
+and refreshing gadgets that may be highlighted due to selection by the
+user.  Such operations may leave pixels highlighted when the gadget is no
+longer selected.  The problems with such transitions can often be avoided
+by providing imagery, either image or border, that covers all pixels in
+the select box.  For <a href="../Libraries_Manual_guide/node014A.html#line16">GFLG_GADGHIMAGE</a> gadgets, the select imagery should
+cover all pixels covered in the normal imagery.
+
+ <a href="../Libraries_Manual_guide/node0145.html">Updating a Gadget's Imagery</a>    <a href="../Libraries_Manual_guide/node0146.html">gadget Refresh Function</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

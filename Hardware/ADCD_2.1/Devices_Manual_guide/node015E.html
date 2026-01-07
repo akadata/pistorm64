@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/V36_Device_Use.c" NODE="MAIN" TITLE="Devices/Dev_examples/V36_Device_Use.c" -->
+<head>
+<title>Devices/Dev_examples/V36_Device_Use.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node015D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node015F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+  /*
+   * V36_Device_Use.c
+   *
+   * This is an example of using the serial device.
+   * First, we will attempt to create a message port with CreateMsgPort()
+   * Next, we will attempt to create the I/O request with CreateIORequest()
+   * Then, we will attempt to open the serial device with OpenDevice()
+   * If successful, we will send the SDCMD_QUERY command to it
+   * and reverse our steps.
+   * If we encounter an error at any time, we will gracefully exit.
+   *
+   * Compile with SAS C 5.10  lc -cfistq -v -y -L
+   *
+   * Requires Kickstart V36 or greater.
+   *
+   * Run from CLI only
+   */
+
+  #include &#060;exec/types.h&#062;
+  #include &#060;exec/memory.h&#062;
+  #include &#060;exec/io.h&#062;
+  #include &#060;devices/serial.h&#062;
+
+  #include &#060;clib/exec_protos.h&#062;
+  #include &#060;clib/alib_protos.h&#062;
+
+  #include &#060;stdio.h&#062;
+
+  #ifdef LATTICE
+  int CXBRK(void) { return(0); }     /* Disable SAS CTRL/C handling */
+  int chkabort(void) { return(0); }  /* really */
+  #endif
+
+  void main(void)
+  {
+  struct MsgPort *SerialMP;       /* pointer to our message port */
+  struct IOExtSer *SerialIO;      /* pointer to our I/O request */
+
+      /* Create the message port */
+  if (SerialMP=CreateMsgPort())
+      {
+          /* Create the I/O request */
+      if (SerialIO = CreateIORequest(SerialMP,sizeof(struct IOExtSer)))
+          {
+              /* Open the serial device */
+          if (OpenDevice(SERIALNAME,0,(struct IORequest *)SerialIO,0L))
+
+              /* Inform user that it could not be opened */
+              printf(&#034;Error: %s did not open\n&#034;,SERIALNAME);
+          else
+              {
+              /* device opened, send query command to it */
+              SerialIO-&#062;IOSer.io_Command  = SDCMD_QUERY;
+              if (DoIO((struct IORequest *)SerialIO))
+
+                  /* Inform user that query failed */
+                  printf(&#034;Query  failed. Error - %d\n&#034;,SerialIO-&#062;IOSer.io_Error);
+              else
+                  /* Print serial device status - see include file for meaning */
+                  printf(&#034;\n\tSerial device status: %x\n\n&#034;,SerialIO-&#062;io_Status);
+
+              /* Close the serial device */
+              CloseDevice((struct IORequest *)SerialIO);
+              }
+          /* Delete the I/O request */
+          DeleteIORequest(SerialIO);
+          }
+      else
+          /* Inform user that the I/O request could be created */
+          printf(&#034;Error: Could create I/O request\n&#034;);
+
+      /* Delete the message port */
+      DeleteMsgPort(SerialMP);
+      }
+  else
+      /* Inform user that the message port could not be created */
+      printf(&#034;Error: Could not create message port\n&#034;);
+  }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

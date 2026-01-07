@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="trackdisk" NODE="TD_SEEK" TITLE="trackdisk.device/TD_SEEK" -->
+<head>
+<title>trackdisk.device/TD_SEEK</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node058E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0590.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	TD_SEEK/ETD_SEEK -- control positioning of the drive heads.
+
+<b>   FUNCTION</b>
+	These commands are currently provided for internal diagnostics,
+	disk repair, and head cleaning only.
+
+	TD_SEEK and ETD_SEEK move the drive heads to the track specified. The
+	io_Offset field should be set to the (byte) offset to which the seek is
+	to occur. TD_SEEK and ETD_SEEK do not verify their position until the
+	next read. That is, they only move the heads; they do not actually read
+	any data.
+
+<b>   IO REQUEST INPUT</b>
+	io_Device	preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice()</a>
+	io_Unit		preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice()</a>
+	io_Command	TD_SEEK or ETD_SEEK
+	io_Flags	0 or IOF_QUICK
+	io_Offset	byte offset from the start of the disk describing
+			where to move the head to.
+	iotd_Count	(ETD_SEEK only) maximum allowable change counter
+			value.
+
+<b>   IO REQUEST RESULT</b>
+	io_Error - 0 for success, or an error code as defined in
+	           <a href="../Includes_and_Autodocs_3._guide/node0604.html">&#060;devices/trackdisk.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

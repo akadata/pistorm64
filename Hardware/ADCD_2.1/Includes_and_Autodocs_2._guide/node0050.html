@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/console.h" NODE="MAIN" TITLE="Includes/devices/console.h" -->
+<head>
+<title>Includes/devices/console.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node004F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0051.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DEVICES_CONSOLE_H
+#define DEVICES_CONSOLE_H
+/*
+**	$Filename: devices/console.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.11 $
+**	$Date: 90/11/07 $
+**
+**	Console device command definitions
+**
+**	(C) Copyright 1986-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include	&#034;exec/types.h&#034;
+#endif
+<a name="line18"></a>
+#ifndef EXEC_IO_H
+#include	&#034;exec/io.h&#034;
+#endif	/* EXEC_IO_H */
+<a name="line22"></a>
+<a name="line23">/****** Console commands ******/</a>
+<a name="line24">#define CD_ASKKEYMAP		(CMD_NONSTD+0)</a>
+<a name="line25">#define CD_SETKEYMAP		(CMD_NONSTD+1)</a>
+<a name="line26">#define CD_ASKDEFAULTKEYMAP	(CMD_NONSTD+2)</a>
+#define CD_SETDEFAULTKEYMAP	(CMD_NONSTD+3)
+
+/****** SGR parameters ******/
+<a name="line30"></a>
+<a name="line31">#define SGR_PRIMARY	0</a>
+<a name="line32">#define SGR_BOLD	1</a>
+<a name="line33">#define SGR_ITALIC	3</a>
+<a name="line34">#define SGR_UNDERSCORE	4</a>
+#define SGR_NEGATIVE	7
+<a name="line36"></a>
+<a name="line37">#define	SGR_NORMAL	22	/* default foreground color, not bold */</a>
+<a name="line38">#define	SGR_NOTITALIC	23</a>
+<a name="line39">#define	SGR_NOTUNDERSCORE 24</a>
+#define	SGR_POSITIVE	27
+
+<a name="line42">/* these names refer to the ANSI standard, not the implementation */</a>
+<a name="line43">#define SGR_BLACK	30</a>
+<a name="line44">#define SGR_RED		31</a>
+<a name="line45">#define SGR_GREEN	32</a>
+<a name="line46">#define SGR_YELLOW	33</a>
+<a name="line47">#define SGR_BLUE	34</a>
+<a name="line48">#define SGR_MAGENTA	35</a>
+<a name="line49">#define SGR_CYAN	36</a>
+<a name="line50">#define SGR_WHITE	37</a>
+#define SGR_DEFAULT	39
+<a name="line52"></a>
+<a name="line53">#define SGR_BLACKBG	40</a>
+<a name="line54">#define SGR_REDBG	41</a>
+<a name="line55">#define SGR_GREENBG	42</a>
+<a name="line56">#define SGR_YELLOWBG	43</a>
+<a name="line57">#define SGR_BLUEBG	44</a>
+<a name="line58">#define SGR_MAGENTABG	45</a>
+<a name="line59">#define SGR_CYANBG	46</a>
+<a name="line60">#define SGR_WHITEBG	47</a>
+#define SGR_DEFAULTBG	49
+
+/* these names refer to the implementation, they are the preferred */
+<a name="line64">/* names for use with the Amiga console device. */</a>
+<a name="line65">#define SGR_CLR0	30</a>
+<a name="line66">#define SGR_CLR1	31</a>
+<a name="line67">#define SGR_CLR2	32</a>
+<a name="line68">#define SGR_CLR3	33</a>
+<a name="line69">#define SGR_CLR4	34</a>
+<a name="line70">#define SGR_CLR5	35</a>
+<a name="line71">#define SGR_CLR6	36</a>
+#define SGR_CLR7	37
+<a name="line73"></a>
+<a name="line74">#define SGR_CLR0BG	40</a>
+<a name="line75">#define SGR_CLR1BG	41</a>
+<a name="line76">#define SGR_CLR2BG	42</a>
+<a name="line77">#define SGR_CLR3BG	43</a>
+<a name="line78">#define SGR_CLR4BG	44</a>
+<a name="line79">#define SGR_CLR5BG	45</a>
+<a name="line80">#define SGR_CLR6BG	46</a>
+#define SGR_CLR7BG	47
+
+
+/****** DSR parameters ******/
+<a name="line85"></a>
+#define DSR_CPR		6
+
+<a name="line88">/****** CTC parameters ******/</a>
+<a name="line89">#define CTC_HSETTAB	0</a>
+<a name="line90">#define CTC_HCLRTAB	2</a>
+#define CTC_HCLRTABSALL	5
+
+<a name="line93">/******	TBC parameters ******/</a>
+<a name="line94">#define TBC_HCLRTAB	0</a>
+#define TBC_HCLRTABSALL	3
+
+<a name="line97">/******	SM and RM parameters ******/</a>
+<a name="line98">#define M_LNM	20	/* linefeed newline mode */</a>
+<a name="line99">#define M_ASM	&#034;&#062;1&#034;	/* auto scroll mode */</a>
+#define M_AWM	&#034;?7&#034;	/* auto wrap mode */
+
+#endif	/* DEVICES_CONSOLE_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/mathieeedoubtrans.c" NODE="MAIN" TITLE="lib_examples/mathieeedoubtrans.c" -->
+<head>
+<title>lib_examples/mathieeedoubtrans.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0601.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0603.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#include &#060;exec/types.h&#062;
+#include &#060;libraries/mathieeedp.h&#062;
+#include &#060;clib/mathdoubtrans_protos.h&#062;
+
+struct Library *MathIeeeDoubTransBase;
+
+VOID main()
+{
+DOUBLE d1, d2, d3;
+FLOAT f1;
+
+if (MathIeeeDoubTransBase = OpenLibrary(&#034;mathieeedoubtrans.library&#034;,34))
+    {
+    d1 = IEEEDPAsin(d2);        /* Call IEEEDPAsin entry */
+    d1 = IEEEDPAcos(d2);        /* Call IEEEDPAcos entry */
+    d1 = IEEEDPAtan(d2);        /* Call IEEEDPAtan entry */
+    d1 = IEEEDPSin(d2);         /* Call IEEEDPSin entry */
+    d1 = IEEEDPCos(d2);         /* Call IEEEDPCos entry */
+    d1 = IEEEDPTan(d2);         /* Call IEEEDPTan entry */
+    d1 = IEEEDPSincos(&#038;d3, d2); /* Call IEEEDPSincos entry */
+    d1 = IEEEDPSinh(d2);        /* Call IEEEDPSinh entry */
+    d1 = IEEEDPCosh(d2);        /* Call IEEEDPCosh entry */
+    d1 = IEEEDPTanh(d2);        /* Call IEEEDPTanh entry */
+    d1 = IEEEDPExp(d2);         /* Call IEEEDPExp entry */
+    d1 = IEEEDPLog(d2);         /* Call IEEEDPLog entry */
+    d1 = IEEEDPLog10(d2);       /* Call IEEEDPLog10 entry */
+    d1 = IEEEDPPow(d2, d3);     /* Call IEEEDPPow entry */
+    d1 = IEEEDPSqrt(d2);        /* Call IEEEDPSqrt entry */
+    f1 = IEEEDPTieee(d2);       /* Call IEEEDPTieee entry */
+    d1 = IEEEDPFieee(f1);       /* Call IEEEDPFieee entry */
+
+    CloseLibrary(MathIeeeDoubTransBase);
+    }
+else printf(&#034;Can't open mathieeedoubtrans.library\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

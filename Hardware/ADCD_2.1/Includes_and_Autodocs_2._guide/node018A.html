@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/icon" NODE="GetDiskObject()" TITLE="icon.library/GetDiskObject" -->
+<head>
+<title>icon.library/GetDiskObject</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0189.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node018B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GetDiskObject - read in a Workbench disk object from disk.
+
+SYNOPSIS
+    diskobj = GetDiskObject(name)
+      D0                      A0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node0135.html#line61">DiskObject</a> *GetDiskObject(char *);
+
+FUNCTION
+    This routine reads in a Workbench disk object in from disk.  The
+    name parameter will have a &#034;.info&#034; postpended to it, and the
+    info file of that name will be read.  If the call fails,
+    it will return zero.  The reason for the failure may be obtained
+    via <a href="../Includes_and_Autodocs_2._guide/node02C2.html">IoErr()</a>.
+
+    Using this routine protects you from any future changes to
+    the way icons are stored within the system.
+
+    A <a href="../Includes_and_Autodocs_2._guide/node0135.html#line82">FreeList</a> structure is allocated just after the <a href="../Includes_and_Autodocs_2._guide/node0135.html#line61">DiskObject</a>
+    structure; <a href="../Includes_and_Autodocs_2._guide/node0187.html">FreeDiskObject</a> makes use of this to get rid of the
+    memory that was allocated.
+
+INPUTS
+    name -- name of the object (char *) or NULL if you just want a
+            <a href="../Includes_and_Autodocs_2._guide/node0135.html#line61">DiskObject</a> structure allocated for you (useful when
+            calling AddAppIcon in workbench.library).
+
+RESULTS
+    diskobj -- the Workbench disk object in question
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node018B.html">GetDiskObjectNew()</a>, <a href="../Includes_and_Autodocs_2._guide/node018E.html">PutDiskObject()</a>, <a href="../Includes_and_Autodocs_2._guide/node0185.html">DeleteDiskObject()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node0187.html">FreeDiskObject()</a>
+
+BUGS
+    None
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

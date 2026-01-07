@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="AddDosEntry()" TITLE="dos.library/AddDosEntry" -->
+<head>
+<title>dos.library/AddDosEntry</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node013A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node013C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AddDosEntry -- Add a Dos <a href="../Includes_and_Autodocs_3._guide/node0628.html#line19">List</a> entry to the lists (V36)
+
+<b>   SYNOPSIS</b>
+	success = AddDosEntry(dlist)
+	D0                     D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> AddDosEntry(struct <a href="../Includes_and_Autodocs_3._guide/node05D9.html#line371">DosList</a> *)
+
+<b>   FUNCTION</b>
+	Adds a device, volume or assign to the dos devicelist.  Can fail if it
+	conflicts with an existing entry (such as another assign to the same
+	name or another device of the same name).  Volume nodes with different
+	dates and the same name CAN be added, or with names that conflict with
+	devices or assigns.  Note: the dos list does NOT have to be locked to
+	call this.  Do not access dlist after adding unless you have locked the
+	Dos <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line23">Device</a> list.
+
+	An additional note concerning calling this from within a handler:
+	in order to avoid deadlocks, your handler must either be multi-
+	threaded, or it must attempt to lock the list before calling this
+	function.  The code would look something like this:
+
+	if (AttemptLockDosList(LDF_xxx|LDF_WRITE))
+	{
+		rc = AddDosEntry(...);
+		UnLockDosList(LDF_xxx|LDF_WRITE);
+	}
+
+	If <a href="../Includes_and_Autodocs_3._guide/node0143.html">AttemptLockDosList()</a> fails (i.e. it's locked already), check for
+	messages at your filesystem port (don't wait!) and try the
+	<a href="../Includes_and_Autodocs_3._guide/node0143.html">AttemptLockDosList()</a> again.
+
+<b>   INPUTS</b>
+	dlist   - <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line23">Device</a> list entry to be added.
+
+<b>   RESULT</b>
+	success - Success/Failure indicator
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01A6.html">RemDosEntry()</a>, <a href="../Includes_and_Autodocs_3._guide/node0167.html">FindDosEntry()</a>, <a href="../Includes_and_Autodocs_3._guide/node0195.html">NextDosEntry()</a>, <a href="../Includes_and_Autodocs_3._guide/node0187.html">LockDosList()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node018A.html">MakeDosEntry()</a>, <a href="../Includes_and_Autodocs_3._guide/node0171.html">FreeDosEntry()</a>, <a href="../Includes_and_Autodocs_3._guide/node0143.html">AttemptLockDosList()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

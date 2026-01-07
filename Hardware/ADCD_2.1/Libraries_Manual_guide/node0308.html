@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_26" NODE="26-2-2" TITLE="26 / Servicing Interrupts / Environment" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>26 / Servicing Interrupts / Environment</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0307.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0309.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Interrupts execute in an environment different from that of tasks. All
+interrupts execute in <a href="../Libraries_Manual_guide/node02CA.html">supervisor mode</a> and utilize the single system stack.
+This stack is large enough to handle extreme cases of nested interrupts
+(of higher priorities).  Interrupt processing has no effect on task stack
+usage.
+
+All interrupt processing code, both handlers and servers, is invoked as
+assembly code subroutines.  Normal assembly code register conventions
+dictate that the D0, D1, A0 and A1 registers be free for scratch use.  In
+the case of an interrupt handler, some of these registers also contain
+data that may be useful to the handler code.  See the section on <a href="../Libraries_Manual_guide/node0309.html">handlers</a>
+<a name="line13">below.</a>
+
+Because interrupt processing executes outside the context of most system
+activities, certain data structures will not be self-consistent and must
+be considered off limits for all practical purposes.  This happens because
+certain system operations are not atomic in nature and might be
+interrupted only after executing part of an important instruction
+sequence.  For example, memory allocation and deallocation routines do not
+disable interrupts.  This results in the possibility of interrupting a
+memory-related routine.  In such a case, a memory linked list may be
+inconsistent during and interrupt. Therefore, interrupt routines must not
+<a name="line24">use any memory allocation or deallocation functions.</a>
+
+In addition, interrupts may not call any system function which might
+allocate memory, wait, manipulate unprotected lists, or modify
+<a href="../Includes_and_Autodocs_2._guide/node009E.html#line31">ExecBase</a>-&#062;ThisTask data (for example <a href="../Libraries_Manual_guide/node02C2.html#line9">Forbid()</a>, <a href="../Libraries_Manual_guide/node02C2.html#line9">Permit()</a>, and <a href="../Libraries_Manual_guide/node047B.html">mathieee</a>
+libraries).  In practice, this means that very few system calls may be
+used within interrupt code. The following functions may generally be used
+safely within interrupts:
+
+    <a href="../Includes_and_Autodocs_2._guide/node032E.html">Alert()</a>, <a href="../Libraries_Manual_guide/node02C3.html#line6">Disable()</a>, <a href="../Libraries_Manual_guide/node02C3.html#line6">Enable()</a>, <a href="../Libraries_Manual_guide/node02D5.html">Signal()</a>, <a href="../Libraries_Manual_guide/node030D.html#line9">Cause()</a>,
+<a name="line34">    <a href="../Libraries_Manual_guide/node02F2.html">GetMsg()</a>, <a href="../Libraries_Manual_guide/node02F0.html">PutMsg()</a>, <a href="../Libraries_Manual_guide/node02F3.html">ReplyMsg()</a>, <a href="../Libraries_Manual_guide/node02EE.html">FindPort()</a>, <a href="../Libraries_Manual_guide/node02BB.html">FindTask()</a></a>
+
+and if you are manipulating your own <a href="../Libraries_Manual_guide/node02DB.html#line23">List</a> structures while in an interrupt:
+
+<a name="line38">    <a href="../Libraries_Manual_guide/node02DF.html">AddHead()</a>, <a href="../Libraries_Manual_guide/node02DF.html">AddTail()</a>, <a href="../Libraries_Manual_guide/node02E0.html">RemHead()</a>, <a href="../Libraries_Manual_guide/node02E0.html">RemTail()</a>, <a href="../Libraries_Manual_guide/node02E3.html#line5">FindName()</a></a>
+
+In addition, certain devices (notably the timer device) specifically allow
+limited use of <a href="../Libraries_Manual_guide/node029F.html#line13">SendIO()</a> and <a href="../Libraries_Manual_guide/node029F.html#line21">BeginIO()</a> within interrupts.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

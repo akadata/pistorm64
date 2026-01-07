@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-9-2" TITLE="3 / Other Screen Functions / Screen Movement and Scrolling" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Other Screen Functions / Screen Movement and Scrolling</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00FA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00FC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node022B.html">MoveScreen()</a> function moves the screen origin by the number of pixels
+specified in dx and dy.
+
+    VOID MoveScreen( struct Screen *myscreen, WORD dx, WORD dy )
+
+Calls to <a href="../Includes_and_Autodocs_2._guide/node022B.html">MoveScreen()</a> are asynchronous; the screen is not necessarily
+moved upon return of this function.  If the calls happen too quickly,
+there may be unexpected results.  One way to pace these calls is to call
+<a name="line10">the function one time for each <a href="../Libraries_Manual_guide/node01E1.html#line80">IDCMP_INTUITICKS</a> event.</a>
+
+Screen movement is also available through the screen's drag gadget in the
+title bar and through a keyboard/mouse shortcut.  Left-Amiga with the
+select button of the mouse anywhere within the screen will drag the screen
+(even if the title bar is totally concealed by a window).  Dragging a
+screen down will reveal any screen(s) behind it.  Screens are never
+<a name="line17">revealed to the left, right or bottom of another screen.</a>
+
+Additionally, oversized screens may be moved with the new autoscroll
+feature of Release 2.  With autoscroll, the screen is automatically
+scrolled as the pointer reaches one of the edges of the display.
+<a name="line22">Autoscroll only works on the active screen.</a>
+
+Another screen movement feature added in Release 2 is screen menu snap.
+When a screen much larger than the viewing area is scrolled such that the
+upper left corner is not visible (scrolled down or to the right), menus
+may could be out of the visible portion of the screen.  To prevent this,
+menu snap moves the screen to a position where the menus will be visible
+before rendering them.  The screen appears to snap to the home position as
+the menus are selected, moving back when the operation is complete.  If
+the Left-Amiga qualifier is held when the menus are selected then the
+<a name="line32">screen will remain in the home position when the menu button is released.</a>
+
+The Intuition preferences editor, IControl, allows the user to change a
+number of Intuition features.  Some of these features include the ability
+to globally disable menu snap, and to change the select qualifier for
+dragging the screen.  See the User's Manual for more information on
+Preferences editors.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

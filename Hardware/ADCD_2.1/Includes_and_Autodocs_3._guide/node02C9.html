@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="CWAIT" TITLE="graphics.library/CWAIT" -->
+<head>
+<title>graphics.library/CWAIT</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02C8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02CA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CWAIT -- Append copper wait instruction to user copper list.
+
+<b>   SYNOPSIS</b>
+	CWAIT( c , v , h )
+
+	CWait( c , v , h )
+	       a1  d0  d1
+	CBump( c )
+	      a1
+
+	void CWait( struct <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> *, WORD, WORD)
+
+<b>   FUNCTION</b>
+	Add instruction to wait for vertical beam position v and
+	horizontal position h to this intermediate copper list.
+
+<b>   INPUTS</b>
+	c - pointer to <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> structure
+	v - vertical beam position (relative to top of viewport)
+	h - horizontal beam position
+
+<b>   RESULTS</b>
+	this is actually a macro that calls CWait(c,v,h)
+	and then calls CBump(c) to bump the local pointer
+	to the next instruction.
+
+<b>   BUGS</b>
+	User waiting for horizontal values of greater than 222 decimal
+	is illegal.
+
+<b>   SEE ALSO</b>
+ 	CINIT() CMOVE() CEND() <a href="../Includes_and_Autodocs_3._guide/node05F3.html">graphics/copper.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

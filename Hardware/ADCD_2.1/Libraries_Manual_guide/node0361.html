@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-3-1" TITLE="27 / / Performing Data Move Operations / Clearing a Memory Area" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Performing Data Move Operations / Clearing a Memory Area</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0360.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0362.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For memory that is accessible to the blitter (that is, internal Chip
+<a name="line3">memory), the most efficient way to clear a range of memory is to use the</a>
+blitter. You use the blitter to clear a block of memory with the statement:
+
+<a name="line6">    BltClear(memblock, bytecount, flags);</a>
+
+The memblock argument is a pointer to the location of the first byte to be
+cleared and bytecount is the number of bytes to set to zero.  In general
+the flags variable should be set to one to wait for the blitter operation
+to complete.  Refer to the Amiga ROM Kernel Manual: <a href="../Includes_and_Autodocs_2._guide/node0421.html">Includes and Autodocs</a>
+for other details about the flag argument.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

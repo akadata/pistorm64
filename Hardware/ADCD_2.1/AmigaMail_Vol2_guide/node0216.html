@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VIII-51/copybuff.doc" NODE="VIII-51-1" TITLE="any_sana2_protocol/CopyFromBuff" -->
+<head>
+<title>any_sana2_protocol/CopyFromBuff</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0215.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0217.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+NAME
+    CopyFromBuff -- Copy n bytes from an abstract data structure.
+
+SYNOPSIS
+    success = CopyFromBuff(to, from, n)
+    d0                     a0  a1    d0
+
+    BOOL CopyToBuff(VOID *, VOID *, ULONG);
+
+FUNCTION
+    This function copies 'n' bytes of data in the abstract data structure
+    pointed to by 'from' into the contigous memory pointed to by 'to'.
+    'to' must contain at least 'n' bytes of usable memory or innocent
+    memory will be overwritten.
+
+INPUTS
+    to              - pointer to contiguous memory to copy to.
+    from            - pointer to abstract structure to copy from.
+    n               - number of bytes to copy.
+
+RESULT
+    success         - TRUE if operation was successful, else FALSE.
+
+EXAMPLE
+
+NOTES
+    This function must be callable from interupts.  In particular, this
+    means that this function may not directly or indirectly call any
+    system memory functions (since those functions rely on Forbid() to
+    protect themselves) and that  you must not compile this function
+    with stack checking enabled.  See the RKM:Libraries Exec:Interupts
+    chapter for more details on what is legal in a routine called from
+    an interupt handler.
+
+    'C' programmers should not compile with stack checking (option '-v'
+    in SAS) and should geta4() or __saveds.
+
+BUGS
+
+SEE ALSO
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="SyncSBitMap()" TITLE="graphics.library/SyncSBitMap" -->
+<head>
+<title>graphics.library/SyncSBitMap</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0330.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0332.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       SyncSBitMap --	Syncronize Super <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> with whatever is
+			in the standard <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> bounds.
+
+<b>   SYNOPSIS</b>
+       SyncSBitMap( layer )
+                      a0
+
+	void SyncSBitMap( struct <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> * );
+
+<b>   FUNCTION</b>
+       Copy all bits from ClipRects in <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> into Super <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.  This is used for those functions that do not
+	want to deal with the <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line56">ClipRect</a> structures but do want
+	to be able to work with a SuperBitMap <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a>.
+
+<b>   INPUTS</b>
+	layer - pointer to a <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> that has a SuperBitMap
+		The <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> should already be locked by the caller.
+
+<b>   RESULT</b>
+	After calling this function, the programmer can manipulate
+	the bits in the superbitmap associated with the layer.
+	Afterwards, the programmer should call <a href="../Includes_and_Autodocs_3._guide/node02C8.html">CopySBitMap</a> to
+	copy the bits back into the onscreen layer.
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02C8.html">CopySBitMap()</a> <a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

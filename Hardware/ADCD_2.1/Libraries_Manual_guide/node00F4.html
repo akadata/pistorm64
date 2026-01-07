@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-7-3" TITLE="3 / / Screen Functions That Integrate Intuition and Graphics" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / / Screen Functions That Integrate Intuition and Graphics</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00F3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00F5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+These functions, normally used only by the system, integrate high-level
+Intuition structures with the lower-level constructs used by the graphics
+library to create the display.
+<a name="line5"></a>
+
+    Table 3-9: Screen Functions That Integrate Intuition and Graphics
+  _______________________________________________________________________
+ |                                                                       |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0228.html">MakeScreen()</a>  Update a single screen's copper list               |
+ |                                                                       |
+ |  <a href="../Includes_and_Autodocs_2._guide/node024B.html">RethinkDisplay()</a>  Merge copper lists from all screens to form a <a href="../Libraries_Manual_guide/node00F1.html#line4">View</a> |
+ |                                                                       |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0244.html">RemakeDisplay()</a>  Update all screen copper lists then merge them to  |
+ |                    form a View                                        |
+ |_______________________________________________________________________|
+
+
+Advanced Intuition programmers may use these functions to achieve special
+screen effects such as <a href="../Libraries_Manual_guide/node00F7.html">double-buffering</a> or <a href="../Libraries_Manual_guide/node00F8.html">dual-playfield</a> Intuition
+<a name="line21">screens.  For examples of these see the next section.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0228.html">MakeScreen()</a> updates, but does not install, a screen's Copper list.  This
+function is the Intuition equivalent of the low-level <a href="../Libraries_Manual_guide/node0332.html#line9">MakeVPort()</a> graphics
+library function.  MakeScreen() performs the MakeVPort() call,
+synchronized with Intuition's own use of the screen's <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a>.  Call
+RethinkDisplay() after MakeScreen() to allow the new Copper list for the
+screen to take effect.  The MakeScreen() function takes one argument, a
+<a name="line29">pointer to the <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a> that contains the Copper list to be updated.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node024B.html">RethinkDisplay()</a> combines all the screen's copper lists into a single
+view.  This procedure performs the Intuition global display
+reconstruction, which includes massaging some of Intuition's internal
+state data, rethinking all of the Intuition screen <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPorts</a> and their
+relationship to one another, and, finally, reconstructing the entire
+display by merging the new screens into the graphics <a href="../Libraries_Manual_guide/node00F1.html#line4">View</a> structure.
+<a href="../Libraries_Manual_guide/node00DF.html">Custom screens</a> that handle their own Copper instructions, use this call to
+install the Copper list previously updated with MakeScreen().
+RethinkDisplay() calls lower-level graphics primitives <a href="../Libraries_Manual_guide/node0332.html#line27">MrgCop()</a> and
+<a name="line40"><a href="../Libraries_Manual_guide/node0333.html">LoadView()</a> to install the Copper list.  This function takes no arguments.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0244.html">RemakeDisplay()</a> remakes the entire Intuition display.  It is equivalent to
+calling MakeScreen() for each screen in the system, then calling
+RethinkDisplay().  This routine performs a MakeVPort() (graphics
+primitive) on every Intuition screen and then calls RethinkDisplay() to
+recreate the <a href="../Libraries_Manual_guide/node00F1.html#line4">View</a>.  It takes no arguments.
+
+Both RemakeDisplay() and RethinkDisplay() take several milliseconds to run
+and lock out all other tasks while they run.  This can seriously degrade
+system performance, so do not use these routines lightly.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

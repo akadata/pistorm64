@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-2" TITLE="15 GadTools Library / GadTools Menus" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 GadTools Library / GadTools Menus</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node024D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node024F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+GadTools menus are easy to use.  Armed only with access to a <a href="../Libraries_Manual_guide/node026C.html#line12">VisualInfo</a>
+data structure, GadTools allows the application to easily create, layout
+and delete Intuition menus.
+
+Normally, the greatest difficulty in creating menus is that a large number
+of structures must be filled out and linked.  This is bothersome since
+much of the required information is orderly and is easier to do
+algorithmically than to do manually.  GadTools handles this for you.
+
+There are also many complexities in creating a sensible layout for menus.
+This includes some mechanical items such as handling various font sizes,
+automatic columnization of menus that are too tall and accounting for
+space for checkmarks and Amiga-key equivalents.  There are also aesthetic
+considerations, such as how much spacing to provide, where sub-menus
+<a name="line16">should be placed and so on.</a>
+
+GadTools menu functions support all the features that most applications
+will need.  These include:
+
+  * An easily constructed and legible description of the menus.
+
+  * Font-sensitive layout.
+
+  * Support for menus and sub-menus.
+
+  * Sub-menu indicators (a &#034;&#062;&#062;&#034; symbol attached to items with sub-menus).
+
+  * Separator bars for sectioning menus.
+
+  * Command-key equivalents.
+
+  * Checkmarked and mutually exclusive checkmarked menu items.
+
+  * Graphical menu items.
+
+With GadTools, it takes only one structure, the <a href="../Libraries_Manual_guide/node024F.html">NewMenu</a> structure, to
+specifiy the whole menu bar,  For instance, here is how a typical menu
+<a name="line39">strip containing two menus might be specified:</a>
+
+    struct NewMenu mynewmenu[] =
+        {
+            { NM_TITLE, &#034;Project&#034;,    0 , 0, 0, 0,},
+            {  NM_ITEM, &#034;Open...&#034;,   &#034;O&#034;, 0, 0, 0,},
+            {  NM_ITEM, &#034;Save&#034;,      &#034;S&#034;, 0, 0, 0,},
+            {  NM_ITEM, NM_BARLABEL,  0 , 0, 0, 0,},
+            {  NM_ITEM, &#034;Print&#034;,      0 , 0, 0, 0,},
+            {   NM_SUB, &#034;Draft&#034;,      0 , 0, 0, 0,},
+            {   NM_SUB, &#034;NLQ&#034;,        0 , 0, 0, 0,},
+            {  NM_ITEM, NM_BARLABEL,  0 , 0, 0, 0,},
+            {  NM_ITEM, &#034;Quit...&#034;,   &#034;Q&#034;, 0, 0, 0,},
+
+            { NM_TITLE, &#034;Edit&#034;,       0 , 0, 0, 0,},
+            {  NM_ITEM, &#034;Cut&#034;,       &#034;X&#034;, 0, 0, 0,},
+            {  NM_ITEM, &#034;Copy&#034;,      &#034;C&#034;, 0, 0, 0,},
+            {  NM_ITEM, &#034;Paste&#034;,     &#034;V&#034;, 0, 0, 0,},
+            {  NM_ITEM, NM_BARLABEL,  0 , 0, 0, 0,},
+            {  NM_ITEM, &#034;Undo&#034;,      &#034;Z&#034;, 0, 0, 0,},
+
+            {   NM_END, NULL,         0 , 0, 0, 0,},
+        };
+
+This <a href="../Libraries_Manual_guide/node024F.html">NewMenu</a> specification would produce the two menus below:
+
+
+     <a href="../Libraries_Manual_guide/node05E2.html">Figure 15-1: Two Example Menus</a> 
+
+
+The <a href="../Libraries_Manual_guide/node024F.html">NewMenu</a> arrays are designed to be read easily.  The elements in the
+NewMenu array appear in the same order as they will appear on-screen.
+Unlike the lower-level menu structures described in the &#034;<a href="../Libraries_Manual_guide/node0198.html">Intuition Menus</a>&#034;
+chapter earlier, there is no need to specify sub-menus first, then the
+menu items with their sub-menus, and finally the menu headers with their
+menu items.  The indentation shown above also helps highlight the
+relationship between menus, menu items and sub-items.
+
+ <a href="../Libraries_Manual_guide/node024F.html">The NewMenu Structure</a>           <a href="../Libraries_Manual_guide/node0255.html">GadTools Menus And IntuiMessages</a> 
+ <a href="../Libraries_Manual_guide/node059A.html">GadTools Menus Example</a>          <a href="../Libraries_Manual_guide/node0256.html">Restrictions on GadTools Menus</a> 
+ <a href="../Libraries_Manual_guide/node0250.html">Functions for GadTools Menus</a>    <a href="../Libraries_Manual_guide/node0257.html">Language-Sensitive Menus</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

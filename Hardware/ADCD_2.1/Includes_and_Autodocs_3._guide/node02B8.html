@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="CalcIVG()" TITLE="graphics.library/CalcIVG" -->
+<head>
+<title>graphics.library/CalcIVG</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02B7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02B9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CalcIVG -- Calculate the number of blank lines above a <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> (V39)
+
+<b>   SYNOPSIS</b>
+	count = CalcIVG(View, ViewPort)
+	 d0.w           a0    a1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a> CalcIVG(struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *);
+
+<b>   FUNCTION</b>
+	To calculate the maximum number of blank lines above a viewport needed to
+	load all the copper instructions, after accounting for the viewport
+	bandwidth and size.
+
+<b>   INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a>       - pointer to the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>   - pointer to the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> you are interested in.
+
+<b>   RESULT</b>
+	count      - the number of <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> resolution scan lines needed to
+	             execute all the copper instructions for <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>,
+	             or 0 if any error.
+
+<b>   NOTES</b>
+	The number of copper instructions comes from the vp-&#062;vp_DspIns list.
+	Although there may be other copper instructions in the final list (from
+	UCopIns, SprIns and ClrIns) they are currently ignored for this
+	function. This also means that if the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> has never been made
+	(for example, the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> of an intuition screen was opened behind)
+	then vp-&#062;vp_DspIns is NULL.
+
+	Although CalcIVG() returns the true number of lines needed by the
+	copper, intuition still maintains an inter-screen gap of 3 non-laced
+	lines (6 interlaced). Therefore, for intuition screens use:
+	MAX(CalcIVG(v, vp), (islaced ? 6 : 3))
+
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02F1.html">GfxNew()</a>  <a href="../Includes_and_Autodocs_3._guide/node0338.html">VideoControl()</a>  <a href="../Includes_and_Autodocs_3._guide/node05ED.html">graphics/view.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

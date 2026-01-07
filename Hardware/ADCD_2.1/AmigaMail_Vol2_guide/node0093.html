@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-3/screens20.txt" NODE="IV-3-5" TITLE="Overscan" -->
+<head>
+<title>Overscan</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0092.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0094.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In release 2.0, Intuition fully supports video overscan.  There are
+four standard overscan specifiers: OSCAN_TEXT, OSCAN_STANDARD,
+OSCAN_MAX and OSCAN_VIDEO.  OSCAN_TEXT is based on user preference
+settings and indicates a display which is within the visible bounds
+of the monitor.  The dimensions of this type of overscan are used for
+the Workbench screen and for the defaults for OpenScreenTagList(),
+STDSCREENWIDTH and STDSCREENHEIGHT.  OVERSCAN_STANDARD is also based
+on user preference settings.  The edges of an OVERSCAN_STANDARD
+display are set by the user via Preferences to be just outside the
+visible bounds of the monitor.  OSCAN_MAX is the largest display
+fully supported by Intuition.  OSCAN_VIDEO is the largest display
+region which, for a given display mode, can be reliably generated.
+Note that OSCAN_VIDEO displays are not scrollable.
+
+The Intuition function QueryOverscan() returns rectangle information
+for the indicated overscan type of a particular display mode.  Using
+the rectangle returned by QueryOverscan(), it is possible to
+explicitly specify the offset and dimensions of the DisplayClip
+region.  Note however that this custom rectangle must fit within the
+OSCAN_MAX rectangle, offset included.  It is not permitted to specify
+custom rectangles whose values are in between OSCAN_MAX and
+OSCAN_VIDEO, nor is it permitted to specify rectangles larger than
+OSCAN_VIDEO.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

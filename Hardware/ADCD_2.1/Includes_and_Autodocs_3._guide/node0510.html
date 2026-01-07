@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="printer" NODE="PRD_QUERY" TITLE="printer.device/PRD_QUERY" -->
+<head>
+<title>printer.device/PRD_QUERY</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node050F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0511.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	PRD_QUERY -- query printer port/line status
+
+<b>   FUNCTION</b>
+	This command returns the status of the printer port's lines and
+	registers.  Since the printer port uses either the serial or
+	parallel port for i/o, the actual status returned is either the
+	serial or parallel port's status.
+
+<b>   IO REQUEST</b>
+	io_Message	mn_ReplyPort set if quick I/O is not possible
+	io_Device	preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Command	PRD_QUERY
+	io_Data		ptr to 2 UBYTES where result will be stored.
+
+<b>   RESULTS</b>
+<b>     io_Data          BIT  ACTIVE  FUNCTION (SERIAL DEVICE)</b>
+
+             LSB       0    low    reserved
+                       1    low    reserved
+                       2    low    reserved
+                       3    low    Data Set Ready
+                       4    low    Clear To Send
+                       5    low    Carrier Detect
+                       6    low    Ready To Send
+                       7    low    Data Terminal Ready
+             MSB       8    high   read buffer overflow
+                       9    high   break sent (most recent output)
+                      10    high   break received (as latest input)
+                      11    high   transmit x-OFFed
+                      12    high   receive x-OFFed
+                   13-15           reserved
+
+
+<b>     io_Data          BIT  ACTIVE  FUNCTION (PARALLEL DEVICE)</b>
+
+                       0     hi     printer busy (offline)
+                       1     hi     paper out
+                       2     hi     printer selected
+				     (WARNING: the bit 2 line is also connected
+				      to the serial port's ring indicator pin
+				      on the A500 and A2000)
+                     3-7            reserved
+
+<b>     io_Actual       1-parallel, 2-serial</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

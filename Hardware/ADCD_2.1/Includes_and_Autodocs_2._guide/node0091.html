@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/nodes.h" NODE="MAIN" TITLE="Includes/exec/nodes.h" -->
+<head>
+<title>Includes/exec/nodes.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0090.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0092.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_NODES_H
+#define	EXEC_NODES_H
+/*
+**	$Filename: exec/nodes.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.11 $
+**	$Date: 91/01/09 $
+**
+**	Nodes &#038; Node type identifiers.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif /* EXEC_TYPES_H */
+
+
+/*
+ *  List Node Structure.  Each member in a list starts with a Node
+ */
+<a name="line23"></a>
+<a name="line24">struct Node {</a>
+<a name="line25">    struct  Node *ln_Succ;	/* Pointer to next (successor) */</a>
+<a name="line26">    struct  Node *ln_Pred;	/* Pointer to previous (predecessor) */</a>
+<a name="line27">    UBYTE   ln_Type;</a>
+<a name="line28">    BYTE    ln_Pri;		/* Priority, for sorting */</a>
+    char    *ln_Name;		/* ID string, null terminated */
+};	/* Note: word aligned */
+<a name="line31"></a>
+<a name="line32">/* minimal node -- no type checking possible */</a>
+<a name="line33">struct MinNode {</a>
+<a name="line34">    struct MinNode *mln_Succ;</a>
+    struct MinNode *mln_Pred;
+};
+
+
+/*
+** Note: Newly initialized IORequests, and software interrupt structures
+** used with Cause(), should have type NT_UNKNOWN.  The OS will assign a type
+** when they are first used.
+<a name="line43">*/</a>
+<a name="line44">/*----- Node Types for LN_TYPE -----*/</a>
+<a name="line45">#define NT_UNKNOWN	0</a>
+<a name="line46">#define NT_TASK		1	/* Exec task */</a>
+<a name="line47">#define NT_INTERRUPT	2</a>
+<a name="line48">#define NT_DEVICE	3</a>
+<a name="line49">#define NT_MSGPORT	4</a>
+<a name="line50">#define NT_MESSAGE	5	/* Indicates message currently pending */</a>
+<a name="line51">#define NT_FREEMSG	6</a>
+<a name="line52">#define NT_REPLYMSG	7	/* Message has been replied */</a>
+<a name="line53">#define NT_RESOURCE	8</a>
+<a name="line54">#define NT_LIBRARY	9</a>
+<a name="line55">#define NT_MEMORY	10</a>
+<a name="line56">#define NT_SOFTINT	11	/* Internal flag used by SoftInits */</a>
+<a name="line57">#define NT_FONT		12</a>
+<a name="line58">#define NT_PROCESS	13	/* AmigaDOS Process */</a>
+<a name="line59">#define NT_SEMAPHORE	14</a>
+<a name="line60">#define NT_SIGNALSEM	15	/* signal semaphores */</a>
+<a name="line61">#define NT_BOOTNODE	16</a>
+<a name="line62">#define NT_KICKMEM	17</a>
+<a name="line63">#define NT_GRAPHICS	18</a>
+#define NT_DEATHMESSAGE	19
+<a name="line65"></a>
+<a name="line66">#define NT_USER		254	/* User node types work down from here */</a>
+#define NT_EXTENDED	255
+
+#endif	/* EXEC_NODES_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

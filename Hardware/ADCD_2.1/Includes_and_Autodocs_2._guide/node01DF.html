@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/iffparse" NODE="WriteChunkRecords()" TITLE="iffparse.library/WriteChunkRecords" -->
+<head>
+<title>iffparse.library/WriteChunkRecords</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01DE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01E0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    WriteChunkRecords -- Write records from a buffer to the current
+                         chunk.
+
+SYNOPSIS
+    error = WriteChunkRecords (iff, buf, recsize, numrec)
+     d0                        a0   a1     d0      d1
+
+    LONG             error;
+    struct <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a> *iff;
+    UBYTE            *buf;
+    LONG             recsize, numrec;
+
+FUNCTION
+    Writes record elements from the buffer into the top chunk.  This
+    function operates much like <a href="../Includes_and_Autodocs_2._guide/node01D6.html">ReadChunkBytes()</a>.
+
+INPUTS
+    iff     - pointer to <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a> struct.
+    buf     - pointer to buffer area containing data.
+    recsize - size of data records to write.
+    numrec  - number of data records to write.
+
+RESULT
+    error   - (positive) number of whole records written if successful
+              or a (negative) IFFERR_#? error code if not successful.
+
+EXAMPLE
+
+NOTES
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01DE.html">WriteChunkBytes()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

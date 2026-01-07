@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="gameport" NODE="GPD_SETTRIGGER" TITLE="gameport.device/GPD_SETTRIGGER" -->
+<head>
+<title>gameport.device/GPD_SETTRIGGER</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node028B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node028D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GPD_SETTRIGGER -- Set the conditions for a game port report
+
+<b>   FUNCTION</b>
+	This command sets what conditions must be met by a game
+	port unit before a pending <a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> request will be satisfied.
+	These conditions, called triggers, are independent -- that
+	any one occurs is sufficient to queue a game port report to
+	the <a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> queue.	 These conditions are inquired with
+	AskTrigger.
+
+	This command always executes immediately.
+
+<b>   IO REQUEST</b>
+	io_Message	mn_ReplyPort set if quick I/O is not possible
+	io_Device	preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Unit		preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Command	GPD_SETTRIGGER
+	io_Flags	IOB_QUICK set if quick I/O is possible
+	io_Length	sizeof(gamePortTrigger)
+	io_Data		a structure of type <a href="../Includes_and_Autodocs_3._guide/node060F.html#line35">GamePortTrigger</a>, which
+			has the following elements
+	    gpt_Keys -
+		    GPTB_DOWNKEYS set if button down transitions
+		    trigger a report, and GPTB_UPKEYS set if button up
+		    transitions trigger a report
+	    gpt_Timeout	-
+		    a time which, if exceeded, triggers a report;
+		    measured in vertical blank units (60/sec)
+	    gpt_XDelta	-
+		    a distance in x which, if exceeded, triggers a
+		    report
+	    gpt_YDelta	-
+		    a distance in x which, if exceeded, triggers a
+		    report
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

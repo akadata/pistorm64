@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-6-4" TITLE=" Standard File Structure / Rules for Reader Programs " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard File Structure / Rules for Reader Programs </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01F2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01F4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here are some notes on building programs that read IFF files.  For <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>
+and <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a> work, you should also read up on recursive descent parsers. [See,
+for example, Compiler Construction, An Advanced Course.]
+
+  o The standard is very flexible so many programs can exchange data.
+     This implies a program has to scan the file and react to what's
+     actually there in whatever order it appears.  An IFF reader program
+     is a parser.
+
+  o For interchange to really work, programs must be willing to do some
+     conversion during read-in.  If the data isn't exactly what you expect,
+     say, the raster is smaller than those created by your program, then
+     adjust it.  Similarly, your program could crop a large picture, add
+     or drop bitplanes, or create/discard a mask plane.  The program
+     should give up gracefully on data that it can't convert.
+
+  o If it doesn't start with &#034;<a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>&#034;, &#034;<a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>&#034;, or &#034;<a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a> &#034;, it's not an IFF-85
+     file.
+
+  o For any <a href="../Devices_Manual_guide/node01DD.html">chunk</a> you encounter, you must recognize its type ID to
+     understand its contents.
+
+  o For any <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> <a href="../Devices_Manual_guide/node01DD.html">chunk</a> you encounter, you must recognize its FORM type ID
+     to understand the contained &#034;local chunks&#034;.  Even if you don't
+     recognize the FORM type, you can still scan it for nested FORMs,
+     <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>s, and <a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a> s of interest.
+
+  o Don't forget to skip the implied pad byte after every odd-length <a href="../Devices_Manual_guide/node01DD.html">chunk</a>,
+     this is not  included in the chunk count!
+
+  o <a href="../Devices_Manual_guide/node01DD.html">Chunk</a> types <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>, <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>, <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>, and <a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a>  are generic groups.  They always
+     contain a subtype ID followed by chunks.
+
+  o Readers ought to handle a <a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a>  of <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>s in a file.  You may treat the
+     FORMs like document pages to sequence through, or just use the first
+     FORM.
+
+  o Many  IFF readers completely skip <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>s.  &#034;Fully IFF-conforming&#034;
+     readers are those that handle LISTs, even if just to read the first
+     <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> from a file.  If you do look into a LIST, you must process
+     shared properties (in <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a> <a href="../Devices_Manual_guide/node01DD.html">chunk</a>s) properly.  The idea is to get the
+     correct data or none at all.
+
+  o The nicest readers are willing to look into unrecognized <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>s for
+     nested FORM types that they do recognize.  For example, a musical
+     score may contain nested instrument descriptions and animation or
+     desktop publishing files may contain still pictures.   This extra
+     step is highly recommended.
+
+Note to programmers: Processing PROP <a href="../Devices_Manual_guide/node01DD.html">chunk</a>s is not simple! You'll need
+some background in interpreters with stack frames.  If this is foreign to
+you, build programs that read/write only one <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> per file.  For the more
+intrepid programmers, the next paragraph summarizes how to process <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>s
+and <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>s.
+
+Allocate a stack frame for every <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a> and <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> you encounter and
+initialize it by copying the stack frame of the parent LIST or FORM.  At
+the top level, you'll need a stack frame initialized to your program's
+global defaults. While reading each LIST or FORM, store all encountered
+properties into the current stack frame.  In the example ShowILBM, each
+stack frame has a place for a bitmap header property ILBM.<a href="../Devices_Manual_guide/node01AF.html">BMHD</a> and a color
+map property ILBM.<a href="../Devices_Manual_guide/node01B0.html">CMAP</a>. When you finally get to the ILBM's <a href="../Devices_Manual_guide/node01B7.html">BODY</a> <a href="../Devices_Manual_guide/node01DD.html">chunk</a>, use
+the property settings accumulated in the current stack frame.
+
+An alternate implementation would just remember <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>s encountered,
+forgetting each on reaching the end of its scope (the end of the
+containing <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>).  When a <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> XXXX is encountered, scan the <a href="../Devices_Manual_guide/node01DD.html">chunk</a>s in all
+remembered <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>s XXXX, in order, as if they appeared before the chunks
+actually in the FORM XXXX.  This gets trickier if you read FORMs inside of
+FORMs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

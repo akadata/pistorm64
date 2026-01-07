@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-18" TITLE="31 Commodities Exchange Library / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0412.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0414.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following are brief descriptions of the Commodities Exchange functions
+covered in this chapter.  All of these functions require Release 2 or a
+later version of the Amiga operating system.  See the Amiga ROM Kernel
+Reference Manual: Includes and Autodocs for details on each function call.
+
+
+              Table 31-2: Commodities Exchange Functions
+  _____________________________________________________________________
+ |                                                                     |
+ |         Function              Description                           |
+ |=====================================================================|
+ |         <a href="../Includes_and_Autodocs_2._guide/node01A2.html">CxBroker()</a>  Creates a <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> of type <a href="../Libraries_Manual_guide/node0402.html">Broker</a>.              |
+ |         <a href="../Includes_and_Autodocs_2._guide/node014D.html">CxFilter()</a>  Creates a CxObject of type <a href="../Libraries_Manual_guide/node0407.html">Filter</a>.              |
+ |         <a href="../Includes_and_Autodocs_2._guide/node014E.html">CxSender()</a>  Creates a CxObject of type <a href="../Libraries_Manual_guide/node0409.html">Sender</a>.              |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0150.html">CxTranslate()</a>  Creates a CxObject of type <a href="../Libraries_Manual_guide/node040A.html">Translate</a>.           |
+ |         <a href="../Includes_and_Autodocs_2._guide/node014F.html">CxSignal()</a>  Creates a CxObject of type <a href="../Libraries_Manual_guide/node040D.html">Signal</a>.              |
+ |         <a href="../Includes_and_Autodocs_2._guide/node014B.html">CxCustom()</a>  Creates a CxObject of type <a href="../Libraries_Manual_guide/node040E.html">Custom</a>.              |
+ |          <a href="../Includes_and_Autodocs_2._guide/node014C.html">CxDebug()</a>  Creates a CxObject of type <a href="../Libraries_Manual_guide/node040F.html">Debug</a>.               |
+ |      <a href="../Includes_and_Autodocs_2._guide/node01A8.html">DeleteCxObj()</a>  Frees a single CxObject                         |
+ |   <a href="../Includes_and_Autodocs_2._guide/node01A9.html">DeleteCxObjAll()</a>  Frees a group of connected CxObjects            |
+ |---------------------------------------------------------------------|
+ |    <a href="../Includes_and_Autodocs_2._guide/node019D.html">ActivateCxObj()</a>  Activates a newly created <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> in the       |
+ |                     commodities network.                            |
+ |---------------------------------------------------------------------|
+ |     <a href="../Includes_and_Autodocs_2._guide/node01B5.html">SetTranslate()</a>  Sets up substitution of one input event for     |
+ |                     another by translate CxObjects.                 |
+ |---------------------------------------------------------------------|
+ |        <a href="../Includes_and_Autodocs_2._guide/node01A5.html">CxMsgType()</a>  Finds the type of a <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a>.                  |
+ |        <a href="../Includes_and_Autodocs_2._guide/node01A3.html">CxMsgData()</a>  Returns the CxMessage data.                     |
+ |          <a href="../Includes_and_Autodocs_2._guide/node01A4.html">CxMsgID()</a>  Returns the CxMessage ID.                       |
+ |---------------------------------------------------------------------|
+ |       <a href="../Includes_and_Autodocs_2._guide/node01A6.html">CxObjError()</a>  Returns the <a href="../Libraries_Manual_guide/node0401.html">CxObject</a>'s accumulated error field. |
+ |  <a href="../Includes_and_Autodocs_2._guide/node01A0.html">ClearCxObjError()</a>  Clear the CxObject's accumulated error field.   |
+ |---------------------------------------------------------------------|
+ |     <a href="../Includes_and_Autodocs_2._guide/node013D.html">ArgArrayInit()</a>  Create a Tool Types array from argc and argv    |
+ |                     (Workbench or Shell).                           |
+ |     <a href="../Includes_and_Autodocs_2._guide/node013C.html">ArgArrayDone()</a>  Free the resources used by ArgArrayInit().      |
+ |        <a href="../Includes_and_Autodocs_2._guide/node013F.html">ArgString()</a>  Return the string associated with a given Tool  |
+ |                     Type in the array.                              |
+ |           <a href="../Includes_and_Autodocs_2._guide/node013E.html">ArgInt()</a>  Return the integer associated with a given Tool |
+ |                     Type in the array.                              |
+ |---------------------------------------------------------------------|
+ |      <a href="../Includes_and_Autodocs_2._guide/node019F.html">AttachCxObj()</a>  Attaches a <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> to the end of a given       |
+ |                     CxObject's list.                                |
+ |      <a href="../Includes_and_Autodocs_2._guide/node01AD.html">InsertCxObj()</a>  Inserts a CxObject in a given position in a     |
+ |                     CxObject's list.                                |
+ |     <a href="../Includes_and_Autodocs_2._guide/node01AC.html">EnqueueCxObj()</a>  Inserts a CxObject in a CxObject's list by      |
+ |                     priority.                                       |
+ |      <a href="../Includes_and_Autodocs_2._guide/node01B2.html">SetCxObjPri()</a>  Sets a CxObject's priority for EnqueueCxObj().  |
+ |      <a href="../Includes_and_Autodocs_2._guide/node01B0.html">RemoveCxObj()</a>  Removes a CxObject from a list.                 |
+ |---------------------------------------------------------------------|
+ |        <a href="../Includes_and_Autodocs_2._guide/node01B3.html">SetFilter()</a>  Set a <a href="../Libraries_Manual_guide/node0407.html">filter</a> for a <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> from an input       |
+ |                     description string.                             |
+ |      <a href="../Includes_and_Autodocs_2._guide/node01B4.html">SetFilterIX()</a>  Set a filter for a CxObject from an IX data     |
+ |                     structure.                                      |
+ |---------------------------------------------------------------------|
+ |          <a href="../Includes_and_Autodocs_2._guide/node01AF.html">ParseIX()</a>  Convert an input description string to an IX    |
+ |                     data structure.                                 |
+ |---------------------------------------------------------------------|
+ |      <a href="../Includes_and_Autodocs_2._guide/node01AB.html">DivertCxMsg()</a>  Divert a <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a> to one <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> and return   |
+ |                     it to another.                                  |
+ |       <a href="../Includes_and_Autodocs_2._guide/node01B1.html">RouteCxMsg()</a>  Redirect a CxMessage to a new CxObject.         |
+ |     <a href="../Includes_and_Autodocs_2._guide/node01AA.html">DisposeCxMsg()</a>  Cancel a CxMessage removing it from the         |
+ |                     Commodities network.                            |
+ |---------------------------------------------------------------------|
+ |     <a href="../Includes_and_Autodocs_2._guide/node0160.html">InvertString()</a>  Creates a linked list of input events that      |
+ |                     correspond to a given string.                   |
+ |      <a href="../Includes_and_Autodocs_2._guide/node015C.html">FreeIEvents()</a>  Frees the linked list of input events created   |
+ |                     with InvertString().                            |
+ |       <a href="../Includes_and_Autodocs_2._guide/node019E.html">AddIEvents()</a>  Converts a list of input events to <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a>   |
+ |                     and puts them into the network.                 |
+ |_____________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

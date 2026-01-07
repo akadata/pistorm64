@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="Enqueue()" TITLE="exec.library/Enqueue" -->
+<head>
+<title>exec.library/Enqueue</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0205.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0207.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	Enqueue -- insert or append node to a system queue
+
+<b>   SYNOPSIS</b>
+	Enqueue(list, node)
+		A0    A1
+
+	void Enqueue(struct <a href="../Includes_and_Autodocs_3._guide/node0628.html#line19">List</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *);
+
+<b>   FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0219.html">Insert</a> or append a node into a system queue.  The insert is
+	performed based on the node priority -- it will keep the list
+	properly sorted.  New nodes will be inserted in front of the first
+	node with a lower priority.   Hence a FIFO queue for nodes of equal
+	priority
+
+<b>   WARNING</b>
+	This function does not arbitrate for access to the list.  The
+	calling task must be the owner of the involved list.
+
+<b>   INPUTS</b>
+	list - a pointer to the system queue header
+	node - the node to enqueue.  This must be a full featured node
+	       with type, priority and name fields.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01D9.html">AddHead()</a>, <a href="../Includes_and_Autodocs_3._guide/node01E1.html">AddTail()</a>, <a href="../Includes_and_Autodocs_3._guide/node0219.html">Insert()</a>, <a href="../Includes_and_Autodocs_3._guide/node022F.html">Remove()</a>, <a href="../Includes_and_Autodocs_3._guide/node022B.html">RemHead()</a>, <a href="../Includes_and_Autodocs_3._guide/node0233.html">RemTail()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

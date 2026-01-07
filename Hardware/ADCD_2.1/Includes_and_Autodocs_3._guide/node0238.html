@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="SetFunction()" TITLE="exec.library/SetFunction" -->
+<head>
+<title>exec.library/SetFunction</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0237.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0239.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetFunction -- change a function vector in a library
+
+<b>   SYNOPSIS</b>
+	oldFunc = SetFunction(library, funcOffset, funcEntry)
+	D0		      A1       A0.W	   D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> SetFunction(struct <a href="../Includes_and_Autodocs_3._guide/node0626.html#line33">Library</a> *,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,APTR);
+
+<b>   FUNCTION</b>
+	SetFunction is a functional way of changing where vectors in a
+	library point.	They are changed in such a way that the
+	checksumming process will never falsely declare a library to be
+	invalid.
+
+<b>   WARNING</b>
+	If you use SetFunction on a function that can be called from
+	interrupts, you are obligated to provide your own arbitration.
+
+<b>   NOTE</b>
+	SetFunction cannot be used on non-standard libraries like pre-V36
+	dos.library.  Here you must manually <a href="../Includes_and_Autodocs_3._guide/node020C.html">Forbid()</a>, preserve all 6
+	original bytes, set the new vector, <a href="../Includes_and_Autodocs_3._guide/node0240.html">SumLibrary()</a>, then <a href="../Includes_and_Autodocs_3._guide/node0224.html">Permit()</a>.
+
+<b>   INPUTS</b>
+	library    - a pointer to the library to be changed
+	funcOffset - the offset of the function to be replaced
+	funcEntry  - pointer to new function
+
+<b>   RESULTS</b>
+	oldFunc    - pointer to the old function that was just replaced
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

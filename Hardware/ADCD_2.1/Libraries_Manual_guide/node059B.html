@@ -1,0 +1,538 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/WBClone.c" NODE="MAIN" TITLE="Lib_examples/WBClone.c" -->
+<head>
+<title>Lib_examples/WBClone.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node059A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node059C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* The following program will create a display with the same attributes
+** as the user's Workbench screen.  It does this by first inquiring as
+** to those attributes, duplicating them, and then creating a similar
+** display.
+*/
+
+/**********************************************************************/
+/*                                                                    */
+/*       WBClone.c: To clone the Workbench using graphics calls       */
+/*                                                                    */
+/*       Compile : SAS/C 5.10a LC -b1 -cfist -L -v -y                 */
+/*                                                                    */
+/**********************************************************************/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/exec.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/intuitionbase.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;graphics/gfx.h&#062;
+#include &#060;graphics/gfxbase.h&#062;
+#include &#060;graphics/view.h&#062;
+#include &#060;graphics/gfxnodes.h&#062;
+#include &#060;graphics/videocontrol.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+#include &#060;stdlib.h&#062;
+
+#define INTUITIONNAME &#034;intuition.library&#034;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+/*********************************************************************/
+/*                            GLOBAL VARIABLES                       */
+/*********************************************************************/
+
+struct IntuitionBase *IntuitionBase = NULL ;
+struct GfxBase *GfxBase = NULL ;
+
+/**********************************************************************/
+/*                                                                    */
+/* VOID Error (char *String)                                          */
+/*                                                                    */
+/* Print string and exit                                              */
+/*                                                                    */
+/**********************************************************************/
+
+VOID Error (char *String)
+{
+	VOID CloseAll (VOID) ;
+
+	printf (String) ;
+
+	CloseAll () ;
+	exit(0) ;
+}
+
+/**********************************************************************/
+/*                                                                    */
+/* VOID Init ()                                                       */
+/*                                                                    */
+/* Opens all the required libraries allocates all memory, etc.        */
+/*                                                                    */
+/**********************************************************************/
+
+VOID Init ( VOID )
+{
+	/* Open the intuition library.... */
+	if ((IntuitionBase = (struct IntuitionBase *)OpenLibrary (INTUITIONNAME, 37L)) == NULL)
+		Error (&#034;Could not open the Intuition.library&#034;) ;
+
+	/* Open the graphics library.... */
+	if ((GfxBase = (struct GfxBase *)OpenLibrary (GRAPHICSNAME, 36L)) == NULL)
+		Error (&#034;Could not open the Graphics.library&#034;) ;
+}
+
+/**********************************************************************/
+/*                                                                    */
+/* VOID CloseAll ()                                                   */
+/*                                                                    */
+/* Closes and tidies up everything that was used.                     */
+/*                                                                    */
+/**********************************************************************/
+
+VOID CloseAll ( VOID )
+{
+	/* Close everything in the reverse order in which they were opened */
+
+	/* Close the Graphics Library */
+	if (GfxBase)
+		CloseLibrary ((struct Library *) GfxBase) ;
+
+	/* Close the Intuition Library */
+	if (IntuitionBase)
+		CloseLibrary ((struct Library *) IntuitionBase) ;
+}
+
+/**********************************************************************/
+/*                                                                    */
+/* VOID DestroyView(struct View *view)                                */
+/*                                                                    */
+/* Close and free everything to do with the View                      */
+/*                                                                    */
+/**********************************************************************/
+
+VOID DestroyView(struct View *view)
+{
+	struct ViewExtra *ve;
+
+	if (view)
+	{
+		if (ve = (struct ViewExtra *)GfxLookUp(view))
+		{
+			if (ve-&#062;Monitor)
+				CloseMonitor(ve-&#062;Monitor);
+
+			GfxFree((struct ExtendedNode *)ve);
+		}
+
+		/* Free up the copper lists */
+		if (view-&#062;LOFCprList)
+			FreeCprList(view-&#062;LOFCprList);
+
+		if (view-&#062;SHFCprList)
+			FreeCprList(view-&#062;SHFCprList);
+
+		FreeVec(view);
+	}
+}
+
+/**********************************************************************/
+/*                                                                    */
+/* struct View *DupView(struct View *v, ULONG ModeID)                 */
+/*                                                                    */
+/* Duplicate the View.                                                */
+/*                                                                    */
+/**********************************************************************/
+
+struct View *DupView(struct View *v, ULONG ModeID)
+{
+	/* Allocate and init a View structure.  Also, get a ViewExtra
+	 * structure and attach the monitor type to the View.
+	 */
+
+	struct View *view = NULL;
+	struct ViewExtra *ve = NULL;
+	struct MonitorSpec *mspc = NULL;
+
+	if (view = AllocVec(sizeof(struct View), MEMF_PUBLIC | MEMF_CLEAR))
+	{
+		if (ve = GfxNew(VIEW_EXTRA_TYPE))
+		{
+			if (mspc = OpenMonitor(NULL, ModeID))
+			{
+				InitView(view);
+				view-&#062;DyOffset = v-&#062;DyOffset;
+				view-&#062;DxOffset = v-&#062;DxOffset;
+				view-&#062;Modes = v-&#062;Modes;
+				GfxAssociate(view, (struct ExtendedNode *)ve);
+				ve-&#062;Monitor = mspc;
+			}
+			else printf(&#034;Could not open monitor\n&#034;);
+		}
+		else printf(&#034;Could not get ViewExtra\n&#034;);
+	}
+	else printf(&#034;Could not create View\n&#034;);
+
+	if (view &#038;&#038; ve &#038;&#038; mspc)
+		return(view);
+	else
+	{
+		DestroyView(view);
+		return(NULL);
+	}
+}
+
+/**********************************************************************/
+/*                                                                    */
+/* VOID DestroyViewPort(struct ViewPort *vp)                          */
+/*                                                                    */
+/* Close and free everything to do with the ViewPort.                 */
+/*                                                                    */
+/**********************************************************************/
+
+VOID DestroyViewPort(struct ViewPort *vp)
+{
+	if (vp)
+	{
+		/* Find the ViewPort's ColorMap. From that use VideoControl
+		 *  to get the ViewPortExtra, and free it.
+		 * Then free the ColorMap, and finally the ViewPort itself.
+		 */
+		struct ColorMap *cm = vp-&#062;ColorMap;
+		struct TagItem ti[] =
+		{
+			{VTAG_VIEWPORTEXTRA_GET, NULL},	/* &#060;-- This field will be filled in */
+			{VTAG_END_CM, NULL}
+		};
+
+		if (cm)
+		{
+			if (VideoControl(cm, ti) == NULL)
+				GfxFree((struct ExtendedNode *)ti[0].ti_Data);
+			else
+				printf(&#034;VideoControl error in DestroyViewPort()\n&#034;);
+
+			FreeColorMap(cm);
+		}
+		else
+		{
+			printf(&#034;Could not free the ColorMap\n&#034;);
+		}
+
+		FreeVPortCopLists(vp);
+
+		FreeVec(vp);
+	}
+}
+
+/**********************************************************************/
+/*                                                                    */
+/* struct ViewPort *DupViewPort(struct ViewPort *vp, ULONG ModeID)    */
+/*                                                                    */
+/* Duplicate the ViewPort.                                            */
+/*                                                                    */
+/**********************************************************************/
+
+struct ViewPort *DupViewPort(struct ViewPort *vp, ULONG ModeID)
+{
+	/* Allocate and initialise a ViewPort. Copy the ViewPort width and
+	 * heights, offsets, and modes values.  Allocate and initialize a
+	 * ColorMap.
+	 *
+	 * Also, allocate a ViewPortExtra, and copy the TextOScan values of the
+	 * ModeID from the database into the ViewPortExtra.
+	 */
+
+	#define COLOURS 32
+	struct ViewPort *Myvp;
+	struct ViewPortExtra *vpe;
+	struct ColorMap *cm;
+	struct TagItem ti[] = 			/* to attach everything */
+	{
+		{VTAG_ATTACH_CM_SET, NULL},	/* these NULLs will be replaced in the code */
+		{VTAG_VIEWPORTEXTRA_SET, NULL},
+		{VTAG_NORMAL_DISP_SET, NULL},
+		{VTAG_END_CM, NULL}
+	};
+	struct DimensionInfo query = {0};
+	UWORD colour;
+	int c;
+	ULONG gotinfo = NULL;
+
+	if (Myvp = AllocVec(sizeof(struct ViewPort), MEMF_CLEAR | MEMF_PUBLIC))
+	{
+		if (vpe = (struct ViewPortExtra *)GfxNew(VIEWPORT_EXTRA_TYPE))
+		{
+			if (cm = GetColorMap(32))
+			{
+				if (gotinfo = GetDisplayInfoData(NULL, (APTR)&#038;query,
+                                                                 sizeof(query), DTAG_DIMS, ModeID))
+				{
+					InitVPort(Myvp);
+
+					/* duplicate the ViewPort structure */
+					Myvp-&#062;DWidth = vp-&#062;DWidth;
+					Myvp-&#062;DHeight = vp-&#062;DHeight;
+					Myvp-&#062;DxOffset = vp-&#062;DxOffset;
+					Myvp-&#062;DyOffset = vp-&#062;DyOffset;
+					Myvp-&#062;Modes = vp-&#062;Modes;
+					Myvp-&#062;SpritePriorities = vp-&#062;SpritePriorities;
+					Myvp-&#062;ExtendedModes = vp-&#062;ExtendedModes;
+
+					/* duplicate the Overscan values */
+					vpe-&#062;DisplayClip = query.TxtOScan;
+
+					/* attach everything together */
+					ti[0].ti_Data = (ULONG)Myvp;
+					ti[1].ti_Data = (ULONG)vpe;
+					ti[2].ti_Data = (ULONG)FindDisplayInfo(ModeID);
+					if (VideoControl(cm, ti) != NULL)
+					{
+						printf(&#034;VideoControl error in CreateViewPort()\n&#034;);
+					}
+
+					/* copy the colours from the workbench */
+					for (c = 0; c &#060; COLOURS; c++)
+					{
+						if ((colour = GetRGB4(vp-&#062;ColorMap, c)) != -1)
+						{
+						SetRGB4CM(cm, c, (colour &#062;&#062; 8),
+							  ((colour &#062;&#062; 4) &#038; 0xf), (colour &#038; 0xf));
+						}
+					}
+				}
+				else printf(&#034;Database error\n&#034;);
+			}
+			else printf(&#034;Could not get the ColorMap\n&#034;);
+		}
+		else printf(&#034;Could not get the ViewPortExtra\n&#034;);
+	}
+	else printf(&#034;Could not get the ViewPort\n&#034;);
+
+	if (Myvp &#038;&#038; vpe &#038;&#038; cm &#038;&#038; gotinfo)
+		return(Myvp);
+	else
+	{
+		DestroyViewPort(vp);
+		return(NULL);
+	}
+}
+
+/***********************************************************************************/
+/*                                                                                 */
+/* VOID DestroyBitMap(struct BitMap *Mybm, SHORT width, SHORT height, SHORT depth) */
+/*                                                                                 */
+/* Close and free everything to do with the BitMap                                 */
+/*                                                                                 */
+/***********************************************************************************/
+
+VOID DestroyBitMap(struct BitMap *Mybm, SHORT width, SHORT height, SHORT depth)
+{
+	int i;
+
+	if (Mybm)
+	{
+		for (i = 0; (i &#060; depth); i++)
+		{
+			if (Mybm-&#062;Planes[i])
+				FreeRaster(Mybm-&#062;Planes[i], width, height);
+		}
+		FreeVec(Mybm);
+	}
+}
+
+/***********************************************************************/
+/*                                                                     */
+/* struct BitMap *CreateBitMap(SHORT width, SHORT height, SHORT depth) */
+/*                                                                     */
+/* Create the BitMap.                                                  */
+/*                                                                     */
+/***********************************************************************/
+
+struct BitMap *CreateBitMap(SHORT width, SHORT height, SHORT depth)
+{
+	/* Allocate a BitMap structure, initialise it, and allocate each plane. */
+
+	struct BitMap *Mybm;
+	PLANEPTR allocated = (PLANEPTR) 1;
+	int i;
+
+	if (Mybm = AllocVec(sizeof(struct BitMap), MEMF_CLEAR | MEMF_PUBLIC))
+	{
+		InitBitMap(Mybm, depth, width, height);
+		for (i = 0; ((i &#060; depth) &#038;&#038; (allocated)); i++)
+			allocated = (Mybm-&#062;Planes[i] = AllocRaster(width, height));
+
+		if (allocated == NULL)
+		{
+			printf(&#034;Could not allocate all the planes\n&#034;);
+			DestroyBitMap(Mybm, width, height, depth);
+			Mybm = NULL;
+		}
+	}
+	else printf(&#034;Could not get BitMap\n&#034;);
+
+	return(Mybm);
+}
+
+/********************************************************************************/
+/*                                                                              */
+/* VOID ShowView(struct View *view, struct ViewPort *vp, struct BitMap *bm,    */
+/*                                                SHORT width, SHORT height)    */
+/*                                                                              */
+/* Assemble and display the View.                                               */
+/*                                                                              */
+/********************************************************************************/
+
+VOID ShowView(struct View *view, struct ViewPort *vp, struct BitMap *bm,
+                                               SHORT width, SHORT height)
+{
+	/* Attach the BitMap to the ViewPort via a RasInfo.  Attach the ViewPort
+	 * to the View.  Clear the BitMap, and draw into it by attaching the BitMap
+	 * to a RastPort.  Then MakeVPort(), MrgCop() and LoadView().
+	 * Just wait for the user to press &#060;RETURN&#062; before returning.
+	 */
+
+	struct RastPort *rp;
+	struct RasInfo *ri;
+
+	if (rp = AllocVec(sizeof(struct RastPort), MEMF_CLEAR | MEMF_PUBLIC))
+	{
+		if (ri = AllocVec(sizeof(struct RasInfo), MEMF_CLEAR | MEMF_PUBLIC))
+		{
+			InitRastPort(rp);
+			ri-&#062;BitMap = rp-&#062;BitMap = bm;
+			vp-&#062;RasInfo = ri;
+			view-&#062;ViewPort = vp;
+
+			/* render */
+			SetRast(rp, 0);		/* clear the background */
+			SetAPen(rp, ((1 &#060;&#060; bm-&#062;Depth) - 1));	/* use the last pen */
+			Move(rp, 0, 0);
+			Draw(rp, width, 0);
+			Draw(rp, width, height);
+			Draw(rp, 0, height);
+			Draw(rp, 0, 0);
+
+			/* display it */
+			MakeVPort(view, vp);
+			MrgCop(view);
+			LoadView(view);
+
+			getchar();
+
+			/* bring back the system */
+			RethinkDisplay();
+
+			FreeVec(ri);
+		}
+		else printf(&#034;Could not get RasInfo\n&#034;);
+
+		FreeVec(rp);
+	}
+	else printf(&#034;Could not get RastPort\n&#034;);
+
+}
+
+/**********************************************************************/
+/*                                                                    */
+/* VOID main (int argc, char *argv[])                                 */
+/*                                                                    */
+/* Clone the Workbench View using Graphics Library calls.             */
+/*                                                                    */
+/**********************************************************************/
+
+VOID main (int argc, char *argv[])
+{
+	struct Screen *wb;
+	struct View *Myview;
+	struct ViewPort *Myvp;
+	struct BitMap *Mybm;
+	ULONG ModeID;
+	ULONG IbaseLock;
+
+	Init () ;		/* to open the libraries */
+
+	/* To clone the Workbench using graphics calls involves duplicating
+	 * the Workbench ViewPort, ViewPort mode, and Intuition's View.
+	 * This also involves duplicating the DisplayClip for the overscan
+	 * value, the colours, and the View position.
+	 *
+	 * When this is all done, the View, ViewPort, ColorMap and BitMap
+	 * (and ViewPortExtra, ViewExtra and RasInfo) all have to be linked
+	 * together, and the copperlists made to create the display.
+	 *
+	 * This is not as difficult as it sounds (trust me!)
+	 */
+
+	/* First, lock the Workbench screen, so no changes can be made to it
+	 * while we are duplicating it.
+	 */
+	if (wb = LockPubScreen(&#034;Workbench&#034;))
+	{
+		/* Find the Workbench's ModeID. This is a 32-bit number that
+		 * identifies the monitor type, and the display mode of that monitor.
+		 */
+		ModeID = GetVPModeID(&#038;wb-&#062;ViewPort);
+
+		/* We need to duplicate Intuition's View structure, so lock IntuitionBase
+		 * to prevent the View changing under our feet.
+		 */
+		IbaseLock = LockIBase(0);
+		if (Myview = DupView(&#038;IntuitionBase-&#062;ViewLord, ModeID))
+		{
+			/* The View has been cloned, so we don't need to keep it locked. */
+			UnlockIBase(IbaseLock);
+
+			/* Now duplicate the Workbench's ViewPort. Remember, we still have
+			 * the Workbench locked.
+			 */
+			if (Myvp = DupViewPort(&#038;wb-&#062;ViewPort, ModeID))
+			{
+				/* Create a BitMap to render into. This will be of the
+				 * same dimensions as the Workbench.
+				 */
+				if (Mybm = CreateBitMap(wb-&#062;Width, wb-&#062;Height, wb-&#062;BitMap.Depth))
+				{
+					/* Now we have everything copied, show something */
+					ShowView(Myview, Myvp, Mybm, wb-&#062;Width-1, wb-&#062;Height-1);
+
+					/* Now free up everything we have allocated */
+					DestroyBitMap(Mybm, wb-&#062;Width, wb-&#062;Height, wb-&#062;BitMap.Depth);
+				}
+				DestroyViewPort(Myvp);
+			}
+			DestroyView(Myview);
+		}
+		else
+		{
+			UnlockIBase(IbaseLock);
+		}
+		UnlockPubScreen(NULL, wb);
+	}
+	CloseAll () ;
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

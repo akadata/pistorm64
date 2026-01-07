@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/pubscreenbeep.c" NODE="MAIN" TITLE="Lib_examples/pubscreenbeep.c" -->
+<head>
+<title>Lib_examples/pubscreenbeep.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05B4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05B6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* pubscreenbeep.c - Execute me to compile me with SAS 5.10
+LC -b1 -cfistq -v -y -j73 pubscreenbeep.c
+blink LIB:c.o pubscreenbeep.o TO pubscreenbeep LIB LIB:lc.lib LIB:amiga.lib
+quit
+*/
+
+#include &#060;exec/types.h&#062;               /* Amiga data types.               */
+#include &#060;exec/libraries.h&#062;
+#include &#060;intuition/intuition.h&#062;      /* Lots of important Intuition     */
+#include &#060;intuition/screens.h&#062;        /* structures we will be using.    */
+
+#include &#060;clib/exec_protos.h&#062;         /* Function prototypes             */
+#include &#060;clib/intuition_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }     /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }     /* really */
+#endif
+
+struct Library *IntuitionBase;        /* Intuition library base           */
+
+/* Simple example of how to find a public screen to work with in Release 2.
+ */
+
+VOID main(int argc, char **argv)
+{
+struct Screen  *my_wbscreen_ptr;     /* Pointer to the Workbench screen */
+<a name="line28"></a>
+/* Open the library before you call any functions */
+IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,0);
+if (NULL != IntuitionBase)
+   {
+   if(IntuitionBase-&#062;lib_Version&#062;=36)
+      {
+      /* OK, we have the right version of the OS so we can use
+      ** the new public screen functions of Release 2 (V36)
+      */
+      if(NULL!=(my_wbscreen_ptr=LockPubScreen(&#034;Workbench&#034;)))
+          {
+          /* OK found the Workbench screen.                      */
+          /* Normally the program would be here.  A window could */
+          /* be opened or the attributes of the screen copied    */
+          DisplayBeep(my_wbscreen_ptr);
+
+          UnlockPubScreen(NULL,my_wbscreen_ptr);
+          }
+      }
+   else
+      {
+      /* Prior to Release 2 (V36), there were no public screens,     */
+      /* just Workbench.  In those older systems, windows can be     */
+      /* opened on Workbench without locking or a pointer by setting */
+      /* the Type=WBENCHSCREEN in struct NewWindow.  Attributes can  */
+      /* be obtained by setting the Type argument to WBENCHSCREEN in */
+      /* the call to GetScreenData().                                */
+      }
+   CloseLibrary(IntuitionBase);
+   }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

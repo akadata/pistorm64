@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="utility" NODE="AllocateTagItems()" TITLE="utility.library/AllocateTagItems" -->
+<head>
+<title>utility.library/AllocateTagItems</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0593.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0595.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AllocateTagItems -- allocate a tag list. (V36)
+
+<b>   SYNOPSIS</b>
+	tagList = AllocateTagItems(numTags);
+	D0		           D0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *AllocateTagItems(ULONG);
+
+<b>   FUNCTION</b>
+	Allocates the specified number of usable TagItems slots.
+
+	Note that to access the TagItems in 'tagList', you should use
+	the function <a href="../Includes_and_Autodocs_3._guide/node05A7.html">NextTagItem()</a>. This will insure you respect any
+	chaining (TAG_MORE) and secret hiding places (TAG_IGNORE) that
+	this function might generate.
+
+<b>   INPUTS</b>
+	numTags - the number of <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> slots you want to allocate.
+
+<b>   RESULTS</b>
+	tagList	- the allocated chain of <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> structures, or NULL if
+	          there was not enough memory. An allocated tag list must
+	          eventually be freed using <a href="../Includes_and_Autodocs_3._guide/node05A2.html">FreeTagItems()</a>.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node064C.html">&#060;utility/tagitem.h&#062;</a>, <a href="../Includes_and_Autodocs_3._guide/node05A2.html">FreeTagItems()</a>, <a href="../Includes_and_Autodocs_3._guide/node059B.html">CloneTagItems()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-7-4" TITLE="21 / Processor and Cache Control / Cache Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 / Processor and Cache Control / Cache Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02CC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02CE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As of the MC68020 all processors have an instruction cache, 256 bytes on
+the MC68020 and MC68030 and 4 KBytes on a <a href="../Libraries_Manual_guide/node02CF.html">MC68040</a>.  The MC68030 and
+MC68040 have data caches as well, 256 bytes and 4 KBytes respectively. All
+the processors load instructions ahead of the program counter (PC), albeit
+it that the MC68000 and MC68010 only prefetch one and two words
+respectively. This means the CPU loads instructions ahead of the current
+program counter.  For this reason self-modifying code is strongly
+discouraged.  If your code modifies or decrypts itself just ahead of the
+program counter, the pre-fetched instructions may not match the modified
+instructions.  If self-modifying code must be used, flushing the cache is
+the safest way to prevent this.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

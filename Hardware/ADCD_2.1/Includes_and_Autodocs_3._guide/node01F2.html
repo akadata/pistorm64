@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="CachePostDMA()" TITLE="exec.library/CachePostDMA" -->
+<head>
+<title>exec.library/CachePostDMA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CachePostDMA - Take actions after to hardware DMA  (V37)
+
+<b>   SYNOPSIS</b>
+	CachePostDMA(vaddress,&#038;length,flags)
+	             a0       a1      d0
+
+	CachePostDMA(APTR,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> *,ULONG);
+
+<b>   FUNCTION</b>
+	Take all appropriate steps after Direct Memory Access (DMA).  This
+	function is primarily intended for writers of DMA device drivers.  The
+	action will depend on the CPU type installed, caching modes, and the
+	state of any Memory Management <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line30">Unit</a> (MMU) activity.
+
+	As implemented
+		68000 - Do nothing
+		68010 - Do nothing
+		68020 - Do nothing
+		68030 - <a href="../Includes_and_Autodocs_3._guide/node016A.html">Flush</a> the data cache
+		68040 - <a href="../Includes_and_Autodocs_3._guide/node016A.html">Flush</a> matching areas of the data cache
+		????? - External cache boards, Virtual Memory Systems, or
+			future hardware may patch this vector to best emulate
+			the intended behavior.
+			With a Bus-Snooping CPU, this function my end up
+			doing nothing.
+
+<b>   INPUTS</b>
+	address	- Same as initially passed to <a href="../Includes_and_Autodocs_3._guide/node01F3.html">CachePreDMA</a>
+	length	- Same as initially passed to <a href="../Includes_and_Autodocs_3._guide/node01F3.html">CachePreDMA</a>
+	flags	- Values:
+			DMA_NoModify - If the area was not modified (and
+			thus there is no reason to flush the cache) set
+			this bit.
+
+			DMA_ReadFromRAM - Indicates that this DMA is a
+			read from RAM to the DMA device (ie - a write
+			to the hard drive)  This flag is not required
+			but if used must match in both the PreDMA and
+			PostDMA calls.  This flag *should* be used to
+			help the system provide the best performance.
+			This flag is safe in all versions of CachePostDMA()
+
+<b>   SEE ALSO</b>
+	exec/execbase.i, <a href="../Includes_and_Autodocs_3._guide/node01F3.html">CachePreDMA()</a>, <a href="../Includes_and_Autodocs_3._guide/node01F0.html">CacheClearU()</a>, <a href="../Includes_and_Autodocs_3._guide/node01EF.html">CacheClearE()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

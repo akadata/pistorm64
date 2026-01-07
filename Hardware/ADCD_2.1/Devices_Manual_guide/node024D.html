@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="DR2D-1-1-1" TITLE="The Global Drawing Attribute Chunks / DRHD " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>The Global Drawing Attribute Chunks / DRHD </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node024C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node024E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+DRHD (0x44524844) 	/* Drawing header */
+
+The DRHD chunk contains the upper left and lower right extremes of the
+document in (X, Y) coordinates.  This chunk is required and should only
+appear once in a document in the outermost layer of the DR2D file (DR2Ds
+can be nested).
+
+	struct DRHDstruct {
+	    ULONG	ID;
+	    ULONG	Size;    		/* Always 16 */
+	    IEEE	XLeft, YTop,
+			XRight, YBot;
+	};
+
+The point (XLeft,YTop) is the upper left corner of the project and the
+point (XRight,YBot) is its lower right corner.  These coordinates not only
+supply the size and position of the document in a coordinate system, they
+also supply the project's orientation.  If XLeft &#060; XRight, the X-axis
+increases toward the right.  If YTop &#060; YBot, the Y-axis increases toward
+the bottom.  Other combinations are possible; for example in Cartesian
+coordinates, XLeft would be less than XRight but YTop would be greater
+than YBot.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

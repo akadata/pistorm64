@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-3-6" TITLE="27 / / Performing Data Move Operations / Copying Rectangular Areas" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Performing Data Move Operations / Copying Rectangular Areas</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0365.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0367.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Four routines use the blitter to copy rectangular areas from one section
+of a <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> to another: <a href="../Includes_and_Autodocs_2._guide/node041F.html">BltBitMap()</a>, <a href="../Includes_and_Autodocs_2._guide/node0420.html">BltBitMapRastPort()</a>,
+<a href="../Includes_and_Autodocs_2._guide/node0422.html">BltMaskBitMapRastPort()</a>, and <a href="../Includes_and_Autodocs_2._guide/node042D.html">ClipBlit()</a>.  All four of these blitter
+<a name="line5">routines take a special argument called a minterm.</a>
+
+The minterm variable is an unsigned byte value which represents an action
+to be performed during the move.  Since all the blitter routines uses the
+hardware blitter to move the data, they can take advantage of the
+blitter's ability to logically combine or change the data as the move is
+made.  The most common operation is a direct copy from source area to
+<a name="line12">destination, which uses a minterm set to hex value C0.</a>
+
+You can determine how to set the minterm variable by using the logic
+equations shown in the following tables.  B represents data from the
+source rectangle and C represents data in the destination area.
+
+
+             Table 27-7: Minterm Logic Equations
+
+
+            Leftmost 4 Bits    Logic Term Included
+             of MinTermin         Final Output
+             ------------         ------------
+                  8                    BC  &#034;B AND C&#034;
+                                        _
+                  4                    BC  &#034;B AND NOT C&#034;
+                                       _
+                  2                    BC  &#034;NOT B AND C&#034;
+                                       __
+                  1                    BC  &#034;NOT B AND NOT C&#034;
+
+
+You can combine values to select the logic terms.  For instance a minterm
+value of 0xC0 selects the first two logic terms in the table above.  These
+logic terms specify that in the final destination area you will have data
+that occurs in source B only.  Thus, C0 means a direct copy.  The logic
+equation for this is:
+          _         _
+    BC + BC = B(C + C) = B
+
+Logic equations may be used to decide on a number of different ways of
+moving the data.  For your convenience, a few of the most common ones are
+listed below.
+<a name="line45"></a>
+
+    Table 27-8: Some Common MinTerm Values to Use for Copying
+
+
+    MinTerm
+     Value        Logic Operation Performed During Copy
+     -----        -------------------------------------
+      30       Replace destination area with inverted source B.
+
+      50       Replace destination area with an inverted version
+               of itself.
+
+      60       Put B where C is not, put C where B is not (cookie cut).
+
+      80       Only put bits into destination where there is a bit in
+               the same position for both source and destination (sieve
+               operation).
+
+      C0       Plain vanilla copy from source B to destination C.
+<a name="line65"></a>
+
+The graphics library blitter routines all accept a minterm argument as
+described above.  <a href="../Includes_and_Autodocs_2._guide/node041F.html">BltBitMap()</a> is the basic blitter routine, moving data
+<a name="line69">from one <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> to another.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node041F.html">BltBitMap()</a> allows you to define a rectangle within a source <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> and
+copy it to a destination area of the same size in another (or even the
+same) BitMap.  This routine is used by the graphics library itself for
+rendering.  BltBitMap() returns the number of planes actually involved in
+the blit.  The syntax for the function is:
+
+    ULONG planes;
+
+    planes = BltBitMap(&#038;srcBM, srcX, srcY, &#038;dstBM, dstX, dstY,
+                 sizeX, sizeY, minterm, mask, tempA);
+
+The source bitmap is specified by the &#038;srcBM argument.  The position of
+the source area within the bitmap is specified by srcX and srcY.  The
+destination bitmap is specified by the &#038;dstBM argument.  The position of
+the destination area within the bitmap is specified by dstX and dstY.
+
+The dimensions (in pixels) of the area to be moved is indicated by the
+sizeX and sizeY arguments.  With the original custom chip set, the blitter
+size limits are 992 x 1024.  With ECS the blitter size limits are 32,736 x
+32,768.  See the section on &#034;<a href="../Libraries_Manual_guide/node031D.html">Determining Chip Versions</a>&#034; earlier in this
+chapter to find out how to tell if the host system has ECS installed.
+
+The minterm argument determines what logical operation to perform on the
+rectangle data as bits are moved (described above).  The mask argument,
+normally set to 0xff, specifies which bitplanes will be involved in the
+blit operation and which will be ignored.  If a bit is set in the mask
+byte, the corresponding bitplane is included.  The tempA argument applies
+only to blits that overlap and, if non-NULL, points to Chip memory the
+<a name="line99">system will use for temporary storage during the blit.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0420.html">BltBitMapRastPort()</a> takes most of the same arguments as <a href="../Includes_and_Autodocs_2._guide/node041F.html">BltBitMap()</a>, but
+its destination is a <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> instead of a <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>.  The syntax for the
+function is:
+
+    VOID BltBitMapRastPort(&#038;srcBM, srcX, srcY, &#038;dstRP, dstX, dstY,
+             sizeX, sizeY, minterm);
+
+The arguments here are the same as for <a href="../Includes_and_Autodocs_2._guide/node041F.html">BltBitMap()</a> above.  Note that the
+<a href="../Includes_and_Autodocs_2._guide/node0420.html">BltBitMapRastPort()</a> function will respect the <a href="../Libraries_Manual_guide/node034F.html">RastPort.Mask</a> field.  Only
+<a name="line110">the planes specified in the Mask will be included in the operation.</a>
+
+A third type of blitter operation is provided by the
+<a href="../Includes_and_Autodocs_2._guide/node0422.html">BltMaskBitMapRastPort()</a> function.  This works the same as
+<a href="../Includes_and_Autodocs_2._guide/node0420.html">BltBitMapRastPort()</a> except that it takes one extra argument, a pointer to
+a single bitplane mask of the same height and width as the source.  The
+mask acts as a filter for the operation--a blit only occurs where the mask
+plane is non-zero.  The syntax for the function is:
+
+    VOID BltMaskBitMapRastPort(&#038;srcBM, srcX, srcY, &#038;dstRP, dstX, dstY,
+             sizeX, sizeY, minterm, bltmask);
+
+The bltmask argument points to a word-aligned mask bitplane in Chip memory
+with the same dimensions as the source bitmap.  Note that this function
+<a name="line124">ignores the <a href="../Libraries_Manual_guide/node034F.html">Mask</a> field of the destination <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node042D.html">ClipBlit()</a> takes most of the same arguments as the other blitter calls
+described above but it works with source and destination <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>s and
+their layers.  Before ClipBlit() moves data, it looks at the area from
+which and to which the data is being copied (RastPorts, not <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>s) and
+determines if there are overlapping areas involved.  If so, it splits up
+the overall operation into a number of bitmaps to move the data in the way
+you request.  To call ClipBlit() use:
+
+    VOID ClipBlit(&#038;srcRP, srcX, srcY, &#038;dstRP, dstX, dstY, XSize, YSize,
+                  minterm);
+
+Since <a href="../Includes_and_Autodocs_2._guide/node042D.html">ClipBlit()</a> respects the <a href="../Libraries_Manual_guide/node03E4.html">Layer</a> of the source and destination
+<a href="../Libraries_Manual_guide/node034A.html">RastPort</a>, it is the easiest blitter movement call to use with Intuition
+windows.  The following code fragments show how to save and restore an
+undo buffer using ClipBlit().
+
+    /* Save work rastport to an undo rastport */
+    ClipBlit(&#038;drawRP, 0, 0, &#038;undoRP, 0, 0, areaWidth, areaHeight, 0xC0);
+
+    /* restore undo rastport to work rastport */
+    ClipBlit(&#038;undoRP, 0, 0, &#038;drawRP, 0, 0, areaWidth, areaHeight, 0xC0);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

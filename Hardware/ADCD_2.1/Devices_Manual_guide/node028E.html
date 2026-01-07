@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="SAMP.doc" TITLE="A / IFF Third Party Public Form and Chunk Specification / SAMP.doc" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>A / IFF Third Party Public Form and Chunk Specification / SAMP.doc</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node028D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node028F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Sampled sound format
+
+                    IFF FORM &#034;SAMP&#034; Sampled Sound
+
+ Date:   Dec 3,1989
+ From:   Jim Fiore and Jeff Glatt, dissidents
+
+The form &#034;SAMP&#034; is a file format used to store sampled sound data in some
+ways like the current standard, &#034;8SVX&#034;. Unlike &#034;8SVX&#034;, this new format is
+not restricted to 8 bit sample data. There can be more than one waveform
+per octave, and the lengths of different waveforms do not have to be
+factors of 2. In fact, the lengths (waveform size) and playback mapping
+(which musical notes each waveform will &#034;play&#034;) are independently
+determined for each wave- form. Furthermore, this format takes into
+account the MIDI sample dump stan- dard (the defacto standard for musical
+sample storage), while also incorpo- rating the ability to store Amiga
+specific info (for example, the sample data that might be sent to an audio
+channel which is modulating another channel).
+
+Although this form can be used to store &#034;sound effects&#034; (typically oneShot
+sounds played at a set pitch), it is primarily intended to correct the
+many deficiencies of the &#034;8SVX&#034; form in regards to musical sampling.
+Because the emphasis is on musical sampling, this format relies on the
+MIDI (Musical Instrument Digital Interface) method of describing &#034;sound
+events&#034; as does virtually all currently manufactured, musical samplers. In
+addition, it at- tempts to incorporate features found on many professional
+music samplers, in anticipation that future Amiga models will implement 16
+bit sampling, and thus be able to achieve this level of performance.
+Because this format is more complex than &#034;8SVX&#034;, programming examples to
+demonstrate the use of this format have been included in both C and
+assembly. Also, a library of func- tions to read and write SAMP files is
+available, with example applications.
+
+SEMANTICS: When MIDI literature talks about a sample, usually it means a
+collection of many sample points that make up what we call a &#034;wave&#034;.
+
+ <a href="../Devices_Manual_guide/node028F.html">Similarities and Differences from the 8SVX Form</a> 
+ <a href="../Devices_Manual_guide/node0290.html">The SAMP Header</a> 
+ <a href="../Devices_Manual_guide/node0291.html">The MHDR Chunk</a> 
+ <a href="../Devices_Manual_guide/node0292.html">The NAME Chunk</a> 
+ <a href="../Devices_Manual_guide/node0293.html">The BODY Chunk</a> 
+ <a href="../Devices_Manual_guide/node0294.html">Structure of an Individual Sample Point</a> 
+ <a href="../Devices_Manual_guide/node0295.html">The Waveheader Explained</a> 
+ <a href="../Devices_Manual_guide/node0296.html">MIDI Velocity vs. Amiga Channel Volume</a> 
+ <a href="../Devices_Manual_guide/node0297.html">An EGpoint (Envelope Generator)</a> 
+ <a href="../Devices_Manual_guide/node0298.html">Additional User Data Section</a> 
+ <a href="../Devices_Manual_guide/node0299.html">Converting Midi Sample Dump to SAMP</a> 
+ <a href="../Devices_Manual_guide/node029A.html">Interpreting the Playmode</a> 
+ <a href="../Devices_Manual_guide/node029B.html">Making A Transpose Table</a> 
+ <a href="../Devices_Manual_guide/node029C.html">Making the Velocity Table</a> 
+ <a href="../Devices_Manual_guide/node029D.html">The Instrument Type</a> 
+ <a href="../Devices_Manual_guide/node029E.html">The Order of the Chunks</a> 
+ <a href="../Devices_Manual_guide/node029F.html">Filename Conventions</a> 
+ <a href="../Devices_Manual_guide/node02A0.html">Why Does Anyone Need Such a Complicated File?</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

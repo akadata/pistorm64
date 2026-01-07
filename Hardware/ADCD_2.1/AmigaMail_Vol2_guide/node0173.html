@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="II-43/Split.c" NODE="MAIN" TITLE="II-43/Split.c" -->
+<head>
+<title>II-43/Split.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0172.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0174.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* Split.c - AmigaMail SplitName() example.  Compiled with SAS/C 6.56.
+sc NMINC STRMERGE NOSTKCHK NODEBUG DATA=FAR IGNORE=73 Split.c
+slink from Split.o to Split lib lib:amiga.lib ; if you don't have pragmas
+quit
+* Tuesday, 16-Jul-91 12:15:49, Ewout
+*
+*
+*/
+/*
+Copyright (c) 1991-1999 Amiga, Inc.
+
+This example is provided in electronic form by Amiga, Inc.
+for use with the Amiga Mail Volume II technical publication.
+Amiga Mail Volume II contains additional information on the correct
+usage of the techniques and operating system functions presented in
+these examples.  The source and executable code of these examples may
+only be distributed in free electronic form, via bulletin board or
+as part of a fully non-commercial and freely redistributable
+diskette.  Both the source and executable code (including comments)
+must be included, without modification, in any copy.  This example
+may not be published in printed form or distributed with any
+commercial product. However, the programming techniques and support
+routines set forth in these examples may be used in the development
+of original executable software products for Amiga
+computers.
+
+All other rights reserved.
+
+This example is provided &#034;as-is&#034; and is subject to change; no
+warranties are made.  All use is at your own risk. No liability or
+responsibility is assumed.
+*/
+
+#include &#060;exec/memory.h&#062;
+#include &#060;dos/dosextens.h&#062;
+#include &#060;dos/rdargs.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+
+/* def PRAGMAS if you have them */
+/* #define PRAGMAS */
+#ifdef PRAGMAS
+#include &#060;pragmas/exec_pragmas.h&#062;
+#include &#060;pragmas/dos_pragmas.h&#062;
+#else
+struct ExecBase *SysBase;
+struct DosLibrary *DOSBase;
+
+#endif
+
+#define BUFFERSIZE      128
+
+VOID            main(VOID);
+
+VOID
+main(VOID)
+{
+#ifdef PRAGMAS
+    struct DosLibrary *DOSBase;
+
+#endif
+    struct RDArgs  *readargs;
+    LONG            rargs[2];
+    UBYTE          *filename, *buffer;
+    ULONG           buffersize;
+    WORD            position = 0;
+    LONG            vargs[4];
+
+#ifndef PRAGMAS
+    /* set up SysBase */
+    SysBase = (*((struct Library **) 4));
+#endif
+
+    /* Fail silently if &#060; 37 */
+    if (DOSBase = (struct DosLibrary *) OpenLibrary(&#034;dos.library&#034;, 37))
+    {
+
+        /* See the DOS Autodocs for more information about ReadArgs() */
+        if (readargs = ReadArgs(&#034;FILE/A,BUFFERSIZE/A/N&#034;, rargs, NULL))
+        {
+            filename = (UBYTE *) rargs[0];
+            buffersize = *((LONG *) rargs[1]);
+            if (buffersize &#060; 1 || buffersize &#062; 4096)
+                buffersize = BUFFERSIZE;
+
+            if (buffer = AllocMem(buffersize, MEMF_CLEAR))
+            {
+                position = SplitName(filename, ':', buffer, position, buffersize);
+
+                vargs[0] = position;
+                vargs[1] = (LONG) buffer;
+                VFPrintf(Output(), &#034;Devicename: position: %ld Buffer: %s\n&#034;, vargs);
+
+                if (position == -1)
+                    position = 0;
+
+                do
+                {
+                    position =
+                        SplitName(filename, '/', buffer, position, buffersize);
+                    vargs[0] = position;
+                    vargs[1] = (LONG) buffer;
+                    VFPrintf(Output(),
+                             &#034;Path component: position: %ld Buffer: %s\n&#034;,
+                             vargs);
+                } while (position != -1);
+                FreeMem(buffer, buffersize);
+            }
+            FreeArgs(readargs);
+
+        }
+        else
+            PrintFault(IoErr(), NULL);
+        CloseLibrary((struct Library *) DOSBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

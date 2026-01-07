@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="UnGetC()" TITLE="dos.library/UnGetC" -->
+<head>
+<title>dos.library/UnGetC</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01C5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01C7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	UnGetC -- Makes a char available for reading again. (buffered) (V36)
+
+<b>   SYNOPSIS</b>
+	value = UnGetC(fh, character)
+	D0	       D1      D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> UnGetC(BPTR, LONG)
+
+<b>   FUNCTION</b>
+	Pushes the character specified back into the input buffer.  Every
+	time you use a buffered read routine, you can always push back 1
+	character.  You may be able to push back more, though it is not
+	recommended, since there is no guarantee on how many can be
+	pushed back at a given moment.
+
+	Passing -1 for the character will cause the last character read to
+	be pushed back.  If the last character read was an EOF, the next
+	character read will be an EOF.
+
+	Note: UnGetC can be used to make sure that a filehandle is set up
+	as a read filehandle.  This is only of importance if you are writing
+	a shell, and must manipulate the filehandle's buffer.
+
+<b>   INPUTS</b>
+	fh	  - filehandle to use for buffered I/O
+	character - character to push back or -1
+
+<b>   RESULT</b>
+	value     - character pushed back, or FALSE if the character cannot
+		    be pushed back.
+
+<b>   BUGS</b>
+	In V36, UnGetC(fh,-1) after an EOF would not cause the next character
+	read to be an EOF.  This was fixed for V37.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0162.html">FGetC()</a>, <a href="../Includes_and_Autodocs_3._guide/node016C.html">FPutC()</a>, <a href="../Includes_and_Autodocs_3._guide/node016A.html">Flush()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

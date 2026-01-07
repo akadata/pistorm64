@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_E" NODE="E-2-14" TITLE="E / Release 2 Changes That Can Affect Compatibility / Workbench" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>E / Release 2 Changes That Can Affect Compatibility / Workbench</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node056D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node056F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+  * The Workbench GUI now has new screen sizes, screen top/left offsets,
+    depths, modes, and fonts.
+
+  * Default Tool now searches paths.
+
+  * New Look (boxed) icons take more space.
+
+  * Do not use icons which have more 1bits set in <a href="../Libraries_Manual_guide/node01BA.html#line63">PlanePick</a> than planes
+    in the <a href="../Libraries_Manual_guide/node01BA.html#line47">ImageData</a> (one IFF-to-Icon utility does this).  Such icons
+    will appear trashed on deeper Workbenches.
+
+  * New Look colors have black and white swapped (as compared to 1.3).
+
+  * The Workbench screen may not be open at startup-sequence time until
+    some output occurs to the initial Shell window.  This can break
+    startup-sequence-started games that think they can steal WB's screen
+    bitplanes.  Do not steal the Workbench screen's bitplanes.  (For
+    compatibility, booting off pre-2.0 disks forces the initial screen
+    open. This is not guaranteed to remain in the system.)  Use startup
+    code that can detach when RUN (such as cback.o) and use
+    <a href="../Libraries_Manual_guide/node00E8.html#line25">CloseWorkbench()</a> to regain the screen's memory.  In addition, see
+    &#034;<a href="../Libraries_Manual_guide/node0576.html">Workbench and Startup</a>&#034; in the &#034;Additional Information&#034; section
+    below.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

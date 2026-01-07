@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_12" NODE="12-4" TITLE="12 Serial Device / Alternative Modes for Serial Input or Output" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>12 Serial Device / Alternative Modes for Serial Input or Output</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00A0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00A2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As an alternative to <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> you can use an asynchronous I/O request to
+transmit the command.  Asynchronous requests are initiated with <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>.
+Your task can continue to execute while the device processes the command.
+You can occasionally do a <a href="../Includes_and_Autodocs_2._guide/node033E.html">CheckIO()</a> to see if the I/O has completed.  The
+write request in this example will be processed while the example
+continues to run:
+
+    SerialIO-&#062;IOSer.io_Length   = -1;
+    SerialIO-&#062;IOSer.io_Data     = (APTR)&#034;Save the whales! &#034;;
+    SerialIO-&#062;IOSer.io_Command  = CMD_WRITE;
+    SendIO((struct IORequest *)SerialIO);
+
+    printf(&#034;CheckIO %lx\n&#034;,CheckIO((struct IORequest *)SerialIO));
+    printf(&#034;The device will process the request in the background\n&#034;);
+    printf(&#034;CheckIO %lx\n&#034;,CheckIO((struct IORequest *)SerialIO));
+    WaitIO((struct IORequest *)SerialIO);  /* Remove message and cleanup */
+
+Most applications will want to wait on multiple signals.  A typical
+<a name="line20">application will wait for menu messages from Intuition at the same time as</a>
+replies from the serial device.  The following fragment demonstrates
+waiting for one of three signals.  The <a href="../Includes_and_Autodocs_2._guide/node038A.html">Wait()</a> will wake up if the read
+request ever finishes, or if the user presses Ctrl-C or Ctrl-F from the
+Shell.  This fragment may be inserted into the above complete example.
+
+    /* Precalculate a wait mask for the CTRL-C, CTRL-F and message
+     * port signals.  When one or more signals are received,
+     * Wait() will return.  Press CTRL-C to exit the example.
+     * Press CTRL-F to wake up the example without doing anything.
+     * NOTE: A signal may show up without an associated message!
+     */
+
+    WaitMask = SIGBREAKF_CTRL_C|
+                SIGBREAKF_CTRL_F|
+                 1L &#060;&#060; SerialMP-&#062;mp_SigBit;
+
+    SerialIO-&#062;IOSer.io_Command  = CMD_READ;
+    SerialIO-&#062;IOSer.io_Length   = READ_BUFFER_SIZE;
+    SerialIO-&#062;IOSer.io_Data     = (APTR)&#038;SerialReadBuffer[0];
+    SendIO(SerialIO);
+
+    printf(&#034;Sleeping until CTRL-C, CTRL-F, or serial input\n&#034;);
+
+    while (1)
+           {
+           Temp = Wait(WaitMask);
+           printf(&#034;Just woke up (YAWN!)\n&#034;);
+
+           if (SIGBREAKF_CTRL_C &#038; Temp)
+               break;
+
+           if (CheckIO(SerialIO) ) /* If request is complete... */
+               {
+               WaitIO(SerialIO);   /* clean up and remove reply */
+               printf(&#034;%ld bytes received\n&#034;,SerialIO-&#062;IOSer.io_Actual);
+               break;
+               }
+           }
+    AbortIO(SerialIO);  /* Ask device to abort request, if pending */
+    WaitIO(SerialIO);   /* Wait for abort, then clean up */
+
+   WaitIO() vs. Remove().
+   ----------------------
+   The <a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a> function is used above, even if the request is already
+   known to be complete.  WaitIO() on a completed request simply removes
+   the reply and cleans up.  The <a href="../Includes_and_Autodocs_2._guide/node0373.html">Remove()</a> function is not acceptable for
+   clearing the reply port; other messages may arrive while the function
+   is executing.
+
+ <a href="../Devices_Manual_guide/node00A2.html">High Speed Operation</a> 
+ <a href="../Devices_Manual_guide/node00A3.html">Use Of BeginIO() With The Serial Device</a> 
+ <a href="../Devices_Manual_guide/node00A4.html">Ending A Read Or Write Using Termination Characters</a> 
+ <a href="../Devices_Manual_guide/node00A5.html">Using Separate Read And Write Tasks</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

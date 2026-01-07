@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_26" NODE="26-2-4-1" TITLE="26 / / Interrupt Servers / Interrupt Server Register Usage" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>26 / / Interrupt Servers / Interrupt Server Register Usage</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node030B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node030D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+ D0 Scratch.
+
+ D1 Scratch.
+
+<a name="line7"> A0 Scratch except in certain cases (see <a href="../Libraries_Manual_guide/node030B.html#line43">note above</a>).</a>
+
+ A1 Points to the data area specified by the <a href="../Libraries_Manual_guide/node0307.html">is_Data</a> field of the
+    <a href="../Libraries_Manual_guide/node0307.html">Interrupt</a> structure.  Because this pointer is always fetched
+    (regardless of whether you use it), it is to your advantage to make
+    some use of it (scratch).
+
+ A5 Points to your interrupt code (scratch).
+
+<a name="line16"> A6 Scratch.</a>
+
+In a server chain, the interrupt is cleared automatically by the system.
+Having a server clear its interrupt is not recommended and not necessary
+(clearing could cause the loss of an interrupt on <a href="../Libraries_Manual_guide/node0303.html#line79">PORTS</a> or <a href="../Libraries_Manual_guide/node0303.html#line99">EXTER</a>).
+
+Here is an example of a program to install and remove a low-priority
+vertical blank interrupt server:
+
+<a name="line25">     <a href="../Libraries_Manual_guide/node05EB.html">vertb.c</a> </a>
+
+This is the assembler VertBServer installed by the C example:
+
+     <a href="../Libraries_Manual_guide/node05EC.html">vertbserver.asm</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

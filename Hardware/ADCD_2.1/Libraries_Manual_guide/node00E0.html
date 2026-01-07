@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-3-1" TITLE="3 / Custom Screen Functions / Creating A New Custom Screen" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Custom Screen Functions / Creating A New Custom Screen</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00DF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00E1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are three functions you can use to open a <a href="../Libraries_Manual_guide/node00DF.html">custom screen</a>:
+<a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreen()</a>, <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreenTags()</a> or <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreenTagList()</a>.  Prior to Release 2
+(V36), OpenScreen() was used to create a new screen.  With V36 and later
+versions of the operating system, this call is superseded by
+OpenScreenTagList() and OpenScreenTags().
+
+   struct Screen *OpenScreen( struct NewScreen *)
+   struct Screen *OpenScreenTagList( struct NewScreen * , struct TagItem *)
+   struct Screen *OpenScreenTags( struct NewScreen *, ULONG, ULONG, ... )
+
+The old <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreen()</a> call relied on a fixed size data structure
+(<a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a>) which made little allowance for extensions and growth.  The
+new calls are tag based, allowing for the addition of new features without
+modification of existing structures and applications.  The
+&#034;<a href="../Libraries_Manual_guide/node00E5.html">Screen Attributes</a>&#034; section below contains a complete list of all the tag
+options available for setting up an Intuition screen.  For a general
+description of tag items, see the &#034;<a href="../Libraries_Manual_guide/node0496.html">Utility Library</a>&#034; chapter.
+
+ <a href="../Libraries_Manual_guide/node00E1.html">A Custom Screen Example</a> 
+ <a href="../Libraries_Manual_guide/node00E2.html">Creating A Custom Screen that Works With Older Systems</a> 
+ <a href="../Libraries_Manual_guide/node00E3.html">Return Values from OpenScreenTagList()</a> 
+ <a href="../Libraries_Manual_guide/node00E4.html">Closing the Screen</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

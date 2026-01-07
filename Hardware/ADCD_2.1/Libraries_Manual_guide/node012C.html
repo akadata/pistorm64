@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-8-6" TITLE="4 / Other Window Functions / Changing Pointer Position Reports" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Other Window Functions / Changing Pointer Position Reports</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node012B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node012D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Pointer position messages to a window may be turned on and off by simply
+setting or clearing the <a href="../Libraries_Manual_guide/node0125.html#line44">WFLG_REPORTMOUSE</a> flag bit in <a href="../Libraries_Manual_guide/node0121.html#line7">Window-&#062;Flags</a>, in an
+atomic way, as explained for the <a href="../Libraries_Manual_guide/node0125.html#line95">WA_RMBTrap</a> tag in the &#034;Window Attributes&#034;
+section above.  Using this direct method of setting the flag avoids the
+historic confusion on the ordering of the arguments of the <a href="../Libraries_Manual_guide/node01EC.html#line14">ReportMouse()</a>
+function call.
+
+Mouse reporting may be turned on even if mouse movements were not
+activated when the window was opened.  The proper IDCMP flags must be set
+for the window to receive the messages.  See the chapter
+&#034;<a href="../Libraries_Manual_guide/node01E9.html">Intuition Mouse and Keyboard</a>&#034; for more details on enabling mouse
+reporting in an application.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

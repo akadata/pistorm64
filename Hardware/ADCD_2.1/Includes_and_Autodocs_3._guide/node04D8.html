@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="narrator" NODE="CMD_WRITE" TITLE="narrator.device/CMD_WRITE" -->
+<head>
+<title>narrator.device/CMD_WRITE</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04D7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04D9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CMD_WRITE - Send speech request to the narrator device
+
+
+<b>   SYNOPSIS</b>
+	Standard device command.
+
+
+<b>   FUNCTION</b>
+	Sends a phonetic string to the narrator device to be spoken
+	and, optionally, is used to direct the narrator device to
+	return mouth shape changes, and word and syllable sync events
+	in response to read requests from the user.  The phonetic string
+	consists of ASCII characters representing the individual phonemes.
+	Refer to the narrator device chapter of the libraries and devices
+	volume of the ROM Kernel Manual for detailed information.
+
+
+<b>   INPUTS</b>
+	User <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> block (struct <a href="../Includes_and_Autodocs_3._guide/node0630.html#line93">narrator_rb</a> as defined in .h file).
+	The <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a> call will initialize the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> block to a
+	&#034;standard male&#034; voice.  If you want to change any parms, do so
+	after the <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a> call and before the <a href="../Includes_and_Autodocs_3._guide/node0204.html">DoIO</a> (or SendIO/WaitIO).
+	For a complete description of the <a href="../Includes_and_Autodocs_3._guide/node0630.html#line93">narrator_rb</a> structure, see the
+	narrator.h or .i include file.  Note that the <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a> call does
+	not initialize all the fields needed by the narrator device.  The
+	<a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> fields which must be set by the user before issuing the
+	write request are:
+
+	   io_Command - Set to CMD_WRITE
+	   io_Data    - Pointer to phonetic string
+	   io_Length  - Length of phonetic string
+	   ch_masks   - Array of audio channel selection masks (see audio
+			device documentation for description of this field)
+	   nm_masks   - Number of audio channel selection masks
+
+	   ****** NEW FOR V37 NARRATOR
+
+	   flags - The bit NDB_NEWIORB must be set in the flags field if
+		   any of the new features of the V37 narrator are used
+
+
+	In addition to producing synthetic speech, the narrator device
+	also provides features for synchronizing the speech to animation
+	or other user defined events.  There are three types of events
+	that the user can request.  They are mouth shape changes, start of
+	new word, and start of new syllable.  Mouth shape changes are
+	requested by setting the mouths field of the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> block to a
+	non-zero value.  Word and syllable sync events are requested by
+	setting the NDB_WORDSYNC and/or NDB_SYLSYNC bits in the flags field
+	of the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> block.  Note that word and syllable sync only work
+	in V37 and later versions of the narrator device.
+
+
+<b>   RESULTS</b>
+	The narrator device range checks and performs other validity
+	checks for all input parms.  If any input is in error, the device
+	sets the io_Error field of the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> block to an appropriate
+	value (see include files for error codes).  If everything is in
+	order, the narrator device will produce the speech and clear the
+	io_Error field.  The io_Actual field is set to the length of the
+	input string that was actually processed.  If the return code
+	indicates a phoneme error (ND_PhonErr), io_Actual is the NEGATIVE
+	of the position in the input string where the error occured.
+
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> command.
+	Audio device documentation.
+	Exec input/output documentation.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

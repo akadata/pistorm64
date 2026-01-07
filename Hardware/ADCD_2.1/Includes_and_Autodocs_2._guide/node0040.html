@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/bootblock.h" NODE="MAIN" TITLE="Includes/devices/bootblock.h" -->
+<head>
+<title>Includes/devices/bootblock.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node003F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0041.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DEVICES_BOOTBLOCK_H
+#define DEVICES_BOOTBLOCK_H
+/*
+**	$Filename: devices/bootblock.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.6 $
+**	$Date: 90/11/05 $
+**
+**	floppy BootBlock definition
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include	&#034;exec/types.h&#034;
+#endif
+<a name="line18"></a>
+<a name="line19">struct BootBlock {</a>
+<a name="line20">	UBYTE	bb_id[4];		/* 4 character identifier */</a>
+<a name="line21">	LONG	bb_chksum;		/* boot block checksum (balance) */</a>
+	LONG	bb_dosblock;		/* reserved for DOS patch */
+};
+<a name="line24"></a>
+#define		BOOTSECTS	2	/* 1K bootstrap */
+<a name="line26"></a>
+<a name="line27">#define BBID_DOS	{ 'D', 'O', 'S', '\0' }</a>
+#define BBID_KICK	{ 'K', 'I', 'C', 'K' }
+<a name="line29"></a>
+<a name="line30">#define BBNAME_DOS	0x444F5300	/* 'DOS\0' */</a>
+#define BBNAME_KICK	0x4B49434B	/* 'KICK' */
+
+#endif	/* DEVICES_BOOTBLOCK_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

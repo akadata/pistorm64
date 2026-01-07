@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/dos/record.h" NODE="MAIN" TITLE="include/dos/record.h" -->
+<head>
+<title>include/dos/record.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0640.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0642.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_RECORD_H
+#define DOS_RECORD_H
+/*
+**
+**	$VER: record.h 36.5 (12.7.1990)
+**	Includes Release 44.1
+**
+**	include file for record locking
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+
+#ifndef DOS_DOS_H
+#include &#060;dos/dos.h&#062;
+#endif
+
+/* Modes for LockRecord/LockRecords() */
+#define REC_EXCLUSIVE		0
+#define REC_EXCLUSIVE_IMMED	1
+#define REC_SHARED		2
+#define REC_SHARED_IMMED	3
+
+/* struct to be passed to LockRecords()/UnLockRecords() */
+<a name="line26"></a>
+struct RecordLock {
+	BPTR	rec_FH;		/* filehandle */
+	ULONG	rec_Offset;	/* offset in file */
+	ULONG	rec_Length;	/* length of file to be locked */
+	ULONG	rec_Mode;	/* Type of lock */
+};
+
+#endif /* DOS_RECORD_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

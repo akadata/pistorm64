@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="listbrowser_gc" NODE="LBM_EDITNODE" TITLE="listbrowser_gc/LBM_EDITNODE" -->
+<head>
+<title>listbrowser_gc/LBM_EDITNODE</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0441.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0443.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        LBM_EDITNODE -- Edit an attached nodes attributes.
+
+<b>    FUNCTION</b>
+        Changes attributes of a node attached to a listbrowser.  If rendering
+        information is available, then any necessary refreshing will take
+        place.  You do not need to detach your list first.
+
+        This method takes the following message structure:
+
+          struct <a href="../Includes_and_Autodocs_3._guide/node05EF.html#line59">lbEditNode</a>
+          {
+              ULONG MethodID;                 /* LBM_EDITNODE */
+              struct <a href="../Includes_and_Autodocs_3._guide/node060E.html#line24">GadgetInfo</a> *lbe_GInfo;   /* to provide rendering info */
+              struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *lbe_Node;          /* modify this node */
+              struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *lbe_NodeAttrs;  /* <a href="../Includes_and_Autodocs_3._guide/node044B.html">SetListBrowserNodeAttrsA()</a>
+                                                 taglist */
+          };
+
+<b>    RESULT</b>
+        Returns non-zero on success, zero on failure.
+
+<b>    SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node0441.html">LBM_ADDNODE</a>, <a href="../Includes_and_Autodocs_3._guide/node0443.html">LBM_REMNODE</a>, reaction.lib/LBEditNode
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

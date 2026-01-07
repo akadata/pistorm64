@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-8-3" TITLE="33 / Advanced Topics / Finding The PROP Context" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Advanced Topics / Finding The PROP Context</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node045A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node045C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Earlier it was mentioned that supplying a position value of <a href="../Libraries_Manual_guide/node044E.html#line17">IFFSLI_PROP</a> to
+<a href="../Libraries_Manual_guide/node044E.html">StoreLocalItem()</a> would store it in the topmost property scope.
+<a href="../Includes_and_Autodocs_2._guide/node01C4.html">FindPropContext()</a> is the routine that finds that topmost context.
+
+Property chunks (such as the <a href="../Libraries_Manual_guide/node0461.html#line3">BMHD</a>, <a href="../Libraries_Manual_guide/node0461.html#line16">CMAP</a>, and others) have dominion over
+the <a href="../Libraries_Manual_guide/node042A.html#line7">FORM</a> that contains them; they are said to be &#034;in scope&#034; and their
+definition persists until the FORM's context ends.  Thus, a property chunk
+has a scoping level equal to the FORM that contains it; when the FORM
+ends, the property dies with it.
+
+Consider a more complicated example.  Suppose you have a <a href="../Libraries_Manual_guide/node042A.html#line7">LIST</a> with a <a href="../Libraries_Manual_guide/node042A.html#line7">PROP</a>
+in it.  PROPs are the global variables of LISTs; thus a property chunk
+declared in a PROP will persist until the LIST's context ends.
+
+This is what <a href="../Includes_and_Autodocs_2._guide/node01C4.html">FindPropContext()</a> is looking for; a context level in which a
+property chunk may be installed.
+
+<a href="../Includes_and_Autodocs_2._guide/node01C4.html">FindPropContext()</a> starts at the parent of the current context (second from
+the top of the context stack) and starts searching downward, looking for
+the first <a href="../Libraries_Manual_guide/node042A.html#line7">FORM</a> or <a href="../Libraries_Manual_guide/node042A.html#line7">LIST</a> context it finds.  If it finds one, it returns a
+pointer to that <a href="../Libraries_Manual_guide/node0446.html">ContextNode</a>.  If it can't find a suitable context level,
+it returns NULL.
+
+<a href="../Includes_and_Autodocs_2._guide/node01C4.html">FindPropContext()</a> is called as follows:
+
+    struct ContextNode *cn;
+
+    cn = FindPropContext (iff);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

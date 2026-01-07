@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/apps/ILBMtoRaw/ILBMtoRaw.c" NODE="MAIN" TITLE="Devices/apps/ILBMtoRaw/ILBMtoRaw.c" -->
+<head>
+<title>Devices/apps/ILBMtoRaw/ILBMtoRaw.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0302.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0304.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*--------------------------------------------------------------*/
+/*								*/
+/* ILBMtoRaw: reads in ILBM, writes out raw file (raw planes, 	*/
+/*  followed by colormap) 					*/
+/*                                                              */
+/* Based on ILBMRaw.c by Jerry Morrison and Steve Shaw,		*/
+/* Electronic Arts.           					*/
+/* Jan 31, 1986							*/
+/*                                                              */
+/* This software is in the public domain.                       */
+/* This version for the Amiga computer.                         */
+/*                                                              */
+/*  Callable from CLI ONLY					*/
+/*  modified 05-91 for use wuth iffparse modules		*/
+/*  Requires linkage with several other modules - see Makefile  */
+/*--------------------------------------------------------------*/
+
+#include &#034;iffp/ilbmapp.h&#034;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+char *vers = &#034;\0$VER: ILBMtoRaw 37.5&#034;;
+char *Copyright = &#034;ILBMtoRaw v37.5 (Freely Redistributable)&#034;;
+
+void bye(UBYTE *s, int e);
+void cleanup(void);
+
+LONG SaveBitMap(UBYTE *name, struct BitMap *bm, SHORT *cols, int ncols);
+
+struct Library *IFFParseBase = NULL;
+struct Library *GfxBase = NULL;
+
+/* ILBM frame */
+struct ILBMInfo ilbm = {0};
+
+
+/* ILBM Property chunks to be grabbed - BMHD and CMAP needed for this app
+ */
+LONG	ilbmprops[] = {
+		ID_ILBM, ID_BMHD,
+		ID_ILBM, ID_CMAP,
+		TAG_DONE
+		};
+
+/* ILBM Collection chunks (more than one in file) to be gathered */
+LONG	*ilbmcollects = NULL;	/* none needed for this app */
+
+/* ILBM Chunk to stop on */
+LONG	ilbmstops[] = {
+		ID_ILBM, ID_BODY,
+		TAG_DONE
+		};
+
+
+/** main() ******************************************************************/
+
+void main(int argc, char **argv)
+    {
+    LONG error=NULL;
+    UBYTE *ilbmname, fname[80], buf[24];
+
+    if ((argc &#060; 2)||(argv[argc-1][0]=='?'))
+	bye(&#034;Usage from CLI: 'ILBMtoRaw filename'\n&#034;,RETURN_OK);
+
+    if(!(GfxBase = OpenLibrary(&#034;graphics.library&#034;,0)))
+	bye(&#034;Can't open graphics.library&#034;,RETURN_FAIL);
+
+    if(!(IFFParseBase = OpenLibrary(&#034;iffparse.library&#034;,0)))
+	bye(&#034;Can't open iffparse.library&#034;,RETURN_FAIL);
+
+/*
+ * Here we set up default ILBMInfo fields for our
+ * application's frames.
+ * Above we have defined the propery and collection chunks
+ * we are interested in (some required like BMHD)
+ */
+    ilbm.ParseInfo.propchks      = ilbmprops;
+    ilbm.ParseInfo.collectchks   = ilbmcollects;
+    ilbm.ParseInfo.stopchks      = ilbmstops;
+    if(!(ilbm.ParseInfo.iff = AllocIFF()))
+    	bye(IFFerr(IFFERR_NOMEM),RETURN_FAIL);	/* Alloc an IFFHandle */
+
+    ilbmname = argv[1];
+
+    /* Load as a brush since we don't need to display it */
+    if (error = loadbrush(&#038;ilbm,ilbmname))
+        {
+        printf(&#034;Can't load ilbm \&#034;%s\&#034;, ifferr=%s\n&#034;,ilbmname,IFFerr(error));
+        bye(&#034;&#034;,RETURN_WARN);
+        }
+    else /* Successfully loaded ILBM */
+	{
+        strcpy(fname,argv[1]);
+
+	if(ilbm.camg &#038; HAM)	strcat(fname, &#034;.ham&#034;);
+	if(ilbm.camg &#038; EXTRA_HALFBRITE)	strcat(fname, &#034;.ehb&#034;);
+
+	if(ilbm.camg &#038; HIRES)	strcat(fname, &#034;.hi&#034;);
+	else strcat(fname, &#034;.lo&#034;);
+
+	if(ilbm.camg &#038; LACE)	strcat(fname, &#034;.lace&#034;);
+
+	strcat(fname,&#034;.&#034;);
+	sprintf(buf,&#034;%d&#034;,ilbm.Bmhd.w);
+	strcat(fname,buf);
+	strcat(fname,&#034;x&#034;);
+	sprintf(buf,&#034;%d&#034;,ilbm.Bmhd.h);
+	strcat(fname,buf);
+	strcat(fname,&#034;x&#034;);
+	sprintf(buf,&#034;%d&#034;,ilbm.brbitmap-&#062;Depth);
+	strcat(fname, buf);
+	printf(&#034; Creating file %s \n&#034;, fname);
+	error=SaveBitMap(fname, ilbm.brbitmap, ilbm.colortable, ilbm.ncolors);
+
+	unloadbrush(&#038;ilbm);
+	}
+
+    if(error)	bye(IFFerr(error),RETURN_WARN);
+    else	bye(&#034;&#034;,RETURN_OK);
+    }
+
+
+/* SaveBitMap (as raw planes and colortable)
+ *
+ * Given filename, bitmap structure, and colortable pointer,
+ * writes out raw bitplanes and colortable (not an ILBM)
+ * Returns 0 for success
+ */
+
+
+LONG SaveBitMap(UBYTE *name, struct BitMap *bm, SHORT *cols, int ncols)
+    {
+    SHORT i;
+    LONG nb,plsize;
+
+    LONG file = Open( name, MODE_NEWFILE);
+    if( file == 0 )
+	{
+	printf(&#034; couldn't open %s \n&#034;,name);
+	return(CLIENT_ERROR);	/* couldnt open a load-file */
+	}
+    plsize = bm-&#062;BytesPerRow*bm-&#062;Rows;
+    for (i=0; i&#060;bm-&#062;Depth; i++)
+	{
+	nb =  Write(file, bm-&#062;Planes[i], plsize);
+	if (nb&#060;plsize) break;
+	}
+    if(nb&#062;0)	nb=Write(file, cols, (1&#060;&#060;bm-&#062;Depth)*2);	/* save color map */
+    Close(file);
+    return(nb &#062;= 0 ? 0L : IFFERR_WRITE);
+    }
+
+void bye(UBYTE *s, int e)
+    {
+    if(s&#038;&#038;(*s))	printf(&#034;%s\n&#034;,s);
+    cleanup();
+    exit(e);
+    }
+
+void cleanup()
+    {
+    if(ilbm.ParseInfo.iff)		FreeIFF(ilbm.ParseInfo.iff);
+
+    if(IFFParseBase)	CloseLibrary(IFFParseBase);
+    if(GfxBase)		CloseLibrary(GfxBase);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

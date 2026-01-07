@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_15" NODE="15-8" TITLE="15 Resources / Misc Resource" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>15 Resources / Misc Resource</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node010F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0111.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The misc resource oversees usage of the serial data port, the serial
+communication bits, the parallel data and handshake port, and the parallel
+communication bits.  Before using serial or parallel port hardware, it
+<a name="line5">first must be acquired from the misc resource.</a>
+
+The misc resource provides two functions for allocating and freeing the
+<a name="line8">serial and parallel hardware.</a>
+
+                             Misc Resource Functions
+                             ------------------------
+     <a href="../Includes_and_Autodocs_2._guide/node054D.html">AllocMiscResource()</a>     Allocate one of the serial or parallel
+                             misc resources.
+
+     <a href="../Includes_and_Autodocs_2._guide/node054E.html">FreeMiscResource()</a>      Deallocate one of the serial or
+                             parallel misc resources.
+
+Once you've successfully allocated one of the misc resources, you are free
+<a name="line19">to write directly to its hardware locations.  Information on the serial</a>
+and parallel hardware can be found in the Amiga <a href="../Hardware_Manual_guide/node017C.html">Hardware Reference Manual</a>
+and the hardware/<a href="../Includes_and_Autodocs_2._guide/node00CD.html">custom.h</a> include file.
+
+The two examples below are assembly and C versions of the same code for
+locking the serial misc resources and waiting for CTRL-C to be pressed
+before releasing them.
+
+     <a href="../Devices_Manual_guide/node01A5.html">Assembly Example Of Allocating Misc Resources</a> 
+     <a href="../Devices_Manual_guide/node0111.html">C Example Of Allocating Misc Resources</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

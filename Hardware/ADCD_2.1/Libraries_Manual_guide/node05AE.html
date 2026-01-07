@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/mapansi.c" NODE="MAIN" TITLE="Lib_examples/mapansi.c" -->
+<head>
+<title>Lib_examples/mapansi.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05AD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05AF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* mapansi.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 mapansi.c
+Blink FROM LIB:c.o,mapansi.o TO mapansi LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+
+mapansi.c - converts a string to input events using MapANSI() function.
+
+            This example will also take the created input events
+            and add them to the input stream using the simple
+            commodities.library function AddIEvents().  Alternately,
+            you could open the input.device and use the input device
+            command IND_WRITEEVENT to add events to the input stream.
+*/
+
+#include       &#060;exec/types.h&#062;
+#include       &#060;exec/memory.h&#062;
+#include       &#060;exec/io.h&#062;
+#include       &#060;dos/dos.h&#062;
+#include       &#060;devices/input.h&#062;
+#include       &#060;devices/inputevent.h&#062;
+
+#include       &#060;clib/exec_protos.h&#062;
+#include       &#060;clib/dos_protos.h&#062;
+#include       &#060;clib/keymap_protos.h&#062;
+#include       &#060;clib/commodities_protos.h&#062;
+
+#include       &#060;stdio.h&#062;
+#include       &#060;stdlib.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)  { return(0); }  /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }  /* really */
+#endif
+
+struct Library          *KeymapBase = NULL;       /* MapAnsi() function    */
+struct Library          *CxBase = NULL;           /* AddIEvents() function */
+
+struct InputEvent       *InputEvent = NULL;       /* we'll allocate this */
+
+/* prototypes for our program functions */
+
+void openall(void);
+void closeall(void);
+void closeout(UBYTE *errstring, LONG rc);
+
+void main(int argc, char **argv)
+{
+    UBYTE               *string;
+    UBYTE               *tmp1;
+    UBYTE               *tmp2;
+    UBYTE               iebuffer[6];            /* Space for two dead keys */
+                                                /* + 1 key + qualifiers    */
+    COUNT               i;
+    LONG                rc = 0;
+
+
+    openall();
+
+    string = &#034;;String converted to input events and sent to input device\n&#034;;
+
+    InputEvent-&#062;ie_Class = IECLASS_RAWKEY;
+
+    /* Turn each character into an InputEvent */
+    tmp1 = string;
+
+    while (*tmp1)
+    {
+        /* Convert one character, use default key map */
+        i = MapANSI(tmp1, 1, iebuffer, 3, NULL);
+
+        /* Make sure we start without deadkeys */
+        InputEvent-&#062;ie_Prev1DownCode = InputEvent-&#062;ie_Prev1DownQual = 0;
+        InputEvent-&#062;ie_Prev2DownCode = InputEvent-&#062;ie_Prev2DownQual = 0;
+
+        tmp2 = iebuffer;
+
+        switch (i)
+        {
+          case -2:
+            printf(&#034;Internal error\n&#034;, NULL);
+            rc = RETURN_FAIL;
+            break;
+
+          case -1:
+            printf(&#034;Overflow\n&#034;, NULL);
+            rc = RETURN_FAIL;
+            break;
+
+          case 0:
+            printf(&#034;Can't generate code\n&#034;, NULL);
+            break;
+
+          case 3:
+            InputEvent-&#062;ie_Prev2DownCode = *tmp2++;
+            InputEvent-&#062;ie_Prev2DownQual = *tmp2++;
+            /* FALL THROUGH */
+
+          case 2:
+            InputEvent-&#062;ie_Prev1DownCode = *tmp2++;
+            InputEvent-&#062;ie_Prev1DownQual = *tmp2++;
+            /* FALL THROUGH */
+
+          case 1:
+            InputEvent-&#062;ie_Code = *tmp2++;
+            InputEvent-&#062;ie_Qualifier = *tmp2;
+            break;
+        }
+
+        if (rc == RETURN_OK)
+        {
+            /* Send the key down event */
+            AddIEvents(InputEvent);
+
+            /* Create a key up event */
+            InputEvent-&#062;ie_Code |= IECODE_UP_PREFIX;
+
+            /* Send the key up event */
+            AddIEvents(InputEvent);
+         }
+
+        if (rc != RETURN_OK)
+            break;
+
+        tmp1++;
+    }
+
+    closeall();
+    exit(rc);
+}
+
+void openall(void)
+{
+    KeymapBase = OpenLibrary(&#034;keymap.library&#034;, 37);
+    if (KeymapBase == NULL)  closeout(&#034;Kickstart 2.0 required&#034;, RETURN_FAIL);
+
+    CxBase = OpenLibrary(&#034;commodities.library&#034;, 37);
+    if (CxBase == NULL)  closeout(&#034;Kickstart 2.0 required&#034;, RETURN_FAIL);
+
+    InputEvent = AllocMem(sizeof(struct InputEvent), MEMF_CLEAR);
+    if (InputEvent == NULL)  closeout(&#034;Can't allocate input event&#034;,RETURN_FAIL);
+}
+
+void closeall()
+{
+    if (InputEvent)    FreeMem(InputEvent, sizeof(struct InputEvent));
+    if (CxBase)        CloseLibrary(CxBase);
+    if (KeymapBase)    CloseLibrary(KeymapBase);
+}
+
+void closeout(UBYTE *errstring, LONG rc)
+{
+    if(*errstring)     printf(&#034;%s\n&#034;,errstring);
+    closeall();
+    exit(rc);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

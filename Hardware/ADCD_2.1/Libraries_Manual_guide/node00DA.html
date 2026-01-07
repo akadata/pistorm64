@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-1-2" TITLE="3 / Types of Screens / Public Screens and Custom Screens" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Types of Screens / Public Screens and Custom Screens</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00D9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00DB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An application may choose to use an existing screen or to create its own
+screen.  For instance, the normal Amiga startup process opens the
+Workbench screen (<a href="../Libraries_Manual_guide/node0237.html">Workbench</a> is the Amiga's default user interface).  Any
+application is free to use the Workbench screen instead of opening a new
+one.  Screens that can be shared this way are called public screens.
+
+<a href="../Libraries_Manual_guide/node00E6.html">Public screens</a> are a new feature of Release 2 (V36).  In older <a href="../Libraries_Manual_guide/node0014.html">versions</a> of
+the OS, only the Workbench screen could be shared.  Now any screen may be
+set up as a public screen so that other applications may use it.
+
+The use of an existing public screen, like the Workbench screen, requires
+little effort by the application and does not use up any memory.  However,
+using  Workbench or another existing public screen means some flexibility
+is lost; the resolution, maximum number of colors and other attributes are
+already set.  If the application cannot function under these limitations,
+it may open its own custom screen.
+
+<a href="../Libraries_Manual_guide/node00DF.html">Custom screens</a> allow for complete control of the display space so an
+application can get exactly the kind of display it wants.  However, since
+creating a new, custom screen uses up memory, they should only be used
+when there are no suitable public screens available.
+
+Owners of a custom screen can keep their screen private, or they may allow
+other applications to share their screen by <a href="../Libraries_Manual_guide/node00E9.html">registering</a> the screen with
+the operating system as a public screen.  See the section on
+&#034;<a href="../Libraries_Manual_guide/node00E8.html">Public Screen Functions</a>&#034; later in this chapter for more about public
+screens and Workbench.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

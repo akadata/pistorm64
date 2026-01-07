@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="CreatePool()" TITLE="exec.library/CreatePool" -->
+<head>
+<title>exec.library/CreatePool</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01FC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01FE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	CreatePool -- Generate a private memory pool header (V39)
+
+<b>    SYNOPSIS</b>
+	newPool=CreatePool(memFlags,puddleSize,threshSize)
+	d0                 d0       d1         d2
+
+	void *CreatePool(ULONG,ULONG,ULONG);
+
+<b>    FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> and prepare a new memory pool header.	Each pool is a
+	separate tracking system for memory of a specific type.  Any number
+	of pools may exist in the system.
+
+	Pools automatically expand and shrink based on demand.	Fixed sized
+	&#034;puddles&#034; are allocated by the pool manager when more total memory
+	is needed.  Many small allocations can fit in a single puddle.
+	Allocations larger than the threshSize are allocation in their own
+	puddles.
+
+	At any time individual allocations may be freed.  Or, the entire
+	pool may be removed in a single step.
+
+<b>    INPUTS</b>
+	memFlags - a memory flags specifier, as taken by <a href="../Includes_and_Autodocs_3._guide/node01E7.html">AllocMem</a>.
+	puddleSize - the size of Puddles...
+	threshSize - the largest allocation that goes into normal puddles
+	             This *MUST* be less than or equal to puddleSize
+	             (CreatePool() will fail if it is not)
+
+<b>    RESULT</b>
+	The address of a new pool header, or NULL for error.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0202.html">DeletePool()</a>, <a href="../Includes_and_Autodocs_3._guide/node01E8.html">AllocPooled()</a>, <a href="../Includes_and_Autodocs_3._guide/node020F.html">FreePooled()</a>, exec/memory.i
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

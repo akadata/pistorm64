@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-4-3-1" TITLE="33 / / Management Functions / CollectionChunk() and FindCollection()" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / / Management Functions / CollectionChunk() and FindCollection()</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0436.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0438.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Libraries_Manual_guide/node0434.html">PropChunk()</a> keeps only one copy of the declared chunk (the one currently
+in scope).  <a href="../Includes_and_Autodocs_2._guide/node01BC.html">CollectionChunk()</a> collects and keeps all instances of a
+specified chunk.  This is useful for chunks such as the <a href="../Libraries_Manual_guide/node045D.html#line8">ILBM</a> CRNG chunk,
+which can appear multiple times in a <a href="../Libraries_Manual_guide/node042A.html#line7">FORM</a>, and which don't override
+previous instances of themselves.  CollectionChunk() is called identically
+to PropChunk():
+
+<a name="line9">    error = CollectionChunk (iff, type, id);</a>
+
+When you wish to find the collected chunks currently in scope, you use the
+function <a href="../Includes_and_Autodocs_2._guide/node01C1.html">FindCollection()</a>:
+
+<a name="line14">    ci = FindCollection (iff, type, id);</a>
+
+You will be returned a pointer to a <a href="../Includes_and_Autodocs_2._guide/node010B.html#line99">CollectionItem</a>, which is part of a
+singly-linked list of all copies of the specified chunk collected so far
+that are currently in scope.
+
+    struct CollectionItem {
+            struct CollectionItem   *ci_Next;
+            LONG                    ci_Size;
+            UBYTE                   *ci_Data;
+    };
+
+The size of this copy of the chunk is in the CollectionItem's ci_Size
+field.  The ci_Data field points to the chunk data itself.  The ci_Next
+field points to the next CollectionItem in the list.  The last element in
+the list has ci_Next set to NULL.
+
+The most recently-encountered instance of the chunk will be first in the
+list, followed by earlier chunks.  Some might consider this ordering
+backwards.
+
+If NULL is returned, the specified chunk was never encountered.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

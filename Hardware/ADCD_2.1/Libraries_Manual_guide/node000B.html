@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_1" NODE="1-1-1-1" TITLE="1 / / Multitasking / What the System Does For You" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>1 / / Multitasking / What the System Does For You</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node000A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node000C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Amiga uses preemptive <a href="../Libraries_Manual_guide/node0287.html">multitasking</a> which means that the operating
+system keeps track of all the tasks in memory and decides which one should
+run.  The system checks hundreds of times per second to see which task
+should be run based on whether or not it is waiting, and other factors.
+Since the system handles all the work of task switching, multitasking is
+transparent to the application.  From the application's point of view, it
+appears to have the machine all to itself.
+
+The Amiga OS also manages the sharing of resources between tasks.  This is
+important because in order for a variety of tasks to run independently in
+the Amiga's <a href="../Libraries_Manual_guide/node0287.html">multitasking</a> environment, tasks must be prevented from
+interfering with one another.  Imagine if five tasks were allowed to use
+the parallel port at the same time.  The result would be I/O chaos.  To
+prevent this, the operating system provides an arbitration method (usually
+a function call) for every system resource.  For instance you must call a
+function, <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a>, to get exclusive access to a block of memory.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

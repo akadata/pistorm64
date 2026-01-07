@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/filereq.c" NODE="MAIN" TITLE="Lib_examples/filereq.c" -->
+<head>
+<title>Lib_examples/filereq.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node057E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0580.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* filereq.c - Execute me to compile me with SASC 5.10
+LC -b1 -cfistq -v -y -j73 filereq.c
+Blink FROM LIB:c.o,filereq.o TO filereq LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+**
+** Here's a short example showing how to create a file requester with
+** asl.library.  If AslRequest() returns TRUE then the rf_File and
+** rf_Dir fields of the requester data structure contain the name and
+** directory of the file the user selected.  Note that the user can type
+** in the a name for the file and directory, which makes it possible for
+** a file requester to return a file and directory that do not
+** (currently) exist.
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;exec/libraries.h&#062;
+#include &#060;libraries/asl.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/asl_protos.h&#062;
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)     { return(0); }  /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }     /* really */
+#endif
+
+UBYTE *vers = &#034;$VER: filereq 37.0&#034;;
+
+#define MYLEFTEDGE 0
+#define MYTOPEDGE  0
+#define MYWIDTH    320
+#define MYHEIGHT   400
+
+struct Library *AslBase = NULL;
+
+struct TagItem frtags[] =
+{
+    ASL_Hail,       (ULONG)&#034;The RKM file requester&#034;,
+    ASL_Height,     MYHEIGHT,
+    ASL_Width,      MYWIDTH,
+    ASL_LeftEdge,   MYLEFTEDGE,
+    ASL_TopEdge,    MYTOPEDGE,
+    ASL_OKText,     (ULONG)&#034;O KAY&#034;,
+    ASL_CancelText, (ULONG)&#034;not OK&#034;,
+    ASL_File,       (ULONG)&#034;asl.library&#034;,
+    ASL_Dir,        (ULONG)&#034;libs:&#034;,
+    TAG_DONE
+};
+
+void main(int argc, char **argv)
+{
+    struct FileRequester *fr;
+
+    if (AslBase = OpenLibrary(&#034;asl.library&#034;, 37L))
+    {
+        if (fr = (struct FileRequester *)
+            AllocAslRequest(ASL_FileRequest, frtags))
+        {
+            if (AslRequest(fr, NULL))
+            {
+                printf(&#034;PATH=%s  FILE=%s\n&#034;, fr-&#062;rf_Dir, fr-&#062;rf_File);
+                printf(&#034;To combine the path and filename, copy the path\n&#034;);
+                printf(&#034;to a buffer, add the filename with Dos AddPart().\n&#034;);
+            }
+            FreeAslRequest(fr);
+        }
+        else printf(&#034;User Cancelled\n&#034;);
+
+        CloseLibrary(AslBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

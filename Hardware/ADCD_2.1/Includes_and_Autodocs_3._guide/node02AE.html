@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="AttachPalExtra()" TITLE="graphics.library/AttachPalExtra" -->
+<head>
+<title>graphics.library/AttachPalExtra</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02AD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02AF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       AttachPalExtra -- <a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> and attach a palette sharing structure to a
+
+	                  colormap. (V39)
+
+
+<b>   SYNOPSIS</b>
+       status=AttachPalExtra( cm, vp)
+	                       a0  a1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> AttachPalExtra( Struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *);
+
+<b>   FUNCTION</b>
+	Allocates and attaches a PalExtra structure to a <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a>.
+	This is necessary for color palette sharing to work. The
+	PalExtra structure will be freed by <a href="../Includes_and_Autodocs_3._guide/node02D7.html">FreeColorMap()</a>.
+	The set of available colors will be determined by the mode
+	and depth of the viewport.
+
+<b>   INPUTS</b>
+	cm  =  A pointer to a color map created by <a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a>.
+
+	vp   = A pointer to the viewport structure associated with
+	       the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a>.
+
+<b>   RESULTS</b>
+	status - 0 if sucessful, else an error number. The only currently
+	         defined error number is out of memory (1).
+
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+	This function is for use with custom ViewPorts and custom ColorMaps,
+	as Intuition attaches a PalExtra to all of its Screens.
+	If there is already a PalExtra associated with the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a>, then
+	this function will do nothing.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a> <a href="../Includes_and_Autodocs_3._guide/node02D7.html">FreeColorMap()</a> <a href="../Includes_and_Autodocs_3._guide/node0307.html">ObtainPen()</a> <a href="../Includes_and_Autodocs_3._guide/node0306.html">ObtainBestPenA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

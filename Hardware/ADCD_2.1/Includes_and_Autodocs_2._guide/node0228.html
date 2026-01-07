@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="MakeScreen()" TITLE="intuition.library/MakeScreen" -->
+<head>
+<title>intuition.library/MakeScreen</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0227.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0229.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    MakeScreen -- Do an Intuition-integrated <a href="../Includes_and_Autodocs_2._guide/node045B.html">MakeVPort()</a> of a screen.
+
+SYNOPSIS
+    MakeScreen( <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> )
+                A0
+
+    VOID MakeScreen( struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> * );
+
+FUNCTION
+    This procedure allows you to do a <a href="../Includes_and_Autodocs_2._guide/node045B.html">MakeVPort()</a> for the viewport of your
+    custom screen in an Intuition-integrated way.  This way you can
+    do your own screen manipulations without worrying about interference
+    with Intuition's usage of the same viewport.
+
+    The operation of this function is as follows:
+        - Block until the Intuition <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">View</a> structure is not in being changed.
+        - Set the view modes correctly to reflect if there is a (visible)
+          interlaced screen.
+        - call <a href="../Includes_and_Autodocs_2._guide/node045B.html">MakeVPort()</a>, passing the Intuition <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">View</a> and your screen's
+          <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a>.
+        - Unlocks the Intuition <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">View</a>.
+
+    After calling this routine, you should call <a href="../Includes_and_Autodocs_2._guide/node024B.html">RethinkDisplay()</a> to
+    incorporate the new viewport of your custom screen into the
+    Intuition display.
+
+    NOTE: Intuition may determine that because of a change in global
+    interlace needs that all viewports need to be remade, so
+    it may effectively call <a href="../Includes_and_Autodocs_2._guide/node0244.html">RemakeDisplay()</a>.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> = address of the custom screen structure
+
+RESULT
+    None
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node024B.html">RethinkDisplay()</a>, <a href="../Includes_and_Autodocs_2._guide/node0244.html">RemakeDisplay()</a>, <a href="../Includes_and_Autodocs_2._guide/node045B.html">graphics.library/MakeVPort()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

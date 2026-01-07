@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-3" TITLE="5 Intuition Gadgets / Gadget Selection" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 Intuition Gadgets / Gadget Selection</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0138.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node013A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The user operates a gadget by pressing the select button while the mouse
+pointer is within the gadget's select box.  Intuition provides two ways of
+notifying your program about the user operating a gadget.  If your
+application needs immediate notification when the gadget is chosen, set
+the <a href="../Libraries_Manual_guide/node014B.html#line9">GACT_IMMEDIATE</a> flag in the gadget's <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field.  Intuition will
+send an <a href="../Libraries_Manual_guide/node01DD.html">IDCMP_GADGETDOWN</a> message to the window's <a href="../Libraries_Manual_guide/node01D6.html#line16">UserPort</a> when it detects
+<a name="line8">the mouse select button being pressed on the gadget.</a>
+
+If the application needs notification when the gadget is released, i.e.,
+when the user releases the mouse select button, set the <a href="../Libraries_Manual_guide/node014B.html#line14">GACT_RELVERIFY</a>
+(for &#034;release verify&#034;) flag in the gadget's <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field.  For <a href="../Libraries_Manual_guide/node014C.html">boolean</a>
+gadgets, Intuition will send an <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> message to the window's
+<a href="../Libraries_Manual_guide/node01D6.html#line16">UserPort</a> when the mouse select button is released over a GACT_RELVERIFY
+gadget.  The program will only receive the IDCMP_GADGETUP message if the
+user still has the pointer positioned over the select box of the gadget
+when the mouse select button is released.
+
+If the user moves the mouse out of the gadget's select box before
+releasing the mouse button an <a href="../Libraries_Manual_guide/node01DC.html">IDCMP_MOUSEBUTTONS</a> event will be sent with a
+code of SELECTUP.  This indicates the user's desire to not proceed with
+the action.  <a href="../Libraries_Manual_guide/node014C.html">Boolean</a> gadgets that are <a href="../Libraries_Manual_guide/node014B.html#line14">GACT_RELVERIFY</a> allow the user a
+chance to cancel a selection by rolling the mouse off of the gadget before
+<a name="line24">releasing the select button.</a>
+
+<a href="../Libraries_Manual_guide/node0164.html">String</a> gadgets have a slightly different behavior, in that they remain
+active after the mouse button has been released.  The gadget remains
+active until Return or Enter is pressed, the user tabs to the next or
+previous gadget, another window becomes active or the user chooses another
+object with the mouse.  An <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> message is only sent for
+<a href="../Libraries_Manual_guide/node014B.html#line14">GACT_RELVERIFY</a> string gadgets if the user ends the gadget interaction
+through the Return, Enter or (if activated) one of the tab keys.
+
+<a href="../Libraries_Manual_guide/node014B.html#line14">GACT_RELVERIFY</a> <a href="../Libraries_Manual_guide/node0153.html">proportional</a> gadgets send <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> events even if the
+mouse button is released when the pointer is not positioned over the
+<a name="line36">select box of the gadget.</a>
+
+Gadgets can specify both the <a href="../Libraries_Manual_guide/node014B.html#line9">GACT_IMMEDIATE</a> and <a href="../Libraries_Manual_guide/node014B.html#line14">GACT_RELVERIFY</a> activation
+types, in which case, the program will receive both <a href="../Libraries_Manual_guide/node01DD.html">IDCMP_GADGETDOWN</a> and
+<a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> messages.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

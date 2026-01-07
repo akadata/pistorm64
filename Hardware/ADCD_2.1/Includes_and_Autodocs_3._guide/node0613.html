@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/diskfont/glyph.h" NODE="MAIN" TITLE="include/diskfont/glyph.h" -->
+<head>
+<title>include/diskfont/glyph.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0612.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0614.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef  DISKFONT_GLYPH_H
+#define  DISKFONT_GLYPH_H
+/*
+**	$VER: glyph.h 9.1 (19.6.1992)
+**	Includes Release 44.1
+**
+**	glyph.h -- structures for glyph libraries
+**
+**	(C) Copyright 1991-1992 Robert R. Burns
+**	    All Rights Reserved
+*/
+
+#ifndef  EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+
+#ifndef  EXEC_LIBRARIES_H
+#include &#060;exec/libraries.h&#062;
+#endif
+
+#ifndef  EXEC_NODES_H
+#include &#060;exec/nodes.h&#062;
+#endif
+
+<a name="line25">/* A GlyphEngine must be acquired via OpenEngine and is read-only */</a>
+struct GlyphEngine {
+    struct Library *gle_Library; /* engine library */
+    char *gle_Name;		/* library basename: e.g. &#034;bullet&#034; */
+    /* private library data follows... */
+};
+
+typedef LONG FIXED;		/* 32 bit signed w/ 16 bits of fraction */
+<a name="line33"></a>
+struct GlyphMap {
+    UWORD   glm_BMModulo;	/* # of bytes in row: always multiple of 4 */
+    UWORD   glm_BMRows;		/* # of rows in bitmap */
+    UWORD   glm_BlackLeft;	/* # of blank pixel columns at left */
+    UWORD   glm_BlackTop;	/* # of blank rows at top */
+    UWORD   glm_BlackWidth;	/* span of contiguous non-blank columns */
+    UWORD   glm_BlackHeight;	/* span of contiguous non-blank rows */
+    FIXED   glm_XOrigin;	/* distance from upper left corner of bitmap */
+    FIXED   glm_YOrigin;	/*   to initial CP, in fractional pixels */
+    WORD    glm_X0;		/* approximation of XOrigin in whole pixels */
+    WORD    glm_Y0;		/* approximation of YOrigin in whole pixels */
+    WORD    glm_X1;		/* approximation of XOrigin + Width */
+    WORD    glm_Y1;		/* approximation of YOrigin + Width */
+    FIXED   glm_Width;		/* character advance, as fraction of em width */
+    UBYTE  *glm_BitMap;		/* actual glyph bitmap */
+};
+<a name="line50"></a>
+struct GlyphWidthEntry {
+    struct MinNode gwe_Node;	/* on list returned by OT_WidthList inquiry */
+    UWORD   gwe_Code;		/* entry's character code value */
+    FIXED   gwe_Width;		/* character advance, as fraction of em width */
+};
+#endif	 /* DISKFONT_GLYPH_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

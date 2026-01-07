@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-4-1-2" TITLE="33 / / Controlling Parsing / PropChunk()/FindProp()" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / / Controlling Parsing / PropChunk()/FindProp()</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0433.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0435.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In the case of a <a href="../Libraries_Manual_guide/node045D.html#line8">FORM ILBM</a>, certain chunks are defined as being able to
+appear in any order.  Among these are the <a href="../Libraries_Manual_guide/node0461.html#line3">BMHD</a>, <a href="../Libraries_Manual_guide/node0461.html#line16">CMAP</a>, and <a href="../Libraries_Manual_guide/node0461.html#line7">CAMG</a>. Typically,
+BMHD appears first, followed by CMAP and CAMG, but you can't make this
+assumption.  The <a href="../Libraries_Manual_guide/node0428.html">IFF</a> and ILBM standards require you to assume these chunks
+will appear in any order.  So ideally, what you'd like to do is collect
+them as they arrive, but not do anything with them until you actually need
+<a name="line8">them.</a>
+
+This is where <a href="../Includes_and_Autodocs_2._guide/node01D3.html">PropChunk()</a> comes in.  The syntax for PropChunk() is
+identical to <a href="../Libraries_Manual_guide/node0433.html">StopChunk()</a>:
+
+    error = PropChunk (iff, ID_ILBM, ID_BMHD);
+
+When you call <a href="../Includes_and_Autodocs_2._guide/node01D1.html">ParseIFF()</a>, the parser will look for chunks declared with
+<a href="../Includes_and_Autodocs_2._guide/node01D3.html">PropChunk()</a>.  When it sees them, the parser will internally copy the
+<a name="line17">contents of the chunk into memory for you before continuing its parsing.</a>
+
+When you're ready to examine the contents of the chunk, you use the
+function <a href="../Includes_and_Autodocs_2._guide/node01C3.html">FindProp()</a>:
+
+    StoredProperty = FindProp (iff, ID_ILBM, ID_BMHD);
+
+<a href="../Includes_and_Autodocs_2._guide/node01C3.html">FindProp()</a> returns a pointer to a struct <a href="../Includes_and_Autodocs_2._guide/node010B.html#line90">StoredProperty</a>, which contains
+the chunk size and data.  If the chunk was never encountered, NULL is
+returned.  This permits you to process the property chunks in any order
+you wish, regardless of how they appeared in the file.  This provides much
+better control of data interpretation and also reduces headaches.  The
+following fragment shows how <a href="../Libraries_Manual_guide/node045F.html">ILBM BitMapHeader</a> data could be accessed
+after using <a href="../Includes_and_Autodocs_2._guide/node01D1.html">ParseIFF()</a> with <a href="../Includes_and_Autodocs_2._guide/node01D3.html">PropChunk</a>(iff, ID_ILBM, ID_BMHD):
+
+    struct StoredProperty *sp;      /* defined in iffparse.h */
+    struct BitMapHeader *bmhd;      /* defined in IFF spec   */
+
+    if (sp = FindProp(iff, ID_ILBM, ID_BMHD))
+            {
+            /* If property is BMHD, sp-&#062;sp_Data is ptr to data in BMHD */
+            bmhd = (struct BitMapHeader *)sp-&#062;sp_Data;
+            printf(&#034;BMHD: PageWidth      = %ld\n&#034;,bmhd-&#062;PageWidth);
+            }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

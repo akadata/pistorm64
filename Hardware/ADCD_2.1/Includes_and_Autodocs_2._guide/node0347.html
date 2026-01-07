@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="Debug()" TITLE="exec.library/Debug" -->
+<head>
+<title>exec.library/Debug</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0346.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0348.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Debug -- run the system debugger
+
+SYNOPSIS
+    Debug(flags)
+          D0
+
+    void Debug(ULONG);
+
+FUNCTION
+    This function calls the system debugger.  By default this debugger
+    is &#034;ROM-WACK&#034;.  Other debuggers are encouraged to take over this
+    entry point (via <a href="../Includes_and_Autodocs_2._guide/node037C.html">SetFunction()</a>) so that when an application calls
+    Debug(), the alternative debugger will get control.  Currently a
+    zero is passed to allow future expansion.
+
+NOTE
+    The Debug() call may be made when the system is in a questionable
+    state; if you have a <a href="../Includes_and_Autodocs_2._guide/node037C.html">SetFunction()</a> patch, make few assumptions, be
+    prepared for <a href="../Includes_and_Autodocs_2._guide/node0386.html">Supervisor</a> mode, and be aware of differences in the
+    Motorola stack frames on the 68000,'10,'20, and '30.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node037C.html">SetFunction</a>
+    your favorite debugger's manual
+    the ROM-WACK chapter of the ROM Kernel Manual
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

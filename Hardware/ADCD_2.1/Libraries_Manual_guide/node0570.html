@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_E" NODE="E-2-16" TITLE="E / Release 2 Changes That Can Affect Compatibility / Graphics" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>E / Release 2 Changes That Can Affect Compatibility / Graphics</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node056F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0571.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+  * Do not rely on the order of Copper list instructions.  The Release 2
+    <a href="../Libraries_Manual_guide/node038E.html">MrgCop()</a> function builds different Copper lists to that of 1.3, by
+    including new registers in the list (e.g., MOVE xxxx,DIWHIGH).  This
+    changes the positions of  the  other  instructions.  We  know  of one
+    game that 'assumes' the BPLxPTRs  would be at a certain offset in the
+    Copper list, and that is now broken on machines running 2.0 with the
+    new Denise chip.
+
+  * Graphics and layers functions which use the blitter generally return
+    after starting the final blit.  If you are mixing graphics rendering
+    calls and processor access of the same memory, you must <a href="../Libraries_Manual_guide/node0368.html">WaitBlit()</a>
+    before touching (or deallocating) the source or destination memory
+    with the processor.  For example, the <a href="../Libraries_Manual_guide/node03D5.html">Text()</a> function is faster in
+    Release 2, causing some programs to trash partial lines of text.
+
+  * <a href="../Libraries_Manual_guide/node00F5.html">ColorMap</a> structure is bigger.  Programs must use <a href="../Libraries_Manual_guide/node0331.html">GetColorMap()</a> to
+    create one.
+
+  * Blitter rtns decide ascend/descend on 1st plane only.
+
+  * Changing the display mode of an existing screen or viewport while
+    open is still not a supported operation.
+
+  * <a href="../Includes_and_Autodocs_2._guide/node00AE.html#line46">GfxBase DisplayFlags</a> and row/cols may not match Workbench screen.
+
+  * Do not hardcode modulo values - use <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap-&#062;BytesPerRow</a>.
+
+  * If the graphics Autodocs say that you need a <a href="../Libraries_Manual_guide/node034D.html#line32">TmpRas</a> of a certain size
+    for some functions, then you must make that the minimum size.  In
+    some cases, before 2.0, you may have gotten away with using a smaller
+    TmpRas with some functions (for example <a href="../Libraries_Manual_guide/node035E.html#line9">Flood()</a>).  To be more robust,
+    graphics now checks the TmpRas size and will fail the function call
+    if the TmpRas is too small.
+
+  * ECS chips under 2.0 generate displays differently. The display window
+    registers now control DMA.
+
+  * <a href="../Libraries_Manual_guide/node0331.html">LoadRGB4()</a> used to poke colors into the active copperlist with no
+    protection against deallocation of that copperlist while it was being
+    poked.  Under 2.0, semaphore protection of the copperlist was added
+    to LoadRGB4() which makes it totally incorrect and extremely
+    dangerous to call LoadRGB4() during an interrupt.  The general
+    symptom of this problem is that a system deadlock can be caused by
+    dragging one screen up and down while another is cycling.  Color
+    cycling should be performed from within a task, not an interrupt.  In
+    general, the only functions which may be safely called from within an
+    interrupt are the small list of Exec functions documented in the
+    &#034;<a href="../Libraries_Manual_guide/node030F.html">Exec Interrupts</a>&#034; chapter.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_7" NODE="7-4-1" TITLE="7 / Amiga Reset Handling / Adding A Reset Handler (KBD_ADDRESETHANDLER)" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>7 / Amiga Reset Handling / Adding A Reset Handler (KBD_ADDRESETHANDLER)</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0102.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0104.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node050D.html">KBD_ADDRESETHANDLER</a> command adds a custom routine to the chain of
+reset-handlers.  Reset handlers are just like any other handler and are
+added to the handler list with an <a href="../Includes_and_Autodocs_2._guide/node008C.html#line23">Interrupt</a> structure.  The priority field
+in the list node of the Interrupt structure establishes the sequence in
+which reset handlers are processed by the system.  Keyboard reset handlers
+are currently limited to the priority values of a software interrupt, that
+is, values of -32, -16, 0, 16, and 32.
+
+The io_Data field of the I/O request is filled in with a pointer to the
+<a href="../Includes_and_Autodocs_2._guide/node008C.html#line23">Interrupt</a> structure and the io_Command field is set to
+<a href="../Includes_and_Autodocs_2._guide/node050D.html">KBD_ADDRESETHANDLER</a>.  These are the only two fields you need to initialize
+to add a reset handler.  Any return value from the command is ignored.
+All keyboard reset handlers are activated if time permits.  Normally, a
+reset handler will just signal the requisite task and return.  The task
+then does whatever processing it needs to do and notifies the system that
+it is done by using the KBD_RESETHANDLERDONE command described below.
+
+   Non-interference and speed are the keys to success.
+   ---------------------------------------------------
+   If you add your own handler to the chain, you must ensure that your
+   handler allows the rest of reset processing to occur.  Reset must
+   continue to function.  Also, if you don't execute your reset code
+   fast enough, the system will still reboot (about 10 seconds).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

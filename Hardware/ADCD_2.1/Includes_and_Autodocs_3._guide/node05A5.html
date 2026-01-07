@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="utility" NODE="MapTags()" TITLE="utility.library/MapTags" -->
+<head>
+<title>utility.library/MapTags</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05A4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05A6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	MapTags	-- convert ti_Tag values in a list via map pairing. (V36)
+
+<b>   SYNOPSIS</b>
+	MapTags(tagList,mapList,mapType);
+		A0	A1      D0
+
+	VOID MapTags(struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *,struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *,ULONG);
+
+<b>   FUNCTION</b>
+	Apply a &#034;mapping list&#034; mapList to tagList.
+
+	If the ti_Tag field of an item in tagList appears as ti_Tag in some
+	item in mapList, overwrite ti_Tag with the corresponding ti_Data
+	from the map list.
+
+	The mapType parameter specifies how the mapping operation is to
+	proceed, with the following available types:
+
+		MAP_REMOVE_NOT_FOUND
+		If a tag in tagList does not appear in the mapList, remove
+		it from tagList.
+
+		MAP_KEEP_NOT_FOUND
+		To have items which do not appear in the mapList survive the
+		mapping process as-is.
+
+	MapTags() is central to BOOPSI gadget interconnections where you want
+	to convert the tag values from one space (the sender) to another (the
+	receiver).
+
+	The procedure will change the values of the input tag list
+	tagList (but not mapList).
+
+	You can &#034;filter&#034; a list by passing MAP_REMOVE_NOT_FOUND as mapType,
+	and having the data items in mapList equal the corresponding tags.
+
+	You can perform the inverse filter (&#034;everything but&#034;) by passing
+	a mapType of MAP_KEEP_NOT_FOUND, and creating a map item for every tag
+	you want to filter out, pairing it with a mapped data value of
+	TAG_IGNORE.
+
+	For safety and &#034;order independence&#034; of tag item arrays, if you
+	attempt to map some tag to the value TAG_DONE, the value TAG_IGNORE
+	will be substituted instead.
+
+<b>   INPUTS</b>
+	tagList	- input list of tag items which is to be mapped to tag values
+		  as specified in mapList.
+	mapList - a &#034;mapping list&#034; tag list which pairs tag values expected to
+		  appear in tagList with new values to be substituted in the
+		  ti_Tag fields of tagList (may be NULL)
+	mapType - one of the available mapping types as defined in
+		  <a href="../Includes_and_Autodocs_3._guide/node064C.html">&#060;utility/tagitem.h&#062;</a>
+
+<b>   EXAMPLE</b>
+	/* Consider this source list: */
+	    struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> list[] =
+	    {
+		{MY_SIZE, 	71},
+		{MY_WEIGHT, 	200},
+		{TAG_DONE,	}
+           };
+
+	/* And the mapping list: */
+	    struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> map[] =
+	    {
+		{MY_SIZE, 	HIS_TALL},
+		{TAG_DONE,	}
+	    };
+
+	/* Then after MapTags(list,map,MAP_REMOVE_NOT_FOUND), 'list' will
+	   become: */
+		{HIS_TALL,71},
+		{TAG_IGNORE,},
+		{TAG_DONE,}
+
+	/* Or after MapTags(list,map,MAP_KEEP_NOT_FOUND), 'list' will
+	   become: */
+		{HIS_TALL,  71},
+		{MY_WEIGHT, 200},
+		{TAG_DONE,  }
+
+<b>   BUGS</b>
+	Prior to V39, the mapType parameter did not work. The function
+	always behaved as if the parameter was set to MAP_KEEP_NOT_FOUND.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node064C.html">&#060;utility/tagitem.h&#062;</a>, <a href="../Includes_and_Autodocs_3._guide/node0597.html">ApplyTagChanges()</a>, <a href="../Includes_and_Autodocs_3._guide/node059D.html">FilterTagChanges()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

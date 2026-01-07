@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_9" NODE="9-1" TITLE="9 Intuition Input and Output Methods / Overview of System I/O" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>9 Intuition Input and Output Methods / Overview of System I/O</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01CE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01D0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This section provides a very simplified model of how Amiga I/O and
+application programs interact.  The main elements of the Amiga's I/O
+system are shown in the diagram below.  Input events begin when mouse
+movement is detected by the gameport device or key presses are received by
+the keyboard device.  These and other input events are merged into a
+single stream by the input device, which then submits the stream to
+Intuition for further processing.
+
+<a name="line10">     <a href="../Libraries_Manual_guide/node05DB.html">Figure 9-1: Amiga Input Block Diagram</a> </a>
+
+The application program can receive its input from Intuition or the
+Console device.  The application may choose to listen to neither, one or
+both of these input sources.
+
+     <a href="../Libraries_Manual_guide/node05DC.html">Figure 9-2: Amiga Output Block Diagram</a> 
+
+An application's display output can go through the high level interfaces
+of the console device or through the Intuition library.  Additionally,
+display output may be sent directly to the graphics library.  Notice that
+both the Console and Intuition call the graphics library to render to the
+display.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

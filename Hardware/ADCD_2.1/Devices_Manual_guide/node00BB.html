@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_5" NODE="5-4-2-1" TITLE="5 / Setting Controller Type /Three Step Protocol for Using Gameport Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>5 / Setting Controller Type /Three Step Protocol for Using Gameport Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00BA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00BC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Step 1:
+    Send <a href="../Devices_Manual_guide/node00B9.html">GPD_ASKCTYPE</a> to the device and check for a GPCT_NOCONTROLLER
+    return. Never issue <a href="../Includes_and_Autodocs_2._guide/node04BD.html">GPD_SETCTYPE</a> without checking whether the desired
+<a name="line5">    gameport unit is in use.</a>
+
+Step 2:
+    If GPCT_NOCONTROLLER is returned, you have access to the gameport.
+    Set the allocation flag to GPCT_MOUSE, GPCT_ABSJOYSTICK or
+    GPCT_RELJOYSTICK if you use a system supported controller, or
+    GPCT_ALLOCATED if you use a custom controller.
+
+    struct IOStdReq *GameIO;  /* Must be initialized prior to using */
+
+    BOOL set_controller_type(type)
+    BYTE type;
+    {
+
+    BOOL success = FALSE;
+    BYTE controller_type = 0;
+
+    Forbid();                           /*critical section start */
+    GameIO-&#062;io_Command = GPD_ASKCTYPE;  /* inquire current status */
+    GameIO-&#062;io_Length = 1;
+    GameIO-&#062;io_Flags = IOF_QUICK;
+    GameIO-&#062;io_Data = (APTR)&#038;controller_type; /* put answer in here */
+    DoIO(GameIO);
+
+    /* No one is using this device unit, let's claim it */
+    if (controller_type == GPCT_NOCONTROLLER)
+        {
+        GameIO-&#062;io_Command = GPD_SETCTYPE;/* set controller type */
+        GameIO-&#062;io_Length = 1;
+        GameIO-&#062;io_Data = (APTR)&#038;type;  /* set to input param */
+        DoIO( GameIO);
+        success = TRUE;
+        UnitOpened = TRUE;
+        }
+    Permit(); /* critical section end */
+
+    /* success can be TRUE or FALSE, see above */
+    return(success);
+    }
+<a name="line44"></a>
+Step 3:
+    The program must set the controller type back to GPCT_NOCONTROLLER
+    upon exiting your program:
+
+    struct IOStdReq *GameIO;  /* Must be initialized prior to using */
+
+    void free_gp_unit()
+    {
+    BYTE type = GPCT_NOCONTROLLER;
+    GameIO-&#062;io_Command = GPD_SETCTYPE;  /* set controller type */
+    GameIO-&#062;io_Length = 1;
+    GameIO-&#062;io_Data = (APTR)&#038;type;      /* set to unused */
+    DoIO( GameIO);
+    }
+
+This three step protocol allows applications to share the gameport device
+in a system compatible way.
+
+    A Word About The Functions.
+    ---------------------------
+    The functions shown above are designed to be included in any
+    application using the gameport device.  The first function,
+    set_controller_type(), would be the first thing done after opening
+    the gameport device. The second function, free_gp_unit(), would be
+    the last thing done before closing the device.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

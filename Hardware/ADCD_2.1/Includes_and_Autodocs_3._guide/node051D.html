@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="radiobutton_gc" NODE="AllocRadioButtonNodeA()" TITLE="radiobutton_gc/AllocRadioButtonNodeA" -->
+<head>
+<title>radiobutton_gc/AllocRadioButtonNodeA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node051C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node051E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        AllocRadioButtonNodeA -- <a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> a RadioButton node. (V40)
+
+<b>    SYNOPSIS</b>
+        struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> * AllocRadioButtonNode(UWORD, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...)
+        node = AllocRadioButtonNode(columns, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...)
+
+        struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> * AllocRadioButtonNodeA(UWORD, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *)
+        node = AllocRadioButtonNodeA(taglist)
+
+<b>    FUNCTION</b>
+        Allocates a node that can be added to the Exec linked list of
+        labels in the radiobutton.  This is the only way to allocate a
+        node for this list, you cannot allocate nodes yourself because
+        the RadioButton class uses a private node structure.
+
+<b>    INPUTS</b>
+        taglist - Attributes for the node, passed onto
+            <a href="../Includes_and_Autodocs_3._guide/node0520.html">SetRadioButtonNodeAttrsA()</a>.
+
+<b>    RESULT</b>
+        node - A node that can be added into the Exec list of labels for
+            a RadioButton gadget.
+
+<b>    SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node051E.html">FreeRadioButtonNode()</a>, <a href="../Includes_and_Autodocs_3._guide/node0520.html">SetRadioButtonNodeAttrsA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

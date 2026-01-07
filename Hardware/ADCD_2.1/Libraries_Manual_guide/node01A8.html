@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_7" NODE="7-2-7" TITLE="7 / True Requesters / Using a Requester to Block Window Input" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>7 / True Requesters / Using a Requester to Block Window Input</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01A7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01A9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There may be times when an application needs to block user input without a
+visible requester.  In some cases, the application needs to be busy for a
+while.  Other times, an application wants the blocking properties of a
+requester, but prefers to use a window instead of a <a href="../Libraries_Manual_guide/node01A1.html">true</a> requester.  In
+this case, the application can create a requester with no imagery,
+attaching it to the parent window to block input.  A new window may then
+be opened to act as the requester.
+
+Some of the advantages of using a window as a requester instead of a real
+requester include:
+
+  * A window can be resized, and moves independently of the parent window.
+
+  * It is legal to render directly into a window.
+
+  * The window can have its own menus since only the parent window's
+    menus are disabled (this is only occasionally useful).
+
+  * Certain code or a library you are using may not work in requesters
+    (GadTools library is an example of this).
+
+Of course, using a <a href="../Libraries_Manual_guide/node01A1.html">true</a> requester instead of a window has the advantage
+that the requester automatically moves and depth-arranges along with the
+parent window.
+
+ <a href="../Libraries_Manual_guide/node05A1.html">A Requester Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

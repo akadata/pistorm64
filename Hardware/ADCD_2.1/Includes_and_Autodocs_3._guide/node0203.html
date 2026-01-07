@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="Disable()" TITLE="exec.library/Disable" -->
+<head>
+<title>exec.library/Disable</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0202.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0204.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	Disable -- disable interrupt processing.
+
+<b>    SYNOPSIS</b>
+	Disable();
+
+	void Disable(void);
+
+<b>    FUNCTION</b>
+	Prevents interrupts from being handled by the system, until a
+	matching <a href="../Includes_and_Autodocs_3._guide/node0205.html">Enable()</a> is executed.  Disable() implies <a href="../Includes_and_Autodocs_3._guide/node020C.html">Forbid()</a>.
+
+	DO NOT USE THIS CALL WITHOUT GOOD JUSTIFICATION.  THIS CALL IS
+	VERY DANGEROUS!
+
+<b>    RESULTS</b>
+	All interrupt processing is deferred until the task executing makes
+	a call to <a href="../Includes_and_Autodocs_3._guide/node0205.html">Enable()</a> or is placed in a wait state.  Normal task
+	rescheduling does not occur while interrupts are disabled.  In order
+	to restore normal interrupt processing, the programmer must execute
+	exactly one call to <a href="../Includes_and_Autodocs_3._guide/node0205.html">Enable()</a> for every call to Disable().
+
+	IMPORTANT REMINDER:
+
+	It is important to remember that there is a danger in using
+	disabled sections.  Disabling interrupts for more than ~250
+	microseconds will prevent vital system functions (especially serial
+	I/0) from operating in a normal fashion.
+
+	Think twice before using Disable(), then think once more.
+	After all that, think again.  With enough thought, the need
+	for a Disable() can often be eliminated.  For the user of many
+	device drivers, a write to disable *only* the particular interrupt
+	of interest can replace a Disable().  For example:
+			MOVE.W	#INTF_PORTS,_intena
+	Do not use a macro for Disable(), insist on the real thing.
+
+	This call may be made from interrupts, it will have the effect
+	of locking out all higher-level interrupts (lower-level interrupts
+	are automatically disabled by the CPU).
+
+        Note: In the event of a task entering a <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait()</a> after disabling
+              interrupts, the system &#034;breaks&#034; the disabled state and runs
+              normally until the task which called Disable() is rescheduled.
+
+<b>    NOTE</b>
+	This call is guaranteed to preserve all registers.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node020C.html">Forbid()</a>, <a href="../Includes_and_Autodocs_3._guide/node0224.html">Permit()</a>, <a href="../Includes_and_Autodocs_3._guide/node0205.html">Enable()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

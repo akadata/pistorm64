@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-59/AppWorkbench.txt" NODE="IV-59-5" TITLE="AppMenuItems" -->
+<head>
+<title>AppMenuItems</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00B6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00B8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Using the workbench.library's AddAppMenuItem() call, an application can
+add an AppMenuItem to the Workbench's &#034;Tools&#034; menu.  This AppAdd function
+has one parameter unique to it, menutext (from the prototype above).  It
+points to the string that appears in the &#034;Tools&#034; menu.
+
+An AppMenuItem performs the same functions as an AppIcon or AppWindow, but
+it does not require the overhead of a DiskObject or a window.  It also
+does not require the user to drop icons on an object.  In some cases, the
+user might prefer to use an AppMenuItem over an AppIcon or AppWindow
+because the user doesn't have to shuffle around the Workbench windows to
+get to the &#034;Tools&#034; menu.  Note that in older versions of release 2.0,
+Workbench did not supply a list of WBArgs when the user selected an
+AppMenuItem.
+
+The C source code example <a href="../AmigaMail_Vol2_guide/node01B5.html">AppMenu.c</a> at the end of this article is a simple
+example of how to create an AppMenuItem.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

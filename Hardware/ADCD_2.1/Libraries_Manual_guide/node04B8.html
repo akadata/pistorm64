@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_A" NODE="A-2" TITLE="A Appendix A: Linker Libraries / Debug.lib" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>A Appendix A: Linker Libraries / Debug.lib</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04B7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04B9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This link library contains standard I/O (stdio) style functions for
+communicating with a serial terminal connected to the Amiga via its
+built-in serial port.  Typically this  terminal will be a 9600-baud, 8
+data-bits, one stop-bit connection to an external terminal or an Amiga
+running a terminal package.  The debug.lib functions allow you to output
+messages and prompt for input (even from within low level task or
+interrupt code) without disturbing the Amiga's display and or current
+state (other than the serial hardware itself).
+
+No matter how badly the system may have crashed, these functions can
+usually get a message out.  A similar debugging library (currently called
+ddebug.lib) is available for sending debugging output to the parallel
+port.  This is useful for debugging serial applications. Ddebug.lib is not
+documented here.  It contains functions similar to debug.lib but with
+names starting with `D' instead of `K'.
+
+Debug.lib is a link library that provides useful diagnostic functions that
+<a name="line19">are handy for developing code.  It includes the following functions:</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0174.html">KCmpStr()</a>
+<a name="line22">    Compare two null-terminated strings.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0175.html">KGetChar()</a>
+<a name="line25">    Get a character from the console.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0176.html">KGetNum()</a>
+<a name="line28">    Get a number from the console.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0177.html">KMayGetChar()</a>
+<a name="line31">    Return a character if present, but don't wait.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0178.html">KPrintF()</a>
+<a name="line34">    Print formatted data to the console.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0179.html">KPutChar()</a>
+<a name="line37">    Put a character to the console.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node017A.html">KPutStr()</a>
+    Put a string to the console.
+
+Please refer to the Amiga ROM Kernel Reference Manual: Includes and
+Autodocs for a detailed description of the functions.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

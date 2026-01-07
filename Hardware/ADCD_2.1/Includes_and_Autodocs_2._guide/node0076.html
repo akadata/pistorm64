@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/rdargs.h" NODE="MAIN" TITLE="Includes/dos/rdargs.h" -->
+<head>
+<title>Includes/dos/rdargs.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0075.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0077.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_RDARGS_H
+#define DOS_RDARGS_H
+/*
+**
+**	$Filename: dos/rdargs.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.6 $
+**	$Date: 90/07/12 $
+**
+**	ReadArgs() structure definitions
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+<a name="line16"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif
+<a name="line20"></a>
+#ifndef EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+#endif
+
+/**********************************************************************
+ *
+ * The CSource data structure defines the input source for &#034;ReadItem()&#034;
+ * as well as the ReadArgs call.  It is a publicly defined structure
+ * which may be used by applications which use code that follows the
+ * conventions defined for access.
+ *
+ * When passed to the dos.library functions, the value passed as
+ * struct *CSource is defined as follows:
+ *	if ( CSource == 0)	Use buffered IO &#034;ReadChar()&#034; as data source
+ *	else			Use CSource for input character stream
+ *
+ * The following two pseudo-code routines define how the CSource structure
+ * is used:
+ *
+ * long CS_ReadChar( struct CSource *CSource )
+ * {
+ *	if ( CSource == 0 )	return ReadChar();
+ *	if ( CSource-&#062;CurChr &#062;= CSource-&#062;Length )	return ENDSTREAMCHAR;
+ *	return CSource-&#062;Buffer[ CSource-&#062;CurChr++ ];
+ * }
+ *
+ * BOOL CS_UnReadChar( struct CSource *CSource )
+ * {
+ *	if ( CSource == 0 )	return UnReadChar();
+ *	if ( CSource-&#062;CurChr &#060;= 0 )	return FALSE;
+ *	CSource-&#062;CurChr--;
+ *	return TRUE;
+ * }
+ *
+ * To initialize a struct CSource, you set CSource-&#062;CS_Buffer to
+ * a string which is used as the data source, and set CS_Length to
+ * the number of characters in the string.  Normally CS_CurChr should
+ * be initialized to ZERO, or left as it was from prior use as
+ * a CSource.
+ *
+ **********************************************************************/
+<a name="line62"></a>
+<a name="line63">struct CSource {</a>
+<a name="line64">	UBYTE	*CS_Buffer;</a>
+<a name="line65">	LONG	CS_Length;</a>
+	LONG	CS_CurChr;
+};
+
+/**********************************************************************
+ *
+ * The RDArgs data structure is the input parameter passed to the DOS
+ * ReadArgs() function call.
+ *
+ * The RDA_Source structure is a CSource as defined above;
+ * if RDA_Source.CS_Buffer is non-null, RDA_Source is used as the input
+ * character stream to parse, else the input comes from the buffered STDIN
+ * calls ReadChar/UnReadChar.
+ *
+ * RDA_DAList is a private address which is used internally to track
+ * allocations which are freed by FreeArgs().  This MUST be initialized
+ * to NULL prior to the first call to ReadArgs().
+ *
+ * The RDA_Buffer and RDA_BufSiz fields allow the application to supply
+ * a fixed-size buffer in which to store the parsed data.  This allows
+ * the application to pre-allocate a buffer rather than requiring buffer
+ * space to be allocated.  If either RDA_Buffer or RDA_BufSiz is NULL,
+ * the application has not supplied a buffer.
+ *
+ * RDA_ExtHelp is a text string which will be displayed instead of the
+ * template string, if the user is prompted for input.
+ *
+ * RDA_Flags bits control how ReadArgs() works.  The flag bits are
+ * defined below.  Defaults are initialized to ZERO.
+ *
+ **********************************************************************/
+<a name="line96"></a>
+<a name="line97">struct RDArgs {</a>
+<a name="line98">	struct	CSource RDA_Source;	/* Select input source */</a>
+<a name="line99">	LONG	RDA_DAList;		/* PRIVATE. */</a>
+<a name="line100">	UBYTE	*RDA_Buffer;		/* Optional string parsing space. */</a>
+<a name="line101">	LONG	RDA_BufSiz;		/* Size of RDA_Buffer (0..n) */</a>
+<a name="line102">	UBYTE	*RDA_ExtHelp;		/* Optional extended help */</a>
+	LONG	RDA_Flags;		/* Flags for any required control */
+};
+<a name="line105"></a>
+<a name="line106">#define RDAB_STDIN	0	/* Use &#034;STDIN&#034; rather than &#034;COMMAND LINE&#034; */</a>
+<a name="line107">#define RDAF_STDIN	1</a>
+<a name="line108">#define RDAB_NOALLOC	1	/* If set, do not allocate extra string space.*/</a>
+<a name="line109">#define RDAF_NOALLOC	2</a>
+<a name="line110">#define RDAB_NOPROMPT	2	/* Disable reprompting for string input. */</a>
+#define RDAF_NOPROMPT	4
+
+/**********************************************************************
+ * Maximum number of template keywords which can be in a template passed
+ * to ReadArgs(). IMPLEMENTOR NOTE - must be a multiple of 4.
+<a name="line116"> **********************************************************************/</a>
+#define MAX_TEMPLATE_ITEMS	100
+
+/**********************************************************************
+ * Maximum number of MULTIARG items returned by ReadArgs(), before
+ * an ERROR_LINE_TOO_LONG.  These two limitations are due to stack
+ * usage.  Applications should allow &#034;a lot&#034; of stack to use ReadArgs().
+<a name="line123"> **********************************************************************/</a>
+#define MAX_MULTIARGS		128
+
+#endif /* DOS_RDARGS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

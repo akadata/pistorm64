@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="V-23/Bullet.txt" NODE="V-23-14" TITLE="About the Examples" -->
+<head>
+<title>About the Examples</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00DC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00DE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This article contains two code examples.  The first, <a href="../AmigaMail_Vol2_guide/node01CA.html">Rotate.c</a>, rotates
+a user-specified glyph around a central point.  By default, it
+rotates a 36 point 'A' using the font fonts:CGTimes.font.  If Rotate
+finds an AmigaDOS environment variable called &#034;XYDPI&#034;, it will use
+the X and Y DPI it finds in that variable as the default target
+device DPI (see the description of the Level 0 OT_DeviceDPI tag).  If
+that variable is not defined, Rotate will use an XDPI of 68 and a
+YDPI of 27 which, nominally, is the X and Y DPI of a standard Hires
+display.
+
+The second example, <a href="../AmigaMail_Vol2_guide/node01CB.html">View.c</a>, displays a file using the same defaults as
+Rotate.  View utilizes kerning pairs to display its glyphs.  Because
+View only considers &#034;visible&#034; characters, it ignores characters
+that have widths but no glyph.  The result is, View doesn't print any
+space characters.  If View were smarter, it would ask the scaling
+engine for a width list so it could properly advance the current
+pointer when it comes across a space or some other character without
+a glyph.
+
+Notice that View uses a slightly modified version of <a href="../AmigaMail_Vol2_guide/node01CC.html">BulletMain.c</a>
+called <a href="../AmigaMail_Vol2_guide/node01CD.html">BulletMainFile.c</a>.  Only BulletMain.c appears in the example
+code.  The only significant difference between the two is that
+BulletMainFile.c obtains a file name for View to display.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

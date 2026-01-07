@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-6-15-1" TITLE="28 / / Double-Buffering / DBufPacket and Double-Buffering" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Double-Buffering / DBufPacket and Double-Buffering</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03A9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03AB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For double-buffering, a place must be provided for the system to store the
+extra information it needs.  The system maintains these data, and does not
+expect the application to change them.  The <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line231">DBufPacket</a> structure consists
+of the following members:
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line236">BufY, BufX</a>  Lets the system keep track of where the object was located
+            in the last frame (as compared to the <a href="../Libraries_Manual_guide/node0398.html">Bob</a> structure
+            members called <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line87">OldY and OldX</a> that tell where the object
+            was two frames ago).  BufY and BufX provide for correct
+            restoration of the background within the currently active
+            drawing buffer.
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line236">BufPath</a>     Assures that the system restores the backgrounds in the
+            correct sequence; it relates to the <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> members
+            <a href="../Libraries_Manual_guide/node0382.html#line6">DrawPath</a> and <a href="../Libraries_Manual_guide/node0382.html#line6">ClearPath</a>.
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line239">BufBuffer</a>   This field must be set to point to a buffer the same size
+            as the Bob's <a href="../Libraries_Manual_guide/node0398.html#line5">SaveBuffer</a>.  This buffer is used to store the
+            background for later restoration when the system moves the
+            object.  This buffer must be allocated from Chip memory.
+
+To create a double-buffered Bob, execute a code sequence similar to the
+following:
+
+    struct Bob        myBob = {0};
+    struct DBufPacket myDBufPacket = {0};
+
+    /* Allocate a DBufPacket for myBob same size as previous example */
+    if (NULL != (myDBufPacket.BufBuffer = AllocRaster(48, 20 * 5)))
+        {
+        /* tell Bob about its double buff status */
+        myBob.DBuffer = myDBufPacket;
+        }
+
+The example routines <a href="../Libraries_Manual_guide/node059C.html#line129">makeBob()</a> and <a href="../Libraries_Manual_guide/node059C.html#line302">freeBob()</a> in the <a href="../Libraries_Manual_guide/node059C.html#line129">animtools.c</a> listing at
+the end of this chapter show how to correctly allocate and free a
+double-buffered Bob.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="chooser_gc" NODE="AllocChooserNodeA()" TITLE="chooser_gc/AllocChooserNodeA" -->
+<head>
+<title>chooser_gc/AllocChooserNodeA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00C2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00C4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        AllocChooserNodeA -- <a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> a Chooser node.
+
+<b>    SYNOPSIS</b>
+        struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> * AllocChooserNode(Tag, ...)
+        node = AllocChooserNode(columns, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...)
+
+        struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> * AllocChooserNodeA(struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *)
+        node = AllocChooserNodeA(taglist)
+
+<b>    FUNCTION</b>
+        Allocates a node that can be added to the Exec linked list of
+        labels in the chooser.  This is the only way to allocate a
+        node for this list, you cannot allocate nodes yourself because
+        the Chooser class uses a private node structure.
+
+<b>    INPUTS</b>
+        taglist - Attributes for the node, passed onto <a href="../Includes_and_Autodocs_3._guide/node00C6.html">SetChooserNodeAttrsA()</a>.
+
+<b>    RESULT</b>
+        node - A node that can be added into the Exec list of labels for
+            a Chooser gadget.
+
+<b>    SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node00C4.html">FreeChooserNode()</a>, <a href="../Includes_and_Autodocs_3._guide/node00C6.html">SetChooserNodeAttrsA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

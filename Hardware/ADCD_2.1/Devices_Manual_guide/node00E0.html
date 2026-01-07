@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-2-2" TITLE="14 / Device Interface / Opening The Trackdisk Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 / Device Interface / Opening The Trackdisk Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00DF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00E1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Three primary steps are required to open the trackdisk device:
+
+   *  Create a message port by calling <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>. Reply messages from
+      the device must be directed to a message port.
+
+   *  Create an extended I/O request structure of type <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a>.  The
+      <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> structure is created by the <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a> function.
+
+   *  Open the trackdisk device.  Call <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>, passing it the
+<a name="line11">      extended I/O request.</a>
+
+For the trackdisk device, the flags parameter of the <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> function
+specifies whether you are opening a 3.5&#034; drive (flags=0) or a 5.25&#034; drive
+(flags=1).  With flags set to 0 trackdisk will only open a 3.5&#034; drive.  To
+tell the device to open any drive it understands, set the flags parameter
+to TDF_ALLOW_NON_3_5.  (See the include file devices/<a href="../Includes_and_Autodocs_2._guide/node005B.html">trackdisk.h</a> for more
+information.)
+
+   #include &#060;devices/trackdisk.h&#062;
+
+   struct MsgPort *TrackMP;         /* Pointer for message port */
+   struct IOExtTD *TrackIO;         /* Pointer for IORequest */
+
+   if (TrackMP=CreatePort(0,0) )
+       if (TrackIO=(struct IOExtTD *)
+              CreateExtIO(TrackMP,sizeof(struct IOExtTD)) )
+           if (OpenDevice(TD_NAME,0L,(struct IORequest *)TrackIO,Flags) )
+               printf(&#034;%s did not open\n&#034;,TD_NAME);
+
+   Disk Drive Unit Numbers.
+   ------------------------
+   The unit number - second parameter of the <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> call - can be
+   any value from 0 to 3.  Unit 0 is the built-in 3.5&#034; disk drive.
+   Units 1 through 3 represent additional disk drives that may be
+   connected to an Amiga system.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

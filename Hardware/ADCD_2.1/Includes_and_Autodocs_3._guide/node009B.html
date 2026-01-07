@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="cardres" NODE="GetCardMap()" TITLE="card.resource/GetCardMap" -->
+<head>
+<title>card.resource/GetCardMap</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node009A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node009C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetCardMap -- Obtain pointer to <a href="../Includes_and_Autodocs_3._guide/node05E2.html#line44">CardMemoryMap</a> structure
+
+<b>   SYNOPSIS</b>
+	pointer=GetCardMap()
+	d0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E2.html#line44">CardMemoryMap</a> *GetCardMap( void );
+
+<b>   FUNCTION</b>
+	Obtain pointer to a <a href="../Includes_and_Autodocs_3._guide/node05E2.html#line44">CardMemoryMap</a> structure.  The structure
+	is READ only.
+
+	Devices should never assume credit-card memory appears
+	at any particular place in memory.  By using this function
+	to obtain pointers to the base memory locations of the various
+	credit-card memory types, your device will continue to work
+	properly should credit cards appear in different memory
+	locations in future hardware.
+
+<b>   RETURNS</b>
+	Pointer to <a href="../Includes_and_Autodocs_3._guide/node05E2.html#line44">CardMemoryMap</a> structure -
+
+		struct <a href="../Includes_and_Autodocs_3._guide/node05E2.html#line44">CardMemoryMap</a> {
+		<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a>	*cmm_CommonMemory;
+		<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a>	*cmm_AttributeMemory;
+		<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a>	*cmm_IOMemory;
+		};
+
+	As of card.resource V39, this structure has been extended to
+	include the size of these memory regions.  See card.h/card.i
+	for the new fields.  If card.resource V39, use the constants
+	in the <a href="../Includes_and_Autodocs_3._guide/node05E2.html#line44">CardMemoryMap</a> structure rather than hard coded constants
+	for memory region size.
+
+<b>   NOTES</b>
+	If any pointer in the structure is NULL, it means this type
+	of credit-card memory is not being made available.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E2.html">resources/card.h</a>, resources/card.i
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

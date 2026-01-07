@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_23" NODE="23-1" TITLE="23 Exec Lists and Queues / List Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>23 Exec Lists and Queues / List Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02D7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02D9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A list is composed of a header and a doubly-linked chain of elements
+called nodes.  The header contains memory pointers to the first and last
+nodes of the linked chain.  The address of the header is used as the
+handle to the entire list.  To manipulate a list, you must provide the
+address of its header.
+                                    _______________
+                                 _\|               |
+                                / /|   First Node  |
+                               /  /|_______________|
+                              /  /       |  /|\
+            _______________  /  /        |   |
+           |               |/  /    ____\|/__|_____
+           |   Head Node   |/_/    |               |
+           |_______________|\      |  Second Node  |
+           |               |/_     |_______________|
+           |   Tail Node   |\ \          |  /|\
+           |_______________|\  \         |   |
+                             \  \   ____\|/__|_____
+                              \  \ |               |
+                               \  \|   Third Node  |
+                                \_\|_______________|
+                                  /
+
+             Figure 23-1: Simplified Overview of an Exec List
+
+
+Nodes may be scattered anywhere in memory.  Each node contains two
+pointers; a successor and a predecessor.  As illustrated above, a list
+header contains two placeholder nodes that contain no data.  In an empty
+list, the head and tail nodes point to each other.
+
+ <a href="../Libraries_Manual_guide/node02D9.html">Node Structure Definition</a>    <a href="../Libraries_Manual_guide/node02DB.html">List Header Structure Definition</a> 
+ <a href="../Libraries_Manual_guide/node02DA.html">Node Initialization</a>          <a href="../Libraries_Manual_guide/node02DC.html">Header Initialization</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

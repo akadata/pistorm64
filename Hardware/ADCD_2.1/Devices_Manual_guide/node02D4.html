@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_8SVX" NODE="16-6-3-2" TITLE=" Appendix A. Quick Reference / 8SVX Regular Expression " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Appendix A. Quick Reference / 8SVX Regular Expression </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02D3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02D5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here's a regular expression summary of the <a href="../Devices_Manual_guide/node02C9.html">FORM 8SVX</a> syntax.  This could
+be an IFF file or part of one.
+
+    8SVX     ::= &#034;FORM&#034; #{  &#034;8SVX&#034; VHDR [NAME] [Copyright] [AUTH] ANNO*
+                            [ATAK] [RLSE] BODY }
+
+    VHDR     ::= &#034;VHDR&#034; #{ Voice8Header     }
+    NAME     ::= &#034;NAME&#034; #{ CHAR*    } [0]
+    Copyright::= &#034;(c) &#034; #{ CHAR*    } [0]
+    AUTH     ::= &#034;AUTH&#034; #{ CHAR*    } [0]
+    ANNO     ::= &#034;ANNO&#034; #{ CHAR*    } [0]
+
+    ATAK     ::= &#034;ATAK&#034; #{ EGPoint* }
+    RLSE     ::= &#034;RLSE&#034; #{ EGPoint* }
+    BODY     ::= &#034;FORM&#034; #{ BYTE*    } [0]
+
+The token &#034;#&#034; represents a ckSize LONG count of the following {braced}
+data bytes.  E.g., a <a href="../Devices_Manual_guide/node02CD.html">VHDR</a>'s &#034;#&#034; should equal sizeof(Voice8Header).
+Literal items are shown in &#034;quotes&#034;, [square bracket items] are optional,
+and &#034;*&#034; means 0 or more replications.  A sometimes-needed pad byte is
+shown as &#034;[0]&#034;.
+
+Actually, the order of chunks in a <a href="../Devices_Manual_guide/node02C9.html">FORM 8SVX</a> is not as strict as this
+regular expression indicates.  The property chunks <a href="../Devices_Manual_guide/node02CD.html">VHDR</a>, NAME, Copyright,
+and AUTH may actually appear in any order as long as they all precede the
+<a href="../Devices_Manual_guide/node02D0.html">BODY</a> chunk.  The optional data chunks ANNO, <a href="../Devices_Manual_guide/node02CF.html">ATAK</a>, and <a href="../Devices_Manual_guide/node02CF.html">RLSE</a> don't have to
+precede the BODY chunk.  And of course, new kinds of chunks may appear
+inside a <a href="../Devices_Manual_guide/node02C9.html">FORM 8SVX</a> in the future.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

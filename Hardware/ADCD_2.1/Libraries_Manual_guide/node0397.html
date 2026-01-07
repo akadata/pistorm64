@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-6-2" TITLE="28 / Using Bobs / VSprite Flags and Bobs" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Bobs / VSprite Flags and Bobs</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0396.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0398.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The bits in the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line92">VSprite.Flags</a> field that apply to a Bob are the <a href="../Libraries_Manual_guide/node0383.html#line6">VSPRITE</a>
+flag, the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line19">SAVEBACK</a> flag and the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line19">OVERLAY</a> flag.  When a <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure is
+used to define a Bob, the VSPRITE flag in the VSprite.Flags field must be
+<a name="line5">set to zero.  This tells the system that this GEL is a Bob type.</a>
+
+To have the GEL routines save the background before the Bob is drawn and
+restore the background after the Bob is removed, specify the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line19">SAVEBACK</a> flag
+(stands for &#034;save the background&#034;) in the <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line92">Flags</a> field.
+If this flag is set, the <a href="../Libraries_Manual_guide/node0398.html#line5">SaveBuffer</a> must have been allocated, which is
+where the system puts this saved background area.  The buffer must be
+large enough to save all the background bitplanes, regardless of how many
+planes the Bob has.  The size in words can be calculated as follows:
+
+    /* Note that Bob.Width is in units of words. */
+    size = Bob.Width * Bob.Height * RastPort.BitMap.Depth;
+
+To allocate this space, the graphics function <a href="../Libraries_Manual_guide/node032E.html">AllocRaster()</a> can be used.
+AllocRaster() takes the width in bits, so it is a convenient way to
+allocate the space needed.  The <a href="../Libraries_Manual_guide/node059C.html#line129">makeBob()</a> routine below shows another way
+to correctly allocate this buffer. For example:
+
+    /* space for 16 bits times 5 lines times 5 bitplanes */
+    myBob.SaveBuffer = AllocRaster( (UWORD) 16, (UWORD) (5 * 5) );
+
+
+    Warning:
+    --------
+    The <a href="../Libraries_Manual_guide/node0398.html#line5">SaveBuffer</a> must be allocated from Chip memory and contain an
+    even number of word-aligned bytes.  The <a href="../Libraries_Manual_guide/node032E.html">AllocRaster()</a> function
+    does this for you.  The AllocRaster() function rounds the width
+    value up to the next integer multiple of 16 bits which is greater
+    than or equal to the current value an it obtains memory from the Chip
+<a name="line34">    memory pool.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line19">OVERLAY</a> is the other <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line92">VSprite.Flags</a> item that applies to Bobs. If this flag
+is set, it means that the background's original pixels show through in any
+area where there are 0 bits in the Bob's shadow mask (<a href="../Libraries_Manual_guide/node039F.html">ImageShadow</a>,
+explained later).  The space for the ImageShadow shadow mask must have
+been allocated and initialized.  The ImageShadow mask must be allocated
+from Chip memory.
+
+If the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line19">OVERLAY</a> bit is cleared, the system uses the entire rectangle of
+words that define the Bob image to replace the playfield area at the
+specified x,y coordinates.  See the paragraphs below called &#034;<a href="../Libraries_Manual_guide/node039F.html">ImageShadow</a>&#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

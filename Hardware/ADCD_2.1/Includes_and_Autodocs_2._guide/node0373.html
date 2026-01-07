@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="Remove()" TITLE="exec.library/Remove" -->
+<head>
+<title>exec.library/Remove</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0372.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0374.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Remove -- remove a node from a list
+
+SYNOPSIS
+    Remove(node)
+           A1
+
+    void Remove(struct <a href="../Includes_and_Autodocs_2._guide/node0091.html#line23">Node</a> *);
+
+FUNCTION
+    Unlink a node from whatever list it is in.  Nodes that are not part
+    of a list must not be passed to this funcion!  Assembly programmers
+    may prefer to use the REMOVE macro from &#034;exec/lists.i&#034;.
+
+WARNING
+    This function does not arbitrate for access to the list.  The
+    calling task must be the owner of the involved list.
+
+INPUTS
+    node - the node to remove
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0325.html">AddHead</a>, <a href="../Includes_and_Autodocs_2._guide/node032C.html">AddTail</a>, <a href="../Includes_and_Autodocs_2._guide/node034D.html">Enqueue</a>, Insert, <a href="../Includes_and_Autodocs_2._guide/node0370.html">RemHead</a>, <a href="../Includes_and_Autodocs_2._guide/node0377.html">RemTail</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

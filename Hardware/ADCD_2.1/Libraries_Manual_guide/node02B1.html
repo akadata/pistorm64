@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_20" NODE="20-2" TITLE="20 Exec Memory Allocation / Allocating Multiple Memory Blocks" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>20 Exec Memory Allocation / Allocating Multiple Memory Blocks</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02B0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02B2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Exec provides the routines <a href="../Includes_and_Autodocs_2._guide/node0331.html">AllocEntry()</a> and <a href="../Libraries_Manual_guide/node02B2.html#line5">FreeEntry()</a> to allocate
+multiple memory blocks in a single call. AllocEntry() accepts a data
+structure called a MemList, which contains the information about the size
+of the memory blocks to be allocated and the requirements, if any, that
+you have regarding the allocation. The MemList structure is found in the
+include file &#060;exec/<a href="../Includes_and_Autodocs_2._guide/node0089.html#line54">memory.h</a>&#062; and is defined as follows:
+
+    struct MemList
+    {
+        struct Node     ml_Node;
+        UWORD           ml_NumEntries;      /* number of MemEntrys */
+        struct MemEntry ml_ME[1];           /* where the MemEntrys begin*/
+    };
+
+Node
+    allows you to link together multiple MemLists.  However, the node is
+    ignored by the routines <a href="../Includes_and_Autodocs_2._guide/node0331.html">AllocEntry()</a> and <a href="../Libraries_Manual_guide/node02B2.html#line5">FreeEntry()</a>.
+
+ml_NumEntries
+    tells the system how many MemEntry sets are contained in this
+    MemList.  Notice that a MemList is a variable-length structure and
+<a name="line23">    can contain as many sets of entries as you wish.</a>
+
+<a name="line25">The <a href="../Includes_and_Autodocs_2._guide/node0089.html#line39">MemEntry</a> structure looks like this:</a>
+
+    struct MemEntry
+    {
+        union {
+            ULONG   meu_Reqs;   /* the AllocMem requirements */
+            APTR    meu_Addr;   /* address of your memory */
+            } me_Un;
+        ULONG   me_Length;      /* the size of this request */
+    };
+
+ <a href="../Libraries_Manual_guide/node02B2.html">Sample Code for Allocating Multiple Memory Blocks</a> 
+ <a href="../Libraries_Manual_guide/node02B3.html">Result of Allocating Multiple Memory Blocks</a> 
+ <a href="../Libraries_Manual_guide/node02B4.html">Multiple Memory Blocks and Tasks</a> 
+ <a href="../Libraries_Manual_guide/node02B5.html">Summary of Multiple Memory Blocks Allocation Routines</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

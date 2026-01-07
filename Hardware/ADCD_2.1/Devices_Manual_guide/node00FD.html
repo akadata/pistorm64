@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_7" NODE="7-1" TITLE="7 Keyboard Device / Keyboard Device Commands and Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>7 Keyboard Device / Keyboard Device Commands and Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00FC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00FE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Command               Operation
+-------               ---------
+<a href="../Includes_and_Autodocs_2._guide/node050C.html">CMD_CLEAR</a>             Clear the keyboard input buffer.  Removes any key
+                      transitions from the input buffer.
+
+<a href="../Devices_Manual_guide/node0103.html">KBD_ADDRESETHANDLER</a>   Add a reset handler function to the list of
+                      functions called  by the keyboard device to clean up
+                      before a hard reset.
+
+<a href="../Devices_Manual_guide/node0104.html">KBD_REMRESETHANDLER</a>   Remove a previously added reset handler from the
+                      list of functions called by the keyboard device to
+                      clean up before a hard reset.
+
+<a href="../Devices_Manual_guide/node0105.html">KBD_RESETHANDLERDONE</a>  Indicate that a handler has completed its job and
+                      reset could possibly occur now.
+
+<a href="../Devices_Manual_guide/node0101.html">KBD_READMATRIX</a>        Read the state of every key in the keyboard.  Tells
+                      the up/down state of every key.
+
+<a href="../Includes_and_Autodocs_2._guide/node050E.html">KBD_READEVENT</a>         Read one (or more) raw key event from the keyboard
+                      device.
+
+
+Exec Functions as Used in This Chapter
+--------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a>             Abort a command to the keyboard device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a>            Allocate a block of memory.
+
+<a href="../Includes_and_Autodocs_2._guide/node033E.html">CheckIO()</a>             Return the status of an I/O request.
+
+<a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>         Relinquish use of the keyboard device.
+
+<a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>                Initiate a command and wait for it to complete
+                      (synchronous request).
+
+<a href="../Includes_and_Autodocs_2._guide/node0355.html">FreeMem()</a>             Free a block of previously allocated memory.
+
+<a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>          Obtain use of the keyboard device.
+
+<a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>              Initiate a command and return immediately
+                      (asynchronous request).
+
+<a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a>              Wait for the completion of an asynchronous request.
+                      When the request is complete the message will be
+                      removed from reply port.
+
+
+Exec Support Functions as Used in This Chapter
+----------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>         Create an extended I/O request structure.  This
+                      structure will be used to communicate commands to
+                      the keyboard device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>          Create a signal message port for reply messages from
+                      the keyboard device.  Exec will signal a task when a
+                      message arrives at the port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>         Delete an extended I/O request structure created by
+                      <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>.
+
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>          Delete the message port created by <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

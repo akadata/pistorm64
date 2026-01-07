@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-8-4-5" TITLE="28 / / / Using Sequenced Drawing and Motion Control" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / / Using Sequenced Drawing and Motion Control</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03C8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03CA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+If you are using Ring Motion Control, you will probably set the velocity
+and acceleration variables to zero.  For instance, consider the example of
+a person walking.  With Ring Motion Control, as each foot falls it is
+positioned on the ground exactly where originally drawn.  If you included
+a velocity value, the person's foot would not be stationary with respect
+to the ground, and the person would appear to &#034;skate&#034; rather than walk.
+If you set the velocity and acceleration variables at zero, you avoid this
+<a name="line9">problem.</a>
+
+When the system activates a new <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a>, it checks the <a href="../Libraries_Manual_guide/node03B9.html#line12">Flags</a> field to see
+if the <a href="../Libraries_Manual_guide/node03C8.html">RINGTRIGGER</a> bit is set.  If so, the system adds <a href="../Libraries_Manual_guide/node0370.html">RingYTrans</a> and
+<a href="../Libraries_Manual_guide/node03B9.html#line48">RingXTrans</a> to <a href="../Libraries_Manual_guide/node03C6.html">AnY and AnX</a> respectively.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="V-23/Engine.c" NODE="MAIN" TITLE="V-23/Engine.c" -->
+<head>
+<title>V-23/Engine.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01C8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01CA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* Engine.c - Execute me to compile me with SAS/C 6.56
+sc NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 Engine.c
+quit ;*/
+
+/* (c)  Copyright 1992-1999 Amiga, Inc.   All rights reserved.       */
+/* The information contained herein is subject to change without notice,  */
+/* and is provided &#034;as is&#034; without warranty of any kind, either expressed */
+/* or implied.  The entire risk as to the use of this information is      */
+/* assumed by the user.                                                   */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;dos/dostags.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;diskfont/diskfonttag.h&#062;
+#include &#060;diskfont/diskfont.h&#062;
+#include &#060;diskfont/glyph.h&#062;
+#include &#060;diskfont/oterrors.h&#062;
+#include &#060;utility/tagitem.h&#062;
+#include &#060;string.h&#062;
+
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/utility_protos.h&#062;
+#include &#060;clib/bullet_protos.h&#062;
+
+#define OTAG_ID 0x0f03   /* this really belongs in &#060;diskfont/diskfont.h&#062;, */
+                         /* but it's not there, yet.                      */
+
+extern UBYTE   *librarystring; /* &#034;.library&#034;, defined in BulletMain.c. */
+
+struct TagItem *AllocOtag(STRPTR);
+void            FreeOtag(void *);
+struct Library *OpenScalingLibrary(struct TagItem *);
+void            CloseScalingLibrary(struct Library *);
+struct GlyphEngine *GetGlyphEngine(struct TagItem *, STRPTR);
+void            ReleaseGlyphEngine(struct GlyphEngine *);
+
+#define BUFSIZE     256
+
+extern struct Library *BulletBase, *UtilityBase;
+
+/*************************************************************************************/
+/* open the otag file, allocate a buffer, read the file into the buffer, verify that */
+/* the file is OK, relocate all of the address relocation tags, close the otag file. */
+/*************************************************************************************/
+struct TagItem *
+AllocOtag(STRPTR otagname)
+{
+  BPTR            otfile;
+  struct TagItem *ti, *tip, *returnti;
+  struct FileInfoBlock *fib;
+
+  ti = NULL;
+
+  if (fib = AllocDosObject(DOS_FIB, NULL))    /* The FileInfoBlock of the OTAG file */
+  {                                           /* contains the file's size.          */
+    if (otfile = Open(otagname, MODE_OLDFILE))
+    {
+      if (ExamineFH(otfile, fib))
+      {
+        if (returnti = (struct TagItem *) AllocVec(fib-&#062;fib_Size, MEMF_CLEAR))
+        {
+          if (Read(otfile, (UBYTE *) returnti, fib-&#062;fib_Size))
+          {
+            if ((returnti-&#062;ti_Tag == OT_FileIdent)               /* Test to see if */
+                &#038;&#038; (returnti-&#062;ti_Data == (ULONG) fib-&#062;fib_Size)) /* the OTAG file  */
+            {                                                    /* is valid.      */
+              tip = returnti;
+              while (ti = NextTagItem(&#038;tip))     /* Step through and relocate tags */
+              {
+                if (ti-&#062;ti_Tag &#038; OT_Indirect)
+                {
+                  ti-&#062;ti_Data = (ULONG) returnti + ti-&#062;ti_Data;
+                }
+              }
+            }
+          }
+        }
+      }
+      Close(otfile);
+    }
+    FreeDosObject(DOS_FIB, fib);
+  }
+  return (returnti);
+}
+
+/**************************************************************************/
+/*********** Deallocates resources allocated by AllocOtag(). **************/
+/**************************************************************************/
+void
+FreeOtag(void *vector)
+{
+  FreeVec(vector);
+}
+
+
+/*****************************************************************************/
+/******* Scans through a TagList looking for an scaling engine name. *********/
+/*******           If it finds one, it opens that library.           *********/
+/*****************************************************************************/
+struct Library *
+OpenScalingLibrary(struct TagItem * ti)
+{
+  STRPTR          enginename;
+  UBYTE           libnamebuffer[BUFSIZE];
+
+  if (enginename = (STRPTR) GetTagData(OT_Engine, NULL, ti))
+  {
+    strcpy(libnamebuffer, enginename);
+    strcat(libnamebuffer, librarystring);
+
+    return (OpenLibrary(libnamebuffer, 0L));
+  }
+  return(NULL);  /*   &#060;----- BUG!:--  This line was missing in the original */
+}                /*                        publication of this code module. */
+
+/**************************************************************************/
+/******* Deallocates resources allocated by OpenScalingLibrary(). *********/
+/**************************************************************************/
+void
+CloseScalingLibrary(struct Library * bbase)
+{
+  CloseLibrary(bbase);
+}
+
+
+/**************************************************************************/
+/* Open the glyph engine, give it the tags from the otag file, and set up */
+/* a default device dpi so it doesn't crash if someone forgets to set it. */
+/**************************************************************************/
+struct GlyphEngine *
+GetGlyphEngine(struct TagItem * ti, STRPTR otagpath)
+{
+  struct GlyphEngine *ge = NULL;
+  BOOL            ok = TRUE;
+
+  if (ge = OpenEngine())
+  {
+    ok = FALSE;
+    if (SetInfo(ge,
+                OT_OTagList, ti,
+                OT_OTagPath, otagpath,
+                TAG_END) == OTERR_Success)
+    {
+      if (SetInfo(ge,
+                  OT_DeviceDPI, ((ULONG) 77) &#060;&#060; 16 | 75,
+                  TAG_END) == OTERR_Success)
+      {
+        ok = TRUE;
+      }
+    }
+  }
+
+  if (!ok)
+  {
+    CloseEngine(ge);
+    ge = NULL;
+  }
+  return (ge);
+}
+
+/**************************************************************************/
+/********* Deallocates resources allocated by GetGlyphEngine(). ***********/
+/**************************************************************************/
+void
+ReleaseGlyphEngine(struct GlyphEngine * ge)
+{
+  CloseEngine(ge);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

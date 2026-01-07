@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_1" NODE="1-7" TITLE="1 Introduction to Amiga System Devices / Devices With Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>1 Introduction to Amiga System Devices / Devices With Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node000B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node000D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Some devices, in addition to their commands, provide functions which can
+be directly called by applications.  These functions are documented in the
+device specific FD files and Autodocs of the Amiga ROM Kernel Reference
+<a name="line5">Manual: <a href="../Includes_and_Autodocs_2._guide/node0000.html">Includes and Autodocs</a> and the device chapters of this manual.</a>
+
+Devices with functions behave much like Amiga libraries, i.e., you set up
+a base address pointer and call the functions as offsets from the pointer.
+(See the <a href="../Libraries_Manual_guide/node0003.html">Exec Libraries</a>&#034; chapter of the Amiga ROM Kernel Reference
+Manual: Libraries.)
+
+The procedure for accessing a device's functions is as follows:
+
+   *  Declare the device base address variable in the global data area.
+      The name of the base address can be found in the device's FD file.
+
+   *  Create a message port using one of the previously discussed methods
+      if you haven't already done so.
+
+   *  Create an I/O request using one of the previously discussed methods
+      if you haven't already done so. Remember to set the message port
+      pointer in the I/O request if necessary.
+
+   *  Call <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>, passing the I/O request if you haven't already
+      done so.  When you do this, the device returns a pointer to its base
+      address in the io_Device field of the I/O request structure.  Consult
+      the include file for the structure you are using to determine the
+      full name of the io_Device field.  The base address is only valid
+      while the device is open.
+
+   *  Set the device base address variable to the pointer returned in the
+      io_Device field.
+
+We will use the timer device to illustrate the above method.  The name of
+the timer device base address is listed in its FD file as &#034;TimerBase.&#034;
+
+  #include &#060;devices/timer.h&#062;
+
+  struct Library *TimerBase;    /* device base address pointer */
+
+  struct MsgPort *TimerMP;      /* message port pointer */
+  struct timerequest *TimerIO;  /* I/O request pointer */
+
+      /* Create the message port */
+  if (TimerMP=CreatePort(NULL,NULL))
+      {
+          /* Create the I/O request */
+      if (TimerIO = (struct timerequest *)
+          {           CreateExtIO(TimerMP,sizeof(struct timerequest)))
+              /* Open the timer device */
+          if (!(OpenDevice(TIMERNAME,UNIT_MICROHZ,TimerIO,0)))
+              {
+              /* Set up pointer for timer functions */
+              TimerBase = (struct Library *)TimerIO-&#062;tr_node.io_Device;
+
+              ... use functions ...
+
+              /* Close the timer device */
+              CloseDevice(TimerIO);
+              }
+
+          /* Delete the I/O request */
+          DeleteExtIO(TimerIO);
+          }
+
+      /* Delete the message port */
+      DeletePort(TimerMP);
+      }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

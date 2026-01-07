@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-5-1" TITLE="14 / Diagnostics and Repair / Moving The Drive Head To A Specific Track" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 / Diagnostics and Repair / Moving The Drive Head To A Specific Track</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You move the drive head to a specific track by passing an <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> to the
+device with <a href="../Includes_and_Autodocs_2._guide/node0530.html">TD_SEEK</a> or ETD_SEEK set in io_Command, and io_Offset set to
+the byte offset of the track to which the seek is to occur.
+
+    DiskIO-&#062;iotd_Req.io_Offset = (ULONG)(TRACK_SIZE * track);
+    DiskIO-&#062;iotd_Req.io_Command = TD_SEEK;
+    DoIO((struct IORequest *)DiskIO);
+
+   Seeking is not Reading.
+   -----------------------
+   <a href="../Includes_and_Autodocs_2._guide/node0530.html">TD_SEEK</a> and ETD_SEEK do not verify their position until the next
+   read. That is, they only move the heads; they do not actually read
+   any data.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="misc" NODE="FreeMiscResource()" TITLE="misc.resource/FreeMiscResource" -->
+<head>
+<title>misc.resource/FreeMiscResource</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04CE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04D0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FreeMiscResource - make a resource available for reallocation
+
+<b>   SYNOPSIS</b>
+	FreeMiscResource( unitNum )
+			  D0
+
+	void FreeMiscResource(ULONG);
+
+<b>   FUNCTION</b>
+	This routine frees one of the resources allocated
+	by <a href="../Includes_and_Autodocs_3._guide/node04CE.html">AllocMiscResource</a>.  The resource is made available
+	for reuse.
+
+	FreeMiscResource must be called from the same task that
+	called <a href="../Includes_and_Autodocs_3._guide/node04CE.html">AllocMiscResource</a>.  This function may not be called from
+	interrupt code.
+
+<b>    INPUTS</b>
+	unitNum - the number of the miscellaneous resource to be freed.
+
+<b>    RESULTS</b>
+	Frees the appropriate resource.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	resources/misc.i, <a href="../Includes_and_Autodocs_3._guide/node04CE.html">AllocMiscResource()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

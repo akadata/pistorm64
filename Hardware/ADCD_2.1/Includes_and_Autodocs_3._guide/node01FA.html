@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="CopyMemQuick()" TITLE="exec.library/CopyMemQuick" -->
+<head>
+<title>exec.library/CopyMemQuick</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01F9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01FB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CopyMemQuick - optimized memory copy function
+
+<b>   SYNOPSIS</b>
+	CopyMemQuick( source, dest, size )
+		      A0      A1    D0
+
+	void CopyMemQuick(ULONG *,ULONG *,ULONG);
+
+<b>   FUNCTION</b>
+	CopyMemQuick is a highly optimized memory copy function, with
+	restrictions on the size and alignment of its arguments. Both the
+	source and destination pointers must be longword aligned.  In
+	addition, the size must be an integral number of longwords (e.g.
+	the size must be evenly divisible by four).
+
+	Arbitrary overlapping copies are not supported.
+
+	The internal implementation of this function will change from system
+	to system, and may be implemented via hardware DMA.
+
+<b>   INPUTS</b>
+	source - a pointer to the source data region, long aligned
+	dest -  a pointer to the destination data region, long aligned
+	size -  the size (in bytes) of the memory area.  Zero copies
+		zero bytes.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01F9.html">CopyMem()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

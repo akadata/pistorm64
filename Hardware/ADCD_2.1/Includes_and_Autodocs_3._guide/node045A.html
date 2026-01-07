@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="locale" NODE="IsXXXX()" TITLE="locale.library/IsXXXX" -->
+<head>
+<title>locale.library/IsXXXX</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0459.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node045B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	IsXXXX -- determine whether a character is of a certain type. (V38)
+
+<b>   SYNOPSIS</b>
+	state = IsXXXX(locale,character);
+	D0	       A0     D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> IsXXXX(struct <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> *,ULONG);
+
+<b>   FUNCTION</b>
+	These functions determine whether the character specified is of a
+	certain type, according to the supplied locale.
+
+	IsAlNum() - test if alphanumeric character
+	IsAlpha() - test if alphabetical character
+	IsCntrl() - test if control character
+	IsDigit() - test if decimal digit character
+	IsGraph() - test if visible character
+	IsLower() - test if lower case character
+	IsPrint() - test if blank
+	IsPunct() - test if punctuation character
+	IsSpace() - test if white space character
+	IsUpper() - test if upper case character
+	IsXDigit() - test if hexadecimal digit
+
+<b>   INPUTS</b>
+	locale - the locale to use for the test
+	character - the character to test
+
+<b>   RESULT</b>
+	state - TRUE if the character is of the required type, FALSE otherwise
+
+<b>   NOTE</b>
+	These functions require full 32-bit characters be passed-in in order
+	to support multi-byte character sets.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/exall.h" NODE="MAIN" TITLE="Includes/dos/exall.h" -->
+<head>
+<title>Includes/dos/exall.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0078.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node007A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_EXALL_H
+#define DOS_EXALL_H
+/*
+**
+**	$Filename: dos/exall.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.5 $
+**	$Date: 90/07/12 $
+**
+**	include file for ExAll() data structures
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+<a name="line16"></a>
+#ifndef EXEC_TYPES_H
+<a name="line18">#include &#034;exec/types.h&#034;</a>
+#endif
+
+#ifndef UTILITY_HOOKS_H
+#include &#034;utility/hooks.h&#034;
+#endif
+
+<a name="line25">/* values that can be passed for what data you want from ExAll() */</a>
+<a name="line26">/* each higher value includes those below it (numerically)	 */</a>
+<a name="line27">/* you MUST chose one of these values */</a>
+<a name="line28">#define	ED_NAME		1</a>
+<a name="line29">#define	ED_TYPE		2</a>
+<a name="line30">#define ED_SIZE		3</a>
+#define ED_PROTECTION	4
+#define ED_DATE		5
+#define ED_COMMENT	6
+
+/*
+<a name="line36"> *   Structure in which exall results are returned in.	Note that only the</a>
+<a name="line37"> *   fields asked for will exist!</a>
+<a name="line38"> */</a>
+<a name="line39"></a>
+<a name="line40">struct ExAllData {</a>
+<a name="line41">	struct ExAllData *ed_Next;</a>
+<a name="line42">	UBYTE  *ed_Name;</a>
+<a name="line43">	LONG	ed_Type;</a>
+<a name="line44">	ULONG	ed_Size;</a>
+<a name="line45">	ULONG	ed_Prot;</a>
+	ULONG	ed_Days;
+	ULONG	ed_Mins;
+	ULONG	ed_Ticks;
+	UBYTE  *ed_Comment;	/* strings will be after last used field */
+};
+
+/*
+ *   Control structure passed to ExAll.  Unused fields MUST be initialized to
+ *   0, expecially eac_LastKey.
+ *
+ *   eac_MatchFunc is a hook (see utility.library documentation for usage)
+ *   It should return true if the entry is to returned, false if it is to be
+<a name="line58"> *   ignored.</a>
+<a name="line59"> *</a>
+<a name="line60"> *   This structure MUST be allocated by AllocDosObject()!</a>
+<a name="line61"> */</a>
+<a name="line62"></a>
+struct ExAllControl {
+	ULONG	eac_Entries;	 /* number of entries returned in buffer      */
+	ULONG	eac_LastKey;	 /* Don't touch inbetween linked ExAll calls! */
+	UBYTE  *eac_MatchString; /* wildcard string for pattern match or NULL */
+	struct Hook *eac_MatchFunc; /* optional private wildcard function     */
+};
+
+#endif /* DOS_EXALL_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

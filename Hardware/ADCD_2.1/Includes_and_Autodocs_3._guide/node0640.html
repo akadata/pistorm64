@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/prefs/reaction.h" NODE="MAIN" TITLE="include/prefs/reaction.h" -->
+<head>
+<title>include/prefs/reaction.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node063F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0641.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef PREFS_REACTION_H
+#define PREFS_REACTION_H
+/*
+**	$VER: reaction.h 44.1 (19.10.1999)
+**	Includes Release 44.1
+**
+**	Reaction preferences file definitions
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef LIBRARIES_IFFPARSE_H
+#include &#060;libraries/iffparse.h&#062;
+#endif
+
+#ifndef GRAPHICS_TEXT_H
+#include &#060;graphics/text.h&#062;
+#endif
+
+
+/*****************************************************************************/
+
+#define ID_RACT MAKE_ID('R','A','C','T')
+
+#define FONTNAMESIZE (128)
+<a name="line27"></a>
+struct ReactionPrefs
+{
+	UWORD     rp_BevelType; /* see &#060;reaction/reaction_prefs.h&#062; */
+	UWORD     rp_GlyphType; /* see (reaction/reaction_prefs.h&#062; */
+	UWORD     rp_LayoutSpacing;
+	BOOL      rp_3DProp;
+	UWORD     rp_LabelPen;
+	UWORD     rp_LabelPlace;
+	BOOL      rp_3DLabel;
+	BOOL      rp_SimpleRefresh;
+	BOOL      rp_3DLook;
+	struct TextAttr rp_FallbackAttr;
+	struct TextAttr rp_LabelAttr;
+	UBYTE     rp_FallbackName[FONTNAMESIZE];
+	UBYTE     rp_LabelName[FONTNAMESIZE];
+	UBYTE     rp_Pattern[256];
+};
+
+#endif /* PREFS_REACTION_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

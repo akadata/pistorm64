@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="8SVXSEQ-2-1" TITLE=" 8SVXSEQN.FADE.doc / Optional Data Chunk SEQN " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> 8SVXSEQN.FADE.doc / Optional Data Chunk SEQN </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node020C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node020E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The optional data chunk SEQN gives the information necessary to play a
+sample in a sequence of defined blocks. To have a segment repeat twice,
+the definition occurs twice in the list.
+
+This list consists of pairs of ULONG &#034;loop start&#034; and &#034;end&#034; definitions
+which are offsets from the start of the waveform. The locations or values
+must be LONGWORD aligned (divisable by 4).
+
+To determine how many loop definitions in a given file, simply divide the
+SEQN chunk size by 8.
+
+E.g., if chunk size == 40 ... number of loops = (40 / 8) .. equals 5 loops.
+
+The raw data in a file might look like this...
+
+'S-E-Q-N' [ size ] [     Loop 1    ] [     Loop 2    ] [     Loop 3    ]
+
+ 5345514E 00000028 00000000 00000C00 00000000 00000C00 00000C08 00002000
+             ^
+             ^     'Haaaallelujah..' 'Haaaallelujah..'   'Hallelujah..'
+             ^
+             ^
+             40 bytes decimal / 8 = 5 loop or segments
+
+
+      [     Loop 4    ] [    Loop 5     ]'B-O-D-Y'   Size     Data
+
+      00000C08 00002000 00002008 00003000 424F4459 000BE974 010101010101010
+
+        'Hallelujah..'  'Halleeeelujah..'
+
+
+In a waveform containing SEQN chunks, the oneShotHiSamples should be set
+to 0 and the repeatHiSamples should equal the BODY length (divided by 2 if
+STEREO).
+
+Remember the locations of the start and end of each segment or loop should
+be LONGWORD aligned.
+
+If the waveform is Stereo, treat the values and locations in exactly the
+same way. In other words, if a loop starts at location 400 within a Stereo
+waveform, you start the sound at the 400th byte position in the left data
+and the 400th byte position in the right data simultaneously.
+
+	#define ID_SEQN MakeID('S','E','Q','N')
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

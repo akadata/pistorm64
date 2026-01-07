@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="LoadRGB32()" TITLE="graphics.library/LoadRGB32" -->
+<head>
+<title>graphics.library/LoadRGB32</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02FA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02FC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	LoadRGB32 -- Set a series of color registers for this Viewport. (V39)
+
+<b>   SYNOPSIS</b>
+	LoadRGB32(  vp,  table )
+	            a0   a1
+
+	void LoadRGB32( struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *, ULONG *);
+
+<b>   INPUTS</b>
+	vp = viewport
+	table = a pointer to a series of records which describe which colors to
+	        modify.
+<b>   RESULT</b>
+	The selected color registers are changed to match your specs.
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+
+	Passing a NULL &#034;table&#034; is ignored.
+	The format of the table passed to this function is a series of records,
+	each with the following format:
+
+	        1 Word with the number of colors to load
+	        1 Word with the first color to be loaded.
+	        3 longwords representing a left justified 32 bit rgb triplet.
+	        The list is terminated by a count value of 0.
+
+	   examples:
+	        ULONG table[]={1l&#060;&#060;16+0,0xffffffff,0,0,0} loads color register
+	                0 with 100% red.
+	        ULONG table[]={256l&#060;&#060;16+0,r1,g1,b1,r2,g2,b2,.....0} can be used
+	                to load an entire 256 color palette.
+
+	Lower order bits of the palette specification will be discarded,
+	depending on the color palette resolution of the target graphics
+	device. Use 0xffffffff for the full value, 0x7fffffff for 50%,
+	etc. You can find out the palette range for your screen by
+	querying the graphics data base.
+
+	LoadRGB32 is faster than <a href="../Includes_and_Autodocs_3._guide/node0328.html">SetRGB32</a>, even for one color.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02FC.html">LoadRGB4()</a> <a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a> <a href="../Includes_and_Autodocs_3._guide/node02E9.html">GetRGB32()</a> <a href="../Includes_and_Autodocs_3._guide/node0329.html">SetRGB32CM()</a> <a href="../Includes_and_Autodocs_3._guide/node05ED.html">graphics/view.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

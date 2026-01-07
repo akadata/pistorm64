@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-1-24" TITLE="D / Errors / Hang--One Program Only" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D / Errors / Hang--One Program Only</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node054D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node054F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Program hangs are generally caused by <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a>ing on the wrong signal bits,
+on the wrong port, on the wrong message, or on some other event that will
+never occur.  This can occur if the event you are waiting on is not
+coming, or if one task tries to Wait(), <a href="../Libraries_Manual_guide/node02F1.html#line9">WaitPort()</a>, or <a href="../Libraries_Manual_guide/node02A0.html#line48">WaitIO()</a> on a
+signal, port, or window that was created by a different task.  Both
+WaitIO() and WaitPort() can call Wait(), and you cannot Wait() on another
+task's signals.  Hangs can also be caused by verify deadlocks. Be sure to
+turn off all Intuition verify messages (such as <a href="../Libraries_Manual_guide/node01DE.html#line6">MENUVERIFY</a>) before calling
+<a href="../Libraries_Manual_guide/node01B4.html#line21">AutoRequest()</a> or doing disk access.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

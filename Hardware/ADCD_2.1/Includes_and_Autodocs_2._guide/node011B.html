@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/resources/disk.i" NODE="MAIN" TITLE="Includes/resources/disk.i" -->
+<head>
+<title>Includes/resources/disk.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node011A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node011C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	RESOURCES_DISK_I
+RESOURCES_DISK_I	SET	1
+**
+**	$Filename: resources/disk.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 27.10 $
+**	$Date: 90/11/21 $
+**
+**	disk.i -- external declarations for the disk resource
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+	IFND	EXEC_TYPES_I
+	INCLUDE	&#034;exec/types.i&#034;
+	ENDC	!EXEC_TYPES_I
+
+	IFND	EXEC_LISTS_I
+	INCLUDE	&#034;exec/lists.i&#034;
+	ENDC	!EXEC_LISTS_I
+
+	IFND	EXEC_PORTS_I
+	INCLUDE	&#034;exec/ports.i&#034;
+	ENDC	!EXEC_PORTS_I
+
+	IFND	EXEC_INTERRUPTS_I
+	INCLUDE	&#034;exec/interrupts.i&#034;
+	ENDC	!EXEC_INTERRUPTS_I
+
+	IFND	EXEC_LIBRARIES_I
+	INCLUDE	&#034;exec/libraries.i&#034;
+	ENDC	!EXEC_LIBRARIES_I
+
+
+*********************************************************************
+*
+* Resource structures
+*
+*********************************************************************
+
+    STRUCTURE DISCRESOURCEUNIT,MN_SIZE
+	STRUCT	DRU_DISCBLOCK,IS_SIZE
+	STRUCT	DRU_DISCSYNC,IS_SIZE
+	STRUCT	DRU_INDEX,IS_SIZE
+	LABEL	DRU_SIZE
+
+
+
+    STRUCTURE DISCRESOURCE,LIB_SIZE
+	APTR	DR_CURRENT	; pointer to current unit structure
+	UBYTE	DR_FLAGS
+	UBYTE	DR_pad
+	APTR	DR_SYSLIB
+	APTR	DR_CIARESOURCE
+	STRUCT	DR_UNITID,4*4
+	STRUCT	DR_WAITING,LH_SIZE
+	STRUCT	DR_DISCBLOCK,IS_SIZE
+	STRUCT	DR_DISCSYNC,IS_SIZE
+	STRUCT	DR_INDEX,IS_SIZE
+	APTR	DR_CURRTASK	; pointer to owning task for GiveUnit
+	LABEL	DR_SIZE
+
+	BITDEF	DR,ALLOC0,0	; unit zero is allocated
+	BITDEF	DR,ALLOC1,1	; unit one is allocated
+	BITDEF	DR,ALLOC2,2	; unit two is allocated
+	BITDEF	DR,ALLOC3,3	; unit three is allocated
+	BITDEF	DR,ACTIVE,7	; is the disc currently busy?
+
+
+*********************************************************************
+*
+* Hardware Magic
+*
+*********************************************************************
+
+
+DSKDMAOFF	EQU	$4000	; idle command for dsklen register
+
+
+*********************************************************************
+*
+* Resource specific commands
+*
+*********************************************************************
+
+*-- DR_NAME is a generic macro to get the name of the resource.  This
+*-- way if the name is ever changed you will pick up the change
+*-- automatically.
+*--
+*-- Normal usage would be:
+*--
+*-- internalName:	DISKNAME
+*--
+
+DISKNAME:	MACRO
+		DC.B	'disk.resource',0
+		DS.W	0
+		ENDM
+
+	LIBINIT LIB_BASE
+	LIBDEF	DR_ALLOCUNIT
+	LIBDEF	DR_FREEUNIT
+	LIBDEF	DR_GETUNIT
+	LIBDEF	DR_GIVEUNIT
+	LIBDEF	DR_GETUNITID
+	LIBDEF	DR_READUNITID
+
+DR_LASTCOMM	EQU	DR_READUNITID
+
+
+*********************************************************************
+*
+* drive types
+*
+*********************************************************************
+
+DRT_AMIGA	EQU	$00000000
+DRT_37422D2S	EQU	$55555555
+DRT_EMPTY	EQU	$FFFFFFFF
+DRT_150RPM	EQU	$AAAAAAAA
+
+	ENDC	; RESOURCES_DISK_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

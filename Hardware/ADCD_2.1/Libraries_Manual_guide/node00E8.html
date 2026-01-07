@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-4-2" TITLE="3 / Public Screen Functions / The Default Public Screen and Workbench" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Public Screen Functions / The Default Public Screen and Workbench</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00E7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00E9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As mentioned earlier, Workbench is a special case <a href="../Libraries_Manual_guide/node00E6.html">public screen</a> because it
+is the initial default public screen.  There are other reasons Workbench
+has a special status.  Normally, it's the first thing the user sees
+because it is the default user interface on all Amiga computers.  Many
+older applications written for V34 and earlier versions of the OS expect
+to run in the Workbench screen.  Also, Workbench is currently the only
+public screen supported by system Preferences and the only screen
+<a name="line9">Intuition can automatically open.</a>
+
+Because of its close ties with the operating system, there are some extra
+functions available to manipulate the Workbench screen.  One function
+which controls both Workbench and other <a href="../Libraries_Manual_guide/node00E6.html">public screens</a> is
+<a href="../Libraries_Manual_guide/node00E6.html#line34">SetPubScreenModes()</a>.  This function controls the global public screen mode
+bits, SHANGHAI and POPPUBSCREEN.  If the SHANGHAI mode bit is set, older
+applications which expect to open on the Workbench screen will open
+instead on the default public screen (which may or may not be the
+Workbench screen).  The POPPUBSCREEN bit controls whether public screens
+will be popped to the front when a window is opened.  These modes are
+documented in the &#034;Intuition Windows&#034; chapter in the section on
+&#034;<a href="../Libraries_Manual_guide/node0106.html#line48">Windows and Screens</a>&#034;.
+
+Other functions which control the Workbench screen are listed in the table
+below.
+<a name="line25"></a>
+
+           Table 3-6: Workbench Public Screen Functions
+  ______________________________________________________________________
+ |                                                                      |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0261.html">WBenchToBack()</a>  Move the Workbench screen behind all other        |
+ |                    screens.                                          |
+ |                                                                      |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0262.html">WBenchToFront()</a>  Move the Workbench screen in front of all other   |
+ |                    screens.                                          |
+ |                                                                      |
+ |   <a href="../Includes_and_Autodocs_2._guide/node023B.html">OpenWorkBench()</a>  Open the Workbench screen.  If the screen is      |
+ |                    already open, this call has no effect.  This call |
+ |                    will re-awaken the Workbench application if it    |
+ |                    was active when CloseWorkBench() was called.      |
+ |                                                                      |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0209.html">CloseWorkBench()</a>  Attempt to reclaim memory used for the Workbench  |
+ |                    screen.  If successful, this call closes the      |
+ |                    screen and puts the Workbench application to      |
+ |                    sleep.  This call fails if any application has    |
+ |                    windows open or locks on the Workbench screen.    |
+ |______________________________________________________________________|
+<a name="line47"></a>
+
+Programs can attempt to reclaim memory used by the Workbench screen by
+calling CloseWorkBench().  Programs that have closed Workbench, should
+call OpenWorkBench() as they exit or allow the user to re-open the screen
+through a menu or gadget.
+
+If Workbench is closed, any of the following events can re-open it:
+calling OpenWorkBench(); opening a window on the Workbench (including
+<a href="../Libraries_Manual_guide/node01AC.html">EasyRequests()</a> such as the DOS &#034;Insert Disk&#034; requester); calling
+<a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen</a>(&#034;Workbench&#034;);  calling LockPubScreen(NULL) when Workbench is
+the default <a href="../Libraries_Manual_guide/node00E6.html">public screen</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

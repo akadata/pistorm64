@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/port1.c" NODE="MAIN" TITLE="lib_examples/port1.c" -->
+<head>
+<title>lib_examples/port1.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05E7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05E9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* port1.c - Execute me to compile with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 port1.c
+Blink FROM LIB:c.o,port1.o TO port1 LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+
+* port1.c - port and message example, run at the same time as port2.c
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/ports.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL-C handling */
+int chkabort(void) {return(0);}
+#endif
+
+struct XYMessage {
+    struct Message xym_Msg;
+    WORD           xy_X;
+    WORD           xy_Y;
+};
+
+void main(int argc, char **argv)
+{
+    struct MsgPort *xyport;
+    struct XYMessage *xymsg;
+    ULONG portsig, usersig, signal;
+    BOOL ABORT = FALSE;
+
+    if (xyport = CreatePort(&#034;xyport&#034;, 0))
+    {
+        portsig = 1 &#060;&#060; xyport-&#062;mp_SigBit;       /* Give user a `break' signal. */
+        usersig = SIGBREAKF_CTRL_C;
+
+        printf(&#034;Start port2 in another shell.  CTRL-C here when done.\n&#034;);
+        do
+        {                                                 /* port1 will wait forever and reply   */
+            signal = Wait(portsig | usersig);             /* to messages, until the user breaks. */
+
+                                   /* Since we only have one port that might get messages we     */
+            if (signal &#038; portsig)  /* have to reply to, it is not really necessary to test for   */
+            {                      /* the portsignal. If there is not message at the port, xymsg */
+
+                while(xymsg = (struct XYMessage *)GetMsg(xyport))        /* simply will be NULL. */
+                {
+                    printf(&#034;port1 received: x = %d y = %d\n&#034;, xymsg-&#062;xy_X, xymsg-&#062;xy_Y);
+
+                    xymsg-&#062;xy_X += 50;       /* Since we have not replied yet to the owner of    */
+                    xymsg-&#062;xy_Y += 50;       /* xymsg, we can change the data contents of xymsg. */
+
+                    printf(&#034;port1 replying with: x = %d y = %d\n&#034;, xymsg-&#062;xy_X, xymsg-&#062;xy_Y);
+                    ReplyMsg((struct Message *)xymsg);
+                }
+            }
+
+            if (signal &#038; usersig)                                    /* The user wants to abort. */
+            {
+                while(xymsg = (struct XYMessage *)GetMsg(xyport))    /* Make sure port is empty. */
+                    ReplyMsg((struct Message *)xymsg);
+                ABORT = TRUE;
+            }
+        }
+        while (ABORT == FALSE);
+            DeletePort(xyport);
+        }
+    else printf(&#034;Couldn't create 'xyport'\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

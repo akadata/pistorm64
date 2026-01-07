@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_5" NODE="5-4-1" TITLE="5 / Setting and Reading Controller Type / Determining The Controller Type" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>5 / Setting and Reading Controller Type / Determining The Controller Type</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00B8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00BA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You determine the type of controller being used by passing an I/O request
+to the device with <a href="../Includes_and_Autodocs_2._guide/node04BA.html">GPD_ASKCTYPE</a> set in io_Command, 1 set in io_Length and
+the number of the unit set in io_Unit. The gameport device will respond
+with the type of controller being used.
+
+   struct IOStdReq *GameIO;  /* Must be initialized prior to using */
+
+   BYTE GetControllerType()
+   {
+   BYTE controller_type = 0;
+
+   GameIO-&#062;io_Command = GPD_ASKCTYPE;         /* get type of controller */
+   GameIO-&#062;io_Data = (APTR)&#038;controller_type;  /* place data here */
+   GameIO-&#062;io_Length = 1;
+   DoIO(GameIO);
+   return (controller_type);
+   }
+
+The BYTE value returned corresponds to one of the five controller types
+noted above.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

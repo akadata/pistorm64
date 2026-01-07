@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-2-2" TITLE="B / rootclass / New Methods: OM_DISPOSE" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / rootclass / New Methods: OM_DISPOSE</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04BC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04BE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This method instructs an object to delete itself.  The <a href="../Libraries_Manual_guide/node04BB.html">rootclass</a>
+dispatcher's OM_DISPOSE method decrements the true class's internal count
+of instances of true class.  The return value for this method is not
+explicitly defined.
+<a name="line6"></a>
+This method uses the default Boopsi message.
+
+Applications should not call this method directly.  Instead they should
+use the intuition.library function <a href="../Libraries_Manual_guide/node0204.html">DisposeObject()</a>.
+
+For the OM_DISPOSE method, an object should do the following:
+
+Free any additional resources the object explicitly allocated itself in
+the <a href="../Libraries_Manual_guide/node04BC.html">OM_NEW</a> method (this does not include the instance data).
+
+Pass the message up to the superclass, which will eventually reach
+<a href="../Libraries_Manual_guide/node04BB.html">rootclass</a>, which will free the instance data allocated for the object.
+
+If a class does not allocate any extra resources when it creates an
+object, it can defer all OM_DISPOSE processing to its superclass.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

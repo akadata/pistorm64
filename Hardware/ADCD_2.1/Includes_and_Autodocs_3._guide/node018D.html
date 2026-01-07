@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="MatchFirst()" TITLE="dos.library/MatchFirst" -->
+<head>
+<title>dos.library/MatchFirst</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node018C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node018E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	MatchFirst -- Finds file that matches pattern (V36)
+
+<b>   SYNOPSIS</b>
+	error = MatchFirst(pat, AnchorPath)
+	D0                 D1       D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> MatchFirst(STRPTR, struct <a href="../Includes_and_Autodocs_3._guide/node05D0.html#line51">AnchorPath</a> *)
+
+<b>   FUNCTION</b>
+	Locates the first file or directory that matches a given pattern.
+	MatchFirst() is passed your pattern (you do not pass it through
+	<a href="../Includes_and_Autodocs_3._guide/node019B.html">ParsePattern()</a> - MatchFirst() does that for you), and the control
+	structure.  MatchFirst() normally initializes your <a href="../Includes_and_Autodocs_3._guide/node05D0.html#line51">AnchorPath</a>
+	structure for you, and returns the first file that matched your
+	pattern, or an error.  Note that <a href="../Includes_and_Autodocs_3._guide/node018E.html">MatchFirst()/MatchNext()</a> are unusual
+	for Dos in that they return 0 for success, or the error code (see
+	<a href="../Includes_and_Autodocs_3._guide/node05F8.html">&#060;dos/dos.h&#062;</a>), instead of the application getting the error code
+	from <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>.
+
+	When looking at the result of <a href="../Includes_and_Autodocs_3._guide/node018E.html">MatchFirst()/MatchNext()</a>, the ap_Info
+	field of your <a href="../Includes_and_Autodocs_3._guide/node05D0.html#line51">AnchorPath</a> has the results of an <a href="../Includes_and_Autodocs_3._guide/node015C.html">Examine()</a> of the object.
+	You normally get the name of the object from fib_FileName, and the
+	directory it's in from ap_Current-&#062;an_Lock.  To access this object,
+	normally you would temporarily <a href="../Includes_and_Autodocs_3._guide/node014E.html">CurrentDir()</a> to the lock, do an action
+	to the file/dir, and then <a href="../Includes_and_Autodocs_3._guide/node014E.html">CurrentDir()</a> back to your original directory.
+	This makes certain you affect the right object even when two volumes
+	of the same name are in the system.  You can use ap_Buf (with
+	ap_Strlen) to get a name to report to the user.
+
+	To initialize the <a href="../Includes_and_Autodocs_3._guide/node05D0.html#line51">AnchorPath</a> structure (particularily when reusing
+	it), set ap_BreakBits to the signal bits (CDEF) that you want to take
+	a break on, or NULL, if you don't want to convenience the user.
+	ap_Flags should be set to any flags you need or all 0's otherwise.
+	ap_FoundBreak should be cleared if you'll be using breaks.
+
+	If you want to have the FULL PATH NAME of the files you found,
+	allocate a buffer at the END of this structure, and put the size of
+	it into ap_Strlen.  If you don't want the full path name, make sure
+	you set ap_Strlen to zero.  In this case, the name of the file, and
+	stats are available in the ap_Info, as per usual.
+
+	Then call MatchFirst() and then afterwards, <a href="../Includes_and_Autodocs_3._guide/node018E.html">MatchNext()</a> with this
+	structure.  You should check the return value each time (see below)
+	and take the appropriate action, ultimately calling <a href="../Includes_and_Autodocs_3._guide/node018C.html">MatchEnd()</a> when
+	there are no more files or you are done.  You can tell when you are
+	done by checking for the normal AmigaDOS return code
+	ERROR_NO_MORE_ENTRIES.
+
+	Note: patterns with trailing slashes may cause <a href="../Includes_and_Autodocs_3._guide/node018E.html">MatchFirst()/MatchNext()</a>
+	to return with an ap_Current-&#062;an_Lock on the object, and a filename
+	of the empty string (&#034;&#034;).
+
+	See <a href="../Includes_and_Autodocs_3._guide/node019B.html">ParsePattern()</a> for more information on the patterns.
+
+<b>   INPUTS</b>
+	pat        - Pattern to search for
+	<a href="../Includes_and_Autodocs_3._guide/node05D0.html#line51">AnchorPath</a> - Place holder for search.  MUST be longword aligned!
+
+<b>   RESULT</b>
+	error - 0 for success or error code.  (Opposite of most Dos calls!)
+
+<b>   BUGS</b>
+	In V36, there were a number of bugs with <a href="../Includes_and_Autodocs_3._guide/node018E.html">MatchFirst()/MatchNext()</a>.
+	One was that if you entered a directory with a name like &#034;df0:l&#034;
+	using DODIR, it would re-lock the full string &#034;df0:l&#034;, which can
+	cause problems if the disk has changed.  It also had problems
+	with patterns such as #?/abc/def - the ap_Current-&#062;an_Lock would
+	not be on the directory def is found in.  ap_Buf would be correct,
+	however.  It had similar problems with patterns with trailing
+	slashes.  These have been fixed for V37 and later.
+
+	A bug that has not been fixed for V37 concerns a pattern of a
+	single directory name (such as &#034;l&#034;).  If you enter such a directory
+	via DODIR, it re-locks l relative to the current directory.  Thus
+	you must not change the current directory before calling <a href="../Includes_and_Autodocs_3._guide/node018E.html">MatchNext()</a>
+	with DODIR in that situation.  If you aren't using DODIR to enter
+	directories you can ignore this.  This may be fixed in some upcoming
+	release.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node018E.html">MatchNext()</a>, <a href="../Includes_and_Autodocs_3._guide/node019B.html">ParsePattern()</a>, <a href="../Includes_and_Autodocs_3._guide/node015C.html">Examine()</a>, <a href="../Includes_and_Autodocs_3._guide/node014E.html">CurrentDir()</a>, <a href="../Includes_and_Autodocs_3._guide/node015C.html">Examine()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node018C.html">MatchEnd()</a>, <a href="../Includes_and_Autodocs_3._guide/node0160.html">ExNext()</a>, <a href="../Includes_and_Autodocs_3._guide/node05D0.html">&#060;dos/dosasl.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

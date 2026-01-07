@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_35" NODE="35-10" TITLE="35 Math Libraries / IEEE Double-Precision Basic Math Library" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>35 Math Libraries / IEEE Double-Precision Basic Math Library</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0489.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node048B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The IEEE double-precision basic math library contains entries for the
+basic IEEE mathematics functions, such as add, subtract, and divide. This
+library resides on disk and is opened by calling <a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a> with
+&#034;mathieeedoubbas.library&#034; as the argument.  Do not share the library base
+pointer between tasks -- <a href="../Libraries_Manual_guide/node047B.html#line12">see note</a> at beginning of chapter for details.
+
+    #include &#060;exec/types.h&#062;
+    #include &#060;libraries/mathieeedp.h&#062;
+
+    #include &#060;clib/mathdoubbas_protos.h&#062;
+
+    struct Library *MathIeeeDoubBasBase;
+
+    VOID main()
+    {
+        /* do not share base pointer between tasks. */
+    if (MathIeeeDoubBasBase = OpenLibrary(&#034;mathieeedoubbas.library&#034;, 34))
+        {
+               . . .
+
+        CloseLibrary(MathIeeeDoubBasBase);
+        }
+    else printf(&#034;Can't open mathieeedoubbas.library\n&#034;);
+    }
+
+The global variable MathIeeeDoubBasBase is used internally for all future
+<a name="line28">library references.</a>
+
+If an 680X0/68881/68882 processor combination is available, it will be
+used by the IEEE basic library instead of the software emulation.  Also,
+if an autoconfigured math resource is available, that will be used.
+Typically this is a 68881 designed as a 16 bit I/O port, but it could be
+another device as well.
+
+ <a href="../Libraries_Manual_guide/node048B.html">DP IEEE Basic Functions</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

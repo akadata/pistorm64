@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="ObtainSemaphoreShared()" TITLE="exec.library/ObtainSemaphoreShared" -->
+<head>
+<title>exec.library/ObtainSemaphoreShared</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node021E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0220.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ObtainSemaphoreShared -- gain shared access to a semaphore (V36)
+
+<b>    SYNOPSIS</b>
+	ObtainSemaphoreShared(signalSemaphore)
+	                      a0
+
+	void ObtainSemaphoreShared(struct <a href="../Includes_and_Autodocs_3._guide/node0647.html#line39">SignalSemaphore</a> *);
+
+<b>    FUNCTION</b>
+	A lock on a signal semaphore may either be exclusive, or shared.
+	Exclusive locks are granted by the <a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a> and
+	<a href="../Includes_and_Autodocs_3._guide/node01EC.html">AttemptSemaphore()</a> functions.  Shared locks are granted by
+	ObtainSemaphoreShared().  Calls may be nested.
+
+	Any number of tasks may simultaneously hold a shared lock on a
+	semaphore.  Only one task may hold an exclusive lock.  A typical
+	application is a list that is often read, but only occasionally
+	written to.
+
+	Any exlusive locker will be held off until all shared lockers
+	release the semaphore.  Likewise, if an exlusive lock is held,
+	all potential shared lockers will block until the exclusive lock
+	is released.  All shared lockers are restarted at the same time.
+
+<b>    EXAMPLE</b>
+		ObtainSemaphoreShared(ss);
+		/* read data */
+		ReleaseSemaohore(ss);
+
+		ObtainSemaphore(ss);
+		/* modify data */
+		ReleaseSemaohore(ss);
+
+<b>    NOTES</b>
+	While this function was added for V36, the feature magically works
+	with all older semaphore structures.
+
+	A task owning a shared lock must not attempt to get an exclusive
+	lock on the same semaphore.
+
+	Starting in V39, if the caller already has an exclusive lock on the
+	semaphore it will return with another nesting of the lock.  Pre-V39
+	this would cause a deadlock.  For pre-V39 use, you can use the
+	following workaround:
+
+		/* Try to get the shared semaphore */
+		if (!AttemptSemaphoreShared(ss))
+		{
+			/* Check if we can get the exclusive version */
+			if (!AttemptSemaphore(ss))
+			{
+				/* Oh well, wait for the shared lock */
+				ObtainSemaphoreShared(ss));
+			}
+		}
+		:
+		:
+		ReleaseSemaphore(ss);
+
+<b>    INPUT</b>
+	signalSemaphore -- an initialized signal semaphore structure
+
+<b>    NOTE</b>
+	This call is guaranteed to preserve all registers, starting with
+	V37 exec.
+
+<b>    RESULT</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node0217.html">InitSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node0228.html">ReleaseSemaphore()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node01EC.html">AttemptSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node021E.html">ObtainSemaphoreList()</a>, <a href="../Includes_and_Autodocs_3._guide/node0225.html">Procure()</a>, <a href="../Includes_and_Autodocs_3._guide/node0245.html">Vacate()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

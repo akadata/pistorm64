@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="nonvolatile" NODE="GetCopyNV()" TITLE="nonvolatile.library/GetCopyNV" -->
+<head>
+<title>nonvolatile.library/GetCopyNV</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04DD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04DF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetCopyNV -- return a copy of an item stored in nonvolatile storage.
+		     (V40)
+
+<b>   SYNOPSIS</b>
+	data = GetCopyNV(appName, itemName, killRequesters);
+	D0		 A0	  A1	    D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> GetCopyNV(STRPTR, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, BOOL);
+
+<b>   FUNCTION</b>
+	Searches the nonvolatile storage for the indicated appName and
+	itemName. A pointer to a copy of this data will be returned.
+
+	The strings appName and itemName may not contain the '/' or ':'
+	characters. It is recommended that these characters be blocked
+	from user input when requesting appName and itemName strings.
+
+<b>   INPUTS</b>
+	appName - NULL terminated string indicating the application name
+		  to be found. Maximum length is 31.
+	itemName - NULL terminated string indicated the item within the
+		   application to be found. Maximum length is 31.
+	killRequesters - Suppress system requesters flag. TRUE if all system
+			 requesters are to be suppressed during this function.
+			 FALSE if system requesters are allowed.
+
+<b>   RESULT</b>
+	data - pointer to a copy of the data found in the nonvolatile storage
+	       assocated with appName and itemName. NULL will be returned
+	       if there is insufficient memory or the appName/itemName does
+	       not exist.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node04DD.html">FreeNVData()</a>, <a href="../Includes_and_Autodocs_3._guide/node0635.html">&#060;libraries/nonvolatile.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

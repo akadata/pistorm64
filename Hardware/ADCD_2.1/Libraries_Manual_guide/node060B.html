@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/sample_stubs.asm" NODE="MAIN" TITLE="lib_examples/sample_stubs.asm" -->
+<head>
+<title>lib_examples/sample_stubs.asm</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node060A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node060C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+*******************************************************************************************
+* sample_stubs.asm
+*
+* Stubs match this .fd file:
+*
+*       ##base _SampleBase
+*       ##bias 30
+*       ##public
+*       Double(n1)(D0)
+*       AddThese(n1,n2)(D0/D1)
+*       ##end
+*
+* After assembling,
+*   JOIN sample_stubs.o sample_lvos.o AS sample.lib
+*
+* Apps LINK with LIBRARY sample.lib when calling sample.library functions
+*
+* If you put all of your stubs in one file, as shown here, then ALL of the stubs will be
+* linked into an application that references one stub.  For larger libraries, you should
+* place each stub in a separate assembler file, assemble them each separately, then join
+* all of the .o's together. That will allow each stub to be independently pulled into the
+* application that links with the .lib.
+*******************************************************************************************
+   INCLUDE  &#034;exec/types.i&#034;
+   INCLUDE  &#034;exec/libraries.i&#034;
+
+          section code
+
+*------ Caller declares and initializes SampleBase in their C code
+
+            XREF        _SampleBase
+
+*------ Must externally reference the _LVO labels defined in samplelib_lvos
+
+            XREF        _LVODouble
+            XREF        _LVOAddThese
+
+*------ Make C function stubs available to caller
+
+            XDEF        _Double
+            XDEF        _AddThese
+
+*------- These stubs move C args from stack to appropriate registers,
+*------- call the library function, and return result in d0
+
+_Double:
+            MOVE.L      A6,-(SP)           ;Save register(s)
+            MOVE.L      8(SP),D0           ;Copy param to register
+            MOVE.L      _SampleBase,A6     ;Library base to A6
+            JSR         _LVODouble(A6)     ;Go to real routine
+            MOVE.L      (SP)+,A6           ;Restore register(s)
+            RTS
+
+_AddThese:
+            MOVE.L      A6,-(SP)           ;Save register(s)
+            MOVEM.L     8(SP),D0/D1        ;Copy params to registers
+                                           ;8(SP)  goes into D0
+                                           ;12(SP) goes into D1
+            MOVE.L      _SampleBase,A6     ;Library base to A6
+            JSR         _LVOAddThese(A6)   ;Go to real routine
+            MOVE.L      (SP)+,A6           ;Restore register(s)
+            RTS
+
+          END
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

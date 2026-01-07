@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-41/imageclass.txt" NODE="IV-41-3" TITLE="Boopsi Dispatcher" -->
+<head>
+<title>Boopsi Dispatcher</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00A0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00A2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Now all you need to do is implement a dispatcher routine.  When the
+dispatcher is in operation, Intuition passes method IDs to it.  The
+dispatcher will either execute code corresponding to the a method ID (the
+code is usually part of the dispatcher) or delegate processing the method
+to the superclass (or it can do a little of both).
+
+The following fragment provides an example of what a dispatcher for a
+boopsi class looks like (Note that __saveds (Save DS) is used to insure
+that register A4 is set up properly for indirect addressing with the SASC
+compiler):
+
+
+   ULONG __saveds dispatchmyTextLabel (Class *cl, Object *o, Msg msg)
+   {
+       struct localObjData *lod;
+       Object *newobj;
+       ULONG retval;
+
+       switch (msg-&#062;MethodID)
+       {
+           /* Create a new object */
+           case OM_NEW:
+               /* Have our superclass create it.  DSM() passes on the
+                * message to the superclass, where msg is the structure
+                * containing the message specific parameters.
+                */
+               if (newobj = (Object *) DSM (cl, o, msg))
+               {
+                   /* Set the attributes */
+                   setmyTextLabelAttrs(cl, newobj, (struct opSet *) msg);
+               }
+
+               retval = (ULONG) newobj;
+               break;
+
+           /* Obtain information on an attribute */
+           case OM_GET:
+               retval = getmyTextLabelAttrs (cl, o, (struct opGet *) msg);
+               break;
+
+           /* Set attributes */
+           case OM_UPDATE:
+           case OM_SET:
+               /* Let the superclass set the attributes that it
+                * knows about. */
+               retval = DSM (cl, o, msg);
+
+               /* Set the attributes that we care about */
+               retval |= setmyTextLabelAttrs (cl, o, (struct opSet *) msg);
+               break;
+
+           /* Draw the various states that the image supports */
+           case IM_DRAW:
+           case IM_DRAWFRAME:
+               retval = drawmyTextLabel (cl, o, (struct impDraw *) msg);
+               break;
+
+           /* Let the superclass handle everything else */
+           default:
+               retval = (ULONG) DSM (cl, o, msg);
+               break;
+       }
+
+       return (retval);
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

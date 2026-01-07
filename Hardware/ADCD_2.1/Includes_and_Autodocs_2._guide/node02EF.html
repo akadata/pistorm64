@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="SelectOutput()" TITLE="dos.library/SelectOutput" -->
+<head>
+<title>dos.library/SelectOutput</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02EE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02F0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SelectOutput -- Select a filehandle as the default input channel (V36)
+
+SYNOPSIS
+    old_fh = SelectOutput(fh)
+    D0                    D1
+
+    BPTR SelectOutput(BPTR)
+
+FUNCTION
+    Set the current output as the default output for the process.
+    This changes the value returned by <a href="../Includes_and_Autodocs_2._guide/node02D8.html">Output()</a>.  old_fh should
+    be closed or saved as needed.
+
+INPUTS
+    fh     - Newly desired output handle
+
+RESULT
+    old_fh - Previous current output
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02D8.html">Output()</a>, <a href="../Includes_and_Autodocs_2._guide/node02EE.html">SelectInput()</a>, <a href="../Includes_and_Autodocs_2._guide/node02BF.html">Input()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

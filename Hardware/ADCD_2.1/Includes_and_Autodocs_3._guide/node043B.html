@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="layout_gc" NODE="LAYOUT_GetClass()" TITLE="layout_gc/LAYOUT_GetClass" -->
+<head>
+<title>layout_gc/LAYOUT_GetClass</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node043A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node043C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+  NAME
+      LAYOUT_GetClass -- Gets the pointer to the layout class.
+
+  SYNOPSIS
+      layout_class = LAYOUT_GetClass();
+      D0
+
+      Class * LAYOUT_GetClass(VOID);
+
+  FUNCTION
+      Obtains the pointer to the layout gadget class for use with
+      <a href="../Includes_and_Autodocs_3._guide/node03CB.html">NewObject()</a>.  This function always returns a valid pointer so
+      you do not need to check it.  The reason is that if the library
+      opens fine, then the pointer returned is already setup.  (Of
+      course this implies that if opening the library fails, you
+      shouldn't be calling this.)
+
+      Note that this function does not create the class, that is done
+      when the class library is opened.
+
+  INPUTS
+      Nothing.
+
+  RESULT
+      LayoutClass - Pointer to the layout gadget class.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

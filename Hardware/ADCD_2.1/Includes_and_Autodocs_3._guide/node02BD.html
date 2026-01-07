@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="ChangeVPBitMap()" TITLE="graphics.library/ChangeVPBitMap" -->
+<head>
+<title>graphics.library/ChangeVPBitMap</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02BC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02BE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       ChangeVPBitMap -- change display memory address for multi-buffered
+			  animation (V39)
+
+<b>   SYNOPSIS</b>
+       ChangeVPBitMap(vp,bm,db)
+	               a0 a1 a2
+
+	void ChangeVPBitMap(struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line278">DBufInfo</a> *);
+
+<b>   FUNCTION</b>
+	Changes the area of display memory which will be displayed in a
+	viewport. This can be used to implement double (or triple)
+	buffering, a method of achieving smooth animation.
+
+<b>   INPUTS</b>
+	vp  =  a pointer to a viewport
+       bm  = a pointer to a <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> structure. This <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> structure must be
+	      of the same layout as the one attached to the viewport (same
+	      depth, alignment, and BytesPerRow).
+	db  =  A pointer to a <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line278">DBufInfo</a>.
+
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+	This will set the vp-&#062;RasInfo-&#062;BitMap field to the bm pointer which is
+	passed.
+
+	When using the synchronization features, you MUST carefully insure that
+	all messages have been replied to before calling <a href="../Includes_and_Autodocs_3._guide/node02DA.html">FreeDBufInfo</a> or
+	calling ChangeVPBitMap with the same <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line278">DBufInfo</a>.
+
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02A1.html">AllocDBufInfo()</a> <a href="../Includes_and_Autodocs_3._guide/node02A0.html">AllocBitMap()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

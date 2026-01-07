@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_9" NODE="9-5-3" TITLE="9 / Using the IDCMP / Setting Up A Custom User Port" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>9 / Using the IDCMP / Setting Up A Custom User Port</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01D7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01D9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An application can use its own message port for the IDCMP instead of the
+<a name="line3">one set up by Intuition, although some care is required.</a>
+
+As described earlier, IDCMP communication takes place through a pair of
+Exec message ports attached to a window: the <a href="../Libraries_Manual_guide/node01D6.html#line16">UserPort</a> and the <a href="../Libraries_Manual_guide/node01D6.html#line16">WindowPort</a>.
+The UserPort is the port where the application receives IDCMP messages
+from Intuition.  The WindowPort is the reply port where Intuition receives
+<a name="line9">replies from the application (via the <a href="../Libraries_Manual_guide/node02F3.html">ReplyMsg()</a> function).</a>
+
+In the simplest case, Intuition allocates (and deallocates) both of these
+ports when the program opens a window with non-NULL IDCMP flags.
+Intuition will also allocate these ports if the application calls
+<a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> with non-NULL flags for a window that has NULL IDCMP flags.
+These port variables will be set to NULL if there is no message port
+allocated, otherwise they will contain a pointer to a message port.
+
+If the <a href="../Libraries_Manual_guide/node01D6.html#line16">WindowPort</a> is not already opened when either <a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a> or
+<a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> is called, it will be allocated and initialized.
+
+<a name="line21">The <a href="../Libraries_Manual_guide/node01D6.html#line16">UserPort</a> is checked separately to see whether it is already opened.</a>
+
+When Intuition initializes the <a href="../Libraries_Manual_guide/node01D6.html#line16">UserPort</a>, it also allocates a signal bit
+with a call to <a href="../Libraries_Manual_guide/node02D3.html#line5">AllocSignal()</a>.  Since the application makes the call to
+<a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> or <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a>, this signal bit is valid for the
+application's task.  The address of the application's task is saved in the
+<a name="line27"><a href="../Libraries_Manual_guide/node02EB.html#line36">SigTask</a> variable of the message port.</a>
+
+The program may choose to supply its own <a href="../Libraries_Manual_guide/node01D6.html#line16">UserPort</a>.  This might be done in
+an environment where the program is using several windows and would prefer
+to monitor the input using only one message port.  This is done by with
+<a name="line32">the following procedure:</a>
+
+ 1. Create a port for the IDCMP by calling either the Exec function
+    <a href="../Libraries_Manual_guide/node02EC.html#line39">CreateMsgPort()</a> or the amiga.lib function <a href="../Libraries_Manual_guide/node02EC.html">CreatePort()</a>, both of which
+    return a pointer to a port.  (CreateMsgPort() is a new Exec function
+    in V36 and can therefore only be used on systems running Release 2 or
+    a later version of the OS.)
+
+ 2. Open the windows with no IDCMP flags set.  This will prevent
+    Intuition from allocating a port for this window.
+
+ 3. Place a pointer to the port created in step 1 into the <a href="../Libraries_Manual_guide/node01D6.html#line16">UserPort</a> field
+    of the <a href="../Libraries_Manual_guide/node0121.html">Window</a> structure.
+
+ 4. Call <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> to set the desired IDCMP flags for the port.
+    Intuition will use the port supplied with the window.
+
+    Be Careful with Shared IDCMP Ports.
+    -----------------------------------
+    If the application is sharing an IDCMP among several windows, it
+    must be very careful not to call <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP</a>(window,NULL) for any
+    of the windows that are using the shared port, as this will free the
+    port and the signal bit.
+
+ 5. When an application decides to close a window that has a shared
+    IDCMP, there may be messages waiting at the port for any of the
+    windows including the window being closed.  It is essential that
+    messages destined for a given window be removed and replied to before
+<a name="line60">    that window is closed.</a>
+
+    <a href="../Libraries_Manual_guide/node0583.html#line46">CloseWindowSafely()</a>, listed in the next example, performs proper
+    message cleanup before closing such a window.  It also sets the
+    window's <a href="../Libraries_Manual_guide/node01D6.html#line16">UserPort</a> to NULL so that Intuition knows not to delete the
+    port, which should be done by the application in this case.  It is
+    incorrect (and dangerous) to simply call <a href="../Libraries_Manual_guide/node0105.html">CloseWindow()</a> on a window
+    that has a shared IDCMP.
+
+<a name="line69">    Note that <a href="../Libraries_Manual_guide/node0583.html#line46">CloseWindowSafely()</a> assumes that the window has a <a href="../Libraries_Manual_guide/node01D6.html#line16">UserPort</a>.</a>
+
+ 6. After all windows have been closed, and the port has been removed
+    from each, delete the port that was created in step 1.  Use the
+    amiga.lib function <a href="../Libraries_Manual_guide/node02ED.html">DeletePort()</a> (if <a href="../Libraries_Manual_guide/node02EC.html">CreatePort()</a> was used) or the
+    Exec function <a href="../Libraries_Manual_guide/node02ED.html#line26">DeleteMsgPort()</a> (if <a href="../Libraries_Manual_guide/node02EC.html#line39">CreateMsgPort()</a> was used).
+
+ <a href="../Libraries_Manual_guide/node0583.html">Closing a Window with a Shared IDCMP</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

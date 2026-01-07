@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-2" TITLE="D Troubleshooting Guide / General Debugging Techniques" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D Troubleshooting Guide / General Debugging Techniques</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node055B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node055D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Narrow the search
+    Use methodical testing procedures, and debugging messages if
+    necessary, to locate the problem area.  Low level code can be
+    debugged using <a href="../Includes_and_Autodocs_2._guide/node0178.html">KPrintF()</a> serial (or dprintf() parallel) messages.
+    Check the initial values, allocation, use, and freeing of all
+    pointers and structures used in the problem area.  Check that all of
+    your system and internal function calls pass correct initialized
+    arguments, and that all possible error returns are checked for and
+    handled.
+
+Isolate the problem
+    If errors cannot be found, simplify your code to the smallest
+    possible example that still functions.  Often you will find that this
+    smallest example will not have the problem.  If so, add back the
+    other features of your code until the problem reappears, then debug
+    that section.
+
+Use debugging tools
+    A variety of debugging tools are available to help locate faulty
+    code. Some of these are source level and other debuggers, crash
+    interceptors, vital watchdog and memory invalidation tools like
+    Enforcer and MungWall.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

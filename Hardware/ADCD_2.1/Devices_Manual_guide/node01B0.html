@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_ILBM" NODE="16-3-2-2" TITLE=" Standard Properties / CMAP " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Properties / CMAP </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01AF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01B1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The optional (but encouraged) property &#034;CMAP&#034; stores color map data as
+triplets of red, green, and blue intensity values.  The n color map
+entries (&#034;color registers&#034;) are stored in the order 0 through n-1,
+totaling 3n bytes. Thus n is the ckSize/3.  Normally, n would equal
+2^(nPlanes).
+
+A CMAP chunk contains a ColorMap array as defined below.  Note that these
+typedefs assume a C compiler that implements packed arrays of 3-byte
+elements.
+
+    typedef struct {
+        UBYTE red, green, blue;           /* color intensities 0..255 */
+        } ColorRegister;                  /* size = 3 bytes           */
+
+    typedef ColorRegister ColorMap[n];    /* size = 3n bytes          */
+
+The color components red, green, and blue represent fractional intensity
+values in the range 0 through 255 256ths.  White is (255, 255, 255) and
+black is (0, 0, 0).  If your machine has less color resolution, use the
+high order bits.  Shift each field right on reading (or left on writing)
+and assign it to (from) a field in a local packed format like Color4,
+below.  This achieves automatic conversion of images across environments
+with different color resolutions.  On reading an ILBM, use defaults if the
+color map is absent or has fewer color registers than you need.  Ignore
+any extra color registers. (See <a href="../Devices_Manual_guide/node01C1.html">Appendix E</a> for a better way to write
+colors)
+
+The example type Color4 represents the format of a color register in
+working memory of an Amiga computer, which has 4 bit video DACs.  (The
+&#034;:4&#034; tells smarter C compilers to pack the field into 4 bits.)
+
+    typedef struct {
+        unsigned pad1 :4, red :4, green :4, blue :4;
+        } Color4;                /*   Amiga RAM format.  Not filed.  */
+
+Remember that every <a href="../Devices_Manual_guide/node01DD.html">chunk</a> must be padded to an even length, so a color map
+with an odd number of entries would be followed by a 0 byte, not included
+in the ckSize.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

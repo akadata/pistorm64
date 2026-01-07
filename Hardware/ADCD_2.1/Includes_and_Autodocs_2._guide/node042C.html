@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="ClearScreen()" TITLE="graphics.library/ClearScreen" -->
+<head>
+<title>graphics.library/ClearScreen</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node042B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node042D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ClearScreen -- Clear from current position to end of <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>.
+
+SYNOPSIS
+    ClearScreen(rp)
+                A1
+
+    void ClearScreen(struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *);
+
+FUNCTION
+    Clear a rectangular swath from the current position to the
+    right edge of the rastPort with <a href="../Includes_and_Autodocs_2._guide/node0429.html">ClearEOL</a>, then clear the rest
+    of the screen from just beneath the swath to the bottom of
+    the rastPort.
+    Clearing consists of setting the color of the swath to zero,
+    or, if the DrawMode is 2, to the BgPen.
+
+INPUTS
+    rp - pointer to <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> structure
+
+NOTES
+    o   This function may use the blitter.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0429.html">ClearEOL()</a>  <a href="../Includes_and_Autodocs_2._guide/node0482.html">Text()</a>  <a href="../Includes_and_Autodocs_2._guide/node047B.html">SetRast()</a>
+    <a href="../Includes_and_Autodocs_2._guide/node00A8.html">graphics/text.h</a>  <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

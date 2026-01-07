@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="HotKey()" TITLE="amiga.lib/HotKey" -->
+<head>
+<title>amiga.lib/HotKey</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0040.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0042.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	HotKey -- create a commodity triad. (V36)
+
+<b>   SYNOPSIS</b>
+	filterObj = Hotkey(description,port,id);
+
+	<a href="../Includes_and_Autodocs_3._guide/node0632.html#line74">CxObj</a> *HotKey(STRPTR,struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *,LONG);
+
+<b>   FUNCTION</b>
+	This function creates a triad of commodity objects to accomplish a
+	high-level function.
+
+	The three objects are a filter, which is created to match by the call
+	CxFilter(description), a sender created by the call CxSender(port,id),
+	and a translator which is created by CxTranslate(NULL), so that it
+	swallows any commodity input event messages that are passed down by
+	the filter.
+
+	This is the simple way to get a message sent to your program when the
+	user performs a particular input action.
+
+	It is strongly recommended that the ToolTypes environment be used to
+	allow the user to specify the input descriptions for your application's
+	hotkeys.
+
+<b>   INPUTS</b>
+	description - the description string to use for the filter in the same
+		      format as accepted by <a href="../Includes_and_Autodocs_3._guide/node00F7.html">commodities.library/SetFilter()</a>
+	port - port for the sender to send messages to.
+	id - id of the messages sent by the sender
+
+<b>   RESULTS</b>
+	filterObj - a pointer to a filter object, or NULL if it could
+		    not be created.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node002F.html">CxFilter()</a>, <a href="../Includes_and_Autodocs_3._guide/node0030.html">CxSender()</a>, <a href="../Includes_and_Autodocs_3._guide/node0032.html">CxTranslate()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node00E9.html">commodities.library/CxObjError()</a>, <a href="../Includes_and_Autodocs_3._guide/node00F7.html">commodities.library/SetFilter()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

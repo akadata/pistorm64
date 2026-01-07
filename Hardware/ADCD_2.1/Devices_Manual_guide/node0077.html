@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_11" NODE="11-2-2" TITLE="11 / Device Interface / Closing The SCSI Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>11 / Device Interface / Closing The SCSI Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0076.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0078.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Each <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> must eventually be matched by a call to <a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>.
+All I/O requests must be complete before calling <a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>.  If any
+requests are still pending, abort them with <a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a>.
+
+    if (!(CheckIO(SCSIIO)))
+        {
+        AbortIO(SCSIIO);   /* Ask device to abort any pending requests */
+        WaitIO(SCSIIO);    /* Wait for abort, then clean up */
+        }
+    CloseDevice(SCSIIO);   /* Close SCSI device */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

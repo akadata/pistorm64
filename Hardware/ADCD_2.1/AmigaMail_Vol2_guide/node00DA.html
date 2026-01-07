@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="V-23/Bullet.txt" NODE="V-23-11" TITLE="Shearing" -->
+<head>
+<title>Shearing</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00D9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00DB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Like baseline rotation, glyph shearing (also known as italicizing) is
+a matter of setting some Level 0 tags.  The shearing tags,
+OT_ShearSin and OT_ShearCos, specify the shearing angle, or the angle
+at which the typeface is italicized.  This angle refers to the angle
+that results from rotating the vertical axis clockwise.  The angle
+can range from -45 to 45 degrees (inclusive).  Like the rotation
+angle, the shearing angle is represented as a sine and cosine value
+that must correspond to the same angle and must fall into normal
+bounds for sine and cosine values.  Also like the rotation angle sine
+and cosine tags, an application must set both the OT_ShearSin and
+OT_ShearCos tags, in that order.  By default, the shearing value is
+zero degrees meaning there is no shearing (OT_ShearSin = 0x00000000,
+OT_ShearCos = 0x00010000).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

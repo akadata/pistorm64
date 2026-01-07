@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-5" TITLE="10 Printer Device / Obtaining Printer Specific Data" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 Printer Device / Obtaining Printer Specific Data</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node004A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node004C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Information about the printer in use can be obtained by reading the
+<a href="../Includes_and_Autodocs_2._guide/node005A.html#line65">PrinterData</a> and <a href="../Includes_and_Autodocs_2._guide/node005A.html#line134">PrinterExtendedData</a> structures.  The values found in these
+structures are determined by the printer driver selected through
+Preferences.  The data structures are defined in devices/<a href="../Includes_and_Autodocs_2._guide/node005A.html">prtbase.h</a>.
+
+Printer specific data is returned in <a href="../Devices_Manual_guide/node0044.html#line16">printerIO</a> when the printer device is
+opened.  To read the structures, you must first set the <a href="../Includes_and_Autodocs_2._guide/node005A.html#line65">PrinterData</a>
+structure to point to iodrp.io_Device of the <a href="../Devices_Manual_guide/node0044.html#line16">printerIO</a> used to open the
+device and then set <a href="../Includes_and_Autodocs_2._guide/node005A.html#line134">PrinterExtendedData</a> to point to the extended data
+portion of <a href="../Includes_and_Autodocs_2._guide/node005A.html#line65">PrinterData</a>.
+
+     <a href="../Devices_Manual_guide/node0163.html">Printer_Data.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

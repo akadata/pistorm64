@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="StartNotify()" TITLE="dos.library/StartNotify" -->
+<head>
+<title>dos.library/StartNotify</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0300.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0302.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    StartNotify -- Starts notification on a file or directory (V36)
+
+SYNOPSIS
+    success = StartNotify(notifystructure)
+    D0                          D1
+
+    BOOL StartNotify(struct <a href="../Includes_and_Autodocs_2._guide/node006E.html#line52">NotifyRequest</a> *)
+
+FUNCTION
+    Posts a notification request.  Do not modify the notify structure while
+    it is active.  You will be notified when the file or directory changes.
+    For files, you will be notified after the file is closed.  Not all
+    filesystems will support this: applications should NOT require it.  In
+    particular, most network filesystems won't support it.
+
+INPUTS
+    notifystructure - A filled-in <a href="../Includes_and_Autodocs_2._guide/node006E.html#line52">NotifyRequest</a> structure
+
+RESULT
+    success - Success/failure of request
+
+BUGS
+    The V36 floppy/HD filesystem doesn't actually send notifications.  The
+    V36 ram handler (ram:) does.  This has been fixed for V37.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0299.html">EndNotify()</a>, <a href="../Includes_and_Autodocs_2._guide/node006E.html">&#060;dos/notify.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

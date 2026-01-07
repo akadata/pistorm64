@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_13" NODE="13-5-1" TITLE="13 / Using the Time Arithmetic Functions / Why Use Time Arithmetic?" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>13 / Using the Time Arithmetic Functions / Why Use Time Arithmetic?</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00C6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00C8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As mentioned earlier in this section, because of the multitasking
+capability of the Amiga, the timer device can provide timings that are at
+least as long as the specified amount of time. If you need more precision
+than this, using the system timer along with the time arithmetic routines
+can at least, in the long run, let you synchronize your software with this
+precision timer after a selected period of time.
+
+Say, for example, that you select timer intervals so that you get 161
+signals within each 3-minute span. Therefore, the  <a href="../Devices_Manual_guide/node00BF.html#line25">timeval</a> you would have
+selected would be 180/161, which comes out to 1 second and 118,012
+microseconds per interval.  Considering the time it takes to set up a call
+to set the timer and delays due to task-switching (especially if the
+system is very busy), it is possible that after 161 timing intervals, you
+may be somewhat beyond the 3-minute time. Here is a method you can use to
+keep in sync with system time:
+
+   1. Begin.
+
+   2. Read system time; save it.
+
+   3. Perform your loop however many times in your selected interval.
+
+   4. Read system time again, and compare it to the old value you saved.
+      (For this example, it will be more or less than 3 minutes as a total
+      time elapsed.)
+
+   5. Calculate a new value for the time interval ( <a href="../Devices_Manual_guide/node00BF.html#line25">timeval</a>); that is, one
+      that (if precise) would put you exactly in sync with system time the
+      next time around. Timeval will be a lower value if the loops took too
+      long, and a higher value if the loops didn't take long enough.
+
+   6. Repeat the cycle.
+
+Over the long run, then, your average number of operations within a
+specified period of time can become precisely what you have designed.
+
+   You Can't Do 1+1 on E-Clock Values.
+   -----------------------------------
+   The arithmetic functions are not designed to operate on <a href="../Devices_Manual_guide/node00BF.html#line31">EClockVal</a>s.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

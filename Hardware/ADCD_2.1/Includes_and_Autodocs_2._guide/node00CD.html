@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/hardware/custom.h" NODE="MAIN" TITLE="Includes/hardware/custom.h" -->
+<head>
+<title>Includes/hardware/custom.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00CC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00CE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	HARDWARE_CUSTOM_H
+#define	HARDWARE_CUSTOM_H
+/*
+**	$Filename: hardware/custom.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.4 $
+**	$Date: 90/11/05 $
+**
+**	Offsets of Amiga custom chip registers
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif /* EXEC_TYPES_H */
+
+
+
+/*
+ * do this to get base of custom registers:
+ * extern struct Custom custom;
+ */
+<a name="line25"></a>
+<a name="line26"></a>
+<a name="line27">struct Custom {</a>
+<a name="line28">    UWORD   bltddat;</a>
+<a name="line29">    UWORD   dmaconr;</a>
+<a name="line30">    UWORD   vposr;</a>
+<a name="line31">    UWORD   vhposr;</a>
+<a name="line32">    UWORD   dskdatr;</a>
+<a name="line33">    UWORD   joy0dat;</a>
+<a name="line34">    UWORD   joy1dat;</a>
+<a name="line35">    UWORD   clxdat;</a>
+<a name="line36">    UWORD   adkconr;</a>
+<a name="line37">    UWORD   pot0dat;</a>
+<a name="line38">    UWORD   pot1dat;</a>
+<a name="line39">    UWORD   potinp;</a>
+<a name="line40">    UWORD   serdatr;</a>
+<a name="line41">    UWORD   dskbytr;</a>
+<a name="line42">    UWORD   intenar;</a>
+<a name="line43">    UWORD   intreqr;</a>
+<a name="line44">    APTR    dskpt;</a>
+<a name="line45">    UWORD   dsklen;</a>
+<a name="line46">    UWORD   dskdat;</a>
+<a name="line47">    UWORD   refptr;</a>
+<a name="line48">    UWORD   vposw;</a>
+<a name="line49">    UWORD   vhposw;</a>
+<a name="line50">    UWORD   copcon;</a>
+<a name="line51">    UWORD   serdat;</a>
+<a name="line52">    UWORD   serper;</a>
+<a name="line53">    UWORD   potgo;</a>
+<a name="line54">    UWORD   joytest;</a>
+<a name="line55">    UWORD   strequ;</a>
+<a name="line56">    UWORD   strvbl;</a>
+<a name="line57">    UWORD   strhor;</a>
+<a name="line58">    UWORD   strlong;</a>
+<a name="line59">    UWORD   bltcon0;</a>
+<a name="line60">    UWORD   bltcon1;</a>
+<a name="line61">    UWORD   bltafwm;</a>
+<a name="line62">    UWORD   bltalwm;</a>
+<a name="line63">    APTR    bltcpt;</a>
+<a name="line64">    APTR    bltbpt;</a>
+<a name="line65">    APTR    bltapt;</a>
+<a name="line66">    APTR    bltdpt;</a>
+<a name="line67">    UWORD   bltsize;</a>
+<a name="line68">    UBYTE   pad2d;</a>
+<a name="line69">    UBYTE   bltcon0l;	/* low 8 bits of bltcon0, write only */</a>
+<a name="line70">    UWORD   bltsizv;</a>
+<a name="line71">    UWORD   bltsizh;	/* 5e */</a>
+<a name="line72">    UWORD   bltcmod;</a>
+<a name="line73">    UWORD   bltbmod;</a>
+<a name="line74">    UWORD   bltamod;</a>
+<a name="line75">    UWORD   bltdmod;</a>
+<a name="line76">    UWORD   pad34[4];</a>
+<a name="line77">    UWORD   bltcdat;</a>
+<a name="line78">    UWORD   bltbdat;</a>
+<a name="line79">    UWORD   bltadat;</a>
+<a name="line80">    UWORD   pad3b[3];</a>
+<a name="line81">    UWORD deniseid;   /* 7c */</a>
+<a name="line82">    UWORD   dsksync;</a>
+<a name="line83">    ULONG   cop1lc;</a>
+<a name="line84">    ULONG   cop2lc;</a>
+<a name="line85">    UWORD   copjmp1;</a>
+<a name="line86">    UWORD   copjmp2;</a>
+<a name="line87">    UWORD   copins;</a>
+<a name="line88">    UWORD   diwstrt;</a>
+<a name="line89">    UWORD   diwstop;</a>
+<a name="line90">    UWORD   ddfstrt;</a>
+<a name="line91">    UWORD   ddfstop;</a>
+<a name="line92">    UWORD   dmacon;</a>
+<a name="line93">    UWORD   clxcon;</a>
+<a name="line94">    UWORD   intena;</a>
+<a name="line95">    UWORD   intreq;</a>
+<a name="line96">    UWORD   adkcon;</a>
+<a name="line97">    struct  AudChannel {</a>
+<a name="line98">      UWORD *ac_ptr; /* ptr to start of waveform data */</a>
+<a name="line99">      UWORD ac_len;	/* length of waveform in words */</a>
+<a name="line100">      UWORD ac_per;	/* sample period */</a>
+<a name="line101">      UWORD ac_vol;	/* volume */</a>
+<a name="line102">      UWORD ac_dat;	/* sample pair */</a>
+<a name="line103">      UWORD ac_pad[2];	/* unused */</a>
+<a name="line104">    } aud[4];</a>
+<a name="line105">    APTR    bplpt[8];</a>
+<a name="line106">    UWORD   bplcon0;</a>
+<a name="line107">    UWORD   bplcon1;</a>
+<a name="line108">    UWORD   bplcon2;</a>
+<a name="line109">    UWORD   bplcon3;</a>
+<a name="line110">    UWORD   bpl1mod;</a>
+<a name="line111">    UWORD   bpl2mod;</a>
+<a name="line112">    UWORD   bplhmod;</a>
+<a name="line113">    UWORD   pad86[1];</a>
+<a name="line114">    UWORD   bpldat[8];</a>
+<a name="line115">    APTR    sprpt[8];</a>
+<a name="line116">    struct  SpriteDef {</a>
+<a name="line117">      UWORD pos;</a>
+<a name="line118">      UWORD ctl;</a>
+<a name="line119">      UWORD dataa;</a>
+<a name="line120">      UWORD datab;</a>
+<a name="line121">    } spr[8];</a>
+<a name="line122">    UWORD   color[32];</a>
+<a name="line123">    UWORD htotal;</a>
+<a name="line124">    UWORD hsstop;</a>
+<a name="line125">    UWORD hbstrt;</a>
+<a name="line126">    UWORD hbstop;</a>
+<a name="line127">    UWORD vtotal;</a>
+<a name="line128">    UWORD vsstop;</a>
+<a name="line129">    UWORD vbstrt;</a>
+<a name="line130">    UWORD vbstop;</a>
+<a name="line131">    UWORD sprhstrt;</a>
+<a name="line132">    UWORD sprhstop;</a>
+<a name="line133">    UWORD bplhstrt;</a>
+<a name="line134">    UWORD bplhstop;</a>
+<a name="line135">    UWORD hhposw;</a>
+<a name="line136">    UWORD hhposr;</a>
+<a name="line137">    UWORD beamcon0;</a>
+<a name="line138">    UWORD hsstrt;</a>
+<a name="line139">    UWORD vsstrt;</a>
+<a name="line140">    UWORD hcenter;</a>
+    UWORD   diwhigh;	/* 1e4 */
+};
+<a name="line143"></a>
+#ifdef ECS_SPECIFIC
+
+<a name="line146">/* defines for beamcon register */</a>
+<a name="line147">#define VARVBLANK	0x1000	/* Variable vertical blank enable */</a>
+<a name="line148">#define LOLDIS		0x0800	/* long line disable */</a>
+<a name="line149">#define CSCBLANKEN	0x0400	/* redirect composite sync */</a>
+<a name="line150">#define VARVSYNC	0x0200	/* Variable vertical sync enable */</a>
+<a name="line151">#define VARHSYNC	0x0100	/* Variable horizontal sync enable */</a>
+<a name="line152">#define VARBEAM	0x0080	/* variable beam counter enable */</a>
+<a name="line153">#define DISPLAYDUAL	0x0040	/* use UHRES pointer and standard pointers */</a>
+<a name="line154">#define DISPLAYPAL	0x0020	/* set decodes to generate PAL display */</a>
+<a name="line155">#define VARCSYNC	0x0010	/* Variable composite sync enable */</a>
+<a name="line156">#define CSBLANK	0x0008	/* Composite blank out to CSY* pin */</a>
+<a name="line157">#define CSYNCTRUE	0x0004	/* composite sync true signal */</a>
+<a name="line158">#define VSYNCTRUE	0x0002	/* vertical sync true */</a>
+#define HSYNCTRUE	0x0001	/* horizontal sync true */
+
+<a name="line161">/* new defines for bplcon0 */</a>
+#define USE_BPLCON3	1
+
+<a name="line164">/* new defines for bplcon2 */</a>
+<a name="line165">#define BPLCON2_ZDCTEN		(1&#060;&#060;10) /* colormapped genlock bit */</a>
+<a name="line166">#define BPLCON2_ZDBPEN		(1&#060;&#060;11) /* use bitplane as genlock bits */</a>
+<a name="line167">#define BPLCON2_ZDBPSEL0	(1&#060;&#060;12) /* three bits to select one */</a>
+<a name="line168">#define BPLCON2_ZDBPSEL1	(1&#060;&#060;13) /* of 8 bitplanes in */</a>
+#define BPLCON2_ZDBPSEL2	(1&#060;&#060;14) /* ZDBPEN genlock mode */
+
+<a name="line171">/* defines for bplcon3 register */</a>
+<a name="line172">#define BPLCON3_EXTBLNKEN	(1&#060;&#060;0)	/* external blank enable */</a>
+<a name="line173">#define BPLCON3_EXTBLKZD	(1&#060;&#060;1)	/* external blank ored into trnsprncy */</a>
+<a name="line174">#define BPLCON3_ZDCLKEN	(1&#060;&#060;2)	/* zd pin outputs a 14mhz clock*/</a>
+<a name="line175">#define BPLCON3_BRDNTRAN	(1&#060;&#060;4)	/* border is opaque */</a>
+#define BPLCON3_BRDNBLNK	(1&#060;&#060;5)	/* border is opaque */
+
+#endif	/* ECS_SPECIFIC */
+
+#endif	/* HARDWARE_CUSTOM_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

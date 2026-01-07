@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/mathieeedoubbas" NODE="IEEEDPCmp()" TITLE="mathieeedoubbas.library/IEEEDPCmp" -->
+<head>
+<title>mathieeedoubbas.library/IEEEDPCmp</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03FC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03FE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    IEEEDPCmp -- compare two double precision floating point numbers
+
+SYNOPSIS
+      c   = IEEEDPCmp(  y  ,  z  );
+      d0              d0/d1 d2/d3
+
+    double  y,z;
+    long    c;
+
+FUNCTION
+    Compare y with z. Set the condition codes for less, greater, or
+    equal. Set return value c to -1 if y&#060;z, or +1 if y&#062;z, or 0 if
+    y == z.
+
+INPUTS
+    y -- IEEE double precision floating point value
+    z -- IEEE double precision floating point value
+
+RESULT
+   c = 1   cc = gt         for (y &#062; z)
+   c = 0   cc = eq         for (y == z)
+   c = -1  cc = lt         for (y &#060; z)
+
+BUGS
+
+SEE ALSO
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

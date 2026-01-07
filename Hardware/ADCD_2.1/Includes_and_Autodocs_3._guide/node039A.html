@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="ChangeScreenBuffer()" TITLE="intuition.library/ChangeScreenBuffer" -->
+<head>
+<title>intuition.library/ChangeScreenBuffer</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0399.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node039B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ChangeScreenBuffer -- Swap the screen's <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>. (V39)
+
+<b>    SYNOPSIS</b>
+	success = ChangeScreenBuffer( <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a>, <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> )
+	D0                            A0      A1
+
+	ULONG ChangeScreenBuffer( struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> * );
+
+<b>    FUNCTION</b>
+	Performs double (or multiple) buffering on an Intuition screen
+	in an Intuition-cooperative manner.  The <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> associated
+	with the supplied <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> will be installed in the
+	specified screen, if possible.  The previously-installed <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>
+	is available for re-use upon receiving a signal from
+	graphics.library.  See the graphics.library autodocs for
+	<a href="../Includes_and_Autodocs_3._guide/node02A1.html">graphics.library/AllocDBufInfo()</a> and <a href="../Includes_and_Autodocs_3._guide/node02BD.html">graphics.library/ChangeVPBitMap()</a>
+	for details.
+
+<b>    INPUTS</b>
+	Screen: pointer to the screen whose bitmap is to be swapped.
+	ScreenBuffer: pointer to a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> structure obtained from
+	    <a href="../Includes_and_Autodocs_3._guide/node0395.html">AllocScreenBuffer()</a>.
+
+<b>    RESULT</b>
+	Returns non-zero if the operation succeeded.  Returns zero
+	if the operation cannot be performed.  This function will
+	fail if Intuition's state cannot permit it, for example the
+	user is playing with menus or gadgets.
+
+<b>    NOTES</b>
+	It is not required to restore the original <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a>
+	before closing the screen. Simply <a href="../Includes_and_Autodocs_3._guide/node03B1.html">FreeScreenBuffer()</a> each
+	buffer (including the original and the currently-installed one)
+	then close the screen.	Of course, you cannot call
+	ChangeScreenBuffer() after freeing the currently-installed one.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0395.html">AllocScreenBuffer()</a>, <a href="../Includes_and_Autodocs_3._guide/node03B1.html">FreeScreenBuffer()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node02BD.html">graphics.library/ChangeVPBitMap()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

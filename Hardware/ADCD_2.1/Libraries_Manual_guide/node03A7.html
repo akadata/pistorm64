@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-6-12" TITLE="28 / Using Bobs / Sorting and Displaying Bobs" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Bobs / Sorting and Displaying Bobs</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03A6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03A8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As with VSprites, the <a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a> list must be sorted before any Bobs can be
+displayed.  This is accomplished with the <a href="../Libraries_Manual_guide/node038B.html#line7">SortGList()</a> function.  For Bobs,
+the system uses the position information to decide inter-Bob priorities,
+<a name="line5">if not explicitly set by using the <a href="../Libraries_Manual_guide/node03A4.html">Bob.Before</a> and <a href="../Libraries_Manual_guide/node03A4.html">Bob.After</a> pointers.</a>
+
+Once the <a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a> list has been sorted, the Bobs in the list can be
+displayed by calling <a href="../Libraries_Manual_guide/node038C.html">DrawGList()</a>.  This call should then be followed by a
+call to <a href="../Libraries_Manual_guide/node038C.html">WaitTOF()</a> if the application wants to be sure that the Bobs are
+rendered before proceeding.  Call these functions as follows:
+
+    struct RastPort myRastPort = {0};  /* Of course, these have to be */
+    struct ViewPort myViewPort = {0};  /* initialized...              */
+
+    SortGList(&#038;myRastPort);
+    DrawGList(&#038;myRastPort, &#038;myViewPort);/* Draw the elements (Bobs only) */
+    WaitTOF();
+
+
+    Warning:
+    --------
+    If your <a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a> list contains VSprites in addition to Bobs, you
+    must also call <a href="../Libraries_Manual_guide/node038C.html">MrgCop()</a> and <a href="../Libraries_Manual_guide/node038C.html">LoadView()</a> to make all the GELs
+    visible.  Or, under Intuition, <a href="../Libraries_Manual_guide/node00F4.html#line5">RethinkDisplay()</a> must be called to
+    make all the GELs visible.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

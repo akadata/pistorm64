@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/resources/mathresource.h" NODE="MAIN" TITLE="include/resources/mathresource.h" -->
+<head>
+<title>include/resources/mathresource.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node062B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node062D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	RESOURCES_MATHRESOURCE_H
+#define	RESOURCES_MATHRESOURCE_H
+/*
+**	$VER: mathresource.h 1.2 (13.7.1990)
+**	Includes Release 44.1
+**
+**	Data structure returned by OpenResource of:
+**	&#034;MathIEEE.resource&#034;
+**
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_NODES_H
+#include &#060;exec/nodes.h&#062;
+#endif
+
+/*
+*	The 'Init' entries are only used if the corresponding
+*	bit is set in the Flags field.
+*
+*	So if you are just a 68881, you do not need the Init stuff
+*	just make sure you have cleared the Flags field.
+*
+*	This should allow us to add Extended Precision later.
+*
+*	For Init users, if you need to be called whenever a task
+*	opens this library for use, you need to change the appropriate
+*	entries in MathIEEELibrary.
+*/
+<a name="line32"></a>
+struct MathIEEEResource
+{
+	struct	Node	MathIEEEResource_Node;
+	unsigned short	MathIEEEResource_Flags;
+	unsigned short	*MathIEEEResource_BaseAddr; /* ptr to 881 if exists */
+	void	(*MathIEEEResource_DblBasInit)();
+	void	(*MathIEEEResource_DblTransInit)();
+	void	(*MathIEEEResource_SglBasInit)();
+	void	(*MathIEEEResource_SglTransInit)();
+	void	(*MathIEEEResource_ExtBasInit)();
+	void	(*MathIEEEResource_ExtTransInit)();
+};
+
+/* definations for MathIEEEResource_FLAGS */
+#define	MATHIEEERESOURCEF_DBLBAS	(1&#060;&#060;0)
+#define	MATHIEEERESOURCEF_DBLTRANS	(1&#060;&#060;1)
+#define	MATHIEEERESOURCEF_SGLBAS	(1&#060;&#060;2)
+#define	MATHIEEERESOURCEF_SGLTRANS	(1&#060;&#060;3)
+#define	MATHIEEERESOURCEF_EXTBAS	(1&#060;&#060;4)
+#define	MATHIEEERESOURCEF_EXTTRANS	(1&#060;&#060;5)
+
+#endif	/* RESOURCES_MATHRESOURCE_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

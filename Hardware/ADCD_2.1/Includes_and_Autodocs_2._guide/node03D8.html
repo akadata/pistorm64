@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/utility" NODE="GetTagData()" TITLE="utility.library/GetTagData" -->
+<head>
+<title>utility.library/GetTagData</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03D7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03D9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GetTagData -- Obtain data corresponding to Tag. (V36)
+
+SYNOPSIS
+    value = GetTagData(tagVal, default, tagList)
+    D0                 D0      D1       A0
+
+    ULONG GetTagData(Tag TagVal, ULONG Default, struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *TagList)
+
+FUNCTION
+    Searches a <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> list for a matching Tag value, and returns the
+    corresponding ti_Data value for the <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> found.  If none
+    found, will return the value passed it as 'default'.
+
+INPUTS
+    tagVal          - Tag value to search for.
+    default         - value to be returned if tagVal is not found.
+    tagList         - the <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> list to search.
+
+RESULT
+    value           - The ti_Data value for first matching <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a>, or
+                      'default' if a ti_Tag matching 'Tag' is not found.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node012E.html">utility/tagitem.h</a>, <a href="../Includes_and_Autodocs_2._guide/node03D6.html">FindTagItem()</a>, <a href="../Includes_and_Autodocs_2._guide/node03DB.html">PackBoolTags()</a>, <a href="../Includes_and_Autodocs_2._guide/node03DA.html">NextTagItem()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

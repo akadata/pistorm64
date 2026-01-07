@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/clib/layers_protos.h" NODE="MAIN" TITLE="Includes/clib/layers_protos.h" -->
+<head>
+<title>Includes/clib/layers_protos.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0017.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0019.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef  CLIB_LAYERS_PROTOS_H
+#define  CLIB_LAYERS_PROTOS_H
+/*
+**	$Filename: clib/layers_protos.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 1.6 $
+**	$Date: 90/12/09 $
+**
+**	C prototypes. For use with 32 bit integers only.
+**
+**	(C) Copyright 1990-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+#ifndef  EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+#ifndef  GRAPHICS_LAYERS_H
+#include &#060;graphics/layers.h&#062;
+#endif
+#ifndef  GRAPHICS_CLIP_H
+#include &#060;graphics/clip.h&#062;
+#endif
+#ifndef  GRAPHICS_RASTPORT_H
+#include &#060;graphics/rastport.h&#062;
+#endif
+#ifndef  GRAPHICS_REGIONS_H
+#include &#060;graphics/regions.h&#062;
+#endif
+void InitLayers( struct Layer_Info *li );
+struct Layer *CreateUpfrontLayer( struct Layer_Info *li, struct BitMap *bm,
+	long x0, long y0, long x1, long y1, long flags, struct BitMap *bm2 );
+struct Layer *CreateBehindLayer( struct Layer_Info *li, struct BitMap *bm,
+	long x0, long y0, long x1, long y1, long flags, struct BitMap *bm2 );
+LONG UpfrontLayer( long dummy, struct Layer *layer );
+LONG BehindLayer( long dummy, struct Layer *layer );
+LONG MoveLayer( long dummy, struct Layer *layer, long dx, long dy );
+LONG SizeLayer( long dummy, struct Layer *layer, long dx, long dy );
+void ScrollLayer( long dummy, struct Layer *layer, long dx, long dy );
+LONG BeginUpdate( struct Layer *l );
+void EndUpdate( struct Layer *layer, unsigned long flag );
+LONG DeleteLayer( long dummy, struct Layer *layer );
+void LockLayer( long dummy, struct Layer *layer );
+void UnlockLayer( struct Layer *layer );
+void LockLayers( struct Layer_Info *li );
+void UnlockLayers( struct Layer_Info *li );
+void LockLayerInfo( struct Layer_Info *li );
+void SwapBitsRastPortClipRect( struct RastPort *rp, struct ClipRect *cr );
+struct Layer *WhichLayer( struct Layer_Info *li, long x, long y );
+void UnlockLayerInfo( struct Layer_Info *li );
+struct Layer_Info *NewLayerInfo( void );
+void DisposeLayerInfo( struct Layer_Info *li );
+LONG FattenLayerInfo( struct Layer_Info *li );
+void ThinLayerInfo( struct Layer_Info *li );
+LONG MoveLayerInFrontOf( struct Layer *layer_to_move,
+	struct Layer *other_layer );
+struct Region *InstallClipRegion( struct Layer *layer,
+	struct Region *region );
+LONG MoveSizeLayer( struct Layer *layer, long dx, long dy, long dw, long dh );
+struct Layer *CreateUpfrontHookLayer( struct Layer_Info *li, struct BitMap *bm,
+	long x0, long y0, long x1, long y1, long flags, struct Hook *hook,
+	struct BitMap *bm2 );
+struct Layer *CreateBehindHookLayer( struct Layer_Info *li, struct BitMap *bm,
+	long x0, long y0, long x1, long y1, long flags, struct Hook *hook,
+	struct BitMap *bm2 );
+struct Hook *InstallLayerHook( struct Layer *layer, struct Hook *hook );
+#endif	 /* CLIB_LAYERS_PROTOS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

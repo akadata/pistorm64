@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Terminate_Parallel.c" NODE="MAIN" TITLE="Devices/Dev_examples/Terminate_Parallel.c" -->
+<head>
+<title>Devices/Dev_examples/Terminate_Parallel.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node015E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0160.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Terminate_Parallel.c
+ *
+ * This is an example of using a termination array for writes from the
+ * parallel device. A termination array is set up for the characters Q, E,
+ * A and %. The EOFMODE flag is set in io_ParFlags to indicate that we want
+ * to use a termination array by sending the PDCMD_SETPARAMS command to the
+ * device. Then, a CMD_WRITE command is sent to the device with io_Length
+ * set to -1. The write will terminate when one of the four characters in
+ * the termination array is sent or when the end of the write buffer has
+ * been reached.
+ *
+ * Compile with SAS C 5.10  lc -b1 -cfistq -v -y -L
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/io.h&#062;
+#include &#060;devices/parallel.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+void main(void)
+{
+struct MsgPort  *ParallelMP;          /* Define storage for one pointer */
+struct IOExtPar *ParallelIO;         /* Define storage for one pointer */
+
+struct IOPArray Terminators =
+{
+0x51454125,/* Q E A A */
+0x25252525 /* fill to end with lowest value, must be in descending order */
+};
+
+UBYTE *WriteBuffer =&#034;abcdefghijklmEopqrstuvwxyze&#034;;
+UWORD ctr;
+
+if (ParallelMP=CreatePort(0,0))
+    {
+    if (ParallelIO=(struct IOExtPar *)
+                    CreateExtIO(ParallelMP,sizeof(struct IOExtPar)) )
+        {
+        if (OpenDevice(PARALLELNAME,0L,(struct IORequest *)ParallelIO,0) )
+            printf(&#034;%s did not open\n&#034;,PARALLELNAME);
+        else
+           {
+            /* Tell user what we are doing */
+            printf(&#034;\fLooking for Q, E, A or % in output\n&#034;);
+
+            /* Set EOF mode flag
+             * Set the termination array
+             * Send PDCMD_SETPARAMS to the parallel device
+             */
+            ParallelIO-&#062;io_ParFlags |= PARF_EOFMODE;
+            ParallelIO-&#062;io_PTermArray = Terminators;
+            ParallelIO-&#062;IOPar.io_Command  = PDCMD_SETPARAMS;
+            if (DoIO((struct IORequest *)ParallelIO))
+              printf(&#034;Set Params failed &#034;);   /* Inform user of error */
+            else
+             {
+             /* Send buffer */
+             ParallelIO-&#062;IOPar.io_Length   = -1;
+             ParallelIO-&#062;IOPar.io_Data     = WriteBuffer;
+             ParallelIO-&#062;IOPar.io_Command  = CMD_WRITE;
+             if (DoIO((struct IORequest *)ParallelIO))
+              printf(&#034;Error: Write failed\n&#034;);
+             else
+             {
+               /* Display all characters sent */
+               printf(&#034;\nThese characters were sent:\n\t\t\tASCII\tHEX\n&#034;);
+               for (ctr=0;ctr&#060;ParallelIO-&#062;IOPar.io_Actual;ctr++)
+                    printf(&#034;\t\t\t%c\t%x\n&#034;,*WriteBuffer,*WriteBuffer++);
+               printf(&#034;\nThe actual number of characters sent: %d\n&#034;,
+                         ParallelIO-&#062;IOPar.io_Actual);
+             }
+           }
+           CloseDevice((struct IORequest *)ParallelIO);
+            }
+
+        DeleteExtIO((struct IORequest *)ParallelIO);
+        }
+    else
+        printf(&#034;Error: Could not create I/O request\n&#034;);
+
+    DeletePort(ParallelMP);
+    }
+else
+    printf(&#034;Error: Could not create message port\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

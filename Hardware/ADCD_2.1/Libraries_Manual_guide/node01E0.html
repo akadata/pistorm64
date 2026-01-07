@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_9" NODE="9-6-1-5" TITLE="9 / / Event Message Classes and Flags / Window Flags" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>9 / / Event Message Classes and Flags / Window Flags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01DF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01E1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+IDCMP_NEWSIZE
+    Intuition sends this message after the user has resized the window.
+    After receiving this, the program can examine the size variables in
+    the window structure to discover the new size of the window.  The
+    message is sent, even if the size of the window did not actually
+<a name="line7">    change.</a>
+
+IDCMP_REFRESHWINDOW
+    This message is sent whenever the window needs refreshing.  This flag
+    makes sense only with windows that have a refresh type of
+<a name="line12">    <a href="../Libraries_Manual_guide/node0125.html#line110">WA_SimpleRefresh</a> or <a href="../Libraries_Manual_guide/node0125.html#line115">WA_SmartRefresh</a>.</a>
+
+    As a minimum, the application must call <a href="../Libraries_Manual_guide/node011E.html">BeginRefresh()</a> and
+    <a href="../Libraries_Manual_guide/node011E.html#line25">EndRefresh()</a> for the window after receiving an IDCMP_REFRESHWINDOW
+    event.  Create the window with the <a href="../Libraries_Manual_guide/node0125.html#line62">WA_NoCareRefresh</a> attribute if you
+    do not want to manage these events.  See the &#034;<a href="../Libraries_Manual_guide/node0119.html">Intuition Windows</a>&#034;
+<a name="line18">    chapter for details.</a>
+
+    Most of the graphics library calls used for display output are
+    compatible with Intuition, with the exception of ScrollRaster().
+    Intuition will not send an IDCMP_REFRESHWINDOW event when damage is
+    caused to a window by <a href="../Libraries_Manual_guide/node0363.html">ScrollRaster()</a>.  This may happen in a simple
+    refresh window which is partially obscured by another window--the
+    region that scrolls out from behind the front window will be damaged,
+    but the window will receive no notification.  Check the LAYERREFRESH
+    bit in the <a href="../Libraries_Manual_guide/node03E4.html">Layer</a> structure Flags field to see if damage did happen as
+<a name="line28">    a result of ScrollRaster().</a>
+
+IDCMP_SIZEVERIFY
+    Set this flag if the program must complete some operation before the
+    user sizes the window.  When the user sizes the window, Intuition
+    sends an IDCMP_SIZEVERIFY message to the application and then waits
+    until the program replies before allowing the user to size the
+    window.  See the &#034;<a href="../Libraries_Manual_guide/node01E2.html">Verification Functions</a>&#034; section below for some
+<a name="line36">    things to consider when using this flag.</a>
+
+IDCMP_ACTIVEWINDOW and IDCMP_INACTIVEWINDOW
+    Set these flags to discover when the window becomes activated or
+    deactivated.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

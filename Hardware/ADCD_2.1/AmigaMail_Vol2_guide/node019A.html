@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-3/CloneWB.c" NODE="MAIN" TITLE="IV-3/CloneWB.c" -->
+<head>
+<title>IV-3/CloneWB.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0199.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node019B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* CloneWB.c -  V36 Clone Workbench screen.  Compiled with SAS/C 6.56
+sc NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 LINK CloneWB.c
+quit
+
+Copyright (c) 1990-1999 Amiga, Inc.
+
+This example is provided in electronic form by Amiga, Inc.
+for use with the Amiga Mail Volume II technical publication.
+Amiga Mail Volume II contains additional information on the correct
+usage of the techniques and operating system functions presented in
+these examples.  The source and executable code of these examples may
+only be distributed in free electronic form, via bulletin board or
+as part of a fully non-commercial and freely redistributable
+diskette.  Both the source and executable code (including comments)
+must be included, without modification, in any copy.  This example
+may not be published in printed form or distributed with any
+commercial product. However, the programming techniques and support
+routines set forth in these examples may be used in the development
+of original executable software products for Amiga
+computers.
+
+All other rights reserved.
+
+This example is provided &#034;as-is&#034; and is subject to change; no
+warranties are made.  All use is at your own risk. No liability or
+responsibility is assumed.
+*/
+
+#include &#060;stdio.h&#062;
+#include &#060;stdlib.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;graphics/displayinfo.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+
+#include &#060;pragmas/exec_pragmas.h&#062;
+#include &#060;pragmas/intuition_pragmas.h&#062;
+#include &#060;pragmas/graphics_pragmas.h&#062;
+
+struct IntuitionBase *IntuitionBase;
+struct GfxBase *GfxBase;
+extern struct Library *SysBase;
+
+struct EasyStruct failedES = {
+    sizeof(struct EasyStruct), 0, &#034;CWB&#034;,
+    &#034;%s&#034;,
+    &#034;OK&#034;,
+};
+
+void            main(void);
+
+void
+main(void)
+{
+    struct Screen *wbscreen;
+    struct Screen *clonescreen;
+    struct Window *window;
+    struct ViewPort *vp;
+    struct IntuiMessage *msg;
+    ULONG modeID;
+
+    struct DisplayInfo displayinfo;
+    struct MonitorInfo monitorinfo;
+    struct DimensionInfo dimensioninfo;
+    struct NameInfo nameinfo;
+    struct DrawInfo *drawinfo;
+
+    ULONG result;
+
+    /* Fails silently when not V36 */
+    if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 36)) {
+        if (GfxBase = OpenLibrary(&#034;graphics.library&#034;, 36)) {
+
+            if (wbscreen = LockPubScreen(&#034;Workbench&#034;)) {
+                /* Using intuition.library/GetScreenDrawInfo(), we get the pen
+                 * array we'll use for the screen clone the easy way. */
+                drawinfo = GetScreenDrawInfo(wbscreen);
+
+                vp = &#038;(wbscreen-&#062;ViewPort);
+                /* Use graphics.library/GetVPModeID() to get the ModeID of the
+                 * Workbench screen. */
+                if ((modeID = GetVPModeID(vp)) != INVALID_ID) {
+                    /* OK, we got a valid ModeID for the Workbench
+                     * screen (surprise) */
+
+                    /* With just the ModeID, the lock on the Workbench
+                     * screen &#038; drawinfo-&#062;dri_Pens we're able to clone the
+                     * Workbench exactly, displaymode and all. When you want
+                     * to know everything there is to know about this
+                     * displaymode, use graphics.library/GetDisplayInfoData().
+                     */
+                    /* 'result' is the actual # of bytes copies
+                     * into the buffer.
+                     * See graphics/displayinfo.h for definitions
+                     * of the various structures.
+                     */
+                    result = GetDisplayInfoData(NULL,
+                                                (UBYTE *)&#038;monitorinfo,
+                                                sizeof(struct MonitorInfo),
+                                                DTAG_MNTR, modeID);
+                    result = GetDisplayInfoData(NULL,
+                                                (UBYTE *)&#038;displayinfo,
+                                                sizeof(struct DisplayInfo),
+                                                DTAG_DISP, modeID);
+                    result = GetDisplayInfoData(NULL,
+                                                (UBYTE *)&#038;dimensioninfo,
+                                                sizeof(struct DimensionInfo),
+                                                DTAG_DIMS,
+                                                modeID);
+                    result = GetDisplayInfoData(NULL,
+                                                (UBYTE *)&#038;nameinfo,
+                                                sizeof(struct NameInfo),
+                                                DTAG_NAME,
+                                                modeID);
+
+                    /* If you don't want to clone the workbench exactly,
+                     * you could use one of the other overscan modes
+                     * and/or min/max.
+                     * dimensions in dimensioninfo or open a regular screen.
+                     */
+                    if (clonescreen = OpenScreenTags(NULL,
+                        /* Could use STDSCREENWIDTH/HEIGHT for non-scrollable
+                         * screens. Those make */
+                        SA_Width, wbscreen-&#062;Width,
+
+                        /* OpenScreen() use the textoverscan values */
+                        SA_Height, wbscreen-&#062;Height,
+
+                        SA_DisplayID, modeID,
+
+                        SA_Depth, wbscreen-&#062;BitMap.Depth,
+
+                        /*Workbench always sizes up to OSCAN_TEXT, so do we */
+                        SA_Overscan, OSCAN_TEXT,
+
+                        SA_Pens, drawinfo-&#062;dri_Pens,
+
+                        SA_Title, nameinfo.Name,
+
+                        /* Doesn't hurt for screens which don't scroll */
+                        SA_AutoScroll, TRUE,
+
+                        TAG_END)) {
+
+                        if (window = OpenWindowTags(NULL,
+                            WA_Top, clonescreen-&#062;BarHeight + 1,
+                            WA_Height, clonescreen-&#062;Height
+                                                - (clonescreen-&#062;BarHeight + 1),
+                            WA_CustomScreen, clonescreen,
+                            WA_MinWidth, 320,
+                            WA_MinHeight, 100,
+                            WA_MaxWidth, clonescreen-&#062;Width,
+                            WA_MaxHeight, clonescreen-&#062;Height,
+
+                            /* I'm only interested in CLOSEWINDOW messages */
+                            WA_IDCMP, CLOSEWINDOW,
+                            WA_Flags, WINDOWSIZING|WINDOWDRAG|
+                                           WINDOWDEPTH|WINDOWCLOSE|ACTIVATE,
+                            WA_Title, &#034;Close to exit.&#034;,
+                            TAG_END)) {
+
+                            /* Wait for the closewindow message */
+                            WaitPort(window-&#062;UserPort);
+                            /* And remove message from the port */
+                            while(msg = (struct IntuiMessage *)
+                                  GetMsg(window-&#062;UserPort))
+                                ReplyMsg((struct Message *)msg);
+                            CloseWindow(window);
+                        } else
+                            EasyRequest(NULL, &#038;failedES, NULL,
+                                        &#034;Can't open window&#034;);
+                        CloseScreen(clonescreen);
+                    } else
+                        EasyRequest(NULL, &#038;failedES, NULL,
+                                    &#034;Can't open screen&#034;);
+                } else
+                    EasyRequest(NULL, &#038;failedES, NULL, &#034;Invalide ModeID&#034;);
+                FreeScreenDrawInfo(wbscreen, drawinfo);
+                UnlockPubScreen(NULL, wbscreen);
+            } else
+                EasyRequest(NULL, &#038;failedES, NULL,
+                            &#034;Can't lock Workbench screen&#034;);
+            CloseLibrary(GfxBase);
+        }
+        CloseLibrary(IntuitionBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

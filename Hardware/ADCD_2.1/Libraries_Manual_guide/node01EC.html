@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_10" NODE="10-2-1" TITLE="10 / The Pointer / Pointer Position" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>10 / The Pointer / Pointer Position</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01EB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01ED.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are two ways to determine the position of the pointer: by direct
+examination of variables in the window structure at any time, and by
+examining messages sent by Intuition which inform the application of
+pointer movement.  The pointer coordinates are relative to the upper left
+corner of the window and are reported in the resolution of the screen,
+even though the pointer's visible resolution is always in low-resolution
+<a name="line8">pixels (note that the pointer is actually a sprite).</a>
+
+The <a href="../Libraries_Manual_guide/node0121.html#line48">MouseX</a> and <a href="../Libraries_Manual_guide/node0121.html#line48">MouseY</a> fields of the <a href="../Libraries_Manual_guide/node0121.html">Window</a> structure always contain the
+current pointer x and y coordinates, whether or not the window is the
+active one.  If the window is a <a href="../Libraries_Manual_guide/node0116.html">GimmeZeroZero</a> window, the variables
+<a href="../Libraries_Manual_guide/node0121.html#line48">GZZMouseX</a> and <a href="../Libraries_Manual_guide/node0121.html#line48">GZZMouseY</a> in the Window structure contain the position of
+<a name="line14">the mouse relative to the upper left corner of the inner window.</a>
+
+If the window is receiving mouse move messages, it will get a set of x,y
+coordinates each time the pointer moves.  To receive messages about
+pointer movements, the <a href="../Libraries_Manual_guide/node0125.html#line44">WFLG_REPORTMOUSE</a> flag must be set in the <a href="../Libraries_Manual_guide/node0121.html">Window</a>
+structure.  This flag can be set when the window is opened.  The flag can
+also be modified after the window is open by calling <a href="../Includes_and_Autodocs_2._guide/node0248.html">ReportMouse()</a>,
+however C programmers should avoid this function.  ReportMouse() has
+problems due to historic confusion about the ordering of its C language
+arguments.  Do not use ReportMouse() unless you are programming in
+assembler.  C programmers should set the flag directly in the Window
+structure using an atomic operation.
+
+Most compilers generate atomic code for operations such as mywindow-&#062;flags
+|= <a href="../Libraries_Manual_guide/node0125.html#line44">WFLG_REPORTMOUSE</a> or mywindow-&#062;flags &#038;= ~WFLG_REPORTMOUSE.  If you are
+unsure of getting an atomic operation from your compiler, you may wish to
+do this operation in assembler, or bracket the code with a
+<a name="line31"><a href="../Libraries_Manual_guide/node02D0.html#line10">Forbid()/Permit()</a> pair.</a>
+
+After the <a href="../Libraries_Manual_guide/node0125.html#line44">WFLG_REPORTMOUSE</a> flag is set, whenever the window is active it
+will be sent an <a href="../Libraries_Manual_guide/node01DC.html#line23">IDCMP_MOUSEMOVE</a> messages each time the pointer position
+changes. The window must have the IDCMP flag IDCMP_MOUSEMOVE set to
+receive these messages.
+
+Mouse movements can cause a very large number of messages to be sent to
+<a name="line39">the IDCMP, the application should be prepared to handle them efficiently.</a>
+
+Messages about pointer movements may also be activated by setting the flag
+<a href="../Libraries_Manual_guide/node014B.html#line40">GACT_FOLLOWMOUSE</a> in an application <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure. When this flag is set
+in a gadget, changes in the pointer position are reported as long as the
+gadget is selected by the user. These messages are also sent as
+<a href="../Libraries_Manual_guide/node01DC.html#line23">IDCMP_MOUSEMOVE</a> messages.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

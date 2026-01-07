@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VIII-51/sana2device.doc" NODE="VIII-51-1" TITLE="sana2.device/AbortIO" -->
+<head>
+<title>sana2.device/AbortIO</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01E0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01E2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+NAME
+    AbortIO -- Remove an existing device request.
+
+SYNOPSIS
+    error = AbortIO(Sana2Req)
+    D0              A1
+
+    LONG AbortIO(struct IOSana2Req *);
+
+FUNCTION
+    This is an exec.library call.
+
+    This function aborts an ioRequest. If the request is active, it may or
+    may not be aborted. If the request is queued it is removed. The
+    request will be returned in the same way as if it had normally
+    completed.  You must WaitIO() after AbortIO() for the request to
+    return.
+
+INPUTS
+    Sana2Req        - Sana2Req to be aborted.
+
+RESULTS
+    error           - Zero if the request was aborted, non-zero otherwise.
+                      io_Error in Sana2Req will be set to IOERR_ABORTED
+                      if it was aborted.
+
+NOTES
+
+SEE ALSO
+    exec.library/AbortIO(), exec.library/WaitIO()
+
+BUGS
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

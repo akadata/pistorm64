@@ -1,0 +1,397 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/iobsolete.h" NODE="MAIN" TITLE="Includes/intuition/iobsolete.h" -->
+<head>
+<title>Includes/intuition/iobsolete.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00E3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00E5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef INTUITION_IOBSOLETE_H
+#define INTUITION_IOBSOLETE_H
+
+/*
+**  $Filename: intuition/iobsolete.h $
+**  $Release: 2.04 Includes, V37.4 $
+**  $Revision: 36.2 $
+**  $Date: 90/11/02 $
+**
+**  Obsolete identifiers for Intuition.  Use the new ones instead!
+**
+**  (C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+
+/* This file contains:
+ *
+ * 1.  The traditional identifiers for gadget Flags, Activation, and Type,
+ * and for window Flags and IDCMP classes.  They are defined in terms
+ * of their new versions, which serve to prevent confusion between
+ * similar-sounding but different identifiers (like IDCMP_WINDOWACTIVE
+ * and WFLG_ACTIVATE).
+ *
+ * 2.  Some tag names and constants whose labels were adjusted after V36.
+ *
+ * 3.  Some tag names that were used only during the V36-beta cycle.
+ *
+ * By default, 1 and 2 are enabled, while 3 are excluded.
+ *
+ * #define INTUI_V36_NAMES_ONLY to exclude the traditional identifiers and
+ * the original V36 names of some identifiers.
+ *
+ * #define INTUI_V36_BETA_NAMES to include the beta tag-names.
+ */
+
+<a name="line37"></a>
+#ifndef INTUITION_INTUITION_H
+#include &#060;intuition/intuition.h&#062;
+#endif
+
+/* #define INTUI_V36_NAMES_ONLY to remove these older names */
+
+#ifndef INTUI_V36_NAMES_ONLY
+
+
+/* V34-style Gadget-&#062;Flags names: */
+<a name="line48"></a>
+<a name="line49">#define GADGHIGHBITS	GFLG_GADGHIGHBITS</a>
+<a name="line50">#define GADGHCOMP	GFLG_GADGHCOMP</a>
+<a name="line51">#define GADGHBOX	GFLG_GADGHBOX</a>
+<a name="line52">#define GADGHIMAGE	GFLG_GADGHIMAGE</a>
+<a name="line53">#define GADGHNONE	GFLG_GADGHNONE</a>
+<a name="line54">#define GADGIMAGE	GFLG_GADGIMAGE</a>
+<a name="line55">#define GRELBOTTOM	GFLG_RELBOTTOM</a>
+<a name="line56">#define GRELRIGHT	GFLG_RELRIGHT</a>
+<a name="line57">#define GRELWIDTH	GFLG_RELWIDTH</a>
+<a name="line58">#define GRELHEIGHT	GFLG_RELHEIGHT</a>
+<a name="line59">#define SELECTED	GFLG_SELECTED</a>
+<a name="line60">#define GADGDISABLED	GFLG_DISABLED</a>
+<a name="line61">#define LABELMASK	GFLG_LABELMASK</a>
+<a name="line62">#define LABELITEXT	GFLG_LABELITEXT</a>
+<a name="line63">#define	LABELSTRING	GFLG_LABELSTRING</a>
+#define LABELIMAGE	GFLG_LABELIMAGE
+
+
+/* V34-style Gadget-&#062;Activation flag names: */
+<a name="line68"></a>
+<a name="line69">#define RELVERIFY	GACT_RELVERIFY</a>
+<a name="line70">#define GADGIMMEDIATE	GACT_IMMEDIATE</a>
+<a name="line71">#define ENDGADGET	GACT_ENDGADGET</a>
+<a name="line72">#define FOLLOWMOUSE	GACT_FOLLOWMOUSE</a>
+<a name="line73">#define RIGHTBORDER	GACT_RIGHTBORDER</a>
+<a name="line74">#define LEFTBORDER	GACT_LEFTBORDER</a>
+<a name="line75">#define TOPBORDER	GACT_TOPBORDER</a>
+<a name="line76">#define BOTTOMBORDER	GACT_BOTTOMBORDER</a>
+<a name="line77">#define BORDERSNIFF	GACT_BORDERSNIFF</a>
+<a name="line78">#define TOGGLESELECT	GACT_TOGGLESELECT</a>
+<a name="line79">#define BOOLEXTEND	GACT_BOOLEXTEND</a>
+<a name="line80">#define STRINGLEFT	GACT_STRINGLEFT</a>
+<a name="line81">#define STRINGCENTER	GACT_STRINGCENTER</a>
+<a name="line82">#define STRINGRIGHT	GACT_STRINGRIGHT</a>
+<a name="line83">#define LONGINT		GACT_LONGINT</a>
+<a name="line84">#define ALTKEYMAP	GACT_ALTKEYMAP</a>
+<a name="line85">#define STRINGEXTEND	GACT_STRINGEXTEND</a>
+#define ACTIVEGADGET	GACT_ACTIVEGADGET
+
+
+/* V34-style Gadget-&#062;Type names: */
+<a name="line90"></a>
+<a name="line91">#define GADGETTYPE	GTYP_GADGETTYPE</a>
+<a name="line92">#define SYSGADGET	GTYP_SYSGADGET</a>
+<a name="line93">#define SCRGADGET	GTYP_SCRGADGET</a>
+<a name="line94">#define GZZGADGET	GTYP_GZZGADGET</a>
+<a name="line95">#define REQGADGET	GTYP_REQGADGET</a>
+<a name="line96">#define SIZING		GTYP_SIZING</a>
+<a name="line97">#define WDRAGGING	GTYP_WDRAGGING</a>
+<a name="line98">#define SDRAGGING	GTYP_SDRAGGING</a>
+<a name="line99">#define WUPFRONT	GTYP_WUPFRONT</a>
+<a name="line100">#define SUPFRONT	GTYP_SUPFRONT</a>
+<a name="line101">#define WDOWNBACK	GTYP_WDOWNBACK</a>
+<a name="line102">#define SDOWNBACK	GTYP_SDOWNBACK</a>
+<a name="line103">#define CLOSE		GTYP_CLOSE</a>
+<a name="line104">#define BOOLGADGET	GTYP_BOOLGADGET</a>
+<a name="line105">#define GADGET0002	GTYP_GADGET0002</a>
+<a name="line106">#define PROPGADGET	GTYP_PROPGADGET</a>
+<a name="line107">#define STRGADGET	GTYP_STRGADGET</a>
+<a name="line108">#define CUSTOMGADGET	GTYP_CUSTOMGADGET</a>
+#define GTYPEMASK	GTYP_GTYPEMASK
+
+
+/* V34-style IDCMP class names: */
+<a name="line113"></a>
+<a name="line114">#define SIZEVERIFY	IDCMP_SIZEVERIFY</a>
+<a name="line115">#define NEWSIZE		IDCMP_NEWSIZE</a>
+<a name="line116">#define REFRESHWINDOW	IDCMP_REFRESHWINDOW</a>
+<a name="line117">#define MOUSEBUTTONS	IDCMP_MOUSEBUTTONS</a>
+<a name="line118">#define MOUSEMOVE	IDCMP_MOUSEMOVE</a>
+<a name="line119">#define GADGETDOWN	IDCMP_GADGETDOWN</a>
+<a name="line120">#define GADGETUP	IDCMP_GADGETUP</a>
+<a name="line121">#define REQSET		IDCMP_REQSET</a>
+<a name="line122">#define MENUPICK	IDCMP_MENUPICK</a>
+<a name="line123">#define CLOSEWINDOW	IDCMP_CLOSEWINDOW</a>
+<a name="line124">#define RAWKEY		IDCMP_RAWKEY</a>
+<a name="line125">#define REQVERIFY	IDCMP_REQVERIFY</a>
+<a name="line126">#define REQCLEAR	IDCMP_REQCLEAR</a>
+<a name="line127">#define MENUVERIFY	IDCMP_MENUVERIFY</a>
+<a name="line128">#define NEWPREFS	IDCMP_NEWPREFS</a>
+<a name="line129">#define DISKINSERTED	IDCMP_DISKINSERTED</a>
+<a name="line130">#define DISKREMOVED	IDCMP_DISKREMOVED</a>
+<a name="line131">#define WBENCHMESSAGE	IDCMP_WBENCHMESSAGE</a>
+<a name="line132">#define ACTIVEWINDOW	IDCMP_ACTIVEWINDOW</a>
+<a name="line133">#define INACTIVEWINDOW	IDCMP_INACTIVEWINDOW</a>
+<a name="line134">#define DELTAMOVE	IDCMP_DELTAMOVE</a>
+<a name="line135">#define VANILLAKEY	IDCMP_VANILLAKEY</a>
+<a name="line136">#define INTUITICKS	IDCMP_INTUITICKS</a>
+<a name="line137">#define IDCMPUPDATE	IDCMP_IDCMPUPDATE</a>
+<a name="line138">#define MENUHELP	IDCMP_MENUHELP</a>
+<a name="line139">#define CHANGEWINDOW	IDCMP_CHANGEWINDOW</a>
+#define LONELYMESSAGE	IDCMP_LONELYMESSAGE
+
+
+/* V34-style Window-&#062;Flags names: */
+<a name="line144"></a>
+<a name="line145">#define WINDOWSIZING	WFLG_SIZEGADGET</a>
+<a name="line146">#define WINDOWDRAG	WFLG_DRAGBAR</a>
+<a name="line147">#define WINDOWDEPTH	WFLG_DEPTHGADGET</a>
+<a name="line148">#define WINDOWCLOSE	WFLG_CLOSEGADGET</a>
+<a name="line149">#define SIZEBRIGHT	WFLG_SIZEBRIGHT</a>
+<a name="line150">#define SIZEBBOTTOM	WFLG_SIZEBBOTTOM</a>
+<a name="line151">#define REFRESHBITS	WFLG_REFRESHBITS</a>
+<a name="line152">#define SMART_REFRESH	WFLG_SMART_REFRESH</a>
+<a name="line153">#define SIMPLE_REFRESH	WFLG_SIMPLE_REFRESH</a>
+<a name="line154">#define SUPER_BITMAP	WFLG_SUPER_BITMAP</a>
+<a name="line155">#define OTHER_REFRESH	WFLG_OTHER_REFRESH</a>
+<a name="line156">#define BACKDROP	WFLG_BACKDROP</a>
+<a name="line157">#define REPORTMOUSE	WFLG_REPORTMOUSE</a>
+<a name="line158">#define GIMMEZEROZERO	WFLG_GIMMEZEROZERO</a>
+<a name="line159">#define BORDERLESS	WFLG_BORDERLESS</a>
+<a name="line160">#define ACTIVATE	WFLG_ACTIVATE</a>
+<a name="line161">#define WINDOWACTIVE	WFLG_WINDOWACTIVE</a>
+<a name="line162">#define INREQUEST	WFLG_INREQUEST</a>
+<a name="line163">#define MENUSTATE	WFLG_MENUSTATE</a>
+<a name="line164">#define RMBTRAP		WFLG_RMBTRAP</a>
+<a name="line165">#define NOCAREREFRESH	WFLG_NOCAREREFRESH</a>
+<a name="line166">#define WINDOWREFRESH	WFLG_WINDOWREFRESH</a>
+<a name="line167">#define WBENCHWINDOW	WFLG_WBENCHWINDOW</a>
+<a name="line168">#define WINDOWTICKED	WFLG_WINDOWTICKED</a>
+<a name="line169">#define NW_EXTENDED	WFLG_NW_EXTENDED</a>
+<a name="line170">#define VISITOR		WFLG_VISITOR</a>
+<a name="line171">#define ZOOMED		WFLG_ZOOMED</a>
+#define HASZOOM		WFLG_HASZOOM
+
+
+/* These are the obsolete tag names for general gadgets, proportional gadgets,
+ * and string gadgets.	Use the mixed-case equivalents from gadgetclass.h
+ * instead.
+ */
+<a name="line179"></a>
+<a name="line180">#define GA_LEFT			GA_Left</a>
+<a name="line181">#define GA_RELRIGHT		GA_RelRight</a>
+<a name="line182">#define GA_TOP			GA_Top</a>
+<a name="line183">#define GA_RELBOTTOM		GA_RelBottom</a>
+<a name="line184">#define GA_WIDTH		GA_Width</a>
+<a name="line185">#define GA_RELWIDTH		GA_RelWidth</a>
+<a name="line186">#define GA_HEIGHT		GA_Height</a>
+<a name="line187">#define GA_RELHEIGHT		GA_RelHeight</a>
+<a name="line188">#define GA_TEXT			GA_Text</a>
+<a name="line189">#define GA_IMAGE		GA_Image</a>
+<a name="line190">#define GA_BORDER		GA_Border</a>
+<a name="line191">#define GA_SELECTRENDER		GA_SelectRender</a>
+<a name="line192">#define GA_HIGHLIGHT		GA_Highlight</a>
+<a name="line193">#define GA_DISABLED		GA_Disabled</a>
+<a name="line194">#define GA_GZZGADGET		GA_GZZGadget</a>
+<a name="line195">#define GA_USERDATA		GA_UserData</a>
+<a name="line196">#define GA_SPECIALINFO		GA_SpecialInfo</a>
+<a name="line197">#define GA_SELECTED		GA_Selected</a>
+<a name="line198">#define GA_ENDGADGET		GA_EndGadget</a>
+<a name="line199">#define GA_IMMEDIATE		GA_Immediate</a>
+<a name="line200">#define GA_RELVERIFY		GA_RelVerify</a>
+<a name="line201">#define GA_FOLLOWMOUSE		GA_FollowMouse</a>
+<a name="line202">#define GA_RIGHTBORDER		GA_RightBorder</a>
+<a name="line203">#define GA_LEFTBORDER		GA_LeftBorder</a>
+<a name="line204">#define GA_TOPBORDER		GA_TopBorder</a>
+<a name="line205">#define GA_BOTTOMBORDER		GA_BottomBorder</a>
+<a name="line206">#define GA_TOGGLESELECT		GA_ToggleSelect</a>
+<a name="line207">#define GA_SYSGADGET		GA_SysGadget</a>
+<a name="line208">#define GA_SYSGTYPE		GA_SysGType</a>
+<a name="line209">#define GA_PREVIOUS		GA_Previous</a>
+<a name="line210">#define GA_NEXT			GA_Next</a>
+<a name="line211">#define GA_DRAWINFO		GA_DrawInfo</a>
+<a name="line212">#define GA_INTUITEXT		GA_IntuiText</a>
+#define GA_LABELIMAGE		GA_LabelImage
+<a name="line214"></a>
+<a name="line215">#define PGA_FREEDOM		PGA_Freedom</a>
+<a name="line216">#define PGA_BORDERLESS		PGA_Borderless</a>
+<a name="line217">#define PGA_HORIZPOT		PGA_HorizPot</a>
+<a name="line218">#define PGA_HORIZBODY		PGA_HorizBody</a>
+<a name="line219">#define PGA_VERTPOT		PGA_VertPot</a>
+<a name="line220">#define PGA_VERTBODY		PGA_VertBody</a>
+<a name="line221">#define PGA_TOTAL		PGA_Total</a>
+<a name="line222">#define PGA_VISIBLE		PGA_Visible</a>
+#define PGA_TOP			PGA_Top
+<a name="line224"></a>
+<a name="line225">#define LAYOUTA_LAYOUTOBJ	LAYOUTA_LayoutObj</a>
+<a name="line226">#define LAYOUTA_SPACING		LAYOUTA_Spacing</a>
+#define LAYOUTA_ORIENTATION	LAYOUTA_Orientation
+
+
+/* These are the obsolete tag names for image attributes.
+ * Use the mixed-case equivalents from imageclass.h instead.
+ */
+<a name="line233"></a>
+<a name="line234">#define IMAGE_ATTRIBUTES	(IA_Dummy)</a>
+<a name="line235">#define IA_LEFT			IA_Left</a>
+<a name="line236">#define IA_TOP			IA_Top</a>
+<a name="line237">#define IA_WIDTH		IA_Width</a>
+<a name="line238">#define IA_HEIGHT		IA_Height</a>
+<a name="line239">#define IA_FGPEN		IA_FGPen</a>
+<a name="line240">#define IA_BGPEN		IA_BGPen</a>
+<a name="line241">#define IA_DATA			IA_Data</a>
+<a name="line242">#define IA_LINEWIDTH		IA_LineWidth</a>
+<a name="line243">#define IA_PENS			IA_Pens</a>
+<a name="line244">#define IA_RESOLUTION		IA_Resolution</a>
+<a name="line245">#define IA_APATTERN		IA_APattern</a>
+<a name="line246">#define IA_APATSIZE		IA_APatSize</a>
+<a name="line247">#define IA_MODE			IA_Mode</a>
+<a name="line248">#define IA_FONT			IA_Font</a>
+<a name="line249">#define IA_OUTLINE		IA_Outline</a>
+<a name="line250">#define IA_RECESSED		IA_Recessed</a>
+<a name="line251">#define IA_DOUBLEEMBOSS		IA_DoubleEmboss</a>
+<a name="line252">#define IA_EDGESONLY		IA_EdgesOnly</a>
+<a name="line253">#define IA_SHADOWPEN		IA_ShadowPen</a>
+#define IA_HIGHLIGHTPEN		IA_HighlightPen
+
+
+/* These are the obsolete identifiers for the various DrawInfo pens.
+ * Use the uppercase versions in screens.h instead.
+ */
+<a name="line260"></a>
+<a name="line261">#define detailPen	DETAILPEN</a>
+<a name="line262">#define blockPen	BLOCKPEN</a>
+<a name="line263">#define textPen		TEXTPEN</a>
+<a name="line264">#define shinePen	SHINEPEN</a>
+<a name="line265">#define shadowPen	SHADOWPEN</a>
+<a name="line266">#define hifillPen	FILLPEN</a>
+<a name="line267">#define hifilltextPen	FILLTEXTPEN</a>
+<a name="line268">#define backgroundPen	BACKGROUNDPEN</a>
+<a name="line269">#define hilighttextPen	HIGHLIGHTTEXTPEN</a>
+#define numDrIPens	NUMDRIPENS
+
+
+#endif /* !INTUI_V36_NAMES_ONLY */
+
+
+/* #define INTUI_V36_BETA_NAMES to enable these tag names that were used
+ * during the V36 beta period only.  New code should use the official
+ * tags instead.
+ */
+
+#ifdef INTUI_V36_BETA_NAMES
+
+/* These are the obsolete tag-names for the OpenWindowTags().
+ * Use the WA_... equivalents from intuition.h instead.
+ */
+
+#define W_Dummy			WA_Dummy
+#define W_LEFT			WA_Left
+#define W_TOP			WA_Top
+#define W_WIDTH			WA_Width
+#define W_HEIGHT		WA_Height
+#define W_DETAILPEN		WA_DetailPen
+#define W_BLOCKPEN		WA_BlockPen
+#define W_IDCMP			WA_IDCMP
+#define W_FLAGS			WA_Flags
+#define W_GADGETS		WA_Gadgets
+#define W_CHECKMARK		WA_Checkmark
+#define W_TITLE			WA_Title
+#define W_SCREENTITLE		WA_ScreenTitle
+#define W_CUSTOMSCREEN		WA_CustomScreen
+#define W_SUPERBITMAP		WA_SuperBitMap
+#define W_MINWIDTH		WA_MinWidth
+#define W_MINHEIGHT		WA_MinHeight
+#define W_MAXWIDTH		WA_MaxWidth
+#define W_MAXHEIGHT		WA_MaxHeight
+#define W_INNERWIDTH		WA_InnerWidth
+#define W_INNERHEIGHT		WA_InnerHeight
+#define W_PUBSCNAME		WA_PubScreenName
+#define W_PUBSC			WA_PubScreen
+#define W_PUBSCFALLBACK		WA_PubScreenFallBack
+#define W_WINDOWNAME		WA_WindowName
+#define W_COLORS		WA_Colors
+#define W_ZOOM			WA_Zoom
+#define W_MOUSEQUEUE		WA_MouseQueue
+#define W_BACKFILL		WA_BackFill
+#define W_RPTQUEUE		WA_RptQueue
+#define W_SIZEGADGET		WA_SizeGadget
+#define W_DRAGBAR		WA_DragBar
+#define W_DEPTHGADGET		WA_DepthGadget
+#define W_CLOSEGADGET		WA_CloseGadget
+#define W_BACKDROP		WA_Backdrop
+#define W_REPORTMOUSE		WA_ReportMouse
+#define W_NOCAREREFRESH		WA_NoCareRefresh
+#define W_BORDERLESS		WA_Borderless
+#define W_ACTIVATE		WA_Activate
+#define W_RMBTRAP		WA_RMBTrap
+#define W_WBENCHWINDOW		WA_WBenchWindow
+#define W_SIMPLE_REFRESH	WA_SimpleRefresh
+#define W_SMART_REFRESH		WA_SmartRefresh
+#define W_SIZEBRIGHT		WA_SizeBRight
+#define W_SIZEBBOTTOM		WA_SizeBBottom
+#define W_AUTOADJUST		WA_AutoAdjust
+#define W_GIMMEZEROZERO		WA_GimmeZeroZero
+
+
+/* These are the obsolete tag-names for the OpenScreenTags().
+ * Use the SA_... equivalents from screens.h instead.
+ */
+
+#define S_DUMMY		SA_Dummy
+#define S_LEFT		SA_Left
+#define S_TOP		SA_Top
+#define S_WIDTH		SA_Width
+#define S_HEIGHT	SA_Height
+#define S_DEPTH		SA_Depth
+#define S_DETAILPEN	SA_DetailPen
+#define S_BLOCKPEN	SA_BlockPen
+#define S_TITLE		SA_Title
+#define S_COLORS	SA_Colors
+#define S_ERRORCODE	SA_ErrorCode
+#define S_FONT		SA_Font
+#define S_SYSFONT	SA_SysFont
+#define S_TYPE		SA_Type
+#define S_BITMAP	SA_BitMap
+#define S_PUBNAME	SA_PubName
+#define S_PUBSIG	SA_PubSig
+#define S_PUBTASK	SA_PubTask
+#define S_DISPLAYID	SA_DisplayID
+#define S_DCLIP		SA_DClip
+#define S_STDDCLIP	SA_Overscan
+#define S_MONITORNAME	SA_Obsolete1
+#define S_SHOWTITLE	SA_ShowTitle
+#define S_BEHIND	SA_Behind
+#define S_QUIET		SA_Quiet
+#define S_AUTOSCROLL	SA_AutoScroll
+
+
+#endif /* INTUI_V36_BETA_NAMES */
+
+
+#endif /* INTUITION_IOBSOLETE_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

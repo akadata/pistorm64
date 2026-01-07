@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="WritePixelArray8()" TITLE="graphics.library/WritePixelArray8" -->
+<head>
+<title>graphics.library/WritePixelArray8</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node048D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node048F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    WritePixelArray8 -- write the pen number value of a rectangular array
+    of pixels starting at a specified x,y location and continuing
+    through to another x,y location within a certain <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>. (V36)
+
+SYNOPSIS
+    count = WritePixelArray8(rp,xstart,ystart,xstop,ystop,array,temprp)
+    D0                       A0 D0:16  D1:16  D2:16 D3:16  A2   A1
+
+    LONG WritePixelArray8(struct  <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *, UWORD, UWORD,
+         UWORD, UWORD, UBYTE *, struct  <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *);
+
+FUNCTION
+    For each pixel in a rectangular region, decode the pen number selector
+    from a linear array of pen numbers into the bit-planes used to describe
+    a particular rastport.
+
+INPUTS
+    rp     -  pointer to a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> structure
+    (xstart,ystart) -  starting point in the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>
+    (xstop,ystop)   -  stopping point in the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>
+    array  - pointer to an array of UBYTEs from which to fetch the
+             pixel data. Allocate at least
+             ((((width+15)&#062;&#062;4)&#060;&#060;4)*(ystop-ystart+1)) bytes.
+    temprp - temporary rastport (copy of rp with <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line33">Layer</a> set == NULL,
+             temporary memory allocated for
+             temprp-&#062;BitMap with Rows set == 1,
+             temprp-&#062;BytesPerRow == (((width+15)&#062;&#062;4)&#060;&#060;1),
+             and temporary memory allocated for
+             temprp-&#062;BitMap-&#062;Planes[])
+
+RESULT
+    For each pixel in the array:
+        Pen - (0..255) number at that position is returned
+
+NOTE
+    xstop must be &#062;= xstart
+    ystop must be &#062;= ystart
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node048D.html">WritePixel()</a>  <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

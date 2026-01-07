@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-8-1" TITLE="4 / Other Window Functions / Menus and the Active Window" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Other Window Functions / Menus and the Active Window</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0126.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0128.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Menus for the active window will be displayed when the user presses the
+menu button on the mouse.  Menus may be disabled for the window by not
+providing a menu strip, or by clearing the menus with <a href="../Libraries_Manual_guide/node0181.html#line11">ClearMenuStrip()</a>.
+Similarly, if the active window has <a href="../Libraries_Manual_guide/node0125.html#line95">WFLG_RMBTRAP</a> set, the menu button will
+<a name="line6">not bring up the menus.</a>
+
+Two other functions, <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a> and <a href="../Libraries_Manual_guide/node0184.html#line9">ResetMenuStrip()</a>, are used to
+attach or update the menu strip for a window.
+
+    void ClearMenuStrip( struct Window *window );
+    BOOL SetMenuStrip( struct Window *window, struct Menu *menu );
+    BOOL ResetMenuStrip( struct Window *window, struct Menu *menu );
+
+If <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a> has been called for a window, <a href="../Libraries_Manual_guide/node0181.html#line11">ClearMenuStrip()</a> must be
+called before closing the window.  After ClearMenuStrip() has been called,
+the user can no longer access menus for this window.  See the chapter
+&#034;<a href="../Libraries_Manual_guide/node0180.html">Intuition Menus</a>,&#034; for complete information about setting up menus.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

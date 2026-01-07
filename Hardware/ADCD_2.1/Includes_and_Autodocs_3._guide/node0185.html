@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="LoadSeg()" TITLE="dos.library/LoadSeg" -->
+<head>
+<title>dos.library/LoadSeg</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0184.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0186.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	LoadSeg -- Scatterload a loadable file into memory
+
+<b>    SYNOPSIS</b>
+	seglist = LoadSeg( name )
+	D0		   D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node05F8.html#line129">BPTR</a> LoadSeg(STRPTR)
+
+<b>    FUNCTION</b>
+	The file 'name' should be a load module produced by the linker.
+	LoadSeg() scatterloads the CODE, DATA and BSS segments into memory,
+	chaining together the segments with BPTR's on their first words.
+	The end of the chain is indicated by a zero.  There can be any number
+	of segments in a file.  All necessary relocation is handled by
+	LoadSeg().
+
+	In the event of an error any blocks loaded will be unloaded and a
+	NULL result returned.
+
+	If the module is correctly loaded then the output will be a pointer
+	at the beginning of the list of blocks. Loaded code is unloaded via
+	a call to <a href="../Includes_and_Autodocs_3._guide/node01C7.html">UnLoadSeg()</a>.
+
+<b>    INPUTS</b>
+	name - pointer to a null-terminated string
+
+<b>    RESULTS</b>
+	seglist - BCPL pointer to a seglist
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01C7.html">UnLoadSeg()</a>, <a href="../Includes_and_Autodocs_3._guide/node0180.html">InternalLoadSeg()</a>, <a href="../Includes_and_Autodocs_3._guide/node0181.html">InternalUnLoadSeg()</a>, <a href="../Includes_and_Autodocs_3._guide/node014D.html">CreateProc()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node014C.html">CreateNewProc()</a>, <a href="../Includes_and_Autodocs_3._guide/node0194.html">NewLoadSeg()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

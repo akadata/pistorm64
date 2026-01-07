@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_25" NODE="25-1-1-2" TITLE="25 / / / Making a SignalSemaphore Available to the Public" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>25 / / / Making a SignalSemaphore Available to the Public</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02F8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02FA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A semaphore should be used internally in your program if it has more than
+one task operating on shared data structures.  There may also be cases
+when you wish to make a data item public to other applications but still
+need to restrict its access via semaphores.  In that case, you would give
+your semaphore a unique name and add it to the public <a href="../Libraries_Manual_guide/node02F7.html">SignalSemaphore</a> list
+maintained by Exec.  The <a href="../Includes_and_Autodocs_2._guide/node032B.html">AddSemaphore()</a> function does this for you.  This
+works in a manner similar to <a href="../Libraries_Manual_guide/node02EC.html">AddPort()</a> for message ports.
+
+To create and initialize a public semaphore for a data item and add it to
+the public semaphore list maintained by Exec, the following function
+should be used.  (This will prevent the semaphore from being added or
+removed more than once by separate programs that use the semaphore).
+
+   UBYTE *name;   /* name of semaphore to add */
+   struct SignalSemaphore *semaphore;
+
+   Forbid();
+   /* Make sure the semaphore name is unique */
+   if (!FindSemaphore(name)) {
+       /* Allocate memory for the structure */
+       if (sema=(struct SignalSemaphore *)
+           AllocMem(sizeof(struct SignalSemaphore),MEMF_PUBLIC|MEMF_CLEAR))
+       {
+           sema-&#062;ss_Link.ln_Pri=0;         /* Set the priority to zero */
+           sema-&#062;ss_Link.ln_Name=name;
+           /* Note that the string 'name' is not copied. If that is    */
+           /* needed, allocate memory for it and copy the string. And  */
+           /* add the semaphore the the system list                    */
+           AddSemaphore(semaphore);
+       }
+   }
+   Permit();
+
+A value of NULL for semaphore means that the semaphore already exists or
+that there was not enough free memory to create it.
+
+Before using the data item or other resource which is protected by a
+semaphore, you must first obtain the semaphore.  Depending on your needs,
+you can get either <a href="../Libraries_Manual_guide/node02FA.html">exclusive</a> or <a href="../Libraries_Manual_guide/node02FB.html">shared</a> access to the semaphore.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

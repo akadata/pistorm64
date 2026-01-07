@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_9" NODE="9-2" TITLE="9 Parallel Device / Device Interface" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>9 Parallel Device / Device Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node000F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0011.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The parallel device operates like the other Amiga devices.  To use it, you
+must first open the parallel device, then send I/O requests to it, and
+then close it when finished.  See &#034;<a href="../Devices_Manual_guide/node0006.html">Introduction to Amiga System Devices</a>&#034;
+<a name="line5">chapter for general information on device usage.</a>
+
+<a name="line7">The I/O request used by the parallel device is called IOExtPar.</a>
+
+    struct   IOExtPar
+        {
+        struct  IOStdReq IOPar;
+        ULONG   io_PExtFlags;   /* additional parallel flags */
+        UBYTE   io_Status;      /* status of parallel port and registers */
+        UBYTE   io_ParFlags;    /* parallel device flags */
+        struct  IOPArray io_PTermArray; /* termination character array */
+<a name="line16">        };</a>
+
+See the include file devices/<a href="../Includes_and_Autodocs_2._guide/node004A.html">parallel.h</a> for the complete structure
+definition.
+
+ <a href="../Devices_Manual_guide/node0011.html">Opening The Parallel Device</a> 		 <a href="../Devices_Manual_guide/node0013.html">Writing To The Parallel Device</a> 
+ <a href="../Devices_Manual_guide/node0012.html">Reading From The Parallel Device</a> 	 <a href="../Devices_Manual_guide/node0014.html">Closing The Parallel Device</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

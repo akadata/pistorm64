@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="listbrowser_gc" NODE="AllocListBrowserNodeA()" TITLE="listbrowser_gc/AllocListBrowserNodeA" -->
+<head>
+<title>listbrowser_gc/AllocListBrowserNodeA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0443.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0445.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        AllocListBrowserNodeA -- <a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> a ListBrowser node.
+
+<b>    SYNOPSIS</b>
+        struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> * AllocListBrowserNode(UWORD, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...)
+        node = AllocListBrowserNode(columns, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...)
+
+        struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> * AllocListBrowserNodeA(UWORD, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *)
+        node = AllocListBrowserNodeA(columns, taglist)
+
+<b>    FUNCTION</b>
+        Allocates a node that can be added to the Exec linked list of
+        labels in the listbrowser.  This is the only way to allocate a
+        node for this list, you cannot allocate nodes yourself because
+        the ListBrowser class uses a private node structure.
+
+<b>    TAGS</b>
+        See <a href="../Includes_and_Autodocs_3._guide/node044B.html">SetListBrowserNodeAttrsA()</a> for the list of supported tags.  In
+        addition, AllocListBrowserNodeA() supports the following additional
+        tags:
+
+        LBNA_NodeSize (ULONG) (V41)
+        The size in bytes of the public portion of the node structure that
+        should be allocated.  Usually the default (sizeof(struct Node)) will
+        suffice, unless you wish to have a custom node structure embedded
+        within the ListBrowser node, in which case you'd provide the size
+        of that structure.  Then the node returned can be treated as an
+        instance of your custom node structure.
+
+        Defaults to sizeof(struct Node).
+
+<b>    INPUTS</b>
+        columns - How many columns your ListBrowser has.
+        taglist - Attributes for the node, passed onto
+            <a href="../Includes_and_Autodocs_3._guide/node044B.html">SetListBrowserNodeAttrsA()</a>.
+
+<b>    RESULT</b>
+        node - A node that can be added into the Exec list of labels for
+            a ListBrowser gadget.
+
+<b>    SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node0446.html">FreeListBrowserNode()</a>, <a href="../Includes_and_Autodocs_3._guide/node044B.html">SetListBrowserNodeAttrsA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

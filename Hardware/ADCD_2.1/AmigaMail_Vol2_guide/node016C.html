@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="II-1/SystemTest.c" NODE="MAIN" TITLE="II-1/SystemTest.c" -->
+<head>
+<title>II-1/SystemTest.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node016B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node016D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* SystemTest.c - Execute me to compile me with SAS/C 6.56
+;   Demonstration of System(), AUTO CON, and custom screen CON
+sc DATA=NEAR NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 SystemTest.c
+slink FROM LIB:c.o,SystemTest.o TO SystemTest LIBRARY LIB:sc.lib,LIB:amiga.lib
+quit
+*/
+/*
+Copyright (c) 1990-1999 Amiga, Inc.
+
+This example is provided in electronic form by Amiga, Inc.
+for use with the Amiga Mail Volume II technical publication.
+Amiga Mail Volume II contains additional information on the correct
+usage of the techniques and operating system functions presented in
+these examples.  The source and executable code of these examples may
+only be distributed in free electronic form, via bulletin board or
+as part of a fully non-commercial and freely redistributable
+diskette.  Both the source and executable code (including comments)
+must be included, without modification, in any copy.  This example
+may not be published in printed form or distributed with any
+commercial product. However, the programming techniques and support
+routines set forth in these examples may be used in the development
+of original executable software products for Amiga
+computers.
+
+All other rights reserved.
+
+This example is provided &#034;as-is&#034; and is subject to change; no
+warranties are made.  All use is at your own risk. No liability or
+responsibility is assumed.
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/libraries.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;dos/dostags.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;graphics/displayinfo.h&#062;
+
+#ifdef LATTICE
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;stdlib.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;string.h&#062;
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+/* our function error codes */
+#define SYSTEMFAIL      (-1L)
+#define WINDOWFAIL      (-2L)
+
+/* function prototypes */
+LONG beginCommand(UBYTE *command);
+LONG doCommand(UBYTE *command, BPTR other);
+VOID checkResult(UBYTE *command, LONG result);
+
+
+/* Formatted version string for the 2.0 VERSION command */
+UBYTE *vers = &#034;\0$VER: SystemTest 36.10&#034;;
+
+struct Library *IntuitionBase;
+
+
+struct Screen *OpenScreenTags(struct NewScreen *,ULONG tags, ...);
+struct Window *OpenWindowTags(struct NewWindow *,ULONG tags, ...);
+
+
+void main(int argc, char **argv)
+    {
+    extern struct Library *DOSBase;
+    struct Screen *scr = NULL;
+    struct Window *win = NULL;
+    ULONG penspecterm = ~0;
+    LONG result;
+    BPTR file;
+    UBYTE *command;
+    UBYTE buf[128];
+
+    if(DOSBase-&#062;lib_Version &#060; 36)
+        {
+        printf(&#034;This example requires dos.library V36 or higher\n&#034;);
+        exit(RETURN_FAIL);
+        }
+    if(!(IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,36)))
+        {
+        printf(&#034;This example requires intuition.library V36 or higher\n&#034;);
+        exit(RETURN_FAIL);
+        }
+
+    /* SYNCHRONOUS SYSTEM() WITH OUR INPUT/OUTPUT
+     */
+    printf(&#034;\n*** SystemTest: Synchronous System call 'dir libs:':\n&#034;);
+    command = &#034;dir libs:&#034;;
+    result = doCommand(command,NULL);
+    checkResult(command,result);
+    printf(&#034;\n*** SystemTest: Synchronous System call of nonexistant command:\n&#034;);
+    command = &#034;badcommand&#034;;
+    result = doCommand(command,NULL);
+    checkResult(command,result);
+
+    printf(&#034;\n*** SystemTest: Synchronous System call 'ask \&#034;...Answer y now\&#034;':\n&#034;);
+    command =
+        &#034;ask \&#034;Ready for CON: on a Custom Screen? Answer y now (should return 5):\&#034;&#034;;
+    result = doCommand(command,NULL);
+    checkResult(command,result);
+
+   /* SYNCHRONOUS SYSTEM() WITH CON: IN A CUSTOM SCREEN AND WINDOW
+     */
+    if(scr = OpenScreenTags(NULL,
+                SA_Width, 640,
+                SA_Height, 200,
+                SA_Depth, 3,
+                SA_DisplayID, HIRES_KEY,
+                SA_Pens, &#038;penspecterm,  /* Give us New Look */
+                TAG_DONE))
+        {
+        if(win = OpenWindowTags(NULL,
+                WA_CustomScreen, scr,
+                WA_Flags, WINDOWDRAG|WINDOWCLOSE|ACTIVATE,
+                WA_IDCMP, CLOSEWINDOW,
+                WA_Top, 20,
+                WA_Height, scr-&#062;Height - 20,
+                WA_Title, &#034;Custom Window&#034;,
+                WA_ScreenTitle, &#034;Custom Screen&#034;,
+                TAG_DONE))
+            {
+            sprintf(buf,&#034;CON://///WINDOW0x%lx&#034;, win); /* adds window pointer */
+            if(file = Open(buf, MODE_OLDFILE))
+                {
+                command = &#034;echo \&#034;CLI commands on a custom screen!\&#034;&#034;;
+                result = doCommand(command,file);
+                command = &#034;dir libs:&#034;;
+                result = doCommand(command,file);
+                command = &#034;echo \&#034;( Click CLOSE gadget, or type CTRL-C )\&#034;&#034;;
+                result = doCommand(command,file);
+                Wait(1 &#060;&#060; win-&#062;UserPort-&#062;mp_SigBit | SIGBREAKF_CTRL_C);
+                Close(file);    /* Closes the window too */
+                }
+            else CloseWindow(win);
+            }
+        CloseScreen(scr);
+        }
+
+    printf(&#034;\n*** SystemTest: Synchronous System call 'ask \&#034;...Answer y now\&#034;':\n&#034;);
+    command = &#034;ask \&#034;Ready for Asynchronous demo? Answer y now (should return 5):\&#034;&#034;;
+    result = doCommand(command,NULL);
+    checkResult(command,result);
+
+
+    /* ASYNCHRONOUS SYSTEM() WITH ON-DEMAND AUTO/WAIT CON:
+     */
+    printf(&#034;\n*** SystemTest: Asynchronous startup of 'Sys:Utilities/Clock':\n&#034;);
+    command = &#034;SYS:Utilities/Clock&#034;;
+    result = beginCommand(command);
+    checkResult(command,result);
+
+    printf(&#034;\n*** SystemTest: Asynchronous startup of 'avail':\n&#034;);
+    command = &#034;avail&#034;;
+    result = beginCommand(command);
+    checkResult(command,result);
+
+    printf(&#034;\nSystemTest exiting. Close Clock and Autocon window when you wish.\n&#034;);
+
+    CloseLibrary(IntuitionBase);
+    exit(RETURN_OK);
+    }
+
+
+
+
+
+/*
+ * Synchronous external command (wait for return)
+ * Uses your Input/Output unless you supply other handle
+ * Result will be return code of the command, unless the System() call
+ * itself fails, in which case the result will be -1
+ */
+LONG doCommand(UBYTE *command, BPTR other)
+    {
+    struct TagItem stags[4];
+
+    stags[0].ti_Tag = SYS_Input;
+    stags[0].ti_Data = other ? other : Input();
+    stags[1].ti_Tag = SYS_Output;
+    stags[1].ti_Data = other ? NULL: Output();
+    stags[3].ti_Tag = TAG_DONE;
+    return(System(command, stags));
+    }
+
+
+
+
+/*
+ * Asynchronous external command started with its own autocon Input/Output
+ * This routine shows use of the SYS_UserShell tag as well.
+ * Result will only reflect whether System() call itself succeeded.
+ * If System() call fails, result will be -1L
+ * We are using -2L as result if our Open of CON: fails
+ */
+UBYTE *autocon=&#034;CON:0/40/640/150/Auto CON Window Opens if Needed/auto/close/wait&#034;;
+LONG beginCommand(UBYTE *command)
+    {
+    struct TagItem stags[5];
+    BPTR file;
+
+    if(file = Open(autocon, MODE_OLDFILE))
+        {
+        stags[0].ti_Tag = SYS_Input;
+        stags[0].ti_Data = file;
+        stags[1].ti_Tag = SYS_Output;
+        stags[1].ti_Data = NULL;
+        stags[2].ti_Tag = SYS_Asynch;
+        stags[2].ti_Data = TRUE;
+        stags[3].ti_Tag = SYS_UserShell;
+        stags[3].ti_Data = TRUE;
+        stags[4].ti_Tag = TAG_DONE;
+        return(System(command, stags));
+        }
+    else return(WINDOWFAIL);
+    }
+
+
+
+
+
+/*
+ * Demo routine outputs result of System
+ */
+VOID checkResult(UBYTE *command, LONG result)
+    {
+    if(result == SYSTEMFAIL)
+        printf(&#034;*** SystemTest: could not start process for command\n&#034;);
+    else if(result == WINDOWFAIL)
+        printf(&#034;*** SystemTest: can't open con: for command\n&#034;);
+    else
+        printf(&#034;*** SystemTest: command (if synchronous) returned %ld\n&#034;,result);
+    }
+
+
+
+
+
+
+/*
+ * Stack based stubs for opening screen, window
+ */
+struct Screen *OpenScreenTags(ns, tags)
+struct NewScreen *ns;
+ULONG tags;
+    {
+    return (OpenScreenTagList(ns, (struct TagItem *)&#038;tags));
+    }
+
+struct Window *OpenWindowTags(nw, tags)
+struct NewWindow *nw;
+ULONG tags;
+    {
+    return (OpenWindowTagList(nw, (struct TagItem *)&#038;tags));
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="cd" NODE="CD_PLAYTRACK" TITLE="cd.device/CD_PLAYTRACK" -->
+<head>
+<title>cd.device/CD_PLAYTRACK</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00AD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00AF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       CD_PLAYTRACK -- Play one or more tracks of CD audio.
+
+<b>   IO REQUEST</b>
+       io_Device       preset by the call to <a href="../Includes_and_Autodocs_3._guide/node00BB.html">OpenDevice()</a>
+       io_Unit         preset by the call to <a href="../Includes_and_Autodocs_3._guide/node00BB.html">OpenDevice()</a>
+       io_Command      CD_PLAYTRACK
+       io_Data         NULL
+       io_Length       number of tracks to play
+       io_Offset       start playing at beginning of this track
+
+<b>   RESULTS</b>
+       io_Error        0 for success, or an error code as defined in
+                       <a href="../Includes_and_Autodocs_3._guide/node05E4.html">&#060;devices/cd.h&#062;</a>
+<b>   FUNCTION</b>
+       This command causes the drive to play the specified audio track(s).
+       The command will return when the audio has completed.
+
+       io_Offset specifies the track number (starting from 1).
+
+       io_Length specifies the number of tracks to play (0 is invalid).
+
+<b>   EXAMPLE</b>
+
+       ior-&#062;io_Command = CD_PLAYTRACK;    /* Play audio tracks     */
+       ior-&#062;io_Offset  = STARTTRACK;      /* Start with this track */
+       ior-&#062;io_Length  = 3;               /* Play three tracks     */
+       DoIO(ior);
+
+<b>   NOTES</b>
+
+       PLAY commands are asynchronous with many other CD commands.
+       Using a separate I/O request, other commands can be sent to the device
+       that can change the behavior of the PLAY command.
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node00AD.html">CD_PLAYMSF</a>, <a href="../Includes_and_Autodocs_3._guide/node00AC.html">CD_PLAYLSN</a>, <a href="../Includes_and_Autodocs_3._guide/node00AB.html">CD_PAUSE</a>, <a href="../Includes_and_Autodocs_3._guide/node00B6.html">CD_SEARCH</a>, <a href="../Includes_and_Autodocs_3._guide/node00A3.html">CD_ATTENUATE</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

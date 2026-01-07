@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="XI-25/AppKeyMap.c" NODE="MAIN" TITLE="XI-25/AppKeyMap.c" -->
+<head>
+<title>XI-25/AppKeyMap.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0206.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0208.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* appkeymap.c link module - Execute me to compile me with SAS/C 6.56
+sc data=far nominc strmer streq nostkchk saveds ign=73 appkeymap.c
+quit
+*/
+
+/* appkeymap.c - subroutines to create/delete an application keymap
+ *               by modifying a copy of a keymap
+ *
+ * The modifications made to the keymap are controlled by the &#034;mykeys&#034; array.
+ * To create more complex keymappings, see the Rom Kernel Manual Libraries
+ * keymap library chapter (p 821 et al).
+ *
+ * NOTE: disabling all numeric pad keys creates a good keymap for use
+ * with either keymap.library MapANSI() or commodities InvertString().
+ * If you used a default keymap with the above functions, numeric keypad
+ * raw key values would be returned for keys which are available with
+ * fewer keypresses on numeric pad than on the normal keyboard.
+ * It is generally preferable to have the normal keyboard raw values
+ * since many applications attach special meanings to numeric pad keys.
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;devices/console.h&#062;
+#include &#060;devices/keymap.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/keymap_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#include &#034;appkeymap.h&#034;
+
+/* local functions */
+static void CopyKeyMap (struct KeyMap *source, struct KeyMap *dest);
+
+
+struct KeyMap *
+CreateAppKeyMap (struct KeyMap *defkeymap)
+{
+  struct KeyMap *appkeymap = NULL;
+  struct KeyMapArrays *karrays;
+  ULONG keymapsize;
+
+                                /* Because of the way this code allocates memory,  */
+                                /* it must make sure the KeyMap structure will take*/
+                                /* up an even amount of bytes (so the tables that  */
+                                /* follow it will be word aligned).  This adds one */
+                                /* to the size of the KeyMap structure's size if   */
+                                /* necessary.  This is only for future compatibil- */
+                                /* ity as a KeyMap structure is currently even.    */
+  keymapsize = (sizeof(struct KeyMap)+1)&#038;0x0000FFFE;
+
+                                /* Allocate the space for the clone of the KeyMap. */
+                                /* This includes space for the KeyMap structure    */
+                                /* which is immediately followed by space for the  */
+                                /* keymapping tables.                              */
+  if (appkeymap = (struct KeyMap *)
+          AllocVec (sizeof (struct KeyMap) + sizeof (struct KeyMapArrays),
+                    MEMF_CLEAR|MEMF_PUBLIC) )
+  {
+                  /* Initialize the pointer to the KeyMapArrays structure. These   */
+                  /* arrays are organized so that the &#034;Lo&#034; tables are immediately  */
+                  /* followed by the &#034;Hi&#034; tables, so you don't have to treat the   */
+                  /* Lo and Hi maps separately.  This allows AlterKeyMap() to find */
+                  /* Hi map raw key entries by use the raw key value as an index   */
+                  /* into the Lo map tables.                                       */
+    karrays = (struct KeyMapArrays *) ((ULONG)appkeymap + keymapsize);
+
+                  /* Initialize the appkeymap fields to point to the KeyMapArrays. */
+                  /* Each LH array contains the Lo table followed by the Hi table. */
+    appkeymap-&#062;km_LoKeyMap      = &#038;karrays-&#062;LHKeyMap[0];
+    appkeymap-&#062;km_HiKeyMap      = &#038;karrays-&#062;LHKeyMap[LO_MAP_SIZE];
+    appkeymap-&#062;km_LoKeyMapTypes = &#038;karrays-&#062;LHKeyMapTypes[0];
+    appkeymap-&#062;km_HiKeyMapTypes = &#038;karrays-&#062;LHKeyMapTypes[LO_TYPE_SIZE];
+    appkeymap-&#062;km_LoCapsable    = &#038;karrays-&#062;LHCapsable[0];
+    appkeymap-&#062;km_HiCapsable    = &#038;karrays-&#062;LHCapsable[LO_CAPS_SIZE];
+    appkeymap-&#062;km_LoRepeatable  = &#038;karrays-&#062;LHRepeatable[0];
+    appkeymap-&#062;km_HiRepeatable  = &#038;karrays-&#062;LHRepeatable[LO_REPS_SIZE];
+
+
+    CopyKeyMap (defkeymap, appkeymap);     /* Copy the keymap arrays to appkeymap. */
+  }
+
+  return (appkeymap);
+}
+
+
+void
+DeleteAppKeyMap (struct KeyMap *appkeymap)
+{
+  if (appkeymap)
+    FreeVec (appkeymap);
+}
+
+
+void
+AlterAppKeyMap (struct KeyMap *appkeymap, struct MyKey *mykeys, UWORD mykeycount)
+{
+  ULONG *keymappings;
+  UBYTE *keymaptypes, *capsables, *repeatables;
+  UBYTE rawkeynum;
+  int i, bytenum, bitnum;
+
+
+/* AlterAppKeyMap() assumes that the tables of the keymap passed to it are */
+/* contiguous from Lo through Hi. This allows AlterAppKeyMap() to directly */
+/* reference any key using its raw key code as an index.  This also limits */
+/* an application to using AlterAppKeyMap() to modify only keymap created  */
+/* by CreateAppKeyMap().                                                   */
+
+
+  keymappings = appkeymap-&#062;km_LoKeyMap;
+  keymaptypes = appkeymap-&#062;km_LoKeyMapTypes;
+  capsables   = appkeymap-&#062;km_LoCapsable;
+  repeatables = appkeymap-&#062;km_LoRepeatable;
+
+  for (i = 0; i &#060; mykeycount; i++)
+  {
+
+                                    /* Because we allocated each of our Lo and Hi    */
+    rawkeynum = mykeys[i].RawCode;  /* array pairs as sequential memory, we can use  */
+                                    /* the RAWKEY values directly  to index into our */
+                                    /* sequential Lo/Hi array.                       */
+
+    keymaptypes[rawkeynum] = mykeys[i].MapType;
+    keymappings[rawkeynum] = mykeys[i].Map;
+
+    bytenum = rawkeynum &#062;&#062; 3; /* These are for the Capsable + Repeatable bit tables. */
+    bitnum = rawkeynum % 8;   /*    Careful--There's only a 1 bit entry per raw key! */
+
+    if (mykeys[i].Capsable)
+      capsables[bytenum] |= (1 &#060;&#060; bitnum);          /* If capsable, set bit, else... */
+    else
+      capsables[bytenum] &#038;= (~(1 &#060;&#060; bitnum));       /*             ...clear the bit. */
+
+    if (mykeys[i].Repeatable)
+      repeatables[bytenum] |= (1 &#060;&#060; bitnum);      /* If repeatable, set bit, else... */
+    else
+      repeatables[bytenum] &#038;= (~(1 &#060;&#060; bitnum));   /*               ...clear the bit. */
+  }
+}
+
+
+
+
+
+static void
+CopyKeyMap (struct KeyMap *source, struct KeyMap *dest)
+{
+  UBYTE *bb;
+  ULONG *ll;
+  int i;
+
+  for (i = 0, ll = source-&#062;km_LoKeyMap; i &#060; LO_MAP_SIZE; i++)
+    dest-&#062;km_LoKeyMap[i] = *ll++;
+  for (i = 0, ll = source-&#062;km_HiKeyMap; i &#060; HI_MAP_SIZE; i++)
+    dest-&#062;km_HiKeyMap[i] = *ll++;
+
+  for (i = 0, bb = source-&#062;km_LoKeyMapTypes; i &#060; LO_TYPE_SIZE; i++)
+    dest-&#062;km_LoKeyMapTypes[i] = *bb++;
+  for (i = 0, bb = source-&#062;km_HiKeyMapTypes; i &#060; HI_TYPE_SIZE; i++)
+    dest-&#062;km_HiKeyMapTypes[i] = *bb++;
+
+  for (i = 0, bb = source-&#062;km_LoCapsable; i &#060; LO_CAPS_SIZE; i++)
+    dest-&#062;km_LoCapsable[i] = *bb++;
+  for (i = 0, bb = source-&#062;km_HiCapsable; i &#060; HI_CAPS_SIZE; i++)
+    dest-&#062;km_HiCapsable[i] = *bb++;
+
+  for (i = 0, bb = source-&#062;km_LoRepeatable; i &#060; LO_REPS_SIZE; i++)
+    dest-&#062;km_LoRepeatable[i] = *bb++;
+  for (i = 0, bb = source-&#062;km_HiRepeatable; i &#060; HI_REPS_SIZE; i++)
+    dest-&#062;km_HiRepeatable[i] = *bb++;
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

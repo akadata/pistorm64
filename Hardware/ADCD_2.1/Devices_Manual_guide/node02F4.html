@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/modules/getbitmap.c" NODE="MAIN" TITLE="Devices/modules/getbitmap.c" -->
+<head>
+<title>Devices/modules/getbitmap.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02F3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02F5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*----------------------------------------------------------------------*
+ * GETBITMAP.C  Support routines for reading ILBM files.
+ * (IFF is Interchange Format File.)
+ *
+ * Based on code by Jerry Morrison and Steve Shaw, Electronic Arts.
+ * This software is in the public domain.
+ * Modified for iffparse.library by CBM 04/90
+ * This version for the Amiga computer.
+ *----------------------------------------------------------------------*/
+
+#include &#034;iffp/ilbm.h&#034;
+#include &#034;iffp/packer.h&#034;
+#include &#034;iffp/ilbmapp.h&#034;
+
+/* createbrush
+ *
+ * Passed an initialized ILBMInfo with a parsed IFFHandle (chunks parsed,
+ * stopped at BODY),
+ * gets the bitmap and colors
+ * Sets up ilbm-&#062;brbitmap, ilbm-&#062;colortable, ilbm-&#062;ncolors
+ * Returns 0 for success
+ */
+LONG createbrush(struct ILBMInfo *ilbm)
+	{
+	int error;
+
+	error 			= getbitmap(ilbm);
+	if(!error) error 	= loadbody(ilbm-&#062;ParseInfo.iff,
+						ilbm-&#062;brbitmap,&#038;ilbm-&#062;Bmhd);
+	if(!error) 		getcolors(ilbm);
+	if(error)  		deletebrush(ilbm);
+	return(error);
+	}
+
+/* deletebrush
+ *
+ * closes and deallocates created brush bitmap and colors
+ */
+void deletebrush(ilbm)
+struct ILBMInfo		*ilbm;
+	{
+	freebitmap(ilbm);
+	freecolors(ilbm);
+	}
+
+
+/* getbitmap
+ *
+ * Passed an initialized ILBMInfo with parsed IFFHandle (chunks parsed,
+ * stopped at BODY), allocates a BitMap structure and planes just large
+ * enough for the BODY.  Generally used for brushes but may be used
+ * to load backgrounds without displaying, or to load deep ILBM's.
+ * Sets ilbm-&#062;brbitmap.  Returns 0 for success.
+ */
+LONG getbitmap(struct ILBMInfo *ilbm)
+	{
+	struct IFFHandle	*iff;
+	BitMapHeader	*bmhd;
+	USHORT			wide, high;
+	LONG  error = NULL;
+	int k, extra=0;
+	BYTE deep;
+
+	if(!(iff=ilbm-&#062;ParseInfo.iff))	return(CLIENT_ERROR);
+
+	ilbm-&#062;brbitmap = NULL;
+
+	if (!( bmhd = (BitMapHeader *)
+			findpropdata(iff, ID_ILBM, ID_BMHD)))
+		{
+		message(&#034;No ILBM.BMHD chunk!\n&#034;);
+		return(IFFERR_SYNTAX);
+		}
+
+	*(&#038;ilbm-&#062;Bmhd) = *bmhd;	/* copy contents of BMHD */
+
+	wide = BitsPerRow(bmhd-&#062;w);
+	high = bmhd-&#062;h;
+	deep = bmhd-&#062;nPlanes;
+
+	ilbm-&#062;camg = getcamg(ilbm);
+
+	D(bug(&#034;allocbitmap: bmhd=$%lx wide=%ld high=%ld deep=%ld\n&#034;,
+			bmhd,wide,high,deep));
+	/*
+	 * Allocate Bitmap and planes
+	 */
+        extra = deep &#062; 8 ? deep - 8 : 0;
+	if(ilbm-&#062;brbitmap = AllocMem(sizeof(struct BitMap)+(extra&#060;&#060;2),MEMF_CLEAR))
+		{
+		InitBitMap(ilbm-&#062;brbitmap,deep,wide,high);
+		for(k=0; k&#060;deep &#038;&#038; (!error); k++)
+		    {
+		    if(!(ilbm-&#062;brbitmap-&#062;Planes[k] = AllocRaster(wide,high)))
+                        error = 1;
+		    if(! error)
+			BltClear(ilbm-&#062;brbitmap-&#062;Planes[k],RASSIZE(wide,high),0);
+		    }
+
+		if(error)
+		    {
+		    message(&#034;Failed to allocate raster\n&#034;);
+		    freebitmap(ilbm);
+		    }
+		}
+	else error = 1;
+	return(error);
+	}
+
+
+/* freebitmap
+ *
+ * deallocates ilbm-&#062;brbitmap BitMap structure and planes
+ */
+void freebitmap(struct ILBMInfo * ilbm)
+	{
+	int k, extra=0;
+
+	if(ilbm-&#062;brbitmap)
+		{
+		for(k=0; k&#060; ilbm-&#062;brbitmap-&#062;Depth; k++)
+			{
+			if(ilbm-&#062;brbitmap-&#062;Planes[k])
+				FreeRaster(ilbm-&#062;brbitmap-&#062;Planes[k],
+					(USHORT)(ilbm-&#062;brbitmap-&#062;BytesPerRow &#060;&#060; 3),
+					ilbm-&#062;brbitmap-&#062;Rows);
+			}
+
+        	extra = ilbm-&#062;brbitmap-&#062;Depth &#062; 8 ? ilbm-&#062;brbitmap-&#062;Depth - 8 : 0;
+		FreeMem(ilbm-&#062;brbitmap,sizeof(struct BitMap) + (extra &#060;&#060; 2));
+		ilbm-&#062;brbitmap = NULL;
+		}
+	}
+
+/* end */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

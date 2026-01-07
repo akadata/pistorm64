@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-2-2-3" TITLE="12 / / Writing The Dispatcher / OM_GET" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / Writing The Dispatcher / OM_GET</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0213.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0215.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The rkmmodel only has one &#034;gettable&#034; attribute: <a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a>, which
+makes processing it easy.  The <a href="../Libraries_Manual_guide/node0211.html#line36">OM_GET</a> message looks like this (defined in
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00E2.html#line106">classusr.h</a>&#062;):
+
+    struct opGet {
+        ULONG MethodID;     /* OM_GET */
+        ULONG opg_AttrID;   /* The attribute to retrieve */
+        ULONG *opg_Storage; /* a place to put the attribute's value */
+    };
+
+When the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> dispatcher receives an <a href="../Libraries_Manual_guide/node0211.html#line36">OM_GET</a> message with an
+opg_AttrID equal to <a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a>, it copies the current value
+(<a href="../Libraries_Manual_guide/node0210.html#line18">RKMModData</a>).currval to the memory location opg_Storage points to and
+returns a value of TRUE.  The TRUE indicates that there was no error.  If
+opg_AttrID is not RKMMOD_CurrVal, the dispatcher should let its superclass
+handle this message.
+
+The <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> dispatcher can take advantage of the fact that the only
+&#034;gettable&#034; attribute available to an rkmmodel is <a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a> (the
+attributes defined by <a href="../Libraries_Manual_guide/node020D.html#line13">modelclass</a> and <a href="../Libraries_Manual_guide/node0200.html#line55">icclass</a> are not gettable--see the
+Boopsi Class Reference in the <a href="../Libraries_Manual_guide/node04B9.html">Appendix B</a> of this manual for more details
+on which attributes are &#034;settable&#034;, &#034;gettable&#034;, etc.).  If opg_AttrID is
+not RKMMOD_CurrVal, the rkmmodelclass dispatcher can return FALSE,
+indicating that the attribute was not &#034;gettable&#034;.
+
+If the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> dispatcher comes across any other messages besides
+<a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a>, <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a>, <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a>, and <a href="../Libraries_Manual_guide/node0211.html#line36">OM_GET</a> message, it blindly passes them on
+to its superclass for processing.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

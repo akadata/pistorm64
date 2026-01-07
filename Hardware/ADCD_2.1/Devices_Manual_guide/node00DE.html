@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-2" TITLE="14 Trackdisk Device / Device Interface" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 Trackdisk Device / Device Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00DD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00DF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The trackdisk device operates like other Amiga devices.  To use it, you
+must first open the device, then send I/O requests to it, and then close
+it when finished.  See the &#034;<a href="../Devices_Manual_guide/node0006.html">Introduction to Amiga System Devices</a>&#034;
+<a name="line5">chapter for general information on device usage.</a>
+
+The trackdisk device uses two different types of I/O request blocks,
+IOStdReq and IOExtTD and two types of commands, standard and extended.
+An IOExtTD is required for the extended trackdisk commands (those
+beginning with &#034;ETD_&#034;), but can be used for both types of commands.
+Thus, the IOExtTD is the type of I/O request that will be used in this
+<a name="line12">chapter.</a>
+
+    struct IOExtTD
+    {
+        struct  IOStdReq iotd_Req;
+        ULONG   iotd_Count;         /* Diskchange counter */
+<a name="line18">        ULONG   iotd_SecLabel;      /* Sector label data */</a>
+    };
+
+See the include file devices/<a href="../Includes_and_Autodocs_2._guide/node005B.html">trackdisk.h</a> for the complete structure
+<a name="line22">definition.</a>
+
+The enhanced commands listed above - those beginning with &#034;ETD_&#034; - are
+similar to their standard counterparts but have additional features: they
+allow you to control whether a command will be executed if the disk has
+been changed and they allow you to read or write to the sector label
+<a name="line28">portion of a sector.</a>
+
+Enhanced commands require a larger I/O request, IOExtTD, than the IOStdReq
+request used by the standard commands.  IOExtTD contains extra information
+needed by the enhanced command; since the standard form of a command
+ignores the extra fields, IOExtTD requests can be used for both types. The
+extra information takes the form of two extra longwords at the end of the
+data structure.  These commands are performed only if the change count is
+less than or equal to the value in the iotd_Count field of the command's
+<a name="line37">request block.</a>
+
+The iotd_Count field keeps old I/O requests from being performed when the
+disk is changed.  Any request found with an iotd_Count less than the
+current change counter value will be returned with a characteristic error
+(TDERR_DiskChange) in the io_Error field. This allows stale I/O requests
+to be returned to the user after a disk has been changed. The current
+disk-change counter value can be obtained by <a href="../Includes_and_Autodocs_2._guide/node0524.html">TD_CHANGENUM</a>.  If the user
+wants enhanced disk I/O but does not care about disk removal, then
+iotd_Count may be set to the maximum unsigned long integer value
+(0xFFFFFFFF).
+
+The iotd_SecLabel field allows access to the sector identification section
+of the sector header. Each sector has 16 bytes of descriptive data space
+available to it; the trackdisk device does not interpret this data.  If
+iotd_SecLabel is NULL, then this descriptive data is ignored.  If it is
+not NULL, then iotd_SecLabel should point to a series of contiguous
+16-byte chunks (one for each sector that is to be read or written).  These
+chunks will be written out to the sector's label region on a write or
+filled with the sector's label area on a read.  If a <a href="../Includes_and_Autodocs_2._guide/node0522.html">CMD_WRITE</a> (the
+standard write call) is done, then the sector label area is left unchanged.
+
+ <a href="../Devices_Manual_guide/node00DF.html">About Amiga Floppy Disks</a> 		 <a href="../Devices_Manual_guide/node00E2.html">Writing To The Trackdisk Device</a> 
+ <a href="../Devices_Manual_guide/node00E0.html">Opening The Trackdisk Device</a> 		 <a href="../Devices_Manual_guide/node00E3.html">Closing The Trackdisk Device</a> 
+ <a href="../Devices_Manual_guide/node00E1.html">Reading From The Trackdisk Device</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

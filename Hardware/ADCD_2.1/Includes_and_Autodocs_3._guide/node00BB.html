@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="cd" NODE="OpenDevice()" TITLE="cd.device/OpenDevice" -->
+<head>
+<title>cd.device/OpenDevice</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00BA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00BC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       OpenDevice - <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open</a> a CD unit for access
+
+<b>   SYNOPSIS</b>
+       error = OpenDevice(&#034;cd.device&#034;, UnitNumber, <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a>, flags);
+       D0                 A0           D0          A1         D1
+
+<b>   FUNCTION</b>
+       Opens the cd.device and creates an <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> for use in accessing
+       the CD.
+
+<b>   INPUTS</b>
+       UnitNumber - Normally zero; however, this is described as:
+                    Ones digit      = <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line30">Unit</a> (SCSI unit number)
+                    Tens digit      = LUN (disk within disk changer)
+                    Hundreds digit  = Card number (SCSI card)
+                    Thousands digit = Reserved (must be zero)
+       <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a>  - Pointer to a struct(IOStdReq)
+       flags      - Should be zero.
+
+<b>   RESULTS</b>
+       error        0 = success, otherwise this is an error.
+
+<b>   NOTES</b>
+
+<b>   SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node00BA.html">CloseDevice()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="gadtools" NODE="GT_GetIMsg()" TITLE="gadtools.library/GT_GetIMsg" -->
+<head>
+<title>gadtools.library/GT_GetIMsg</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node027F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0281.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GT_GetIMsg -- get an <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a>, with GadTools processing. (V36)
+
+<b>   SYNOPSIS</b>
+	imsg = GT_GetIMsg(intuiport)
+	D0                A0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> *GT_GetIMsg(struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *);
+
+<b>   FUNCTION</b>
+	Use GT_GetIMsg() in place of the usual <a href="../Includes_and_Autodocs_3._guide/node0214.html">exec.library/GetMsg()</a> when
+	reading IntuiMessages from your window's UserPort.  If needed,
+	the GadTools dispatcher will be invoked, and suitable processing
+	will be done for gadget actions.  This function returns a pointer
+	to a modified <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> (which is a copy of the original,
+	possibly with some supplementary information from GadTools).
+	If there are no messages (or if the only messages are meaningful
+	only to GadTools, NULL will be returned.
+
+<b>   INPUTS</b>
+	intuiport - the Window-&#062;UserPort of a window that is using the
+	            <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> Toolkit.
+
+<b>   RESULT</b>
+	imsg - pointer to modified <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a>, or NULL if there are
+	       no applicable messages.
+
+<b>   NOTES</b>
+	Be sure to use <a href="../Includes_and_Autodocs_3._guide/node0283.html">GT_ReplyIMsg()</a> and not <a href="../Includes_and_Autodocs_3._guide/node0235.html">exec.library/ReplyMsg()</a> on
+	messages obtained with GT_GetIMsg().
+	If you intend to do more with the resulting message than read
+	its fields, act on it, and reply it, you may find <a href="../Includes_and_Autodocs_3._guide/node027E.html">GT_FilterIMsg()</a>
+	more appropriate.
+
+	Starting with V39, this function actually returns a pointer to an
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line821">ExtIntuiMessage</a> structure, but the prototype was not changed for
+	source code compatibility with older software.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0283.html">GT_ReplyIMsg()</a>, <a href="../Includes_and_Autodocs_3._guide/node027E.html">GT_FilterIMsg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

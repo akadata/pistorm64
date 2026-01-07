@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-3-5" TITLE="14 / Advanced Commands / Formatting A Track" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 / Advanced Commands / Formatting A Track</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00E8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00EA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+ETD_FORMAT and <a href="../Includes_and_Autodocs_2._guide/node0527.html">TD_FORMAT</a> are used to write data to a track that either has
+not yet been formatted or has had a hard error on a standard write
+command. TD_FORMAT completely ignores all data currently on a track and
+does not check for disk change before performing the command. The device
+will format the requested tracks, filling each sector with the contents of
+the buffer pointed to by io_Data field. You should do a read pass to
+verify the data.
+
+If you have a hard write error during a normal write, you may find it
+possible to use the <a href="../Includes_and_Autodocs_2._guide/node0527.html">TD_FORMAT</a> command to reformat the track as part of
+your error recovery process. ETD_FORMAT will write the sector label area
+if the iotd_SecLabel is non-NULL.
+
+You format a track by passing an <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> to the device with TD_FORMAT or
+ETD_FORMAT set in io_Command, io_Data set to at least track worth of data,
+io_Offset field set to the byte offset of the track you want to write and
+the io_Length set to the length of a track. For ETD_FORMAT, you must also
+set iotd_Count to the current diskchange number.
+
+    #define TRACK_SIZE ((LONG) (NUMSECS * TD_SECTOR))
+    UBYTE *Writebuffer;
+
+    if (WriteBuffer = AllocMem(TRACK_SIZE,MEMF_CLEAR|MEMF_CHIP))
+        {
+        DiskIO-&#062;iotd_Req.io_Length=TRACK_SIZE;
+        DiskIO-&#062;iotd_Req.io_Data=(APTR)Writebuffer;
+        DiskIO-&#062;iotd_Req.io_Offset=(ULONG)(TRACK_SIZE * track);
+        DiskIO-&#062;iotd_Req.io_Command = TD_FORMAT;
+        DoIO((struct IORequest *)DiskIO);
+        }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

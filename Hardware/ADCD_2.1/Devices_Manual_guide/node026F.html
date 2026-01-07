@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="FANT-10" TITLE="FANT.doc / Fantavision high-level IFF format " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>FANT.doc / Fantavision high-level IFF format </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node026E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0270.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+FORM FANT
+    FHDR
+
+    - background -
+    FORM ILBM   if Background is non-zero
+        BMHD
+        BODY
+
+    - bitmap list -
+    NOTE:  If a bitmap has a mask, it will be compute during load time.
+
+    FORM ILBM   times NumberOfBitMaps
+        BMHD
+        BODY
+
+    - sound list -
+{   FORM 8SVX   times NumberOfSounds
+        VHDR
+        BODY
+    SEFX    }   Default parameters for sound
+
+    - frame list -
+{   FRAM        times NumberOfFrames
+    SEFX        if sound for channel 1.
+    SEFX        if sound for channel 2.
+    POLY        times NumberOfPolys
+  { CSTR        Text of poly if PolyType = pTEXTBLOCK
+    CSTR  } }   Name of font
+*/
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-3-1" TITLE="14 / Advanced Commands / Determining The Drive Geometry Table" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 / Advanced Commands / Determining The Drive Geometry Table</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00E4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00E6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The layout geometry of a disk drive can be determined by using the
+<a href="../Includes_and_Autodocs_2._guide/node0529.html">TD_GETGEOMETRY</a> command.  The layout can be defined three ways:
+
+   *  TotalSectors
+
+   *  Cylinders and CylSectors
+
+   *  Cylinders, Heads, and TrackSectors.
+
+Of the three, TotalSectors is the most accurate, Cylinders and CylSectors
+is less so, and Cylinders, Heads and TrackSectors is the least accurate.
+All are usable, though the last two may waste some portion of the
+available space on some drives.
+
+The <a href="../Includes_and_Autodocs_2._guide/node0529.html">TD_GETGEOMETRY</a> commands returns the disk layout geometry in a
+DriveGeometry structure:
+
+    struct DriveGeometry
+    {
+        ULONG dg_SectorSize;      /* in bytes */
+        ULONG dg_TotalSectors;    /* total # of sectors on drive */
+        ULONG dg_Cylinders;       /* number of cylinders */
+        ULONG dg_CylSectors;      /* number of sectors/cylinder */
+        ULONG dg_Heads;           /* number of surfaces */
+        ULONG dg_TrackSectors;    /* number of sectors/track */
+        ULONG dg_BufMemType;      /* preferred buffer memory type */
+                                  /* (usually MEMF_PUBLIC) */
+        UBYTE dg_DeviceType;      /* codes as defined in the SCSI-2 spec*/
+        UBYTE dg_Flags;           /* flags, including removable */
+        UWORD dg_Reserved;
+    };
+
+See the include file devices/<a href="../Includes_and_Autodocs_2._guide/node005B.html">trackdisk.h</a> for the complete structure
+definition and values for the dg_DeviceType and dg_Flags fields.
+
+You determine the drive layout geometry by passing an <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> with
+<a href="../Includes_and_Autodocs_2._guide/node0529.html">TD_GETGEOMETRY</a> set in io_Command and a pointer to a DriveGeometry
+structure set in io_Data.
+
+   struct DriveGeometry *Euclid;
+
+   Euclid = (struct DriveGeometry *)
+             AllocMem(sizeof(struct DriveGeometry),
+                      MEMF_PUBLIC | MEMF_CLEAR);
+
+   DiskIO-&#062;iotd_Req.io_Data = Euclid;     /* put layout geometry here */
+   DiskIO-&#062;iotd_Req.io_Command = TD_GETGEOMETRY;
+   DoIO((struct IORequest *)DiskIO);
+
+For V36 and higher versions of the operating system, <a href="../Includes_and_Autodocs_2._guide/node0529.html">TD_GETGEOMETRY</a> is
+preferred over <a href="../Includes_and_Autodocs_2._guide/node052A.html">TD_GETNUMTRACKS</a> for determining the number of tracks on a
+disk.  This is because new drive types may have more sectors or different
+sector sizes, etc., than standard Amiga drives.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

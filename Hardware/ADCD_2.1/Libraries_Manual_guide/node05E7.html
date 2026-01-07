@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/port2.c" NODE="MAIN" TITLE="lib_examples/port2.c" -->
+<head>
+<title>lib_examples/port2.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05E6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05E8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* port2.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 port2.c
+Blink FROM LIB:c.o,port2.o TO port2 LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+
+** port2.c - port and message example, run at the same time as port1.c
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/ports.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL-C handling */
+int chkabort(void) {return(0);}
+#endif
+
+BOOL SafePutToPort(struct Message *, STRPTR);
+
+struct XYMessage {
+    struct Message xy_Msg;
+    WORD           xy_X;
+    WORD           xy_Y;
+};
+
+void main(int argc, char **argv)
+{
+    struct MsgPort *xyreplyport;
+    struct XYMessage *xymsg, *reply;
+                                                           /* Using CreatePort() with no name       */
+    if (xyreplyport = CreatePort(0,0))                     /* because this port need not be public. */
+    {
+        if (xymsg = (struct XYMessage *) AllocMem(sizeof(struct XYMessage), MEMF_PUBLIC | MEMF_CLEAR))
+        {
+            xymsg-&#062;xy_Msg.mn_Node.ln_Type = NT_MESSAGE;                /* make up a message,        */
+            xymsg-&#062;xy_Msg.mn_Length = sizeof(struct XYMessage);        /* including the reply port. */
+            xymsg-&#062;xy_Msg.mn_ReplyPort = xyreplyport;
+            xymsg-&#062;xy_X = 10;                                   /* our special message information. */
+            xymsg-&#062;xy_Y = 20;
+
+            printf(&#034;Sending to port1: x = %d y = %d\n&#034;, xymsg-&#062;xy_X, xymsg-&#062;xy_Y);
+                                                                   /* port2 will simply try to put  */
+
+            if (SafePutToPort((struct Message *)xymsg, &#034;xyport&#034;))  /* one message to port1 wait for */
+            {                                                      /*  the reply, and then exit     */
+                WaitPort(xyreplyport);
+                if (reply = (struct XYMessage *)GetMsg(xyreplyport))
+                    printf(&#034;Reply contains: x = %d y = %d\n&#034;,         /* We don't ReplyMsg since   */
+                            xymsg-&#062;xy_X, xymsg-&#062;xy_Y);                /* WE initiated the message. */
+
+                      /* Since we only use this private port for receiving replies, and we sent     */
+                      /* only one and got one reply there is no need to cleanup. For a public port, */
+                      /* or if you pass a pointer to the port to another process, it is a very good */
+                      /* habit to always handle all messages at the port before you delete it.      */
+            }
+            else printf(&#034;Can't find 'xyport'; start port1 in a separate shell\n&#034;);
+            FreeMem(xymsg, sizeof(struct XYMessage));
+        }
+        else printf(&#034;Couldn't get memory\n&#034;);
+        DeletePort(xyreplyport);
+    }
+    else printf(&#034;Couldn't create xyreplyport\n&#034;);
+}
+
+
+BOOL SafePutToPort(struct Message *message, STRPTR portname)
+{
+    struct MsgPort *port;
+
+    Forbid();
+    port = FindPort(portname);
+    if (port) PutMsg(port, message);
+    Permit();
+    return(port ? TRUE : FALSE); /* FALSE if the port was not found */
+
+         /* Once we've done a Permit(), the port might go away and leave us with an invalid port    */
+}        /* address. So we return just a BOOL to indicate whether the message has been sent or not. */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

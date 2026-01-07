@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-7-1" TITLE="4 / Window Attributes / Extended New Window" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Window Attributes / Extended New Window</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0122.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0124.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Of the three functions for opening a window, only <a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a> is present
+in all versions of the OS.  This function takes a <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a> structure as
+its sole argument.  In order to allow applications to use the OpenWindow()
+call with Release 2 <a href="../Libraries_Manual_guide/node0102.html#line8">TagItem</a> attributes, an extended version of the
+NewWindow structure has been created named <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line1039">ExtNewWindow</a>.
+
+Setting WFLG_NW_EXTENDED in the NewWindow.Flags field specifies to the
+<a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a> call that this <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a> structure is really an <a href="../Libraries_Manual_guide/node0102.html#line8">ExtNewWindow</a>
+structure.  This is simply a standard NewWindow structure with a pointer
+to a tag list at the end.  Since WFLG_NW_EXTENDED is ignored prior to V36,
+information provided in the tag list will be ignored by earlier versions
+of Intuition.  Note that WFLG_NW_EXTENDED may not be specified in the
+<a href="../Libraries_Manual_guide/node0125.html#line147">WA_Flags</a> tag.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-2-2" TITLE="4 / Basic Window Structures and Functions / Closing Windows" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Basic Window Structures and Functions / Closing Windows</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0104.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0106.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Call the <a href="../Includes_and_Autodocs_2._guide/node0208.html">CloseWindow()</a> function to close a window, remove its imagery from
+the display, and clean up any system resources used by the window.
+Typically, you call CloseWindow() when Intuition informs you that the user
+has selected the window's close gadget but this is not a requirement nor
+does the window have to be active to be closed.
+
+    void CloseWindow( struct Window *window );
+
+Pass this function a pointer to the <a href="../Libraries_Manual_guide/node0102.html#line8">Window</a> structure returned by one of
+<a name="line11">the <a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a> calls.</a>
+
+If you call <a href="../Includes_and_Autodocs_2._guide/node0208.html">CloseWindow()</a> on the active window, the previously active
+window (if available) will become the active window.  If the previously
+active window has already closed, then the window active prior to that
+window will become the active window.  (Applications should not rely on
+this behavior.  To make a specific window become active, call the
+<a name="line18"><a href="../Libraries_Manual_guide/node010F.html#line19">ActivateWindow()</a> function.)</a>
+
+Intuition does not automatically close a window when the user selects the
+close window gadget.  Instead, Intuition sends your program a message
+about the user's action.  The program can then perform whatever cleanup is
+necessary before closing the window with the <a href="../Includes_and_Autodocs_2._guide/node0208.html">CloseWindow()</a> function.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="CallHookA()" TITLE="amiga.lib/CallHookA" -->
+<head>
+<title>amiga.lib/CallHookA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0024.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0026.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CallHookA -- Invoke a hook given a pointer to a message.
+
+<b>   SYNOPSIS</b>
+	result = CallHookA( hookPtr, obj, message )
+
+	ULONG CallHook( struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *, <a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> );
+
+<b>   FUNCTION</b>
+	Invoke a hook on the supplied hook-specific data (an &#034;object&#034;)
+	and a parameter packet (&#034;message&#034;).  This function is equivalent
+	to <a href="../Includes_and_Autodocs_3._guide/node0599.html">utility.library/CallHookPkt()</a>.
+
+<b>   INPUTS</b>
+	hookPtr - A system-standard hook
+	obj - hook-specific data object
+	message - The hook-specific message you wish to send
+
+<b>   RESULT</b>
+	result - a hook-specific result.
+
+<b>   NOTES</b>
+	This function first appeared in the V37 release of amiga.lib.
+	However, it does not depend on any particular version of the OS,
+	and works fine even in V34.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0024.html">CallHook()</a>, <a href="../Includes_and_Autodocs_3._guide/node0599.html">utility.library/CallHookPkt()</a>, <a href="../Includes_and_Autodocs_3._guide/node0617.html">&#060;utility/hooks.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

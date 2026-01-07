@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-2-5" TITLE="4 / Basic Window Structures and Functions / Window Dimensions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Basic Window Structures and Functions / Window Dimensions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0107.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0109.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The initial position and dimensions of the window are defined in the
+<a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> call.  These values undergo error checking before the
+window is actually opened on the screen.  If the dimensions are too big,
+the window will fail to open.  (Or, you can use the <a href="../Libraries_Manual_guide/node0125.html#line135">WA_AutoAdjust</a> tag if
+<a name="line6">you want Intuition to move or size your window to fit.)</a>
+
+Maximum and minimum size values may also be defined, but are not required
+If the window does not have a sizing gadget.  In setting these dimensions,
+bear in mind the horizontal and vertical resolutions of the screen in
+which the window will open.
+
+The maximum dimensions of the window are unsigned values and may legally
+be set to the maximum by using the value 0xFFFF, better expressed as &#034;~0&#034;.
+Using this value for the maximum dimensions allows the window to be sized
+to the full screen.
+
+ <a href="../Libraries_Manual_guide/node0109.html">A Display Sized Window Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

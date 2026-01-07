@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-1-6" TITLE=" A Quick Introduction to IFF / File extensibility" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> A Quick Introduction to IFF / File extensibility</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01C8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01CA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+IFF files are extensible and forward/backward compatible:
+
+  o Chunk contents should be designed for compatibility across
+     environments and for longevity.  Every chunk should have a path for
+     future expansion; at minimum this will be an unused bit or two.
+
+  o The standards team for a <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> type can extend one of the chunks that
+     contains a structure by appending new, optional structure fields.
+
+  o Anyone can define new <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> types as well as new chunk types within a
+     FORM type.  Storing private chunks within a FORM is OK, but be sure
+     to register your activities with Commodore Applications and Technical
+     Support.
+
+  o A chunk can be superseded by a new chunk type, e.g., to store more
+     bits per RGB color register. New programs can output the old chunk
+     (for backward compatibility) along with the new chunk.
+
+  o If you must change data in an incompatible way, change the chunk ID or
+     the <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> type ID.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/gadtools" NODE="GT_FilterIMsg()" TITLE="gadtools.library/GT_FilterIMsg" -->
+<head>
+<title>gadtools.library/GT_FilterIMsg</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03F0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03F2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GT_FilterIMsg -- Filter an <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a> through GadTools. (V36)
+
+SYNOPSIS
+    modimsg = GT_FilterIMsg(imsg)
+    D0                      A1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a> *GT_FilterIMsg(struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a> *);
+
+FUNCTION
+    NOTE WELL:  Extremely few programs will actually need this function.
+    You almost certainly should be using <a href="../Includes_and_Autodocs_2._guide/node03F2.html">GT_GetIMsg()</a> and <a href="../Includes_and_Autodocs_2._guide/node03F5.html">GT_ReplyIMsg()</a>
+    only, and not GT_FilterIMsg() and <a href="../Includes_and_Autodocs_2._guide/node03F3.html">GT_PostFilterIMsg()</a>.
+
+    GT_FilterIMsg() takes the supplied <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a> and asks the
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> Toolkit to consider and possibly act on it.  Returns
+    NULL if the message was only of significance to a GadTools gadget
+    (i.e. not to you), else returns a pointer to a modified IDCMP
+    message, which may contain additional information.
+    You should examine the Class, Code, and IAddress fields of
+    the returned message to learn what happened.  Do not make
+    interpretations based on the original imsg.
+    You should use <a href="../Includes_and_Autodocs_2._guide/node03F3.html">GT_PostFilterIMsg()</a> to revert to the original
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a> once you are done with the modified one.
+
+INPUTS
+    imsg - An <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a> you obtained from a Window's UserPort.
+
+RESULT
+    modimsg - A modified <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a>, possibly with extra information
+        from GadTools, or NULL.
+
+EXAMPLE
+
+NOTES
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node03F2.html">GT_GetIMsg()</a>, <a href="../Includes_and_Autodocs_2._guide/node03F3.html">GT_PostFilterIMsg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

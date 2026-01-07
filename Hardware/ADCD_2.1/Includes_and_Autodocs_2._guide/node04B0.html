@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/audio" NODE="CMD_FLUSH" TITLE="audio.device/CMD_FLUSH" -->
+<head>
+<title>audio.device/CMD_FLUSH</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04AF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04B1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CMD_FLUSH -- cancel all pending I/O
+
+FUNCTION
+    CMD_FLUSH is a standard command for multiple audio channels.  For each
+    selected channel (io_Unit), if the allocation key (ioa_AllocKey) is
+    correct, CMD_FLUSH aborts all writes (CMD_WRITE) in progress or queued
+    and any I/O requests waiting to synchronize with the end of the cycle
+    (ADCMD_WAITCYCLE); otherwise, CMD_FLUSH returns an error
+    (ADIOERR_NOALLOCATION).  CMD_FLUSH is synchronous and only replies
+    (mn_ReplyPort) if the quick flag (IOF_QUICK) is clear.  Do not use
+    CMD_FLUSH in interrupt code at interrupt level 5 or higher.
+
+INPUTS
+    mn_ReplyPort- pointer to message port that receives I/O request
+                  if the quick flag (IOF_QUICK) is clear
+    io_Device   - pointer to device node, must be set by (or copied from
+                  I/O block set by) <a href="../Includes_and_Autodocs_2._guide/node04B8.html">OpenDevice</a> function
+    io_Unit     - bit map of channels to flush (bits 0 thru 3 correspond
+                  to channels 0 thru 3)
+    io_Command  - command number for CMD_FLUSH
+    io_Flags    - flags, must be cleared if not used:
+                  IOF_QUICK - (CLEAR) reply I/O request
+    ioa_AllocKey- allocation key, must be set by (or copied from I/O block
+                  set by) <a href="../Includes_and_Autodocs_2._guide/node04B8.html">OpenDevice</a> function or <a href="../Includes_and_Autodocs_2._guide/node04A6.html">ADCMD_ALLOCATE</a> command
+
+OUTPUTS
+    io_Unit     - bit map of channels successfully flushed (bits 0 thru 3
+                  correspond to channels 0 thru 3)
+    io_Error    - error number:
+                  0                    - no error
+                  ADIOERR_NOALLOCATION - allocation key (ioa_AllocKey)
+                                         does not match key for channel
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

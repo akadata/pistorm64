@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_15" NODE="15-1" TITLE="15 Resources / The Amiga Resources" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>15 Resources / The Amiga Resources</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0108.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node010A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are currently seven standard resources in the Amiga system.  The
+following lists the name of each resource and its function.
+
+<a href="../Devices_Manual_guide/node010B.html">battclock.resource</a>
+   grants access to the battery-backed clock chip.
+
+<a href="../Devices_Manual_guide/node010C.html">battmem.resource</a>
+   grants access to non-volatile RAM.
+
+<a href="../Devices_Manual_guide/node010D.html">cia.resource</a>
+   grants access to the interrupts and timer bits of the 8520 CIA
+   (Complex Interface Adapter) chips.
+
+<a href="../Devices_Manual_guide/node010E.html">disk.resource</a>
+   grants temporary exclusive access to the disk hardware.
+
+<a href="../Devices_Manual_guide/node010F.html">FileSystem.resource</a>
+   grants access to the file system.
+
+<a href="../Devices_Manual_guide/node0110.html">misc.resource</a>
+   grants exclusive access to functional blocks of chip registers.  At
+   present, definitions have been made for the serial and parallel
+   hardware only.
+
+<a href="../Devices_Manual_guide/node0112.html">potgo.resource</a>
+   manages the bits of the proportional I/O pins on the game controller
+   ports.
+
+The resources allow you direct access to the hardware in a way that is
+compatible with multitasking.  They also allow you to temporarily bar
+other tasks from using the resource.  You may then use the associated
+hardware directly for your special purposes.  If applicable, you must
+return the resource back to the system for other tasks to use when you are
+finished with it.
+
+See the <a href="../Hardware_Manual_guide/node0000.html">Amiga Hardware Reference Manual</a> for detailed information on the
+actual hardware involved.
+
+   Look Before You Leap.
+   ---------------------
+   Resources are just one step above direct hardware manipulation. You
+   are advised to try the higher level device and library approach
+   before resorting to the hardware.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

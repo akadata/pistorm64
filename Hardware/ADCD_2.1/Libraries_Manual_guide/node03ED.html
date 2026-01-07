@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-5-1" TITLE="30 / / Working With Existing Layers / Intertask Operations" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / / Working With Existing Layers / Intertask Operations</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03EC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03EE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+If multiple tasks are manipulating layers on the same display they will be
+sharing a <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> structure and their use of it and its related data
+structures need to be coordinated.  To ensure that a structure remains
+cohesive, it should be operated on by only one task at a time.  The
+<a name="line6">Layer_Info encompasses all the layers existing on a single display.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node039C.html">LockLayerInfo()</a> must be called whenever the visible portions of layers may
+be affected, or when the <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> structure is changed.
+
+    void LockLayerInfo( struct Layer_Info *li );
+
+The lock should be obtained whenever a layer is created, deleted sized or
+moved, as the list of layers that is being managed by the <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> data
+<a name="line15">structure must be updated.</a>
+
+It is not necessary to lock the <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> data structure while rendering,
+or when calling routines like <a href="../Libraries_Manual_guide/node03EF.html#line17">ScrollLayer()</a>, because layer sizes and
+<a name="line19">on-display positions are not being affected.</a>
+
+Use <a href="../Includes_and_Autodocs_2._guide/node03A7.html">UnlockLayerInfo()</a> when you have finished the layer operation:
+
+    void UnlockLayerInfo( struct Layer_Info *li );
+
+If you don't unlock the <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> then any other task calling
+<a href="../Includes_and_Autodocs_2._guide/node039C.html">LockLayerInfo()</a> on the same Layer_Info structure will be blocked creating
+<a name="line27">a potential deadlock situation.</a>
+
+In addition to locking the <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> structure, the layer itself should
+be locked if it is shared between tasks so that only one task at a time
+renders graphics to it.  <a href="../Includes_and_Autodocs_2._guide/node039B.html">LockLayer()</a> is used to get exclusive graphics
+output to a layer.
+
+<a name="line34">    void LockLayer( long dummy, struct Layer *layer );</a>
+
+If a graphics function is in process, the lock will return when the
+function is completed.  Other tasks are blocked only if they attempt to
+draw graphics into this layer, or try to obtain a lock on this layer. The
+<a href="../Libraries_Manual_guide/node03EF.html#line17">MoveLayer()</a>, <a href="../Libraries_Manual_guide/node03EF.html#line17">SizeLayer()</a> and <a href="../Libraries_Manual_guide/node03EF.html#line17">ScrollLayer()</a> functions automatically lock
+<a name="line40">and unlock the layer they operate on.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node03A6.html">UnlockLayer()</a> should be used after the graphics operation to make the
+layer available to other tasks again.
+
+<a name="line45">    void UnlockLayer( struct Layer *layer );</a>
+
+If more than one layer must be locked, then the <a href="../Includes_and_Autodocs_2._guide/node039B.html">LockLayer()</a> calls should
+be surrounded by <a href="../Includes_and_Autodocs_2._guide/node039C.html">LockLayerInfo()</a> and <a href="../Includes_and_Autodocs_2._guide/node03A7.html">UnlockLayerInfo()</a> calls, to prevent
+<a name="line49">deadlock situations.</a>
+
+The layers library provides two additional functions, <a href="../Includes_and_Autodocs_2._guide/node039D.html">LockLayers()</a> and
+<a href="../Includes_and_Autodocs_2._guide/node03A8.html">UnlockLayers()</a>, for locking multiple layers.
+
+    void LockLayers( struct Layer_Info *li );
+<a name="line55">    void UnlockLayers( struct Layer_Info *li );</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node039D.html">LockLayers()</a> is used to lock all layers in a single command.
+<a href="../Includes_and_Autodocs_2._guide/node03A8.html">UnlockLayers()</a> releases the layers lock.  The system calls these routines
+during the <a href="../Libraries_Manual_guide/node03EF.html#line23">BehindLayer()</a>, <a href="../Libraries_Manual_guide/node03EF.html#line23">UpfrontLayer()</a> and <a href="../Libraries_Manual_guide/node03EF.html#line23">MoveLayerInFrontOf()</a>
+operations (<a href="../Libraries_Manual_guide/node03EF.html">described below</a>).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

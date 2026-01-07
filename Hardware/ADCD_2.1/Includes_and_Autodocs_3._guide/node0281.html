@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="gadtools" NODE="GT_PostFilterIMsg()" TITLE="gadtools.library/GT_PostFilterIMsg" -->
+<head>
+<title>gadtools.library/GT_PostFilterIMsg</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0280.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0282.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GT_PostFilterIMsg -- return the unfiltered message after
+	                     <a href="../Includes_and_Autodocs_3._guide/node027E.html">GT_FilterIMsg()</a> was called, and clean up. (V36)
+
+<b>   SYNOPSIS</b>
+	imsg = GT_PostFilterIMsg(modimsg)
+	D0                       A1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> *GT_PostFilterIMsg(struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> *);
+
+<b>   FUNCTION</b>
+	NOTE WELL:  Extremely few programs will actually need this function.
+	You almost certainly should be using <a href="../Includes_and_Autodocs_3._guide/node0280.html">GT_GetIMsg()</a> and <a href="../Includes_and_Autodocs_3._guide/node0283.html">GT_ReplyIMsg()</a>
+	only, and not <a href="../Includes_and_Autodocs_3._guide/node027E.html">GT_FilterIMsg()</a> and GT_PostFilterIMsg().
+
+	Performs any clean-up necessitated by a previous call to
+	<a href="../Includes_and_Autodocs_3._guide/node027E.html">GT_FilterIMsg()</a>.  The original <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> is now yours to handle.
+	Do not interpret the fields of the original <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a>, but
+	rather use only the one you got from <a href="../Includes_and_Autodocs_3._guide/node027E.html">GT_FilterIMsg()</a>.  You
+	may only do message related things at this point, such as queueing
+	it up or replying it.  Since you got the message with
+	<a href="../Includes_and_Autodocs_3._guide/node0214.html">exec.library/GetMsg()</a>, your responsibilities do include replying
+	it with <a href="../Includes_and_Autodocs_3._guide/node0235.html">exec.library/ReplyMsg()</a>. This function may be safely
+	called with a NULL parameter.
+
+<b>   INPUTS</b>
+	modimsg - a modified <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> obtained with <a href="../Includes_and_Autodocs_3._guide/node027E.html">GT_FilterIMsg()</a>,
+	          or NULL in which case this function does nothing and
+	          returns NULL
+
+<b>   RESULT</b>
+	imsg - a pointer to the original <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a>, if <a href="../Includes_and_Autodocs_3._guide/node027E.html">GT_FilterIMsg()</a>
+	       returned non-NULL.
+
+<b>   NOTES</b>
+	Be sure to use <a href="../Includes_and_Autodocs_3._guide/node0235.html">exec.library/ReplyMsg()</a> on the original <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a>
+	you obtained with <a href="../Includes_and_Autodocs_3._guide/node0214.html">GetMsg()</a>, (which is the what you passed to
+	<a href="../Includes_and_Autodocs_3._guide/node027E.html">GT_FilterIMsg()</a>), and not on the parameter of this function.
+
+	Starting with V39, this function actually expects and returns
+	pointers to <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line821">ExtIntuiMessage</a> structures, but the prototype was not
+	changed for source code compatibility with older software.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node027E.html">GT_FilterIMsg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

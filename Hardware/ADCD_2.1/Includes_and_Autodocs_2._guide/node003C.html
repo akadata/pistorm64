@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/audio.i" NODE="MAIN" TITLE="Includes/devices/audio.i" -->
+<head>
+<title>Includes/devices/audio.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node003B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node003D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	DEVICES_AUDIO_I
+DEVICES_AUDIO_I SET	1
+**
+**	$Filename: devices/audio.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.3 $
+**	$Date: 90/08/29 $
+**
+**	audio.device include file
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+	IFND	EXEC_IO_I
+	INCLUDE	&#034;exec/io.i&#034;
+	ENDC
+
+AUDIONAME MACRO
+		DC.B	'audio.device',0
+	ENDM
+
+ADHARD_CHANNELS		EQU	4
+
+ADALLOC_MINPREC		EQU	-128
+ADALLOC_MAXPREC		EQU	127
+
+ADCMD_FREE		EQU	CMD_NONSTD+0
+ADCMD_SETPREC		EQU	CMD_NONSTD+1
+ADCMD_FINISH		EQU	CMD_NONSTD+2
+ADCMD_PERVOL		EQU	CMD_NONSTD+3
+ADCMD_LOCK		EQU	CMD_NONSTD+4
+ADCMD_WAITCYCLE		EQU	CMD_NONSTD+5
+ADCMD_ALLOCATE		EQU	32
+
+ADIOB_PERVOL		EQU	4
+ADIOF_PERVOL		EQU	1&#060;&#060;4
+ADIOB_SYNCCYCLE		EQU	5
+ADIOF_SYNCCYCLE		EQU	1&#060;&#060;5
+ADIOB_NOWAIT		EQU	6
+ADIOF_NOWAIT		EQU	1&#060;&#060;6
+ADIOB_WRITEMESSAGE	EQU	7
+ADIOF_WRITEMESSAGE	EQU	1&#060;&#060;7
+
+ADIOERR_NOALLOCATION	EQU	-10
+ADIOERR_ALLOCFAILED	EQU	-11
+ADIOERR_CHANNELSTOLEN	EQU	-12
+
+    STRUCTURE	IOAudio,IO_SIZE
+	WORD	ioa_AllocKey
+	APTR	ioa_Data
+	ULONG	ioa_Length
+	UWORD	ioa_Period
+	UWORD	ioa_Volume
+	UWORD	ioa_Cycles
+	STRUCT	ioa_WriteMsg,MN_SIZE
+	LABEL	ioa_SIZEOF
+
+	ENDC	; DEVICES_AUDIO_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

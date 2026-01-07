@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/trackdisk.h" NODE="MAIN" TITLE="Includes/devices/trackdisk.h" -->
+<head>
+<title>Includes/devices/trackdisk.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node005A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node005C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DEVICES_TRACKDISK_H
+#define DEVICES_TRACKDISK_H
+
+/*
+**
+**	$Filename: devices/trackdisk.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 33.13 $
+**	$Date: 90/11/28 $
+**
+**	trackdisk device structure and value definitions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+<a name="line17"></a>
+#ifndef EXEC_IO_H
+#include &#034;exec/io.h&#034;
+#endif
+<a name="line21"></a>
+#ifndef EXEC_DEVICES_H
+#include &#034;exec/devices.h&#034;
+#endif
+
+/*
+ *--------------------------------------------------------------------
+ *
+ * Physical drive constants
+ *
+ *--------------------------------------------------------------------
+ */
+
+/* OBSOLETE -- use the TD_GETNUMTRACKS command! */
+/*#define	NUMCYLS	80*/		/*  normal # of cylinders */
+/*#define	MAXCYLS	(NUMCYLS+20)*/	/* max # cyls to look for during cal */
+/*#define	NUMHEADS 2*/
+/*#define	NUMTRACKS (NUMCYLS*NUMHEADS)*/
+<a name="line39"></a>
+<a name="line40">#define	NUMSECS	11</a>
+#define NUMUNITS 4
+
+/*
+ *--------------------------------------------------------------------
+ *
+ * Useful constants
+ *
+ *--------------------------------------------------------------------
+ */
+
+<a name="line51">/*-- sizes before mfm encoding */</a>
+<a name="line52">#define	TD_SECTOR 512</a>
+#define	TD_SECSHIFT 9		/* log TD_SECTOR */
+
+/*
+ *--------------------------------------------------------------------
+ *
+ * Driver Specific Commands
+ *
+ *--------------------------------------------------------------------
+ */
+
+/*
+ *-- TD_NAME is a generic macro to get the name of the driver.	This
+ *-- way if the name is ever changed you will pick up the change
+ *-- automatically.
+ *--
+ *-- Normal usage would be:
+ *--
+ *-- char internalName[] = TD_NAME;
+ *--
+ */
+<a name="line73"></a>
+#define	TD_NAME	&#034;trackdisk.device&#034;
+<a name="line75"></a>
+#define	TDF_EXTCOM (1&#060;&#060;15)		/* for internal use only! */
+
+<a name="line78"></a>
+<a name="line79">#define	TD_MOTOR	(CMD_NONSTD+0)	/* control the disk's motor */</a>
+<a name="line80">#define	TD_SEEK		(CMD_NONSTD+1)	/* explicit seek (for testing) */</a>
+<a name="line81">#define	TD_FORMAT	(CMD_NONSTD+2)	/* format disk */</a>
+<a name="line82">#define	TD_REMOVE	(CMD_NONSTD+3)	/* notify when disk changes */</a>
+<a name="line83">#define	TD_CHANGENUM	(CMD_NONSTD+4)	/* number of disk changes */</a>
+<a name="line84">#define	TD_CHANGESTATE	(CMD_NONSTD+5)	/* is there a disk in the drive? */</a>
+<a name="line85">#define	TD_PROTSTATUS	(CMD_NONSTD+6)	/* is the disk write protected? */</a>
+<a name="line86">#define	TD_RAWREAD	(CMD_NONSTD+7)	/* read raw bits from the disk */</a>
+<a name="line87">#define	TD_RAWWRITE	(CMD_NONSTD+8)	/* write raw bits to the disk */</a>
+<a name="line88">#define	TD_GETDRIVETYPE	(CMD_NONSTD+9)	/* get the type of the disk drive */</a>
+<a name="line89">#define	TD_GETNUMTRACKS	(CMD_NONSTD+10)	/* # of tracks for this type drive */</a>
+<a name="line90">#define	TD_ADDCHANGEINT	(CMD_NONSTD+11)	/* TD_REMOVE done right */</a>
+<a name="line91">#define	TD_REMCHANGEINT	(CMD_NONSTD+12)	/* remove softint set by ADDCHANGEINT */</a>
+<a name="line92">#define TD_GETGEOMETRY	(CMD_NONSTD+13) /* gets the disk geometry table */</a>
+<a name="line93">#define TD_EJECT	(CMD_NONSTD+14) /* for those drives that support it */</a>
+#define	TD_LASTCOMM	(CMD_NONSTD+15)
+
+/*
+<a name="line97"> *</a>
+ * The disk driver has an &#034;extended command&#034; facility.	These commands
+ * take a superset of the normal IO Request block.
+ *
+ */
+<a name="line102"></a>
+<a name="line103">#define	ETD_WRITE	(CMD_WRITE|TDF_EXTCOM)</a>
+<a name="line104">#define	ETD_READ	(CMD_READ|TDF_EXTCOM)</a>
+<a name="line105">#define	ETD_MOTOR	(TD_MOTOR|TDF_EXTCOM)</a>
+<a name="line106">#define	ETD_SEEK	(TD_SEEK|TDF_EXTCOM)</a>
+<a name="line107">#define	ETD_FORMAT	(TD_FORMAT|TDF_EXTCOM)</a>
+<a name="line108">#define	ETD_UPDATE	(CMD_UPDATE|TDF_EXTCOM)</a>
+<a name="line109">#define	ETD_CLEAR	(CMD_CLEAR|TDF_EXTCOM)</a>
+<a name="line110">#define	ETD_RAWREAD	(TD_RAWREAD|TDF_EXTCOM)</a>
+#define	ETD_RAWWRITE	(TD_RAWWRITE|TDF_EXTCOM)
+
+/*
+ *
+ * extended IO has a larger than normal io request block.
+ *
+ */
+<a name="line118"></a>
+<a name="line119">struct IOExtTD {</a>
+<a name="line120">	struct	IOStdReq iotd_Req;</a>
+<a name="line121">	ULONG	iotd_Count;</a>
+	ULONG	iotd_SecLabel;
+};
+
+/*
+ *  This is the structure returned by TD_DRIVEGEOMETRY
+ *  Note that the layout can be defined three ways:
+ *
+ *  1. TotalSectors
+ *  2. Cylinders and CylSectors
+ *  3. Cylinders, Heads, and TrackSectors.
+ *
+ *  #1 is most accurate, #2 is less so, and #3 is least accurate.  All
+ *  are usable, though #2 and #3 may waste some portion of the available
+ *  space on some drives.
+<a name="line136"> */</a>
+<a name="line137">struct DriveGeometry {</a>
+<a name="line138">	ULONG	dg_SectorSize;		/* in bytes */</a>
+<a name="line139">	ULONG	dg_TotalSectors;	/* total # of sectors on drive */</a>
+<a name="line140">	ULONG	dg_Cylinders;		/* number of cylinders */</a>
+<a name="line141">	ULONG	dg_CylSectors;		/* number of sectors/cylinder */</a>
+<a name="line142">	ULONG	dg_Heads;		/* number of surfaces */</a>
+<a name="line143">	ULONG	dg_TrackSectors;	/* number of sectors/track */</a>
+	ULONG	dg_BufMemType;		/* preferred buffer memory type */
+<a name="line145">					/* (usually MEMF_PUBLIC) */</a>
+<a name="line146">	UBYTE	dg_DeviceType;		/* codes as defined in the SCSI-2 spec*/</a>
+<a name="line147">	UBYTE	dg_Flags;		/* flags, including removable */</a>
+	UWORD	dg_Reserved;
+};
+
+<a name="line151">/* device types */</a>
+<a name="line152">#define DG_DIRECT_ACCESS	0</a>
+<a name="line153">#define DG_SEQUENTIAL_ACCESS	1</a>
+<a name="line154">#define DG_PRINTER		2</a>
+<a name="line155">#define DG_PROCESSOR		3</a>
+<a name="line156">#define DG_WORM			4</a>
+<a name="line157">#define DG_CDROM		5</a>
+<a name="line158">#define DG_SCANNER		6</a>
+<a name="line159">#define DG_OPTICAL_DISK		7</a>
+<a name="line160">#define DG_MEDIUM_CHANGER	8</a>
+<a name="line161">#define DG_COMMUNICATION	9</a>
+#define DG_UNKNOWN		31
+
+<a name="line164">/* flags */</a>
+<a name="line165">#define DGB_REMOVABLE		0</a>
+#define DGF_REMOVABLE		1
+
+/*
+** raw read and write can be synced with the index pulse.  This flag
+** in io request's IO_FLAGS field tells the driver that you want this.
+*/
+<a name="line172"></a>
+<a name="line173">#define IOTDB_INDEXSYNC	4</a>
+#define IOTDF_INDEXSYNC (1&#060;&#060;4)
+/*
+** raw read and write can be synced with a $4489 sync pattern.	This flag
+** in io request's IO_FLAGS field tells the driver that you want this.
+<a name="line178">*/</a>
+<a name="line179">#define IOTDB_WORDSYNC	5</a>
+#define IOTDF_WORDSYNC (1&#060;&#060;5)
+
+
+/* labels are TD_LABELSIZE bytes per sector */
+<a name="line184"></a>
+#define	TD_LABELSIZE 16
+
+/*
+** This is a bit in the FLAGS field of OpenDevice.  If it is set, then
+** the driver will allow you to open all the disks that the trackdisk
+** driver understands.	Otherwise only 3.5&#034; disks will succeed.
+*/
+<a name="line192"></a>
+<a name="line193">#define TDB_ALLOW_NON_3_5	0</a>
+#define TDF_ALLOW_NON_3_5	(1&#060;&#060;0)
+
+/*
+**  If you set the TDB_ALLOW_NON_3_5 bit in OpenDevice, then you don't
+**  know what type of disk you really got.  These defines are for the
+**  TD_GETDRIVETYPE command.  In addition, you can find out how many
+**  tracks are supported via the TD_GETNUMTRACKS command.
+*/
+<a name="line202"></a>
+<a name="line203">#define	DRIVE3_5	1</a>
+<a name="line204">#define	DRIVE5_25	2</a>
+#define	DRIVE3_5_150RPM	3
+
+/*
+ *--------------------------------------------------------------------
+ *
+ * Driver error defines
+ *
+ *--------------------------------------------------------------------
+ */
+<a name="line214"></a>
+<a name="line215">#define	TDERR_NotSpecified	20	/* general catchall */</a>
+<a name="line216">#define	TDERR_NoSecHdr		21	/* couldn't even find a sector */</a>
+<a name="line217">#define	TDERR_BadSecPreamble	22	/* sector looked wrong */</a>
+<a name="line218">#define	TDERR_BadSecID		23	/* ditto */</a>
+<a name="line219">#define	TDERR_BadHdrSum		24	/* header had incorrect checksum */</a>
+<a name="line220">#define	TDERR_BadSecSum		25	/* data had incorrect checksum */</a>
+<a name="line221">#define	TDERR_TooFewSecs	26	/* couldn't find enough sectors */</a>
+<a name="line222">#define	TDERR_BadSecHdr		27	/* another &#034;sector looked wrong&#034; */</a>
+<a name="line223">#define	TDERR_WriteProt		28	/* can't write to a protected disk */</a>
+<a name="line224">#define	TDERR_DiskChanged	29	/* no disk in the drive */</a>
+<a name="line225">#define	TDERR_SeekError		30	/* couldn't find track 0 */</a>
+<a name="line226">#define	TDERR_NoMem		31	/* ran out of memory */</a>
+<a name="line227">#define	TDERR_BadUnitNum	32	/* asked for a unit &#062; NUMUNITS */</a>
+<a name="line228">#define	TDERR_BadDriveType	33	/* not a drive that trackdisk groks */</a>
+<a name="line229">#define	TDERR_DriveInUse	34	/* someone else allocated the drive */</a>
+#define	TDERR_PostReset		35	/* user hit reset; awaiting doom */
+
+/*
+ *--------------------------------------------------------------------
+ *
+ * public portion of the unit structure
+ *
+ *--------------------------------------------------------------------
+ */
+<a name="line239"></a>
+<a name="line240">struct TDU_PublicUnit {</a>
+<a name="line241">	struct	Unit tdu_Unit;		/* base message port */</a>
+<a name="line242">	UWORD	tdu_Comp01Track;	/* track for first precomp */</a>
+<a name="line243">	UWORD	tdu_Comp10Track;	/* track for second precomp */</a>
+<a name="line244">	UWORD	tdu_Comp11Track;	/* track for third precomp */</a>
+<a name="line245">	ULONG	tdu_StepDelay;		/* time to wait after stepping */</a>
+<a name="line246">	ULONG	tdu_SettleDelay;	/* time to wait after seeking */</a>
+<a name="line247">	UBYTE	tdu_RetryCnt;		/* # of times to retry */</a>
+<a name="line248">	UBYTE	tdu_PubFlags;		/* public flags, see below */</a>
+	UWORD	tdu_CurrTrk;		/* track the heads are over... */
+<a name="line250">					/* ONLY ACCESS WHILE UNIT IS STOPPED! */</a>
+	ULONG	tdu_CalibrateDelay;	/* time to wait after stepping */
+<a name="line252">					/* during a recalibrate */</a>
+	ULONG	tdu_Counter;		/* counter for disk changes... */
+					/* ONLY ACCESS WHILE UNIT IS STOPPED! */
+};
+
+<a name="line257">/* flags for tdu_PubFlags */</a>
+<a name="line258">#define TDPB_NOCLICK	0</a>
+#define TDPF_NOCLICK	(1L &#060;&#060; 0)
+
+#endif	/* DEVICES_TRACKDISK_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VII-1/DR2D.txt" NODE="VII-1-9" TITLE="DASH (0x44415348)       / Line dash pattern for edges /" -->
+<head>
+<title>DASH (0x44415348)       / Line dash pattern for edges /</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00E8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00EA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This chunk describes the on-off dash pattern associated with a line.
+
+    struct DASHstruct {
+        ULONG       ID;
+        ULONG       Size;
+        USHORT      DashID;                 /* ID of the dash pattern */
+        USHORT      NumDashes;              /* Should always be even */
+        IEEE        Dashes[NumDashes];      /* On-off pattern */
+    };
+
+DashID is the number assigned to this specific dash pattern.
+References to this dash pattern by other DR2D chunks are made using
+this number.
+
+The Dashes[] array contains the actual dash pattern.  The first number
+in the array (element 0) is the length of the &#034;on&#034; portion of the
+pattern.  The second number (element 1) specifies the &#034;off&#034; portion
+of the pattern.  If there are more entries in the Dashes array, the
+pattern will continue.  Even-index elements specify the length of an
+&#034;on&#034; span, while odd-index elements specify the length of an &#034;off&#034;
+span.  There must be an even number of entries.  These lengths are not
+in the same units as specified in the PPRF chunk, but are multiples of
+the line width, so a line of width 2.5 and a dash pattern of 1.0, 2.0
+would have an &#034;on&#034; span of length 1.0 x 2.5 = 2.5 followed by an
+&#034;off&#034; span of length 2.0 x 2.5 = 5.  The following figure shows
+several dash pattern examples.  Notice that for lines longer than the
+dash pattern, the pattern repeats.
+
+   <a href="../AmigaMail_Vol2_guide/node01D4.html">figure 1 - dash patterns</a> 
+
+By convention, DashID 0 is reserved to mean `No line pattern at all',
+i.e. the edges are invisible.  This DASH pattern should not be defined
+by a DR2D DASH chunk.  Again by convention, a NumDashes of 0 means
+that the line is solid.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

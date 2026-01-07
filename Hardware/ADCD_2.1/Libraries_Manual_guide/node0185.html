@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-5" TITLE="6 / Setting Up Menus / Sharing Menu Strips" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Setting Up Menus / Sharing Menu Strips</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0184.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0186.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A single menu strip may be attached to multiple windows in an application
+by calling <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a> for each window.  All of the windows must be on
+the same screen for this to work.  Since menus are always associated with
+the active window on a given screen, and since only one window may be
+active on a screen at a time, only one window may display the shared menu
+<a name="line7">strip at any given time.</a>
+
+When multiple windows share a single menu strip, they will all &#034;see&#034; the
+same state of the menus, that is, changes made to the menu strip from one
+window will still exist when a new window is activated.  If the
+application wishes to share menu strips but to have a different flag and
+enabled status for each window, the program may watch <a href="../Libraries_Manual_guide/node01E0.html#line36">IDCMP_ACTIVEWINDOW</a>
+for the windows and modify the menu strip to match the active window's
+requirements at that point.  In addition, the application must also set
+<a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> to insure that the user can't access the menus of a newly
+activated window before the application can process the IDCMP_ACTIVEWINDOW
+<a name="line18">message.</a>
+
+<a href="../Libraries_Manual_guide/node0184.html#line9">ResetMenuStrip()</a> may also be used to set the menus for the multiple
+windows as long as <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a> is used first to attach the menu strip
+to any one window and no major changes are made to the menu strip before
+the calls to ResetMenuStrip() on subsequent windows.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

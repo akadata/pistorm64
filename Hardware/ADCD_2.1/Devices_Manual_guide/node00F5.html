@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-6-2" TITLE="14 / / Removing A Diskchange Software Interrupt Handler" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 / / Removing A Diskchange Software Interrupt Handler</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00F4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00F6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You remove a software interrupt handler by passing an <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> to the
+device with a pointer to an Interrupt structure set in io_Data, the length
+of the structure set in io_Length and <a href="../Includes_and_Autodocs_2._guide/node052F.html">TD_REMCHANGEINT</a> set in io_Command.
+You must pass it the same Interrupt structure used to add the handler.
+
+    DiskIO-&#062;iotd_Req.io_Length = sizeof(struct Interrupt)
+    DiskIO-&#062;iotd_Req.io_Data   = (APTR)Disk_Interrupt;
+    DiskIO-&#062;iotd_Req.io_Command = TD_REMCHANGEINT;
+    DoIO((struct IORequest *)DiskIO);
+
+   Don't use with pre-V36 and earlier versions.
+   --------------------------------------------
+   Under pre-V36 and earlier versions of the Amiga system software,
+   <a href="../Includes_and_Autodocs_2._guide/node052F.html">TD_REMCHANGEINT</a> does not work and should not be used.  Instead, use
+   the workaround listed in the &#034;trackdisk.doc&#034; of the Amiga ROM
+   Kernel Reference Manual: Includes and Autodocs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

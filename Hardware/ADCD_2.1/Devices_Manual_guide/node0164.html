@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Set_Prefs.c" NODE="MAIN" TITLE="Devices/Dev_examples/Set_Prefs.c" -->
+<head>
+<title>Devices/Dev_examples/Set_Prefs.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0163.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0165.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Set_Prefs.c
+ *
+ * This example changes the printer device's COPY of preferences (as obtained
+ * when the printer device was opened by a task via OpenDevice()).  Note that
+ * it only changes the printer device's copy of preferences, not the preferences
+ * as set by the user via the preference editor(s).
+ *
+ * Compile with SAS C 5.10: LC -b1 -cfistq -v -y -L
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;devices/printer.h&#062;
+#include &#060;devices/prtbase.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;intuition/preferences.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/alib_stdio_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+struct Library *IntuitionBase;
+struct Library *GfxBase;
+
+union printerIO
+{
+    struct IOStdReq    ios;
+    struct IODRPReq    iodrp;
+    struct IOPrtCmdReq iopc;
+};
+
+struct MsgPort *PrintMP;
+union printerIO *pio;
+
+char message[] = &#034;\
+This is a test message to see how this looks when printed\n\
+using various printer settings.\n\n&#034;;
+
+VOID main(VOID);
+VOID DoPrinter(VOID);
+int DoTest(VOID);
+
+VOID main(VOID)
+{
+
+if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,0L))
+    {
+    if (GfxBase = OpenLibrary(&#034;graphics.library&#034;,0L))
+        {
+        DoPrinter();
+        CloseLibrary(GfxBase);
+        }
+
+    CloseLibrary(IntuitionBase);
+    }
+}
+
+VOID DoPrinter(VOID)
+{
+
+if (PrintMP = CreatePort(0L,0L))
+    {
+    if (pio = (union printerIO *)CreateExtIO(PrintMP,sizeof(union printerIO)))
+        {
+        if (!(OpenDevice(&#034;printer.device&#034;,0L,(struct IORequest *)pio,0L)))
+            {
+            DoTest();
+            CloseDevice((struct IORequest *)pio);
+            }
+        DeleteExtIO((struct IORequest *)pio);
+        }
+    DeletePort(PrintMP);
+    }
+}
+
+DoTest(VOID)
+{
+struct PrinterData *PD;
+struct Preferences *prefs;
+UWORD newpitch;
+UWORD newspacing;
+
+/* Send INIT sequence - make sure printer is inited - some      */
+/* printers may eject the current page if necessary when inited */
+
+pio-&#062;ios.io_Command = CMD_WRITE;
+pio-&#062;ios.io_Data = &#034;\033#1&#034;;
+pio-&#062;ios.io_Length = -1L;
+
+if (DoIO((struct IORequest *)pio))
+    return(FALSE);
+
+/* Print some text using the default settings from Preferences */
+
+pio-&#062;ios.io_Command = CMD_WRITE;
+pio-&#062;ios.io_Data = message;
+pio-&#062;ios.io_Length = -1L;
+
+if(DoIO((struct IORequest *)pio))
+   return(FALSE);
+
+/* Now try changing some settings
+ * Note that we could just as well send the printer.device escape
+ * sequences to change these settings, but this is an example program.
+ */
+
+/* Get pointer to printer data  */
+PD = (struct PrinterData *) pio-&#062;ios.io_Device;
+
+/* Get pointer to printer's copy of preferences
+ * Note that the printer.device makes a copy of preferences when
+ * the printer.device is successfully opened via OpenDevice(),
+ * so we are only going to change the COPY of preferences
+ */
+
+prefs = &#038;PD-&#062;pd_Preferences;
+
+
+/* Change a couple of settings                          */
+
+if (prefs-&#062;PrintSpacing == SIX_LPI)
+    newspacing = EIGHT_LPI;
+if (prefs-&#062;PrintSpacing == EIGHT_LPI)
+    newspacing = SIX_LPI;
+
+if (prefs-&#062;PrintPitch == PICA)
+    newpitch = ELITE;
+if (prefs-&#062;PrintPitch == ELITE)
+    newpitch = FINE;
+if (prefs-&#062;PrintPitch == FINE)
+    newpitch = PICA;
+
+/* And let's change the margins too for this example */
+
+prefs-&#062;PrintLeftMargin = 20;
+prefs-&#062;PrintRightMargin = 40;
+
+prefs-&#062;PrintPitch = newpitch;
+prefs-&#062;PrintSpacing = newspacing;
+
+/* Send INIT sequence so that these settings are used */
+
+pio-&#062;ios.io_Command = CMD_WRITE;
+pio-&#062;ios.io_Data = &#034;\033#1&#034;;
+pio-&#062;ios.io_Length = -1L;
+
+if(DoIO((struct IORequest *)pio))
+   return(FALSE);
+
+pio-&#062;ios.io_Command = CMD_WRITE;
+pio-&#062;ios.io_Data = message;
+pio-&#062;ios.io_Length = -1L;
+
+if(DoIO((struct IORequest *)pio))
+   return(FALSE);
+
+/* Send FormFeed so page is ejected  */
+
+pio-&#062;ios.io_Command = CMD_WRITE;
+pio-&#062;ios.io_Data = &#034;\014&#034;;
+pio-&#062;ios.io_Length = -1L;
+
+if(DoIO((struct IORequest *)pio))
+   return(FALSE);
+
+return(TRUE);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

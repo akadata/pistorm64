@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="GadgetMouse()" TITLE="intuition.library/GadgetMouse" -->
+<head>
+<title>intuition.library/GadgetMouse</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0219.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node021B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GadgetMouse -- Calculate gadget-relative mouse position. (V36)
+
+SYNOPSIS
+    GadgetMouse( <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a>, GInfo, MousePoint )
+                 A0      A1     A2
+
+    VOID GadgetMouse( struct <a href="../Includes_and_Autodocs_2._guide/node00D2.html#line26">GadgetInfo</a> *, WORD * );
+
+FUNCTION
+    Determines the current location of the mouse pointer relative
+    to the upper-left corner of a custom gadget.  Typically used
+    only in the GM_HANDLEINPUT and GM_GOACTIVE custom gadget hook
+    routines.
+
+    NEWS FLASH!!: These two hook routines are now passed the mouse
+    coordinates, so this function has no known usefulness.
+
+    We recommend that you don't call it.
+
+    Note that this function calculates the mouse position taking
+    &#034;gadget relativity&#034; (GFLG_RELRIGHT, GFLG_RELBOTTOM) into
+    consideration.  If your custom gadget intends to ignore these
+    properties, then you should either enjoin or inhibit your users
+    from setting those bits, since Intuition won't ask if you respect
+    them.
+
+INPUTS
+    GInfo = A pointer to a <a href="../Includes_and_Autodocs_2._guide/node00D2.html#line26">GadgetInfo</a> structure as passed to the
+            custom gadget hook routine.
+    MousePoint = address of two WORDS, or a pointer to a structure of
+            type Point.
+
+RESULT
+    Returns nothing.  Fills in the two words pointed to by
+    MousePoint with the gadget-relative mouse position.
+
+BUGS
+    Useless, since equivalent information is now passed to every
+    function that might have a use for this.
+
+SEE ALSO
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

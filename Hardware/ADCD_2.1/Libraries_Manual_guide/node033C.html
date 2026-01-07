@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-9-7" TITLE="27 / / / The Display Database and the DisplayInfo Record" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / / The Display Database and the DisplayInfo Record</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node033B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node033D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For each ModeID, the graphics library has a body of data that enables the
+set up of the display hardware and provides applications with information
+<a name="line4">about the properties of the display mode.</a>
+
+The display information in the database is accessed by searching it for a
+record with a given ModeID.  For performance reasons, a look-up function
+named <a href="../Includes_and_Autodocs_2._guide/node043B.html">FindDisplayInfo()</a> is provided which, given a ModeID, will return a
+<a name="line9">handle to the internal data record about the attributes of the display.</a>
+
+This handle is then used for queries to the display database and
+specification of display mode to the low-level graphics routines.  It is
+never used as a pointer.  The private data structure associated with a
+given ModeID is called a <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line49">DisplayInfo</a>.  From the &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line30">displayinfo.h</a>&#062;
+include file:
+
+    /* the &#034;public&#034; handle to a DisplayInfo  */
+
+<a name="line19">     typedef APTR DisplayInfoHandle;</a>
+
+In order to obtain database information about an existing <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>, you
+must first gain reference to its 32-bit ModeID.  A graphics function
+<a href="../Includes_and_Autodocs_2._guide/node044A.html">GetVPModeID()</a> simplifies this operation:
+
+    modeID = ULONG GetVPModeID(struct ViewPort *vp )
+
+The vp argument is pointer to a <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> structure.  This function returns
+the normal display ModeID, if one is currently associated with this
+<a name="line29">ViewPort.  If no ModeID exists this function returns INVALID_ID.</a>
+
+Each new valid 32-bit ModeID is associated with data initialized by the
+graphics library at powerup.  This data is accessed by obtaining a handle
+to it with the graphics function <a href="../Includes_and_Autodocs_2._guide/node043B.html">FindDisplayInfo()</a>.
+
+    handle = DisplayInfoHandle FindDisplayInfo(ULONG modeID);
+
+Given a 32-bit ModeID key (modeID in the prototype above)
+<a href="../Includes_and_Autodocs_2._guide/node043B.html">FindDisplayInfo()</a> returns a handle to a valid <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line49">DisplayInfo</a> Record found in
+the graphics database, or NULL.  Using this handle, you can obtain
+information about this video mode, including its default dimensions,
+properties and whether it is currently available for use.
+
+For instance, you can use a <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line32">DisplayInfoHandle</a> with the <a href="../Libraries_Manual_guide/node033D.html">GetDisplayInfoData()</a>
+function to look up the properties of a mode (<a href="../Libraries_Manual_guide/node033D.html">see below</a>).  Or use the
+DisplayInfoHandle with <a href="../Libraries_Manual_guide/node0339.html#line15">VideoControl()</a> and the <a href="../Libraries_Manual_guide/node0339.html#line44">VTAG_NORMAL_DISP_SET</a> tag to
+set up a custom <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

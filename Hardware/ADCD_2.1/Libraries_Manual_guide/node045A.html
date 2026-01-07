@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-8-2-3" TITLE="33 / / Custom Chunk Handlers / The Object Parameter" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / / Custom Chunk Handlers / The Object Parameter</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0459.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node045B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The object parameter supplied to <a href="../Includes_and_Autodocs_2._guide/node01BF.html">EntryHandler()</a> and <a href="../Includes_and_Autodocs_2._guide/node01C0.html">ExitHandler()</a> is a
+pointer which will be passed to your handler when invoked.  This pointer
+can be anything; the parser doesn't use it directly.  As an example, you
+might pass the pointer to the <a href="../Libraries_Manual_guide/node042C.html">IFFHandle</a>.  This way, when your handler is
+<a name="line6">called, you'll be able to easily perform operations on the IFFHandle</a>
+within your handler.  Such code might appear as follows:
+
+    error = EntryHandler (iff, ID_ILBM, ID_BMHD, IFFSLI_ROOT, hook, iff);
+
+And your handler would be declared as follows:
+
+    /* Registerized handler hook h_Entry using */
+    /* SAS C registerized parameters           */
+    LONG __asm MyHandler (register __a0 struct Hook      *hook,
+                          register __a1 LONG             *cmd,
+                          register __a2 struct IFFHandle *iff)
+
+    /* Standard args handler hook h_SubEntry using */
+    /* HookEntry.asm as Hook h_Entry               */
+    LONG MyHandler ( struct Hook      *hook,
+                     LONG             *cmd,
+                     struct IFFHandle *iff )
+
+From within your handler, you could then call <a href="../Libraries_Manual_guide/node0447.html">CurrentChunk()</a>,
+<a href="../Libraries_Manual_guide/node043B.html">ReadChunkBytes()</a>, or nearly any other operation on the <a href="../Libraries_Manual_guide/node042C.html">IFFHandle</a>. Please
+refer to the <a href="../Includes_and_Autodocs_2._guide/node01BF.html">EntryHandler()</a> and <a href="../Includes_and_Autodocs_2._guide/node01C0.html">ExitHandler()</a> Autodocs for additional
+information on the use of chunk handlers.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-8-2" TITLE="3 / Advanced Screen Programming / Dual-Playfield Screen Example" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Advanced Screen Programming / Dual-Playfield Screen Example</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00F7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00F9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This example shows how to create a dual-playfield display.  Note that this
+technique is only valid for screen modes which support dual-playfield, do
+<a name="line4">not try to convert other modes.</a>
+
+Setting up dual playfield mode in the <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreen()</a> call is not the best
+method of obtaining a dual playfield viewport for a screen.  It is better
+to open a standard screen, passing to Intuition (or letting Intuition
+create) only one of the playfield bitmaps (the front one).  Next allocate
+and set up a second bitmap, its bitplanes, and a <a href="../Libraries_Manual_guide/node032F.html">RasInfo</a> structure
+installing these into the new screen's viewport.  Update the viewport
+modes to include DUALPF and call <a href="../Libraries_Manual_guide/node00F4.html#line5">MakeScreen()</a> and <a href="../Libraries_Manual_guide/node00F4.html#line5">RethinkDisplay()</a>.  This
+method, shown in the example below, keeps Intuition rendering (gadgets,
+menus, windows) in a single playfield.
+
+     <a href="../Libraries_Manual_guide/node05B4.html">dualplayfield.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

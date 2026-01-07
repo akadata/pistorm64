@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="keyboard" NODE="KBD_READMATRIX" TITLE="keyboard.device/KBD_READMATRIX" -->
+<head>
+<title>keyboard.device/KBD_READMATRIX</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node040B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node040D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	KBD_READMATRIX -- <a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> the current keyboard key matrix.
+
+<b>   FUNCTION</b>
+	This function reads the up/down state of every key in the
+	key matrix.
+
+<b>   IO REQUEST INPUT</b>
+	io_Message	mn_ReplyPort set if quick I/O is not possible
+	io_Device	preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Command	KBD_READMATRIX
+	io_Flags	IOB_QUICK set if quick I/O is possible
+	io_Length	the size of the io_Data area in bytes: this
+			must be big enough to hold the key matrix.
+	io_Data		a buffer area to fill with the key matrix:
+			an array of bytes whose component bits reflect
+			each keys state: the state of the key for
+			keycode n is at bit (n MOD 8) in byte
+			(n DIV 8) of this matrix.
+
+<b>   IO REQUEST OUTPUT</b>
+	io_Error
+	     IOERR_BADLENGTH - the io_Length was not exactly 13 bytes.
+			The buffer is unchanged.  This is only returned
+			by V33/V34 kickstart.
+	io_Actual	the number of bytes filled in io_Data with key
+			matrix data, i.e. the minimum of the supplied
+			length and the internal key matrix size.
+
+<b>   NOTE</b>
+	For V33/V34 Kickstart, io_Length must be set to exactly 13 bytes.
+
+<b>   RESULTS</b>
+	This function sets the error field in the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a>, and sets
+	matrix to the current key matrix.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

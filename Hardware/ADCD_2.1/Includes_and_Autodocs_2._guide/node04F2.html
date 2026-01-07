@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/parallel" NODE="OpenDevice()" TITLE="parallel.device/OpenDevice" -->
+<head>
+<title>parallel.device/OpenDevice</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Open -- a request to open the parallel port
+
+SYNOPSIS
+    error = OpenDevice(&#034;parallel.device&#034;, unit, ioExtPar, flags)
+    D0                  A0                D0    A1        D1
+
+FUNCTION
+    This function allows the requestor software access to the parallel
+    device.  Unless the shared-access bit (bit 5 of io_ParFlags) is
+    set, exclusive use is granted and no other access is allowed
+    until the owner closes the device.
+
+    A FAST_MODE, can be specified (bit 3 of io_Parflags) to speed up
+    transfers to high-speed printers. Rather than waiting for the printer
+    to acknowledge a character using the *ACK interrupt, this mode will
+    send out data as long as the BUSY signal is low. The printer must be
+    able to raise the BUSY signal within 3 micro-seconds on A2630s,
+    otherwise data will be lost. Should be used only in an exclusive-
+    access OpenDevice().
+
+    A SLOWMODE mode can be specified (bit 4 of io_ParFlags) when very
+    slow printers are used. If the printer acknowledges data at less
+    than 5000 bytes per second, then this mode will actually save CPU
+    time, although it consumes much more with high-speed printers.
+
+    The PTermArray of the ioExtPar is initialized only if the EOFMODE
+    bit (bit 1 of io_ParFlags) is set. The PTermArray can be further
+    modified using the <a href="../Includes_and_Autodocs_2._guide/node04F4.html">PDCMD_SETPARAMS</a> command.
+
+INPUTS
+    &#034;parallel.device&#034; - a pointer to literal string &#034;parallel.device&#034;
+    unit - Must be zero for future compatibility
+    ioExtPar - pointer to an IO Request block of structure IOExtPar to
+               be initialized by the OpenDevice() function. The io_ParFlags
+               field must be set as desired.
+    flags - Must be zero for future compatibility
+
+RESULTS
+    d0 -- same as io_Error
+    io_Error -- if the Open succeded, then io_Error will be null.
+                If the Open failed, then io_Error will be non-zero.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node04CC.html">exec/CloseDevice</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

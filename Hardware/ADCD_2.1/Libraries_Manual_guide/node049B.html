@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_37" NODE="37-1-4-2" TITLE="37 / / Advanced Tag Usage / Copying an Existing Tag List" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>37 / / Advanced Tag Usage / Copying an Existing Tag List</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node049A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node049C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node03D2.html">CloneTagItems()</a> function is used to copy an existing tag array into a
+new tag array.
+
+    struct TagItem *otags;      /* Original tag array */
+    struct TagItem *ntags;      /* New tag array */
+
+    /* Make sure there is a TagItem array */
+    if (otags)
+    {
+        /* Copy the original tags into a new tag array */
+        if (ntags = CloneTagItems(otags))
+        {
+            /* ...do something with the array... */
+
+            /* Free the array when your done with it */
+            FreeTagItems (ntags);
+        }
+    }
+
+This function can also be used to implement a function that will insert
+tag items into an array.
+
+    struct TagItem *otags;      /* Original tag array */
+    struct TagItem *tags;       /* New tag array */
+
+    /* Insert a couple of tags into an existing tag array */
+    if (tags = MakeNewTagList (GA_LeftEdge, 10,
+                               GA_TopEdge, 20,
+                               TAG_MORE, otags))
+    {
+        /* ...do something with the array... */
+
+        /* Free the array when your done with it */
+        FreeTagItems (tags);
+    }
+
+    /* This function will create a tag array from tag pairs placed on
+     * the stack */
+    struct TagItem *MakeNewTagList (ULONG data,...)
+    {
+        struct TagItem *tags = (struct TagItem *) &#038;data;
+
+        return (CloneTagItems (tags));
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

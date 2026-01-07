@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_20" NODE="20-3-2" TITLE="20 / Other Memory Functions / Adding Memory to the System Pool" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>20 / Other Memory Functions / Adding Memory to the System Pool</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02B7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02B9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When non-Autoconfig memory needs to be added to the system free pool, the
+<a href="../Includes_and_Autodocs_2._guide/node0328.html">AddMemList()</a> function can be used.  This function takes the size of the
+memoryblock, its type, the priority for the memory list, the base address
+and the name of the memory block.  A <a href="../Libraries_Manual_guide/node02B6.html">MemHeader</a> structure will be placed at
+the start of the memory block, the remainder of the memory block will be
+made available for allocation. For example:
+
+    AddMemList(0x200000, MEMF_FAST, 0, 0xF00000, &#034;FZeroBoard&#034;);
+
+will add a two megabyte memory block, starting at $F00000 to the system
+free pool as Fast memory.  The memory list entry is identified with
+&#034;FZeroBoard&#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

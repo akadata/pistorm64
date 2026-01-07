@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="GetGBuffers()" TITLE="graphics.library/GetGBuffers" -->
+<head>
+<title>graphics.library/GetGBuffers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0446.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0448.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GetGBuffers -- Attempt to allocate ALL buffers of an entire <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line204">AnimOb</a>.
+
+SYNOPSIS
+    status = GetGBuffers(anOb, rp, db)
+    D0                   A0    A1  D0
+
+    BOOL GetGBuffers(struct <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line204">AnimOb</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *, BOOL);
+
+FUNCTION
+    For each sequence of each component of the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line204">AnimOb</a>, allocate memory for:
+        SaveBuffer
+        BorderLine
+        CollMask and ImageShadow (point to same buffer)
+        if db is set TRUE (user wants double-buffering) allocate:
+            <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line234">DBufPacket</a>
+            BufBuffer
+
+INPUTS
+    anOb = pointer to the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line204">AnimOb</a> structure
+    rp   = pointer to the current <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>
+    db   = double-buffer indicator (set TRUE for double-buffering)
+
+RESULT
+    status = TRUE if the memory allocations were all successful, else FALSE
+
+BUGS
+    If any of the memory allocations fail it does not free the partial
+    allocations that did succeed.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0441.html">FreeGBuffers()</a> <a href="../Includes_and_Autodocs_2._guide/node00C3.html">graphics/gels.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

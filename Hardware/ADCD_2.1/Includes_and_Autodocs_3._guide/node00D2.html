@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="clicktab_gc" NODE="SetClickTabNodeAttrsA()" TITLE="clicktab_gc/SetClickTabNodeAttrsA" -->
+<head>
+<title>clicktab_gc/SetClickTabNodeAttrsA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00D1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00D3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        SetClickTabNodeAttrsA -- Set attributes of a ClickTab node.
+
+<b>    SYNOPSIS</b>
+        VOID SetClickTabNodeAttrs(struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...)
+        SetClickTabNodeAttrs(node, firsttag, ...)
+
+        VOID SetClickTabNodeAttrsA(struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *)
+        SetClickTabNodeAttrsA(node, taglist)
+
+<b>    FUNCTION</b>
+        Changes attributes for a ClickTab node.  Since the ClickTab
+        class uses a private node structure, this is the only way to change
+        node attributes.
+
+        You may NOT change node attributes when the node is in a list
+        attached to a ClickTab gadget.  You must first detach the list
+        with CLICKTAB_Labels, ~0 before you can change attributes, and
+        then re-attach the list, and re-render the gadget to reflect
+        any changes. This should include re-domaining the gadget.
+        If used in a layout group, turn off domain caching for the
+        clicktab object if you intend to dynamically alter the tabs
+        and refresh the layout group with <a href="../Includes_and_Autodocs_3._guide/node043D.html">RethinkLayout()</a>.
+
+<b>    TAGS</b>
+        TNA_Text (STRPTR)
+
+            <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text</a> string to appear as a line in the ClickTab menu node.
+
+        TNA_Number (WORD)
+
+            ID Number assigned to a ClickTab menu node
+
+        TNA_TextPen (WORD)
+
+            Specifies pen number to use for the label.
+
+            Defaults to pens[TEXTPEN].
+
+<b>    INPUTS</b>
+        node - <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> whose attributes you are changing.
+        taglist - <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a> list of attributes to change.
+
+<b>    SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node00D1.html">GetClickTabNodeAttrsA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

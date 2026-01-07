@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/filehandler.h" NODE="MAIN" TITLE="Includes/dos/filehandler.h" -->
+<head>
+<title>Includes/dos/filehandler.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0065.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0067.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_FILEHANDLER_H
+#define DOS_FILEHANDLER_H
+/*
+**	$Filename: dos/filehandler.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.5 $
+**	$Date: 90/07/12 $
+**
+**	device and file handler specific code for AmigaDOS
+**
+**	(C) Copyright 1986-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef	  EXEC_PORTS_H
+#include &#034;exec/ports.h&#034;
+#endif
+<a name="line18"></a>
+#ifndef	  DOS_DOS_H
+#include &#034;dos/dos.h&#034;
+#endif
+
+
+/* The disk &#034;environment&#034; is a longword array that describes the
+ * disk geometry.  It is variable sized, with the length at the beginning.
+ * Here are the constants for a standard geometry.
+ */
+<a name="line28"></a>
+<a name="line29">struct DosEnvec {</a>
+<a name="line30">    ULONG de_TableSize;	     /* Size of Environment vector */</a>
+<a name="line31">    ULONG de_SizeBlock;	     /* in longwords: standard value is 128 */</a>
+<a name="line32">    ULONG de_SecOrg;	     /* not used; must be 0 */</a>
+<a name="line33">    ULONG de_Surfaces;	     /* # of heads (surfaces). drive specific */</a>
+<a name="line34">    ULONG de_SectorPerBlock; /* not used; must be 1 */</a>
+<a name="line35">    ULONG de_BlocksPerTrack; /* blocks per track. drive specific */</a>
+<a name="line36">    ULONG de_Reserved;	     /* DOS reserved blocks at start of partition. */</a>
+<a name="line37">    ULONG de_PreAlloc;	     /* DOS reserved blocks at end of partition */</a>
+<a name="line38">    ULONG de_Interleave;     /* usually 0 */</a>
+<a name="line39">    ULONG de_LowCyl;	     /* starting cylinder. typically 0 */</a>
+<a name="line40">    ULONG de_HighCyl;	     /* max cylinder. drive specific */</a>
+<a name="line41">    ULONG de_NumBuffers;     /* Initial # DOS of buffers.  */</a>
+<a name="line42">    ULONG de_BufMemType;     /* type of mem to allocate for buffers */</a>
+<a name="line43">    ULONG de_MaxTransfer;    /* Max number of bytes to transfer at a time */</a>
+<a name="line44">    ULONG de_Mask;	     /* Address Mask to block out certain memory */</a>
+<a name="line45">    LONG  de_BootPri;	     /* Boot priority for autoboot */</a>
+    ULONG de_DosType;	     /* ASCII (HEX) string showing filesystem type;
+			      * 0X444F5300 is old filesystem,
+<a name="line48">			      * 0X444F5301 is fast file system */</a>
+<a name="line49">    ULONG de_Baud;	     /* Baud rate for serial handler */</a>
+<a name="line50">    ULONG de_Control;	     /* Control word for handler/filesystem */</a>
+    ULONG de_BootBlocks;     /* Number of blocks containing boot code */
+
+};
+
+/* these are the offsets into the array */
+<a name="line56"></a>
+<a name="line57">#define DE_TABLESIZE	0	/* standard value is 11 */</a>
+<a name="line58">#define DE_SIZEBLOCK	1	/* in longwords: standard value is 128 */</a>
+<a name="line59">#define DE_SECORG	2	/* not used; must be 0 */</a>
+<a name="line60">#define DE_NUMHEADS	3	/* # of heads (surfaces). drive specific */</a>
+<a name="line61">#define DE_SECSPERBLK	4	/* not used; must be 1 */</a>
+<a name="line62">#define DE_BLKSPERTRACK 5	/* blocks per track. drive specific */</a>
+<a name="line63">#define DE_RESERVEDBLKS 6	/* unavailable blocks at start.	 usually 2 */</a>
+<a name="line64">#define DE_PREFAC	7	/* not used; must be 0 */</a>
+<a name="line65">#define DE_INTERLEAVE	8	/* usually 0 */</a>
+<a name="line66">#define DE_LOWCYL	9	/* starting cylinder. typically 0 */</a>
+<a name="line67">#define DE_UPPERCYL	10	/* max cylinder.  drive specific */</a>
+<a name="line68">#define DE_NUMBUFFERS	11	/* starting # of buffers.  typically 5 */</a>
+#define DE_MEMBUFTYPE	12	/* type of mem to allocate for buffers. */
+<a name="line70">#define DE_BUFMEMTYPE	12	/* same as above, better name</a>
+<a name="line71">				 * 1 is public, 3 is chip, 5 is fast */</a>
+<a name="line72">#define DE_MAXTRANSFER	13	/* Max number bytes to transfer at a time */</a>
+<a name="line73">#define DE_MASK		14	/* Address Mask to block out certain memory */</a>
+#define DE_BOOTPRI	15	/* Boot priority for autoboot */
+#define DE_DOSTYPE	16	/* ASCII (HEX) string showing filesystem type;
+<a name="line76">				 * 0X444F5300 is old filesystem,</a>
+<a name="line77">				 * 0X444F5301 is fast file system */</a>
+<a name="line78">#define DE_BAUD		17	/* Baud rate for serial handler */</a>
+<a name="line79">#define DE_CONTROL	18	/* Control word for handler/filesystem */</a>
+#define DE_BOOTBLOCKS	19	/* Number of blocks containing boot code */
+
+/* The file system startup message is linked into a device node's startup
+** field.  It contains a pointer to the above environment, plus the
+** information needed to do an exec OpenDevice().
+<a name="line85">*/</a>
+<a name="line86">struct FileSysStartupMsg {</a>
+<a name="line87">    ULONG	fssm_Unit;	/* exec unit number for this device */</a>
+<a name="line88">    BSTR	fssm_Device;	/* null terminated bstring to the device name */</a>
+<a name="line89">    BPTR	fssm_Environ;	/* ptr to environment table (see above) */</a>
+    ULONG	fssm_Flags;	/* flags for OpenDevice() */
+};
+
+
+/* The include file &#034;libraries/dosextens.h&#034; has a DeviceList structure.
+ * The &#034;device list&#034; can have one of three different things linked onto
+ * it.	Dosextens defines the structure for a volume.  DLT_DIRECTORY
+ * is for an assigned directory.  The following structure is for
+ * a dos &#034;device&#034; (DLT_DEVICE).
+*/
+<a name="line100"></a>
+<a name="line101">struct DeviceNode {</a>
+<a name="line102">    BPTR	dn_Next;	/* singly linked list */</a>
+<a name="line103">    ULONG	dn_Type;	/* always 0 for dos &#034;devices&#034; */</a>
+    struct MsgPort *dn_Task;	/* standard dos &#034;task&#034; field.  If this is
+				 * null when the node is accesses, a task
+<a name="line106">				 * will be started up */</a>
+<a name="line107">    BPTR	dn_Lock;	/* not used for devices -- leave null */</a>
+<a name="line108">    BSTR	dn_Handler;	/* filename to loadseg (if seglist is null) */</a>
+<a name="line109">    ULONG	dn_StackSize;	/* stacksize to use when starting task */</a>
+<a name="line110">    LONG	dn_Priority;	/* task priority when starting task */</a>
+<a name="line111">    BPTR	dn_Startup;	/* startup msg: FileSysStartupMsg for disks */</a>
+    BPTR	dn_SegList;	/* code to run to start new task (if necessary).
+<a name="line113">				 * if null then dn_Handler will be loaded. */</a>
+    BPTR	dn_GlobalVec;	/* BCPL global vector to use when starting
+				 * a task.  -1 means that dn_SegList is not
+				 * for a bcpl program, so the dos won't
+				 * try and construct one.  0 tell the
+				 * dos that you obey BCPL linkage rules,
+				 * and that it should construct a global
+				 * vector for you.
+<a name="line121">				 */</a>
+    BSTR	dn_Name;	/* the node name, e.g. '\3','D','F','3' */
+};
+
+#endif	/* DOS_FILEHANDLER_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

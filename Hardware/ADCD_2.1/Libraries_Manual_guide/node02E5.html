@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_23" NODE="23-2-8" TITLE="23 / List Functions / List Macros for Assembly Language Programmers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>23 / List Functions / List Macros for Assembly Language Programmers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02E4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02E6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Assembly language programmers may want to optimize their code by using
+assembly code list macros.  Because these macros actually embed the
+specified list operation into the code, they result in slightly faster
+operations.  The file &#060;exec/<a href="../Includes_and_Autodocs_2._guide/node0081.html#line42">lists.i</a>&#062; contains the recommended set of
+macros. For example, the following instructions implement the <a href="../Includes_and_Autodocs_2._guide/node0081.html#line133">REMOVE</a> macro:
+
+    MOVE.L  LN_SUCC(A1),A0       ; get successor
+    MOVE.L  LN_PRED(A1),A1       ; get predecessor
+    MOVE.L  A0,LN_SUCC(A1)       ; fix up predecessor's succ pointer
+    MOVE.L  A1,LN_PRED(A0)       ; fix up successor's pred pointer
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

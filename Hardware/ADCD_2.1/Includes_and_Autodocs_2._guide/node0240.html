@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="RefreshGadgets()" TITLE="intuition.library/RefreshGadgets" -->
+<head>
+<title>intuition.library/RefreshGadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node023F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0241.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    RefreshGadgets -- Refresh (redraw) the gadget display.
+
+SYNOPSIS
+    RefreshGadgets( Gadgets, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> )
+                    A0       A1      A2
+
+    VOID RefreshGadgets( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> *,
+            struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> * );
+
+FUNCTION
+    Refreshes (redraws) all of the gadgets in the gadget list starting
+    from the specified gadget.
+
+    The window parameter must point to the window which contains the
+    gadget, or which contains the requester that contains the gadget
+    The requester parameter must only be valid if the gadget has the
+    GTYP_REQGADGET flag set, a requirement for all requester gadgets.
+
+    The Pointer argument points to a <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> structure.
+
+    The two main reasons why you might want to use this routine are:
+    first, that you've modified the imagery of the gadgets in your
+    display and you want the new imagery to be displayed; secondly,
+    if you think that some graphic operation you just performed
+    trashed the gadgetry of your display, this routine will refresh
+    the imagery for you.
+
+    Note that to modify the imagery of a gadget, you must first remove
+    that gadget from the window's gadget list, using <a href="../Includes_and_Autodocs_2._guide/node0246.html">RemoveGadget()</a> (or
+    RemoveGList()).  After changing the image, border, text (including
+    text for a string gadget), the gadget is replaced in the gadget list
+    (using <a href="../Includes_and_Autodocs_2._guide/node01FC.html">AddGadget()</a> or <a href="../Includes_and_Autodocs_2._guide/node01FD.html">AddGList()</a>).  Adding gadgets does not cause
+    them to be displayed (refreshed), so this function, or <a href="../Includes_and_Autodocs_2._guide/node0241.html">RefreshGList()</a>
+    is typically called.
+
+    A common technique is to set or reset the GFLG_SELECTED flag of a
+    Boolean gadget and then call RefreshGadgets() to see it displayed
+    highlighted if and only if GFLG_SELECTED is set.  If you wish to do
+    this and be completely proper, you must <a href="../Includes_and_Autodocs_2._guide/node0246.html">RemoveGadget()</a>, change the
+    GFLG_SELECTED flag, <a href="../Includes_and_Autodocs_2._guide/node01FC.html">AddGadget()</a>, and RefreshGadgets(), or the
+    equivalent.
+
+    The gadgets argument can be a copy of the FirstGadget variable in
+    the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> structure that you want refreshed:
+    the effect of this will be that all gadgets will be redrawn.
+    However, you can selectively refresh just some of the gadgets
+    by starting the refresh part-way into the list:  for instance,
+    redrawing your window non-GTYP_GZZGADGET gadgets only, which you've
+    conveniently grouped at the end of your gadget list.
+
+    Even more control is available using the <a href="../Includes_and_Autodocs_2._guide/node0241.html">RefreshGList()</a> routine which
+    enables you to refresh a single gadget, or number of your choice.
+
+    NOTE:  It's never safe to tinker with the gadget list yourself.  Don't
+    supply some gadget list that Intuition hasn't already processed in
+    the usual way.
+
+INPUTS
+    Gadgets = pointer to the first in the list of gadgets wanting
+        refreshment
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> = pointer to the window containing the gadget or its requester
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> = pointer to a requester (ignored if gadget is not attached
+        to a requester).
+
+RESULT
+    None
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0241.html">RefreshGList()</a>, <a href="../Includes_and_Autodocs_2._guide/node0246.html">RemoveGadget()</a>, <a href="../Includes_and_Autodocs_2._guide/node0247.html">RemoveGList()</a>, <a href="../Includes_and_Autodocs_2._guide/node01FC.html">AddGadget()</a>, <a href="../Includes_and_Autodocs_2._guide/node01FD.html">AddGList()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

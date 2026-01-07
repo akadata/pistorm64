@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="PrintIText()" TITLE="intuition.library/PrintIText" -->
+<head>
+<title>intuition.library/PrintIText</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03D8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03DA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	PrintIText -- Print text described by the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> argument.
+
+<b>    SYNOPSIS</b>
+	PrintIText( <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, IText, LeftOffset, TopOffset )
+		    A0        A1     D0          D1
+
+	VOID PrintIText( struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> *, WORD, WORD );
+
+<b>    FUNCTION</b>
+	Prints the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> into the specified <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.  Sets up the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+	as specified by the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> values, then prints the text into the
+	<a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> at the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> x/y coordinates offset by the left/top
+	arguments.  Note, though, that the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> structure itself
+	may contain further text position coordinates: those coordinates
+	and the Left/TopOffsets are added to obtain the true position of
+	the text to be rendered.
+
+	This routine does window layer clipping as appropriate -- if you
+	print text outside of your window, your characters will be
+	clipped at the window's edge, providing you pass your window's
+	(layered) <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+
+	If the NextText field of the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> argument is non-NULL,
+	the next <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> is rendered as well, and so on until some
+	NextText field is NULL.
+
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> with the ITextFont field NULL are displayed in the
+	font of the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.  If the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> font is also NULL, the
+	system default font, as set via the <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> tool, will be used.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> = the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> destination of the text
+	IText = pointer to an instance of the structure <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a>
+	LeftOffset = left offset of the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> into the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+	TopOffset = top offset of the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> into the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

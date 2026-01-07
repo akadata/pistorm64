@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="RemLibrary()" TITLE="exec.library/RemLibrary" -->
+<head>
+<title>exec.library/RemLibrary</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0371.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0373.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    RemLibrary -- remove a library from the system
+
+SYNOPSIS
+    RemLibrary(library)
+               A1
+
+    void RemLibrary(struct <a href="../Includes_and_Autodocs_2._guide/node009C.html#line34">Library</a> *);
+
+FUNCTION
+    This function calls the library's EXPUNGE vector, which requests
+    that a library delete itself.  The library may refuse to do this if
+    it is busy or currently open. This is not typically called by user
+    code.
+
+    There are certain, limited circumstances where it may be
+    appropriate to attempt to specifically flush a certain <a href="../Includes_and_Autodocs_2._guide/node009C.html#line34">Library</a>.
+    Example:
+
+     /* Attempts to flush the named library out of memory. */
+     #include <a href="../Includes_and_Autodocs_2._guide/node0096.html">&#060;exec/types.h&#062;</a>
+     #include <a href="../Includes_and_Autodocs_2._guide/node009E.html">&#060;exec/execbase.h&#062;</a>
+
+     void FlushLibrary(name)
+     STRPTR name;
+     {
+     struct <a href="../Includes_and_Autodocs_2._guide/node009C.html#line34">Library</a> *result;
+
+        Forbid();
+        if(result=(struct <a href="../Includes_and_Autodocs_2._guide/node009C.html#line34">Library</a> *)FindName(&#038;SysBase-&#062;LibList,name))
+            RemLibrary(result);
+        Permit();
+     }
+
+INPUTS
+    library - pointer to a library node structure
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

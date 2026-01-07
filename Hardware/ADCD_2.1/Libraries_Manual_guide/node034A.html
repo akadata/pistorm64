@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-1" TITLE="27 / Drawing Routines / The RastPort Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / Drawing Routines / The RastPort Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0349.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node034B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The RastPort data structure can be found in the include files
+&#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">rastport.h</a>&#062; and &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00B3.html#line67">rastport.i</a>&#062;. It contains the following
+information:
+
+
+struct RastPort
+{
+<a name="line9">    struct  Layer  *Layer;</a>
+    struct  BitMap *BitMap;
+    UWORD          *AreaPtrn;  /* Ptr to areafill pattern */
+    struct  TmpRas *TmpRas;
+<a name="line13">    struct  AreaInfo *AreaInfo;</a>
+<a name="line14">    struct  GelsInfo *GelsInfo;</a>
+    UBYTE   Mask;              /* Write mask for this raster */
+    BYTE    FgPen;             /* Foreground pen for this raster */
+    BYTE    BgPen;             /* Background pen  */
+    BYTE    AOlPen;            /* Areafill outline pen */
+    BYTE    DrawMode;          /* Drawing mode for fill, lines, and text */
+    BYTE    AreaPtSz;          /* 2^n words for areafill pattern */
+<a name="line21">    BYTE    linpatcnt;         /* Current line drawing pattern preshift */</a>
+    BYTE    dummy;
+<a name="line23">    UWORD   Flags;             /* Miscellaneous control bits */</a>
+    UWORD   LinePtrn;          /* 16 bits for textured lines */
+<a name="line25">    WORD    cp_x, cp_y;	       /* Current pen position */</a>
+    UBYTE   minterms[8];
+<a name="line27">    WORD    PenWidth;</a>
+    WORD    PenHeight;
+    struct  TextFont *Font;    /* Current font address */
+    UBYTE   AlgoStyle;         /* The algorithmically generated style */
+    UBYTE   TxFlags;           /* Text specific flags */
+    UWORD   TxHeight;          /* Text height */
+    UWORD   TxWidth;           /* Text nominal width */
+    UWORD   TxBaseline;        /* Text baseline */
+    WORD    TxSpacing;         /* Text spacing (per character) */
+    APTR    *RP_User;
+    ULONG   longreserved[2];
+#ifndef GFX_RASTPORT_1_2
+    UWORD   wordreserved[7];   /* Used to be a node */
+    UBYTE   reserved[8];       /* For future use */
+#endif
+};
+
+
+The sections that follow explain each of the items in the
+RastPort structure is used.
+
+ <a href="../Libraries_Manual_guide/node034B.html">Initializing a BitMap Structure</a> 
+ <a href="../Libraries_Manual_guide/node034C.html">Initializing a RastPort Structure</a> 
+ <a href="../Libraries_Manual_guide/node034D.html">RastPort Area-fill Information</a> 
+ <a href="../Libraries_Manual_guide/node034E.html">RastPort Graphics Element Pointer</a> 
+ <a href="../Libraries_Manual_guide/node034F.html">RastPort Write Mask</a> 
+ <a href="../Libraries_Manual_guide/node0350.html">RastPort Drawing Pens</a> 
+ <a href="../Libraries_Manual_guide/node0351.html">RastPort Drawing Modes</a> 
+ <a href="../Libraries_Manual_guide/node0352.html">RastPort Line and Area Drawing Patterns</a> 
+ <a href="../Libraries_Manual_guide/node0353.html">RastPort Pen Position and Size</a> 
+ <a href="../Libraries_Manual_guide/node0354.html">Text Attributes</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

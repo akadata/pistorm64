@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-2-2" TITLE="3 / Screen Data Structures / Other Screen Data Structures" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Screen Data Structures / Other Screen Data Structures</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00DD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00DF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In addition to the Screen structure, Intuition uses some other supporting
+structures defined in the include file &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DD.html">screens.h</a>&#062; and in
+&#060;utility/<a href="../Includes_and_Autodocs_2._guide/node012E.html">tagitems.h</a>&#062;.  (See the Amiga ROM Kernel Reference Manual:
+Includes and Autodocs for a complete listing.)
+<a name="line6"></a>
+
+      Table 3-2: Data Structures Used with Intuition Screens
+
+
+  Structure Name  Description                    Defined in Include File
+  --------------  -----------                    -----------------------
+  <a href="../Libraries_Manual_guide/node00DD.html">Screen</a>          Main Intuition structure that   &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">screens.h</a>&#062;
+                  defines a screen (see above)
+
+  <a href="../Libraries_Manual_guide/node00EB.html">DrawInfo</a>        Holds the screen's pen, font    &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">screens.h</a>&#062;
+                  and aspect data for Intuition
+
+  <a href="../Libraries_Manual_guide/node0497.html">TagItem</a>         General purpose parameter        &#060;utility/<a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">tagitem.h</a>&#062;
+                  structure used to set up
+                  screens in V36
+
+  NewScreen       Parameter structure used to     &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">screens.h</a>&#062;
+                  create a screen in V34
+
+  ExtNewScreen    An extension to the NewScreen   &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DD.html#line345">screens.h</a>&#062;
+                  structure used in V37 for
+                  backward compatibility with
+                  older systems
+
+
+As <a href="../Libraries_Manual_guide/node00DC.html">previously mentioned</a>, there is an Intuition Screen structure (and a
+corresponding graphics <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a>) for every screen in memory.  Under
+Release 2, whenever a new screen is created, Intuition also creates an
+auxiliary data structure called a DrawInfo.
+
+The <a href="../Libraries_Manual_guide/node00EB.html">DrawInfo</a> structure is similar to a <a href="../Libraries_Manual_guide/node00F1.html#line4">RastPort</a> in that it holds drawing
+information.  But where a RastPort is used at the lower graphics level,
+the DrawInfo structure is used at the higher Intuition level.
+Specifically, DrawInfo contains data needed to support the New Look of
+Intuition in Release 2.  (For more information see the section below,
+&#034;<a href="../Libraries_Manual_guide/node00EB.html">DrawInfo and the 3D Look</a>&#034;.)
+
+Another new feature of Release 2 is <a href="../Libraries_Manual_guide/node0496.html">tag</a> items.  A <a href="../Libraries_Manual_guide/node0497.html">TagItem</a> is a general
+purpose parameter structure used to pass arguments to many of the
+functions in the Release 2 system software.  Each tag consists of a LONG
+tag ID (<a href="../Libraries_Manual_guide/node0497.html#line9">ti_Tag</a>) and a LONG tag data value (<a href="../Libraries_Manual_guide/node0497.html#line9">ti_Data</a>).  With screens, tag
+items are used to describe the attributes an application wants for a new,
+<a href="../Libraries_Manual_guide/node00DF.html">custom screen</a>.  Tag items replace the NewScreen structure, the set of
+parameters used in older versions of the OS to set up a screen.
+
+Applications may wish to use tag items to set up a new screen instead of
+the <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">NewScreen</a> structure since tag items are often more convenient.  For
+the sake of backwards compatibility, the <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line345">ExtNewScreen</a> structure is
+available.  ExtNewScreen combines the NewScreen method used to define
+screens in older versions of the OS with the tag item method used in
+Release 2.  The <a href="../Libraries_Manual_guide/node00E1.html">examples</a> listed in the next section show how these various
+data structures can be used to set up a new screen.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

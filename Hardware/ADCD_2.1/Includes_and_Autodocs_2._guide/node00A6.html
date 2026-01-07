@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/gfx.h" NODE="MAIN" TITLE="Includes/graphics/gfx.h" -->
+<head>
+<title>Includes/graphics/gfx.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00A5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00A7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_GFX_H
+#define	GRAPHICS_GFX_H
+/*
+**	$Filename: graphics/gfx.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**	general include file for application programs
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+<a name="line19">#define BITSET	0x8000</a>
+#define BITCLR	0
+<a name="line21"></a>
+#define AGNUS
+<a name="line23">#ifdef AGNUS</a>
+#define TOBB(a)      ((long)(a))
+#else
+#define TOBB(a)      ((long)(a)&#062;&#062;1)  /* convert Chip adr to Bread Board Adr */
+#endif
+<a name="line28"></a>
+struct Rectangle
+<a name="line30">{</a>
+<a name="line31">    WORD   MinX,MinY;</a>
+    WORD   MaxX,MaxY;
+};
+<a name="line34"></a>
+struct Rect32
+<a name="line36">{</a>
+<a name="line37">    LONG    MinX,MinY;</a>
+    LONG    MaxX,MaxY;
+};
+<a name="line40"></a>
+typedef struct tPoint
+<a name="line42">{</a>
+<a name="line43">    WORD x,y;</a>
+} Point;
+<a name="line45"></a>
+typedef UBYTE *PLANEPTR;
+<a name="line47"></a>
+struct BitMap
+<a name="line49">{</a>
+<a name="line50">    UWORD   BytesPerRow;</a>
+<a name="line51">    UWORD   Rows;</a>
+<a name="line52">    UBYTE   Flags;</a>
+<a name="line53">    UBYTE   Depth;</a>
+<a name="line54">    UWORD   pad;</a>
+    PLANEPTR Planes[8];
+};
+<a name="line57"></a>
+#define RASSIZE(w,h)	((h)*( ((w)+15)&#062;&#062;3&#038;0xFFFE))
+
+#endif	/* GRAPHICS_GFX_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

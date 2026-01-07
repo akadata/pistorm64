@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/libraries/iffparse.h" NODE="MAIN" TITLE="Includes/libraries/iffparse.h" -->
+<head>
+<title>Includes/libraries/iffparse.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node010A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node010C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef IFF_IFFPARSE_H
+#define IFF_IFFPARSE_H
+/*
+**	$Filename: libraries/iffparse.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 33.1 $
+**	$Date: 90/11/20 $
+**
+**	Structure definitions for the all new good nifty IFF code.
+**
+**	(C) Copyright 1989-1999 Amiga, Inc., Stuart Ferguson and
+**	Leo L. Schwab
+**		All Rights Reserved
+*/
+<a name="line15"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+<a name="line18">#endif</a>
+#ifndef EXEC_LISTS_H
+#include &#060;exec/lists.h&#062;
+<a name="line21">#endif</a>
+#ifndef EXEC_PORTS_H
+#include &#060;exec/ports.h&#062;
+<a name="line24">#endif</a>
+#ifndef DEVICES_CLIPBOARD_H
+#include &#060;devices/clipboard.h&#062;
+#endif
+<a name="line28"></a>
+/*
+ * Struct associated with an active IFF stream.
+ * &#034;iff_Stream&#034; is a value used by the client's read/write/seek functions -
+ * it will not be accessed by the library itself and can have any value
+ * (could even be a pointer or a BPTR).
+<a name="line34"> */</a>
+<a name="line35">struct IFFHandle {</a>
+<a name="line36">	ULONG	iff_Stream;</a>
+<a name="line37">	ULONG	iff_Flags;</a>
+	LONG	iff_Depth;	/*  Depth of context stack.  */
+	/*  There are private fields hiding here.  */
+};
+
+/*
+ * Bit masks for &#034;iff_Flags&#034; field.
+<a name="line44"> */</a>
+<a name="line45">#define IFFF_READ	0L			/* read mode - default */</a>
+<a name="line46">#define IFFF_WRITE	1L			/* write mode */</a>
+<a name="line47">#define IFFF_RWBITS	(IFFF_READ | IFFF_WRITE)	/* read/write bits */</a>
+<a name="line48">#define IFFF_FSEEK	(1L&#060;&#060;1)			/* forward seek only */</a>
+<a name="line49">#define IFFF_RSEEK	(1L&#060;&#060;2)			/* random seek */</a>
+#define	IFFF_RESERVED	0xFFFF0000L		/* Don't touch these bits. */
+<a name="line51"></a>
+/*
+ * When the library calls your stream handler, you'll be passed a pointer
+ * to this structure as the &#034;message packet&#034;.
+<a name="line55"> */</a>
+<a name="line56">struct IFFStreamCmd {</a>
+<a name="line57">	LONG	sc_Command;	/*  Operation to be performed (IFFCMD_)	*/</a>
+<a name="line58">	APTR	sc_Buf;		/*  Pointer to data buffer		*/</a>
+	LONG	sc_NBytes;	/*  Number of bytes to be affected	*/
+};
+<a name="line61"></a>
+/*
+ * A node associated with a context on the iff_Stack.  Each node
+ * represents a chunk, the stack representing the current nesting
+ * of chunks in the open IFF file.  Each context node has associated
+ * local context items in the (private) LocalItems list.  The ID, type,
+ * size and scan values describe the chunk associated with this node.
+<a name="line68"> */</a>
+<a name="line69">struct ContextNode {</a>
+<a name="line70">	struct MinNode	cn_Node;</a>
+<a name="line71">	LONG		cn_ID;</a>
+<a name="line72">	LONG		cn_Type;</a>
+<a name="line73">	LONG		cn_Size;	/*  Size of this chunk		   */</a>
+	LONG		cn_Scan;	/*  # of bytes read/written so far */
+	/*  There are private fields hiding here.  */
+};
+<a name="line77"></a>
+/*
+ * Local context items live in the ContextNode's.  Each class is identified
+ * by its lci_Ident code and has a (private) purge vector for when the
+ * parent context node is popped.
+<a name="line82"> */</a>
+<a name="line83">struct LocalContextItem {</a>
+<a name="line84">	struct MinNode	lci_Node;</a>
+<a name="line85">	ULONG		lci_ID,</a>
+<a name="line86">			lci_Type,</a>
+			lci_Ident;
+	/*  There are private fields hiding here.  */
+};
+<a name="line90"></a>
+/*
+ * StoredProperty: a local context item containing the data stored
+ * from a previously encountered property chunk.
+<a name="line94"> */</a>
+<a name="line95">struct StoredProperty {</a>
+<a name="line96">	LONG	sp_Size;</a>
+	UBYTE	*sp_Data;
+};
+<a name="line99"></a>
+/*
+ * Collection Item: the actual node in the collection list at which
+ * client will look.  The next pointers cross context boundaries so
+ * that the complete list is accessable.
+<a name="line104"> */</a>
+<a name="line105">struct CollectionItem {</a>
+<a name="line106">	struct CollectionItem	*ci_Next;</a>
+<a name="line107">	LONG			ci_Size;</a>
+	UBYTE			*ci_Data;
+};
+
+/*
+ * Structure returned by OpenClipboard().  You may do CMD_POSTs and such
+ * using this structure.  However, once you call OpenIFF(), you may not
+ * do any more of your own I/O to the clipboard until you call CloseIFF().
+<a name="line115"> */</a>
+<a name="line116">struct ClipboardHandle {</a>
+<a name="line117">	struct IOClipReq	cbh_Req;</a>
+<a name="line118">	struct MsgPort		cbh_CBport;</a>
+	struct MsgPort		cbh_SatisfyPort;
+};
+
+/*
+ * IFF return codes.  Most functions return either zero for success or
+ * one of these codes.	The exceptions are the read/write functions which
+ * return positive values for number of bytes or records read or written,
+ * or a negative error code.  Some of these codes are not errors per sae,
+ * but valid conditions such as EOF or EOC (End of Chunk).
+<a name="line128"> */</a>
+<a name="line129">#define	IFFERR_EOF		-1L	/*  Reached logical end of file	*/</a>
+<a name="line130">#define IFFERR_EOC		-2L	/*  About to leave context	*/</a>
+<a name="line131">#define	IFFERR_NOSCOPE		-3L	/*  No valid scope for property	*/</a>
+<a name="line132">#define	IFFERR_NOMEM		-4L	/*  Internal memory alloc failed*/</a>
+<a name="line133">#define	IFFERR_READ		-5L	/*  Stream read error		*/</a>
+<a name="line134">#define	IFFERR_WRITE		-6L	/*  Stream write error		*/</a>
+<a name="line135">#define	IFFERR_SEEK		-7L	/*  Stream seek error		*/</a>
+<a name="line136">#define	IFFERR_MANGLED		-8L	/*  Data in file is corrupt	*/</a>
+<a name="line137">#define	IFFERR_SYNTAX		-9L	/*  IFF syntax error		*/</a>
+<a name="line138">#define	IFFERR_NOTIFF		-10L	/*  Not an IFF file		*/</a>
+<a name="line139">#define	IFFERR_NOHOOK		-11L	/*  No call-back hook provided	*/</a>
+#define IFF_RETURN2CLIENT	-12L	/*  Client handler normal return*/
+
+<a name="line142">#define	MAKE_ID(a,b,c,d)	\</a>
+	((ULONG) (a)&#060;&#060;24 | (ULONG) (b)&#060;&#060;16 | (ULONG) (c)&#060;&#060;8 | (ULONG) (d))
+
+/*
+ * Universal IFF identifiers.
+<a name="line147"> */</a>
+<a name="line148">#define	ID_FORM			MAKE_ID('F','O','R','M')</a>
+<a name="line149">#define	ID_LIST			MAKE_ID('L','I','S','T')</a>
+<a name="line150">#define	ID_CAT			MAKE_ID('C','A','T',' ')</a>
+<a name="line151">#define	ID_PROP			MAKE_ID('P','R','O','P')</a>
+#define	ID_NULL			MAKE_ID(' ',' ',' ',' ')
+
+/*
+ * Ident codes for universally recognized local context items.
+<a name="line156"> */</a>
+<a name="line157">#define IFFLCI_PROP		MAKE_ID('p','r','o','p')</a>
+<a name="line158">#define IFFLCI_COLLECTION	MAKE_ID('c','o','l','l')</a>
+<a name="line159">#define IFFLCI_ENTRYHANDLER	MAKE_ID('e','n','h','d')</a>
+#define IFFLCI_EXITHANDLER	MAKE_ID('e','x','h','d')
+
+/*
+ * Control modes for ParseIFF() function.
+<a name="line164"> */</a>
+<a name="line165">#define IFFPARSE_SCAN		0L</a>
+<a name="line166">#define IFFPARSE_STEP		1L</a>
+#define IFFPARSE_RAWSTEP	2L
+
+/*
+ * Control modes for StoreLocalItem().
+<a name="line171"> */</a>
+<a name="line172">#define IFFSLI_ROOT		1L	/*  Store in default context	   */</a>
+<a name="line173">#define IFFSLI_TOP		2L	/*  Store in current context	   */</a>
+#define IFFSLI_PROP		3L	/*  Store in topmost FORM or LIST  */
+
+/*
+ * &#034;Flag&#034; for writing functions.  If you pass this value in as a size
+ * to PushChunk() when writing a file, the parser will figure out the
+ * size of the chunk for you.  (Chunk sizes &#062;= 2**31 are forbidden by the
+ * IFF specification, so this works.)
+<a name="line181"> */</a>
+#define	IFFSIZE_UNKNOWN		-1L
+
+/*
+ * Possible call-back command values.  (Using 0 as the value for IFFCMD_INIT
+ * was, in retrospect, probably a bad idea.)
+<a name="line187"> */</a>
+<a name="line188">#define	IFFCMD_INIT	0	/*  Prepare the stream for a session	*/</a>
+<a name="line189">#define	IFFCMD_CLEANUP	1	/*  Terminate stream session		*/</a>
+<a name="line190">#define	IFFCMD_READ	2	/*  Read bytes from stream		*/</a>
+<a name="line191">#define	IFFCMD_WRITE	3	/*  Write bytes to stream		*/</a>
+<a name="line192">#define	IFFCMD_SEEK	4	/*  Seek on stream			*/</a>
+<a name="line193">#define	IFFCMD_ENTRY	5	/*  You just entered a new context	*/</a>
+<a name="line194">#define	IFFCMD_EXIT	6	/*  You're about to leave a context	*/</a>
+#define	IFFCMD_PURGELCI	7	/*  Purge a LocalContextItem		*/
+
+<a name="line197">/*  Backward compatibility.  Don't use these in new code.  */</a>
+<a name="line198">#define	IFFSCC_INIT	IFFCMD_INIT</a>
+<a name="line199">#define	IFFSCC_CLEANUP	IFFCMD_CLEANUP</a>
+<a name="line200">#define	IFFSCC_READ	IFFCMD_READ</a>
+<a name="line201">#define	IFFSCC_WRITE	IFFCMD_WRITE</a>
+#define	IFFSCC_SEEK	IFFCMD_SEEK
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/appwindow.c" NODE="MAIN" TITLE="Lib_examples/appwindow.c" -->
+<head>
+<title>Lib_examples/appwindow.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05C1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05C3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* This example shows how to create an AppWindow and obtain arguments
+ * from Workbench when the user drops an icon into it.  The AppWindow
+ * will appear on the Workbench screen with the name &#034;AppWindow&#034; and
+ * will run until the window's close gadget is selected.  If any icons
+ * are dropped into the AppWindow, the program prints their arguments in
+ * the Shell window.
+ */
+
+/* appwindow.c - Compiled under SAS C 5.10 with lc -L appwindow.c           */
+/* Requires Kickstart version 37 or later.  Works from the Shell (CLI) only */
+
+#include &#060;exec/types.h&#062;          /* Need this for the Amiga variable types  */
+#include &#060;workbench/workbench.h&#062; /* This has DiskObject and AppWindow       */
+#include &#060;workbench/startup.h&#062;   /* This has WBStartup and WBArg structs    */
+#include &#060;exec/libraries.h&#062;      /* Need this to check library versions     */
+
+#include &#060;stdio.h&#062;
+
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/wb_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }   /* Disable SAS Lattice CTRL/C handling */
+int chkabort(void) { return(0); }/* really */
+#endif
+
+struct Library      *IntuitionBase;
+struct Library      *WorkbenchBase;
+
+void main(int argc, char **argv)
+{
+  struct MsgPort *awport;
+  struct Window  *win;
+  struct AppWindow *appwin;
+  struct IntuiMessage *imsg;
+  struct AppMessage *amsg;
+  struct WBArg   *argptr;
+
+  ULONG           winsig, appwinsig, signals, id = 1, userdata = 0;
+  BOOL            done = FALSE;
+  int             i;
+
+  if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 37))
+    {
+    if (WorkbenchBase = OpenLibrary(&#034;workbench.library&#034;, 37))
+      {
+      /* The CreateMsgPort() function is in Exec version 37 and later only */
+      if (awport = CreateMsgPort())
+         {
+         if (win = OpenWindowTags(NULL,
+                                  WA_Width, 200,        WA_Height, 50,
+                                  WA_IDCMP, CLOSEWINDOW,
+                                  WA_Flags, WINDOWCLOSE | WINDOWDRAG,
+                                  WA_Title, &#034;AppWindow&#034;,
+                                  TAG_DONE))
+          {
+          if (appwin = AddAppWindow(id, userdata, win, awport, NULL))
+            {
+            printf(&#034;AppWindow added... Drag files into AppWindow\n&#034;);
+            winsig    = 1L &#060;&#060; win-&#062;UserPort-&#062;mp_SigBit;
+            appwinsig = 1L &#060;&#060; awport-&#062;mp_SigBit;
+
+            while (! done)
+              {
+              /* Wait for IDCMP messages and AppMessages */
+              signals = Wait( winsig | appwinsig );
+
+              if(signals &#038; winsig)      /* Got an IDCMP message */
+                {
+                while (imsg = (struct IntuiMessage *) GetMsg(win-&#062;UserPort))
+                  {
+                  if (imsg-&#062;Class = CLOSEWINDOW)   done = TRUE;
+                  ReplyMsg((struct Message *) imsg);
+                  }
+                }
+              if(signals &#038; appwinsig)   /* Got an AppMessage */
+                {
+                while (amsg = (struct AppMessage *) GetMsg(awport))
+                  {
+                  printf(&#034;AppMsg: Type=%ld, ID=%ld, NumArgs=%ld\n&#034;,
+                           amsg-&#062;am_Type, amsg-&#062;am_ID, amsg-&#062;am_NumArgs);
+                  argptr = amsg-&#062;am_ArgList;
+                  for (i = 0; i &#060; amsg-&#062;am_NumArgs; i++)
+                    {
+                    printf(&#034;   arg(%ld): Name='%s', Lock=%lx\n&#034;,
+                             i, argptr-&#062;wa_Name, argptr-&#062;wa_Lock);
+                    argptr++;
+                    }
+                  ReplyMsg((struct Message *) amsg);
+                  }
+                }
+              }     /* done */
+            RemoveAppWindow(appwin);
+            }
+          CloseWindow(win);
+	  }
+        /* Make sure there are no more outstanding messages */
+        while(amsg = (struct AppMessage *)GetMsg(awport))
+              ReplyMsg((struct Message *)amsg);
+        DeleteMsgPort(awport);
+        }
+      CloseLibrary(WorkbenchBase);
+      }
+    CloseLibrary(IntuitionBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

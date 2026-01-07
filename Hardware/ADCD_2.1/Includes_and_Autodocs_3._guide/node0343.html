@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="icon" NODE="AddFreeList()" TITLE="icon.library/AddFreeList" -->
+<head>
+<title>icon.library/AddFreeList</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0342.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0344.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AddFreeList - add memory to a free list.
+
+<b>   SYNOPSIS</b>
+	status = AddFreeList(free, mem, len)
+	  D0                  A0    A1   A2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> AddFreeList(struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line85">FreeList</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a>, ULONG);
+
+<b>   FUNCTION</b>
+	This routine adds the specified memory to the free list.
+	The free list will be extended (if required).  If there
+	is not enough memory to complete the call, NULL is returned.
+
+	Note that AddFreeList() does NOT allocate the requested memory.
+	It only records the memory in the free list.
+
+<b>   INPUTS</b>
+	free -- a pointer to a <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line85">FreeList</a> structure
+	mem -- the base of the memory to be recorded
+	len -- the length of the memory to be recorded
+
+<b>   RESULTS</b>
+	status -- TRUE if the call succeeded else FALSE;
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01E6.html">exec.library/AllocEntry</a>
+	<a href="../Includes_and_Autodocs_3._guide/node020D.html">exec.library/FreeEntry</a>
+	<a href="../Includes_and_Autodocs_3._guide/node034B.html">icon.library/FreeFreeList</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05D6.html">workbench/workbench.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

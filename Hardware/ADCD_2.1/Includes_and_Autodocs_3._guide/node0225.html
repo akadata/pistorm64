@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="Procure()" TITLE="exec.library/Procure" -->
+<head>
+<title>exec.library/Procure</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0224.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0226.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	Procure -- bid for a semaphore                                   (V39)
+
+<b>   SYNOPSIS</b>
+	Procure(semaphore, bidMessage)
+		A0	    A1
+
+	VOID Procure(struct <a href="../Includes_and_Autodocs_3._guide/node0647.html#line39">SignalSemaphore</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node0647.html#line50">SemaphoreMessage</a> *);
+
+<b>   FUNCTION</b>
+	This function is used to obtain a semaphore in an async manner.
+	Like <a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a>, it will obtain a <a href="../Includes_and_Autodocs_3._guide/node0647.html#line39">SignalSemaphore</a> for you
+	but unlike <a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a>, you will not block until you get
+	the semaphore.  Procure() will just post a request for the semaphore
+	and will return.  When the semaphore is available (which could
+	be at any time) the bidMessage will <a href="../Includes_and_Autodocs_3._guide/node0235.html">ReplyMsg()</a> and you will own
+	the semaphore.  This lets you wait on multiple semaphores at once
+	and to continue processing while waiting for the semaphore.
+
+	NOTE:  Pre-V39, Procure() and <a href="../Includes_and_Autodocs_3._guide/node0245.html">Vacate()</a> did not work correctly.
+	They also did not operate on <a href="../Includes_and_Autodocs_3._guide/node0647.html#line39">SignalSemaphore</a> semaphores.
+	Old (and broken) MessageSemaphore use as of V39 will no longer work.
+
+<b>   INPUT</b>
+	semaphore - The <a href="../Includes_and_Autodocs_3._guide/node0647.html#line39">SignalSemaphore</a> that you wish to Procure()
+	bidMessage- The <a href="../Includes_and_Autodocs_3._guide/node0647.html#line50">SemaphoreMessage</a> that you wish replied when
+		you obtain access to the semaphore.  The message's
+		ssm_Semaphore field will point at the semaphore that
+		was obtained.  If the ssm_Semaphore field is NULL,
+		the Procure() was aborted via <a href="../Includes_and_Autodocs_3._guide/node0245.html">Vacate()</a>.
+		The mn_ReplyPort field of the message must point to
+		a valid message port.
+		To obtain a shared semaphore, the ln_Name field
+		must be set to 1.  For an exclusive lock, the ln_Name
+		field must be 0.  No other values are valid.
+
+<b>   BUGS</b>
+	Before V39, Procure() and <a href="../Includes_and_Autodocs_3._guide/node0245.html">Vacate()</a> used a different semaphore
+	system that was very broken.  This new system is only available
+	as of V39 even though the LVOs are the same.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node021F.html">ObtainSemaphoreShared()</a>, <a href="../Includes_and_Autodocs_3._guide/node0217.html">InitSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node0228.html">ReleaseSemaphore()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node01EC.html">AttemptSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node021E.html">ObtainSemaphoreList()</a>, <a href="../Includes_and_Autodocs_3._guide/node0245.html">Vacate()</a>, <a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

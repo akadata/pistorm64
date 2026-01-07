@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="ExAllEnd()" TITLE="dos.library/ExAllEnd" -->
+<head>
+<title>dos.library/ExAllEnd</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node015A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node015C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ExAllEnd -- Stop an <a href="../Includes_and_Autodocs_3._guide/node015A.html">ExAll()</a> (V39)
+
+<b>   SYNOPSIS</b>
+	ExAllEnd(lock, buffer, size, type, control)
+	          D1     D2     D3    D4     D5
+
+	ExAllEnd(BPTR,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,struct <a href="../Includes_and_Autodocs_3._guide/node0608.html#line69">ExAllControl</a> *)
+
+<b>   FUNCTION</b>
+	Stops an <a href="../Includes_and_Autodocs_3._guide/node015A.html">ExAll()</a> on a directory before it hits NO_MORE_ENTRIES.
+	The full set of arguments that had been passed to <a href="../Includes_and_Autodocs_3._guide/node015A.html">ExAll()</a> must be
+	passed to ExAllEnd(), so it can handle filesystems that can't abort
+	an <a href="../Includes_and_Autodocs_3._guide/node015A.html">ExAll()</a> directly.
+
+<b>   INPUTS</b>
+	lock    - <a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock</a> on directory to be examined.
+	buffer  - Buffer for data returned (MUST be at least word-aligned,
+		  preferably long-word aligned).
+	size    - Size in bytes of 'buffer'.
+	type    - Type of data to be returned.
+	control - Control data structure (see notes above).  MUST have been
+		  allocated by AllocDosObject!
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node015A.html">ExAll()</a>, <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

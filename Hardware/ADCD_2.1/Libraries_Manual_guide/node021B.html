@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-3-1-2" TITLE="12 / / The Boopsi Gadget Methods / GM_HITTEST" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / The Boopsi Gadget Methods / GM_HITTEST</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node021A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node021C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When Intuition gets a left mouse button click in a window, one of the
+things it does is check through the window's list of gadgets to see if
+that click was inside the bounds of a gadget's <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure (using the
+<a href="../Libraries_Manual_guide/node0149.html#line33">LeftEdge</a>, <a href="../Libraries_Manual_guide/node0149.html#line33">TopEdge</a>, <a href="../Libraries_Manual_guide/node0149.html#line33">Width</a>, and <a href="../Libraries_Manual_guide/node0149.html#line33">Height</a> fields).  If it was (and that gadget
+is a Boopsi gadget), Intuition sends that gadget a GM_HITTEST message
+<a name="line7">(defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D3.html#line174">gadgetclass.h</a>&#062;):</a>
+
+    struct gpHitTest
+    {
+        ULONG             MethodID;     /* GM_HITTEST   */
+        struct GadgetInfo *gpht_GInfo;
+        struct
+        {
+            WORD X;     /* Is this point inside of the gadget? */
+            WORD Y;
+        } gpht_Mouse;
+    };
+
+This message contains the coordinates of the mouse click.  These
+coordinates are relative to the upper-left of the gadget (<a href="../Libraries_Manual_guide/node0149.html#line33">LeftEdge</a>,
+<a name="line22"><a href="../Libraries_Manual_guide/node0149.html#line33">TopEdge</a>).</a>
+
+Because Intuition can only tell if the user clicked inside gadget's
+&#034;bounding box&#034;, Intuition only knows that the click was close to the
+gadget.  Intuition uses the GM_HITTEST to ask the gadget if the click was
+really inside the gadget.  The gadget returns GMR_GADGETHIT (defined in
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D3.html#line183">gadgetclass</a>&#062;) to tell Intuition that the user hit it,
+otherwise it returns zero.  This method allows a gadget to be any shape or
+pattern, rather than just rectangular.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/layers.h" NODE="MAIN" TITLE="Includes/graphics/layers.h" -->
+<head>
+<title>Includes/graphics/layers.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00C5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_LAYERS_H
+#define	GRAPHICS_LAYERS_H
+/*
+**	$Filename: graphics/layers.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_LISTS_H
+#include &#060;exec/lists.h&#062;
+#endif
+<a name="line18"></a>
+#ifndef EXEC_SEMAPHORES_H
+#include &#060;exec/semaphores.h&#062;
+#endif
+<a name="line22"></a>
+<a name="line23">#define LAYERSIMPLE	1</a>
+<a name="line24">#define LAYERSMART	2</a>
+<a name="line25">#define LAYERSUPER	4</a>
+<a name="line26">#define LAYERUPDATING	0x10</a>
+<a name="line27">#define LAYERBACKDROP	0x40</a>
+<a name="line28">#define LAYERREFRESH	0x80</a>
+#define LAYER_CLIPRECTS_LOST	0x100	/* during BeginUpdate */
+					/* or during layerop */
+<a name="line31">					/* this happens if out of memory */</a>
+#define LMN_REGION	-1
+<a name="line33"></a>
+struct Layer_Info
+<a name="line35">{</a>
+<a name="line36">    struct Layer *top_layer;</a>
+<a name="line37">    struct Layer *check_lp;	    /* system use */</a>
+<a name="line38">    struct ClipRect *obs;	    /* system use */</a>
+<a name="line39">	struct MinList	FreeClipRects;</a>
+<a name="line40">	struct SignalSemaphore Lock;</a>
+<a name="line41">	struct List gs_Head;			/* system use */</a>
+<a name="line42">	LONG	longreserved;</a>
+<a name="line43">	UWORD	Flags;</a>
+<a name="line44">	BYTE	fatten_count;</a>
+<a name="line45">	BYTE	LockLayersCount;</a>
+<a name="line46">    UWORD  LayerInfo_extra_size;</a>
+<a name="line47">    WORD	*blitbuff;</a>
+    VOID	*LayerInfo_extra;
+};
+<a name="line50"></a>
+<a name="line51">#define NEWLAYERINFO_CALLED 1</a>
+#define ALERTLAYERSNOMEM 0x83010000
+
+#endif	/* GRAPHICS_LAYERS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

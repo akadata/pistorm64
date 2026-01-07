@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="CLUT-3" TITLE="ILBM.CLUT.DOC / Specifications " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>ILBM.CLUT.DOC / Specifications </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0276.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0278.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* Here is the IFF chunk ID macro for a CLUT chunk */
+
+#define ID_CLUT MakeID('C','L','U','T')
+
+/*
+ * Defines for different flavors of 8-bit CLUTs.
+ */
+#define CLUT_MONO       0L   /* A Monochrome, contrast or intensity LUT */
+#define CLUT_RED        1L   /* A LUT for reds               */
+#define CLUT_GREEN      2L   /* A LUT for greens             */
+#define CLUT_BLUE       3L   /* A LUT for blues              */
+#define CLUT_HUE        4L   /* A LUT for hues               */
+#define CLUT_SAT        5L   /* A LUT for saturations        */
+#define CLUT_UNUSED6    6L   /* How about a Signed Data flag */
+#define CLUT_UNUSED7    7L   /* Or an Assumed Negative flag  */
+
+/* All types &#062; 7 are reserved until formally claimed */
+#define CLUT_RESERVED_BITS 0xfffffff8L
+
+/* The struct for Color Look-Up-Tables of all types */
+typedef struct
+{
+  ULONG type;		/* See above type defines */
+  ULONG res0;		/* RESERVED FOR FUTURE EXPANSION */
+  UBYTE lut[256];	/* The 256 byte look up table */
+} ColorLUT;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

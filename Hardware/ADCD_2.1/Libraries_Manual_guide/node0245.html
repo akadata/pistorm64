@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_14" NODE="14-4" TITLE="14 Workbench and Icon Library / The Workbench Library" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>14 Workbench and Icon Library / The Workbench Library</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0244.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0246.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Workbench arguments are sent to an application when it is started. There
+are also special facilities in Release 2 of Workbench that allow an
+application that is already running to get additional arguments.  These
+<a name="line5">special facilities are known as AppWindow, AppIcon and AppMenuItem.</a>
+
+An <a href="../Includes_and_Autodocs_2._guide/node0135.html#line142">AppWindow</a> is a special kind of window that allows the user to drag
+icons into it.  Applications that set up an AppWindow will receive a
+message from Workbench whenever the user moves an icon into the AppWindow.
+The message contains the name of the file or directory that the icon
+<a name="line11">represents.</a>
+
+An <a href="../Includes_and_Autodocs_2._guide/node0135.html#line142">AppIcon</a> is similar to an AppWindow.  It is a special type of icon that
+allows the user to drag other icons on top of it.  Like AppWindows, an
+application that sets up an AppIcon will receive a message from Workbench
+whenever the user moves another icon on top of the AppIcon.  The message
+<a name="line17">contains the name of the file or directory that the moved icon represents.</a>
+
+An <a href="../Includes_and_Autodocs_2._guide/node0135.html#line142">AppMenuItem</a> allows an application to add a custom menu item to the
+usual set of menu choices supported by Workbench.  An application that
+sets up an AppMenuItem will receive a message from Workbench whenever the
+<a name="line22">user picks that item from the Workbench menus.</a>
+
+When an application receives the messages described above, the message
+will include struct <a href="../Libraries_Manual_guide/node023E.html#line40">WBArg</a> *am_ArgList containing the names (<a href="../Libraries_Manual_guide/node023E.html#line49">wa_Name</a>) and
+directory locks (<a href="../Libraries_Manual_guide/node023E.html#line49">wa_Lock</a>) of all selected icons that were passed as
+arguments by the user.  This am_ArgList has the same format as the
+<a href="../Libraries_Manual_guide/node023E.html#line36">sm_ArgList</a> of a <a href="../Libraries_Manual_guide/node023E.html">WBStartup</a> message.
+
+ <a href="../Libraries_Manual_guide/node0246.html">Workbench Library Functions</a>    <a href="../Libraries_Manual_guide/node05C1.html">An AppMenuItem Example</a> 
+ <a href="../Libraries_Manual_guide/node05C0.html">An AppIcon Example</a>             <a href="../Libraries_Manual_guide/node05C2.html">An AppWindow Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

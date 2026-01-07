@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_37" NODE="37-2-1-1" TITLE="37 / / Hook Structure And Function / Simple Callback Hook Usage" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>37 / / Hook Structure And Function / Simple Callback Hook Usage</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04A3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04A5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A <a href="../Libraries_Manual_guide/node04A3.html">Hook</a> function must accept the following three parameters in these
+specific registers:
+
+
+      A0 - Pointer to the <a href="../Libraries_Manual_guide/node04A3.html">Hook</a> structure.
+      A2 - Pointer to an object to manipulate. The object is
+           context specific.
+      A1 - Pointer to a message packet. This is also context
+           specific.
+
+
+For a callback function written in C, the parameters should appear in this
+order:
+
+    myCallbackFunction(Pointer to Hook (A0),
+                       Pointer to Object (A2),
+                       Pointer to message (A1));
+
+This is because the standard C stub pushes the parameters onto the stack
+in the following order: A1, A2, A0.  The following assembly language
+routine is a callback stub for C:
+
+    INCLUDE 'exec/types.i'
+    INCLUDE 'utility/hooks.i'
+
+    xdef        _hookEntry
+
+    _hookEntry:
+        move.l  a1,-(sp)                ; push message packet pointer
+        move.l  a2,-(sp)                ; push object pointer
+        move.l  a0,-(sp)                ; push hook pointer
+        move.l  h_SubEntry(a0),a0       ; fetch actual Hook entry point ...
+        jsr     (a0)                    ; and call it
+        lea     12(sp),sp               ; fix stack
+        rts
+
+If your C compiler supports registerized parameters, your callback
+functions can get the parameters directly from the CPU registers instead
+of having to use a stub to push them on the stack.  The following C
+language routine uses registerized parameters to put parameters in the
+right registers.  This routine requires a C compiler that supports
+registerized parameters.
+
+    #include &#060;exec/types.h&#062;
+    #include &#060;utility/hooks.h&#062;
+
+    #define     ASM     __asm
+    #define     REG(x)  register __ ## x
+
+    /* This function converts register-parameter hook calling
+     * convention into standard C conventions.  It requires a C
+     * compiler that supports registerized parameters, such as
+     * SAS/C 5.xx or greater.
+     */
+    ULONG ASM
+    hookEntry(REG(a0) struct Hook *h, REG(a2) VOID *o, REG(a1) VOID *msg)
+    {
+        return ((*h-&#062;h_SubEntry)(h, o, msg));
+    }
+
+A callback function is executed on the context of the module that invoked
+it.  This usually means that callback functions cannot call functions that
+need to look at environment specific data.  For example, <a href="../Includes_and_Autodocs_2._guide/node0162.html">printf()</a> needs to
+look at the current process's input and output stream.  Entities like
+Intuition have no input and output stream.  This also means that in order
+for the function to access any of its global data, it needs to make sure
+the CPU can find the function's data segment.  It does this by forcing the
+function to load the offset for the program's data segment into CPU
+register A4.  See your compiler documentation for details.
+
+The following is a simple function that can be used in a callback hook.
+
+    ULONG MyFunction (struct Hook *h, VOID *o, VOID *msg)
+    {
+        /* A SASC and Manx function that obtains access to the global
+           data segment */
+        geta4();
+
+        /* Debugging function to send a string to the serial port */
+        KPrintF(&#034;Inside MyFunction()\n&#034;);
+
+        return (1);
+    }
+
+The next step is to initialize the <a href="../Libraries_Manual_guide/node04A3.html">Hook</a> for use.  This basically means
+that the fields of the Hook structure must be filled with appropriate
+values.
+
+The following simple function initializes a <a href="../Libraries_Manual_guide/node04A3.html">Hook</a> structure.
+
+    /* This simple function is used to initialize a Hook */
+    VOID InitHook (struct Hook *h, ULONG (*func)(), VOID *data)
+    {
+        /* Make sure a pointer was passed */
+        if (h)
+        {
+            /* Fill in the hook fields */
+            h-&#062;h_Entry = (ULONG (*)()) hookEntry;
+            h-&#062;h_SubEntry = func;
+            h-&#062;h_Data = data;
+        }
+    }
+
+The following is a simple example of a callback hook function.
+
+     <a href="../Libraries_Manual_guide/node05C5.html">hooks1.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

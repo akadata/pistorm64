@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_12" NODE="12-2-1" TITLE="12 / Device Interface / Opening The Serial Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>12 / Device Interface / Opening The Serial Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node009C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node009E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Three primary steps are required to open the serial device:
+
+   *  Create a message port using <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>. Reply messages from the
+      device must be directed to a message port.
+
+   *  Create an extended I/O request structure of type IOExtSer using
+      <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>. CreateExtIO() will initialize the I/O request to point
+      to your reply port.
+
+   *  Open the serial device.  Call <a href="../Includes_and_Autodocs_2._guide/node04D4.html">OpenDevice()</a>, passing the I/O request.
+
+   struct MsgPort  *SerialMP;          /* Define storage for one pointer */
+   struct IOExtSer *SerialIO;         /* Define storage for one pointer */
+
+   if (SerialMP=CreatePort(0,0) )
+       if (SerialIO=(struct IOExtSer *)
+              CreateExtIO(SerialMP,sizeof(struct IOExtSer)) )
+<a name="line19">           SerialIO-&#062;io_SerFlags=SERF_SHARED;  /* Turn on SHARED mode */</a>
+           if (OpenDevice(SERIALNAME,0L,(struct IORequest *)SerialIO,0) )
+               printf(&#034;%s did not open\n&#034;,SERIALNAME);
+<a name="line22"></a>
+During the open, the serial device pays attention to a subset of the flags
+in the io_SerFlags field.  The flag bits, <a href="../Devices_Manual_guide/node00A7.html#line20">SERF_SHARED</a> and <a href="../Devices_Manual_guide/node00A7.html#line57">SERF_7WIRE</a>, must
+be set before open.  For consistency, the other flag bits should also be
+<a name="line26">properly set.  Full descriptions of all flags will be given later.</a>
+
+The serial device automatically fills in default settings for all
+parameters - stop bits, parity, baud rate, etc.  For the default unit, the
+settings will come from Preferences.  You may need to change certain
+parameters, such as the baud rate, to match your requirements. Once the
+serial device is opened, all characters received will be buffered, even if
+there is no current request for them.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

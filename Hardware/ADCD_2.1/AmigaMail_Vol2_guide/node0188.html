@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="II-113/multilist.c" NODE="MAIN" TITLE="II-113/multilist.c" -->
+<head>
+<title>II-113/multilist.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0187.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0189.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* multilist.c -- execute me to compile me
+sc data=near nominc strmer streq nostkchk saveds ign=73 multilist
+slink FROM LIB:c.o multilist.o TO multilist LIB LIB:sc.lib LIB:amiga.lib
+quit
+*/
+
+/* This example illustrates how to scan DOS file names without      */
+/* having to make a special case for assigns and multiassigns.      */
+/* The DoAllAssigns() routine accepts an arbitrary dos path and     */
+/* a pointer to a function.  DoAllAssigns() will call this function */
+/* passing it a lock to the object named in the path.               */
+
+#define BUFSIZE 1024
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;dos/dosextens.h&#062;
+#include &#060;dos/exall.h&#062;
+
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;strings.h&#062;
+
+BOOL DoAllAssigns(char *, BOOL (*)());
+BOOL ListContents(BPTR);
+
+extern struct DosLibrary *DOSBase;
+
+
+void main(int argc, char **argv)
+{
+    if (DOSBase-&#062;dl_lib.lib_Version &#062;= 37)
+    {
+        if (argc &#062; 1)
+        {
+            (void) DoAllAssigns(argv[1], &#038;ListContents);
+        }
+    }
+}
+
+       /* Pass this routine a directory lock and it prints the names of the  */
+       /* files and directories in that directory.  If you pass this routine */
+       /* a file lock, it just prints the file's name.                       */
+BOOL ListContents(BPTR lock)
+{
+    struct ExAllControl  *myeac;
+    struct ExAllData     *myead;
+    APTR                 buffer;
+    BOOL                 done;
+    struct FileInfoBlock *myfib;
+
+    if (myfib = AllocDosObject(DOS_FIB, NULL))
+    {
+        if (Examine(lock, myfib) == DOSTRUE)
+        {
+            if (myfib-&#062;fib_DirEntryType &#062; 0)
+            {
+                if (buffer = AllocVec(BUFSIZE, MEMF_PUBLIC))
+                {
+                    if (myeac = AllocDosObject(DOS_EXALLCONTROL, NULL))
+                    {
+                        myeac-&#062;eac_LastKey = 0;
+
+                        do
+                        {
+                            done = ExAll(lock, buffer, BUFSIZE, ED_NAME, myeac);
+                            myead = buffer;
+                            while (myead)
+                            {
+                                printf(&#034;%s\n&#034;, myead-&#062;ed_Name);
+                                myead = myead-&#062;ed_Next;
+                            }
+                        } while (done != 0);
+                        FreeDosObject(DOS_EXALLCONTROL, myeac);
+                    }
+                    FreeVec(buffer);
+                }
+            }
+            else printf(&#034;%s\n&#034;, myfib-&#062;fib_FileName);
+        }
+        FreeDosObject(DOS_FIB, myfib);
+    }
+    return TRUE;
+}
+
+
+
+/* This routine accepts a path string that may include a device name. From   */
+/* that string, this routine locks the object named in the path and calls    */
+/* the function passback_func() on the lock.  DoAllAssigns() should work on  */
+/* paths with assigns and multiassigns, as well as a filesystem-based device */
+/* (i.e. df0:, work:, ram:, etc.)                                            */
+
+BOOL DoAllAssigns(char *dos_path, BOOL (*passback_func)(BPTR lock))
+{
+    struct DevProc *dp=NULL;
+    struct MsgPort *old_fsport;
+    BPTR           lock, old_curdir;
+    char           *rest_of_path;
+
+
+    while(dp = GetDeviceProc(dos_path, dp))
+    {                                        /* I need to cut the device name from  */
+        rest_of_path = strchr(dos_path,':'); /* the front of dos_path so I can give */
+                                             /* that substring to Lock().           */
+        if (rest_of_path == NULL)                 /* There was no device name to    */
+            rest_of_path = dos_path;              /* cut off, use the whole string. */
+        else
+            rest_of_path++;     /* Increment string pointer to just past the colon. */
+
+
+
+        old_fsport = SetFileSysTask(dp-&#062;dvp_Port); /* in case dp-&#062;dvp_Lock is NULL. */
+        old_curdir = CurrentDir(dp-&#062;dvp_Lock);     /* Lock() locks relative to the  */
+                                /* current directory and falls back to the root of  */
+                                /* the current file system if dp-&#062;dvp_Lock is NULL. */
+
+        lock = Lock(rest_of_path,SHARED_LOCK);
+
+        (void) SetFileSysTask(old_fsport); /* reset the process' default filesystem */
+        (void) CurrentDir(old_curdir);     /* port and current dir to their initial */
+                                           /* values for clean up later.            */
+
+        if (lock)
+        {
+            if (!(*passback_func)(lock))
+            {
+                printf(&#034;function returned false\n&#034;);
+                UnLock(lock);         /* UnLock() will ignore NULL lock */
+                FreeDeviceProc(dp);
+                return FALSE;
+            }
+            UnLock(lock);
+        }
+    }
+    if (IoErr() == ERROR_NO_MORE_ENTRIES)
+        return TRUE;               /* At present, a bug in DOS prevents this case, */
+    else                           /* so DoAllAssigns() always returns FALSE.      */
+        return FALSE;
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

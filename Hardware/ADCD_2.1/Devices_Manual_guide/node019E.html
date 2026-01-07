@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Read_Keyboard_Matrix.c" NODE="MAIN" TITLE="Devices/Dev_examples/Read_Keyboard_Matrix.c" -->
+<head>
+<title>Devices/Dev_examples/Read_Keyboard_Matrix.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node019D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node019F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Read_Keyboard_Matrix.c
+ *
+ * Compile with SAS C 5.10  lc -b1 -cfistq -v -y -L
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/libraries.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;devices/keyboard.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }     /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+/*
+ * There are keycodes from 0x00 to 0x7F, so the matrix needs to be
+ * of 0x80 bits in size, or 0x80/8 which is 0x10 or 16 bytes...
+ */
+#define MATRIX_SIZE 16L
+
+/*
+ * This assembles the matrix for display that translates directly
+ * to the RAW key value of the key that is up or down
+ */
+
+VOID Display_Matrix(UBYTE *keyMatrix)
+{
+SHORT  bitcount;
+SHORT  bytecount;
+SHORT   mask;
+USHORT twobyte;
+
+printf(&#034;\n    0 1 2 3 4 5 6 7&#034;);
+printf(&#034;\n  +-----------------&#034;);
+for (bitcount=0;bitcount&#060;16;bitcount++)
+    {
+    printf(&#034;\n%x |&#034;,bitcount);
+    mask=1 &#060;&#060; bitcount;
+    for (bytecount=0;bytecount&#060;16;bytecount+=2)
+        {
+        twobyte=keyMatrix[bytecount] | (keyMatrix[bytecount+1] &#060;&#060; 8);
+        if (twobyte &#038; mask)
+            printf(&#034; *&#034;);
+        else
+            printf(&#034; -&#034;);
+        }
+    }
+printf(&#034;\n\n&#034;);
+}
+
+
+void main(int argc, char *argv[])
+{
+extern struct Library *SysBase;
+struct IOStdReq *KeyIO;
+struct MsgPort  *KeyMP;
+UBYTE    *keyMatrix;
+
+if (KeyMP=CreatePort(NULL,NULL))
+  {
+  if (KeyIO=(struct IOStdReq *)CreateExtIO(KeyMP,sizeof(struct IOStdReq)))
+    {
+    if (!OpenDevice(&#034;keyboard.device&#034;,NULL,(struct IORequest *)KeyIO,NULL))
+      {
+      if (keyMatrix=AllocMem(MATRIX_SIZE,MEMF_PUBLIC|MEMF_CLEAR))
+        {
+         KeyIO-&#062;io_Command=KBD_READMATRIX;
+         KeyIO-&#062;io_Data=(APTR)keyMatrix;
+         KeyIO-&#062;io_Length= SysBase-&#062;lib_Version &#062;= 36 ? MATRIX_SIZE : 13;
+         DoIO((struct IORequest *)KeyIO);
+
+        /* Check for CLI startup... */
+        if (argc)
+            Display_Matrix(keyMatrix);
+
+        FreeMem(keyMatrix,MATRIX_SIZE);
+        }
+    else
+          printf(&#034;Error: Could not allocate keymatrix memory\&#034;);
+
+      CloseDevice((struct IORequest *)KeyIO);
+      }
+      else
+        printf(&#034;Error: Could not open keyboard.device\n&#034;);
+
+    DeleteExtIO((struct IORequest *)KeyIO);
+    }
+    else
+      printf(&#034;Error: Could not create I/O request\n&#034;);
+
+  DeletePort(KeyMP);
+  }
+  else
+    printf(&#034;Error: Could not create message port\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

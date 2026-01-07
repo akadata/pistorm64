@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_4" NODE="4-4" TITLE="4 Console Device / Writing to the Console Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>4 Console Device / Writing to the Console Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0089.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node008B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You write to the console device by passing an I/O request to the device
+with a pointer to the write buffer set in io_Data, the number of bytes in
+the buffer set in io_Length and <a href="../Includes_and_Autodocs_2._guide/node0508.html">CMD_WRITE</a> set in io_Command.
+
+    UBYTE *outstring= &#034;Make it so.&#034;;
+
+    ConsIO-&#062;io_Data = outstring;
+    ConsIO-&#062;io_Length = strlen(outstring);
+    ConsIO-&#062;io_Command = CMD_WRITE;
+    DoIO(ConsIO);
+
+You may also send NULL-terminated strings to the console device in the
+same manner except that io_Length must be set to -1.
+
+    ConsIO-&#062;io_Data = &#034;\033[3mOh boy.&#034;;
+    ConsIO-&#062;io_Length = -1;
+    ConsIO-&#062;io_Command = CMD_WRITE;
+    DoIO(ConsIO);
+
+The fragment above will output the string &#034;Oh boy.&#034; in italics.  Keep in
+mind that setting the text rendition to italics will remain in effect
+until you specifically instruct the console device to change it to another
+text style.
+
+ <a href="../Devices_Manual_guide/node008B.html">Hints For Writing Text</a> 
+ <a href="../Devices_Manual_guide/node008C.html">Control Sequences For Window Output</a> 
+ <a href="../Devices_Manual_guide/node008E.html">Example Console Control Sequences</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_SMUS" NODE="16-5-3-7" TITLE=" Standard Data and Property Chunks / Set Instrument SEvent " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Data and Property Chunks / Set Instrument SEvent </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02B8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02BA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+One of the running state variables of every track is an instrument number.
+An instrument number is the array index of an &#034;instrument register&#034;, which
+in turn points to an instrument.  (See &#034;<a href="../Devices_Manual_guide/node02B0.html">Instrument Registers</a>&#034;, in section
+2.) This is like a color number in a bitmap; a reference to a color
+through a &#034;color register&#034;.
+
+The initial setting for each track's instrument number is the track
+number. Track 1 is set to instrument 1, etc.  Each time the score is
+played, every track's instrument number should be reset to the track
+number.
+
+The <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a> SID_Instrument changes the instrument number for a track, that
+is, which instrument plays the following notes.  Its SEvent.data field is
+an instrument register number in the range 0 through 255.  If a program
+doesn't implement the SID_Instrument event, each track is fixed to one
+instrument.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

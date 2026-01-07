@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="commodities" NODE="MatchIX()" TITLE="commodities.library/MatchIX" -->
+<head>
+<title>commodities.library/MatchIX</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	MatchIX -- see if an input event matches an initialized input
+		   expression. (V38)
+
+<b>   SYNOPSIS</b>
+	match = MatchIX(event,ix);
+	D0		A0    A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> MatchIX(struct <a href="../Includes_and_Autodocs_3._guide/node061A.html#line256">InputEvent</a> *,IX *);
+
+<b>   FUNCTION</b>
+	This function determines whether an input event matches an
+	initialized input expression. Applications generally do not
+	need to call this function as filter objects will normally provide
+	all the event filtering needed. Nevertheless, MatchIX()
+	can come in handy as it is the same function used to match an
+	event to the various filter objects when an event makes its way
+	through the input network.
+
+<b>   INPUTS</b>
+	event - the input event to match against the input expression
+	ix - the input expression for the comparison
+
+<b>   RESULTS</b>
+	match - TRUE if the input event matches the input expression, or
+		FALSE if not
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0632.html">&#060;libraries/commodities.h&#062;</a>, <a href="../Includes_and_Autodocs_3._guide/node00F3.html">ParseIX()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

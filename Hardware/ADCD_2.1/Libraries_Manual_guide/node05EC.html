@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/vertbserver.asm" NODE="MAIN" TITLE="lib_examples/vertbserver.asm" -->
+<head>
+<title>lib_examples/vertbserver.asm</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05EB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05ED.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+* vertbserver.asm. Example simple interrupt server for vertical blank
+*
+* Assembled with Howesoft Adapt 680x0 Macro Assembler Rel. 1.0
+* hx68 from: vertbserver.asm to vertbserver.o INCDIR include:
+* blink from lib:c.o vertb.o vertbserver.o to vertb lib lib:lc.lib lib:amiga.lib
+*
+    INCLUDE &#034;exec/types.i&#034;
+    INCLUDE &#034;hardware/custom.i&#034;
+    INCLUDE &#034;hardware/intbits.i&#034;
+
+        XDEF    _VertBServer
+
+* Entered with:       A0 == scratch (execpt for highest pri vertb server)
+*  D0 == scratch      A1 == is_Data
+*  D1 == scratch      A5 == vector to interrupt code (scratch)
+*                     A6 == scratch
+*
+    section code
+
+_VertBServer:
+        ADDI.L  #1,(a1)           ; increments counter is_Data points to
+        MOVEQ.L #0,d0             ; set Z flag to continue to process other vb-servers
+        RTS                       ;return to exec
+        END
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

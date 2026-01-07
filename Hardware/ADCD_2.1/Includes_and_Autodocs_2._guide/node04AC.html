@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/audio" NODE="ADCMD_WAITCYCLE" TITLE="audio.device/ADCMD_WAITCYCLE" -->
+<head>
+<title>audio.device/ADCMD_WAITCYCLE</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04AB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04AD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ADCMD_WAITCYCLE -- wait for an audio channel to complete the current
+                       cycle of a write
+
+FUNCTION
+    ADCMD_WAITCYCLE is a command for a single audio channel (io_Unit).
+    If the allocation key (ioa_AllocKey) is correct and there is a write
+    (CMD_WRITE) in progress on selected channel, ADCMD_WAITCYCLE does not
+    reply (mn_ReplyPort) until the end of the current cycle.  If there is
+    no write is progress, ADCMD_WAITCYCLE replies immediately.  If the
+    allocation key is incorrect, ADCMD_WAITCYCLE returns an error
+    (ADIOERR_NOALLOCATION).  ADCMD_WAITCYCLE returns an error
+    (IOERR_ABORTED) if it is canceled (AbortIO) or the channel is stolen
+    (ADCMD_ALLOCATE).  ADCMD_WAITCYCLE is only asynchronous if it is
+    waiting for a cycle to complete, in which case it clears the quick
+    flag (IOF_QUICK); otherwise, it is synchronous and only replies if the
+    quick flag (IOF_QUICK) is clear.  Do not use ADCMD_WAITCYCLE in
+    interrupt code at interrupt level 5 or higher.
+
+INPUTS
+    mn_ReplyPort- pointer to message port that receives I/O request, if
+                  the quick flag (IOF_QUICK) is clear, or if a write is in
+                  progress on the selected channel and a cycle has
+                  completed
+    io_Device   - pointer to device node, must be set by (or copied from
+                  I/O block set by) <a href="../Includes_and_Autodocs_2._guide/node04B8.html">OpenDevice</a> function
+    io_Unit     - bit map of channel to wait for cycle (bits 0 thru 3
+                  correspond to channels 0 thru 3), if more then one bit
+                  is set lowest bit number channel is used
+    io_Command  - command number for CMD_WAITCYCLE
+    io_Flags    - flags, must be cleared if not used:
+                  IOF_QUICK - (CLEAR) reply I/O request
+                              (SET) only reply I/O request if a write is
+                                    in progress on the selected channel
+                                    and a cycle has completed
+    ioa_AllocKey- allocation key, must be set by (or copied from I/O block
+                  set by) <a href="../Includes_and_Autodocs_2._guide/node04B8.html">OpenDevice</a> function or <a href="../Includes_and_Autodocs_2._guide/node04A6.html">ADCMD_ALLOCATE</a> command
+
+OUTPUTS
+    io_Unit     - bit map of channel that successfully waited for cycle
+                  (bits 0 thru 3 correspond to channels 0 thru 3)
+    io_Flags    - IOF_QUICK flag cleared if a write is in progress on the
+                  selected channel
+    io_Error    - error number:
+                  0                    - no error
+                  IOERR_ABORTED        - canceled (AbortIO) or channel
+                                         stolen
+                  ADIOERR_NOALLOCATION - allocation key (ioa_AllocKey)
+                                         does not match key for channel
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

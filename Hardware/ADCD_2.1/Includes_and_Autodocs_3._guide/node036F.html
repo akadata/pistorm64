@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="iffparse" NODE="OpenClipboard()" TITLE="iffparse.library/OpenClipboard" -->
+<head>
+<title>iffparse.library/OpenClipboard</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node036E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0370.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	OpenClipboard -- create a handle on a clipboard unit. (V36)
+
+<b>   SYNOPSIS</b>
+	ch = OpenClipboard(unitNumber)
+	D0                 D0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line147">ClipboardHandle</a> *OpenClipboard(LONG);
+
+<b>   FUNCTION</b>
+	Opens the clipboard.device and opens a stream for the specified unit
+	(usually PRIMARY_CLIP). This handle structure will be used as the
+	clipboard stream for IFFHandles initialized as clipboard streams by
+	<a href="../Includes_and_Autodocs_3._guide/node036C.html">InitIFFasClip()</a>.
+
+<b>   INPUTS</b>
+	unitNumber - clipboard unit number (usually PRIMARY_CLIP).
+
+<b>   RESULT</b>
+	ch - pointer to <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line147">ClipboardHandle</a> structure or NULL if unsuccessful.
+
+<b>   BUGS</b>
+	This function had several bugs prior to V39.
+
+       First bug was that if the clipboard.device couldn't open, two calls
+	to <a href="../Includes_and_Autodocs_3._guide/node0210.html">FreeSignal()</a> were made with uninitialized values as parameters.
+	The result of this was a corrupt signal mask in the <a href="../Includes_and_Autodocs_3._guide/node064B.html#line23">Task</a> field.
+
+	Second bug was that <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice()</a> was called with an IO request that
+	didn't have a valid <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> pointer in it.
+
+	Third bug was that the two message ports allocated by the function
+	(ClipboardHandle-&#062;cbh_CBport and ClipboardHandle-&#062;cbh_SatisfyPort)
+	were not being initialized correctly and would cause a system crash
+	if a message ever got to either of them.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node036C.html">InitIFFasClip()</a>, <a href="../Includes_and_Autodocs_3._guide/node035B.html">CloseClipboard()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E8.html">&#060;libraries/iffparse.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

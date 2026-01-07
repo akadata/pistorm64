@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="layers" NODE="SwapBitsRastPortClipRect()" TITLE="layers.library/SwapBitsRastPortClipRectayers.library/SwapBitsRastPortClipRect" -->
+<head>
+<title>layers.library/SwapBitsRastPortClipRectayers.library/SwapBitsRastPortClipRect</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node042F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0431.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	SwapBitsRastPortClipRect -- Swap bits between common bitmap
+	                            and obscured <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line56">ClipRect</a>
+
+<b>    SYNOPSIS</b>
+	SwapBitsRastPortClipRect( rp, cr )
+	                          a0  a1
+
+	void SwapBitsRastPortClipRect( struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line56">ClipRect</a> *);
+
+<b>    FUNCTION</b>
+	Support routine useful for those that need to do some
+	operations not done by the layer library.  Allows programmer
+	to swap the contents of a small <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> with a subsection of
+	the display. This is accomplished without using extra memory.
+	The bits in the display <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> are exchanged with the
+	bits in the ClipRect's <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.
+
+	Note: the <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line56">ClipRect</a> structures which the layer library allocates are
+	actually a little bigger than those described in the <a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a>
+	include file.  So be warned that it is not a good idea to have
+	instances of cliprects in your code.
+
+<b>    INPUTS</b>
+	rp - pointer to rastport
+	cr - pointer to cliprect to swap bits with
+
+<b>    NOTE</b>
+	Because the blit operation started by this function is done asynchronously,
+	it is imperative that a <a href="../Includes_and_Autodocs_3._guide/node0339.html">WaitBlit()</a> be performed before releasing or using
+	the processor to modify any of the associated structures.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a>, <a href="../Includes_and_Autodocs_3._guide/node05D7.html">graphics/rastport.h</a>, <a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

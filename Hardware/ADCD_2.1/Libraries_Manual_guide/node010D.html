@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-3-1" TITLE="4 / Communicating with Intuition / The IDCMP" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Communicating with Intuition / The IDCMP</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node010C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node010E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The IDCMP gives an application convenient access to many types of user
+input events through the Exec message and port system.  Intuition input
+event messages include mouse and keyboard activity as well as high level
+<a name="line5">events from menus and gadgets.</a>
+
+With the IDCMP, you specify the input events you want to know about when
+you open the window.  The input events are specified with one or more of
+the <a href="../Libraries_Manual_guide/node01DA.html">IDCMP flags</a> in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D4.html#line722">intuition.h</a>&#062;.  Use the flags with the
+<a href="../Libraries_Manual_guide/node0124.html#line35">WA_IDCMP</a> tag for the <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> (or <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTags()</a>) function.
+Or, set the flags in <a href="../Libraries_Manual_guide/node0124.html#line35">NewWindow.IDCMPFlags</a> for the <a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a> function.  If
+any IDCMP flags are set when the window is opened, Intuition automatically
+creates a message port for you to receive messages about user activity.
+If NULL is specified for IDCMP flags, no port is created.  For more
+information on receiving messages from Intuition, see the IDCMP sections
+in the chapter &#034;<a href="../Libraries_Manual_guide/node01CE.html">Intuition Input and Output Methods</a>.&#034;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

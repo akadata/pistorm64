@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-4-3" TITLE="3 / Public Screen Functions / Taking a New Custom Screen Public" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Public Screen Functions / Taking a New Custom Screen Public</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00E8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00EA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Applications that open a new screen should consider taking the screen
+<a href="../Libraries_Manual_guide/node00E6.html">public</a>.  If the screen's characteristics are not very esoteric, making the
+screen public is useful because it allows other applications to share the
+working context.  This makes an application more powerful and more
+attractive to the user because it allows the user to add supporting
+applications and utilities from other vendors to make a customized and
+integrated work environment.
+
+To make your own <a href="../Libraries_Manual_guide/node00DF.html">custom screen</a> into a <a href="../Libraries_Manual_guide/node00E6.html">public screen</a> that other
+applications may use, you give the screen a public name and then register
+the screen with Intuition.  The screen must be declared as public in the
+<a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreenTagList()</a> call by specifying a public name string with the
+<a href="../Libraries_Manual_guide/node00E5.html#line234">SA_PubName</a> tag.  The application's task ID and a signal bit may also be
+registered when the screen is opened with the <a href="../Libraries_Manual_guide/node00E5.html#line240">SA_PubTask and SA_PubSig</a>
+tags.  If these tags are given, the system will signal your task when the
+<a name="line17">last window on the screen closes.</a>
+
+When a new <a href="../Libraries_Manual_guide/node00E6.html">public screen</a> is opened, it starts out private so the
+application can perform any desired initialization (for instance, opening
+a backdrop window) before the screen is made public.  Use the
+<a href="../Libraries_Manual_guide/node00E6.html#line34">PubScreenStatus()</a> function to make the screen public and available to
+other applications (or to take the screen private again, later).  The
+screen may not be taken private or closed until all windows on the screen
+are closed and all locksn on the screen are released.  However, the screen
+does not need to be made private before closing it.
+
+<a href="../Libraries_Manual_guide/node00E4.html">CloseScreen()</a> will fail if an attempt is made to close a <a href="../Libraries_Manual_guide/node00E6.html">public screen</a>
+that still has visitor windows or locks on it.  If the user selects close
+screen, but the screen will not close due to visitor windows, a requester
+should be displayed informing the user of the condition and instructing
+them to close any windows before closing the screen.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="OpenWindowTagList()" TITLE="intuition.library/OpenWindowTagList" -->
+<head>
+<title>intuition.library/OpenWindowTagList</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03D5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03D7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME	</b>
+	OpenWindowTagList -- <a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a> with <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> extension. (V36)
+	OpenWindowTags -- Varargs stub for OpenWindowTagList (V36)
+
+<b>   SYNOPSIS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = OpenWindowTagList( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1086">NewWindow</a>, TagItems )
+	D0	  		    A0         A1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *OpenWindowTagList( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1086">NewWindow</a> *,
+		struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> * );
+
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = OpenWindowTags( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1086">NewWindow</a>, Tag1, ... )
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *OpenWindowTags( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1086">NewWindow</a> *, ULONG, ... );
+
+<b>   FUNCTION</b>
+	A variation of <a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a> that allow direct specification of
+	a <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> array of extension data.  Recommended over using the
+	ExtNewWindow.Extension field.
+
+	If you omit the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1086">NewWindow</a> (pass NULL), a set of defaults
+	are used, and overridden by the tag items.  Even without
+	any tag items at all, a reasonable window opens on the Workbench
+	or default public screen.
+
+	See <a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a> for all the details.
+
+<b>   INPUTS</b>
+ 	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1086">NewWindow</a> - (optional) pointer to a <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1086">NewWindow</a> structure.
+	TagItems - (optional) pointer to <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> array, with tag
+		values as described under the description for
+		<a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a>.
+
+<b>   RESULT</b>
+ 	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> - newly created window, per your specifications.
+
+<b>   EXAMPLE</b>
+	See <a href="../Includes_and_Autodocs_3._guide/node03D4.html">OpenScreenTagList()</a> for an example of how to create
+	a &#034;varargs&#034; version of this function for convenient C
+	language programming.
+
+<b>   NOTES</b>
+
+
+<b>   BUGS</b>
+
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

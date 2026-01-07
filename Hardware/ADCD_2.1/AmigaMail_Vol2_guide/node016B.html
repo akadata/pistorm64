@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="I-43/Hooks1.c" NODE="MAIN" TITLE="I-43/Hooks1.c" -->
+<head>
+<title>I-43/Hooks1.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node016A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node016C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* hooks1.c
+ * Simple hook example
+ * Copyright (C) 1991-1999 Amiga, Inc.
+ *
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/libraries.h&#062;
+#include &#060;utility/hooks.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/utility_protos.h&#062;
+
+extern struct Library *SysBase;
+struct Library *UtilityBase;
+
+#define ASM     __asm
+#define REG(x)  register __ ## x
+
+/* This function converts register-parameter Hook calling
+ * convention into standard C conventions.  It requires a C
+ * compiler that supports registerized parameters, such as
+ * SAS/C 5.xx or greater.
+ */
+ULONG ASM
+hookEntry(REG(a0) struct Hook *h, REG(a2) VOID *o, REG(a1) VOID *msg)
+{
+    return ((*h-&#062;h_SubEntry)(h, o, msg));
+}
+
+/* This simple function is used to initialize a Hook */
+VOID InitHook (struct Hook *h, ULONG (*func)(), VOID *data)
+{
+    /* Make sure a pointer was passed */
+    if (h)
+    {
+        /* Fill in the Hook fields */
+        h-&#062;h_Entry = (ULONG (*)()) hookEntry;
+        h-&#062;h_SubEntry = func;
+        h-&#062;h_Data = data;
+    }
+}
+
+/* This function only prints out a message to the serial port indicating that
+ * we are inside the callback function.  Note that we cannot use printf() or
+ * any other functions that use standard I/O with any of the system modules that
+ * support callback Hooks, because there is no guarantee that there would
+ * be a valid Output() channel. */
+
+ULONG MyFunction (struct Hook *h, VOID *o, VOID *msg)
+{
+    /* Obtain access to the global data segment */
+    geta4();
+
+    /* Debugging function to send a string to the serial port */
+    KPrintF(&#034;Inside MyFunction()\n&#034;);
+
+    return (1);
+}
+
+int main (int argc, char **argv)
+{
+    struct Hook h;
+
+    /* Open the utility library */
+    if (UtilityBase = OpenLibrary (&#034;utility.library&#034;, 36))
+    {
+        /* Initialize the callback Hook */
+        InitHook (&#038;h, MyFunction, NULL);
+
+        /* Use the utility library function to invoke the Hook */
+        CallHookPkt (&#038;h, NULL, NULL);
+
+        /* Close utility library now that we're done with it */
+        CloseLibrary (UtilityBase);
+    }
+    else
+    {
+        /* Display an error message */
+        printf (&#034;Couldn't open utility.library\n&#034;);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

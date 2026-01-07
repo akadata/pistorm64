@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="DeleteMsgPort()" TITLE="exec.library/DeleteMsgPort" -->
+<head>
+<title>exec.library/DeleteMsgPort</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0200.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0202.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	DeleteMsgPort - Free a message port created by <a href="../Includes_and_Autodocs_3._guide/node01FC.html">CreateMsgPort</a>  (V36)
+
+<b>   SYNOPSIS</b>
+	DeleteMsgPort(msgPort)
+		      a0
+
+	void DeleteMsgPort(struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *);
+
+<b>   FUNCTION</b>
+	Frees a message port created by <a href="../Includes_and_Autodocs_3._guide/node01FC.html">CreateMsgPort()</a>.  All messages that
+	may have been attached to this port must have already been
+	replied to.
+
+<b>   INPUTS</b>
+	msgPort - A message port.  NULL for no action.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01FC.html">CreateMsgPort()</a>, <a href="../Includes_and_Autodocs_3._guide/node0035.html">amiga.lib/DeletePort()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

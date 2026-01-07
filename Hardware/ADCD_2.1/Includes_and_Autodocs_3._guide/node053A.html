@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="realtime" NODE="SetConductorState()" TITLE="realtime.library/SetConductorState" -->
+<head>
+<title>realtime.library/SetConductorState</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0539.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node053B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetConductorState -- change the play state of a player's
+			     conductor. (V37)
+
+<b>   SYNOPSIS</b>
+	result = SetConductorState(player, state, time);
+	D0			   A0	   D0     D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> SetConductorState(struct <a href="../Includes_and_Autodocs_3._guide/node05F0.html#line105">Player</a> *, ULONG, LONG);
+
+<b>   FUNCTION</b>
+	Changes the play state of the conductor referenced by the
+	player. The states can be CONDSTATE_STOPPED, CONDSTATE_PAUSED,
+	CONDSTATE_LOCATE, CONDSTATE_RUNNING, or the special value
+	CONDSTATE_METRIC which asks the highest priority conducted node
+	to do a CONDSTATE_LOCATE, or the special value CONDSTATE_SHUTTLE
+	which informs the players that the clock value is changing, but the
+	clock isn't actually running. Note that going from CONDSTATE_PAUSED
+	to CONDSTATE_RUNNING does not reset the cdt_ClockTime of the
+	conductor.
+
+<b>   INPUTS</b>
+	player - player referencing the conductor to change
+	state - new play state of conductor
+	time - start time offset in realtime.library heartbeat units
+
+<b>   RESULTS</b>
+	result - 0 if everything went OK, or a realtime.library error code
+		 if an error occured. These currently include RTE_PLAYING
+		 and RTE_NOCONDUCTOR.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

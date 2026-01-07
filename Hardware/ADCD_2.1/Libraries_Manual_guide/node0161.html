@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-11-4-1" TITLE="5 / / Initialization of Proportional Gadget / the PropInfo Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / / Initialization of Proportional Gadget / the PropInfo Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0160.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0162.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This is the special data required by the <a href="../Libraries_Manual_guide/node0153.html">proportional</a> gadget.
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line451">PropInfo</a>
+        {
+        UWORD Flags;
+        UWORD HorizPot;
+        UWORD VertPot;
+        UWORD HorizBody;
+        UWORD VertBody;
+        UWORD CWidth;
+        UWORD CHeight;
+        UWORD HPotRes, VPotRes;
+        UWORD LeftBorder;
+        UWORD TopBorder;
+<a name="line16">        };</a>
+
+Flags
+<a name="line19">    In the Flags variable, the following flag bits are of interest:</a>
+
+    PROPBORDERLESS
+        Set the PROPBORDERLESS flag to create a <a href="../Libraries_Manual_guide/node0153.html">proportional</a> gadget
+<a name="line23">        without a border.</a>
+
+    AUTOKNOB
+        Set the AUTOKNOB flag in the Flags field to use the <a href="../Libraries_Manual_guide/node015A.html#line16">auto-knob</a>,
+<a name="line27">        otherwise the application must provide <a href="../Libraries_Manual_guide/node015A.html">knob</a> imagery.</a>
+
+    FREEHORIZ and FREEVERT
+        Set the FREEHORIZ flag to create a gadget that adjust
+        left-to-right, set the FREEVERT flag for top-to-bottom movement.
+<a name="line32">        Both flags may be set in a single gadget.</a>
+
+    PROPNEWLOOK
+        Set the PROPNEWLOOK flag to create a gadget with the new look.
+        If this flag is not set, the gadget will be rendered using a V34
+<a name="line37">        compatible design.</a>
+
+    KNOBHIT
+        The KNOBHIT flag is set by Intuition when this <a href="../Libraries_Manual_guide/node015A.html">knob</a> is hit by
+<a name="line41">        the user.</a>
+
+HorizPot and VertPot
+    Initialize the <a href="../Libraries_Manual_guide/node015B.html">HorizPot</a> and <a href="../Libraries_Manual_guide/node015B.html">VertPot</a> variables to their starting
+    values before the gadget is added to the system. The variables may be
+    read by the application. The gadget must be removed before writing to
+    these variables, or they may be modified with <a href="../Libraries_Manual_guide/node0163.html">NewModifyProp()</a>.
+
+HorizBody and VertBody
+    Set the <a href="../Libraries_Manual_guide/node015C.html">HorizBody</a> and <a href="../Libraries_Manual_guide/node015C.html">VertnBody</a> variables to the desired increment. If
+    there is no data to show or the total amount displayed is less than
+    the area in which to display it, set the <a href="../Libraries_Manual_guide/node015C.html">body variables</a> to the
+    maximum, MAXBODY.
+
+The remaining variables and flags are reserved for use by Intuition.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

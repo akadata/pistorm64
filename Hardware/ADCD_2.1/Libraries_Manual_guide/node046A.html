@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_34" NODE="34-1-1" TITLE="34 / Keymap Functions / Asking For the Default Keymap" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>34 / Keymap Functions / Asking For the Default Keymap</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0469.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node046B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node0313.html">AskKeyMapDefault()</a> returns a pointer to the current default keymap.
+To use the mapping functions in keymap.library it is normally not
+necessary to call this function. They accept NULL as equivalent to 'use
+default keymap' and will call this function for you. You can use this
+pointer for example to cache the system default in order to temporarily
+change the keymap your applications uses, or find the keymap in the
+keymap.resource list of loaded keymaps.  You should never change the
+system wide default keymap unless the user asks you to do so; since the
+Amiga is a multitasking system, changing the keymap could interfere with
+the behaviour of other applications.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

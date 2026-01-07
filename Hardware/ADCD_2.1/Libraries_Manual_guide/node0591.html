@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/trap_c.c" NODE="MAIN" TITLE="Lib_examples/trap_c.c" -->
+<head>
+<title>Lib_examples/trap_c.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0590.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0592.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* trap_c.c - Execute me to compile me with SAS C 5.10
+LC -b0 -cfistq -v -y -j73 trap_c.c
+Blink FROM LIB:c.o,trap_c.o,trap_a.o TO trap LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+
+trap_c.c - C module of sample integer divide-by-zero trap
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;exec/tasks.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;stdlib.h&#062;
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) {return(0); }
+#endif
+
+extern ULONG trapa();           /* assembler trap code in trap_a.asm */
+
+APTR oldTrapCode;
+ULONG countdiv0;
+
+void main(int argc, char **argv)
+{
+    struct Task *thistask;
+    ULONG k,j;
+
+    thistask = FindTask(NULL);
+
+    /* Save our task's current trap code pointer */
+    oldTrapCode = thistask-&#062;tc_TrapCode;
+
+    /* Point task to our assembler trap handler code.  Ours will just count */
+    /* divide-by-zero traps, and pass other traps on to the normal TrapCode */
+    thistask-&#062;tc_TrapCode = (APTR)trapa;
+
+    countdiv0 = 0L;
+
+    for(k=0; k&#060;4; k++)            /* Let's divide by zero a few times */
+       {
+       printf(&#034;dividing %ld by zero... &#034;,k);
+       j = k/0L;
+       printf(&#034;did it\n&#034;);
+       }
+    printf(&#034;\nDivide by zero happened %ld times\n&#034;,countdiv0);
+
+    thistask-&#062;tc_TrapCode = oldTrapCode;     /* Restore old trap code */
+}
+
+
+
+* trap_a.asm - Example trap handling code (leaves D0 intact).  Entered
+* in supervisor mode with the following on the supervisor stack:
+*    0(sp).l = trap#
+*    4(sp) Processor dependent exception frame
+
+    INCLUDE &#034;exec/types.i&#034;
+    INCLUDE &#034;libraries/dos.i&#034;
+
+        XDEF _trapa
+        XREF _countdiv0
+        XREF _oldTrapCode
+
+        CODE
+_trapa:                                 ; our trap handler entry
+        CMPI.L  #5,(SP)                 ; is this a divide by zero ?
+        BNE.S   notdiv0                 ; no
+        ADD.L   #1,_countdiv0           ; yes, increment our div0 count
+endtrap:
+        ADDQ    #4,SP                   ; remove exception number from SSP
+        RTE                             ; return from exception
+notdiv0:
+        TST.L   _oldTrapCode            ; is there another trap handler ?
+        BEQ.S   endtrap                 ; no, so we'll exit
+        MOVE.L  _oldTrapCode,-(SP)      ; yes, go on to old TrapCode
+        RTS                             ; jumps to old TrapCode
+
+        END
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/gfxmacros.h" NODE="MAIN" TITLE="Includes/graphics/gfxmacros.h" -->
+<head>
+<title>Includes/graphics/gfxmacros.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00B5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00B7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_GFXMACROS_H
+#define	GRAPHICS_GFXMACROS_H
+/*
+**	$Filename: graphics/gfxmacros.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+#ifndef  GRAPHICS_RASTPORT_H
+#include &#060;graphics/rastport.h&#062;
+#endif
+<a name="line22"></a>
+<a name="line23">#define ON_DISPLAY	custom.dmacon = BITSET|DMAF_RASTER;</a>
+<a name="line24">#define OFF_DISPLAY	custom.dmacon = BITCLR|DMAF_RASTER;</a>
+<a name="line25">#define ON_SPRITE	custom.dmacon = BITSET|DMAF_SPRITE;</a>
+#define OFF_SPRITE	custom.dmacon = BITCLR|DMAF_SPRITE;
+<a name="line27"></a>
+<a name="line28">#define ON_VBLANK	custom.intena = BITSET|INTF_VERTB;</a>
+#define OFF_VBLANK	custom.intena = BITCLR|INTF_VERTB;
+<a name="line30"></a>
+<a name="line31">#define SetOPen(w,c)	{(w)-&#062;AOlPen = c;(w)-&#062;Flags |= AREAOUTLINE;}</a>
+<a name="line32">#define SetDrPt(w,p)	{(w)-&#062;LinePtrn = p;(w)-&#062;Flags |= FRST_DOT;(w)-&#062;linpatcnt=15;}</a>
+<a name="line33">#define SetWrMsk(w,m)	{(w)-&#062;Mask = m;}</a>
+#define SetAfPt(w,p,n)	{(w)-&#062;AreaPtrn = p;(w)-&#062;AreaPtSz = n;}
+<a name="line35"></a>
+#define BNDRYOFF(w)	{(w)-&#062;Flags &#038;= ~AREAOUTLINE;}
+<a name="line37"></a>
+<a name="line38">#define CINIT(c,n)	  UCopperListInit(c,n);</a>
+<a name="line39">#define CMOVE(c,a,b)	{ CMove(c,&#038;a,b);CBump(c); }</a>
+<a name="line40">#define CWAIT(c,a,b)	{ CWait(c,a,b);CBump(c); }</a>
+#define CEND(c)	{ CWAIT(c,10000,255); }
+<a name="line42"></a>
+<a name="line43">#define DrawCircle(rp,cx,cy,r)	DrawEllipse(rp,cx,cy,r,r);</a>
+#define AreaCircle(rp,cx,cy,r)	AreaEllipse(rp,cx,cy,r,r);
+
+#endif	/* GRAPHICS_GFXMACROS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

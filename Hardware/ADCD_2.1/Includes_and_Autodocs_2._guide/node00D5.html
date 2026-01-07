@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/preferences.h" NODE="MAIN" TITLE="Includes/intuition/preferences.h" -->
+<head>
+<title>Includes/intuition/preferences.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00D4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00D6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef INTUITION_PREFERENCES_H
+#define INTUITION_PREFERENCES_H TRUE
+/*
+**  $Filename: intuition/preferences.h $
+**  $Release: 2.04 Includes, V37.4 $
+**  $Revision: 36.8 $
+**  $Date: 91/05/08 $
+**
+**  Structure definition for old-style preferences
+**
+**  (C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+#ifndef DEVICES_TIMER_H
+#include &#060;devices/timer.h&#062;
+#endif
+
+/* ======================================================================== */
+/* === Preferences ======================================================== */
+/* ======================================================================== */
+
+<a name="line27">/* these are the definitions for the printer configurations */</a>
+#define	FILENAME_SIZE	30			/* Filename size */
+<a name="line29"></a>
+#define	POINTERSIZE (1 + 16 + 1) * 2	/* Size of Pointer data buffer */
+
+/* These defines are for the default font size.  These actually describe the
+ * height of the defaults fonts.  The default font type is the topaz
+ * font, which is a fixed width font that can be used in either
+ * eighty-column or sixty-column mode.	The Preferences structure reflects
+ * which is currently selected by the value found in the variable FontSize,
+ * which may have either of the values defined below.  These values actually
+ * are used to select the height of the default font.  By changing the
+ * height, the resolution of the font changes as well.
+<a name="line40"> */</a>
+<a name="line41">#define TOPAZ_EIGHTY 8</a>
+#define TOPAZ_SIXTY 9
+<a name="line43"></a>
+struct Preferences
+{
+<a name="line46">    /* the default font height */</a>
+    BYTE FontHeight;			/* height for system default font  */
+
+<a name="line49">    /* constant describing what's hooked up to the port */</a>
+    UBYTE PrinterPort;			/* printer port connection	   */
+
+<a name="line52">    /* the baud rate of the port */</a>
+    UWORD BaudRate;			/* baud rate for the serial port   */
+
+<a name="line55">    /* various timing rates */</a>
+<a name="line56">    struct timeval KeyRptSpeed;		/* repeat speed for keyboard	   */</a>
+<a name="line57">    struct timeval KeyRptDelay;		/* Delay before keys repeat	   */</a>
+    struct timeval DoubleClick;		/* Interval allowed between clicks */
+
+<a name="line60">    /* Intuition Pointer data */</a>
+<a name="line61">    UWORD PointerMatrix[POINTERSIZE];	/* Definition of pointer sprite    */</a>
+<a name="line62">    BYTE XOffset;			/* X-Offset for active 'bit'	   */</a>
+<a name="line63">    BYTE YOffset;			/* Y-Offset for active 'bit'	   */</a>
+<a name="line64">    UWORD color17;			/***********************************/</a>
+<a name="line65">    UWORD color18;			/* Colours for sprite pointer	   */</a>
+<a name="line66">    UWORD color19;			/***********************************/</a>
+    UWORD PointerTicks;			/* Sensitivity of the pointer	   */
+
+<a name="line69">    /* Workbench Screen colors */</a>
+<a name="line70">    UWORD color0;			/***********************************/</a>
+<a name="line71">    UWORD color1;			/*  Standard default colours	   */</a>
+<a name="line72">    UWORD color2;			/*   Used in the Workbench	   */</a>
+    UWORD color3;			/***********************************/
+
+<a name="line75">    /* positioning data for the Intuition View */</a>
+<a name="line76">    BYTE ViewXOffset;			/* Offset for top lefthand corner  */</a>
+<a name="line77">    BYTE ViewYOffset;			/* X and Y dimensions		   */</a>
+    WORD ViewInitX, ViewInitY;		/* View initial offset values	   */
+<a name="line79"></a>
+    BOOL EnableCLI;			/* CLI availability switch */
+
+<a name="line82">    /* printer configurations */</a>
+<a name="line83">    UWORD PrinterType;			/* printer type		   */</a>
+    UBYTE PrinterFilename[FILENAME_SIZE];/* file for printer	   */
+
+<a name="line86">    /* print format and quality configurations */</a>
+<a name="line87">    UWORD PrintPitch;			/* print pitch			   */</a>
+<a name="line88">    UWORD PrintQuality;			/* print quality		   */</a>
+<a name="line89">    UWORD PrintSpacing;			/* number of lines per inch	   */</a>
+<a name="line90">    UWORD PrintLeftMargin;		/* left margin in characters	   */</a>
+<a name="line91">    UWORD PrintRightMargin;		/* right margin in characters	   */</a>
+<a name="line92">    UWORD PrintImage;			/* positive or negative		   */</a>
+<a name="line93">    UWORD PrintAspect;			/* horizontal or vertical	   */</a>
+<a name="line94">    UWORD PrintShade;			/* b&#038;w, half-tone, or color	   */</a>
+    WORD PrintThreshold;		/* darkness ctrl for b/w dumps	   */
+
+<a name="line97">    /* print paper descriptors */</a>
+<a name="line98">    UWORD PaperSize;			/* paper size			   */</a>
+<a name="line99">    UWORD PaperLength;			/* paper length in number of lines */</a>
+    UWORD PaperType;			/* continuous or single sheet	   */
+
+    /* Serial device settings: These are six nibble-fields in three bytes */
+<a name="line103">    /* (these look a little strange so the defaults will map out to zero) */</a>
+    UBYTE   SerRWBits;	 /* upper nibble = (8-number of read bits)	*/
+<a name="line105">			 /* lower nibble = (8-number of write bits)	*/</a>
+    UBYTE   SerStopBuf;  /* upper nibble = (number of stop bits - 1)	*/
+<a name="line107">			 /* lower nibble = (table value for BufSize)	*/</a>
+    UBYTE   SerParShk;	 /* upper nibble = (value for Parity setting)	*/
+<a name="line109">			 /* lower nibble = (value for Handshake mode)	*/</a>
+    UBYTE   LaceWB;	 /* if workbench is to be interlaced		*/
+<a name="line111"></a>
+    UBYTE   WorkName[FILENAME_SIZE];  /* temp file for printer		*/
+<a name="line113"></a>
+<a name="line114">    BYTE    RowSizeChange;	/* affect NormalDisplayRows/Columns	*/</a>
+    BYTE    ColumnSizeChange;
+<a name="line116"></a>
+<a name="line117">    UWORD    PrintFlags;	/* user preference flags */</a>
+<a name="line118">    UWORD    PrintMaxWidth;	/* max width of printed picture in 10ths/in */</a>
+<a name="line119">    UWORD    PrintMaxHeight;	/* max height of printed picture in 10ths/in */</a>
+<a name="line120">    UBYTE    PrintDensity;	/* print density */</a>
+    UBYTE    PrintXOffset;	/* offset of printed picture in 10ths/inch */
+<a name="line122"></a>
+<a name="line123">    UWORD    wb_Width;		/* override default workbench width  */</a>
+<a name="line124">    UWORD    wb_Height;		/* override default workbench height */</a>
+    UBYTE    wb_Depth;		/* override default workbench depth  */
+<a name="line126"></a>
+    UBYTE    ext_size;		/* extension information -- do not touch! */
+			    /* extension size in blocks of 64 bytes */
+};
+
+
+<a name="line132">/* Workbench Interlace (use one bit) */</a>
+<a name="line133">#define LACEWB			(1&#060;&#060; 0)</a>
+#define LW_RESERVED	1		/* internal use only */
+
+<a name="line136">/* Enable_CLI	*/</a>
+<a name="line137">#define SCREEN_DRAG	(1&#060;&#060;14)</a>
+#define MOUSE_ACCEL	(1L&#060;&#060;15)
+
+<a name="line140">/* PrinterPort */</a>
+<a name="line141">#define PARALLEL_PRINTER 0x00</a>
+#define SERIAL_PRINTER	0x01
+
+<a name="line144">/* BaudRate */</a>
+<a name="line145">#define BAUD_110	0x00</a>
+<a name="line146">#define BAUD_300	0x01</a>
+<a name="line147">#define BAUD_1200	0x02</a>
+<a name="line148">#define BAUD_2400	0x03</a>
+<a name="line149">#define BAUD_4800	0x04</a>
+<a name="line150">#define BAUD_9600	0x05</a>
+<a name="line151">#define BAUD_19200	0x06</a>
+#define BAUD_MIDI	0x07
+
+<a name="line154">/* PaperType */</a>
+<a name="line155">#define FANFOLD	0x00</a>
+#define SINGLE		0x80
+
+<a name="line158">/* PrintPitch */</a>
+<a name="line159">#define PICA		0x000</a>
+<a name="line160">#define ELITE		0x400</a>
+#define FINE		0x800
+
+<a name="line163">/* PrintQuality */</a>
+<a name="line164">#define DRAFT		0x000</a>
+#define LETTER		0x100
+
+<a name="line167">/* PrintSpacing */</a>
+<a name="line168">#define SIX_LPI		0x000</a>
+#define EIGHT_LPI	0x200
+
+<a name="line171">/* Print Image */</a>
+<a name="line172">#define IMAGE_POSITIVE	0x00</a>
+#define IMAGE_NEGATIVE	0x01
+
+<a name="line175">/* PrintAspect */</a>
+<a name="line176">#define ASPECT_HORIZ	0x00</a>
+#define ASPECT_VERT	0x01
+
+<a name="line179">/* PrintShade */</a>
+<a name="line180">#define SHADE_BW	0x00</a>
+<a name="line181">#define SHADE_GREYSCALE	0x01</a>
+#define SHADE_COLOR	0x02
+
+<a name="line184">/* PaperSize */</a>
+<a name="line185">#define US_LETTER	0x00</a>
+<a name="line186">#define US_LEGAL	0x10</a>
+<a name="line187">#define N_TRACTOR	0x20</a>
+<a name="line188">#define W_TRACTOR	0x30</a>
+#define CUSTOM		0x40
+
+<a name="line191">/* New PaperSizes for V36: */</a>
+<a name="line192">#define EURO_A0	0x50		/* European size A0: 841 x 1189 */</a>
+<a name="line193">#define EURO_A1	0x60		/* European size A1: 594 x 841 */</a>
+<a name="line194">#define EURO_A2	0x70		/* European size A2: 420 x 594 */</a>
+<a name="line195">#define EURO_A3	0x80		/* European size A3: 297 x 420 */</a>
+<a name="line196">#define EURO_A4	0x90		/* European size A4: 210 x 297 */</a>
+<a name="line197">#define EURO_A5	0xA0		/* European size A5: 148 x 210 */</a>
+<a name="line198">#define EURO_A6	0xB0		/* European size A6: 105 x 148 */</a>
+<a name="line199">#define EURO_A7	0xC0		/* European size A7: 74 x 105 */</a>
+<a name="line200">#define EURO_A8	0xD0		/* European size A8: 52 x 74 */</a>
+<a name="line201"></a>
+
+<a name="line203">/* PrinterType */</a>
+<a name="line204">#define CUSTOM_NAME		0x00</a>
+#define	ALPHA_P_101		0x01
+#define BROTHER_15XL		0x02
+<a name="line207">#define CBM_MPS1000		0x03</a>
+<a name="line208">#define DIAB_630		0x04</a>
+<a name="line209">#define DIAB_ADV_D25		0x05</a>
+<a name="line210">#define DIAB_C_150		0x06</a>
+<a name="line211">#define EPSON			0x07</a>
+<a name="line212">#define EPSON_JX_80		0x08</a>
+#define OKIMATE_20		0x09
+#define QUME_LP_20		0x0A
+<a name="line215">/* new printer entries, 3 October 1985 */</a>
+<a name="line216">#define HP_LASERJET		0x0B</a>
+#define HP_LASERJET_PLUS	0x0C
+<a name="line218"></a>
+<a name="line219">/* Serial Input Buffer Sizes */</a>
+#define SBUF_512	0x00
+<a name="line221">#define SBUF_1024	0x01</a>
+<a name="line222">#define SBUF_2048	0x02</a>
+#define SBUF_4096	0x03
+#define SBUF_8000	0x04
+#define SBUF_16000	0x05
+
+<a name="line227">/* Serial Bit Masks */</a>
+<a name="line228">#define	SREAD_BITS	0xF0 /* for SerRWBits	*/</a>
+<a name="line229">#define	SWRITE_BITS	0x0F</a>
+
+#define	SSTOP_BITS	0xF0 /* for SerStopBuf	*/
+#define	SBUFSIZE_BITS	0x0F
+
+<a name="line234">#define	SPARITY_BITS	0xF0 /* for SerParShk	*/</a>
+<a name="line235">#define SHSHAKE_BITS	0x0F</a>
+<a name="line236"></a>
+/* Serial Parity (upper nibble, after being shifted by
+ * macro SPARNUM() )
+ */
+<a name="line240">#define SPARITY_NONE	 0</a>
+<a name="line241">#define SPARITY_EVEN	 1</a>
+<a name="line242">#define SPARITY_ODD	 2</a>
+/* New parity definitions for V36: */
+<a name="line244">#define SPARITY_MARK	 3</a>
+#define SPARITY_SPACE	 4
+<a name="line246"></a>
+<a name="line247">/* Serial Handshake Mode (lower nibble, after masking using</a>
+<a name="line248"> * macro SHANKNUM() )</a>
+<a name="line249"> */</a>
+<a name="line250">#define SHSHAKE_XON	 0</a>
+#define SHSHAKE_RTS	 1
+<a name="line252">#define SHSHAKE_NONE	 2</a>
+
+<a name="line254">/* new defines for PrintFlags */</a>
+<a name="line255"></a>
+<a name="line256">#define CORRECT_RED	    0x0001  /* color correct red shades */</a>
+#define CORRECT_GREEN	    0x0002  /* color correct green shades */
+<a name="line258">#define CORRECT_BLUE	    0x0004  /* color correct blue shades */</a>
+<a name="line259"></a>
+#define CENTER_IMAGE	    0x0008  /* center image on paper */
+
+#define IGNORE_DIMENSIONS   0x0000 /* ignore max width/height settings */
+<a name="line263">#define BOUNDED_DIMENSIONS  0x0010  /* use max width/height as boundaries */</a>
+<a name="line264">#define ABSOLUTE_DIMENSIONS 0x0020  /* use max width/height as absolutes */</a>
+<a name="line265">#define PIXEL_DIMENSIONS    0x0040  /* use max width/height as prt pixels */</a>
+#define MULTIPLY_DIMENSIONS 0x0080 /* use max width/height as multipliers */
+
+#define INTEGER_SCALING     0x0100  /* force integer scaling */
+
+#define ORDERED_DITHERING   0x0000 /* ordered dithering */
+#define HALFTONE_DITHERING  0x0200  /* halftone dithering */
+#define FLOYD_DITHERING     0x0400 /* Floyd-Steinberg dithering */
+
+#define ANTI_ALIAS	    0x0800 /* anti-alias image */
+#define GREY_SCALE2	    0x1000 /* for use with hi-res monitor */
+
+/* masks used for checking bits */
+
+#define CORRECT_RGB_MASK    (CORRECT_RED|CORRECT_GREEN|CORRECT_BLUE)
+#define DIMENSIONS_MASK     (BOUNDED_DIMENSIONS|ABSOLUTE_DIMENSIONS|PIXEL_DIMENSIONS|MULTIPLY_DIMENSIONS)
+#define DITHERING_MASK	    (HALFTONE_DITHERING|FLOYD_DITHERING)
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

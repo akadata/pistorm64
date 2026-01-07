@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-3-12-1" TITLE="28 / / Displaying the VSprites / Drawing the Graphics Elements" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Displaying the VSprites / Drawing the Graphics Elements</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node038C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node038E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The system function called <a href="../Includes_and_Autodocs_2._guide/node0438.html">DrawGList()</a> looks through the list of GELS and
+prepares the necessary Copper instructions and memory areas to display the
+data.  This function is called as follows:
+
+    struct RastPort myRastPort = {0};
+    struct ViewPort myViewPort = {0};
+
+    DrawGList(&#038;myRastPort, &#038;myViewPort);
+
+The myRastPort argument specifies the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> containing the <a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a>
+list with the VSprites that you want to display.  The &#038;myViewPort argument
+is a pointer to the <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a> for which the VSprites will be created.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

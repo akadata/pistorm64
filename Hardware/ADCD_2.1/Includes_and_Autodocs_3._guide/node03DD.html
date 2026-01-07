@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="RefreshGList()" TITLE="intuition.library/RefreshGList" -->
+<head>
+<title>intuition.library/RefreshGList</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03DC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03DE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	RefreshGList -- Refresh (redraw) a chosen number of gadgets.
+
+<b>    SYNOPSIS</b>
+	RefreshGList( Gadgets, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a>, NumGad )
+		      A0       A1      A2         D0
+
+	VOID RefreshGList( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+		struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> *, WORD );
+
+<b>    FUNCTION</b>
+	Refreshes (redraws) gadgets in the gadget list starting
+	from the specified gadget.  At most NumGad gadgets are redrawn.
+	If NumGad is -1, all gadgets until a terminating NULL value
+	in the NextGadget field is found will be refreshed, making this
+	routine a superset of <a href="../Includes_and_Autodocs_3._guide/node03DC.html">RefreshGadgets()</a>.
+
+	The <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> parameter can point to a <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> structure.  If
+	the first gadget in the list has the GTYP_REQGADGET flag set, the
+	gadget list refers to gadgets in a requester and the pointer
+	must necessarily point to a window.  If these are not the gadgets
+	of a requester, the requester argument may be NULL.
+
+	Be sure to see the <a href="../Includes_and_Autodocs_3._guide/node03DC.html">RefreshGadgets()</a> function description, as this
+	function is simply an extension of that.
+
+<b>    INPUTS</b>
+	Gadgets = pointer to the first in the list of gadgets wanting
+	    refreshment
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to the window containing the gadget or its requester
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> = pointer to a requester (ignored if <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> is not attached
+	    to a Requester).
+	NumGad  = maximum number of gadgets to be refreshed.  A value of -1
+	  will cause all gadgets to be refreshed from gadget to the
+	  end of the list.  A value of -2 will also do this, but if 'Gadgets'
+	  points to a <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> (GTYP_REQGADGET) ALL gadgets in the
+	  requester will be refreshed (this is a mode compatible with v1.1
+	  RefreshGadgets().)
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03DC.html">RefreshGadgets()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

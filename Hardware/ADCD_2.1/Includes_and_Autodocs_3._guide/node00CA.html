@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="cia" NODE="RemICRVector()" TITLE="cia.resource/RemICRVector" -->
+<head>
+<title>cia.resource/RemICRVector</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00C9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00CB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	RemICRVector -- Detach an interrupt handler from a <a href="../Includes_and_Autodocs_3._guide/node05E5.html#line28">CIA</a> bit.
+
+<b>   SYNOPSIS</b>
+	RemICRVector( Resource, iCRBit, interrupt )
+	              A6        D0      A1
+
+	void RemICRVector( struct <a href="../Includes_and_Autodocs_3._guide/node0626.html#line33">Library</a> *, WORD, struct <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> *);
+
+<b>   FUNCTION</b>
+	Disconnect interrupt processing code for a particular
+	interrupt bit of the <a href="../Includes_and_Autodocs_3._guide/node05E5.html#line28">CIA</a> ICR.
+
+	This function will also disable the <a href="../Includes_and_Autodocs_3._guide/node05E5.html#line28">CIA</a> interrupt for the
+	given ICR bit.
+
+<b>   INPUTS</b>
+	iCRBit          Bit number to set (0..4).
+	interrupt       Pointer to interrupt structure.
+
+<b>   RESULT</b>
+
+<b>   NOTE</b>
+	The <a href="../Includes_and_Autodocs_3._guide/node05E5.html#line28">CIA</a> resources are special in that there is more than one
+	of them in the system. Because of this, the C language stubs
+	in amiga.lib for the <a href="../Includes_and_Autodocs_3._guide/node05E5.html#line28">CIA</a> resources require an extra parameter
+	to specify which <a href="../Includes_and_Autodocs_3._guide/node05E5.html#line28">CIA</a> resource to use. The synopsis for the
+	amiga.lib stubs is as follows:
+
+	RemICRVector( Resource, iCRBit, interrupt )
+	              A6        D0      A1
+
+	void RemICRVector( struct <a href="../Includes_and_Autodocs_3._guide/node0626.html#line33">Library</a> *, WORD, struct <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> *);
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node00C9.html">cia.resource/AddICRVector()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

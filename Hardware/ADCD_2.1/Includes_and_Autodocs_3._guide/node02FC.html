@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="LoadRGB4()" TITLE="graphics.library/LoadRGB4" -->
+<head>
+<title>graphics.library/LoadRGB4</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02FB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02FD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	LoadRGB4 -- Load RGB color values from table.
+
+<b>   SYNOPSIS</b>
+	LoadRGB4( vp, colors , count )
+                 a0  	a1     d0:16
+
+	void LoadRGB4( struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a> *, WORD);
+
+<b>   FUNCTION</b>
+<b>   	load the count words of the colormap from table starting at</b>
+	entry 0.
+
+<b>   INPUTS</b>
+	vp - pointer to <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>, whose colors you wish to change
+	colors - pointer to table of RGB values set up as an array
+	         of USHORTS
+		 	background--  0x0RGB
+			color1	  --  0x0RGB
+			color2    --  0x0RGB
+			 etc.         <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a> per value.
+		The colors are interpreted as 15 = maximum intensity.
+		                              0 = minimum intensity.
+	count	= number of UWORDs in the table to load into the
+	  colormap starting at color 0(background) and proceeding
+	  to the next higher color number
+
+<b>   RESULTS</b>
+	The <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> should have a pointer to a valid <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> to store
+	the colors in.
+	Updates the hardware copperlist to reflect the new colors.
+	Updates the intermediate copperlist with the new colors.
+
+<b>   BUGS</b>
+
+	NOTE: Under V36 and up, it is not safe to call this function
+	from an interrupt, due to semaphore protection of graphics
+	copper lists.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node032A.html">SetRGB4()</a> <a href="../Includes_and_Autodocs_3._guide/node02EA.html">GetRGB4()</a> <a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a> <a href="../Includes_and_Autodocs_3._guide/node05ED.html">graphics/view.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

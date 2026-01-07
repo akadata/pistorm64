@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/tag1.c" NODE="MAIN" TITLE="Lib_examples/tag1.c" -->
+<head>
+<title>Lib_examples/tag1.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05C8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05CA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* tag1.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfis -j73 tag1.c
+Blink FROM LIB:c.o,tag1.o TO tag1 LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+**
+** The following example shows simple usage of tags.  It shows how to
+** allocate a tag array and use it, it also shows how to build a tag
+** array on the stack.
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/libraries.h&#062;
+#include &#060;utility/tagitem.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/utility_protos.h&#062;
+
+extern struct Library *SysBase;
+struct Library *IntuitionBase, *UtilityBase;
+
+int main (int argc, char **argv)
+{
+    struct TagItem *tags;
+    struct Window  *win;
+
+    /* For this example we need Version 2.0 */
+    if (IntuitionBase = OpenLibrary (&#034;intuition.library&#034;, 37))
+    {
+        /* We need the utility library for this example */
+        if (UtilityBase = OpenLibrary (&#034;utility.library&#034;, 37))
+        {
+
+        /****************************************************************/
+        /* This section allocates a tag array, fills it in with values, */
+        /* and then uses it.                                            */
+        /****************************************************************/
+
+            /* Allocate a tag array */
+            if (tags = AllocateTagItems (7))
+            {
+                /* Fill in our tag array */
+                tags[0].ti_Tag = WA_Width;
+                tags[0].ti_Data = 320;
+                tags[1].ti_Tag = WA_Height;
+                tags[1].ti_Data = 50;
+                tags[2].ti_Tag = WA_Title;
+                tags[2].ti_Data = (ULONG) &#034;RKM Tag Example 1&#034;;
+                tags[3].ti_Tag = WA_IDCMP;
+                tags[3].ti_Data = IDCMP_CLOSEWINDOW;
+                tags[4].ti_Tag = WA_CloseGadget;
+                tags[4].ti_Data = TRUE;
+                tags[5].ti_Tag = WA_DragBar;
+                tags[5].ti_Data = TRUE;
+                tags[6].ti_Tag = TAG_DONE;
+
+                /* Open the window, using the tag attributes as the
+                 * only description. */
+                if (win = OpenWindowTagList (NULL, tags))
+                {
+                    /* Wait for an event to occur */
+                    WaitPort (win-&#062;UserPort);
+
+                    /* Close the window now that we're done with it */
+                    CloseWindow (win);
+                }
+
+                /* Free the tag list now that we're done with it */
+                FreeTagItems(tags);
+            }
+
+        /****************************************************************/
+        /* This section builds the tag array on the stack, and passes   */
+        /* the array to a function.                                     */
+        /****************************************************************/
+
+            /* Now use the VarArgs (or stack based) version. */
+            if (win = OpenWindowTags ( NULL,
+                                       WA_Width, 320,
+                                       WA_Height, 50,
+                                       WA_Title, (ULONG)&#034;RKM Tag Example 1&#034;,
+                                       WA_IDCMP, IDCMP_CLOSEWINDOW,
+                                       WA_CloseGadget, TRUE,
+                                       WA_DragBar, TRUE,
+                                       TAG_DONE))
+            {
+                /* Wait for an event to occur */
+                WaitPort (win-&#062;UserPort);
+
+                /* Close the window now that we're done with it */
+                CloseWindow (win);
+            }
+
+            /* Close the library now */
+            CloseLibrary (UtilityBase);
+        }
+
+        /* Close the library now that we're done with it */
+        CloseLibrary (IntuitionBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

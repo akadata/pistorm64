@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-5-2" TITLE="4 / Preserving the Window Display / Refreshing Intuition Windows" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Preserving the Window Display / Refreshing Intuition Windows</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0118.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node011A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When the user or an application performs an Intuition operation which
+causes damage to a window, Intuition notifies that window's application.
+It does this by sending a message of the class <a href="../Libraries_Manual_guide/node01E0.html#line7">IDCMP_REFRESHWINDOW</a> to that
+window's IDCMP.
+
+In response to this message, your application should update the damaged
+areas.  Rendering proceeds faster and looks cleaner if it is restricted to
+the damaged areas only.  The <a href="../Libraries_Manual_guide/node011E.html">BeginRefresh()</a>/<a href="../Libraries_Manual_guide/node011E.html#line25">EndRefresh()</a> pair achieve
+that.  The application should call BeginRefresh() for the window, and then
+do its rendering.  Any rendering that would have gone into undamaged areas
+of the window is automatically discarded; only the area in need of repair
+is affected.  Finally, the application should call EndRefresh(), which
+removes the restriction on rendering, and informs the system that the
+damage region has been dealt with. Even if your application intends to do
+no rendering, it must at least call BeginRefresh()/EndRefresh(), to inform
+the system that the damage region is no longer needed.  If your
+application never needs to render in response to a refresh event, it can
+avoid having to call BeginRefresh()/EndRefresh() by setting the
+WFLG_NOCAREREFRESH flag or the <a href="../Libraries_Manual_guide/node0125.html#line62">WA_NoCareRefresh</a> tag in the
+<a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> call.
+
+Note that by the time that your application receives notification that
+refresh is needed, Intuition will have already refreshed your window's
+border and all gadgets in the window, as needed.  Thus, it is unnecessary
+to use any of the gadget-refreshing functions in response to an
+<a name="line27"><a href="../Libraries_Manual_guide/node01E0.html#line7">IDCMP_REFRESHWINDOW</a> event.</a>
+
+Operations performed between the <a href="../Libraries_Manual_guide/node011E.html">BeginRefresh()</a>/<a href="../Libraries_Manual_guide/node011E.html#line25">EndRefresh()</a> pair should
+be restricted to simple rendering.  All of the rendering functions in
+Intuition library and Graphics library are safe.  Avoid <a href="../Libraries_Manual_guide/node0146.html">RefreshGList()</a> or
+<a href="../Libraries_Manual_guide/node0177.html#line5">RefreshGadgets()</a>, or you risk deadlocking the computer.  Avoid calls that
+may lock the <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">LayerInfo</a> or get complicated in Intuition, since
+BeginRefresh() leaves the window's layer or layers locked.  Avoid
+<a href="../Libraries_Manual_guide/node01B4.html#line21">AutoRequest()</a> and <a href="../Libraries_Manual_guide/node01AC.html">EasyRequest()</a>, and therefore all direct or indirect disk
+related DOS calls.  See the &#034;<a href="../Libraries_Manual_guide/node0143.html#line10">Intuition Gadgets</a>&#034; chapter for more
+information on gadget restrictions with BeginRefresh()/EndRefresh().
+
+ <a href="../Libraries_Manual_guide/node011A.html">Simple Refresh</a>    <a href="../Libraries_Manual_guide/node011B.html">Smart Refresh</a>    <a href="../Libraries_Manual_guide/node011C.html">SuperBitMap Refresh</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

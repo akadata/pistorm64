@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_20" NODE="20-1" TITLE="20 Exec Memory Allocation / Memory Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>20 Exec Memory Allocation / Memory Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02A6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02A8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Normally, an application uses the <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a> function to ask for memory:
+
+    APTR AllocMem(ULONG byteSize, ULONG attributes);
+<a name="line5"></a>
+The byteSize argument is the amount of memory the application needs and
+attributes is a bit field which specifies any special memory
+characteristics (<a href="../Libraries_Manual_guide/node02A8.html">described later</a>).  If <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a> is successful, it
+returns a pointer to a block of memory.  The memory allocation will fail
+if the system cannot find a big enough block with the requested
+<a name="line11">attributes.  If AllocMem() fails, it returns NULL.</a>
+
+Because the system only keeps track of how much free memory is available
+and not how much is in use, it has no idea what memory has been allocated
+by any task.  This means an application has to explicitly return, or
+deallocate, any memory it has allocated so the system can return that
+memory to the free memory list.  If an application does not return a block
+of memory to the system, the system will not be able to reallocate that
+memory to some other task.  That block of memory will be lost until the
+Amiga is reset.  If you are using <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a> to allocate memory, a call to
+<a href="../Includes_and_Autodocs_2._guide/node0355.html">FreeMem()</a> will return that memory to the system:
+
+    void FreeMem(APTR mymemblock, ULONG byteSize);
+
+Here mymemblock is a pointer to the memory block the application is
+returning to the system and byteSize is the same size that was passed when
+the memory was allocated with <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a>.
+
+Unlike some compiler memory allocation functions, the Amiga system memory
+allocation functions return memory blocks that are at least longword
+aligned.  This means that the allocated memory will always start on an
+address which is at least evenly divisible by four.  This alignment makes
+the memory suitable for any system structures or buffers which require
+word or longword alignment, and also provides optimal alignment for stacks
+and memory copying.
+
+ <a href="../Libraries_Manual_guide/node02A8.html">Memory Attributes</a> 
+ <a href="../Libraries_Manual_guide/node02A9.html">Allocating System Memory</a> 
+ <a href="../Libraries_Manual_guide/node02AA.html">Freeing System Memory</a> 
+ <a href="../Libraries_Manual_guide/node02AB.html">Memory Information Functions</a> 
+ <a href="../Libraries_Manual_guide/node02AE.html">Using Memory Copy Functions</a> 
+ <a href="../Libraries_Manual_guide/node02B0.html">Summary of System Controlled Memory Handling Routines</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

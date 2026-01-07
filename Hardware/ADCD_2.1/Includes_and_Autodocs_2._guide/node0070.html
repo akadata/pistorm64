@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/dosasl.h" NODE="MAIN" TITLE="Includes/dos/dosasl.h" -->
+<head>
+<title>Includes/dos/dosasl.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node006F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0071.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_DOSASL_H
+#define DOS_DOSASL_H
+/*
+**
+**	$Filename: dos/dosasl.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.16 $
+**	$Date: 91/05/02 $
+**
+**	Pattern-matching structure definitions
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+<a name="line16"></a>
+#ifndef EXEC_LIBRARIES_H
+#include &#060;exec/libraries.h&#062;
+#endif
+<a name="line20"></a>
+#ifndef EXEC_LISTS_H
+#include &#060;exec/lists.h&#062;
+#endif
+<a name="line24"></a>
+#ifndef DOS_DOS_H
+#include &#060;dos/dos.h&#062;
+#endif
+
+
+/***********************************************************************
+************************ PATTERN MATCHING ******************************
+************************************************************************
+
+* structure expected by MatchFirst, MatchNext.
+* Allocate this structure and initialize it as follows:
+*
+* Set ap_BreakBits to the signal bits (CDEF) that you want to take a
+* break on, or NULL, if you don't want to convenience the user.
+*
+* If you want to have the FULL PATH NAME of the files you found,
+* allocate a buffer at the END of this structure, and put the size of
+* it into ap_Strlen.  If you don't want the full path name, make sure
+* you set ap_Strlen to zero.  In this case, the name of the file, and stats
+* are available in the ap_Info, as per usual.
+*
+* Then call MatchFirst() and then afterwards, MatchNext() with this structure.
+* You should check the return value each time (see below) and take the
+* appropriate action, ultimately calling MatchEnd() when there are
+* no more files and you are done.  You can tell when you are done by
+* checking for the normal AmigaDOS return code ERROR_NO_MORE_ENTRIES.
+*
+<a name="line52">*/</a>
+<a name="line53"></a>
+<a name="line54">struct AnchorPath {</a>
+<a name="line55">	struct AChain	*ap_Base;	/* pointer to first anchor */</a>
+<a name="line56">#define	ap_First ap_Base</a>
+<a name="line57">	struct AChain	*ap_Last;	/* pointer to last anchor */</a>
+<a name="line58">#define ap_Current ap_Last</a>
+<a name="line59">	LONG	ap_BreakBits;	/* Bits we want to break on */</a>
+<a name="line60">	LONG	ap_FoundBreak;	/* Bits we broke on. Also returns ERROR_BREAK */</a>
+<a name="line61">	BYTE	ap_Flags;	/* New use for extra word. */</a>
+<a name="line62">	BYTE	ap_Reserved;</a>
+<a name="line63">	WORD	ap_Strlen;	/* This is what ap_Length used to be */</a>
+<a name="line64">#define	ap_Length ap_Flags	/* Old compatability for LONGWORD ap_Length */</a>
+<a name="line65">	struct	FileInfoBlock ap_Info;</a>
+	UBYTE	ap_Buf[1];	/* Buffer for path name, allocated by user */
+	/* FIX! */
+};
+
+<a name="line70"></a>
+<a name="line71">#define	APB_DOWILD	0	/* User option ALL */</a>
+#define APF_DOWILD	1
+<a name="line73"></a>
+<a name="line74">#define	APB_ITSWILD	1	/* Set by MatchFirst, used by MatchNext	 */</a>
+#define APF_ITSWILD	2	/* Application can test APB_ITSWILD, too */
+				/* (means that there's a wildcard	 */
+				/* in the pattern after calling		 */
+				/* MatchFirst).				 */
+<a name="line79"></a>
+<a name="line80">#define	APB_DODIR	2	/* Bit is SET if a DIR node should be */</a>
+#define APF_DODIR	4	/* entered. Application can RESET this */
+				/* bit after MatchFirst/MatchNext to AVOID */
+				/* entering a dir. */
+<a name="line84"></a>
+<a name="line85">#define	APB_DIDDIR	3	/* Bit is SET for an &#034;expired&#034; dir node. */</a>
+#define APF_DIDDIR	8
+<a name="line87"></a>
+<a name="line88">#define	APB_NOMEMERR	4	/* Set on memory error */</a>
+#define APF_NOMEMERR	16
+<a name="line90"></a>
+<a name="line91">#define	APB_DODOT	5	/* If set, allow conversion of '.' to */</a>
+#define APF_DODOT	32	/* CurrentDir */
+<a name="line93"></a>
+<a name="line94">#define APB_DirChanged	6	/* ap_Current-&#062;an_Lock changed */</a>
+#define APF_DirChanged	64	/* since last MatchNext call */
+
+#define APB_FollowHLinks 7	/* follow hardlinks on DODIR - defaults   */
+<a name="line98">#define APF_FollowHLinks 128	/* to not following hardlinks on a DODIR. */</a>
+<a name="line99"></a>
+<a name="line100"></a>
+<a name="line101">struct AChain {</a>
+<a name="line102">	struct AChain *an_Child;</a>
+<a name="line103">	struct AChain *an_Parent;</a>
+	BPTR	an_Lock;
+	struct FileInfoBlock an_Info;
+<a name="line106">	BYTE	an_Flags;</a>
+<a name="line107">	UBYTE	an_String[1];	/* FIX!! */</a>
+<a name="line108">};</a>
+<a name="line109"></a>
+<a name="line110">#define	DDB_PatternBit	0</a>
+<a name="line111">#define	DDF_PatternBit	1</a>
+<a name="line112">#define	DDB_ExaminedBit	1</a>
+<a name="line113">#define	DDF_ExaminedBit	2</a>
+<a name="line114">#define	DDB_Completed	2</a>
+<a name="line115">#define	DDF_Completed	4</a>
+#define	DDB_AllBit	3
+#define	DDF_AllBit	8
+#define	DDB_Single	4
+#define	DDF_Single	16
+
+/*
+ * Constants used by wildcard routines, these are the pre-parsed tokens
+<a name="line123"> * referred to by pattern match.  It is not necessary for you to do</a>
+<a name="line124"> * anything about these, MatchFirst() MatchNext() handle all these for you.</a>
+<a name="line125"> */</a>
+<a name="line126"></a>
+<a name="line127">#define P_ANY		0x80	/* Token for '*' or '#?  */</a>
+<a name="line128">#define P_SINGLE	0x81	/* Token for '?' */</a>
+<a name="line129">#define P_ORSTART	0x82	/* Token for '(' */</a>
+<a name="line130">#define P_ORNEXT	0x83	/* Token for '|' */</a>
+<a name="line131">#define P_OREND	0x84	/* Token for ')' */</a>
+<a name="line132">#define P_NOT		0x85	/* Token for '~' */</a>
+<a name="line133">#define P_NOTEND	0x86	/* Token for */</a>
+<a name="line134">#define P_NOTCLASS	0x87	/* Token for '^' */</a>
+#define P_CLASS	0x88	/* Token for '[]' */
+#define P_REPBEG	0x89	/* Token for '[' */
+#define P_REPEND	0x8A	/* Token for ']' */
+<a name="line138">#define P_STOP		0x8B	/* token to force end of evaluation */</a>
+<a name="line139"></a>
+/* Values for an_Status, NOTE: These are the actual bit numbers */
+
+#define COMPLEX_BIT	1	/* Parsing complex pattern */
+#define EXAMINE_BIT	2	/* Searching directory */
+
+/*
+ * Returns from MatchFirst(), MatchNext()
+<a name="line147"> * You can also get dos error returns, such as ERROR_NO_MORE_ENTRIES,</a>
+<a name="line148"> * these are in the dos.h file.</a>
+<a name="line149"> */</a>
+
+#define ERROR_BUFFER_OVERFLOW	303	/* User or internal buffer overflow */
+#define ERROR_BREAK		304	/* A break character was received */
+#define ERROR_NOT_EXECUTABLE	305	/* A file has E bit cleared */
+
+#endif /* DOS_DOSASL_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

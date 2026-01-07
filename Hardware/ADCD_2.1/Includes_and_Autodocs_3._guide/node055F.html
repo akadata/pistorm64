@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="serial" NODE="CMD_WRITE" TITLE="serial.device/CMD_WRITE" -->
+<head>
+<title>serial.device/CMD_WRITE</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node055E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0560.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       <a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a> -- send output to serial port
+
+<b>   FUNCTION</b>
+       This command causes a stream of characters to be written out
+       the serial port. The number of characters is specified in
+       io_Length, unless -1 is used, in which case output is sent until
+       a null(0x00) is encountered.
+
+<b>   IO REQUEST</b>
+       io_Message      must have mn_ReplyPort initialized
+       io_Device       set by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+       io_Unit         set by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+       io_Command      CMD_WRITE
+       io_Flags        Set IOF_QUICK to try quick I/O
+       io_Length       number of characters to transmit, or if set
+                       to -1 transmit until null encountered in buffer
+       io_Data         pointer to block of data to transmit
+
+<b>   RESULTS</b>
+       Error -- if the <a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a> succeded, then io_Error will be null.
+           If the <a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a> failed, then the io_Error will be non-zero.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0563.html">serial.device/SDCMD_SETPARAMS</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

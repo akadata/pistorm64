@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-1" TITLE="31 Commodities Exchange Library / Custom Input Handlers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / Custom Input Handlers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03FF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0401.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The input.device has a hand in almost all user input on the Amiga.  It
+gathers input events from the keyboard, the gameport (mouse), and several
+other sources, into one input &#034;stream&#034;.  Special programs called input
+event handlers intercept input events along this stream, examining and
+sometimes changing the input events.  Both Intuition and the console
+device use input handlers to process user input.
+
+     <a href="../Libraries_Manual_guide/node05FA.html">Figure 31-1: The Amiga Input Stream</a> 
+
+Using the input.device, a program can introduce its own custom handler
+into the chain of input handlers at almost any point in the chain.  &#034;Hot
+key&#034; programs, shell pop-up programs, and screen blankers all commonly use
+custom input handlers to monitor user input before it gets to the
+Intuition input handler.
+
+
+     <a href="../Libraries_Manual_guide/node05FB.html">Figure 31-2: A Custom Input Handler</a> 
+
+Custom input handlers do have their drawbacks, however.  Not only are
+these handlers hard to program, but because there is no standard way to
+implement and control them, multiple handlers often do not work well
+together.  Their antisocial behavior can result in load order dependencies
+and incompatibilities between different custom input handlers.  Even for
+the expert user, having several custom input handlers coexist peacefully
+can be next to impossible.
+
+     <a href="../Libraries_Manual_guide/node05FC.html">Figure 31-3: The Commodities Network</a> 
+
+Commodities Exchange eliminates these problems by providing a simple,
+standardized way to program and control custom input handlers.  It is
+divided into three parts: an Exec library, a controller program, and some
+<a name="line33">amiga.lib functions.</a>
+
+The Exec library is called commodities.library.  When it is first opened,
+commodities.library establishes a single input handler just before
+Intuition in the input chain.  When this input handler receives an input
+event, it creates a <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a> (Commodities Exchange Message) corresponding
+to the input event, and diverts the CxMessage through the network of
+<a name="line40">Commodities Exchange input handlers (Figure 31-3).</a>
+
+These handlers are made up of trees of different <a href="../Libraries_Manual_guide/node0401.html">CxObjects</a> (Commodities
+Exchange Objects), each of which performs a simple operation on the
+<a href="../Libraries_Manual_guide/node0403.html">CxMessages</a>.  Any CxMessages that exit the network are returned to the
+input.device's input stream as input events.
+
+Through function calls to the commodities.library, an application can
+install a custom input handler.  A Commodities Exchange application,
+sometimes simply referred to as a commodity, uses the <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> primitives
+to do things such as filter certain <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a>, translate CxMessages,
+signal a task when a CxObject receives a CxMessage, send a message when a
+CxObject receives a CxMessage, or if necessary, call a custom function
+when a CxObject receives a CxMessage.
+
+The controller program is called Commodities Exchange.  The user can
+monitor and control all the currently running Commodities Exchange
+applications from this one program.  The user can enable and disable a
+commodity, kill a commodity, or, if the commodity has a window, ask the
+commodity to show or hide its window.  When the user requests any of these
+actions, the controller program sends the commodity a message, telling it
+which action to perform.
+
+The third component of Commodities Exchange is its scanned library
+functions.  These functions are part of the amiga.lib scanned library.
+They do a lot of the work involved with parsing command lines and Tool
+Types.
+
+Commodities Exchange is ideal for programs like hot keys/pop ups, screen
+blankers, and mouse blankers that need to monitor all user input.
+Commodities Exchange should never be used as an alternate method of
+receiving user input for an application.  Other applications depend on
+getting user input in some form or another from the input stream.   A
+greedy program that diverts input to itself rather than letting the input
+go to where the user expects it can seriously confuse the user, not to
+mention compromise the advantages of multitasking.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

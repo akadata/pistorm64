@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_11" NODE="11-2-2" TITLE="11 / Easy Memory Allocation and Deallocation / How to Remember" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>11 / Easy Memory Allocation and Deallocation / How to Remember</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01F8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01FA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To use Intuition's memory functions, first create an anchor for the memory
+to be allocated by declaring a variable that is a pointer to a <a href="../Libraries_Manual_guide/node01FA.html">Remember</a>
+structure and initializing that pointer to NULL.  This variable is called
+the remember key.
+
+<a name="line7">    struct Remember *rememberKey = NULL;</a>
+
+Call <a href="../Libraries_Manual_guide/node01F8.html">AllocRemember()</a> with the address of the remember key, along with the
+memory requirements for the specific allocation.  Multiple allocations may
+<a name="line11">be made before a call to <a href="../Libraries_Manual_guide/node01F8.html#line29">FreeRemember()</a>.</a>
+
+    memBlockA = AllocRemember(&#038;rememberKey, SIZE_A,
+                              MEMF_CLEAR | MEMF_PUBLIC);
+    if (memBlockA == NULL)
+        {
+        /* error: allocation failed */
+        printf(&#034;Memory allocation failed.\n&#034;);
+        }
+    else
+        {
+        /* use the memory here */
+        printf(&#034;Memory allocation succeeded.\n&#034;);
+        }
+
+<a href="../Libraries_Manual_guide/node01F8.html">AllocRemember()</a> actually performs two memory allocations per call, one for
+the memory requested and the other for a <a href="../Libraries_Manual_guide/node01FA.html">Remember</a> structure.  The Remember
+structure is filled in with data describing the allocation, and is linked
+into the list to which the remember key points.
+
+To free memory that has been allocated, simply call <a href="../Libraries_Manual_guide/node01F8.html#line29">FreeRemember()</a> with
+the correct remember key.
+
+    void FreeRemember(&#038;rememberKey, TRUE);
+
+This will free all the memory blocks previously allocated with
+<a href="../Libraries_Manual_guide/node01F8.html">AllocRemember()</a> in a single call.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

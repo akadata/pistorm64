@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="wb" NODE="OpenWorkbenchObjectA()" TITLE="workbench.library/OpenWorkbenchObjectA" -->
+<head>
+<title>workbench.library/OpenWorkbenchObjectA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05C0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05C2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	OpenWorkbenchObjectA -- <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open</a> a drawer or launch a program as if
+	    the user had double-clicked on an icon. (V44)
+
+<b>   SYNOPSIS</b>
+	success = OpenWorkbenchObjectA(name,tags)
+	   D0                           A0   A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> OpenWorkbenchObjectA(STRPTR name,struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *tags);
+
+	success = OpenWorkbenchObject(name,...);
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> OpenWorkbenchObject(STRPTR name,...);
+
+<b>   FUNCTION</b>
+	This routine attempts to open the named object as if the user
+	had double-clicked on its icon. This allows you to open drawers
+	under program control or to have Workbench launch your programs.
+
+<b>   INPUTS</b>
+	name -- Name of the object to be opened; this can be a drawer
+	    name, a tool name or a project name.
+
+	tags -- Additional options.
+
+<b>   TAGS</b>
+	WBOPENA_ArgLock (BPTR) -- Corresponds to the WBArg-&#062;wa_Lock
+	    entry of a <a href="../Includes_and_Autodocs_3._guide/node0650.html#line24">WBStartup</a> message, to be sent to a program
+	    to be launched. The lock you provide will be duplicated
+	    when it is put into a <a href="../Includes_and_Autodocs_3._guide/node0650.html#line33">WBArg</a> list.
+
+	    The WBOPENA_ArgLock determines the lock parameters
+	    to be associated with all following WBOPENA_ArgName tags.
+
+	    This tag defaults to NULL.
+
+	WBOPENA_ArgName (STRPTR) -- Corresponds to the WBArg-&#062;wa_Name
+	    entry of a <a href="../Includes_and_Autodocs_3._guide/node0650.html#line24">WBStartup</a> message to be sent to a program
+	    to be launched. This tag can be used to construct a list
+	    of parameters to pass to the tool/project to be launched.
+	    It works in conjunction with the WBOPENA_ArgLock tag.
+	    The name you provide will be duplicated when it is put
+	    into a <a href="../Includes_and_Autodocs_3._guide/node0650.html#line33">WBArg</a> list.
+
+<b>   RESULTS</b>
+	result -- FALSE if the object in question could not be opened,
+	    TRUE otherwise. Note that TRUE may be returned even if
+	    the program the object represents could not be launched;
+	    this is due to limitations in the current (V44) Workbench
+	    design. If FALSE is returned, you can query the error
+	    code using <a href="../Includes_and_Autodocs_3._guide/node0182.html">dos.library/IoErr()</a>.
+
+<b>   EXAMPLE</b>
+	/* Launch Multiview with S:Startup-Sequence as its parameter. */
+	OpenWorkbenchObject(&#034;MultiView&#034;,
+	    WBOPENA_ArgLock, Lock(&#034;S:&#034;,SHARED_LOCK),
+	    WBOPENA_ArgName, &#034;Startup-Sequence&#034;,
+	TAG_DONE);
+
+	/* Launch the application &#034;Paint&#034; with the project files &#034;Image1&#034;
+	 * and &#034;Image2&#034;, which are both found in the drawer &#034;Paint:Pictures&#034;.
+	 */
+	OpenWorkbenchObject(&#034;Paint&#034;,
+	    WBOPENA_ArgLock, Lock(&#034;Paint:Pictures&#034;,SHARED_LOCK),
+	    WBOPENA_ArgName, &#034;Image1&#034;,
+	    WBOPENA_ArgName, &#034;Image2&#034;,
+	TAG_DONE);
+
+	/* Launch the application &#034;Paint&#034; with the project files &#034;Image1&#034;
+	 * and &#034;Anim1&#034;, which are both found in the drawers &#034;Paint:Pictures&#034;
+	 * and &#034;Paint:Animations&#034;, respectively.
+	 */
+	OpenWorkbenchObject(&#034;Paint&#034;,
+	    WBOPENA_ArgLock, Lock(&#034;Paint:Pictures&#034;,SHARED_LOCK),
+	    WBOPENA_ArgName, &#034;Image1&#034;,
+	    WBOPENA_ArgLock, Lock(&#034;Paint:Animations&#034;,SHARED_LOCK),
+	    WBOPENA_ArgName, &#034;Anim1&#034;,
+	TAG_DONE);
+
+<b>   NOTES</b>
+	You need not specify fully qualified path names for programs to
+	be launched. Workbench will look for files without fully
+	qualified path names along its default Shell search path.
+	In any case, Workbench will look for the tool to be launched
+	in the current directory of the program that called
+	OpenWorkbenchObjectA(). The same holds true for drawers.
+
+	When launching a program, Workbench will automatically figure
+	out which tool to use if the object in question is actually a
+	project file with a project icon. Note that if the project
+	icon's default tool cannot be found, you will not see any
+	error message.
+
+	Workbench transparently supports launching of Shell programs,
+	but this is not recommended. You should always launch Shell
+	programs from your own process.
+
+	When you open a drawer, all WBOPENA_Arg[..] parameters you may
+	have provided will be ignored.
+
+	For this function call to succeed, Workbench must be open. This
+	means that the LoadWB command was executed and the Workbench
+	screen has been opened.
+
+	While the user is dragging icons, no on-screen rendering may
+	take place. In this state Workbench may refuse to execute the
+	OpenWorkbenchObject() call and return an error code instead
+	(ERROR_OBJECT_IN_USE).
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0182.html">dos.library/IoErr</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05BF.html">workbench.library/CloseWorkbenchObjectA</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0650.html">&#060;workbench/startup.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

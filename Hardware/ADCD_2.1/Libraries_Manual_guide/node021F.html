@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-3-2-1" TITLE="12 / / The Active Gadget / RKMButtonclass.c" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / The Active Gadget / RKMButtonclass.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node021E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0220.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following example is a sample Boopsi gadget, RKMButClass.c.  While the
+user has the RKMButton selected, the gadget sends an <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> message to
+its <a href="../Libraries_Manual_guide/node020B.html#line20">ICA_TARGET</a> for every timer event the button sees.  The gadget sends
+notification about its RKMBUT_Pulse attribute, which is the horizontal
+distance in screen pixels the mouse is from the center of the button.  The
+gadget takes care of rendering all of its imagery (as opposed to using a
+Boopsi image to do it).  The gadget's imagery is scalable to any
+dimensions and can be set (using <a href="../Libraries_Manual_guide/node0205.html#line5">SetGadgetAttrs()</a>) while the gadget is in
+place.
+
+One possible use for such a gadget is as buttons for a prop gadget. If the
+user has the prop gadget's RKMButton selected, while the mouse is to the
+left of the button's center, the knob on the prop gadget moves left.
+While the mouse is to the right of the button's center, the knob on the
+prop gadget moves right.  The speed at which the knob moves is
+proportional to the horizontal distance from the mouse to the active
+RKMButton.
+
+     <a href="../Libraries_Manual_guide/node0580.html">RKMButClass.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

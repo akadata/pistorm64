@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="FindDisplayInfo()" TITLE="graphics.library/FindDisplayInfo" -->
+<head>
+<title>graphics.library/FindDisplayInfo</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node043A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node043C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    FindDisplayInfo -- search for a record identified by a specific key
+                       (V36)
+
+SYNOPSIS
+    handle = FindDisplayInfo(ID)
+    D0                       D0
+
+    DisplayInfoHandle FindDisplayInfo(ULONG);
+
+FUNCTION
+    Given a 32-bit Mode Key, return a handle to a valid DisplayInfoRecord
+    found in the graphics database.  Using this handle, you can obtain
+    information about this Mode, including its default dimensions,
+    properties, and whether it is currently available for use.
+
+INPUTS
+    ID     - unsigned long identifier
+
+RESULT
+    handle - handle to a displayinfo Record with that key
+             or NULL if no match.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00BD.html">graphics/displayinfo.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

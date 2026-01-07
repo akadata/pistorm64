@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-6-8" TITLE="30 / / Creating and Using New Layers / Sub-Layer Rectangle Operations" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / / Creating and Using New Layers / Sub-Layer Rectangle Operations</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03F6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03F8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node03A4.html">SwapBitsRastPortClipRect()</a> routine is for applications that do not
+want to worry about clipping rectangles.
+
+    void SwapBitsRastPortClipRect( struct RastPort *rp,
+                                   struct ClipRect *cr );
+
+For instance, you may use The <a href="../Includes_and_Autodocs_2._guide/node03A4.html">SwapBitsRastPortClipRect()</a> to produce a menu
+<a name="line9">without using Intuition.  There are two ways to produce such a menu:</a>
+
+ 1. Create an up-front layer with <a href="../Libraries_Manual_guide/node03EF.html#line13">CreateUpfrontLayer()</a>, then render the
+    menu in it.  This could use lots of memory and require a lot of (very
+    temporary) &#034;slice-and-dice&#034; operations to create all of the clipping
+    rectangles for the existing windows and so on.
+
+ 2. Use <a href="../Includes_and_Autodocs_2._guide/node03A4.html">SwapBitsRastPortClipRect()</a>, directly on the display drawing area:
+
+      * Render the menu in a back-up area off the display, then lock all
+        of the on-display layers so that no task may use graphics
+        routines to draw over the menu area on the display.
+
+      * Next, swap the on-display bits with the off-display bits, making
+        the menu appear.
+
+      * When finished with the menu, swap again and unlock the layers.
+
+The second method is faster and leaves the clipping rectangles and most of
+the rest of the window data structures untouched.
+
+    Warning:
+    --------
+    All of the layers must be locked while the menu is visible if you
+    use the second method above.  Any task that is using any of the
+    layers for graphics output will be halted while the menu operations
+    are taking place.  If, on the other hand, the menu is rendered as a
+    layer, no task need be halted while the menu is up because the lower
+    layers need not be locked.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Keyboard_Events.c" NODE="MAIN" TITLE="Devices/Dev_examples/Keyboard_Events.c" -->
+<head>
+<title>Devices/Dev_examples/Keyboard_Events.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node019F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01A1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* Shown below is an example keyboard.device read-event program:   */
+/*
+ * Keyboard_Events.c
+ *
+ * This example does not work very well in a system where
+ * input.device is active since input.device also actively calls for
+ * keyboard events via this call. For that reason, you will not get all of
+ * the keyboard events. Neither will the input device;no one will be happy.
+ *
+ * Compile with SAS 5.10  lc -b1 -cfistq -v -y -L
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/io.h&#062;
+#include &#060;exec/ports.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;devices/inputevent.h&#062;
+#include &#060;devices/keyboard.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }     /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+VOID Display_Event(struct InputEvent *keyEvent)
+{
+printf(&#034;Got key event: KeyCode: %2x  Quailifiers: %4x\n&#034;,
+               keyEvent-&#062;ie_Code,
+               keyEvent-&#062;ie_Qualifier);
+}
+
+VOID main(int argc, char *argv[])
+{
+struct IOStdReq   *keyRequest;
+struct MsgPort    *keyPort;
+struct InputEvent *keyEvent;
+       SHORT      loop;
+
+if (keyPort=CreatePort(NULL,NULL))
+  {
+  if (keyRequest=
+          (struct IOStdReq *)CreateExtIO(keyPort,sizeof(struct IOStdReq)))
+      {
+      if (!OpenDevice(&#034;keyboard.device&#034;,NULL,
+                        (struct IORequest *)keyRequest,NULL))
+          {
+          if (keyEvent=AllocMem(sizeof(struct InputEvent),MEMF_PUBLIC))
+              {
+              for (loop=0;loop&#060;4;loop++)
+                   {
+                   keyRequest-&#062;io_Command=KBD_READEVENT;
+                   keyRequest-&#062;io_Data=(APTR)keyEvent;
+
+                   /*
+                    * We want 1 event, so we just set the
+                    * length field to the size, in bytes
+                    * of the event.  For multiple events,
+                    * set this to a multiple of that size.
+                    * The keyboard device NEVER fills partial
+                    * events...
+                    */
+
+                   keyRequest-&#062;io_Length=sizeof(struct InputEvent);
+                   DoIO((struct IORequest *)keyRequest);
+
+                       /* Check for CLI startup... */
+                   if (argc)
+                       Display_Event(keyEvent);
+                   }
+
+              FreeMem(keyEvent,sizeof(struct InputEvent));
+              }
+          else
+              printf(&#034;Error:Could not allocate memory for InputEvent\n&#034;);
+
+          CloseDevice((struct IORequest *)keyRequest);
+          }
+      else
+          printf(&#034;Error: Could not open keyboard.device\n&#034;);
+
+      DeleteExtIO((struct IORequest *)keyRequest);
+      }
+  else
+      printf(&#034;Error: Could not create I/O request\n&#034;);
+
+  DeletePort(keyPort);
+  }
+  else
+    printf(&#034;Error: Could not create message port\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-2" TITLE="27 / Drawing Routines / Using the Graphics Drawing Routines" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / Drawing Routines / Using the Graphics Drawing Routines</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0354.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0356.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This section shows you how to use the Amiga drawing routines. All of these
+routines work either on their own or along with the windowing system and
+layers library.  For details about using the layers and windows, see the
+<a name="line5">chapters on &#034;<a href="../Libraries_Manual_guide/node03E2.html">Layers Library</a>&#034; and &#034;<a href="../Libraries_Manual_guide/node00FE.html">Intuition</a> Windows&#034;.</a>
+
+    Use WaitBlit().
+    ---------------
+    The graphics library rendering and data movement routines generally
+    wait to get access to the blitter, start their blit, and then exit.
+    Therefore, you must <a href="../Libraries_Manual_guide/node0368.html">WaitBlit()</a> after a graphics rendering or data
+    movement call if you intend to immediately deallocate, examine, or
+    perform order-dependent processor operations on the memory used in
+<a name="line14">    the call.</a>
+
+As you read this section, keep in mind that to use the drawing routines,
+you need to pass them a pointer to a <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>.  You can define the
+RastPort directly, as shown in the sample program segments in preceding
+sections, or you can get a RastPort from your <a href="../Libraries_Manual_guide/node0121.html">Window</a> structure using code
+like the following:
+
+    struct Window *window;
+    struct RastPort *rastPort;
+
+    window = OpenWindow(&#038;newWindow);  /*  You could use OpenWindowTags() */
+    if (window)
+        rastPort = window-&#062;RPort;
+
+You can also get the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> from the <a href="../Libraries_Manual_guide/node03E4.html">Layer</a> structure, if you are not
+using Intuition.
+
+ <a href="../Libraries_Manual_guide/node0356.html">Drawing Individual Pixels</a> 
+ <a href="../Libraries_Manual_guide/node0357.html">Reading Individual Pixels</a> 
+ <a href="../Libraries_Manual_guide/node0358.html">Drawing Ellipses and Circles</a> 
+ <a href="../Libraries_Manual_guide/node0359.html">Drawing Lines</a> 
+ <a href="../Libraries_Manual_guide/node035A.html">Drawing Patterned Lines</a> 
+ <a href="../Libraries_Manual_guide/node035B.html">Drawing Multiple Lines with a Single Command</a> 
+ <a href="../Libraries_Manual_guide/node035C.html">Area-fill Operations</a> 
+ <a href="../Libraries_Manual_guide/node035D.html">Ellipse and Circle-fill Operations</a> 
+ <a href="../Libraries_Manual_guide/node035E.html">Flood-fill Operations</a> 
+ <a href="../Libraries_Manual_guide/node035F.html">Rectangle-fill Operations</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

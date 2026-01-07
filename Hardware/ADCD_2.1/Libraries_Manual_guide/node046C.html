@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_34" NODE="34-1-3" TITLE="34 / Keymap Functions / Accessing the Keymap For the Current Console" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>34 / Keymap Functions / Accessing the Keymap For the Current Console</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node046B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node046D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The function AskKeyMap() shown below does not return a pointer to a table
+of pointers to currently assigned key mapping. Instead, it copies the
+current set of pointers to a user-designated area of memory.  AskKeyMap()
+returns a TRUE or FALSE value that says whether or not the function
+<a name="line6">succeeded.</a>
+
+The function SetKeyMap(), also shown below, copies the designated key map
+data structure to the console device.  Thus this routine is complementary
+to AskKeymap() in that it can restore an original key mapping as well as
+establish a new one.
+
+    Ask/SetKeyMap() functions.
+    --------------------------
+    These functions assume that you have already opened the console.device
+    and that request is a valid IOStdReq structure for the newly opened
+    console. These functions are not part of the keymap.library, nor of
+    the console.device.  These merely demonstrate <a href="../Libraries_Manual_guide/node0469.html#line13">CD_ASKKEYMAP</a> and
+<a name="line19">    <a href="../Libraries_Manual_guide/node0469.html#line13">CD_SETKEYMAP</a> which are console.device commands.</a>
+
+
+/* These functions require that you have created a port and an IO request,
+ * and have opened the console device as shown in the Console Device
+ * chapter of the Devices volume of this manual set.
+ */
+#include &#060;devices/keymap.h&#062;
+
+BOOL AskKeyMap(struct IOStdReq *request, struct KeyMap *keymap)
+{
+    request-&#062;io_Command = CD_ASKKEYMAP;
+    request-&#062;io_Length = sizeof(struct KeyMap);
+    request-&#062;io_Data = (APTR)keymap;  /* where to put it */
+    DoIO(request);
+    if(request-&#062;io_Error) return(FALSE);
+    else  return(TRUE); /* if no error, it worked. */
+}
+
+BOOL SetKeyMap(struct IOStdReq *request,struct KeyMap *keymap)
+{
+    request-&#062;io_Command = CD_SETKEYMAP;
+    request-&#062;io_Length = sizeof(struct KeyMap);
+    request-&#062;io_Data = (APTR)keymap;      /* where to get it */
+    DoIO(request);
+    if(request-&#062;io_Error) return(FALSE);
+    else  return(TRUE);     /* if no error, it worked. */
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

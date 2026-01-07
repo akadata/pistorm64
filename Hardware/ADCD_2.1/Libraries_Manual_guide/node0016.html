@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_1" NODE="1-1-5" TITLE="1 / Programming in the Amiga Environment / The Custom Chips" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>1 / Programming in the Amiga Environment / The Custom Chips</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0015.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0017.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The most important feature of the Amiga's hardware design is the set of
+custom chips that perform specialized tasks independently of the CPU. Each
+of the custom chips (named Paula, Agnus, and Denise) is dedicated to a
+particular job:
+
+Paula   (8364)            Audio, floppy disk, serial, interrupts
+Agnus   (8361/8370/8372)  <a href="../Libraries_Manual_guide/node031F.html">Copper</a> (video coprocessor), blitter, DMA control
+Denise  (8362)            Color registers, color DACs (Digital to Analog
+                          Converters) and sprites
+
+The custom chips can perform work independently of the CPU because they
+have DMA, or Direct Memory Access, capability.  DMA means the custom chips
+can access special areas of memory by themselves without any CPU
+involvement.  (On computer systems without DMA, the CPU must do some or
+all of the memory handling for support chips.)  The Amiga's custom chips
+make <a href="../Libraries_Manual_guide/node000A.html">multitasking</a> especially effective because they can handle things like
+rendering graphics and playing sound independently, giving the CPU more
+time to handle the overhead of <a href="../Libraries_Manual_guide/node000B.html">task-switching</a> and other important jobs.
+
+ <a href="../Libraries_Manual_guide/node0017.html">Custom Chip Revisions</a>    <a href="../Libraries_Manual_guide/node0018.html">Two Kinds of Memory</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

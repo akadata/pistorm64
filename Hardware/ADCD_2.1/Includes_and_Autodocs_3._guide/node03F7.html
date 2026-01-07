@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="SetWindowPointerA()" TITLE="intuition.library/SetWindowPointerA" -->
+<head>
+<title>intuition.library/SetWindowPointerA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03F6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03F8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	SetWindowPointerA -- Select a pointer for your window. (V39)
+	SetWindowPointer -- Varargs stub for SetWindowPointerA(). (V39)
+
+<b>    SYNOPSIS</b>
+	SetWindowPointerA( window, taglist )
+	                   A0      A1
+
+	VOID SetWindowPointerA( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> * );
+
+	SetWindowPointer( window, tag1, ... )
+
+	VOID SetWindowPointer( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *, ULONG tag1, ... );
+
+<b>    FUNCTION</b>
+	Allows you to set the pointer image associated with the
+	specified window.  Whenever the window is the active one,
+	the pointer image will change to the window's version.
+	If the window is the active one when this routine is
+	called, the change takes place immediately.
+
+<b>    INPUTS</b>
+	window = pointer to the window to receive this pointer definition
+	taglist = pointer to a taglist describing your pointer
+
+<b>    TAGS</b>
+	The same three tags are also accepted by <a href="../Includes_and_Autodocs_3._guide/node03D6.html">OpenWindowTagList()</a>,
+	which allows you to establish the initial pointer at the
+	time you open your window.
+
+	WA_Pointer (APTR) - The pointer you wish to associate with
+	    your window.  If NULL, you are requesting the <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a>
+	    default pointer.  <a href="../Includes_and_Autodocs_3._guide/node05F6.html#line24">Custom</a> pointers should be allocated
+	    by performing a <a href="../Includes_and_Autodocs_3._guide/node03CB.html">NewObject()</a> on &#034;pointerclass&#034;.
+	    (See &#060;intuition/pointerclass.h&#062;).  Defaults to NULL.
+
+	WA_BusyPointer (BOOL) - Set to TRUE to request the <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a>
+	    busy-pointer.  If FALSE, your pointer will be as requested
+	    by WA_Pointer.  Defaults to FALSE.
+
+	WA_PointerDelay (BOOL) - Set to TRUE to defer changing your
+	    pointer for a brief instant.  This is typically used
+	    along with setting the busy pointer, especially when
+	    the application knows it may be busy for a very short
+	    while.  If the application clears the pointer or sets
+	    another pointer before the delay expires, the pending
+	    pointer change is cancelled.  This reduces short
+	    flashes of the busy pointer.
+
+<b>    RESULT</b>
+	None
+
+<b>    EXAMPLE</b>
+	This example sets the standard busy pointer with pointer-delay,
+	does a bit of work, then clears the pointer:
+
+		/* Put up the busy pointer, with pointer-delay */
+		SetWindowPointer( win,
+		    WA_BusyPointer, TRUE,
+		    WA_PointerDelay, TRUE,
+		    TAG_DONE );
+
+		/* Do busy stuff here */
+
+		/* No tags means &#034;clear the pointer&#034; */
+		SetWindowPointer( win,
+		    TAG_DONE );
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03F4.html">SetPointer()</a>, <a href="../Includes_and_Autodocs_3._guide/node039E.html">ClearPointer()</a>, ROM Kernel Manual: Libraries
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

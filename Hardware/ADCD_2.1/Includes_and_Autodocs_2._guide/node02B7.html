@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="GetDeviceProc()" TITLE="dos.library/GetDeviceProc" -->
+<head>
+<title>dos.library/GetDeviceProc</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02B6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02B8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GetDeviceProc -- Finds a handler to send a message to (V36)
+
+SYNOPSIS
+    devproc = GetDeviceProc(name, devproc)
+      D0                     D1     D2
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node0078.html#line418">DevProc</a> *GetDeviceProc(STRPTR, struct <a href="../Includes_and_Autodocs_2._guide/node0078.html#line418">DevProc</a> *)
+
+FUNCTION
+    Finds the handler/filesystem to send packets regarding 'name' to.
+    This may involve getting temporary locks.  It returns a structure
+    that includes a lock and msgport to send to to attempt your operation.
+    It also includes information on how to handle multiple-directory
+    assigns (by passing the <a href="../Includes_and_Autodocs_2._guide/node0078.html#line418">DevProc</a> back to GetDeviceProc() until it
+    returns NULL).
+
+    The initial call to GetDeviceProc() should pass NULL for devproc.  If
+    after using the returned <a href="../Includes_and_Autodocs_2._guide/node0078.html#line418">DevProc</a>, you get an ERROR_OBJECT_NOT_FOUND,
+    and (devproc-&#062;dvp_Flags &#038; DVPF_ASSIGN) is true, you should call
+    GetDeviceProc() again, passing it the devproc structure.  It will
+    either return a modified devproc structure, or NULL (with
+    ERROR_NO_MORE_ENTRIES in IoErr()).  Continue until it returns NULL.
+
+    This call also increments the counter that locks a handler/fs into
+    memory.  After calling <a href="../Includes_and_Autodocs_2._guide/node02B0.html">FreeDeviceProc()</a>, do not use the port or lock
+    again!
+
+INPUTS
+    name    - name of the object you wish to access.  This can be a
+              relative path (&#034;foo/bar&#034;), relative to the current volume
+              (&#034;:foo/bar&#034;), or relative to a device/volume/assign
+              (&#034;foo:bar&#034;).
+    devproc - A value returned by GetDeviceProc() before, or NULL
+
+RESULT
+    devproc - a pointer to a <a href="../Includes_and_Autodocs_2._guide/node0078.html#line418">DevProc</a> structure or NULL
+
+BUGS
+    Counter not currently active in 2.0.
+    In 2.0 and 2.01, you HAD to check DVPF_ASSIGN before calling it again.
+    This was fixed for the 2.02 release of V36.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02B0.html">FreeDeviceProc()</a>, <a href="../Includes_and_Autodocs_2._guide/node0295.html">DeviceProc()</a>, <a href="../Includes_and_Autodocs_2._guide/node0282.html">AssignLock()</a>, <a href="../Includes_and_Autodocs_2._guide/node0281.html">AssignLate()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node0283.html">AssignPath()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

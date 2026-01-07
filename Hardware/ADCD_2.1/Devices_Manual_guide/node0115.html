@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_8" NODE="8-2" TITLE="8 Narrator Device / Device Interface" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>8 Narrator Device / Device Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0114.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0116.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The narrator device operates like all other Amiga devices.  To use the
+narrator device, you must first open it.  This initializes certain global
+areas, opens the audio device, allocates audio channels, and performs
+other housekeeping functions.  Once open, the device is ready to receive
+I/O commands (most typically <a href="../Includes_and_Autodocs_2._guide/node04C7.html">CMD_WRITE</a> and<a href="../Includes_and_Autodocs_2._guide/node04C3.html">CMD_READ</a>). Finally, when
+finished, the user should close the device.  This will free some buffers
+and allow the entire device to be expunged should the system require
+memory.  See the <a href="../Devices_Manual_guide/node0006.html">Introduction to Amiga System Devices</a> chapter for general
+<a name="line10">information on device usage.</a>
+
+The narrator device uses two extended I/O request structures: narrator_rb
+for write commands (to produce speech output) and mouth_rb for read
+commands (to receive mouth shape changes and word/syllable synchronization
+events).  Both I/O request structures have been expanded (in a backwards
+compatible fashion) for the V37 narrator device with several new fields
+<a name="line17">defined.</a>
+
+    struct narrator_rb
+    {
+       struct IOStdReq  message; /* Standard IORequest Block       */
+       UWORD   rate;             /* Speaking rate (words/minute)   */
+       UWORD   pitch;            /* Baseline pitch in Hertz        */
+       UWORD   mode;             /* Pitch mode                     */
+       UWORD   sex;              /* Sex of voice                   */
+       UBYTE   *ch_masks;        /* Pointer to audio allocation maps  */
+       UWORD   nm_masks;         /* Number of audio allocation maps   */
+       UWORD   volume;           /* Volume. 0 (off) thru 64        */
+       UWORD   sampfreq;         /* Audio sampling frequency       */
+       UBYTE   mouths;           /* If non-zero, generate mouths   */
+       UBYTE   chanmask; /* Which ch mask used (internal - do not modify)*/
+       UBYTE   numchan;  /* Num ch masks used (internal- do not modify) */
+       UBYTE   flags;            /* New feature flags              */
+       UBYTE   F0enthusiasm;     /* F0 excursion factor            */
+       UBYTE   F0perturb;        /* Amount of F0 perturbation      */
+       BYTE    F1adj;            /* F1 adjustment in +- 5% steps   */
+       BYTE    F2adj;            /* F2 adjustment in +- 5% steps   */
+       BYTE    F3adj;            /* F3 adjustment in +- 5% steps   */
+       BYTE    A1adj;            /* A1 adjustment in decibels      */
+       BYTE    A2adj;            /* A2 adjustment in decibels      */
+       BYTE    A3adj;            /* A3 adjustment in decibels      */
+       UBYTE   articulate;       /* Transition time multiplier     */
+       UBYTE   centralize;       /* Degree of vowel centralization */
+       char    *centphon;        /* Pointer to central ASCII phon  */
+       BYTE    AVbias;           /* Amplitude of voicing bias      */
+       BYTE    AFbias;           /* Amplitude of frication bias    */
+<a name="line47">       BYTE    priority;         /* Priority while speaking        */</a>
+       BYTE    pad1;             /* For alignment                  */
+<a name="line49">    };</a>
+
+    struct mouth_rb
+    {
+       struct  narrator_rb voice;/* Speech IORequest Block         */
+       UBYTE   width;            /* Mouth width (returned value)   */
+       UBYTE   height;           /* Mouth height (returned value)  */
+       UBYTE   shape;            /* Internal use, do not modify    */
+       UBYTE   sync;             /* Returned sync events           */
+<a name="line58">    };</a>
+
+Details on the meaning of the various fields of the two I/O request blocks
+can be found in the <a href="../Devices_Manual_guide/node0119.html">Writing to the Narrator Device</a> and
+<a href="../Devices_Manual_guide/node011A.html">Reading from the Narrator Device</a> sections later in this chapter.  See
+the include file devices/<a href="../Includes_and_Autodocs_2._guide/node0042.html">narrator.h</a> for the complete structure definitions.
+
+ <a href="../Devices_Manual_guide/node0116.html">The Amiga Speech System</a> 
+ <a href="../Devices_Manual_guide/node0117.html">Opening The Narrator Device</a> 
+ <a href="../Devices_Manual_guide/node0118.html">Closing The Narrator Device</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

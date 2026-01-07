@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="iffparse" NODE="StoreItemInContext()" TITLE="iffparse.library/StoreItemInContext" -->
+<head>
+<title>iffparse.library/StoreItemInContext</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node037C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node037E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	StoreItemInContext -- store local context item in given context node.
+	                      (V36)
+
+<b>   SYNOPSIS</b>
+	StoreItemInContext(iff, localItem, contextNode);
+	                   A0   A1         A2
+
+	VOID StoreItemInContext(struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line103">LocalContextItem</a> *,
+                               struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line84">ContextNode</a> *);
+
+<b>   FUNCTION</b>
+	Adds the <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line103">LocalContextItem</a> to the list of items for the given context
+	node. If an LCI with the same Type, ID, and Ident is already
+	present in the <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line84">ContextNode</a>, it will be purged and replaced with the
+	new one. This is a raw form of <a href="../Includes_and_Autodocs_3._guide/node037E.html">StoreLocalItem()</a>.
+
+<b>   INPUTS</b>
+	iff - pointer to <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> structure for this context.
+	localItem - pointer to a <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line103">LocalContextItem</a> to be stored.
+	contextNode - pointer to context node in which to store item.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node037E.html">StoreLocalItem()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E8.html">&#060;libraries/iffparse.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

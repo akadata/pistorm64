@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="CloseScreen()" TITLE="intuition.library/CloseScreen" -->
+<head>
+<title>intuition.library/CloseScreen</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node039E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03A0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	CloseScreen -- <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close</a> an Intuition screen.
+
+<b>    SYNOPSIS</b>
+	Success = CloseScreen( <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> )
+	D0 (V36)               A0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> CloseScreen( struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> * );
+	/* returns <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> in V36 and greater */
+
+<b>    FUNCTION</b>
+	Unlinks the screen, unlinks the viewport, deallocates everything that
+	Intuition allocated when the screen was opened (using <a href="../Includes_and_Autodocs_3._guide/node03D3.html">OpenScreen()</a>).
+	Doesn't care whether or not there are still any windows attached to the
+	screen.  Doesn't try to close any attached windows; in fact, ignores
+	them altogether (but see below for changes in V36).
+
+	If this is the last screen to go, attempts to reopen Workbench.
+
+	New for V36: this function will refuse to close the screen
+	if there are windows open on the screen or if there are any
+	outstanding screen locks (see <a href="../Includes_and_Autodocs_3._guide/node03C1.html">LockPubScreen()</a>) when
+	CloseScreen() is called.  This avoids the almost certain crash
+	when a screen is closed out from under a window.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> = pointer to the screen to be closed.
+
+<b>    RESULT</b>
+	New for V36: returns TRUE (1) if screen is closed,
+	returns FALSE (0) if screen had open windows when
+	called.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03D3.html">OpenScreen()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

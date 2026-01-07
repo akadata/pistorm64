@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-12-3" TITLE="5 / String Gadget Type / Program Control of String Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / String Gadget Type / Program Control of String Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0166.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0168.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Includes_and_Autodocs_2._guide/node01F9.html">ActivateGadget()</a> allows the program to activate a <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget (and
+certain <a href="../Libraries_Manual_guide/node0176.html">custom</a> gadgets).  If successful, this function has the same effect
+as the user clicking the mouse select button when the mouse pointer is
+within the gadget's select box and any subsequent keystrokes will effect
+<a name="line6">the gadget's string.</a>
+
+    BOOL ActivateGadget( struct Gadget *gadget, struct Window *window,
+                         struct Requester *requester );
+
+This function will fail if the user is in the middle of some other
+interaction, such as menu or <a href="../Libraries_Manual_guide/node0153.html">proportional</a> gadget operation.  In that case
+it returns FALSE, otherwise it returns TRUE. The window or requester
+containing the <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget to be activated must itself be open and
+active.  Since some operations in Intuition may occur after the function
+that initiates them completes, calling <a href="../Includes_and_Autodocs_2._guide/node01F9.html">ActivateGadget()</a> after
+<a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> or <a href="../Libraries_Manual_guide/node01A2.html#line12">Request()</a> is no guarantee that the gadget will
+actually activate. Instead, call ActivateGadget() only after having
+received an <a href="../Libraries_Manual_guide/node01E0.html#line36">IDCMP_ACTIVEWINDOW</a> or <a href="../Libraries_Manual_guide/node01DF.html">IDCMP_REQSET</a> message for a newly opened
+window or requester, respectively.
+
+    The Window Active Message Is Required.
+    --------------------------------------
+    It is incorrect to simply insert a small delay between the call to
+    <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> or <a href="../Libraries_Manual_guide/node01A2.html#line12">Request()</a> and the call to <a href="../Includes_and_Autodocs_2._guide/node01F9.html">ActivateGadget()</a>.
+    Such schemes fail under various conditions, including changes in
+    processor speed and CPU loading.
+
+If you want to activate a <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget in a newly opened window that has
+a shared IDCMP <a href="../Libraries_Manual_guide/node01D6.html#line16">UserPort</a>, there is an additional complication.  Sharing
+UserPorts means that the window is opened without any IDCMP messages
+enabled, and only later is <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> called to turn on message
+passing.  If the newly opened window becomes active before ModifyIDCMP()
+is called, the <a href="../Libraries_Manual_guide/node01E0.html#line36">IDCMP_ACTIVEWINDOW</a> message will not be received (because
+IDCMP message passing was off at the time).  The following code will
+handle this problem:
+
+       BOOL activated;
+
+       /* Open window with NULL IDCMPFlags */
+       win = OpenWindow( ... );
+
+       /* Set the UserPort to your shared port, and turn on message
+        * passing, which includes the IDCMP_ACTIVEWINDOW message.
+        */
+       win-&#062;UserPort = sharedport;
+       ModifyIDCMP( win, ... | IDCMP_ACTIVEWINDOW | ... );
+
+       /* If the window became active before the ModifyIDCMP() got
+        * executed, then this ActivateGadget() can succeed.  If not, then
+        * this ActivateGadget() might be too early, but in that case, we
+        * know we'll receive the IDCMP_ACTIVEWINDOW event.  We handle that
+        * below.
+        */
+        activated = ActivateGadget( stringgad, win, NULL );
+
+  and later, in the event loop:
+
+    if ( (msg-&#062;Class == ACTIVEWINDOW) &#038;&#038; ( !activated ) )
+        success = ActivateGadget(stringgad,...);
+
+Note however that a window which has the <a href="../Libraries_Manual_guide/node0125.html#line90">WA_Activate</a> attribute is not
+guaranteed to be activated upon opening.  Certain conditions (like an
+active <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget in another window) will prevent the automatic initial
+activation of the window.  Therefore, do not let your code depend on
+receiving the initial <a href="../Libraries_Manual_guide/node01E0.html#line36">IDCMP_ACTIVEWINDOW</a> message.
+
+ <a href="../Libraries_Manual_guide/node0597.html">String Gadget Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

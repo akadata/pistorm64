@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="LockRecords()" TITLE="dos.library/LockRecords" -->
+<head>
+<title>dos.library/LockRecords</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02C8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02CA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    LockRecords -- Lock a series of records (V36)
+
+SYNOPSIS
+    success = LockRecords(record_array,timeout)
+    D0                       D1           D2
+
+    BOOL LockRecords(struct <a href="../Includes_and_Autodocs_2._guide/node0063.html#line28">RecordLock</a> *,ULONG)
+
+FUNCTION
+    This locks several records within a file for exclusive access.
+    Timeout is how long to wait in ticks for the records to be available.
+    The wait is applied to each attempt to lock each record in the list.
+    It is recommended that you always lock a set of records in the same
+    order to reduce possibilities of deadlock.
+
+    The array of <a href="../Includes_and_Autodocs_2._guide/node0063.html#line28">RecordLock</a> structures is terminated by an entry with
+    rec_FH of NULL.
+
+INPUTS
+    record_array - <a href="../Includes_and_Autodocs_2._guide/node007D.html#line21">List</a> of records to be locked
+    timeout      - Timeout interval.  0 is legal
+
+RESULT
+    success      - Success or failure
+
+BUGS
+    See <a href="../Includes_and_Autodocs_2._guide/node02C8.html">LockRecord()</a>
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02C8.html">LockRecord()</a>, <a href="../Includes_and_Autodocs_2._guide/node0309.html">UnLockRecord()</a>, <a href="../Includes_and_Autodocs_2._guide/node030A.html">UnLockRecords()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

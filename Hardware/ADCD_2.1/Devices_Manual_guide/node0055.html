@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-10-1" TITLE="10 / Creating a Printer Driver / Writing Alphanumeric Printer Drivers" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 / Creating a Printer Driver / Writing Alphanumeric Printer Drivers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0054.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0056.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The alphanumeric portion of the printer driver is designed to convert ANSI
+x3.64 style commands into the specific escape codes required by each
+individual printer.  For example, the ANSI code for underline-on is
+ESC[4m.  The Commodore MPS-1250 printer would like a ESC[-1 to set
+underline-on. The HP LaserJet accepts ESC[&#038;dD as a start underline
+command. By using the printer driver, all printers may be handled in a
+similar manner.
+
+There are two parts to the alphanumeric portion of the printer driver: the
+Command Table data table and the DoSpecial() routine.
+
+ <a href="../Devices_Manual_guide/node0056.html">Command Table</a> 
+ <a href="../Devices_Manual_guide/node0057.html">DoSpecial()</a> 
+ <a href="../Devices_Manual_guide/node0058.html">Printertag.asm</a> 
+ <a href="../Devices_Manual_guide/node0059.html">Extended Character Table</a> 
+ <a href="../Devices_Manual_guide/node005A.html">Character Conversion Routine</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

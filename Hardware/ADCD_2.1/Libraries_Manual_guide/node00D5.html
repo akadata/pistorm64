@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_2" NODE="2-4" TITLE="2 Intuition and the Graphical Interface / A Simple Intuition Program" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>2 Intuition and the Graphical Interface / A Simple Intuition Program</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00D4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00D6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The sample Intuition program that follows shows all of the basic
+requirements for an Intuition application. There are three important
+points:
+
+  * You must open the Intuition library before you can use the Intuition
+    functions.  Certain languages such as  require the pointer to the
+    Intuition library to be assigned to a variable called IntuitionBase
+    (see <a href="../Libraries_Manual_guide/node000D.html">Chapter 1</a> for more about this).
+
+  * When you set up a <a href="../Libraries_Manual_guide/node00CF.html">window</a>, you also specify the events that you want
+    to know about.  If the user performs some activity that triggers one
+    of the events you specified, Intuition signals you and sends a
+    <a href="../Libraries_Manual_guide/node01D0.html">message</a>.  The message is a pointer to an <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a> data structure
+    that describes the event in more detail.  Messages about Intuition
+    events are sent to a <a href="../Libraries_Manual_guide/node02EB.html">MsgPort</a> structure which queues up the messages
+    for you in a linked list so that you may respond to them at your
+    convenience.
+
+  * Resources must be <a href="../Libraries_Manual_guide/node0334.html#line14">returned</a> to the system.  In this case, any windows,
+    screens or libraries that were opened are closed before exiting.
+
+ <a href="../Libraries_Manual_guide/node00D6.html">Example Intuition Event Loop</a> 
+ <a href="../Libraries_Manual_guide/node05A6.html">Intuition Example (V36 And Later)</a> 
+ <a href="../Libraries_Manual_guide/node05A5.html">Intuition Example (All Versions)</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

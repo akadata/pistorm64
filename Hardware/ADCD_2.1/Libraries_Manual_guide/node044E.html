@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-6-4-1" TITLE="33 / / Storing LCIs / StoreLocalItem()" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / / Storing LCIs / StoreLocalItem()</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node044D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node044F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node01DD.html">StoreLocalItem()</a> function is called as follows:
+
+    error = StoreLocalItem (iff, lci, position);
+
+The position argument determines where the <a href="../Libraries_Manual_guide/node044A.html">LCI</a> is stored.  The possible
+values are IFFSLI_ROOT, IFFSLI_TOP, and IFFSLI_PROP.
+
+IFFSLI_ROOT causes <a href="../Includes_and_Autodocs_2._guide/node01DD.html">StoreLocalItem()</a> to store your <a href="../Libraries_Manual_guide/node044A.html">LCI</a> in the default
+<a href="../Libraries_Manual_guide/node0446.html">ContextNode</a>.
+
+IFFSLI_TOP gets your <a href="../Libraries_Manual_guide/node044A.html">LCI</a> stored in the top (current) <a href="../Libraries_Manual_guide/node0446.html">ContextNode</a>.
+
+    The LCI Ends When the Current Context Ends.
+    -------------------------------------------
+    When the current context expires, your <a href="../Libraries_Manual_guide/node044A.html">LCI</a> will be deleted by
+<a name="line17">    the parser.</a>
+
+IFFSLI_PROP causes your <a href="../Libraries_Manual_guide/node044A.html">LCI</a> to be stored in the topmost context from which
+a property would apply.  This is usually the topmost <a href="../Libraries_Manual_guide/node042A.html#line7">FORM</a> or <a href="../Libraries_Manual_guide/node042A.html#line7">LIST</a> chunk.
+For example, suppose you had a deeply nested <a href="../Libraries_Manual_guide/node045D.html#line8">ILBM FORM</a>, and you wanted to
+store the <a href="../Libraries_Manual_guide/node0461.html#line3">BMHD</a> property in its correct context such that, when the current
+FORM context expired, the BMHD property would be deleted.  IFFSLI_PROP
+will cause <a href="../Includes_and_Autodocs_2._guide/node01DD.html">StoreLocalItem()</a> to locate the proper context for such scoping,
+and store the LCI there.  See the section on &#034;<a href="../Libraries_Manual_guide/node045B.html">Finding the Prop Context</a>&#034;
+for additional information on the scope of properties.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

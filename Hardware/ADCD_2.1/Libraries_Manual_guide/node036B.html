@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-5-1" TITLE="27 / User Copper Lists / Copper List Macros" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / User Copper Lists / Copper List Macros</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node036A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node036C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Once this pointer to a user Copper list is available, you can use it with
+system macros (&#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00B6.html#line22">gfxmacros.h</a>&#062;) to instruct the system what to add
+to its own list of things for the Copper to do within a specific <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.
+The file &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00B6.html#line37">gfxmacros.h</a>&#062; provides the following five macro
+<a name="line6">functions that implement user Copper instructions.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0428.html">CINIT</a> initializes the Copper list buffer. It is used to specify how many
+instructions are going to be placed in the Copper list.  It is called as
+follows.
+
+    CINIT(uCopList, num_entries);
+
+The uCopList argument is a pointer tot he user Copper list and num_entries
+<a name="line15">is the number of entries in the list.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0432.html">CWAIT</a> waits for the video beam to reach a particular horizontal and
+vertical position.  Its format is:
+
+    CWAIT(uCopList, v, h)
+
+Again, uCopList is the pointer to the Copper list.  The v argument is the
+vertical position for which to wait, specified relative to the top of the
+<a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.  The legal range of values (for both NTSC and PAL) is from 0 to
+255; h is the horizontal position for which to wait.  The legal range of
+<a name="line26">values (for both NTSC and PAL) is from 0 to 226.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0430.html">CMOVE</a> installs a particular value into a specified system register. Its
+format is:
+
+    CMOVE(uCopList, reg, value)
+
+Again, uCopList is the pointer to the Copper list.  The reg argument is
+the register to be affected, specified in this form:  custom.register-name
+where the register-name is one of the registers listed in the Custom
+structure in &#060;hardware/<a href="../Includes_and_Autodocs_2._guide/node00CD.html#line25">custom.h</a>&#062;.  The value argument to <a href="../Includes_and_Autodocs_2._guide/node0430.html">CMOVE</a> is the
+<a name="line37">value to place in the register.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0425.html">CBump()</a> increments the user Copper list pointer to the next position in
+thelist.  It is usually invoked for the programmer as part of the macro
+definitions <a href="../Includes_and_Autodocs_2._guide/node0432.html">CWAIT</a> or <a href="../Includes_and_Autodocs_2._guide/node0430.html">CMOVE</a>.  Its format is:
+
+    CBump(uCopList)
+
+<a name="line45">where uCopList is the pointer to the user Copper list.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0426.html">CEND</a> terminates the user Copper list.  Its format is:
+
+    CEND(uCopList)
+
+<a name="line51">where uCopList is the pointer to the user Copper list.</a>
+
+Executing any of the user Copper list macros causes the system to
+dynamically allocate special data structures called intermediate Copper
+lists that are linked into your user Copper list (the list to which
+uCopList points) describing the operation. When you call the function
+<a href="../Libraries_Manual_guide/node0332.html#line27">MrgCop</a>(&#038;view) as shown in the section called &#034;<a href="../Libraries_Manual_guide/node0332.html">Forming A Basic Display</a>,&#034;
+the system uses all of its intermediate Copper lists to sort and merge
+together the real Copper lists for the system (<a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">LOFCprList and SHFCprList</a>).
+
+When your program exits, you must return to the system all of the memory
+that you allocated or caused to be allocated.  This means that you must
+return the intermediate Copper lists, as well as the user Copper list data
+structure.  Here are two different methods for returning this memory to
+the system.
+
+    /* Returning memory to the system if you have NOT
+     * obtained the ViewPort from Intuition.  */
+    FreeVPortCopLists(viewPort);
+
+    /* Returning memory to the system if you HAVE
+     * obtained the ViewPort from Intuition.  */
+<a name="line73">    CloseScreen(screen);    /* Intuition only */</a>
+
+User Copper lists may be clipped, under Release 2 and later, to <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>
+boundaries if the appropriate tag (VTAG_USERCLIP_SET) is passed to
+<a href="../Libraries_Manual_guide/node0339.html#line15">VideoControl()</a>.  Under earlier releases, the user Copper list would &#034;leak&#034;
+through to lower ViewPorts.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

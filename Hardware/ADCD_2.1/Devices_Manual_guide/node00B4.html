@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_5" NODE="5-3" TITLE="5 Gameport Device / Gameport Events" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>5 Gameport Device / Gameport Events</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00B3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00B5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A gameport event is an InputEvent structure which describes the following:
+
+   * The class of the event - always set to IECLASS_RAWMOUSE for the
+     gameport device.
+
+   * The subclass of the event - 0 for the left port; 1 for the right port.
+
+   * The code - which button and its state.  (No report = 0xFF)
+
+   * The qualifier - only button and relative mouse bits are set.
+
+   * The position - either a data address or mouse position count.
+
+   * The time stamp - delta time since last report, returned as frame
+     count in tv_secs field.
+
+<a name="line18">   * The next event - pointer to next event.</a>
+<a name="line19"></a>
+
+    struct InputEvent GameEV
+    {
+        struct InputEvent *ie_NextEvent;  /* next event */
+        UBYTE    ie_Class;                /* input event class */
+        UBYTE    ie_SubClass;             /* subclass of the class */
+        UWORD    ie_Code;                 /* input event code */
+        UWORD    ie_Qualifier;            /* event qualifiers in effect */
+           union
+           {
+             struct
+             {
+              WORD   ie_x;                /* x position for the event */
+              WORD   ie_y;                /* y position for the event */
+             }  ie_xy;
+             APTR ie_addr;
+           } ie_position;
+        struct timeval ie_TimeStamp;      /* delta time since last report
+    }
+
+See the include file devices/<a href="../Includes_and_Autodocs_2._guide/node0051.html">inputevent.h</a> for the complete structure
+definition and listing of input event fields.
+
+ <a href="../Devices_Manual_guide/node00B5.html">Reading Gameport Events</a> 
+ <a href="../Devices_Manual_guide/node00B6.html">Setting Gameport Event Trigger Conditions</a> 
+ <a href="../Devices_Manual_guide/node00B7.html">Determining The Trigger Conditions</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

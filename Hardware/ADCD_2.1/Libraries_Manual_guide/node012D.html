@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-8-7" TITLE="4 / Other Window Functions / Custom Pointers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Other Window Functions / Custom Pointers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node012C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node012E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The active window also has control over the pointer.  If the active window
+changes the image for the pointer using the functions <a href="../Libraries_Manual_guide/node01ED.html#line4">SetPointer()</a> or
+<a href="../Libraries_Manual_guide/node01ED.html#line38">ClearPointer()</a>, the pointer image will change:
+
+    void SetPointer( struct Window *window, UWORD *pointer, long height,
+                     long width, long xOffset, long yOffset );
+
+    void ClearPointer( struct Window *window );
+
+<a href="../Libraries_Manual_guide/node01ED.html#line4">SetPointer()</a> sets up the window with a sprite definition for a custom
+pointer.  If the window is active, the change takes place immediately.
+The pointer will not change if an inactive window calls SetPointer().  In
+this way, each window may have its own custom pointer that is displayed
+only when the window is active.
+
+<a href="../Libraries_Manual_guide/node01ED.html#line38">ClearPointer()</a> clears the custom pointer from the window and restores it
+to the default Intuition pointer, which is set by the user.  Setting a
+pointer for a window is discussed further in the chapter
+&#034;<a href="../Libraries_Manual_guide/node01ED.html">Intuition Mouse and Keyboard</a>&#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

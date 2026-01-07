@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-2-9" TITLE="27 / / Using the Graphics Drawing Routines / Flood-fill Operations" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Using the Graphics Drawing Routines / Flood-fill Operations</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node035D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node035F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Flood fill is a technique for filling an arbitrary shape with a color.
+The Amiga flood-fill routines can use a plain color or do the fill using a
+combination of the drawing mode, <a href="../Libraries_Manual_guide/node0350.html#line3">FgPen</a>, <a href="../Libraries_Manual_guide/node0350.html#line6">BgPen</a> and the area pattern.
+
+Flood-fill requires a <a href="../Libraries_Manual_guide/node034D.html#line32">TmpRas</a> structure at least as large as the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>
+in which the flood-fill will be done.  This is to ensure that even if the
+flood-filling operation &#034;leaks&#034;, it will not flow outside the TmpRas and
+<a name="line9">corrupt another task's memory.</a>
+
+You use the <a href="../Includes_and_Autodocs_2._guide/node043C.html">Flood()</a> routine for flood fill. The syntax for this routine is
+as follows:
+
+    Flood(&#038;rastPort, mode, x, y);
+
+The rastPort argument specifies the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> you want to draw into.  The x
+and y arguments specify the starting coordinate within the <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>.  The
+mode argument tells how to do the fill.  There are two different modes for
+<a name="line19">flood fill:</a>
+
+Outline Mode
+    In outline mode, you specify an x,y coordinate, and from that point
+    the system searches outward in all directions for a pixel whose color
+    is the same as that specified in the area outline pen (<a href="../Libraries_Manual_guide/node0350.html#line9">AOlPen</a>).  All
+    horizontally or vertically adjacent pixels not of that color are
+    filled with a colored pattern or plain color.  The fill stops at the
+    outline color. Outline mode is selected when the mode argument to
+<a name="line28">    <a href="../Includes_and_Autodocs_2._guide/node043C.html">Flood()</a> is set to a 0.</a>
+
+Color Mode
+    In color mode, you specify an x,y coordinate, and whatever pixel
+    color is found at that position defines the area to be filled. The
+    system searches for all horizontally or vertically adjacent pixels
+    whose color is the same as this one and replaces them with the
+    colored pattern or plain color.  Color mode is selected when the mode
+    argument ot <a href="../Includes_and_Autodocs_2._guide/node043C.html">Flood()</a> is set to a one.
+
+The following sample program fragment creates and then flood-fills a
+triangular region. The overall effect is exactly the same as shown in the
+preceding area-fill example above, except that flood-fill is slightly
+slower than area-fill. Mode 0 (fill to a pixel that has the color of the
+outline pen) is used in the example.
+
+    BYTE oldAPen;
+    UWORD oldDrPt;
+    struct RastPort *rastPort = Window-&#062;RPort;
+
+    /* Save the old values of the foreground pen and draw pattern. */
+    oldAPen = rastPort-&#062;FgPen;
+    oldDrPt = rastPort-&#062;LinePtrn;
+
+    /* Use AreaOutline pen color for foreground pen. */
+    SetAPen(rastPort, rastPort-&#062;AOlPen);
+    SetDrPt(rastPort, ~0);      /* Insure a solid draw pattern. */
+
+    Move(rastPort, 0, 0);  /* Using mode 0 to create a triangular shape */
+    Draw(rastPort, 0, 100);
+    Draw(rastPort, 100, 100);
+    Draw(rastPort, 0, 0);       /* close it */
+
+    SetAPen(rastPort, oldAPen); /* Restore original foreground pen. */
+    Flood(rastPort, 0, 10, 50); /* Start Flood() inside triangle. */
+
+<a name="line64">    SetDrPt(rastPort, oldDrPt); /* Restore original draw mode. */</a>
+
+This example saves the current <a href="../Libraries_Manual_guide/node0350.html#line3">FgPen</a> value and draws the shape in the same
+color as <a href="../Libraries_Manual_guide/node0350.html#line9">AOlPen</a>. Then FgPen is restored to its original color so that
+FgPen, <a href="../Libraries_Manual_guide/node0350.html#line6">BgPen</a>, <a href="../Libraries_Manual_guide/node0351.html">DrawMode</a>, and <a href="../Libraries_Manual_guide/node034A.html#line9">AreaPtrn</a> can be used to define the fill within
+the outline.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

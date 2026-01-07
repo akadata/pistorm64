@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-9-12" TITLE="27 / / Monitors, Modes and the Display Database / Nominal Values" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Monitors, Modes and the Display Database / Nominal Values</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0340.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0342.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Some of the display information is initialized in ROM for each mode such
+as recommended nominal (or default) dimensions.  Even though this
+information is presumably static, it would still be a mistake to hardcode
+assumptions about these nominal values into your code.
+
+Gathering information about the nominal dimensions of various modes is
+handled in a fashion similar to to the basic queries above.  Here is an
+example of how to query the nominal dimensions of a given mode from a
+<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line32">DisplayInfoHandle</a>.
+
+
+#include &#060;graphics/displayinfo.h&#062;
+
+check_dimensions( handle )
+DisplayInfoHandle handle;
+{
+    struct DimensionInfo query;
+
+    /* fill the buffer with Mode dimension information */
+
+    if(GetDisplayInfoData(handle, (UBYTE *)&#038;query,sizeof(query),
+       DTAG_DIMS,NULL)))
+    {
+        /* display Nominal dimensions of this Mode */
+
+        printf(&#034;nominal width  = %ld&#034;,
+                query.Nominal.MaxX - query.Nominal.MinX + 1);
+
+        printf(&#034;nominal height = %ld&#034;,
+                query.Nominal.MaxY - query.Nominal.MinY + 1);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

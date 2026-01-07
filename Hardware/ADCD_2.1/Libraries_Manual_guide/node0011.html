@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_1" NODE="1-1-2-4" TITLE="1 / / Libraries of Functions / Libraries, Devices and Resources" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>1 / / Libraries of Functions / Libraries, Devices and Resources</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0010.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0012.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Most of the Amiga's OS routines are organized into groups of shared
+<a href="../Libraries_Manual_guide/node0010.html#line9">run-time</a> libraries.  The Amiga also has specialized function groups called
+devices and resources that programmers use to perform basic I/O operations
+or access low-level hardware.
+
+Devices and resources are similar in concept to a shared <a href="../Libraries_Manual_guide/node0010.html">run-time</a> library.
+They are managed by <a href="../Libraries_Manual_guide/node0013.html">Exec</a> and must be opened before they can be used.
+Their functions are separate from the programs that use them and are
+accessed dynamically at run time.  Multiple programs can access the device
+or resource even though only one copy exists in memory (a few resources
+can only be used by one program at a time.)
+
+   ________________      ________________
+  |                |    |                |
+  | AmigaDOS CLI   |    |   Workbench    |
+  | &#038; utilities    |    | Icons/Drawers/ |
+  |                |    |   Utilities    |
+  |________________|    |________________|
+         |   |_________       |   |
+         |    _________|______|   |
+         |   |      ___|____      |
+         |   |     /        \     |
+         |   |    / Console  \    |
+         |   |   |  Device    |   |
+         |   |    \          /    |
+         |   |     \________/     |
+         |   |         |______    |
+   ______|___|_____        ___|___|________
+  |                |      |                |
+  |   AmigaDOS     |      |   Intuition    |
+  |   Processes,   |      | Windows,Menus  |
+  |  File System   |      | Gadgets,Events |
+  |________________|      |________________|
+         |              ______|   |   |______
+         |          ___|____      |   _______|________
+         |         /        \     |  |                |
+         |        /  Input   \    |  |    Layers      |
+         |       |   Device   |   |  |    Library     |
+         |        \          /    |  |                |
+         |         \________/     |  |________________|
+         |             |          |    ______|
+         |             |     _____|___|______
+         |             |    |                |
+         |             |    |    Graphics    |
+         |             |    |   Rendering    |
+         |             |    |   Text, Gels   |
+         |             |    |________________|
+     ____|___       ___|____        |         ________       ________
+    /        \     /        \       |        /        \     /        \
+   /  SCSI &#038;  \   / Keyboard \      |       /  Audio   \   /  Serial  \
+  | Trackdisk  | | &#038; Gameport |     |      |   Device   | | &#038; Parallel |
+   \  Device  /   \  Devices /      |       \          /   \  Devices /
+    \________/     \________/       |        \________/     \________/
+         |             |            |             |              |
+   ______|_____________|____________|_____________|______________|______
+  |                                                                     |
+  |    Exec: Tasks, Messages, Interrupts, I/O, Libraries and Devices    |
+  |_____________________________________________________________________|
+         |             |            |             |            |
+   ______|_____________|____________|_____________|____________|________
+  |              |            |             |             |             |
+  | Disk Control |  Keyboard  |  Graphics   |    Audio    |  I/O Ports  |
+  |              |  &#038; Mouse   |             |             |             |
+  |______________|____________|_____________|_____________|_____________|
+
+
+                Figure 1-1: Amiga System Software Hierarchy
+
+
+Devices and resources are managed by <a href="../Libraries_Manual_guide/node0013.html">Exec</a> just as libraries are.  For more
+information on devices and resources, see the chapter on <a href="../Libraries_Manual_guide/node0299.html">Exec Device I/O</a>
+later in this book or refer to the Amiga ROM Kernel Reference Manual:
+<a href="../Devices_Manual_guide/node0000.html">Devices</a> for detailed descriptions of each device.
+  _____________________________________________________________________
+ |                                                                     |
+ | What Every Amiga Programmer Should Know:                            |
+ | ----------------------------------------                            |
+ | The functions in the Amiga OS are accessed through shared <a href="../Libraries_Manual_guide/node0010.html#line9">run-time</a>  |
+ | libraries.  Libraries must be opened before their functions may be  |
+ | used.  The system's master library, <a href="../Libraries_Manual_guide/node0013.html">Exec</a>, is always open.  The Exec |
+ | function <a href="../Libraries_Manual_guide/node000D.html">OpenLibrary()</a> is used to open all other libraries.         |
+ |_____________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

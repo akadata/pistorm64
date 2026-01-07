@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-1" TITLE="12 Boopsi--Object Oriented Intuition / OOP Overview" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 Boopsi--Object Oriented Intuition / OOP Overview</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01FF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0201.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Understanding Boopsi requires an understanding of several of the concepts
+behind Object Oriented Programming.  This section is a general overview of
+these concepts as they pertain to Boopsi.  Because Boopsi is in part based
+on the concepts present in the OOP language Smalltalk, a reference book on
+Smalltalk may provide a deeper understanding of Boopsi in general.
+Timothy Budd's book entitled A Little Smalltalk (Addison-Wesley Publishing
+<a name="line8">ISBN 0-201-10698-1) is a good start.</a>
+
+In the Boopsi version of the Object Oriented Programming model, everything
+is an Object.  For example, a proportional gadget named myprop is an
+object.  Certain objects have similar characteristics and can be
+classified into groups called classes.  As objects, Rover the dog, Bob the
+cat, and Sam the bird are all distinct objects but they all have something
+in common, they can all be classified as animals.  As objects, myprop the
+proportional gadget, mystring the string gadget, and mybutton the button
+gadget all have something in common, they can all be classified as
+gadgets.  A specific object is an instance of a particular class (&#034;Rover&#034;
+is an instance of class &#034;animal&#034;, &#034;myslidergadget&#034; is an instance of class
+<a name="line20">&#034;gadget&#034;).</a>
+
+Notice that, although Rover, Bob, and Sam can all be classified as
+animals, each belongs to a subgroup of the animal class.  &#034;Rover&#034; is an
+instance of class &#034;dog&#034;, &#034;Bob&#034; is an instance of class &#034;cat&#034;, and &#034;Sam&#034; is
+an instance of class &#034;bird&#034;.  Because each of these animal types share
+common characteristics, each type makes up its own class.  Because dog,
+cat, and bird are subclassifications of the animal class, they are known
+as subclasses of the animal class.  Conversely, the animal class is the
+superclass of the dog, cat, and bird classes.
+
+Following the branches upward from class to superclass will bring you to a
+universal root category from which all objects are derived.  The OOP
+<a name="line33">language Smalltalk calls this class &#034;Object&#034;.</a>
+
+
+                  Figure 12-1: Object Diagram
+
+
+                            object
+                               |
+                    ___________|__________
+                   /                      \
+                  /                        \
+               animal                  vegetables
+                 |                          |
+            _____|_____                _____|_____
+           /     |     \              /     |     \
+          /      |      \            /      |      \
+        dog     cat    mouse       peas    corn  spinach
+<a name="line50"></a>
+
+Like Smalltalk, Boopsi also has a universal root catagory, <a href="../Libraries_Manual_guide/node04BB.html">rootclass</a>.
+Currently, Intuition defines three immediate subclasses of rootclass.  The
+first, <a href="../Libraries_Manual_guide/node020A.html">gadgetclass</a>, is the class of Boopsi gadgets.  The second class,
+<a name="line55"><a href="../Libraries_Manual_guide/node0209.html">imageclass</a>, makes up the class of Boopsi images.</a>
+
+Unlike <a href="../Libraries_Manual_guide/node020A.html">gadgetclass</a> and <a href="../Libraries_Manual_guide/node0209.html">imageclass</a>, the remaining subclass, <a href="../Libraries_Manual_guide/node04C6.html">icclass</a>, does
+not correspond to an existing Intuition entity, it is a concept new to
+Intuition.  Icclass, or interconnection class, allows one Boopsi object to
+notify another Boopsi object when a specific event occurs.  For example,
+consider a Boopsi proportional gadget and a Boopsi image object that
+displays an integer value.  An application can connect these two objects
+so that the prop gadget tells the image object the prop gadget's current
+value, which the image object displays.  Every time the user slides the
+prop gadget, the prop gadget notifies the image of the change and the
+image updates its display to reflect the prop gadget's current integer
+value.  Because these objects are talking to each other rather than the
+application, the updates happen automatically.  The application doesn't
+have to talk to the two objects, it only has to connect them.
+
+<a name="line71">     <a href="../Libraries_Manual_guide/node05DD.html">Figure 12-2: Simple Boopsi Diagram</a> </a>
+
+An object's characteristics and behavior are determined by its class. Each
+class can define a set of attributes and a set of methods that apply to
+all objects of that class.  An attribute is a variable characteristic of
+an object.  For example, an attribute for the animal class could be the
+number of legs an animal object has.  An example of a Boopsi attribute is
+the X coordinate of a Boopsi image object.  The data that makes up the
+values of an object's attributes is collectively known as the instance
+data for that object.
+
+The behavior of an object depends upon the set of methods associated to it
+by its class.  A method is basically a function that applies to objects of
+that class.  An example of a Boopsi method is the <a href="../Libraries_Manual_guide/node0209.html">imageclass</a> method
+<a href="../Libraries_Manual_guide/node04D2.html">IM_DRAW</a>.  This method tells a Boopsi image to draw itself.  All Boopsi
+<a name="line86">actions are carried out via methods.</a>
+
+From the Object Diagram, two of the methods of the &#034;animal&#034; class could be
+&#034;eat&#034; and &#034;sleep&#034;.  One of the methods of the &#034;dog&#034; class could be &#034;bark&#034;.
+Notice that instances of the &#034;dog&#034; class can do more than just bark, they
+can also eat and sleep. This is because a subclass inherits methods from
+its superclasses. If there were a subclass of dog called &#034;attack dog&#034;, all
+instances of that class would be able to bark, eat, and sleep, as well as
+&#034;attack&#034;.  Due to inheritance, a subclass has all of the methods and all
+of the attributes of its superclass.  For example, the <a href="../Libraries_Manual_guide/node04DC.html">IA_Height</a> attribute
+is defined by <a href="../Libraries_Manual_guide/node0209.html">imageclass</a>.  All instances of the subclasses of imageclass
+have their own IA_Height attribute, even though the subclasses do not
+explicitly define IA_Height.  In turn, all instances of subclasses of the
+imageclass subclasses also inherit the IA_Height attribute.  All classes
+<a name="line100">on levels below a class will inherit its methods and attributes.</a>
+
+When an application or a Boopsi object wants another Boopsi object to
+perform a method, it passes it a command in the form of a Boopsi message.
+A Boopsi message tells an object which method to perform.  The message may
+<a name="line105">also contain some parameters that the method requires.</a>
+
+    Watch Out!
+    ----------
+    The term &#034;message&#034; used in object oriented terminology can be little
+    confusing to the Amiga programmer because the Boopsi message has
+<a name="line111">    nothing to do with an Exec message.</a>
+
+Boopsi classes can be either public or private.  Public classes have ASCII
+names associated with them and are accessible to all applications.
+Private classes have no ASCII name and normally can only be accessed by
+the application that created the private class.
+
+ <a href="../Libraries_Manual_guide/node0201.html">Using Boopsi</a> 
+ <a href="../Libraries_Manual_guide/node0208.html">The Public Classes</a> 
+ <a href="../Libraries_Manual_guide/node020B.html">Making Gadget Objects Talk to Each Other</a> 
+ <a href="../Libraries_Manual_guide/node020C.html">Making Gadgets Talk to an Application</a> 
+ <a href="../Libraries_Manual_guide/node020D.html">The Interconnection Classes</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

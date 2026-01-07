@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_2" NODE="2-7-8" TITLE="2 / Hardware Control Commands / CMD_START" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>2 / Hardware Control Commands / CMD_START</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0039.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node003B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Includes_and_Autodocs_2._guide/node04B3.html">CMD_START</a> undoes the CMD_STOP command. Any cycles that were stopped by the
+<a href="../Devices_Manual_guide/node0039.html">CMD_STOP</a> command are actually lost because of the impossibility of
+determining exactly where the DMA ceased. If the <a href="../Devices_Manual_guide/node0033.html">CMD_WRITE</a> command was
+playing two cycles and the first one was playing when <a href="../Devices_Manual_guide/node0039.html">CMD_STOP</a> was issued,
+the first one is lost and the second one will be played.
+
+This command is also useful when you are playing the same wave form with
+the same period out of multiple channels. If the channels are stopped when
+the <a href="../Devices_Manual_guide/node0033.html">CMD_WRITE</a> commands are issued, CMD_START exactly synchronizes them,
+avoiding cancellation and distortion. When channels are allocated, they
+are effectively started by the CMD_START command.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

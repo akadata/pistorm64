@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_23" NODE="23-1-4" TITLE="23 / List Structure / Header Initialization" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>23 / List Structure / Header Initialization</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02DB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02DD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+List headers must be properly initialized before use.  It is not adequate
+to initialize the entire header to zero.  The head and tail entries must
+have specific values. The header must be initialized as follows:
+
+    1. Set the <a href="../Libraries_Manual_guide/node02DB.html#line14">lh_Head</a> field to the address of <a href="../Libraries_Manual_guide/node02DB.html#line17">lh_Tail</a>.
+
+    2. Clear the <a href="../Libraries_Manual_guide/node02DB.html#line17">lh_Tail</a> field.
+
+    3. Set the <a href="../Libraries_Manual_guide/node02DB.html#line20">lh_TailPred</a> field to the address of <a href="../Libraries_Manual_guide/node02DB.html#line14">lh_Head</a>.
+
+    4. Set <a href="../Libraries_Manual_guide/node02DB.html#line34">lh_Type</a> to the same data type as the nodes to be kept the list.
+       (Unless you are using a <a href="../Libraries_Manual_guide/node02DB.html#line5">MinList</a>).
+
+
+<a name="line16">         Figure 23-3: Initializing a List Header Structure</a>
+
+                                             _________________
+                                            |   ___________   |
+                                            |  |           |__|
+                                            |  |  lh_Head  |/_
+                                            |  |___________|\ |
+                                            |_\|           |  |
+                                              /| lh_Tail=0 |  |
+                                               |___________|  |
+                                               |           |  |
+                                               |lh_TailPred|__|
+                                               |_ _ _ _ _ _|
+                                               |     |     |
+    /* C example - equivalent to NewList() */  |     |     |
+    struct List list;                          |_ _ _|_ _ _|
+
+    list.lh_Head          = (struct Node *) &#038;list.lh_Tail;
+    list.lh_Tail          = 0;
+    list.lh_TailPred      = (struct Node*) &#038;list.lh_Head;
+    /* Now set lh_Type, if needed */
+
+    ;Assembly example - equivalent to NEWLIST
+          MOVE.L  A0,LH_HEAD(A0)  ;A0 points to the list header
+          ADDQ.L  #4,LH_HEAD(A0)  ;Bump LH_HEAD(A0) to address of LH_TAIL
+          CLR.L   LH_TAIL(A0)
+          MOVE.L  A0,LH_TAILPRED(A0)
+    ;Now set LH_TYPE, if needed.
+<a name="line44"></a>
+
+The sequence of assembly instructions in the figure above is equivalent to
+the macro NEWLIST, contained in the include file &#060;exec/<a href="../Includes_and_Autodocs_2._guide/node0081.html#line44">lists.i</a>&#062;.  Since
+the <a href="../Libraries_Manual_guide/node02DB.html#line5">MinList</a> structure is the same as the <a href="../Libraries_Manual_guide/node02DB.html#line23">List</a> structure except for the
+type and pad fields, this sequence of assembly language code will work for
+both structures.  The sequence performs its function without destroying
+the pointer to the list header in A0 (which is why ADDQ.L is used).  This
+function may also be accessed from C as a call to <a href="../Includes_and_Autodocs_2._guide/node0161.html">NewList</a>(header), where
+header is the address of a list header.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

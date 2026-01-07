@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="LockRecord()" TITLE="dos.library/LockRecord" -->
+<head>
+<title>dos.library/LockRecord</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0187.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0189.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	LockRecord -- Locks a portion of a file (V36)
+
+<b>   SYNOPSIS</b>
+	success = LockRecord(fh,offset,length,mode,timeout)
+	D0                   D1   D2     D3    D4    D5
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> LockRecord(BPTR,ULONG,ULONG,ULONG,ULONG)
+
+<b>   FUNCTION</b>
+	This locks a portion of a file for exclusive access.  Timeout is how
+	long to wait in ticks (1/50 sec) for the record to be available.
+
+	Valid modes are:
+		REC_EXCLUSIVE
+		REC_EXCLUSIVE_IMMED
+		REC_SHARED
+		REC_SHARED_IMMED
+	For the IMMED modes, the timeout is ignored.
+
+	Record locks are tied to the filehandle used to create them.  The
+	same filehandle can get any number of exclusive locks on the same
+	record, for example.  These are cooperative locks, they only
+	affect other people calling LockRecord().
+
+<b>   INPUTS</b>
+	fh      - File handle for which to lock the record
+	offset  - Record start position
+	length  - Length of record in bytes
+	mode    - Type of lock requester
+	timeout - Timeout interval in ticks.  0 is legal.
+
+<b>   RESULT</b>
+	success - Success or failure
+
+<b>   BUGS</b>
+	In 2.0 through 2.02 (V36), LockRecord() only worked in the ramdisk.
+	Attempting to lock records on the disk filesystem causes a crash.
+	This was fixed for V37.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0189.html">LockRecords()</a>, <a href="../Includes_and_Autodocs_3._guide/node01CA.html">UnLockRecord()</a>, <a href="../Includes_and_Autodocs_3._guide/node01CB.html">UnLockRecords()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

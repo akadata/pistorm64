@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/asl" NODE="AllocFileRequest()" TITLE="asl.library/AllocFileRequest" -->
+<head>
+<title>asl.library/AllocFileRequest</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node017C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node017E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AllocFileRequest -- allocates a <a href="../Includes_and_Autodocs_2._guide/node00EA.html#line65">FileRequester</a> structure (V36)
+
+SYNOPSIS
+    request = AllocFileRequest()
+    D0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00EA.html#line65">FileRequester</a> *request;
+
+FUNCTION
+    Creates and initializes the data structure required to pass to the
+    <a href="../Includes_and_Autodocs_2._guide/node0181.html">RequestFile()</a> function.
+
+INPUTS
+    None.  If you wish to get other than default values, you can use
+    <a href="../Includes_and_Autodocs_2._guide/node017C.html">AllocAslRequest()</a> to set up a file request with tag items.
+
+RESULT
+    Pointer to a struct <a href="../Includes_and_Autodocs_2._guide/node00EA.html#line65">FileRequester</a>, which is to be passed to the
+    <a href="../Includes_and_Autodocs_2._guide/node0181.html">RequestFile()</a> function.
+
+    The returned <a href="../Includes_and_Autodocs_2._guide/node00EA.html#line65">FileRequester</a> pointer has public fields which are
+    readable by the application as defined in aslbase.h.
+
+CAUTION
+    The application MUST use either the AllocFileRequest(), or
+    <a href="../Includes_and_Autodocs_2._guide/node017C.html">AllocAslRequest()</a>, function to allocate the structure to be passed to
+    the FileRequest() or <a href="../Includes_and_Autodocs_2._guide/node017E.html">AslRequest()</a> functions; it is not possible to
+    create a struct FileRequest except through the library calls.
+
+    Also, any modifications MUST be done through <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> values, rather
+    than directly modifying, unless explicitly documented otherwise.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0181.html">RequestFile()</a>, <a href="../Includes_and_Autodocs_2._guide/node017F.html">FreeAslRequest()</a>, <a href="../Includes_and_Autodocs_2._guide/node017E.html">AslRequest()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

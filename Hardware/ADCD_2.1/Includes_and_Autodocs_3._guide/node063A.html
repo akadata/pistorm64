@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/prefs/pointer.h" NODE="MAIN" TITLE="include/prefs/pointer.h" -->
+<head>
+<title>include/prefs/pointer.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0639.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node063B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef PREFS_POINTER_H
+#define PREFS_POINTER_H
+/*
+**	$VER: pointer.h 39.2 (9.6.1992)
+**	Includes Release 44.1
+**
+**	File format for pointer preferences
+**
+**	(C) Copyright 1991-1999 Amiga, Inc.
+**	All Rights Reserved
+*/
+
+/*****************************************************************************/
+
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+
+#ifndef LIBRARIES_IFFPARSE_H
+#include &#060;libraries/iffparse.h&#062;
+#endif
+
+/*****************************************************************************/
+
+#define ID_PNTR MAKE_ID('P','N','T','R')
+
+/*****************************************************************************/
+<a name="line28"></a>
+struct PointerPrefs
+{
+    ULONG pp_Reserved[4];
+    UWORD pp_Which;				/* 0=NORMAL, 1=BUSY */
+    UWORD pp_Size;				/* see &#060;intuition/pointerclass.h&#062; */
+    UWORD pp_Width;				/* Width in pixels */
+    UWORD pp_Height;				/* Height in pixels */
+    UWORD pp_Depth;				/* Depth */
+    UWORD pp_YSize;				/* YSize */
+    UWORD pp_X, pp_Y;				/* Hotspot */
+
+    /* Color Table:  numEntries = (1 &#060;&#060; pp_Depth) - 1 */
+
+    /* Data follows */
+};
+
+/*****************************************************************************/
+
+/* constants for PointerPrefs.pp_Which */
+#define	WBP_NORMAL	0
+#define	WBP_BUSY	1
+
+/*****************************************************************************/
+<a name="line52"></a>
+struct RGBTable
+{
+    UBYTE t_Red;
+    UBYTE t_Green;
+    UBYTE t_Blue;
+};
+
+/*****************************************************************************/
+
+#endif /* PREFS_POINTER_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

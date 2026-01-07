@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amigaguide" NODE="SendAmigaGuideContextA()" TITLE="amigaguide.library/SendAmigaGuideContextAguide.library/SendAmigaGuideContextA" -->
+<head>
+<title>amigaguide.library/SendAmigaGuideContextAguide.library/SendAmigaGuideContextA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0012.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0014.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+        SendAmigaGuideContextA - Align an AmigaGuide system on the context ID
+.
+                                                               (V34)
+<b>   SYNOPSIS</b>
+        success = SendAmigaGuideContextA (handle, attrs);
+        d0                                 a0      d0
+
+        <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> SendAmigaGuideContextA (AMIGAGUIDECONTEXT, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+        success = SendAmigaGuideContext (handle, tag1, ...);
+
+        <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> SendAmigaGuideContext (AMIGAGUIDECONTEXT, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...);
+
+<b>   FUNCTION</b>
+        This function is used to send a message to an AmigaGuide system to
+        align it on the current context ID.
+
+        This function effectively does a:
+
+            SendAmigaGuideCmd(handle 'LINK ContextArray[contextID]', NULL);
+
+<b>   INPUTS</b>
+        handle - Handle to an AmigaGuide system.
+        future - Future expansion, must be set to NULL for now.
+
+<b>   EXAMPLE</b>
+
+        struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> *imsg;
+
+        ...
+
+        case RAWKEY:
+            switch (imsg-&#062;Code)
+            {
+                case 95:
+                    /* bring up help on a particular subject */
+                    SendAmigaGuideContext(handle, NULL);
+                    break;
+                ...
+            }
+            break;
+
+        ...
+
+<b>   RETURNS</b>
+        success -- Returns TRUE if the message was sent, otherwise returns
+            FALSE.
+
+<b>   SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node0015.html">SetAmigaGuideContextA()</a>, <a href="../Includes_and_Autodocs_3._guide/node0012.html">SendAmigaGuideCmdA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

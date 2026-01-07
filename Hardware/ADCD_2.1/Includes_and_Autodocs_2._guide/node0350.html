@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="FindResident()" TITLE="exec.library/FindResident" -->
+<head>
+<title>exec.library/FindResident</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node034F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0351.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    FindResident - find a resident module by name
+
+SYNOPSIS
+    resident = FindResident(name)
+    D0                      A1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00A0.html#line19">Resident</a> *FindResident(STRPTR);
+
+FUNCTION
+    Search the system resident tag list for a resident tag (&#034;ROMTag&#034;) with
+    the given name.  If found return a pointer to the resident tag
+    structure, else return zero.
+
+    <a href="../Includes_and_Autodocs_2._guide/node00A0.html#line19">Resident</a> modules are used by the system to pull all its parts
+    together at startup.  <a href="../Includes_and_Autodocs_2._guide/node00A0.html#line19">Resident</a> tags are also found in disk based
+    devices and libraries.
+
+INPUTS
+    name - pointer to name string
+
+RESULT
+    resident - pointer to the resident tag structure or
+            zero if none found.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00A0.html">exec/resident.h</a>, <a href="../Includes_and_Autodocs_2._guide/node035C.html">InitResident</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/cb.h" NODE="MAIN" TITLE="Devices/Dev_examples/cb.h" -->
+<head>
+<title>Devices/Dev_examples/cb.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node018D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node018F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/***********************************************************************
+ *
+ * cb.h - Include file used by clipdemo.c, changehook_test.c and cbio.c
+ *
+ ***********************************************************************/
+
+struct cbbuf {
+
+        ULONG size;     /* size of memory allocation            */
+        ULONG count;    /* number of characters after stripping */
+        UBYTE *mem;     /* pointer to memory containing data    */
+};
+
+#define MAKE_ID(a,b,c,d) ((a&#060;&#060;24L) | (b&#060;&#060;16L) | (c&#060;&#060;8L) | d)
+
+#define ID_FORM MAKE_ID('F','O','R','M')
+#define ID_FTXT MAKE_ID('F','T','X','T')
+#define ID_CHRS MAKE_ID('C','H','R','S')
+
+#ifdef CBIO
+
+/* prototypes */
+
+struct IOClipReq        *CBOpen         ( ULONG );
+void                    CBClose         (struct IOClipReq *);
+int                     CBWriteFTXT     (struct IOClipReq *, char *);
+int                     CBQueryFTXT     (struct IOClipReq *);
+struct cbbuf            *CBReadCHRS     (struct IOClipReq *);
+void                    CBReadDone      (struct IOClipReq *);
+void                    CBFreeBuf       (struct cbbuf *);
+
+
+/* routines which are meant to be used internally by routines in cbio */
+
+int                     WriteLong       (struct IOClipReq *, long *);
+int                     ReadLong        (struct IOClipReq *, ULONG *);
+struct cbbuf            *FillCBData     (struct IOClipReq *, ULONG);
+
+#else
+
+/* prototypes */
+
+extern struct IOClipReq *CBOpen         ( ULONG );
+extern void             CBClose         (struct IOClipReq *);
+extern int              CBWriteFTXT     (struct IOClipReq *, char *);
+extern int              CBQueryFTXT     (struct IOClipReq *);
+extern struct cbbuf     *CBReadCHRS     (struct IOClipReq *);
+extern void             CBReadDone      (struct IOClipReq *);
+extern void             CBFreeBuf       (struct cbbuf *);
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

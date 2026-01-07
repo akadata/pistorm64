@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/monitor.h" NODE="MAIN" TITLE="Includes/graphics/monitor.h" -->
+<head>
+<title>Includes/graphics/monitor.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00A6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00A8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_MONITOR_H
+#define	GRAPHICS_MONITOR_H
+/*
+**	$Filename: graphics/monitor.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**	graphics monitorspec definintions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef	EXEC_SEMAPHORES_H
+#include	&#060;exec/semaphores.h&#062;
+#endif
+<a name="line18"></a>
+#ifndef	GRAPHICS_GFXNODES_H
+#include	&#060;graphics/gfxnodes.h&#062;
+#endif
+<a name="line22"></a>
+#ifndef	GRAPHICS_GFX_H
+#include	&#060;graphics/gfx.h&#062;
+#endif
+<a name="line26"></a>
+struct	MonitorSpec
+<a name="line28">{</a>
+<a name="line29">    struct	ExtendedNode	ms_Node;</a>
+<a name="line30">    UWORD	ms_Flags;</a>
+<a name="line31">    LONG	ratioh;</a>
+<a name="line32">    LONG	ratiov;</a>
+<a name="line33">    UWORD	total_rows;</a>
+<a name="line34">    UWORD	total_colorclocks;</a>
+<a name="line35">    UWORD	DeniseMaxDisplayColumn;</a>
+<a name="line36">    UWORD	BeamCon0;</a>
+<a name="line37">    UWORD	min_row;</a>
+<a name="line38">    struct	SpecialMonitor	*ms_Special;</a>
+<a name="line39">    UWORD	ms_OpenCount;</a>
+<a name="line40">    LONG	(*ms_transform)();</a>
+<a name="line41">    LONG	(*ms_translate)();</a>
+<a name="line42">    LONG	(*ms_scale)();</a>
+<a name="line43">    UWORD	ms_xoffset;</a>
+<a name="line44">    UWORD	ms_yoffset;</a>
+<a name="line45">    struct	Rectangle	ms_LegalView;</a>
+<a name="line46">    LONG	(*ms_maxoscan)();	/* maximum legal overscan */</a>
+<a name="line47">    LONG	(*ms_videoscan)();	/* video display overscan */</a>
+<a name="line48">    UWORD	DeniseMinDisplayColumn;</a>
+<a name="line49">    ULONG	DisplayCompatible;</a>
+<a name="line50">    struct	List DisplayInfoDataBase;</a>
+<a name="line51">    struct	SignalSemaphore DisplayInfoDataBaseSemaphore;</a>
+<a name="line52">    ULONG	ms_reserved00;</a>
+    ULONG	ms_reserved01;
+};
+<a name="line55"></a>
+<a name="line56">#define	TO_MONITOR	0</a>
+<a name="line57">#define	FROM_MONITOR	1</a>
+<a name="line58">#define	STANDARD_XOFFSET	9</a>
+<a name="line59">#define	STANDARD_YOFFSET	0</a>
+<a name="line60">#define	REQUEST_NTSC	1</a>
+<a name="line61">#define	REQUEST_PAL	2</a>
+<a name="line62">#define	REQUEST_SPECIAL	4</a>
+#define	REQUEST_A2024	8
+<a name="line64"></a>
+<a name="line65">#define	DEFAULT_MONITOR_NAME	&#034;default.monitor&#034;</a>
+<a name="line66">#define	NTSC_MONITOR_NAME	&#034;ntsc.monitor&#034;</a>
+<a name="line67">#define	PAL_MONITOR_NAME	&#034;pal.monitor&#034;</a>
+#define	STANDARD_MONITOR_MASK	( REQUEST_NTSC | REQUEST_PAL )
+<a name="line69"></a>
+<a name="line70">#define	STANDARD_NTSC_ROWS	262</a>
+<a name="line71">#define	STANDARD_PAL_ROWS	312</a>
+<a name="line72">#define	STANDARD_COLORCLOCKS	226</a>
+<a name="line73">#define	STANDARD_DENISE_MAX	455</a>
+<a name="line74">#define	STANDARD_DENISE_MIN	93</a>
+<a name="line75">#define	STANDARD_NTSC_BEAMCON	( 0x0000 )</a>
+#define	STANDARD_PAL_BEAMCON	( DISPLAYPAL )
+<a name="line77"></a>
+#define	SPECIAL_BEAMCON	( VARVBLANK | LOLDIS | VARVSYNC | VARBEAM | CSBLANK )
+<a name="line79"></a>
+<a name="line80">#define	MIN_NTSC_ROW	21</a>
+<a name="line81">#define	MIN_PAL_ROW	29</a>
+<a name="line82">#define	STANDARD_VIEW_X	0x81</a>
+<a name="line83">#define	STANDARD_VIEW_Y	0x2C</a>
+<a name="line84">#define	STANDARD_HBSTRT	0x06</a>
+<a name="line85">#define	STANDARD_HSSTRT	0x0B</a>
+<a name="line86">#define	STANDARD_HSSTOP	0x1C</a>
+<a name="line87">#define	STANDARD_HBSTOP	0x2C</a>
+<a name="line88">#define	STANDARD_VBSTRT	0x0122</a>
+<a name="line89">#define	STANDARD_VSSTRT	0x02A6</a>
+<a name="line90">#define	STANDARD_VSSTOP	0x03AA</a>
+#define	STANDARD_VBSTOP	0x1066
+<a name="line92"></a>
+<a name="line93">#define	VGA_COLORCLOCKS (STANDARD_COLORCLOCKS/2)</a>
+<a name="line94">#define	VGA_TOTAL_ROWS	(STANDARD_NTSC_ROWS*2)</a>
+<a name="line95">#define	VGA_DENISE_MIN	59</a>
+<a name="line96">#define	MIN_VGA_ROW	29</a>
+<a name="line97">#define	VGA_HBSTRT	0x08</a>
+<a name="line98">#define	VGA_HSSTRT	0x0E</a>
+<a name="line99">#define	VGA_HSSTOP	0x1C</a>
+<a name="line100">#define	VGA_HBSTOP	0x1E</a>
+<a name="line101">#define	VGA_VBSTRT	0x0000</a>
+<a name="line102">#define	VGA_VSSTRT	0x0153</a>
+<a name="line103">#define	VGA_VSSTOP	0x0235</a>
+#define	VGA_VBSTOP	0x0CCD
+<a name="line105"></a>
+#define	VGA_MONITOR_NAME	&#034;vga.monitor&#034;
+<a name="line107"></a>
+<a name="line108">#define	VGA70_COLORCLOCKS (STANDARD_COLORCLOCKS/2)</a>
+<a name="line109">#define	VGA70_TOTAL_ROWS 449</a>
+<a name="line110">#define	VGA70_DENISE_MIN 59</a>
+<a name="line111">#define	MIN_VGA70_ROW	35</a>
+<a name="line112">#define	VGA70_HBSTRT	0x08</a>
+<a name="line113">#define	VGA70_HSSTRT	0x0E</a>
+<a name="line114">#define	VGA70_HSSTOP	0x1C</a>
+<a name="line115">#define	VGA70_HBSTOP	0x1E</a>
+<a name="line116">#define	VGA70_VBSTRT	0x0000</a>
+<a name="line117">#define	VGA70_VSSTRT	0x02A6</a>
+<a name="line118">#define	VGA70_VSSTOP	0x0388</a>
+#define	VGA70_VBSTOP	0x0F73
+<a name="line120"></a>
+<a name="line121">#define	VGA70_BEAMCON	(SPECIAL_BEAMCON ^ VSYNCTRUE)</a>
+#define	VGA70_MONITOR_NAME	&#034;vga70.monitor&#034;
+<a name="line123"></a>
+<a name="line124">#define	BROADCAST_HBSTRT	0x01</a>
+<a name="line125">#define	BROADCAST_HSSTRT	0x06</a>
+<a name="line126">#define	BROADCAST_HSSTOP	0x17</a>
+<a name="line127">#define	BROADCAST_HBSTOP	0x27</a>
+<a name="line128">#define	BROADCAST_VBSTRT	0x0000</a>
+<a name="line129">#define	BROADCAST_VSSTRT	0x02A6</a>
+<a name="line130">#define	BROADCAST_VSSTOP	0x054C</a>
+<a name="line131">#define	BROADCAST_VBSTOP	0x1C40</a>
+<a name="line132">#define	BROADCAST_BEAMCON	( LOLDIS | CSBLANK )</a>
+<a name="line133">#define	RATIO_FIXEDPART	4</a>
+#define	RATIO_UNITY	(1 &#060;&#060; RATIO_FIXEDPART)
+<a name="line135"></a>
+struct	AnalogSignalInterval
+<a name="line137">{</a>
+<a name="line138">    UWORD	asi_Start;</a>
+    UWORD	asi_Stop;
+};
+<a name="line141"></a>
+struct	SpecialMonitor
+<a name="line143">{</a>
+<a name="line144">    struct	ExtendedNode	spm_Node;</a>
+<a name="line145">    UWORD	spm_Flags;</a>
+<a name="line146">    int	(*do_monitor)();</a>
+<a name="line147">    int	(*reserved1)();</a>
+<a name="line148">    int	(*reserved2)();</a>
+<a name="line149">    int	(*reserved3)();</a>
+<a name="line150">    struct	AnalogSignalInterval	hblank;</a>
+<a name="line151">    struct	AnalogSignalInterval	vblank;</a>
+<a name="line152">    struct	AnalogSignalInterval	hsync;</a>
+    struct	AnalogSignalInterval	vsync;
+};
+
+#endif	/* GRAPHICS_MONITOR_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

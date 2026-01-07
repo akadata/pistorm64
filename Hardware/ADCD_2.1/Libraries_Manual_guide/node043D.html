@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-4-5-1" TITLE="33 / / Other Parsing Modes / IFFPARSE_RAWSTEP" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / / Other Parsing Modes / IFFPARSE_RAWSTEP</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node043C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node043E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This mode causes the parser to progress through the stream step by step,
+rather than in the automated fashion provided by <a href="../Libraries_Manual_guide/node0431.html">IFFPARSE_SCAN</a>.  In this
+mode, <a href="../Libraries_Manual_guide/node0432.html">ParseIFF()</a> will return upon every entry to and departure from a
+context.
+
+When the parser enters a context, <a href="../Libraries_Manual_guide/node0432.html">ParseIFF()</a> will return zero.
+<a href="../Libraries_Manual_guide/node0447.html">CurrentChunk()</a> will report the type and ID of the chunk just entered, and
+the stream will be positioned to read the first byte in the chunk.  When
+entering a <a href="../Libraries_Manual_guide/node042A.html#line7">FORM</a>, <a href="../Libraries_Manual_guide/node042A.html#line7">LIST</a>, <a href="../Libraries_Manual_guide/node042A.html#line7">CAT</a> or <a href="../Libraries_Manual_guide/node042A.html#line7">PROP</a> chunk, the longword containing the type
+(e.g., <a href="../Libraries_Manual_guide/node045D.html#line8">ILBM</a>, <a href="../Libraries_Manual_guide/node045D.html#line8">FTXT</a>, etc.) is read by the parser.  In this case, the stream
+will be positioned to read the byte immediately following the type.)
+
+When the parser leaves a context, <a href="../Libraries_Manual_guide/node0432.html">ParseIFF()</a> will return the value
+IFFERR_EOC.  This is not strictly an error, but an indication that you are
+about to leave the current context.  <a href="../Libraries_Manual_guide/node0447.html">CurrentChunk()</a> will report the type
+and ID of the chunk you are about to leave.  The stream is not positioned
+predictably within the chunk.
+
+The parser does not call any installed chunk handlers when using this mode
+(e.g., property chunks declared with <a href="../Libraries_Manual_guide/node0434.html">PropChunk()</a> will not be collected).
+
+See the example program, <a href="../Libraries_Manual_guide/node05A0.html">Sift.c</a>, for a demonstration of IFFPARSE_RAWSTEP.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

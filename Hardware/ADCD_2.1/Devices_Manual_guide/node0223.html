@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="AIFF-11-1" TITLE="AIFF / The Instrument Chunk / Looping " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>AIFF / The Instrument Chunk / Looping </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0222.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0224.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Sound data can be looped, allowing a portion of the sound to be repeated
+in order to lengthen the sound.  The structure below describes a loop.
+
+    typedef struct {
+	short	PlayMode;
+	MarkerId beginLoop;
+	MarkerId endLoop;
+    } Loop;
+
+A loop is marked with two points, a begin position and an end position.
+There are two ways to play a loop, forward looping and forward/backward
+looping. In the case of forward looping, playback begins at the beginning
+of the sound, continues past the begin position and continues to the end
+position, at which point playback starts again at the begin position.  The
+segment between the begin and end positions, called the loop segment, is
+played repeatedly until interrupted by a user action, such as the release
+of a key on a sampling instrument.
+
+                   ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
+    sample frames |   |   |   |&#060;--- loop segment ----&#062;|   |   |   |
+                  |___|___|___|___|___|___|___|___|___|___|___|___|
+                              ^                       ^
+                        begin position           end position
+
+                        Figure 9: Sample Frame Looping
+
+With forward/backward looping, the loop segment is first played from the
+begin position to the end position, and then played backwards from the end
+position to the begin position.  This flip-flop pattern is repeated over
+and over again until interrupted.
+
+The playMode specifies which type of looping is to be performed:
+
+	#define NoLooping		0
+	#define ForwardLooping		1
+	#define ForwardBackwardLooping  2
+
+If NoLooping is specified, then the loop points are ignored during
+playback.
+
+The beginLoop is a marker id that marks the begin position of the loop
+segment.
+
+The endLoop marks the end position of a loop.  The begin position must be
+less than the end position.  If this is not the case, then the loop
+segment has zero or negative length and no looping takes place.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

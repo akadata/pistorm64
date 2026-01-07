@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-7-3" TITLE="14 / Low-Level Access Commands / Limitations For Synced Reads And Writes" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 / Low-Level Access Commands / Limitations For Synced Reads And Writes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00F8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00FA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There is a delay between the index pulse and the start of bits coming in
+from the drive (e.g. dma started). It is in the range of 135-200
+microseconds. This delay breaks down as follows: 55 microseconds for
+software interrupt overhead (this is the time from interrupt to the write
+of the DSKLEN register); 66 microsecs for one horizontal line delay
+(remember that disk I/O is synchronized with Agnus' display fetches). The
+last variable (0-65 microseconds) is an additional scan line since DSKLEN
+is poked anywhere in the horizontal line. This leaves 15 microseconds
+unaccounted for. In short, you will almost never get bits within the first
+135 microseconds of the index pulse, and may not get it until 200
+microseconds. At 4 microsecs/bit, this works out to be between 4 and 7
+bytes of user data delay.
+
+   Forewarned is Forearmed.
+   ------------------------
+   Amiga, Inc. may make enhancements to the disk format in the
+   future. Amiga, Inc. intends to provide compatibility within the
+   trackdisk device.  Anyone who uses these raw routines is bypassing
+   this upward-compatibility and does so at her own risk.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/sprite.h" NODE="MAIN" TITLE="Includes/graphics/sprite.h" -->
+<head>
+<title>Includes/graphics/sprite.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00C4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00C6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_SPRITE_H
+#define	GRAPHICS_SPRITE_H
+/*
+**	$Filename: graphics/sprite.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+#define SPRITE_ATTACHED 0x80
+<a name="line20"></a>
+struct SimpleSprite
+<a name="line22">{</a>
+<a name="line23">    UWORD *posctldata;</a>
+<a name="line24">    UWORD height;</a>
+<a name="line25">    UWORD   x,y;    /* current position */</a>
+    UWORD   num;
+};
+
+#endif	/* GRAPHICS_SPRITE_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

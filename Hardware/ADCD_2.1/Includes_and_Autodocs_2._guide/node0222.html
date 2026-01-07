@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="IntuiTextLength()" TITLE="intuition.library/IntuiTextLength" -->
+<head>
+<title>intuition.library/IntuiTextLength</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0221.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0223.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    IntuiTextLength -- Return the length (pixel-width) of an <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line572">IntuiText</a>.
+
+SYNOPSIS
+    Length = IntuiTextLength( IText )
+    D0                        A0
+
+    LONG IntuiTextLength( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line572">IntuiText</a> * );
+
+FUNCTION
+    This routine accepts a pointer to an instance of an <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line572">IntuiText</a>
+    structure, and returns the length (the pixel-width) of the string
+    which that instance of the structure represents.
+
+    NOTE: if the Font pointer of your <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line572">IntuiText</a> structure is set to NULL,
+    you'll get the pixel-width of your text in terms of the current system
+    default font.  You may wish to be sure that the field IText-&#062;ITextFont
+    for 'default font' text is equal to the Font field of the screen it is
+    being measured for.
+
+INPUTS
+    IText = pointer to an instance of an <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line572">IntuiText</a> structure
+
+RESULT
+    Returns the pixel-width of the text specified by the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line572">IntuiText</a> data
+
+BUGS
+    Would do better to take a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> as argument, so that a NULL in
+    the Font pointer would lead automatically to the font for the
+    intended target <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>, rather than the system default font.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

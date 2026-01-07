@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-5" TITLE="15 / GadTools Gadgets / Freeing Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / GadTools Gadgets / Freeing Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node025C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node025E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+After closing the window, the gadgets allocated using <a href="../Libraries_Manual_guide/node025A.html">CreateGadget()</a> must
+be released.  <a href="../Includes_and_Autodocs_2._guide/node03EB.html">FreeGadgets()</a> is a simple call that will free all the
+GadTools gadgets that it finds, beginning with the gadget whose pointer is
+passed as an argument.
+
+    void FreeGadgets( struct Gadget *gad );
+
+The gad argument is a pointer to the first gadget to be freed.  It is safe
+to call <a href="../Includes_and_Autodocs_2._guide/node03EB.html">FreeGadgets()</a> with a NULL gadget pointer, the function will then
+return immediately.  Before calling FreeGadgets(), the application must
+first either remove the gadgets or close the window.
+
+When the gadget passed to <a href="../Includes_and_Autodocs_2._guide/node03EB.html">FreeGadgets()</a> is the first gadget in a linked
+list, the function frees all the GadTools gadgets on the list without
+patching pointers or trying to maintain the integrity of the list.  Any
+non-GadTools gadgets found on the list will not be freed, hence the result
+will not necessarily form a nice list since any intervening GadTools
+gadgets will be gone.
+
+See the section on &#034;<a href="../Libraries_Manual_guide/node026E.html">Creating Gadget Lists</a>&#034; for more information on using
+linked lists of gadgets.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

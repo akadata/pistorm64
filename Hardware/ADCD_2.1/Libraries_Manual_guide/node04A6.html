@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_37" NODE="37-4" TITLE="37 Utility Library / International String Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>37 Utility Library / International String Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04A5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04A7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The international string functions in utility library are a way to make
+use of a future localization library which Amiga, Inc. will provide.
+When the localization library is opened, the functions will be replaced by
+ones which will take the locale as defined by the user into account. This
+means that the compare order may change according to the locale, so care
+<a name="line7">should be taken not to rely on obtaining specific compare sequences.</a>
+
+Currently implemented are:
+
+  _______________________________________________________________
+ |                                                               |
+ |  <a href="../Includes_and_Autodocs_2._guide/node03DF.html">Stricmp()</a>  Compare string case-insensitive.                  |
+ | <a href="../Includes_and_Autodocs_2._guide/node03E0.html">Strnicmp()</a>  Compare string case-insensitive, with a specified |
+ |             length.                                           |
+ |  <a href="../Includes_and_Autodocs_2._guide/node03E2.html">ToLower()</a>  Convert a character to lower case.                |
+ |  <a href="../Includes_and_Autodocs_2._guide/node03E3.html">ToUpper()</a>  Convert a character to upper case.                |
+ |_______________________________________________________________|
+
+    Table 37-4: Utility Library International String Functions
+
+
+These functions operate in the same manner as their ANSI C equivalents,
+for the most part.  For more information, see the &#034;<a href="../Includes_and_Autodocs_2._guide/node03CD.html">Utility Library</a>&#034;
+Autodocs in the Amiga ROM Kernel Reference Manual: Includes and Autodocs.
+Here is a simple example of the usage of the international string
+functions.
+
+     <a href="../Libraries_Manual_guide/node05C7.html">istr.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

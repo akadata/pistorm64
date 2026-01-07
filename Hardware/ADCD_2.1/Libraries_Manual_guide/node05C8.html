@@ -1,0 +1,501 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/Layers.c" NODE="MAIN" TITLE="Lib_examples/Layers.c" -->
+<head>
+<title>Lib_examples/Layers.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05C7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05C9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* For the sake of brevity, the example is a single task.  No Layer
+** locking is done.  Also note that the routine myLabelLayer() is used
+** to redraw a given layer.  It is called only when a layer needs
+** refreshing.
+**
+** Layers.c
+**
+** SAS/C 5.10a
+** lc -b1 -cfist -v -y layers
+** blink FROM LIB:c.o layers.o TO layers LIB LIB:lc.lib LIB:amiga.lib
+*/
+
+/* Force use of new variable names to help prevent errors */
+#define INTUI_V36_NAMES_ONLY
+
+#include &#060;exec/types.h&#062;
+#include &#060;graphics/gfxbase.h&#062;
+#include &#060;graphics/layers.h&#062;
+#include &#060;graphics/displayinfo.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/layers_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+#include &#060;stdlib.h&#062;
+#include &#060;string.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+#define L_DELAY  (100)
+#define S_DELAY   (50)
+
+#define DUMMY      (0L)
+
+#define RED_PEN    (1)
+#define GREEN_PEN  (2)
+#define BLUE_PEN   (3)
+
+#define SCREEN_D   (2)
+#define SCREEN_W (320)
+#define SCREEN_H (200)
+
+/* the starting size of example layers, offsets are used for placement */
+#define W_H (50)
+#define W_T (5)
+#define W_B ((W_T+W_H)-1)
+#define W_W (80)
+#define W_L ((SCREEN_W/2) - (W_W/2))
+#define W_R ((W_L+W_W)-1)
+
+/* size of the superbitmap */
+#define SUPER_H SCREEN_H
+#define SUPER_W SCREEN_W
+
+/* starting size of the message layer */
+#define M_H (10)
+#define M_T (SCREEN_H-M_H)
+#define M_B ((M_T+M_H)-1)
+#define M_W (SCREEN_W)
+#define M_L (0)
+#define M_R ((M_L+M_W)-1)
+
+struct GfxBase *GfxBase;
+struct Library *LayersBase;
+
+/* global constant data for initializing the layers */
+LONG  theLayerFlags[3] = { LAYERSUPER, LAYERSMART, LAYERSIMPLE };
+UWORD colortable[]     = { 0x000, 0xf44, 0x4f4, 0x44f };
+
+
+/*
+** Clear the layer then draw in a text string.
+*/
+VOID myLabelLayer(struct Layer *layer, LONG color, UBYTE *string)
+{
+/* fill layer with color */
+SetRast(layer-&#062;rp, color);
+
+/* set up for writing text into layer */
+SetDrMd(layer-&#062;rp,JAM1);
+SetAPen(layer-&#062;rp,0);
+Move(layer-&#062;rp, 5, 7);
+
+/* write into layer */
+Text(layer-&#062;rp, string, strlen(string));
+}
+
+
+/*
+** write a message into a layer with a delay.
+*/
+VOID pMessage(struct Layer *layer, UBYTE *string)
+{
+Delay(S_DELAY);
+myLabelLayer(layer, GREEN_PEN, string);
+}
+
+/*
+** write an error message into a layer with a delay.
+*/
+VOID error(struct Layer *layer, UBYTE *string)
+{
+myLabelLayer(layer, RED_PEN, string);
+Delay(L_DELAY);
+}
+
+
+/*
+** do some layers manipulations to demonstrate their abilities.
+*/
+VOID doLayers(struct Layer *msgLayer, struct Layer *layer_array[])
+{
+WORD ktr;
+WORD ktr_2;
+
+pMessage(msgLayer, &#034;Label all Layers&#034;);
+myLabelLayer(layer_array[0], RED_PEN,   &#034;Super&#034;);
+myLabelLayer(layer_array[1], GREEN_PEN, &#034;Smart&#034;);
+myLabelLayer(layer_array[2], BLUE_PEN,  &#034;Simple&#034;);
+
+pMessage(msgLayer, &#034;MoveLayer 1 InFrontOf 0&#034;);
+if (!MoveLayerInFrontOf(layer_array[1], layer_array[0]))
+    error(msgLayer, &#034;MoveLayerInFrontOf() failed.&#034;);
+
+pMessage(msgLayer, &#034;MoveLayer 2 InFrontOf 1&#034;);
+if (!MoveLayerInFrontOf(layer_array[2], layer_array[1]))
+    error(msgLayer, &#034;MoveLayerInFrontOf() failed.&#034;);
+
+pMessage(msgLayer, &#034;Refresh Simple Refresh Layer&#034;);
+myLabelLayer(layer_array[2], BLUE_PEN, &#034;Simple&#034;);
+
+pMessage(msgLayer, &#034;Incrementally MoveLayers...&#034;);
+for(ktr = 0; ktr &#060; 30; ktr++)
+    {
+    if (!MoveLayer(DUMMY, layer_array[1], -1, 0))
+        error(msgLayer, &#034;MoveLayer() failed.&#034;);
+    if (!MoveLayer(DUMMY, layer_array[2], -2, 0))
+        error(msgLayer, &#034;MoveLayer() failed.&#034;);
+    }
+
+pMessage(msgLayer, &#034;Refresh Simple Refresh Layer&#034;);
+myLabelLayer(layer_array[2], BLUE_PEN, &#034;Simple&#034;);
+
+pMessage(msgLayer, &#034;make Layer 0 the UpfrontLayer&#034;);
+if (!UpfrontLayer(DUMMY, layer_array[0]))
+    error(msgLayer, &#034;UpfrontLayer() failed.&#034;);
+
+pMessage(msgLayer, &#034;make Layer 2 the BehindLayer&#034;);
+if (!BehindLayer(DUMMY, layer_array[2]))
+    error(msgLayer, &#034;BehindLayer() failed.&#034;);
+
+pMessage(msgLayer, &#034;Incrementally MoveLayers again...&#034;);
+for(ktr = 0; ktr &#060; 30; ktr++)
+    {
+    if (!MoveLayer(DUMMY, layer_array[1], 0, 1))
+        error(msgLayer, &#034;MoveLayer() failed.&#034;);
+    if (!MoveLayer(DUMMY, layer_array[2], 0, 2))
+        error(msgLayer, &#034;MoveLayer() failed.&#034;);
+    }
+
+pMessage(msgLayer, &#034;Refresh Simple Refresh Layer&#034;);
+myLabelLayer(layer_array[2], BLUE_PEN, &#034;Simple&#034;);
+
+pMessage(msgLayer, &#034;Big MoveLayer&#034;);
+for(ktr = 0; ktr &#060; 3; ktr++)
+    {
+    if (!MoveLayer(DUMMY, layer_array[ktr], -layer_array[ktr]-&#062;bounds.MinX, 0))
+        error(msgLayer, &#034;MoveLayer() failed.&#034;);
+    }
+
+
+pMessage(msgLayer, &#034;Incrementally increase size&#034;);
+for(ktr = 0; ktr &#060; 5; ktr++)
+    {
+    for(ktr_2 = 0; ktr_2 &#060; 3; ktr_2++)
+        {
+        if (!SizeLayer(DUMMY, layer_array[ktr_2], 1, 1))
+            error(msgLayer, &#034;SizeLayer() failed.&#034;);
+        }
+    }
+
+pMessage(msgLayer, &#034;Refresh Smart Refresh Layer&#034;);
+myLabelLayer(layer_array[1], GREEN_PEN, &#034;Smart&#034;);
+pMessage(msgLayer, &#034;Refresh Simple Refresh Layer&#034;);
+myLabelLayer(layer_array[2], BLUE_PEN,  &#034;Simple&#034;);
+
+pMessage(msgLayer, &#034;Big SizeLayer&#034;);
+for(ktr = 0; ktr &#060; 3; ktr++)
+    {
+    if (!SizeLayer(DUMMY,layer_array[ktr],
+                SCREEN_W-(layer_array[ktr]-&#062;bounds.MaxX)-1,0))
+        error(msgLayer, &#034;SizeLayer() failed.&#034;);
+    }
+
+pMessage(msgLayer, &#034;Refresh Smart Refresh Layer&#034;);
+myLabelLayer(layer_array[1], GREEN_PEN, &#034;Smart&#034;);
+pMessage(msgLayer, &#034;Refresh Simple Refresh Layer&#034;);
+myLabelLayer(layer_array[2], BLUE_PEN,  &#034;Simple&#034;);
+
+pMessage(msgLayer, &#034;ScrollLayer down&#034;);
+for(ktr = 0; ktr &#060; 30; ktr++)
+    {
+    for(ktr_2 = 0; ktr_2 &#060; 3; ktr_2++)
+        {
+        ScrollLayer(DUMMY, layer_array[ktr_2], 0, -1);
+        }
+    }
+
+pMessage(msgLayer, &#034;Refresh Smart Refresh Layer&#034;);
+myLabelLayer(layer_array[1], GREEN_PEN, &#034;Smart&#034;);
+pMessage(msgLayer, &#034;Refresh Simple Refresh Layer&#034;);
+myLabelLayer(layer_array[2], BLUE_PEN,  &#034;Simple&#034;);
+
+pMessage(msgLayer, &#034;ScrollLayer up&#034;);
+for(ktr = 0; ktr &#060; 30; ktr++)
+    {
+    for(ktr_2 = 0; ktr_2 &#060; 3; ktr_2++)
+        {
+        ScrollLayer(DUMMY, layer_array[ktr_2], 0, 1);
+        }
+    }
+
+pMessage(msgLayer, &#034;Refresh Smart Refresh Layer&#034;);
+myLabelLayer(layer_array[1], GREEN_PEN, &#034;Smart&#034;);
+pMessage(msgLayer, &#034;Refresh Simple Refresh Layer&#034;);
+myLabelLayer(layer_array[2], BLUE_PEN,  &#034;Simple&#034;);
+
+Delay(L_DELAY);
+}
+
+
+/*
+** delete the layer array created by allocLayers().
+*/
+VOID disposeLayers(struct Layer *msgLayer, struct Layer *layer_array[])
+{
+WORD ktr;
+
+for (ktr = 0; ktr &#060; 3; ktr++)
+    {
+    if (layer_array[ktr] != NULL)
+        {
+        if (!DeleteLayer(DUMMY, layer_array[ktr]))
+            error(msgLayer, &#034;Error deleting layer&#034;);
+        }
+    }
+}
+
+
+/*
+** Create some hard-coded layers.  The first must be super-bitmap, with
+** the bitmap passed as an argument.  The others must not be super-bitmap.
+** The pointers to the created layers are returned in layer_array.
+**
+** Return FALSE on failure.  On a FALSE return, the layers are
+** properly cleaned up.
+*/
+BOOL allocLayers(struct Layer *msgLayer, struct Layer *layer_array[],
+    struct BitMap *super_bitmap, struct Layer_Info *theLayerInfo,
+    struct BitMap *theBitMap)
+{
+WORD ktr;
+BOOL create_layer_ok = TRUE;
+
+for (ktr = 0;
+     (ktr &#060; 3) &#038;&#038; (create_layer_ok);
+     ktr++)
+    {
+    pMessage(msgLayer, &#034;Create BehindLayer&#034;);
+    if (ktr == 0)
+        {
+        if ((layer_array[ktr] = CreateBehindLayer(theLayerInfo, theBitMap,
+                  W_L+(ktr*30), W_T+(ktr*30), W_R+(ktr*30), W_B+(ktr*30),
+                  theLayerFlags[ktr], super_bitmap)) == NULL)
+            create_layer_ok = FALSE;
+        }
+     else
+        {
+        if ((layer_array[ktr] = CreateBehindLayer(theLayerInfo, theBitMap,
+                  W_L+(ktr*30), W_T+(ktr*30), W_R+(ktr*30), W_B+(ktr*30),
+                  theLayerFlags[ktr], NULL)) == NULL)
+            create_layer_ok = FALSE;
+        }
+
+    if (create_layer_ok)
+        {
+        pMessage(msgLayer, &#034;Fill the RastPort&#034;);
+        SetRast(layer_array[ktr]-&#062;rp, ktr + 1);
+        }
+    }
+
+if (!create_layer_ok)
+    disposeLayers(msgLayer, layer_array);
+
+return(create_layer_ok);
+}
+
+
+/*
+** Free the bitmap and all bitplanes created by allocBitMap().
+*/
+VOID disposeBitMap(struct BitMap *bitmap, LONG depth, LONG width, LONG height)
+{
+WORD ktr;
+
+if (NULL != bitmap)
+    {
+    for (ktr = 0; ktr &#060; depth; ktr++)
+        {
+        if (NULL != bitmap-&#062;Planes[ktr])
+            FreeRaster(bitmap-&#062;Planes[ktr], width, height);
+        }
+
+    FreeMem(bitmap, sizeof(*bitmap));
+    }
+}
+
+
+/*
+** Allocate and initialize a bitmap structure.
+*/
+struct BitMap *allocBitMap(LONG depth, LONG width, LONG height)
+{
+WORD ktr;
+BOOL bit_map_failed = FALSE;
+struct BitMap *bitmap = NULL;
+
+if (NULL != (bitmap = AllocMem(sizeof(*bitmap),NULL)))
+    {
+    InitBitMap(bitmap,depth,width,height);
+
+    for (ktr = 0; ktr &#060; depth; ktr++)
+        {
+        if (NULL == (bitmap-&#062;Planes[ktr] = (PLANEPTR)AllocRaster(width,height)))
+            bit_map_failed = TRUE;
+        else
+            BltClear(bitmap-&#062;Planes[ktr], RASSIZE(width,height), 1);
+        }
+    if (bit_map_failed)
+        {
+        disposeBitMap(bitmap,depth,width,height);
+        bitmap = NULL;
+        }
+    }
+return(bitmap);
+}
+
+/*
+** Set up to run the layers example, doLayers(). Clean up when done.
+*/
+VOID startLayers(struct Layer_Info *theLayerInfo, struct BitMap *theBitMap)
+{
+struct Layer  *msgLayer;
+struct BitMap *theSuperBitMap;
+struct Layer  *theLayers[3] = { NULL, NULL, NULL, };
+
+if (NULL != (msgLayer = CreateUpfrontLayer(theLayerInfo, theBitMap,
+                     M_L, M_T, M_R, M_B, LAYERSMART, NULL)))
+    {
+    pMessage(msgLayer, &#034;Setting up Layers&#034;);
+
+    if (NULL != (theSuperBitMap = allocBitMap(SCREEN_D, SUPER_W, SUPER_H)))
+        {
+        if (allocLayers(msgLayer, theLayers, theSuperBitMap, theLayerInfo, theBitMap))
+            {
+            doLayers(msgLayer, theLayers);
+
+            disposeLayers(msgLayer, theLayers);
+            }
+        disposeBitMap(theSuperBitMap, SCREEN_D, SUPER_W, SUPER_H);
+        }
+    if (!DeleteLayer(DUMMY, msgLayer))
+        error(msgLayer, &#034;Error deleting layer&#034;);
+    }
+}
+
+/*
+** Set up a low-level graphics display for layers to work on.  Layers
+** should not be built directly on Intuition screens, use a low-level
+** graphics view.  If you need mouse or other events for the layers
+** display, you have to get them directly from the input device.  The
+** only supported method of using layers library calls with Intuition
+** (other than the InstallClipRegion() call) is through Intuition windows.
+**
+** See graphics primitives chapter for details on creating and using the
+** low-level graphics calls.
+*/
+VOID runNewView(VOID)
+{
+struct View        theView;
+struct View       *oldview;
+struct ViewPort    theViewPort;
+struct RasInfo     theRasInfo;
+struct ColorMap   *theColorMap;
+struct Layer_Info *theLayerInfo;
+struct BitMap     *theBitMap;
+UWORD             *colorpalette;
+WORD               ktr;
+
+/* save current view, to be restored when done */
+if (NULL != (oldview = GfxBase-&#062;ActiView))
+    {
+    /* get a LayerInfo structure */
+    if (NULL != (theLayerInfo = NewLayerInfo()))
+        {
+        if (NULL != (theColorMap = GetColorMap(4)))
+            {
+            colorpalette = (UWORD *)theColorMap-&#062;ColorTable;
+            for(ktr = 0; ktr &#060; 4; ktr++)
+                *colorpalette++ = colortable[ktr];
+
+            if (NULL != (theBitMap = allocBitMap(SCREEN_D, SCREEN_W, SCREEN_H)))
+                {
+                InitView(&#038;theView);
+                InitVPort(&#038;theViewPort);
+
+                theView.ViewPort = &#038;theViewPort;
+
+                theViewPort.DWidth   = SCREEN_W;
+                theViewPort.DHeight  = SCREEN_H;
+                theViewPort.RasInfo  = &#038;theRasInfo;
+                theViewPort.ColorMap = theColorMap;
+
+                theRasInfo.BitMap   = theBitMap;
+                theRasInfo.RxOffset = 0;
+                theRasInfo.RyOffset = 0;
+                theRasInfo.Next     = NULL;
+
+                MakeVPort(&#038;theView, &#038;theViewPort);
+                MrgCop(&#038;theView);
+                LoadView(&#038;theView);
+                WaitTOF();
+
+                startLayers(theLayerInfo, theBitMap);
+
+                /* put back the old view, wait for it to become
+                ** active before freeing any of our display
+                */
+                LoadView(oldview);
+                WaitTOF();
+
+                /* free dynamically created structures */
+                FreeVPortCopLists(&#038;theViewPort);
+                FreeCprList(theView.LOFCprList);
+
+                disposeBitMap(theBitMap, SCREEN_D, SCREEN_W, SCREEN_H);
+                }
+            FreeColorMap(theColorMap);       /* free the color map */
+            }
+        DisposeLayerInfo(theLayerInfo);
+        }
+    }
+}
+
+/*
+** Open the libraries used by the example.  Clean up when done.
+*/
+VOID main(int argc, char **argv)
+{
+if (NULL != (GfxBase = (struct GfxBase *)OpenLibrary(&#034;graphics.library&#034;,33L)))
+    {
+    if (NULL != (LayersBase = OpenLibrary(&#034;layers.library&#034;,33L)))
+        {
+        runNewView();
+
+        CloseLibrary((struct Library *)LayersBase);
+        }
+    CloseLibrary((struct Library *)GfxBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

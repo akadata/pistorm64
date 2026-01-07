@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="FindColor()" TITLE="graphics.library/FindColor" -->
+<head>
+<title>graphics.library/FindColor</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02D1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02D3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FindColor -- Find the closest matching color in a colormap. (V39)
+
+<b>   SYNOPSIS</b>
+	color = FindColor(  cm,  R,   G,    B , maxpen)
+	                   a3   d1   d2    d3   d4
+
+	ULONG FindColor( struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> *, ULONG, ULONG, ULONG,LONG);
+
+<b>   INPUTS</b>
+	cm = colormap
+	R = red level   (32 bit left justified fraction)
+	G = green level (32 bit left justified fraction)
+	B = blue level  (32 bit left justified fraction)
+	MaxPen = the maximum entry in the color table to search. A value of
+	        -1 will limt the search to only those pens which could be
+	        rendered in (for instance, it will not examine the sprite
+	        colors on a 4 color screen).
+
+
+<b>   RESULT</b>
+	The system will attempt to find the color in the passed colormap
+	which most closely matches the RGB values passed. No new pens will
+	be allocated, and you should not <a href="../Includes_and_Autodocs_3._guide/node0314.html">ReleasePen()</a> the returned pen.
+	This function is not sensitive to palette sharing issues. Its
+	intended use is for:
+
+	        (a) programs which pop up on public screens when those
+	            screens are not using palette sharing. You might
+	            use this function as a fallback when <a href="../Includes_and_Autodocs_3._guide/node0306.html">ObtainBestPenA()</a>
+	            says that there are no sharable pens.
+
+	        (b) Internal color matching by an application which is
+	            either running on a non-public screen, or which
+	            wants to match colors to an internal color table
+	            which may not be associated with any displayed screen.
+
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+	In order to use the MaxPen=-1 feature, you must have initialized
+	palette sharing via <a href="../Includes_and_Autodocs_3._guide/node02AE.html">AttachPalExtra()</a> (all intuition screens do this).
+	Otherwise, MaxPen=-1 will search all colors in the colormap.
+
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0306.html">ObtainBestPenA()</a> <a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a> <a href="../Includes_and_Autodocs_3._guide/node0307.html">ObtainPen()</a> <a href="../Includes_and_Autodocs_3._guide/node0314.html">ReleasePen()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

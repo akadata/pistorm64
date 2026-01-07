@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="CxSignal()" TITLE="amiga.lib/CxSignal" -->
+<head>
+<title>amiga.lib/CxSignal</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0030.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0032.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CxSignal -- create a commodity signaller object. (V36)
+
+<b>   SYNOPSIS</b>
+	signalerObj = CxSignal(task,signal);
+
+	<a href="../Includes_and_Autodocs_3._guide/node0632.html#line74">CxObj</a> *CxSignal(struct <a href="../Includes_and_Autodocs_3._guide/node064B.html#line23">Task</a> *,LONG);
+
+<b>   FUNCTION</b>
+	This function creates a Commodities signal object. The action
+	of this object on receiving a Commodities message is to
+	send the 'signal' to the 'task'. The caller is responsible
+	for allocating the signal and determining the proper task ID.
+
+	Note that 'signal' is the signal value as returned by <a href="../Includes_and_Autodocs_3._guide/node01E9.html">AllocSignal()</a>,
+	not the mask made from that value.
+
+	This function is a C-language macro for <a href="../Includes_and_Autodocs_3._guide/node00E4.html">CreateCxObj()</a>, defined
+	in <a href="../Includes_and_Autodocs_3._guide/node0632.html">&#060;libraries/commodities.h&#062;</a>.
+
+<b>   INPUTS</b>
+	task - the task for the signaller to signal
+	signal - the signal bit number for the signaller to send
+
+<b>   RESULTS</b>
+	signallerObj - a pointer to the signaller object, or NULL if it could
+		       not be created.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node00E4.html">commodities.library/CreateCxObj()</a>, <a href="../Includes_and_Autodocs_3._guide/node020B.html">exec.library/FindTask()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node023D.html">exec.library/Signal()</a>, <a href="../Includes_and_Autodocs_3._guide/node01E9.html">exec.library/AllocSignal()</a>,
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

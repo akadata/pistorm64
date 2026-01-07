@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-4-1" TITLE="21 / Task Exclusion / Forbidding Task Switching" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 / Task Exclusion / Forbidding Task Switching</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02C1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02C3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Forbidding is used when a task is accessing shared structures that might
+also be accessed at the same time from another task.  It effectively
+eliminates the possibility of simultaneous access by imposing
+nonpreemptive task scheduling.  This has the net effect of disabling
+multitasking for as long as your task remains in its running state. While
+forbidden, your task will continue running until it performs a call to
+<a href="../Libraries_Manual_guide/node02D4.html">Wait()</a> or exits from the forbidden state.  Interrupts will occur normally,
+<a name="line9">but no new tasks will be dispatched, regardless of their priorities.</a>
+
+When a task running in the forbidden state calls the <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a> function,
+directly or indirectly, it implies a temporary exit from its forbidden
+state. Since almost all stdio, device I/O, and file I/O functions must
+Wait() for I/O completion, performing such calls will cause your task to
+Wait(), temporarily breaking the forbid.  While the task is waiting, the
+system will perform normally.  When the task receives one of the signals
+it is waiting for, it will again reenter the forbidden state. To become
+forbidden, a task calls the <a href="../Includes_and_Autodocs_2._guide/node0353.html">Forbid()</a> function.  To escape, the <a href="../Includes_and_Autodocs_2._guide/node0369.html">Permit()</a>
+function is used.  The use of these functions may be nested with the
+expected affects; you will not exit the forbidden mode until you call the
+outermost Permit().
+
+As an example, the Exec task list should only be accessed when in a
+<a href="../Includes_and_Autodocs_2._guide/node0353.html">Forbid()</a> state.  Accessing the list without forbidding could lead to
+incorrect results or it could crash the entire system.  To access the task
+list also requires the program to disable interrupts which is discussed in
+the <a href="../Libraries_Manual_guide/node02C3.html">next section</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

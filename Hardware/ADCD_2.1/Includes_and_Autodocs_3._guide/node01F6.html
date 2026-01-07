@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="CloseDevice()" TITLE="exec.library/CloseDevice" -->
+<head>
+<title>exec.library/CloseDevice</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01F5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01F7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CloseDevice -- conclude access to a device
+
+<b>   SYNOPSIS</b>
+	CloseDevice(iORequest)
+		    A1
+
+	void CloseDevice(struct <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> *);
+
+<b>   FUNCTION</b>
+	This function informs the device that access to a device/unit
+	previously opened has been concluded.  The device may perform
+	certain house-cleaning operations.
+
+	The user must ensure that all outstanding IORequests have been
+	returned before closing the device.  The <a href="../Includes_and_Autodocs_3._guide/node0574.html">AbortIO</a> function can kill
+	any stragglers.
+
+	After a close, the I/O request structure is free to be reused.
+	Starting with V36 exec it is safe to CloseDevice() with an
+	<a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> that is either cleared to zeros, or failed to
+	open.
+
+<b>   INPUTS</b>
+	iORequest - pointer to an I/O request structure
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0221.html">OpenDevice()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="commodities" NODE="ActivateCxObj()" TITLE="commodities.library/ActivateCxObj" -->
+<head>
+<title>commodities.library/ActivateCxObj</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00DF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00E1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ActivateCxObj -- change the activation state of a commodity object.
+			 (V36)
+
+<b>   SYNOPSIS</b>
+	previous = ActivateCxObj(co,true);
+	D0			 A0 D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> ActivateCxObj(CxObj *,LONG);
+
+<b>   FUNCTION</b>
+	Commodity objects of all types maintain an activation state.
+	If an object is &#034;active&#034;, then it performs its particular action
+	whenever a commodity message arrives. If the object is &#034;inactive&#034;
+	no action is taken, and the message goes on to its next destination.
+
+	All objects are created in the &#034;active&#034; state except brokers
+	which are created &#034;inactive&#034;. Thus, after you create your
+	broker and hang a tree of objects off of it, you must remember
+	to use this function to activate it. This causes it to divert all
+	messages to your tree of objects.
+
+	This function activates 'co' if 'true' is different than 0. and
+	deactivates it otherwise. The previous activation state is
+	returned.
+
+<b>   INPUTS</b>
+	co - the commodity object to affect (may be NULL)
+	true - 0 to deactivate the object, anything else to activate it
+
+<b>   RESULTS</b>
+	previous - the previous activation state: 0 if the object was
+		   inactive or if 'co' was NULL, anything else if the object
+		   was active
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node00E5.html">CxBroker()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="FGetC()" TITLE="dos.library/FGetC" -->
+<head>
+<title>dos.library/FGetC</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0161.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0163.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FGetC -- <a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> a character from the specified input (buffered) (V36)
+
+<b>   SYNOPSIS</b>
+	char = FGetC(fh)
+	D0	     D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> FGetC(BPTR)
+
+<b>   FUNCTION</b>
+	Reads the next character from the input stream.  A -1 is
+	returned when EOF or an error is encountered.  This call is buffered.
+	Use <a href="../Includes_and_Autodocs_3._guide/node016A.html">Flush()</a> between buffered and unbuffered I/O on a filehandle.
+
+<b>   INPUTS</b>
+	fh - filehandle to use for buffered I/O
+
+<b>   RESULT</b>
+	char - character read (0-255) or -1
+
+<b>   BUGS</b>
+	In V36, after an EOF was read, EOF would always be returned from
+	FGetC() from then on.  Starting in V37, it tries to read from the
+	handler again each time (unless UnGetC(fh,-1) was called).
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node016C.html">FPutC()</a>, <a href="../Includes_and_Autodocs_3._guide/node01C6.html">UnGetC()</a>, <a href="../Includes_and_Autodocs_3._guide/node016A.html">Flush()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

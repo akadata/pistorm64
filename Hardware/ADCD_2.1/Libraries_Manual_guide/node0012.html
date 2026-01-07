@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_1" NODE="1-1-3" TITLE="1 / Programming in the Amiga Environment / Dynamic Memory Architecture" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>1 / Programming in the Amiga Environment / Dynamic Memory Architecture</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0011.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0013.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Unlike some microcomputer operating systems, the Amiga OS relies on
+absolute memory addresses as little as possible.  Instead the Amiga OS
+uses a technique (sometimes referred to as soft machine architecture)
+which allows system routines and data structures to be positioned anywhere
+in memory.
+
+Amiga <a href="../Libraries_Manual_guide/node0010.html#line9">run-time</a> libraries may be positioned anywhere in memory because they
+are always accessed through a jump table.  Each library whether in ROM or
+loaded from disk has an associated Library structure and jump table in RAM.
+
+
+                            Low Memory
+                               /|\
+                                |
+                       _________|_________
+                      |                   |
+                      |  JMP Function  N  |
+                      |         &#183;         |
+                      |         &#183;         |
+                      |  JMP Function  3  |
+                      |  JMP Function  2  |
+                      |  JMP Function  1  |
+      Library Base____|___________________|
+                      |                   |
+                      | Library Structure |
+                      |___________________|
+                      |                   |
+                      |     Data Area     |
+                      |___________________|
+                                |
+                                |
+                               \|/
+                           High Memory
+
+
+      Figure 1-2: Amiga Library Structure and Jump Table
+
+
+The system knows where the jump table starts in RAM because when a library
+is opened for the first time, <a href="../Libraries_Manual_guide/node0013.html">Exec</a> creates the library structure and keeps
+track of its location.  The order of the entries in the library's jump
+table is always preserved between versions of the OS but the functions
+they point to can be anywhere in memory.  Hence, system routines in ROM
+may be moved from one version of the OS to another.  Given the location of
+the jump table and the appropriate offset into the table, any function can
+always be found.
+
+Not only are system routines relocatable but system data structures are
+too.  In the Amiga's <a href="../Libraries_Manual_guide/node000A.html">multitasking</a> environment, multiple applications run
+at the same time and each may have its own screen, memory, open files, and
+even its own subtasks.  Since any number of application tasks are run and
+stopped at the user's option, system data structures have to be set up as
+needed.  They cannot be set up ahead of time at a fixed memory location
+because there is no way to tell how many and what type will be needed.
+
+The Amiga system software manages this confusion by using linked lists of
+information about items such as libraries, tasks, screens, files and
+available memory.  A linked list is a chain of data items with each data
+item containing a pointer to the next item in the chain.  Given a pointer
+to the first item in a linked list, pointers to all the other items in the
+chain can be found.
+
+ <a href="../Libraries_Manual_guide/node0013.html">Exec: The System Executive</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

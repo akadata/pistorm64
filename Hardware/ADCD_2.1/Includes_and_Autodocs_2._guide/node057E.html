@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="FD/utility_lib.fd" NODE="MAIN" TITLE="FD/utility_lib.fd" -->
+<head>
+<title>FD/utility_lib.fd</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node057D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node057F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+* &#034;utility.library&#034;
+##base _UtilityBase
+##bias 30
+##public
+* *** TagItem FUNCTIONS ***
+FindTagItem(tagVal,tagList)(d0/a0)
+GetTagData(tagVal,defaultVal,tagList)(d0/d1/a0)
+PackBoolTags(initialFlags,tagList,boolMap)(d0/a0/a1)
+NextTagItem(tagListPtr)(a0)
+FilterTagChanges(newTagList,oldTagList,apply)(a0/a1,d0)
+MapTags(tagList,mapList,includeMiss)(a0/a1,d0)
+AllocateTagItems(numItems)(d0)
+CloneTagItems(tagList)(a0)
+FreeTagItems(tagList)(a0)
+RefreshTagItemClones(cloneList,origList)(a0/a1)
+TagInArray(tagVal,tagArray)(d0/a0)
+FilterTagItems(tagList,filterArray,logic)(a0/a1,d0)
+*
+* *** HOOK FUNCTIONS *** *
+CallHookPkt(hook,object,paramPacket)(a0/a2,a1)
+*--- (1 function slot reserved here) ---
+##bias 114
+*
+* *** DATE FUNCTIONS *** *
+*--- (1 function slot reserved here) ---
+##bias 120
+Amiga2Date(amigaTime,date)(d0/a0)
+Date2Amiga(date)(a0)
+CheckDate(date)(a0)
+*
+* *** 32 BIT MATH FUNCTIONS *** *
+SMult32(factor1,factor2)(d0/d1)
+UMult32(factor1,factor2)(d0/d1)
+* NOTE: Quotient:Remainder returned in d0:d1
+SDivMod32(dividend,divisor)(d0/d1)
+UDivMod32(dividend,divisor)(d0/d1)
+*
+* *** International string routines ***
+Stricmp(string1,string2)(a0/a1)
+Strnicmp(string1,string2,length)(a0/a1,d0)
+ToUpper(character)(d0)
+ToLower(character)(d0)
+##end
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

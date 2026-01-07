@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_5" NODE="5-2-1" TITLE="5 / Device Interface / Opening The Gameport Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>5 / Device Interface / Opening The Gameport Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00B0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00B2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Three primary steps are required to open the gameport device:
+
+   *  Create a message port using <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>. Reply messages from the
+      device must be directed to a message port.
+
+   *  Create an I/O request structure of type <a href="../Devices_Manual_guide/node00B0.html#line7">IOStdReq</a>. The IOStdReq
+      structure is created by the <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a> function. CreateExtIO()
+      will initialize the I/O request with your reply port.
+
+   *  Open the gameport device.  Call <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>, passing the I/O request
+      and and indicating the unit you wish to use.
+
+   struct MsgPort *GameMP;   /* Message port pointer */
+   struct IOStdReq *GameIO;  /* I/O request pointer */
+
+     /* Create port for gameport device communications */
+   if (!(GameMP = CreatePort(&#034;RKM_game_port&#034;,0)))
+       cleanexit(&#034; Error: Can't create port\n&#034;,RETURN_FAIL);
+
+     /* Create message block for device I/O */
+   if (!(GameIO = CreateExtIO(GameMP,sizeof(struct IOStdReq))))
+       cleanexit(&#034; Error: Can't create I/O request\n&#034;,RETURN_FAIL);
+
+     /* Open the right/back (unit 1, number 2) gameport.device unit */
+   if (error=OpenDevice(&#034;gameport.device&#034;,1,GameIO,0))
+       cleanexit(&#034; Error: Can't open gameport.device\n&#034;,RETURN_FAIL);
+
+The gameport commands are unit specific.  The unit number specified in the
+call to <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> determines which unit is acted upon.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

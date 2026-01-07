@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-9-11" TITLE="27 / / Monitors, Modes and the Display Database / Mode Properties" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Monitors, Modes and the Display Database / Mode Properties</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node033F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0341.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here is an example of how to query the properties of a given mode from a
+<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line32">DisplayInfoHandle</a>.
+
+
+#include &#060;graphics/displayinfo.h&#062;
+
+check_properties( handle )
+DisplayInfoHandle handle;
+{
+    struct DisplayInfo queryinfo;
+
+    /* fill in the displayinfo buffer with basic Mode display data */
+
+    if(GetDisplayInfoData(handle, (UBYTE *)&#038;queryinfo,sizeof(queryinfo),
+       DTAG_DISP,NULL)))
+    {
+        /* check for Properties of this Mode */
+
+        if(queryinfo.PropertyFlags)
+        {
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_LACE)
+                printf(&#034;mode is interlaced&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_DUALPF)
+                printf(&#034;mode has dual playfields&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_PF2PRI)
+                printf(&#034;mode has playfield two priority&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_HAM)
+                printf(&#034;mode uses hold-and-modify&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_ECS)
+                printf(&#034;mode requires the ECS chip set&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_PAL)
+                printf(&#034;mode is naturally displayed on pal.monitor&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_SPRITES)
+                printf(&#034;mode has sprites&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_GENLOCK)
+                printf(&#034;mode is compatible with genlock displays&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_WB)
+                printf(&#034;mode will support workbench displays&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_DRAGGABLE)
+                printf(&#034;mode may be dragged to new positions&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_PANELLED)
+                printf(&#034;mode is broken up for scan conversion&#034;);
+            if(queryinfo.PropertyFlags &#038; DIPF_IS_BEAMSYNC)
+                printf(&#034;mode supports beam synchronization&#034;);
+        }
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

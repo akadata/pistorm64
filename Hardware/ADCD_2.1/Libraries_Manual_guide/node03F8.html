@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-2" TITLE="30 Layers Library / Regions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 Layers Library / Regions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03F7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03F9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Regions allow the application to install clipping rectangles into layers.
+A clipping rectangle is a rectangular area into which the graphics
+routines will draw.  All drawing that would fall outside of that
+rectangular area is clipped (not rendered).
+
+User clipping regions are linked lists of clipping rectangles created by
+an application program through the graphics library routines described
+below.  By combining together various clipping rectangles, any arbitrary
+clipping shape can be created.  Once the region is set up, you use the
+layers library call <a href="../Libraries_Manual_guide/node03FA.html">InstallClipRegion()</a> to make the clipping region active
+in a layer.
+
+Regions are safe to use with layers created by Intuition (i.e., windows).
+The following table describes the routines available for the creation,
+<a name="line16">manipulation and use of regions.</a>
+<a name="line17"></a>
+
+                Table 30-4: Functions Used with Regions
+  ____________________________________________________________________
+ |                                                                    |
+ |          Routine      Library         Description                  |
+<a name="line23"> |====================================================================|</a>
+ |  <a href="../Libraries_Manual_guide/node03FA.html">InstallClipRegion()</a>  Layers    Add a clipping region to a layer.  |
+ |--------------------------------------------------------------------|
+ |          <a href="../Libraries_Manual_guide/node03F9.html">NewRegion()</a>  Graphics  Create a new, empty region.        |
+ |      <a href="../Libraries_Manual_guide/node03F9.html#line9">DisposeRegion()</a>  Graphics  Dispose of an existing region and  |
+ |                                 its rectangles.                    |
+ |--------------------------------------------------------------------|
+ |      <a href="../Libraries_Manual_guide/node03FC.html">AndRectRegion()</a>  Graphics  And a rectangle into a region.     |
+ |       <a href="../Libraries_Manual_guide/node03FC.html">OrRectRegion()</a>  Graphics  Or a rectangle into a region.      |
+ |      <a href="../Libraries_Manual_guide/node03FC.html">XorRectRegion()</a>  Graphics  Exclusive-or a rectangle into a    |
+ |                                 region.                            |
+ |    <a href="../Libraries_Manual_guide/node03FC.html">ClearRectRegion()</a>  Graphics  Clear a rectangular portion of a   |
+ |                                 region.                            |
+ |    <a href="../Libraries_Manual_guide/node03FD.html">AndRegionRegion()</a>  Graphics  And two regions together.          |
+ |     <a href="../Libraries_Manual_guide/node03FD.html">OrRegionRegion()</a>  Graphics  Or two regions together.           |
+ |    <a href="../Libraries_Manual_guide/node03FD.html">XorRegionRegion()</a>  Graphics  Exclusive-or two regions together. |
+ |--------------------------------------------------------------------|
+ |        <a href="../Libraries_Manual_guide/node03FD.html">ClearRegion()</a>  Graphics  Clear a region.                    |
+ |____________________________________________________________________|
+
+
+With these functions, the application can selectively update a
+custom-shaped part of a layer without disturbing any of the other layers
+<a name="line46">that might be present.</a>
+
+    Never Modify the DamageList of a Layer Directly.
+    ------------------------------------------------
+    Use the routine <a href="../Libraries_Manual_guide/node03FA.html">InstallClipRegion()</a> to add clipping to the layer.
+    The regions installed by InstallClipRegion() are independent of
+    the layer's <a href="../Libraries_Manual_guide/node03E4.html#line21">DamageList</a> and use of user clipping regions will not
+<a name="line53">    interfere with optimized window refreshing.</a>
+
+    Do Not Modify A Region After It Has Been Added.
+    -----------------------------------------------
+    After a region has been added with <a href="../Libraries_Manual_guide/node03FA.html">InstallClipRegion()</a>, the
+    program may not modify it until the region has been removed with
+    another call to InstallClipRegion().
+
+ <a href="../Libraries_Manual_guide/node03F9.html">Creating and Deleting Regions</a>    <a href="../Libraries_Manual_guide/node03FB.html">Changing a Region</a> 
+ <a href="../Libraries_Manual_guide/node03FA.html">Installing Regions</a>               <a href="../Libraries_Manual_guide/node05C6.html">Regions Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

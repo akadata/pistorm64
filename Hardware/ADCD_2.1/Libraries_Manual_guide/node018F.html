@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-13" TITLE="6 / Setting Up Menus / Mutual Exclusion" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Setting Up Menus / Mutual Exclusion</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node018E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0190.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Mutual exclusion allows the selection of an item to cause other items to
+<a name="line3">become unselected.</a>
+
+For example, for a list of menu items describing the available sizes for a
+font, the selection of any size could unselect all other sizes.  Use the
+<a href="../Libraries_Manual_guide/node019A.html#line39">MutualExclude</a> variable in the <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structure to specify other menu
+items to be excluded when the user selects an item.  Exclusion also
+depends upon the <a href="../Libraries_Manual_guide/node019B.html#line7">CHECKED</a> and <a href="../Libraries_Manual_guide/node019B.html#line3">CHECKIT</a> flags of the MenuItem, as explained
+below.
+
+  * If <a href="../Libraries_Manual_guide/node019B.html#line7">CHECKED</a> is not set, then this item is available to be selected.
+    If the user selects this item, the CHECKED flag is set and the
+    checkmark will be drawn to the left of the item.
+
+  * If the item selected has bits set in the <a href="../Libraries_Manual_guide/node019A.html#line39">MutualExclude</a> field, the
+    <a href="../Libraries_Manual_guide/node019B.html#line7">CHECKED</a> flag is examined in the excluded items.  If any item is
+    currently CHECKED, its checkmark is erased, and its CHECKED flag is
+<a name="line19">    cleared.</a>
+
+  * Mutual exclusion pertains only to items that have the <a href="../Libraries_Manual_guide/node019B.html#line3">CHECKIT</a> flag
+    set.  Attempting to exclude items that do not have the CHECKIT flag
+<a name="line23">    set has no effect.</a>
+
+    Keep track of deselected items.
+    -------------------------------
+    It is up to the program to track internally which excluded items have
+    been deselected.  See the &#034;<a href="../Libraries_Manual_guide/node0192.html">Enabling and Disabling Menus and Menu Items</a>&#034;
+    section below for more information.
+
+In the <a href="../Libraries_Manual_guide/node019A.html#line39">MutualExclude</a> field, bit 0 refers to the first item in the item
+list, bit 1 to the second, bit 2 to the third, and so on.
+
+In the text style example described above, selecting plain excludes any
+other style.  The <a href="../Libraries_Manual_guide/node019A.html#line39">MutualExclude</a> fields of the four items would look like
+this:
+                     _____________________
+                    |                     |
+                    |  Plain      0xFFFE  |
+                    |  Bold       0x0001  |
+                    |  Italic     0x0001  |
+                    |  Underline  0x0001  |
+                    |_____________________|
+
+
+&#034;Plain&#034; is the first item on the list.  It excludes all items except the
+first one.  All of the other items exclude only the first item, so that
+bold, underlined text may be selected, while bold, plain text may not.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

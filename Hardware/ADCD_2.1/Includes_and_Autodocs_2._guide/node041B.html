@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="AskFont()" TITLE="graphics.library/AskFont" -->
+<head>
+<title>graphics.library/AskFont</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node041A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node041C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AskFont -- get the text attributes of the current font
+
+SYNOPSIS
+    AskFont(rp, textAttr)
+            A1  A0
+
+    void AskFont(struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line66">TextAttr</a> *);
+
+FUNCTION
+    This function fills the text attributes structure with the
+    attributes of the current font in the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>.
+
+INPUTS
+    rp       - the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> from which the text attributes are
+               extracted
+    textAttr - the <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line66">TextAttr</a> structure to be filled.  Note that
+               there is no support for a <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line73">TTextAttr</a>.
+
+RESULT
+    The textAttr structure is filled with the RastPort's text
+    attributes.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00A8.html">graphics/text.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

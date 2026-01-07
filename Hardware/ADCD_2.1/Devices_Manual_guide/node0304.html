@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/modules/copychunks.c" NODE="MAIN" TITLE="Devices/modules/copychunks.c" -->
+<head>
+<title>Devices/modules/copychunks.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0303.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0305.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* copychunks
+ *
+ * For Read/Modify/Write programs and other programs that need
+ *   to close the IFF file but still reference gathered chunks.
+ * Copies your gathered property and collection chunks
+ *   from an iff context so that IFF handle may be
+ *   closed right after parsing (allowing file or clipboard to
+ *   to be reopened for read or write by self or other programs)
+ *
+ * The created list of chunks can be modified and written
+ *   back out to a new handle with writechunklist().
+ *
+ * If you have used copychunks(), remember to free the copied
+ *   chunks with freechunklist(), when ready, to deallocate them.
+ *
+ * Note that this implementation is flat and is suitable only
+ *   for simple FORMs.
+ */
+
+#include &#034;iffp/iff.h&#034;
+
+/* copychunks()
+ *
+ * Copies chunks specified in propchks and collectchks
+ *   FROM an already-parsed IFFHandle
+ *   TO a singly linked list of Chunk structures,
+ * and returns a pointer to the start of the list.
+ *
+ * Generally you would store this pointer in parseInfo.copiedchunks.
+ *
+ * You must later free the list of copied chunks by calling
+ *   FreeChunkList().
+ *
+ * Reorders collection chunks so they appear in SAME ORDER
+ * in chunk list as they did in the file.
+ *
+ * Returns 0 for failure
+ */
+struct Chunk *copychunks(struct IFFHandle *iff,
+			LONG *propchks, LONG *collectchks,
+			ULONG memtype)
+    {
+    struct Chunk *chunk, *first=NULL, *prevchunk = NULL;
+    struct StoredProperty *sp;
+    struct CollectionItem *ci, *cii;
+    long error;
+    int k, kk, bk;
+
+    if(!iff)	return(NULL);
+
+    /* Copy gathered property chunks */
+    error = 0;
+    for(k=0; (!error) &#038;&#038; (propchks) &#038;&#038; (propchks[k] != TAG_DONE); k+=2)
+	{
+	if(sp=FindProp(iff,propchks[k],propchks[k+1]))
+	    {
+	    D(bug(&#034;copying %.4s.%.4s chunk\n&#034;,&#038;propchks[k],&#038;propchks[k+1]));
+
+	    if(chunk=(struct Chunk *)
+			AllocMem(sizeof(struct Chunk),memtype|MEMF_CLEAR))
+		{
+		chunk-&#062;ch_Type = propchks[k];
+		chunk-&#062;ch_ID   = propchks[k+1];
+		if(chunk-&#062;ch_Data = AllocMem(sp-&#062;sp_Size,memtype))
+		    {
+		    chunk-&#062;ch_Size = sp-&#062;sp_Size;
+		    CopyMem(sp-&#062;sp_Data,chunk-&#062;ch_Data,sp-&#062;sp_Size);
+		    if(prevchunk)	prevchunk-&#062;ch_Next = chunk;
+		    else 		first = chunk;
+		    prevchunk = chunk;
+		    }
+		else
+		    {
+		    FreeMem(chunk,sizeof(struct Chunk));
+		    chunk=NULL;
+		    error = 1;
+		    }
+		}
+	    else error = 1;
+	    }
+	}
+
+    /* Copy gathered collection chunks in reverse order */
+    for(k=0; (!error) &#038;&#038; (collectchks) &#038;&#038; (collectchks[k] != TAG_DONE); k+=2)
+	{
+	if(ci=FindCollection(iff,collectchks[k],collectchks[k+1]))
+	    {
+	    D(bug(&#034;copying %.4s.%.4s collection\n&#034;,&#038;collectchks[k],&#038;collectchks[k+1]));
+	    for(cii=ci, bk=0; cii; cii=cii-&#062;ci_Next)	bk++;
+
+	    D(bug(&#034; There are %ld of these, first is at $%lx\n&#034;,bk,ci));
+
+	    for( bk; bk; bk--)
+		{
+ 		for(kk=1, cii=ci; kk&#060;bk; kk++) cii=cii-&#062;ci_Next;
+
+		D(bug(&#034;  copying number %ld\n&#034;,kk));
+
+	    	if(chunk=(struct Chunk *)
+		    AllocMem(sizeof(struct Chunk),memtype|MEMF_CLEAR))
+		    {
+		    chunk-&#062;ch_Type = collectchks[k];
+		    chunk-&#062;ch_ID   = collectchks[k+1];
+		    if(chunk-&#062;ch_Data = AllocMem(cii-&#062;ci_Size,memtype))
+		    	{
+		    	chunk-&#062;ch_Size = cii-&#062;ci_Size;
+		    	CopyMem(cii-&#062;ci_Data,chunk-&#062;ch_Data,cii-&#062;ci_Size);
+		    	if(prevchunk)	prevchunk-&#062;ch_Next = chunk;
+		    	else 		first = chunk;
+		    	prevchunk = chunk;
+		    	}
+		    else
+		    	{
+		    	FreeMem(chunk,sizeof(struct Chunk));
+		    	chunk=NULL;
+		    	error = 1;
+		    	}
+		    }
+	    	else error = 1;
+		}
+	    }
+	}
+
+    if(error)
+	{
+	if(first) freechunklist(first);
+	first = NULL;
+	}
+
+    return(first);
+    }
+
+/* freechunklist - Free a dynamically allocated Chunk list and
+ *   all of its ch_Data.
+ *
+ * Note - if a chunk's ch_Size is IFFSIZE_UNKNOWN, its ch_Data
+ *   will not be deallocated.
+ */
+void freechunklist(struct Chunk *first)
+    {
+    struct Chunk *chunk, *next;
+
+    chunk = first;
+    while(chunk)
+	{
+	next = chunk-&#062;ch_Next;
+	if((chunk-&#062;ch_Data)&#038;&#038;(chunk-&#062;ch_Size != IFFSIZE_UNKNOWN))
+		FreeMem(chunk-&#062;ch_Data,chunk-&#062;ch_Size);
+	FreeMem(chunk, sizeof(struct Chunk));
+	chunk = next;
+	}
+    }
+
+
+/* findchunk - find first matching chunk in list of struct Chunks
+ *    example  finchunk(pi-&#062;copiedchunks,ID_ILBM,ID_CRNG);
+ *
+ * returns struct Chunk *, or NULL if none found
+ */
+struct Chunk *findchunk(struct Chunk *first, long type, long id)
+    {
+    struct Chunk *chunk;
+
+    for(chunk=first; chunk; chunk=chunk-&#062;ch_Next)
+	{
+	if((chunk-&#062;ch_Type == type)&#038;&#038;(chunk-&#062;ch_ID == id)) return(chunk);
+	}
+    return(NULL);
+    }
+
+
+/* writechunklist - write out list of struct Chunk's
+ * If data is a null terminated string, you may use
+ * IFFSIZE_UNKNOWN as the ch_Szie and strlen(chunk-&#062;ch_Data)
+ * will be used here as size.
+ *
+ * Returns 0 for success or an IFFERR
+ */
+long writechunklist(struct IFFHandle *iff, struct Chunk *first)
+    {
+    struct Chunk *chunk;
+    long size, error = 0;
+
+    D(bug(&#034;writechunklist: first chunk pointer = $%lx\n&#034;,first));
+
+    for(chunk=first; chunk &#038;&#038; (!error); chunk=chunk-&#062;ch_Next)
+	{
+	size  = (chunk-&#062;ch_Size == IFFSIZE_UNKNOWN) ?
+			strlen(chunk-&#062;ch_Data) :  chunk-&#062;ch_Size;
+	error = PutCk(iff, chunk-&#062;ch_ID, size, chunk-&#062;ch_Data);
+	D(bug(&#034;writechunklist: put %.4s size=%ld, error=%ld\n&#034;,
+				&#038;chunk-&#062;ch_ID,size, error));
+	}
+    return(error);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

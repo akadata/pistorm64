@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="cd" NODE="CD_READ" TITLE="cd.device/CD_READ" -->
+<head>
+<title>cd.device/CD_READ</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00B1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00B3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       CD_READ -- read data from disk.
+
+<b>   FUNCTION</b>
+       Reads data from the CD into memory.  Data may be accessed on WORD
+       boundaries (you are not restricted to sector boundaries as with
+       normal disk devices).  Data lengths can also be described in WORD
+       amounts.
+
+<b>   IO REQUEST INPUT</b>
+       io_Device       preset by the call to <a href="../Includes_and_Autodocs_3._guide/node00BB.html">OpenDevice()</a>
+       io_Unit         preset by the call to <a href="../Includes_and_Autodocs_3._guide/node00BB.html">OpenDevice()</a>
+       io_Command      CD_READ
+       io_Data         pointer to the buffer where the data should be put
+       io_Length       number of bytes to read, must be a WORD multiple.
+       io_Offset       byte offset from the start of the disk describing
+                       where to read data from, must be a WORD multiple.
+
+<b>   IO REQUEST RESULT</b>
+       io_Error  - 0 for success, or an error code as defined in
+                   <a href="../Includes_and_Autodocs_3._guide/node05E4.html">&#060;devices/cd.h&#062;</a>
+       io_Actual - if io_Error is 0, number of bytes actually transferred
+
+<b>   NOTES</b>
+       If an error occurs when attempting a CD_READ, the software will
+       retry up to 10 times before giving up on the request.  If the
+       drive is in double-speed and an error occurs, the software will
+       retry once more in double-speed, and if this fails, will retry
+       the next 9 times in single-speed.
+
+<b>   SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node00B3.html">CD_READXL</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_34" NODE="34-1-7" TITLE="34 / Keymap Functions / Key Map Standards" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>34 / Keymap Functions / Key Map Standards</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0475.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0477.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Users and programs depend on certain predictable behaviors from all
+keyboards and keymaps. With the exception of dead-class keys (see
+&#034;<a href="../Libraries_Manual_guide/node0477.html">Dead-Class</a> Keys&#034; section), mapping of keys in the low key map should
+follow these general rules:
+
+    * When pressed alone, keys should transmit the ASCII equivalent of
+      the unshifted letter or lower symbol on the keycap.
+
+    * When Shifted, keys should transmit the ASCII equivalent of the
+      shifted letter or upper symbol printed on the keycap.
+
+    * When Alt'ed, keys should generally transmit the same character
+      (or act as the same <a href="../Libraries_Manual_guide/node0477.html">deadkey</a>) as the Alt'ed key in the usa1
+      keymap.
+
+    * When pressed with CTRL alone, alphabetic keys should generally
+      transmit their unshifted value but with bits 5 and 6 cleared.
+      This allows keyboard typing of &#034;control characters.&#034;  For
+      example, the C key (normally value $63) should transmit value
+      $03 (Ctrl-C) when Ctrl and C are pressed together.
+
+The keys in the high key map (keys with raw key values $40 and higher) are
+generally non-alphanumeric keys such as those used for editing (backspace,
+delete, cursor keys, etc.), and special Amiga keys such as the function
+and help keys. Keymaps should translate these keys to the same values or
+strings as those shown in <a href="../Libraries_Manual_guide/node0479.html#line11">table 34-6</a>, ROM Default Key Mapping.
+
+In addition to their normal unshifted and shifted values, the following
+translations are standard for particular qualified high keymap keys:
+
+                   Generates     If Used with Qualifier,
+        Key        This Value    Generates This Value
+        ---        ----------    -----------------------
+        Space         $20        $A0 with qualifier <a href="../Libraries_Manual_guide/node0472.html">KCF_ALT</a>
+        Return        $0D        $0A with qualifier <a href="../Libraries_Manual_guide/node0472.html">KCF_CONTROL</a>
+        Esc           $1B        $9B with qualifier <a href="../Libraries_Manual_guide/node0472.html">KCF_ALT</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

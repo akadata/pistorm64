@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_1" NODE="1-2" TITLE="1 Introduction to Amiga System Libraries / About the Examples" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>1 Introduction to Amiga System Libraries / About the Examples</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0018.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node001A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For the most part, the examples in this book are written in C (there are a
+few 68000 assembly language examples too).
+
+C examples have been compiled under SAS C, version 5.10a.  The compiler
+options used with each example are noted in the comments preceding the
+<a name="line7">code.</a>
+
+In general, the examples are also compatible with Manx Aztec C 68K,
+version 5.0d, and other C compilers, however some changes will usually be
+necessary.  Specifically, all the C examples assume that the automatic
+Ctrl-C feature of the compiler has been disabled.  For SAS C (and Lattice
+C revisions 4.0 and greater) this is handled with:
+
+
+    /* Add this before main() to override the default Ctrl-C handling
+     * provided in SAS (Lattice) C.  Ctrl-C event will be ignored */
+
+    int CXBRK ( void )   { return(0); }
+    int chkabort( void ) { return(0); }
+
+For Manx Aztec C, replace the above with:
+
+    /* Add this near the top */
+            #include &#060;functions.h&#062;
+
+    /* Add this before main() */
+            extern int Enable_Abort;   /* reference abort enable */
+
+    /* Add this after main(), as the first active line in the program */
+            Enable_Abort=0;         /* turn off CTRL-C */
+<a name="line32"></a>
+
+Other changes may be required depending on the example and the C compiler
+you are using.  Most of the C examples in this book use the following
+special option flags of the SAS/C compiler (set the equivalent option of
+whatever compiler you are using):
+
+
+-b1 = Small data model.
+-cf = Check for function prototypes.
+  i = Ignore #include statements that are identical to one already given.
+  s = Store all literal strings that are identical in the same place.
+  t = Enable warnings for structures that are used before they are defined.
+
+ -v = Do not include stack checking code with each function.
+ -y = Load register A4 with the data section base address on function
+      entry.  The -v and -y flags are are generally only needed for parts
+      of the program that are called directly by the system such as
+      <a href="../Libraries_Manual_guide/node030B.html">interrupt servers</a>, <a href="../Libraries_Manual_guide/node02C0.html#line29">subtasks</a>, <a href="../Libraries_Manual_guide/node0309.html">handlers</a> and <a href="../Libraries_Manual_guide/node04A2.html">callback hook</a> functions.
+
+
+Except where noted, each example was linked with the standard SAS/C
+startup code c.o, the SAS/C linker library lc.lib and the Amiga linker
+library amiga.lib.  The SAS/C compiler defaults to 32-bit ints.  If your
+development environment uses 16-bit ints you may need to explicitly cast
+certain arguments as longs (for example 1L &#060;&#060; sigbit instead of 1 &#060;&#060;
+sigbit).
+
+The 68000 assembly language examples have been assembled under the
+Innovatronics CAPE assembler V2.x, the HiSoft Devpac assembler V1.2, and
+<a name="line62">the Lake Forest Logic ADAPT assembler 1.0.  No substantial changes should</a>
+be required to switch between assemblers.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

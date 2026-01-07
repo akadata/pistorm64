@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/io.h" NODE="MAIN" TITLE="Includes/exec/io.h" -->
+<head>
+<title>Includes/exec/io.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0093.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0095.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_IO_H
+#define	EXEC_IO_H
+/*
+**	$Filename: exec/io.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.4 $
+**	$Date: 90/05/10 $
+**
+**	Message structures used for device communication
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_PORTS_H
+#include &#034;exec/ports.h&#034;
+#endif /* EXEC_PORTS_H */
+
+<a name="line19"></a>
+<a name="line20">struct IORequest {</a>
+<a name="line21">    struct  Message io_Message;</a>
+<a name="line22">    struct  Device  *io_Device;     /* device node pointer  */</a>
+<a name="line23">    struct  Unit    *io_Unit;	    /* unit (driver private)*/</a>
+<a name="line24">    UWORD   io_Command;	    /* device command */</a>
+<a name="line25">    UBYTE   io_Flags;</a>
+    BYTE    io_Error;		    /* error or warning num */
+};
+<a name="line28"></a>
+<a name="line29">struct IOStdReq {</a>
+<a name="line30">    struct  Message io_Message;</a>
+<a name="line31">    struct  Device  *io_Device;     /* device node pointer  */</a>
+<a name="line32">    struct  Unit    *io_Unit;	    /* unit (driver private)*/</a>
+<a name="line33">    UWORD   io_Command;	    /* device command */</a>
+<a name="line34">    UBYTE   io_Flags;</a>
+<a name="line35">    BYTE    io_Error;		    /* error or warning num */</a>
+<a name="line36">    ULONG   io_Actual;		    /* actual number of bytes transferred */</a>
+<a name="line37">    ULONG   io_Length;		    /* requested number bytes transferred*/</a>
+<a name="line38">    APTR    io_Data;		    /* points to data area */</a>
+    ULONG   io_Offset;		    /* offset for block structured devices */
+};
+
+<a name="line42">/* library vector offsets for device reserved vectors */</a>
+<a name="line43">#define DEV_BEGINIO	(-30)</a>
+#define DEV_ABORTIO	(-36)
+<a name="line45"></a>
+<a name="line46">/* io_Flags defined bits */</a>
+<a name="line47">#define IOB_QUICK	0</a>
+#define IOF_QUICK	(1&#060;&#060;0)
+<a name="line49"></a>
+<a name="line50"></a>
+<a name="line51">#define CMD_INVALID	0</a>
+<a name="line52">#define CMD_RESET	1</a>
+<a name="line53">#define CMD_READ	2</a>
+<a name="line54">#define CMD_WRITE	3</a>
+<a name="line55">#define CMD_UPDATE	4</a>
+<a name="line56">#define CMD_CLEAR	5</a>
+<a name="line57">#define CMD_STOP	6</a>
+<a name="line58">#define CMD_START	7</a>
+#define CMD_FLUSH	8
+<a name="line60"></a>
+#define CMD_NONSTD	9
+
+#endif	/* EXEC_IO_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

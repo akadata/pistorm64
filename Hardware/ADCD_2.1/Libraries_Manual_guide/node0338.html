@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-9-3" TITLE="27 / / / Mode Specification, Screen Interface" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / / Mode Specification, Screen Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0337.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0339.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Opening an Intuition screen in one of the new modes requires the
+specification of 32 bits of mode data.  The <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line303">NewScreen.ViewModes</a> field is a
+UWORD (16 bits).  Therefore, the new Release 2 function <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreenTags()</a>
+must be used along with a SA_DisplayID tag which specifies the 32-bit
+ModeID.  See the &#034;<a href="../Libraries_Manual_guide/node00EE.html">Intuition Screens</a>&#034; chapter for more on this.
+
+The new display modes also introduce some complexity for applications that
+want to support &#034;mode-sensitive&#034; processing.  If a program wishes to open
+a screen in the highest resolution that a user has available, there are
+many more cases to handle under Release 2.  Therefore, it will become
+increasingly important to algorithmically layout a screen for correct,
+functional and aesthetic operation.  All the information needed to be
+mode-flexible is available through the display database functions
+(explained below).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

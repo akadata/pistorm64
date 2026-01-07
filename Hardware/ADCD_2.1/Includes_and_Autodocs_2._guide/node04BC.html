@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/gameport" NODE="GPD_READEVENT" TITLE="gameport.device/GPD_READEVENT" -->
+<head>
+<title>gameport.device/GPD_READEVENT</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04BB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04BD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GPD_READEVENT -- Return the next game port event.
+
+FUNCTION
+    Read game port events from the game port and put them in the
+    data area of the iORequest.  If there are no pending game port
+    events, this command will not be satisfied, but if there are
+    some events, but not as many as can fill IO_LENGTH, the
+    request will be satisfied with those currently available.
+
+IO REQUEST
+    io_Message      mn_ReplyPort set if quick I/O is not possible
+    io_Device       preset by the call to <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice</a>
+    io_Unit         preset by the call to <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice</a>
+    io_Command      GPD_READEVENT
+    io_Flags        IOB_QUICK set if quick I/O is possible
+    io_Length       the size of the io_Data area in bytes: there
+                    are sizeof(inputEvent) bytes per input event.
+    io_Data         a buffer area to fill with input events.  The
+                    fields of the input event are:
+        ie_NextEvent
+                    links the events returned
+        ie_Class
+                    is IECLASS_RAWMOUSE
+        ie_SubClass
+                    is 0 for the left, 1 for the right game port
+        ie_Code
+                    contains any gameport button reports.  No
+                    report is indicated by the value 0xff.
+        ie_Qualifier
+                    only the relative and button bits are set
+        ie_X, ie_Y
+                    the x and y values for this report, in either
+                    relative or absolute device dependent units.
+        ie_TimeStamp
+                    the delta time since the last report, given
+                    not as a standard timestamp, but as the frame
+                    count in the TV_SECS field.
+
+RESULTS
+    This function sets the error field in the iORequest, and fills
+    the iORequest with the next game port events (but not partial
+    events).
+
+SEE ALSO
+    gameport.device/SetCType, gameport.device/SetTrigger
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_E" NODE="E-2-11" TITLE="E /Release 2 Changes That Affect Compatibility / Other Hardware Issues" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>E /Release 2 Changes That Affect Compatibility / Other Hardware Issues</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node056A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node056C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+  * Battery-backed clock is different on A3000.  Use battclock.resource
+    to access the real-time clock if battclock.resource can be opened.
+
+  * A 68030 hardware characteristic causes longword-aligned longword
+    writes to allocate a valid entry in the data cache,  even if the
+    hardware area shouldn't be cached.  This can cause problems for I/O
+    registers and shared memory devices.  To solve this: 1) don't do that
+    2) flush the cache or 3) use Enforcer Quiet.  See the Motorola 68030
+    manual under the description of the Write Allocate bit (which must be
+    set for the Amiga to run with the Data Cache).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

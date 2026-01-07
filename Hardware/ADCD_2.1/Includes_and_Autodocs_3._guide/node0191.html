@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="MaxCli()" TITLE="dos.library/MaxCli" -->
+<head>
+<title>dos.library/MaxCli</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0190.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0192.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	MaxCli -- returns the highest CLI process number possibly in use (V36)
+
+<b>   SYNOPSIS</b>
+	number = MaxCli()
+	D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> MaxCli(void)
+
+<b>   FUNCTION</b>
+	Returns the highest CLI number that may be in use.  CLI numbers are
+	reused, and are usually as small as possible.  To find all CLIs, scan
+	using <a href="../Includes_and_Autodocs_3._guide/node0166.html">FindCliProc()</a> from 1 to MaxCLI().  The number returned by
+	MaxCli() may change as processes are created and destroyed.
+
+<b>   RESULT</b>
+	number - The highest CLI number that _may_ be in use.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0166.html">FindCliProc()</a>, <a href="../Includes_and_Autodocs_3._guide/node0146.html">Cli()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

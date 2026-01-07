@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_14" NODE="14-4-1" TITLE="14 / The Workbench Library / Workbench Library Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>14 / The Workbench Library / Workbench Library Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0245.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0247.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Libraries_Manual_guide/node0245.html#line5">AppWindows</a>, <a href="../Libraries_Manual_guide/node0245.html#line11">AppIcons</a> and <a href="../Libraries_Manual_guide/node0245.html#line17">AppMenuItems</a> extend the user's ability to perform
+operations with the Workbench iconic interface.  They all provide
+graphical methods for passing arguments to a running application. In order
+to manage AppWindows, AppIcons and AppMenuItems, the Amiga OS includes
+these Workbench library functions:
+
+
+struct AppIcon     *AddAppIconA( ULONG, ULONG, char *, struct MsgPort *,
+                                 struct FileLock *, struct DiskObject *,
+                                 struct *TagItem );
+struct AppMenuItem *AddAppMenuItemA( ULONG, ULONG, char *,
+                                     struct MsgPort *, struct *TagItem);
+struct AppWindow   *AddAppWindowA( ULONG, ULONG, struct Window *,
+                                   struct MsgPort *, struct *TagItem);
+
+BOOL                RemoveAppIcon(struct AppIcon *);
+BOOL                RemoveAppMenuItem(struct AppMenuItem *);
+BOOL                RemoveAppWindow(struct AppWindow  *);
+
+
+The functions <a href="../Includes_and_Autodocs_2._guide/node0408.html">AddAppMenuItemA()</a>, <a href="../Includes_and_Autodocs_2._guide/node0409.html">AddAppWindowA()</a> and <a href="../Includes_and_Autodocs_2._guide/node0407.html">AddAppIconA()</a> have
+alternate entry points using the same function name without the trailing
+A.  The alternate functions accept any <a href="../Libraries_Manual_guide/node0497.html">TagItem</a> arguments on the stack
+instead of from an array. See the listings below for examples.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

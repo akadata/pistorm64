@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-5-3" TITLE="33 / Writing IFF Files / A Note On Seekability" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Writing IFF Files / A Note On Seekability</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0443.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0445.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As you can see from the above examples, IFFParse works best with a stream
+that can seek randomly.  However, it is not possible to seek on some
+streams (e.g., pipes).
+
+IFFParse will read and write streams with limited or no seek capability.
+In the case of reading, only forward-seek capability is desirable.
+Failing this, IFFParse will fake forward seeks with a number of short
+reads.
+
+In the case of writing, if the stream lacks random seek capability,
+IFFParse will buffer the entire contents of the file until you do the
+final <a href="../Libraries_Manual_guide/node0442.html">PopChunk()</a>, or when you <a href="../Libraries_Manual_guide/node042F.html">CloseIFF()</a> the handle.  At that time, the
+entire stream will be written in one go.  This buffering happens whether
+or not you specify all the chunk sizes to <a href="../Libraries_Manual_guide/node0441.html">PushChunk()</a>.
+
+    About the Internal Buffering.
+    -----------------------------
+    The current implementation of this internal buffering could be
+    more efficient.  Be aware that Amiga, Inc. reserves the right to alter
+    this behavior of the parser, to improve performance or reduce memory
+    requirements.  We mention this behavior on the off chance it is
+    important to you.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

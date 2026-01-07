@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-7" TITLE="3 Intuition Screens / Intuition Screens and the Graphics Library" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 Intuition Screens / Intuition Screens and the Graphics Library</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00F0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00F2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As previously mentioned, an Intuition screen is related to a number of
+underlying graphics library structures.
+<a name="line4"></a>
+
+         Table 3-8: Graphics Data Structures Used with Screens
+
+
+    Structure Name  Description                   Defined in Include File
+    --------------  -----------                   -----------------------
+    View            Root structure of the            &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">view.h</a>&#062;
+                    graphics display system
+
+    ViewPort        The graphics structure that      &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">view.h</a>&#062;
+                    corresponds to a screen
+
+    BitMap          Contains size and pointers to    &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">gfx.h</a>&#062;
+                    the screen's bit planes
+
+    ColorMap        Contains size and pointer to     &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00B8.html#line113">view.h</a>&#062;
+                    the screen's color table
+
+    <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>        Holds drawing, pen and font    &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">rastport.h</a>&#062;
+                    settings and the BitMap
+                    address
+
+
+These data structures are unified in Intuition's <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a> structure (which
+also incorporates higher level Intuition constructs such as menus and
+windows).  Here's a brief explanation of the graphics library structures
+<a name="line31">used with Intuition.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">View</a>
+    The View is the graphics structure that corresponds to the whole
+    display, including all visible screens.  The system has just one
+    View; it's what you see on the monitor.  The address of the View may
+<a name="line37">    be obtained from any screen by using <a href="../Libraries_Manual_guide/node00FD.html#line52">ViewAddress()</a>.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a>
+    The ViewPort is the underlying graphics structure corresponding to a
+    screen.  Every screen has one ViewPort.  To get the address of the
+    ViewPort from the <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a> structure, use (&#038;my_screen-&#062; ViewPort).
+    From the ViewPort an application may obtain pointers to all the
+<a name="line44">    screen's bitplanes and to its color table.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a>
+    The BitMap structure contains pointers to all the bit planes (up to
+    8) and their sizes.  For future compatibility, use
+    (my_screen-&#062;RastPort.BitMap) to get the address of the BitMap from
+    the screen rather than (&#038;my_screen-&#062;BitMap).
+
+    The BitMap.BytesPerRow field specifies the number of bytes that have
+    been allocated for each raster line.  This may be larger than the
+    screen width depending on display alignment restrictions.  Alignment
+    restrictions may change.  Always use this variable, not a hard-coded
+<a name="line56">    value.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00B8.html#line113">ColorMap</a>
+    The ColorMap contains a pointer to the color table, an array of 32
+    WORDs for the hardware color registers.  Use SetRGB4(), GetRGB4(),
+    SetRGB4CM() and LoadRGB4() from the graphics library to access the
+<a name="line62">    color table.  Do not read or write it directly.</a>
+
+<a href="../Libraries_Manual_guide/node034A.html">RastPort</a>
+    A RastPort controls the graphics rendering to any display area (not
+    just screens).  Screens have a RastPort to allow direct rendering
+    into the screen.  Applications may find the RastPort address of a
+    screen with (&#038;my_screen-&#062;RastPort).  This generally is not useful
+    since applications normally render into windows.
+
+ <a href="../Libraries_Manual_guide/node00F2.html">Changing Screen Colors</a> 
+ <a href="../Libraries_Manual_guide/node00F3.html">Direct Screen Access</a> 
+ <a href="../Libraries_Manual_guide/node00F4.html">Screen Functions That Integrate Intuition and Graphics</a> 
+ <a href="../Libraries_Manual_guide/node00F5.html">Limitations of the Graphics Subsystem</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

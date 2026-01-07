@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-7" TITLE="27 / Display Routines and Structures / Forming a Basic Display" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / Display Routines and Structures / Forming a Basic Display</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node032B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node032D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here are the data structures that you need to define to create a basic
+display:
+
+    struct View view;               /* These get used in all versions of */
+    struct ViewPort viewPort;       /* the OS */
+    struct BitMap bitMap;
+    struct RasInfo rasInfo;
+    struct ColorMap *cm;
+
+    struct ViewExtra *vextra;       /* Extra View data, new in Release 2 */
+    struct ViewPortExtra *vpextra;  /* Extra ViewPort data, new in       */
+                                    /* Release 2 */
+    struct MonitorSpec *monspec;    /* Monitor data needed in Release 2  */
+    struct DimensionInfo dimquery;  /* Display dimension data needed in  */
+<a name="line16">                                    /* Release 2 */</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00B8.html#line67">ViewExtra</a> and <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line76">ViewPortExtra</a> are new data structures used in Release 2 to
+hold extended data about their corresponding parent structure.  ViewExtra
+contains information about the video monitor being used to render the
+<a href="../Libraries_Manual_guide/node032B.html#line51">View</a>.  ViewPortExtra contains information required for clipping of the
+<a name="line22"><a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node044E.html">GfxNew()</a> is used to create these extended data structures and
+<a href="../Includes_and_Autodocs_2._guide/node044B.html">GfxAssociate()</a> is used to associate the extended data structure with an
+appropriate parent structure.  Although GfxAssociate() can associate a
+<a href="../Includes_and_Autodocs_2._guide/node00B8.html#line76">ViewPortExtra</a> structure with a <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>, it is better to use
+<a href="../Libraries_Manual_guide/node0339.html#line15">VideoControl()</a> with the <a href="../Libraries_Manual_guide/node0339.html#line38">VTAG_VIEWPORTEXTRA_SET</a> tag instead.  Keep in mind
+that GfxNew() allocates memory for the resulting data structure which must
+be returned using <a href="../Includes_and_Autodocs_2._guide/node044C.html">GfxFree()</a> before the application exits.  The function
+<a href="../Includes_and_Autodocs_2._guide/node044D.html">GfxLookUp()</a> will find the address of an extended data structure from the
+address of its parent.
+
+ <a href="../Libraries_Manual_guide/node032D.html">Preparing the View Structure</a> 
+ <a href="../Libraries_Manual_guide/node032E.html">Preparing the BitMap Structure</a> 
+ <a href="../Libraries_Manual_guide/node032F.html">Preparing the RasInfo Structure</a> 
+ <a href="../Libraries_Manual_guide/node0330.html">Preparing the ViewPort Structure</a> 
+ <a href="../Libraries_Manual_guide/node0331.html">Preparing the ColorMap Structure</a> 
+ <a href="../Libraries_Manual_guide/node0332.html">Creating the Display Instructions</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

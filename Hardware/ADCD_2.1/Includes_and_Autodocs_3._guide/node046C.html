@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="lowlevel" NODE="SetJoyPortAttrsA()" TITLE="lowlevel.library/SetJoyPortAttrsA" -->
+<head>
+<title>lowlevel.library/SetJoyPortAttrsA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node046B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node046D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetJoyPortAttrsA -- change the attributes of a port.  (V40.27)
+	SetJoyPortAttrs -- varargs stub for SetJoyPortAttrsA().  (V40.27)
+
+<b>   SYNOPSIS</b>
+	success = SetJoyPortAttrsA(portNumber, tagList);
+	D0                         D0          A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> SetJoyPortAttrsA(ULONG, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	Success = SetJoyPortAttrs(portNumber, firstTag, ...);
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> SetJoyPortAttrs(Tag, ...);
+
+
+<b>   FUNCTION</b>
+	This function allows modification of several attributes held by
+	<a href="../Includes_and_Autodocs_3._guide/node0468.html">ReadJoyPort()</a> about both it's operation and the type of controller
+	currently plugged into the port.
+
+	ReadJoyPort()'s default behavior is to attempt to automatically
+	sense the type of controller plugged into any given port, when
+	asked to read that port. This behavior is beneficial, to allow
+	simple detection of the type of controller plugged into the port.
+	Unfortunately, rare cases are possible where extremely fine
+	mouse movements appear to be real joystick movements. Also, this
+	ability to auto-sense the controller type causes most reads to
+	take longer than if there were no auto-sensing.
+
+	SetJoyPortAttrs() is intended to provide for both of these cases.
+	It allows the programmer to notify <a href="../Includes_and_Autodocs_3._guide/node0468.html">ReadJoyPort()</a> to stop spending
+	time attempting to sense which type of controller is in use -- and,
+	optionally, to force <a href="../Includes_and_Autodocs_3._guide/node0468.html">ReadJoyPort()</a> into utilizing a certain
+	controller type.
+
+<b>   INPUTS</b>
+	portNumber - the joyport in question (0-3).
+	tagList - a pointer to an array of tags providing parameters
+	          to SetJoyPortAttrs(); if NULL, the function
+	          will return TRUE, but do nothing.
+
+<b>   TAGS</b>
+	SJA_Type (ULONG) - Sets the current controller type to the mouse,
+			joystick, or game controller. Supply one of
+			SJA_TYPE_GAMECTLR, SJA_TYPE_MOUSE, SJA_TYPE_JOYSTK,
+			or SJA_TYPE_AUTOSENSE. If SJA_TYPE_AUTOSENSE is used,
+			<a href="../Includes_and_Autodocs_3._guide/node0468.html">ReadJoyPort()</a> will attempt to determine the type of
+			controller plugged into the given port automatically.
+			If one of the other types is used, <a href="../Includes_and_Autodocs_3._guide/node0468.html">ReadJoyPort()</a> will
+			make no attempt to read the given controller as
+			anything other than the type specified. The default
+			type is SJA_AUTOSENSE.
+
+	             	Note -- if you set the type to anything other than
+	             	auto-sense, it's your responsibility to return it
+	             	to auto-sense mode before exiting.
+
+	SJA_Reinitialize (VOID) - Return a given port to it's initial state,
+		     	forcing a port to deallocate any allocated resources;
+	             	return the implied type to SJA_TYPE_AUTOSENSE.
+
+<b>   RESULT</b>
+	success - TRUE if everything went according to plan, or FALSE upon
+		  failure
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0468.html">ReadJoyPort()</a>, <a href="../Includes_and_Autodocs_3._guide/node0624.html">&#060;libraries/lowlevel.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

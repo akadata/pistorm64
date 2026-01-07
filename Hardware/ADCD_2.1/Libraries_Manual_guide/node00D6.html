@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_2" NODE="2-4-1" TITLE="2 / A Simple Intuition Program / Example Intuition Event Loop" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>2 / A Simple Intuition Program / Example Intuition Event Loop</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00D5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00D7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Intuition <a href="../Libraries_Manual_guide/node01D7.html">event loop</a> used in the example is very simple.  The example
+first sets up a <a href="../Libraries_Manual_guide/node00DF.html">custom screen</a>, <a href="../Libraries_Manual_guide/node0103.html">opens a window</a> on it, then waits for
+Intuition to send messages about user input with the following event loop:
+
+    winsignal = 1L &#060;&#060; window1-&#062;UserPort-&#062;mp_SigBit;  /* window signal */
+    signalmask = winsignal;   /* example only waits for window events */
+
+    while( !done )  {
+        signals = Wait(signalmask);
+        if (signals &#038; winsignal)
+            done = handleIDCMP(window1);
+<a name="line13">    }</a>
+
+Intuition sends messages about user activity to a special port known as
+the <a href="../Libraries_Manual_guide/node01D2.html">IDCMP</a>.  Each window can have its own IDCMP (in the code above the
+IDCMP is window1-&#062;UserPort).  To wait for event messages to arrive at the
+IDCMP port, the example code calls the Exec <a href="../Libraries_Manual_guide/node02F1.html">Wait()</a> function.  It then
+processes and replies to any event messages that it gets in a subroutine
+named handleIDCMP().  For this example, the only event Intuition will
+report is the close window event.  When the example detects this event, it
+<a href="../Libraries_Manual_guide/node0105.html">closes the window</a>, <a href="../Libraries_Manual_guide/node00E4.html">closes the screen</a>, <a href="../Libraries_Manual_guide/node028E.html#line91">closes the Intuition library</a> and
+exits.  <a href="../Libraries_Manual_guide/node01D7.html">Event loops</a> similar to this one are used in Intuition examples
+throughout this book.  For more information about IDCMP and user input,
+see the chapters on &#034;<a href="../Libraries_Manual_guide/node010C.html">Intuition Windows</a>&#034; and &#034;<a href="../Libraries_Manual_guide/node01CE.html">Intuition Input and Output</a>&#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

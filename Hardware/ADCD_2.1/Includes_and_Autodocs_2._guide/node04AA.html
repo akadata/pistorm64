@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/audio" NODE="ADCMD_PERVOL" TITLE="audio.device/ADCMD_PERVOL" -->
+<head>
+<title>audio.device/ADCMD_PERVOL</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04A9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04AB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ADCMD_PERVOL -- change the period and volume for writes in progress to
+                    audio channels
+
+FUNCTION
+    ADCMD_PERVOL is a command for multiple audio channels.  For each
+    selected channel (io_Unit), if the allocation key (ioa_AllocKey) is
+    correct and there is a write (CMD_WRITE) in progress, ADCMD_PERVOL
+    loads a new volume and period immediately or at the end of the current
+    cycle depending on the sync flag (ADIOF_SYNCCYCLE).  If the allocation
+    key in incorrect, ADCMD_PERVOL returns an error
+    (ADIOERR_NOALLOCATION).  ADCMD_PERVOL is synchronous and only replies
+    (mn_ReplyPort) if the quick flag (IOF_QUICK) is clear.  Do not use
+    ADCMD_PERVOL in interrupt code at interrupt level 5 or higher.
+
+INPUTS
+    mn_ReplyPort- pointer to message port that receives I/O request
+                  if the quick flag (IOF_QUICK) is clear
+    io_Device   - pointer to device node, must be set by (or copied from
+                  I/O block set by) <a href="../Includes_and_Autodocs_2._guide/node04B8.html">OpenDevice</a> function
+    io_Unit     - bit map of channels to load period and volume (bits 0
+                  thru 3 correspond to channels 0 thru 3)
+    io_Command  - command number for ADCMD_PERVOL
+    io_Flags    - flags, must be cleared if not used:
+                  IOF_QUICK      - (CLEAR) reply I/O request
+                  ADIOF_SYNCCYCLE- (CLEAR) load period and volume
+                                           immediately
+                                   (SET) load period and volume at the end
+                                         of the current cycle
+    ioa_AllocKey- allocation key, must be set by (or copied from I/O block
+                  set by) <a href="../Includes_and_Autodocs_2._guide/node04B8.html">OpenDevice</a> function or <a href="../Includes_and_Autodocs_2._guide/node04A6.html">ADCMD_ALLOCATE</a> command
+    ioa_Period  - new sample period in 279.365 ns increments (124 thru
+                  65536, anti-aliasing filter works below 300 to 500
+                  depending on waveform)
+    ioa_Volume  - new volume (0 thru 64, linear)
+
+OUTPUTS
+    io_Unit     - bit map of channels that successfully loaded period and
+                  volume (bits 0 thru 3 correspond to channels 0 thru 3)
+    io_Error    - error number:
+                  0                    - no error
+                  ADIOERR_NOALLOCATION - allocation key (ioa_AllocKey)
+                                         does not match key for channel
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/doshunks.h" NODE="MAIN" TITLE="Includes/dos/doshunks.h" -->
+<head>
+<title>Includes/dos/doshunks.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0064.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0066.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_DOSHUNKS_H
+#define DOS_DOSHUNKS_H
+/*
+**	$Filename: dos/doshunks.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.5 $
+**	$Date: 90/07/12 $
+**
+**	Hunk definitions for object and load modules.
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+<a name="line15">/* hunk types */</a>
+<a name="line16">#define HUNK_UNIT	999</a>
+<a name="line17">#define HUNK_NAME	1000</a>
+<a name="line18">#define HUNK_CODE	1001</a>
+<a name="line19">#define HUNK_DATA	1002</a>
+<a name="line20">#define HUNK_BSS	1003</a>
+<a name="line21">#define HUNK_RELOC32	1004</a>
+<a name="line22">#define HUNK_RELOC16	1005</a>
+<a name="line23">#define HUNK_RELOC8	1006</a>
+<a name="line24">#define HUNK_EXT	1007</a>
+<a name="line25">#define HUNK_SYMBOL	1008</a>
+<a name="line26">#define HUNK_DEBUG	1009</a>
+<a name="line27">#define HUNK_END	1010</a>
+#define HUNK_HEADER	1011
+<a name="line29"></a>
+<a name="line30">#define HUNK_OVERLAY	1013</a>
+#define HUNK_BREAK	1014
+<a name="line32"></a>
+<a name="line33">#define HUNK_DREL32	1015</a>
+<a name="line34">#define HUNK_DREL16	1016</a>
+#define HUNK_DREL8	1017
+<a name="line36"></a>
+<a name="line37">#define HUNK_LIB	1018</a>
+#define HUNK_INDEX	1019
+
+<a name="line40">/* hunk_ext sub-types */</a>
+<a name="line41">#define EXT_SYMB	0	/* symbol table */</a>
+<a name="line42">#define EXT_DEF		1	/* relocatable definition */</a>
+<a name="line43">#define EXT_ABS		2	/* Absolute definition */</a>
+<a name="line44">#define EXT_RES		3	/* no longer supported */</a>
+<a name="line45">#define EXT_REF32	129	/* 32 bit reference to symbol */</a>
+<a name="line46">#define EXT_COMMON	130	/* 32 bit reference to COMMON block */</a>
+<a name="line47">#define EXT_REF16	131	/* 16 bit reference to symbol */</a>
+<a name="line48">#define EXT_REF8	132	/*  8 bit reference to symbol */</a>
+<a name="line49">#define EXT_DEXT32	133	/* 32 bit data releative reference */</a>
+<a name="line50">#define EXT_DEXT16	134	/* 16 bit data releative reference */</a>
+#define EXT_DEXT8	135	/*  8 bit data releative reference */
+
+#endif	/* DOS_DOSHUNKS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

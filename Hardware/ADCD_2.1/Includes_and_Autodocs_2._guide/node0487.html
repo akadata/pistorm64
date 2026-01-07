@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="VBeamPos()" TITLE="graphics.library/VBeamPos" -->
+<head>
+<title>graphics.library/VBeamPos</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0486.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0488.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    VBeamPos -- Get vertical beam position at this instant.
+
+SYNOPSIS
+    pos = VBeamPos()
+     d0
+
+    LONG VBeamPos( void );
+
+FUNCTION
+    Get the vertical beam position from the hardware.
+
+INPUTS
+    none
+
+RESULT
+    interrogates hardware for beam position and returns value.
+    valid results in are the range of 0-511.
+    Because of multitasking, the actual value returned may have
+    no use. If you are the highest priority task then the value
+    returned should be close, within 1 line.
+
+BUGS
+
+SEE ALSO
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

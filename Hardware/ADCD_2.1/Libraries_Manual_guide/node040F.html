@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-14" TITLE="31 Commodities Exchange Library / Debug CxObjects" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / Debug CxObjects</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node040E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0410.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The final <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> is the debug CxObject.  When a debug CxObject receives
+<a name="line3">a <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a>, it sends debugging information to the serial port using</a>
+<a href="../Includes_and_Autodocs_2._guide/node0178.html">KPrintF()</a>.
+
+    debugCxObj  = CxObj  *CxDebug(LONG ID);
+
+The debug <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> will <a href="../Includes_and_Autodocs_2._guide/node0178.html">KPrintF()</a> the following information about itself,
+the <a href="../Includes_and_Autodocs_2._guide/node00F0.html#line71">CxMsg</a>, and the corresponding <a href="../Libraries_Manual_guide/node01D0.html">InputEvent</a> structure:
+
+    DEBUG NODE: 7CB5AB0, ID: 2
+     CxMsg: 7CA6EF2, type: 0, data 2007CA destination 6F1E07CB
+    dump IE: 7CA6F1E
+     Class 1
+     Code 40
+     Qualifier 8000
+     EventAddress 40001802
+
+There has to be a terminal connected to the Amiga's serial port to receive
+this information.  See the <a href="../Includes_and_Autodocs_2._guide/node0178.html">KPrintF()</a> Autodoc (debug.lib) for more details.
+Note that the debug <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> did not work before V37.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

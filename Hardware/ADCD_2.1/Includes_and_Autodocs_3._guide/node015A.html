@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="ExAll()" TITLE="dos.library/ExAll" -->
+<head>
+<title>dos.library/ExAll</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0159.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node015B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ExAll -- <a href="../Includes_and_Autodocs_3._guide/node015C.html">Examine</a> an entire directory (V36)
+
+<b>   SYNOPSIS</b>
+	continue = ExAll(lock, buffer, size, type, control)
+	D0               D1     D2     D3    D4     D5
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> ExAll(BPTR,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,struct <a href="../Includes_and_Autodocs_3._guide/node0608.html#line69">ExAllControl</a> *)
+
+<b>   FUNCTION</b>
+	Examines an entire directory.
+
+ <a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock</a> must be on a directory.  Size is the size of the buffer supplied.
+ The buffer will be filled with (partial) <a href="../Includes_and_Autodocs_3._guide/node0608.html#line44">ExAllData</a> structures, as
+ specified by the type field.
+
+ Type is a value from those shown below that determines which information is
+ to be stored in the buffer.  Each higher value adds a new thing to the list
+ as described in the table below:-
+
+	ED_NAME		FileName
+	ED_TYPE		Type
+	ED_SIZE		Size in bytes
+	ED_PROTECTION	Protection bits
+	ED_DATE		3 longwords of date
+	ED_COMMENT	Comment (will be NULL if no comment)
+			Note: the V37 ROM/disk filesystem returns this
+			incorrectly as a BSTR.  See BUGS for a workaround.
+	ED_OWNER	owner user-id and group-id (if supported)  (V39)
+
+ Thus, ED_NAME gives only filenames, and ED_OWNER gives everything.
+
+ NOTE: V37 dos.library, when doing ExAll() emulation, and RAM: filesystem
+ will return an error if passed ED_OWNER.  If you get ERROR_BAD_NUMBER,
+ retry with ED_COMMENT to get everything but owner info.  All filesystems
+ supporting ExAll() must support through ED_COMMENT, and must check Type
+ and return ERROR_BAD_NUMBER if they don't support the type.
+
+ The V37 ROM/disk filesystem doesn't fill in the comment field correctly
+ if you specify ED_OWNER.  See BUGS for a workaround if you need to use
+ ED_OWNER.
+
+ The ead_Next entry gives a pointer to the next entry in the buffer.  The
+ last entry will have NULL in ead_Next.
+
+ The control structure is required so that FFS can keep track if more than
+ one call to ExAll is required.  This happens when there are more names in
+ a directory than will fit into the buffer.  The format of the control
+ structure is as follows:-
+
+ NOTE: the control structure MUST be allocated by AllocDosObject!!!
+
+ Entries:  This field tells the calling application how many entries are
+	    in the buffer after calling ExAll.  Note: make sure your code
+	    handles the 0 entries case, including 0 entries with continue
+	    non-zero.
+
+ LastKey:  This field ABSOLUTELY MUST be initialised to 0 before calling
+	    ExAll for the first time.  Any other value will cause nasty
+	    things to happen.  If ExAll returns non-zero, then this field
+	    should not be touched before making the second and subsequent
+	    calls to ExAll.  Whenever ExAll returns non-zero, there are more
+	    calls required before all names have been received.
+
+	    As soon as a FALSE return is received then ExAll has completed
+	    (if <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a> returns ERROR_NO_MORE_ENTRIES - otherwise it returns
+	    the error that occured, similar to ExNext.)
+
+ MatchString
+	    If this field is NULL then all filenames will be returned.  If
+	    this field is non-null then it is interpreted as a pointer to
+	    a string that is used to pattern match all file names before
+	    accepting them and putting them into the buffer.  The default
+	    AmigaDOS caseless pattern match routine is used.  This string
+	    MUST have been parsed by ParsePatternNoCase()!
+
+ MatchFunc:
+	    Contains a pointer to a hook for a routine to decide if the entry
+	    will be included in the returned list of entries.  The entry is
+	    filled out first, and then passed to the hook.  If no MatchFunc is
+	    to be called then this entry should be NULL.  The hook is
+	    called with the following parameters (as is standard for hooks):
+
+	    <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> = MatchFunc( hookptr, data, typeptr )
+				a0	a1	a2
+	    (a0 = ptr to hook, a1 = ptr to filled in <a href="../Includes_and_Autodocs_3._guide/node0608.html#line44">ExAllData</a>, a2 = ptr
+	     to longword of type).
+
+	    MatchFunc should return FALSE if the entry is not to be
+	    accepted, otherwise return TRUE.
+
+	Note that Dos will emulate ExAll() using <a href="../Includes_and_Autodocs_3._guide/node015C.html">Examine()</a> and <a href="../Includes_and_Autodocs_3._guide/node0160.html">ExNext()</a>
+	if the handler in question doesn't support the ExAll() packet.
+
+<b>   INPUTS</b>
+	lock    - <a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock</a> on directory to be examined.
+	buffer  - Buffer for data returned (MUST be at least word-aligned,
+		  preferably long-word aligned).
+	size    - Size in bytes of 'buffer'.
+	type    - Type of data to be returned.
+	control - Control data structure (see notes above).  MUST have been
+		  allocated by AllocDosObject!
+
+<b>   RESULT</b>
+	continue - Whether or not ExAll is done.  If FALSE is returned, either
+		   ExAll has completed (IoErr() == ERROR_NO_MORE_ENTRIES), or
+		   an error occurred (check IoErr()).  If non-zero is returned,
+		   you MUST call ExAll again until it returns FALSE.
+
+<b>   EXAMPLE</b>
+
+<b>   eac = AllocDosObject(DOS_EXALLCONTROL,NULL);</b>
+<b>   if (!eac) ...</b>
+   ...
+<b>   eac-&#062;eac_LastKey = 0;</b>
+<b>   do {</b>
+       more = ExAll(lock, EAData, sizeof(EAData), ED_FOO, eac);
+       if ((!more) &#038;&#038; (IoErr() != ERROR_NO_MORE_ENTRIES)) {
+           * ExAll failed abnormally *
+           break;
+       }
+       if (eac-&#062;eac_Entries == 0) {
+           * ExAll failed normally with no entries *
+           continue;                   * (&#034;more&#034; is *usually* zero) *
+       }
+       ead = (struct <a href="../Includes_and_Autodocs_3._guide/node0608.html#line44">ExAllData</a> *) EAData;
+       do {
+           * use ead here *
+           ...
+           * get next ead *
+           ead = ead-&#062;ed_Next;
+       } while (ead);
+
+<b>   } while (more);</b>
+   ...
+<b>   FreeDosObject(DOS_EXALLCONTROL,eac);</b>
+
+<b>   BUGS</b>
+	In V36, there were problems with ExAll (particularily with
+	eac_MatchString, and ed_Next with the ramdisk and the emulation
+	of it in Dos for handlers that do not support the packet.  It is
+	advised you only use this under V37 and later.
+
+	The V37 ROM/disk filesystem incorrectly returned comments as BSTR's
+	(length plus characters) instead of CSTR's (null-terminated).  See
+	the next bug for a way to determine if the filesystem is a V37
+	ROM/disk filesystem.  Fixed in V39.
+
+	The V37 ROM/disk filesystem incorrectly handled values greater than
+	ED_COMMENT.  Because of this, ExAll() information is trashed if
+	ED_OWNER is passed to it.  Fixed in V39.  To work around this, use
+	the following code to identify if a filesystem is a V37 ROM/disk
+	filesystem:
+
+ // return TRUE if this is a V37 ROM filesystem, which doesn't (really)
+ // support ED_OWNER safely
+
+ <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> CheckV37(BPTR lock)
+ {
+ 	struct <a href="../Includes_and_Autodocs_3._guide/node05D9.html#line455">FileLock</a> *l = BADDR(lock);
+ 	struct <a href="../Includes_and_Autodocs_3._guide/node0643.html#line17">Resident</a> *resident;
+ 	struct <a href="../Includes_and_Autodocs_3._guide/node05D9.html#line371">DosList</a> *dl;
+ 	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> result = FALSE;
+
+ 	dl = LockDosList(LDF_READ|LDF_DEVICES);
+
+ 	// if the lock has a volume and no device, we won't find it,
+	// so we know it's not a V37 ROM/disk filesystem
+ 	do {
+ 	    dl = NextDosEntry(dl,LDF_READ|LDF_DEVICES);
+ 	    if (dl &#038;&#038; (dl-&#062;dol_Task == l-&#062;fl_Task))
+ 	    {
+ 		// found the filesystem - test isn't actually required,
+		// but we know the filesystem we're looking for will always
+		// have a startup msg.  If we needed to examine the message,
+		// we would need a _bunch_ of checks to make sure it's not
+		// either a small value (like port-handler uses) or a BSTR.
+ 		if (dl-&#062;dol_misc.dol_handler.dol_Startup)
+ 		{
+ 			// try to make sure it's the ROM fs or l:FastFileSystem
+ 			if (resident =
+ 			    FindRomTag(dl-&#062;dol_misc.dol_handler.dol_SegList))
+ 			{
+ 				if (resident-&#062;rt_Version &#060; 39 &#038;&#038;
+ 				    (strncmp(resident-&#062;rt_IdString,&#034;fs 37.&#034;,
+ 					     strlen(&#034;fs 37.&#034;)) == 0 ||
+ 				     strncmp(resident-&#062;rt_Name,&#034;ffs 37.&#034;,
+ 					     strlen(&#034;ffs 37.&#034;)) == 0))
+ 				{
+ 					result = TRUE;
+ 				}
+ 			}
+ 		}
+ 		break;
+ 	    }
+ 	} while (dl);
+
+ 	UnLockDosList(LDF_READ|LDF_DEVICES);
+
+ 	return result;
+ }
+
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node015C.html">Examine()</a>, <a href="../Includes_and_Autodocs_3._guide/node0160.html">ExNext()</a>, <a href="../Includes_and_Autodocs_3._guide/node015D.html">ExamineFH()</a>, <a href="../Includes_and_Autodocs_3._guide/node0190.html">MatchPatternNoCase()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node019C.html">ParsePatternNoCase()</a>, <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>, <a href="../Includes_and_Autodocs_3._guide/node015B.html">ExAllEnd()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

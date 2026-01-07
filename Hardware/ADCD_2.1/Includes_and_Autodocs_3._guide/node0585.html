@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="trackdisk" NODE="TD_EJECT" TITLE="trackdisk.device/TD_EJECT" -->
+<head>
+<title>trackdisk.device/TD_EJECT</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0584.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0586.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       TD_EJECT -- eject (or load) the disk in the drive, if possible.
+
+<b>   FUNCTION</b>
+	This command causes the drive to attempt to eject the disk in
+	it, if any.  Note that the current trackdisk.device does not
+	implement this command, but it might in the future, and other
+	trackdisk-compatible drivers may implement this command.  Some
+	devices may be able to load disks on command also.
+
+<b>   IO REQUEST INPUT</b>
+	io_Device	preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice()</a>
+	io_Unit		preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice()</a>
+	io_Command	TD_EJECT
+	io_Flags	0 or IOF_QUICK
+	io_Length	0 (load, if supported) or 1 (eject)
+
+<b>   IO REQUEST RESULT</b>
+	io_Error - 0 for success, or an error code as defined in
+	           <a href="../Includes_and_Autodocs_3._guide/node0604.html">&#060;devices/trackdisk.h&#062;</a>
+
+<b>   BUGS</b>
+	The pre-V40 autodoc didn't mention io_Length.  Because of this, for
+	devices that can never support load, a driver might want to eject if
+	io_Length is 0.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

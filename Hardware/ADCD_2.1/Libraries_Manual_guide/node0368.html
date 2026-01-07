@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-3-8" TITLE="27 / / Performing Data Move Operations / When to Wait for the Blitter" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Performing Data Move Operations / When to Wait for the Blitter</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0367.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0369.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This section explains why you might have to call <a href="../Includes_and_Autodocs_2._guide/node0489.html">WaitBlit()</a>, a special
+graphics function that suspends your task until the blitter is idle.  Many
+of the calls in the graphics library use the Amiga's hardware blitter to
+perform their operation, most notably those which render text and images,
+fill or pattern, draw lines or dots and move blocks of graphic memory.
+
+<a name="line8">Internally, these graphics library functions operate in a loop, doing</a>
+graphic operations with the blitter one plane at a time as follows:
+
+    OwnBlitter();    /* Gain exclusive access to the hardware blitter    */
+
+    for(planes=0; planes &#060; bitmap-&#062;depth; planes++)
+            {
+            WaitBlit();    /* Sleep until the previous blitter operation */
+                           /* completes start a blit                     */
+            }
+
+    DisownBlitter(); /* Release exclusive access to the hardware blitter */
+
+Graphics library functions that are implemented this way always wait for
+the blitter at the start and exit right after the final blit is started.
+It is important to note that when these blitter-using functions return to
+your task, the final (or perhaps only) blit has just been started, but not
+necessarily completed.  This is efficient if you are making many such
+calls in a row because the next graphics blitter call always waits for the
+previous blitter operation to complete before starting its first blit.
+
+However, if you are intermixing such graphics blitter calls with other
+code that accesses the same graphics memory then you must first <a href="../Includes_and_Autodocs_2._guide/node0489.html">WaitBlit()</a>
+to make sure that the final blit of a previous graphics call is complete
+before you use any of the memory.  For instance, if you plan to
+immediately deallocate or reuse any of the memory areas which were passed
+to your most recent blitter-using function call as a source, destination,
+or mask, it is imperative that you first call WaitBlit().
+
+    Warning:
+    --------
+    If you do not follow the above procedure, you could end up with a
+    program that works correctly most of the time but crashes sometimes.
+    Or you may run into problems when your program is run on faster
+    machines or under other circumstances where the blitter is not as
+    fast as the processor.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

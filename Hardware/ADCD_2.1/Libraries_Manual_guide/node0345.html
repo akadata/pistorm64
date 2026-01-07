@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-3-1" TITLE="27 / Advanced Topics / Creating a Dual-Playfield Display" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / Advanced Topics / Creating a Dual-Playfield Display</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0344.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0346.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In dual-playfield mode, you have two separately controllable playfields.
+You specify dual-playfield mode in 1.3 by setting the <a href="../Libraries_Manual_guide/node0327.html#line14">DUALPF</a> bit in the
+<a href="../Libraries_Manual_guide/node0327.html">ViewPort.Modes</a> field.  In Release 2, you specify dual-playfield by using
+any ModeID that includes DPF in its name as listed in &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line152">displayinfo.h</a>&#062;.
+<a name="line6"></a>
+In dual-playfield mode, you always define two <a href="../Libraries_Manual_guide/node032B.html#line69">RasInfo</a> data structures.
+Each of these structures defines one of the playfields. There are five
+different ways you can configure a dual-playfield display, because there
+are five different distributions of the bitplanes which the system
+hardware allows.
+
+<a name="line13"></a>
+        Table 27-6: Bitplane Assignment in Dual-playfield Mode
+
+
+               Number of    Playfield 1    Playfield 2
+               Bitplanes       Depth          Depth
+               ---------       -----          -----
+                   2             1              1
+                   3             2              1
+                   4             2              2
+                   5             3              2
+                   6             3              3
+
+<a name="line26"></a>
+Under 1.3 if <a href="../Libraries_Manual_guide/node0327.html#line19">PFBA</a> is set in the <a href="../Libraries_Manual_guide/node0327.html">ViewPort.Modes</a> field, or, under Release 2,
+if the ModeID includes DPF2 in its name, then the playfield priorities are
+swapped and playfield 2 will be displayed in front of playfield 1.  In
+this way, you can get more bitplanes in the background playfield than you
+have in the foreground playfield. The playfield priority affects only one
+<a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> at a time.  If you have multiple ViewPorts with dual-playfields,
+the playfield priority is set for each one individually.
+
+Here's a summary of the steps you need to take to create a dual-playfield
+display:
+
+  * Allocate one <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> structure and one <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> structure.
+
+  * Allocate two <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> structures.  Allocate two <a href="../Libraries_Manual_guide/node032B.html#line69">RasInfo</a> structures
+    (linked together), each pointing to a separate BitMap. The two
+    RasInfo structures are linked together as follows:
+
+        struct RasInfo playfield1, playfield2;
+
+        playfield1.Next = &#038;playfield2;
+        playfield2.Next = NULL;
+
+  * Initialize each <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> structure to describe one playfield, using one
+    of the permissible bitplane distributions shown in the above table
+    and allocate memory for the bitplanes themselves.  Note that BitMap 1
+    and BitMap 2 need not be the same width and height.
+
+  * Initialize the <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> structure.  In 1.3, specify dual-playfield
+    mode by setting the <a href="../Libraries_Manual_guide/node0327.html#line14">DUALPF</a> bit (and <a href="../Libraries_Manual_guide/node0327.html#line19">PFBA</a>, if appropriate) in the
+    <a href="../Libraries_Manual_guide/node0327.html">ViewPort.Modes</a> field.  Under Release 2, specify dual-playfield mode
+    by selecting a ModeID that includes DPF (or DPF2) in its name as
+    listed in &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line152">displayinfo.h</a>&#062;.  Set the <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort.RasInfo</a> field
+    to the address of the playfield 1 <a href="../Libraries_Manual_guide/node032B.html#line69">RasInfo</a>.
+
+  * Set up the <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> information
+
+  * Call <a href="../Libraries_Manual_guide/node0332.html#line9">MakeVPort()</a>, <a href="../Libraries_Manual_guide/node0332.html#line27">MrgCop()</a> and <a href="../Libraries_Manual_guide/node0333.html">LoadView()</a> to display the newly
+    created <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.
+<a name="line65"></a>
+For display purposes, each of the two <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>s is assigned to a separate
+<a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.  To draw separately into the BitMaps, you must also assign these
+BitMaps to two separate <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>s.  The section called
+&#034;<a href="../Libraries_Manual_guide/node034C.html">Initializing a RastPort Structure</a>&#034; shows you how to use a RastPort data
+structure to control your drawing routines.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

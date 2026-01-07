@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="InitArea()" TITLE="graphics.library/InitArea" -->
+<head>
+<title>graphics.library/InitArea</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node044E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0450.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+
+    InitArea -- Initialize vector collection matrix
+
+SYNOPSIS
+
+    InitArea( areainfo, buffer, maxvectors )
+                a0          a1      d0
+
+    void InitArea(struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line22">AreaInfo</a> *, void *, SHORT);
+
+FUNCTION
+    This function provides initialization for the vector collection
+    matrix such that it has a size of (max vectors ).  The size of the
+    region pointed to by buffer (short pointer) should be five (5) times as
+    large as maxvectors. This size is in bytes.  Areafills done by using
+    <a href="../Includes_and_Autodocs_2._guide/node041A.html">AreaMove</a>, <a href="../Includes_and_Autodocs_2._guide/node0417.html">AreaDraw</a>, and <a href="../Includes_and_Autodocs_2._guide/node0419.html">AreaEnd</a> must have enough space allocated in
+    this table to store all the points of the largest fill. <a href="../Includes_and_Autodocs_2._guide/node0418.html">AreaEllipse</a>
+    takes up two vectors for every call. If AreaMove/Draw/Ellipse detect
+    too many vectors going into the buffer they will return -1.
+
+INPUTS
+    areainfo - pointer to <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line22">AreaInfo</a> structure
+    buffer - pointer to chunk of memory to collect vertices
+    maxvectors - max number of vectors this buffer can hold
+
+RESULT
+    Pointers are set up to begin storage of vectors done by
+    <a href="../Includes_and_Autodocs_2._guide/node041A.html">AreaMove</a>, <a href="../Includes_and_Autodocs_2._guide/node0417.html">AreaDraw</a>, and <a href="../Includes_and_Autodocs_2._guide/node0418.html">AreaEllipse</a>.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0419.html">AreaEnd()</a> <a href="../Includes_and_Autodocs_2._guide/node041A.html">AreaMove()</a> <a href="../Includes_and_Autodocs_2._guide/node0417.html">AreaDraw()</a> <a href="../Includes_and_Autodocs_2._guide/node0418.html">AreaEllipse()</a> <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

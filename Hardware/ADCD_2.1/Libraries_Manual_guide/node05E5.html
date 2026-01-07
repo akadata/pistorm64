@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/allocentry.c" NODE="MAIN" TITLE="lib_examples/allocentry.c" -->
+<head>
+<title>lib_examples/allocentry.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05E4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05E6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* allocentry.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 allocentry.c
+Blink FROM LIB:c.o,allocentry.o TO allocentry LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit ;
+
+allocentry.c - example of allocating several memory areas.
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;stdlib.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)  { return(0); }  /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }  /* really */
+#endif
+
+#define ALLOCERROR 0x80000000
+
+struct MemList *memlist;             /* pointer to a MemList structure        */
+
+struct MemBlocks /* define a new structure because C cannot initialize unions */
+{
+    struct MemList  mn_head;         /* one entry in the header               */
+    struct MemEntry mn_body[3];      /* additional entries follow directly as */
+} memblocks;                         /* part of the same data structure       */
+
+VOID main(VOID)
+{
+    memblocks.mn_head.ml_NumEntries = 4; /* 4! Since the MemEntry starts at 1! */
+
+    /* Describe the first piece of memory we want.  Because of our MemBlocks structure */
+    /* setup, we reference the first MemEntry differently when initializing it.        */
+    memblocks.mn_head.ml_ME[0].me_Reqs = MEMF_CLEAR;
+    memblocks.mn_head.ml_ME[0].me_Length = 4000;
+
+    memblocks.mn_body[0].me_Reqs   = MEMF_CHIP | MEMF_CLEAR;   /* Describe the other pieces of    */
+    memblocks.mn_body[0].me_Length = 100000;                   /* memory we want. Additional      */
+    memblocks.mn_body[1].me_Reqs   = MEMF_PUBLIC | MEMF_CLEAR; /* MemEntries are initialized this */
+    memblocks.mn_body[1].me_Length = 200000;                   /* way. If we wanted even more en- */
+    memblocks.mn_body[2].me_Reqs   = MEMF_PUBLIC;              /* tries, we would need to declare */
+    memblocks.mn_body[2].me_Length = 25000;                    /* a larger MemEntry array in our  */
+                                                               /* MemBlocks structure.            */
+
+    memlist = (struct MemList *)AllocEntry((struct MemList *)&#038;memblocks);
+
+    if ((ULONG)memlist &#038; ALLOCERROR)          /* 'error' bit 31 is set (see below). */
+    {
+       printf(&#034;AllocEntry FAILED\n&#034;);
+       exit(200);
+    }
+    /* We got all memory we wanted.  Use it and call FreeEntry() to free it */
+    printf(&#034;AllocEntry succeeded - now freeing all allocated blocks\n&#034;);
+    FreeEntry(memlist);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

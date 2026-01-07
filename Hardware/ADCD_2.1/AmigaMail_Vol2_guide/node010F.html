@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VIII-31/Amnet.txt" NODE="MAIN" TITLE="VIII-31: A Shared Socket Library Server and Client" TOC="AmigaMail_Vol2/VIII" -->
+<head>
+<title>VIII-31: A Shared Socket Library Server and Client</title>
+</head>
+<body>
+<a href="../AmigaMail_Vol2_guide/node0008.html"><img src="../images/toc.gif" alt="[Contents]" border=0></a>
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node010E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0110.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+by John Wiederhirn and John Orr
+
+
+Wednesday is gyro day in CATS, so we have to go out to lunch and eat
+gyros.  Because David the Engineer used to work in CATS, we are morally
+obligated to bring him along.  Like the rest of the engineers, David is
+usually working very hard and doesn't notice what time it is, so we
+have to remind him that it's time to leave for lunch.  Unfortunately,
+David can't hear us yelling to him in the Engineering department, so we
+needed an alternate way to tell David that is was time for lunch.  The
+only logical conclusion was to write a program that uses the Shared
+Socket Library to make a requester pop up on David's Workbench screen
+telling him it is lunch time.
+
+To write a network application for the Shared Socket Library you will
+need two things:
+
+    1) An understand the material in the article
+       &#034;<a href="../AmigaMail_Vol2_guide/node0102.html">Developing Network Applications for the Amiga</a>&#034; from the
+       January/February 1992 issue of Amiga Mail.
+
+    2) The Shared Socket Library include files and Autodocs
+       (which are on the Network Developer's Disk and the
+       Denver/Milano 1991 Devcon disks)
+@rem link used to go to &#034;cats_cd:devcon_disks/devcon_91/contents_91.2/Network!Socket&#034;
+This application has to be broken into two pieces, a client and a
+server.  The client program will send out the notes.  On Amiga A, the
+user runs the client (SendNote), passing it a note string (like
+&#034;David, it's time to eat&#034;) and a machine address for Amiga B.  The
+client then sends a note request off to the note server (ShowNote) on
+Amiga B.  When the note server gets the note request, it pops up an
+EasyRequest containing the note on Amiga B.  The server waits for the
+user to click an &#034;OK&#034; gadget, then sends back an acknowledgement to
+the client.
+
+There are a couple of decisions to make about the application before
+coding anything.  First, there are two transport protocols to choose
+from: TCP and UDP.  To make things easier, this application uses TCP
+because it is a reliable protocol, so the application doesn't have to
+worry about making sure data makes it across the network.  The
+application uses a client/server model, but there are two of those
+models to choose from: iterative and concurrent.  Because this
+application does not need to handle more than one request at the same
+time, the iterative server is a better choice.  This also makes coding
+easier.
+
+ <a href="../AmigaMail_Vol2_guide/node0110.html">The Application Protocol</a> 
+ <a href="../AmigaMail_Vol2_guide/node0111.html">The ShowNote Server Application</a> 
+ <a href="../AmigaMail_Vol2_guide/node0112.html">Listening for Network and Amiga Events</a> 
+ <a href="../AmigaMail_Vol2_guide/node0113.html">Identifying Network Events and Talking to the Client</a> 
+ <a href="../AmigaMail_Vol2_guide/node0114.html">Starting the ShowNote Server</a> 
+ <a href="../AmigaMail_Vol2_guide/node0115.html">The SendNote Client Application</a> 
+ <a href="../AmigaMail_Vol2_guide/node0116.html">Resolving the Target (Host) Address</a> 
+ <a href="../AmigaMail_Vol2_guide/node0117.html">Locating the Server Port and Connecting to It</a> 
+ <a href="../AmigaMail_Vol2_guide/node0118.html">Starting the SendNote Client</a> 
+
+ <a href="../AmigaMail_Vol2_guide/node01DB.html">Note.h</a>      <a href="../AmigaMail_Vol2_guide/node01DC.html">SendNote.c</a>      <a href="../AmigaMail_Vol2_guide/node01DD.html">ShowNote.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

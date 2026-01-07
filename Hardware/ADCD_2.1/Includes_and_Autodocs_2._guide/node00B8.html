@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/view.h" NODE="MAIN" TITLE="Includes/graphics/view.h" -->
+<head>
+<title>Includes/graphics/view.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00B7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00B9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef GRAPHICS_VIEW_H
+#define GRAPHICS_VIEW_H
+/*
+**	$Filename: graphics/view.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**	graphics view/viewport definintions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#define ECS_SPECIFIC
+<a name="line16"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line20"></a>
+#ifndef GRAPHICS_GFX_H
+#include &#060;graphics/gfx.h&#062;
+#endif
+
+#ifndef GRAPHICS_COPPER_H
+#include &#060;graphics/copper.h&#062;
+#endif
+
+#ifndef GRAPHICS_GFXNODES_H
+#include &#060;graphics/gfxnodes.h&#062;
+#endif
+
+#ifndef GRAPHICS_MONITOR_H
+#include &#060;graphics/monitor.h&#062;
+#endif
+
+#ifndef HARDWARE_CUSTOM_H
+#include &#060;hardware/custom.h&#062;
+#endif
+<a name="line40"></a>
+struct ViewPort
+<a name="line42">{</a>
+<a name="line43">   struct   ViewPort *Next;</a>
+   struct   ColorMap  *ColorMap;    /* table of colors for this viewport */
+<a name="line45">		  /* if this is nil, MakeVPort assumes default values */</a>
+<a name="line46">   struct   CopList  *DspIns;	    /* user by MakeView() */</a>
+<a name="line47">   struct   CopList  *SprIns;	    /* used by sprite stuff */</a>
+<a name="line48">   struct   CopList  *ClrIns;	    /* used by sprite stuff */</a>
+<a name="line49">   struct   UCopList *UCopIns;	    /* User copper list */</a>
+<a name="line50">   WORD    DWidth,DHeight;</a>
+<a name="line51">   WORD    DxOffset,DyOffset;</a>
+<a name="line52">   UWORD    Modes;</a>
+<a name="line53">   UBYTE	SpritePriorities;		/* used by makevp */</a>
+<a name="line54">   UBYTE	ExtendedModes;</a>
+   struct   RasInfo *RasInfo;
+};
+<a name="line57"></a>
+struct View
+<a name="line59">{</a>
+<a name="line60">   struct ViewPort *ViewPort;</a>
+<a name="line61">   struct cprlist *LOFCprList;	 /* used for interlaced and noninterlaced */</a>
+<a name="line62">   struct cprlist *SHFCprList;	 /* only used during interlace */</a>
+   WORD DyOffset,DxOffset;   /* for complete View positioning */
+<a name="line64">			      /* offsets are +- adjustments to standard #s */</a>
+   UWORD   Modes;	      /* such as INTERLACE, GENLOC */
+};
+<a name="line67"></a>
+/* these structures are obtained via GfxNew */
+<a name="line69">/* and disposed by GfxFree */</a>
+struct ViewExtra
+<a name="line71">{</a>
+<a name="line72">	struct ExtendedNode n;</a>
+<a name="line73">	struct View *View;	 /* backwards link */</a>
+	struct MonitorSpec *Monitor; /* monitors for this view */
+};
+<a name="line76"></a>
+/* this structure is obtained via GfxNew */
+<a name="line78">/* and disposed by GfxFree */</a>
+struct ViewPortExtra
+<a name="line80">{</a>
+<a name="line81">	struct ExtendedNode n;</a>
+<a name="line82">	struct ViewPort *ViewPort;	/* backwards link */</a>
+	struct Rectangle DisplayClip;  /* makevp display clipping information */
+};
+<a name="line85"></a>
+#define EXTEND_VSTRUCT	0x1000	/* unused bit in Modes field of View */
+<a name="line87"></a>
+/* defines used for Modes in IVPargs */
+<a name="line89"></a>
+<a name="line90">#define GENLOCK_VIDEO	0x0002</a>
+<a name="line91">#define LACE		0x0004</a>
+<a name="line92">#define SUPERHIRES	0x0020</a>
+<a name="line93">#define PFBA		0x0040</a>
+<a name="line94">#define EXTRA_HALFBRITE 0x0080</a>
+<a name="line95">#define GENLOCK_AUDIO	0x0100</a>
+<a name="line96">#define DUALPF		0x0400</a>
+<a name="line97">#define HAM		0x0800</a>
+<a name="line98">#define EXTENDED_MODE	0x1000</a>
+<a name="line99">#define VP_HIDE	0x2000</a>
+<a name="line100">#define SPRITES	0x4000</a>
+#define HIRES		0x8000
+<a name="line102"></a>
+<a name="line103">#define VPF_A2024		0x40</a>
+<a name="line104">#define VPF_AGNUS		0x20</a>
+#define VPF_TENHZ		0x20
+<a name="line106"></a>
+struct RasInfo	/* used by callers to and InitDspC() */
+<a name="line108">{</a>
+<a name="line109">   struct   RasInfo *Next;	    /* used for dualpf */</a>
+<a name="line110">   struct   BitMap *BitMap;</a>
+   WORD    RxOffset,RyOffset;	   /* scroll offsets in this BitMap */
+};
+<a name="line113"></a>
+struct ColorMap
+<a name="line115">{</a>
+<a name="line116">	UBYTE	Flags;</a>
+<a name="line117">	UBYTE	Type;</a>
+<a name="line118">	UWORD	Count;</a>
+<a name="line119">	APTR	ColorTable;</a>
+<a name="line120">	struct	ViewPortExtra *cm_vpe;</a>
+<a name="line121">	UWORD	*TransparencyBits;</a>
+<a name="line122">	UBYTE	TransparencyPlane;</a>
+<a name="line123">	UBYTE	reserved1;</a>
+<a name="line124">	UWORD	reserved2;</a>
+<a name="line125">	struct	ViewPort *cm_vp;</a>
+<a name="line126">	APTR	NormalDisplayInfo;</a>
+<a name="line127">	APTR	CoerceDisplayInfo;</a>
+<a name="line128">	struct	TagItem *cm_batch_items;</a>
+	ULONG	VPModeID;
+};
+
+/* if Type == 0 then ColorMap is V1.2/V1.3 compatible */
+/* if Type != 0 then ColorMap is V36	   compatible */
+<a name="line134"></a>
+<a name="line135">#define COLORMAP_TYPE_V1_2	0x00</a>
+<a name="line136">#define COLORMAP_TYPE_V1_4	0x01</a>
+#define COLORMAP_TYPE_V36 COLORMAP_TYPE_V1_4	/* use this definition */
+
+<a name="line139">/* Flags variable */</a>
+<a name="line140">#define COLORMAP_TRANSPARENCY	0x01</a>
+<a name="line141">#define COLORPLANE_TRANSPARENCY	0x02</a>
+<a name="line142">#define BORDER_BLANKING		0x04</a>
+<a name="line143">#define BORDER_NOTRANSPARENCY	0x08</a>
+<a name="line144">#define VIDEOCONTROL_BATCH	0x10</a>
+#define USER_COPPER_CLIP	0x20
+
+#endif	/* GRAPHICS_VIEW_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

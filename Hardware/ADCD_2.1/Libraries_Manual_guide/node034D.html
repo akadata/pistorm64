@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-1-3" TITLE="27 / / The RastPort Structure / RastPort Area-fill Information" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / The RastPort Structure / RastPort Area-fill Information</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node034C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node034E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Two structures in the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> -- <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line22">AreaInfo</a> and <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line33">TmpRas</a> -- define certain
+information for area filling operations.  The AreaInfo pointer is
+initialized by a call to the routine <a href="../Includes_and_Autodocs_2._guide/node044F.html">InitArea()</a>.
+
+    #define AREA_SIZE 200
+
+    register USHORT i;
+    WORD areaBuffer[AREA_SIZE];
+    struct AreaInfo areaInfo = {0};
+
+    /*  Clear areaBuffer before calling InitArea().  */
+    for (i=0; i&#060;AREA_SIZE; i++)
+        areaBuffer[i] = 0;
+
+<a name="line16">    InitArea(&#038;areaInfo, areaBuffer, (AREA_SIZE*2)/5);</a>
+
+The area buffer must start on a word boundary.  That is why the sample
+declaration shows areaBuffer as composed of unsigned words (200), rather
+than unsigned bytes (400).  It still reserves the same amount of space,
+<a name="line21">but aligns the data space correctly.</a>
+
+To use area fill, you must first provide a work space in memory for the
+system to store the list of points that define your area. You must allow a
+storage space of 5 bytes per vertex.  To create the areas in the work
+space, you use the functions <a href="../Libraries_Manual_guide/node035C.html#line4">AreaMove()</a>, <a href="../Libraries_Manual_guide/node035C.html#line12">AreaDraw()</a>, and <a href="../Libraries_Manual_guide/node035C.html#line26">AreaEnd()</a>.
+
+Typically, you prepare the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> for area-filling by following the
+steps in the code fragment above and then linking your <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line22">AreaInfo</a> into the
+RastPort like so:
+
+<a name="line32">    rastPort-&#062;AreaInfo = &#038;areaInfo;</a>
+
+In addition to the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line22">AreaInfo</a> structure in the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>, you must also
+provide the system with some work space to build the object whose vertices
+you are going to define.  This requires that you initialize a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line33">TmpRas</a>
+structure, then point to that structure for your RastPort to use. First
+the TmpRas structure is initialized (via <a href="../Includes_and_Autodocs_2._guide/node0455.html">InitTmpRas()</a>) then it is linked
+into the RastPort structure.
+
+    Allocate Enough Space.
+    ----------------------
+    The area to which <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line33">TmpRas.RasPtr</a> points must be at least as large
+    as the area (width times height) of the largest rectangular region
+    you plan to fill. Typically, you allocate a space as large as a
+    single bitplane (usually 320 by 200 bits for Lores mode, 640 by 200
+    for Hires, and 1280 by 200 for SuperHires).
+
+When you use functions that dynamically allocate memory from the system,
+you must remember to return these memory blocks to the system before your
+program exits.  See the description of <a href="../Includes_and_Autodocs_2._guide/node0442.html">FreeRaster()</a> in the Amiga ROM
+Kernel Reference Manual: Includes and Autodocs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

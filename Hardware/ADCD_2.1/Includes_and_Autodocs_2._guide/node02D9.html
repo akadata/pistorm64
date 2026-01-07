@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="ParentDir()" TITLE="dos.library/ParentDir" -->
+<head>
+<title>dos.library/ParentDir</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02D8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02DA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ParentDir -- Obtain the parent of a directory or file
+
+SYNOPSIS
+    newlock = ParentDir( lock )
+    D0                   D1
+
+    BPTR ParentDir(BPTR)
+
+FUNCTION
+    The argument 'lock' is associated with a given file or directory.
+    ParentDir() returns 'newlock' which is associated the parent
+    directory of 'lock'.
+
+    Taking the ParentDir() of the root of the current filing system
+    returns a NULL (0) lock.  Note this 0 lock represents the root of
+    file system that you booted from (which is, in effect, the parent
+    of all other file system roots.)
+
+INPUTS
+    lock - BCPL pointer to a lock
+
+RESULTS
+    newlock - BCPL pointer to a lock
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02C6.html">Lock()</a>, <a href="../Includes_and_Autodocs_2._guide/node0297.html">DupLock()</a>, <a href="../Includes_and_Autodocs_2._guide/node0307.html">UnLock()</a>, <a href="../Includes_and_Autodocs_2._guide/node02DA.html">ParentOfFH()</a>, <a href="../Includes_and_Autodocs_2._guide/node0298.html">DupLockFromFH()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

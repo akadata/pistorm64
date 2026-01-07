@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-9-2" TITLE="10 / Dumping Rastport to a Printer / Printing Corrected Aspect Ratio" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 / Dumping Rastport to a Printer / Printing Corrected Aspect Ratio</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0050.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0052.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Using the special flags it is fairly easy to ensure a graphic dump will
+have the correct aspect ratio on paper. There are some considerations
+though when printing a non-displayed <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>.  One way to get a corrected
+aspect ratio dump is to calculate the printer's ratio from XDotsInch and
+YDotsInch (taking into account that the printer may not have square
+pixels) and then adjust the width and height parameters accordingly. You
+then ask for a non-aspect-ratio-corrected dump since you already corrected
+<a name="line9">it yourself.</a>
+
+Another possibility is having the printer device do it for you. To get a
+correct calculation you could build your <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> dimensions in two ways:
+
+
+   1. Using an integer multiple of one of the standard (NTSC) display
+      resolutions and setting the io_Modes argument accordingly. For
+      example if your <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> dimensions were 1280 x 800 (an even multiple
+      of 640 x 400) you would set io_Modes to LACE | HIRES. Setting the
+      <a href="../Devices_Manual_guide/node0050.html#line3">SPECIAL_ASPECT</a> flag would enable the printer device to properly
+      calculate the aspect ratio of the image.
+
+   2. When using an arbitrary sized <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>, you can supply the ModeID of
+      a display mode which has the aspect ratio you would like for your
+      RastPort. The aspect ratio of the various display modes are defined
+      as ticks-per-pixel in the Resolution field of the <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line50">DisplayInfo</a>
+      structure.  You can obtain this value from the graphics database.
+      For example, the resolution of Productivity Mode is 22:22, in other
+      words, 1:1, perfect for a RastPort sized to the limits of the output
+      device.  See the &#034;<a href="../Libraries_Manual_guide/node0004.html">Graphics Library</a>&#034; chapters of the  Amiga ROM
+      Kernel Reference Manual: Libraries for general information on the
+      graphics system.
+
+The following example will dump a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> to the printer and wait for
+either the printer to finish or the user to cancel the dump and act
+accordingly.
+
+     <a href="../Devices_Manual_guide/node0165.html">Demo_Dump.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

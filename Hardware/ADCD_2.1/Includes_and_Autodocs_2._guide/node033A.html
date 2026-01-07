@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="CacheControl()" TITLE="exec.library/CacheControl" -->
+<head>
+<title>exec.library/CacheControl</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0339.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node033B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CacheControl - Instruction &#038; data cache control
+
+SYNOPSIS
+    oldBits = CacheControl(cacheBits,cacheMask)
+    D0                     D0        D1
+
+    ULONG CacheControl(ULONG,ULONG);
+
+FUNCTION
+    This function provides global control of any instruction or data
+    caches that may be connected to the system.  All settings are
+    global -- per task control is not provided.
+
+    The action taken by this function will depend on the type of
+    CPU installed.  This function may be patched to support external
+    caches, or different cache architectures.  In all cases the function
+    will attempt to best emulate the provided settings.  Use of this
+    function may save state specific to the caches involved.
+
+    The list of supported settings is provided in the exec/execbase.i
+    include file.  The bits currently defined map directly to the Motorola
+    68030 CPU CACR register.  Alternate cache solutions may patch into
+    the Exec cache functions.  Where possible, bits will be interpreted to
+    have the same meaning on the installed cache.
+
+INPUTS
+    cacheBits - new values for the bits specified in cacheMask.
+
+    cacheMask - a mask with ones for all bits to be changed.
+
+RESULT
+    oldBits   - the complete prior values for all settings.
+
+NOTE
+    As a side effect, this function clears all caches.
+
+SEE ALSO
+    exec/execbase.i, <a href="../Includes_and_Autodocs_2._guide/node0339.html">CacheClearU</a>, <a href="../Includes_and_Autodocs_2._guide/node0338.html">CacheClearE</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

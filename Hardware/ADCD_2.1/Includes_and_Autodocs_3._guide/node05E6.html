@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/intuition/classes.h" NODE="MAIN" TITLE="include/intuition/classes.h" -->
+<head>
+<title>include/intuition/classes.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05E5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05E7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	INTUITION_CLASSES_H
+#define INTUITION_CLASSES_H
+/*
+**  $VER: classes.h 40.0 (15.2.1994)
+**  Includes Release 44.1
+**
+**  Used only by class implementors
+**
+**  (C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+/*****************************************************************************/
+
+#ifndef	EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+
+#ifndef	EXEC_LIBRARIES_H
+#include &#060;exec/libraries.h&#062;
+#endif
+
+#ifndef UTILITY_HOOKS_H
+#include &#060;utility/hooks.h&#062;
+#endif
+
+#ifndef	INTUITION_CLASSUSR_H
+#include &#060;intuition/classusr.h&#062;
+#endif
+
+/*****************************************************************************/
+/***************** &#034;White Box&#034; access to struct IClass ***********************/
+/*****************************************************************************/
+
+<a name="line35">/* This structure is READ-ONLY, and allocated only by Intuition */</a>
+typedef struct IClass
+{
+    struct Hook		 cl_Dispatcher;		/* Class dispatcher */
+    ULONG		 cl_Reserved;		/* Must be 0  */
+    struct IClass	*cl_Super;		/* Pointer to superclass */
+    ClassID		 cl_ID;			/* Class ID */
+
+    UWORD		 cl_InstOffset;		/* Offset of instance data */
+    UWORD		 cl_InstSize;		/* Size of instance data */
+
+    ULONG		 cl_UserData;		/* Class global data */
+    ULONG		 cl_SubclassCount;	/* Number of subclasses */
+    ULONG		 cl_ObjectCount;	/* Number of objects */
+    ULONG		 cl_Flags;
+
+} Class;
+
+#define	CLF_INLIST	0x00000001L
+    /* class is in public class list */
+
+/*****************************************************************************/
+
+/* add offset for instance data to an object handle */
+#define INST_DATA(cl,o)		((void *)(((UBYTE *)o)+cl-&#062;cl_InstOffset))
+
+/*****************************************************************************/
+
+/* sizeof the instance data for a given class */
+#define SIZEOF_INSTANCE(cl)	((cl)-&#062;cl_InstOffset + (cl)-&#062;cl_InstSize \
+			+ sizeof (struct _Object))
+
+/*****************************************************************************/
+/***************** &#034;White box&#034; access to struct _Object **********************/
+/*****************************************************************************/
+
+/* We have this, the instance data of the root class, PRECEDING the &#034;object&#034;.
+ * This is so that Gadget objects are Gadget pointers, and so on.  If this
+ * structure grows, it will always have o_Class at the end, so the macro
+ * OCLASS(o) will always have the same offset back from the pointer returned
+ * from NewObject().
+ *
+ * This data structure is subject to change.  Do not use the o_Node embedded
+<a name="line78"> * structure. */</a>
+struct _Object
+{
+    struct MinNode	 o_Node;
+    struct IClass	*o_Class;
+
+};
+
+/*****************************************************************************/
+
+/* convenient typecast	*/
+#define _OBJ(o)			((struct _Object *)(o))
+
+/* get &#034;public&#034; handle on baseclass instance from real beginning of obj data */
+#define BASEOBJECT(_obj)	((Object *)(_OBJ(_obj)+1))
+
+/* get back to object data struct from public handle */
+#define _OBJECT(o)		(_OBJ(o) - 1)
+
+/* get class pointer from an object handle	*/
+#define OCLASS(o)		((_OBJECT(o))-&#062;o_Class)
+
+/*****************************************************************************/
+
+/* BOOPSI class libraries should use this structure as the base for their
+ * library data.  This allows developers to obtain the class pointer for
+<a name="line104"> * performing object-less inquiries. */</a>
+struct ClassLibrary
+{
+    struct Library	 cl_Lib;	/* Embedded library */
+    UWORD		 cl_Pad;	/* Align the structure */
+    Class		*cl_Class;	/* Class pointer */
+
+};
+
+/*****************************************************************************/
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

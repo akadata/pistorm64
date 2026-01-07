@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/showprefs.c" NODE="MAIN" TITLE="Lib_examples/showprefs.c" -->
+<head>
+<title>Lib_examples/showprefs.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05B0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05B2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* showprefs.c - Execute me to compile me with SAS C 5.10
+LC -b0 -d0 -cfis -v -j73 showprefs.c
+Blink FROM showprefs.o TO showprefs LIBRARY LIB:Amiga.lib
+quit
+**
+** The following example shows a way to read a Preferences file.
+**
+** showprefs.c - parse and show some info from an IFF Preferences file
+** NOTE: This example requires upcoming 2.1 prefs/ include files.
+**
+** IMPORTANT!! This example is not linked with startup code (eg. c.o).
+** It uses strictly direct AmigaDOS stdio, and also demonstrates
+** direct ReadArgs argument parsing.  Therefore it is a CLI-only
+** example.  If launched from Workbench, packet errors would occur
+** since the WbStartup message is still sitting in the process's
+** pr_MsgPort, and the code would never be unloaded from memory.
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;libraries/dos.h&#062;
+#include &#060;libraries/iffparse.h&#062;
+#include &#060;prefs/prefhdr.h&#062;
+#include &#060;prefs/font.h&#062;
+#include &#060;prefs/icontrol.h&#062;
+#include &#060;prefs/input.h&#062;
+#include &#060;prefs/overscan.h&#062;
+#include &#060;prefs/printergfx.h&#062;
+#include &#060;prefs/printertxt.h&#062;
+#include &#060;prefs/screenmode.h&#062;
+#include &#060;prefs/serial.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/iffparse_protos.h&#062;
+
+struct ExecBase *SysBase;
+struct Library *DOSBase;
+struct Library *IFFParseBase;
+
+static UBYTE *IFFErrTxt[] = {
+  &#034;EOF&#034;,    /* (end of file, not an error) */
+  &#034;EOC&#034;,     /* (end of context, not an error) */
+  &#034;no lexical scope&#034;,
+  &#034;insufficient memory&#034;,
+  &#034;stream read error&#034;,
+  &#034;stream write error&#034;,
+  &#034;stream seek error&#034;,
+  &#034;file corrupt&#034;,
+  &#034;IFF syntax error&#034;,
+  &#034;not an IFF file&#034;,
+  &#034;required call-back hook missing&#034;,
+  NULL,     /* (return to client, never shown) */
+};
+
+LONG main(void)
+{
+  struct RDArgs *readargs = NULL;
+  LONG rargs[2];
+  struct IFFHandle *iffhandle;
+  struct ContextNode *cnode;
+  struct StoredProperty *hdrsp;
+  struct StoredProperty *sp;
+  UBYTE *filename = NULL;
+  LONG ifferror, error = 0, rc = RETURN_OK;
+
+  /* We must set up SysBase (we are not linked with startup code) */
+  SysBase = (*((struct Library **) 4));
+
+  /* This no-startup-code example may not be used from Workbench */
+  if ((((struct Process *)FindTask(NULL))-&#062;pr_CLI)==NULL)
+        return(RETURN_FAIL);
+
+  if (DOSBase = OpenLibrary(&#034;dos.library&#034;, 37)) {
+    if (IFFParseBase = OpenLibrary (&#034;iffparse.library&#034;, 37)) {
+
+      readargs = ReadArgs(&#034;FILE/A&#034;, rargs, NULL);
+      if( (readargs) &#038;&#038; (rargs[0]) ) {
+
+        filename = (UBYTE *)rargs[0];
+
+        /* allocate an IFF handle */
+        if (iffhandle = AllocIFF()) {
+          /* Open the file for reading */
+          if (iffhandle-&#062;iff_Stream = (LONG)Open(filename, MODE_OLDFILE)) {
+            /* initialize the iff handle */
+            InitIFFasDOS (iffhandle);
+            if ((ifferror = OpenIFF (iffhandle, IFFF_READ)) == 0) {
+              PropChunk(iffhandle, ID_PREF, ID_PRHD);
+
+              PropChunk(iffhandle, ID_PREF, ID_FONT);
+              PropChunk(iffhandle, ID_PREF, ID_ICTL);
+              PropChunk(iffhandle, ID_PREF, ID_INPT);
+              PropChunk(iffhandle, ID_PREF, ID_OSCN);
+              PropChunk(iffhandle, ID_PREF, ID_PGFX);
+              PropChunk(iffhandle, ID_PREF, ID_PTXT);
+              PropChunk(iffhandle, ID_PREF, ID_SCRM);
+              PropChunk(iffhandle, ID_PREF, ID_SERL);
+
+              for (;;) {
+                ifferror = ParseIFF(iffhandle, IFFPARSE_STEP);
+
+                 if (ifferror == IFFERR_EOC)
+                   continue;
+                else if (ifferror)
+                  break;
+
+                /* Do nothing is this is a PrefHeader chunk,
+                 * we'll pop it later when there is a pref
+                 * chunk.
+                 */
+                if (cnode = CurrentChunk(iffhandle))
+                  if (cnode-&#062;cn_ID == ID_PRHD || cnode-&#062;cn_ID == ID_FORM)
+                    continue;
+
+                /* Get the preferences header, stored previously */
+                hdrsp = FindProp(iffhandle, ID_PREF, ID_PRHD);
+
+                if (sp = FindProp(iffhandle, ID_PREF, ID_FONT)) {
+                  Printf(&#034;FrontPen:  %ld\n&#034;,
+                        ((struct FontPrefs *)sp-&#062;sp_Data)-&#062;fp_FrontPen);
+                  Printf(&#034;BackPen:   %ld\n&#034;,
+                        ((struct FontPrefs *)sp-&#062;sp_Data)-&#062;fp_BackPen);
+                  Printf(&#034;DrawMode:  %ld\n&#034;,
+                        ((struct FontPrefs *)sp-&#062;sp_Data)-&#062;fp_DrawMode);
+                  Printf(&#034;Font:      %s\n&#034;,
+                        (LONG)((struct FontPrefs *)sp-&#062;sp_Data)-&#062;fp_Name);
+                  Printf(&#034;ta_YSize:  %ld\n&#034;,
+                        ((struct FontPrefs *)sp-&#062;sp_Data)-&#062;fp_TextAttr.ta_YSize);
+                  Printf(&#034;ta_Style:  %ld\n&#034;,
+                        ((struct FontPrefs *)sp-&#062;sp_Data)-&#062;fp_TextAttr.ta_Style);
+                  Printf(&#034;ta_Flags:  %ld\n&#034;,
+                        ((struct FontPrefs *)sp-&#062;sp_Data)-&#062;fp_TextAttr.ta_Flags);
+                } else   if (sp = FindProp(iffhandle, ID_PREF, ID_ICTL)) {
+                  Printf(&#034;TimeOut:   %ld\n&#034;,
+                        ((struct IControlPrefs *)sp-&#062;sp_Data)-&#062;ic_TimeOut);
+                  Printf(&#034;MetaDrag:  %ld\n&#034;,
+                        ((struct IControlPrefs *)sp-&#062;sp_Data)-&#062;ic_MetaDrag);
+                  Printf(&#034;WBtoFront: %ld\n&#034;,
+                        ((struct IControlPrefs *)sp-&#062;sp_Data)-&#062;ic_WBtoFront);
+                  Printf(&#034;FrontToBack: %ld\n&#034;,
+                        ((struct IControlPrefs *)sp-&#062;sp_Data)-&#062;ic_FrontToBack);
+                  Printf(&#034;ReqTrue:    %ld\n&#034;,
+                        ((struct IControlPrefs *)sp-&#062;sp_Data)-&#062;ic_ReqTrue);
+                  Printf(&#034;ReqFalse:    %ld\n&#034;,
+                        ((struct IControlPrefs *)sp-&#062;sp_Data)-&#062;ic_ReqFalse);
+                  /* etc */
+                } else if (sp = FindProp(iffhandle, ID_PREF, ID_INPT)) {
+                  Printf(&#034;PointerTicks:      %ld\n&#034;,
+                        ((struct InputPrefs *)sp-&#062;sp_Data)-&#062;ip_PointerTicks);
+                  Printf(&#034;DoubleClick/Secs:  %ld\n&#034;,
+                        ((struct InputPrefs *)sp-&#062;sp_Data)-&#062;ip_DoubleClick.tv_secs);
+                  Printf(&#034;DoubleClick/Micro: %ld\n&#034;,
+                        ((struct InputPrefs *)sp-&#062;sp_Data)-&#062;ip_DoubleClick.tv_micro);
+                  /* etc */
+                } else if (sp = FindProp(iffhandle, ID_PREF, ID_OSCN)) {
+                  Printf(&#034;DisplayID:  0x%lx\n&#034;,
+                        ((struct OverscanPrefs *)sp-&#062;sp_Data)-&#062;os_DisplayID);
+                  /* etc */
+                } else if (sp = FindProp(iffhandle, ID_PREF, ID_PGFX)) {
+                  Printf(&#034;Aspect:     %ld\n&#034;,
+                        ((struct PrinterGfxPrefs *)sp-&#062;sp_Data)-&#062;pg_Aspect);
+                  /* etc */
+                } else if (sp = FindProp(iffhandle, ID_PREF, ID_PTXT)) {
+                  Printf(&#034;Driver:     %s\n&#034;,
+                        (LONG)((struct PrinterTxtPrefs *)sp-&#062;sp_Data)-&#062;pt_Driver);
+                  /* etc */
+                } else if (sp = FindProp(iffhandle, ID_PREF, ID_SCRM)) {
+                  Printf(&#034;DisplayID:  0x%lx\n&#034;,
+                        ((struct ScreenModePrefs *)sp-&#062;sp_Data)-&#062;sm_DisplayID);
+                  /* etc */
+                } else if (sp = FindProp(iffhandle, ID_PREF, ID_SERL)) {
+                  Printf(&#034;BaudRate:   %ld\n&#034;,
+                        ((struct SerialPrefs *)sp-&#062;sp_Data)-&#062;sp_BaudRate);
+                  /* etc */
+                }
+              }
+
+              CloseIFF(iffhandle);
+            }
+
+            if (ifferror != IFFERR_EOF) {
+              rargs[1] = (LONG)IFFErrTxt[-ifferror - 1];
+              VFPrintf(Output(), &#034;%s: %s\n&#034;, rargs);
+              rc = RETURN_FAIL;
+            }
+
+            Close(iffhandle-&#062;iff_Stream);
+          } else
+            error = IoErr();
+
+          FreeIFF(iffhandle);
+        } else {
+          VFPrintf(Output(), &#034;Can't allocate IFF handle\n&#034;, NULL);
+          rc = RETURN_FAIL;
+        }
+      } else
+        error = IoErr();
+      CloseLibrary(IFFParseBase);
+
+
+      SetIoErr(error);
+      if (error) {
+        rc = RETURN_FAIL;
+        PrintFault(error, filename ? filename : &#034;&#034;);
+      }
+    }
+
+    if(readargs) FreeArgs(readargs);
+    CloseLibrary(DOSBase);
+
+  } else {
+      rc = RETURN_FAIL;
+      Write(Output(), &#034;Kickstart 2.0 required\n&#034;, 23);
+    }
+
+  return(rc);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

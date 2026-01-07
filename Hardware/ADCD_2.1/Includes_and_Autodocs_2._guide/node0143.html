@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/amiga_lib" NODE="CallHookA()" TITLE="amiga.lib/CallHookA" -->
+<head>
+<title>amiga.lib/CallHookA</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0142.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0144.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CallHookA -- Invoke a hook given a pointer to a message.  (V36)
+
+SYNOPSIS
+    result = CallHookA( hookPtr, obj, message )
+
+    ULONG CallHook( struct <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> *, Object *, APTR );
+
+FUNCTION
+    Invoke a hook on the supplied hook-specific data (an &#034;object&#034;)
+    and a parameter packet (&#034;message&#034;).  This function is equivalent
+    to <a href="../Includes_and_Autodocs_2._guide/node03D0.html">utility.library/CallHookPkt()</a>.
+
+INPUTS
+    hookPtr - A system-standard hook
+    obj - hook-specific data object
+    message - The hook-specific message you wish to send
+
+RESULT
+    result - a hook-specific result.
+
+NOTES
+    While this function requires V36 or higher intuition.library,
+    it first appeared in V37 amiga.lib.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0142.html">CallHook()</a>, <a href="../Includes_and_Autodocs_2._guide/node03D0.html">utility.library/CallHookPkt()</a>, <a href="../Includes_and_Autodocs_2._guide/node012D.html">&#060;utility/hooks.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

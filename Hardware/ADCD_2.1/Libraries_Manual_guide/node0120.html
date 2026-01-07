@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-5-5-1" TITLE="4 / / Setting Up A SuperBitMap Window / Graphics and Layers Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / / Setting Up A SuperBitMap Window / Graphics and Layers Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node011F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0121.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The portion of the bitmap showing within a SuperBitMap window is
+controlled by the application.  Initially, the window shows the bitmap
+starting from its origin (0,0) and clipped to fit within the window layer.
+The visible portion of the bitmap can be scrolled around within the window
+using the layers library <a href="../Libraries_Manual_guide/node03EF.html#line17">ScrollLayer()</a> function:
+
+    void ScrollLayer(LONG unused, struct Layer *layer, LONG dx, LONG dy)
+
+Pass this function a pointer to the window's layer in layer and the scroll
+offsets in dx and dy.  (A pointer to the window's layer can be obtained
+<a name="line12">from <a href="../Libraries_Manual_guide/node0121.html#line66">Window.RPort</a>-&#062;Layer.)</a>
+
+When rendering operations are performed in a SuperBitMap window, any
+rendering that falls outside window boundaries is done in the
+application's bitmap.  Rendering that falls within window bounds is done
+in the screen's bitmap.  Before performing an operation such as a save on
+the application bitmap, the graphics library function <a href="../Includes_and_Autodocs_2._guide/node0481.html">SyncSBitMap()</a> should
+be called:
+
+    void SyncSBitMap(struct Layer *layer)
+
+Pass this function a pointer to the window's layer.  <a href="../Includes_and_Autodocs_2._guide/node0481.html">SyncSBitMap()</a> copies
+the window contents to the corresponding part of the application bitmap,
+bringing it up to date.  (If no rendering operations have been performed
+<a name="line26">this call is not necessary.)</a>
+
+Similarly, after making any changes to the application bitmap such as
+loading a new one, the window's layer should be locked and the
+<a href="../Includes_and_Autodocs_2._guide/node0431.html">CopySBitMap()</a> function should be called.
+
+    void CopySBitMap(struct Layer *)
+
+This function copies the new information in the appropriate area of the
+underlying bitmap to the window's layer.
+
+For more information about bitmaps and layers, see the
+&#034;<a href="../Libraries_Manual_guide/node0363.html">Graphics Primitives</a>&#034; and &#034;<a href="../Libraries_Manual_guide/node03EF.html">Layers Library</a>&#034; chapters of this manual.  Also
+see the &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00A1.html">clip.h</a>&#062;, &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00A6.html">gfx.h</a>&#062;, &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00C4.html">layers.h</a>&#062;,
+<a href="../Includes_and_Autodocs_2._guide/node040D.html">graphics library</a> and <a href="../Includes_and_Autodocs_2._guide/node038D.html">layers library</a> sections of the Amiga ROM Kernel
+Reference Manual: Includes and Autodocs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

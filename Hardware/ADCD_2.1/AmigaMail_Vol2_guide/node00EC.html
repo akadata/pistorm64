@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VII-1/DR2D.txt" NODE="VII-1-12" TITLE="LAYR (0x4C415952)       / Define a layer /" -->
+<head>
+<title>LAYR (0x4C415952)       / Define a layer /</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00EB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00ED.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A DR2D project is broken up into one or more layers.  Each DR2D object
+is in one of these layers.  Layers provide several useful features.
+Any particular layer can be &#034;turned off&#034;, so that the objects in the
+layer are not displayed.  This eliminates the unnecessary display of
+objects not currently needed on the screen.  Also, the user can lock a
+layer to protect the layer's objects from accidental changes.
+
+    struct LAYRstruct {
+        ULONG    ID;
+        ULONG    Size;
+        USHORT   LayerID;              /* ID of the layer */
+        char     LayerName[16];        /* Null terminated and padded */
+        UBYTE    Flags;                /* Flags, from LF_*, below */
+        UBYTE    Pad0;                 /* Always 0 */
+    };
+
+LayerID is the number assigned to this layer.  As the field's name
+indicates, LayerName[] is the NULL terminated name of the layer.
+Flags is a bit field who's bits are set according to the #defines
+below:
+
+    #define LF_ACTIVE       0x01    /* Active for editing */
+    #define LF_DISPLAYED    0x02    /* Displayed on the screen */
+
+If the LF_ACTIVE bit is set, this layer is unlocked.  A set
+LF_DISPLAYED bit indicates that this layer is currently visible on the
+screen.  A cleared LF_DISPLAYED bit implies that LF_ACTIVE is not set.
+The reason for this is to keep the user from accidentally editing
+layers that are invisible.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

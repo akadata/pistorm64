@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="cd" NODE="CD_QCODELSN" TITLE="cd.device/CD_QCODELSN" -->
+<head>
+<title>cd.device/CD_QCODELSN</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00AF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00B1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       CD_QCODELSN -- Report current disk position.
+
+<b>   IO REQUEST</b>
+       io_Device       preset by the call to <a href="../Includes_and_Autodocs_3._guide/node00BB.html">OpenDevice()</a>
+       io_Unit         preset by the call to <a href="../Includes_and_Autodocs_3._guide/node00BB.html">OpenDevice()</a>
+       io_Command      CD_QCODELSN
+       io_Data         pointer to <a href="../Includes_and_Autodocs_3._guide/node05E4.html#line284">QCode</a> structure
+       io_Length       0 - MUST be zero (for future compatability)
+
+<b>   RESULTS</b>
+       io_Error        0 for success, or an error code as defined in
+                       <a href="../Includes_and_Autodocs_3._guide/node05E4.html">&#060;devices/cd.h&#062;</a>
+
+<b>   FUNCTION</b>
+       This command reports current subcode Q channel time information.  This
+       command only returns data when CD Audio is playing (or paused).  At
+       any other time, an error is returned.  The Q-Code packet consists of:
+
+       struct <a href="../Includes_and_Autodocs_3._guide/node05E4.html#line284">QCode</a> {
+
+           <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a>        CtlAdr;        /* Data type / <a href="../Includes_and_Autodocs_3._guide/node05E4.html#line284">QCode</a> type           */
+           <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a>        Track;         /* Track number                     */
+           <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a>        Index;         /* Track subindex number            */
+           <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a>        Zero;          /* The &#034;Zero&#034; byte of Q-Code packet */
+           union LSNMSF TrackPosition; /* Position from start of track     */
+           union LSNMSF DiskPosition;  /* Position from start of disk      */
+           };
+
+<b>   EXAMPLE</b>
+
+       struct <a href="../Includes_and_Autodocs_3._guide/node05E4.html#line284">QCode</a> qcode;
+
+       ior-&#062;io_Command = CD_QCODELSN;  /* Retrieve TOC information */
+       ior-&#062;io_Length  = 0;            /* MUST be zero             */
+       ior-&#062;io_Data    = (APTR)qcode;  /* Here's where we want it  */
+       <a href="../Includes_and_Autodocs_3._guide/node0204.html">DoIO</a> (ior);
+
+       if (!ior-&#062;io_Error) {           /* Command succeeded        */
+
+           printf(&#034;Current position is: %ldn&#034;, qcode.DiskPosition.LSN);
+           }
+
+<b>   NOTES</b>
+       This function may not return immediately.  It may take several frames
+       to pass by before a valid Q-Code packet can be returned.  Use <a href="../Includes_and_Autodocs_3._guide/node0236.html">SendIO()</a>
+       and <a href="../Includes_and_Autodocs_3._guide/node01F5.html">CheckIO()</a> if response time is critical, and the information is
+       not.
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node00AD.html">CD_PLAYMSF</a>, <a href="../Includes_and_Autodocs_3._guide/node00AC.html">CD_PLAYLSN</a>, <a href="../Includes_and_Autodocs_3._guide/node00AE.html">CD_PLAYTRACK</a>, <a href="../Includes_and_Autodocs_3._guide/node05E4.html">&#060;devices/cd.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

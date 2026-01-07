@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="diskfont" NODE="NewFontContents()" TITLE="diskfont.library/NewFontContents" -->
+<head>
+<title>diskfont.library/NewFontContents</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0134.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0136.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	NewFontContents -- Create a <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line26">FontContents</a> image for a font. (V34)
+
+<b>   SYNOPSIS</b>
+	fontContentsHeader = NewFontContents(fontsLock,fontName)
+       D0                                   A0        A1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line52">FontContentsHeader</a> *NewFontContents( <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line129">BPTR</a>, char * );
+
+<b>   FUNCTION</b>
+	This function creates a new array of <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line26">FontContents</a> entries
+	that describe all the fonts associated with the fontName,
+	specifically, all those in the font directory whose name
+	is that of the font sans the &#034;.font&#034; suffix.
+
+<b>   INPUTS</b>
+	fontsLock - a DOS lock on the FONTS: directory (or other
+	    directory where the font contents file and associated
+	    font directory resides).
+	fontName - the font name, with the &#034;.font&#034; suffix, which
+	    is also the name of the font contents file.
+
+<b>   RESULT</b>
+	fontContentsHeader - a struct <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line52">FontContentsHeader</a> pointer.
+
+<b>   EXCEPTIONS</b>
+	This command was first made available as of version 34.
+
+	D0 is zero if the fontName is does not have a &#034;.font&#034; suffix,
+	if the fontName is too long, if a DOS error occurred, or if
+	memory could not be allocated for the fontContentsHeader.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0134.html">DisposeFontContents()</a> to free the structure acquired here.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="ObtainGIRPort()" TITLE="intuition.library/ObtainGIRPort" -->
+<head>
+<title>intuition.library/ObtainGIRPort</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03CD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03CF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ObtainGIRPort -- Set up a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> for a custom gadget. (V36)
+
+<b>    SYNOPSIS</b>
+	RPort = ObtainGIRPort( GInfo )
+	D0		       A0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *ObtainGIRPort( struct <a href="../Includes_and_Autodocs_3._guide/node060E.html#line24">GadgetInfo</a> * );
+
+<b>    FUNCTION</b>
+	Sets up a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> for use (only) by custom gadget hook routines.
+	This function must be called EACH time a hook routine needing
+	to perform gadget rendering is called, and must be accompanied
+	by a corresponding call to <a href="../Includes_and_Autodocs_3._guide/node03DF.html">ReleaseGIRPort()</a>.
+
+	Note that if a hook function passes you a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> pointer,
+	e.g., GM_RENDER, you needn't call ObtainGIRPort() in that case.
+
+<b>    INPUTS</b>
+	A pointer to a <a href="../Includes_and_Autodocs_3._guide/node060E.html#line24">GadgetInfo</a> structure, as passed to each custom
+	gadget hook function.
+
+<b>    RESULT</b>
+	A pointer to a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> that may be used for gadget rendering.
+	This pointer may be NULL, in which case you should do no rendering.
+	You may (optionally) pass a null return value to <a href="../Includes_and_Autodocs_3._guide/node03DF.html">ReleaseGIRPort()</a>.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03DF.html">ReleaseGIRPort()</a>, <a href="../Includes_and_Autodocs_3._guide/node05F6.html#line24">Custom</a> <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> documentation
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

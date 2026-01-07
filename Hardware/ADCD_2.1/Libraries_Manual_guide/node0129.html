@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-8-3" TITLE="4 / Other Window Functions / Program Control of Window Arrangement" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Other Window Functions / Program Control of Window Arrangement</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0128.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node012A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Includes_and_Autodocs_2._guide/node022C.html">MoveWindow()</a>, <a href="../Includes_and_Autodocs_2._guide/node025A.html">SizeWindow()</a>, <a href="../Includes_and_Autodocs_2._guide/node0265.html">WindowToFront()</a> and <a href="../Includes_and_Autodocs_2._guide/node0264.html">WindowToBack()</a> allow the
+program to modify the size and placement of its windows.  These calls are
+<a name="line4">available in all versions of the operating system.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node022D.html">MoveWindowInFrontOf()</a>, <a href="../Includes_and_Autodocs_2._guide/node0203.html">ChangeWindowBox()</a> and <a href="../Includes_and_Autodocs_2._guide/node0266.html">ZipWindow()</a> have been added
+in Release 2 to provide more flexible control over the size and placement
+<a name="line8">of windows.</a>
+
+All of these functions are asynchronous.  The window will not be affected
+by them immediately, rather, Intuition will act on the request the next
+time it receives an input event.  Currently this happens at a minimum rate
+of ten times per second, and a maximum of sixty times per second.  There
+is no guarantee that the operation has taken place when the function
+returns.  In some cases, there are IDCMP messages which will inform the
+application when the change has completed (for example, an <a href="../Libraries_Manual_guide/node01E0.html">IDCMP_NEWSIZE</a>
+event indicates that a resize operation has completed).
+
+Use the <a href="../Includes_and_Autodocs_2._guide/node022C.html">MoveWindow()</a> function to move a window to a new position in the
+screen.  Use <a href="../Includes_and_Autodocs_2._guide/node025A.html">SizeWindow()</a> to change the size of the window:
+
+    void MoveWindow( struct Window *window, long dx, long dy );
+    void SizeWindow( struct Window *window, long dx, long dy );
+
+Note that both <a href="../Includes_and_Autodocs_2._guide/node022C.html">MoveWindow()</a> and <a href="../Includes_and_Autodocs_2._guide/node025A.html">SizeWindow()</a> take the amount of change in
+each axis (delta values instead of absolute coordinates).  To specify the
+coordinates as absolute numbers, use <a href="../Includes_and_Autodocs_2._guide/node0203.html">ChangeWindowBox()</a>.  The SizeWindow()
+function will respect the window's maximum and minimum dimensions only if
+the window has a sizing gadget.
+
+A new function in Release 2, <a href="../Includes_and_Autodocs_2._guide/node0203.html">ChangeWindowBox()</a>, allows an application to
+change the window size and position in a single call:
+
+    void ChangeWindowBox( struct Window *window, long left, long top,
+                          long width, long height );
+
+Note that the position and size values are absolutes and not deltas.  The
+<a name="line38">window's maximum and minimum dimensions are always respected.</a>
+
+To depth arrange windows under program control, use <a href="../Includes_and_Autodocs_2._guide/node0265.html">WindowToFront()</a> and
+<a href="../Includes_and_Autodocs_2._guide/node0264.html">WindowToBack()</a>:
+
+    void WindowToFront( struct Window *window );
+    void WindowToBack( struct Window *window );
+
+<a href="../Includes_and_Autodocs_2._guide/node0265.html">WindowToFront()</a> depth arranges a given window in front of all other
+windows on its screen.  <a href="../Includes_and_Autodocs_2._guide/node0264.html">WindowToBack()</a> depth arranges a given window
+<a name="line48">behind all other windows on its screen.</a>
+
+To move a window in front of a specific, given window (as opposed to all
+windows), use <a href="../Includes_and_Autodocs_2._guide/node022D.html">MoveWindowInFrontOf()</a>:
+
+    void MoveWindowInFrontOf( struct Window *window,
+                              struct Window *behindWindow );
+
+<a href="../Includes_and_Autodocs_2._guide/node022D.html">MoveWindowInFrontOf()</a> is a new call provided in Release 2 and is not
+<a name="line57">available in older versions of the OS.</a>
+
+To toggle the window size between its two zoom settings use <a href="../Includes_and_Autodocs_2._guide/node0266.html">ZipWindow()</a>.
+This performs the same action that occurs when the user selects the zoom
+gadget:
+
+    void ZipWindow( struct Window *window );
+
+The two zoom settings are the initial size and position of the window when
+it was first opened and the alternate position specified with the <a href="../Libraries_Manual_guide/node0124.html#line143">WA_Zoom</a>
+tag.  If no WA_Zoom tag is provided, the alternate position is taken from
+the window's minimum dimensions, unless the window was opened at its
+minimum dimension.  In that case, the alternate position is taken from the
+window's maximum dimension.  <a href="../Includes_and_Autodocs_2._guide/node0266.html">ZipWindow()</a> is a new call provided in Release
+2 and is not available in older versions of the OS.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

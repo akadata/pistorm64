@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/iffparse" NODE="OpenClipboard()" TITLE="iffparse.library/OpenClipboard" -->
+<head>
+<title>iffparse.library/OpenClipboard</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01CD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01CF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    OpenClipboard -- Create a handle on a clipboard unit.
+
+SYNOPSIS
+    ch = OpenClipboard (unit)
+    d0                   d0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node010B.html#line115">ClipboardHandle</a>   *ch;
+    LONG                    unit;
+
+FUNCTION
+    Opens the clipboard.device and opens a stream for the specified unit
+    (usually PRIMARY_CLIP).  This handle structure will be used as the
+    clipboard stream for IFFHandles initialized as clipboard streams by
+    <a href="../Includes_and_Autodocs_2._guide/node01CB.html">InitIFFasClip()</a>.
+
+INPUTS
+    unit    - clipboard unit number (usually PRIMARY_CLIP).
+
+RESULT
+    ch      - pointer to <a href="../Includes_and_Autodocs_2._guide/node010B.html#line115">ClipboardHandle</a> structure or NULL if
+              unsuccessful.
+
+EXAMPLE
+
+NOTES
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01CB.html">InitIFFasClip()</a>, <a href="../Includes_and_Autodocs_2._guide/node01BA.html">CloseClipboard()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

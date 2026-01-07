@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_FTXT" NODE="16-4-2-2" TITLE=" Standard Data and Property Chunks / Control Sequences " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Data and Property Chunks / Control Sequences </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node016B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node016D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Eight of the control characters begin ISO/ANSI standard &#034;control
+sequences&#034; (or &#034;escape sequences&#034;).  These sequences are described below
+and diagramed in <a href="../Devices_Manual_guide/node0174.html">Appendix C</a>.
+
+	G0	  ::= (SP through DEL)
+	G1	  ::= (NBSP through &#034;&#255;&#034;)
+
+	ESC-Seq	  ::= ESC (SP through &#034;/&#034;) * (&#034;0&#034; through &#034;~&#034;)
+	ShiftToG2 ::= SS2 G0
+	ShiftToG3 ::= SS3 G0
+	CSI-Seq	  ::= CSI (SP through &#034;?&#034;) * (&#034;@&#034; through &#034;~&#034;)
+	DCS-Seq   ::= (DCS | OSC | PM | APC) (SP through &#034;~&#034; | G1) * ST
+
+&#034;ESC-Seq&#034; is the control sequence ESC (hex 1B), followed by zero or more
+characters in the range SP through &#034;/&#034; (hex 20 through hex 2F), followed
+by a character in the range &#034;0&#034; through &#034;~&#034; (hex 30 through hex 7E).
+These sequences are reserved for future use and should be skipped by
+current <a href="../Devices_Manual_guide/node0168.html">FTXT</a> reader programs.
+
+SS2 (hex 8E) and SS3 (hex 8F) shift the single following G0 character into
+yet-to-be-defined graphic sets G2 and G3, respectively.  These sequences
+should not be used until the character sets G2 and G3 are standardized.  A
+reader may simply skip the SS2 or SS3 (taking the following character as a
+corresponding G0 character) or replace the two-character sequence with a
+character like &#034;?&#034; to mean &#034;absent&#034;.
+
+<a href="../Devices_Manual_guide/node0168.html">FTXT</a> uses &#034;CSI-Seq&#034; control sequences to store character formatting (font
+selection by number, type face, and text size) and perhaps layout
+information (position and rotation).  &#034;CSI-Seq&#034; control sequences start
+with CSI (the &#034;control sequence introducer&#034;, hex 9B).  Syntactically, the
+sequence includes zero or more characters in the range SP through &#034;?&#034; (hex
+20 through hex 3F) and a concluding character in the range &#034;@&#034; through &#034;~&#034;
+(hex 40 through hex 7E).  These sequences may be skipped by a minimal <a href="../Devices_Manual_guide/node0168.html">FTXT</a>
+reader, i.e., one that ignores formatting information.
+
+Note: A future <a href="../Devices_Manual_guide/node0168.html">FTXT</a> standardization document will explain the uses of
+CSI-Seq sequences for setting character face (light weight vs. medium vs.
+bold, italic vs. upright, height, pitch, position, and rotation).  For
+now, consult the ISO/ANSI references.
+
+&#034;DCS-Seq&#034; is the control sequences starting with DCS (hex 90), OSC (hex
+9D), PM (hex 9E), or APC (hex 9F), followed by zero or more characters
+each of which is in the range SP through &#034;~&#034; (hex 20 through hex 7E) or
+else a G1 character, and terminated by an ST (hex 9C).  These sequences
+are reserved for future use and should be skipped by current <a href="../Devices_Manual_guide/node0168.html">FTXT</a> reader
+programs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="I-19/SWCompat.txt" NODE="I-19-25" TITLE="Intuition Fonts" -->
+<head>
+<title>Intuition Fonts</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0033.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0035.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following table shows where the Intuition gets its fonts from:
+
+
+   What you tell OpenScreen  Screen's Font          Windows' RPort's Font
+   ------------------------  -------------          ---------------------
+A. NewScreen.Font = myfont  myfont                          myfont
+B. NewScreen.Font = NULL    GfxBase-&#062;DefaultFont    GfxBase-&#062;DefaultFont
+C. {SA_Font, myfont}        myfont                          myfont
+D. {SA_SysFont, 0}          GfxBase-&#062;DefaultFont    GfxBase-&#062;DefaultFont
+E. {SA_SysFont, 1}          Font Prefs Screen text  GfxBase-&#062;DefaultFont
+
+
+Notes:
+
+  A and B are the options that existed in releases prior to V36.
+
+  C and D are new V36 tags that are equivalent to A and B respectively.
+
+  E is a NEW option for V36.  The Workbench screen uses this option.
+
+  GfxBase-&#062;DefaultFont will always be monospace.  This is the
+  ``System Default Text'' from Font Preferences.
+
+  The ``Screen Text'' choice from Font Preferences can be monospace or
+  proportional.
+
+  'myfont' can be any font of the programmer's choosing, including a
+  proportional one.  This is true under all releases of the OS.
+
+
+The menu bar, window titles, menu-items, and the contents of a string
+gadget use the screen's font.  The font used for menu items can be
+overridden in the item's IntuiText structure.  Under V36 and higher, the
+font used in a string gadget can be overridden through the StringExtend
+structure.  The font of the menu bar and window titles cannot be
+overridden.  Because the 2.0 Workbench screen uses option E to specify its
+Screen font from the user's Screen font Preferences, applications which
+open windows on the Workbench screen may get very large or proportional
+fonts in their menu bars, window titles, menu-items and string gadgets.
+
+To predict your window's titlebar height before you call OpenWindow():
+
+    topborder = screen-&#062;WBorTop + screen-&#062;Font-&#062;ta_YSize + 1
+
+The screen's font may not legally be changed after a screen is opened.
+
+Be sure the screen cannot go away on you.  This is true if:
+
+    1) You opened the screen yourself.
+    2) You currently have a window open on the screen.
+    3) You currently hold a lock on this screen (see LockPubScreen() ).
+
+IntuiText rendered into a window (either through PrintIText() or as a
+gadget's GadgetText) defaults to the Window RastPort font, but can be
+overridden using its ITextFont field.  Text rendered with the Text()
+graphics.library call appears in the Window RastPort font.
+
+The Window's RPort's font shown above is the initial font that Intuition
+sets for you in your window's RastPort.  It is legal to change that
+subsequently with SetFont().
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

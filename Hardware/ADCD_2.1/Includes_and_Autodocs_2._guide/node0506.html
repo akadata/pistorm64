@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/console" NODE="CMD_CLEAR" TITLE="console.device/CMD_CLEAR" -->
+<head>
+<title>console.device/CMD_CLEAR</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0505.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0507.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CMD_CLEAR -- Clear console input buffer.
+
+FUNCTION
+    Remove from the console input buffer any reports waiting to
+    satisfy read requests.
+
+IO REQUEST INPUT
+    io_Message      mn_ReplyPort set if quick I/O is not possible
+    io_Device       preset by the call to <a href="../Includes_and_Autodocs_2._guide/node0509.html">OpenDevice</a>
+    io_Unit         preset by the call to <a href="../Includes_and_Autodocs_2._guide/node0509.html">OpenDevice</a>
+    io_Command      CMD_CLEAR
+    io_Flags        IOB_QUICK set if quick I/O is possible, else 0
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0094.html">exec/io.h</a>, <a href="../Includes_and_Autodocs_2._guide/node0050.html">devices/console.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

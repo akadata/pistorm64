@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/modules/ilbmw.c" NODE="MAIN" TITLE="Devices/modules/ilbmw.c" -->
+<head>
+<title>Devices/modules/ilbmw.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0300.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0302.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*----------------------------------------------------------------------*
+ * ILBMW.C  Support routines for writing ILBM files using IFFParse.
+ * (IFF is Interchange Format File.)
+ *
+ * Based on code by Jerry Morrison and Steve Shaw, Electronic Arts.
+ * This software is in the public domain.
+ *
+ * This version for the Amiga computer.
+ *----------------------------------------------------------------------*/
+
+#include &#034;iffp/ilbm.h&#034;
+#include &#034;iffp/packer.h&#034;
+
+#include &#060;graphics/gfxbase.h&#062;
+
+extern struct Library *GfxBase;
+
+/*---------- initbmhd -------------------------------------------------*/
+long initbmhd(BitMapHeader *bmhd, struct BitMap *bitmap,
+	      WORD masking, WORD compression, WORD transparentColor,
+	      WORD width, WORD height, WORD pageWidth, WORD pageHeight,
+	      ULONG modeid)
+    {
+    extern struct Library *GfxBase;
+    struct DisplayInfo DI;
+
+    WORD rowBytes = bitmap-&#062;BytesPerRow;
+
+    D(bug(&#034;In InitBMHD\n&#034;));
+
+    bmhd-&#062;w = width;
+    bmhd-&#062;h = height;
+    bmhd-&#062;x = bmhd-&#062;y = 0;	/* Default position is (0,0).*/
+    bmhd-&#062;nPlanes = bitmap-&#062;Depth;
+    bmhd-&#062;masking = masking;
+    bmhd-&#062;compression = compression;
+    bmhd-&#062;reserved1 = 0;
+    bmhd-&#062;transparentColor = transparentColor;
+    bmhd-&#062;pageWidth = pageWidth;
+    bmhd-&#062;pageHeight = pageHeight;
+
+    bmhd-&#062;xAspect = 0;	/* So we can tell when we've got it */
+    if(GfxBase-&#062;lib_Version &#062;=36)
+	{
+   	if(GetDisplayInfoData(NULL, (UBYTE *)&#038;DI,
+		sizeof(struct DisplayInfo), DTAG_DISP, modeid))
+		{
+    		bmhd-&#062;xAspect =  DI.Resolution.x;
+    		bmhd-&#062;yAspect =  DI.Resolution.y;
+		}
+	}
+
+    /* If running under 1.3 or GetDisplayInfoData failed, use old method
+     * of guessing aspect ratio
+     */
+    if(! bmhd-&#062;xAspect)
+	{
+    	bmhd-&#062;xAspect =  44;
+    	bmhd-&#062;yAspect =
+		((struct GfxBase *)GfxBase)-&#062;DisplayFlags &#038; PAL ? 44 : 52;
+    	if(modeid &#038; HIRES)	bmhd-&#062;xAspect = bmhd-&#062;xAspect &#062;&#062; 1;
+    	if(modeid &#038; LACE)	bmhd-&#062;yAspect = bmhd-&#062;yAspect &#062;&#062; 1;
+	}
+
+    return( IS_ODD(rowBytes) ? CLIENT_ERROR : IFF_OKAY );
+    }
+
+/*---------- putcmap ---------------------------------------------------*/
+/* This function will accept a table of color values in one of the
+ * following forms:
+ *  if bitspergun=4,  colortable is words, each with nibbles 0RGB
+ *  if bitspergun=8,  colortable is bytes of RGBRGB etc. (like a CMAP)
+ *  if bitspergun=32, colortable is ULONGS of RGBRGB etc.
+ *     (only the high eight bits of each gun will be written to CMAP)
+ */
+long putcmap(struct IFFHandle *iff, APTR colortable,
+	     UWORD ncolors, UWORD bitspergun)
+   {
+   long error, offs;
+   WORD  *tabw;
+   UBYTE *tab8;
+   ColorRegister cmapReg;
+
+   D(bug(&#034;In PutCMAP\n&#034;));
+
+   if((!iff)||(!colortable))	return(CLIENT_ERROR);
+
+   /* size of CMAP is 3 bytes * ncolors */
+   if(error = PushChunk(iff, NULL, ID_CMAP, ncolors * sizeofColorRegister))
+	return(error);
+
+   D(bug(&#034;Pushed ID_CMAP, error = %ld\n&#034;,error));
+
+   if(bitspergun == 4)
+	{
+   	/* Store each 4-bit value n as nn */
+	tabw = (UWORD *)colortable;
+   	for( ;  ncolors;  --ncolors )
+	    {
+      	    cmapReg.red    = ( *tabw &#062;&#062; 4 ) &#038; 0xf0;
+      	    cmapReg.red   |= (cmapReg.red &#062;&#062; 4);
+
+      	    cmapReg.green  = ( *tabw      ) &#038; 0xf0;
+      	    cmapReg.green |= (cmapReg.green &#062;&#062; 4);
+
+      	    cmapReg.blue   = ( *tabw &#060;&#060; 4 ) &#038; 0xf0;
+      	    cmapReg.blue  |= (cmapReg.blue &#062;&#062; 4);
+
+      	    if((WriteChunkBytes(iff, (BYTE *)&#038;cmapReg, sizeofColorRegister))
+                != sizeofColorRegister)
+                        return(IFFERR_WRITE);
+      	    ++tabw;
+      	    }
+	}
+   else if((bitspergun == 8)||(bitspergun == 32))
+	{
+	tab8 = (UBYTE *)colortable;
+	offs = (bitspergun == 8) ? 1 : 4;
+   	for( ;  ncolors;  --ncolors )
+	    {
+	    cmapReg.red   = *tab8;
+	    tab8 += offs;
+	    cmapReg.green = *tab8;
+	    tab8 += offs;
+	    cmapReg.blue  = *tab8;
+	    tab8 += offs;
+      	    if((WriteChunkBytes(iff, (BYTE *)&#038;cmapReg, sizeofColorRegister))
+                != sizeofColorRegister)
+                        return(IFFERR_WRITE);
+	    }
+	}
+   else (error = CLIENT_ERROR)
+
+   D(bug(&#034;Wrote registers, error = %ld\n&#034;,error));
+
+   error = PopChunk(iff);
+   return(error);
+   }
+
+/*---------- putbody ---------------------------------------------------*/
+/* NOTE: This implementation could be a LOT faster if it used more of the
+ * supplied buffer. It would make far fewer calls to IFFWriteBytes (and
+ * therefore to DOS Write). */
+long putbody(struct IFFHandle *iff, struct BitMap *bitmap, BYTE *mask,
+	     BitMapHeader *bmhd, BYTE *buffer, LONG bufsize)
+   {
+   long error;
+   LONG rowBytes = bitmap-&#062;BytesPerRow;
+   int dstDepth = bmhd-&#062;nPlanes;
+   UBYTE compression = bmhd-&#062;compression;
+   int planeCnt;		/* number of bit planes including mask */
+   register int iPlane, iRow;
+   register LONG packedRowBytes;
+   BYTE *buf;
+   BYTE *planes[MAXSAVEDEPTH + 1]; /* array of ptrs to planes &#038; mask */
+
+   D(bug(&#034;In PutBODY\n&#034;));
+
+   if ( bufsize &#060; MaxPackedSize(rowBytes)  ||	/* Must buffer a comprsd row*/
+        compression &#062; cmpByteRun1  ||		/* bad arg */
+	bitmap-&#062;Rows != bmhd-&#062;h   ||		/* inconsistent */
+	rowBytes != RowBytes(bmhd-&#062;w)  ||	/* inconsistent*/
+	bitmap-&#062;Depth &#060; dstDepth   ||		/* inconsistent */
+	dstDepth &#062; MAXSAVEDEPTH )		/* too many for this routine*/
+      return(CLIENT_ERROR);
+
+   planeCnt = dstDepth + (mask == NULL ? 0 : 1);
+
+   /* Copy the ptrs to bit &#038; mask planes into local array &#034;planes&#034; */
+   for (iPlane = 0; iPlane &#060; dstDepth; iPlane++)
+      planes[iPlane] = (BYTE *)bitmap-&#062;Planes[iPlane];
+   if (mask != NULL)
+      planes[dstDepth] = mask;
+
+   /* Write out a BODY chunk header */
+   if(error = PushChunk(iff, NULL, ID_BODY, IFFSIZE_UNKNOWN)) return(error);
+
+   /* Write out the BODY contents */
+   for (iRow = bmhd-&#062;h; iRow &#062; 0; iRow--)  {
+      for (iPlane = 0; iPlane &#060; planeCnt; iPlane++)  {
+
+         /* Write next row.*/
+         if (compression == cmpNone) {
+	    if(WriteChunkBytes(iff,planes[iPlane],rowBytes) != rowBytes)
+		error = IFFERR_WRITE;
+            planes[iPlane] += rowBytes;
+            }
+
+         /* Compress and write next row.*/
+         else {
+            buf = buffer;
+            packedRowBytes = packrow(&#038;planes[iPlane], &#038;buf, rowBytes);
+	    if(WriteChunkBytes(iff,buffer,packedRowBytes) != packedRowBytes)
+		error = IFFERR_WRITE;
+            }
+
+         if(error)	return(error);
+         }
+      }
+
+   /* Finish the chunk */
+   error = PopChunk(iff);
+   return(error);
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

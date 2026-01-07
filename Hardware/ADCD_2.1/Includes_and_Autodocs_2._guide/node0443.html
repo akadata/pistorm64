@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="FreeSprite()" TITLE="graphics.library/FreeSprite" -->
+<head>
+<title>graphics.library/FreeSprite</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0442.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0444.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    FreeSprite -- Return sprite for use by others and virtual
+                                      sprite machine.
+
+SYNOPSIS
+    FreeSprite( pick )
+                d0
+
+    void FreeSprite( WORD );
+
+FUNCTION
+    Mark sprite as available for others to use.
+    These sprite routines are provided to ease sharing of sprite
+    hardware and to handle simple cases of sprite usage and
+    movement.  It is assumed the programs that use these routines
+    do want to be good citizens in their hearts. ie: they will
+    not FreeSprite unless they actually own the sprite.
+    The Virtual Sprite machine may ignore the simple sprite machine.
+
+INPUTS
+    pick - number in range of 0-7
+
+RESULTS
+    sprite made available for subsequent callers of <a href="../Includes_and_Autodocs_2._guide/node0449.html">GetSprite</a>
+    as well as use by Virtual Sprite Machine.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0449.html">GetSprite()</a> <a href="../Includes_and_Autodocs_2._guide/node0427.html">ChangeSprite()</a> <a href="../Includes_and_Autodocs_2._guide/node045E.html">MoveSprite()</a> <a href="../Includes_and_Autodocs_2._guide/node00C5.html">graphics/sprite.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

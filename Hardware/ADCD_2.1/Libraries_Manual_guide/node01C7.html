@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-4-1" TITLE="8 / Creating Text / IntuiText Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Text / IntuiText Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01C6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01C8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To render text using Intuition, the application must create one or more
+instances of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line568">IntuiText</a> structure:
+
+    struct IntuiText
+        {
+        UBYTE FrontPen, BackPen;
+        UBYTE DrawMode;
+        WORD LeftEdge;
+        WORD TopEdge;
+        struct TextAttr *ITextFont;
+        UBYTE *IText;
+        struct IntuiText *NextText;
+        };
+
+<a name="line16">Here is a brief description of each member of the IntuiText structure:</a>
+
+FrontPen
+<a name="line19">    The pen number specifying the color used to draw the text.</a>
+
+BackPen
+    The pen number specifying the color used to draw the background for
+<a name="line23">    the text, if JAM2 drawing mode is specified.</a>
+
+DrawMode
+<a name="line26">    This field specifies one of four drawing modes:</a>
+
+    JAM1
+<a name="line29">        FrontPen is used to draw the text; background color is unchanged.</a>
+
+    JAM2
+        FrontPen is used to draw the text; background color is changed
+<a name="line33">        to the color in BackPen.</a>
+
+    COMPLEMENT
+        The characters are drawn in the complement of the colors that
+<a name="line37">        were in the background.</a>
+
+    INVERSVID
+        Inverses the draw modes describe above.  For instance INVERVID
+        used with JAM1 means the character is untouched while the
+<a name="line42">        background is filled with the color of the FrontPen.</a>
+
+LeftEdge and TopEdge
+    The location of the text relative to its base position when it is
+    drawn.  These offsets are added to the base position to determine the
+<a name="line47">    final location of the text data.</a>
+
+    The base position for text rendered with <a href="../Libraries_Manual_guide/node01C8.html">PrintIText()</a> is taken from
+    arguments passed in the function call.  For gadgets and menus, the
+    base position is always the upper, left corner of the select box.
+    For requesters the base position is always the upper, left corner of
+<a name="line53">    the requester.</a>
+
+    LeftEdge gives the offset of the left edge of the character cell and
+    TopEdge gives the offset of the top edge of the character cell for
+    the first character in the text string.  Negative values of LeftEdge
+    and TopEdge move the position up and to the left of the base
+<a name="line59">    position.  Positive values move down and to the right.</a>
+
+ITextFont
+    A pointer to a TextAttr structure defining the font to be used. Set
+<a name="line63">    this to NULL to use the default font.</a>
+
+IText
+<a name="line66">    A pointer to the NULL terminated text string to be displayed.</a>
+
+NextText
+    A pointer to another instance of IntuiText.  Set this field to NULL
+    for the last IntuiText in a list.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

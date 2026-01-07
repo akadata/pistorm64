@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_26" NODE="26-2-3-1" TITLE="26 / / Interrupt Handlers / Interrupt Handler Register Usage" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>26 / / Interrupt Handlers / Interrupt Handler Register Usage</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0309.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node030B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here are the register conventions for interrupt handlers.
+
+<a name="line4"> D0 Contains no valid information.</a>
+
+ D1 Contains the 4703 <a href="../Hardware_Manual_guide/node0164.html#line8">INTENAR</a> and <a href="../Hardware_Manual_guide/node0164.html#line17">INTREQR</a> registers values AND'ed
+    together.  This results in an indication of which interrupts are
+    enabled and active.
+
+ A0 Points to the base address of the Amiga custom chips.  This
+    information is useful for performing indexed instruction access to
+<a name="line12">    the chip registers.</a>
+
+ A1 Points to the data area specified by the <a href="../Libraries_Manual_guide/node0307.html">is_Data</a> field of the
+    <a href="../Libraries_Manual_guide/node0307.html">Interrupt</a> structure.  Because this pointer is always fetched
+    (regardless of whether you use it), it is to your advantage to make
+    some use of it.
+
+<a name="line19"> A5 Is used as a vector to your interrupt code.</a>
+
+ A6 Points to the Exec library base (SysBase).  You may use this register
+    to call Exec functions or set it up as a base register to access your
+<a name="line23">    own library or device.</a>
+
+Interrupt handlers are established by passing the Exec function
+<a href="../Includes_and_Autodocs_2._guide/node037D.html">SetIntVector()</a>, your initialized <a href="../Libraries_Manual_guide/node0307.html">Interrupt</a> structure, and the 4703
+interrupt bit number of interest.  The parameters for this function are as
+follows:
+
+<a name="line30">    SetIntVector(ULONG intNumber, struct Interrupt *interrupt)</a>
+
+The first argument is the bit number for which this interrupt server is to
+respond (example INTB_VERTB).  The possible bits for interrupts are
+defined in &#060;hardware/<a href="../Includes_and_Autodocs_2._guide/node00CE.html">intbits.h</a>&#062;.  The second argument is the address of an
+<a href="../Libraries_Manual_guide/node0307.html">interrupt server node</a> as described earlier in this chapter.  Keep in mind
+that certain interrupts are established as server chains and should not be
+accessed as handlers.
+
+The following example demonstrates initialization and installation of an
+assembler interrupt handler.  See the &#034;<a href="../Devices_Manual_guide/node0108.html">Resources</a>&#034; chapter for more
+information on allocating resources, and the &#034;<a href="../Devices_Manual_guide/node009A.html">Serial Device</a>&#034; chapter in
+the Amiga ROM Kernel Reference Manual: Devices for the more common method
+of serial communications.
+
+<a name="line45">     <a href="../Libraries_Manual_guide/node05E9.html">rbf.c</a> </a>
+
+The assembler interrupt handler code, RBFHandler, reads the complete word
+of serial input data from the serial hardware and then separates the
+character and flag bytes into separate buffers. When the buffers are full,
+the handler signals the main process causing main to print the character
+buffer contents, remove the handler, and exit.
+
+<a name="line53">     <a href="../Libraries_Manual_guide/node05EA.html">rbfhandler.asm</a> </a>
+
+    NOTE.
+    -----
+    The data structure containing the signal to use, task address
+    pointer, and buffers is allocated and initialized in main(), and
+    passed to the handler via the <a href="../Libraries_Manual_guide/node0307.html">is_Data</a> pointer of the <a href="../Libraries_Manual_guide/node0307.html">Interrupt</a>
+    structure.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

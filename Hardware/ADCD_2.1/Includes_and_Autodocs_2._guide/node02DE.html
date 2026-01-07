@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="PrintFault()" TITLE="dos.library/PrintFault" -->
+<head>
+<title>dos.library/PrintFault</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02DD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02DF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    PrintFault -- Returns the text associated with a DOS error code (V36)
+
+SYNOPSIS
+    success = PrintFault(code, header)
+    D0                    D1     D2
+
+    BOOL PrintFault(LONG, STRPTR)
+
+FUNCTION
+    This routine obtains the error message text for the given error code.
+    This is similar to the <a href="../Includes_and_Autodocs_2._guide/node02A1.html">Fault()</a> function, except that the output is
+    written to the default output channel with buffered output.
+    The value returned by <a href="../Includes_and_Autodocs_2._guide/node02C2.html">IoErr()</a> is set to the code passed in.
+
+INPUTS
+    code   - Error code
+    header - header to output before error text
+
+RESULT
+    success - Success/failure code.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02C2.html">IoErr()</a>, <a href="../Includes_and_Autodocs_2._guide/node02A1.html">Fault()</a>, <a href="../Includes_and_Autodocs_2._guide/node02F8.html">SetIoErr()</a>, <a href="../Includes_and_Autodocs_2._guide/node02D8.html">Output()</a>, <a href="../Includes_and_Autodocs_2._guide/node02AD.html">FPuts()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

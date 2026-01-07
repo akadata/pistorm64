@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-7-3" TITLE="27 / / Forming a Basic Display / Preparing the RasInfo Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Forming a Basic Display / Preparing the RasInfo Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node032E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0330.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node032B.html#line69">RasInfo</a> structure provides information to the system about the
+location of the <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> as well as the positioning of the display area as a
+window against a larger drawing area. Use the following steps to prepare
+the RasInfo structure:
+
+    /* Initialize the RasInfos. */
+    rasInfo.BitMap = &#038;bitMap;  /* Attach the corresponding BitMap.       */
+    rasInfo.RxOffset = 0;      /* Align upper left corners of display    */
+    rasInfo.RyOffset = 0;      /* with upper left corner of drawing area.*/
+    rasInfo.Next = NULL;       /* for a single playfield display, there
+<a name="line12">                                * is only one RasInfo structure present  */</a>
+
+The system may be made to reinterpret the <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line106">RxOffset</a> and <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line106">RyOffset</a> values in
+a <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>'s <a href="../Libraries_Manual_guide/node032B.html#line69">RasInfo</a> structure by calling <a href="../Includes_and_Autodocs_2._guide/node0474.html">ScrollVPort()</a> with the address
+of the ViewPort. Changing one or both offsets and calling ScrollVPort()
+has the effect of scrolling the ViewPort.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

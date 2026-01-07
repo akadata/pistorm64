@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="checkbox_gc" NODE="--datasheet--" TITLE="checkbox_gc/--datasheet--" -->
+<head>
+<title>checkbox_gc/--datasheet--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00BC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00BE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        checkbox_gc -- create checkbox BOOPSI objects
+
+<b>    SUPERCLASS</b>
+        gadgetclass
+
+<b>    REQUIRES</b>
+        bevel.image, glyph.image
+
+<b>    DESCRIPTION</b>
+        The checkbox gadget class is used to create toggling check buttons.
+        Selection of an associated option is denoted by the gadget being
+        &#034;checked&#034;, or in other words, containing a checkmark with in the
+        checkbox. Unlike GadTools, GA_Height and GA_Width DO NOT specify
+        the checkbox size, but rather the entire hit box area which
+        includes the text label. The checkbox will maintain its aspect
+        ratio when possible.
+
+        Advantages that this class provides over the standard gadtools
+        checkbox are:
+
+         &#062; Supports window relativity.
+
+         &#062; Ability to change background pen, text pen, and filltext pen.
+
+         &#062; Larger selection area, includes text label area.
+
+         &#062; Supports OS 3.0 BOOPSI <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> HelpTest.
+
+         &#062; Aspect adaptive checkbox for any resolution and font.
+
+<b>    METHODS</b>
+        OM_NEW -- Passed to superclass first, defaults set, then OM_SET.
+
+        OM_SET -- Passed to superclass first, then custom tags set &#038; render.
+
+        OM_GET -- Returns requested setting or passed to superclass
+
+        OM_UPDATE -- Passed to superclass first, then custom tags set &#038; render.
+
+        OM_NOTIFY -- <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a> set then passed to superclass.
+
+        OM_DISPOSE -- Passed to superclass.
+
+        GM_DOMAIN -- Returns aspect ratio corrected minimum and maximum
+            sizes.
+
+        GM_GOACTIVE -- Passed to superclass first, then check activated
+
+        GM_GOINACTIVE -- Passed to superclass first, then check deactivated
+
+        GM_HANDLEINPUT -- Overrides superclass.
+
+        GM_HITTEST -- Overrides superclass, returns GMR_HITTEST.
+
+        GM_RENDER -- Renders or erases checkmark glyph.
+
+        GM_DOMAIN -- Returns GDOMAIN_MINIMUM, GDOMAIN_NOMINAL and
+            GDOMAIN_MAXIMUM dimensions.
+
+        GM_KEYACTIVE -- Private method for keyboard control.
+
+        GM_KEYINACTIVE -- Private method for keyboard control.
+
+<b>    ATTRIBUTES</b>
+
+        GA_ID (WORD)
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE, OM_NOTIFY)
+
+        GA_Text (STRPTR)
+            Used to set the text label for the checkbox
+
+            Defaults to NULL.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+        GA_TextAttr (struct <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> *)
+            Used to set the text font to render the checkbox label.
+
+            Defaults to RPort-&#062;Font, which is often the screen or
+            window font.
+
+            Applicability is (OM_NEW, OM_SET)
+
+        GA_Selected (BOOL)
+            Used to set the checkmark state via application control.
+
+            Defaults to FALSE.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE, OM_NOTIFY)
+
+        GA_Disabled (BOOL)
+            Used to disable the gadget, and render a disable ghost
+            pattern of the checkbox.
+
+            Defaults to FALSE.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+        CHECKBOX_TextPen (WORD)
+            Pen number used to render the text label.
+
+            Defaults to TEXTPEN.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+        CHECKBOX_BackGroundPen (WORD)
+            Pen number used to render the gadget background.
+
+            Defaults to BACKGROUNDPEN.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+        CHECKBOX_TextPlace (WORD)
+            Location of checkbox text label. Supports:
+
+                PLACETEXT_RIGHT
+                PLACETEXT_LEFT
+
+            Defaults to PLACETEXT_RIGHT.
+
+            Applicability is (OM_NEW)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

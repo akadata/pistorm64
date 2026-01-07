@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/devices/clipboard.h" NODE="MAIN" TITLE="include/devices/clipboard.h" -->
+<head>
+<title>include/devices/clipboard.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05E8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05EA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef     DEVICES_CLIPBOARD_H
+#define     DEVICES_CLIPBOARD_H
+/*
+**	$VER: clipboard.h 36.5 (2.11.1990)
+**	Includes Release 44.1
+**
+**	clipboard.device structure definitions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef	EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+#ifndef	EXEC_NODES_H
+#include &#060;exec/nodes.h&#062;
+#endif
+#ifndef	EXEC_LISTS_H
+#include &#060;exec/lists.h&#062;
+#endif
+#ifndef	EXEC_PORTS_H
+#include &#060;exec/ports.h&#062;
+#endif
+
+#define	CBD_POST		(CMD_NONSTD+0)
+#define	CBD_CURRENTREADID	(CMD_NONSTD+1)
+#define	CBD_CURRENTWRITEID	(CMD_NONSTD+2)
+#define	CBD_CHANGEHOOK		(CMD_NONSTD+3)
+
+#define	CBERR_OBSOLETEID	1
+
+<a name="line33"></a>
+struct ClipboardUnitPartial {
+    struct  Node cu_Node;	/* list of units */
+    ULONG   cu_UnitNum;		/* unit number for this unit */
+    /* the remaining unit data is private to the device */
+};
+
+<a name="line40"></a>
+struct IOClipReq {
+    struct Message io_Message;
+    struct Device *io_Device;	/* device node pointer	*/
+    struct ClipboardUnitPartial *io_Unit; /* unit node pointer */
+    UWORD   io_Command;		/* device command */
+    UBYTE   io_Flags;		/* including QUICK and SATISFY */
+    BYTE    io_Error;		/* error or warning num */
+    ULONG   io_Actual;		/* number of bytes transferred */
+    ULONG   io_Length;		/* number of bytes requested */
+    STRPTR  io_Data;		/* either clip stream or post port */
+    ULONG   io_Offset;		/* offset in clip stream */
+    LONG    io_ClipID;		/* ordinal clip identifier */
+};
+
+#define	PRIMARY_CLIP	0	/* primary clip unit */
+<a name="line56"></a>
+struct SatisfyMsg {
+    struct Message sm_Msg;	/* the length will be 6 */
+    UWORD   sm_Unit;		/* which clip unit this is */
+    LONG    sm_ClipID;		/* the clip identifier of the post */
+};
+<a name="line62"></a>
+struct ClipHookMsg {
+    ULONG   chm_Type;		/* zero for this structure format */
+    LONG    chm_ChangeCmd;	/* command that caused this hook invocation: */
+				/*   either CMD_UPDATE or CBD_POST */
+    LONG    chm_ClipID;		/* the clip identifier of the new data */
+};
+
+#endif	/* DEVICES_CLIPBOARD_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

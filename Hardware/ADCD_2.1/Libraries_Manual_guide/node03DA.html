@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_29" NODE="29-3" TITLE="29 Graphics Library and Text / Does the Text Fit?" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>29 Graphics Library and Text / Does the Text Fit?</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03D9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03DB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node03D5.html">Text()</a> function renders its text on a single horizontal line without
+considering whether or not the text it renders will actually fit in the
+visible portion of the display area.  Although for some applications this
+behavior is acceptable, other applications, for example a word processor,
+need to render all of their text where the user can see it.  These
+applications need to measure the display area to determine how much text
+can fit along a given baseline.  The graphics.library contains several
+<a name="line9">functions that perform some of the necessary measurements:</a>
+
+    WORD TextLength( struct RastPort *my_rp, STRPTR mystring,
+                     ULONG mycount );
+
+    void TextExtent( struct RastPort *my_rp, STRPTR mystring, LONG mycount,
+<a name="line15">                     struct TextExtent *textExtent );</a>
+
+    void FontExtent( struct TextFont *font,
+                     struct TextExtent *fontExtent );
+
+    ULONG TextFit  ( struct RastPort *rp, STRPTR mystring, ULONG strLen,
+                     struct TextExtent *textExtent,
+                     struct TextExtent *constrainingExtent,
+                     LONG strDirection, ULONG constrainingBitWidth,
+                     ULONG constrainingBitHeight );
+
+The <a href="../Includes_and_Autodocs_2._guide/node0485.html">TextLength()</a> function is intended to mimic the <a href="../Libraries_Manual_guide/node03D5.html">Text()</a> function without
+rendering the text.  Using the exact same parameters as the Text()
+function, TextLength() returns the change in my_rp's current X position
+(my_rp.cp_x) that would result if the text had been rendered using the
+Text() function.  As in Text(), the mycount parameter tells how many
+characters of mystring to measure.
+
+Some fonts have characters that intrinsically render outside of the normal
+rectangular bounds.  This can result for example, from the Amiga's version
+of <a href="../Libraries_Manual_guide/node03DE.html#line139">kerning</a> (which is discussed later in this chapter) or from algorithmic
+italicizing.  In such cases, <a href="../Includes_and_Autodocs_2._guide/node0485.html">TextLength()</a> is insufficient for determining
+<a name="line37">whether a text string can fit within a given rectangular bounds.</a>
+
+The <a href="../Includes_and_Autodocs_2._guide/node0483.html">TextExtent()</a> function offers a more complete measurement of a string
+than the <a href="../Includes_and_Autodocs_2._guide/node0485.html">TextLength()</a> function.  TextExtent(), which was introduced in
+Release 2, fills in the TextExtent structure passed to it based on the
+current rendering settings in my_rp. T The TextExtent structure
+<a name="line43">&#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00A8.html#line164">text.h</a>&#062;) supplies the dimensions of mystring's bounding box:</a>
+
+    struct TextExtent {
+        UWORD   te_Width;           /* same as TextLength */
+        UWORD   te_Height;          /* same as tf_YSize   */
+        struct Rectangle te_Extent; /* relative to CP     */
+<a name="line49">    };</a>
+
+The Rectangle structure (from &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00A6.html#line28">gfx.h</a>&#062;):
+
+    struct Rectangle
+    {
+        WORD   MinX,MinY;
+        WORD   MaxX,MaxY;
+    };
+
+<a href="../Includes_and_Autodocs_2._guide/node0483.html">TextExtent()</a> fills in the <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line164">TextExtent</a> as follows:
+
+    te_Width        the same value returned by <a href="../Includes_and_Autodocs_2._guide/node0485.html">TextLength()</a>.
+
+    te_Height       the font's Y size.
+
+    te_Extent.MinX  the pixel offset from the rastport's current X position
+                    to the left side of the bounding box defined by the
+                    rectangle structure.  Normally, this is zero.
+
+    te_Extent.MinY  the distance in pixels from the baseline to the top of
+                    the bounding box.
+
+    te_Extent.MaxX  the pixel offset from the rastport's current X position
+                    to the right side of the bounding box.  Normally, this
+                    is te_Width - 1.
+
+    te_Extent.MaxY  the distance from the baseline to the bottom of the
+                    bounding box.
+
+The <a href="../Includes_and_Autodocs_2._guide/node043D.html">FontExtent()</a> function is similar to the <a href="../Includes_and_Autodocs_2._guide/node0483.html">TextExtent()</a> function.  It
+fills in a <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line164">TextExtent</a> structure that describes the bounding box of the
+largest possible single character in a particular open font, including the
+effects of kerning.  Because the FontExtent() function looks at an open
+<a href="../Libraries_Manual_guide/node03DE.html">TextFont</a> structure rather than a rastport to figure out values of the
+TextExtent structure, it cannot consider the effects of algorithmic
+styling.  Like TextExtent(), FontExtent() was introduced in Release 2, so
+it is not available under the 1.3 or earlier OS releases.
+
+The <a href="../Includes_and_Autodocs_2._guide/node0484.html">TextFit()</a> function looks at a string and returns the number of
+characters of the string that will fit into a given rectangular bounds.
+TextFit() takes the current rastport rendering settings into consideration
+when measuring the text.  Its parameters (from the prototype above) are:
+
+    my_rp                  tells which rastport to get the rendering
+                           attributes from
+
+    mystring               the string to &#034;fit&#034;
+
+    strLen                 number of characters of mystring to &#034;fit&#034;
+
+    constrainingExtent     a <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line164">TextExtent</a> describing the bounding
+                           box in which to &#034;fit&#034; mystring
+
+    strDirection           the offset to add to the string pointer to get
+                           to the next character in mystring (can be
+                           negative)
+
+    constrainingBitWidth   an alternative way to specify the width of the
+                           bounding box in which to &#034;fit&#034; mystring
+
+    constrainingBitHeight  an alternative way to specify the height of the
+                           bounding box in which to &#034;fit&#034; mystring
+
+<a href="../Includes_and_Autodocs_2._guide/node0484.html">TextFit()</a> will only pay attention to the constrainingBitWidth and
+constrainingBitHeight fields if constrainingExtent is NULL.
+
+ <a href="../Libraries_Manual_guide/node05B8.html">Text Measuring Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

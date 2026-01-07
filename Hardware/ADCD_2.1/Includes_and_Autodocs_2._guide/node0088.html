@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/initializers.i" NODE="MAIN" TITLE="Includes/exec/initializers.i" -->
+<head>
+<title>Includes/exec/initializers.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0087.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0089.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	EXEC_INITIALIZERS_I
+EXEC_INITIALIZERS_I	SET	1
+**
+**	$Filename: exec/initializers.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.5 $
+**	$Date: 90/05/10 $
+**
+**	Macros for creating InitStruct() tables
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+INITBYTE	MACRO	; &#038;offset,&#038;value
+		IFLE	(\1)-255	;If offset &#060;=255
+		DC.B	$a0,\1		;use byte offset
+		DC.B	\2,0
+		MEXIT			;exit early
+		ENDC
+		DC.B	$e0,0
+		DC.W	\1
+		DC.B	\2,0
+		ENDM
+
+INITWORD	MACRO	; &#038;offset,&#038;value
+		IFLE	(\1)-255	;If offset &#060;=255
+		DC.B	$90,\1		;use byte offset
+		DC.W	\2
+		MEXIT			;exit early
+		ENDC
+		DC.B	$d0,0
+		DC.W	\1
+		DC.W	\2
+		ENDM
+
+INITLONG	MACRO	; &#038;offset,&#038;value
+		IFLE	(\1)-255	;If offset &#060;=255
+		DC.B	$80,\1		;use byte offset
+		DC.L	\2
+		MEXIT			;exit early
+		ENDC
+		DC.B	$c0,0
+		DC.W	\1
+		DC.L	\2
+		ENDM
+
+;size=source size 0=long, 1=word, 2=byte, 3=illegal.
+;offset=offset from memory base to put data
+;value=unused
+;count=number of source items to copy, minus one
+;follow this macro with the proper sized data (dc.b,dc.w,dc.l,etc.)
+INITSTRUCT	MACRO	; &#038;size,&#038;offset,&#038;value,&#038;count
+		DS.W	0
+		IFC	'\4',''
+COUNT\@	SET	0
+		ENDC
+		IFNC	'\4',''
+COUNT\@	SET	\4
+		ENDC
+CMD\@		SET	(((\1)&#060;&#060;4)!COUNT\@)
+		IFLE	(\2)-255	;byte offset large enough?
+		DC.B	(CMD\@)!$80
+		DC.B	\2
+		MEXIT
+		ENDC
+		DC.B	CMD\@!$0C0	;byte too small, use 24-bit offset.
+		DC.B	(((\2)&#062;&#062;16)&#038;$0FF)
+		DC.W	((\2)&#038;$0FFFF)
+		ENDM
+
+	ENDC	; EXEC_INITIALIZERS_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

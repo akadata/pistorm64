@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/mathffp.c" NODE="MAIN" TITLE="lib_examples/mathffp.c" -->
+<head>
+<title>lib_examples/mathffp.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05FD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05FF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#include &#060;exec/types.h&#062;
+#include &#060;libraries/mathffp.h&#062;
+
+#include &#060;clib/mathffp_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+struct Library *MathBase;
+
+UBYTE st1[80] = &#034;3.1415926535897&#034;;
+UBYTE st2[80] = &#034;2.718281828459045&#034;;
+UBYTE st3[80], st4[80];
+
+VOID main()
+{
+FLOAT num1, num2;
+FLOAT n1, n2, n3, n4;
+LONG  exp1, exp2, exp3, exp4;
+LONG  mant1, mant2, mant3, mant4;
+LONG  place1, place2;
+
+if (MathBase = OpenLibrary(&#034;mathffp.library&#034;, 33))
+    {
+
+    n1 = afp(st1);            /* Call afp entry */
+    n2 = afp(st2);            /* Call afp entry */
+    printf(&#034;\n\nASCII %s converts to floating point %f&#034;, st1, n1);
+    printf(&#034;\nASCII %s converts to floating point %f&#034;, st2, n2);
+
+    num1 = 3.1415926535897;
+    num2 = 2.718281828459045;
+
+    exp1 = fpa(num1, st3);    /* Call fpa entry */
+    exp2 = fpa(num2, st4);    /* Call fpa entry */
+    printf(&#034;\n\nfloating point %f converts to ASCII %s&#034;, num1, st3);
+    printf(&#034;\nfloating point %f converts to ASCII %s&#034;, num2, st4);
+
+    place1 = -2;
+    place2 = -1;
+    arnd(place1, exp1, st3);    /* Call arnd entry */
+    arnd(place2, exp2, st4);    /* Call arnd entry */
+    printf(&#034;\n\nASCII round of %f to %d places yields %s&#034;, num1, place1, st3);
+    printf(&#034;\nASCII round of %f to %d places yields %s&#034;, num2, place2, st4);
+
+    exp1  = -3;   exp2  = 3;    exp3  = -3;   exp4  = 3;
+    mant1 = 12345;  mant2 = -54321;  mant3 = -12345; mant4 = 54321;
+
+    n1 = dbf(exp1, mant1);        /* Call dbf entry */
+    n2 = dbf(exp2, mant2);        /* Call dbf entry */
+    n3 = dbf(exp3, mant3);        /* Call dbf entry */
+    n4 = dbf(exp4, mant4);        /* Call dbf entry */
+    printf(&#034;\n\ndbf of exp = %d and mant = %d yields FFP number of %f&#034;, exp1, mant1, n1);
+    printf(&#034;\ndbf of exp = %d and mant = %d yields FFP number of %f&#034;, exp2, mant2, n2);
+    printf(&#034;\ndbf of exp = %d and mant = %d yields FFP number of %f&#034;, exp3, mant3, n3);
+    printf(&#034;\ndbf of exp = %d and mant = %d yields FFP number of %f&#034;, exp4, mant4, n4);
+
+    CloseLibrary(MathBase);
+    }
+else
+    printf(&#034;Can't open mathffp.library\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-1" TITLE="21 Exec Tasks / Task Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 Exec Tasks / Task Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02BA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02BC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Exec maintains task context and state information in a task-control data
+structure. Like most Exec structures, Task structures are dynamically
+linked onto various task queues through the use of an embedded Exec list
+<a name="line5"><a href="../Libraries_Manual_guide/node02D9.html#line19">Node</a> structure (see the &#034;<a href="../Libraries_Manual_guide/node02D9.html">Exec Lists and Queues</a>&#034; chapter).  Any task can</a>
+find its own task structure by calling <a href="../Libraries_Manual_guide/node02D0.html#line5">FindTask</a>(NULL).  The C-language
+form of this structure is defined in the &#060;exec/<a href="../Includes_and_Autodocs_2._guide/node008E.html#line23">tasks.h</a>&#062; include file:
+
+    struct Task  {
+        struct Node tc_Node;
+        UBYTE       tc_Flags;
+        UBYTE       tc_State;
+        BYTE        tc_IDNestCnt;   /* intr disabled nesting */
+        BYTE        tc_TDNestCnt;   /* task disabled nesting */
+        ULONG       tc_SigAlloc;    /* sigs allocated */
+        ULONG       tc_SigWait;     /* sigs we are waiting for */
+        ULONG       tc_SigRecvd;    /* sigs we have received */
+        ULONG       tc_SigExcept;   /* sigs we will take excepts for */
+<a name="line19">        UWORD       tc_TrapAlloc;   /* traps allocated */</a>
+        UWORD       tc_TrapAble;    /* traps enabled */
+        APTR        tc_ExceptData;  /* points to except data */
+        APTR        tc_ExceptCode;  /* points to except code */
+        APTR        tc_TrapData;    /* points to trap code */
+        APTR        tc_TrapCode;    /* points to trap data */
+        APTR        tc_SPReg;       /* stack pointer */
+        APTR        tc_SPLower;     /* stack lower bound */
+        APTR        tc_SPUpper;     /* stack upper bound + 2*/
+<a name="line28">        VOID      (*tc_Switch)();   /* task losing CPU */</a>
+        VOID      (*tc_Launch)();   /* task getting CPU */
+        struct List tc_MemEntry;    /* allocated memory */
+        APTR        tc_UserData;    /* per task data */
+    };
+
+A similar assembly code structure is available in the &#060;exec/<a href="../Includes_and_Autodocs_2._guide/node0092.html#line27">tasks.i</a>&#062;
+<a name="line35">include file.</a>
+
+Most of these fields are not relevant for simple tasks; they are used by
+Exec for state and administrative purposes.  A few fields, however, are
+provided for the advanced programs that support higher level environments
+(as in the case of processes) or require precise control (as in devices).
+The following sections explain these fields in more detail.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

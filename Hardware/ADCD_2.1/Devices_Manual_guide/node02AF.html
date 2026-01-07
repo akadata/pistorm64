@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_SMUS" NODE="16-5-2-2" TITLE=" Background / Tracks " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Background / Tracks </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02AE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02B0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The events in a <a href="../Devices_Manual_guide/node02AB.html">SMUS</a> score are grouped into parallel &#034;tracks&#034;.  Each track
+is a linear stream of events.
+
+Why use tracks?  Tracks serve 4 functions:
+
+  1. Tracks make it possible to encode event delays very compactly.  A
+     &#034;classical&#034; score has chorded notes and sequential notes; no
+     overlapping notes.  That is, each event begins either simultaneous
+     with or immediately following the previous event in that track.  So
+     each event delay is either 0 or the same as the event's duration.
+     This binary distinction requires only one bit of storage.
+
+  2. Tracks represent the &#034;voice tracks&#034; in Common Music Notation.  CMN
+     organizes a score in parallel staves, with one or two &#034;voice tracks&#034;
+     per staff.  So one or two <a href="../Devices_Manual_guide/node02AB.html">SMUS</a> tracks represents a
+     CMN staff.
+
+  3. Tracks are a good match to available sound hardware.  We can use
+     &#034;instrument settings&#034; in a track to store the timbre assignments for
+     that track's notes.  The instrument setting may change over the track.
+
+     Furthermore, tracks can help to allocate notes among available output
+     channels or performance devices or tape recorder &#034;tracks&#034;.  Tracks can
+     also help to adapt polyphonic data to monophonic output channels.
+
+  4. Tracks are a good match to simple sound software.  Each track is a
+     place to hold state settings like &#034;dynamic mark pp &#034;, &#034;time signature
+     3/4&#034;, &#034;mute this track&#034;, etc., just as it's a context for instrument
+     settings.  This is a lot like a text stream with running &#034;font&#034; and
+     &#034;face&#034; properties (attributes).  Running state is usually more compact
+     than, say, storing an instrument setting in every note event.  It's
+     also a useful way to organize &#034;attributes&#034; of notes.  With &#034;running
+     track state&#034; we can define new note attributes in an upward- and
+     backward-compatible way.
+
+     Running track state can be expanded (run decoded) while loading a
+     track into memory or while playing the track.  The runtime track
+     state must be reinitialized every time the score is played.
+
+Separated vs. interleaved tracks.  Multi-track data could be stored either
+as separate event streams or interleaved into one stream.  To interleave
+the streams, each event has to carry a &#034;track number&#034; attribute.
+
+If we were designing an editable score format, we might interleave the
+streams so that nearby events are stored nearby.  This helps when
+searching the data, especially if you can't fit the entire score into
+memory at once.  But it takes extra storage for the track numbers and may
+take extra work to manipulate the interleaved tracks.
+
+The musical score format FORM <a href="../Devices_Manual_guide/node02AB.html">SMUS</a> is intended for simple loading and
+playback of small scores that fit entirely in main memory.  So we chose to
+store its tracks separately.
+
+There can be up to 255 tracks in a FORM <a href="../Devices_Manual_guide/node02AB.html">SMUS</a>.  Each track is stored as a
+<a href="../Devices_Manual_guide/node02B7.html">TRAK</a> chunk.  The count of tracks (the number of TRAK chunks) is recorded
+in the <a href="../Devices_Manual_guide/node02B3.html">SHDR</a> chunk at the beginning of the FORM <a href="../Devices_Manual_guide/node02AB.html">SMUS</a>.  The TRAK chunks
+appear in numerical order 1, 2, 3, ....  This is also priority order, most
+important track first. A player program that can handle up to N parallel
+tracks should read the first N tracks and ignore any others.
+
+The different tracks in a score may have different lengths.  This is true
+both of storage length and of playback duration.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

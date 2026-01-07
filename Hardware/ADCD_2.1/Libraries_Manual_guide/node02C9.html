@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-7" TITLE="21 Exec Tasks / Processor and Cache Control" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 Exec Tasks / Processor and Cache Control</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02C8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02CA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Exec provides a number of to control the processor mode and, if available,
+the caches.  All these functions work independently of the specific M68000
+family processor type.  This enables you to write code which correctly
+controls the state of both the MC68000 and the MC68040.  Along with
+processor mode and cache control, functions are provided to obtain
+information about the condition code register (CCR) and status register
+(SR).  No functions are provided to control a paged memory management unit
+(PMMU) or floating point unit (FPU).
+
+
+          Table 21-2: Processor and Cache Control Functions
+   __________________________________________________________________
+  |                                                                  |
+  |     Function              Description                            |
+  |==================================================================|
+  |         <a href="../Libraries_Manual_guide/node02CC.html">GetCC()</a>  Get processor condition codes.                  |
+  |         <a href="../Libraries_Manual_guide/node02CB.html">SetSR()</a>  Get/set processor status register.              |
+  |    <a href="../Libraries_Manual_guide/node02CA.html#line21">SuperState()</a>  Set supervisor mode with user stack.            |
+  |    <a href="../Libraries_Manual_guide/node02CA.html#line10">Supervisor()</a>  Execute a short supervisor mode function.       |
+  |     <a href="../Libraries_Manual_guide/node02CA.html#line21">UserState()</a>  Return to user mode with user stack.            |
+  |------------------------------------------------------------------|
+  |   <a href="../Includes_and_Autodocs_2._guide/node0338.html">CacheClearE()</a>  Flush CPU instruction and/or data caches (V37). |
+  |   <a href="../Libraries_Manual_guide/node02CF.html#line45">CacheClearU()</a>  Flush CPU instruction and data caches (V37).    |
+  |  <a href="../Includes_and_Autodocs_2._guide/node033A.html">CacheControl()</a>  Global cache control (V37).                     |
+  |  <a href="../Libraries_Manual_guide/node02CE.html">CachePostDMA()</a>  Perform actions prior to hardware DMA (V37).    |
+  |   <a href="../Libraries_Manual_guide/node02CE.html">CachePreDMA()</a>  Perform actions after hardware DMA (V37).       |
+  |__________________________________________________________________|
+
+
+ <a href="../Libraries_Manual_guide/node02CA.html">Supervisor Mode</a>    <a href="../Libraries_Manual_guide/node02CC.html">Condition Code Register</a>    <a href="../Libraries_Manual_guide/node02CE.html">DMA Cache Functions</a> 
+ <a href="../Libraries_Manual_guide/node02CB.html">Status Register</a>    <a href="../Libraries_Manual_guide/node02CD.html">Cache Functions</a>            <a href="../Libraries_Manual_guide/node02CF.html">The 68040 and CPU Caches</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

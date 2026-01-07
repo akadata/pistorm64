@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="FindName()" TITLE="exec.library/FindName" -->
+<head>
+<title>exec.library/FindName</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node034D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node034F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    FindName -- find a system list node with a given name
+
+SYNOPSIS
+    node = FindName(start, name)
+    D0,Z            A0     A1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node0091.html#line23">Node</a> *FindName(struct <a href="../Includes_and_Autodocs_2._guide/node007D.html#line21">List</a> *, STRPTR);
+
+FUNCTION
+    Traverse a system list until a node with the given name is found.
+    To find multiple occurrences of a string, this function may be
+    called with a node starting point.
+
+    No arbitration is done for access to the list!  If multiple tasks
+    access the same list, an arbitration mechanism such as
+    SignalSemaphores must be used.
+
+INPUTS
+    start - a list header or a list node to start the search
+            (if node, this one is skipped)
+    name - a pointer to a name string terminated with NULL
+
+RESULTS
+    node - a pointer to the node with the same name else
+        zero to indicate that the string was not found.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

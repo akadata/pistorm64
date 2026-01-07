@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-1-30" TITLE="D / Errors / Memory Loss--Workbench Only" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D / Errors / Memory Loss--Workbench Only</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0553.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0555.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Commonly, this is caused by a failure of your code to unload after you
+exit.  Make sure that your code is being linked with a standard correct
+startup module, and do not use the <a href="../Includes_and_Autodocs_2._guide/node029F.html">Exit</a>(n) function to exit your program.
+This function will bypass your startup code's cleanup, including its
+<a href="../Libraries_Manual_guide/node02F2.html">ReplyMsg()</a> of the <a href="../Libraries_Manual_guide/node023E.html#line5">WBStartup</a> message (which would signal Workbench to
+unload your program from memory).  You should exit via either exit(n)
+where n is a valid DOS error code such as RETURN_OK (&#060;dos/<a href="../Includes_and_Autodocs_2._guide/node0068.html#line198">dos.h</a>&#062;), or via
+final &#034;}&#034; or return.  Assembler programmers using startup code can JMP to
+_exit with a long return value on stack, or use the RTS instruction.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

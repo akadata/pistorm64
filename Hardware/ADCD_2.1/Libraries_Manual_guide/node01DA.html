@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_9" NODE="9-6" TITLE="9 Intuition Input and Output Methods / IDCMP Flags" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>9 Intuition Input and Output Methods / IDCMP Flags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01D9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01DB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The application specifies the information it wants Intuition to send to it
+via the IDCMP by setting IDCMP flags.  These may be set either when
+<a name="line4">opening the window or by calling <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a>.</a>
+
+The flags set may be viewed as a filter, in that Intuition will only post
+<a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>s to an IDCMP if the matching flag is set.  Thus, the
+application will only receive the IDCMP messages whose <a href="../Libraries_Manual_guide/node01D9.html#line28">Class</a> matches one
+<a name="line9">of the bits set in the window's IDCMP.</a>
+
+For many of these messages, there is a separation of the act of filtering
+these messages and causing Intuition to send the messages in the first
+place.  For instance, menu help events may be activated for a window by
+setting the <a href="../Libraries_Manual_guide/node0125.html#line142">WA_MenuHelp</a> attribute when the window is opened.  However, the
+IDCMP will only receive the messages if the <a href="../Libraries_Manual_guide/node01DE.html#line21">IDCMP_MENUHELP</a> flag is set.
+If this flag is not set, then the events are passed downstream in the
+input and may be picked up by the console device.
+
+ <a href="../Libraries_Manual_guide/node01DB.html">Event Message Classes and Flags</a>    <a href="../Libraries_Manual_guide/node01E2.html">Verification Functions</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-3-5" TITLE="8 / Creating Borders / Border Coordinates" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Borders / Border Coordinates</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01C3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01C5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Intuition draws lines between points that are specified as sets of X, Y
+<a name="line3">coordinates.  <a href="../Libraries_Manual_guide/node01C1.html">Border</a> data does not have to be in Chip memory.</a>
+
+The <a href="../Libraries_Manual_guide/node01C1.html#line38">XY</a> field contains a pointer to an array of coordinate pairs.  All of
+these coordinates are offsets relative to the <a href="../Libraries_Manual_guide/node01C1.html">Border</a> position, which is
+determined by the sum of the external and internal position components as
+described above.  The coordinate pairs are ordered sequentially.  The
+first two numbers make up the first coordinate pair, the next two numbers
+make up the second pair, and so on.  Within a coordinate pair, the first
+number is the X offset and the second number is the Y offset.
+
+The first coordinate pair describes the starting point of the first line.
+When the <a href="../Libraries_Manual_guide/node01C1.html">Border</a> is rendered, a line is drawn between each pair of points.
+The first line is drawn from point one to point two, the second line is
+drawn from point two to point three, and so on, until the final point is
+<a name="line17">reached.</a>
+
+The numbers specified in the <a href="../Libraries_Manual_guide/node01C1.html#line38">XY</a> array may be positive or negative.
+Negative values move up and to the left relative to the <a href="../Libraries_Manual_guide/node01C1.html">Border</a> position,
+positive values move down and to the right. Again, the Border position is
+determined by adding the external position component and the internal
+position component.  For example, a Border attached to a <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> has an
+external component equal to the upper left corner of the gadget's select
+box.  The internal component is set within the Border structure itself.
+These two components are added together and offsets from the resulting
+position, specified within the XY array, determine where the lines of the
+<a name="line28">Border will appear.</a>
+
+Suppose the top left corner of the select box of the gadget is at window
+position (10,5).  If the <a href="../Libraries_Manual_guide/node01C1.html">Border</a> has <a href="../Libraries_Manual_guide/node01C1.html#line15">LeftEdge</a> set to 10 and <a href="../Libraries_Manual_guide/node01C1.html#line15">TopEdge</a> set to
+10, then the Border is positioned at (10+10,5+10), that is (20,15).  All
+<a href="../Libraries_Manual_guide/node01C1.html#line38">XY</a> coordinates will be relative to this Border position.  If the XY array
+contains `0,5, 15,5, 15,0', then the relative coordinates will be (0,5),
+(15,5) and (15,0).  Adding each coordinate to the Border position gives
+the absolute position of the lines within the window.  This Border will
+draw two lines in the window, one from (20,20) to (35,20) and the second
+from (35,20) to (35,15).
+
+
+          0    5   10   15   20   25   30   35   40   45   50
+          |         |         |         |         |         |
+       0__|____|____|____|____|____|____|____|____|____|____|
+          |   Top left corner of the
+          | gadget's select box (10,5)
+       5 _|         * _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+          |
+          |         |
+      10__|                Border          Third
+          |         |     Position       Coordinate
+          |                (20,15)      (20+15,15+0)
+      15 _|         |         *              *
+          |                                  |
+          |         |                        |
+      20__|                   *______________*
+          |         |       First          Second
+          |              Coordinate      Coordinate
+      25 _|         |    (20+0,15+5)    (20+15,15+5)
+          |
+          |         |
+      30__|
+
+
+             Figure 8-3: Example of Border Relative Position
+
+
+To create a border that is outside the select box of a gadget, specify
+negative values in the internal component or use negative values for the
+initial <a href="../Libraries_Manual_guide/node01C1.html#line38">XY</a> values.  For example, setting <a href="../Libraries_Manual_guide/node01C1.html#line15">LeftEdge</a> to -1 and <a href="../Libraries_Manual_guide/node01C1.html#line15">TopEdge</a> to -1
+moves the position of the <a href="../Libraries_Manual_guide/node01C1.html">Border</a> one pixel above and one pixel to the left
+of the gadget's select box.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

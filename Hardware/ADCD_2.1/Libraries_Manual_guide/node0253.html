@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-2-3-3" TITLE="15 / / Functions for GadTools Menus / Layout for Individual Menus" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / / Functions for GadTools Menus / Layout for Individual Menus</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0252.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0254.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Includes_and_Autodocs_2._guide/node03F7.html">LayoutMenuItems()</a> performs the same function as <a href="../Libraries_Manual_guide/node0252.html">LayoutMenus()</a>, but only
+affects the menu items and sub-items of a single menu instead of the whole
+menu strip.  Ordinarily, there is no need to call this function after
+having called LayoutMenus().  This function is useful for adding menu
+items to an extensible menu, such as the Workbench &#034;Tools&#034; menu.
+
+For example, a single <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> can be created by calling <a href="../Libraries_Manual_guide/node0251.html">CreateMenus()</a>
+with a two-entry <a href="../Libraries_Manual_guide/node024F.html">NewMenu</a> array whose first entry is of type <a href="../Libraries_Manual_guide/node024F.html#line22">NM_ITEM</a> and
+whose second is of type <a href="../Libraries_Manual_guide/node024F.html#line35">NM_END</a>.  The menu strip may then be removed and
+this new item linked to the end of an extensible menu by placing its
+address in the <a href="../Libraries_Manual_guide/node019A.html#line24">NextItem</a> field of the last MenuItem in the menu.
+<a href="../Includes_and_Autodocs_2._guide/node03F7.html">LayoutMenuItems()</a> can then be used to to recalculate the layout of just
+the items in the extensible menu and, finally, the menu strip can be
+<a name="line15">reattached to the window.</a>
+
+    BOOL LayoutMenuItemsA( struct MenuItem *firstitem, APTR vi,
+                           struct TagItem *taglist );
+    BOOL LayoutMenuItems( struct MenuItem *firstitem, APTR vi,
+                          Tag tag1, ... );
+
+Set firstitem to a pointer to the first <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> in the linked list of
+MenuItems that make up the <a href="../Libraries_Manual_guide/node0199.html">Menu</a>.  (See the &#034;<a href="../Libraries_Manual_guide/node0198.html">Intuition Menus</a>&#034; chapter for
+more about these structures.)  Set vi to the address of a <a href="../Libraries_Manual_guide/node026C.html#line12">VisualInfo</a>
+handle obtained from <a href="../Libraries_Manual_guide/node026C.html">GetVisualInfo()</a>. The tag arguments, tag1 or taglist,
+<a name="line26">may be set as follows:</a>
+
+GTMN_TextAttr
+    A pointer to an openable font (<a href="../Libraries_Manual_guide/node03D6.html#line21">TextAttr</a> structure) to be used for the
+<a name="line30">    menu item and sub-item text.  The default is to use the screen's font.</a>
+
+GTMN_Menu
+    Use this tag to provide a pointer to the <a href="../Libraries_Manual_guide/node0199.html">Menu</a> structure whose
+    <a href="../Libraries_Manual_guide/node0199.html#line51">FirstItem</a> is passed as the first parameter to this function.  This
+    tag should always be used.
+
+<a href="../Includes_and_Autodocs_2._guide/node03F7.html">LayoutMenuItems()</a> returns TRUE if it succeeds and FALSE otherwise.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

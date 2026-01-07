@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_24" NODE="24-2-4" TITLE="24 / Messages / Replying" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>24 / Messages / Replying</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02F2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02F4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When the operations associated with receiving a new message are finished,
+it is usually necessary to send the message back to the originator.  The
+receiver replies the message by returning it to the originator using the
+<a href="../Includes_and_Autodocs_2._guide/node0379.html">ReplyMsg()</a> function.  This is important because it notifies the originator
+that the message can be reused or deallocated. The ReplyMsg() function
+serves this purpose.  It returns the message to the port specified in the
+<a href="../Libraries_Manual_guide/node02EF.html#line14">mn_ReplyPort</a> field of the message.  If this field is zero, no reply is
+returned.
+
+The <a href="../Libraries_Manual_guide/node02F2.html#line5">previous example</a> can be enhanced to reply to each of its messages:
+
+    while (xymsg = GetMsg(xyport)) {
+        printf(&#034;x=%ld y=%ld\n&#034;, xymsg-&#062;xy_X, xymsg-&#062;xy_Y);
+        ReplyMsg(xymsg);
+    }
+
+Notice that the reply does not occur until after the message values have
+been used.
+
+Often the operations associated with receiving a message involve returning
+results to the originator.  Typically this is done within the message
+itself.  The receiver places the results in fields defined (or perhaps
+reused) within the message body before replying the message back to the
+originator.  Receipt of the replied message at the originator's reply port
+indicates it is once again safe for the originator to use or change the
+values found within the message.
+
+The following are two short example tasks that communicate by sending,
+waiting for and replying to messages.  Run these two programs together.
+
+     <a href="../Libraries_Manual_guide/node05E8.html">Port1.c</a>    <a href="../Libraries_Manual_guide/node05E7.html">Port2.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

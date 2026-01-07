@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_2" NODE="2-2" TITLE="2 Audio Device / Audio Device Commands and Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>2 Audio Device / Audio Device Commands and Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node001C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node001E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Command          Operation
+-------          ---------
+ <a href="../Devices_Manual_guide/node002A.html">ADCMD_ALLOCATE</a>    Allocate one or more of the four audio channels.
+
+ <a href="../Devices_Manual_guide/node0034.html">ADCMD_FINISH</a>      Abort the current write request on one or more of the
+                   channels.  Can be done immediately or at the end of the
+                   current cycle.
+
+ <a href="../Devices_Manual_guide/node002F.html">ADCMD_FREE</a>        Free one or more audio channels.
+
+ <a href="../Devices_Manual_guide/node0031.html">ADCMD_LOCK</a>        Lock one or more audio channels.
+
+ <a href="../Devices_Manual_guide/node0035.html">ADCMD_PERVOL</a>      Change the period and volume for writes in progress. Can
+                   be done immediately or at the end of the cycle.
+
+ <a href="../Devices_Manual_guide/node0030.html">ADCMD_SETPREC</a>     Set the allocation precedence of one or more channels.
+
+ <a href="../Devices_Manual_guide/node0038.html">ADCMD_WAITCYCLE</a>   Wait for the current write cycle to complete on a single
+                   channel.  Returns at the end of the cycle or immediately
+                   if no cycle is active on the channel.
+
+ <a href="../Devices_Manual_guide/node0036.html">CMD_FLUSH</a>         Purge all write cycles and waitcycles (in-progress and
+                   queued) for one or more channels.
+
+ <a href="../Devices_Manual_guide/node003B.html">CMD_READ</a>          Return a pointer to the I/O block currently writing on a
+                   single channel.
+
+ <a href="../Devices_Manual_guide/node0037.html">CMD_RESET</a>         Reset one or more channels their initialized state.  All
+                   active and queued requests will be aborted.
+
+ <a href="../Devices_Manual_guide/node003A.html">CMD_START</a>         Resume writes to one or more channels that were stopped.
+
+ <a href="../Devices_Manual_guide/node0039.html">CMD_STOP</a>          Stop any write cycle in progress on one or more
+                                   channels.
+
+ <a href="../Devices_Manual_guide/node0033.html">CMD_WRITE</a>         Start a write cycle on a single channel.
+
+
+Exec Functions as Used in This Chapter
+--------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node04A5.html">AbortIO()</a>        Abort a command to the audio device. If in progress, it
+                 is stopped immediately, otherwise it is removed from the
+                 queue.
+
+<a href="../Includes_and_Autodocs_2._guide/node04AD.html">BeginIO()</a>        Initiate a command and return immediately (asynchronous
+                 request).
+
+<a href="../Includes_and_Autodocs_2._guide/node033E.html">CheckIO()</a>        Determine the current state of an I/O request.
+
+<a href="../Includes_and_Autodocs_2._guide/node04AE.html">CloseDevice()</a>    Relinquish use of the audio device.
+
+<a href="../Includes_and_Autodocs_2._guide/node04B8.html">OpenDevice()</a>     Obtain use of the audio device.
+
+<a href="../Includes_and_Autodocs_2._guide/node038A.html">Wait()</a>           Wait for a signal from the audio device.
+
+<a href="../Includes_and_Autodocs_2._guide/node038C.html">WaitPort()</a>       Wait for the audio message port to receive a message.
+
+
+Exec Support Functions as Used in This Chapter
+----------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a>       Allocate a block of memory.
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>     Create a signal message port for reply messages from the
+                 audio device.  Exec will signal a task when a message
+                 arrives at the reply port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>     Delete the message port created by CreatePort().
+
+<a href="../Includes_and_Autodocs_2._guide/node0355.html">FreeMem()</a>        Free a block of previously allocated memory.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

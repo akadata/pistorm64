@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-10-2-3" TITLE="10 / Writing A Graphics Printer Driver / SetDensity()" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 / Writing A Graphics Printer Driver / SetDensity()</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node005D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node005F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+SetDensity() is a short function which implements multiple densities. It
+is called in the Pre-master initialization case of the Render() function.
+It is passed the density code in density_code. This is used to select the
+desired density or, if the user asked for a higher density than is
+supported, the maximum density available.  SetDensity() should also handle
+narrow and wide tractor paper sizes.
+
+Densities below 80 dpi should not be supported in SetDensity(), so that a
+minimum of 640 dots across for a standard 8.5x11-inch paper is guaranteed.
+This results in a 1:1 correspondence of dots on the printer to dots on the
+screen in standard screen sizes. The HP LaserJet is an exception to this
+rule. Its minimum density is 75 dpi because the original HP LaserJet had
+too little memory to output a full page at a higher density.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

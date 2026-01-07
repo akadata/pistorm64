@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="AllocPooled()" TITLE="exec.library/AllocPooled" -->
+<head>
+<title>exec.library/AllocPooled</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01E7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01E9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	AllocPooled -- <a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> memory with the pool manager (V39)
+
+<b>    SYNOPSIS</b>
+	memory=AllocPooled(poolHeader,memSize)
+	d0                 a0         d0
+
+	void *AllocPooled(void *,ULONG);
+
+<b>    FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> memSize bytes of memory, and return a pointer. NULL is
+	returned if the allocation fails.
+
+	Doing a <a href="../Includes_and_Autodocs_3._guide/node0202.html">DeletePool()</a> on the pool will free all of the puddles
+	and thus all of the allocations done with AllocPooled() in that
+	pool.  (No need to <a href="../Includes_and_Autodocs_3._guide/node020F.html">FreePooled()</a> each allocation)
+
+<b>    INPUTS</b>
+	memSize - the number of bytes to allocate
+	poolHeader - a specific private pool header.
+
+<b>    RESULT</b>
+	A pointer to the memory, or NULL.
+	The memory block returned is long word aligned.
+
+<b>    NOTES</b>
+	The pool function do not protect an individual pool from
+	multiple accesses.  The reason is that in most cases the pools
+	will be used by a single task.  If your pool is going to
+	be used by more than one task you must Semaphore protect
+	the pool from having more than one task trying to allocate
+	within the same pool at the same time.  Warning:  <a href="../Includes_and_Autodocs_3._guide/node020C.html">Forbid()</a>
+	protection *will not work* in the future.  *Do NOT* assume
+	that we will be able to make it work in the future.  AllocPooled()
+	may well break a <a href="../Includes_and_Autodocs_3._guide/node020C.html">Forbid()</a> and as such can only be protected
+	by a semaphore.
+
+	To track sizes yourself, the following code can be used:
+	Assumes a6=ExecBase
+
+	;
+	; Function to do AllocVecPooled(Pool,memSize)
+	;
+	AllocVecPooled:	addq.l	#4,d0		; Get space for tracking
+			move.l	d0,-(sp)	; Save the size
+			jsr	_LVOAllocPooled(a6)	; Call pool...
+			move.l	(sp)+,d1	; Get size back...
+			tst.l	d0		; Check for error
+			beq.s	avp_fail	; If NULL, failed!
+			move.l	d0,a0		; Get pointer...
+			move.l	d1,(a0)+	; Store size
+			move.l	a0,d0		; Get result
+	avp_fail:	rts			; return
+
+	;
+	; Function to do FreeVecPooled(pool,memory)
+	;
+	FreeVecPooled:	move.l	-(a1),d0	; Get size / ajust pointer
+			jmp	_LVOFreePooled(a6)
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node020F.html">FreePooled()</a>, <a href="../Includes_and_Autodocs_3._guide/node01FD.html">CreatePool()</a>, <a href="../Includes_and_Autodocs_3._guide/node0202.html">DeletePool()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

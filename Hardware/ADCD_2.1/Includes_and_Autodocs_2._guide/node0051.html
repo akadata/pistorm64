@@ -1,0 +1,255 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/inputevent.h" NODE="MAIN" TITLE="Includes/devices/inputevent.h" -->
+<head>
+<title>Includes/devices/inputevent.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0050.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0052.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DEVICES_INPUTEVENT_H
+#define DEVICES_INPUTEVENT_H
+/*
+**	$Filename: devices/inputevent.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.7 $
+**	$Date: 91/01/22 $
+**
+**	input event definitions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef DEVICES_TIMER_H
+#include &#034;devices/timer.h&#034;
+#endif
+<a name="line18"></a>
+/*----- constants --------------------------------------------------*/
+<a name="line20"></a>
+/*  --- InputEvent.ie_Class --- */
+<a name="line22">/* A NOP input event */</a>
+#define IECLASS_NULL			0x00
+<a name="line24">/* A raw keycode from the keyboard device */</a>
+#define IECLASS_RAWKEY			0x01
+<a name="line26">/* The raw mouse report from the game port device */</a>
+#define IECLASS_RAWMOUSE		0x02
+<a name="line28">/* A private console event */</a>
+#define IECLASS_EVENT			0x03
+<a name="line30">/* A Pointer Position report */</a>
+#define IECLASS_POINTERPOS		0x04
+<a name="line32">/* A timer event */</a>
+#define IECLASS_TIMER			0x06
+<a name="line34">/* select button pressed down over a Gadget (address in ie_EventAddress) */</a>
+#define IECLASS_GADGETDOWN		0x07
+<a name="line36">/* select button released over the same Gadget (address in ie_EventAddress) */</a>
+#define IECLASS_GADGETUP		0x08
+<a name="line38">/* some Requester activity has taken place.  See Codes REQCLEAR and REQSET */</a>
+#define IECLASS_REQUESTER		0x09
+<a name="line40">/* this is a Menu Number transmission (Menu number is in ie_Code) */</a>
+#define IECLASS_MENULIST		0x0A
+<a name="line42">/* User has selected the active Window's Close Gadget */</a>
+#define IECLASS_CLOSEWINDOW		0x0B
+<a name="line44">/* this Window has a new size */</a>
+#define IECLASS_SIZEWINDOW		0x0C
+<a name="line46">/* the Window pointed to by ie_EventAddress needs to be refreshed */</a>
+#define IECLASS_REFRESHWINDOW		0x0D
+<a name="line48">/* new preferences are available */</a>
+#define IECLASS_NEWPREFS		0x0E
+<a name="line50">/* the disk has been removed */</a>
+#define IECLASS_DISKREMOVED		0x0F
+<a name="line52">/* the disk has been inserted */</a>
+#define IECLASS_DISKINSERTED		0x10
+<a name="line54">/* the window is about to be been made active */</a>
+#define IECLASS_ACTIVEWINDOW		0x11
+<a name="line56">/* the window is about to be made inactive */</a>
+#define IECLASS_INACTIVEWINDOW		0x12
+<a name="line58">/* extended-function pointer position report (V36) */</a>
+#define IECLASS_NEWPOINTERPOS		0x13
+<a name="line60">/* Help key report during Menu session (V36) */</a>
+#define IECLASS_MENUHELP		0x14
+<a name="line62">/* the Window has been modified with move, size, zoom, or change (V36) */</a>
+#define	IECLASS_CHANGEWINDOW		0x15
+
+<a name="line65">/* the last class */</a>
+#define IECLASS_MAX			0x15
+
+
+/*  --- InputEvent.ie_SubClass --- */
+/*  IECLASS_NEWPOINTERPOS */
+<a name="line71">/*	like IECLASS_POINTERPOS */</a>
+#define IESUBCLASS_COMPATIBLE	0x00
+<a name="line73">/*	ie_EventAddress points to struct IEPointerPixel */</a>
+#define IESUBCLASS_PIXEL	0x01
+<a name="line75">/*	ie_EventAddress points to struct IEPointerTablet */</a>
+#define IESUBCLASS_TABLET	0x02
+
+/* pointed to by ie_EventAddress for IECLASS_NEWPOINTERPOS,
+ * and IESUBCLASS_PIXEL.
+ *
+ * You specify a screen and pixel coordinates in that screen
+ * at which you'd like the mouse to be positioned.
+ * Intuition will try to oblige, but there will be restrictions
+ * to positioning the pointer over offscreen pixels.
+ *
+ * IEQUALIFIER_RELATIVEMOUSE is supported for IESUBCLASS_PIXEL.
+<a name="line87"> */</a>
+<a name="line88">struct IEPointerPixel	{</a>
+    struct Screen	*iepp_Screen;	/* pointer to an open screen */
+<a name="line90">    struct {				/* pixel coordinates in iepp_Screen */</a>
+<a name="line91">	WORD	X;</a>
+<a name="line92">	WORD	Y;</a>
+    }			iepp_Position;
+};
+
+/* pointed to by ie_EventAddress for IECLASS_NEWPOINTERPOS,
+ * and IESUBCLASS_TABLET.
+ *
+ * You specify a range of values and a value within the range
+ * independently for each of X and Y (the minimum value of
+ * the ranges is always normalized to 0).
+ *
+ * Intuition will position the mouse proportionally within its
+ * natural mouse position rectangle limits.
+ *
+ * IEQUALIFIER_RELATIVEMOUSE is not supported for IESUBCLASS_TABLET.
+<a name="line107"> */</a>
+struct IEPointerTablet	{
+<a name="line109">    struct {</a>
+<a name="line110">	UWORD	X;</a>
+<a name="line111">	UWORD	Y;</a>
+    }			iept_Range;	/* 0 is min, these are max	*/
+<a name="line113">    struct {</a>
+<a name="line114">	UWORD	X;</a>
+<a name="line115">	UWORD	Y;</a>
+    }			iept_Value;	/* between 0 and iept_Range	*/
+<a name="line117"></a>
+    WORD		iept_Pressure;	/* -128 to 127 (unused, set to 0)  */
+};
+
+
+<a name="line122"></a>
+/*  --- InputEvent.ie_Code --- */
+<a name="line124">/*  IECLASS_RAWKEY */</a>
+<a name="line125">#define IECODE_UP_PREFIX		0x80</a>
+<a name="line126">#define IECODE_KEY_CODE_FIRST		0x00</a>
+<a name="line127">#define IECODE_KEY_CODE_LAST		0x77</a>
+<a name="line128">#define IECODE_COMM_CODE_FIRST		0x78</a>
+#define IECODE_COMM_CODE_LAST		0x7F
+
+<a name="line131">/*  IECLASS_ANSI */</a>
+<a name="line132">#define IECODE_C0_FIRST			0x00</a>
+<a name="line133">#define IECODE_C0_LAST			0x1F</a>
+<a name="line134">#define IECODE_ASCII_FIRST		0x20</a>
+<a name="line135">#define IECODE_ASCII_LAST		0x7E</a>
+<a name="line136">#define IECODE_ASCII_DEL		0x7F</a>
+<a name="line137">#define IECODE_C1_FIRST			0x80</a>
+<a name="line138">#define IECODE_C1_LAST			0x9F</a>
+<a name="line139">#define IECODE_LATIN1_FIRST		0xA0</a>
+#define IECODE_LATIN1_LAST		0xFF
+
+<a name="line142">/*  IECLASS_RAWMOUSE */</a>
+<a name="line143">#define IECODE_LBUTTON			0x68	/* also uses IECODE_UP_PREFIX */</a>
+<a name="line144">#define IECODE_RBUTTON			0x69</a>
+<a name="line145">#define IECODE_MBUTTON			0x6A</a>
+#define IECODE_NOBUTTON			0xFF
+
+<a name="line148">/*  IECLASS_EVENT (V36) */</a>
+<a name="line149">#define IECODE_NEWACTIVE		0x01	/* new active input window */</a>
+<a name="line150">#define IECODE_NEWSIZE			0x02	/* resize of window */</a>
+#define IECODE_REFRESH			0x03	/* refresh of window */
+
+/*  IECLASS_REQUESTER */
+/*	broadcast when the first Requester (not subsequent ones) opens up in */
+<a name="line155">/*	the Window */</a>
+#define IECODE_REQSET			0x01
+<a name="line157">/*	broadcast when the last Requester clears out of the Window */</a>
+#define IECODE_REQCLEAR			0x00
+
+
+<a name="line161"></a>
+<a name="line162">/*  --- InputEvent.ie_Qualifier --- */</a>
+<a name="line163">#define IEQUALIFIER_LSHIFT		0x0001</a>
+<a name="line164">#define IEQUALIFIER_RSHIFT		0x0002</a>
+<a name="line165">#define IEQUALIFIER_CAPSLOCK		0x0004</a>
+<a name="line166">#define IEQUALIFIER_CONTROL		0x0008</a>
+<a name="line167">#define IEQUALIFIER_LALT		0x0010</a>
+<a name="line168">#define IEQUALIFIER_RALT		0x0020</a>
+<a name="line169">#define IEQUALIFIER_LCOMMAND		0x0040</a>
+<a name="line170">#define IEQUALIFIER_RCOMMAND		0x0080</a>
+<a name="line171">#define IEQUALIFIER_NUMERICPAD		0x0100</a>
+<a name="line172">#define IEQUALIFIER_REPEAT		0x0200</a>
+<a name="line173">#define IEQUALIFIER_INTERRUPT		0x0400</a>
+<a name="line174">#define IEQUALIFIER_MULTIBROADCAST	0x0800</a>
+<a name="line175">#define IEQUALIFIER_MIDBUTTON		0x1000</a>
+<a name="line176">#define IEQUALIFIER_RBUTTON		0x2000</a>
+<a name="line177">#define IEQUALIFIER_LEFTBUTTON		0x4000</a>
+#define IEQUALIFIER_RELATIVEMOUSE	0x8000
+<a name="line179"></a>
+<a name="line180">#define IEQUALIFIERB_LSHIFT		0</a>
+<a name="line181">#define IEQUALIFIERB_RSHIFT		1</a>
+<a name="line182">#define IEQUALIFIERB_CAPSLOCK		2</a>
+<a name="line183">#define IEQUALIFIERB_CONTROL		3</a>
+<a name="line184">#define IEQUALIFIERB_LALT		4</a>
+<a name="line185">#define IEQUALIFIERB_RALT		5</a>
+<a name="line186">#define IEQUALIFIERB_LCOMMAND		6</a>
+<a name="line187">#define IEQUALIFIERB_RCOMMAND		7</a>
+<a name="line188">#define IEQUALIFIERB_NUMERICPAD		8</a>
+<a name="line189">#define IEQUALIFIERB_REPEAT		9</a>
+<a name="line190">#define IEQUALIFIERB_INTERRUPT		10</a>
+<a name="line191">#define IEQUALIFIERB_MULTIBROADCAST	11</a>
+<a name="line192">#define IEQUALIFIERB_MIDBUTTON		12</a>
+<a name="line193">#define IEQUALIFIERB_RBUTTON		13</a>
+<a name="line194">#define IEQUALIFIERB_LEFTBUTTON		14</a>
+#define IEQUALIFIERB_RELATIVEMOUSE	15
+<a name="line196"></a>
+/*----- InputEvent -------------------------------------------------*/
+<a name="line198"></a>
+<a name="line199">struct InputEvent {</a>
+<a name="line200">    struct  InputEvent *ie_NextEvent;	/* the chronologically next event */</a>
+<a name="line201">    UBYTE   ie_Class;			/* the input event class */</a>
+<a name="line202">    UBYTE   ie_SubClass;		/* optional subclass of the class */</a>
+<a name="line203">    UWORD   ie_Code;			/* the input event code */</a>
+    UWORD   ie_Qualifier;		/* qualifiers in effect for the event*/
+    union {
+<a name="line206">	struct {</a>
+<a name="line207">	    WORD    ie_x;		/* the pointer position for the event*/</a>
+<a name="line208">	    WORD    ie_y;</a>
+<a name="line209">	} ie_xy;</a>
+	APTR	ie_addr;		/* the event address */
+<a name="line211">	struct {</a>
+<a name="line212">	    UBYTE   ie_prev1DownCode;	/* previous down keys for dead */</a>
+<a name="line213">	    UBYTE   ie_prev1DownQual;	/*   key translation: the ie_Code */</a>
+<a name="line214">	    UBYTE   ie_prev2DownCode;	/*   &#038; low byte of ie_Qualifier for */</a>
+<a name="line215">	    UBYTE   ie_prev2DownQual;	/*   last &#038; second last down keys */</a>
+<a name="line216">	} ie_dead;</a>
+<a name="line217">    } ie_position;</a>
+    struct timeval ie_TimeStamp;	/* the system tick at the event */
+};
+<a name="line220"></a>
+<a name="line221">#define	ie_X			ie_position.ie_xy.ie_x</a>
+<a name="line222">#define	ie_Y			ie_position.ie_xy.ie_y</a>
+<a name="line223">#define	ie_EventAddress		ie_position.ie_addr</a>
+<a name="line224">#define	ie_Prev1DownCode	ie_position.ie_dead.ie_prev1DownCode</a>
+<a name="line225">#define	ie_Prev1DownQual	ie_position.ie_dead.ie_prev1DownQual</a>
+<a name="line226">#define	ie_Prev2DownCode	ie_position.ie_dead.ie_prev2DownCode</a>
+#define	ie_Prev2DownQual	ie_position.ie_dead.ie_prev2DownQual
+
+#endif	/* DEVICES_INPUTEVENT_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

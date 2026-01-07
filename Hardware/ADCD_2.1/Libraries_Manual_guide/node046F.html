@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_34" NODE="34-1-6" TITLE="34 / Keymap Functions / Details Of the Keymap Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>34 / Keymap Functions / Details Of the Keymap Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node046E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0470.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A <a href="../Includes_and_Autodocs_2._guide/node003A.html#line22">KeyMap</a> structure contains pointers to arrays which determine the
+translation from raw key codes to ANSI characters.
+
+    struct KeyMap
+        {
+        UBYTE *km_LoKeyMapTypes;
+        ULONG *km_LoKeyMap;
+        UBYTE *km_LoCapsable;
+        UBYTE *km_LoRepeatable;
+        UBYTE *km_HiKeyMapTypes;
+        ULONG *km_HiKeyMap;
+        UBYTE *km_HiCapsable;
+        UBYTE *km_HiRepeatable;
+        };
+
+ <a href="../Libraries_Manual_guide/node0470.html">LoKeyMap and HighKeyMap</a>            <a href="../Libraries_Manual_guide/node0473.html">String Output Keys</a> 
+ <a href="../Libraries_Manual_guide/node0471.html">LoKeyMapTypes and HiKeyMapTypes</a>    <a href="../Libraries_Manual_guide/node0474.html">Capsable Bit Tables</a> 
+ <a href="../Libraries_Manual_guide/node0472.html">More About Qualifiers</a>              <a href="../Libraries_Manual_guide/node0475.html">Repeatable Bit Tables</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

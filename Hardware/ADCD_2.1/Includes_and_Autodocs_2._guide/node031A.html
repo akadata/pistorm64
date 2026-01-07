@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/rexxsyslib" NODE="CreateRexxMsg()" TITLE="rexxsyslib.library/CreateRexxMsg" -->
+<head>
+<title>rexxsyslib.library/CreateRexxMsg</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0319.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node031B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CreateRexxMsg - Create an ARexx message structure
+
+SYNOPSIS
+    rexxmsg = CreateRexxMsg(port, extension, host)
+    D0,A0                   A0    A1         D0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node0127.html#line99">RexxMsg</a> *CreateRexxMsg(struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *, UBYTE *, UBYTE *);
+
+FUNCTION
+    This functions allocates an ARexx message packet.  The <a href="../Includes_and_Autodocs_2._guide/node0127.html#line99">RexxMsg</a>
+    consists of a standard EXEC message structure extended to include
+    the ARexx specific information.
+
+INPUTS
+    port - A pointer to a public or private message port.  This *MUST*
+           be a valid port as this is where the message will be replied.
+
+    extension - A pointer to a NULL terminated string that is to be used
+                as the default extension for the REXX scripts.  If this
+                is NULL, the default is &#034;REXX&#034;
+
+    host - A pointer to a NULL terminated string that is to be used
+           as the default host port.  The name must be the same as the
+           name of the public message port that is to be the default host.
+           If this field is NULL, the default is REXX.
+
+RESULTS
+    rexxmsg - A <a href="../Includes_and_Autodocs_2._guide/node0127.html#line99">RexxMsg</a> structure
+
+NOTES
+    The extension and host strings must remain valid for as long as the
+    <a href="../Includes_and_Autodocs_2._guide/node0127.html#line99">RexxMsg</a> exists as only the pointer to those strings are stored.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node031C.html">DeleteRexxMsg()</a>, <a href="../Includes_and_Autodocs_2._guide/node0318.html">ClearRexxMsg()</a>, <a href="../Includes_and_Autodocs_2._guide/node031D.html">FillRexxMsg()</a>
+
+BUGS
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

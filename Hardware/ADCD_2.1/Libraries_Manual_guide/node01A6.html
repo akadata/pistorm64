@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_7" NODE="7-2-5" TITLE="7 / True Requesters / Requester Display Position" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>7 / True Requesters / Requester Display Position</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01A5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01A7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The location of <a href="../Libraries_Manual_guide/node01A1.html">true</a> requesters may be specified in one of three ways.
+The requester may either be a constant location, which is an offset from
+the top left corner of the window; a location relative to the current
+location of the pointer; or a location relative to the center of the
+<a name="line6">window.</a>
+
+To display the requester as an offset from the upper left corner of the
+window, initialize the <a href="../Libraries_Manual_guide/node01AB.html#line39">TopEdge</a> and <a href="../Libraries_Manual_guide/node01AB.html#line39">LeftEdge</a> variables and clear the
+<a href="../Libraries_Manual_guide/node01AB.html#line113">POINTREL</a> flag.  This will create a requester with a fixed position
+relative to the upper left corner for both normal requesters and
+<a name="line12"><a href="../Libraries_Manual_guide/node01A9.html">double menu</a> requesters.</a>
+
+Displaying the requester relative to the pointer can get the user's
+attention immediately and closely associates the requester with whatever
+the user was doing just before the requester was displayed in the window.
+However, only <a href="../Libraries_Manual_guide/node01A9.html">double menu</a> requesters may be positioned relative to the
+pointer position.  See below for more information on double menu
+<a name="line19">requesters.</a>
+
+Requesters that are not <a href="../Libraries_Manual_guide/node01A9.html">double menu</a> requesters may be positioned relative
+to the center of the window on systems running Release 2 or a later
+version of the OS.  This is done by setting the <a href="../Libraries_Manual_guide/node01AB.html#line113">POINTREL</a> flag and filling
+in the relative top and left of the gadget.  Setting <a href="../Libraries_Manual_guide/node01AB.html#line48">RelTop</a> and <a href="../Libraries_Manual_guide/node01AB.html#line48">RelLeft</a> to
+zero will center the requester in the window.  Positive values of RelTop
+and RelLeft will move the requester down and to the right, negative values
+will move it up and to the left.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

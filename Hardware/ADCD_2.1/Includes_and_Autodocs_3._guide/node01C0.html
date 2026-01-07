@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="SetVBuf()" TITLE="dos.library/SetVBuf" -->
+<head>
+<title>dos.library/SetVBuf</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01BF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01C1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetVBuf -- set buffering modes and size (V39)
+
+<b>   SYNOPSIS</b>
+	error = SetVBuf(fh, buff, type, size)
+	D0		D1   D2    D3    D4
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> SetVBuf(BPTR, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, LONG)
+
+<b>   FUNCTION</b>
+	Changes the buffering modes and buffer size for a filehandle.
+	With buff == NULL, the current buffer will be deallocated and a
+	new one of (approximately) size will be allocated.  If buffer is
+	non-NULL, it will be used for buffering and must be at least
+	max(size,208) bytes long, and MUST be longword aligned.  If size
+	is -1, then only the buffering mode will be changed.
+
+	Note that a user-supplied buffer will not be freed if it is later
+	replaced by another SetVBuf() call, nor will it be freed if the
+	filehandle is closed.
+
+	Has no effect on the buffersize of filehandles that were not created
+	by <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>.
+
+<b>   INPUTS</b>
+	fh   - Filehandle
+	buff - buffer pointer for buffered I/O or NULL.  MUST be LONG-aligned!
+	type - buffering mode (see <a href="../Includes_and_Autodocs_3._guide/node065A.html">&#060;dos/stdio.h&#062;</a>)
+	size - size of buffer for buffered I/O (sizes less than 208 bytes
+	       will be rounded up to 208), or -1.
+
+<b>   RESULT</b>
+	error - 0 if successful.  NOTE: opposite of most dos functions!
+		NOTE: fails if someone has replaced the buffer without
+		using SetVBuf() - <a href="../Includes_and_Autodocs_3._guide/node01AA.html">RunCommand()</a> does this.  <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1429">Remember</a> to
+		check error before freeing user-supplied buffers!
+
+<b>   BUGS</b>
+	Not implemented until after V39.  From V36 up to V39, always
+	returned 0.
+
+<b>   SEE ALSO</b>
+	FputC(), <a href="../Includes_and_Autodocs_3._guide/node0162.html">FGetC()</a>, <a href="../Includes_and_Autodocs_3._guide/node01C6.html">UnGetC()</a>, <a href="../Includes_and_Autodocs_3._guide/node016A.html">Flush()</a>, <a href="../Includes_and_Autodocs_3._guide/node016E.html">FRead()</a>, <a href="../Includes_and_Autodocs_3._guide/node0173.html">FWrite()</a>, <a href="../Includes_and_Autodocs_3._guide/node0163.html">FGets()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node016D.html">FPuts()</a>, <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

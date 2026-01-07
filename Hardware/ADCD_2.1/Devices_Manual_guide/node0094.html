@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_4" NODE="4-7" TITLE="4 Console Device / Selecting Raw Input Events" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>4 Console Device / Selecting Raw Input Events</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0093.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0095.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+If the keyboard information - including &#034;cooked&#034; keystrokes - does not
+give you enough information about input events, you can request additional
+information from the console driver.
+
+The command to SET RAW EVENTS is formatted as:
+
+    &#060;CSI&#062;[event-types-separated-by-semicolons]{
+
+If, for example, you need to know when each key is pressed and released,
+you would request &#034;RAW keyboard input.&#034; This is done by writing
+&#034;&#060;CSI&#062;1{&#034; to the console.  In a single SET RAW EVENTS request, you can
+ask the console to set up for multiple event types at one time.  You must
+send multiple numeric parameters, separating them by semicolons (;). For
+example, to ask for gadget pressed, gadget released, and close gadget
+events, write:
+
+    &#060;CSI&#062;7;8;11{
+
+You can reset, that is, delete from reporting, one or more of the raw
+input event types by using the RESET RAW EVENTS command, in the same
+manner as the SET RAW EVENTS was used to establish them in the first
+place.  This command stream is formatted as:
+
+    &#060;CSI&#062;[event-types-separated-by-semicolons]}
+
+So, for example, you could reset all of the events set in the above
+example by transmitting the command sequence:
+
+    &#060;CSI&#062;7;8;11}
+
+   The Read Stream May Not Be Dry.
+   -------------------------------
+   There could still be pending RAW INPUT EVENTS in your read stream
+   after turning off one or more RAW INPUT EVENTS.
+
+<a name="line37">The following table lists the valid raw input event types.</a>
+
+                      RAW INPUT EVENT TYPES
+    Request                                        Request
+    Number   Description              Number     Description
+    -------  -----------              ------     -----------
+      0      No-op (used internally)    11       Close Gadget
+      1      RAW keyboard input *       12       Window resized
+      2      RAW mouse input            13       Window refreshed
+      3      Private Console Event      14       Preferences changed
+      4      Pointer position           15       Disk removed
+      5      (unused)                   16       Disk inserted
+      6      Timer                      17       Active window
+      7      Gadget pressed             18       Inactive window
+      8      Gadget released            19       New pointer position (V36)
+      9      Requester activity         20       Menu help (V36)
+      10     Menu numbers               21       Window changed (V36)
+                                                 (zoom, move)
+
+      * Note:Intuition swallows all except the select button.
+
+The event types-requester, window refreshed, active window, inactive
+window, window resized and window changed-are dispatched to the console
+unit which owns the window from which the events are generated, even if it
+is not the active (selected ) window at the time the event is generated.
+This ensures that the proper console unit is notified of those events. All
+other events are dispatched to the active console unit (if it has
+requested those events).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

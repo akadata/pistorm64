@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="GetSprite()" TITLE="graphics.library/GetSprite" -->
+<head>
+<title>graphics.library/GetSprite</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0448.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node044A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GetSprite -- Attempt to get a sprite for the simple sprite
+                                     manager.
+
+SYNOPSIS
+    Sprite_Number = GetSprite( sprite, pick )
+        d0                      a0      d0
+
+    SHORT GetSprite( struct <a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">SimpleSprite</a> *, SHORT );
+
+FUNCTION
+    Attempt to allocate one of the eight sprites for private use
+    with the simple sprite manager. This must be done before using
+    further calls to the simple sprite machine. If the programmer
+    wants to use 15 color sprites, they must allocate both sprites
+    and set the 'SPRITE_ATTACHED' bit in the odd sprite's posctldata
+    array.
+
+INPUTS
+    sprite - ptr to programmers <a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">SimpleSprite</a> structure.
+    pick - number in the range of 0-7 or
+      -1 if programmer just wants the next one.
+
+RESULTS
+    If pick is 0-7 attempt to allocate the sprite. If the sprite
+    is already allocated then return -1.
+    If pick -1 allocate the next sprite starting search at 0.
+    If no sprites are available return -1 and fill -1 in num entry
+    of <a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">SimpleSprite</a> structure.
+    If the sprite is available for allocation, mark it allocated
+    and fill in the 'num' entry of the <a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">SimpleSprite</a> structure.
+    If successful return the sprite number.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0443.html">FreeSprite()</a> <a href="../Includes_and_Autodocs_2._guide/node0427.html">ChangeSprite()</a> <a href="../Includes_and_Autodocs_2._guide/node045E.html">MoveSprite()</a> GetSprite() <a href="../Includes_and_Autodocs_2._guide/node00C5.html">graphics/sprite.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

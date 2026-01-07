@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_14" NODE="14-1" TITLE="14 Workbench and Icon Library / The Info File" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>14 Workbench and Icon Library / The Info File</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0237.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0239.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The iconic representation of Amiga filing system objects is implemented
+through .info files.  In general, for each file, disk or directory that is
+visible in the Workbench environment, there is an associated .info file
+which contains the icon imagery and other information needed by Workbench.
+
+Icons are associated with a particular file or directory by name.  For
+example, the icon for a file named myapp would be stored in a .info file
+named myapp.info in the same directory.
+
+To make your application program accessible (and visible) in the
+Workbench environment, you need only supply a .info file with
+the appropriate name and type.  The are four main types of icons
+(and .info files) used to represent Amiga filing system
+objects (Table (14-1).
+
+
+           Table 14-1: Basic Workbench Icon Types
+
+
+    Workbench          Filing                   Result When
+    Icon Type       System Object            Icon Is Activated
+    ---------       -------------            -----------------
+    Disk       The root level directory    Window opens showing files
+                                           and subdirectories
+
+    Drawer     A subdirectory              Window opens showing files
+                                           and subdirectories
+
+    Tool       An executable file          Application runs
+               (i.e., an application)
+
+    Project    A data file                 Typically, the application
+                                           that created the data file
+                                           runs and the data file is
+                                           automatically loaded into it.
+
+
+     <a href="../Libraries_Manual_guide/node05E1.html">Figure 14-1: Basic Workbench Icon Types</a> 
+
+
+Icons can be created with the IconEdit program (in the Tools directory of
+the Extras disk), or by copying an existing .info file of the correct
+type.  Icons can also be created under program control with
+<a href="../Libraries_Manual_guide/node0243.html#line4">PutDiskObject()</a>.  See the discussion of the <a href="../Libraries_Manual_guide/node0243.html">icon library functions</a> below
+for more on this.
+
+For an executable file the icon type must be set to tool.  For a data file
+the icon type must be set to project. Create icons for your application
+disk and directories too.  For a directory, the icon is stored in a .info
+file at the same level where the directory name appears (not in the
+directory itself).  The icon type should be set to drawer.  The icon for a
+disk should always be stored in a file named disk.info at the root level
+directory of the disk.  The icon type should be set to disk.  (The icon
+type can be set and the icon imagery edited with the IconEdit program.)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="Flush()" TITLE="dos.library/Flush" -->
+<head>
+<title>dos.library/Flush</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0169.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node016B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	Flush -- Flushes buffers for a buffered filehandle (V36)
+
+<b>   SYNOPSIS</b>
+	success = Flush(fh)
+	D0		D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> Flush(BPTR)
+
+<b>   FUNCTION</b>
+	Flushes any pending buffered writes to the filehandle.  All buffered
+	writes will also be flushed on <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close()</a>.  If the filehandle was being
+	used for input, it drops the buffer, and tries to <a href="../Includes_and_Autodocs_3._guide/node01AD.html">Seek()</a> back to the
+	last read position  (so subsequent reads or writes will occur at the
+	expected position in the file).
+
+<b>   INPUTS</b>
+	fh	- Filehandle to flush.
+
+<b>   RESULT</b>
+	success - Success or failure.
+
+<b>   BUGS</b>
+	Before V37 release, Flush() returned a random value.  As of V37,
+	it always returns success (this will be fixed in some future
+	release).
+
+	The V36 and V37 releases didn't properly flush filehandles which
+	have never had a buffered IO done on them.  This commonly occurs
+	on redirection of input of a command, or when opening a file for
+	input and then calling <a href="../Includes_and_Autodocs_3._guide/node014C.html">CreateNewProc()</a> with NP_Arguments, or when
+	using a new filehandle with <a href="../Includes_and_Autodocs_3._guide/node01AE.html">SelectInput()</a> and then calling
+	<a href="../Includes_and_Autodocs_3._guide/node01AA.html">RunCommand()</a>.  This is fixed in V39.  A workaround would be to
+	do <a href="../Includes_and_Autodocs_3._guide/node0162.html">FGetC()</a>, then <a href="../Includes_and_Autodocs_3._guide/node01C6.html">UnGetC()</a>, then Flush().
+
+<b>   SEE ALSO</b>
+	FputC(), <a href="../Includes_and_Autodocs_3._guide/node0162.html">FGetC()</a>, <a href="../Includes_and_Autodocs_3._guide/node01C6.html">UnGetC()</a>, <a href="../Includes_and_Autodocs_3._guide/node01AD.html">Seek()</a>, <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close()</a>, <a href="../Includes_and_Autodocs_3._guide/node014C.html">CreateNewProc()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node01AE.html">SelectInput()</a>, <a href="../Includes_and_Autodocs_3._guide/node01AA.html">RunCommand()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

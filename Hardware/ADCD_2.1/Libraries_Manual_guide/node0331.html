@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-7-5" TITLE="27 / / Forming a Basic Display / Preparing the ColorMap Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Forming a Basic Display / Preparing the ColorMap Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0330.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0332.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> is created, Copper instructions are generated to change the
+current contents of each color register just before the topmost line of a
+<a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> so that this ViewPort's color registers will be used for
+interpreting its display.  To set the color registers you create a
+<a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> for the ViewPort with <a href="../Includes_and_Autodocs_2._guide/node0445.html">GetColorMap()</a> and call <a href="../Includes_and_Autodocs_2._guide/node047C.html">SetRGB4()</a>.  Here are
+the steps used in 1.3 to initialize a ColorMap:
+
+    if( view.ColorMap=GetColorMap( 4L ) )
+<a name="line10">        LoadRGB4((&#038;viewPort, colortable, 4);</a>
+
+Under Release 2, a <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> is attached to the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> -- usually along with
+<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line49">DisplayInfo</a> and <a href="../Libraries_Manual_guide/node032C.html#line16">ViewExtra</a> -- by calling the <a href="../Libraries_Manual_guide/node0339.html#line15">VideoControl()</a> function.
+
+    /*  RGB values for the four colors used.  */
+    #define BLACK 0x000
+    #define RED   0xf00
+    #define GREEN 0x0f0
+    #define BLUE  0x00f
+
+    /*  Define some colors in an array of UWORDS.  */
+    static UWORD colortable[] = { BLACK, RED, GREEN, BLUE };
+
+    /* Fill the TagItem Data field with the address of the properly
+       initialized (including ViewPortExtra) structure to be passed to
+       VideoControl().                                                 */
+    vc[0].ti_Data = (ULONG)viewPort;
+
+    /* Init ColorMap.  2 planes deep, so 4 entries
+       (2 raised to #planes power).                */
+    if(cm = GetColorMap( 4L ) )
+    {
+        /* For applications that must be compatible with 1.3, replace  */
+        /* the next 2 lines with: viewPort.ColorMap=cm;                */
+<a name="line35">        if( VideoControl( cm , vcTags ) )</a>
+            fail(&#034;Could not attach extended structures\n&#034;);
+
+        /*  Change colors to those in colortable.  */
+        LoadRGB4(&#038;viewPort, colortable, 4);
+    }
+<a name="line41"></a>
+
+    The 4 Is For Bits, Not Entries.
+    -------------------------------
+    The 4 in the name <a href="../Includes_and_Autodocs_2._guide/node0458.html">LoadRGB4()</a> refers to the fact that each of the red,
+    green, and blue values in a color table entry consists of four bits.
+    It has nothing to do with the fact that this particular color table
+    contains four entries. The call <a href="../Includes_and_Autodocs_2._guide/node0448.html">GetRGB4()</a> returns the RGB value of a
+    single entry of a <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a>. <a href="../Includes_and_Autodocs_2._guide/node047D.html">SetRGB4CM()</a> allows individual control of
+    the entries in the ColorMap before or after linking it into the
+<a name="line51">    <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.</a>
+
+The <a href="../Includes_and_Autodocs_2._guide/node0458.html">LoadRGB4()</a> call above could be replaced with the following:
+
+    register USHORT entry;
+
+    /*  Operate on the same four ColorMap entries as above.  */
+    for (entry = 0; entry &#060; 4; entry++)
+        {
+        /* Call SetRGB4CM() with the address of the ColorMap, the entry to
+           be changed, and the Red, Green, and Blue values to be stored
+           there.
+        */
+        SetRGB4CM(viewPort.ColorMap, entry,
+        /* Extract the three color values from the one colortable entry. */
+            ((colortable[entry] &#038; 0x0f00) &#062;&#062; 8),
+                ((colortable[entry] &#038; 0x00f0) &#062;&#062; 4),
+                    (colortable[entry] &#038; 0x000f));
+        }
+
+Notice above how the four bits for each color are masked out and shifted
+right to get values from 0 to 15.
+
+    WARNING!
+    --------
+    It is important to use only the standard system <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a>-related
+    calls to access the ColorMap entries.  These calls will remain
+    compatible with recent and future enhancements to the ColorMap
+<a name="line79">    structure.</a>
+
+You might need to specify more colors in the color map than you think. If
+you use a <a href="../Libraries_Manual_guide/node0345.html">dual playfield</a> display (covered later in this chapter) with a
+depth of 1 for each of the two playfields, this means a total of four
+colors (two for each playfield). However, because playfield 2 uses color
+registers starting from number 8 on up when in dual-playfield mode, the
+color map must be initialized to contain at least 10 entries. That is, it
+must contain entries for colors 0 and 1 (for playfield 1) and color
+numbers 8 and 9 (for playfield 2). Space for sprite colors must be
+allocated as well. For Amiga system software version 1.3 and earlier, when
+in doubt, allocate a <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> with 32 entries, just in case.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_2" NODE="2-3-4-2" TITLE="2 / Audio And System I/O Functions / Wait() and WaitPort()" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>2 / Audio And System I/O Functions / Wait() and WaitPort()</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0023.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0025.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+These functions can be used to put your task to sleep while a sound plays.
+<a href="../Includes_and_Autodocs_2._guide/node038A.html">Wait()</a> takes a wake-up mask as its argument. The wake-up mask is usually
+the mp_SigBit of a <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> that you have set up to get replies back from
+<a name="line5">the audio device.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node038C.html">WaitPort()</a> will put your task to sleep while a sound plays.  The argument
+to WaitPort() is a pointer to a MsgPort that you have set up to get
+replies back from the audio device.
+
+<a href="../Includes_and_Autodocs_2._guide/node038A.html">Wait()</a> and <a href="../Includes_and_Autodocs_2._guide/node038C.html">WaitPort()</a> will not remove the message from the reply port.
+You must use <a href="../Includes_and_Autodocs_2._guide/node035A.html">GetMsg()</a> to remove it.
+
+You must always use Wait() or WaitPort() to wait for I/O to finish with
+the audio device.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

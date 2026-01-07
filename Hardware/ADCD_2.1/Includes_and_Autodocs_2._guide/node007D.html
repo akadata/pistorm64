@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/lists.h" NODE="MAIN" TITLE="Includes/exec/lists.h" -->
+<head>
+<title>Includes/exec/lists.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node007C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node007E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef EXEC_LISTS_H
+#define EXEC_LISTS_H
+/*
+**	$Filename: exec/lists.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.10 $
+**	$Date: 91/03/15 $
+**
+**	Definitions and macros for use with Exec lists
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+#endif /* EXEC_NODES_H */
+
+/*
+ *  Full featured list header.
+<a name="line21"> */</a>
+<a name="line22">struct List {</a>
+<a name="line23">   struct  Node *lh_Head;</a>
+<a name="line24">   struct  Node *lh_Tail;</a>
+<a name="line25">   struct  Node *lh_TailPred;</a>
+<a name="line26">   UBYTE   lh_Type;</a>
+   UBYTE   l_pad;
+};	/* word aligned */
+
+/*
+ * Minimal List Header - no type checking
+<a name="line32"> */</a>
+<a name="line33">struct MinList {</a>
+<a name="line34">   struct  MinNode *mlh_Head;</a>
+<a name="line35">   struct  MinNode *mlh_Tail;</a>
+   struct  MinNode *mlh_TailPred;
+};	/* longword aligned */
+
+
+/*
+ *	Check for the presence of any nodes on the given list.	These
+ *	macros are even safe to use on lists that are modified by other
+ *	tasks.	However; if something is simultaneously changing the
+ *	list, the result of the test is unpredictable.
+ *
+ *	Unless you first arbitrated for ownership of the list, you can't
+ *	_depend_ on the contents of the list.  Nodes might have been added
+ *	or removed during or after the macro executes.
+ *
+ *		if( IsListEmpty(list) )		printf(&#034;List is empty\n&#034;);
+ */
+<a name="line52">#define IsListEmpty(x) \</a>
+	( ((x)-&#062;lh_TailPred) == (struct Node *)(x) )
+
+<a name="line55">#define IsMsgPortEmpty(x) \</a>
+	( ((x)-&#062;mp_MsgList.lh_TailPred) == (struct Node *)(&#038;(x)-&#062;mp_MsgList) )
+
+
+#endif	/* EXEC_LISTS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

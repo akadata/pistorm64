@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="reaction_lib" NODE="OpenLayoutWindowTagList()" TITLE="reaction.lib/OpenLayoutWindowTagList" -->
+<head>
+<title>reaction.lib/OpenLayoutWindowTagList</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node052F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0531.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       OpenLayoutWindowTagList -- <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open</a> a window at a suitable size for layout
+       OpenLayoutWindowTags -- Varags stub for OpenLayoutWindowTagList
+
+<b>   SYNOPSIS</b>
+       window = OpenLayoutWindowTagList( layout, screen, taglist )
+
+       struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *OpenLayoutWindowTagList( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *,
+               struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *, struct TagList * )
+
+       window = OpenLayoutWindowTags( layout, screen, tag, ... )
+
+       struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *OpenLayoutWindowTags( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *,
+               struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ... )
+
+<b>   FUNCTION</b>
+       Determines the minimum size that will fit a layout and opens the window
+       at that size. The sizing limits of the window will be set according to
+       the layout's limits, and the layout will be added to the window,
+       making it relative to window size. The layout will fit the whole inner
+       size of the window. It will not be rendered, so you must call
+       <a href="../Includes_and_Autodocs_3._guide/node03DC.html">RefreshGadgets()</a>, possibly after adding your border gadgets.
+
+       This function will set InnerWidth, InnerHeight, and the screen for the
+       window. Other tags you have to pass yourself.
+
+<b>   INPUTS</b>
+       layout -- the layout hierarcy for the window
+       screen -- pointer to the screen the window will be opened on
+       taglist -- the additional tags for the window.
+
+<b>   RESULTS</b>
+       A pointer to the opened window or NULL if the open failed.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

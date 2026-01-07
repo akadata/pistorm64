@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-15" TITLE="15 / GadTools Gadgets / Restrictions on GadTools Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / GadTools Gadgets / Restrictions on GadTools Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0275.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0277.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There is a strict set of functions and operations that are permitted on
+GadTools gadgets.  Even if a technique is discovered that works for a
+particular case, be warned that it cannot be guaranteed and should not be
+used.  If the trick concocted only works most of the time, it may
+introduce subtle problems in the future.
+
+Never selectively or forcibly refresh gadgets.  The only gadget refresh
+that should ever be performed is the initial <a href="../Libraries_Manual_guide/node026F.html#line5">GT_RefreshWindow()</a> after a
+window is opened with GadTools gadgets attached.  It is also possible to
+add gadgets after the window is opened by calling AddGlist() and
+RefreshGlist() followed by GT_RefreshWindow().  These refresh functions
+should not be called at any other time.
+
+GadTools gadgets may not overlap with each other, with other gadgets or
+with other imagery.  Doing this to modify the gadget's appearance is not
+supported.
+
+GadTools gadgets may not be selectively added or removed from a window.
+This has to do with the number of Intuition gadgets that each call to
+<a href="../Libraries_Manual_guide/node025A.html">CreateGadget()</a> produces and with refresh constraints.
+
+Never use <a href="../Libraries_Manual_guide/node0147.html#line10">OnGadget()</a> or <a href="../Libraries_Manual_guide/node0147.html#line10">OffGadget()</a> or directly modify the <a href="../Libraries_Manual_guide/node014A.html#line73">GFLG_DISABLED</a>
+Flags bit.  The only approved way to disable or enable a gadget is to use
+<a href="../Libraries_Manual_guide/node025E.html">GT_SetGadgetAttrs()</a> and the GA_Disabled tag.  Those kinds of GadTools
+gadgets that do not support GA_Disabled may not be disabled (for now).
+
+The application should never write into any of the fields of the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>
+structure or any of the structures that hang off it, with the exception
+noted earlier for <a href="../Libraries_Manual_guide/node026A.html">GENERIC_KIND</a> gadgets.  Avoid making assumptions about
+the contents of these fields unless they are explicitly programmer fields
+(<a href="../Libraries_Manual_guide/node0149.html#line137">GadgetID</a> and <a href="../Libraries_Manual_guide/node0149.html#line142">UserData</a>, for example) or if they are guaranteed meaningful
+(<a href="../Libraries_Manual_guide/node0149.html#line33">LeftEdge</a>, <a href="../Libraries_Manual_guide/node0149.html#line33">TopEdge</a>, <a href="../Libraries_Manual_guide/node0149.html#line33">Width</a>, <a href="../Libraries_Manual_guide/node0149.html#line33">Height</a>, <a href="../Libraries_Manual_guide/node0149.html#line33">Flags</a>).  On occasion, the program is
+specifically invited to read a field, for example the <a href="../Libraries_Manual_guide/node016B.html#line19">StringInfo-&#062;Buffer</a>
+field.
+
+GadTools gadgets may not be made relative sized or relative positioned.
+This means that the gadget flags <a href="../Libraries_Manual_guide/node014A.html#line47">GFLG_RELWIDTH</a>, <a href="../Libraries_Manual_guide/node014A.html#line55">GFLG_RELHEIGHT</a>,
+<a href="../Libraries_Manual_guide/node014A.html#line29">GFLG_RELBOTTOM</a> and <a href="../Libraries_Manual_guide/node014A.html#line38">GFLG_RELRIGHT</a> may not be specified.  The activation
+type of the gadget may not be modified (for example changing
+<a href="../Libraries_Manual_guide/node014B.html#line9">GACT_IMMEDIATE</a> to <a href="../Libraries_Manual_guide/node014B.html#line14">GACT_RELVERIFY</a>).  The imagery or the highlighting method
+may not be changed.
+
+These restrictions are not imposed without reason; subtle or blatant
+problems may arise now or in future versions of GadTools for programs that
+violate these guidelines.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

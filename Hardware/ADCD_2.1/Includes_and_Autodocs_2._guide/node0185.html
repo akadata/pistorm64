@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/icon" NODE="DeleteDiskObject()" TITLE="icon.library/DeleteDiskObject" -->
+<head>
+<title>icon.library/DeleteDiskObject</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0184.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0186.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    DeleteDiskObject - Delete a Workbench disk object from disk.     (V37)
+
+SYNOPSIS
+    result = DeleteDiskObject(name)
+      D0                      A0
+
+    BOOL DeleteDiskObject(char *);
+
+FUNCTION
+    This routine will try to delete a Workbench disk object from disk.
+    The name parameter will have a &#034;.info&#034; postpended to it, and the
+    info file of that name will be deleted.  If the call fails,
+    it will return zero.  The reason for the failure may be obtained
+    via <a href="../Includes_and_Autodocs_2._guide/node02C2.html">IoErr()</a>.
+
+    This call also updates the Workbench screen if needed.
+
+    Using this routine protects you from any future changes to
+    the way icons are stored within the system.
+
+INPUTS
+    name -- name of the object (char *)
+
+RESULTS
+    result -- TRUE if it worked, false if not.
+
+EXAMPLE
+    error=NULL;
+
+    *Check if you have the right library version*
+
+    if (((struct <a href="../Includes_and_Autodocs_2._guide/node009C.html#line34">Library</a> *)IconBase)-&#062;lib_Version &#062; 36)
+    {
+            if (!DeleteDiskObject(name)) error=IoErr();
+    }
+    else
+    {
+            * Delete name plus &#034;.info&#034; *
+    }
+
+    if (error)
+    {
+            * Do error routine...*
+    }
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node018E.html">PutDiskObject()</a>, <a href="../Includes_and_Autodocs_2._guide/node018A.html">GetDiskObject()</a>, <a href="../Includes_and_Autodocs_2._guide/node0187.html">FreeDiskObject()</a>
+
+BUGS
+    None
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

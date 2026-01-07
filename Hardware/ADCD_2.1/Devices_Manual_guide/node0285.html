@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="MTRX-1" TITLE="MTRX.doc / Introduction " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>MTRX.doc / Introduction </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0284.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0286.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Numerical data, as it comes from the real world, is an ill-mannered beast.
+Often much is assumed about the data, such as the number of dimensions,
+formatting, compression, limits, and sizes.  As such, data is not
+portable. The MTRX FORM will both store the data, and completely describe
+its format, such that programs no longer need to guess the parameters of a
+data file.  There needs to be but one program to read ascii files and
+output MTRX IFF files.
+
+A matrix, by our definition, is composed of three types of things.
+Firstly, the atomic data, such as an integer, or floating point number.
+Secondly, arrays, which are simply lists of things which are all the same.
+Thirdly, structures, which are lists of things which are different. Both
+arrays and structures may be composed of things besides atomic data - they
+may contain other structures and arrays as well.  This concept of nesting
+structures may be repeated to any desired depth.
+
+For example, a list of data pairs could be encoded as an array of
+structures, where each structure contains two numbers.  A two-dimensional
+array is simply an array of arrays.
+
+Since space conservation is often desirable, there is provision for
+representing each number with fewer bits, and compressing the bits
+together.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

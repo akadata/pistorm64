@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-1-2" TITLE="5 / About Gadgets / Application Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / About Gadgets / Application Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0131.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0133.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Application gadgets imitate real life controls: they are the switches,
+knobs, handles and buttons of the Intuition environment.  Gadgets can be
+created with almost any imaginable type of imagery and function.  Visual
+imagery for gadgets can combine text with hand drawn imagery or lines of
+multiple colors.
+
+A gadget is created by declaring and initializing a Gadget structure as
+defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">intuition.h</a>&#062;.  See the &#034;<a href="../Libraries_Manual_guide/node0149.html">Gadget Structure</a>&#034; section
+later in this chapter for more details.
+
+Gadgets always appear in a window or requester.  All windows and
+requesters keep a list of the gadgets they contain.  Gadgets can be added
+when the window or requester is opened, or they can be added or removed
+<a name="line15">from the window or requester after it is open.</a>
+
+As with other types of input events, Intuition notifies your application
+about gadget activity by sending a message to your window's I/O channels:
+the IDCMP (<a href="../Libraries_Manual_guide/node01D6.html#line16">Window.UserPort</a>) or the console device.  The message is sent as
+an Intuition <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a> structure.  The <a href="../Libraries_Manual_guide/node01D9.html#line28">Class</a> field of this structure is
+set to <a href="../Libraries_Manual_guide/node01DD.html">IDCMP_GADGETDOWN</a> or <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> with the <a href="../Libraries_Manual_guide/node01D9.html#line73">IAddress</a> field set to
+the address of the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> that was activated.  (See the chapter on
+&#034;<a href="../Libraries_Manual_guide/node01DD.html">Intuition Input and Output Methods</a>&#034; for details.)
+
+Application gadgets can go anywhere in windows or requesters, including in
+the borders, and can be any size or shape.  When application gadgets are
+placed into the window's border at the time the window is opened,
+Intuition will adjust the border size accordingly.  Application gadgets
+are not supported in screens (although this may be simulated by placing
+the gadget in a <a href="../Libraries_Manual_guide/node0114.html">backdrop</a> window).
+
+Gadget size can be fixed, or can change relative to the window size.
+Gadget position can be set relative to either the top or bottom border,
+and either the left or right border of the window, allowing the gadget to
+move with a border as the window is sized.
+
+This flexibility provides the application designer the freedom to create
+gadgets that mimic real devices, such as light switches or joysticks, as
+well as the freedom to create controls that satisfy the unique needs of
+the application.
+
+ <a href="../Libraries_Manual_guide/node0595.html">A Simple Gadget Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="UnlockPubScreen()" TITLE="intuition.library/UnlockPubScreen" -->
+<head>
+<title>intuition.library/UnlockPubScreen</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node025C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node025E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    UnlockPubScreen -- Release lock on a public screen. (V36)
+
+SYNOPSIS
+    UnlockPubScreen( Name, [Screen] )
+                     A0    A1
+
+    VOID UnlockPubScreen( UBYTE *, struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> * );
+
+FUNCTION
+    Releases lock gotten by <a href="../Includes_and_Autodocs_2._guide/node0225.html">LockPubScreen()</a>.
+    It is best to identify the locked public screen by
+    the pointer returned from <a href="../Includes_and_Autodocs_2._guide/node0225.html">LockPubScreen()</a>.  To do this,
+    supply a NULL 'Name' pointer and the screen pointer.
+
+    In rare circumstances where it would be more convenient to pass
+    a non-NULL pointer to the public screen name string, the
+    'Screen' parameter is ignored.
+
+INPUTS
+    Name = pointer to name of public screen.  If Name is NULL,
+        then argument 'Screen' is used as a direct pointer to
+        a public screen.
+    <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> = pointer to a public screen.  Used only if Name
+        is NULL.  This pointer MUST have been returned
+        by <a href="../Includes_and_Autodocs_2._guide/node0225.html">LockPubScreen()</a>.
+        It is safe to call UnlockPubScreen() with NULL Name
+        and <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> (the function will have no effect).
+
+RESULT
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0225.html">LockPubScreen()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

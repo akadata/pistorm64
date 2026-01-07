@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="PrintFault()" TITLE="dos.library/PrintFault" -->
+<head>
+<title>dos.library/PrintFault</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node019D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node019F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	PrintFault -- Returns the text associated with a DOS error code (V36)
+
+<b>   SYNOPSIS</b>
+	success = PrintFault(code, header)
+	D0                    D1     D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> PrintFault(LONG, STRPTR)
+
+<b>   FUNCTION</b>
+	This routine obtains the error message text for the given error code.
+	This is similar to the <a href="../Includes_and_Autodocs_3._guide/node0161.html">Fault()</a> function, except that the output is
+	written to the default output channel with buffered output.
+	The value returned by <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a> is set to the code passed in.
+
+<b>   INPUTS</b>
+	code   - Error code
+	header - header to output before error text
+
+<b>   RESULT</b>
+	success - Success/failure code.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>, <a href="../Includes_and_Autodocs_3._guide/node0161.html">Fault()</a>, <a href="../Includes_and_Autodocs_3._guide/node01B8.html">SetIoErr()</a>, <a href="../Includes_and_Autodocs_3._guide/node0198.html">Output()</a>, <a href="../Includes_and_Autodocs_3._guide/node016D.html">FPuts()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

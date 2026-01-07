@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-23/ClassDoc.txt" NODE="IV-23-8" TITLE="modelclass" -->
+<head>
+<title>modelclass</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01A6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01A8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Class:                  modelclass
+Superclass:             icclass
+Description:            Provides &#034;broadcast&#034; interconnection.
+Include File:           &#060;intuition/icclass.h&#062;
+
+
+New Methods:
+------------
+
+None.
+
+
+Changed Methods:
+----------------
+
+OM_ADDMEMBER - Adds an object to the the Model's internally maintained
+broadcast list.  Anything on this list will be DISPOSED when the model
+object is disposed.
+
+
+OM_REMMEMBER - Removes objects added by OM_ADDMEMBER.
+
+
+OM_DISPOSE - Disposes members of the broadcast list as well as itself.
+
+
+OM_NOTIFY, OM_UPDATE - these behave like the icclass methods, but first
+an OM_UPDATE message is sent to all members of the object's broadcast
+list, un-mapped.  The members of the broadcast list are typically
+icclass objects, which have gadgets as their targets and appropriate
+mapping lists.  If you are creating a useful subclass, you will probably
+want to intercept OM_UPDATE, but pass OM_NOTIFY to modelclass, your
+superclass.
+
+
+Attributes:
+-----------
+
+ICA_Map, ICA_Target -  Same as for the superclass (icclass).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="SetExcept()" TITLE="exec.library/SetExcept" -->
+<head>
+<title>exec.library/SetExcept</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0236.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0238.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetExcept -- define certain signals to cause exceptions
+
+<b>   SYNOPSIS</b>
+	oldSignals = SetExcept(newSignals, signalMask)
+	D0		       D0	   D1
+
+	ULONG SetExcept(ULONG,ULONG);
+
+<b>   FUNCTION</b>
+	This function defines which of the task's signals will cause a
+	private task exception.  When any of the signals occurs the task's
+	exception handler will be dispatched.  If the signal occurred prior
+	to calling SetExcept, the exception will happen immediately.
+
+	The user function pointed to by the task's tc_ExceptCode gets
+	called as:
+
+	    newExcptSet = &#060;exceptCode&#062;(signals, exceptData),SysBase
+	    D0			       D0	A1	    A6
+
+	    signals - The set of signals that caused this exception.  These
+		Signals have been disabled from the current set of signals
+		that can cause an exception.
+
+	    exceptData - A copy of the task structure tc_ExceptData field.
+
+	    newExcptSet - The set of signals in NewExceptSet will be re-
+		enabled for exception generation.  Usually this will be the
+		same as the Signals that caused the exception.
+
+<b>   INPUTS</b>
+	newSignals - the new values for the signals specified in
+		signalMask.
+	signalMask - the set of signals to be effected
+
+<b>   RESULTS</b>
+	oldSignals - the prior exception signals
+
+<b>   EXAMPLE</b>
+	Get the current state of all exception signals:
+	    SetExcept(0,0)
+	Change a few exception signals:
+	    SetExcept($1374,$1074)
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node023D.html">Signal()</a>, <a href="../Includes_and_Autodocs_3._guide/node023A.html">SetSignal()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="ModifyProp()" TITLE="intuition.library/ModifyProp" -->
+<head>
+<title>intuition.library/ModifyProp</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0229.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node022B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ModifyProp -- Modify the current parameters of a proportional gadget.
+
+SYNOPSIS
+    ModifyProp( <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a>,
+                A0      A1      A2
+                Flags, HorizPot, VertPot, HorizBody, VertBody )
+                D0     D1        D2       D3         D4
+
+    VOID ModifyProp( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> *,
+            struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> *, UWORD, UWORD, UWORD, UWORD, UWORD );
+
+FUNCTION
+    Modifies the parameters of the specified proportional gadget.  The
+    gadget's internal state is then recalculated and the imagery
+    is redisplayed in the window or requester that contains the gadget.
+
+    The requester variable can point to a requester structure.  If the
+    gadget has the GTYP_REQGADGET flag set, the gadget is in a requester
+    and the window pointer must point to the window of the requester.
+    If this is not the gadget of a requester, the requester argument may
+    be NULL.
+
+    NOTE: this function causes all gadgets from the proportional
+    gadget to the end of the gadget list to be refreshed, for
+    reasons of compatibility.
+    For more refined display updating, use <a href="../Includes_and_Autodocs_2._guide/node022E.html">NewModifyProp()</a>.
+
+    New for V36: ModifyProp() refreshing consists of redrawing gadgets
+    completely.  <a href="../Includes_and_Autodocs_2._guide/node022E.html">NewModifyProp()</a> has changed this behavior (see
+    <a href="../Includes_and_Autodocs_2._guide/node022E.html">NewModifyProp()</a>).
+
+INPUTS
+    PropGadget = pointer to a proportional gadget
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> = pointer to the window containing the gadget or the window
+        containing the requester containing the gadget.
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> = pointer to a requester (may be NULL if this isn't
+        a requester gadget)
+    Flags = value to be stored in the Flags field of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line454">PropInfo</a>
+    HorizPot = value to be stored in the HorizPot field of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line454">PropInfo</a>
+    VertPot = value to be stored in the VertPot field of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line454">PropInfo</a>
+    HorizBody = value to be stored in the HorizBody field of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line454">PropInfo</a>
+    VertBody = value to be stored in the VertBody field of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line454">PropInfo</a>
+
+RESULT
+    None
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node022E.html">NewModifyProp()</a>
+    The Intuition Reference Manual and Amiga Rom Kernel Manual contain
+    more information on Proportional Gadgets.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

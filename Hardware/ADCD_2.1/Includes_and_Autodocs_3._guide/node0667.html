@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/gadgets/scroller.h" NODE="MAIN" TITLE="include/gadgets/scroller.h" -->
+<head>
+<title>include/gadgets/scroller.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0666.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0668.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef GADGETS_SCROLLER_H
+#define GADGETS_SCROLLER_H
+/*
+**	$VER: scroller.h 44.1 (19.10.1999)
+**	Includes Release 44.1
+**
+**  Definitions for the scroller.gadget BOOPSI class
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+/*****************************************************************************/
+
+#ifndef REACTION_REACTION_H
+#include &#060;reaction/reaction.h&#062;
+#endif
+
+#ifndef INTUITION_GADGETCLASS_H
+#include &#060;intuition/gadgetclass.h&#062;
+#endif
+
+/*****************************************************************************/
+
+/* Additional attributes defined by the scroller.gadget class
+ */
+
+#define SCROLLER_Dummy			(REACTION_Dummy+0x0005000)
+
+#define SCROLLER_Top			(SCROLLER_Dummy+1L)
+	/* (WORD) scroller Top value (Defaults to 0). */
+
+#define SCROLLER_Visible		(SCROLLER_Dummy+2L)
+	/* (WORD) visible part of total. */
+
+#define SCROLLER_Total			(SCROLLER_Dummy+3L)
+	/* (WORD) total scroller size. */
+
+#define SCROLLER_Orientation	(SCROLLER_Dummy+4L)
+	/* (WORD) Vertical or Horizontal mode. */
+
+#define SCROLLER_Arrows			(SCROLLER_Dummy+5L)
+	/* (BOOL) Render arrows. */
+
+#define SCROLLER_Stretch		(SCROLLER_Dummy+6L)
+	/* (BOOL) AutoExpand/Stretch Total. */
+
+#define SCROLLER_ArrowDelta		(SCROLLER_Dummy+7L)
+	/* (WORD) Change arrow click makes. */
+
+#define SCROLLER_SignalTask		(SCROLLER_Dummy+10L)
+	/* (struct Task *) Signal this Task while scroller is active */
+
+#define SCROLLER_SignalTaskBit	(SCROLLER_Dummy+11L)
+	/* (ULONG) Signal with this Bit. */
+
+/*****************************************************************************/
+
+/* SCROLLER_Orientation Modes
+ */
+
+#define SORIENT_HORIZ	FREEHORIZ
+#define SORIENT_VERT	FREEVERT
+
+#define SCROLLER_HORIZONTAL	SORIENT_HORIZ
+#define SCROLLER_VERTICAL	SORIENT_VERT
+
+#endif /* GADGETS_SCROLLER_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

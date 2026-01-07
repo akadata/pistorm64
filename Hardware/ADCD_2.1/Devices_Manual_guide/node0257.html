@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="DR2D-1-2-2" TITLE="The Object Attribute Chunks / BBOX " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>The Object Attribute Chunks / BBOX </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0256.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0258.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+BBOX (0x42424F48)   	/* Bounding box of next object in FORM */
+
+The BBOX chunk supplies the dimensions and position of a bounding box
+surrounding the DR2D object that follows this chunk in the FORM.  A BBOX
+chunk can apply to a FILL or AROW as well as a DR2D object.  The BBOX
+chunk appears just before its DR2D object, FILL, or AROW chunk.
+
+   struct BBOXstruct {
+       ULONG       ID;
+       ULONG       Size;
+       IEEE                XMin, YMin,     /* Bounding box of obj. */
+                           XMax, YMax;     /* including line width */
+   };
+
+In a Cartesian coordinate system, the point (XMin, YMin) is the
+coordinate of the lower left hand corner of the bounding box and
+(XMax, YMax) is the upper right.  These coordinates take into
+consideration the width of the lines making up the bounding box.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

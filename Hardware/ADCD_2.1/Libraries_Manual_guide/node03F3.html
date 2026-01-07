@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-6-4" TITLE="30 / / Creating and Using Layers / Allocating and Deallocating Layers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / / Creating and Using Layers / Allocating and Deallocating Layers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03F2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03F4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Layers are created using the routines <a href="../Includes_and_Autodocs_2._guide/node0393.html">CreateUpfrontLayer()</a>
+and <a href="../Includes_and_Autodocs_2._guide/node0391.html">CreateBehindLayer()</a>.  CreateUpfrontLayer()
+creates a layer that will appear in front of any existing layers.
+
+    struct Layer *CreateUpfrontLayer( struct Layer_Info *li,
+                                      struct BitMap *bm,
+                                      long x0, long y0, long x1, long y1,
+<a name="line9">                                      long flags, struct BitMap *bm2 );</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0391.html">CreateBehindLayer()</a> creates a layer that appears behind existing layers,
+but in front of <a href="../Libraries_Manual_guide/node03EA.html">backdrop</a> layers.
+
+    struct Layer *CreateBehindLayer( struct Layer_Info *li,
+                                     struct BitMap *bm,
+                                     long x0, long y0, long x1, long y1,
+                                     long flags, struct BitMap *bm2 );
+
+Both of these routines return a pointer to a <a href="../Libraries_Manual_guide/node03E4.html">Layer</a> data structure (as
+defined in the include file &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">layers.h</a>&#062;), or NULL if the operation
+<a name="line21">was unsuccessful.</a>
+
+    A New Layer Also Gets a RastPort.
+    ---------------------------------
+    When a layer is created, the routine automatically creates a
+    <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> to go along with it.  If the layer's RastPort is passed
+    to the drawing routines, drawing will be restricted to the layer.
+<a name="line28">    See &#034;<a href="../Libraries_Manual_guide/node03E5.html">The Layer's RastPort</a>&#034; section above.</a>
+
+Use the <a href="../Includes_and_Autodocs_2._guide/node0394.html">DeleteLayer()</a> call to remove a layer:
+
+    LONG DeleteLayer( long dummy, struct Layer *layer );
+
+<a href="../Includes_and_Autodocs_2._guide/node0394.html">DeleteLayer()</a> removes a layer from the layer list and frees the memory
+allocated by the layer creation calls listed above.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

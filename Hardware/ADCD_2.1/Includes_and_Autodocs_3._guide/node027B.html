@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="gadtools" NODE="GetVisualInfoA()" TITLE="gadtools.library/GetVisualInfoA" -->
+<head>
+<title>gadtools.library/GetVisualInfoA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node027A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node027C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetVisualInfoA -- get information GadTools needs for visuals. (V36)
+	GetVisualInfo -- varargs stub for GetVisualInfoA(). (V36)
+
+<b>   SYNOPSIS</b>
+	vi = GetVisualInfoA(screen, tagList)
+	D0                  A0      A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> vi = GetVisualInfoA(struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	vi = GetVisualInfo(screen, firsttag, ...)
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> vi = GetVisualInfo(struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...);
+
+<b>   FUNCTION</b>
+	Get a pointer to a (private) block of data containing various bits
+	of information that GadTools needs to ensure the best quality
+	visuals.  Use the result in the <a href="../Includes_and_Autodocs_3._guide/node062A.html#line82">NewGadget</a> structure of any gadget
+	you create, or as a parameter to the various menu calls.  Once the
+	gadgets/menus are no longer needed (after the last CloseWindow),
+	call <a href="../Includes_and_Autodocs_3._guide/node027A.html">FreeVisualInfo()</a>.
+
+<b>   INPUTS</b>
+	screen - pointer to the screen you will be opening on. This parameter
+		 may be NULL, in which case this function fails.
+	tagList - pointer to an array of tags providing optional extra
+		  parameters, or NULL.
+
+<b>   TAGS</b>
+	There are currently no tags defined for this function.
+
+<b>   RESULT</b>
+	vi - pointer to private data, or NULL for failure
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node027A.html">FreeVisualInfo()</a>, <a href="../Includes_and_Autodocs_3._guide/node03C1.html">intuition/LockPubScreen()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node03FE.html">intuition/UnlockPubScreen()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

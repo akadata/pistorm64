@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/utility" NODE="NextTagItem()" TITLE="utility.library/NextTagItem" -->
+<head>
+<title>utility.library/NextTagItem</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03D9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03DB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    NextTagItem -- Iterate <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> lists. (V36)
+
+SYNOPSIS
+    next_tag = NextTagItem( tagItemPtr )
+    D0                      A0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *NextTagItem( struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> **tagItemPtr );
+
+FUNCTION
+    Iterates through a (chained) array of <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> structures,
+    skipping and chaining as dictated by system tags.  TAG_SKIP
+    will cause it to skip the entry and the next, TAG_IGNORE ignores
+    that single entry, and TAG_MORE has a pointer to another array
+    of tags (and terminates the current array!)  TAG_DONE also
+    terminates the current array.  Each call returns either the next
+    tagitem you should examine, or NULL at the end.
+
+INPUTS
+    tagItemPtr      - doubly-indirect reference to a <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> structure.
+                      The pointer will be changed to keep track of the
+                      iteration.
+
+RESULT
+    next_tag        - Each <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> in the array or chain of arrays that
+                      should be processed according to system Tag values
+                      (in <a href="../Includes_and_Autodocs_2._guide/node012E.html">utility/tagitem.h)</a> is returned in turn with
+                      successive calls.
+
+EXAMPLE
+    Iterate( struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *tags );
+    {
+            struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *tstate;
+            struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *tag;
+
+            tstate = tags;
+            while ( tag = NextTagItem( &#038;tstate ) )
+            {
+                    switch ( tag-&#062;ti_Tag )
+                    {
+                    case TAG1:
+                        ...
+                        break;
+                    case TAG2:
+                        ...
+                        break;
+                    ...
+                    }
+            }
+    }
+
+NOTES
+    Do NOT use the value of *tagItemPtr, but rather use the pointer
+    returned by NextTagItem().
+
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node012E.html">utility/tagitem.h</a>, <a href="../Includes_and_Autodocs_2._guide/node03D8.html">GetTagData()</a>, <a href="../Includes_and_Autodocs_2._guide/node03DB.html">PackBoolTags()</a>, <a href="../Includes_and_Autodocs_2._guide/node03D6.html">FindTagItem()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

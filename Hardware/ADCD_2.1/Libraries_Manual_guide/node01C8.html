@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-4-2" TITLE="8 / Creating Text / Directly Drawing the IntuiText" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Text / Directly Drawing the IntuiText</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01C7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01C9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Use the <a href="../Includes_and_Autodocs_2._guide/node023D.html">PrintIText()</a> call to directly draw the text into the target
+<a href="../Libraries_Manual_guide/node034A.html">RastPort</a> of a window or screen.
+
+    void PrintIText( struct RastPort *rp, struct IntuiText *iText,
+                     long left, long top );
+
+The rp argument is a pointer to the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> into which the text should be
+<a name="line9">drawn.  This RastPort can come from a <a href="../Libraries_Manual_guide/node0121.html">Window</a> or <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a> structure.</a>
+
+The iText argument is a pointer to a list of <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structures which
+are to be rendered.  The list may contain a single IntuiText structure.
+If the font is not specified in the IntuiText structure, Intuition will
+<a name="line14">render the text using the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>'s font.</a>
+
+The left and top arguments give the external component, or base position
+for this list of <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structures.  The <a href="../Libraries_Manual_guide/node01C7.html#line42">LeftEdge</a> and <a href="../Libraries_Manual_guide/node01C7.html#line42">TopEdge</a> values in
+each IntuiText structure are added to these to determine the final
+position of the text.
+
+<a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> objects may also be drawn indirectly by attaching them to
+gadgets, menus or requesters.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="SetRPAttrA()" TITLE="graphics.library/SetRPAttrA" -->
+<head>
+<title>graphics.library/SetRPAttrA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node032B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node032D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       SetRPAttrA -- modify rastport settings via a tag list
+	SetRPAttrs  -- varargs stub for SetRPAttrA
+
+<b>   SYNOPSIS</b>
+       SetRPAttrA(rp,tags)
+                  a0   a1
+
+	void SetRPAttrA(struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	SetRPAttrs(rp,tag,...);
+
+<b>   FUNCTION</b>
+       Modify settings of a rastport, based on the taglist passed.
+	currently available tags are:
+
+		RPTAG_Font		Font for <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text()</a>
+		RPTAG_SoftStyle		style for text (see <a href="../Includes_and_Autodocs_3._guide/node05EC.html">graphics/text.h)</a>
+		RPTAG_APen		Primary rendering pen
+		RPTAG_BPen		Secondary rendering pen
+		RPTAG_DrMd 		Drawing mode (see <a href="../Includes_and_Autodocs_3._guide/node05D7.html">graphics/rastport.h)</a>
+		RPTAG_OutLinePen 	Area Outline pen
+		RPTAG_WriteMask 	Bit Mask for writing.
+		RPTAG_MaxPen 		Maximum pen to render (see <a href="../Includes_and_Autodocs_3._guide/node0324.html">SetMaxPen()</a>)
+
+<b>   INPUTS</b>
+	rp - pointer to the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> to modify.
+	tags - a standard tag list
+
+<b>   RESULT</b>
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0323.html">SetFont()</a> <a href="../Includes_and_Autodocs_3._guide/node032D.html">SetSoftStyle()</a> <a href="../Includes_and_Autodocs_3._guide/node031E.html">SetAPen()</a> <a href="../Includes_and_Autodocs_3._guide/node031F.html">SetBPen()</a> <a href="../Includes_and_Autodocs_3._guide/node0322.html">SetDrMd()</a> SetOutLinePen()
+	<a href="../Includes_and_Autodocs_3._guide/node032E.html">SetWriteMask()</a> <a href="../Includes_and_Autodocs_3._guide/node0324.html">SetMaxPen()</a> <a href="../Includes_and_Autodocs_3._guide/node02EB.html">GetRPAttrA()</a> <a href="../Includes_and_Autodocs_3._guide/node0663.html">graphics/rpattr.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

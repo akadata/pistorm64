@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="VPrintf()" TITLE="dos.library/VPrintf" -->
+<head>
+<title>dos.library/VPrintf</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01CD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01CF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	VPrintf -- format and print string (buffered) (V36)
+
+<b>   SYNOPSIS</b>
+	count = VPrintf(fmt, argv)
+	  D0            D1   D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> VPrintf(STRPTR, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> *)
+
+	count = Printf(fmt, ...)
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> Printf(STRPTR, ...)
+
+<b>   FUNCTION</b>
+	Writes the formatted string and values to <a href="../Includes_and_Autodocs_3._guide/node0198.html">Output()</a>.  This routine is
+	assumed to handle all internal buffering so that the formatting string
+	and resultant formatted values can be arbitrarily long.  Any secondary
+	error code is returned in <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>.  This routine is buffered.
+
+	Note: <a href="../Includes_and_Autodocs_3._guide/node0227.html">RawDoFmt</a> assumes 16 bit ints, so you will usually need 'l's in
+	your formats (ex: %ld versus %d).
+
+<b>   INPUTS</b>
+	fmt   - exec.library <a href="../Includes_and_Autodocs_3._guide/node0227.html">RawDoFmt()</a> style formatting string
+	argv  - Pointer to array of formatting values
+
+<b>   RESULT</b>
+	count - Number of bytes written or -1 (EOF) for an error
+
+<b>   BUGS</b>
+	The prototype for Printf() currently forces you to cast the first
+	varargs parameter to <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> due to a deficiency in the program
+	that generates fds, prototypes, and amiga.lib stubs.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01CC.html">VFPrintf()</a>, <a href="../Includes_and_Autodocs_3._guide/node01CD.html">VFWritef()</a>, <a href="../Includes_and_Autodocs_3._guide/node0227.html">RawDoFmt()</a>, <a href="../Includes_and_Autodocs_3._guide/node016C.html">FPutC()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

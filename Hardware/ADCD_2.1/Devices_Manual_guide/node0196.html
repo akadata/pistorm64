@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Simple_Timer.c" NODE="MAIN" TITLE="Devices/Dev_examples/Simple_Timer.c" -->
+<head>
+<title>Devices/Dev_examples/Simple_Timer.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0195.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0197.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* Simple_Timer.c
+ *
+ * A simple example of using the timer device.
+ *
+ * Compile with SAS C 5.10: LC -b1 -cfistq -v -y -L
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/io.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;devices/timer.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }     /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+/* Our timer sub-routines */
+void delete_timer  (struct timerequest *);
+LONG get_sys_time  (struct timeval *);
+LONG set_new_time  (LONG);
+void wait_for_timer(struct timerequest *, struct timeval *);
+LONG time_delay    ( struct timeval *, LONG );
+struct timerequest *create_timer( ULONG );
+void show_time     (ULONG);
+
+struct Library *TimerBase;      /* to get at the time comparison functions */
+
+/* manifest constants -- &#034;will never change&#034; */
+#define   SECSPERMIN   (60)
+#define   SECSPERHOUR  (60*60)
+#define   SECSPERDAY   (60*60*24)
+
+void main(int argc,char **argv)
+{
+LONG seconds;
+struct timerequest *tr;      /* IO block for timer commands */
+struct timeval oldtimeval;   /* timevals to store times     */
+struct timeval mytimeval;
+struct timeval currentval;
+
+printf(&#034;\nTimer test\n&#034;);
+
+/* sleep for two seconds */
+currentval.tv_secs = 2;
+currentval.tv_micro = 0;
+time_delay( &#038;currentval, UNIT_VBLANK );
+printf( &#034;After 2 seconds delay\n&#034; );
+
+/* sleep for four seconds */
+currentval.tv_secs = 4;
+currentval.tv_micro = 0;
+time_delay( &#038;currentval, UNIT_VBLANK );
+printf( &#034;After 4 seconds delay\n&#034; );
+
+/* sleep for 500,000 micro-seconds = 1/2 second */
+currentval.tv_secs = 0;
+currentval.tv_micro = 500000;
+time_delay( &#038;currentval, UNIT_MICROHZ );
+printf( &#034;After 1/2 second delay\n&#034; );
+
+printf( &#034;DOS Date command shows: &#034; );
+(void) Execute( &#034;date&#034;, 0, 0 );
+
+/* save what system thinks is the time....we'll advance it temporarily */
+get_sys_time( &#038;oldtimeval );
+printf(&#034;Original system time is:\n&#034;);
+show_time(oldtimeval.tv_secs );
+
+printf(&#034;Setting a new system time\n&#034;);
+
+seconds = 1000 * SECSPERDAY + oldtimeval.tv_secs;
+
+set_new_time( seconds );
+
+/* (if user executes the AmigaDOS DATE command now, he will*/
+/* see that the time has advanced something over 1000 days */
+printf( &#034;DOS Date command now shows: &#034; );
+(void) Execute( &#034;date&#034;, 0, 0 );
+
+get_sys_time( &#038;mytimeval );
+printf( &#034;Current system time is:\n&#034;);
+show_time(mytimeval.tv_secs);
+
+/* Added the microseconds part to show that time keeps */
+/* increasing even though you ask many times in a row  */
+printf(&#034;Now do three TR_GETSYSTIMEs in a row (notice how the microseconds increase)\n\n&#034;);
+get_sys_time( &#038;mytimeval );
+printf(&#034;First TR_GETSYSTIME \t%ld.%ld\n&#034;,mytimeval.tv_secs, mytimeval.tv_micro);
+get_sys_time( &#038;mytimeval );
+printf(&#034;Second TR_GETSYSTIME \t%ld.%ld\n&#034;,mytimeval.tv_secs, mytimeval.tv_micro);
+get_sys_time( &#038;mytimeval );
+printf(&#034;Third TR_GETSYSTIME \t%ld.%ld\n&#034;,mytimeval.tv_secs, mytimeval.tv_micro);
+
+printf( &#034;\nResetting to former time\n&#034; );
+set_new_time( oldtimeval.tv_secs );
+
+get_sys_time( &#038;mytimeval );
+printf( &#034;Current system time is:\n&#034;);
+show_time(mytimeval.tv_secs);
+
+/* just shows how to set up for using the timer functions, does not */
+/* demonstrate the functions themselves.  (TimerBase must have a    */
+/* legal value before AddTime, SubTime or CmpTime are performed.    */
+tr = create_timer( UNIT_MICROHZ );
+TimerBase = (struct Library *)tr-&#062;tr_node.io_Device;
+
+/* and how to clean up afterwards */
+TimerBase = (struct Library *)(-1);
+delete_timer( tr );
+}
+
+
+struct timerequest *create_timer( ULONG unit )
+{
+/* return a pointer to a timer request.  If any problem, return NULL */
+LONG error;
+struct MsgPort *timerport;
+struct timerequest *TimerIO;
+
+timerport = CreatePort( 0, 0 );
+if (timerport == NULL )
+    return( NULL );
+
+TimerIO = (struct timerequest *)
+    CreateExtIO( timerport, sizeof( struct timerequest ) );
+if (TimerIO == NULL )
+    {
+    DeletePort(timerport);   /* Delete message port */
+    return( NULL );
+    }
+
+error = OpenDevice( TIMERNAME, unit,(struct IORequest *) TimerIO, 0L );
+if (error != 0 )
+    {
+    delete_timer( TimerIO );
+    return( NULL );
+    }
+return( TimerIO );
+}
+
+
+/* more precise timer than AmigaDOS Delay() */
+LONG time_delay( struct timeval *tv, LONG unit )
+{
+struct timerequest *tr;
+/* get a pointer to an initialized timer request block */
+tr = create_timer( unit );
+
+/* any nonzero return says timedelay routine didn't work. */
+if (tr == NULL )
+    return( -1L );
+
+wait_for_timer( tr, tv );
+
+/* deallocate temporary structures */
+delete_timer( tr );
+return( 0L );
+}
+
+
+void wait_for_timer(struct timerequest *tr, struct timeval *tv )
+{
+
+tr-&#062;tr_node.io_Command = TR_ADDREQUEST; /* add a new timer request */
+
+/* structure assignment */
+tr-&#062;tr_time = *tv;
+
+/* post request to the timer -- will go to sleep till done */
+DoIO((struct IORequest *) tr );
+}
+
+
+LONG set_new_time(LONG secs)
+{
+struct timerequest *tr;
+tr = create_timer( UNIT_MICROHZ );
+
+/* non zero return says error */
+if (tr == 0 )
+    return( -1 );
+
+tr-&#062;tr_time.tv_secs = secs;
+tr-&#062;tr_time.tv_micro = 0;
+tr-&#062;tr_node.io_Command = TR_SETSYSTIME;
+DoIO((struct IORequest *) tr );
+
+delete_timer(tr);
+return(0);
+}
+
+
+LONG get_sys_time(struct timeval *tv)
+{
+struct timerequest *tr;
+tr = create_timer( UNIT_MICROHZ );
+
+/* non zero return says error */
+if (tr == 0 )
+    return( -1 );
+
+tr-&#062;tr_node.io_Command = TR_GETSYSTIME;
+DoIO((struct IORequest *) tr );
+
+/* structure assignment */
+*tv = tr-&#062;tr_time;
+
+delete_timer( tr );
+return( 0 );
+}
+
+
+void delete_timer(struct timerequest *tr )
+{
+struct MsgPort *tp;
+
+if (tr != 0 )
+    {
+    tp = tr-&#062;tr_node.io_Message.mn_ReplyPort;
+
+    if (tp != 0)
+        DeletePort(tp);
+
+    CloseDevice( (struct IORequest *) tr );
+    DeleteExtIO( (struct IORequest *) tr );
+    }
+}
+
+
+void show_time(ULONG secs)
+{
+ULONG days,hrs,mins;
+
+/* Compute days, hours, etc. */
+mins=secs/60;
+hrs=mins/60;
+days=hrs/24;
+secs=secs%60;
+mins=mins%60;
+hrs=hrs%24;
+
+/* Display the time */
+printf(&#034;*   Hour Minute Second  (Days since Jan.1,1978)\n&#034;);
+printf(&#034;*%5ld:%5ld:%5ld      (%6ld )\n\n&#034;,hrs,mins,secs,days);
+}      /* end of main */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_25" NODE="25-1-1-7" TITLE="25 / / The Signal Semaphore / Removing a SignalSemaphore Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>25 / / The Signal Semaphore / Removing a SignalSemaphore Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02FD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02FF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Semaphore resources can only be freed if the semaphore is not locked.  A
+<a href="../Libraries_Manual_guide/node02F9.html">public</a> semaphore should first be removed from the system semaphore list
+with the <a href="../Includes_and_Autodocs_2._guide/node0376.html">RemSemaphore()</a> function. This prevents other tasks from finding
+the semaphore and trying to lock it. Once the semaphore is removed from
+the system list, the semaphore should be <a href="../Libraries_Manual_guide/node02FA.html">locked exclusively</a> so no other
+task can lock it.  Once the lock is obtained, it can be released again,
+and the resources can be deallocated.
+
+The following code should be used to remove a <a href="../Libraries_Manual_guide/node02F9.html">public</a> semaphore:
+
+    UBYTE *name;
+    struct SignalSemaphore *semaphore;
+
+    Forbid();
+    if (semaphore=FindSemaphore(name))
+    {
+        RemSemaphore(semaphore);       /* So no one else can find it... */
+        ObtainSemaphore(semaphore);    /* Wait for us to be last user...*/
+        ReleaseSemaphore(semaphore);   /* Ready for cleanup...          */
+    }
+    FreeMem(semaphore, sizeof(struct SignalSemaphore));
+    Permit();
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

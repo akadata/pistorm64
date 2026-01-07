@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/rexx/rxslib.h" NODE="MAIN" TITLE="Includes/rexx/rxslib.h" -->
+<head>
+<title>Includes/rexx/rxslib.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0125.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0127.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef REXX_RXSLIB_H
+#define REXX_RXSLIB_H
+/*
+**	$Filename: rexx/rxslib.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 1.6 $
+**	$Date: 91/11/08 $
+**
+**	The header file for the REXX Systems Library
+**
+**	(C) Copyright 1987,1988,1989,1990 William S. Hawes
+**	(C) Copyright 1990-1999 Amiga, Inc.
+**		All Rights Reserved
+<a name="line14">*/</a>
+
+#ifndef REXX_STORAGE_H
+#include &#034;rexx/storage.h&#034;
+<a name="line18">#endif</a>
+<a name="line19"></a>
+<a name="line20">#define RXSNAME  &#034;rexxsyslib.library&#034;</a>
+#define RXSDIR	 &#034;REXX&#034;
+#define RXSTNAME &#034;ARexx&#034;
+
+/* The REXX systems library structure.	This should be considered as	*/
+<a name="line25">/* semi-private and read-only, except for documented exceptions.	*/</a>
+<a name="line26"></a>
+<a name="line27">struct RxsLib {</a>
+<a name="line28">   struct Library rl_Node;	       /* EXEC library node		*/</a>
+<a name="line29">   UBYTE    rl_Flags;		       /* global flags			*/</a>
+<a name="line30">   UBYTE    rl_Shadow;		       /* shadow flags			*/</a>
+<a name="line31">   APTR     rl_SysBase;	       /* EXEC library base		*/</a>
+<a name="line32">   APTR     rl_DOSBase;	       /* DOS library base		*/</a>
+<a name="line33">   APTR     rl_IeeeDPBase;	       /* IEEE DP math library base	*/</a>
+<a name="line34">   LONG     rl_SegList;	       /* library seglist		*/</a>
+<a name="line35">   LONG     rl_NIL;		       /* global NIL: filehandle	*/</a>
+<a name="line36">   LONG     rl_Chunk;		       /* allocation quantum		*/</a>
+<a name="line37">   LONG     rl_MaxNest;	       /* maximum expression nesting	*/</a>
+<a name="line38">   struct NexxStr *rl_NULL;	       /* static string: NULL		*/</a>
+<a name="line39">   struct NexxStr *rl_FALSE;	       /* static string: FALSE		*/</a>
+<a name="line40">   struct NexxStr *rl_TRUE;	       /* static string: TRUE		*/</a>
+<a name="line41">   struct NexxStr *rl_REXX;	       /* static string: REXX		*/</a>
+<a name="line42">   struct NexxStr *rl_COMMAND;	       /* static string: COMMAND	*/</a>
+<a name="line43">   struct NexxStr *rl_STDIN;	       /* static string: STDIN		*/</a>
+<a name="line44">   struct NexxStr *rl_STDOUT;	       /* static string: STDOUT	*/</a>
+   struct NexxStr *rl_STDERR;	       /* static string: STDERR	*/
+<a name="line46">   STRPTR    rl_Version;	       /* version string		*/</a>
+<a name="line47"></a>
+<a name="line48">   STRPTR    rl_TaskName;	       /* name string for tasks	*/</a>
+<a name="line49">   LONG      rl_TaskPri;	       /* starting priority		*/</a>
+<a name="line50">   LONG      rl_TaskSeg;	       /* startup seglist		*/</a>
+<a name="line51">   LONG      rl_StackSize;	       /* stack size			*/</a>
+<a name="line52">   STRPTR    rl_RexxDir;	       /* REXX directory		*/</a>
+   STRPTR    rl_CTABLE;	       /* character attribute table	*/
+<a name="line54">   STRPTR    rl_Notice;	       /* copyright notice		*/</a>
+<a name="line55"></a>
+<a name="line56">   struct MsgPort rl_RexxPort;	       /* REXX public port		*/</a>
+<a name="line57">   UWORD     rl_ReadLock;	       /* lock count			*/</a>
+<a name="line58">   LONG      rl_TraceFH;	       /* global trace console		*/</a>
+<a name="line59">   struct List rl_TaskList;	       /* REXX task list		*/</a>
+<a name="line60">   WORD      rl_NumTask;	       /* task count			*/</a>
+<a name="line61">   struct List rl_LibList;	       /* Library List header		*/</a>
+<a name="line62">   WORD      rl_NumLib;	       /* library count		*/</a>
+<a name="line63">   struct List rl_ClipList;	       /* ClipList header		*/</a>
+<a name="line64">   WORD      rl_NumClip;	       /* clip node count		*/</a>
+<a name="line65">   struct List rl_MsgList;	       /* pending messages		*/</a>
+<a name="line66">   WORD      rl_NumMsg;	       /* pending count		*/</a>
+   struct List rl_PgmList;	       /* cached programs		*/
+<a name="line68">   WORD      rl_NumPgm;	       /* program count		*/</a>
+<a name="line69"></a>
+   UWORD     rl_TraceCnt;	       /* usage count for trace console */
+   WORD      rl_avail;
+   };
+<a name="line73"></a>
+<a name="line74">/* Global flag bit definitions for RexxMaster				*/</a>
+<a name="line75">#define RLFB_TRACE RTFB_TRACE	       /* interactive tracing?		*/</a>
+<a name="line76">#define RLFB_HALT  RTFB_HALT	       /* halt execution?		*/</a>
+<a name="line77">#define RLFB_SUSP  RTFB_SUSP	       /* suspend execution?		*/</a>
+#define RLFB_STOP  6		       /* deny further invocations	*/
+<a name="line79">#define RLFB_CLOSE 7		       /* close the master		*/</a>
+
+#define RLFMASK    (1&#060;&#060;RLFB_TRACE) | (1&#060;&#060;RLFB_HALT) | (1&#060;&#060;RLFB_SUSP)
+<a name="line82"></a>
+<a name="line83">/* Initialization constants						*/</a>
+<a name="line84">#define RXSCHUNK   1024	       /* allocation quantum		*/</a>
+<a name="line85">#define RXSNEST    32		       /* expression nesting limit	*/</a>
+#define RXSTPRI    0		       /* task priority		*/
+#define RXSSTACK   4096	       /* stack size			*/
+<a name="line88"></a>
+<a name="line89">/* Character attribute flag bits used in REXX.				*/</a>
+<a name="line90">#define CTB_SPACE   0		       /* white space characters	*/</a>
+<a name="line91">#define CTB_DIGIT   1		       /* decimal digits 0-9		*/</a>
+<a name="line92">#define CTB_ALPHA   2		       /* alphabetic characters	*/</a>
+<a name="line93">#define CTB_REXXSYM 3		       /* REXX symbol characters	*/</a>
+<a name="line94">#define CTB_REXXOPR 4		       /* REXX operator characters	*/</a>
+<a name="line95">#define CTB_REXXSPC 5		       /* REXX special symbols		*/</a>
+#define CTB_UPPER   6		       /* UPPERCASE alphabetic		*/
+#define CTB_LOWER   7		       /* lowercase alphabetic		*/
+<a name="line98"></a>
+<a name="line99">/* Attribute flags							*/</a>
+<a name="line100">#define CTF_SPACE   (1 &#060;&#060; CTB_SPACE)</a>
+<a name="line101">#define CTF_DIGIT   (1 &#060;&#060; CTB_DIGIT)</a>
+<a name="line102">#define CTF_ALPHA   (1 &#060;&#060; CTB_ALPHA)</a>
+<a name="line103">#define CTF_REXXSYM (1 &#060;&#060; CTB_REXXSYM)</a>
+<a name="line104">#define CTF_REXXOPR (1 &#060;&#060; CTB_REXXOPR)</a>
+<a name="line105">#define CTF_REXXSPC (1 &#060;&#060; CTB_REXXSPC)</a>
+#define CTF_UPPER   (1 &#060;&#060; CTB_UPPER)
+#define CTF_LOWER   (1 &#060;&#060; CTB_LOWER)
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

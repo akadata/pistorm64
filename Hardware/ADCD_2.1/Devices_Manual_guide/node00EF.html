@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-4-4" TITLE="14 / Disk Status Commands / Determining The Number Of Tracks Of A Drive" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 / Disk Status Commands / Determining The Number Of Tracks Of A Drive</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00EE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00F0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You determine the number of a tracks of a drive by passing an <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> to
+the device with <a href="../Includes_and_Autodocs_2._guide/node052A.html">TD_GETNUMTRACKS</a> set in io_Command.  For quick I/O, you
+must set io_Flags to IOF_QUICK.
+
+    DiskIO-&#062;iotd_Req.io_Flags = IOF_QUICK;
+    DiskIO-&#062;iotd_Req.io_Command = TD_GETNUMTRACKS;
+    BeginIO((struct IORequest *)DiskIO);
+
+<a href="../Includes_and_Autodocs_2._guide/node052A.html">TD_GETNUMTRACKS</a> returns the number of tracks on that device in io_Actual.
+This is the number of tracks of TD_SECTOR * NUMSECS size. It is not the
+number of cylinders. With two heads, the number of cylinders is half of
+the number of tracks.  The number of cylinders is equal to the number of
+tracks divided by the number of heads (surfaces).  The standard 3.5&#034; Amiga
+<a name="line15">drive has two heads</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0529.html">TD_GETGEOMETRY</a> is the preferred over <a href="../Includes_and_Autodocs_2._guide/node052A.html">TD_GETNUMTRACKS</a> for V36 and higher
+versions of the operating system especially since new drive types may have
+more sectors or different sector sizes, etc., than standard Amiga drives.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

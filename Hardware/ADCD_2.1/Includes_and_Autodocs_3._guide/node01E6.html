@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="AllocEntry()" TITLE="exec.library/AllocEntry" -->
+<head>
+<title>exec.library/AllocEntry</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01E5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01E7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AllocEntry -- allocate many regions of memory
+
+<b>   SYNOPSIS</b>
+	memList = AllocEntry(memList)
+	D0		     A0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node062D.html#line55">MemList</a> *AllocEntry(struct <a href="../Includes_and_Autodocs_3._guide/node062D.html#line55">MemList</a> *);
+
+<b>   FUNCTION</b>
+	This function takes a memList structure and allocates enough memory
+	to hold the required memory as well as a <a href="../Includes_and_Autodocs_3._guide/node062D.html#line55">MemList</a> structure to keep
+	track of it.
+
+	These <a href="../Includes_and_Autodocs_3._guide/node062D.html#line55">MemList</a> structures may be linked together in a task control
+	block to keep track of the total memory usage of this task. (See
+	the description of TC_MEMENTRY under RemTask).
+
+<b>   INPUTS</b>
+	memList -- A <a href="../Includes_and_Autodocs_3._guide/node062D.html#line55">MemList</a> structure filled in with <a href="../Includes_and_Autodocs_3._guide/node062D.html#line39">MemEntry</a> structures.
+
+<b>   RESULTS</b>
+	memList -- A different <a href="../Includes_and_Autodocs_3._guide/node062D.html#line55">MemList</a> filled in with the actual memory
+	    allocated in the me_Addr field, and their sizes in me_Length.
+	    If enough memory cannot be obtained, then the requirements of
+	    the allocation that failed is returned and bit 31 is set.
+
+	    WARNING: The result is unusual!  Bit 31 indicates failure.
+
+<b>   EXAMPLES</b>
+	The user wants five regions of 2, 4, 8, 16, and 32 bytes in size
+	with requirements of MEMF_CLEAR, MEMF_PUBLIC, MEMF_CHIP!MEMF_CLEAR,
+	MEMF_CLEAR, and MEMF_PUBLIC!MEMF_CLEAR respectively.  The
+	following code fragment would do that:
+
+	    MemListDecl:
+		DS.B	LN_SIZE 	    * reserve space for list node
+		DC.W	5		    * number of entries
+		DC.L	MEMF_CLEAR		    * entry #0
+		DC.L	2
+		DC.L	MEMF_PUBLIC		    * entry #1
+		DC.L	4
+		DC.L	MEMF_CHIP!MEMF_CLEAR	    * entry #2
+		DC.L	8
+		DC.L	MEMF_CLEAR	   	    * entry #3
+		DC.L	16
+		DC.L	MEMF_PUBLIC!MEMF_CLEAR	    * entry #4
+		DC.L	32
+
+	    start:
+		LEA.L	MemListDecl(PC),A0
+		JSR	_LVOAllocEntry(a6)
+		BCLR.L	#31,D0
+		BEQ.S	success
+
+		------- Type of memory that we failed on is in D0
+
+<b>   BUGS</b>
+	If any one of the allocations fails, this function fails to back
+	out fully.  This is fixed by the &#034;SetPatch&#034; program on V1.3
+	Workbench disks.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node062D.html">exec/memory.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

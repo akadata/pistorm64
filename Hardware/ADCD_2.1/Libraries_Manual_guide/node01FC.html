@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_11" NODE="11-4" TITLE="11 Special Functions / Using Sprites in Intuition Windows and Screens" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>11 Special Functions / Using Sprites in Intuition Windows and Screens</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01FB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01FD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Sprite functionality has limitations under Intuition.  The hardware and
+graphics library sprite systems manage sprites independently of the
+Intuition display.  In particular:
+
+  * Sprites cannot be attached to any particular screen.  Instead, they
+<a name="line7">    always appear in front of every screen.</a>
+
+  * When a screen is moved, the sprites do not automatically move with
+    it. The sprites move to their correct locations only when the
+    appropriate function is called (either <a href="../Libraries_Manual_guide/node038D.html">DrawGList()</a> or <a href="../Libraries_Manual_guide/node037D.html">MoveSprite()</a>).
+
+Hardware sprites are of limited use under the Intuition paradigm.  They
+travel out of windows and out of screens, unlike all other Intuition
+<a name="line15">mechanisms (except the Intuition pointer, which is meant to be global).</a>
+
+Remember that sprite data must be in Chip memory to be accessible to the
+custom chips.  This may be done with a compiler specific feature, such as
+the __chip keyword of SAS/C.  Otherwise, Chip memory can be allocated with
+the Exec <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a> function or the Intuition <a href="../Libraries_Manual_guide/node01F8.html">AllocRemember()</a> function,
+setting the memory requirement flag to <a href="../Libraries_Manual_guide/node0288.html#line27">MEMF_CHIP</a>.  The sprite data may
+then be copied to Chip memory using a function like <a href="../Libraries_Manual_guide/node02AF.html">CopyMem()</a> in the Exec
+library.  See the chapter &#034;<a href="../Libraries_Manual_guide/node037C.html">Graphics Sprites, Bobs and Animation</a>&#034; for more
+information.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

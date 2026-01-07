@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="clipboard" NODE="CBD_POST" TITLE="clipboard.device/CBD_POST" -->
+<head>
+<title>clipboard.device/CBD_POST</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00D6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00D8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CBD_POST -- Post availability of a clip to the clipboard.
+
+<b>   FUNCTION</b>
+	Indicate to the clipboard device that data is available for
+	use by accessors of the clipboard.  This is intended to be
+	used when a cut is large, in a private data format, and/or
+	changing frequently, and it thus makes sense to avoid
+	converting it to an IFF form and writing it to the clipboard
+	unless another application wants it.  The post provides a
+	message port to which the clipboard device will send a satisfy
+	message if the data is required.
+
+	If the satisfy message is received, the write associated with
+	the post must be performed.  The act of writing the clip
+	indicates that the message has been received: it may then be
+	re-used by the clipboard device, and so must actually be
+	removed from the satisfy message port so that the port is not
+	corrupted.
+
+	If the application wishes to determine if a post it has
+	performed is still the current clip, it should check the
+	post's io_ClipID with that returned by the <a href="../Includes_and_Autodocs_3._guide/node00D5.html">CBD_CURRENTREADID</a>
+	command.  If the current read io_ClipID is greater, the clip
+	is not still current.
+
+	If an application has a pending post and wishes to determine
+	if it should satisfy it (e.g. before it exits), it should
+	check the post's io_ClipID with that returned by the
+	<a href="../Includes_and_Autodocs_3._guide/node00D6.html">CBD_CURRENTWRITEID</a> command.  If the current write io_ClipID is
+	greater, there is no need to satisfy the post.
+
+<b>   IO REQUEST</b>
+	io_Message	mn_ReplyPort set up
+	io_Device	preset by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Unit		preset by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Command	CBD_POST
+	io_Data		pointer to satisfy message port
+	io_ClipID	zero
+
+<b>   RESULTS</b>
+	io_Error	non-zero if an error occurred
+	io_ClipID	the clip ID assigned to this post, to be used
+			in the write command if this is satisfied
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

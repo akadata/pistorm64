@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_34" NODE="34-1-6-2" TITLE="34 / / Details Of Keymap Structure / LoKeyMapTypes and HiKeyMapTypes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>34 / / Details Of Keymap Structure / LoKeyMapTypes and HiKeyMapTypes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0470.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0472.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The tables named <a href="../Libraries_Manual_guide/node046F.html">km_LoKeyMapTypes</a> and <a href="../Libraries_Manual_guide/node046F.html">km_HiKeyMapTypes</a> each contain one
+byte per raw key code. Each byte defines the type of entry that is found
+in the keymap table for that raw key code.
+
+Possible key types are:
+
+    * Any of the qualifier groupings <a href="../Libraries_Manual_guide/node0472.html">noted below</a>
+
+    * <a href="../Libraries_Manual_guide/node0472.html">KCF_STRING</a> + any combination of <a href="../Libraries_Manual_guide/node0472.html">KCF_SHIFT</a>, <a href="../Libraries_Manual_guide/node0472.html">KCF_ALT</a>, <a href="../Libraries_Manual_guide/node0472.html">KCF_CONTROL</a>
+      (or <a href="../Libraries_Manual_guide/node0472.html">KC_NOQUAL</a>) if the result of pressing the key is to be a
+      stream of bytes (and key-with-one-or-more-qualifiers is to be
+      one or more alternate streams of bytes).
+
+      Any key can be made to output up to eight unique byte streams if
+      <a href="../Libraries_Manual_guide/node0472.html">KCF_STRING</a> is set in its keytype. The only limitation is that
+      the total length of all of the strings assigned to a key must be
+      within the &#034;jump range&#034; of a single byte increment. See the
+      &#034;<a href="../Libraries_Manual_guide/node0473.html">String Output Keys</a>&#034; section below for more information.
+
+    * <a href="../Libraries_Manual_guide/node0477.html#line14">KCF_DEAD</a> + any combination of <a href="../Libraries_Manual_guide/node0472.html">KCF_SHIFT</a>, <a href="../Libraries_Manual_guide/node0472.html">KCF_ALT</a>, <a href="../Libraries_Manual_guide/node0472.html">KCF_CONTROL</a>
+      (or <a href="../Libraries_Manual_guide/node0472.html">KC_NOQUAL</a>) if the key is a dead-class key and can thus
+      modify or be modified by another dead-class key. See the
+      &#034;<a href="../Libraries_Manual_guide/node0477.html">Dead-Class Keys</a>&#034; section below for more information.
+
+The low keytype table covers the raw key codes from hex 00-3F and contains
+one byte per key code. Therefore this table contains 64 (decimal) bytes.
+The high keytype table covers the raw key codes from hex 40-7F and
+contains 64 (decimal) bytes.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_8SVX" NODE="16-6-5" TITLE=" 8SVX IFF 8-Bit Sampled Voice / Appendix C. Fibonacci Delta Compression " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> 8SVX IFF 8-Bit Sampled Voice / Appendix C. Fibonacci Delta Compression </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02D5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02D7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This is Steve Hayes' Fibonacci Delta sound compression technique.  It's
+like the traditional delta encoding but encodes each delta in a mere 4
+bits.  The compressed data is half the size of the original data plus a
+2-byte overhead for the initial value.  This much compression introduces
+some distortion, so try it out and use it with discretion.
+
+To achieve a reasonable slew rate, this algorithm looks up each stored
+4-bit value in a table of Fibonacci numbers.  So very small deltas are
+encoded precisely while larger deltas are approximated.  When it has to
+make approximations, the compressor should adjust all the values (forwards
+and backwards in time) for minimum overall distortion.
+
+Here is the decompressor written in the C programming language.
+
+    /* Fibonacci delta encoding for sound data. */
+    BYTE codeToDelta[16] = {-34,-21,-13,-8,-5,-3,-2,-1,0,1,2,3,5,8,13,21};
+
+    /* Unpack Fibonacci-delta encoded data from n byte source buffer into
+     * 2*n byte dest buffer, given initial data value x.  It returns the
+     * last data value x so you can call it several times to incrementally
+     * decompress the data.                                             */
+    short D1Unpack(source, n, dest, x)
+        BYTE source[], dest[];
+        LONG n;
+        BYTE x;
+        {
+        BYTE d;
+        LONG i, lim;
+
+        lim = n &#060;&#060; 1;
+        for (i = 0; i &#060; lim; ++i)
+                { /* Decode a data nybble; high nybble then low nybble. */
+                d = source[i &#062;&#062; 1];     /* get a pair of nybbles        */
+                if (i &#038; 1)              /* select low or high nybble?   */
+                        d &#038;= 0xf;       /* mask to get the low nybble   */
+                else
+                        d &#062;&#062;= 4;        /* shift to get the high nybble */
+                x += codeToDelta[d];    /* add in the decoded delta     */
+                dest[i] = x;            /* store a 1-byte sample        */
+                }
+        return(x);
+        }
+
+    /* Unpack Fibonacci-delta encoded data from n byte source buffer into
+     * 2*(n-2) byte dest buffer. Source buffer has a pad byte, an 8-bit
+     * initial value, followed by n-2 bytes comprising 2*(n-2) 4-bit
+     * encoded samples.                                                 */
+
+    void DUnpack(source, n, dest)
+        BYTE source[], dest[];
+        LONG n;
+        {
+          D1Unpack(source + 2, n - 2, dest, source[1]);
+        }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

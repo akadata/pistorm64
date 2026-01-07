@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_32" NODE="32-3-4-5" TITLE="32 / / RigidDiskBlock and Alternate Filesystems / LoadSegBlock" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>32 / / RigidDiskBlock and Alternate Filesystems / LoadSegBlock</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0423.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0425.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This is the current specification of the LoadSegBlock. The end of data
+occurs when lsb_Next is NULL ($FFFFFFFF), and the summed data is exhausted.
+
+
+   lsb_ID                  == 'LSEG'
+
+   lsb_SummedLongs         size of this checksummed structure
+                           Note that this is not 64 like most of the other
+                           structures.  This is the number of valid longs
+                           in this image, like <a href="../Libraries_Manual_guide/node0421.html#line6">bbb_SummedLongs</a>.
+
+   lsb_ChkSum              block checksum (longword sum to zero)
+
+   lsb_HostID              SCSI Target ID of host
+                           This describes the initiator ID for the creator
+                           of these blocks.  (see <a href="../Libraries_Manual_guide/node0420.html#line8">rdb_HostID</a> discussion)
+
+   lsb_Next                block number of the next LoadSegBlock
+
+   lsb_LoadData            data for &#034;loadseg&#034;
+                           The data starts here and continues as long
+                           as indicated by lsb_SummedLongs-5: e.g. if
+                           lsb_SummedLongs is 128 (ie. for 512 byte
+                           blocks), 123 longs of data are valid here.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

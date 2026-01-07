@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="BestModeIDA()" TITLE="graphics.library/BestModeIDA" -->
+<head>
+<title>graphics.library/BestModeIDA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02AF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02B1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	BestModeIDA -- calculate the best ModeID with given parameters (V39)
+	BestModeID  -- varargs stub for BestModeIDA()
+
+<b>   SYNOPSIS</b>
+	ID = BestModeIDA(TagItems)
+	d0               a0
+
+	ULONG BestModeIDA(struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	ID = BestModeID(Tag1, ...)
+
+	ULONG BestModeID(ULONG, ...);
+
+<b>   FUNCTION</b>
+	To determine the best ModeID to fit the parameters set in the TagList.
+
+<b>   INPUTS</b>
+	TagItems - A pointer to an array of TagItems.
+
+<b>   TAGS</b>
+	BIDTAG_DIPFMustHave (ULONG) - Mask of DIPF_ flags
+	       (from DisplayInfo-&#062;PropertyFlags) that the returned ModeID
+	       must have.
+	       Default - NULL
+
+	BIDTAG_DIPFMustNotHave (ULONG) - Mask of DIPF_ flags that the
+	       returned ModeID must not have.
+	       Default - SPECIAL_FLAGS
+
+	BIDTAG_ViewPort (struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *) - <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> for which a best-fit
+	       ModeID is sought.
+	       Default - NULL
+
+	BIDTAG_NominalWidth (UWORD),
+	BIDTAG_NominalHeight (UWORD) - together make the aspect ratio.
+	       These values override the vp-&#062;DWidth and vp-&#062;DHeight values
+	       in the given <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>.
+	       Default - SourceID NominalDimensionInfo if BIDTAG_SourceID is
+	       passed, or vp-&#062;DWidth and vp-&#062;DHeight if BIDTAG_ViewPort is
+	       passed, or 640 x 200.
+
+	BIDTAG_DesiredWidth (UWORD),
+	BIDTAG_DesiredHeight (UWORD) - Used to distinguish between two
+	       mode IDs with identical aspect ratios.
+	       Default - same values as NominalWidth and NominalHeight.
+
+	BIDTAG_Depth (UBYTE) - minimum the returned ModeID must support.
+	       Default - vp-&#062;RasInfo-&#062;BitMap-&#062;Depth if BIDTAG_ViewPort is
+	       passed, else 1.
+
+	BIDTAG_MonitorID (ULONG) - returned ModeID must use this monitor.
+	       Default - will not restrict the search to any particular monitor
+
+	BIDTAG_SourceID (ULONG) - Use this ModeID instead of a <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>.
+	       If specified, the DIPFMustHave mask is made up of the
+	       ((DisplayInfo-&#062;PropertyFlags of this ID &#038; SPECIAL_FLAGS) |
+	        DIPFMustHave flags).
+	       Default - VPModeID(vp) if BIDTAG_ViewPort was passed, else the
+	       DIPFMustHave and DIPFMustNotHave masks are left unchanged.
+
+	BIDTAG_RedBits (UBYTE),
+	BIDTAG_BlueBits (UBYTE),
+	BIDTAG_Greenits (UBYTE) - Minimum bits per gun the resultant
+	       ModeID must support.
+	       Default - 4 bits per gun.
+
+<b>   RESULTS</b>
+	ID      - ID of the best mode to use, or INVALID_ID if a match could
+	          not be found.
+
+<b>   NOTES</b>
+	This function takes into account the Compatability of the Monitor
+	being matched to, and the source <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> or ModeID.
+	Incompatibilitys will cause a result of INVALID_ID.
+
+	BIDTAG_NominalWidth, BIDTAG_NominalHeight,
+	BIDTAG_DesiredWidth, BIDTAG_DesiredHeight, must all be non-0.
+
+	The comparisons are made against the DimensionInfo-&#062;Nominal values.
+	ie, this will not return a best fit against overscan dimensions.
+
+<b>   EXAMPLE</b>
+	IFF Display Program with a HAM image, to be displayed in the same
+	monitor type as the Workbench <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>.
+
+	ID = BestModeID(BIDTAG_NominalWidth, IFFImage-&#062;Width,
+	                BIDTAG_NominalHeight, IFFImage-&#062;Height,
+	                BIDTAG_Depth, IFFImage-&#062;Depth,
+	                BIDTAG_DIPFMustHave, DIPF_IS_HAM,
+	                BIDTAG_MonitorID, (GetVPModeID(WbVP) &#038; MONITOR_ID_MASK),
+	                TAG_END);
+
+	To make an interlace version of a ViewPort:
+
+	ID = BestModeID(BIDTAG_ViewPort, ThisViewPort,
+	                BIDTAG_MustHave, DIFP_IS_LACE,
+	                TAG_END);
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0661.html">&#060;graphics/modeid.h&#062;</a> <a href="../Includes_and_Autodocs_3._guide/node05FF.html">&#060;graphics/displayinfo.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

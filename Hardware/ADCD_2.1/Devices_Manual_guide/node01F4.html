@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-6-5" TITLE=" Standard File Structure / Rules for Writer Programs " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard File Structure / Rules for Writer Programs </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01F3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01F5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here are some notes on building programs that write IFF files, which is
+much easier than reading them.
+
+   o An IFF file is a single <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>, <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>, or <a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a>  <a href="../Devices_Manual_guide/node01DD.html">chunk</a>.
+
+   o Any IFF-85 file must start with the 4 characters &#034;<a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>&#034;, &#034;<a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>&#034;, or
+      &#034;<a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a> &#034;, followed by a LONG ckSize.  There should be no data after
+      the <a href="../Devices_Manual_guide/node01DD.html">chunk</a> end.
+
+   o <a href="../Devices_Manual_guide/node01DD.html">Chunk</a> types <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>, <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>, <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>, and <a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a>  are generic.  They always
+      contain a subtype ID followed by chunks.  These three IDs are
+      universally reserved, as are &#034;LIS1&#034; through &#034;LIS9&#034;, &#034;FOR1&#034; through
+      &#034;FOR9&#034;, &#034;CAT1&#034; through &#034;CAT9&#034;, and &#034;    &#034;.
+
+   o Don't forget to write a 0 pad byte after each odd-length <a href="../Devices_Manual_guide/node01DD.html">chunk</a>.
+
+   o Do not try to edit a file that you don't know how to create.  Programs
+      may look into a file and copy out nested <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>s of types that they
+      recognize, but they should not edit and replace the nested FORMs and
+      not add or remove them.  Breaking these rules could make the
+      containing structure inconsistent.  You may write a new file
+      containing items you copied, or copied and modified, but don't copy
+      structural parts you don't understand.
+
+   o You must adhere to the syntax descriptions in Appendix A.  E.g., <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>s
+      may only appear inside <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>s.
+
+There are at least four common techniques for writing an IFF group:
+
+  (1)  build the data in a file mapped into virtual memory.
+  (2)  build the data in memory blocks and use block I/O.
+  (3)  stream write the data piecemeal and (don't forget!) random
+          access back to set the group (or <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>)
+          length count.
+  (4)  make a preliminary pass to compute the length count then stream
+          write the data.
+
+Issue: The standard disallows &#034;blind&#034; <a href="../Devices_Manual_guide/node01DD.html">chunk</a> copying for consistency
+reasons. Perhaps we can define a ckID convention for chunks that are OK to
+replicate without knowledge of the contents.  Any such chunks would need
+to be internally consistent, and not be bothered by changed external
+references.
+
+Issue: Stream-writing an IFF <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> can be inconvenient.  With random access
+files one can write all the <a href="../Devices_Manual_guide/node01DD.html">chunk</a>s then go back to fix up the FORM size.
+With stream access, the FORM size must be calculated before the file is
+written. When compression is involved, this can be slow or inconvenient.
+Perhaps we can define an &#034;END &#034; chunk.  The stream writer would use -1
+($FFFFFFFF) as the FORM size.  The reader would follow each chunk, when
+the reader reaches an &#034;END &#034;, it would terminate the last -1 sized chunk.
+Certain new IFF FORMs could require that readers understand &#034;END &#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

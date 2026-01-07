@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="utility" NODE="FilterTagItems()" TITLE="utility.library/FilterTagItems" -->
+<head>
+<title>utility.library/FilterTagItems</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node059D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node059F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FilterTagItems -- remove selected items from a tag list. (V36)
+
+<b>   SYNOPSIS</b>
+	numValid = FilterTagItems(tagList,filterArray,logic);
+	D0		          A0	  A1	      D0
+
+	ULONG FilterTagItems(struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *,<a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a> *,ULONG);
+
+<b>   FUNCTION</b>
+	Removes tag items from a tag list (by changing ti_Tag to
+	TAG_IGNORE) depending on whether its ti_Tag value is
+	found in an array of tag values.
+
+	If the 'logic' parameter is TAGFILTER_AND, then all items
+	not appearing in 'tagArray' are excluded from 'tagList'.
+
+	If 'logic' is TAGFILTER_NOT, then items not found in 'tagArray'
+	are preserved, and the ones in the array are cast out.
+
+<b>   INPUTS</b>
+	tagList	- input list of tag items which is to be filtered by having
+		  selected items changed to TAG_IGNORE.
+	filterArray - an array of tag values, terminated by TAG_DONE, as
+		      specified in the documentation for <a href="../Includes_and_Autodocs_3._guide/node05B2.html">TagInArray()</a>.
+	logic - specification whether items in 'tagArray' are to be included
+		or excluded in the filtered result.
+
+<b>   RESULTS</b>
+	numValid - number of valid items left in resulting filtered list.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node064C.html">&#060;utility/tagitem.h&#062;</a>, <a href="../Includes_and_Autodocs_3._guide/node05B2.html">TagInArray()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

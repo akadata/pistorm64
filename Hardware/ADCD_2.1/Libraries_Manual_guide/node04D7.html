@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-5-6" TITLE="B / imageclass / New Methods: IM_ERASEFRAME" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / imageclass / New Methods: IM_ERASEFRAME</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04D6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04D8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This method is a special version of <a href="../Libraries_Manual_guide/node04D4.html">IM_ERASE</a> for images that support
+<a href="../Libraries_Manual_guide/node04D5.html">IM_DRAWFRAME</a>.  It asks an image to erase itself as if it were confined
+(scaled, clipped, etc.) to a rectangular bounds.  The return value for
+this method is not explicitly defined.
+
+This method uses a custom message structure:
+
+struct impErase /* NOTE: This is a subset of impDraw */
+    {
+        ULONG           MethodID;   /* IM_ERASEFRAME */
+        struct RastPort *imp_RPort; /* The image's RastPort */
+        struct
+        {
+            WORD X;      /* X and Y offset relative to the */
+            WORD Y;      /* image's IA_Left and IA_Top attributes */
+        } imp_Offset;
+
+        struct
+        {
+            WORD Width;  /* scale, clip, restrict, etc. to these bounds */
+            WORD Height;
+        } imp_Dimensions;
+    };
+
+The <a href="../Libraries_Manual_guide/node04D1.html">imageclass</a> dispatcher handles an IM_ERASEFRAME message as if it was an
+IM_ERASE message, ignoring the bounds.  See the imageclass description for
+<a href="../Libraries_Manual_guide/node04D4.html">IM_ERASE</a> for more details.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-1" TITLE="6 / Setting Up Menus / Submitting and Removing Menu Strips" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Setting Up Menus / Submitting and Removing Menu Strips</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0180.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0182.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Once the application has set up the proper menu structures, linked them
+into a list and attached the list to a window, the menu system completely
+handles the menu display.  The menu strip is submitted to Intuition and
+attached to the window by calling the function <a href="../Includes_and_Autodocs_2._guide/node0253.html">SetMenuStrip()</a>.
+
+<a name="line7">    BOOL SetMenuStrip( struct Window *window, struct Menu *menu );</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0253.html">SetMenuStrip()</a> always returns TRUE.  This function can also be used to
+attach a single menu strip to multiple windows by calling SetMenuStrip()
+<a name="line11">for each window (<a href="../Libraries_Manual_guide/node0185.html">see below</a>).</a>
+
+Any menu strip attached to a window must be removed before the window is
+closed.  To remove the menu strip, call <a href="../Includes_and_Autodocs_2._guide/node0205.html">ClearMenuStrip()</a>.
+
+    void ClearMenuStrip( struct Window *window );
+
+The menu example below demonstrates how to use these functions with a
+simple menu strip.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-3" TITLE="31 Commodities Exchange Library / Installing A Broker Object" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / Installing A Broker Object</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0401.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0403.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Commodities Exchange input handler maintains a master list of
+<a href="../Libraries_Manual_guide/node0401.html">CxObjects</a> to which it diverts input events using <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a>.  The
+CxObjects in this master list are a special type of CxObject called
+brokers.  The only thing a broker CxObject does is divert CxMessages to
+its own personal list of CxObjects.  A commodity creates a broker and
+attaches other CxObjects to it.  These attached objects take care of the
+actual input handler related work of the commodity and make up the
+broker's personal list.
+
+The first program listing, <a href="../Libraries_Manual_guide/node0586.html">Broker.c</a>, is a very simple example of a working
+commodity.  It serves only to illustrate the basics of a commodity, not to
+actually perform any useful function.  It shows how to set up a broker and
+<a name="line14">process commands from the controller program.</a>
+
+Besides opening commodities.library and creating an Exec message port,
+setting up a commodity requires creating a broker.  The function
+<a href="../Includes_and_Autodocs_2._guide/node01A2.html">CxBroker()</a> creates a broker and adds it to the master list.
+
+<a name="line20">    CxObj *CxBroker(struct NewBroker *nb, long *error);</a>
+
+<a name="line22"><a href="../Includes_and_Autodocs_2._guide/node01A2.html">CxBroker()</a>'s first argument is a pointer to a <a href="../Includes_and_Autodocs_2._guide/node00F0.html#line47">NewBroker</a> structure:</a>
+
+    struct NewBroker {
+        BYTE    nb_Version;
+                    /* There is an implicit pad byte after this BYTE */
+        BYTE    *nb_Name;
+<a name="line28">        BYTE    *nb_Title;</a>
+        BYTE    *nb_Descr;
+        SHORT   nb_Unique;
+        SHORT   nb_Flags;
+<a name="line32">        BYTE    nb_Pri;</a>
+                    /* There is an implicit pad byte after this BYTE */
+        struct  MsgPort   *nb_Port;
+        WORD    nb_ReservedChannel;
+                    /* Unused, make zero for future compatibility */
+    };
+
+Commodities Exchange gets all the information it needs about the broker
+from this structure.  NewBroker's nb_Version field contains the version
+number of the NewBroker structure.  This should be set to NB_VERSION which
+is defined in &#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node00F0.html#line45">commodities.h</a>&#062;.  The nb_Name, nb_Title, and
+nb_Descr point to strings which hold the name, title, and description of
+the broker.  The two bit fields, <a href="../Libraries_Manual_guide/node040C.html#line7">nb_Unique</a> and <a href="../Libraries_Manual_guide/node0404.html#line9">nb_Flags</a>, toggle certain
+features of Commodities Exchange based on their values.  They are
+discussed in detail later in this chapter.
+
+The nb_Pri field contains the broker's priority.  Commodities Exchange
+inserts the broker into the master list based on this number.  Higher
+<a name="line50">priority brokers get <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a> before lower priority brokers.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node01A2.html">CxBroker()</a>'s second argument is a pointer to a LONG.  If this pointer is
+not NULL, CxBroker() fills in this field with one of the following error
+return codes from &#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node00F0.html#line39">commodities.h</a>&#062;:
+
+    CBERR_OK        0        /* No error                         */
+    CBERR_SYSERR    1        /* System error , no memory, etc    */
+    CBERR_DUP       2        /* uniqueness violation             */
+<a name="line59">    CBERR_VERSION   3        /* didn't understand nb_VERSION     */</a>
+
+Once the broker object is created with <a href="../Includes_and_Autodocs_2._guide/node01A2.html">CxBroker()</a>, it must be activated
+with <a href="../Includes_and_Autodocs_2._guide/node019D.html">ActivateCxObj()</a>.
+
+    oldactivationvalue = LONG ActivateCxObj(CxObj *co,
+                                            long newactivationvalue);
+
+After successfully completing the initial set up and activating the
+broker, a commodity can begin its input processing loop waiting for
+<a href="../Libraries_Manual_guide/node0403.html">CxMessages</a> to arrive.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

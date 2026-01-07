@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/HP_Laserjet_transfer.c" NODE="MAIN" TITLE="Devices/Dev_examples/HP_Laserjet_transfer.c" -->
+<head>
+<title>Devices/Dev_examples/HP_Laserjet_transfer.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0185.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0187.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+        Example transfer routine for HP_LaserJet driver.
+
+        Transfer() should be written in assembly code for speed
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;devices/prtgfx.h&#062;
+
+Transfer(PInfo, y, ptr)
+struct PrtInfo *PInfo;
+UWORD y;        /* row # */
+UBYTE *ptr;     /* ptr to buffer */
+{
+        static UBYTE bit_table[] = {128, 64, 32, 16, 8, 4, 2, 1};
+        UBYTE *dmatrix, Black, dvalue, threshold;
+        union colorEntry *ColorInt;
+        UWORD x, width, sx, *sxptr, bit;
+
+        /* pre-compute */
+        /* printer non-specific, MUST DO FOR EVERY PRINTER */
+        x = PInfo-&#062;pi_xpos; /* get starting x position */
+        ColorInt = PInfo-&#062;pi_ColorInt; /* get ptr to color intensities */
+        sxptr = PInfo-&#062;pi_ScaleX;
+        width = PInfo-&#062;pi_width; /* get # of source pixels */
+
+        /* pre-compute threshold; are we thresholding? */
+        if (threshold = PInfo-&#062;pi_threshold) { /* thresholding */
+                dvalue = threshold ^ 15; /* yes, so pre-compute dither value */
+                do { /* for all source pixels */
+                        /* pre-compute intensity value for Black */
+                        Black = ColorInt-&#062;colorByte[PCMBLACK];
+                        ColorInt++; /* bump ptr for next time */
+
+                        sx = *sxptr++;
+
+                        /* dither and render pixel */
+                        do { /* use this pixel 'sx' times */
+                                /* if we should render Black */
+                                if (Black &#062; dvalue) {
+                                        /* set bit */
+                                        *(ptr + (x &#062;&#062; 3)) |= bit_table[x &#038; 7];
+                                }
+                                ++x; /* done 1 more printer pixel */
+                        } while (--sx);
+                } while (--width);
+        }
+        else { /* not thresholding, pre-compute ptr to dither matrix */
+                dmatrix = PInfo-&#062;pi_dmatrix + ((y &#038; 3) &#060;&#060; 2);
+                do { /* for all source pixels */
+                        /* pre-compute intensity value for Black */
+                        Black = ColorInt-&#062;colorByte[PCMBLACK];
+                        ColorInt++; /* bump ptr for next time */
+
+                        sx = *sxptr++;
+
+                        /* dither and render pixel */
+                        do { /* use this pixel 'sx' times */
+                                /* if we should render Black */
+                                if (Black &#062; dmatrix[x &#038; 3]) {
+                                        /* set bit */
+                                        *(ptr + (x &#062;&#062; 3)) |= bit_table[x &#038; 7];
+                                }
+                                ++x; /* done 1 more printer pixel */
+                        } while (--sx);
+                } while (--width);
+        }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

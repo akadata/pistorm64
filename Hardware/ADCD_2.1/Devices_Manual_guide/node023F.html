@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="ANIM-1-2-2" TITLE="Introduction / Recording ANIMs / Long Delta mode " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Introduction / Recording ANIMs / Long Delta mode </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node023E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0240.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This mode stores the actual new frame long-words which are different,
+along with the offset in the bitmap.  The exact format is shown and
+discussed in section 2 below. Each plane is handled separately, with no
+data being saved if no changes take place in a given plane.  Strings of 2
+or more long-words in a row which change can be run together so offsets do
+not have to be saved for each one.
+
+Constructing this data chunk usually consists of having a buffer to hold
+the data, and calculating the data as one compares the new frame,
+long-word by long-word, with two frames back.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

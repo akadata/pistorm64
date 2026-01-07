@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="utility" NODE="RemNamedObject()" TITLE="utility.library/RemNamedObject" -->
+<head>
+<title>utility.library/RemNamedObject</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05AB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05AD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	RemNamedObject -- remove a named object. (V39)
+
+<b>   SYNOPSIS</b>
+	RemNamedObject(object, message);
+	               A0      A1
+
+	VOID RemNamedObject(struct <a href="../Includes_and_Autodocs_3._guide/node0631.html#line24">NamedObject</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line46">Message</a> *);
+
+<b>   FUNCTION</b>
+	This function will post a request to release the object
+	from whatever NameSpace it is in.  It will reply the message
+	when the object is fully removed.  The message.mn_Node.ln_Name
+	field will contain the object pointer or NULL if the object
+	was removed by another process.
+
+	This function will effectively do a <a href="../Includes_and_Autodocs_3._guide/node05AB.html">ReleaseNamedObject()</a>
+	thus you must have &#034;found&#034; the object first.
+
+<b>   INPUTS</b>
+	object - the object to remove: Must be a valid <a href="../Includes_and_Autodocs_3._guide/node0631.html#line24">NamedObject</a>.
+	message - message to <a href="../Includes_and_Autodocs_3._guide/node0235.html">ReplyMsg()</a> (must be supplied)
+
+<b>   RESULT</b>
+	The message is replied with the ln_Name field either being
+	the object or NULL. If it contains the object, the object
+	is completely removed.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0598.html">AttemptRemNamedObject()</a>, <a href="../Includes_and_Autodocs_3._guide/node0593.html">AddNamedObject()</a>, <a href="../Includes_and_Autodocs_3._guide/node05AB.html">ReleaseNamedObject()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

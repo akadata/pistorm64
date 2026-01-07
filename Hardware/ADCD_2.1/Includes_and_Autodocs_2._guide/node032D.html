@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="AddTask()" TITLE="exec.library/AddTask" -->
+<head>
+<title>exec.library/AddTask</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node032C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node032E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AddTask -- add a task to the system
+
+SYNOPSIS
+    AddTask(task, initialPC, finalPC)
+            A1    A2         A3
+
+    APTR AddTask(struct <a href="../Includes_and_Autodocs_2._guide/node008E.html#line25">Task</a> *, APTR, APTR);
+
+FUNCTION
+    Add a task to the system.  A reschedule will be run; the task with
+    the highest priority in the system will start to execute (this may
+    or may not be the new task).
+
+    Certain fields of the task control block must be initialized and a
+    stack allocated prior to calling this function.  The absolute
+    smallest stack that is allowable is something in the range of 100
+    bytes, but in general the stack size is dependent on what
+    subsystems are called. In general 256 bytes is sufficient if only
+    Exec is called, and 4K will do if anything in the system is called.
+    DO NOT UNDERESTIMATE.  If you use a stack sniffing utility,
+    leave a healthy pad above the minimum value.  The system guarantees
+    that its stack operations will leave the stack longword aligned.
+
+    This function will temporarily use space from the new task's stack
+    for the task's initial set of registers.  This space is allocated
+    starting at the SPREG location specified in the task control block
+    (not from SPUPPER).  This means that a task's stack may contain
+    static data put there prior to its execution.  This is useful for
+    providing initialized global variables or some tasks may want to
+    use this space for passing the task its initial arguments.
+
+    A task's initial registers are set to zero (except the PC).
+
+    The TC_MEMENTRY field of the task structure may be extended by
+    the user to hold additional MemLists (as returned by <a href="../Includes_and_Autodocs_2._guide/node0331.html">AllocEntry()</a>).
+    These will be automatically be deallocated at <a href="../Includes_and_Autodocs_2._guide/node0378.html">RemTask()</a> time.
+    If the code you have used to start the task has already added
+    something to the MEMENTRY list, simply use <a href="../Includes_and_Autodocs_2._guide/node0325.html">AddHead</a> to add your
+    new MemLists in.  If no initialization has been done, a <a href="../Includes_and_Autodocs_2._guide/node0161.html">NewList</a> will
+    need to be performed.
+
+INPUTS
+    task  - pointer to the task control block (TCB).  All unset fields
+            must be zero.
+    initialPC - the initial entry point's address
+    finalPC - the finalization code entry point's address.  If zero,
+              the system will use a general finalizer. This pointer is
+              placed on the stack as if it were the outermost return
+              address.
+
+RESULTS
+    For V36, AddTask returns either a NULL or the address of the new
+    task.  Old code need not check this.
+
+WARNING
+    Tasks are a low-level building block, and are unable to call
+    dos.library, or any system function that might call dos.library.
+    See the AmigaDOS <a href="../Includes_and_Autodocs_2._guide/node028E.html">CreateProc()</a> for information on Processes.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0378.html">RemTask</a>, <a href="../Includes_and_Autodocs_2._guide/node0352.html">FindTask</a>, <a href="../Includes_and_Autodocs_2._guide/node014A.html">amiga.lib/CreateTask</a>, <a href="../Includes_and_Autodocs_2._guide/node028E.html">dos/CreateProc</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node0161.html">amiga.lib/NewList</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

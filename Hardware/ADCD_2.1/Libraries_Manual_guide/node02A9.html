@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_20" NODE="20-1-2" TITLE="20 / Memory Functions / Allocating System Memory" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>20 / Memory Functions / Allocating System Memory</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02A8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02AA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following examples show how to allocate memory.
+
+    APTR  apointer,anotherptr, yap;
+
+    if (!(apointer = AllocMem(100, MEMF_ANY)))
+        {  /* COULDN'T GET MEMORY, EXIT */ }
+<a name="line8"></a>
+<a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a> returns the address of the first byte of a memory block that is
+at least 100 bytes in size or NULL if there is not that much free memory.
+Because the requirement field is specified as <a href="../Libraries_Manual_guide/node02A8.html#line5">MEMF_ANY</a> (zero), memory will
+be allocated from any one of the system-managed memory regions.
+
+    if (!(anotherptr = (APTR)AllocMem(1000, MEMF_CHIP | MEMF_CLEAR)))
+        {  /* COULDN'T GET MEMORY, EXIT */ }
+
+The example above allocates only chip-accessible memory, which the system
+fills with zeros before it lets the application use the memory.  If the
+system free memory list does not contain enough contiguous memory bytes in
+an area matching your requirements, <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a> returns a zero.  You must
+<a name="line21">check for this condition.</a>
+
+If you are using Release 2, you can use the <a href="../Includes_and_Autodocs_2._guide/node0335.html">AllocVec()</a> function to
+allocate memory.  In addition to allocating a block of memory, this
+function keeps track of the size of the memory block, so your application
+doesn't have to remember it when it deallocates that memory block.  The
+AllocVec() function allocates a little more memory to store the size of
+the memory allocation request.
+
+    if (!(yap = (APTR)AllocVec(512, MEMF_CLEAR)))
+        {  /* COULDN'T GET MEMORY, EXIT */ }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

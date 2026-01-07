@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/scsidisk.h" NODE="MAIN" TITLE="Includes/devices/scsidisk.h" -->
+<head>
+<title>Includes/devices/scsidisk.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0042.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0044.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	DEVICES_SCSIDISK_H
+#define	DEVICES_SCSIDISK_H
+/*
+**	$Filename: devices/scsidisk.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.2 $
+**	$Date: 90/11/07 $
+**
+**	SCSI exec-level device command
+**
+**	(C) Copyright 1988-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+<a name="line15"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif /* EXEC_TYPES_H */
+
+
+
+/*--------------------------------------------------------------------
+ *
+ *   SCSI Command
+ *	Several Amiga SCSI controller manufacturers are converging on
+ *	standard ways to talk to their controllers.  This include
+ *	file describes an exec-device command (e.g. for hddisk.device)
+ *	that can be used to issue SCSI commands
+ *
+ *   UNIT NUMBERS
+ *	Unit numbers to the OpenDevice call have encoded in them which
+ *	SCSI device is being referred to.  The three decimal digits of
+ *	the unit number refer to the SCSI Target ID (bus address) in
+ *	the 1's digit, the SCSI logical unit (LUN) in the 10's digit,
+ *	and the controller board in the 100's digit.
+ *
+ *	Examples:
+ *		  0	drive at address 0
+ *		 12	LUN 1 on multiple drive controller at address 2
+ *		104	second controller board, address 4
+ *		 88	not valid: both logical units and addresses
+ *			range from 0..7.
+ *
+ *   CAVEATS
+ *	Original 2090 code did not support this command.
+ *
+ *	Commodore 2090/2090A unit numbers are different.  The SCSI
+ *	logical unit is the 100's digit, and the SCSI Target ID
+ *	is a permuted 1's digit: Target ID 0..6 maps to unit 3..9
+ *	(7 is reserved for the controller).
+ *
+ *	    Examples:
+ *		  3	drive at address 0
+ *		109	drive at address 6, logical unit 1
+ *		  1	not valid: this is not a SCSI unit.  Perhaps
+ *			it's an ST506 unit.
+ *
+ *	Some controller boards generate a unique name (e.g. 2090A's
+ *	iddisk.device) for the second controller board, instead of
+ *	implementing the 100's digit.
+ *
+ *	There are optional restrictions on the alignment, bus
+ *	accessability, and size of the data for the data phase.
+ *	Be conservative to work with all manufacturer's controllers.
+ *
+ *------------------------------------------------------------------*/
+<a name="line67"></a>
+#define	HD_SCSICMD	28	/* issue a SCSI command to the unit */
+				/* io_Data points to a SCSICmd */
+				/* io_Length is sizeof(struct SCSICmd) */
+				/* io_Actual and io_Offset are not used */
+<a name="line72"></a>
+<a name="line73">struct SCSICmd {</a>
+    UWORD  *scsi_Data;		/* word aligned data for SCSI Data Phase */
+				/* (optional) data need not be byte aligned */
+<a name="line76">				/* (optional) data need not be bus accessable */</a>
+    ULONG   scsi_Length;	/* even length of Data area */
+				/* (optional) data can have odd length */
+<a name="line79">				/* (optional) data length can be &#062; 2**24 */</a>
+<a name="line80">    ULONG   scsi_Actual;	/* actual Data used */</a>
+<a name="line81">    UBYTE  *scsi_Command;	/* SCSI Command (same options as scsi_Data) */</a>
+<a name="line82">    UWORD   scsi_CmdLength;	/* length of Command */</a>
+<a name="line83">    UWORD   scsi_CmdActual;	/* actual Command used */</a>
+<a name="line84">    UBYTE   scsi_Flags;		/* includes intended data direction */</a>
+<a name="line85">    UBYTE   scsi_Status;	/* SCSI status of command */</a>
+    UBYTE  *scsi_SenseData;	/* sense data: filled if SCSIF_[OLD]AUTOSENSE */
+				/* is set and scsi_Status has CHECK CONDITION */
+<a name="line88">				/* (bit 1) set */</a>
+    UWORD   scsi_SenseLength;	/* size of scsi_SenseData, also bytes to */
+<a name="line90">				/* request w/ SCSIF_AUTOSENSE, must be 4..255 */</a>
+    UWORD   scsi_SenseActual;	/* amount actually fetched (0 means no sense) */
+};
+
+
+<a name="line95">/*----- scsi_Flags -----*/</a>
+<a name="line96">#define	SCSIF_WRITE		0	/* intended data direction is out */</a>
+<a name="line97">#define	SCSIF_READ		1	/* intended data direction is in */</a>
+#define	SCSIB_READ_WRITE	0	/* (the bit to test) */
+<a name="line99"></a>
+<a name="line100">#define	SCSIF_NOSENSE		0	/* no automatic request sense */</a>
+#define	SCSIF_AUTOSENSE		2	/* do standard extended request sense */
+<a name="line102">					/* on check condition */</a>
+#define	SCSIF_OLDAUTOSENSE	6	/* do 4 byte non-extended request */
+<a name="line104">					/* sense on check condition */</a>
+<a name="line105">#define	SCSIB_AUTOSENSE		1	/* (the bit to test) */</a>
+#define	SCSIB_OLDAUTOSENSE	2	/* (the bit to test) */
+
+<a name="line108">/*----- SCSI io_Error values -----*/</a>
+<a name="line109">#define	HFERR_SelfUnit		40	/* cannot issue SCSI command to self */</a>
+<a name="line110">#define	HFERR_DMA		41	/* DMA error */</a>
+<a name="line111">#define	HFERR_Phase		42	/* illegal or unexpected SCSI phase */</a>
+<a name="line112">#define	HFERR_Parity		43	/* SCSI parity error */</a>
+<a name="line113">#define	HFERR_SelTimeout	44	/* Select timed out */</a>
+#define	HFERR_BadStatus		45	/* status and/or sense error */
+
+<a name="line116">/*----- OpenDevice io_Error values -----*/</a>
+#define	HFERR_NoBoard		50	/* Open failed for non-existant board */
+
+#endif	/* DEVICES_SCSIDISK_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

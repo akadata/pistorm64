@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="wb" NODE="CloseWorkbenchObjectA()" TITLE="workbench.library/CloseWorkbenchObjectAorkbench.library/CloseWorkbenchObjectA" -->
+<head>
+<title>workbench.library/CloseWorkbenchObjectAorkbench.library/CloseWorkbenchObjectA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05BE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05C0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CloseWorkbenchObjectA -- <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close</a> a drawer as if the user had clicked
+	    on the window close gadget. (V44)
+
+<b>   SYNOPSIS</b>
+	success = CloseWorkbenchObjectA(name,tags)
+	   D0                            A0   A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> CloseWorkbenchObjectA(STRPTR name,struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *tags);
+
+	success = CloseWorkbenchObject(name,...);
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> CloseWorkbenchObject(STRPTR name,...);
+
+<b>   FUNCTION</b>
+	This routine attempts to close the named object as if the user
+	had clicked on its drawer window close gadget.
+
+<b>   INPUTS</b>
+	name -- Name of the drawer to be closed.
+
+	tags -- Additional options.
+
+<b>   TAGS</b>
+	No tags are defined yet (V44).
+
+<b>   RESULTS</b>
+	result -- FALSE if the object in question could not be closed,
+	    TRUE otherwise. If FALSE is returned, you can query the error
+	    code using <a href="../Includes_and_Autodocs_3._guide/node0182.html">dos.library/IoErr()</a>.
+
+<b>   EXAMPLE</b>
+	/* <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close</a> the drawer &#034;SYS:&#034; */
+	CloseWorkbenchObjectA(&#034;SYS:&#034;,NULL);
+
+<b>   NOTES</b>
+	The name of the drawer to be closed is interpreted relative
+	to the current directory of the program to call
+	CloseWorkbenchObjectA().
+
+	For this function call to succeed, Workbench must be open. This
+	means that the LoadWB command was executed and the Workbench
+	screen has been opened.
+
+	While the user is dragging icons, no on-screen rendering may
+	take place. In this state Workbench may refuse to execute the
+	CloseWorkbenchObject() call and return an error code instead
+	(ERROR_OBJECT_IN_USE).
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0182.html">dos.library/IoErr</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05C1.html">workbench.library/OpenWorkbenchObjectA</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

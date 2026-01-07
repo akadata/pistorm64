@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="NewLoadSeg()" TITLE="dos.library/NewLoadSeg" -->
+<head>
+<title>dos.library/NewLoadSeg</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02D3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02D5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    NewLoadSeg -- Improved version of <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg</a> for stacksizes (V36)
+
+SYNOPSIS
+    seglist = NewLoadSeg(file, tags)
+    D0                    D1    D2
+
+    BPTR NewLoadSeg(STRPTR, struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *)
+
+    seglist = NewLoadSegTagList(file, tags)
+    D0                           D1    D2
+
+    BPTR NewLoadSegTagList(STRPTR, struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *)
+
+    seglist = NewLoadSegTags(file, ...)
+
+    BPTR NewLoadSegTags(STRPTR, ...)
+
+FUNCTION
+    Does a <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg</a> on a file, and takes additional actions based on the
+    tags supplied.
+
+    Clears unused portions of Code and Data hunks (as well as BSS hunks).
+    (This also applies to <a href="../Includes_and_Autodocs_2._guide/node02C0.html">InternalLoadSeg()</a> and <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a>).
+
+    NOTE to overlay users: NewLoadSeg() does NOT return seglist in
+    both D0 and D1, as <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg</a> does.  The current ovs.asm uses <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a>,
+    and assumes returns are in D1.  We will support this for <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a>
+    ONLY.
+
+INPUTS
+    file - Filename of file to load
+    tags - pointer to tagitem array
+
+RESULT
+    seglist - Seglist loaded, or NULL
+
+BUGS
+    No tags are currently defined.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a>, <a href="../Includes_and_Autodocs_2._guide/node0306.html">UnLoadSeg()</a>, <a href="../Includes_and_Autodocs_2._guide/node02C0.html">InternalLoadSeg()</a>, <a href="../Includes_and_Autodocs_2._guide/node02C1.html">InternalUnLoadSeg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

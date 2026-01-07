@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-5-2-3" TITLE="4 / / Refreshing Intuition Windows / SuperBitMap Refresh" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / / Refreshing Intuition Windows / SuperBitMap Refresh</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node011B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node011D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The SuperBitMap refresh type allows the application to provide and
+maintain bitmap memory for graphics in the window.  The bitmap can be any
+size as long as the window sizing limits respect the maximum size of the
+<a name="line5">bitmap.</a>
+
+SuperBitMap windows have their own memory for maintaining all obscured
+parts of the window up to the size of the defined bitmap, including those
+parts outside of the current window.  Intuition will update all parts of
+the window that are revealed through changes in sizing and changes in
+window overlapping.  The application never needs to redraw portions of the
+<a name="line12">window that were revealed by sizing or positioning windows in the screen.</a>
+
+SuperBitMap windows require the application to allocate a bitmap for use
+as off-screen memory, instead of using Intuition managed buffers.  This
+bitmap must be as large as, or larger than, the inner window's maximum
+dimensions (that is, the window's outside dimensions less the border
+<a name="line18">sizes).</a>
+
+SuperBitMap windows are almost always <a href="../Libraries_Manual_guide/node0125.html#line81">WFLG_GIMMEZEROZERO</a>, which renders
+the borders and system gadgets in a separate bitmap.  If the application
+wishes to create a SuperBitMap window that is not <a href="../Libraries_Manual_guide/node0116.html">GimmeZeroZero</a>, it must
+make the window borderless with no system gadgets, so that no border
+imagery is rendered by Intuition into the application's bitmap.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="RemSegment()" TITLE="dos.library/RemSegment" -->
+<head>
+<title>dos.library/RemSegment</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01A6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01A8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	RemSegment - Removes a resident segment from the resident list (V36)
+
+<b>   SYNOPSIS</b>
+	success = RemSegment(segment)
+	D0		        D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> RemSegment(struct <a href="../Includes_and_Autodocs_3._guide/node05D9.html#line298">Segment</a> *)
+
+<b>   FUNCTION</b>
+	Removes a resident segment from the Dos resident segment list,
+	unloads it, and does any other cleanup required.  Will only succeed
+	if the seg_UC (usecount) is 0.
+
+<b>   INPUTS</b>
+	segment - the segment to be removed
+
+<b>   RESULT</b>
+	success - success or failure.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0168.html">FindSegment()</a>, <a href="../Includes_and_Autodocs_3._guide/node013D.html">AddSegment()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

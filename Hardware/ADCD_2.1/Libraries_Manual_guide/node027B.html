@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_16" NODE="16-2" TITLE="16 ASL Library / Creating a File Requester" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>16 ASL Library / Creating a File Requester</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node027A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node027C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Opening an ASL requester requires the use of three functions:
+
+    APTR request =  AllocAslRequest( unsigned long type,
+                                     struct TagItem *tagList );
+    BOOL success =  AslRequest( APTR request, struct TagItem *tagList );
+    void            FreeAslRequest( APTR request );
+
+The first function you should call is <a href="../Includes_and_Autodocs_2._guide/node017C.html">AllocAslRequest()</a>.  This allocates
+the main data structure you will use, either a FileRequester structure or
+a <a href="../Libraries_Manual_guide/node0281.html">FontRequester</a> structure.  You specify the type of requester you want for
+AllocAslRequest() by setting the type argument.  This can be one of two
+values defined in &#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node00EA.html#line53">asl.h</a>&#062;:  either ASL_FileRequest, to ask for a
+FileRequester structure, or ASL_FontRequest, to ask for a FontRequester
+<a name="line15">structure.</a>
+
+Here's a listing of the FileRequester structure.  (The <a href="../Libraries_Manual_guide/node0281.html">FontRequester</a>
+<a name="line18">structure is discussed in more detail later in this chapter.)</a>
+
+    struct FileRequester    {          /* (from &#060;libraries/asl.h&#062;)     */
+        APTR    rf_Reserved1;
+        BYTE    *rf_File;          /* Filename pointer             */
+        BYTE    *rf_Dir;           /* Directory name pointer       */
+        CPTR    rf_Reserved2;
+        UBYTE   rf_Reserved3;
+        UBYTE   rf_Reserved4;
+        APTR    rf_Reserved5;
+        WORD    rf_LeftEdge,rf_TopEdge; /* Preferred window pos   */
+        WORD    rf_Width,rf_Height;     /* Preferred window size  */
+        WORD    rf_Reserved6;
+        LONG    rf_NumArgs;        /* A-la WB Args, for multiselects */
+        struct WBArg *rf_ArgList;
+        APTR    rf_UserData;       /* Applihandle (you may write!!)  */
+        APTR    rf_Reserved7;
+        APTR    rf_Reserved8;
+        BYTE    *rf_Pat;           /* Pattern match pointer          */
+        };                         /* note - more reserved fields follow */
+
+Whichever requester type you use, you must allocate the requester
+structure with the <a href="../Includes_and_Autodocs_2._guide/node017C.html">AllocAslRequest()</a> function call.  Do not create the
+data structure yourself.  The values in this structure are for read access
+only.  Any changes to them must be performed only through asl.library
+<a name="line43">function calls.</a>
+
+Once you have set up a requester structure with <a href="../Includes_and_Autodocs_2._guide/node017C.html">AllocAslRequest()</a>, call
+<a href="../Includes_and_Autodocs_2._guide/node017E.html">AslRequest()</a> to make the requester appear on screen.  AslRequest() takes
+the requester data structure as an argument using it as a specification
+for the requester that it creates on screen.
+
+     <a href="../Libraries_Manual_guide/node05E3.html">Figure 16-1: The ASL File Requester</a> 
+
+<a href="../Includes_and_Autodocs_2._guide/node017E.html">AslRequest()</a> is always synchronous to the calling program.  That is,
+control does not return to your program until the user makes a selection
+or cancels.  AslRequest() returns TRUE, if the user selects a file (or a
+font).  In that case the file (or font) name that the user selected is
+returned in the requester data structure.  AslRequest() returns FALSE if
+the user cancels the requester or the requester failed for some reason.
+
+When you have finished with a requester use the <a href="../Includes_and_Autodocs_2._guide/node017F.html">FreeAslRequest()</a> function
+to deallocate the requester data structure.
+
+ <a href="../Libraries_Manual_guide/node027C.html">Specifying Requester Options with TagItems</a> 
+ <a href="../Libraries_Manual_guide/node057F.html">Simple ASL File Requester Example</a> 
+ <a href="../Libraries_Manual_guide/node027D.html">File Pattern Matching and Multiple Selects</a> 
+ <a href="../Libraries_Manual_guide/node027E.html">ASL Requesters and Custom Screens</a> 
+ <a href="../Libraries_Manual_guide/node027F.html">The Save Requester</a> 
+ <a href="../Libraries_Manual_guide/node0280.html">The Directory Requester</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

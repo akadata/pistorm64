@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-2" TITLE="21 Exec Tasks / Task Creation" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 Exec Tasks / Task Creation</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02BB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02BD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To create a new task you must allocate a task structure, initialize its
+various fields, and then link AutoDocs/it into Exec with a call to <a href="../Includes_and_Autodocs_2._guide/node032D.html">AddTask()</a>. The
+task structure may be allocated by calling the <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a> function with
+the <a href="../Libraries_Manual_guide/node02A8.html#line37">MEMF_CLEAR</a> and <a href="../Libraries_Manual_guide/node02A8.html#line31">MEMF_PUBLIC</a> allocation attributes.  These attributes
+indicate that the data structure is to be pre-initialized to zero and that
+the structure is shared.
+
+The <a href="../Libraries_Manual_guide/node02BB.html">Task</a> fields that require initialization depend on how you intend to
+use the task.  For the simplest of tasks, only a few fields must be
+initialized:
+
+    tc_Node
+        The task list node structure.  This includes the task's
+        priority, its type, and its name (refer to the chapter
+<a name="line16">	&#034;<a href="../Libraries_Manual_guide/node02DA.html">Exec Lists and Queues</a>&#034;).</a>
+
+    tc_SPLower
+        The lower memory bound of the task's stack.
+
+    tc_SPUpper
+        The upper memory bound of the task's stack.
+
+    tc_SPReg
+        The initial stack pointer.  Because task stacks grow downward in
+        memory, this field is usually set to the same value as
+        tc_SPUpper.
+
+Zeroing all other unused fields will cause Exec to supply the appropriate
+system default values.  Allocating the structure with the <a href="../Libraries_Manual_guide/node02A8.html#line37">MEMF_CLEAR</a>
+<a name="line31">attribute is an easy way to be sure that this happens.</a>
+
+Once the structure has been initialized, it must be linked to Exec. This
+is done with a call to <a href="../Includes_and_Autodocs_2._guide/node032D.html">AddTask()</a> in which the following parameters are
+<a name="line35">specified:</a>
+
+    AddTask(struct Task *task, APTR initialPC, APTR finalPC )
+
+The task argument is a pointer to your initialized <a href="../Libraries_Manual_guide/node02BB.html">Task</a> structure.  Set
+initialPC to the entry point of your task code.   This is the address of
+the first instruction the new task will execute.
+
+Set finalPC to the address of the finalization code for your task.  This
+is a code section that will receive control if the initialPC routine ever
+performs a return (RTS). This exists to prevent your task from being
+launched into random memory upon an accidental return.  The finalPC
+routine should usually perform various program-related clean-up duties and
+should then remove the task.  If a zero is supplied for this parameter,
+Exec will use its default finalization code (which simply calls the
+<a href="../Libraries_Manual_guide/node02D0.html#line5">RemTask()</a> function).
+
+Under Release 2, <a href="../Includes_and_Autodocs_2._guide/node032D.html">AddTask()</a> returns the address of the newly added task or
+NULL for failure.  Under 1.3 and older versions of the OS, no values are
+returned.
+
+ <a href="../Libraries_Manual_guide/node02BD.html">Task Creation With Amiga.lib</a>    <a href="../Libraries_Manual_guide/node02BE.html">Task Stack</a>    <a href="../Libraries_Manual_guide/node02BF.html">Task Priority</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

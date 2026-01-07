@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="cardres" NODE="CardMiscControl()" TITLE="card.resource/CardMiscControl" -->
+<head>
+<title>card.resource/CardMiscControl</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0093.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0095.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CardMiscControl -- Set/Clear miscellaneous control bits
+
+<b>   SYNOPSIS</b>
+	control_bits=CardMiscControl( handle, control_bits );
+	d0			 	a1      	d1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> CardMiscControl( struct <a href="../Includes_and_Autodocs_3._guide/node05E2.html#line29">CardHandle</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> );
+
+<b>   FUNCTION</b>
+	Used to set/clear miscellaneous control bits (generally for
+	use with I/O cards).
+
+<b>   INPUTS</b>
+	handle - Same handle as that used when <a href="../Includes_and_Autodocs_3._guide/node009D.html">OwnCard()</a> was called.
+
+	control_bits - A mask value of control bits to be turned on/off.
+
+	The bit values which might be usable are defined in card.h/i.
+
+	For example, to enable digital audio, and disable hardware
+	write-protect (if supported), you would call this function with these
+	values --
+
+	CARDF_DISABLE_WP|CARDF_ENABLE_DIGAUDIO
+
+	Then to turn off digital audio, but leave write-protect
+	disable, you would use a value of --
+
+	CARDF_DISABLE_WP
+
+	Finally too reenable write protect, call this function with
+	a mask value of 0.
+
+<b>   RETURNS</b>
+	control_bits - The same mask value you called this function
+	with if successful.  If one, or more bits has been cleared
+	in the return mask, this would indicate that the control bit
+	is not being supported, or that the card has been removed
+	by the user.
+
+	For example, if you called this function with a mask value
+	of --
+
+	CARDF_DISABLE_WP|CARDF_ENABLE_DIGAUDIO
+
+	And this function returned a value of --
+
+	CARDF_DISABLE_WP
+
+	This would indicate that it is not possible to enable digital
+	audio (most likely because this feature has not been implemented).
+
+<b>   NOTES</b>
+	This function may be called from within a task, or from a level 1
+	or level 2 interrupt.
+
+	!!!IMPORTANT!!!
+
+	You should ALWAYS try to enable digital audio for I/O cards
+	as this will also configure the card socket for the I/O
+	interface (if supported).
+
+	Not all cards will connect the write-enable line (e.g.,
+	some I/O cards).  On some machines (e.g., the A600) it will
+	not be possible to write to such cards unless you disable
+	write-protection by using this function.
+
+	!!!NEW!!!
+
+	For card.resource V39 (check resource base for VERSION before
+	using), new bits have been defined which let you enable/disable
+	particular status change interrupts.  See <a href="../Includes_and_Autodocs_3._guide/node0093.html">CardInterface()</a> for
+	defaults.  These new bits are backwards compatable with V37
+	for which only the CARDB_DISABLE_WP, and CARDB_ENABLE_DIGAUDIO
+	bits were defined.  These new bits allow you to enable, or
+	disable specific status change interrupts including BVD1/SC,
+	BVD2/DA, and BSY/IRQ.  The defaults for these status change
+	interrupts are unchanged from V37, and WR (Write-protect) status
+	change interrupts are always enabled as they use to be.
+
+	An example of use:
+
+	CARD_INTF_SETCLR!CARD_INTF_BVD1
+
+	Would enable BVD1/SC status change interrupts, and not change
+	the enable/disable state for BVD2/DA or BSY/IRQ status change
+	interrupts.  If the change was made successfully, the
+	CARD_INTB_BVD1 bit would be set in register D0 when this function
+	returns.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0093.html">CardInterface()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E2.html">resources/card.h</a>, resources/card.i
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

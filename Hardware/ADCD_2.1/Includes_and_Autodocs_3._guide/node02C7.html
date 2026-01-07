@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="CoerceMode()" TITLE="graphics.library/CoerceMode" -->
+<head>
+<title>graphics.library/CoerceMode</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02C6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02C8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CoerceMode -- calculate <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> mode coercion (V39)
+
+<b>   SYNOPSIS</b>
+	ID = CoerceMode(RealViewPort, MonitorID, Flags);
+	d0              a0            d0         d1
+
+	ULONG CoerceMode(struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *, ULONG, ULONG);
+
+<b>   FUNCTION</b>
+	To determine the best mode in the MonitorID to coerce RealViewPort to,
+	given the restrictions set in Flags.
+
+<b>   INPUTS</b>
+	RealViewPort - <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> to coerce
+	MonitorID    - Montor number to coerce to (ie a mode masked with
+	               MONITOR_ID_MASK).
+	Flags        - PRESERVE_COLORS - keep the number of bitplanes
+	               in the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>.
+	               AVOID_FLICKER - do not coerce to an interlace mode
+
+<b>   RESULTS</b>
+	ID      - ID of the best mode to coerce to, or INVALID_ID if could not
+	          coerce (see NOTES).
+
+<b>   NOTES</b>
+	This function takes into account the compatibility of the Monitor
+	being coerced to, and the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> that is being coerced.
+	Incompatibilities will cause a result of INVALID_ID.
+
+<b>   EXAMPLE</b>
+	newmode = CoerceMode(vp, VGA_MONITOR_ID, PRESERVE_COLORS);
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0662.html">&#060;graphics/coerce.h&#062;</a> <a href="../Includes_and_Autodocs_3._guide/node05FF.html">&#060;graphics/displayinfo.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

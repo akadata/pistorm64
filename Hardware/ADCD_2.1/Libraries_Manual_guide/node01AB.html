@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_7" NODE="7-3" TITLE="7 Intuition Requesters and Alerts / Requester Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>7 Intuition Requesters and Alerts / Requester Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01AA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01AC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Unused fields in the Requester structure should be initialized to NULL or
+zero before using the structure.  For global data that is pre-initialized,
+be sure to set all unused fields to zero.  For dynamically allocated
+structures, allocate the storage with the MEMF_CLEAR flag, or call the
+<a href="../Libraries_Manual_guide/node01A2.html">InitRequester()</a> function to clear the structure.
+
+    Requesters are Initialized According to Their Type.
+    ---------------------------------------------------
+    See &#034;<a href="../Libraries_Manual_guide/node01A4.html">Rendering Requesters</a>&#034; and &#034;<a href="../Libraries_Manual_guide/node01A7.html">Gadgets in Requesters</a>&#034; above for
+    information about how the initialization of the structure differs
+<a name="line12">    according to how the requester is rendered.</a>
+
+The specification for a Requester structure, defined in
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">intuition.h</a>&#062;, is as follows.
+
+    struct Requester
+        {
+        struct Requester *OlderRequest;
+        WORD LeftEdge, TopEdge;
+        WORD Width, Height;
+        WORD RelLeft, RelTop;
+        struct Gadget *ReqGadget;
+        struct Border *ReqBorder;
+        struct IntuiText *ReqText;
+        UWORD Flags;
+        UBYTE BackFill;
+        struct Layer *ReqLayer;
+        UBYTE ReqPad1[32];
+        struct BitMap *ImageBMap;
+        struct Window *RWindow;
+        struct Image  *ReqImage;
+        UBYTE ReqPad2[32];
+<a name="line34">        };</a>
+
+<a name="line36">Here are the meanings of the fields in the Requester structure:</a>
+
+OlderRequest
+<a name="line39">    For system use, initialize to NULL.</a>
+
+LeftEdge, TopEdge
+    The location of the requester relative to the upper left corner of
+    the window.  These values must be set if the POINTREL flag is not
+<a name="line44">    set.  Use RelLeft and RelTop for POINTREL requesters.</a>
+
+Width, Height
+    These fields describe the size of the entire requester rectangle,
+<a name="line48">    containing all the text and gadgets.</a>
+
+RelLeft, RelTop
+    These values are only used if the POINTREL flag in the requester's
+    Flags field is set.
+
+    If the requester is a <a href="../Libraries_Manual_guide/node01A9.html">double menu</a> requester and POINTREL is set then
+    these values contain the relative offset of the requester's upper
+    left corner from the current pointer position.
+
+    If the requester is not a <a href="../Libraries_Manual_guide/node01A9.html">double menu</a> requester and POINTREL is set,
+    then these values contain the relative offset of the requester's
+    center from the center of the window that the requester is to be
+    displayed in.  For example, using POINTREL with a requester which is
+    not a double menu requester with RelLeft and RelTop of zero will
+    center the requester in the window.  The requester is centered within
+    the inner part of the window, that is, within the inside edge of the
+    window's borders.
+
+    If the requester is POINTREL and part of the containing box will
+    appear out of the window, Intuition will adjust the requester so that
+    the upper left corner is visible and as much of the remaining box as
+    possible is visible.  The adjustment attempts to maintain the
+    requester within the window's borders, not within the window's
+<a name="line72">    bounding box.</a>
+
+ReqGadget
+    This field is a pointer to the first in a linked list of <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>
+    structures.  <a href="../Libraries_Manual_guide/node0149.html#line88">GTYP_REQGADGET</a> must be specified in the <a href="../Libraries_Manual_guide/node0149.html#line58">GadgetType</a>s
+    field of all Gadget structures that are used in a requester.  Take
+    care not to specify gadgets that extend beyond the Requester
+    rectangle specified by the Width and Height fields, as Intuition does
+<a name="line80">    no boundary checking.</a>
+
+    For requesters with custom imagery, where PREDRAWN is set, ReqGadget
+    points to a valid list of gadgets, which are real gadgets in every
+    way except that the gadget text and imagery information are ignored
+    (and can be NULL).  The select box, highlighting, and gadget type
+    data are still used.  Try to maintain a close correspondence between
+    the gadgets' select boxes and the supplied imagery.
+
+    String Gadgets and Pre-drawn Requesters.
+    ----------------------------------------
+    Intuition will not render string gadget text in a predrawn requester.
+    The application must use other rendering means than the predrawn
+<a name="line93">    bitmap if it wishes to use string gadgets with a requester.</a>
+
+ReqBorder
+    This field is a pointer to an optional linked list of <a href="../Libraries_Manual_guide/node01C1.html">Border</a>
+    structures for drawing lines around and within the requester.  The
+    lines specified in the border may go anywhere in the requester; they
+    are not confined to the perimeter of the requester.
+
+    For requesters with custom imagery, where PREDRAWN is set, this
+<a name="line102">    variable is ignored and may be set to NULL.</a>
+
+ReqText
+    This field is a pointer to an optional linked list of <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a>
+    structures containing text for the requester.  This is for general
+    text in the requester.
+
+    For requesters with custom imagery, where PREDRAWN is set, this
+<a name="line110">    variable is ignored and can be set to NULL.</a>
+
+Flags
+<a name="line113">    The following flags may be specified for the Requester:</a>
+
+    POINTREL
+        Specify POINTREL to indicate that the requester is to appear in
+        a relative rather than a fixed position.
+
+        For <a href="../Libraries_Manual_guide/node01A9.html">double menu</a> requesters, the position is relative to the
+        pointer. Otherwise, the position of POINTREL requesters is
+        relative to the center of the window.
+
+<a name="line123">        See the discussion of RelLeft and RelTop, above.</a>
+
+    PREDRAWN
+        Specify PREDRAWN if a custom <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> structure is supplied for
+<a name="line127">        the requester and ImageBMap points to the structure.</a>
+
+    NOISYREQ
+        Normally, when a requester is active, any gadget, menu, mouse
+        and keyboard events within the parent window are blocked.
+        Specify the NOISYREQ requester flag to allow keyboard and mouse
+        button IDCMP events to be posted, even though the requester is
+        active in the parent window.
+
+        If the NOISYREQ requester flag is set, the application will
+        receive <a href="../Libraries_Manual_guide/node01E1.html#line19">IDCMP_RAWKEY</a>, <a href="../Libraries_Manual_guide/node01E1.html">IDCMP_VANILLAKEY</a> and <a href="../Libraries_Manual_guide/node01DC.html">IDCMP_MOUSEBUTTONS</a>
+        events.  Note that with NOISYREQ set, IDCMP_MOUSEBUTTON events
+        will also be sent when the user clicks on any of the blocked
+        gadgets in the parent window.
+
+        Although the reporting of mouse button events depends on
+        NOISYREQ, mouse movement events do not.  <a href="../Libraries_Manual_guide/node01DC.html#line23">IDCMP_MOUSEMOVE</a> events
+        are reported if the window flag <a href="../Libraries_Manual_guide/node0125.html#line44">WFLG_REPORTMOUSE</a> is set in the
+        parent window, or if one of the requester gadgets is down and
+        has the <a href="../Libraries_Manual_guide/node014B.html#line40">GACT_FOLLOWMOUSE</a> flag set.  This is true even if the
+<a name="line147">        requester is a <a href="../Libraries_Manual_guide/node01A9.html">double menu</a> requester.</a>
+
+    USEREQIMAGE
+        Render the linked list of images pointed to by ReqImage after
+<a name="line151">        rendering the BackFill color but before gadgets and text.</a>
+
+    NOREQBACKFILL
+        Do not backfill the requester with the BackFill pen.
+
+<a name="line156">    In addition, Intuition uses these flags in the Requester:</a>
+
+    REQOFFWINDOW
+        Set by Intuition if the requester is currently active but is
+<a name="line160">        positioned off window.</a>
+
+    REQACTIVE
+        This flag is set or cleared by Intuition as the requester is
+        posted and removed.  The active requester is indicated by the
+<a name="line165">        value of <a href="../Libraries_Manual_guide/node0121.html">Window</a>.FirstRequest.</a>
+
+    SYSREQUEST
+        This flag is set by Intuition if this is a <a href="../Libraries_Manual_guide/node01AF.html">system</a> generated
+        requester. Since the system will never create a <a href="../Libraries_Manual_guide/node01A1.html">true</a> requester
+        in an application window, the application should not be
+<a name="line171">        concerned with this flag.</a>
+
+BackFill
+    BackFill is the pen number to be used to fill the rectangle of the
+    requester before any drawing takes place.  For requesters with custom
+    imagery, where PREDRAWN is set, or for requesters with NOREQBACKFILL
+<a name="line177">    set, this variable is ignored.</a>
+
+ReqLayer
+    While the requester is active, this contains the address of the <a href="../Libraries_Manual_guide/node03E4.html">Layer</a>
+<a name="line181">    structure used in rendering the requester.</a>
+
+ImageBMap
+    A pointer to the custom bitmap for this requester.  If this requester
+<a name="line185">    is not PREDRAWN, Intuition ignores this variable.</a>
+
+    When a custom bitmap is supplied, the PREDRAWN flag in the
+<a name="line188">    requester's Flags field must be set.</a>
+
+RWindow
+<a name="line191">    Reserved for system use.</a>
+
+ReqImage
+    A pointer to a list of <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structures used to create imagery within
+    the requester.  Intuition ignores this field if the flag USEREQIMAGE
+    is not set.  This imagery is automatically redrawn by Intuition each
+    time the requester needs refreshing.  The images are drawn after
+<a name="line198">    filling with the BackFill pen, but before the gadgets and text.</a>
+
+ReqPad1, ReqPad2
+    Reserved for system use.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="II-37/Pattern.c" NODE="MAIN" TITLE="II-37/Pattern.c" -->
+<head>
+<title>II-37/Pattern.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0170.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0172.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* Pattern.c.   AmigaMail pattern matching example.  Compiled with SAS/C 6.56:
+sc NMINC STRMERGE NOSTKCHK NODEBUG DATA=FAR IGNORE=73 Pattern.c
+slink from Pattern.o to Pattern lib lib:amiga.lib
+quit
+*/
+/*
+Copyright (c) 1991-1999 Amiga, Inc.
+
+This example is provided in electronic form by Amiga, Inc.
+for use with the Amiga Mail Volume II technical publication.
+Amiga Mail Volume II contains additional information on the correct
+usage of the techniques and operating system functions presented in
+these examples.  The source and executable code of these examples may
+only be distributed in free electronic form, via bulletin board or
+as part of a fully non-commercial and freely redistributable
+diskette.  Both the source and executable code (including comments)
+must be included, without modification, in any copy.  This example
+may not be published in printed form or distributed with any
+commercial product. However, the programming techniques and support
+routines set forth in these examples may be used in the development
+of original executable software products for Amiga
+computers.
+
+All other rights reserved.
+
+This example is provided &#034;as-is&#034; and is subject to change; no
+warranties are made.  All use is at your own risk. No liability or
+responsibility is assumed.
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;dos/dosasl.h&#062;
+#include &#060;dos/rdargs.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/utility_protos.h&#062;
+
+/* define pragmas if you have them
+#define PRAGMAS */
+#ifdef PRAGMAS
+#include &#060;pragmas/exec_pragmas.h&#062;
+#include &#060;pragmas/dos_pragmas.h&#062;
+#include &#060;pragmas/utility_pragmas.h&#062;
+#else
+struct ExecBase *SysBase;
+struct DosLibrary *DOSBase;
+struct Library *UtilityBase;
+#endif
+
+VOID            main(VOID);
+UWORD           StrLen(UBYTE *);
+
+VOID main(VOID)
+{
+#ifdef PRAGMAS
+    struct DosLibrary *DOSBase;
+    struct Library *UtilityBase;
+
+#endif
+
+    struct RDArgs  *readargs;
+    LONG            rargs[3];
+    LONG            vargs[4];
+    UBYTE         **strings;
+    UBYTE          *pattern, *parsebuffer;
+    UWORD           case_sensitive, buffersize;
+    LONG            iswild, success;
+    COUNT           i;
+
+#ifndef PRAGMAS
+    /* set up SysBase */
+    SysBase = (*((struct Library **) 4));
+#endif
+
+    /* Fail silently if &#060; 37 */
+    if (DOSBase = (struct DosLibrary *) OpenLibrary(&#034;dos.library&#034;, 37))
+    {
+        UtilityBase = DOSBase-&#062;dl_UtilityBase;
+
+        /* See the DOS Autodocs for more information about ReadArgs() */
+        if (readargs = ReadArgs(&#034;PATTERN/A,CASE/S,STRINGS/A/M&#034;, rargs, NULL))
+        {
+
+            /* The pattern. */
+            pattern = (UBYTE *) (rargs[0]);
+
+            /*
+             * Case sensitive or not? (default not. Note filename matching
+             * should ALWAYS be case insensitive).
+             */
+            case_sensitive = (UWORD) (rargs[1]);
+
+            /* Pointer to array of strings to match */
+            strings = (UBYTE **) (rargs[2]);
+
+            /* Get a buffer big enough to hold all the tokens */
+            buffersize = StrLen(pattern) * 3;
+
+            if (parsebuffer = AllocMem(buffersize, MEMF_CLEAR))
+            {
+
+                /* Parse the pattern, according to case sensitivity flag */
+                if (case_sensitive)
+                    iswild = ParsePattern(pattern, parsebuffer, buffersize);
+                else
+                {
+                    /* make pattern uppercase in case of character classes */
+                    i = 0;
+                    while (pattern[i])
+                        pattern[i] = ToUpper(pattern[i++]);
+                    iswild = ParsePatternNoCase(pattern, parsebuffer, buffersize);
+                }
+
+                /*
+                 * -1 if ParsePattern() failed, 0 for no wildcards, 1 for
+                 * wildcards. For this I don't care if the supplied pattern had
+                 * wildcards or not.
+                 */
+                if (iswild != -1)
+                {
+                    /* The array of strings is terminated with a NULL */
+                    while (*strings)
+                    {
+
+                        /*
+                         * MatchPattern() returns 1 for a successful match, 0
+                         * for no match
+                         */
+                        if (case_sensitive)
+                            success = MatchPattern(parsebuffer, *strings);
+                        else
+                            success = MatchPatternNoCase(parsebuffer, *strings);
+                        if (success)
+                        {
+                            vargs[0] = (LONG) * strings;
+                            VFPrintf(Output(), &#034;Match: %s\n&#034;, vargs);
+                        }
+                        else
+                        {
+                            if (IoErr() != 0)
+                            {
+                                VFPrintf(Output(), &#034;Overflow\n&#034;, NULL);
+                                break;
+                            }
+                        }
+                        strings++;
+                    }
+                }
+                else
+                    PrintFault(ERROR_BAD_TEMPLATE, pattern);
+                FreeMem(parsebuffer, buffersize);
+            }
+            else
+                PrintFault(ERROR_NO_FREE_STORE, NULL);
+            FreeArgs(readargs);
+        }
+        else
+            PrintFault(IoErr(), NULL);
+        CloseLibrary((struct Library *) DOSBase);
+    }
+}
+
+UWORD StrLen(UBYTE * string)
+{
+    UBYTE          *length = string + 1;
+
+    while (*string++ != '\0');
+    return ((UWORD) (string - length));
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

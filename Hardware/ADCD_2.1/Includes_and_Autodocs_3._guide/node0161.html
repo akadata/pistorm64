@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="Fault()" TITLE="dos.library/Fault" -->
+<head>
+<title>dos.library/Fault</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0160.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0162.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	Fault -- Returns the text associated with a DOS error code (V36)
+
+<b>   SYNOPSIS</b>
+	len = Fault(code, header, buffer, len)
+	D0           D1     D2      D3    D4
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> Fault(LONG, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, LONG)
+
+<b>   FUNCTION</b>
+	This routine obtains the error message text for the given error code.
+	The header is prepended to the text of the error message, followed
+	by a colon.  Puts a null-terminated string for the error message into
+	the buffer.  By convention, error messages should be no longer than 80
+	characters (+1 for termination), and preferably no more than 60.
+	The value returned by <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a> is set to the code passed in.  If there
+	is no message for the error code, the message will be &#034;Error code
+	&#060;number&#062;n&#034;.
+
+	The number of characters put into the buffer is returned, which will
+	be 0 if the code passed in was 0.
+
+<b>   INPUTS</b>
+	code   - Error code
+	header - header to output before error text
+	buffer - Buffer to receive error message.
+	len    - Length of the buffer.
+
+<b>   RESULT</b>
+	len    - number of characters put into buffer (may be 0)
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>, <a href="../Includes_and_Autodocs_3._guide/node01B8.html">SetIoErr()</a>, <a href="../Includes_and_Autodocs_3._guide/node019E.html">PrintFault()</a>
+
+<b>   BUGS</b>
+	In older documentation, the return was shown as <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> success.  This
+	was incorrect, it has always returned the length.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

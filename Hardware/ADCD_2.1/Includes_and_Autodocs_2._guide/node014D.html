@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/amiga_lib" NODE="CxFilter()" TITLE="amiga.lib/CxFilter" -->
+<head>
+<title>amiga.lib/CxFilter</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node014C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node014E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CxFilter -- create a commodity filter object. (V36)
+
+SYNOPSIS
+    filterObj = CxFilter(description);
+
+    CxObj *CxFilter(STRPTR)
+
+FUNCTION
+    Creates an input event filter object that matches the
+    'description' string. If 'description' is NULL, the filter will not
+    match any messages.
+
+    A filter may be modified by the functions <a href="../Includes_and_Autodocs_2._guide/node01B3.html">SetFilter()</a>, using
+    a description string, and <a href="../Includes_and_Autodocs_2._guide/node01B4.html">SetFilterIX()</a>, which takes a
+    binary Input Expression as a parameter.
+
+    This function is a C-language macro for <a href="../Includes_and_Autodocs_2._guide/node01A1.html">CreateCxObj()</a>, defined
+    in <a href="../Includes_and_Autodocs_2._guide/node00F0.html">&#060;libraries/commodities.h&#062;</a>.
+
+INPUTS
+    description - the description string in the same format as strings
+                  expected by <a href="../Includes_and_Autodocs_2._guide/node01B3.html">commodities.library/SetFilter()</a>
+
+RESULTS
+    filterObj - a pointer to the filter object, or NULL if there
+                was not enough memory. If there is a problem in the
+                description string, the internal error code of the filter
+                object will be set to so indicate. This error code may be
+                interrogated using the function <a href="../Includes_and_Autodocs_2._guide/node01A6.html">CxObjError()</a>.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01A1.html">commodities.library/CreateCxObj()</a>, <a href="../Includes_and_Autodocs_2._guide/node01B3.html">commodities.library/SetFilter()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node01B4.html">commodities.library/SetFilterIX()</a>, <a href="../Includes_and_Autodocs_2._guide/node01A6.html">commodities.library/CxObjError()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

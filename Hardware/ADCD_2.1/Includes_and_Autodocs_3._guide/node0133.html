@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="diskfont" NODE="AvailFonts()" TITLE="diskfont.library/AvailFonts" -->
+<head>
+<title>diskfont.library/AvailFonts</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0132.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0134.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05DA.html#line95">AvailFonts</a> -- Inquire available memory &#038; disk fonts.
+
+<b>   SYNOPSIS</b>
+	error = AvailFonts(buffer, bufBytes, flags);
+	                   A0      D0        D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> AvailFonts( struct <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line105">AvailFontsHeader</a> *buffer, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> bufBytes
+		ULONG flags );
+
+<b>   FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05DA.html#line95">AvailFonts</a> fills a user supplied buffer with the structure,
+	described below, that contains information about all the
+	fonts available in memory and/or on disk.  Those fonts
+	available on disk need to be loaded into memory and opened
+	via <a href="../Includes_and_Autodocs_3._guide/node0137.html">OpenDiskFont</a>, those already in memory are accessed via
+	<a href="../Includes_and_Autodocs_3._guide/node0308.html">OpenFont</a>.  The <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> structure required by the open calls
+	is part of the information <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line95">AvailFonts</a> supplies.
+
+	When <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line95">AvailFonts</a> fails, it returns the number of extra bytes
+	it needed to complete the command.  Add this number to your
+	current buffer size, allocate a new buffer, and try again.
+
+<b>   INPUTS</b>
+	buffer - memory to be filled with struct <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line105">AvailFontsHeader</a>
+		followed by an array of <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line95">AvailFonts</a> elements, which
+		contains entries for the available fonts and their
+		names.
+
+	bufBytes - the number of bytes in the buffer
+	flags - AFF_MEMORY is set to search memory for fonts to fill
+		the structure, AFF_DISK is set to search the disk for
+		fonts to fill the structure.  AFF_SCALED is set to
+		not filter out memory fonts that are not designed.
+		AFF_BITMAP is set to filter out fonts that are not
+		stored in Amiga font format, i.e. to filter out
+		outline fonts.  Any combination may be specified.
+		AFF_TAGGED is set to fill the buffer with <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line100">TAvailFonts</a>
+		elements instead of <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line95">AvailFonts</a> elements.
+
+<b>   RESULTS</b>
+	buffer - filled with struct <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line105">AvailFontsHeader</a> followed by the
+		[T]AvailFonts elements, There will be duplicate entries
+		for fonts found both in memory and on disk, differing
+		only by type.  The existance of a disk font in the
+		buffer indicates that it exists as an entry in a font
+		contents file -- the underlying font file has not been
+		checked for validity, thus an <a href="../Includes_and_Autodocs_3._guide/node0137.html">OpenDiskFont</a> of it may
+		fail.
+	error - if non-zero, this indicates the number of bytes needed
+		for <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line95">AvailFonts</a> in addition to those supplied.  Thus
+		structure elements were not returned because of
+		insufficient bufBytes.
+
+<b>   EXAMPLE</b>
+	int afShortage, afSize;
+	struct <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line105">AvailFontsHeader</a> *afh;
+
+	...
+
+	afSize = 400;
+	do {
+	    afh = (struct <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line105">AvailFontsHeader</a> *) AllocMem(afSize, 0);
+	    if (afh) {
+	        afShortage = AvailFonts(afh, afSize, AFF_MEMORY|AFF_DISK);
+	        if (afShortage) {
+	            FreeMem(afh, afSize);
+	            afSize += afShortage;
+	        }
+	    }
+	    else {
+	        fail(&#034;AllocMem of <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line95">AvailFonts</a> buffer afh failedn&#034;);
+	        break;
+	    }
+	}
+	    while (afShortage);
+
+	/*
+	 * if (afh) non-zero here, then:
+	 * 1. it points to a valid <a href="../Includes_and_Autodocs_3._guide/node05DA.html#line105">AvailFontsHeader</a>
+	 * 2. it must have FreeMem(afh, afSize) called for it after use
+	 */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

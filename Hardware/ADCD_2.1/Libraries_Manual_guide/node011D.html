@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-5-3" TITLE="4 / Preserving the Window Display / Intuition Refresh Events" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Preserving the Window Display / Intuition Refresh Events</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node011C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node011E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When using a Simple Refresh or a Smart Refresh windows, the program may
+receive refresh events, informing it to update the display.  See the above
+<a name="line4">discussion for information on when refresh events are sent.</a>
+
+A message of the class <a href="../Libraries_Manual_guide/node01E0.html#line7">IDCMP_REFRESHWINDOW</a> arrives at the IDCMP, informing
+the program of the need to update the display.  The program must take some
+action when it receives a refresh event, even if it is just the acceptable
+<a name="line9">minimum action described below.</a>
+
+On receiving a refresh event, <a href="../Libraries_Manual_guide/node011E.html">BeginRefresh()</a> must be called, then the
+program should redraw its display, and, finally, call <a href="../Libraries_Manual_guide/node011E.html#line25">EndRefresh()</a>.  The
+minimum required action is to call the BeginRefresh()/EndRefresh() pair.
+This allows Intuition and the <a href="../Libraries_Manual_guide/node03E3.html#line22">Layers library</a> keep things sorted and
+organized.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

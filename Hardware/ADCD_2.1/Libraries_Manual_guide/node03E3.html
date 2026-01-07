@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1" TITLE="30 Layers Library / Layers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 Layers Library / Layers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03E2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03E4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The concept of a layer is closely tied to Intuition windows.  A layer is a
+rectangular drawing area.  A layer can overlap other layers and has a
+display priority that determines whether it will appear in front or behind
+other layers.  Every Intuition window has an associated <a href="../Libraries_Manual_guide/node03E4.html">Layer</a> structure.
+<a name="line6">Layers allow Intuition and application programs to :</a>
+
+    * Share a display's <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> among various tasks in an orderly way
+      by creating layers, separate drawing rectangles, within the
+      BitMap.
+
+    * Move, size or depth-arrange a layer while automatically keeping
+      track of which portions of other layers are hidden or revealed
+<a name="line14">      by the operation.</a>
+
+    * Manage the remapping of coordinates, so the application need not
+      track the layer's offset into the <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a>.
+
+    * Maintain each layer as a separate entity, which may optionally
+      have its own <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a>.
+
+<a name="line22">    * Automatically update same newly visible portions.</a>
+
+The layers library takes care of housekeeping: the low level, repetitive
+tasks which are required to keep track of where to place bits.  The layers
+library also provides a locking mechanism which coordinates display
+updating when multiple tasks are drawing graphics to layers.  The
+windowing environment provided by the Intuition library is largely based
+on layers.
+
+    WARNING:
+    --------
+    Layers may not be created or used directly with Intuition screens.
+    Intuition windows are the only supported method of adding layers to
+    Intuition screens.  Only the layer locking and unlocking functions
+    are safe to use with Intuition.  An application must create and
+    manage its own <a href="../Libraries_Manual_guide/node00F1.html#line4">View</a> if it will be creating layers directly on the
+    display.
+
+ <a href="../Libraries_Manual_guide/node03E4.html">The Layer Structure</a>           <a href="../Libraries_Manual_guide/node03EC.html">Working With Existing Layers</a> 
+ <a href="../Libraries_Manual_guide/node03E5.html">The Layer's RastPort</a>          <a href="../Libraries_Manual_guide/node03EF.html">Creating and Using New Layers</a> 
+ <a href="../Libraries_Manual_guide/node03E6.html">Types of Layers</a>               <a href="../Libraries_Manual_guide/node05C8.html">Layers Example</a> 
+ <a href="../Libraries_Manual_guide/node03EB.html">Opening the Layers Library</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

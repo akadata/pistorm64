@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_12" NODE="12-4-4" TITLE="12 / / Using Separate Read And Write Tasks" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>12 / / Using Separate Read And Write Tasks</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00A4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00A6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In some cases there are advantages to creating a separate <a href="../Devices_Manual_guide/node009C.html#line7">IOExtSer</a> for
+reading and writing.  This allows simultaneous operation of both reading
+and writing.  Some users of the device have separate tasks for read and
+write operations. The sample code below creates a separate reply port and
+request for writing to the serial device.
+
+
+struct IOExtSer *SerialWriteIO;
+struct MsgPort  *SerialWriteMP;
+
+/*
+ * If two tasks will use the same device at the same time, it is
+ * preferred use two OpenDevice() calls and SHARED mode.  If exclusive
+ * access mode is required, then you will need to copy an existing
+ * IORequest.
+ * Remember that two separate tasks will require two message ports.
+ */
+
+SerialWriteMP = CreatePort(0,0);
+SerialWriteIO = (struct IOExtSer *)
+                CreateExtIO( SerialWriteMP,sizeof(struct IOExtSer) );
+
+if (SerialWriteMP &#038;&#038; SerialWriteIO )
+    {
+
+    /* Copy over the entire old IO request, then stuff the
+     * new Message port pointer.
+     */
+
+    CopyMem( SerialIO, SerialWriteIO, sizeof(struct IOExtSer) );
+    SerialWriteIO-&#062;IOSer.io_Message.mn_ReplyPort = SerialWriteMP;
+
+    SerialWriteIO-&#062;IOSer.io_Command  = CMD_WRITE;
+    SerialWriteIO-&#062;IOSer.io_Length = -1;
+    SerialWriteIO-&#062;IOSer.io_Data = (APTR)&#034;A poet's food is love and fame&#034;;
+    DoIO(SerialWriteIO);
+    }
+
+
+   Where's OpenDevice()?
+   ---------------------
+   This code assumes that the <a href="../Includes_and_Autodocs_2._guide/node04D4.html">OpenDevice()</a> function has already been
+   called.  The initialized read request block is copied onto the new
+   write request block.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

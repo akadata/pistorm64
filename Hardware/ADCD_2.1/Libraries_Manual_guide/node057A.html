@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/uptime.c" NODE="MAIN" TITLE="lib_examples/uptime.c" -->
+<head>
+<title>lib_examples/uptime.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0579.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node057B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* uptime.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfis -j73 uptime.c
+Blink FROM LIB:c.o,uptime.o TO uptime LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+*/
+    /* Uses SAS C getreg() */
+
+    #include &#060;exec/types.h&#062;
+    #include &#060;exec/memory.h&#062;
+    #include &#060;dos/dos.h&#062;
+    #include &#060;dos/dosextens.h&#062;
+    #include &#060;dos/datetime.h&#062;
+    #include &#060;utility/date.h&#062;
+    #include &#060;dos.h&#062;
+
+    #include &#060;clib/exec_protos.h&#062;
+    #include &#060;clib/dos_protos.h&#062;
+    #include &#060;clib/utility_protos.h&#062;
+
+    #include &#060;stdlib.h&#062;
+
+    struct Library *UtilityBase;
+
+    LONG main(void);
+
+    LONG main(void)
+    {
+      struct InfoData *infodata;
+      struct DeviceList *ramdevice;
+      struct DateStamp *now;
+      LONG currenttime, boottime;
+      BPTR lock;
+      LONG vargs[3];
+      LONG rc = RETURN_FAIL;
+
+      /* Fails silently if &#060; 37 */
+      if (UtilityBase = OpenLibrary(&#034;utility.library&#034;, 37))
+      {
+        if (infodata = AllocMem(sizeof(struct InfoData), MEMF_CLEAR))
+        {
+          if (now = AllocMem(sizeof(struct DateStamp), MEMF_CLEAR))
+          {
+            if (lock = Lock(&#034;RAM:&#034;, SHARED_LOCK))
+            {
+              if ((Info(lock, infodata)) == DOSTRUE)
+              {
+                /* Make C pointer */
+
+                ramdevice = BADDR(infodata-&#062;id_VolumeNode);
+
+                boottime = SMult32(ramdevice-&#062;dl_VolumeDate.ds_Days, 86400) +
+                           SMult32(ramdevice-&#062;dl_VolumeDate.ds_Minute, 60) +
+                           SDivMod32(ramdevice-&#062;dl_VolumeDate.ds_Tick,
+                                     TICKS_PER_SECOND );
+
+                DateStamp(now);
+
+                currenttime = SMult32(now-&#062;ds_Days, 86400) +
+                              SMult32(now-&#062;ds_Minute, 60) +
+                              SDivMod32(now-&#062;ds_Tick, TICKS_PER_SECOND);
+
+                currenttime -= boottime;
+
+                if (currenttime &#062; 0)
+                {
+                  vargs[0] = UDivMod32(currenttime, 86400);
+
+                  vargs[1] = getreg(1);
+                  vargs[1] = UDivMod32(vargs[1], 3600);
+
+                  vargs[2] =getreg(1);
+                  vargs[2] = UDivMod32(vargs[2], 60);
+
+                  /*
+                   * Passing the address of the array allows the VPrintf()
+                   * function to access the array contents.  Keep in mind
+                   * that VPrintf() does _NOT_ know how many elements are
+                   * really valid in the final parameter, and will gleefully
+                   * run past the valid arguments.
+                   */
+                  VFPrintf(Output(),
+                           &#034;up for %ld days, %ld hours, %ld minutes\n&#034;,
+                           vargs );
+
+                  rc = RETURN_OK;
+                }
+              }
+              UnLock(lock);
+            }
+            FreeMem(now, sizeof(struct DateStamp));
+          }
+          FreeMem(infodata, sizeof(struct InfoData));
+        }
+        CloseLibrary(UtilityBase);
+      }
+      exit(rc);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_4" NODE="4-5" TITLE="4 Console Device / Reading from the Console Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>4 Console Device / Reading from the Console Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node008E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0090.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Reading input from the console device returns an ANSI 3.64 standard byte
+stream.  This stream may contain normal characters and/or RAW input event
+information.  You may also request other RAW input events using the SET
+RAW EVENTS and RESET RAW EVENTS control sequences discussed below.  See
+&#034;<a href="../Devices_Manual_guide/node0094.html">Selection of Raw Input Events.</a>&#034;.
+
+Generally, console reads are performed asynchronously so that your program
+can respond to other events and other user input (such as menu selections)
+when the user is not typing on the keyboard. To perform asynchronous I/O,
+an I/O request is sent to the console using the <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> function (rather
+than a synchronous <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> which would wait until the read request returned
+with a character).
+
+You read from the console device by passing an I/O request to the device
+with a pointer to the read buffer set in io_Data, the number of bytes in
+the buffer set in io_Length and <a href="../Includes_and_Autodocs_2._guide/node0507.html">CMD_READ</a> set in io_Command.
+
+   #define READ_BUFFER_SIZE 25
+   char ConsoleReadBuffer[READ_BUFFER_SIZE];
+
+   ConsIO-&#062;io_Data = (APTR)ConsoleReadBuffer;
+   ConsIO-&#062;io_Length = READ_BUFFER_SIZE;
+   ConsIO-&#062;io_Command = CMD_READ;
+   SendIO(ConsIO);
+
+   You May Get Less Than You Bargained For.
+   ----------------------------------------
+   A request for more than one character may be satisfied by the receipt
+   of only one character.  If you request more than one character, you
+   will have to examine the io_Actual field of the request when it
+   returns to determine how many characters you have actually received.
+
+After sending the read request, your program can wait on a combination of
+signal bits including that of the reply port you created. The following
+fragment demonstrates waiting on both a queued console read request, and
+Window IDCMP messages:
+
+   ULONG conreadsig = 1 &#060;&#060; ConsoleMP-&#062;mp_SigBit;
+   ULONG windowsig = 1 &#060;&#060; win-&#062;UserPort-&#062;mp_SigBit;
+
+   /* A character, or an IDCMP msg, or both will wake us up */
+   ULONG signals = Wait(conreadsig | windowsig);
+
+   if (signals &#038; conreadsig)
+       {
+       /* Then check for a character */
+       };
+
+   if (signals &#038; windowsig)
+       {
+       /* Then check window messages */
+       };
+
+ <a href="../Devices_Manual_guide/node0090.html">Information About The Input Stream</a> 
+ <a href="../Devices_Manual_guide/node0091.html">Cursor Position Report</a> 
+ <a href="../Devices_Manual_guide/node0092.html">Window Bounds Report</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

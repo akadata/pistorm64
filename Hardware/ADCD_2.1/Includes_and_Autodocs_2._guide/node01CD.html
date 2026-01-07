@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/iffparse" NODE="LocalItemData()" TITLE="iffparse.library/LocalItemData" -->
+<head>
+<title>iffparse.library/LocalItemData</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01CC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01CE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    LocalItemData -- Get pointer to user data for local context item.
+
+SYNOPSIS
+    data = LocalItemData (lci)
+     d0                   a0
+
+    UBYTE                   *data;
+    struct <a href="../Includes_and_Autodocs_2._guide/node010B.html#line82">LocalContextItem</a>   *lci;
+
+FUNCTION
+    Returns pointer to the user data associated with the given local
+    context item.  The size of the data area depends on the &#034;usize&#034;
+    argument used when allocating this item.  If the pointer to the item
+    given (lci) is NULL, the function also returns NULL.
+
+INPUTS
+    lci     - pointer to local context item or NULL.
+
+RESULT
+    data    - pointer to user data area or NULL if lci is NULL.
+
+EXAMPLE
+
+NOTES
+
+BUGS
+    Currently, there is no way to determine the size of the user data
+    area; you have to 'know'.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01B9.html">AllocLocalItem()</a>, <a href="../Includes_and_Autodocs_2._guide/node01C6.html">FreeLocalItem()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

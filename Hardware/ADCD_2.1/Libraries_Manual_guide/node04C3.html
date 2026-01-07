@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-2-8" TITLE="B / rootclass / New Methods: OM_SET" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / rootclass / New Methods: OM_SET</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04C2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04C4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This method tells an object to set one or more of its attributes.
+Applications should not call this method directly.  Instead, use the
+intuition.library functions <a href="../Libraries_Manual_guide/node0205.html">SetAttrs()</a> and <a href="../Libraries_Manual_guide/node0205.html#line5">SetGadgetAttrs()</a> to call this
+method.  The return value for this method is not explicitly defined.
+
+The return value for this method is not explicitly defined.  However, in
+general, when implementing the OM_SET method, if setting an object
+attribute causes some sort of visual state change, the OM_SET method
+should return a value greater than zero.  If changing an attribute does
+not affect the visual state, OM_SET should return zero.
+
+This method uses a custom message (defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00E2.html#line76">classusr.h</a>&#062;):
+
+    struct opSet {
+        ULONG             MethodID;      /* OM_SET */
+        struct TagItem    *ops_AttrList; /* tag list of attributes to set*/
+        struct GadgetInfo *ops_GInfo;
+    };
+
+The ops_AttrList field contains a pointer to a tag list of attribute/value
+pairs.  These pairs contain the IDs and the new values of the attributes
+to set.  The dispatcher has to look through this list (see docs for the
+utility.library <a href="../Libraries_Manual_guide/node0497.html#line35">NextTagItem()</a> function) for attributes its class
+recognizes and set the attribute's value accordingly.  The dispatcher
+should let its superclass handle any attributes it does not recognize.
+
+If the object is a gadget, the ops_GInfo field contains a pointer to a
+<a href="../Libraries_Manual_guide/node0219.html#line23">GadgetInfo</a> structure.  Otherwise, the value in ops_GInfo is undefined.
+Intuition use the GadgetInfo structure to pass display information to
+gadgets.  See the <a href="../Libraries_Manual_guide/node04F2.html">gadgetclass</a> methods for more details.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

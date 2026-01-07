@@ -1,0 +1,324 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/iconexample.c" NODE="MAIN" TITLE="Lib_examples/iconexample.c" -->
+<head>
+<title>Lib_examples/iconexample.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05C2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05C4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* iconexample.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 iconexample.c
+Blink FROM LIB:c.o,iconexample.o TO iconexample LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+**
+** The following example demonstrates icon creation, icon reading and
+** Tool Type parsing in the Workbench environment.  When called from the
+** Shell, the example creates a small data file in RAM: and creates or
+** updates a project icon for the data file.  The created project icon
+** points to this example as its default tool.  When the new project
+** icon is double-clicked, Workbench will invoke the default tool (this
+** example) as a Workbench process, and pass it a description of the
+** project data file as a Workbench argument (WBArg) in the WBStartup
+** message.
+**
+** iconexample.c - Workbench icon startup, creation, and parsing example
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;libraries/dos.h&#062;
+#include &#060;workbench/workbench.h&#062;
+#include &#060;workbench/startup.h&#062;
+
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/icon_protos.h&#062;
+#include &#060;stdlib.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;string.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }   /* Disable SAS Lattice CTRL/C handling */
+int chkabort(void) { return(0); }/* really */
+#endif
+
+/* our functions */
+void cleanexit(UBYTE *,LONG);
+void cleanup(void);
+void message(UBYTE *);
+BOOL makeIcon(UBYTE *, char **, char *);
+BOOL showToolTypes(struct WBArg *);
+
+UBYTE *projname     = &#034;RAM:Example_Project&#034;;
+UBYTE *conwinname   = &#034;CON:10/10/620/180/iconexample&#034;;
+
+UBYTE deftoolname[] = {&#034;iconexample&#034;};
+
+USHORT IconImageData1[] =  {
+/* Plane 0 */
+    0x0000,0x0000,0x0000,0x1000,0x0000,0x0000,0x0000,0x3000,
+    0x0FFF,0xFFFC,0x0000,0x3000,0x0800,0x0004,0x0000,0x3000,
+    0x0800,0x07FF,0xFFC0,0x3000,0x08A8,0xA400,0x00A0,0x3000,
+    0x0800,0x0400,0x0090,0x3000,0x08AA,0xA400,0x0088,0x3000,
+    0x0800,0x042A,0xA0FC,0x3000,0x082A,0xA400,0x0002,0x3000,
+    0x0800,0x0400,0x0002,0x3000,0x0800,0xA42A,0xA0A2,0x3000,
+    0x0800,0x0400,0x0002,0x3000,0x0950,0xA42A,0x8AA2,0x3000,
+    0x0800,0x0400,0x0002,0x3000,0x082A,0xA400,0x0002,0x3000,
+    0x0800,0x042A,0x2AA2,0x3000,0x0FFF,0xFC00,0x0002,0x3000,
+    0x0000,0x0400,0x0002,0x3000,0x0000,0x07FF,0xFFFE,0x3000,
+    0x0000,0x0000,0x0000,0x3000,0x7FFF,0xFFFF,0xFFFF,0xF000,
+/* Plane 1 */
+    0xFFFF,0xFFFF,0xFFFF,0xE000,0xD555,0x5555,0x5555,0x4000,
+    0xD000,0x0001,0x5555,0x4000,0xD7FF,0xFFF9,0x5555,0x4000,
+    0xD7FF,0xF800,0x0015,0x4000,0xD757,0x5BFF,0xFF55,0x4000,
+    0xD7FF,0xFBFF,0xFF65,0x4000,0xD755,0x5BFF,0xFF75,0x4000,
+    0xD7FF,0xFBD5,0x5F01,0x4000,0xD7D5,0x5BFF,0xFFFD,0x4000,
+    0xD7FF,0xFBFF,0xFFFD,0x4000,0xD7FF,0x5BD5,0x5F5D,0x4000,
+    0xD7FF,0xFBFF,0xFFFD,0x4000,0xD6AF,0x5BD5,0x755D,0x4000,
+    0xD7FF,0xFBFF,0xFFFD,0x4000,0xD7D5,0x5BFF,0xFFFD,0x4000,
+    0xD7FF,0xFBD5,0xD55D,0x4000,0xD000,0x03FF,0xFFFD,0x4000,
+    0xD555,0x53FF,0xFFFD,0x4000,0xD555,0x5000,0x0001,0x4000,
+    0xD555,0x5555,0x5555,0x4000,0x8000,0x0000,0x0000,0x0000,
+};
+
+struct Image iconImage1 =
+    {
+    0, 0,                /* Top Corner */
+    52, 22, 2,           /* Width, Height, Depth */
+    &#038;IconImageData1[0],  /* Image Data */
+    0x003, 0x000,        /* PlanePick,PlaneOnOff */
+    NULL                 /* Next Image */
+    };
+
+UBYTE *toolTypes[] =
+    {
+    &#034;FILETYPE=text&#034;,
+    &#034;FLAGS=BOLD|ITALICS&#034;,
+    NULL
+    };
+
+struct DiskObject projIcon =
+    {
+    WB_DISKMAGIC,                   /* Magic Number */
+    WB_DISKVERSION,                 /* Version */
+        {                           /* Embedded Gadget Structure */
+        NULL,                       /* Next Gadget Pointer */
+        97,12,52,23,                /* Left,Top,Width,Height */
+        GADGIMAGE|GADGHBOX,         /* Flags */
+        GADGIMMEDIATE|RELVERIFY,    /* Activation Flags */
+        BOOLGADGET,                 /* Gadget Type */
+        (APTR)&#038;iconImage1,          /* Render Image */
+        NULL,                       /* Select Image */
+        NULL,                       /* Gadget Text */
+        NULL,                       /* Mutual Exclude */
+        NULL,                       /* Special Info */
+        0,                          /* Gadget ID */
+        NULL                        /* User Data */
+        },
+    WBPROJECT,                      /* Icon Type */
+    deftoolname,                    /* Default Tool */
+    toolTypes,                      /* Tool Type Array */
+    NO_ICON_POSITION,               /* Current X */
+    NO_ICON_POSITION,               /* Current Y */
+    NULL,                           /* Drawer Structure */
+    NULL,                           /* Tool Window */
+    4000                            /* Stack Size */
+    };
+
+/* Opens and allocations we must clean up */
+struct Library *IconBase = NULL;
+FILE *conwin = NULL;
+LONG olddir = -1;
+
+BOOL FromWb;
+
+void main(int argc, char **argv)
+    {
+    struct WBStartup *WBenchMsg;
+    struct WBArg *wbarg;
+    FILE  *file;
+    LONG  wLen;
+    SHORT i;
+
+    FromWb = (argc==0) ? TRUE : FALSE;
+
+    /* Open icon.library */
+    if(!(IconBase = OpenLibrary(&#034;icon.library&#034;,33)))
+         cleanexit(&#034;Can't open icon.library\n&#034;,RETURN_FAIL);
+
+    /* If started from CLI, this example will create a small text
+     * file RAM:Example_Project, and create an icon for the file
+     * which points to this program as its default tool.
+     */
+    if(!FromWb)
+        {
+        /* Make a sample project (data) file */
+        wLen = -1;
+        if(file=fopen(projname,&#034;w&#034;))
+            {
+            wLen = fprintf(file,&#034;Have a nice day\n&#034;);
+            fclose(file);
+            }
+        if(wLen &#060; 0) cleanexit(&#034;Error writing data file\n&#034;,RETURN_FAIL);
+
+        /* Now save/update icon for this data file */
+        if(makeIcon(projname, toolTypes, deftoolname))
+             {
+             printf(&#034;%s data file and icon saved.\n&#034;,projname);
+             printf(&#034;Use Workbench menu Icon Information to examine the icon.\n&#034;);
+             printf(&#034;Then copy this example (iconexample) to RAM:\n&#034;);
+             printf(&#034;and double-click the %s project icon\n&#034;,projname);
+             }
+        else cleanexit(&#034;Error writing icon\n&#034;,RETURN_FAIL);
+        }
+
+    else  /* Else we are FromWb - ie. we were either
+           * started by a tool icon, or as in this case,
+           * by being the default tool of a project icon.
+           */
+        {
+        if(!(conwin = fopen(conwinname,&#034;r+&#034;)))
+             cleanexit(&#034;Can't open output window\n&#034;,RETURN_FAIL);
+
+        WBenchMsg = (struct WBStartup *)argv;
+
+        /* Note wbarg++ at end of FOR statement steps through wbargs.
+         * First arg is our executable (tool).  Any additional args
+         * are projects/icons passed to us via either extend select
+         * or default tool method.
+         */
+        for(i=0, wbarg=WBenchMsg-&#062;sm_ArgList;
+            i &#060; WBenchMsg-&#062;sm_NumArgs;
+            i++, wbarg++)
+            {
+            /* if there's a directory lock for this wbarg, CD there */
+            olddir = -1;
+            if((wbarg-&#062;wa_Lock)&#038;&#038;(*wbarg-&#062;wa_Name))
+                olddir = CurrentDir(wbarg-&#062;wa_Lock);
+
+            showToolTypes(wbarg);
+
+            if((i&#062;0)&#038;&#038;(*wbarg-&#062;wa_Name))
+                fprintf(conwin,&#034;In Main. We could open the %s file here\n&#034;,
+                                 wbarg-&#062;wa_Name);
+            if(olddir != -1)  CurrentDir(olddir); /* CD back where we were */
+            }
+        Delay(500);
+        }
+    cleanup();
+    exit(RETURN_OK);
+    }
+
+BOOL makeIcon(UBYTE *name, char **newtooltypes, char *newdeftool)
+    {
+    struct DiskObject *dobj;
+    char *olddeftool;
+    char **oldtooltypes;
+    BOOL success = FALSE;
+
+    if(dobj=GetDiskObject(name))
+        {
+        /* If file already has an icon, we will save off any fields we
+         * need to update, update those fields, put the object, restore
+         * the old field pointers and then free the object.  This will
+         * preserve any custom imagery the user has, and the user's
+         * current placement of the icon.  If your application does
+         * not know where the user currently keeps your application,
+         * you should not update his dobj-&#062;do_DefaultTool.
+         */
+         oldtooltypes = dobj-&#062;do_ToolTypes;
+         olddeftool = dobj-&#062;do_DefaultTool;
+
+         dobj-&#062;do_ToolTypes = newtooltypes;
+         dobj-&#062;do_DefaultTool = newdeftool;
+
+         success = PutDiskObject(name,dobj);
+
+         /* we must restore the original pointers before freeing */
+         dobj-&#062;do_ToolTypes = oldtooltypes;
+         dobj-&#062;do_DefaultTool = olddeftool;
+         FreeDiskObject(dobj);
+         }
+    /* Else, put our default icon */
+    if(!success)  success = PutDiskObject(name,&#038;projIcon);
+    return(success);
+    }
+
+BOOL showToolTypes(struct WBArg *wbarg)
+    {
+    struct DiskObject *dobj;
+    char **toolarray;
+    char *s;
+    BOOL success = FALSE;
+
+    fprintf(conwin,&#034;\nWBArg Lock=0x%lx, Name=%s\n&#034;,
+                           wbarg-&#062;wa_Lock,wbarg-&#062;wa_Name);
+
+    if((*wbarg-&#062;wa_Name) &#038;&#038; (dobj=GetDiskObject(wbarg-&#062;wa_Name)))
+        {
+        fprintf(conwin,&#034;  We have read the DiskObject (icon) for this arg\n&#034;);
+        toolarray = (char **)dobj-&#062;do_ToolTypes;
+
+        if(s=(char *)FindToolType(toolarray,&#034;FILETYPE&#034;))
+            {
+            fprintf(conwin,&#034;    Found tooltype FILETYPE with value %s\n&#034;,s);
+            }
+        if(s=(char *)FindToolType(toolarray,&#034;FLAGS&#034;))
+            {
+            fprintf(conwin,&#034;    Found tooltype FLAGS with value %s\n&#034;,s);
+            if(MatchToolValue(s,&#034;BOLD&#034;))
+                fprintf(conwin,&#034;      BOLD flag requested\n&#034;);
+            if(MatchToolValue(s,&#034;ITALICS&#034;))
+                fprintf(conwin,&#034;      ITALICS flag requested\n&#034;);
+            }
+        /* Free the diskobject we got */
+        FreeDiskObject(dobj);
+        success = TRUE;
+        }
+    else if(!(*wbarg-&#062;wa_Name))
+        fprintf(conwin,&#034;  Must be a disk or drawer icon\n&#034;);
+    else
+        fprintf(conwin,&#034;  Can't find any DiskObject (icon) for this WBArg\n&#034;);
+    return(success);
+    }
+
+
+/* Workbench-started programs with no output window may want to display
+ * messages in a different manner (requester, window title, etc)
+ */
+void message(UBYTE *s)
+    {
+    if(FromWb &#038;&#038; conwin)  fprintf(conwin,s,strlen(s));
+    else if (!FromWb) printf(s);
+    }
+
+void cleanexit(UBYTE *s, LONG n)
+    {
+    if(*s)  message(s);
+    cleanup();
+    exit(n);
+    }
+
+void cleanup()
+   {
+   if(conwin)    fclose(conwin);
+   if(IconBase)  CloseLibrary(IconBase);
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

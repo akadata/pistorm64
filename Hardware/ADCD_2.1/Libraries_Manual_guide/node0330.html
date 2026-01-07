@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-7-4" TITLE="27 / / Forming a Basic Display / Preparing the ViewPort Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Forming a Basic Display / Preparing the ViewPort Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node032F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0331.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To prepare the <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> structure for further use, you call <a href="../Includes_and_Autodocs_2._guide/node0457.html">InitVPort()</a>
+and initialize certain fields as follows:
+
+    InitVPort(&#038;viewPort);        /* Initialize the ViewPort.             */
+    viewPort.RasInfo = &#038;rasInfo; /* The rasInfo must also be initialized */
+    viewPort.DWidth  = WIDTH;
+    viewPort.DHeight = HEIGHT;
+
+    /* Under 1.3, you should set viewPort.Modes here to select a display
+     * mode. Under Release 2, use VideoControl() with VTAG_NORMAL_DISP_SET
+     * to select a display mode by attaching a DisplayInfo structure to
+<a name="line13">     *  the ViewPort.                                                    */</a>
+
+The <a href="../Includes_and_Autodocs_2._guide/node0457.html">InitVPort()</a> routine presets certain default values in the <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>
+<a name="line16">structure.  The defaults include:</a>
+
+  * <a href="../Libraries_Manual_guide/node0327.html">Modes</a> variable set to zero--this means you select a low-resolution
+    display.  (To alter this, use <a href="../Libraries_Manual_guide/node0339.html#line15">VideoControl()</a> with the
+<a name="line20">    <a href="../Libraries_Manual_guide/node0339.html#line44">VTAG_NORMAL_DISP_SET</a> tag as explained below.)</a>
+
+  * <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">Next</a> variable set to NULL--no other <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> is linked to this one.
+    If you want a display with multiple ViewPorts, you must fill in the
+    link yourself.
+
+If you want to create a <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> with two or more <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>s you must declare
+and initialize the ViewPorts as above.  Then link them together using the
+<a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort.Next</a> field with a NULL link for the ViewPort at the end of the
+chain:
+
+    viewPortA.Next = &#038;viewPortB; /* Tell 1st one the address of the 2nd. */
+    viewPortB.Next = NULL;       /* There are no others after this one.  */
+<a name="line33"></a>
+
+For Release 2 applications, once a <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> has been prepared, a
+<a href="../Libraries_Manual_guide/node032C.html#line16">ViewPortExtra</a> structure must also be created with <a href="../Libraries_Manual_guide/node032C.html#line22">GfxNew()</a>, initialized,
+and associated with the ViewPort via the <a href="../Libraries_Manual_guide/node0339.html#line15">VideoControl()</a> function.  In
+addition, a <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line49">DisplayInfo</a> for this mode must be attached to the ViewPort.
+The fragment below shows how to do this.  For complete examples, refer to
+the program listings of <a href="../Libraries_Manual_guide/node059D.html">RGBBoxes.c</a> and <a href="../Libraries_Manual_guide/node059B.html">WBClone.c</a>.
+
+
+struct TagItem vcTags[] =              /* These tags will be passed to   */
+{                                      /* the VideoControl() function to */
+    { VTAG_ATTACH_CM_SET, NULL },      /* set up the extended ViewPort   */
+    { VTAG_VIEWPORTEXTRA_SET, NULL },  /* structures required in Release */
+    { VTAG_NORMAL_DISP_SET, NULL },    /* 2. The NULL ti_Data field of   */
+    { VTAG_END_CM, NULL }              /* these tags must be filled in   */
+};                                     /* before making the call to      */
+                                       /* VideoControl().                */
+
+struct DimensionInfo dimquery;  /* Release 2 structure for display size  */
+                                /* data */
+
+/* Make a ViewPortExtra and get ready to attach it */
+if( vpextra = GfxNew(VIEWPORT_EXTRA_TYPE) )
+    {
+    vcTags[1].ti_Data = (ULONG) vpextra;
+
+    /* Initialize the DisplayClip field of the ViewPortExtra structure */
+    if( GetDisplayInfoData( NULL , (UBYTE *) &#038;dimquery ,
+                           sizeof(struct dimquery) , DTAG_DIMS, modeID) )
+        {
+        vpextra-&#062;DisplayClip = dimquery.Nominal;
+
+        /* Make a DisplayInfo and get ready to attach it */
+        if( !(vcTags[2].ti_Data = (ULONG) FindDisplayInfo(modeID)) )
+            fail(&#034;Could not get DisplayInfo\n&#034;);
+        }
+    else fail(&#034;Could not get DimensionInfo\n&#034;);
+    }
+else fail(&#034;Could not get ViewPortExtra\n&#034;);
+
+/* This is for backwards compatibility with, for example,   */
+/* a 1.3 screen saver utility that looks at the Modes field */
+viewPort.Modes = (UWORD) (modeID &#038; 0x0000ffff);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

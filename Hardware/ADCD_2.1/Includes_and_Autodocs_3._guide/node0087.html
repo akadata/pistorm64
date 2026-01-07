@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="bullet" NODE="ObtainInfoA()" TITLE="bullet.library/ObtainInfoA" -->
+<head>
+<title>bullet.library/ObtainInfoA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0086.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0088.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ObtainInfoA -- Inquire tagged font and/or glyph metrics
+	ObtainInfo -- varargs form of ObtainInfoA
+
+<b>    SYNOPSIS</b>
+	error = ObtainInfoA(engineHandle, tagList)
+	                    A0            A1
+
+	ULONG ObtainInfoA(struct <a href="../Includes_and_Autodocs_3._guide/node0613.html#line25">GlyphEngine</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	error = ObtainInfo(engineHandle, firstTag, ...)
+
+	ULONG ObtainInfo(struct <a href="../Includes_and_Autodocs_3._guide/node0613.html#line25">GlyphEngine</a> *, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...);
+
+<b>    FUNCTION</b>
+	This function accepts a tagList whose tag field elements are
+	valid for inquiry, and whose associated data fields are
+	pointers to the destination in which to place the requested
+	data.
+
+	<a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a> items that refer to data indirectly (OT_Indirect is set)
+	return pointers that may be allocated or cached by the
+	library.  This data must be treated as read-only data.  When
+	the application is done with the data acquired via ObtainInfoA,
+	it must perform a <a href="../Includes_and_Autodocs_3._guide/node0089.html">ReleaseInfoA</a> to allow the library to release
+	the data.
+
+<b>    INPUTS</b>
+	engineHandle -- the handle acquired via <a href="../Includes_and_Autodocs_3._guide/node0088.html">OpenEngine</a>.
+	tagList -- a tagList containing OT_ tags valid for inquiry
+		paired with the destination pointers for the inquiry
+		results.  All destinations are longwords, whether they
+		are pointers or values, and regardless of whether the
+		value could fit in a smaller variable.
+
+<b>    RESULT</b>
+	This function returns a zero success indication, or a non-zero
+	error code.
+
+<b>    EXAMPLE</b>
+	    ULONG pointSize;
+	    struct <a href="../Includes_and_Autodocs_3._guide/node0613.html#line33">GlyphMap</a> *glyph;
+	    ...
+	    if (!ObtainInfo(EngineHandle, OT_Glyph, &#038;glyph, TAG_DONE)) {
+		...
+		ReleaseInfo(EngineHandle, OT_Glyph, glyph, TAG_DONE);
+	    }
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0089.html">ReleaseInfoA()</a>, <a href="../Includes_and_Autodocs_3._guide/node0655.html">diskfont/diskfonttag.h</a>, <a href="../Includes_and_Autodocs_3._guide/node0656.html">diskfont/oterrors.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-3-1" TITLE="33 / Stream Management / Initialization" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Stream Management / Initialization</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node042D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node042F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As shown above, the <a href="../Libraries_Manual_guide/node042C.html">IFFHandle</a> structure contains the public field
+iff_Stream.  This is a longword that must be initialized to contain
+something meaningful to the stream manager.  IFFParse never looks at this
+field itself (at least not directly).  Your iff_Stream may be an AmigaDOS
+filehandle, or an IFFParse ClipboardHandle, or a custom stream of any type
+if you provide your own custom stream handler (see the section on
+&#034;<a href="../Libraries_Manual_guide/node0454.html">Custom Stream Handlers</a>&#034; later in this chapter).  You must initialize your
+IFFHandle structure's iff_Stream to your stream, and then initialize the
+<a name="line10">IFFHandle's flags and stream hook.</a>
+
+Three sample initializations are shown here.  In the case of the internal
+DOS stream manager, iff_Stream is an AmigaDOS filehandle as returned by
+<a href="../Includes_and_Autodocs_2._guide/node02D6.html">Open()</a>:
+
+    iff-&#062;iff_Stream = (ULONG) Open (&#034;filename&#034;, MODE_OLDFILE);
+    if(iff-&#062;iff_Stream) InitIFFasDOS (iff);
+<a name="line18">        /* use internal DOS stream manager */</a>
+
+In the case of the internal Clipboard stream manager, iff_Stream is a
+pointer to an IFFParse ClipboardHandle structure (the <a href="../Includes_and_Autodocs_2._guide/node01CE.html">OpenClipboard()</a> call
+used here is a function of iffparse.library, not the clipboard.device):
+
+    iff-&#062;iff_Stream = (ULONG) OpenClipboard (PRIMARY_CLIP);
+<a name="line25">    InitIFFasClip (iff); /* use internal Clipboard stream manager  */</a>
+
+When using a custom handle such as an <a href="../Libraries_Manual_guide/node0455.html">fopen()</a> file handle, or a device
+other than the clipboard, you must provide your own flags and stream
+<a name="line29">handler:</a>
+
+    iff-&#062;iff_Stream = (ULONG) OpenMyCustomStream(&#034;foo&#034;);
+    InitIFF (iff, IFFF_FSEEK | IFFF_RSEEK, &#038;mystreamhook);
+
+IFFParse &#034;knows&#034; the seek capabilities of DOS and ClipboardHandle streams,
+so <a href="../Includes_and_Autodocs_2._guide/node01CC.html">InitIFFasDOS()</a> and <a href="../Includes_and_Autodocs_2._guide/node01CB.html">InitIFFasClip()</a> set the flags for you.
+
+    You May Change the Seek Bits in iff_Flags:
+    ------------------------------------------
+    IFFParse sets IFFF_FSEEK | IFFF_RSEEK for DOS files.  This is not
+    always true (e.g., pipes).  If you know that a DOS file has different
+    seek characteristics, your application may correct the seek bits in
+    iff_Flags after calling <a href="../Includes_and_Autodocs_2._guide/node01CC.html">InitIFFasDOS()</a>.
+
+When using <a href="../Includes_and_Autodocs_2._guide/node01CA.html">InitIFF()</a> to provide a custom handler, you must also provide
+flags to tell IFFParse the capabilities of your stream.  The flags are:
+
+
+    IFFF_FSEEK:  This stream has forward-seek capability only.
+    IFFF_RSEEK:  This stream has random-seek capability.
+                 IFFF_RSEEK tends to imply IFFF_FSEEK, but it's
+                 best to specify both.
+
+
+If neither flag is specified, you're telling IFFParse that it can't seek
+<a name="line55">through the stream.</a>
+
+After your stream is initialized, call <a href="../Includes_and_Autodocs_2._guide/node01CF.html">OpenIFF()</a>:
+
+    error = OpenIFF (iff, IFFF_READ);
+
+Once you establish a read/write mode (by passing IFFF_READ or IFFF_WRITE),
+you remain in that mode until you call <a href="../Libraries_Manual_guide/node042F.html">CloseIFF()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

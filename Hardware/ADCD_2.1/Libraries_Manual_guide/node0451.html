@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-6-5" TITLE="33 / Context Functions / Some Interesting Internal Details" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Context Functions / Some Interesting Internal Details</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0450.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0452.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+    WARNING:
+    --------
+    This section details some internal implementation details of
+    iffparse.library which may help you to understand it better.  Use of
+    the following information to do &#034;clever&#034; things in an application is
+    forbidden and unsupportable.  Don't even think about it.
+
+It turns out that <a href="../Includes_and_Autodocs_2._guide/node010B.html#line90">StoredProperties</a>, <a href="../Libraries_Manual_guide/node0437.html#line14">CollectionItem</a>s, and entry and exit
+handlers are all implemented using <a href="../Libraries_Manual_guide/node044A.html">LCI</a>s.  For example, when you call
+<a href="../Libraries_Manual_guide/node0434.html">FindProp()</a>, you are actually calling a front-end to <a href="../Libraries_Manual_guide/node0450.html">FindLocalItem()</a>.  The
+mysterious identification value (which has heretofore never been
+discussed) is a value which permits you to differentiate between LCIs
+having the same type and ID.
+
+For instance, suppose you called <a href="../Libraries_Manual_guide/node0434.html">PropChunk()</a>, asking it to store an <a href="../Libraries_Manual_guide/node045D.html#line8">ILBM</a>
+<a href="../Libraries_Manual_guide/node0461.html#line3">BMHD</a>.  PropChunk() will install an entry handler in the form of an <a href="../Libraries_Manual_guide/node044A.html">LCI</a>,
+having type equal to `ILBM', ID equal to `BMHD', and an identification
+value of IFFLCI_ENTRYHANDLER.
+
+When an <a href="../Libraries_Manual_guide/node0461.html#line3">ILBM BMHD</a> is encountered, the entry handler is called, and it
+creates and stores another <a href="../Libraries_Manual_guide/node044A.html">LCI</a> having type equal to `ILBM', ID equal to
+`BMHD' and an identification value of IFFLCI_PROP.
+
+Thus, when you call <a href="../Libraries_Manual_guide/node0434.html">FindProp()</a>, it merely calls <a href="../Libraries_Manual_guide/node0450.html">FindLocalItem()</a> with your
+type and ID, and supplies IFFLCI_PROP for the identification value.
+
+Therefore, handlers, <a href="../Includes_and_Autodocs_2._guide/node010B.html#line90">StoredProperties</a>, <a href="../Libraries_Manual_guide/node0437.html#line14">CollectionItem</a>s and your own custom
+<a href="../Libraries_Manual_guide/node044A.html">LCI</a>s can never be confused with each other, since they all have unique
+identification values.  Since they are all handled (and searched for) in
+the same way, they all &#034;override&#034; each other in a consistent way. Just as
+StoredProperties higher in the context stack will be found and returned
+before identical ones in lower contexts, so will chunk handlers be found
+and invoked before ones lower on the context stack (recall
+<a href="../Libraries_Manual_guide/node0450.html">FindLocalItem()</a>'s search procedure).
+
+This means you can temporarily override a chunk handler by installing an
+identical handler in a higher context.  The handler will persist until the
+context in which it is stored expires, after which, the original one
+regains scope.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

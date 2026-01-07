@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-5-4" TITLE="B / imageclass / New Methods: IM_DRAWFRAME" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / imageclass / New Methods: IM_DRAWFRAME</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04D4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04D6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The IM_DRAWFRAME method instructs an image object to render itself within
+the confines of a given rectangle.  The return value for this method is
+not explicitly defined.
+
+This method uses a custom message structure that is basically an extension
+of the <a href="../Libraries_Manual_guide/node04D2.html">IM_DRAW</a> message: struct <a href="../Libraries_Manual_guide/node04D2.html#line7">impDraw</a>
+
+    {
+        ULONG           MethodID;    /* IM_DRAWFRAME */
+        struct RastPort *imp_RPort;  /* RastPort to render into */
+        struct
+        {
+            WORD X;                  /* X and Y offset relative to the */
+            WORD Y;           /* image's IA_Left and IA_Top attributes */
+        } imp_Offset;
+        ULONG    imp_State;  /* Visual state of image (see defines below)*/
+        struct DrawInfo *imp_DrInfo;
+                    /* DrawInfo describing target RastPort (can be NULL) */
+        struct
+        {
+            WORD Width;   /* scale, clip, restrict, etc. to these bounds */
+            WORD Height;
+        } imp_Dimensions;
+    };
+
+The Width and Height fields provide the object's rectangular bounds.  How
+the image object deals with the frame is implementation specific.  If the
+<a href="../Libraries_Manual_guide/node04D1.html">imageclass</a> dispatcher sees this message, it will convert it to an <a href="../Libraries_Manual_guide/node04D2.html">IM_DRAW</a>
+message and send it back to the image's true class.  An image subclass
+which assigns proper meaning to this method (i.e., <a href="../Libraries_Manual_guide/node04DF.html">frameiclass</a>) should
+handle this method itself.
+
+This method is useful to classes of images that can scale or clip
+themselves to arbitrary dimensions.  Typically, an instance of a class
+that truly supports this method will massage its imagery as best it can to
+fit into the rectangle.
+
+In general, applications that use this method to draw an object should use
+the <a href="../Libraries_Manual_guide/node04D7.html">IM_ERASEFRAME</a> method to erase it (see below).  This will ensure that
+the image erases itself at the proper scale.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/findboards.c" NODE="MAIN" TITLE="Lib_examples/findboards.c" -->
+<head>
+<title>Lib_examples/findboards.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0592.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0594.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* findboards.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 findboards.c
+Blink FROM LIB:c.o,findboards.o TO findboards LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;libraries/dos.h&#062;
+#include &#060;libraries/configvars.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/expansion_protos.h&#062;
+#include &#060;stdlib.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;string.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+struct Library   *ExpansionBase = NULL;
+
+void main(int argc, char **argv)
+{
+    struct ConfigDev *myCD;
+    UWORD m,i;
+    UBYTE p,f,t;
+
+    if((ExpansionBase=OpenLibrary(&#034;expansion.library&#034;,0L))==NULL)
+	exit(RETURN_FAIL);
+
+    /*--------------------------------------------------*/
+    /* FindConfigDev(oldConfigDev,manufacturer,product) */
+    /* oldConfigDev = NULL for the top of the list      */
+    /* manufacturer = -1 for any manufacturer           */
+    /* product      = -1 for any product                */
+    /*--------------------------------------------------*/
+
+    myCD = NULL;
+    while(myCD=FindConfigDev(myCD,-1L,-1L)) /* search for all ConfigDevs */
+	{
+	printf(&#034;\n---ConfigDev structure found at location $%lx---\n&#034;,myCD);
+
+	/* These values were read directly from the board at expansion time */
+	printf(&#034;Board ID (ExpansionRom) information:\n&#034;);
+
+	t = myCD-&#062;cd_Rom.er_Type;
+	m = myCD-&#062;cd_Rom.er_Manufacturer;
+	p = myCD-&#062;cd_Rom.er_Product;
+	f = myCD-&#062;cd_Rom.er_Flags;
+	i = myCD-&#062;cd_Rom.er_InitDiagVec;
+
+	printf(&#034;er_Manufacturer         =%d=$%04x=(~$%4x)\n&#034;,m,m,(UWORD)~m);
+	printf(&#034;er_Product              =%d=$%02x=(~$%2x)\n&#034;,p,p,(UBYTE)~p);
+
+	printf(&#034;er_Type                 =$%02x&#034;,myCD-&#062;cd_Rom.er_Type);
+	if(myCD-&#062;cd_Rom.er_Type &#038; ERTF_MEMLIST)
+	    printf(&#034;  (Adds memory to free list)\n&#034;);
+	else printf(&#034;\n&#034;);
+
+	printf(&#034;er_Flags                =$%02x=(~$%2x)\n&#034;,f,(UBYTE)~f);
+	printf(&#034;er_InitDiagVec          =$%04x=(~$%4x)\n&#034;,i,(UWORD)~i);
+
+
+	/* These values are generated when the AUTOCONFIG(tm) software
+	 * relocates the board
+	 */
+	printf(&#034;Configuration (ConfigDev) information:\n&#034;);
+	printf(&#034;cd_BoardAddr            =$%lx\n&#034;,myCD-&#062;cd_BoardAddr);
+	printf(&#034;cd_BoardSize            =$%lx (%ldK)\n&#034;,
+	       myCD-&#062;cd_BoardSize,((ULONG)myCD-&#062;cd_BoardSize)/1024);
+
+	printf(&#034;cd_Flags                =$%x&#034;,myCD-&#062;cd_Flags);
+	if(myCD-&#062;cd_Flags &#038; CDF_CONFIGME)
+	    printf(&#034;\n&#034;);
+	else printf(&#034;  (driver clears CONFIGME bit)\n&#034;);
+	}
+    CloseLibrary(ExpansionBase);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

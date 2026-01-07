@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_SMUS" NODE="16-5-1" TITLE=" SMUS IFF Simple Musical Score / Introduction " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> SMUS IFF Simple Musical Score / Introduction </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02AA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02AC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This is a reference manual for the data interchange format &#034;SMUS&#034;, which
+stands for Simple MUsical Score.  &#034;<a href="../Devices_Manual_guide/node01C5.html">EA IFF 85</a>&#034; is Electronic Arts' standard
+for interchange format files.  A <a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a> or &#034;data section&#034;) such as FORM SMUS
+can be an IFF file or a part of one.  [See &#034;<a href="../Devices_Manual_guide/node01C5.html">EA IFF 85</a>&#034; Electronic Arts
+Interchange File Format.]
+
+SMUS is a practical data format for uses like moving limited scores
+between programs and storing theme songs for game programs.  The format
+should be geared for easy read-in and playback.  So FORM SMUS uses the
+compact time encoding of Common Music Notation (half notes, dotted quarter
+rests, etc.). The SMUS format should also be structurally simple.  So it
+has no provisions for fancy notational information needed by graphical
+score editors or the more general timing (overlapping notes, etc.) and
+continuous data (pitch bends, etc.) needed by performance-oriented MIDI
+recorders and sequencers.  Complex music programs may wish to save in a
+more complete format, but still import and export SMUS when requested.
+
+A SMUS score can say which &#034;instruments&#034; are supposed play which notes.
+But the score is independent of whatever output device and driver software
+is used to perform the notes.  The score can contain device- and
+driver-dependent instrument data, but this is just a cache.  As long as a
+SMUS file stays in one environment, the embedded instrument data is very
+convenient.  When you move a SMUS file between programs or hardware
+configurations, the contents of this cache usually become useless.
+
+Like all IFF formats, SMUS is a filed or &#034;archive&#034; format.  It is
+completely independent of score representations in working memory, editing
+operations, user interface, display graphics, computation hardware, and
+sound hardware. Like all IFF formats, SMUS is extensible.
+
+SMUS is not an end-all musical score format.  Other formats may be more
+appropriate for certain uses.  (We'd like to design an general-use IFF
+score format &#034;GSCR&#034;.  FORM GSCR would encode fancy notational data and
+performance data.  There would be a SMUS to/from GSCR converter.)
+
+Section 2 gives important <a href="../Devices_Manual_guide/node02AD.html">background</a> information.  Section 3 details the
+SMUS components by defining the required property score header &#034;<a href="../Devices_Manual_guide/node02B3.html">SHDR</a>&#034;, the
+optional text properties name &#034;NAME&#034;, copyright &#034;(c) &#034;, and author &#034;AUTH&#034;,
+optional text annotation &#034;ANNO&#034;, the optional instrument specifier &#034;INS1&#034;,
+and the track data chunk &#034;<a href="../Devices_Manual_guide/node02B7.html">TRAK</a>&#034;.  Section 4 defines some chunks for
+particular programs to store <a href="../Devices_Manual_guide/node02C2.html">private information</a>.  These are &#034;standard&#034;
+chunks; specialized chunks for future needs can be added later.  <a href="../Devices_Manual_guide/node02C3.html">Appendix</a>
+A is a quick-reference summary. <a href="../Devices_Manual_guide/node02C6.html">Appendix B</a> is an example box diagram.
+<a href="../Devices_Manual_guide/node02C7.html">Appendix C</a> names the committee responsible for this standard.
+
+ <a href="../Devices_Manual_guide/node02AC.html">References</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

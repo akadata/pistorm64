@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="gadtools" NODE="CreateMenusA()" TITLE="gadtools.library/CreateMenusA" -->
+<head>
+<title>gadtools.library/CreateMenusA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0275.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0277.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CreateMenusA -- allocate and fill out a menu structure. (V36)
+	CreateMenus -- varargs stub for CreateMenus(). (V36)
+
+<b>   SYNOPSIS</b>
+	menu = CreateMenusA(newmenu, tagList)
+	D0                  A0       A1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line59">Menu</a> *CreateMenusA(struct <a href="../Includes_and_Autodocs_3._guide/node062A.html#line113">NewMenu</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	menu = CreateMenus(newmenu, firsttag, ...)
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line59">Menu</a> *CreateMenus(struct <a href="../Includes_and_Autodocs_3._guide/node062A.html#line113">NewMenu</a> *, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...);
+
+<b>   FUNCTION</b>
+	CreateMenusA() allocates and initializes a complete menu
+	structure based on the supplied array of <a href="../Includes_and_Autodocs_3._guide/node062A.html#line113">NewMenu</a> structures.
+	Optionally, CreateMenusA() can allocate and initialize a complete
+	set of menu items and sub-items for a single menu title.  This
+	is dictated by the contents of the array of NewMenus.
+
+<b>   INPUTS</b>
+	newmenu - pointer to an array of initialized struct NewMenus.
+	tagList - pointer to an array of tags providing optional extra
+		  parameters, or NULL.
+
+<b>   TAGS</b>
+	GTMN_FrontPen (UBYTE) - Pen number to be used for menu text.
+	    (Under V39 and higher, this tag also exists for <a href="../Includes_and_Autodocs_3._guide/node0286.html">LayoutMenusA()</a>
+	    and LayoutMenuItemsA()).  (defaults to zero).
+	GTMN_FullMenu (BOOL) - Requires that the <a href="../Includes_and_Autodocs_3._guide/node062A.html#line113">NewMenu</a> specification
+	    describes a complete menu strip, not a fragment.  If a fragment
+	    is found, CreateMenusA() will fail with a secondary error of
+	    GTMENU_INVALID.  (defaults to FALSE). (V37)
+	GTMN_SecondaryError (ULONG *) - Supply a pointer to a NULL-initialized
+	    ULONG to receive a descriptive error code.  Possible values:
+	    GTMENU_INVALID - <a href="../Includes_and_Autodocs_3._guide/node062A.html#line113">NewMenu</a> structure describes an illegal
+	        menu.  (CreateMenusA() will fail with a NULL result).
+	    GTMENU_TRIMMED - <a href="../Includes_and_Autodocs_3._guide/node062A.html#line113">NewMenu</a> structure has too many menus, items,
+	        or subitems (CreateMenusA() will succeed, returning a
+	        trimmed-down menu structure).
+	    GTMENU_NOMEM - CreateMenusA() ran out of memory.
+	    (V37)
+
+<b>   RESULT</b>
+	menu - pointer to the resulting initialized menu structure (or
+              the resulting FirstItem), with all the links for menu items
+              and subitems in place.
+              The result will be NULL if CreateMenusA() could not allocate
+              memory for the menus, or if the <a href="../Includes_and_Autodocs_3._guide/node062A.html#line113">NewMenu</a> array had an
+              illegal arrangement (eg. NM_SUB following NM_TITLE).
+              (see also the GTMN_SecondaryError tag above).
+
+<b>   NOTES</b>
+	The strings you supply for menu text are not copied, and must
+	be preserved for the life of the menu.
+	The resulting menus have no positional information.  You will
+	want to call <a href="../Includes_and_Autodocs_3._guide/node0286.html">LayoutMenusA()</a> (or <a href="../Includes_and_Autodocs_3._guide/node0285.html">LayoutMenuItemsA()</a>) to supply that.
+	CreateMenusA() automatically provides you with a UserData field
+	for each menu, menu-item or sub-item.  Use the GTMENU_USERDATA(menu)
+	or GTMENUITEM_USERDATA(menuitem) macro to access it.
+
+<b>   BUGS</b>
+	Prior to V39, if you put images into menus using IM_ITEM
+	or IM_SUB for a NewMenu-&#062;nm_Type, the image supplied had to
+	be an ordinary struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a>.  Starting with V39, you can use
+	boopsi images.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0286.html">LayoutMenusA()</a>, <a href="../Includes_and_Autodocs_3._guide/node0279.html">FreeMenus()</a>, gadtools.h/GTMENU_USERDATA(),
+	gadtools.h/GTMENUITEM_USERDATA()
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

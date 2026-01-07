@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="port-handler" NODE="port_handler()" TITLE="port-handler/port_handler" -->
+<head>
+<title>port-handler/port_handler</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04FC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04FE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	port_handler -- standard serial/parallel/printer port handler.
+
+<b>   SYNOPSIS</b>
+	Open(&#034;PRT:[RAW/TRANSPARENT/UNIT=&#060;Unit number&#062;]&#034;,...);
+
+	Open(&#034;SER:[BAUD=&#060;speed&#062;/CONTROL=&#060;settings&#062;/UNIT=&#060;Unit number&#062;]&#034;,...);
+
+	Open(&#034;PAR:[UNIT=&#060;Unit number&#062;]&#034;,...);
+
+<b>   FUNCTION</b>
+	Port-handler allows AmigaDOS to interface to a standard parallel
+	device, a standard printer device, and a standard serial device.
+
+	Accessing &#034;PAR:&#034; connects AmigaDOS to the system's parallel port.
+	By default this will use parallel.device, unit 0. To use a
+	different unit number, such as 1, specify &#034;PAR:UNIT=1&#034; instead.
+
+	Accessing &#034;PRT:&#034; connects AmigaDOS to the system's printer. Data
+	written to PRT: is processed by the Amiga's printer device, handling
+	conversions of ANSI sequences, and sent to the printer. Accessing
+	&#034;PRT:RAW&#034; instead causes carriage return translation to be turned
+	off in the printer device while printing. To send data transparently
+	to the printer, without any translation or escape sequence substitution
+	whatsoever, use &#034;PRT:TRANSPARENT&#034;. The TRANSPARENT and RAW switches
+	are mutually exclusive. By default &#034;PRT:&#034; will access printer.device,
+	unit 0. To use a different unit number, such as 1, specify &#034;PRT:UNIT=1&#034;
+	instead. The keywords can be combined, such as in &#034;PRT:RAW/UNIT=1&#034;.
+
+	Accessing &#034;SER:&#034; connects AmigaDOS to the system's default serial port.
+	Following SER:, the baud rate and some control information can be
+	supplied. This is done in the form &#034;SER:baud/control&#034; where baud is
+	a number indicating the baud rate, and where control is a 3 letter
+	sequence denoting the number of read/write bits, the parity, and the
+	number of stop bits. For example, &#034;SER:9600/8N1&#034; connects to the
+	serial port, sets the baud rate to 9600, with 8 bit data, no parity,
+	and 1 stop bit. The possible control settings are:
+
+	        1st character: 7 or 8
+	        2nd character: N (No parity), O (Odd parity), E (Even parity)
+	                       M (Mark parity), S (Space parity)
+	        3rd character: 1 or 2
+
+	Specifying no baud rate or control values when accessing SER: gives you
+	the values set in Serial preferences.
+	To override the default unit number, use the UNIT keyword, as with the
+	PRT: and PAR: devices described above. For example, to access unit 1
+	with 38400 bps you could use &#034;SER:38400/UNIT=1&#034;.
+
+<b>   PACKETS</b>
+	ACTION_FINDINPUT
+	ACTION_FINDOUTPUT
+	ACTION_FINDUPDATE
+	ACTION_READ
+	ACTION_WRITE
+	ACTION_END
+	ACTION_IS_FILESYSTEM
+
+<b>   MOUNTLIST ENTRIES</b>
+	dos.library automatically mounts PAR:, PRT:, and SER: upon
+	system boot up. The mount entries used by dos.library are equivalent
+	to:
+
+	   SER:    Handler   = L:Port-Handler
+	           Priority  = 5
+	           StackSize = 800
+	           GlobVec   = 1
+	           Startup   = 0
+	   #
+
+	   PAR:    Handler   = L:Port-Handler
+	           Priority  = 5
+	           StackSize = 800
+	           GlobVec   = 1
+	           Startup   = 1
+	   #
+
+	   PRT:    Handler   = L:Port-Handler
+	           Priority  = 5
+	           StackSize = 1000
+	           GlobVec   = 1
+	           Startup   = 2
+	   #
+
+	Starting with V40, you can also provide disk-based mount entries
+	which let you use port-handler as a serial handler on various devices
+	and units. The form of these mount entries is:
+
+	   SER0:   EHandler  = L:Port-Handler
+	           Priority  = 5
+	           StackSize = 800
+	           GlobVec   = 1
+	           <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line23">Device</a>    = serial.device
+	           <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line30">Unit</a>      = 0
+	           Flags     = 0
+	           Control   = &#034;8N1&#034;
+	           Baud      = 9600
+	#
+
+	The &#034;Device&#034;, &#034;Unit&#034; and &#034;Flags&#034; keywords define the parameters
+	that the handler uses for <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice()</a>. &#034;Baud&#034; and &#034;Control&#034;
+	define the default values for baud rate and control information for
+	whenever that serial handler is accessed by name only, without
+	explicit baud rate and control information specified.
+
+<b>   NOTE</b>
+	Prior to V40, the baud rate and control information for SER: were
+	only recognized if an A2232 multi-serial card was installed in the
+	system. Starting with V40, these values are always recognized.
+
+	The TRANSPARENT, UNIT, BAUD and CONTROL keywords were introduced
+	with Port-Handler V44. For the different devices, the argument
+	templates are:
+
+	    PRT:RAW/S,TRANSPARENT/S,UNIT/K/N
+	    SER:BAUD/N,UNIT/K/N,CONTROL/F
+	    PAR:UNIT/K/N
+
+	Instead of blank spaces, keywords must be separated by slashes (&#034;/&#034;).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

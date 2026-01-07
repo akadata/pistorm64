@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-2-2" TITLE="27 / / Using the Graphics Drawing Routines / Reading Individual Pixels" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Using the Graphics Drawing Routines / Reading Individual Pixels</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0356.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0358.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a name="line2">You can determine the color of a specific pixel with a statement like this:</a>
+
+    SHORT x, y;
+    LONG result;
+    result = ReadPixel(&#038;rastPort, x, y);
+
+<a href="../Includes_and_Autodocs_2._guide/node046A.html">ReadPixel()</a> returns the value of the pixel color selector at the specified
+x,y location. If the coordinates you specify are outside the range of your
+<a href="../Libraries_Manual_guide/node034A.html">RastPort</a>, this function returns a value of -1.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

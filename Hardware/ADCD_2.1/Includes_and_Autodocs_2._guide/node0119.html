@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/resources/disk.h" NODE="MAIN" TITLE="Includes/resources/disk.h" -->
+<head>
+<title>Includes/resources/disk.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0118.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node011A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	RESOURCES_DISK_H
+#define RESOURCES_DISK_H
+/*
+**	$Filename: resources/disk.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 27.11 $
+**	$Date: 90/11/21 $
+**
+**	disk.h -- external declarations for the disk resource
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef	EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif
+<a name="line18"></a>
+#ifndef	EXEC_LISTS_H
+#include &#034;exec/lists.h&#034;
+#endif
+<a name="line22"></a>
+#ifndef	EXEC_PORTS_H
+#include &#034;exec/ports.h&#034;
+#endif
+<a name="line26"></a>
+#ifndef	EXEC_INTERRUPTS_H
+#include &#034;exec/interrupts.h&#034;
+#endif
+<a name="line30"></a>
+#ifndef	EXEC_LIBRARIES_H
+#include &#034;exec/libraries.h&#034;
+#endif
+
+
+/********************************************************************
+*
+* Resource structures
+*
+********************************************************************/
+
+<a name="line42"></a>
+<a name="line43">struct DiscResourceUnit {</a>
+<a name="line44">    struct Message dru_Message;</a>
+<a name="line45">    struct Interrupt dru_DiscBlock;</a>
+<a name="line46">    struct Interrupt dru_DiscSync;</a>
+    struct Interrupt dru_Index;
+};
+<a name="line49"></a>
+<a name="line50">struct DiscResource {</a>
+<a name="line51">    struct Library		dr_Library;</a>
+<a name="line52">    struct DiscResourceUnit	*dr_Current;</a>
+<a name="line53">    UBYTE			dr_Flags;</a>
+<a name="line54">    UBYTE			dr_pad;</a>
+<a name="line55">    struct Library		*dr_SysLib;</a>
+<a name="line56">    struct Library		*dr_CiaResource;</a>
+<a name="line57">    ULONG			dr_UnitID[4];</a>
+<a name="line58">    struct List		dr_Waiting;</a>
+<a name="line59">    struct Interrupt		dr_DiscBlock;</a>
+<a name="line60">    struct Interrupt		dr_DiscSync;</a>
+<a name="line61">    struct Interrupt		dr_Index;</a>
+    struct Task			*dr_CurrTask;
+};
+
+<a name="line65">/* dr_Flags entries */</a>
+<a name="line66">#define DRB_ALLOC0	0	/* unit zero is allocated */</a>
+<a name="line67">#define DRB_ALLOC1	1	/* unit one is allocated */</a>
+<a name="line68">#define DRB_ALLOC2	2	/* unit two is allocated */</a>
+<a name="line69">#define DRB_ALLOC3	3	/* unit three is allocated */</a>
+#define DRB_ACTIVE	7	/* is the disc currently busy? */
+<a name="line71"></a>
+<a name="line72">#define DRF_ALLOC0	(1&#060;&#060;0)	/* unit zero is allocated */</a>
+<a name="line73">#define DRF_ALLOC1	(1&#060;&#060;1)	/* unit one is allocated */</a>
+<a name="line74">#define DRF_ALLOC2	(1&#060;&#060;2)	/* unit two is allocated */</a>
+<a name="line75">#define DRF_ALLOC3	(1&#060;&#060;3)	/* unit three is allocated */</a>
+#define DRF_ACTIVE	(1&#060;&#060;7)	/* is the disc currently busy? */
+
+
+
+/********************************************************************
+*
+* Hardware Magic
+*
+********************************************************************/
+
+<a name="line86"></a>
+#define	DSKDMAOFF	0x4000	/* idle command for dsklen register */
+
+
+/********************************************************************
+*
+* Resource specific commands
+*
+********************************************************************/
+
+/*
+ * DISKNAME is a generic macro to get the name of the resource.
+ * This way if the name is ever changed you will pick up the
+ *  change automatically.
+ */
+<a name="line101"></a>
+#define DISKNAME	&#034;disk.resource&#034;
+
+<a name="line104"></a>
+<a name="line105">#define	DR_ALLOCUNIT	(LIB_BASE - 0*LIB_VECTSIZE)</a>
+<a name="line106">#define	DR_FREEUNIT	(LIB_BASE - 1*LIB_VECTSIZE)</a>
+<a name="line107">#define	DR_GETUNIT	(LIB_BASE - 2*LIB_VECTSIZE)</a>
+<a name="line108">#define	DR_GIVEUNIT	(LIB_BASE - 3*LIB_VECTSIZE)</a>
+<a name="line109">#define	DR_GETUNITID	(LIB_BASE - 4*LIB_VECTSIZE)</a>
+#define	DR_READUNITID	(LIB_BASE - 5*LIB_VECTSIZE)
+<a name="line111"></a>
+#define	DR_LASTCOMM	(DR_READUNITID)
+
+/********************************************************************
+*
+* drive types
+*
+********************************************************************/
+<a name="line119"></a>
+<a name="line120">#define	DRT_AMIGA	(0x00000000)</a>
+<a name="line121">#define	DRT_37422D2S	(0x55555555)</a>
+<a name="line122">#define DRT_EMPTY	(0xFFFFFFFF)</a>
+#define DRT_150RPM	(0xAAAAAAAA)
+
+#endif /* RESOURCES_DISK_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

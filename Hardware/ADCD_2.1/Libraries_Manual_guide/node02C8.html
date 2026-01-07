@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-6-2" TITLE="21 / Task Traps / Trap Instructions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 / Task Traps / Trap Instructions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02C7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02C9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The TRAP instructions in the 68000 generate traps 32-47.  Because many
+independent pieces of system code may desire to use these traps, the
+<a href="../Includes_and_Autodocs_2._guide/node0334.html">AllocTrap()</a> and <a href="../Includes_and_Autodocs_2._guide/node0357.html">FreeTrap()</a> functions are provided.  These work in a
+fashion similar to that used by <a href="../Libraries_Manual_guide/node02D3.html#line5">AllocSignal()</a> and <a href="../Libraries_Manual_guide/node02D3.html#line5">FreeSignal()</a>, mentioned
+in the &#034;<a href="../Libraries_Manual_guide/node02D3.html">Exec Signals</a>&#034; chapter.
+
+Allocating a trap is simply a bookkeeping job within a task.  It does not
+affect how the system calls the trap handler; it helps coordinate who owns
+what traps.  Exec does nothing to determine whether or not a task is
+prepared to handle a particular trap.  It simply calls your code. It is up
+to your program to handle the trap.
+
+To allocate any trap, you can use the following code:
+
+    if (-1 == (trap = AllocTrap(-1)))
+        printf(&#034;all trap instructions are in use\n&#034;);
+
+Or you can select a specific trap using this code:
+
+    if (-1 == (trap = AllocTrap(3)))
+        printf(&#034;trap #3 is in use\n&#034;);
+
+To free a trap, you use the <a href="../Includes_and_Autodocs_2._guide/node0357.html">FreeTrap()</a> function passing it the trap number
+to be freed.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

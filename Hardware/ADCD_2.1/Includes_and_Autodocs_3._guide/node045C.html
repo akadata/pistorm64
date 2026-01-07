@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="locale" NODE="OpenLocale()" TITLE="locale.library/OpenLocale" -->
+<head>
+<title>locale.library/OpenLocale</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node045B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node045D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	OpenLocale -- open a locale. (V38)
+
+<b>   SYNOPSIS</b>
+	locale = OpenLocale(name);
+	D0                  A0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> *OpenLocale(STRPTR);
+
+<b>   FUNCTION</b>
+	This function opens a named locale. Locales contain many parameters
+	that an application needs to consider when being integrated into
+	different languages, territories and customs. Using the information
+	stored in a locale instead of hard-coding it into an application,
+	lets the application dynamically adapt to the user's environment.
+
+	Locales originally come from disk files which are created by the
+	user using the <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> preferences editor. Passing a NULL instead of
+	a name causes this function to return the current default locale.
+	This is what most applications will do.
+
+	Every locale specifies a language, and special language drivers
+	must be loaded from disk depending on which language is being used.
+	These files include for example:
+
+		LOCALE:Languages/fran&#231;ais.language
+		LOCALE:Languages/dansk.language
+		LOCALE:Languages/italiano.language
+
+<b>   INPUTS</b>
+	name - the NULL-terminated name of the locale to open, or NULL to open
+	       the current default locale. This should generally be NULL. The
+	       name you supply must be a pathname leading to a locale
+	       preferences file. This is an IFF PREF file as saved by
+	       <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> prefs, that can contain both LCLE and CTRY chunks.
+	       See <a href="../Includes_and_Autodocs_3._guide/node05F4.html">&#060;prefs/locale.h&#062;</a> for definitions.
+
+<b>   RESULT</b>
+	locale - a pointer to an initialized <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> structure, or NULL if the
+		 locale could not be loaded. In the case of a NULL return, the
+		 DOS <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a> function can be called to obtain more information
+		 on the failure.
+
+		 When passing a NULL name parameter to this function, you are
+		 guaranteed a valid return.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0453.html">CloseLocale()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E3.html">&#060;libraries/locale.h&#062;</a>, <a href="../Includes_and_Autodocs_3._guide/node05F4.html">&#060;prefs/locale.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

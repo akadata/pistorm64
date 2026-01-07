@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="iffparse" NODE="StopOnExit()" TITLE="iffparse.library/StopOnExit" -->
+<head>
+<title>iffparse.library/StopOnExit</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node037B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node037D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	StopOnExit -- declare a stop condition for exiting a chunk. (V36)
+
+<b>   SYNOPSIS</b>
+	error = StopOnExit(iff, type, id);
+	D0                 A0   D0    D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> StopOnExit(struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, LONG);
+
+<b>   FUNCTION</b>
+	Installs an exit handler for the specified chunk which will cause the
+	<a href="../Includes_and_Autodocs_3._guide/node0372.html">ParseIFF()</a> function to return control to the caller when this chunk
+	is exhausted. <a href="../Includes_and_Autodocs_3._guide/node0372.html">ParseIFF()</a> will return IFFERR_EOC when the declared
+	chunk is about to be popped. This is only of value when <a href="../Includes_and_Autodocs_3._guide/node0372.html">ParseIFF()</a>
+	is called with the IFFPARSE_SCAN control code.
+
+<b>   INPUTS</b>
+	iff - pointer to <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> structure (need not be open).
+	type - type code for chunk to declare (ex. &#034;ILBM&#034;).
+	id - identifier for chunk to declare (ex. &#034;BODY&#034;).
+
+<b>   RESULT</b>
+	error - 0 if successful or an IFFERR_#? error code if unsuccessful.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0372.html">ParseIFF()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E8.html">&#060;libraries/iffparse.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

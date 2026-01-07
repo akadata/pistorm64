@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="CBump()" TITLE="graphics.library/CBump" -->
+<head>
+<title>graphics.library/CBump</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0424.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0426.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+NAME
+    CBump -- increment user copper list pointer (bump to next position
+             in list).
+
+SYNOPSIS
+    CBump( c )
+          a1
+
+    void CBump( struct <a href="../Includes_and_Autodocs_2._guide/node00AD.html#line82">UCopList</a> * );
+
+FUNCTION
+    Increment pointer to space for next instruction in user copper list.
+
+INPUTS
+    c - pointer to <a href="../Includes_and_Autodocs_2._guide/node00AD.html#line82">UCopList</a> structure
+
+RESULTS
+    User copper list pointer is incremented to next position.
+    Pointer is repositioned to next user copperlist instruction block
+    if the current block is full.
+
+        Note: CBump is usually invoked for the programmer as part of the
+              macro definitions <a href="../Includes_and_Autodocs_2._guide/node0432.html">CWAIT</a> or <a href="../Includes_and_Autodocs_2._guide/node0430.html">CMOVE</a>.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0428.html">CINIT</a> <a href="../Includes_and_Autodocs_2._guide/node0432.html">CWAIT</a> <a href="../Includes_and_Autodocs_2._guide/node0430.html">CMOVE</a> <a href="../Includes_and_Autodocs_2._guide/node0426.html">CEND</a> <a href="../Includes_and_Autodocs_2._guide/node00AD.html">graphics/copper.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

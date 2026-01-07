@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-6" TITLE="3 Intuition Screens / Overscan and the Display Clip" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 Intuition Screens / Overscan and the Display Clip</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00EE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00F0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Screens may be larger or smaller than the defined display area (overscan
+rectangle or display clip).  When a screen is smaller than the display
+area, the display clip acts as a &#034;container&#034; for the screen.  The screen
+may be moved anywhere within the display clip.  When a screen is larger
+than the display area, the display clip acts as a &#034;window&#034; into the
+screen.  The screen may be moved so that different parts are visible.
+Each dimension of the screen is independent and may be larger than, the
+same as, or smaller than the dimensions of the display clip.
+
+The system is very flexible in its specification of screen size.  Unless
+an application fixes its screen size with hard coded values, it should be
+prepared to handle the possibility that the user has changed the default
+<a name="line14">overscan presets or the default monitor (NTSC/PAL).</a>
+
+Use the constants STDSCREENHEIGHT and STDSCREENWIDTH with the <a href="../Libraries_Manual_guide/node00E5.html#line54">SA_Width</a> and
+<a href="../Libraries_Manual_guide/node00E5.html#line54">SA_Height</a> tags to open a screen the same size as the display clip.  These
+constants will work with any of the preset overscan values set with
+<a href="../Libraries_Manual_guide/node00E5.html#line247">SA_Overscan</a>, and with custom overscan values set with <a href="../Libraries_Manual_guide/node00E5.html#line257">SA_DClip</a>.
+
+ <a href="../Libraries_Manual_guide/node00F0.html">Preset Overscan Values</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

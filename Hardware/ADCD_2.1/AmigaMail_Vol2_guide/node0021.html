@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="I-19/SWCompat.txt" NODE="I-19-6" TITLE="DOS" -->
+<head>
+<title>DOS</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0020.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0022.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+* DOS is now written in C and assembler, not BCPL.  The BCPL compiler
+  artifact which caused D0 function results to also be in D1 is gone.  2.0
+  compatibility patches which return some DOS function results in both D0
+  and D1 are not guaranteed to remain in the next release.  Fix your
+  programs! Use Scratch to find these problems in your code.
+
+* DOS now has a real library base with normal LVO vectors.
+
+* Stack usage has all changed (variables, direction).
+
+* New packet and lock types.  Make sure you are not passing stack
+  garbage for the second argument to Lock().
+
+* Process structure is bigger.  ``Rolling your own'' Process structure
+  from a Task fails.
+
+* Unless documented otherwise, you must be a process to call DOS
+  functions. DOS function dependence on special process structures can
+  change with OS revisions.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

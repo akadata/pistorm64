@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_12" NODE="12-2-4" TITLE="12 / Device Interface / Closing The Serial Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>12 / Device Interface / Closing The Serial Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node009F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00A1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Each <a href="../Includes_and_Autodocs_2._guide/node04D4.html">OpenDevice()</a> must eventually be matched by a call to <a href="../Includes_and_Autodocs_2._guide/node04CC.html">CloseDevice()</a>.
+When the last close is performed, the device will deallocate all resources
+and buffers.
+
+All IORequests must be complete before <a href="../Includes_and_Autodocs_2._guide/node04CC.html">CloseDevice()</a>.  Abort any pending
+requests with <a href="../Includes_and_Autodocs_2._guide/node04CA.html">AbortIO()</a>.
+
+   if (!(CheckIO(SerialIO)))
+       {
+       AbortIO((struct IORequest *)SerialIO); /* Ask device to abort */
+       }			              /*   request, if pending */
+   WaitIO((struct IORequest *)SerialIO);      /* Wait for abort, then */
+   CloseDevice((struct IORequest *)SerialIO); /*  clean up */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

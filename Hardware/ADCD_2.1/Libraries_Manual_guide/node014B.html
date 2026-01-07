@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-9-2" TITLE="5 / Gadget Structure / Gadget Activation Flags" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / Gadget Structure / Gadget Activation Flags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node014A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node014C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a name="line2">These flags may be set in the <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field of the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure.</a>
+
+GACT_TOGGLESELECT
+    This flag applies only to <a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadgets, and tells Intuition that
+    this is to be a toggle-select gadget, not a hit-select one.  Preset
+    the selection state with the gadget flag <a href="../Libraries_Manual_guide/node014A.html#line63">GFLG_SELECTED</a> (see above).
+    The program may check if the gadget is in the selected state by
+<a name="line9">    examining the GFLG_SELECTED flag at any time.</a>
+
+GACT_IMMEDIATE
+    If this bit is set, the program will be sent an <a href="../Libraries_Manual_guide/node01DD.html">IDCMP_GADGETDOWN</a>
+    message when the gadget is first picked.  The message will be sent
+<a name="line14">    when the user presses the mouse select button.</a>
+
+GACT_RELVERIFY
+    This is short for &#034;release verify.&#034;  If this bit is set, the program
+    will be sent an <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> message when the gadget is
+    deactivated.  IDCMP_GADGETUP will be sent for <a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadgets when
+    the user releases the mouse select button while the pointer is over
+    the select box, for <a href="../Libraries_Manual_guide/node0153.html">proportional</a> gadgets whenever the user releases
+    the mouse select button (regardless of the pointer position), and for
+    <a href="../Libraries_Manual_guide/node0164.html">string</a> and <a href="../Libraries_Manual_guide/node0165.html">integer</a> gadgets when the user completes the text entry by
+    pressing return or tabbing to the next gadget (where supported).
+
+    For <a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadgets, if the user releases the mouse button while the
+    pointer is outside of the gadget's select box <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> will not
+    be generated.  Instead, the program will receive an
+    <a href="../Libraries_Manual_guide/node01DC.html">IDCMP_MOUSEBUTTONS</a> event with the SELECTUP code set.  For <a href="../Libraries_Manual_guide/node0164.html">string</a>
+    gadgets, if the user deactivates the gadget by clicking elsewhere, it
+<a name="line31">    may not be possible to detect.</a>
+
+GACT_ENDGADGET
+    This flag pertains only to gadgets attached to requesters.  If a
+    gadget with the GACT_ENDGADGET flag set is chosen by the user the
+    requester will be terminated as if the application had called the
+    <a href="../Libraries_Manual_guide/node01A2.html#line24">EndRequest()</a> function.
+
+    See the chapter &#034;<a href="../Libraries_Manual_guide/node01A7.html">Intuition Requesters and Alerts</a>,&#034; for more
+<a name="line40">    information about requester gadget considerations.</a>
+
+GACT_FOLLOWMOUSE
+    These flags may be set in the <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field of the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>
+    structure. As long as a gadget that has this flag set is active, the
+    program will receive mouse position messages for each change of mouse
+    position.  For <a href="../Libraries_Manual_guide/node0149.html#line63">GTYP_BOOLGADGET</a> gadgets, GACT_RELVERIFY must also be
+    set for the program to receive mouse events.
+<a name="line48"></a>
+
+The following flags are used to place application gadgets into a specified
+window border.  Intuition will adjust the size of a window's borders
+appropriately provided these gadgets are set up with a call to
+<a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a>, <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTags()</a> or <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a>.  Intuition knows to
+refresh gadgets marked with these flags when the window border is changed,
+e.g., when the window is activated.  For <a href="../Libraries_Manual_guide/node0116.html">GimmeZeroZero</a> windows, the
+<a name="line56"><a href="../Libraries_Manual_guide/node0149.html#line81">GTYP_GZZGADGET</a> flag must also be set for border gadgets.</a>
+
+GACT_RIGHTBORDER
+    If this flag is set, the gadget is placed in the right border of the
+    window and the width and position of this gadget are used in deriving
+<a name="line61">    the width of the window's right border.</a>
+
+GACT_LEFTBORDER
+    If this flag is set, the gadget is placed in the left border of the
+    window and the width and position of this gadget are used in deriving
+<a name="line66">    the width of the window's left border.</a>
+
+GACT_TOPBORDER
+    If this flag is set, the gadget is placed in the top border of the
+    window and the height and position of this gadget are used in
+<a name="line71">    deriving the height of the window's top border.</a>
+
+GACT_BOTTOMBORDER
+    If this flag is set, the gadget is placed in the bottom border of the
+    window and the height and position of this gadget are used in
+    deriving the height of the window's bottom border.
+
+
+<a name="line79">The following flags apply only to <a href="../Libraries_Manual_guide/node0164.html">string</a> gadgets:</a>
+
+GACT_STRINGCENTER
+    If this flag is set, the text in a <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget is centered within
+<a name="line83">    the select box.</a>
+
+GACT_STRINGRIGHT
+    If this flag is set, the text in a <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget is right justified
+<a name="line87">    within the select box.</a>
+
+GACT_STRINGLEFT
+    This &#034;flag&#034; has a value of zero.  By default, the text in a <a href="../Libraries_Manual_guide/node0164.html">string</a>
+<a name="line91">    gadget is left justified within the select box.</a>
+
+GACT_LONGINT
+    If this flag is set, the user can construct a 32-bit signed integer
+    value in a normal <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget. The input buffer of the string
+    gadget must be initialized with an ASCII representation of the
+<a name="line97">    starting integer value.</a>
+
+GACT_ALTKEYMAP
+    These flags may be set in the <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field of the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>
+    structure.  A pointer to the keymap must be placed in the <a href="../Libraries_Manual_guide/node016B.html">StringInfo</a>
+<a name="line102">    structure variable <a href="../Libraries_Manual_guide/node016C.html">AltKeyMap</a>.</a>
+
+GACT_BOOLEXTEND
+    This flag applies only to <a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadgets.  If this flag is set, then
+    the boolean gadget has a <a href="../Libraries_Manual_guide/node014E.html">BoolInfo</a> structure associated with it.  A
+    pointer to the BoolInfo structure must be placed in the <a href="../Libraries_Manual_guide/node0149.html#line125">SpecialInfo</a>
+<a name="line108">    field of the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure.</a>
+
+GACT_STRINGEXTEND
+    This is an obsolete flag originally defined in V36.  It applies only
+    to <a href="../Libraries_Manual_guide/node0164.html">string</a> gadgets and indicates that <a href="../Libraries_Manual_guide/node016B.html#line76">StringInfo.Extension</a> points to a
+    valid <a href="../Libraries_Manual_guide/node016D.html">StringExtend</a> structure.  Although this flag works, it is not
+    ignored prior to V36 as it should be in order to be backward
+    compatible.  This flag is replaced by <a href="../Libraries_Manual_guide/node014A.html#line81">GFLG_STRINGEXTEND</a> in V37.
+    GFLG_STRINGEXTEND performs the same function and is properly ignored
+    on systems prior to V36.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

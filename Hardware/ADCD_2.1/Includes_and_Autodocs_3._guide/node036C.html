@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="iffparse" NODE="InitIFFasClip()" TITLE="iffparse.library/InitIFFasClip" -->
+<head>
+<title>iffparse.library/InitIFFasClip</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node036B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node036D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	InitIFFasClip -- initialize an <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> as a clipboard stream. (V36)
+
+<b>   SYNOPSIS</b>
+	InitIFFasClip(iff);
+	              A0
+
+	VOID InitIFFasClip(struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> *);
+
+<b>   FUNCTION</b>
+	Initializes the given <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> to be a clipboard stream. The
+	function initializes the stream processing vectors to operate on
+	streams of the <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line147">ClipboardHandle</a> type. The iff_Stream field will still
+	need to be initialized to point to a <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line147">ClipboardHandle</a> as returned from
+	<a href="../Includes_and_Autodocs_3._guide/node036F.html">OpenClipboard()</a>.
+
+<b>   INPUTS</b>
+	iff - pointer to <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> structure.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node036B.html">InitIFF()</a>, <a href="../Includes_and_Autodocs_3._guide/node036F.html">OpenClipboard()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E8.html">&#060;libraries/iffparse.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

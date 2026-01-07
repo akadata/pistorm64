@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/clibtest.c" NODE="MAIN" TITLE="lib_examples/clibtest.c" -->
+<head>
+<title>lib_examples/clibtest.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node060B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node060D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* clibtest.c--Calls the Sample.library functions (execute to compile with Lattice 5.10a)
+LC -b1 -cfistq -v -y -j73 clibtest.c
+Blink FROM LIB:c.o,clibtest.o TO clibtest LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+; note - you must also link with sample.lib if not using sample_pragmas.h
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/libraries.h&#062;
+#include &#060;libraries/dos.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+
+#include &#060;stdlib.h&#062;
+#include &#060;stdio.h&#062;
+
+#include &#034;sampleinclude/samplebase.h&#034;
+#include &#034;sampleinclude/sample_protos.h&#034;
+#include &#034;sampleinclude/sample_pragmas.h&#034;
+
+#ifdef LATTICE
+int CXBRK(void)     { return(0); }      /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }         /* really */
+#endif
+
+struct Library *SampleBase = NULL;
+
+void main(int argc, char **argv)
+   {
+   LONG n;
+
+   /* Open sample.library */
+   if(!(SampleBase=OpenLibrary(&#034;sample.library&#034;,0)))
+      {
+      printf(&#034;Can't open sample.library\n&#034;);
+      exit(RETURN_FAIL);
+      }
+   /* Print library name, ID string, version, revision */
+   printf(&#034;%s  Version=%ld   Revision=%ld  IdString: %s\n&#034;,
+             SampleBase-&#062;lib_Node.ln_Name, SampleBase-&#062;lib_Version,
+             SampleBase-&#062;lib_Revision, SampleBase-&#062;lib_IdString);
+
+   /* Call the two functions */
+   n = Double(-7);
+   printf(&#034;Function Double(-7) returned %ld\n&#034;, n);
+   n = AddThese(21,4);
+   printf(&#034;Function AddThese(21,4) returned %ld\n&#034;, n);
+
+   CloseLibrary(SampleBase);
+   exit(RETURN_OK);
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="ObtainSemaphore()" TITLE="exec.library/ObtainSemaphore" -->
+<head>
+<title>exec.library/ObtainSemaphore</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node021C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node021E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ObtainSemaphore -- gain exclusive access to a semaphore
+
+<b>   SYNOPSIS</b>
+	ObtainSemaphore(signalSemaphore)
+			A0
+
+	void ObtainSemaphore(struct <a href="../Includes_and_Autodocs_3._guide/node0647.html#line39">SignalSemaphore</a> *);
+
+<b>   FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node023D.html">Signal</a> semaphores are used to gain exclusive access to an object.
+	ObtainSemaphore is the call used to gain this access.  If another
+	user currently has the semaphore locked the call will block until
+	the object is available.
+
+	If the current task already has locked the semaphore and attempts to
+	lock it again the call will still succeed.  A &#034;nesting count&#034; is
+	incremented each time the current owning task of the semaphore calls
+	ObtainSemaphore().  This counter is decremented each time
+	<a href="../Includes_and_Autodocs_3._guide/node0228.html">ReleaseSemaphore()</a> is called.  When the counter returns to zero the
+	semaphore is actually released, and the next waiting task is called.
+
+	A queue of waiting tasks is maintained on the stacks of the waiting
+	tasks.	Each will be called in turn as soon as the current task
+	releases the semaphore.
+
+	<a href="../Includes_and_Autodocs_3._guide/node023D.html">Signal</a> Semaphores are different than <a href="../Includes_and_Autodocs_3._guide/node0245.html">Procure()/Vacate()</a> semaphores.
+	The former requires less CPU time, especially if the semaphore is
+	not currently locked.  They require very little set up and user
+	thought.  The latter flavor of semaphore make no assumptions about
+	how they are used -- they are completely general.  Unfortunately
+	they are not as efficient as signal semaphores, and require the
+	locker to have done some setup before doing the call.
+
+<b>   INPUT</b>
+       signalSemaphore -- an initialized signal semaphore structure
+
+<b>   NOTE</b>
+	This function preserves all registers (see BUGS).
+
+<b>   BUGS</b>
+	Until V37, this function could destroy A0.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node021F.html">ObtainSemaphoreShared()</a>, <a href="../Includes_and_Autodocs_3._guide/node0217.html">InitSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node0228.html">ReleaseSemaphore()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node01EC.html">AttemptSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node021E.html">ObtainSemaphoreList()</a>, <a href="../Includes_and_Autodocs_3._guide/node0225.html">Procure()</a>, <a href="../Includes_and_Autodocs_3._guide/node0245.html">Vacate()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

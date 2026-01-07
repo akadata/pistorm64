@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-8-5" TITLE="4 / Other Window Functions / Changing Message Queue Limits" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Other Window Functions / Changing Message Queue Limits</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node012A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node012C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Starting with V36, windows have limits on the number of mouse movement and
+repeat key messages that may be waiting at their IDCMP at any time.  These
+queue limits prevent the accumulation of these messages, which may arrive
+<a name="line5">at the IDCMP message port in large numbers.</a>
+
+Once a queue limit is reached, further messages of that type will be
+discarded by Intuition.  The application will never hear about the
+discarded messages; they are gone forever.  (Note that only mouse move and
+key repeat messages are limited this way.  Other types of messages will
+still be added to the port.)  Messages of the limited type will arrive at
+the port again after the application has replied to one of the messages in
+the queue.
+
+The queue limits are independent of each other.  Having reached the limit
+for one type of message does not prevent other types of messages (that
+have not yet reached their queuing limits) from being added to the IDCMP.
+Note that the queues apply only to the IDCMP and not to messages received
+directly via an input handler or from the console device.
+
+Order of event arrival is not a factor in the message count.  Messages may
+be sequential or interspersed with other events--only the number of
+<a name="line23">messages of the specific type waiting at the IDCMP matters.</a>
+
+The <a href="../Libraries_Manual_guide/node0124.html#line159">WA_RptQueue</a> tag allows setting an initial value for the repeat key
+backlog limit for the window.  There is no function to change this value
+<a name="line27">as of V37.  The default value for WA_RptQueue is 3.</a>
+
+The <a href="../Libraries_Manual_guide/node0124.html#line154">WA_MouseQueue</a> tag allows setting an initial value for the mouse
+message backlog limit for the window.  The default value for WA_MouseQueue
+is 5.  The number may later be changed with a call to <a href="../Includes_and_Autodocs_2._guide/node0254.html">SetMouseQueue()</a>:
+
+    LONG SetMouseQueue( struct Window *window, unsigned long queueLength );
+
+Note that real information may be lost if the queue fills and Intuition is
+forced to discard messages.  See the chapter
+&#034;<a href="../Libraries_Manual_guide/node01E9.html">Intuition Mouse and Keyboard</a>&#034; for more information.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

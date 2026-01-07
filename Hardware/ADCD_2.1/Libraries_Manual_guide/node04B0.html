@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_A" NODE="A-1-1" TITLE="A / Amiga.lib / Exec Support" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>A / Amiga.lib / Exec Support</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04AF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04B1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Includes_and_Autodocs_2._guide/node0141.html">BeginIO()</a>
+    This function takes an <a href="../Libraries_Manual_guide/node029D.html">IORequest</a> and passes it directly to the
+    BEGINIO vector of the proper device.  This works exactly like
+    <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>, but does not clear the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">io_Flags</a> field first. This function
+<a name="line6">    does not wait for the I/O to complete.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a> and <a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>
+    CreateExtIO() allocates memory for and initializes a new I/O request
+    block of a program-specified number of bytes.  The number of bytes
+    must be the size of a legal <a href="../Libraries_Manual_guide/node01D2.html">IORequest</a> (or extended request) or very
+    nasty things will happen. DeleteExtIO() frees up an I/O request as
+    allocated by CreateExtIO(). The <a href="../Includes_and_Autodocs_2._guide/node0099.html#line46">mn_Length</a> field determines how much
+<a name="line14">    memory to deallocate.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a> and <a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>
+    CreatePort() allocates and initializes a new message port. The
+    message list of the new port will be prepared for use via NewList().
+    The port will be set to signal your task when a message arrives
+    (<a href="../Libraries_Manual_guide/node02EB.html#line49">PA_SIGNAL</a>). DeletePort() deletes the port created by CreatePort().
+    All messages that may have been attached to that port must already
+<a name="line22">    have been replied to.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0149.html">CreateStdIO()</a> and <a href="../Includes_and_Autodocs_2._guide/node0154.html">DeleteStdIO()</a>
+    CreateStdIO() allocates memory for and initializes a new <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a>
+    structure. DeleteStdIO() frees up an IOStdReq allocated by
+<a name="line27">    CreateStdIO().</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node014A.html">CreateTask()</a> and <a href="../Includes_and_Autodocs_2._guide/node0155.html">DeleteTask()</a>
+    These functions simplify creation and deletion of subtasks by
+    dynamically allocating and initializing the required structures and
+    stack space.  They also add the task to Exec's task list with the
+    given name and priority.  A <a href="../Includes_and_Autodocs_2._guide/node008E.html#line25">tc_MemEntry</a> list is provided so that all
+    stack and structure memory allocated by CreateTask() is automatically
+    deallocated when the task is removed. Before deleting a  task with
+    DeleteTask(), you must first make sure that the task is not currently
+    executing any system code which might try to signal the task after it
+<a name="line38">    is gone.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0161.html">NewList()</a>
+    Prepares a List structure for use; the list will be empty and ready
+    to use.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

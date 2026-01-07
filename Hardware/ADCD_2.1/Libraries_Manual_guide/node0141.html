@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-5-3" TITLE="5 / Gadget Highlighting / With an Alternate Image or Alternate Border" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / Gadget Highlighting / With an Alternate Image or Alternate Border</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0140.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0142.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An alternate image may be supplied as highlighting for gadgets that use
+image rendering, similarly an alternate border may be supplied for gadgets
+that use border rendering.  When the gadget is active or selected, the
+alternate image or border is displayed in place of the default image or
+border.  For this highlighting method, set the <a href="../Libraries_Manual_guide/node0149.html#line102">SelectRender</a> field of the
+<a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure to point to the <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structure or <a href="../Libraries_Manual_guide/node01C1.html">Border</a> structure for
+<a name="line8">the alternate display.</a>
+
+Specify that highlighting is to be done with alternate imagery by setting
+the <a href="../Libraries_Manual_guide/node014A.html#line16">GFLG_GADGHIMAGE</a> flag in the <a href="../Libraries_Manual_guide/node0149.html#line48">Flags</a> field of the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure.  When
+using GFLG_GADGHIMAGE, remember to set the <a href="../Libraries_Manual_guide/node014A.html#line23">GFLG_GADGIMAGE</a> flag for images,
+<a name="line13">clear it for borders.</a>
+
+When using alternate images and borders for highlighting, gadgets rendered
+with images must highlight with another image and gadgets rendered with
+borders must highlight with another border.  For information about how to
+create an <a href="../Libraries_Manual_guide/node01B9.html">Image</a> or <a href="../Libraries_Manual_guide/node01C0.html">Border</a> structure, see the chapter &#034;Intuition Images,
+Line Drawing, and Text.&#034;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

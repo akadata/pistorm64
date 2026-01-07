@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/istr.c" NODE="MAIN" TITLE="Lib_examples/istr.c" -->
+<head>
+<title>Lib_examples/istr.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05C6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05C8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* istr.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfis -j73 istr.c
+Blink FROM LIB:c.o,istr.o TO istr LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+*/
+
+    #include &#060;exec/types.h&#062;
+    #include &#060;stdio.h&#062;
+    #include &#060;string.h&#062;
+
+    #include &#060;clib/exec_protos.h&#062;
+    #include &#060;clib/utility_protos.h&#062;
+
+    void main(void);
+    struct Library *UtilityBase;
+
+    void main(void)
+    {
+        UBYTE *butter = &#034;B&#248;tervl&#248;&#248;t&#034;;
+        UBYTE *bread = &#034;Kn&#229;ckerbr&#248;t&#034;;
+        UBYTE ch1, ch2;
+        LONG result;
+
+        /* Fails silently if &#060; 37 */
+        if (UtilityBase = OpenLibrary(&#034;utility.library&#034;, 37))
+        {
+                result = Stricmp(butter, bread);
+
+                printf(&#034;comparing %s with %s yields %ld\n&#034;, butter, bread, result );
+
+                result = Strnicmp(bread, butter, strlen(bread));
+
+                printf(&#034;comparing (with length) %s with %s yields %ld\n&#034;, bread, butter, result );
+
+                ch1 = ToUpper(0xE6); &#230; /* ASCII character 230 ae ligature */
+                ch2 = ToLower(0xD0); &#208; /* ASCII character 208 Icelandic Eth */
+
+                printf(&#034;Chars %c %c\n&#034;, ch1, ch2);
+        }
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

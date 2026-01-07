@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="OpenDevice()" TITLE="exec.library/OpenDevice" -->
+<head>
+<title>exec.library/OpenDevice</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0220.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0222.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	OpenDevice -- gain access to a device
+
+<b>   SYNOPSIS</b>
+	error = OpenDevice(devName, unitNumber, iORequest, flags)
+	D0		   A0	    D0		A1	   D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line48">BYTE</a> OpenDevice(STRPTR,ULONG,struct <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> *,ULONG);
+
+<b>   FUNCTION</b>
+	This function opens the named device/unit and initializes the given
+	I/O request block.  Specific documentation on opening procedures
+	may come with certain devices.
+
+	The device may exist in memory, or on disk; this is transparent to
+	the OpenDevice caller.
+
+	A full path name for the device name is legitimate.  For example
+	&#034;test:devs/fred.device&#034;.  This allows the use of custom devices
+	without requiring the user to copy the device into the system's
+	DEVS: directory.
+
+<b>   NOTES</b>
+	All calls to OpenDevice should have matching calls to CloseDevice!
+
+	Devices on disk cannot be opened until after DOS has been
+	started.
+
+	As of V36 tasks can safely call OpenDevice, though DOS may open
+	system requesters (e.g., asking the user to insert the Workbench
+	disk if DEVS: is not online).  You must call this function from a
+	DOS <a href="../Includes_and_Autodocs_3._guide/node05D9.html#line36">Process</a> if you want to turn off DOS requesters.
+
+<b>   INPUTS</b>
+	devName - requested device name
+
+	unitNumber - the unit number to open on that device.  The format of
+		the unit number is device specific.  If the device does
+		not have separate units, send a zero.
+
+	iORequest - the I/O request block to be returned with
+		appropriate fields initialized.
+
+	flags - additional driver specific information.  This is sometimes
+		used to request opening a device with exclusive access.
+
+<b>   RESULTS</b>
+	error - Returns a sign-extended copy of the io_Error field
+		of the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a>.  Zero if successful, else an error code
+		is returned.
+
+<b>   BUGS</b>
+	AmigaDOS file names are not case sensitive, but Exec lists are.  If
+	the library name is specified in a different case than it exists on
+	disk, unexpected results may occur.
+
+	Prior to V36, tasks could not make OpenDevice calls requiring disk
+	access (since tasks are not allowed to make dos.library calls).
+	Now OpenDevice is protected from tasks.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01F6.html">CloseDevice()</a>, <a href="../Includes_and_Autodocs_3._guide/node0204.html">DoIO()</a>, <a href="../Includes_and_Autodocs_3._guide/node0236.html">SendIO()</a>, <a href="../Includes_and_Autodocs_3._guide/node01F5.html">CheckIO()</a>, <a href="../Includes_and_Autodocs_3._guide/node01D7.html">AbortIO()</a>, <a href="../Includes_and_Autodocs_3._guide/node0247.html">WaitIO()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

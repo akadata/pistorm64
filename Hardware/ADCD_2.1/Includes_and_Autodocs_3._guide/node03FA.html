@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="SizeWindow()" TITLE="intuition.library/SizeWindow" -->
+<head>
+<title>intuition.library/SizeWindow</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03F9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03FB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	SizeWindow -- Ask Intuition to size a window.
+
+<b>    SYNOPSIS</b>
+	SizeWindow( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, DeltaX, DeltaY )
+		    A0      D0      D1
+
+	VOID SizeWindow( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *, WORD, WORD );
+
+<b>    FUNCTION</b>
+	This routine sends a request to Intuition asking to size the window
+	the specified amounts.  The delta arguments describe how much to
+	size the window along the respective axes.
+
+	Note that the window will not be sized immediately, but rather
+	will be sized the next time Intuition receives an input event,
+	which happens currently at a minimum rate of ten times per second,
+	and a maximum of sixty times a second.  You can discover when
+	you window has finally been sized by setting the IDCMP_NEWSIZE flag
+	of the IDCMP of your window.  See the &#034;Input and Output Methods&#034;
+	chapter of The Intuition Reference Manual for description of the IDCMP.
+
+	New for V36: Intuition now will do validity checking on the final
+	dimensions.  To change to new absolute dimensions, or to move and
+	size a window in one step, use <a href="../Includes_and_Autodocs_3._guide/node039B.html">ChangeWindowBox()</a>.
+
+	However, limit checking against window MinWidth, MinHeight,
+	MaxWidth, and MaxHeight was not done prior to V36, and
+	these fields are still ignored (as documented) if you have
+	no sizing gadget (WFLG_SIZEGADGET is not set).  The *are*
+	respected now (V36) if WFLG_SIZEGADGET is set.
+
+	New for V36: you can determine when the change in size has
+	taken effect by receiving the IDCMP_CHANGEWINDOW IDCMP message.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to the structure of the window to be sized
+	DeltaX = signed value describing how much to size the window
+	 on the x-axis
+	DeltaY = signed value describing how much to size the window
+	 on the y-axis
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node039B.html">ChangeWindowBox()</a>, <a href="../Includes_and_Autodocs_3._guide/node03C8.html">MoveWindow()</a>, <a href="../Includes_and_Autodocs_3._guide/node0406.html">WindowToFront()</a>, <a href="../Includes_and_Autodocs_3._guide/node0405.html">WindowToBack()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-41/imageclass.txt" NODE="IV-41-4" TITLE="Boopsi Rootclass Methods" -->
+<head>
+<title>Boopsi Rootclass Methods</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00A1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00A3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Since all classes should be subclasses of some class, with the exception
+of rootclass, all classes you write will be subclasses--perhaps indirectly
+so--of rootclass.  Because of this, your class must either implement the
+rootclass methods or defer processing of these methods to the superclass
+(as DispatchmyTextLabel() did).  Provided below are brief descriptions of
+the rootclass methods.  Remember that any message unrecognized by a class
+dispatcher should be passed to the superclass (using the amiga.lib
+functions DSM() or DoSuperMethod() ).
+
+The rootclass method IDs that a subclass of imageclass needs to understand
+are:
+
+	OM_NEW			Create a new object.
+	OM_DISPOSE		Delete an object.
+	OM_SET			Change an object's attributes.
+	OM_GET			Retrieve the value of one of the object's attributes.
+
+The dispatcher should pass other rootclass methods on to the superclass.
+
+Each method requires one or more parameters.  The MethodID is the only
+common parameter for each method.
+
+ <a href="../AmigaMail_Vol2_guide/node00A3.html">OM_NEW</a>      <a href="../AmigaMail_Vol2_guide/node00A4.html">OM_DISPOSE</a>      <a href="../AmigaMail_Vol2_guide/node00A5.html">OM_SET</a>      <a href="../AmigaMail_Vol2_guide/node00A6.html">OM_GET</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

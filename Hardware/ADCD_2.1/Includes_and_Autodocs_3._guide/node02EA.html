@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="GetRGB4()" TITLE="graphics.library/GetRGB4" -->
+<head>
+<title>graphics.library/GetRGB4</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02E9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02EB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       GetRGB4 -- Inquire value of entry in <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a>.
+
+<b>   SYNOPSIS</b>
+       value = GetRGB4( colormap, entry )
+          d0              a0       d0
+
+	ULONG GetRGB4(struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> *, LONG);
+
+<b>   FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> and format a value from the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a>.
+
+<b>   INPUTS</b>
+	colormap - pointer to <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> structure
+	entry - index into colormap
+
+<b>   RESULT</b>
+	returns -1 if no valid entry
+	return <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a> RGB value 4 bits per gun right justified
+
+<b>   NOTE</b>
+	Intuition's <a href="../Includes_and_Autodocs_3._guide/node03A4.html">DisplayBeep()</a> changes color 0. Reading Color 0 during a
+	<a href="../Includes_and_Autodocs_3._guide/node03A4.html">DisplayBeep()</a> will lead to incorrect results.
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node032A.html">SetRGB4()</a> <a href="../Includes_and_Autodocs_3._guide/node02FC.html">LoadRGB4()</a> <a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a> <a href="../Includes_and_Autodocs_3._guide/node02D7.html">FreeColorMap()</a> <a href="../Includes_and_Autodocs_3._guide/node05ED.html">graphics/view.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

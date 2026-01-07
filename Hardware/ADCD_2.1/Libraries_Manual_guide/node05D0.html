@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/newlookscreen.c" NODE="MAIN" TITLE="lib_examples/newlookscreen.c" -->
+<head>
+<title>lib_examples/newlookscreen.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05CF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05D1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* newlookscreen.c
+** open a screen with the &#034;new look&#034;.
+**
+** SAS/C 5.10a
+** lc -b1 -cfist -v -y newlookscreen
+** blink LIB:c.o newlookscreen.o TO newlookscreen LIB LIB:lc.lib LIB:amiga.lib
+*/
+
+#define INTUI_V36_NAMES_ONLY
+
+#include &#060;exec/types.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/screens.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+struct Library *IntuitionBase;
+<a name="line25"></a>
+/* Simple routine to demonstrate opening a screen with the new look.
+** Simply supply the tag SA_Pens along with a minimal pen specification,
+** Intuition will fill in all unspecified values with defaults.
+** Since we are not supplying values, all are Intuition defaults.
+*/
+VOID main(int argc, char **argv)
+{
+UWORD pens[] = { ~0 };
+struct Screen *my_screen;
+
+IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,0);
+if (NULL != IntuitionBase)
+    {
+    if (IntuitionBase-&#062;lib_Version &#062;= 37)
+        {
+        /* The screen is opened two bitplanes deep so that the
+        ** new look will show-up better.
+        */
+        if (NULL != (my_screen = OpenScreenTags(NULL,
+                                     SA_Pens, (ULONG)pens,
+                                     SA_Depth, 2,
+                                     TAG_DONE)))
+            {
+            /* screen successfully opened */
+            Delay(30L);  /* normally the program would be here */
+
+            CloseScreen(my_screen);
+            }
+        }
+    CloseLibrary(IntuitionBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

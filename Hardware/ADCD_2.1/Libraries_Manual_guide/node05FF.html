@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/mathieeesingbas.c" NODE="MAIN" TITLE="lib_examples/mathieeesingbas.c" -->
+<head>
+<title>lib_examples/mathieeesingbas.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05FE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0600.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#include &#060;exec/types.h&#062;
+#include &#060;libraries/mathieeesp.h&#062;
+
+#include &#060;clib/mathsingbas_protos.h&#062;
+
+struct Library *MathIeeeSingBasBase;
+
+VOID main()
+{
+FLOAT f1, f2, f3;
+LONG   i1;
+
+if (MathIeeeSingBasBase = OpenLibrary(&#034;mathieeesingbas.library&#034;,37))
+    {
+    i1 = IEEESPFix(f1);                /* Call IEEESPFix entry */
+    fi = IEEESPFlt(i1);                /* Call IEEESPFlt entry */
+    switch (IEEESPCmp(f1, f2)) {};     /* Call IEEESPCmp entry */
+    switch (IEEESPTst(f1)) {};         /* Call IEEESPTst entry */
+    f1 = IEEESPAbs(f2);                /* Call IEEESPAbs entry */
+    f1 = IEEESPNeg(f2);                /* Call IEEESPNeg entry */
+    f1 = IEEESPAdd(f2, f3);            /* Call IEEESPAdd entry */
+    f1 = IEEESPSub(f2, f3);            /* Call IEEESPSub entry */
+    f1 = IEEESPMul(f2, f3);            /* Call IEEESPMul entry */
+    f1 = IEEESPDiv(f2, f3);            /* Call IEEESPDiv entry */
+    f1 = IEEESPCeil(f2);               /* Call IEEESPCeil entry */
+    f1 = IEEESPFloor(f2);              /* Call IEEESPFloor entry */
+
+    CloseLibrary(MathIeeeSingBasBase);
+    }
+else
+    printf(&#034;Can't open mathieeesingbas.library\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

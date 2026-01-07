@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-1-11" TITLE="D / Errors / Crashes--Workbench Only" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D / Errors / Crashes--Workbench Only</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0540.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0542.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+If you are crashing near the first DOS call, either your stack is too
+small or your startup code did not <a href="../Libraries_Manual_guide/node02F2.html">GetMsg()</a> the <a href="../Libraries_Manual_guide/node023E.html#line5">WBStartup</a> message from the
+process message port.  If your program crashes during execution or during
+your exit procedure only when started from Workbench, and your startup
+opens no stdio window or NIL: file handles for WB programs, then make sure
+you are not writing anything to stdout (<a href="../Includes_and_Autodocs_2._guide/node0162.html">printf()</a>, etc.) when started from
+WB (argc==0).  See also &#034;<a href="../Libraries_Manual_guide/node053C.html">Crashes--After Exit</a>&#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

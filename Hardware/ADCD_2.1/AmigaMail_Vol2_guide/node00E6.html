@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VII-1/DR2D.txt" NODE="VII-1-6" TITLE="PPRF (0x50505249)       / Page preferences /" -->
+<head>
+<title>PPRF (0x50505249)       / Page preferences /</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00E5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00E7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The PPRF chunk contains preference settings for ProVector.  Although
+this chunk is not required, its use is encouraged because it contains
+some important environment information.
+
+    struct PPRFstruct {
+        ULONG       ID;
+        ULONG       Size;
+        char        Prefs[Size];
+    };
+
+DR2D stores preferences as a concatenation of several null-terminated
+strings, in the Prefs[] array.  The strings can appear in any order.
+The currently supported strings are:
+
+            Units=&#060;unit-type&#062;
+            Portrait=&#060;boolean&#062;
+            PageType=&#060;page-type&#062;
+            GridSize=&#060;number&#062;
+
+where:
+            &#060;unit-type&#062;     is either Inch, Cm, or Pica
+            &#060;boolean&#062;       is either True or False
+            &#060;page-type&#062;     is either Standard, Legal, B4, B5, A3,
+                              A4, A5, or Custom
+            &#060;number&#062;        is a floating-point number
+
+The DR2D FORM does not require this chunk to explicitly state all the
+possible preferences.  In the absence of any particular preference
+string, a DR2D reader should fall back on the default value.  The
+defaults are:
+
+            Units=Inch
+            Portrait=True
+            PageType=Standard
+            GridSize=1.0
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

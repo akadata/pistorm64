@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="ActivateWindow()" TITLE="intuition.library/ActivateWindow" -->
+<head>
+<title>intuition.library/ActivateWindow</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node038F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0391.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ActivateWindow -- Activate an Intuition window.
+
+<b>    SYNOPSIS</b>
+	ActivateWindow( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> )
+	                A0
+
+	VOID ActivateWindow( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> * );
+
+<b>    FUNCTION</b>
+	Activates an Intuition window.
+
+	Note that this call may have its action deferred: you cannot assume
+	that when this call is made the selected window has become active.
+	This action will be postponed while the user plays with gadgets and
+	menus, or sizes and drags windows.  You may detect when the window
+	actually has become active by the IDCMP_ACTIVEWINDOW IDCMP message.
+
+	This call is intended to provide flexibility but not to confuse the
+	user.  Please call this function synchronously with some action
+	by the user.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = a pointer to a <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> structure
+
+<b>    RESULT</b>
+	None.
+
+<b>    BUGS</b>
+	Some versions of the documentation claimed that this function
+	had a meaningful return value under V36 and higher.  That is
+	not true.
+
+	Calling this function in a tight loop can blow out Intuition's
+	deferred action queue.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a>, and the WFLG_ACTIVATE window flag
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="XI-1/amcx.txt" NODE="XI-1-3" TITLE="CxMessages" -->
+<head>
+<title>CxMessages</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0130.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0132.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are actually two types of CxMessages.  The first, CXM_IEVENT,
+corresponds to an input event and travels through the Commodities
+Exchange network.  The other type, CXM_COMMAND, carries a command to
+a commodity.  A CXM_COMMAND normally comes from the controller
+program and is used to pass user commands on to a commodity.  A
+commodity receives these commands through an Exec message port that
+the commodity sets up before it calls CxBroker.  The NewBroker's
+nb_Port field points to this message port.  A c ommodity can tell the
+difference between the two types of CxMessages by calling the
+CxMsgType() function.
+
+    ULONG CxMsgType(CxMsg *cxm);
+    UBYTE *CxMsgData(CxMsg *cxm);
+    LONG  CxMsgID(CxMsg *cxm);
+
+A CxMessage not only has a type, it can also have a data pointer as
+well as an ID associated with it.  The data associated with a
+CXM_IEVENT is an InputEvent structure.  By using the CxMsgData()
+function, a commodity can obtain a pointer to the correspond ing
+InputEvent of a CXM_IEVENT.  Commodities Exchange does not give an ID
+to the CXM_IEVENT CxMessages it introduces to the Commodities network,
+but certain CxObjects can assign an ID to a CXM_IEVENT CxMessage.
+
+CXM_COMMAND CxMessages generally do not use the data pointer.
+Instead, they use an ID.  They use this ID to specify the command
+passed to a commodity.  CxMsgID() extracts the ID from a CxMessage.
+
+    oldactivationvalue = LONG ActivateCxObj(CxObj *co,
+                           long newactivationvalue);
+
+After successfully completing the initial set up and activating the
+broker using ActivateCxObj(), a commodity can begin its input
+processing loop.  The example <a href="../AmigaMail_Vol2_guide/node0202.html">Broker.c</a> receives input from one source,
+the controller program.  The controller program sends a CxMessage each
+time the user clicks its enable, disable, or kill gadgets.  Using the
+CxMsgID() function, the commodity finds out what the command is and
+executes it.
+
+Notice that <a href="../AmigaMail_Vol2_guide/node0202.html">Broker.c</a> uses Ctrl-C as a break key.  This is a change
+from 1990 Atlanta DevCon Notes on Commodities Exchange which said to
+use Ctrl-E.  The break key for any commodity should be Ctrl-C.
+
+The commands that a commodity can receive from the controller program
+(as defined in &#060;libraries/commodities.h&#062;) are:
+
+    CXCMD_DISABLE     /* please disable yourself       */
+    CXCMD_ENABLE      /* please enable yourself        */
+    CXCMD_KILL        /* go away for good              */
+    CXCMD_APPEAR      /* open your window, if you can  */
+    CXCMD_DISAPPEAR   /* hide your window              */
+
+The CXCMD_DISABLE, CXCMD_ENABLE, and CXCMD_KILL commands correspond
+to the similarly named controller program gadgets, &#034;Disable&#034;,
+&#034;Enable&#034;, and &#034;Kill&#034;; CXCMD_APPEAR and CXCMD_DISAPPEAR correspond to
+the controller program gadgets, &#034;Show&#034; and &#034;Hi de&#034;.  These gadgets
+are ghosted in <a href="../AmigaMail_Vol2_guide/node0202.html">Broker.c</a> because it has no window (It doesn't make
+much sense to give the user a chance to click the &#034;Show&#034; and &#034;Hide&#034;
+gadgets).  In order to do this, Broker.c has to tell Commodities
+Exchange to ghost these gadge ts.  When CxBroker() sets up a broker,
+it looks at the NewBroker.nb_Flags field to see if the COF_SHOW_HIDE
+bit (from &#060;libraries/commodities.h&#062;) is set.  If it is, the &#034;Show&#034;
+and &#034;Hide&#034; gadgets for this broker will be selectable. Otherwise they
+are g hosted and disabled.
+
+Shutting down a commodity is easy.  After replying to all CxMessages
+waiting at the broker's message port, a commodity can delete its
+CxObjects.  DeleteCxObj() removes a single CxObject from the
+Commodities network.
+
+    void DeleteCxObj(CxObj *co);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-3-2" TITLE="Primitive Data Types / Numbers " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Primitive Data Types / Numbers </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01D8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01DA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Numeric types supported are two's complement binary integers in the format
+used by the MC68000 processor - high byte first, high word first - the
+reverse of 8088 and 6502 format.
+
+	UBYTE	 8 bits unsigned
+	WORD	16 bits signed
+	UWORD	16 bits unsigned
+	LONG	32 bits signed
+
+The actual type definitions depend on the CPU and the compiler.  In this
+document, we'll express data type definitions in the C programming
+language. [See C, A Reference Manual.]  In 68000 Lattice C:
+
+	typedef unsigned char	UBYTE;	/*  8 bits unsigned	*/
+	typedef short		WORD;	/* 16 bits signed	*/
+	typedef unsigned short	UWORD;	/* 16 bits unsigned	*/
+	typedef long		LONG;	/* 32 bits signed	*/
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

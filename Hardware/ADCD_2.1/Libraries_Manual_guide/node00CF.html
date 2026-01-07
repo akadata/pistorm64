@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_2" NODE="2-3-2" TITLE="2 / How an Application Sees Intuition / Screens and Windows" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>2 / How an Application Sees Intuition / Screens and Windows</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00CE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00D0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As mentioned earlier, Intuition allows multiple programs to share the
+display by managing a system of <a href="../Libraries_Manual_guide/node00D9.html">multiple screens</a> and overlapping <a href="../Libraries_Manual_guide/node00FF.html">windows</a>.
+A screen sets up the display environment and forms the background that
+application windows operate in.  A window is simply a graphic rectangle
+that represents a work context.  Each screen can have many windows on it.
+
+<a href="../Libraries_Manual_guide/node00D9.html">Multiple screens</a> and <a href="../Libraries_Manual_guide/node00FF.html">windows</a> give each application its own separate visual
+context so that many programs can output graphics and text to the display
+at the same time without interfering with one another.  Intuition (using
+the <a href="../Libraries_Manual_guide/node03E3.html">layers library</a>) handles all the details of clipping graphics so they
+stay inside window bounds and remembering graphics that go temporarily out
+<a name="line13">of sight when the user <a href="../Libraries_Manual_guide/node0117.html">rearranges windows</a>.</a>
+
+The keyboard and mouse are shared among applications through a simpler
+technique:  only one application window at a time can have the
+<a href="../Libraries_Manual_guide/node01D3.html">input focus</a>.  Hence, Intuition ensures that only one window, called the
+<a href="../Libraries_Manual_guide/node010F.html">active window</a> gets to know about keyboard, mouse and other types of input
+activity.
+
+Each application window is like a virtual terminal or console.  Your
+program will seem to have the entire machine and display to itself.  It
+can send text and graphics to its terminal window, and ask for input from
+any number of sources, ignoring the fact that other programs may be
+performing these same operations.  Intuition handles all the housekeeping.
+In fact, your program can open several of these virtual terminals and
+treat each one as if it were the only program running on the machine.
+Intuition will keep track of all the activity and make sure commands and
+data are dispatched to the right place.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

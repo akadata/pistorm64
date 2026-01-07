@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_35" NODE="35-12" TITLE="35 Math Libraries / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>35 Math Libraries / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node048D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node048F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here's a brief summary of the functions covered in this chapter.  Refer to
+the Amiga ROM Kernel Reference Manual: Includes and Autodocs for
+additional information.
+
+  _______________________________________________________________________
+ |                                                                       |
+ |                          FFP Basic Functions                          |
+ |=======================================================================|
+ |    <a href="../Includes_and_Autodocs_2._guide/node03C1.html">SPAbs()</a>  Take absolute value of FFP variable                       |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03C2.html">SPAdd()</a>  Add two FFP variables                                     |
+ |   <a href="../Includes_and_Autodocs_2._guide/node03C3.html">SPCeil()</a>  Compute least integer greater than or equal to variable.  |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03C4.html">SPCmp()</a>  Compare two FFP variables                                 |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03C5.html">SPDiv()</a>  Divide two FFP variables                                  |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03C6.html">SPFix()</a>  Convert FFP variable to integer                           |
+ |  <a href="../Includes_and_Autodocs_2._guide/node03C7.html">SPFloor()</a>  Computer largest integer less than or equal to variable.  |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03C8.html">SPFlt()</a>  Convert integer variable to FFP                           |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03C9.html">SPMul()</a>  Multiply two FFP variables                                |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03CA.html">SPNeg()</a>  Take two's complement of FFP variable                     |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03CB.html">SPSub()</a>  Subtract two FFP variables                                |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03CC.html">SPTst()</a>  Test an FFP variable against zero                         |
+ |_______________________________________________________________________|
+
+  _______________________________________________________________________
+ |                                                                       |
+ |                      FFP Transcendental Functions                     |
+ |=======================================================================|
+ |       <a href="../Includes_and_Autodocs_2._guide/node0268.html">SPAcos()</a>  Return arccosine of FFP variable.                     |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0269.html">SPAsin()</a>  Return arcsine of FFP variable.                       |
+ |       <a href="../Includes_and_Autodocs_2._guide/node026A.html">SPAtan()</a>  Return arctangent of FFP variable.                    |
+ |        <a href="../Includes_and_Autodocs_2._guide/node026B.html">SPCos()</a>  Return cosine of FFP variable.                        |
+ |       <a href="../Includes_and_Autodocs_2._guide/node026C.html">SPCosh()</a>  Return hyperbolic cosine of FFP variable.             |
+ |        <a href="../Includes_and_Autodocs_2._guide/node026D.html">SPExp()</a>  Return e to the FFP variable power.                   |
+ |      <a href="../Includes_and_Autodocs_2._guide/node026E.html">SPFieee()</a>  Convert IEEE variable to FFP format.                  |
+ |        <a href="../Includes_and_Autodocs_2._guide/node026F.html">SPLog()</a>  Return natural log (base e) of FFP variable.          |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0270.html">SPLog10()</a>  Return log (base 10) of FFP variable.                 |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0271.html">SPPow()</a>  Return FFP arg2 to FFP arg1.                          |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0272.html">SPSin()</a>  Return sine of FFP variable.                          |
+ |     <a href="../Includes_and_Autodocs_2._guide/node0273.html">SPSincos()</a>  Return sine and cosine of FFP variable.               |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0274.html">SPSinh()</a>  Return hyperbolic sine of FFP variable.               |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0275.html">SPSqrt()</a>  Return square root of FFP variable.                   |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0276.html">SPTan()</a>  Return tangent of FFP variable.                       |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0277.html">SPTanh()</a>  Return hyperbolic tangent of FFP variable.            |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0278.html">SPTieee()</a>  Convert FFP variable to IEEE format                   |
+ |_______________________________________________________________________|
+
+  _______________________________________________________________________
+ |                                                                       |
+ |                        Math Support Functions                         |
+ |=======================================================================|
+ |      <a href="../Includes_and_Autodocs_2._guide/node013B.html">afp()</a>  Convert ASCII string into FFP equivalent.                 |
+ |      <a href="../Includes_and_Autodocs_2._guide/node015B.html">fpa()</a>  Convert FFP variable into ASCII equivalent.               |
+ |     <a href="../Includes_and_Autodocs_2._guide/node0140.html">arnd()</a>  Round ASCII representation of FFP number.                 |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0151.html">dbf()</a>  Convert FFP dual-binary number to FFP equivalent.         |
+ |_______________________________________________________________________|
+
+  _______________________________________________________________________
+ |                                                                       |
+ |                    SP IEEE Basic Functions (V36)                      |
+ |=======================================================================|
+ |   <a href="../Includes_and_Autodocs_2._guide/node0190.html">IEEESPAbs()</a>  Take absolute value of IEEE single-precision variable. |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0191.html">IEEESPAdd()</a>  Add two IEEE single-precision variables.               |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0192.html">IEEESPCeil()</a>  Compute least integer greater than or equal to         |
+ |                variable.                                              |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0193.html">IEEESPCmp()</a>  Compare two IEEE single-precision variables.           |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0194.html">IEEESPDiv()</a>  Divide two IEEE single-precision variables.            |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0195.html">IEEESPFix()</a>  Convert IEEE single-precision  variable to integer.    |
+ | <a href="../Includes_and_Autodocs_2._guide/node0196.html">IEEESPFloor()</a>  Compute largest integer less than or equal to          |
+ |                variable.                                              |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0197.html">IEEESPFlt()</a>  Convert integer variable to IEEE single-precision.     |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0198.html">IEEESPMul()</a>  Multiply two IEEE single-precision variables.          |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0199.html">IEEESPNeg()</a>  Take two's complement of IEEE single-precision         |
+ |                variable.                                              |
+ |   <a href="../Includes_and_Autodocs_2._guide/node019A.html">IEEESPSub()</a>  Subtract two IEEE single-precision variables.          |
+ |   <a href="../Includes_and_Autodocs_2._guide/node019B.html">IEEESPTst()</a>  Test an IEEE single-precision variable against zero.   |
+ |_______________________________________________________________________|
+
+  _______________________________________________________________________
+ |                                                                       |
+ |                SP IEEE Transcendental Functions (V36)                 |
+ |=======================================================================|
+ |   <a href="../Includes_and_Autodocs_2._guide/node01E1.html">IEEESPACos()</a>  Return arccosine of IEEE single-precision variable.   |
+ |   <a href="../Includes_and_Autodocs_2._guide/node01E2.html">IEEESPASin()</a>  Return arcsine of IEEE single-precision variable.     |
+ |   <a href="../Includes_and_Autodocs_2._guide/node01E3.html">IEEESPAtan()</a>  Return arctangent of IEEE single-precision variable.  |
+ |    <a href="../Includes_and_Autodocs_2._guide/node01E4.html">IEEESPCos()</a>  Return cosine of IEEE single-precision variable.      |
+ |   <a href="../Includes_and_Autodocs_2._guide/node01E5.html">IEEESPCosh()</a>  Return hyperbolic cosine of IEEE single-precision     |
+ |                 variable.                                             |
+ |    <a href="../Includes_and_Autodocs_2._guide/node01E6.html">IEEESPExp()</a>  Return e to the IEEE variable power.                  |
+ |    <a href="../Includes_and_Autodocs_2._guide/node01E8.html">IEEESPLog()</a>  Return natural log (base e of IEEE single-precision   |
+ |                 variable.                                             |
+ |  <a href="../Includes_and_Autodocs_2._guide/node01E9.html">IEEESPLog10()</a>  Return log (base 10) of IEEE single-precision         |
+ |                 variable.                                             |
+ |    <a href="../Includes_and_Autodocs_2._guide/node01EA.html">IEEESPPow()</a>  Return power of IEEE single-precision variable.       |
+ |    <a href="../Includes_and_Autodocs_2._guide/node01EB.html">IEEESPSin()</a>  Return sine of IEEE single-precision variable.        |
+ | <a href="../Includes_and_Autodocs_2._guide/node01EC.html">IEEESPSincos()</a>  Return sine and cosine of IEEE single-precision       |
+ |                 variable.                                             |
+ |   <a href="../Includes_and_Autodocs_2._guide/node01ED.html">IEEESPSinh()</a>  Return hyperbolic sine of IEEE single-precision       |
+ |                variable.                                              |
+ |   <a href="../Includes_and_Autodocs_2._guide/node01EE.html">IEEESPSqrt()</a>  Return square root of IEEE single-precision variable. |
+ |    <a href="../Includes_and_Autodocs_2._guide/node01EF.html">IEEESPTan()</a>  Return tangent of IEEE single-precision variable.     |
+ |   <a href="../Includes_and_Autodocs_2._guide/node01F0.html">IEEESPTanh()</a>  Return hyperbolic tangent of IEEE single-precision    |
+ |                 variable.                                             |
+ |_______________________________________________________________________|
+
+  _______________________________________________________________________
+ |                                                                       |
+ |                       DP IEEE Basic Functions                         |
+ |=======================================================================|
+ |   <a href="../Includes_and_Autodocs_2._guide/node03FA.html">IEEEDPAbs()</a>  Take absolute value of IEEE double-precision variable. |
+ |   <a href="../Includes_and_Autodocs_2._guide/node03FB.html">IEEEDPAdd()</a>  Add two IEEE double-precision variables.               |
+ |  <a href="../Includes_and_Autodocs_2._guide/node03FC.html">IEEEDPCeil()</a>  Compute least integer greater than or equal to         |
+ |                variable.                                              |
+ |   <a href="../Includes_and_Autodocs_2._guide/node03FD.html">IEEEDPCmp()</a>  Compare two IEEE double-precision variables.           |
+ |   <a href="../Includes_and_Autodocs_2._guide/node03FE.html">IEEEDPDiv()</a>  Divide two IEEE double-precision variables.            |
+ |   <a href="../Includes_and_Autodocs_2._guide/node03FF.html">IEEEDPFix()</a>  Convert IEEE double-precision  variable to integer.    |
+ | <a href="../Includes_and_Autodocs_2._guide/node0400.html">IEEEDPFloor()</a>  Compute largest integer less than or equal to          |
+ |                variable.                                              |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0401.html">IEEEDPFlt()</a>  Convert integer variable to IEEE double-precision.     |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0402.html">IEEEDPMul()</a>  Multiply two IEEE double-precision variables.          |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0403.html">IEEEDPNeg()</a>  Take two's complement of IEEE double-precision         |
+ |                variable.                                              |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0404.html">IEEEDPSub()</a>  Subtract two IEEE single-precision variables.          |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0405.html">IEEEDPTst()</a>  Test an IEEE double-precision variable against zero.   |
+ |_______________________________________________________________________|
+
+  _______________________________________________________________________
+ |                                                                       |
+ |                   DP IEEE Transcendental Functions                    |
+ |=======================================================================|
+ |   <a href="../Includes_and_Autodocs_2._guide/node0493.html">IEEEDPACos()</a>  Return arccosine of IEEE double-precision variable.   |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0494.html">IEEEDPASin()</a>  Return arcsine of IEEE double-precision variable.     |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0495.html">IEEEDPAtan()</a>  Return arctangent of IEEE double-precision variable.  |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0496.html">IEEEDPCos()</a>  Return cosine of IEEE double-precision variable.      |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0497.html">IEEEDPCosh()</a>  Return hyperbolic cosine of IEEE double-precision     |
+ |                 variable.                                             |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0498.html">IEEEDPExp()</a>  Return e to the IEEE variable power.                  |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0499.html">IEEEDPFieee()</a>  Convert IEEE single-precision number to IEEE          |
+ |                 double-precision number.                              |
+ |    <a href="../Includes_and_Autodocs_2._guide/node049A.html">IEEEDPLog()</a>  Return natural log (base e of IEEE double-precision   |
+ |                 variable.                                             |
+ |  <a href="../Includes_and_Autodocs_2._guide/node049B.html">IEEEDPLog10()</a>  Return log (base 10) of IEEE double-precision         |
+ |                 variable.                                             |
+ |    <a href="../Includes_and_Autodocs_2._guide/node049C.html">IEEEDPPow()</a>  Return power of IEEE double-precision variable.       |
+ |    <a href="../Includes_and_Autodocs_2._guide/node049D.html">IEEEDPSin()</a>  Return sine of IEEE double-precision variable.        |
+ | <a href="../Includes_and_Autodocs_2._guide/node049E.html">IEEEDPSincos()</a>  Return sine and cosine of IEEE double-precision       |
+ |                 variable.                                             |
+ |   <a href="../Includes_and_Autodocs_2._guide/node049F.html">IEEEDPSinh()</a>  Return hyperbolic sine of IEEE double-precision       |
+ |                 variable.                                             |
+ |   <a href="../Includes_and_Autodocs_2._guide/node04A0.html">IEEEDPSqrt()</a>  Return square root of IEEE double-precision variable. |
+ |    <a href="../Includes_and_Autodocs_2._guide/node04A1.html">IEEEDPTan()</a>  Return tangent of IEEE double-precision variable.     |
+ |   <a href="../Includes_and_Autodocs_2._guide/node04A2.html">IEEEDPTanh()</a>  Return hyperbolic tangent of IEEE double-precision    |
+ |                 variable.                                             |
+ |  <a href="../Includes_and_Autodocs_2._guide/node04A3.html">IEEEDPTieee()</a>  Convert IEEE double-precision number to IEEE          |
+ |                 single-precision number.                              |
+ |_______________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

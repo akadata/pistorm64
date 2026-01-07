@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/narrator" NODE="OpenDevice()" TITLE="narrator.device/OpenDevice" -->
+<head>
+<title>narrator.device/OpenDevice</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04C7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04C9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    OpenDevice - opens the narrator device.
+
+SYNOPSIS
+    error = OpenDevice(&#034;narrator.device&#034;,  unit, <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a>, flags);
+     D0                       A0            D0     A1         D1
+
+FUNCTION
+    The OpenDevice routine grants access to the narrator device.
+    OpenDevice checks the unit number, and if non-zero, returns an
+    error (ND_UnitErr).  If this is the first time the driver has
+    been opened, OpenDevice will attempt to open the audio device
+    and allocate the driver's static buffers.  If either of these
+    operations fail, an error is returned.  See the .h and .i
+    include files for possible error return codes.  Next, OpenDevice
+    (done for all opens, not just the first one) initializes various
+    fields in the user's <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block (see below).  If users wish
+    to use non-default values for these parms, the values must be set
+    after the open is done.  OpenDevice also assigns a pseudo unit
+    number to the IORB for use in synchronizing read and write requests.
+    See the read command for more details.  Finally, OpenDevice stores
+    the device node pointer in the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block and clears the
+    delayed expunge bit.
+
+    ***** NEW FOR V37 NARRATOR *****
+
+    Several new fields in the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block have been added for V37
+    narrator.  These fields are initialized when the device is opened
+    if the NDB_NEWIORB bit is set in the flags field of the user's
+    <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block.  Note that NDB_NEWIORB is set in the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a>
+    block, NOT in the &#034;flags&#034; input parm to the OpenDevice call.
+
+INPUTS
+    device     - &#034;narrator.device&#034;
+    unit       - 0
+    <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a>  - Pointer to the user's <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block
+    flags      - 0
+
+RESULTS
+    The narrator device will initialize the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block as follows
+    (assume IORB points to the IOrequest block):
+
+    IORB-&#062;rate = 150;               /* Speaking rate in words/minute */
+    IORB-&#062;pitch = 110;              /* Baseline pitch in Hertz      */
+    IORB-&#062;mode = NATURALF0;         /* Pitch (F0) mode              */
+    IORB-&#062;sex = MALE;               /* Sex of voice                 */
+    IORB-&#062;volume = 64               /* Volume, full on              */
+    IORB-&#062;sampfreq = 22200          /* Audio sampling freq          */
+    IORB-&#062;mouths = 0                /* Don't generate sync events   */
+
+    and if the NDB_NEWIORB bit is set:
+
+    IORB-&#062;F0enthusiasm = 0          /* F0 excursion factor          */
+    IORB-&#062;F0perturb = 32            /* F0 perturbation (in 32nds)   */
+    IORB-&#062;F1adj = 0                 /* F1 adjustment in &#177;5% steps   */
+    IORB-&#062;F2adj = 0                 /* F2 adjustment in &#177;5% steps   */
+    IORB-&#062;F3adj = 0                 /* F3 adjustment in &#177;5% steps   */
+    IORB-&#062;A1adj = 0                 /* A1 adjustment in decibels    */
+    IORB-&#062;A2adj = 0                 /* A2 adjustment in decibels    */
+    IORB-&#062;A3adj = 0                 /* A3 adjustment in decibels    */
+    IORB-&#062;articulate = 100          /* Transition time multiplier   */
+    IORB-&#062;centralize = 0            /* Degree of vowel centralization */
+    IORB-&#062;centphon = &#034;&#034;             /* Pointer to central ASCII phon  */
+    IORB-&#062;AVbias = 0                /* AV bias                      */
+    IORB-&#062;AFbias = 0                /* AF bias                      */
+    IORB-&#062;priority = 100            /* Priority while speaking      */
+
+SEE ALSO
+    The include files contain the complete <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block definition,
+        default settings, and error return codes.
+    Exec input/output documentation.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

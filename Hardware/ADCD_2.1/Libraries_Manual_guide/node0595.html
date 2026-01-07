@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/simplegad.c" NODE="MAIN" TITLE="Lib_examples/simplegad.c" -->
+<head>
+<title>Lib_examples/simplegad.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0594.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0596.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* simplegad.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 simplegad.c
+Blink FROM LIB:c.o,simplegad.o TO simplegad LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+**
+** The example below demonstrates a simple application gadget.  The
+** program declares a Gadget structure set up as a boolean gadget with
+** complement mode highlighting.  The gadget is attached to the window
+** when it is opened by using the WA_Gadgets tag in the OpenWindowTags()
+** call.
+**
+** simplegad.c - show the use of a button gadget.
+*/
+
+#define INTUI_V36_NAMES_ONLY
+
+#include &#060;exec/types.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/intuitionbase.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+struct Library *IntuitionBase;
+
+#define BUTTON_GAD_NUM   (3)
+#define MYBUTTONGADWIDTH (100)
+#define MYBUTTONGADHEIGHT (50)
+
+/* NOTE that the use of constant size and positioning values are
+** not recommended; it just makes it easy to show what is going on.
+** The position of the gadget should be dynamically adjusted depending
+** on the height of the font in the title bar of the window.
+*/
+
+UWORD buttonBorderData[] =
+    {
+    0,0, MYBUTTONGADWIDTH + 1,0, MYBUTTONGADWIDTH + 1,MYBUTTONGADHEIGHT + 1,
+    0,MYBUTTONGADHEIGHT + 1, 0,0,
+    };
+
+struct Border buttonBorder =
+    {
+    -1,-1,1,0,JAM1,5,buttonBorderData,NULL,
+    };
+
+struct Gadget buttonGad =
+    {
+    NULL, 20,20, MYBUTTONGADWIDTH,MYBUTTONGADHEIGHT,
+    GFLG_GADGHCOMP, GACT_RELVERIFY | GACT_IMMEDIATE,
+    GTYP_BOOLGADGET, &#038;buttonBorder, NULL, NULL,0,NULL,BUTTON_GAD_NUM,NULL,
+    };
+
+/*
+** routine to show the use of a button (boolean) gadget.
+*/
+VOID main(int argc, char **argv)
+{
+struct Window *win;
+struct IntuiMessage *msg;
+struct Gadget *gad;
+ULONG  class;
+BOOL done;
+
+/* make sure to get intuition version 37, for OpenWindowTags() */
+IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 37);
+if (IntuitionBase)
+    {
+    if (win = OpenWindowTags(NULL,
+                            WA_Width, 400,
+                            WA_Height, 100,
+                            WA_Gadgets, &#038;buttonGad,
+                            WA_Activate, TRUE,
+                            WA_CloseGadget, TRUE,
+                            WA_IDCMP, IDCMP_GADGETDOWN | IDCMP_GADGETUP |
+                                      IDCMP_CLOSEWINDOW,
+                            TAG_END))
+        {
+        done = FALSE;
+        while (done == FALSE)
+            {
+            Wait(1L &#060;&#060; win-&#062;UserPort-&#062;mp_SigBit);
+            while ( (done == FALSE) &#038;&#038;
+                    (msg = (struct IntuiMessage *)GetMsg(win-&#062;UserPort)))
+                {
+                /* Stash message contents and reply, important when message
+                ** triggers some lengthy processing
+                */
+                class = msg-&#062;Class;
+
+                /* gadget address is ONLY valid for gadget messages! */
+                if ((class == IDCMP_GADGETUP) || (class == IDCMP_GADGETDOWN))
+                    gad = (struct Gadget *)(msg-&#062;IAddress);
+
+                ReplyMsg((struct Message *)msg);
+
+                /* switch on the type of the event */
+                switch (class)
+                    {
+                    case IDCMP_GADGETUP:
+                        /* caused by GACT_RELVERIFY */
+                        printf(&#034;received an IDCMP_GADGETUP, gadget number %d\n&#034;,
+                               gad-&#062;GadgetID);
+                        break;
+                    case IDCMP_GADGETDOWN:
+                        /* caused by GACT_IMMEDIATE */
+                        printf(&#034;received an IDCMP_GADGETDOWN, gadget number %d\n&#034;,
+                               gad-&#062;GadgetID);
+                        break;
+                    case IDCMP_CLOSEWINDOW:
+                        /* set a flag that we are done processing events... */
+                        printf(&#034;received an IDCMP_CLOSEWINDOW\n&#034;);
+                        done = TRUE;
+                        break;
+                    }
+                }
+            }
+        CloseWindow(win);
+        }
+    CloseLibrary(IntuitionBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/hardware/intbits.h" NODE="MAIN" TITLE="Includes/hardware/intbits.h" -->
+<head>
+<title>Includes/hardware/intbits.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00CD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00CF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	HARDWARE_INTBITS_H
+#define	HARDWARE_INTBITS_H
+/*
+**	$Filename: hardware/intbits.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.2 $
+**	$Date: 90/07/10 $
+**
+**	bits in the interrupt enable (and interrupt request) register
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#define  INTB_SETCLR	(15)  /* Set/Clear control bit. Determines if bits */
+	    /* written with a 1 get set or cleared. Bits */
+<a name="line17">	    /* written with a zero are allways unchanged */</a>
+<a name="line18">#define  INTB_INTEN	(14)  /* Master interrupt (enable only ) */</a>
+<a name="line19">#define  INTB_EXTER	(13)  /* External interrupt */</a>
+<a name="line20">#define  INTB_DSKSYNC	(12)  /* Disk re-SYNChronized */</a>
+<a name="line21">#define  INTB_RBF	(11)  /* serial port Receive Buffer Full */</a>
+<a name="line22">#define  INTB_AUD3	(10)  /* Audio channel 3 block finished */</a>
+<a name="line23">#define  INTB_AUD2	(9)   /* Audio channel 2 block finished */</a>
+<a name="line24">#define  INTB_AUD1	(8)   /* Audio channel 1 block finished */</a>
+<a name="line25">#define  INTB_AUD0	(7)   /* Audio channel 0 block finished */</a>
+<a name="line26">#define  INTB_BLIT	(6)   /* Blitter finished */</a>
+<a name="line27">#define  INTB_VERTB	(5)   /* start of Vertical Blank */</a>
+<a name="line28">#define  INTB_COPER	(4)   /* Coprocessor */</a>
+<a name="line29">#define  INTB_PORTS	(3)   /* I/O Ports and timers */</a>
+<a name="line30">#define  INTB_SOFTINT	(2)   /* software interrupt request */</a>
+<a name="line31">#define  INTB_DSKBLK	(1)   /* Disk Block done */</a>
+#define  INTB_TBE	(0)   /* serial port Transmit Buffer Empty */
+
+
+<a name="line35"></a>
+<a name="line36">#define  INTF_SETCLR	(1&#060;&#060;15)</a>
+<a name="line37">#define  INTF_INTEN	(1&#060;&#060;14)</a>
+<a name="line38">#define  INTF_EXTER	(1&#060;&#060;13)</a>
+<a name="line39">#define  INTF_DSKSYNC	(1&#060;&#060;12)</a>
+<a name="line40">#define  INTF_RBF	(1&#060;&#060;11)</a>
+<a name="line41">#define  INTF_AUD3	(1&#060;&#060;10)</a>
+<a name="line42">#define  INTF_AUD2	(1&#060;&#060;9)</a>
+<a name="line43">#define  INTF_AUD1	(1&#060;&#060;8)</a>
+<a name="line44">#define  INTF_AUD0	(1&#060;&#060;7)</a>
+<a name="line45">#define  INTF_BLIT	(1&#060;&#060;6)</a>
+<a name="line46">#define  INTF_VERTB	(1&#060;&#060;5)</a>
+<a name="line47">#define  INTF_COPER	(1&#060;&#060;4)</a>
+<a name="line48">#define  INTF_PORTS	(1&#060;&#060;3)</a>
+<a name="line49">#define  INTF_SOFTINT	(1&#060;&#060;2)</a>
+<a name="line50">#define  INTF_DSKBLK	(1&#060;&#060;1)</a>
+#define  INTF_TBE	(1&#060;&#060;0)
+
+#endif	/* HARDWARE_INTBITS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

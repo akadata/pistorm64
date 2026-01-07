@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/var.h" NODE="MAIN" TITLE="Includes/dos/var.h" -->
+<head>
+<title>Includes/dos/var.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0072.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0074.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_VAR_H
+#define DOS_VAR_H
+/*
+**
+**	$Filename: dos/var.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.10 $
+**	$Date: 91/03/14 $
+**
+**	include file for dos local and environment variables
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+
+<a name="line17"></a>
+#ifndef EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+#endif
+
+/* the structure in the pr_LocalVars list */
+/* Do NOT allocate yourself, use SetVar()!!! This structure may grow in */
+/* future releases!  The list should be left in alphabetical order, and */
+/* may have multiple entries with the same name but different types.	*/
+<a name="line26"></a>
+<a name="line27">struct LocalVar {</a>
+<a name="line28">	struct Node lv_Node;</a>
+<a name="line29">	UWORD	lv_Flags;</a>
+<a name="line30">	UBYTE	*lv_Value;</a>
+	ULONG	lv_Len;
+};
+
+/*
+ * The lv_Flags bits are available to the application.	The unused
+ * lv_Node.ln_Pri bits are reserved for system use.
+ */
+
+<a name="line39">/* bit definitions for lv_Node.ln_Type: */</a>
+<a name="line40">#define LV_VAR			0	/* an variable */</a>
+#define LV_ALIAS		1	/* an alias */
+<a name="line42">/* to be or'ed into type: */</a>
+<a name="line43">#define LVB_IGNORE		7	/* ignore this entry on GetVar, etc */</a>
+#define LVF_IGNORE		0x80
+
+/* definitions of flags passed to GetVar()/SetVar()/DeleteVar() */
+/* bit defs to be OR'ed with the type: */
+<a name="line48">/* item will be treated as a single line of text unless BINARY_VAR is used */</a>
+<a name="line49">#define GVB_GLOBAL_ONLY		8</a>
+<a name="line50">#define GVF_GLOBAL_ONLY		0x100</a>
+<a name="line51">#define GVB_LOCAL_ONLY		9</a>
+<a name="line52">#define GVF_LOCAL_ONLY		0x200</a>
+<a name="line53">#define GVB_BINARY_VAR		10		/* treat variable as binary */</a>
+#define GVF_BINARY_VAR		0x400
+#define GVB_DONT_NULL_TERM	11	/* only with GVF_BINARY_VAR */
+#define GVF_DONT_NULL_TERM	0x800
+
+#endif /* DOS_VAR_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

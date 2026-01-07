@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_37" NODE="37-1-1" TITLE="37 / Tags / Tag Functions and Structures" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>37 / Tags / Tag Functions and Structures</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0496.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0498.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A tag is made up of an attribute/value pair as defined below (from
+&#060;utility/<a href="../Includes_and_Autodocs_2._guide/node012E.html#line18">tagitem.h</a>&#062;):
+
+<a name="line5">    struct TagItem</a>
+    {
+        ULONG  ti_Tag;    /* identifies the type of this item */
+        ULONG  ti_Data;   /* type-specific data, can be a pointer */
+<a name="line9">    };</a>
+
+The ti_Tag field specifies an attribute to set.  The possible values of
+ti_Tag are implementation specific.  System tags are defined in the
+include files.  The value the attribute is set to is specified in ti_Data.
+An example of the attribute/value pair that will specify a window's name
+is:
+
+    ti_Tag  = WA_Title;
+    ti_Data = &#034;My Window's Name&#034;;
+
+The ti_Data field often contains 32-bit data as well as pointers.
+
+These are brief descriptions of the utility functions you can use to
+manipulate and access tags.  For complete descriptions, see the
+<a name="line24">&#034;<a href="../Libraries_Manual_guide/node0498.html">Simple Tag Usage</a>&#034; and &#034;<a href="../Libraries_Manual_guide/node0499.html">Advanced Tag Usage</a>&#034; sections.</a>
+
+The following utility library calls are for supporting tags:
+
+
+                Table 37-1: Utility Library Tag Functions
+  ______________________________________________________________________
+ |                                                                      |
+ |     <a href="../Libraries_Manual_guide/node049A.html">AllocateTagItems()</a>  Allocate a TagItem array (or chain).         |
+ |         <a href="../Libraries_Manual_guide/node049A.html">FreeTagItems()</a>  Frees allocated TagItem lists.               |
+ |----------------------------------------------------------------------|
+<a name="line35"> |        <a href="../Libraries_Manual_guide/node049B.html">CloneTagItems()</a>  Copies a TagItem list.                       |</a>
+ | <a href="../Libraries_Manual_guide/node049C.html">RefreshTagItemClones()</a>  Rejuvenates a clone from the original.       |
+ |----------------------------------------------------------------------|
+ |          <a href="../Libraries_Manual_guide/node049D.html#line13">FindTagItem()</a>  Scans TagItem list for a tag.                |
+ |           <a href="../Libraries_Manual_guide/node049F.html">GetTagData()</a>  Obtain data corresponding to tag.            |
+ |          <a href="../Libraries_Manual_guide/node049E.html">NextTagItem()</a>  Iterate TagItem lists.                       |
+ |           <a href="../Libraries_Manual_guide/node049D.html">TagInArray()</a>  Check if a tag value appears in a Tag array. |
+ |----------------------------------------------------------------------|
+ |     <a href="../Libraries_Manual_guide/node049C.html">FilterTagChanges()</a>  Eliminate TagItems which specify no change.  |
+ |       <a href="../Libraries_Manual_guide/node049C.html">FilterTagItems()</a>  Remove selected items from a TagItem list.   |
+ |              <a href="../Libraries_Manual_guide/node04A1.html">MapTags()</a>  Convert ti_Tag values in a list via map      |
+ |                         pairing.                                     |
+ |         <a href="../Libraries_Manual_guide/node04A0.html">PackBoolTags()</a>  Builds a &#034;Flag&#034; word from a TagItem list.    |
+ |______________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_SMUS" NODE="16-5-3-15" TITLE=" Standard Data and Property Chunks / More SEvents To Be Defined " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Data and Property Chunks / More SEvents To Be Defined </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02C0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02C2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+More <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a>s can be defined in the future.  The sID codes 133 through 143
+and 160 through 254 are reserved for future needs.  Caution: sID codes
+must be allocated by a central &#034;clearinghouse&#034; to avoid conflicts.
+
+The following <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a> types are under consideration and should not yet be
+used.
+
+Issue: A &#034;change tempo&#034; <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a> changes tempo during a score.  Changing the
+tempo affects all tracks, not just the track containing the change tempo
+event.
+
+One possibility is a &#034;scale tempo&#034; <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a> SID_ScaleTempo that rescales the
+global tempo:
+
+	currentTempo := globalTempo * (data + 1) / 128
+
+This can scale the global tempo (in the <a href="../Devices_Manual_guide/node02B3.html">SHDR</a>) anywhere from x1/128 to x2
+in roughly 1% increments.
+
+An alternative is two events SID_SetHTempo and SID_SetLTempo.
+SID_SetHTempo gives the high byte and SID_SetLTempo gives the low byte of
+a new tempo setting, in 128ths quarter note/minute.  SetHTempo
+automatically sets the low byte to 0, so the SetLTempo event isn't needed
+for coarse settings.  In this scheme, the <a href="../Devices_Manual_guide/node02B3.html">SHDR</a>'s tempo is simply a
+starting tempo.
+
+An advantage of SID_ScaleTempo is that the playback program can just alter
+the global tempo to adjust the overall performance time and still easily
+implement tempo variations during the score.  But the &#034;set tempo&#034; <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a>
+may be simpler to generate.
+
+Issue: The events SID_BeginRepeat and SID_EndRepeat define a repeat span
+for one track.  The span of events between a BeginRepeat and an EndRepeat
+is played twice.  The SEvent.data field in the BeginRepeat event could
+give an iteration count, 1 through 255 times or 0 for &#034;repeat forever&#034;. 
+
+Repeat spans can be nested.  All repeat spans automatically end at the end
+of the track.
+
+An event SID_Ending begins a section like &#034;first ending&#034; or &#034;second
+ending&#034;. The SEvent.data field gives the ending number.  This SID_Ending
+event only applies to the innermost repeat group.  (Consider generalizing
+it.)
+
+A more general alternative is a &#034;subtrack&#034; or &#034;subscore&#034; event.  A
+&#034;subtrack&#034; event is essentially a &#034;subroutine call&#034; to another series of
+<a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a>s.  This is a nice way to encode all the possible variations
+of repeats, first endings, codas, and such.
+
+To define a subtrack, we must demark its start and end.  One possibility
+is to define a relative branch-to-subtrack event SID_BSR and a
+return-from-subtrack event SID_RTS.  The 8-bit data field in the SID_BSR
+event can reach as far as 512 <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a>s.  A second possibility is to call a
+subtrack by index number, with an IFF chunk outside the <a href="../Devices_Manual_guide/node02B7.html">TRAK</a> defining the
+start and end of all subtracks. This is very general since a portion of
+one subtrack can be used as another subtrack.  It also models the tape
+recording practice of first &#034;laying down a track&#034; and then selecting
+portions of it to play and repeat.  To embody the music theory idea of
+playing a sequence like &#034;ABBA&#034;, just compose the &#034;main&#034; track entirely of
+subtrack events.  A third possibility is to use a numbered subtrack chunk
+&#034;STRK&#034; for each subroutine.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="FreeScreenDrawInfo()" TITLE="intuition.library/FreeScreenDrawInfo" -->
+<head>
+<title>intuition.library/FreeScreenDrawInfo</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0217.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0219.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    FreeScreenDrawInfo -- Finish using a <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> structure. (V36)
+
+SYNOPSIS
+    FreeScreenDrawInfo( <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a>, DrInfo )
+                        A0      A1
+
+    VOID FreeScreenDrawInfo( struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> * );
+
+FUNCTION
+    Declares that you are finished with the <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> structure
+    returned by <a href="../Includes_and_Autodocs_2._guide/node0220.html">GetScreenDrawInfo()</a>.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a>           - pointer to screen passed to <a href="../Includes_and_Autodocs_2._guide/node0220.html">GetScreenDrawInfo()</a>
+    DrInfo      - pointer to <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> returned by <a href="../Includes_and_Autodocs_2._guide/node0220.html">GetScreenDrawInfo()</a>
+
+RESULT
+    None
+
+NOTES
+    This function, and <a href="../Includes_and_Autodocs_2._guide/node0220.html">GetScreenDrawInfo()</a>, don't really do much, but
+    they provide an upward compatibility path.  That means that
+    if you misuse them today, they probably won't cause a problem,
+    although they may someday later.  So, please be very careful
+    only to use the <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> structure between calls to
+    <a href="../Includes_and_Autodocs_2._guide/node0220.html">GetScreenDrawInfo()</a> and FreeScreenDrawInfo(), and be sure
+    that you don't forget FreeScreenDrawInfo().
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0220.html">GetScreenDrawInfo()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

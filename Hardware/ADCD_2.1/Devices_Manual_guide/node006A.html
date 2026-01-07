@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_3" NODE="3-2-3" TITLE="3 / Device Interface / Multiple Clips" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>3 / Device Interface / Multiple Clips</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0069.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node006B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The clipboard supports multiple clips, i.e., the clipboard device can
+contain more than one distinct piece of data.  This is not to be confused
+with the IFF CAT CLIP, which allows for different representation of the
+same data.
+
+The multiple clips are implemented as different units in the clipboard
+device.  The unit is specified at <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> time.
+
+    struct IOClipReq *ClipIO;
+    LONG unit;
+
+    OpenDevice(&#034;clipboard.device&#034;, unit, ClipIO, 0);
+
+<a name="line15">By default, applications should use clipboard unit 0. However, it is</a>
+recommended that each application provide a mechanism for selecting the
+unit number which will be used when the clipboard is opened. This will
+allow the user to create a convention for storing different types of data
+in the clipboard. Applications should never write to clipboard unit 0
+unless the user requests it (e.g., selecting COPY or CUT within an
+<a name="line21">application).</a>
+
+Clipboard units 1-255 can be used by the more advanced user for:
+
+   *  Sharing data between applications within an ARexx Script.
+
+   *  Customizing applications to store different kinds of data in
+      different clipboard units.
+
+   *  Customizing an application to use multiple cut/copy/paste buffers.
+
+   *  Specialized utilities which might display and/or automatically modify
+      the contents of a clipboard unit.
+
+All applications which provide CUT, COPY and PASTE capabilities, should,
+at a minimum, provide support for clipboard unit 0.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

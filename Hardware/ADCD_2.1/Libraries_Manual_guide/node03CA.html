@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-8-5" TITLE="28 / Animation with GELs / The AnimKey" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Animation with GELs / The AnimKey</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03C9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03CB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The system uses one pointer, known as the AnimKey, to keep track of all
+the <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a>s via their PrevOb and NextOb linkage fields.  The AnimKey acts
+as the anchor for the list of AnimObs you are using and is initialized
+with code such as the following:
+
+    struct AnimOb *animKey;
+
+    InitAnimate(&#038;animKey);
+        /* Only do this once to initialize the AnimOb list */
+
+As each new object is added (via <a href="../Libraries_Manual_guide/node03CB.html">AddAnimOb()</a>), it is linked in at the
+beginning of the list, so AnimKey will always point to the object most
+recently added to the list.  To search forward through the list, start
+with the AnimKey and move forward on the NextOb link.  Continue to move
+forward until the NextOb is NULL, indicating the end of the list.  The
+PrevOb link will allow you to move back to a previous object.
+
+    Set Up PrevOb and NextOb Correctly.
+    -----------------------------------
+    It is important that the NextOb link of the last object is NULL,
+    and that the PrevOb of the first object is NULL.  In fact, the
+    system expects the animation object lists to be exactly the way
+    that they are described above.  If they are not, the system will
+    produce unexpected results.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

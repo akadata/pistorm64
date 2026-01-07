@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-7" TITLE="31 Commodities Exchange Library / Connecting CxObjects" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / Connecting CxObjects</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0407.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0409.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> has to be inserted into the Commodities network before it can
+process any <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a>.  <a href="../Includes_and_Autodocs_2._guide/node019F.html">AttachCxObj()</a> adds a CxObject to the personal
+list of another CxObject.  The HotKey.c example uses it to attach its
+<a href="../Libraries_Manual_guide/node0407.html">filter</a> to a <a href="../Libraries_Manual_guide/node0402.html">broker</a>.
+
+    void AttachCxObj ( CxObj *headobj, CxObj *co);
+    void InsertCxObj ( CxObj *headobj, CxObj *co, CxObj *co_pred );
+    void EnqueueCxObj( CxObj *headobj, CxObj *co );
+    void SetCxObjPri ( CxObj *co, long pri );
+    void RemoveCxObj ( CxObj *co );
+
+<a href="../Includes_and_Autodocs_2._guide/node019F.html">AttachCxObj()</a> adds the <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> to the end of headobj's personal list.
+The ordering of a CxObject list determines which object gets <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a>
+first.  <a href="../Includes_and_Autodocs_2._guide/node01AD.html">InsertCxObj()</a> also inserts a CxObject, but it inserts it after
+another CxObject already in the personal list (co_pred in the prototype
+above).
+
+<a href="../Libraries_Manual_guide/node0402.html">Brokers</a> aren't the only <a href="../Libraries_Manual_guide/node0401.html">CxObjects</a> with a priority.  All CxObjects have a
+priority associated with them.  To change the priority of any CxObject,
+use the <a href="../Includes_and_Autodocs_2._guide/node01B2.html">SetCxObjPri()</a> function.  A commodity can use the priority to keep
+CxObjects in a personal list sorted by their priority.  The
+commodities.library function <a href="../Includes_and_Autodocs_2._guide/node01AC.html">EnqueueCxObj()</a> inserts a CxObject into
+another CxObject's personal list based on priority.
+
+Like its name implies, the <a href="../Includes_and_Autodocs_2._guide/node01B0.html">RemoveCxObj()</a> function removes a <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> from
+a personal list.  Note that it is not necessary to remove a CxObject from
+a list in order to delete it.
+
+     <a href="../Libraries_Manual_guide/node0587.html">HotKey.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

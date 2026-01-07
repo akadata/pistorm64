@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-5-1" TITLE="3 / DrawInfo and the 3D Look / The Pen Specification in DrawInfo" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / DrawInfo and the 3D Look / The Pen Specification in DrawInfo</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00EB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00ED.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The drawing pen specification in <a href="../Libraries_Manual_guide/node00EB.html#line8">DrawInfo.dri_Pens</a> allows applications to
+use appropriate colors for graphic operations such as drawing text,
+<a name="line4">shading 3D objects and filling items selected by the user.</a>
+
+Intuition has two default sets of pens, one for multi-bitplane screens and
+one for single bitplane screens.  In addition, there is a special
+<a name="line8">compatibility mode for screens that do not specify the <a href="../Libraries_Manual_guide/node00E5.html#line82">SA_Pens</a> tag.</a>
+
+New 3D Look
+    The is the full 3D look as found by default on the Workbench screen
+    in Release 2.  Objects are drawn so that light appears to come from
+    the upper left of the screen with shadows cast to the lower right
+<a name="line14">    giving them a three-dimensional look.</a>
+
+Monochrome New Look
+    It is impossible to produce the full 3D look in a single bitplane
+    (two color) screen.  Intuition provides a fallback pen specification
+<a name="line19">    that is used in monochrome screens with no loss of information.</a>
+
+Compatible New Look
+    <a href="../Libraries_Manual_guide/node00DF.html">Custom screens</a> that do not provide the <a href="../Libraries_Manual_guide/node00E5.html#line82">SA_Pens</a> tag are assumed to
+    have no knowledge of the pen array.  They are rendered in a special
+    version of the monochrome new look, which uses the screen's <a href="../Libraries_Manual_guide/node00E5.html#line91">DetailPen</a>
+    and <a href="../Libraries_Manual_guide/node00E5.html#line99">BlockPen</a> to get its colors.  This is provided for compatibility
+<a name="line26">    with V34 and older <a href="../Libraries_Manual_guide/node0014.html">versions</a> of the operating system.</a>
+
+It is very easy for an application to use the default pen specification.
+Simply specify an empty pen specification (in C, {~0}), and Intuition will
+fill in all of the values with defaults appropriate for the screen.  This
+technique is demonstrated in the first two examples (<a href="../Libraries_Manual_guide/node05D0.html#line25">newlookscreen.c</a> and
+<a name="line32"><a href="../Libraries_Manual_guide/node05D1.html#line23">screen34to37.c</a>)listed earlier in this chapter.</a>
+
+For certain applications, a custom pen specification is required.  A
+custom pen specification is set up when the screen is opened by using the
+<a href="../Libraries_Manual_guide/node00E5.html#line82">SA_Pens</a> tag and a pointer to a pen array.  Currently, Intuition uses nine
+pens to support the 3D look.  The application can specify all of these, or
+only a few pens and Intuition will fill in the rest.  Intuition will only
+fill in pens that are past the end of those specified by the application,
+there is no facility for using default values for &#034;leading&#034; pens (those at
+the beginning of the array) without using the defaults for the rest of the
+<a name="line42">pens.</a>
+
+Using the pen specification of an existing <a href="../Libraries_Manual_guide/node00E6.html">public screen</a> is a bit more
+involved.  First, the application must get a pointer to the screen
+structure of the public screen using the <a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a> call.  A copy of
+the screen's <a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> structure may then be obtained by calling
+<a href="../Libraries_Manual_guide/node00EE.html#line16">GetScreenDrawInfo()</a>.  The DrawInfo structure contains a copy of the pen
+specification for the screen that can be used in the <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreenTagList()</a>
+call with the <a href="../Libraries_Manual_guide/node00E5.html#line82">SA_Pens</a> tag.  The pen array is copied to the data structures
+of the new screen (it is not kept as a pointer to the information passed),
+so the application may immediately call <a href="../Libraries_Manual_guide/node00FD.html#line21">FreeScreenDrawInfo()</a> and
+<a href="../Libraries_Manual_guide/node00E6.html#line34">UnlockPubScreen()</a> after the new screen is open.
+
+<a name="line55">     <a href="../Libraries_Manual_guide/node05B6.html">publicscreen.c</a> </a>
+
+Beginning with V36, the pen specification for the Workbench screen happens
+to match the Intuition default specification, however, this is not
+required and may change in the future.  To create a screen that uses the
+pens defined in the Workbench screen, the application must get a copy of
+the pen array from the Workbench screen and use this copy with the <a href="../Libraries_Manual_guide/node00E5.html#line82">SA_Pens</a>
+<a name="line62">tag as described above.</a>
+
+Here is a list of the pens defined under V36 that support the 3D look
+along with their uses.  To read the value of a particular pen, use UWORD
+penvalue = myDrawInfo-&#062;dri_Pens[PENNAME], where myDrawInfo is a pointer to
+<a name="line67">a <a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> structure and PENNAME is taken from the list below:</a>
+
+DETAILPEN
+<a name="line70">    Pen compatible with V34. Used to render text in the screen's title bar.</a>
+
+BLOCKPEN
+<a name="line73">    Pen compatible with V34. Used to fill the screen's title bar.</a>
+
+TEXTPEN
+<a name="line76">    Pen for regular text on BACKGROUNDPEN.</a>
+
+SHINEPEN
+<a name="line79">    Pen for the bright edge on 3D objects.</a>
+
+SHADOWPEN
+<a name="line82">    Pen for the dark edge on 3D objects.</a>
+
+FILLPEN
+<a name="line85">    Pen for filling the active window borders and selected gadgets.</a>
+
+FILLTEXTPEN
+<a name="line88">    Pen for text rendered over FILLPEN.</a>
+
+BACKGROUNDPEN
+<a name="line91">    Pen for the background color.  Currently must be zero.</a>
+
+HIGHLIGHTTEXTPEN
+    Pen for &#034;special color&#034; or highlighted text on BACKGROUNDPEN.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

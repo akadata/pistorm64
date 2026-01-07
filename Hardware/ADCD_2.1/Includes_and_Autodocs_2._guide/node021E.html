@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="GetPrefs()" TITLE="intuition.library/GetPrefs" -->
+<head>
+<title>intuition.library/GetPrefs</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node021D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node021F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GetPrefs -- Get the current Intuition <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> structure.
+
+SYNOPSIS
+    Prefs = GetPrefs( PrefBuffer, Size )
+    D0                A0          D0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> *GetPrefs( struct <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> *, WORD );
+
+FUNCTION
+    Gets a copy of the current Intuition <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> structure.
+    Writes the data into the buffer you specify.  The number of bytes you
+    want copied is specified by the size argument.
+
+    It is legal to take a partial copy of the <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> structure.
+    The more pertinent preferences variables have been grouped near
+    the top of the structure to facilitate the memory conservation
+    that can be had by taking a copy of only some of the <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a>
+    structure.
+
+    New for V36:  A new and more extensible method for supplying
+    <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> has been introduced in V36, and relies on file
+    system notification.  The Intuition preferences items rely
+    also on the IPrefs program.  Certain elements of the
+    <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> structure have been superceded by this new method.
+    As much as possible, the <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> structure returned by
+    GetPrefs() reflect the current state of <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a>.  However,
+    it is impossible to represent some of the V36-style preferences
+    items using the existing <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> structure.
+
+INPUTS
+    PrefBuffer = pointer to the memory buffer to receive your copy of the
+       Intuition <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a>
+    Size = the number of bytes in your PrefBuffer, the number of bytes
+       you want copied from the system's internal Preference settings
+
+RESULT
+    Returns your parameter PrefBuffer.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node021D.html">GetDefPrefs()</a>, <a href="../Includes_and_Autodocs_2._guide/node0256.html">SetPrefs()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

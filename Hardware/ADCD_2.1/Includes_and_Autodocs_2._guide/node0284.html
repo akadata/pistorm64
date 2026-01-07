@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="AttemptLockDosList()" TITLE="dos.library/AttemptLockDosList" -->
+<head>
+<title>dos.library/AttemptLockDosList</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0283.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0285.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AttemptLockDosList -- Attempt to lock the Dos Lists for use (V36)
+
+SYNOPSIS
+    dlist = AttemptLockDosList(flags)
+    D0                          D1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node0078.html#line369">DosList</a> *AttemptLockDosList(ULONG)
+
+FUNCTION
+    Locks the dos device list in preparation to walk the list.  If the
+    list is 'busy' then this routine will return NULL.  See <a href="../Includes_and_Autodocs_2._guide/node02C7.html">LockDosList()</a>
+    for more information.
+
+INPUTS
+    flags - Flags stating which types of nodes you want to lock.
+
+RESULT
+    dlist - Pointer to the beginning of the list or NULL.  Not a valid
+            node!
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02C7.html">LockDosList()</a>, <a href="../Includes_and_Autodocs_2._guide/node0308.html">UnLockDosList()</a>, <a href="../Includes_and_Autodocs_2._guide/node0353.html">Forbid()</a>, <a href="../Includes_and_Autodocs_2._guide/node02D5.html">NextDosEntry()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

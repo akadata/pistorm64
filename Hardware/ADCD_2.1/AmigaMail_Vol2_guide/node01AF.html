@@ -1,0 +1,513 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-41/mytextlabelclass.c" NODE="MAIN" TITLE="IV-41/mytextlabelclass.c" -->
+<head>
+<title>IV-41/mytextlabelclass.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01AE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01B0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+Copyright (c) 1991-1999 Amiga, Inc.
+
+This example is provided in electronic form by Amiga, Inc.
+for use with the Amiga Mail Volume II technical publication.
+Amiga Mail Volume II contains additional information on the correct
+usage of the techniques and operating system functions presented in
+these examples.  The source and executable code of these examples may
+only be distributed in free electronic form, via bulletin board or
+as part of a fully non-commercial and freely redistributable
+diskette.  Both the source and executable code (including comments)
+must be included, without modification, in any copy.  This example
+may not be published in printed form or distributed with any
+commercial product. However, the programming techniques and support
+routines set forth in these examples may be used in the development
+of original executable software products for Amiga
+computers.
+
+All other rights reserved.
+
+This example is provided &#034;as-is&#034; and is subject to change; no
+warranties are made.  All use is at your own risk. No liability or
+responsibility is assumed.
+ *
+ * Written by David N. Junod
+ *
+ * Compiled with SAS/C 6.56 sc NMINC STRMERGE OPTSIZE OPTIMIZE OPTGLOBAL NOSTKCHK
+ * (must be linked with classface.o and hookface.o)
+ *
+ * The Image structure as used by this class:
+ *
+ * struct Image {
+ *
+ * SHORT    LeftEdge;        &#060;----Offset relative to the container
+ * SHORT    TopEdge;
+ *
+ * SHORT    Width;           &#060;----Contains the text extent of the string
+ * SHORT    Height;
+ *
+ * SHORT    Depth;           &#060;----Maintained by boopsi (must be set to CUSTOMIMAGEDEPTH).
+ *
+ * USHORT   *ImageData;      &#060;----Pointer to a NULL terminated text string
+ *
+ * UBYTE    PlanePick;       &#060;----We use this for the foreground color
+ *
+ * UBYTE    PlaneOnOff;      &#060;----We use this for the background color
+ *
+ * struct Image *NextImage;  &#060;----Pointer to the next image.  Handled by DrawImage(). };
+ */
+
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/libraries.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/classes.h&#062;
+#include &#060;intuition/classusr.h&#062;
+#include &#060;intuition/cghooks.h&#062;
+#include &#060;intuition/gadgetclass.h&#062;
+#include &#060;intuition/imageclass.h&#062;
+#include &#060;intuition/icclass.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;graphics/gfx.h&#062;
+#include &#060;graphics/gfxmacros.h&#062;
+#include &#060;libraries/gadtools.h&#062;
+#include &#060;utility/tagitem.h&#062;
+#include &#060;clib/macros.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/utility_protos.h&#062;
+#include &#060;string.h&#062;
+
+extern struct Library *SysBase, *DOSBase;
+extern struct Library *IntuitionBase, *GfxBase, *UtilityBase;
+
+/*
+ * Because we are dealing with imageclass objects, the data structure that makes up the
+ * object is an intuition Image structure.
+ */
+#define IM(o)   ((struct Image *)(o))
+
+#define MYCLASSID       NULL
+#define SUPERCLASSID    (IMAGECLASS)
+
+Class          *initmyTextLabelClass(VOID);
+ULONG           freemyTextLabelClass(Class * cl);
+ULONG __saveds  dispatchmyTextLabel(Class * cl, Object * o, Msg msg);
+ULONG           setmyTextLabelAttrs(Class * cl, Object * o, struct opSet * msg);
+ULONG           getmyTextLabelAttr(Class * cl, Object * o, struct opGet * msg);
+ULONG           drawmyTextLabel(Class * cl, Object * o, struct impDraw * msg);
+WORD            aTextExtent(struct RastPort *, STRPTR, LONG, struct TextExtent *);
+UWORD           GetLabelKeystroke(STRPTR label);
+static VOID     getContentsExtent(Class * cl, Object * o, struct DrawInfo * drinfo);
+
+/* prototypes of functions from classface.o */
+ULONG           DoMethod(Object * o, ULONG methodID,...);
+ULONG           DoSuperMethod(Class * cl, Object * o, ULONG methodID,...);
+ULONG           CoerceMethod(Class * cl, Object * o, ULONG methodID,...);
+ULONG           CM(Class * cl, Object * o, Msg msg);
+ULONG           DM(Object * o, Msg msg);
+ULONG           DSM(Class * cl, Object * o, Msg msg);
+ULONG           SetSuperAttrs(Class * cl, Object * o, ULONG data,...);
+
+struct localObjData
+{
+    /* Font to use */
+    struct TextFont *lod_Font;
+
+    /* The key that is underlined */
+    UWORD           lod_Key;
+
+    /* DrawMode */
+    UBYTE           lod_Mode;
+};
+
+
+Class          *
+initmyTextLabelClass(VOID)
+{
+    ULONG           hookEntry(); /* from hookface.o */
+    Class          *cl;
+
+    if (cl = MakeClass(MYCLASSID,
+                       SUPERCLASSID, NULL,
+                       sizeof(struct localObjData), 0))
+    {
+        /* Fill in the callback hook */
+        cl-&#062;cl_Dispatcher.h_Entry = hookEntry;
+        cl-&#062;cl_Dispatcher.h_SubEntry = dispatchmyTextLabel;
+    }
+    /* Return a pointer to the class */
+    return (cl);
+}
+
+
+ULONG
+freemyTextLabelClass(Class * cl)
+{
+
+    /* Try to free the public class */
+    return ((ULONG) FreeClass(cl));
+}
+
+
+/*
+ * The SAS &#034;__saveds&#034; flag tells the SAS compiler to put
+ * the data storage address + 32766 into A4.
+ */
+ULONG           __saveds
+dispatchmyTextLabel(Class * cl, Object * o, Msg msg)
+{
+    struct localObjData *lod;
+    Object         *newobj;
+    ULONG           retval;
+
+    switch (msg-&#062;MethodID)
+    {
+    case OM_NEW:
+        /* Pass up to the superclass... */
+        if (newobj = (Object *) DSM(cl, o, msg))
+        {
+            struct TagItem *attrs = ((struct opSet *) msg)-&#062;ops_AttrList;
+            struct DrawInfo *drinfo;
+
+            /* Get the DrawInfo */
+            drinfo = (struct DrawInfo *) GetTagData(SYSIA_DrawInfo, NULL, attrs);
+
+            /* Get the instance data */
+            lod = INST_DATA(cl, newobj);
+
+            /* Establish defaults */
+            IM(newobj)-&#062;PlanePick = 1;
+            lod-&#062;lod_Mode = JAM1;
+
+            /* Set the attributes */
+            setmyTextLabelAttrs(cl, newobj, (struct opSet *) msg);
+
+            /* Get the bounding rectangle of the label */
+            getContentsExtent(cl, newobj, drinfo);
+        }
+        retval = (ULONG) newobj;
+        break;
+
+    case OM_GET:
+        retval = getmyTextLabelAttr(cl, o, (struct opGet *) msg);
+        break;
+
+    case OM_UPDATE:
+    case OM_SET:
+        /* Do the superclass first */
+        retval = DSM(cl, o, msg);
+
+        /* Call our set routines */
+        retval += setmyTextLabelAttrs(cl, o, (struct opSet *) msg);
+        break;
+
+    case IM_DRAW:               /* draw the label */
+    case IM_DRAWFRAME:          /* drawmyTextLabel() will take care of
+                                   extra framing info */
+        retval = drawmyTextLabel(cl, o, (struct impDraw *) msg);
+        break;
+
+    /* Let the superclass handle everything else */
+    default:
+        retval = (ULONG) DSM(cl, o, msg);
+        break;
+    }
+
+    return (retval);
+}
+
+
+/* Set attributes of an object */
+ULONG
+setmyTextLabelAttrs(Class * cl, Object * o, struct opSet * msg)
+{
+    struct localObjData *lod = INST_DATA(cl, o);
+    struct TagItem *tags = msg-&#062;ops_AttrList;
+    struct TagItem *tstate;
+    struct TagItem *tag;
+    ULONG           tidata;
+
+    /* process rest */
+    tstate = tags;
+    while (tag = NextTagItem(&#038;tstate))
+    {
+        tidata = tag-&#062;ti_Data;
+        switch (tag-&#062;ti_Tag)
+        {
+        case IA_FGPen:
+            IM(o)-&#062;PlanePick = (UBYTE) tidata;
+            break;
+
+        case IA_BGPen:
+            IM(o)-&#062;PlaneOnOff = (UBYTE) tidata;
+            break;
+
+            /* Must be a TextFont pointer. */
+        case IA_Font:
+            /* Set the font */
+            lod-&#062;lod_Font = (struct TextFont *) tidata;
+            break;
+
+            /* Drawing mode to use */
+        case IA_Mode:
+            lod-&#062;lod_Mode = (UBYTE) tidata;
+            break;
+
+        case IA_Data:
+            IM(o)-&#062;ImageData = (USHORT *) tidata;
+            lod-&#062;lod_Key = GetLabelKeystroke((STRPTR) tidata);
+            break;
+        }
+    }
+
+    return (1L);
+}
+
+
+
+
+
+
+/* Inquire attributes of an object */
+ULONG
+getmyTextLabelAttr(Class * cl, Object * o, struct opGet * msg)
+{
+    struct localObjData *lod = INST_DATA(cl, o);
+
+    switch (msg-&#062;opg_AttrID)
+    {
+    case IA_Font:
+        *msg-&#062;opg_Storage = (ULONG) lod-&#062;lod_Font;
+        break;
+
+    case IA_Mode:
+        *msg-&#062;opg_Storage = (ULONG) lod-&#062;lod_Mode;
+        break;
+
+        /* Let the superclass try */
+    default:
+        return ((ULONG) DSM(cl, o, msg));
+    }
+
+    return (1L);
+}
+
+
+ULONG
+drawmyTextLabel(Class * cl, Object * o, struct impDraw * msg)
+{
+    struct localObjData *lod = INST_DATA(cl, o);
+    STRPTR          label = (STRPTR) IM(o)-&#062;ImageData;
+    struct DrawInfo *di = msg-&#062;imp_DrInfo;
+    struct RastPort *rp = msg-&#062;imp_RPort;
+    struct TextFont *tf = NULL;
+    WORD            len = strlen(label);
+    WORD            left, top;
+    WORD            height = 0;
+    WORD            width = 0;
+    WORD            i;
+
+    /* Clear the key */
+    lod-&#062;lod_Key = NULL;
+
+    /* Get a pointer to the font to use */
+    if (!(tf = lod-&#062;lod_Font) &#038;&#038; di)
+    {
+        tf = di-&#062;dri_Font;
+    }
+
+    /* Make sure we have font pointer */
+    if (tf)
+    {
+        /* Set the font */
+        SetFont(rp, tf);
+    }
+    /* Figure out our coordinates */
+    top = msg-&#062;imp_Offset.Y + IM(o)-&#062;TopEdge + rp-&#062;TxBaseline;
+    left = msg-&#062;imp_Offset.X + IM(o)-&#062;LeftEdge;
+
+    /* See if we have frame information. */
+    if (msg-&#062;MethodID == IM_DRAWFRAME)
+    {
+        /* Center the text inside the frame. */
+        width = msg-&#062;imp_Dimensions.Width;
+        height = msg-&#062;imp_Dimensions.Height;
+        top += ((height - IM(o)-&#062;Height) &#062; 0) ? ((height - IM(o)-&#062;Height) / 2) : 0;
+        left += ((width - IM(o)-&#062;Width) &#062; 0) ? ((width - IM(o)-&#062;Width) / 2) : 0;
+    }
+
+    /* Set the colors */
+    SetAPen(rp, IM(o)-&#062;PlanePick);
+    SetBPen(rp, IM(o)-&#062;PlaneOnOff);
+
+    /* Set the drawing mode */
+    SetDrMd(rp, lod-&#062;lod_Mode);
+
+    /* Move to the start */
+    Move(rp, left, top);
+
+
+
+    /* Step through string */
+    for (i = 0; i &#060; (len - 1); i++)
+    {
+        /* Is this an '_' ? */
+        if (label[i] == '_')
+        {
+            WORD            bot = (top + rp-&#062;TxHeight - rp-&#062;TxBaseline);
+            WORD            mark;
+
+            /* Draw the first part of the string */
+            Text(rp, label, i);
+
+            /* Remember where we are in the string */
+            mark = rp-&#062;cp_x;
+
+            /* Draw the underscore */
+            Move(rp, mark, bot);
+            Draw(rp, (mark + TextLength(rp, &#038;label[(i + 1)], 1L) - 2), bot);
+
+            /* Return to where we were */
+            Move(rp, mark, top);
+
+            /*
+             * Draw the rest of the string.  This one is done last so that the cursor
+             * could be positioned after the text.
+             */
+            Text(rp, &#038;label[(i + 1)], (len - i - 1));
+
+            /* Return the underlined character */
+            lod-&#062;lod_Key = (UWORD) label[i];
+        }
+    }
+
+    /* Do we have an underscore? */
+    if (!lod-&#062;lod_Key)
+    {
+        /* Didn't find an '_' sign */
+        Text(rp, label, len);
+    }
+    return (1L);
+}
+
+
+UWORD
+GetLabelKeystroke(STRPTR label)
+{
+    LONG            count = (label) ? strlen(label) : 0L;
+    LONG            i;
+
+    /* Search for an _ sign */
+    for (i = 0; i &#060; (count - 1); i++)
+    {
+        /* Did we find an _ sign? */
+        if (label[i] == '_')
+        {
+            return ((UWORD) label[(i + 1)]);
+        }
+    }
+
+    return (0);
+}
+
+
+/* TextExtent that honors the '_' as being a non-printable character (once) */
+WORD
+aTextExtent(struct RastPort * rp, STRPTR string, LONG count, struct TextExtent * te)
+{
+    WORD retval = FALSE;
+    STRPTR buffer;
+    LONG i;
+
+    /* Allocate a temporary buffer */
+    if (buffer = AllocVec ((count + 1), MEMF_CLEAR))
+    {
+	/* Step through string */
+	for (i = 0; i &#060; count; i++)
+	{
+            /* Is this an '_' sign? */
+            if (string[i] == '_')
+            {
+		/* Add the rest of the label to the buffer */
+		strcat (buffer, &#038;string[(i + 1)]);
+
+		/* Adjust the length of the string. */
+		count--;
+		break;
+	    }
+	    else
+	    {
+		/* Copy each character over, until we reach the _ mark */
+		buffer[i] = string[i];
+	    }
+        }
+
+        /* Get the extent */
+        TextExtent(rp, buffer, count, te);
+
+	/* Free the temporary buffer */
+	FreeVec (buffer);
+
+	/* Show that we were successful */
+	retval = TRUE;
+    }
+
+    /* Return whatever textextent returned */
+    return (retval);
+}
+
+static          VOID
+getContentsExtent(Class * cl, Object * o, struct DrawInfo * drinfo)
+{
+    struct localObjData *lod = INST_DATA(cl, o);
+    struct TextExtent te =
+    {NULL};
+    struct RastPort rp;
+    STRPTR          label;
+
+    /* maybe look at some flags to handle other types of text someday */
+    if (label = (STRPTR) IM(o)-&#062;ImageData)
+    {
+        /* Initialize the RastPort */
+        InitRastPort(&#038;rp);
+
+        if (lod-&#062;lod_Font)
+        {
+            SetFont(&#038;rp, lod-&#062;lod_Font);
+        }
+        else if (drinfo &#038;&#038; drinfo-&#062;dri_Font)
+        {
+            SetFont(&#038;rp, drinfo-&#062;dri_Font);
+        }
+        /* Get the rectangle for the label */
+        aTextExtent(&#038;rp, label, strlen(label), &#038;te);
+
+        /* Set the image structure */
+        IM(o)-&#062;Width = te.te_Width;
+        IM(o)-&#062;Height = te.te_Height;
+    }
+    else
+    {
+        IM(o)-&#062;Width = IM(o)-&#062;Height = 0;
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

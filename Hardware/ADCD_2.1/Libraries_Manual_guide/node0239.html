@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_14" NODE="14-2" TITLE="14 Workbench and Icon Library / Workbench Environment" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>14 Workbench and Icon Library / Workbench Environment</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0238.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node023A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+On the Amiga there are at least two ways to start a program running:
+
+  * By activating a tool or project icon in Workbench (an icon is
+    activated by pointing to it with the mouse and double-clicking
+    the mouse select button.)
+
+  * By typing the name of an executable file at the Shell (also
+    known as the CLI or Command Line Interface)
+
+In the Workbench environment, a program is run as a separate process.  A
+process is simply a task with additional information needed to use DOS
+library.
+
+By default, a Workbench program does not have a window to which its output
+will go.  Therefore, stdin and stdout do not point to legal file handles.
+This means you cannot use stdio functions such as <a href="../Includes_and_Autodocs_2._guide/node0162.html">printf()</a> if your program
+is started from Workbench unless you first set up a stdio window.
+
+Some compilers have options or defaults to provide a stdio window for
+programs started from Workbench.  In Release 2, applications can use an
+auto console window for stdio when started from Workbench by opening
+&#034;CON:0/0/640/200/auto/close/wait&#034; as a file.  An auto console window will
+only open if stdio input or output occurs.  This can also be handled in
+the startup code module that comes with your compiler.
+
+ <a href="../Libraries_Manual_guide/node023A.html">Argument Passing In Workbench</a> 
+ <a href="../Libraries_Manual_guide/node023E.html">WBStartup Message</a> 
+ <a href="../Libraries_Manual_guide/node05C4.html">Example of Parsing Workbench Arguments</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

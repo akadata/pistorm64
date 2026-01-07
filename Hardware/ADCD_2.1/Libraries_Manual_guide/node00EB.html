@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-5" TITLE="3 Intuition Screens / DrawInfo and the 3D Look" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 Intuition Screens / DrawInfo and the 3D Look</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00EA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00EC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In Release 2, whenever a new screen is created, Intuition also creates an
+auxiliary data structure called a <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a>.  The DrawInfo structure
+provides information Intuition uses to support the new 3D look of Release
+2 and  specifies graphical information for applications that use the
+screen.  The information includes such items as aspect ratio (resolution),
+font, number of colors and drawing pens.
+<a name="line8"></a>
+
+struct DrawInfo
+{
+    UWORD       dri_Version;    /* will be  DRI_VERSION                 */
+    UWORD       dri_NumPens;    /* guaranteed to be &#062;= numDrIPens       */
+    UWORD       *dri_Pens;      /* pointer to pen array	                */
+
+    struct TextFont     *dri_Font;  /* screen default font              */
+    UWORD       dri_Depth;          /* (initial) depth of screen bitmap */
+
+    struct {    /* from DisplayInfo database for initial display mode   */
+	UWORD   X;
+	UWORD   Y;
+    }           dri_Resolution;
+
+    ULONG       dri_Flags;              /* defined below                */
+    ULONG       dri_Reserved[7];        /* avoid recompilation ;^)      */
+};
+
+
+Before an application uses fields in the <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> structure, it should
+check the version of the structure to ensure that all fields are
+available.  If the field dri_Version is greater than or equal to the
+constant DRI_VERSION that the application was compiled with, it can be
+assured that all fields in DrawInfo that it knows about are being
+supported by Intuition.
+
+ <a href="../Libraries_Manual_guide/node00EC.html">The Pen Specification in DrawInfo</a> 
+ <a href="../Libraries_Manual_guide/node00ED.html">The Font Specification in DrawInfo</a> 
+ <a href="../Libraries_Manual_guide/node00EE.html">Cloning a Public Screen (Workbench)</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

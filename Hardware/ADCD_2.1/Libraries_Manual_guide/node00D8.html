@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-1" TITLE="3 Intuition Screens / Types of Screens" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 Intuition Screens / Types of Screens</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00D7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00D9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Screens are important because they determine the basic resolution and
+maximum number of colors in the display.  Once a screen is set up, these
+attributes cannot be changed so any graphics work done on a given screen
+is restricted to that screen's resolution and number of colors.  Hence,
+the type of screen used is a basic design decision.
+
+With Intuition screens, a <a href="../Libraries_Manual_guide/node0313.html">video display</a> can be created in any one of the
+many Amiga display modes.  The basic parameters of the video display such
+as resolution, total size, frame rate, genlock compatibility, support of
+screen movement and number of colors are defined by these modes.  There
+are currently four basic modes available on all Amiga models.  These basic
+modes work with conventional monitors (15 kHz scan rate) and older
+<a name="line14"><a href="../Libraries_Manual_guide/node0014.html">versions</a> of the operating system.</a>
+
+
+            Table 3-1: Basic Amiga Display Modes
+
+
+     Basic Amiga      Resolution  Maximum    Supports
+    Display Modes        NTSC       PAL       Colors    HAM/EHB*
+    -------------     ----------  -------    --------   -------
+    <a href="../Libraries_Manual_guide/node0317.html">Lores</a>              320x200    320x256   32 of 4096    Yes
+    Lores-<a href="../Libraries_Manual_guide/node0316.html">Interlaced</a>   320x400    320x512   32 of 4096    Yes
+    <a href="../Libraries_Manual_guide/node0317.html">Hires</a>              640x200    640x256   16 of 4096    No
+    Hires-Interlaced   640x400    640x512   16 of 4096    No
+
+
+    * <a href="../Libraries_Manual_guide/node0348.html">HAM</a> and <a href="../Libraries_Manual_guide/node0347.html">EHB</a> modes provide for additional colors with some
+      restrictions.
+
+
+With Release 2 of the operating system, many other display modes are
+available (these usually require a <a href="../Libraries_Manual_guide/node0336.html">special monitor</a> or <a href="../Libraries_Manual_guide/node0319.html">ECS</a>).  All these
+display modes, including the specialized modes, are integrated through the
+graphics library display database.  See the &#034;<a href="../Libraries_Manual_guide/node0318.html">Graphics Primitives</a>&#034; chapter
+for a complete list of all Amiga display modes.
+
+ <a href="../Libraries_Manual_guide/node00D9.html">Multiple Screens</a> 
+ <a href="../Libraries_Manual_guide/node00DA.html">Public Screens and Custom Screens</a> 
+ <a href="../Libraries_Manual_guide/node00DB.html">Screen Components</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

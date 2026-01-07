@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/clib/rexxsyslib_protos.h" NODE="MAIN" TITLE="Includes/clib/rexxsyslib_protos.h" -->
+<head>
+<title>Includes/clib/rexxsyslib_protos.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node002D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node002F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef  CLIB_REXXSYSLIB_PROTOS_H
+#define  CLIB_REXXSYSLIB_PROTOS_H
+/*
+**	$Filename: clib/rexxsyslib_protos.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.3 $
+**	$Date: 91/02/19 $
+**
+**	C prototypes. For use with 32 bit integers only.
+**
+**	(C) Copyright 1990-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+/*--- functions in V33 or higher (distributed as Release 1.2) ---*/
+#ifndef  EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+#ifndef  REXX_RXSLIB_H
+#include &#060;rexx/rxslib.h&#062;
+#endif
+#ifndef  REXX_REXXIO_H
+#include &#060;rexx/rexxio.h&#062;
+#endif
+
+UBYTE *CreateArgstring( UBYTE *string, unsigned long length );
+void DeleteArgstring( UBYTE *argstring );
+ULONG LengthArgstring( UBYTE *argstring );
+struct RexxMsg *CreateRexxMsg( struct MsgPort *port, UBYTE *extension,
+	UBYTE *host );
+void DeleteRexxMsg( struct RexxMsg *packet );
+void ClearRexxMsg( struct RexxMsg *msgptr, unsigned long count );
+BOOL FillRexxMsg( struct RexxMsg *msgptr, unsigned long count,
+	unsigned long mask );
+BOOL IsRexxMsg( struct RexxMsg *msgptr );
+
+
+void LockRexxBase( unsigned long resource );
+void UnlockRexxBase( unsigned long resource );
+
+#endif	 /* CLIB_REXXSYSLIB_PROTOS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

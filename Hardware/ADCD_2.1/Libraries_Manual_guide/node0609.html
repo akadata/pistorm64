@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/samplebase.h" NODE="MAIN" TITLE="lib_examples/samplebase.h" -->
+<head>
+<title>lib_examples/samplebase.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0608.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node060A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* samplebase.h -- C include file defining sample.library base */
+
+#ifndef SAMPLE_BASE_H
+#define SAMPLE_BASE_H
+
+#ifndef  EXEC_TYPES_H
+#include  &#060;exec/types.h&#062;
+#endif   EXEC_TYPES_H
+
+#ifndef  EXEC_LIBRARIES_H
+#include &#060;exec/libraries.h&#062;
+#endif   EXEC_LIBRARIES_H
+
+/* library data structures-- Note that the library base begins with a library node */
+
+struct SampleBase {
+   struct Library LibNode;
+   UBYTE  Flags;
+   UBYTE  pad;
+   /* We are now longword aligned */
+   ULONG  SysLib;
+   ULONG  DosLib;
+   ULONG  SegList;
+   };
+
+#define SAMPLENAME   &#034;sample.library&#034;
+
+#endif  /* SAMPLE_BASE_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

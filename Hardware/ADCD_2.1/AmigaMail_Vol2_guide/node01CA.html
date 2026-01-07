@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="V-23/Rotate.c" NODE="MAIN" TITLE="V-23/Rotate.c" -->
+<head>
+<title>V-23/Rotate.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01C9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01CB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* Rotate.c - Execute me to compile me with SAS/C 6.56
+sc NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 Rotate.c
+slink FROM LIB:c.o,BulletMain.o,engine.o,Rotate.o TO Rotate LIBRARY LIB:sc.lib,LIB:amiga.lib
+quit ;*/
+
+/* (c)  Copyright 1992-1999 Amiga, Inc.   All rights reserved.       */
+/* The information contained herein is subject to change without notice,  */
+/* and is provided &#034;as is&#034; without warranty of any kind, either expressed */
+/* or implied.  The entire risk as to the use of this information is      */
+/* assumed by the user.                                                   */
+
+#include &#060;exec/types.h&#062;
+#include &#060;diskfont/diskfonttag.h&#062;
+#include &#060;diskfont/diskfont.h&#062;
+#include &#060;diskfont/glyph.h&#062;
+#include &#060;diskfont/oterrors.h&#062;
+#include &#060;graphics/gfx.h&#062;
+#include &#060;graphics/regions.h&#062;
+#include &#060;utility/tagitem.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;devices/timer.h&#062;
+
+#include &#060;clib/alib_stdio_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/bullet_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/layers_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+extern struct Library *BulletBase, *UtilityBase, *GfxBase, *IntuitionBase;
+struct Library *LayersBase;
+void            BulletExample(struct GlyphEngine *,
+                              struct Window *,
+                              struct RastPort *,
+                              ULONG, ULONG, ULONG, ULONG, ULONG);
+
+UBYTE          *vers = &#034;\0$VER: Rotate 38.10&#034;;
+
+#define TABLE_ENTRIES 24
+#define SINE_INDEX    0
+#define COSINE_INDEX  1
+
+/* precalculated sine and cosine */
+LONG            table[TABLE_ENTRIES][2] =
+{
+  {0x0, 0x10000},             /* 0   degrees */ /* Notice that the sine and cosine  */
+  {0x424e, 0xf747},           /* 15  degrees */ /* values have to correspond to the */
+  {0x8000, 0xddb4},           /* 30  degrees */ /* same angle.  The IntelliFont     */
+  {0xb505, 0xb505},           /* 45  degrees */ /* engine will have severe mental   */
+  {0xddb4, 0x8000},           /* 60  degrees */ /* problems if the values aren't    */
+  {0xf747, 0x424e},           /* 75  degrees */ /* close to representing the same   */
+  {0x10000, 0x0},             /* 90  degrees */ /* angle.                           */
+  {0xf747, 0xffffbdbe},       /* 105 degrees */
+  {0xddb4, 0xffff8000},       /* 120 degrees */
+  {0xb505, 0xffff4afb},       /* 135 degrees */
+  {0x8000, 0xffff224c},       /* 150 degrees */
+  {0x424e, 0xffff08b9},       /* 165 degrees */
+  {0x0, 0xffff0000},          /* 180 degrees */
+  {0xffffbdbe, 0xffff08b9},   /* 195 degrees */
+  {0xffff8000, 0xffff224c},   /* 210 degrees */
+  {0xffff4afb, 0xffff4afb},   /* 225 degrees */
+  {0xffff224c, 0xffff8000},   /* 240 degrees */
+  {0xffff08b9, 0xffffbdbe},   /* 255 degrees */
+  {0xffff0000, 0x0},          /* 270 degrees */
+  {0xffff08b9, 0x424e},       /* 285 degrees */
+  {0xffff224c, 0x8000},       /* 300 degrees */
+  {0xffff4afb, 0xb505},       /* 315 degrees */
+  {0xffff8000, 0xddb4},       /* 330 degrees */
+  {0xffffbdbe, 0xf747}        /* 345 degrees */
+};
+
+struct Rectangle rectangle;
+struct Region    *region;
+
+void
+BulletExample(struct GlyphEngine * ge,
+              struct Window * w, struct RastPort * rp,
+     ULONG pointheight, ULONG xdpi, ULONG ydpi, ULONG unicode, ULONG unicode2)
+{
+  struct GlyphMap *gm;
+  PLANEPTR        tempbitmap;
+  ULONG           centerx, centery, x, y, dx, dy, sin, cos, oldx, oldy, olddx,
+                  olddy, emheight, emwidth;
+  ULONG           i = 0;
+
+  struct IntuiMessage *mymsg;
+  BOOL            done = FALSE;
+
+  if (pointheight &#062; 180) pointheight = 180;
+
+  if (SetInfo(ge,
+              OT_DeviceDPI, ((ULONG) xdpi) &#060;&#060; 16 | ydpi,
+              TAG_END) != OTERR_Success)
+        return;
+
+  emheight = (pointheight * ydpi) / 72; /* Calculate the pixel dimensions */
+  emwidth  = (pointheight * xdpi) / 72; /* of the EM square.              */
+  centerx  = w-&#062;BorderLeft + emheight;
+  centery  = w-&#062;BorderTop  + emwidth;
+
+  dx = (2 * emwidth) + w-&#062;BorderLeft + w-&#062;BorderRight;  /* Calculate window size to */
+  dy = (2 * emheight) + w-&#062;BorderTop + w-&#062;BorderBottom; /* fit around glyph com-    */
+  dx = (dx &#062; 640) ? 640 : dx;                           /* fortablely.              */
+  dy = (dy &#062; 200) ? 200 : dy;
+  dx = (dx &#060; 80) ? 80: dx;
+  dy = (dy &#060; 50) ? 50: dy;
+
+  if (ModifyIDCMP(w, IDCMP_CHANGEWINDOW))
+  {
+    ChangeWindowBox(w, w-&#062;LeftEdge, w-&#062;TopEdge, dx, dy);        /* Set window size  */
+    WaitPort(w-&#062;UserPort);                                      /* and wait for the */
+    while (mymsg = (struct IntuiMessage *) GetMsg(w-&#062;UserPort)) /* dimension change */
+      ReplyMsg((struct Message *) mymsg);                       /* to take place.   */
+    if (!(ModifyIDCMP(w, NULL))) return;  /* Quit if there is a problem with IDCMP. */
+  }
+
+  x = centerx; /* calculate original rendering position. */
+  y = centery;
+  dx = 1;   /* Since dx and dy are no longer necessary for figuring out the window  */
+  dy = 1;   /* dimensions, I use them to measure the full width and height of the   */
+            /* glyph bitmap supplied by bullet.  I need this to erase the glyph.    */
+
+  if (LayersBase = OpenLibrary(&#034;layers.library&#034;, 37L)) /* These lines are       */
+  {                                                    /* here to install       */
+    rectangle.MinX = w-&#062;BorderLeft;                    /* a clipping            */
+    rectangle.MinY = w-&#062;BorderTop;                     /* region to the         */
+    rectangle.MaxX = w-&#062;Width  - w-&#062;BorderRight - 1;   /* window to keep        */
+    rectangle.MaxY = w-&#062;Height - w-&#062;BorderBottom - 1;  /* the glyph within      */
+                                                       /* window bounds.        */
+    if (region = NewRegion())                          /* For more information, */
+    {                                                  /* see the &#034;Layers&#034;      */
+      if (OrRectRegion(region, &#038;rectangle))            /* chapter of the        */
+      {                                                /* RKRM: Libraries       */
+        InstallClipRegion(w-&#062;WLayer, region);          /* Manual.               */
+
+        if (SetInfo(ge,
+                    OT_GlyphCode, unicode,                      /* Set the glyph to */
+                    OT_PointHeight, (ULONG) pointheight &#060;&#060; 16,  /* rotate and its   */
+                    TAG_END) == OTERR_Success)                  /* pointsize.       */
+        {
+          SetDrMd(w-&#062;RPort, JAM1);
+          if (tempbitmap = AllocRaster(640, 200))
+          {
+            if (ModifyIDCMP(w, IDCMP_CLOSEWINDOW)) /* Turn on close window reports  */
+            {                                      /* so the example can quit.      */
+              for (i = 0; done == FALSE; i++)
+              {
+                if (i == TABLE_ENTRIES)
+                  i = 0;
+
+                sin = table[i][SINE_INDEX];   /* Step through the sine/cosine array */
+                cos = table[i][COSINE_INDEX]; /* 360 degrees @ 15 degree increments */
+
+                if (SetInfo(ge,                  /* Set the current rotation angle. */
+                            OT_RotateSin, sin,
+                            OT_RotateCos, cos,
+                            TAG_END) == OTERR_Success)
+                {
+                  if ((ObtainInfo(ge, OT_GlyphMap, &#038;gm, TAG_END)) == OTERR_Success)
+                  {
+                    oldx = x;               /* Calculate the dimension and position */
+                    oldy = y;               /* of the new glyph's bitmap and save   */
+                    olddx = dx;             /* the old values so we can erase the   */
+                    olddy = dy;             /* glyph that is still on the screen.   */
+                    x = centerx - gm-&#062;glm_X0;
+                    y = centery - gm-&#062;glm_Y0;
+                    dx = gm-&#062;glm_BMModulo * 8;
+                    dy = gm-&#062;glm_BMRows;
+
+                    CopyMem(gm-&#062;glm_BitMap,/* Copy the glyph's bitmap into Chip RAM */
+                            tempbitmap,    /* so we can blit it into a RastPort.    */
+                            gm-&#062;glm_BMModulo * gm-&#062;glm_BMRows);
+
+                                                            /* Erase the old glyph. */
+                    RectFill(rp, oldx, oldy, oldx + olddx, oldy + olddy);
+
+                    WaitBlit();                 /* Wait for the old glyph to erase. */
+
+                    BltTemplate(                   /* Blit the new glyph into the   */
+                                 tempbitmap,       /* window's RastPort.            */
+                                 0,
+                                 gm-&#062;glm_BMModulo,
+                                 w-&#062;RPort,
+                                 x,
+                                 y,
+                                 dx,
+                                 dy);          /* Running several instances of this */
+                                               /* example simultaneously can really */
+                                               /* slow the system, so we give other */
+                    TimeDelay(UNIT_VBLANK, 0, 250000);  /*   tasks a chance to run. */
+                    ReleaseInfo(ge, OT_GlyphMap, gm, TAG_END);
+                  }
+                }                               /* Check for a CLOSEWINDOW message. */
+                while (mymsg = (struct IntuiMessage *) GetMsg(w-&#062;UserPort))
+                {
+                  ReplyMsg((struct Message *) mymsg);
+                  done = TRUE;
+                }
+              }
+            }
+            FreeRaster(tempbitmap, 640, 200);
+          }
+        }
+      }
+      DisposeRegion(region);
+    }
+    CloseLibrary(LayersBase);
+  }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

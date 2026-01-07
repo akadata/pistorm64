@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-2-1" TITLE="8 / Creating Images / Image Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Images / Image Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01B9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01BB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For images, the application must create one or more instances of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line618">Image</a>
+structure.
+
+    struct Image
+        {
+        WORD LeftEdge;
+        WORD TopEdge;
+        WORD Width;
+        WORD Height;
+        WORD Depth;
+        UWORD *ImageData;
+        UBYTE PlanePick, PlaneOnOff;
+        struct Image *NextImage;
+        };
+
+<a name="line17">The meanings of the fields in the Image structure are:</a>
+
+LeftEdge, TopEdge
+    The location of the image relative to its base position when it is
+    drawn.  These offsets are added to the base position to determine the
+<a name="line22">    final location of the image data.</a>
+
+    The base position for images rendered with <a href="../Libraries_Manual_guide/node01BB.html">DrawImage()</a> is taken from
+    arguments passed in the function call.  For gadgets and menus, the
+    base position is always the upper, left corner of the select box.
+    For requesters the base position is always the upper, left corner of
+    the requester.
+
+    Negative values of LeftEdge and TopEdge move the position up and to
+    the left of the base position.  Positive values move down and to the
+<a name="line32">    right.</a>
+
+Width, Height
+    The width and height of the image.  Width contains the actual width
+    of the image in pixels.  Height specifies the height of the image in
+    pixels.
+
+    The Width field of the Image structure contains the actual width in
+    pixels of the widest part of the image, not how many pixels are
+<a name="line41">    contained in the words that define the image.</a>
+
+Depth
+    The depth of the image, or the number of bitplanes used to define it.
+    This is not the depth of the screen or window in which the image will
+    be displayed, it is the actual number of bitplanes that are defined
+<a name="line47">    in the ImageData.</a>
+
+ImageData
+    This is a pointer to the bits that define the image and determine the
+    colors of each pixel.  Image data must be placed in Chip memory.  The
+    data is organized as an array of 16 bit words whose size can be
+    computed as follows:
+
+        WordWidth = ((Width + 16) / 16);
+        NumImageWords = WordWidth * Height * Depth;
+
+    The width of the image is rounded up to the nearest word (16 bits)
+    and extra trailing bits are ignored.  Each line of each bitplane must
+    have enough words to contain the image width, with extra bits at the
+    end of each line set to zero.  For example, an image 7 bits wide
+    requires one word for each line in the bitplane, whereas an image 17
+<a name="line63">    bits wide requires two words for each line in the bitplane.</a>
+
+PlanePick
+    PlanePick tells which planes of the target <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> are to receive
+    planes of image data.  This field is a bit-wise representation of
+    bitplane numbers.  For each bit set in PlanePick, there should be a
+<a name="line69">    corresponding bitplane in the image data.</a>
+
+PlaneOnOff
+    PlaneOnOff tells whether to set or clear bits in the planes in the
+    target <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> that receive no image data.  This field is a bit-wise
+<a name="line74">    representation of bitplane numbers.</a>
+
+NextImage
+    This field is a pointer to another instance of an Image structure.
+    Set this field to NULL if this is the last Image structure in the
+    linked list.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

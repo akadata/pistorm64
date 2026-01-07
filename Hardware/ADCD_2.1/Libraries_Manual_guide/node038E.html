@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-3-12-2" TITLE="28 / / Displaying the VSprites / Merging VSprite Instructions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Displaying the VSprites / Merging VSprite Instructions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node038D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node038F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a name="line2">Once <a href="../Libraries_Manual_guide/node038C.html">DrawGList()</a> has prepared the necessary instructions and memory areas</a>
+to display the data, the VSprites are installed into the display with
+<a href="../Includes_and_Autodocs_2._guide/node045F.html">MrgCop()</a>.  (DrawGList() does not actually draw the VSprites, it only
+prepares the Copper instructions.)
+
+    struct View *view;
+
+    MrgCop(view);
+
+The view is a pointer to the <a href="../Libraries_Manual_guide/node00F1.html#line4">View</a> structure whose Copper instructions are
+to be merged.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="printer" NODE="PRD_EDITPREFS" TITLE="printer.device/PRD_EDITPREFS" -->
+<head>
+<title>printer.device/PRD_EDITPREFS</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node050D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node050F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	PRD_EDITPREFS - open the driver preferences window (V44)
+
+<b>   FUNCTION</b>
+	New drivers can have own preferences. This commands ask the driver
+	to open a window to allow the user to change the prefs. Typically
+	this is done with an <a href="../Includes_and_Autodocs_3._guide/node0204.html">DoIO()</a> call.
+
+	Every application should have a button &#034;Driver Options...&#034; (that
+	calls PRD_EDITPREFS) in its printer dialog.
+
+<b>   IO REQUEST</b>
+	io_Message	mn_ReplyPort set if quick I/O is not possible.
+	io_Command	PRD_EDITPREFS
+	io_Flags	IOB_QUICK set if quick I/O is possible.
+	io_TagList	a list of tags to specify more parameters
+
+	The following tags are currently defined:
+
+	PPRA_Window (struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *)	a pointer to a window. This prefs
+		window will open on the same screen and lock the window from
+		user input.
+	PPRA_Screen (struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *)	a pointer to a screen. That can be
+		used if no window is open.
+	PPRA_PubScreen (STRPTR)	a name of a public screen that will be used
+		to open the window. This can be NULL to use the default
+		public screen.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

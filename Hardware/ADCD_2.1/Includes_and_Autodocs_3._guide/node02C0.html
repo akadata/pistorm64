@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="ClearRectRegion()" TITLE="graphics.library/ClearRectRegion" -->
+<head>
+<title>graphics.library/ClearRectRegion</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02BF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02C1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ClearRectRegion -- Perform 2d CLEAR operation of rectangle
+			with region, leaving result in region.
+
+<b>   SYNOPSIS</b>
+	status = ClearRectRegion(region,rectangle)
+	 d0	 	 	  a0 	  a1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> ClearRectRegion(struct <a href="../Includes_and_Autodocs_3._guide/node0642.html#line26">Region</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line26">Rectangle</a> * );
+
+<b>   FUNCTION</b>
+	Clip away any portion of the region that exists inside
+	of the rectangle. Leave the result in region.
+
+<b>   INPUTS</b>
+	region - pointer to <a href="../Includes_and_Autodocs_3._guide/node0642.html#line26">Region</a> structure
+	rectangle - pointer to <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line26">Rectangle</a> structure
+
+<b>   RESULTS</b>
+	status - return TRUE if successful operation
+		 return FALSE if ran out of memory
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02A4.html">AndRectRegion()</a> <a href="../Includes_and_Autodocs_3._guide/node0642.html">graphics/regions.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

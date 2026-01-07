@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_7" NODE="7-2-8" TITLE="7 / True Requesters / Double Menu Requesters" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>7 / True Requesters / Double Menu Requesters</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01A8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01AA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A double menu requester is exactly like other requesters with one
+exception: it is displayed only when the user double clicks the mouse menu
+button.  Double menu requesters block input in exactly the same manner as
+other <a href="../Libraries_Manual_guide/node01A1.html">true</a> requesters.  A double menu requester is attached to a window by
+calling <a href="../Includes_and_Autodocs_2._guide/node0250.html">SetDMRequest()</a>.
+
+    BOOL SetDMRequest( struct Window *window,
+                       struct Requester *requester );
+
+This call does not display the requester, it simply prepares it for
+display.  The requester will be brought up when the user double clicks the
+mouse menu button.  The parent window will receive <a href="../Libraries_Manual_guide/node01AA.html#line5">IDCMP_REQSET</a> and
+<a name="line14"><a href="../Libraries_Manual_guide/node01AA.html#line10">IDCMP_REQCLEAR</a> messages when the requester is added and removed.</a>
+
+To prevent the user from bringing up a double menu requester, unlink it
+from the window by calling <a href="../Includes_and_Autodocs_2._guide/node0204.html">ClearDMRequest()</a>.  If a double menu request is
+set for a window, ClearDMRequest() should be called to remove the
+requester before that window is closed.
+
+    BOOL ClearDMRequest( struct Window *window );
+
+This function unlinks the requester from the window and disables the
+ability of the user to bring it up.  <a href="../Includes_and_Autodocs_2._guide/node0204.html">ClearDMRequest()</a> will fail if the
+<a name="line25">double menu request is currently being displayed.</a>
+
+Double menu requesters can be positioned relative to the current mouse
+pointer position.  For a mouse relative requester, specify <a href="../Libraries_Manual_guide/node01AB.html#line113">POINTREL</a> in the
+<a href="../Libraries_Manual_guide/node01AB.html#line110">Flags</a> field and initialize the <a href="../Libraries_Manual_guide/node01AB.html#line48">RelLeft</a> and <a href="../Libraries_Manual_guide/node01AB.html#line48">RelTop</a> variables.  RelLeft and
+RelTop describe the offset of the upper, left corner of the requester from
+the pointer position at the time the requester is displayed.  These values
+can be either negative or positive.
+
+The values of <a href="../Libraries_Manual_guide/node01AB.html#line48">RelLeft</a> and <a href="../Libraries_Manual_guide/node01AB.html#line48">RelTop</a> are only advisory; the actual position
+will be restricted such that the requester is entirely contained within
+the borders of its parent window, if possible.  The actual top and left
+positions are stored in the <a href="../Libraries_Manual_guide/node01AB.html#line39">TopEdge</a> and <a href="../Libraries_Manual_guide/node01AB.html#line39">LeftEdge</a> variables.
+
+Positioning relative to the mouse pointer is possible only with double
+menu requesters.  Setting <a href="../Libraries_Manual_guide/node01AB.html#line113">POINTREL</a> in a requester which is not a double
+menu requester will position the requester relative to the center of the
+window.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

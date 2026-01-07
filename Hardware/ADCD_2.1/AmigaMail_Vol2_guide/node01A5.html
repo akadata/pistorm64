@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-23/ClassDoc.txt" NODE="IV-23-6" TITLE="itexticlass" -->
+<head>
+<title>itexticlass</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01A4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01A6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Class:                  itexticlass
+Superclass:             imageclass
+Description:            IntuiText equivalent with attribute override.
+Include File:           &#060;intuition/imageclass.h&#062;
+
+
+New Methods:
+------------
+
+None.
+
+
+Changed Methods:
+----------------
+
+IM_DRAW - Draws IntuiText specified as IA_Data overriding the attributes
+specified in the IntuiText structure.  The Mode used is JAM1, the color
+as specified as IA_FGPen.  The position of the itexticlass object is
+added to the position of the IntuiText.
+
+This class was defined to make new-looking AutoRequesters without
+changing the IntuiText structures passed to it.
+
+
+Attributes:
+-----------
+
+IA_Data                         (ISG)
+
+Processed blindly by superclass, must be a pointer to a normal IntuiText
+structure.
+
+
+IA_FGPen                        (ISG)
+
+Processed by superclass, used as APen when drawing text.
+
+
+IA_Left, IA_Top                 (ISG)
+
+Added to IntuiText offsets.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

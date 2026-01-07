@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/a2d.c" NODE="MAIN" TITLE="Lib_examples/a2d.c" -->
+<head>
+<title>Lib_examples/a2d.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0587.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0589.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* a2d.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfis -j73 a2d.c
+Blink FROM LIB:c.o,a2d.o TO a2d LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+*/
+    #include &#060;exec/types.h&#062;
+    #include &#060;exec/memory.h&#062;
+    #include &#060;dos/datetime.h&#062;
+    #include &#060;devices/timer.h&#062;
+
+    #include &#060;clib/exec_protos.h&#062;
+    #include &#060;clib/timer_protos.h&#062;
+    #include &#060;clib/utility_protos.h&#062;
+
+    #include &#060;stdio.h&#062;
+
+    LONG main(void);
+
+    struct Library *TimerBase;
+    struct Library *UtilityBase;
+
+    LONG main(void)
+    {
+      struct ClockData *clockdata;
+      struct timerequest *tr;
+      struct timeval *tv;
+      LONG seconds;
+
+      if (UtilityBase = OpenLibrary(&#034;utility.library&#034;, 37))
+      {
+        if (tr = AllocMem(sizeof(struct timerequest), MEMF_CLEAR))
+        {
+          if (tv = AllocMem(sizeof(struct timeval), MEMF_CLEAR))
+          {
+            if (clockdata = AllocMem(sizeof(struct ClockData), MEMF_CLEAR))
+            {
+              if (!(OpenDevice(&#034;timer.device&#034;, UNIT_VBLANK, (struct IORequest *)tr, 0) ))
+              {
+                TimerBase = tr-&#062;tr_node.io_Device;
+
+                GetSysTime(tv);
+
+                printf(&#034;GetSysTime():\t%d %d\n&#034;, tv-&#062;tv_secs, tv-&#062;tv_micro);
+
+                Amiga2Date(tv-&#062;tv_secs, clockdata);
+
+                printf(&#034;Amiga2Date():  sec %d min %d hour %d\n&#034;, clockdata-&#062;sec,
+                        clockdata-&#062;min, clockdata-&#062;hour);
+
+                printf(&#034;               mday %d month %d year %d wday %d\n&#034;, clockdata-&#062;mday,
+                       clockdata-&#062;month, clockdata-&#062;year, clockdata-&#062;wday);
+
+                seconds = CheckDate(clockdata);
+
+                printf(&#034;CheckDate():\t%ld\n&#034;, seconds);
+
+                seconds = Date2Amiga(clockdata);
+
+                printf(&#034;Date2Amiga():\t%ld\n&#034;, seconds);
+
+                CloseDevice((struct IORequest *)tr);
+              }
+              FreeMem(clockdata, sizeof(struct ClockData));
+            }
+            FreeMem(tv, sizeof(struct timeval));
+          }
+          FreeMem(tr, sizeof(struct timerequest));
+        }
+        CloseLibrary(UtilityBase);
+      }
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

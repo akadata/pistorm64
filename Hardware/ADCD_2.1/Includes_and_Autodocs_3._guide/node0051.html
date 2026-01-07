@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="animation_dtc" NODE="animation.datatype()" TITLE="animation.datatype/animation.datatype" -->
+<head>
+<title>animation.datatype/animation.datatype</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0050.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0052.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        animation.datatype -- root data type for animations.
+
+<b>    FUNCTION</b>
+        The animation.datatype is the super-class for any animation related
+        classes.
+
+        This class is responsible for creating the controls, scaling,
+        remapping and synchronization.
+
+<b>    METHODS</b>
+        OM_NEW -- Create a new animation object.
+
+        OM_GET -- Obtain the value of an attribute.
+
+        OM_SET -- Set the values of multiple attributes.
+
+        OM_UPDATE -- Update the values of multiple attributes.
+
+        OM_DISPOSE -- Dispose of a animation object.
+
+        GM_LAYOUT -- Layout the object and notify the application of the
+            title and size.
+
+        GM_HITTEST -- Determine if the object has been hit with the
+            mouse.
+
+        GM_GOACTIVE -- Tell the object to go active.  On SELECTDOWN, the
+            animation will start playing.
+
+        GM_HANDLEINPUT -- Handle input.  Currently input (other than
+            SELECTDOWN) doesn't affect the animation.
+
+        GM_RENDER -- <a href="../Includes_and_Autodocs_3._guide/node01F4.html">Cause</a> the current frame to render.
+
+        DTM_FRAMEBOX -- Obtain the display environment that the animation
+            requires.
+
+        DTM_TRIGGER -- <a href="../Includes_and_Autodocs_3._guide/node01F4.html">Cause</a> an event to occur.  Currently the only
+            trigger event is STM_PLAY, which will cause the animation to
+            start playing.
+
+        DTM_COPY -- Copy the current frame to the clipboard as an IFF ILBM.
+
+        DTM_WRITE -- <a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a> the current frame to a file as an IFF ILBM.
+
+        DTM_PRINT -- Print the current frame.
+
+        ADTM_LOADFRAME -- Load a frame of the animation.
+
+        ADTM_UNLOADFRAME -- <a href="../Includes_and_Autodocs_3._guide/node01FE.html">Deallocate</a> any memory allocated by
+            ADTM_LOADFRAME.
+
+        ADTM_START -- Start the animation.  This MUST be passed to the
+            super-class AFTER the sub-class has started.
+
+        ADTM_PAUSE -- Pause the animation.  This MUST be passed to the
+            super-class BEFORE the sub-class pauses.
+
+        ADTM_STOP -- Stop the animation.  This MUST be passed to the
+            super-class BEFORE the sub-class stops.
+
+        ADTM_LOCATE -- Used to locate a frame of the animation.
+
+        ADTM_LOADNEWFORMATFRAME -- Load a new format frame of the animation,
+            for more information, see <a href="../Includes_and_Autodocs_3._guide/node05D1.html">&#060;datatypes/animationclass.h&#062;</a>. (V44)
+
+        ADTM_UNLOADNEWFORMATFRAME -- <a href="../Includes_and_Autodocs_3._guide/node01FE.html">Deallocate</a> any memory allocated by
+            ADTM_LOADNEWFORMATFRAME. (V44)
+
+<b>    TAGS</b>
+        DTA_ControlPanel (BOOL) -- Determine whether the control
+            panel is shown.  Defaults to TRUE.
+
+            Applicability is (I).
+
+        DTA_Immediate (BOOL) -- Indicate whether the animation
+            should immediately begin playing.  Defaults to
+            FALSE.
+
+            Applicability is (I).
+
+        DTA_Repeat (BOOL) -- Indicate whether the animation
+            should loop. (V44)
+
+            Default for this tag is FALSE. Applicability is (IS).
+
+        ADTA_Remap (BOOL) -- Indicate whether the animation should be
+            remapped or not.
+
+            Applicability is (I).
+
+        ADTA_ModeID (ULONG) -- Set and get the graphic mode id of the
+            picture.
+
+            Applicability is (ISG).
+
+        ADTA_Width (ULONG) -- Width of a frame in pixels.
+
+            Applicability is (IG).
+
+        ADTA_Height (ULONG) -- Height of a frame in pixels.
+
+            Applicability is (IG).
+
+        ADTA_Depth (ULONG) -- Depth of the frame.
+
+            Applicability is (IG).
+
+        ADTA_Frames (ULONG) -- Number of frames in animation.
+
+            Applicability is (ISG).
+
+        ADTA_KeyFrame (struct <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> *) -- Pointer to the key
+            frame.
+
+            Applicability is (ISG).
+
+        ADTA_FramesPerSecond (ULONG) -- Number of frames per
+            second to play.
+
+        ADTA_NumColors (WORD) -- Number of colors used by the frame.
+
+            Applicability is (ISG).
+
+        ADTA_ColorRegisters (struct <a href="../Includes_and_Autodocs_3._guide/node05DD.html#line223">ColorRegister</a> *) -- Color table; its
+            contents should match the colours in the ADTA_CRegs table.
+
+            Applicability is (G).
+
+        ADTA_CRegs (ULONG *) -- Color table to use with <a href="../Includes_and_Autodocs_3._guide/node0329.html">SetRGB32CM()</a>.
+
+            Applicability is (G).
+
+        ADTA_GRegs (ULONG *) -- Color table; this table is initialized
+            during the layout process and will contain the colours the
+            picture will use after remapping. If no remapping takes
+            place, these colours will match those in the ADTA_CRegs table.
+
+        ADTA_ColorTable (UBYTE *) -- Shared pen table; this table is
+            initialized during the layout process while the frames
+            are being remapped.
+
+            Applicability is (G).
+
+        ADTA_ColorTable2 (UBYTE *) -- Shared pen table; in most places
+            this table will be identical to the ADTA_ColorTable table.
+            Some of the colours in this table might match the original
+            colour palette a little better than the colours picked for
+            the other table. The animation.datatype uses the two tables
+            during remapping, alternating for each pixel.
+
+            Applicability is (G).
+
+        ADTA_Allocated (ULONG) --  OBSOLETE; DO NOT USE.
+
+            Applicability is (G).
+
+        ADTA_NumAlloc (UWORD) -- Number of colors allocated by the frame.
+            In this context `allocated' refers to colours allocated via
+            <a href="../Includes_and_Autodocs_3._guide/node0306.html">graphics.library/ObtainBestPenA</a>.
+
+            Applicability is (G).
+
+        ADTA_BitMapHeader (struct <a href="../Includes_and_Autodocs_3._guide/node05DD.html#line203">BitMapHeader</a> *) -- Set and get the
+            base information for the animation.  <a href="../Includes_and_Autodocs_3._guide/node05DD.html#line203">BitMapHeader</a> is defined in
+            <a href="../Includes_and_Autodocs_3._guide/node05DD.html">&#060;datatypes/pictureclass.h&#062;</a>
+
+            Applicability is (G).
+
+        ADTA_Sample (BYTE *) -- Pointer to sample data.
+
+            NOTE: this tag was only (IS) in V40; this has been fixed
+                  in V44.
+
+            Applicability is (ISG).
+
+        ADTA_SampleLength (ULONG) -- Length of sample data.
+
+            Applicability is (ISG).
+
+        ADTA_Period (ULONG) -- Period to play back sample at.
+
+            Applicability is (ISG).
+
+        ADTA_Volume (ULONG) -- Volume to play back sample at (0..64).
+
+            Applicability is (ISG).
+
+        OBP_Precision (ULONG) -- Precision to use when obtaining colors.
+            See the PRECISION_[..] defines in <a href="../Includes_and_Autodocs_3._guide/node05ED.html">&#060;graphics/view.h&#062;</a>.
+
+            Applicability is (I). Defaults to PRECISION_IMAGE. (V44)
+
+        ADTA_LeftSample (BYTE *) -- Pointer to left channel sample
+            data. (V44)
+
+            Applicability is (ISG).
+
+        ADTA_RightSample (BYTE *) -- Pointer to right channel sample
+            data. (V44)
+
+            Applicability is (ISG).
+
+        ADTA_SamplesPerSec (ULONG) -- Number of samples per second to play;
+            if this is &#062; 0, it takes precendence over ADTA_Period.
+
+            Applicability is (ISG).
+
+        ADTA_PreloadFrameCount (ULONG) -- Number of frames to preload. (V44)
+            Frames are preloaded when starting animation playback. The
+            loader will attempt to keep at least this number of frames
+            available for the display process. Note that when changing this
+            attribute the change does not take effect immediately.
+
+            Default for this tag is 10. Applicability is (ISG).
+
+<b>    NOTES</b>
+        The ADTM_LOADNEWFORMATFRAME and ADTM_UNLOADNEWFORMATFRAME methods
+        operate on struct <a href="../Includes_and_Autodocs_3._guide/node05D1.html#line228">adtNewFormatFrame</a> format messages. The
+        <a href="../Includes_and_Autodocs_3._guide/node05D1.html#line228">adtNewFormatFrame</a> message is an extension of the <a href="../Includes_and_Autodocs_3._guide/node05D1.html#line206">adtFrame</a> message
+        with additional fields, such as required for stereo sound playback.
+        By default, animation.datatype will load and unload frames allocated
+        by its subclasses using the compatible ADTM_LOADFRAME and
+        ADTM_UNLOADFRAME methods. If your subclass needs to use the extended
+        <a href="../Includes_and_Autodocs_3._guide/node05D1.html#line228">adtNewFormatFrame</a> format messages, it must say so by providing a
+        list of supported methods for animation.datatype to query through
+        the OM_GET/DTA_Methods tag. If both ADTM_LOADNEWFORMATFRAME and
+        ADTM_UNLOADNEWFORMATFRAME are among the methods supported by your
+        subclass, you will receive <a href="../Includes_and_Autodocs_3._guide/node05D1.html#line228">adtNewFormatFrame</a> format messages instead
+        of the compatible <a href="../Includes_and_Autodocs_3._guide/node05D1.html#line206">adtFrame</a> messages.
+
+        Please note that applications such as MultiView will query the
+        methods supported by your class. Make sure that if you choose to
+        implement support for the OM_GET/DTA_Methods tag the methods you
+        return should also include the methods supported by your superclass.
+        Otherwise, the user will be unable to use functions such as &#034;Copy&#034;
+        or &#034;Print&#034;.
+
+        Since the <a href="../Includes_and_Autodocs_3._guide/node05D1.html#line228">adtNewFormatFrame</a> message format may be enhanced in future
+        releases of animation.datatype, your subclass may access only
+        structure members that are known to exist in the message. To find
+        out which members are available, check the
+        adtNewFormatFrame-&#062;alf_Size member; it contains the total length of
+        the data structure (in bytes). <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1429">Remember</a> which message length you
+        require, then act accordingly. Please keep in mind that the
+        structure member adtNewFormatFrame-&#062;alf_Size does not exist in the
+        compatible <a href="../Includes_and_Autodocs_3._guide/node05D1.html#line206">adtFrame</a> message data structure.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

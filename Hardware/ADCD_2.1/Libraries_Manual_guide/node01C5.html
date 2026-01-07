@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-3-6" TITLE="8 / Creating Borders / Linking Borders" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Borders / Linking Borders</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01C4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01C6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node01C1.html#line41">NextBorder</a> field can point to another instance of a <a href="../Libraries_Manual_guide/node01C1.html">Border</a> structure.
+This allows complex graphic objects to be created by linking together
+Border structures, each with its own data points, color and draw mode.
+This might be used, for instance, to draw a double border around a
+requester or gadget where the outer border is a second Border structure,
+<a name="line7">linked to the first inner border.</a>
+
+Note that the borders can share data.  For instance, to create a border
+with a shadow, link two borders together each of which points to the same
+<a href="../Libraries_Manual_guide/node01C1.html#line38">XY</a> data.  Set the first border to draw in a dark pen (such as the
+<a href="../Libraries_Manual_guide/node00EC.html#line79">SHADOWPEN</a> from the screen's <a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> structure) and position the border
+down and to the right a few pixels by changing <a href="../Libraries_Manual_guide/node01C1.html#line15">LeftEdge</a> and <a href="../Libraries_Manual_guide/node01C1.html#line15">TopEdge</a> in the
+<a href="../Libraries_Manual_guide/node01C1.html">Border</a> structure.
+
+The second border should be set to a bright pen (such as the <a href="../Libraries_Manual_guide/node00EC.html#line76">SHINEPEN</a> in
+the screen's <a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> structure).  When the border is drawn, the first
+border will draw in a dark color and then the second border will be drawn
+over it in a light color.  Since they use the same data set, and the dark
+border is shifted down and to the right, the border will have a three
+dimensional appearance.  This technique is demonstrated in the <a href="../Libraries_Manual_guide/node05AB.html">example</a>
+listed earlier in this section.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

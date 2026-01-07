@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-23/ClassDoc.txt" NODE="IV-23-13" TITLE="buttongclass" -->
+<head>
+<title>buttongclass</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01AB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01AD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Class:                  buttongclass
+Superclass:             gadgetclass
+Description:            A (repeatable) command button gadget.
+Include File:           &#060;intuition/gadgetclass.h&#062;
+
+
+New Methods:
+------------
+
+None.
+
+
+Changed Methods:
+----------------
+
+GM_HITTEST - Delegates this question to its GA_Image attribute.
+
+
+GM_HANDLEINPUT - Will behave like a button, but continuously issues
+OM_NOTIFY messages for each IECLASS_TIMER event.
+
+Flag OPUF_INTERIM will be set for all but the last notification.
+
+The notified attribute is GA_ID, with a twist: the value sent will be
+the negative of GadgetID if the pointer is not currently over the gadget
+image.
+
+
+GM_RENDER - All rendering is passed along to the GadgetRender Image.
+The state provided is  IDS_INACTIVESELECTED, IDS_INACTIVENORMAL,
+IDS_SELECTED, or IDS_NORMAL.
+
+
+Attributes:
+-----------
+
+GA_Image                        (IS)
+
+Changing the image will cause the gadget to refresh itself.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

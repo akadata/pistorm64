@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/displayinfo.h" NODE="MAIN" TITLE="Includes/graphics/displayinfo.h" -->
+<head>
+<title>Includes/graphics/displayinfo.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00BC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00BE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_DISPLAYINFO_H
+#define	GRAPHICS_DISPLAYINFO_H
+/*
+**	$Filename: graphics/displayinfo.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.6 $
+**	$Date: 91/11/08 $
+**
+**	include define file for displayinfo database
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif /* EXEC_TYPES_H */
+<a name="line18"></a>
+#ifndef GRAPHICS_GFX_H
+#include &#060;graphics/gfx.h&#062;
+#endif /* GRAPHICS_GFX_H */
+<a name="line22"></a>
+#ifndef GRAPHICS_MONITOR_H
+#include &#060;graphics/monitor.h&#062;
+#endif /* GRAPHICS_MONITOR_H */
+<a name="line26"></a>
+#ifndef UTILITY_TAGITEM_H
+#include &#060;utility/tagitem.h&#062;
+#endif /* UTILITY_TAGITEM_H */
+<a name="line30"></a>
+/* the &#034;public&#034; handle to a DisplayInfoRecord */
+<a name="line32"></a>
+typedef APTR DisplayInfoHandle;
+
+/* datachunk type identifiers */
+<a name="line36"></a>
+<a name="line37">#define DTAG_DISP		0x80000000</a>
+<a name="line38">#define DTAG_DIMS		0x80001000</a>
+<a name="line39">#define DTAG_MNTR		0x80002000</a>
+#define DTAG_NAME		0x80003000
+<a name="line41"></a>
+struct QueryHeader
+<a name="line43">{</a>
+<a name="line44">	ULONG	StructID;	/* datachunk type identifier */</a>
+<a name="line45">	ULONG	DisplayID;	/* copy of display record key	*/</a>
+<a name="line46">	ULONG	SkipID;		/* TAG_SKIP -- see tagitems.h */</a>
+	ULONG	Length;		/* length of local data in double-longwords */
+};
+<a name="line49"></a>
+<a name="line50">struct DisplayInfo</a>
+<a name="line51">{</a>
+<a name="line52">	struct	QueryHeader Header;</a>
+<a name="line53">	UWORD	NotAvailable;	/* if NULL available, else see defines */</a>
+<a name="line54">	ULONG	PropertyFlags;	/* Properties of this mode see defines */</a>
+<a name="line55">	Point	Resolution;	/* ticks-per-pixel X/Y		       */</a>
+<a name="line56">	UWORD	PixelSpeed;	/* aproximation in nanoseconds	       */</a>
+<a name="line57">	UWORD	NumStdSprites;	/* number of standard amiga sprites    */</a>
+<a name="line58">	UWORD	PaletteRange;	/* distinguishable shades available    */</a>
+<a name="line59">	Point	SpriteResolution; /* std sprite ticks-per-pixel X/Y    */</a>
+<a name="line60">	UBYTE	pad[4];</a>
+	ULONG	reserved[2];	/* terminator */
+};
+<a name="line63"></a>
+/* availability */
+<a name="line65"></a>
+<a name="line66">#define DI_AVAIL_NOCHIPS	0x0001</a>
+<a name="line67">#define DI_AVAIL_NOMONITOR	0x0002</a>
+#define DI_AVAIL_NOTWITHGENLOCK 0x0004
+
+/* mode properties */
+<a name="line71"></a>
+<a name="line72">#define DIPF_IS_LACE		0x00000001</a>
+<a name="line73">#define DIPF_IS_DUALPF		0x00000002</a>
+<a name="line74">#define DIPF_IS_PF2PRI		0x00000004</a>
+#define DIPF_IS_HAM		0x00000008
+
+#define DIPF_IS_ECS		0x00000010	/*	note: ECS modes (SHIRES, VGA, and **
+											**	PRODUCTIVITY) do not support	  **
+<a name="line79">											**	attached sprites.		  **</a>
+<a name="line80">											*/</a>
+<a name="line81">#define DIPF_IS_PAL		0x00000020</a>
+<a name="line82">#define DIPF_IS_SPRITES	0x00000040</a>
+#define DIPF_IS_GENLOCK	0x00000080
+<a name="line84"></a>
+<a name="line85">#define DIPF_IS_WB		0x00000100</a>
+<a name="line86">#define DIPF_IS_DRAGGABLE	0x00000200</a>
+<a name="line87">#define DIPF_IS_PANELLED	0x00000400</a>
+#define DIPF_IS_BEAMSYNC	0x00000800
+<a name="line89"></a>
+#define DIPF_IS_EXTRAHALFBRITE	0x00001000
+<a name="line91"></a>
+struct DimensionInfo
+<a name="line93">{</a>
+<a name="line94">	struct	QueryHeader Header;</a>
+<a name="line95">	UWORD	MaxDepth;	      /* log2( max number of colors ) */</a>
+<a name="line96">	UWORD	MinRasterWidth;       /* minimum width in pixels      */</a>
+<a name="line97">	UWORD	MinRasterHeight;      /* minimum height in pixels     */</a>
+<a name="line98">	UWORD	MaxRasterWidth;       /* maximum width in pixels      */</a>
+<a name="line99">	UWORD	MaxRasterHeight;      /* maximum height in pixels     */</a>
+<a name="line100">	struct	Rectangle   Nominal;  /* &#034;standard&#034; dimensions	      */</a>
+<a name="line101">	struct	Rectangle   MaxOScan; /* fixed, hardware dependant    */</a>
+<a name="line102">	struct	Rectangle VideoOScan; /* fixed, hardware dependant    */</a>
+<a name="line103">	struct	Rectangle   TxtOScan; /* editable via preferences     */</a>
+<a name="line104">	struct	Rectangle   StdOScan; /* editable via preferences     */</a>
+<a name="line105">	UBYTE	pad[14];</a>
+	ULONG	reserved[2];	      /* terminator */
+};
+<a name="line108"></a>
+struct MonitorInfo
+<a name="line110">{</a>
+<a name="line111">	struct	QueryHeader Header;</a>
+<a name="line112">	struct	MonitorSpec  *Mspc;   /* pointer to monitor specification  */</a>
+<a name="line113">	Point	ViewPosition;	      /* editable via preferences	   */</a>
+<a name="line114">	Point	ViewResolution;       /* standard monitor ticks-per-pixel  */</a>
+<a name="line115">	struct	Rectangle ViewPositionRange;  /* fixed, hardware dependant */</a>
+<a name="line116">	UWORD	TotalRows;	      /* display height in scanlines	   */</a>
+<a name="line117">	UWORD	TotalColorClocks;     /* scanline width in 280 ns units    */</a>
+<a name="line118">	UWORD	MinRow;	      /* absolute minimum active scanline  */</a>
+<a name="line119">	WORD	Compatibility;	      /* how this coexists with others	   */</a>
+<a name="line120">	UBYTE	pad[36];</a>
+		Point	DefaultViewPosition;  /* original, never changes */
+		ULONG	PreferredModeID;      /* for Preferences */
+	ULONG	reserved[2];	      /* terminator */
+};
+<a name="line125"></a>
+<a name="line126">/* monitor compatibility */</a>
+<a name="line127"></a>
+#define MCOMPAT_MIXED	0	/* can share display with other MCOMPAT_MIXED */
+<a name="line129">#define MCOMPAT_SELF	1	/* can share only within same monitor */</a>
+#define MCOMPAT_NOBODY -1	/* only one viewport at a time */
+<a name="line131"></a>
+#define DISPLAYNAMELEN 32
+<a name="line133"></a>
+<a name="line134">struct NameInfo</a>
+<a name="line135">{</a>
+	struct	QueryHeader Header;
+	UBYTE	Name[DISPLAYNAMELEN];
+	ULONG	reserved[2];	      /* terminator */
+};
+<a name="line140"></a>
+/* DisplayInfoRecord identifiers */
+
+#define INVALID_ID		~0
+<a name="line144"></a>
+/* normal identifiers */
+<a name="line146"></a>
+<a name="line147">#define MONITOR_ID_MASK		0xFFFF1000</a>
+<a name="line148"></a>
+#define DEFAULT_MONITOR_ID		0x00000000
+#define NTSC_MONITOR_ID		0x00011000
+#define PAL_MONITOR_ID			0x00021000
+<a name="line152"></a>
+/* the following 20 composite keys are for Modes on the default Monitor */
+<a name="line154">/* ntsc &#038; pal &#034;flavors&#034; of these particular keys may be made by or'ing	*/</a>
+<a name="line155">/* the ntsc or pal MONITOR_ID with the desired MODE_KEY... */</a>
+<a name="line156"></a>
+<a name="line157">#define LORES_KEY			0x00000000</a>
+<a name="line158">#define HIRES_KEY			0x00008000</a>
+<a name="line159">#define SUPER_KEY			0x00008020</a>
+<a name="line160">#define HAM_KEY			0x00000800</a>
+<a name="line161">#define LORESLACE_KEY			0x00000004</a>
+<a name="line162">#define HIRESLACE_KEY			0x00008004</a>
+<a name="line163">#define SUPERLACE_KEY			0x00008024</a>
+<a name="line164">#define HAMLACE_KEY			0x00000804</a>
+<a name="line165">#define LORESDPF_KEY			0x00000400</a>
+<a name="line166">#define HIRESDPF_KEY			0x00008400</a>
+<a name="line167">#define SUPERDPF_KEY			0x00008420</a>
+<a name="line168">#define LORESLACEDPF_KEY		0x00000404</a>
+<a name="line169">#define HIRESLACEDPF_KEY		0x00008404</a>
+<a name="line170">#define SUPERLACEDPF_KEY		0x00008424</a>
+<a name="line171">#define LORESDPF2_KEY			0x00000440</a>
+<a name="line172">#define HIRESDPF2_KEY			0x00008440</a>
+<a name="line173">#define SUPERDPF2_KEY			0x00008460</a>
+<a name="line174">#define LORESLACEDPF2_KEY		0x00000444</a>
+<a name="line175">#define HIRESLACEDPF2_KEY		0x00008444</a>
+#define SUPERLACEDPF2_KEY		0x00008464
+#define EXTRAHALFBRITE_KEY		0x00000080
+#define EXTRAHALFBRITELACE_KEY		0x00000084
+<a name="line179"></a>
+/* vga identifiers */
+<a name="line181"></a>
+<a name="line182">#define VGA_MONITOR_ID			0x00031000</a>
+<a name="line183"></a>
+<a name="line184">#define VGAEXTRALORES_KEY		0x00031004</a>
+<a name="line185">#define VGALORES_KEY			0x00039004</a>
+<a name="line186">#define VGAPRODUCT_KEY			0x00039024</a>
+<a name="line187">#define VGAHAM_KEY			0x00031804</a>
+<a name="line188">#define VGAEXTRALORESLACE_KEY		0x00031005</a>
+<a name="line189">#define VGALORESLACE_KEY		0x00039005</a>
+<a name="line190">#define VGAPRODUCTLACE_KEY		0x00039025</a>
+<a name="line191">#define VGAHAMLACE_KEY			0x00031805</a>
+<a name="line192">#define VGAEXTRALORESDPF_KEY		0x00031404</a>
+<a name="line193">#define VGALORESDPF_KEY		0x00039404</a>
+<a name="line194">#define VGAPRODUCTDPF_KEY		0x00039424</a>
+<a name="line195">#define VGAEXTRALORESLACEDPF_KEY	0x00031405</a>
+<a name="line196">#define VGALORESLACEDPF_KEY		0x00039405</a>
+<a name="line197">#define VGAPRODUCTLACEDPF_KEY		0x00039425</a>
+<a name="line198">#define VGAEXTRALORESDPF2_KEY		0x00031444</a>
+<a name="line199">#define VGALORESDPF2_KEY		0x00039444</a>
+<a name="line200">#define VGAPRODUCTDPF2_KEY		0x00039464</a>
+<a name="line201">#define VGAEXTRALORESLACEDPF2_KEY	0x00031445</a>
+<a name="line202">#define VGALORESLACEDPF2_KEY		0x00039445</a>
+#define VGAPRODUCTLACEDPF2_KEY		0x00039465
+#define VGAEXTRAHALFBRITE_KEY		0x00031084
+#define VGAEXTRAHALFBRITELACE_KEY	0x00031085
+<a name="line206"></a>
+/* a2024 identifiers */
+<a name="line208"></a>
+<a name="line209">#define A2024_MONITOR_ID		0x00041000</a>
+
+#define A2024TENHERTZ_KEY		0x00041000
+#define A2024FIFTEENHERTZ_KEY		0x00049000
+<a name="line213"></a>
+/* prototype identifiers */
+
+#define PROTO_MONITOR_ID		0x00051000
+
+#endif	/* GRAPHICS_DISPLAYINFO_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

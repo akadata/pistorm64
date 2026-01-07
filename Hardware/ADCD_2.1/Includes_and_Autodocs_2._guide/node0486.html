@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="UnlockLayerRom()" TITLE="graphics.library/UnlockLayerRom" -->
+<head>
+<title>graphics.library/UnlockLayerRom</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0485.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0487.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    UnlockLayerRom -- Unlock <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line33">Layer</a> structure by rom(gfx lib) code.
+
+SYNOPSIS
+    UnlockLayerRom( layer )
+                     a5
+
+    void UnlockLayerRom( struct <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line33">Layer</a> * );
+
+FUNCTION
+    Release the lock on this layer. If the same task has called
+    <a href="../Includes_and_Autodocs_2._guide/node045A.html">LockLayerRom</a> more than once than the same number of calls to
+    UnlockLayerRom must happen before the layer is actually freed
+    so that other tasks may use it.
+    This call does destroy scratch registers.
+    This call is identical to <a href="../Includes_and_Autodocs_2._guide/node03A6.html">UnlockLayer</a> (layers.library).
+
+INPUTS
+    layer - pointer to <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line33">Layer</a> structure
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node045A.html">LockLayerRom()</a> <a href="../Includes_and_Autodocs_2._guide/node03A6.html">layers.library/UnlockLayer()</a> <a href="../Includes_and_Autodocs_2._guide/node00A1.html">graphics/clip.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

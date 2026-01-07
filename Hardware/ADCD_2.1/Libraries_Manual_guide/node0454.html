@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-8-1" TITLE="33 / Advanced Topics / Custom Stream Handlers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Advanced Topics / Custom Stream Handlers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0453.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0455.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As discussed earlier, IFFParse contains built-in stream handlers for
+AmigaDOS file handles as returned by <a href="../Libraries_Manual_guide/node042E.html#line10">Open()</a>, and for the clipboard.device.
+If you are using AmigaDOS filehandles or the clipboard.device, you need
+not supply a custom stream handler.
+
+If you wish to use your compiler's own file I/O functions (such as fread()
+) or need to read or write to an unusual handler or Exec device, you must
+provide a custom stream handler for your <a href="../Libraries_Manual_guide/node042C.html">IFFHandle</a>.  Your custom stream
+handler will be called to perform all reads, writes, and seeks on your
+custom stream.  The allows you to use compiler file I/O functions, Exec
+device commands, or any other method to perform the requested stream
+operations.
+
+If you are implementing your own custom stream handler, you will need to
+know the mechanics of hook call-backs, and how to interpret the
+parameters.  An IFFParse custom stream handler is simply a function in
+your code that follows Release 2 hook function conventions (Hook functions
+are also known as callback functions.  See the &#034;<a href="../Libraries_Manual_guide/node04A2.html">Utility Library</a>&#034; chapter
+for more details).
+
+ <a href="../Libraries_Manual_guide/node0455.html">Installing a Custom Stream Handler</a> 
+ <a href="../Libraries_Manual_guide/node0456.html">Inside a Custom Stream Handler</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

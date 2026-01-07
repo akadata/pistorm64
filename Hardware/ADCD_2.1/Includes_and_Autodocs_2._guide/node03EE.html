@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/gadtools" NODE="GetVisualInfoA()" TITLE="gadtools.library/GetVisualInfoA" -->
+<head>
+<title>gadtools.library/GetVisualInfoA</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03ED.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03EF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GetVisualInfoA -- Get information GadTools needs for visuals. (V36)
+    GetVisualInfo -- Varargs stub for GetVisualInfoA(). (V36)
+
+SYNOPSIS
+    vi = GetVisualInfoA(screen, taglist)
+    D0                  A0      A1
+
+    APTR vi = GetVisualInfoA(struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *);
+
+    vi = GetVisualInfo(screen, firsttag, ...)
+
+    APTR vi = GetVisualInfo(struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> *, Tag, ...);
+
+FUNCTION
+    Get a pointer to a (private) block of data containing various bits
+    of information that GadTools needs to ensure the best quality
+    visuals.  Use the result in the <a href="../Includes_and_Autodocs_2._guide/node0106.html#line93">NewGadget</a> structure of any gadget
+    you create, or as a parameter to the various menu calls.  Once the
+    gadgets/menus are no longer needed (after the last CloseWindow),
+    call <a href="../Includes_and_Autodocs_2._guide/node03ED.html">FreeVisualInfo()</a>.
+
+INPUTS
+    screen - Pointer to the screen you will be opening on.
+    taglist - Pointer to list of TagItems.
+
+RESULT
+    vi - Pointer to private data.
+
+EXAMPLE
+
+NOTES
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node03ED.html">FreeVisualInfo()</a>, <a href="../Includes_and_Autodocs_2._guide/node0225.html">intuition/LockPubScreen()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node025D.html">intuition/UnlockPubScreen()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

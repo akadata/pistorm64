@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-2" TITLE="33 IFFParse Library / Parsing an IFF File" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 IFFParse Library / Parsing an IFF File</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node042A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node042C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Chunk reading requires a parser to scan each chunk and dispatch the proper
+access/conversion procedure.  For a simple <a href="../Libraries_Manual_guide/node0428.html">IFF</a> file, such parsing may be
+relatively easy, consisting mainly reading in the data of desired chunks,
+and seeking over unwanted chunks (and the pad byte after odd-length
+chunks). Interpreting nested chunks is more complex, and requires a method
+for keeping track of the current context, i.e., the data which is still
+relevant at any particular depth into the nest.  The original IFF
+specifications compare an IFF file to a C program.  Such a metaphor can be
+useful in understanding the scope of of the chunks in an IFF file.
+
+The IFFParse library addresses general <a href="../Libraries_Manual_guide/node0428.html">IFF</a> parsing requirements by
+providing a run-time library which can extract the chunks you want from an
+IFF file, with the ability to pass control to you when it reaches a chunk
+that requires special processing such as decompression.  IFFParse also
+understands complex nested IFF formats and will keep track of the context
+for you.
+
+ <a href="../Libraries_Manual_guide/node042C.html">Basic Functions and Structures of IFFParse Library</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

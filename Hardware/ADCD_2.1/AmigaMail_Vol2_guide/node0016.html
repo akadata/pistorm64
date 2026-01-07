@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="I-7/asl.txt" NODE="I-7-3" TITLE="The ASL_Window Tag" -->
+<head>
+<title>The ASL_Window Tag</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0015.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0017.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An application that uses a custom screen normally wants its requesters to
+open on its screen.  Using the ASL_Window tag, a program can associate a
+requester with a window so the requester appears on the window's screen.
+The ASL_Window tag is followed by a pointer to a window structure.
+ASL_Window works with both file and font requesters.
+
+Normally, a requester associated with a window (using ASL_Window) uses the
+window's IDCMP port for its communication.  An application may not want to
+share an IDCMP port with the requester.  Using the ASL_FuncFlags tag, a
+program can ask for a requester that creates its own IDCMP port.  There
+are two flags that accomplish this.  The first, FILF_NEWIDCMP, is used on
+file requesters.   The other, FONF_NEWIDCMP, is used on font requesters.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

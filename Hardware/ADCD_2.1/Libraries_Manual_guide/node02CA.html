@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-7-1" TITLE="21 / Processor and Cache Control / Supervisor Mode" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 / Processor and Cache Control / Supervisor Mode</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02C9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02CB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+While in supervisor mode, you have complete access to all data and
+registers, including those used for task scheduling and exceptions, and
+can execute privileged instructions.  In application programs, normally
+only task trap code is directly executed in supervisor mode, to be
+compatible with the MC68000.  For normal applications, it should never be
+necessary to switch to supervisor mode itself, only indirectly through
+Exec function calls.  Remember that task switching is disabled while in
+supervisor mode.  If it is absolutely needed to execute code in supervisor
+<a name="line10">mode, keep it as brief as possible.</a>
+
+Supervisor mode can only be entered when a 680x0 exception occurs (an
+interrupt or trap).  The <a href="../Includes_and_Autodocs_2._guide/node0386.html">Supervisor()</a> function allows you to trap an
+exception to a specified assembly function.  In this function your have
+full access to all registers.  No registers are saved when your function
+is invoked.  You are responsible for restoring the system to a sane state
+when you are done. You must return to user mode with an RTE instruction.
+You must not return to user mode by executing a privileged instruction
+which clears the supervisor bit in the <a href="../Libraries_Manual_guide/node02CB.html">status register</a>.  Refer to a manual
+on the M68000 family of CPUs for information about supervisor mode and
+<a name="line21">available privileged instructions per processor type.</a>
+
+The MC68000 has two stacks, the user stack (USP) and supervisor stack
+(SSP). As of the MC68020 there are two supervisor stacks, the interrupt
+stack pointer (ISP) and the master stack pointer (MSP). The <a href="../Includes_and_Autodocs_2._guide/node0385.html">SuperState()</a>
+function allows you to enter supervisor mode with the USP used as SSP. The
+function returns the SSP, which will be the MSP, if an MC68020 or greater
+is used. Returning to user mode is done with the <a href="../Includes_and_Autodocs_2._guide/node0388.html">UserState()</a> function.
+This function takes the SSP as argument, which must be saved when
+SuperState() is called.  Because of possible problems with stack size,
+<a href="../Includes_and_Autodocs_2._guide/node0386.html">Supervisor()</a> is to be preferred over SuperState().
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

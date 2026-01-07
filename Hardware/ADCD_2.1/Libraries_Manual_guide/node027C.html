@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_16" NODE="16-2-1" TITLE="16 / Creating a File Requester / Specifying Options with TagItems" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>16 / Creating a File Requester / Specifying Options with TagItems</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node027B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node027D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Both <a href="../Libraries_Manual_guide/node027B.html">AllocAslRequest()</a> and <a href="../Libraries_Manual_guide/node027B.html#line43">AslRequest()</a> accept a <a href="../Libraries_Manual_guide/node0497.html">TagItem</a> array or tag list
+as an argument.  The tag list is used to initialize or alter the values in
+the requester data structure.
+
+A single <a href="../Libraries_Manual_guide/node0497.html">TagItem</a> consists of a tag name and an associated tag value.  Tag
+items that apply to the asl.library are defined in &#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node00EA.html#line86">asl.h</a>&#062;.  The
+basic tag items (used in the <a href="../Libraries_Manual_guide/node057F.html">first example</a> listed below) are:
+<a name="line9"></a>
+
+   Requester
+   Tag Name        Used For
+   ---------       --------
+   ASL_Hail        String to place in the title bar of the requester window
+   ASL_Width       Requester window width
+   ASL_Height      Requester window height
+   ASL_LeftEdge    Requester window y origin
+   ASL_TopEdge     Requester window x origin
+   ASL_OKText      String to place in OK gadget of requester
+   ASL_CancelText  String to place in Cancel gadget of requester
+   ASL_File        Default file name (for file requesters only)
+   ASL_Dir         Default directory name (for file requesters only)
+
+
+Note that you are currently limited to about six characters for the
+replacement text if you use either the ASL_OKText or ASL_CancelText tags
+to change the text that appears in the OK and Cancel gadgets.
+
+The contents of an ASL requester data structure are preserved across calls
+to <a href="../Libraries_Manual_guide/node027B.html#line43">AslRequest()</a>.  So, until the requester is freed, tag settings and user
+selections will remain in the data structure unless they are altered by
+tags in subsequent calls to AslRequest().  This is very useful because it
+allows the requester to remember and redisplay the user's previous
+selections.  However, this also means that the programmer must assure that
+any addresses passed in ASL tags remain valid, or are refreshed on each
+call to AslRequest().
+
+Generally, options that you wish to specify only once, such as the initial
+position and size, should be specified as tags when you allocate the
+requester.  Options that you wish to control for each use of the requester
+should be passed as tags each time the requester is opened with
+<a href="../Libraries_Manual_guide/node027B.html#line43">AslRequest()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

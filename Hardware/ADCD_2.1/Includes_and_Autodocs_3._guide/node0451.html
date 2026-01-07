@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="locale" NODE="--structures--" TITLE="locale.library/--structures--" -->
+<head>
+<title>locale.library/--structures--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0450.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0452.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+	The <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> structure is the main public structure provided by
+	locale.library. The structure is defined in <a href="../Includes_and_Autodocs_3._guide/node05E3.html">&#060;libraries/locale.h&#062;</a>
+	and consists of the following fields:
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_LocaleName
+	    Locale's name.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_LanguageName
+	    The language of the driver bound to this locale.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_PrefLanguages[10]
+	    The ordered list of preferred languages for this locale.
+
+	ULONG loc_Flags
+	    <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> flags. Currently always 0.
+
+	ULONG loc_CodeSet
+	    Specifies the code set required by this locale. Currently, this
+	    value is always 0.
+
+	ULONG loc_CountryCode
+	    The international country code.
+
+	ULONG loc_TelephoneCode
+	    The international telephone code for the country.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> loc_GMTOffset
+	    The offset in minutes of the current location from GMT.
+	    Positive indicates a Westerly direction from GMT,
+	    negative Easterly.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> loc_MeasuringSystem
+	    The measuring system being used.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_DateTimeFormat
+	    The date and time format string, ready to pass to <a href="../Includes_and_Autodocs_3._guide/node0456.html">FormatDate()</a>
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_DateFormat
+	    The date format string.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_TimeFormat
+	    The time format string.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_ShortDateTimeFormat
+	    The short date and time format string, ready to pass to
+	    <a href="../Includes_and_Autodocs_3._guide/node0456.html">FormatDate()</a>
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_ShortDateFormat
+	    The short date format string.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_ShortTimeFormat
+	    The short time format string.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_DecimalPoint
+	    The decimal point character used to format non-monetary quantities.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_GroupSeparator
+	    The characters used to separate groups of digits before the
+	    decimal-point character in formatted non-monetary quantities.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_FracGroupSeparator
+	    The characters used to separate groups of digits after the
+	    decimal-point character in formatted non-monetary quantities.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_Grouping
+	    A string whose elements indicate the size of each group of digits
+	    before the decimal-point character in formatted non-monetary
+	    quantities.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_FracGrouping
+	    A string whose elements indicate the size of each group of digits
+	    after the decimal-point character in formatted non-monetary
+	    quantities.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_MonDecimalPoint
+	    The decimal-point used to format monetary quantities.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_MonGroupSeparator
+	    The separator for groups of digits before the decimal-point in
+	    monetary quantities.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_MonFracGroupSeparator
+	    The separator for groups of digits after the decimal-point in
+	    monetary quantities.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_MonGrouping
+	    A string whose elements indicate the size of each group of digits
+	    before the decimal-point character in monetary quantities.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_MonFracGrouping
+	    A string whose elements indicate the size of each group of digits
+	    after the decimal-point character in monetary quantities.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> loc_MonFracDigits
+	    The number of fractional digits (those after the decimal-point)
+	    to be displayed in a formatted monetary quantity.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> loc_MonIntFracDigits
+	    The number of fractional digits (those after the decimal-point)
+	    to be displayed in an internationally formatted monetary quantity.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_MonCS
+	    The local currency symbol applicable to the current locale.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_MonSmallCS
+	    The currency symbol for small amounts.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_MonIntCS
+	    The international currency symbol applicable to the current
+	    locale. The first three characters contain the alphabetic
+	    international currency symbol in accordance with those specified
+	    in ISO 4217 Codes for the Representation of Currency and Funds.
+	    The fourth character (immediately preceding the NULL) is the
+	    character used to separate the international currency symbol from
+	    the monetary quantity.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_MonPositiveSign
+	    The string used to indicate a non-negative monetary quantity.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> loc_MonPositiveSpaceSep
+	    Specifies the number of spaces separating the currency symbol from
+	    the non-negative monetary quantity.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> loc_MonPositiveSignPos
+	    Set to a value indicating the positioning of loc_MonPositiveSign
+	    for a non-negative monetary quantity.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> loc_MonPositiveCSPos
+	    Set to 1 or 0 if loc_MonCS respectively precedes or succeeds
+	    the value for a non-negative monetary quantity.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> loc_MonNegativeSign
+	    The string used to indicate a negative monetary quantity.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> loc_MonNegativeSpaceSep
+	    Specifies the number of spaces separating the currency symbol from
+	    the negative monetary quantity.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> loc_MonNegativeSignPos
+	    Set to a value indicating the positioning of loc_MonNegativeSign
+	    for a negative monetary quantity.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> loc_MonNegativeCSPos
+	    Set to 1 or 0 if loc_MonCS respectively precedes or succeeds
+	    the value for a negative monetary quantity.
+
+
+	The grouping tables pointed to by loc_Grouping, loc_FracGrounping,
+	loc_MonGrouping, and loc_MonFracGrouping contain a stream of bytes
+	with the following values:
+
+	    255		No further grouping is to be performed.
+
+	    0		The previous element is to be repeatedly used for the
+			remainder of the digits.
+
+	    1..254	The integer value is the number of digits that comprise
+			the current group. The next element is examined to
+			determine the size of the next group of digits before
+			the current group.
+
+	The values of loc_MonPositiveSignPos and loc_MonNegativeSignPos are
+	interpreted according to the following:
+
+	    0		Parentheses surround the quantity and currency symbol
+
+	    1		The sign string precedes the quantity and
+			currency symbol
+
+	    2		The sign string succeeds the quantity and
+			currency symbol
+
+	    3		The sign string immediately precedes the
+			currency symbol
+
+	    4		The sign string immediately succeeds the
+			currency symbol.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-7-1-2" TITLE="28 / / Detecting Collisions / Building a Table of Collision Routines" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Detecting Collisions / Building a Table of Collision Routines</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03AD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03AF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The collision handler table is a structure, CollTable, defined in
+&#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line263">gels.h</a>&#062;.  It is accessed as the CollHandler member of the
+<a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a> structure.  The table only needs to be as large as the number of
+bits for which you wish to provide collision processing.  It is safest,
+though, to allocate space for all 16 entries, considering the small amount
+<a name="line7">of space required.</a>
+<a name="line8"></a>
+Call the routine <a href="../Includes_and_Autodocs_2._guide/node0477.html">SetCollision()</a> to initialize the table entries that
+correspond to the <a href="../Libraries_Manual_guide/node03B2.html">HitMask</a> and <a href="../Libraries_Manual_guide/node03B2.html">MeMask</a> bits that you plan to use.  Do not
+set any of the table entries directly, instead give the address to
+SetCollision() routine and let it handle the set up of the
+<a href="../Includes_and_Autodocs_2._guide/node00AF.html#line39">GelsInfo.CollTable</a> field.
+
+For example, <a href="../Includes_and_Autodocs_2._guide/node0477.html">SetCollision()</a> could be called as follows:
+
+    ULONG            num;
+    VOID           (*routine)();
+    struct GelsInfo *GInfo;
+
+    VOID myCollisionRoutine(GELA, GELB)   /* sample collision routine */
+    struct VSprite *GELA;
+    struct VSprite *GELB;
+    {
+        /* process gels here - GELA and GELB point to the base VSprites */
+        /* of the gels, you can use the user extensions to identify what */
+        /* hit (if you need the info). */
+    }
+
+    /* GelsInfo must be allocated and initialized */
+
+    routine = myCollisionRoutine;
+
+    SetCollision(num, routine, GInfo)
+
+The num argument is the collision table vector number (0-15).  The
+(*routine)() argument is a pointer to your collision routine.  And the
+GInfo argument is a pointer to the <a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a> structure.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

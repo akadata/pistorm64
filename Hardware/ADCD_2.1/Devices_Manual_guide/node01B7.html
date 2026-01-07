@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_ILBM" NODE="16-3-3-2" TITLE=" Standard BODY Data Chunk / BODY " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard BODY Data Chunk / BODY </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01B6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01B8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The source raster  is stored in a &#034;BODY&#034; chunk.  This one <a href="../Devices_Manual_guide/node01DD.html">chunk</a> holds all
+bitplanes and the optional mask, interleaved by row.
+
+The BitMapHeader, in a <a href="../Devices_Manual_guide/node01AF.html">BMHD</a> property chunk, specifies the raster's
+dimensions w, h, and nPlanes.  It also holds the masking field which
+indicates if there is a mask plane and the compression field which
+indicates the compression algorithm used.  This information is needed to
+interpret the BODY chunk, so the BMHD chunk must appear first.  While
+reading an ILBM's BODY, a program may convert the image to another size by
+filling (with transparentColor) or clipping.
+
+The BODY's content is a concatenation of scan lines.  Each scan line is a
+concatenation of one row of data from each plane in order 0 through
+nPlanes-1 followed by one row from the mask (if masking = hasMask ).  If
+the BitMapHeader field compression is cmpNone, all h rows are exactly
+(w+15)/16 words wide. Otherwise, every row is compressed according to the
+specified algorithm and the stored widths depend on the data compression.
+
+Reader programs that require fewer bitplanes than appear in a particular
+ILBM file can combine planes or drop the high-order (later) planes.
+Similarly, they may add bitplanes and/or discard the mask plane.
+
+Do not compress across rows, and don't forget to compress the mask just
+like the bitplanes.  Remember to pad any BODY chunk that contains an odd
+number of bytes and skip the pad when reading.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

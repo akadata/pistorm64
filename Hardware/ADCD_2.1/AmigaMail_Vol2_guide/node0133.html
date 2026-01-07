@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="XI-1/amcx.txt" NODE="XI-1-5" TITLE="Filter CxObjects" -->
+<head>
+<title>Filter CxObjects</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0132.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0134.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Because not all commodities are interested in every input event that
+makes it way down the input chain, Commodities Exchange has a method
+for filtering them.  A filter CxObject compares the CxMessages it
+receives to a pattern.  If a CxMessage matches the pattern, the filter
+diverts the CxMessage down its personal list of CxObjects.
+
+    CxObj *CxFilter(char *descriptionstring);
+
+The C macro CxFilter() (defined in &#060;libraries/commodities.h&#062;) returns
+a pointer to a filter CxObject.  The macro has only one argument, a
+pointer to a string describing which input events to filter.  The
+following regular expression outlines the format of a description
+string (CX_POPKEY uses the same description string format):
+
+    [class]  ( [-] (qual | syn) )*  [ [-] upstroke]  [highmap |ANSICode]
+             the * means zero or more occurances of ( [-] ( qual | syn ) )
+
+where:
+
+class can be any one of the strings in the table below.  Each string
+corresponds to a class of input event (shown below).  The classes are
+defined in &#060;devices/inputevent.h&#062;.  Commodities Exchange will assume
+the class is rawkey if the class is not explici tly stated.
+
+    &#034;rawkey&#034;        IECLASS_RAWKEY
+    &#034;rawmouse&#034;      IECLASS_RAWMOUSE
+    &#034;event&#034;         IECLASS_EVENT
+    &#034;pointerpos&#034;    IECLASS_POINTERPOS
+    &#034;timer&#034;         IECLASS_TIMER
+    &#034;newprefs&#034;      IECLASS_NEWPREFS
+    &#034;diskremoved&#034;   IECLASS_DISKREMOVED
+    &#034;diskinserted&#034;  IECLASS_DISKINSERTED
+
+
+qual is one of the strings in the table below.  Each string
+corresponds to an input event qualifier (followed by its ID from
+&#060;devices/inputevent.h&#062;).  A dash preceding the qualifier string tells
+the filter object not to care if that qualifier is present i n the
+input event.  Notice that there can be more than one qual (or none at
+all) in the input description string.
+
+    &#034;lshift&#034;            IEQUALIFIER_LSHIFT
+    &#034;rshift&#034;            IEQUALIFIER_RSHIFT
+    &#034;capslock&#034;          IEQUALIFIER_CAPSLOCK
+    &#034;control&#034;           IEQUALIFIER_CONTROL
+    &#034;lalt&#034;              IEQUALIFIER_LALT
+    &#034;ralt&#034;              IEQUALIFIER_RALT
+    &#034;lcommand&#034;          IEQUALIFIER_LCOMMAND
+    &#034;rcommand&#034;          IEQUALIFIER_RCOMMAND
+    &#034;numericpad&#034;        IEQUALIFIER_NUMERICPAD
+    &#034;repeat&#034;            IEQUALIFIER_REPEAT
+    &#034;midbutton&#034;         IEQUALIFIER_MIDBUTTON
+    &#034;rbutton&#034;           IEQUALIFIER_RBUTTON
+    &#034;leftbutton&#034;        IEQUALIFIER_LEFTBUTTON
+    &#034;relativemouse&#034;     IEQUALIFIER_RELATIVEMOUSE
+
+
+syn is one of the strings in the table below.  These strings act as
+synonyms for groups of qualifiers.  Each string below is followed by
+its identifier from &#060;libraries/commodities.h&#062;.  A dash preceding the
+synonym string tells the filter object not to car e if that qualifier
+is present in the input event.  Notice that there can be more than one
+syn (or none at all) in the input description string.
+
+    &#034;shift&#034;     IXSYM_SHIFT    /* look for either shift key */
+    &#034;caps&#034;      IXSYM_CAPS     /* look for either shift key or capslock */
+    &#034;alt&#034;       IXSYM_ALT      /* look for either alt key */
+
+
+upstroke is the literal string &#034;upstroke&#034;.  If this string is absent,
+the filter considers only downstrokes.  If is present alone, the
+filter considers only upstrokes.  If preceded by a dash, the filter
+considers both upstrokes and downstrokes.
+
+
+highmap is one of the following strings:
+
+    &#034;space&#034;, &#034;backspace&#034;, &#034;tab&#034;, &#034;enter&#034;, &#034;return&#034;, &#034;esc&#034;, &#034;del&#034;, &#034;up&#034;,
+    &#034;down&#034;, &#034;right&#034;, &#034;left&#034;, &#034;f1&#034;, &#034;f2&#034;, &#034;f3&#034;, &#034;f4&#034;, &#034;f5&#034;, &#034;f6&#034;, &#034;f7&#034;,
+    &#034;f8&#034;, &#034;f9&#034;, &#034;f10&#034;, &#034;help&#034;.
+
+
+ANSICode is a single character (for example `a`) that Commodities
+Exchange looks up in the system default keymap.
+
+
+The following are some example description strings:
+
+    &#034;rawkey lshift alt f2&#034;    Function key f2 with the left shift and
+                                either alt key pressed.
+    &#034;-shift -alt -control a&#034;  The key that produces an 'a' with or
+                                without any shift, alt, or control keys
+                                pressed.
+    &#034;rawmouse rbutton&#034;        A mouse move with the right mouse button
+                                 down.
+    &#034;timer&#034;                   A timer event.
+
+As of commodities.library version 37.3, ParseIX(), the function used
+to parse input description strings, does not parse certain classes
+correctly.  Only the rawkey, diskremoved, and newprefs classes are
+properly parsed.  For the moment, any commodity that needs to look
+for the other classes must directly use Commodities Exchange's
+internal format for input event descriptions, input expressions or
+IX, discussed later in this article.
+
+A filter has to be inserted into the Commodities network before it can
+process any CxMessages.  AttachCxObj() adds a CxObject to the personal
+list of another commodity.  The <a href="../AmigaMail_Vol2_guide/node0203.html">HotKey.c</a> example uses this function to
+attach its filter to a broker.
+
+    void AttachCxObj(CxObj *HeadObj, CxObj *co);
+
+This function uses the Exec function AddTail() to add the CxObject to
+the end of HeadObj's personal list.  The position of a CxObject list
+determines which CxObject gets CxMessages first.  Other functions
+exist to add CxObjects at different points in the list (see the
+commodities.doc Autodoc for details).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

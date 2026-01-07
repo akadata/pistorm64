@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-6-1" TITLE="33 / Context Functions / Context Nodes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Context Functions / Context Nodes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0445.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0447.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The current context is said to be the top element on the stack.
+Contextual information is stored in a structure called a <a href="../Includes_and_Autodocs_2._guide/node010B.html#line61">ContextNode</a>:
+
+    struct ContextNode {
+            struct MinNode  cn_Node;
+            LONG            cn_ID;
+            LONG            cn_Type;
+            LONG            cn_Size; /*  Size of this chunk             */
+            LONG            cn_Scan; /*  # of bytes read/written so far */
+            /*  There are private fields hiding here.  */
+            };
+
+ <a href="../Libraries_Manual_guide/node0447.html">CurrentChunk()</a>    <a href="../Libraries_Manual_guide/node0448.html">ParentChunk()</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

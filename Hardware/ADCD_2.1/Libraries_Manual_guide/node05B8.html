@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/MeasureText.c" NODE="MAIN" TITLE="Lib_examples/MeasureText.c" -->
+<head>
+<title>Lib_examples/MeasureText.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05B7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05B9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* MeasureText.c - Execute me to compile me with Lattice 5.10a
+LC -b0 -cfistq -v -y -j73 MeasureText.c
+Blink FROM LIB:c.o, MeasureText.o TO MeasureText LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit ;
+**
+** The following example, measuretext.c, opens a window on the default
+** public screen and renders the contents of an ASCII file into the
+** window.  It uses TextFit() to measure how much of a line of text will
+** fit across the window.  If the entire line doesn't fit, measuretext
+** will wrap the remainder of the line into the rows that follow.  This
+** example makes use of an ASL font requester, letting the user choose
+** the font, style, size, drawing mode, and color.
+*/
+#define INTUITION_IOBSOLETE_H
+#include &#060;dos/dos.h&#062;
+#include &#060;dos/dosextens.h&#062;
+#include &#060;graphics/text.h&#062;
+#include &#060;graphics/rastport.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;exec/libraries.h&#062;
+
+#include &#060;clib/alib_stdio_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/diskfont_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/asl_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }
+#endif
+
+#define BUFSIZE 32768
+
+UBYTE *vers = &#034;\0$VER: MeasureText 37.1&#034;;
+
+UBYTE buffer[BUFSIZE];
+
+void MainLoop(void);
+void EOP(void);
+
+struct Library *IntuitionBase, *GfxBase, *DiskfontBase, *AslBase;
+BPTR myfile;
+UWORD wtbarheight;
+struct FontRequester *fr;
+struct TextFont *myfont;
+struct Window *w;
+struct RastPort *myrp;
+struct Task *mytask;
+
+void main(int argc, char **argv)
+{
+  struct TextAttr myta;
+
+  if (argc == 2)
+  {
+    if (myfile = Open(argv[1], MODE_OLDFILE))                 /* Open the file to print out. */
+    {
+      if (DiskfontBase = OpenLibrary(&#034;diskfont.library&#034;, 37L))        /* Open the libraries. */
+      {
+        if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 37L))
+        {
+          if (GfxBase = OpenLibrary(&#034;graphics.library&#034;, 37L))
+          {
+            if (AslBase = OpenLibrary(&#034;asl.library&#034;, 37L))
+            {
+              if (fr = (struct FontRequester *)                /* Open an ASL font requester */
+                       AllocAslRequestTags(ASL_FontRequest,
+                                    /* Supply initial values for requester */
+                                    ASL_FontName, (ULONG)&#034;topaz.font&#034;,
+                                    ASL_FontHeight, 11L,
+                                    ASL_FontStyles, FSF_BOLD | FSF_ITALIC,
+                                    ASL_FrontPen,  0x01L,
+                                    ASL_BackPen,   0x00L,
+
+                                     /* Give us all the gadgetry */
+                                    ASL_FuncFlags, FONF_FRONTCOLOR | FONF_BACKCOLOR |
+                                                   FONF_DRAWMODE | FONF_STYLES,
+                                    TAG_DONE))
+
+
+
+
+              {
+                /* Pop up the requester */
+                if (AslRequest(fr, 0L))
+                {
+                  myta.ta_Name       = fr-&#062;fo_Attr.ta_Name;         /* extract the font and */
+                  myta.ta_YSize      = fr-&#062;fo_Attr.ta_YSize;        /* display attributes   */
+                  myta.ta_Style      = fr-&#062;fo_Attr.ta_Style;        /* from the FontRequest */
+                  myta.ta_Flags      = fr-&#062;fo_Attr.ta_Flags;        /* structure.           */
+
+                  if (myfont = OpenDiskFont(&#038;myta))
+                  {
+                    if (w = OpenWindowTags(NULL,WA_SizeGadget,  TRUE,
+                                                WA_MinWidth,    200,
+                                                WA_MinHeight,   200,
+                                                WA_DragBar,     TRUE,
+                                                WA_DepthGadget, TRUE,
+                                                WA_Title,       (ULONG)argv[1],
+                                                TAG_DONE))
+                    {
+                      myrp = w-&#062;RPort;
+                      /* figure out where the baseline of the uppermost line should be. */
+                      wtbarheight = w-&#062;WScreen-&#062;BarHeight + myfont-&#062;tf_Baseline + 2;
+
+                      /* Set the font and add software styling to the text if I asked for it */
+                      /* in OpenFont() and didn't get it.  Because most Amiga fonts do not   */
+                      /* have styling built into them (with the exception of the CG outline  */
+                      /* fonts), if the user selected some kind of styling for the text, it  */
+                      /* will to be added algorithmically by calling SetSoftStyle().         */
+
+                      SetFont(myrp, myfont);
+                      SetSoftStyle(myrp,   myta.ta_Style ^ myfont-&#062;tf_Style,
+                                    (FSF_BOLD | FSF_UNDERLINED | FSF_ITALIC));
+                      SetDrMd(myrp, fr-&#062;fo_DrawMode);
+                      SetAPen(myrp, fr-&#062;fo_FrontPen);
+                      SetBPen(myrp, fr-&#062;fo_BackPen);
+                      Move(myrp, w-&#062;WScreen-&#062;WBorLeft, wtbarheight);
+                      mytask = FindTask(NULL);
+
+                      MainLoop();
+
+                      Delay(25);                    /* short delay to give user a chance to */
+                      CloseWindow(w);               /* see the text before it goes away.    */
+                    }
+                    CloseFont(myfont);
+                  }
+                }
+                else
+                  VPrintf(&#034;Request Cancelled\n&#034;, NULL);
+                FreeAslRequest(fr);
+              }
+              CloseLibrary(AslBase);
+            }
+            CloseLibrary(GfxBase);
+          }
+          CloseLibrary(IntuitionBase);
+        }
+        CloseLibrary(DiskfontBase);
+      }
+      Close(myfile);
+    }
+  }
+  else
+    VPrintf(&#034;template: MeasureText &#060;file name&#062;\n&#034;, NULL);
+}
+
+
+void MainLoop(void)
+{
+  struct TextExtent resulttextent;
+  LONG fit, actual, count, printable, crrts;
+  BOOL aok = TRUE;
+
+  while (((actual = Read(myfile, buffer, BUFSIZE)) &#062; 0) &#038;&#038; aok)  /* while there's something to */
+  {                                                              /* read, fill the buffer.     */
+    count = 0;
+
+
+    while(count &#060; actual)
+    {
+      crrts = 0;
+
+      while ( ((buffer[count] &#060; myfont-&#062;tf_LoChar) ||    /* skip non-printable characters, but */
+               (buffer[count] &#062; myfont-&#062;tf_HiChar)) &#038;&#038;   /* account for newline characters.    */
+               (count &#060; actual) )
+      {
+        if (buffer[count] == '\012') crrts++; /* is this character a newline?  if it is, bump */
+        count++;                               /* up the newline count.                        */
+      }
+
+      if (crrts &#062; 0)                  /* if there where any newlines, be sure to display them. */
+      {
+        Move(myrp, w-&#062;BorderLeft, myrp-&#062;cp_y + (crrts * (myfont-&#062;tf_YSize + 1)));
+        EOP();                                          /* did we go past the end of the page? */
+      }
+
+      printable = count;
+      while ( (buffer[printable] &#062;= myfont-&#062;tf_LoChar) &#038;&#038;      /* find the next non-printables */
+              (buffer[printable] &#060;= myfont-&#062;tf_HiChar) &#038;&#038;
+              (printable &#060; actual) )
+      {
+        printable++;
+      }                                  /* print the string of printable characters wrapping  */
+      while (count &#060; printable)          /* lines to the beginning of the next line as needed. */
+      {
+        /* how many characters in the current string of printable characters will fit */
+        /* between the rastport's current X position and the edge of the window?      */
+        fit = TextFit(  myrp,                &#038;(buffer[count]),
+                        (printable - count), &#038;resulttextent,
+                        NULL,                1,
+                        (w-&#062;Width  - (myrp-&#062;cp_x + w-&#062;BorderLeft + w-&#062;BorderRight)),
+                        myfont-&#062;tf_YSize + 1  );
+        if ( fit == 0 )
+        {
+            /* nothing else fits on this line, need to wrap to the next line.         */
+            Move(myrp, w-&#062;BorderLeft, myrp-&#062;cp_y + myfont-&#062;tf_YSize + 1);
+        }
+        else
+        {
+           Text(myrp, &#038;(buffer[count]), fit);
+           count += fit;
+        }
+        EOP();
+      }
+
+      if (mytask-&#062;tc_SigRecvd &#038; SIGBREAKF_CTRL_C)        /* did the user hit CTRL-C (the shell */
+      {                                                  /* window has to receive the CTRL-C)? */
+        aok = FALSE;
+        VPrintf(&#034;Ctrl-C Break\n&#034;, NULL);
+        count = BUFSIZE + 1;
+      }
+    }
+  }
+  if (actual &#060; 0)
+    VPrintf(&#034;Error while reading\n&#034;, NULL);
+}
+
+
+void EOP(void)
+{
+    if (myrp-&#062;cp_y &#062; (w-&#062;Height - (w-&#062;BorderBottom + 2))) /* If we reached page bottom, clear the */
+    {                                                     /* rastport and move back to the top.   */
+        Delay(25);
+
+        SetAPen(myrp, 0);
+        RectFill(myrp, (LONG)w-&#062;BorderLeft, (LONG)w-&#062;BorderTop, w-&#062;Width - (w-&#062;BorderRight + 1),
+                 w-&#062;Height - (w-&#062;BorderBottom + 1) );
+        SetAPen(myrp, 1);
+        Move(myrp, w-&#062;BorderLeft + 1, wtbarheight);
+        SetAPen(myrp, fr-&#062;fo_FrontPen);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

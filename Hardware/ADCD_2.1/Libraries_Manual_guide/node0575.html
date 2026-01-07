@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_E" NODE="E-3-2" TITLE="E / Additional Information / Intuition Gadgets and Window Borders" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>E / Additional Information / Intuition Gadgets and Window Borders</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0574.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0576.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+If 2.0 Intuition finds a gadget whose hit area (<a href="../Libraries_Manual_guide/node0149.html">Gadget</a> <a href="../Libraries_Manual_guide/node0149.html#line33">LeftEdge</a>/<a href="../Libraries_Manual_guide/node0149.html#line33">TopEdge</a>/
+<a href="../Libraries_Manual_guide/node0149.html#line33">Width</a>/<a href="../Libraries_Manual_guide/node0149.html#line33">Height</a>) is substantially inside the border, it will be treated as
+though it was declared in the border.  This is called &#034;bordersniffing&#034;.
+Gadgets declared as being in the border or detected by Intuition as being
+in the border are refreshed each time after the border is refreshed, and
+thus aren't clobbered.
+
+Noteworthy special cases:
+
+ 1) A gadget that has several pixels not in the border is not
+    bordersniffed. An example would be an 18-pixel high gadget in the
+    bottom border of a <a href="../Libraries_Manual_guide/node0125.html#line19">SIZEBBOTTOM</a> window.  About half the gadget will be
+    clobbered by the border rendering.
+
+ 2) A gadget that is not substantially in the border but has imagery that
+    extends into the border cannot be sniffed out by Intuition.
+
+ 3) A gadget that is substantially in the border but has imagery that
+    extends into the main part of the window will be sniffed out as a
+    border gadget, and this could change the refreshing results.  A
+    common trick to put imagery in a window is to put a 1x1 or 0x0 dummy
+    gadget at window location (0,0) and attach the window imagery to it.
+    To support this, Intuition will never bordersniff gadgets of size 1x1
+    or smaller.
+
+    All these cases can be fixed by setting the appropriate
+    GACT_xxxBORDER gadget <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> flag.
+
+ 4) In rare cases, buttons rendered with <a href="../Libraries_Manual_guide/node01C1.html">Border</a> structures and <a href="../Libraries_Manual_guide/node01C1.html#line25">JAM1</a> text
+    may appear invisible under Release 2.
+
+The height of the window's title bar is affected by the current font
+settings.  See the discussion of &#034;<a href="../Libraries_Manual_guide/node00E5.html#line125">Screen Attributes</a>&#034; in the &#034;Intuition
+Screens&#034; chapter. To predict your window's titlebar height before you call
+<a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a>:
+
+    topborder = screen-&#062;WBorTop + screen-&#062;Font-&#062;ta_YSize + 1
+
+The screen's font may not legally be changed after a screen is opened.
+
+Be sure the screen cannot go away on you.  This is true if:
+
+    1) You opened the screen yourself.
+
+    2) You currently have a window open on the screen.
+
+    3) You currently hold a lock on this screen (see <a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a>).
+
+<a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> rendered into a window (either through <a href="../Libraries_Manual_guide/node01C8.html">PrintIText()</a> or as a
+gadget's <a href="../Libraries_Manual_guide/node0149.html#line111">GadgetText</a>) defaults to the Window <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> font, but can be
+overridden using its <a href="../Libraries_Manual_guide/node01C7.html#line59">ITextFont</a> field.  Text rendered with the <a href="../Libraries_Manual_guide/node03D5.html">Text()</a>
+function appears in the Window RastPort font.
+
+The Window's <a href="../Libraries_Manual_guide/node0121.html#line66">RPort</a>'s font shown above is the initial font that Intuition
+sets for you in your window's <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>. It is legal to change that
+subsequently with <a href="../Libraries_Manual_guide/node03D6.html">SetFont()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="ParsePatternNoCase()" TITLE="dos.library/ParsePatternNoCase" -->
+<head>
+<title>dos.library/ParsePatternNoCase</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02DB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02DD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ParsePatternNoCase -- Create a tokenized string for
+                                            <a href="../Includes_and_Autodocs_2._guide/node02D0.html">MatchPatternNoCase()</a> (V37)
+
+SYNOPSIS
+    IsWild = ParsePatternNoCase(Source, Dest, DestLength)
+    d0                            D1     D2      D3
+
+    LONG ParsePatternNoCase(STRPTR, STRPTR, LONG)
+
+FUNCTION
+    Tokenizes a pattern, for use by <a href="../Includes_and_Autodocs_2._guide/node02D0.html">MatchPatternNoCase()</a>.  Also indicates
+    if there are any wildcards in the pattern (i.e. whether it might match
+    more than one item).  Note that Dest must be at least 2 times as
+    large as Source plus 2 bytes.
+
+    For a description of the wildcards, see <a href="../Includes_and_Autodocs_2._guide/node02DB.html">ParsePattern()</a>.
+
+INPUTS
+    source     - unparsed wildcard string to search for.
+   dest       - output string, gets tokenized version of input.
+    DestLength - length available in destination (should be at least as
+                 twice as large as source + 2 bytes).
+
+RESULT
+    IsWild - 1 means there were wildcards in the pattern,
+             0 means there were no wildcards in the pattern,
+            -1 means there was a buffer overflow or other error
+
+BUGS
+    Should set <a href="../Includes_and_Autodocs_2._guide/node02C2.html">IoErr()</a> to something useful (not currently set) on an
+    error.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02DB.html">ParsePattern()</a>, <a href="../Includes_and_Autodocs_2._guide/node02D0.html">MatchPatternNoCase()</a>, <a href="../Includes_and_Autodocs_2._guide/node02CD.html">MatchFirst()</a>, <a href="../Includes_and_Autodocs_2._guide/node02CE.html">MatchNext()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="CreateTask()" TITLE="amiga.lib/CreateTask" -->
+<head>
+<title>amiga.lib/CreateTask</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node002B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node002D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CreateTask -- Create task with given name, priority, stacksize
+
+<b>   SYNOPSIS</b>
+	task = CreateTask(name,pri,initPC,stackSize)
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node064B.html#line23">Task</a> *CreateTask(STRPTR,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,funcEntry,ULONG);
+
+<b>   FUNCTION</b>
+	This function simplifies program creation of sub-tasks by
+	dynamically allocating and initializing required structures
+	and stack space, and adding the task to Exec's task list
+	with the given name and priority. A tc_MemEntry list is provided
+	so that all stack and structure memory allocated by CreateTask()
+	is automatically deallocated when the task is removed.
+
+	An Exec task may not call dos.library functions or any function
+	which might cause the loading of a disk-resident library, device,
+	or file (since such functions are indirectly calls to dos.library).
+	Only AmigaDOS Processes may call AmigaDOS; see the
+	<a href="../Includes_and_Autodocs_3._guide/node014D.html">dos.library/CreateProc()</a> or the <a href="../Includes_and_Autodocs_3._guide/node014C.html">dos.library/CreateNewProc()</a>
+	functions for more information.
+
+	If other tasks or processes will need to find this task by name,
+	provide a complex and unique name to avoid conflicts.
+
+	If your compiler provides automatic insertion of stack-checking
+	code, you may need to disable this feature when compiling sub-task
+	code since the stack for the subtask is at a dynamically allocated
+	location.  If your compiler requires 68000 registers to contain
+	particular values for base relative addressing, you may need to
+	save these registers from your main process, and restore them
+	in your initial subtask code.
+
+	The function entry initPC is generally provided as follows:
+
+	In C:
+	extern void functionName();
+	char *tname = &#034;unique name&#034;;
+	task = CreateTask(tname, 0L, functionName, 4000L);
+
+	In assembler:
+		PEA	startLabel
+
+<b>   INPUTS</b>
+	name - a null-terminated name string
+	pri - an Exec task priority between -128 and 127, normally 0
+	funcEntry - the address of the first executable instruction
+		    of the subtask code
+	stackSize - size in bytes of stack for the subtask. Don't cut it
+		    too close - system function stack usage may change.
+
+<b>   RESULT</b>
+	task - a pointer to the newly created task, or NULL if there was not
+	       enough memory.
+
+<b>   BUGS</b>
+	Under exec.library V37 or beyond, the <a href="../Includes_and_Autodocs_3._guide/node01E2.html">AddTask()</a> function used
+	internally by CreateTask() can fail whereas it couldn't fail in
+	previous versions of Exec. Prior to amiga.lib V37.14, this function
+	did not check for failure of <a href="../Includes_and_Autodocs_3._guide/node01E2.html">AddTask()</a> and thus might return a
+	pointer to a task structure even though the task was not actually
+	added to the system.
+
+	Prior to amiga.lib V40.20 low memory conditions could cause
+	CreateTask() to malfunction. The implementation checked whether the
+	initial <a href="../Includes_and_Autodocs_3._guide/node01E6.html">AllocEntry()</a> call would fail, but would use an inappropriate
+	test condition.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0037.html">DeleteTask()</a>, <a href="../Includes_and_Autodocs_3._guide/node020B.html">exec/FindTask()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

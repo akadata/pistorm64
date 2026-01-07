@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="ChangeExtSpriteA()" TITLE="graphics.library/ChangeExtSpriteA" -->
+<head>
+<title>graphics.library/ChangeExtSpriteA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02BA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02BC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       ChangeExtSpriteA -- Change the sprite image pointer. (V39)
+
+<b>   SYNOPSIS</b>
+       ChangeExtSpriteA( vp, oldsprite, newsprite, tags)
+                     	  a0  a1   	 a2	    a3
+
+	success=ChangeExtSpriteA(struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node060B.html#line26">ExtSprite</a> *,
+			struct <a href="../Includes_and_Autodocs_3._guide/node060B.html#line26">ExtSprite</a> *, struct TagList *);
+
+	success=ChangeExtSprite(vp,old_sp,new_sp,tag,....);
+
+<b>   FUNCTION </b>
+	Attempt to change which sprite is displayed for a given
+	sprite engine.
+
+<b>   INPUTS</b>
+       vp - pointer to <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> structure that this sprite is
+		  relative to,  or 0 if relative only top of <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a>
+	oldsprite - pointer the old <a href="../Includes_and_Autodocs_3._guide/node060B.html#line26">ExtSprite</a> structure
+	newsprite - pointer to the new <a href="../Includes_and_Autodocs_3._guide/node060B.html#line26">ExtSprite</a> structure.
+
+<b>   RESULTS </b>
+ 	success - 0 if there was an error.
+<b>   BUGS </b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02DD.html">FreeSprite()</a> <a href="../Includes_and_Autodocs_3._guide/node02BC.html">ChangeSprite()</a> <a href="../Includes_and_Autodocs_3._guide/node0302.html">MoveSprite()</a> <a href="../Includes_and_Autodocs_3._guide/node02A3.html">AllocSpriteDataA()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node060B.html">graphics/sprite.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

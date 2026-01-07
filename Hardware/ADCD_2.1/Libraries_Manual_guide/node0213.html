@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-2-2-2" TITLE="12 / / Writing The Dispatcher / OM_SET/OM_UPDATE" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / Writing The Dispatcher / OM_SET/OM_UPDATE</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0212.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0214.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For the <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> message, the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> dispatcher steps through the
+attribute/value pairs passed to it in the OM_SET message looking for the
+local attributes (see <a href="../Libraries_Manual_guide/node0212.html">OM_NEW</a> for the OM_SET message structure).  The
+<a href="../Libraries_Manual_guide/node0210.html">RKMMOD_Limit</a> attribute is easy to process.  Just find it and record the
+<a name="line6">value in the local <a href="../Libraries_Manual_guide/node0210.html#line18">RKMModData</a>.vallimit field.</a>
+
+Because the function of the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a>'s <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> and <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> methods
+are almost identical, the rkmmodelclass dispatcher handles them as the
+same case.  The only difference is that, because the OM_UPDATE message
+comes from another Boopsi object, the OM_UPDATE method can report on
+transitory state changes of an attribute.  For example, when the user
+slides a Boopsi prop gadget, that prop gadget sends out an interim
+<a name="line14">OM_UPDATE message for every interim value of <a href="../Libraries_Manual_guide/node050F.html">PGA_Top</a>.  When the user lets</a>
+go of the prop gadget, the gadget sends out a final OM_UPDATE message.
+<a name="line16">The OM_UPDATE message is almost identical to the OM_SET message:</a>
+
+    #define OPUF_INTERIM    (1&#060;&#060;0)
+
+    /* the OM_NOTIFY method uses the same structure */
+
+    struct opUpdate {
+        ULONG             MethodID;
+        struct TagItem    *opu_AttrList;
+        struct GadgetInfo *opu_GInfo;
+        ULONG             opu_Flags;      /* The extra field */
+<a name="line27">    };</a>
+
+A dispatcher can tell the difference between an interim and final
+<a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> message because the OM_UPDATE message has an extra field on it
+for flags.  If the low order bit (the OPUF_INTERIM bit) is set, this is an
+interim OM_UPDATE message.  The interim flag is useful to a class that
+wants to ignore any transitory messages, processing only final attribute
+values.  Because <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> wants to process all changes to its
+attributes, it processes all OM_UPDATE messages.
+
+The <a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a> attribute is a little more complicated to process. The
+dispatcher has to make sure the new current value is within the limits set
+by <a href="../Libraries_Manual_guide/node0210.html">RKMMOD_Limit</a>, then record that new value in the local
+<a href="../Libraries_Manual_guide/node0210.html#line18">RKMModData</a>.currval field.  Because other objects need to hear about
+changes to RKMMOD_CurrVal,  the dispatcher has to send a notification
+request.  It does this by sending itself an <a href="../Libraries_Manual_guide/node0211.html#line56">OM_NOTIFY</a> message.  The
+OM_NOTIFY message tells an object to notify its targets (its <a href="../Libraries_Manual_guide/node020B.html#line20">ICA_TARGET</a>
+and the objects in its broadcast list) about an attribute change.  The
+OM_NOTIFY method does this by sending <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> messages to all of an
+<a name="line46">object's targets.</a>
+
+The <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> dispatcher does not handle the <a href="../Libraries_Manual_guide/node0211.html#line56">OM_NOTIFY</a> message itself.
+It inherits this method from <a href="../Libraries_Manual_guide/node020D.html#line13">modelclass</a>, so the rkmmodelclass dispatcher
+passes OM_NOTIFY messages on to its superclass. To notify its targets, the
+rkmmodelclass dispatcher has to construct an OM_NOTIFY message.  The
+OM_NOTIFY method uses the same message structure as <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE.</a>  Using the
+stack-based version of <a href="../Libraries_Manual_guide/node0212.html#line27">DoSuperMethodA()</a>, <a href="../Includes_and_Autodocs_2._guide/node0158.html">DoSuperMethod()</a>, the dispatcher
+can build an OM_NOTIFY message on the stack:
+
+     . . .
+
+    struct TagItem tt[2];
+    struct opUpdate *msg;
+     . . .
+
+    tt[0].ti_Tag  = RKMMOD_CurrVal;  /* make a tag list.  */
+    tt[0].ti_Data = mmd-&#062;currval;
+    tt[1].ti_Tag  = TAG_END;
+
+    DoSuperMethod(cl, o, OM_NOTIFY, tt, msg-&#062;opu__GInfo,
+                  ((msg-&#062;MethodID == OM_UPDATE) ? (msg-&#062;opu_Flags) : 0L));
+     . . .
+
+Because the <a href="../Libraries_Manual_guide/node0211.html#line56">OM_NOTIFY</a> needs a tag list of attributes about which to issue
+updates, the dispatcher builds a tag list containing just the
+<a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a> tag and its new value.  The dispatcher doesn't use the tag
+list passed to it in the <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a>/OM_NOTIFY message because that list can
+contain many other attributes besides RKMMOD_CurrVal.
+
+The msg variable in the <a href="../Includes_and_Autodocs_2._guide/node0158.html">DoSuperMethod()</a> call above is the <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> or
+<a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> message that was passed to the dispatcher.  The dispatcher uses
+that structure to find a pointer to the <a href="../Libraries_Manual_guide/node0219.html#line23">GadgetInfo</a> structure that the
+<a href="../Libraries_Manual_guide/node0211.html#line56">OM_NOTIFY</a> message requires.  The GadgetInfo structure comes from Intuition
+and contains information that Boopsi gadgets need to render themselves.
+For the moment, don't worry about what the GadgetInfo structure actually
+does, just pass it on.  The targets of an rkmmodel will probably need it.
+
+Notice that the dispatcher has to test to see if the message is an <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a>
+or <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> so it can account for the opu_Flags field at the end of the
+OM_UPDATE message.
+
+Processing the <a href="../Libraries_Manual_guide/node0210.html#line8">RKMMOD_Up</a> and <a href="../Libraries_Manual_guide/node0210.html#line8">RKMMOD_Down</a> attributes is similar to the
+<a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a> attribute.  When the dispatcher sees one of these, it has
+to increment or decrement the local <a href="../Libraries_Manual_guide/node0210.html#line18">RKMModData</a>.currval, making sure
+RKMModData.currval is within limits.  The dispatcher then sends an
+<a href="../Libraries_Manual_guide/node0211.html#line56">OM_NOTIFY</a> message to the superclass about the change to RKMModData.currval.
+
+The return value from the dispatcher's <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> method depends on the what
+effect the attribute change has to the visual state of the objects in the
+rkmmodel's broadcast list.  If an attribute change will not affect the
+visual state of the rkmmodel's objects, the OM_SET method returns zero.
+If the attribute change could trigger a change to the rkmmodel's objects,
+it returns something besides zero. For example, the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> OM_SET
+method returns 1L if an rkmmodel's <a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a>, <a href="../Libraries_Manual_guide/node0210.html#line8">RKMMOD_Up</a>, or
+<a name="line101"><a href="../Libraries_Manual_guide/node0210.html#line8">RKMMOD_Down</a> attribute is changed.</a>
+
+At some point the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> dispatcher has to allow its superclasses
+to process these attributes it inherits.  Normally a dispatcher lets the
+superclass process its attributes before attempting to process any local
+attributes.  The rkmmodelclass dispatcher does this by passing on the
+<a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> or <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> message using <a href="../Libraries_Manual_guide/node0212.html#line27">DoSuperMethodA()</a> (inheritance at work!).
+As an alternative, the dispatcher can use the amiga.lib function
+<a href="../Includes_and_Autodocs_2._guide/node0166.html">SetSuperAttrs()</a>.  See the <a href="../Includes_and_Autodocs_2._guide/node0139.html">amiga.lib</a> Autodocs for more details on this
+function.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

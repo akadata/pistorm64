@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-6-4-3" TITLE="33 / / Storing LCIs / FindLocalItem()" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / / Storing LCIs / FindLocalItem()</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node044F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0451.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+After you've stored your <a href="../Libraries_Manual_guide/node044A.html">LCI</a> in a <a href="../Libraries_Manual_guide/node0446.html">ContextNode</a>, you will no doubt want to
+be able to find it again later.  You do this with the function
+<a href="../Includes_and_Autodocs_2._guide/node01C2.html">FindLocalItem()</a>, which is called as follows:
+
+    lci = FindLocalItem (iff, type, id, ident);
+
+<a href="../Includes_and_Autodocs_2._guide/node01C2.html">FindLocalItem()</a> attempts to locate an <a href="../Libraries_Manual_guide/node044A.html">LCI</a> having the specified type, ID,
+and identification values.  The search proceeds as follows (refer to
+<a href="../Libraries_Manual_guide/node044A.html#line6">Figure 33-3</a> to understand this better).
+
+<a href="../Includes_and_Autodocs_2._guide/node01C2.html">FindLocalItem()</a> starts at the top (current) <a href="../Libraries_Manual_guide/node0446.html">ContextNode</a> and searches all
+<a href="../Libraries_Manual_guide/node044A.html">LCI</a>s in that context.  If no matching LCIs are found, it proceeds down the
+context stack to the next ContextNode and searches all its LCIs.  The
+process repeats until it finds the desired LCI (whereupon it returns a
+pointer to it), or reaches the end without finding anything (where it
+returns NULL).
+
+    Context Stack Position.
+    -----------------------
+    <a href="../Libraries_Manual_guide/node044A.html">LCI</a>s higher in the stack will &#034;override&#034; lower LCIs with the
+    same type, ID, and identification field.  This is how property
+    scoping is handled.  As <a href="../Libraries_Manual_guide/node0446.html">ContextNode</a>s are popped off the context
+    stack, all its LCIs are deleted as well.  See the section on
+    &#034;<a href="../Libraries_Manual_guide/node045C.html">Freeing LCIs</a>&#034; below for additional information on deleting LCIs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

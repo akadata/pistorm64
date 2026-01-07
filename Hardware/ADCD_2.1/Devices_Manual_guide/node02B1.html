@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_SMUS" NODE="16-5-2-4" TITLE=" Background / MIDI Instruments " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Background / MIDI Instruments </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02B0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02B2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As mentioned above, A <a href="../Devices_Manual_guide/node02AB.html">SMUS</a> score can also ask for MIDI instruments.  This
+is done by putting the MIDI channel and preset numbers in an INS1 chunk
+with the instrument name.  Some programs will honor these requests while
+others will just find instruments by name.
+
+MIDI Recorder and sequencer programs may simply transcribe the MIDI
+channel and preset commands in a recording session.  For this purpose,
+set-MIDI-channel and set-MIDI-preset events can be embedded in a <a href="../Devices_Manual_guide/node02AB.html">SMUS</a>
+score's tracks.  Most programs should ignore these events.  An editor
+program that wants to exchange scores with such programs should recognize
+these events.  It should let the user change them to the more general
+set-instrument events.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

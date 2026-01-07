@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-11-5" TITLE="5 / Proportional Gadget Type / Modifying an Existing Gadget" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / Proportional Gadget Type / Modifying an Existing Gadget</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0162.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0164.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To change the flags and the <a href="../Libraries_Manual_guide/node015B.html">pot</a> and <a href="../Libraries_Manual_guide/node015C.html">body</a> variables after the gadget is
+displayed, the program can call <a href="../Includes_and_Autodocs_2._guide/node022E.html">NewModifyProp()</a>.
+
+    void NewModifyProp( struct Gadget *gadget, struct Window *window,
+                        struct Requester *requester, unsigned long flags,
+                        unsigned long horizPot, unsigned long vertPot,
+                        unsigned long horizBody, unsigned long vertBody,
+                        long numGad );
+
+The gadget's internal state will be recalculated and the imagery will be
+redisplayed to show the new state.  When numGads (in the prototype above)
+is set to all ones, <a href="../Includes_and_Autodocs_2._guide/node022E.html">NewModifyProp()</a> will only update those parts of the
+imagery that have changed, which is much faster than removing the gadget,
+changing values, adding the gadget back and refreshing its imagery.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

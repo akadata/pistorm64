@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_37" NODE="37-3" TITLE="37 Utility Library / 32-bit Integer Math Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>37 Utility Library / 32-bit Integer Math Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04A4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04A6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Utility library contains some high-speed math functions for 32-bit integer
+division and multiplication. These functions will take advantage of
+available processor instructions (like DIVUL), if a 68020 processor or
+higher is present. If not, these functions will mimic those instructions
+in 68000 only instructions, thus providing processor independency.
+
+<a name="line8">Currently the following functions are implemented:</a>
+
+  ____________________________________________________________
+ |                                                            |
+ |  <a href="../Includes_and_Autodocs_2._guide/node03DD.html">SDivMod32()</a>  Signed 32 by 32-bit division and modulus.    |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03DE.html">SMult32()</a>  Signed 32 by 32-bit multiplication.          |
+ |  <a href="../Includes_and_Autodocs_2._guide/node03E4.html">UDivMod32()</a>  Unsigned 32 by 32-bit division and modulus.  |
+ |    <a href="../Includes_and_Autodocs_2._guide/node03E5.html">UMult32()</a>  Unsigned 32 by 32-bit multiplication.        |
+ |____________________________________________________________|
+
+       Table 37-3: Utility Library 32-bit Math Functions
+
+
+The division functions return the quotient in D0 and the remainder in D1.
+To obtain the remainder in a higher level language, either a compiler
+specific instruction to fetch the contents of a specific register must be
+used (like getreg() in SAS C) or a small assembler stub.
+
+Following a simple example of the usage of the 32-bit integer math
+functions in C.
+
+     <a href="../Libraries_Manual_guide/node057A.html">uptime.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

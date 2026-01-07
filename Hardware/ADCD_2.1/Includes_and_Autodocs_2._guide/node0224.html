@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="LockIBase()" TITLE="intuition.library/LockIBase" -->
+<head>
+<title>intuition.library/LockIBase</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0223.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0225.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    LockIBase -- Invoke semaphore arbitration of <a href="../Includes_and_Autodocs_2._guide/node00DC.html#line67">IntuitionBase</a>.
+
+SYNOPSIS
+    Lock = LockIBase( LockNumber )
+    D0                D0
+
+    ULONG LockIBase( ULONG );
+
+FUNCTION
+    Grabs Intuition internal semaphore so that caller may examine
+    <a href="../Includes_and_Autodocs_2._guide/node00DC.html#line67">IntuitionBase</a> safely.  This function is not a magic &#034;fix all my
+    race conditions&#034; panacea.
+
+    The idea here is that you can get the locks Intuition needs before
+    such <a href="../Includes_and_Autodocs_2._guide/node00DC.html#line67">IntuitionBase</a> fields as ActiveWindow and FirstScreen are
+    changed, or linked lists of windows and screens are changed.
+
+    Do Not Get Tricky with this entry point, and do not hold these locks
+    for long, as all Intuition input processing will wait for you to
+    surrender the lock by a call to <a href="../Includes_and_Autodocs_2._guide/node025C.html">UnlockIBase()</a>.
+
+    NOTE WELL: A call to this function MUST be paired with a subsequent
+    call to <a href="../Includes_and_Autodocs_2._guide/node025C.html">UnlockIBase()</a>, and soon, please.
+
+    NOTE WELL: Do not call any Intuition functions (nor any graphics,
+    layers, dos, or other high-level system function) while
+    holding this lock.
+
+INPUTS
+    A long unsigned integer, LockNumber, specifies which of Intuition's
+    internal locks you want to get.  This parameter should be zero for all
+    forseeable uses of this function, which will let you examine active
+    fields and linked lists of screens and windows with safety.
+
+RESULT
+    Returns another ULONG which should be passed to <a href="../Includes_and_Autodocs_2._guide/node025C.html">UnlockIBase()</a> to
+    surrender the lock gotten by this call.
+
+BUGS
+    This function must not be called while holding any other system locks
+    such as layer or LayerInfo locks.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node025C.html">UnlockIBase()</a>, <a href="../Includes_and_Autodocs_2._guide/node039C.html">layers.library/LockLayerInfo()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node0362.html">exec.library/ObtainSemaphore()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

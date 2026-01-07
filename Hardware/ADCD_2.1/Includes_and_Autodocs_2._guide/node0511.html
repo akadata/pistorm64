@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/keyboard" NODE="KBD_RESETHANDLERDONE" TITLE="keyboard.device/KBD_RESETHANDLERDONE" -->
+<head>
+<title>keyboard.device/KBD_RESETHANDLERDONE</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0510.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0512.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    KBD_RESETHANDLERDONE -- Indicate that reset handling is done.
+
+FUNCTION
+    Indicate that reset cleanup associated with the handler has
+    completed.  This command should be issued by all keyboard
+    reset handlers so that the reset may proceed.
+
+IO REQUEST
+    io_Message      mn_ReplyPort set
+    io_Device       preset by <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice</a>
+    io_Unit         preset by <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice</a>
+    io_Command      KBD_RESETHANDLERDONE
+    io_Data         a pointer to the handler interrupt structure.
+
+NOTES
+    The keyboard processor itself performs the hardware reset, and
+    will time out and perform the reset even if some reset handlers
+    have not indicated yet that the reset may proceed.  This
+    timeout is several seconds.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

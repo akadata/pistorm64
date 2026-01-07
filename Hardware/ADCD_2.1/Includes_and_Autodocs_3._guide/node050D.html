@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="printer" NODE="PRD_DUMPRPORTTAGS" TITLE="printer.device/PRD_DUMPRPORTTAGS" -->
+<head>
+<title>printer.device/PRD_DUMPRPORTTAGS</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node050C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node050E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	PRD_DUMPRPORTTAGS -- dump the specified <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> to a printer (V44)
+
+<b>   FUNCTION</b>
+	Print a rendition of the supplied <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, using the supplied
+	<a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a>, position and scaling information, as specified in
+	the printer preferences.
+
+<b>   IO REQUEST</b>
+	io_Message	mn_ReplyPort set if quick I/O is not possible.
+	io_Command	<a href="../Includes_and_Autodocs_3._guide/node050C.html">PRD_DUMPRPORT</a>.
+	io_Flags	IOB_QUICK set if quick I/O is possible.
+	io_RastPort	ptr to a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+	io_ColorMap	ptr to a <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a>.
+	io_Modes	the 'modes' flag from a <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> structure,
+			(the upper word is reserved and should be zero).
+
+			If you are running under version 36, or greater
+			of graphics.library, it is recommended that
+			you fill in &#034;io_Modes&#034; with the ULONG (32-bit)
+			value returned from calling:
+
+			ULONG ModeID = GetVPModeID(struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *);
+
+			Doing so provides for upwards compatability with
+			the new display modes available under V36
+			(example: aspect ratio calculations for new
+			display modes).
+
+	io_SrcX		x offset into the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> to start printing from.
+	io_SrcY		y offset into the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> to start printing from.
+	io_SrcWidth	width of the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> to print (from io_SrcX).
+	io_SrcHeight	height of the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> to print (from io_SrcY).
+	io_DestCols	width of the printout in printer pixels.
+	io_DestRows	height of the printout in printer pixels.
+	io_Special	flag bits
+	io_TagList	a list of tags to specify more parameters for the
+			dump.
+
+<b>   TAGS</b>
+	DRPA_SourceHook	a pointer to struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> which is called to read
+			the source data. io_RastPort and io_ColorMap are
+			ignored and should be NULL.
+
+			The hook is called with object == NULL and message
+			is a pointer to struct <a href="../Includes_and_Autodocs_3._guide/node0605.html#line314">DRPSourceMsg</a>. It must read
+			an array of source data.
+
+			Each pixel of the array is an ULONG of form
+			0x00RRGGBB.
+
+			Some printer drivers have set PPCB_NOSTRIPE which
+			means they cannot print in stripes. Using
+			DRPA_SourceHook is the best way for printing for such
+			printers because you can still prepare the printer
+			source data in stripes then.
+
+			The Source <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> is always called in the context of
+			the printer driver DOS process.
+
+	DRPA_AspectX	the X aspect ratio.
+	DRPA_AspectY	the Y aspect ratio. This values overwrites the
+			aspect ratio from <a href="../Includes_and_Autodocs_3._guide/node0612.html#line25">GfxBase</a> or io_Modes and is used
+			for scaling.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

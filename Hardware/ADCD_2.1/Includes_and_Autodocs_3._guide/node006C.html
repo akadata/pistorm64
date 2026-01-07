@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="audio" NODE="CMD_READ" TITLE="audio.device/CMD_READ" -->
+<head>
+<title>audio.device/CMD_READ</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node006B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node006D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       CMD_READ -- normal I/O entry point
+
+<b>   FUNCTION</b>
+       CMD_READ is a standard command for a single audio channel (io_Unit).
+       If the allocation key (ioa_AllocKey) is correct, CMD_READ returns a
+       pointer (io_Data) to the I/O block currently writing (CMD_WRITE) on
+       the selected channel; otherwise, CMD_READ returns an error
+       (ADIOERR_NOALLOCATION).  If there is no write in progress, CMD_READ
+       returns zero.  CMD_READ is synchronous and only replies (mn_ReplyPort)
+       if the quick bit (IOF_QUICK) is clear.
+
+<b>   INPUTS</b>
+       mn_ReplyPort- pointer to message port that receives I/O request after
+                     if the quick flag (IOF_QUICK) is clear
+       io_Device   - pointer to device node, must be set by (or copied from
+                     I/O block set by) <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a> function
+       io_Unit     - bit map of channel to read (bit 0 thru 3 corresponds to
+                     channel 0 thru 3), if more then one bit is set lowest
+                     bit number channel read
+       io_Command  - command number for CMD_READ
+       io_Flags    - flags, must be cleared if not used:
+                     IOF_QUICK - (CLEAR) reply I/O request
+       ioa_AllocKey- allocation key, must be set by (or copied from I/O block
+                     set by) <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a> function or <a href="../Includes_and_Autodocs_3._guide/node0061.html">ADCMD_ALLOCATE</a> command
+
+<b>   OUTPUTS</b>
+       io_Unit     - bit map of channel successfully read (bit 0 thru 3
+                     corresponds to channel 0 thru 3)
+       io_Error    - error number:
+                     0                    - no error
+                     ADIOERR_NOALLOCATION - allocation key (ioa_AllocKey)
+                                            does not match key for channel
+       ioa_Data    - pointer to I/O block for current write, zero if none is
+                     progress
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

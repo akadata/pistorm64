@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="SetFileSize()" TITLE="dos.library/SetFileSize" -->
+<head>
+<title>dos.library/SetFileSize</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02F5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02F7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SetFileSize -- Sets the size of a file (V36)
+
+SYNOPSIS
+    newsize = SetFileSize(fh, offset, mode)
+    D0                    D1    D2     D3
+
+    LONG SetFileSize(BPTR, LONG, LONG)
+
+FUNCTION
+    Changes the file size, truncating or extending as needed.  Not all
+    handlers may support this; be careful and check the return code.  If
+    the file is extended, no values should be assumed for the new bytes.
+    If the new position would be before the filehandle's current position
+    in the file, the filehandle will end with a position at the
+    end-of-file.  If there are other filehandles open onto the file, the
+    new size will not leave any filehandle pointing past the end-of-file.
+    You can check for this by looking at the new size.
+
+    Do NOT count on any specific values to be in the extended area.
+
+INPUTS
+    fh     - File to be truncated/extended.
+    offset - Offset from position determined by mode.
+    mode   - One of OFFSET_BEGINNING, OFFSET_CURRENT, or OFFSET_END.
+
+RESULT
+    newsize - position of new end-of-file or -1 for error.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02ED.html">Seek()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

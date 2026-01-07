@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-3" TITLE="28 Graphics Sprites, Bobs and Animation / Using Virtual Sprites" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 Graphics Sprites, Bobs and Animation / Using Virtual Sprites</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node037F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0381.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This section describes how to set up the <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure so that it
+represents a true VSprite.  True VSprites are managed by the GELs system
+which converts them to Simple Sprites and displays them.  (Later sections
+describe how a VSprite structure can be set up for Bobs and AnimComps.)
+
+Before the system is told of a VSprite's existence, space for the <a href="../Libraries_Manual_guide/node0381.html">VSprite</a>
+data structure must be allocated and initialized to correctly represent a
+VSprite.  Since the system does no validity checking on the VSprite
+structure, the result of using a bogus structure is usually a fireworks
+display, followed by a system failure.
+
+The system software provides a way to detect collisions between VSprites
+and other on-screen objects.  There is also a method of extending the
+<a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure to incorporate user defined variables.  These subjects
+are applicable to all GELs and are explained later in the section on
+&#034;<a href="../Libraries_Manual_guide/node03AB.html">Collisions and GEL Structure Extensions</a>&#034;.
+
+ <a href="../Libraries_Manual_guide/node0381.html">Specification of VSprite Structure</a> 
+ <a href="../Libraries_Manual_guide/node0382.html">Reserved VSprite Members</a> 
+ <a href="../Libraries_Manual_guide/node0383.html">Using VSprite Flags</a> 
+ <a href="../Libraries_Manual_guide/node0384.html">VSprite Position</a> 
+ <a href="../Libraries_Manual_guide/node0385.html">VSprite Image Size</a> 
+ <a href="../Libraries_Manual_guide/node0386.html">VSprites and Collision Detection</a> 
+ <a href="../Libraries_Manual_guide/node0387.html">VSprite Image Data</a> 
+ <a href="../Libraries_Manual_guide/node0388.html">Specifying the Colors of a VSprite</a> 
+ <a href="../Libraries_Manual_guide/node0389.html">Adding and Removing VSprites</a> 
+ <a href="../Libraries_Manual_guide/node038A.html">Changing VSprites</a> 
+ <a href="../Libraries_Manual_guide/node038B.html">Getting the VSprite List In Order</a> 
+ <a href="../Libraries_Manual_guide/node038C.html">Displaying the VSprites</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

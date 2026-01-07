@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="string_gc" NODE="--datasheet--" TITLE="string_gc/--datasheet--" -->
+<head>
+<title>string_gc/--datasheet--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node056D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node056F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+        string_gc -- create string BOOPSI objects
+
+<b>    SUPERCLASS</b>
+        gadgetclass
+
+<b>    REQUIRES</b>
+        bevel.image
+
+<b>    DESCRIPTION</b>
+        The string gadget class is used to create single line
+        editable strings. This class also supports window relativity.
+        This class is a subclass of rom strgclass which automatically
+        creates a field bevel and supports GM_DOMAIN for layout groups.
+
+<b>     METHODS</b>
+        OM_NEW -- Passed to superclass, strgclass allocated, then OM_SET.
+
+        OM_SET -- Passed to superclass, and strgclass is set.
+
+        OM_UPDATE -- Passed to superclass, and strgclass is set then
+            rendered.
+
+        OM_DISPOSE -- Disposes strgclass object, then passed to superclass.
+
+        GM_RENDER -- Passed to superclass, then strgclass object
+
+        GM_HITTEST -- Overrides supperclass, returns GMR_HITTEST.
+
+        GM_GOACTIVE -- Passed to superclass, strgclass, string activated
+
+        GM_HANDLEINPUT -- Routes input to strgclass object.
+
+        GM_GOINACTIVE -- Passed to superclass, strgclass, string deactivated.
+
+        GM_DOMAIN -- Returns GDOMAIN_MINIMUM, GDOMAIN_NOMINAL and
+            GDOMAIN_MAXIMUM dimensions.
+
+<b>     ATTRIBUTES</b>
+        GA_Disabled (BOOL)
+            Determines whether the string is disabled or not.
+            Changing disable state will invoke GM_RENDER.  A disabled
+            string is dusted in a ghosting pattern that is rendered
+            in SHADOWPEN.
+
+            Defaults to FALSE.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+        GA_TextAttr (struct <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> *)
+            <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text</a> attribute for the font to use for the string.
+
+            Defaults to RPort-&#062;Font, which is often the screen or
+            window font.
+
+            Applicability is (OM_NEW)
+
+        GA_ReadOnly (BOOL)
+            Read-only gadgets ignore activation attempts.
+
+            Defaults to FALSE.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+        STRINGA_MinVisible (WORD) (V41)
+            Set the minimum number of characters that should be
+            visible for a 'GDOMAIN_MIMIMUM' domain size. Nominal
+            domain sizes to twice this minimum. This is a handy
+            addition (also present in V40.35) to ensure a mimimum
+            number characters will be visible in a string gadget.
+
+            Defaults to 4.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+
+<b>     NOTES</b>
+
+        The string class passes all tags to its strgclass child,
+        please see strgclass tags &#038; autodocs, and look in
+        <a href="../Includes_and_Autodocs_3._guide/node0615.html">&#060;intuition/gadgetclass.h&#062;</a> for the STRINGA_ tags.
+
+        WARNING: string.gadget is ROM strgclass wrapper, depending on
+        string.gadget version. Passing GA_Text can crash strgclass,
+        please use STRING_TextVal as its intended. STRINGA_Font and
+        STRINGA_LongVal are not directly supported, for numeric
+        strings use our more powerful integer.gadget class. To specify
+        the font for the gadget, use GA_TextAttr which is consistant
+        with all other ReAction gadget attributes.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

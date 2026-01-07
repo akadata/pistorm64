@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_25" NODE="25-1-1-1" TITLE="25 / / The Signal Semaphore / Creating a SignalSemaphore Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>25 / / The Signal Semaphore / Creating a SignalSemaphore Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02F7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02F9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To initialize a <a href="../Libraries_Manual_guide/node02F7.html">SignalSemaphore</a> structure use the <a href="../Includes_and_Autodocs_2._guide/node035D.html">InitSemaphore()</a>
+function.  This function initializes the list structure and the nesting
+and queue counters.  It does not change the semaphore's name or priority
+fields.
+
+This fragment creates and initializes a semaphore for a data item such as
+the <a href="../Libraries_Manual_guide/node02F7.html#line37">SharedList</a> structure above.
+
+    struct SharedList *slist;
+
+    if (slist=(struct SharedList *)
+        AllocMem(sizeof(struct SharedList),MEMF_PUBLIC|MEMF_CLEAR))
+    {
+        NewList(&#038;slist-&#062;sl_List);       /* Initialize the MinList       */
+        InitSemaphore((struct SignalSemaphore *)slist);
+                                        /* And initialize the semaphore */
+
+        /* The semaphore can now be used. */
+    }
+    else printf(&#034;Can't allocate structure\n&#034;);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

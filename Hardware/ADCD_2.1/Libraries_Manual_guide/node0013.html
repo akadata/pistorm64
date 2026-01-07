@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_1" NODE="1-1-3-1" TITLE="1 / / Dynamic Memory Architecture / Exec: The System Executive" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>1 / / Dynamic Memory Architecture / Exec: The System Executive</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0012.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0014.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+On the Amiga, the module that keeps track of linked lists is <a href="../Libraries_Manual_guide/node0286.html">Exec</a>, the
+system executive.  Exec is the heart of the Amiga operating system since
+it also is in charge of <a href="../Libraries_Manual_guide/node000A.html">multitasking</a>, granting access to system resources
+<a name="line5">(like memory) and managing the Amiga library system.</a>
+
+As <a href="../Libraries_Manual_guide/node000F.html#line8">previously discussed</a>, memory location 4 ($0000 0004), also known as
+SysBase, contains a <a href="../Libraries_Manual_guide/node030A.html">pointer</a> to the <a href="../Libraries_Manual_guide/node0291.html">Exec library</a> structure.  This is the
+only absolutely defined location in the Amiga operating system.  A program
+need only know where to find the Exec library to find, use and manipulate
+all other system code and data.
+
+
+                             $04 Sysbase
+                                  |
+                                  |
+                             Exec Library
+                                  |
+     _____________________________|_____________________________
+    |         |         |         |         |         |         |
+    |         |         |         |         |         |         |
+LIBRARIES  DEVICES    MEMORY  RESOURCES   INTS      PORTS     TASKS
+    |         |         |         |         |         |         |
+   DOS    Trackdisk   Chunk 1   Potgo      END      IDCMP       |
+    |         |         |         |                   |         |
+Graphics    Serial    Chunk 2   Keymap              IDCMP      / \
+    |         |         |         |                   |       /   \
+Intuition  Parallel    END      CIAA              Workbench  /     \
+    |         |                   |                   |     /    WAITING
+Expansion  Printer              CIAB                 END   /        |
+    |         |                   |                       /    File System
+  Layers    Input               Disk                     /          |
+    |         |                   |                   READY    File System
+ Mathffp   Keyboard             MISC                    |           |
+    |         |                   |                   Shell    Input.device
+   Icon    Gameport              END                    |           |
+    |         |                                        RAM         END
+ Diskfont   Timer                                       |
+    |         |                                    Application
+   END      Audio                                    Task 1
+              |                                         |
+           Console                                 Application
+              |                                      Task 2
+             END                                        |
+                                                       END
+
+
+         Figure 1-3: Exec and the Organization of the Amiga OS
+
+
+The diagram above shows how the entire Amiga operating system is built as
+a tree starting at SysBase.  Exec keeps linked lists of all the system
+libraries, devices, memory, tasks and other data structures.  Each of
+these in turn can have its own variables and linked lists of data
+structures built onto it.  In this way, the flexibility of the OS is
+preserved so that upgrades can be made without jeopardizing <a href="../Libraries_Manual_guide/node001E.html">compatibility</a>.
+  _______________________________________________________________________
+ |                                                                       |
+ | What Every Amiga Programmer Should Know:                              |
+ | ----------------------------------------                              |
+ | The Amiga has a <a href="../Libraries_Manual_guide/node0012.html">dynamic memory</a> map.  There are no fixed locations for |
+ | operating system variables and routines.  Do not call ROM routines or |
+ | access system data structures directly.  Instead use the indirect     |
+ | access methods provided by the system.                                |
+ |_______________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_ILBM" NODE="16-3-6" TITLE=" ILBM IFF Interleaved Bitmap / Appendix B. ILBM Box Diagram " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> ILBM IFF Interleaved Bitmap / Appendix B. ILBM Box Diagram </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01BB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01BD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here's a box diagram for a simple example: an uncompressed image 320 x 200
+pixels x 3 bitplanes.  The text to the right of the diagram shows the
+outline that would be printed by the Sift utility program for this
+particular file.
+
+
+	          +--------------------+
+	          |                    |
+	          |  'FORM'     24070  |  FORM 24070 ILBM
+	          |                    |
+	       -- +--------------------+
+	       |  |                    |
+	       |  |  'ILBM'            |
+	       |  |                    |
+	       |  | +----------------+ |
+	       |  | |  'BMHD'    20  | |  .BMHD 20
+	       |  | |----------------| |
+	       |  | |  320, 200,     | |
+	       |  | |  0 ....        | |
+	       |  | +----------------+ |
+	       |  |                    |
+	       |  | +----------------+ |
+	24070 &#060;   | |  'CMAP'    21  | |  .CMAP 21
+	 bytes |  | |----------------| |
+	       |  | |  0, 0, 0,      | |
+	       |  | |  255 ....      | |
+	       |  | +----------------+ |
+	       |  |   0                |
+	       |  | +----------------+ |
+	       |  | |  'BODY'  24000 | |  .BODY 24000
+	       |  | |----------------| |
+	       |  | |  0, 0, 0....   | |
+	       |  | +----------------+ |
+	       |  |                    |
+	       -- +--------------------+
+
+The &#034;0&#034; after the <a href="../Devices_Manual_guide/node01B0.html">CMAP</a> chunk is a pad byte.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/errors.h" NODE="MAIN" TITLE="Includes/exec/errors.h" -->
+<head>
+<title>Includes/exec/errors.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node008E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0090.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_ERRORS_H
+#define	EXEC_ERRORS_H
+/*
+**	$Filename: exec/errors.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.6 $
+**	$Date: 90/05/27 $
+**
+**	Standard Device IO Errors (returned in io_Error)
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+<a name="line13">*/</a>
+<a name="line14"></a>
+<a name="line15">#define IOERR_OPENFAIL	 (-1) /* device/unit failed to open */</a>
+<a name="line16">#define IOERR_ABORTED	 (-2) /* request terminated early [after AbortIO()] */</a>
+<a name="line17">#define IOERR_NOCMD	 (-3) /* command not supported by device */</a>
+<a name="line18">#define IOERR_BADLENGTH	 (-4) /* not a valid length (usually IO_LENGTH) */</a>
+<a name="line19">#define IOERR_BADADDRESS (-5) /* invalid address (misaligned or bad range) */</a>
+<a name="line20">#define IOERR_UNITBUSY	 (-6) /* device opens ok, but requested unit is busy */</a>
+#define IOERR_SELFTEST	 (-7) /* hardware failed self-test */
+
+#endif	/* EXEC_ERRORS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

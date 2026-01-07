@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="parallel" NODE="PDCMD_QUERY" TITLE="parallel.device/PDCMD_QUERY" -->
+<head>
+<title>parallel.device/PDCMD_QUERY</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04F4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04F6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	Query -- query parallel port/line status
+
+<b>   FUNCTION</b>
+	This command return the status of the parallel port lines and
+	registers.
+
+<b>   IO REQUEST</b>
+	io_Message      must have mn_ReplyPort initialized
+	io_Device       set by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Unit         set by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Command      PDCMD_QUERY (09)
+
+<b>   RESULTS</b>
+	io_Status        BIT  ACTIVE  FUNCTION
+
+	                 0     high   printer busy toggle (offline)
+	                 1     high   paper out
+	                 2     high   printer selected on the A1000
+	                              printer selected &#038; serial &#034;Ring
+	                              Indicator&#034; on the A500/A2000
+	                              Use care when making cables.
+	                 3      -     read=0,write=1
+	               4-7            reserved
+
+<b>   BUGS</b>
+	In a earlier version of this AutoDoc, BUSY and PSEL were reversed.
+	The function has always been correct.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

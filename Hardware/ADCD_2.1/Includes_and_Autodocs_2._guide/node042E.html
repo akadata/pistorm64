@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="CloseFont()" TITLE="graphics.library/CloseFont" -->
+<head>
+<title>graphics.library/CloseFont</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node042D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node042F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CloseFont -- Release a pointer to a system font.
+
+SYNOPSIS
+    CloseFont(font)
+              A1
+
+    void CloseFont(struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line90">TextFont</a> *);
+
+FUNCTION
+    This function indicates that the font specified is no longer
+    in use.  It is used to close a font opened by <a href="../Includes_and_Autodocs_2._guide/node0462.html">OpenFont</a>, so
+    that fonts that are no longer in use do not consume system
+    resources.
+
+INPUTS
+    font -  a font pointer as returned by <a href="../Includes_and_Autodocs_2._guide/node0462.html">OpenFont()</a> or <a href="../Includes_and_Autodocs_2._guide/node01F7.html">OpenDiskFont()</a>
+
+RESULT
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0462.html">OpenFont()</a>  <a href="../Includes_and_Autodocs_2._guide/node01F7.html">diskfont.library/OpenDiskFont</a>  <a href="../Includes_and_Autodocs_2._guide/node00A8.html">graphics/text.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

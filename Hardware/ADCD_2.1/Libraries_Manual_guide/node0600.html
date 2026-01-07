@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/mathieeesingtrans.c" NODE="MAIN" TITLE="lib_examples/mathieeesingtrans.c" -->
+<head>
+<title>lib_examples/mathieeesingtrans.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05FF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0601.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#include &#060;exec/types.h&#062;
+#include &#060;libraries/mathieeesp.h&#062;
+
+#include &#060;clib/mathsingtrans_protos.h&#062;
+
+struct Library *MathIeeeSingTransBase;
+
+VOID main()
+{
+FLOAT f1, f2, f3;
+
+if (MathIeeeSingTransBase = OpenLibrary(&#034;mathieeesingtrans.library&#034;,37))
+    {
+    f1 = IEEEDPAsin(f2);        /* Call IEEESPAsin entry */
+    f1 = IEEEDPAcos(f2);        /* Call IEEESPAcos entry */
+    f1 = IEEEDPAtan(f2);        /* Call IEEESPAtan entry */
+    f1 = IEEEDPSin(f2);         /* Call IEEESPSin entry */
+    f1 = IEEEDPCos(f2);         /* Call IEEESPCos entry */
+    f1 = IEEEDPTan(f2);         /* Call IEEESPTan entry */
+    f1 = IEEEDPSincos(&#038;f3, f2); /* Call IEEESPSincos entry */
+    f1 = IEEEDPSinh(f2);        /* Call IEEESPSinh entry */
+    f1 = IEEEDPCosh(f2);        /* Call IEEESPCosh entry */
+    f1 = IEEEDPTanh(f2);        /* Call IEEESPTanh entry */
+    f1 = IEEEDPExp(f2);         /* Call IEEESPExp entry */
+    f1 = IEEEDPLog(f2);         /* Call IEEESPLog entry */
+    f1 = IEEEDPLog10(f2);       /* Call IEEESPLog10 entry */
+    f1 = IEEEDPPow(d2, f3);     /* Call IEEESPPow entry */
+    f1 = IEEEDPSqrt(f2);        /* Call IEEESPSqrt entry */
+
+    CloseLibrary(MathIeeeSingTransBase);
+    }
+else printf(&#034;Can't open mathieeesingtrans.library\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

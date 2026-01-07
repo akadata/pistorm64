@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/appicon.c" NODE="MAIN" TITLE="Lib_examples/appicon.c" -->
+<head>
+<title>Lib_examples/appicon.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05BF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05C1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* The example listed here shows how to create an AppIcon and obtain
+ * arguments from Workbench when the user drops other icons on top of
+ * it. The AppIcon will appear as a disk icon named &#034;TestAppIcon&#034; on the
+ * Workbench screen.  (All AppIcons appear on the Workbench screen or
+ * window.)
+ *
+ * For convenience, this example code uses GetDefDiskObject() to create
+ * the icon imagery for the AppIcon.  Applications should never do this.
+ * Use your own custom imagery for AppIcons instead.
+ */
+
+/* appicon.c - Compiled under SAS C 5.10 with lc -L appicon.c               */
+/* Requires Kickstart version 37 or later.  Works from the Shell (CLI) only */
+
+#include &#060;exec/types.h&#062;          /* Need this for the Amiga variable types  */
+#include &#060;workbench/workbench.h&#062; /* This has DiskObject and AppIcon structs */
+#include &#060;workbench/startup.h&#062;   /* This has WBStartup and WBArg structs    */
+#include &#060;exec/libraries.h&#062;      /* Need this to check library versions     */
+
+#include &#060;clib/icon_protos.h&#062;    /* Icon (DiskObject) function prototypes   */
+#include &#060;clib/exec_protos.h&#062;    /* Exec message, port and library functions*/
+#include &#060;clib/wb_protos.h&#062;      /* AppIcon function protos                 */
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }   /* Disable SAS Lattice CTRL/C handling */
+int chkabort(void) { return(0); }/* really */
+#endif
+
+extern struct Library *SysBase;
+struct Library *IconBase;
+struct Library *WorkbenchBase;
+
+void main(int argc, char **argv)
+{
+struct DiskObject   *dobj=NULL;
+struct MsgPort    *myport=NULL;
+struct AppIcon   *appicon=NULL;
+struct AppMessage *appmsg=NULL;
+
+LONG dropcount=0L;
+ULONG x;
+BOOL success=0L;
+
+/* Get the the right version of the Icon Library, initialize IconBase */
+if(IconBase = OpenLibrary(&#034;icon.library&#034;,37))
+  {
+  /* Get the the right version of the Workbench Library */
+  if (WorkbenchBase=OpenLibrary(&#034;workbench.library&#034;,37))
+    {
+    /* This is the easy way to get some icon imagery */
+    /* Real applications should use custom imagery   */
+    dobj=GetDefDiskObject(WBDISK);
+    if(dobj!=0)
+      {
+      /* The type must be set to NULL for a WBAPPICON */
+      dobj-&#062;do_Type=NULL;
+
+      /* The CreateMsgPort() function is in Exec version 37 and later only */
+      myport=CreateMsgPort();
+      if(myport)
+        {
+        /* Put the AppIcon up on the Workbench window */
+        appicon=AddAppIconA(0L,0L,&#034;TestAppIcon&#034;,myport,NULL,dobj,NULL);
+        if(appicon)
+          {
+          /* For the sake of this example, we allow the AppIcon */
+          /* to be activated only five times.                   */
+          printf(&#034;Drop files on the Workbench AppIcon\n&#034;);
+          printf(&#034;Example exits after 5 drops\n&#034;);
+
+          while(dropcount&#060;5)
+            {
+            /* Here's the main event loop where we wait for */
+            /* messages to show up from the AppIcon         */
+            WaitPort(myport);
+
+            /* Might be more than one message at the port... */
+            while(appmsg=(struct AppMessage *)GetMsg(myport))
+              {
+              if(appmsg-&#062;am_NumArgs==0L)
+                {
+                /* If NumArgs is 0 the AppIcon was activated directly */
+                printf(&#034;User activated the AppIcon.\n&#034;);
+                printf(&#034;A Help window for the user would be good here\n&#034;);
+                }
+              else if(appmsg-&#062;am_NumArgs&#062;0L)
+                {
+                /* If NumArgs is &#062;0 the AppIcon was activated by */
+                /* having one or more icons dropped on top of it */
+                printf(&#034;User dropped %ld icons on the AppIcon\n&#034;,
+                                              appmsg-&#062;am_NumArgs);
+                for(x=0;x&#060;appmsg-&#062;am_NumArgs;x++)
+                  {
+                  printf(&#034;#%ld name='%s'\n&#034;,x+1,appmsg-&#062;am_ArgList[x].wa_Name);
+                  }
+                }
+              /* Let Workbench know we're done with the message */
+              ReplyMsg((struct Message *)appmsg);
+              }
+            dropcount++;
+            }
+          success=RemoveAppIcon(appicon);
+          }
+        /* Clear away any messages that arrived at the last moment */
+        while(appmsg=(struct AppMessage *)GetMsg(myport))
+            ReplyMsg((struct Message *)appmsg);
+        DeleteMsgPort(myport);
+        }
+      FreeDiskObject(dobj);
+      }
+    CloseLibrary(WorkbenchBase);
+    }
+  CloseLibrary(IconBase);
+  }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

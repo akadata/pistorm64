@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-2-5" TITLE="B / rootclass / New Methods: OM_ADDMEMBER" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / rootclass / New Methods: OM_ADDMEMBER</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04BF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04C1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Tells an object to add another object to its personal Exec list.  What the
+list is for depends on the class.  The return value for this method is not
+explicitly defined.
+
+One class that uses this method is <a href="../Libraries_Manual_guide/node04CC.html">modelclass</a>.  A modelclass object
+maintains a broadcast list.  When a modelclass object gets an <a href="../Libraries_Manual_guide/node04C5.html">OM_NOTIFY</a>
+message, it broadcasts an <a href="../Libraries_Manual_guide/node04D0.html">OM_UPDATE</a> message about the OM_NOTIFY to every
+object in its broadcast list.
+
+This method uses a custom message (defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00E2.html#line121">classusr.h</a>&#062;):
+
+    #define  opAddMember opMember
+    struct opMember {
+        ULONG  MethodID;     /* OM_ADDMEMBER (or OM_REMMEMBER) */
+        Object *opam_Object; /* add (or remove) this object    */
+    };                       /* to (from) personal list.       */
+
+opam_Object is the object to add to the list.  A dispatcher typically
+implements OM_ADDMEMBER by sending the <a href="../Libraries_Manual_guide/node04BE.html">OM_ADDTAIL</a> message to the
+opam_Object object.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

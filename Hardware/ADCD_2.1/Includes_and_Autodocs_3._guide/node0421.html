@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="layers" NODE="EndUpdate()" TITLE="layers.library/EndUpdate" -->
+<head>
+<title>layers.library/EndUpdate</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0420.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0422.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	EndUpdate -- remove damage list and restore state of layer to normal.
+
+<b>    SYNOPSIS</b>
+	EndUpdate( l, flag )
+	           a0  d0
+
+	void EndUpdate( struct <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> *, UWORD);
+
+<b>    FUNCTION</b>
+	After the programmer has redrawn his picture he calls this
+	routine to restore the ClipRects to point to his standard
+	layer tiling. The layer is then unlocked for access by the
+	layer library.
+
+	Note: use flag = FALSE if you are only making a partial update.
+	    You may use the other region functions (graphics functions such as
+	    <a href="../Includes_and_Autodocs_3._guide/node030A.html">OrRectRegion</a>, <a href="../Includes_and_Autodocs_3._guide/node02A4.html">AndRectRegion</a>, and <a href="../Includes_and_Autodocs_3._guide/node0340.html">XorRectRegion</a> ) to clip adjust
+	    the DamageList to reflect a partial update.
+
+<b>    INPUTS</b>
+	l - pointer to a layer
+	flag - use TRUE if update was completed. The damage list is cleared.
+	       use FALSE if update not complete. The damage list is retained.
+
+<b>    EXAMPLE</b>
+
+	-- begin update for first part of two-part refresh --
+	BeginUpdate(my_layer);
+
+	-- do some refresh, but not all --
+	my_partial_refresh_routine(my_layer);
+
+	-- end update, false (not completely done refreshing yet) --
+	EndUpdate(my_layer, FALSE);
+
+	-- begin update for last part of refresh --
+	BeginUpdate(my_layer);
+
+	-- do rest of refresh --
+	my_complete_refresh_routine(my_layer);
+
+	-- end update, true (completely done refreshing now) --
+	EndUpdate(my_layer, TRUE);
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0418.html">BeginUpdate()</a>, <a href="../Includes_and_Autodocs_3._guide/node0625.html">graphics/layers.h</a>, <a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

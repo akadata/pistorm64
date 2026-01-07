@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-3-6" TITLE="Primitive Data Types / Chunks " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Primitive Data Types / Chunks </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01DC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01DE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Chunks are the building blocks in the IFF structure.  The form expressed
+as a C typedef is:
+
+    typedef struct {
+	ID	ckID;			/* 4 character ID */
+	LONG	ckSize;			/* sizeof(ckData) */
+	UBYTE	ckData[/* ckSize */];
+	} Chunk;
+
+
+We can diagram an example chunk - a &#034;<a href="../Devices_Manual_guide/node01B0.html">CMAP</a>&#034; chunk containing 12 data bytes
+- like this:
+
+                        +------------------+   -
+        ckID:           | &#034;CMAP&#034;           |   |
+                        |------------------+   |
+        ckSize:         |  12              |   |
+                    -   |------------------+   |
+        ckData:     |   |  0, 0, 0, 32     |  20 bytes
+                   12   |------------------+   |
+                  bytes |  0, 0, 64, 0     |   |
+                    |   |------------------+   |
+                    |   |  0, 0, 64, 0     |   |
+                    -   +------------------+   -
+
+
+That's 4 bytes of ckID, 4 bytes of ckSize and 12 data bytes.  The total
+space used is 20 bytes.
+
+The ckID identifies the format and purpose of the chunk.  As a rule, a
+program must recognize ckID to interpret ckData.  It should skip over all
+unrecognized chunks.  The ckID also serves as a format version number as
+long as we pick new IDs to identify new formats of ckData (see above).
+
+The following ckIDs are universally reserved to identify chunks with
+particular IFF meanings: <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>, <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>, <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>, <a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a> , and &#034;    &#034;.  The
+special ID &#034;    &#034; (4 spaces) is a ckID for &#034;filler&#034; chunks, that is,
+chunks that fill space but have no meaningful contents.  The IDs &#034;LIS1&#034;
+through &#034;LIS9&#034;, &#034;FOR1&#034; through &#034;FOR9&#034;, and &#034;CAT1&#034; through &#034;CAT9&#034; are
+reserved for future &#034;version number&#034; variations.  All IFF-compatible
+software must account for these chunk IDs.
+
+The ckSize is a logical block size - how many data bytes are in ckData.  If
+ckData is an odd number of bytes long, a 0 pad byte follows which is not
+included in ckSize.  (Cf. Alignment.)  A chunk's total physical size is
+ckSize rounded up to an even number plus the size of the header.  So the
+smallest chunk is 8 bytes long with ckSize = 0.  For the sake of following
+chunks, programs must respect every chunk's ckSize as a virtual
+end-of-file for reading its ckData even if that data is malformed, e.g.,
+if nested contents are truncated.
+
+We can describe the syntax of a chunk as a regular expression with &#034;#&#034;
+representing the ckSize, the length of the following {braced} bytes.  The
+&#034;[0]&#034; represents a sometimes needed pad byte.  (The regular expressions in
+this document are collected in <a href="../Devices_Manual_guide/node01F6.html">Appendix A</a> along with an explanation of
+notation.)
+
+	Chunk	::= ID #{ UBYTE* } [0]
+
+One chunk output technique is to stream write a chunk header, stream write
+the chunk contents, then random access back to the header to fill in the
+size. Another technique is to make a preliminary pass over the data to
+compute the size, then write it out all at once.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

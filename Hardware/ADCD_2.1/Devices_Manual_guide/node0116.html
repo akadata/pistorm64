@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_8" NODE="8-2-1" TITLE="8 / Device Interface / The Amiga Speech System" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>8 / Device Interface / The Amiga Speech System</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0115.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0117.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The speech system on the Amiga is divided into two subsystems:
+
+   *  The translator library,  consisting of a single function:
+      <a href="../Includes_and_Autodocs_2._guide/node03AC.html">Translate()</a>, which converts an English string into its phonetic
+      representation, and
+
+   *  The narrator device, which uses the phonetic representation
+      (generated either manually or by the translator library) as input to
+      generate human-like speech and play it out via the audio device.
+
+The two subsystems can be used either together or individually. Generally,
+hand coding phonetic text will produce better quality speech than using
+the translator library, but this requires the programmer to &#034;hard code&#034;
+the phonetic text in the program or otherwise restrict the input to
+phonetic text only.  If the program must handle arbitrary English input,
+<a name="line17">the translator library should be used.</a>
+
+Below is an example of how you would use the translator library to
+translate a string for the narrator device.
+
+    #define BUFLEN 500
+
+    APTR EnglStr;                   /* pointer to sample input string */
+    LONG EnglLen;                   /* input length */
+    UBYTE PhonBuffer[BUFLEN];       /* place to put the translation */
+    LONG rtnCode;                   /* return code from function */
+
+    struct narrator_rb *VoiceIO;    /* speaking I/O request block */
+    struct mouth_rb *MouthIO;       /* mouth movement I/O request block */
+
+    EnglStr = &#034;This is Amiga speaking.&#034;;    /* a test string */
+    EnglLen = strlen(EnglStr);
+    rtnCode = Translate(EnglStr, EnglLen, (APTR)&#038;PhonBuffer[0], BUFLEN);
+
+    voice_io-&#062;message.io_Command = CMD_WRITE;
+    voice_io-&#062;message.io_Offset  = 0;
+    voice_io-&#062;message.io_Data    = PhonBuffer;
+    voice_io-&#062;message.io_Length  = strlen(PhonBuffer);
+    DoIO((struct IORequest *)VoiceIO)
+
+This chapter discusses only the narrator device; refer to the &#034;Translator
+Library&#034; chapter of the Amiga ROM Kernel Reference Manual: Libraries for
+more information on the translator library.
+
+While the narrator device on the Amiga supports all of the major device
+commands (see the  <a href="../Devices_Manual_guide/node0114.html">Narrator Device Commands and Functions</a> section), two of
+<a name="line48">these commands do most of the work in the device.  They are:</a>
+
+   *  <a href="../Includes_and_Autodocs_2._guide/node04C7.html">CMD_WRITE</a> - This command is used to send a phonetic string to the
+      device to be spoken.  The <a href="../Devices_Manual_guide/node0115.html#line17">narrator_rb</a> I/O request block also contains
+      several parameters which can be set to control  various aspects of
+      the speech, such as pitch, speaking rate, male/female voice, and so
+      on. Some of the options are rather arcane.  See the
+      <a href="../Devices_Manual_guide/node0119.html">Writing to the Narrator Device</a> section for a complete list
+<a name="line56">      of options and their descriptions.</a>
+
+   *  <a href="../Includes_and_Autodocs_2._guide/node04C3.html">CMD_READ</a> - The narrator device can be told to generate various
+      synchronization events which the user can query.  These events are:
+      mouth shape changes, word sync, and/or syllable sync.  The events can
+      be generated singly or in any combination, as requested by the user.
+      Word and syllable synchronization events are new to system 2.0 and
+      later (V37 and later of the narrator device).  See the
+      <a href="../Devices_Manual_guide/node011A.html">Reading from the Narrator Device</a> section for more details.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

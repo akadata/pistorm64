@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-4-1-1" TITLE="33 / / Controlling Parsing / StopChunk()" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / / Controlling Parsing / StopChunk()</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0432.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0434.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You can instruct the parser to stop when it encounters a specific <a href="../Libraries_Manual_guide/node0428.html">IFF</a>
+chunk by using the function <a href="../Includes_and_Autodocs_2._guide/node01D9.html">StopChunk()</a>:
+
+    error = StopChunk (iff, ID_ILBM, ID_BODY);
+
+When the parser encounters the requested chunk, parsing will stop, and
+<a href="../Includes_and_Autodocs_2._guide/node01D1.html">ParseIFF()</a> will return the value zero.  The stream will be positioned
+ready to read the first data byte in the chunk.  You may then call
+<a href="../Libraries_Manual_guide/node043B.html">ReadChunkBytes()</a> or <a href="../Libraries_Manual_guide/node043B.html">ReadChunkRecords()</a> to pull the data out of the chunk.
+
+You may call <a href="../Includes_and_Autodocs_2._guide/node01D9.html">StopChunk()</a> any number of times for any number of different
+chunk types.  If you wish to identify the chunk on which you've stopped,
+you may call <a href="../Libraries_Manual_guide/node0447.html">CurrentChunk()</a> to get a pointer to the current <a href="../Libraries_Manual_guide/node0446.html">ContextNode</a>,
+and examine the cn_Type and cn_ID fields.
+
+Using <a href="../Includes_and_Autodocs_2._guide/node01D9.html">StopChunk()</a> for every chunk, you can parse <a href="../Libraries_Manual_guide/node0428.html">IFF</a> files in a manner
+very similar to the way you're probably doing it now, using a state
+machine.  However, this would be a terrible underuse of IFFParse.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

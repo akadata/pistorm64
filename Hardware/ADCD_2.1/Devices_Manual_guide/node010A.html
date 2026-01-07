@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_15" NODE="15-2" TITLE="15 Resources / Resource Interface" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>15 Resources / Resource Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0109.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node010B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Resources provide functions that you call to do low-level operations with
+the hardware they access.  In order to use the functions of a resource,
+you must obtain a pointer to the resource.  This is done by calling the
+<a href="../Includes_and_Autodocs_2._guide/node0368.html">OpenResource()</a> function with the resource name as its argument.
+
+<a href="../Includes_and_Autodocs_2._guide/node0368.html">OpenResource()</a> returns a pointer to the resource you request or NULL
+if it does not exist.
+
+    #include &#060;resources/filesysres.h&#062;
+
+    struct FileSysResource *FileSysResBase = NULL;
+
+    if (!(FileSysResBase = OpenResource(FSRNAME)))
+        printf(&#034;Cannot open %s\n&#034;,FSRNAME);
+
+There is no CloseResource() function.  When you are done with a resource,
+you are done with it.  However, as you will see later in this chapter,
+some resources provide functions to allocate parts of the hardware they
+access. In those cases, you will have to free those parts for anyone else
+<a name="line21">to use them.</a>
+
+Each resource has at least one include file in the resources subdirectory
+of the include directory.  Some of the include files contain only the name
+of the resource; others list structures and bit definitions used by the
+resource.  The include files will be listed at the end of this chapter.
+
+Calling a resource function is the same as calling any other function on
+the Amiga.  You have to know what parameters it accepts and the return
+value, if any.  The Autodocs for each resource lists the functions and
+their requirements.
+
+    #include &#060;hardware/cia.h&#062;
+    #include &#060;resources/cia.h&#062;
+
+    struct Library *CIAResource = NULL;
+
+    void main()
+    {
+
+    WORD mask = 0;
+
+    if (!(CIAResource = OpenResource(CIABNAME)))
+        printf(&#034;Cannot open %s\n&#034;,CIABNAME);
+    else
+       {
+        /* What is the interrupt enable mask? */
+         mask = AbleICR(CIAResource,0);
+
+        printf(&#034;\nThe CIA interrupt enable mask: %x \n&#034;,mask);
+       }
+    }
+
+   Looks Can Be Deceiving.
+   -----------------------
+   Some resources may look like libraries and act like libraries, but be
+   assured they are not libraries.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-9" TITLE="5 Intuition Gadgets / Gadget Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 Intuition Gadgets / Gadget Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0148.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node014A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here is the specification for the Gadget structure defined in
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">intuition.h</a>&#062;.  You create an instance of this structure for
+each gadget you place in a window or requester:
+
+    struct Gadget
+        {
+        struct Gadget *NextGadget;
+        WORD LeftEdge, TopEdge;
+        WORD Width, Height;
+        UWORD Flags;
+        UWORD Activation;
+        UWORD GadgetType;
+        APTR GadgetRender;
+        APTR SelectRender;
+        struct IntuiText *GadgetText;
+        LONG MutualExclude;
+        APTR SpecialInfo;
+        UWORD GadgetID;
+        APTR UserData;
+<a name="line21">        };</a>
+
+NextGadget
+    Applications may create lists of gadgets that may be added to a
+    window or requester with a single instruction.  NextGadget is a
+    pointer to the next gadget in the list.  The last gadget in the list
+    should have a NextGadget value of NULL.
+
+    When gadgets are added or removed, Intuition will modify the
+    appropriate NextGadget fields to maintain a correctly linked list of
+    gadgets for that window or requester.  However, removing one or more
+    gadgets does not reset the last removed gadget's NextGadget field to
+<a name="line33">    NULL.</a>
+
+LeftEdge, TopEdge, Width, Height
+    These variables describe the location and dimensions of the select
+    box of the gadget.  Both location and dimensions can be either
+    absolute values or else relative to the edges and size of the window
+    or requester that contains the gadget.
+
+    LeftEdge and TopEdge are relative to one of the corners of the
+    display element, according to how <a href="../Libraries_Manual_guide/node014A.html#line38">GFLG_RELRIGHT</a> and <a href="../Libraries_Manual_guide/node014A.html#line29">GFLG_RELBOTTOM</a>
+    are set in the Flags variable (see below).
+
+    Width and Height are either absolute dimensions or a negative
+    increment to the width abd height of a requester or a window,
+    according to to how the <a href="../Libraries_Manual_guide/node014A.html#line47">GFLG_RELWIDTH</a> and <a href="../Libraries_Manual_guide/node014A.html#line55">GFLG_RELHEIGHT</a> flags are
+<a name="line48">    set (see below).</a>
+
+Flags
+    The Flags field is shared by the program and Intuition.  See the
+    section below on &#034;<a href="../Libraries_Manual_guide/node014A.html">Gadget Flags</a>&#034; for a complete description of all the
+<a name="line53">    flag bits.</a>
+
+Activation
+    This field is used for information about some gadget attributes.  See
+    the &#034;<a href="../Libraries_Manual_guide/node014B.html">Gadget Activation Flags</a>&#034; section below for a description of the
+<a name="line58">    various flags.</a>
+
+GadgetType
+    This field contains information about gadget type and in what sort of
+    display element the gadget is to be displayed.  One of the following
+<a name="line63">    flags must be set to specify the type:</a>
+
+    GTYP_BOOLGADGET
+<a name="line66">        <a href="../Libraries_Manual_guide/node014C.html">Boolean</a> gadget type.</a>
+
+    GTYP_STRGADGET
+        <a href="../Libraries_Manual_guide/node0164.html">String</a> gadget type.  For an <a href="../Libraries_Manual_guide/node0165.html">integer</a> gadget, also set the
+        <a href="../Libraries_Manual_guide/node014B.html#line91">GACT_LONGINT</a> flag.  See the &#034;<a href="../Libraries_Manual_guide/node014B.html">Gadget Activation Flags</a>&#034; section
+<a name="line71">        below.</a>
+
+    GTYP_PROPGADGET
+<a name="line74">        <a href="../Libraries_Manual_guide/node0153.html">Proportional</a> gadget type.</a>
+
+    GTYP_CUSTOMGADGET
+        Normally not set by the application.  Used by <a href="../Libraries_Manual_guide/node0176.html">custom</a> BOOPSI
+        gadget types, discussed in the &#034;<a href="../Libraries_Manual_guide/node0218.html">BOOPSI</a>&#034; chapter.
+
+    The following gadget types may be set in addition to one of the above
+<a name="line81">    types.  None of the following types are required:</a>
+
+    GTYP_GZZGADGET
+        If the gadget is placed in a <a href="../Libraries_Manual_guide/node0116.html">GimmeZeroZero</a> window, setting this
+        flag will place the gadget in the border layer, out of the inner
+        window.  If this flag is not set, the gadget will go into the
+        inner window.  Do not set this bit if this gadget is not placed
+<a name="line88">        in a GimmeZeroZero window.</a>
+
+    GTYP_REQGADGET
+<a name="line91">        Set this bit if this gadget is placed in a requester.</a>
+
+GadgetRender
+    A pointer to the <a href="../Libraries_Manual_guide/node01BA.html">Image</a> or <a href="../Libraries_Manual_guide/node01C1.html">Border</a> structure containing the graphics
+    imagery of this gadget.  If this field is set to NULL, no rendering
+    will be done.
+
+    If the graphics of this gadget are implemented with an <a href="../Libraries_Manual_guide/node01BA.html">Image</a>
+    structure, this field should contain a pointer to that structure and
+    the <a href="../Libraries_Manual_guide/node014A.html#line23">GFLG_GADGIMAGE</a> flag must be set.  If a <a href="../Libraries_Manual_guide/node01C1.html">Border</a> structure is used,
+    this field should contain a pointer to the Border structure, and the
+<a name="line102">    GFLG_GADGIMAGE bit must be cleared.</a>
+
+SelectRender
+    If the application does not use an alternate image for highlighting,
+    set this field to NULL.  Otherwise, if the flag <a href="../Libraries_Manual_guide/node014A.html#line16">GFLG_GADGHIMAGE</a> is
+    set, this field must contain a pointer to an <a href="../Libraries_Manual_guide/node01BA.html">Image</a> or <a href="../Libraries_Manual_guide/node01C1.html">Border</a>
+    structure.  The <a href="../Libraries_Manual_guide/node014A.html#line23">GFLG_GADGIMAGE</a> flag determines the type of the
+    rendering. Provide a pointer to an <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structure to include a
+    text component to the gadget.  Multiple IntuiText structures may be
+<a name="line111">    chained.  Set this field to NULL if the gadget has no associated text.</a>
+
+GadgetText
+    Provide a pointer to an <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structure to include a text
+    component to the gadget.  Multiple IntuiText structures may be
+    chained.  Set this field to NULL if the gadget has no associated text.
+
+    The offsets in the <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structure are relative to the top left
+<a name="line119">    of the gadget's select box.</a>
+
+MutualExclude
+    This field is currently ignored by Intuition, but is reserved. Do not
+    store information here. Starting with V36, if the GadgetType is
+    GTYP_CUSTOMGADGET this field is used to point to a Hook for the
+<a name="line125">    <a href="../Libraries_Manual_guide/node0176.html">custom</a> gadget.</a>
+
+SpecialInfo
+    SpecialInfo contains a pointer to an extension structure which
+    contains the special information needed by the gadget.
+
+    If this is a <a href="../Libraries_Manual_guide/node0153.html">proportional</a> gadget, this variable must contain a
+    pointer to an instance of a <a href="../Libraries_Manual_guide/node0161.html">PropInfo</a> data structure. If this is a
+    <a href="../Libraries_Manual_guide/node0164.html">string</a> or <a href="../Libraries_Manual_guide/node0165.html">integer</a> gadget, this variable must contain a pointer to an
+    instance of a <a href="../Libraries_Manual_guide/node016B.html">StringInfo</a> data structure. If this is a <a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadget
+    with <a href="../Libraries_Manual_guide/node014B.html#line102">GACT_BOOLEXTEND</a> activation, this variable must contain a pointer
+    to an instance of a <a href="../Libraries_Manual_guide/node014E.html">BoolInfo</a> data structure. Otherwise, this variable
+<a name="line137">    is ignored.</a>
+
+GadgetID
+    This variable is for application use and may contain any value.  It
+    is often used to identify the specific gadget within an event
+<a name="line142">    processing loop.  This variable is ignored by Intuition.</a>
+
+UserData
+    This variable is for application use and may contain any value.  It
+    is often used as a pointer to a data block specific to the
+    application or gadget.  This variable is ignored by Intuition.
+
+ <a href="../Libraries_Manual_guide/node014A.html">Gadget Flags</a>    <a href="../Libraries_Manual_guide/node014B.html">Gadget Activation Flags</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

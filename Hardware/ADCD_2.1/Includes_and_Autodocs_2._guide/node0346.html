@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="Deallocate()" TITLE="exec.library/Deallocate" -->
+<head>
+<title>exec.library/Deallocate</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0345.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0347.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Deallocate -- deallocate a block of memory
+
+SYNOPSIS
+    Deallocate(memHeader, memoryBlock, byteSize)
+               A0         A1           D0
+
+    void Deallocate(struct <a href="../Includes_and_Autodocs_2._guide/node0089.html#line29">MemHeader</a> *,APTR,ULONG);
+
+FUNCTION
+    This function deallocates memory by returning it to the appropriate
+    private free memory pool.  This function can be used to free an
+    entire block allocated with the above function, or it can be used
+    to free a sub-block of a previously allocated block.  Sub-blocks
+    must be an even multiple of the memory chunk size (currently 8
+    bytes).
+
+    This function can even be used to add a new free region to an
+    existing <a href="../Includes_and_Autodocs_2._guide/node0089.html#line29">MemHeader</a>, however the extent pointers in the <a href="../Includes_and_Autodocs_2._guide/node0089.html#line29">MemHeader</a>
+    will no longer be valid.
+
+    If memoryBlock is not on a block boundary (MEM_BLOCKSIZE) then it
+    will be rounded down in a manner compatible with <a href="../Includes_and_Autodocs_2._guide/node0330.html">Allocate()</a>.  Note
+    that this will work correctly with all the memory allocation
+    functions, but may cause surprises if one is freeing only part of a
+    region.  The size of the block will be rounded up, so the freed
+    block will fill to an even memory block boundary.
+
+INPUTS
+    memHeader - points to the memory header this block is part of.
+    memoryBlock - address of memory block to free.
+    byteSize - the size of the block in bytes. If NULL, nothing
+               happens.
+
+SEE ALSO
+    Allocate, <a href="../Includes_and_Autodocs_2._guide/node0089.html">exec/memory.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

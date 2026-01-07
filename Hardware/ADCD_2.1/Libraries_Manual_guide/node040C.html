@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-11" TITLE="31 Commodities Exchange Library / Uniqueness" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / Uniqueness</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node040B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node040D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When a commodity opens its <a href="../Libraries_Manual_guide/node0402.html">broker</a>, it can ask Commodities Exchange not to
+launch another broker with the same name (<a href="../Libraries_Manual_guide/node0402.html#line22">nb_Name</a>).  The purpose of the
+uniqueness feature is to prevent the user from starting duplicate
+commodities.  If a commodity asks, Commodities Exchange will not only
+refuse to create a new, similarly named broker, but it will also notify
+<a name="line7">the original commodity if someone tries to do so.</a>
+
+A commodity tells Commodities Exchange not to allow duplicates by setting
+certain bits in the <a href="../Includes_and_Autodocs_2._guide/node00F0.html#line59">nb_Unique field</a> of the <a href="../Libraries_Manual_guide/node0402.html#line20">NewBroker</a> structure it sends to
+<a href="../Libraries_Manual_guide/node0402.html#line14">CxBroker()</a>:
+
+    NBU_UNIQUE      bit 0
+    NBU_NOTIFY      bit 1
+
+Setting the NBU_UNIQUE bit prevents duplicate commodities.  Setting the
+NBU_NOTIFY bit tells Commodities Exchange to notify a commodity if an
+attempt was made to launch a duplicate.  Such a commodity will receive a
+<a href="../Libraries_Manual_guide/node0403.html">CXM_COMMAND CxMessage</a> with an ID of <a href="../Includes_and_Autodocs_2._guide/node00F0.html#line127">CXCMD_UNIQUE</a> when someone tries to
+duplicate it. Because the uniqueness feature uses the name a programmer
+gives a commodity to differentiate it from other commodities, it is
+possible for completely different commodities to share the same name,
+preventing the two from coexisting.  For this reason, a commodity should
+not use a name that is likely to be in use by other commodities (like
+&#034;filter&#034; or &#034;hotkey&#034;).  Instead, use a name that matches the commodity
+name.
+
+When <a href="../Libraries_Manual_guide/node0587.html">HotKey.c</a> gets a <a href="../Includes_and_Autodocs_2._guide/node00F0.html#line127">CXCMD_UNIQUE</a> <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a>, it shuts itself down.
+HotKey.c and all the windowless commodities that come with the Release 2
+Workbench shut themselves down when they get a CXCMD_UNIQUE CxMessage.
+Because the user will expect all windowless commodities to work this way,
+all windowless commodities should follow this standard.
+
+When the user tries to launch a duplicate of a system commodity that has a
+window, the system commodity moves its window to the front of the display,
+as if the user had clicked the &#034;Show&#034; gadget in the controller program's
+window.  A windowed commodity should mimic conventions set by existing
+windowed system commodities, and move its window to the front of the
+display.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-2-1-1" TITLE="12 / / Building On Existing Public Classes / Building Rkmmodelclass" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / Building On Existing Public Classes / Building Rkmmodelclass</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node020F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0211.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+So far, the theoretical class <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> has just one attribute,
+<a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a>.  A couple of extra attributes can make it more useful.
+Because the rkmmodel object maintains an upper limit on its RKMMOD_CurrVal
+integer value, it would be useful if that upper limit was variable.  Using
+a new attribute, RKMMOD_Limit, an application can tell a rkmmodel what its
+upper limit is.  The rkmmodel will enforce the limit internally, so the
+<a name="line8">application doesn't have to worry about it.</a>
+
+Another useful addition is a pulse increment and decrement for
+<a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a>.  Whenever the model receives an increment or decrement
+command, it increments or decrements its internal value. To make the
+example class simple, <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> implements incrementing and
+decrementing by creating &#034;dummy&#034; attributes called RKMMOD_Up and
+RKMMOD_Down.  When an rkmmodel receives an <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> message for one of these
+attributes, it increments or decrements RKMMOD_CurrVal.  An rkmmodelclass
+object does not care what the value of the RKMMOD_Up and RKMMOD_Down
+<a name="line18">attributes are, it only cares that it received an <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> about it.</a>
+
+There are two pieces of data that make up this new class's instance data:
+the rkmmodel's current value (<a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a>) and the upper limit of the
+rkmmodel (RKMMOD_Limit).  The example class consolidates them into one
+structure:
+
+    struct RKMModData {
+        ULONG currval;
+        ULONG vallimit;
+    };
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

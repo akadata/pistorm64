@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-41/imageclass.txt" NODE="IV-41-8" TITLE="OM_GET" -->
+<head>
+<title>OM_GET</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00A5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00A7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Retrieve an object's attribute.  This method receives the following
+parameters:
+
+    struct opGet
+    {
+        ULONG MethodID;
+        ULONG opg_AttrID;
+        ULONG *opg_Storage;
+    };
+
+If the new class recognizes the attribute, the new class should fill in
+opg_Storage's target with the attribute's value.  If the attribute is
+actually the attribute of some component object, you might want to pass
+the message on and let the component object process the OM_GET. If
+completely unrecognized, you should pass the message to your superclass.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

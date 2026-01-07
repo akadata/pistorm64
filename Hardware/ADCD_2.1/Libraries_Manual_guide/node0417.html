@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_32" NODE="32-2-1" TITLE="32 / The Expansion Sequence / Simple Expansion Library Example" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>32 / The Expansion Sequence / Simple Expansion Library Example</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0416.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0418.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following example uses <a href="../Includes_and_Autodocs_2._guide/node03B4.html">FindConfigDev()</a> to print out information about
+all of the configured expansion peripherals in the system.
+FindConfigDev() searches the system's list of <a href="../Libraries_Manual_guide/node0416.html#line6">ConfigDev</a> structures and
+returns a pointer to the ConfigDev structure matching a specified board:
+
+    newconfigdev = struct ConfigDev *
+                       FindConfigDev( struct ConfigDev *oldconfigdev,
+                                      LONG manufacturer, LONG product )
+
+The oldconfigdev argument may be set to NULL to begin searching at the top
+of the system list or, if it points to a valid <a href="../Libraries_Manual_guide/node0416.html#line6">ConfigDev</a>, searching will
+begin after that entry in the system list.  The manufacturer and product
+arguments can be set to search for a specific manufacturer and product by
+number, or, if these are set to -1, the function will match any board.
+
+     <a href="../Libraries_Manual_guide/node0593.html">findboards.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

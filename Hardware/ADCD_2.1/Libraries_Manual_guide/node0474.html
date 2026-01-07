@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_34" NODE="34-1-6-5" TITLE="34 / / Details Of the Keymap Structure / Capsable Bit Tables" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>34 / / Details Of the Keymap Structure / Capsable Bit Tables</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0473.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0475.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The vectors <a href="../Libraries_Manual_guide/node046F.html">km_LoCapsable</a> and <a href="../Libraries_Manual_guide/node046F.html">km_HiCapsable</a> each point to an array of 8
+bytes that contain more information about the keytable entries.
+Specifically, if the Caps Lock key has been pressed (the Caps Lock LED is
+on) and if there is a bit on in that position in the capsable map, then
+this key will be treated as though the Shift key is now currently pressed.
+For example, in the default key mapping, the alphabetic keys are
+&#034;capsable&#034; but the punctuation keys are not. This allows you to set the
+Caps Lock key, just as on a normal typewriter, and get all capital
+letters. However, unlike a normal typewriter, you need not go out of Caps
+Lock to correctly type the punctuation symbols or numeric keys.
+
+In the byte array, the bits that control this feature are numbered from
+the lowest bit in the byte, and from the lowest memory byte address to the
+highest. For example, the bit representing capsable status for the key
+that transmits raw code 00 is bit 0 in byte 0; for the key that transmits
+raw code 08 it is bit 0 in byte 1, and so on.
+
+There are 64 bits (8 bytes) in each of the two capsable tables.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/notify.h" NODE="MAIN" TITLE="Includes/dos/notify.h" -->
+<head>
+<title>Includes/dos/notify.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node006D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node006F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_NOTIFY_H
+#define DOS_NOTIFY_H
+/*
+**
+**	$Filename: dos/notify.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.8 $
+**	$Date: 90/08/29 $
+**
+**	dos notification definitions
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+<a name="line16"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif
+<a name="line20"></a>
+#ifndef EXEC_PORTS_H
+#include &#034;exec/ports.h&#034;
+#endif
+<a name="line24"></a>
+#ifndef EXEC_TASKS_H
+#include &#034;exec/tasks.h&#034;
+#endif
+
+
+/* use of Class and code is discouraged for the time being - we might want to
+   change things */
+<a name="line32">/* --- NotifyMessage Class ------------------------------------------------ */</a>
+#define NOTIFY_CLASS	0x40000000
+
+<a name="line35">/* --- NotifyMessage Codes ------------------------------------------------ */</a>
+#define NOTIFY_CODE	0x1234
+
+
+/* Sent to the application if SEND_MESSAGE is specified.		    */
+<a name="line40"></a>
+<a name="line41">struct NotifyMessage {</a>
+<a name="line42">    struct Message nm_ExecMessage;</a>
+<a name="line43">    ULONG  nm_Class;</a>
+<a name="line44">    UWORD  nm_Code;</a>
+<a name="line45">    struct NotifyRequest *nm_NReq;	/* don't modify the request! */</a>
+<a name="line46">    ULONG  nm_DoNotTouch;		/* like it says!  For use by handlers */</a>
+    ULONG  nm_DoNotTouch2;		/* ditto */
+};
+
+/* Do not modify or reuse the notifyrequest while active.		    */
+/* note: the first LONG of nr_Data has the length transfered		    */
+<a name="line52"></a>
+<a name="line53">struct NotifyRequest {</a>
+<a name="line54">	UBYTE *nr_Name;</a>
+<a name="line55">	UBYTE *nr_FullName;		/* set by dos - don't touch */</a>
+<a name="line56">	ULONG nr_UserData;		/* for applications use */</a>
+	ULONG nr_Flags;
+
+	union {
+
+<a name="line61">	    struct {</a>
+<a name="line62">		struct MsgPort *nr_Port;	/* for SEND_MESSAGE */</a>
+	    } nr_Msg;
+
+<a name="line65">	    struct {</a>
+<a name="line66">		struct Task *nr_Task;		/* for SEND_SIGNAL */</a>
+<a name="line67">		UBYTE nr_SignalNum;		/* for SEND_SIGNAL */</a>
+<a name="line68">		UBYTE nr_pad[3];</a>
+<a name="line69">	    } nr_Signal;</a>
+	} nr_stuff;
+<a name="line71"></a>
+	ULONG nr_Reserved[4];		/* leave 0 for now */
+
+<a name="line74">	/* internal use by handlers */</a>
+<a name="line75">	ULONG nr_MsgCount;		/* # of outstanding msgs */</a>
+	struct MsgPort *nr_Handler;	/* handler sent to (for EndNotify) */
+};
+
+<a name="line79">/* --- NotifyRequest Flags ------------------------------------------------ */</a>
+<a name="line80">#define NRF_SEND_MESSAGE	1</a>
+<a name="line81">#define NRF_SEND_SIGNAL		2</a>
+<a name="line82">#define NRF_WAIT_REPLY		8</a>
+#define NRF_NOTIFY_INITIAL	16
+
+<a name="line85">/* do NOT set or remove NRF_MAGIC!  Only for use by handlers! */</a>
+#define NRF_MAGIC	0x80000000
+
+<a name="line88">/* bit numbers */</a>
+<a name="line89">#define NRB_SEND_MESSAGE	0</a>
+<a name="line90">#define NRB_SEND_SIGNAL		1</a>
+<a name="line91">#define NRB_WAIT_REPLY		3</a>
+#define NRB_NOTIFY_INITIAL	4
+<a name="line93"></a>
+#define NRB_MAGIC		31
+
+<a name="line96">/* Flags reserved for private use by the handler: */</a>
+#define NR_HANDLER_FLAGS	0xffff0000
+
+#endif /* DOS_NOTIFY_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

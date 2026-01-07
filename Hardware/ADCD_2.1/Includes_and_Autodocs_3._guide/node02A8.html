@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="AreaDraw()" TITLE="graphics.library/AreaDraw" -->
+<head>
+<title>graphics.library/AreaDraw</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02A7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02A9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AreaDraw -- Add a point to a list of end points for areafill.
+
+
+<b>   SYNOPSIS</b>
+	error = AreaDraw( rp,  x,     y)
+	  d0	          A1 D0:16 D1:16
+
+	ULONG AreaDraw( struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line63">SHORT</a>, SHORT);
+
+<b>   FUNCTION</b>
+	Add point to the vector buffer.
+
+
+<b>   INPUTS</b>
+	rp	- points to a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> structure.
+	x,y	- are coordinates of a point in the raster.
+
+<b>   RESULT</b>
+	error	- zero for success, else -1 if no there was no space
+		  left in the vector list.
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02AB.html">AreaMove()</a> <a href="../Includes_and_Autodocs_3._guide/node02F2.html">InitArea()</a> <a href="../Includes_and_Autodocs_3._guide/node02AA.html">AreaEnd()</a> <a href="../Includes_and_Autodocs_3._guide/node05D7.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

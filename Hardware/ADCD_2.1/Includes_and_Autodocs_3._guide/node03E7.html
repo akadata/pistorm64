@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="RethinkDisplay()" TITLE="intuition.library/RethinkDisplay" -->
+<head>
+<title>intuition.library/RethinkDisplay</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03E6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03E8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	RethinkDisplay -- Grand manipulation of the entire Intuition display.
+
+<b>    SYNOPSIS</b>
+	failure = RethinkDisplay()
+	D0 (V39)
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> RethinkDisplay( VOID );
+	/* Returns <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> in V39 and greater */
+
+<b>    FUNCTION</b>
+	This function performs the Intuition global display reconstruction.
+	This includes rethinking about all of the  ViewPorts and their
+	relationship to one another and reconstructing the entire display
+	based on the results of this rethinking.
+
+	Specifically, and omitting many internal details, the operation
+	consists of this:
+
+	    Determine which ViewPorts are invisible and set their VP_HIDE
+	    <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> Mode flag. VP_HIDE flags are also set for screens that
+	    may not be simultaneously displayed with the frontmost (V36).
+
+	    If a change to a viewport height, or changing interlace or
+	    monitor scan rates require, <a href="../Includes_and_Autodocs_3._guide/node02FF.html">MakeVPort()</a> is called for specific
+	    screen viewports.  After this phase, the intermediate Copper lists
+	    for each screen's viewport are correctly set up.
+
+	    <a href="../Includes_and_Autodocs_3._guide/node0303.html">MrgCop()</a> and <a href="../Includes_and_Autodocs_3._guide/node02FD.html">LoadView()</a> are then called to get these Copper lists
+	    in action, thus establishing the new state of the Intuition
+	    display.
+
+	You may perform a <a href="../Includes_and_Autodocs_3._guide/node03C4.html">MakeScreen()</a> on your <a href="../Includes_and_Autodocs_3._guide/node05F6.html#line24">Custom</a> <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> before calling
+	this routine.  The results will be incorporated in the new display, but
+	changing the INTERLACE <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> mode for one screens must be reflected
+	in the Intuition <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a>, which is left to Intuition.
+
+	WARNING:  This routine can take several milliseconds to run, so
+	do not use it lightly.
+
+	New for V36: This routine is substantially changed to support
+	new screen modes.  In particular, if screen rearrangement has
+	caused a change in interlace mode or scan rate, this routine
+	will remake the copper lists for each screen's viewport.
+
+<b>    INPUTS</b>
+	None
+
+<b>    RESULT</b>
+	Starting with V39, returns zero for success, non-zero for failure.
+	Probable cause of failure is failure of <a href="../Includes_and_Autodocs_3._guide/node02FF.html">graphics.library/MakeVPort()</a>
+	or of <a href="../Includes_and_Autodocs_3._guide/node0303.html">graphics.library/MrgCop()</a>.
+	Prior to V39, the return code is invalid.  Do not interpret it when
+	running on pre-V39 systems!
+
+<b>    BUGS</b>
+	In V35 and earlier, an interlaced screen coming to the front
+	may not trigger a complete remake as required when the global
+	interlace state is changed.  In some cases, this can be compensated
+	for by setting the viewport DHeight field to 0 for hidden screens.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03E0.html">RemakeDisplay()</a>, <a href="../Includes_and_Autodocs_3._guide/node02FF.html">graphics.library/MakeVPort()</a>, <a href="../Includes_and_Autodocs_3._guide/node0303.html">graphics.library/MrgCop()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node02FD.html">graphics.library/LoadView()</a>, <a href="../Includes_and_Autodocs_3._guide/node03C4.html">MakeScreen()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

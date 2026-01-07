@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="wb" NODE="RemoveAppIcon()" TITLE="workbench.library/RemoveAppIcon" -->
+<head>
+<title>workbench.library/RemoveAppIcon</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05C1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05C3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	RemoveAppIcon - remove an icon from Workbench's list            (V36)
+                         of AppIcons.
+
+<b>   SYNOPSIS</b>
+	success = RemoveAppIcon(AppIcon)
+         D0                      A0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> RemoveAppIcon(struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line162">AppIcon</a> *);
+
+<b>   FUNCTION</b>
+	Attempt to remove an <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line162">AppIcon</a> from Workbench's list of AppIcons.
+
+<b>   INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05D6.html#line162">AppIcon</a> - pointer to an <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line162">AppIcon</a> structure returned by AddAppIcon.
+
+<b>   RESULTS</b>
+	success - TRUE if the icon could be removed, FALSE otherwise.
+
+<b>   NOTES</b>
+	As with anything that deals with asynchronous operation, you will need
+	to do a final check for messages on your <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line115">AppMessage</a> port for messages
+	that may have come in between the last time you checked and the
+	call to remove the <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line162">AppIcon</a>.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05BA.html">workbench.library/AddAppIconA</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

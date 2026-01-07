@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_9" NODE="9-5" TITLE="9 Parallel Device / Querying the Parallel Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>9 Parallel Device / Querying the Parallel Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0017.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0019.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You query the parallel device by passing an <a href="../Devices_Manual_guide/node0010.html#line7">IOExtPar</a> to the device with
+<a href="../Includes_and_Autodocs_2._guide/node04F3.html">PDCMD_QUERY</a> set in io_Command.  The parallel device will respond with the
+status of the parallel port lines and registers.
+
+   UWORD Parallel_Status;
+
+   ParallelIO-&#062;IOPar.io_Command  = PDCMD_QUERY; /* indicate query */
+   DoIO((struct IORequest *)ParallelIO);
+
+   Parallel_Status = ParallelIO-&#062;io_Status;     /* store returned status */
+
+The 8 status bits of the parallel device are returned in io_Status.
+
+                       PARALLEL DEVICE STATUS BITS
+
+   Bit    Active              Function
+   ---    ------              --------
+    0       high        Printer busy toggle (offline)
+    1       high        Paper out
+    2       high        Printer Select on the A1000. On theA500 and A2000,
+                        select is also connected to to the parallel port's
+                        Ring Indicator. Be cautious when making cables.
+    3        -          read=0; write=1
+    4-7      -          (reserved)
+
+The parallel device also returns error codes whenever an operation is
+attempted.
+
+   struct IOPArray Terminators =
+   {
+   0x51454141,   /* Q E A A */
+   0x41414141    /* fill to end with lowest value,must be in desc. order */
+   };
+
+   ParallellIO-&#062;io_ParFlags != PARF_EOFMODE;        /* Set EOF mode flag */
+   ParallelIO-&#062;io_PTermArray = Terminators;/* Set termination characters */
+   ParallellIO-&#062;IOPar.io_Command  = PDCMD_SETPARAMS;   /* Set parameters */
+   if (DoIO((struct IORequest *)ParallelIO))
+       printf(&#034;Set Params failed. Error: %ld &#034;,ParallelIO-&#062;IOPar.io_Error);
+
+<a name="line42">The error is returned in the io_Error field of the <a href="../Devices_Manual_guide/node0010.html#line7">IOExtPar</a> structure.</a>
+
+                       PARALLEL DEVICE ERROR CODES
+
+               Error              Value        Explanation
+               -----              -----        -----------
+              ParErr_DevBusy        1          Device in use
+              ParErr_BufToBig       2          Out of memory
+              ParErr_InvParam       3          Invalid parameter
+              ParErr_LineErr        4          Parallel line error
+              ParErr_NotOpen        5          Device not open
+              ParErr_PortReset      6          Port Reset
+              ParErr_InitErr        7          Initialization Error
+
+     <a href="../Devices_Manual_guide/node0160.html">Parallel.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

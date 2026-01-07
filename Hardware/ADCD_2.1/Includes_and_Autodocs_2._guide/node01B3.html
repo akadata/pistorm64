@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/commodities" NODE="SetFilter()" TITLE="commodities.library/SetFilter" -->
+<head>
+<title>commodities.library/SetFilter</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01B2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01B4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SetFilter -- change the matching condition of a commodity filter.
+                 (V36)
+
+SYNOPSIS
+    SetFilter(filter,text);
+              A0     A1
+
+    VOID SetFilter(CxObj *,STRPTR);
+
+FUNCTION
+    This function changes the matching condition of a commodity input
+    filter to that described by the input description string 'text'.
+
+INPUTS
+    filter - the filter object to affect
+    text - the new matching conditions for the filter
+
+RESULTS
+    The internal error of 'filter' will have the COERR_BADFILTER
+    bit set or cleared depending on the failure or success of this
+    function.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01B4.html">SetFilterIX()</a>, <a href="../Includes_and_Autodocs_2._guide/node01A6.html">CxObjError()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

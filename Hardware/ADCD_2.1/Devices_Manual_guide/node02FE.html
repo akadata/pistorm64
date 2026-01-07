@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/other/cycvb.c" NODE="MAIN" TITLE="Devices/other/cycvb.c" -->
+<head>
+<title>Devices/other/cycvb.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02FD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02FF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * cycvb.c --- Dan Silva's DPaint color cycling interrupt code
+ *
+ *    Use this fragment as an example for interrupt driven color cycling
+ *    If compiled with SAS, include flags -v -y on LC2
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/interrupts.h&#062;
+#include &#060;graphics/view.h&#062;
+#include &#060;iff/compiler.h&#062;
+
+#define MAXNCYCS 4
+#define NO  FALSE
+#define YES TRUE
+#define LOCAL static
+
+typedef struct {
+    SHORT count;
+    SHORT rate;
+    SHORT flags;
+    UBYTE low, high;  /* bounds of range */
+    } Range;
+
+/* Range flags values */
+#define RNG_ACTIVE  1
+#define RNG_REVERSE 2
+#define RNG_NORATE 36  /* if rate == NORATE, don't cycle */
+
+/* cycling frame rates */
+#define OnePerTick   16384
+#define OnePerSec    OnePerTick/60
+
+extern Range  cycles[];
+extern BOOL   cycling[];
+extern WORD   cycols[];
+extern struct ViewPort *vport;
+extern SHORT  nColors;
+
+
+MyVBlank()  {
+   int i,j;
+   LOCAL  Range *cyc;
+   LOCAL  WORD  temp;
+   LOCAL  BOOL  anyChange;
+
+#ifdef IS_AZTEC
+#asm
+       movem.l  a2-a7/d2-d7,-(sp)
+       move.l   a1,a4
+#endasm
+#endif
+
+   if (cycling)  {
+      anyChange = NO;
+      for (i=0; i&#060;MAXNCYCS; i++)  {
+         cyc = &#038;cycles[i];
+         if ( (cyc-&#062;low == cyc-&#062;high) ||
+              ((cyc-&#062;flags&#038;RNG_ACTIVE) == 0) ||
+              (cyc-&#062;rate == RNG_NORATE) )
+                 continue;
+
+         cyc-&#062;count += cyc-&#062;rate;
+         if (cyc-&#062;count &#062;= OnePerTick)  {
+            anyChange = YES;
+            cyc-&#062;count -= OnePerTick;
+
+            if (cyc-&#062;flags&#038;RNG_REVERSE)  {
+               temp = cycols[cyc-&#062;low];
+               for (j=cyc-&#062;low; j &#060; cyc-&#062;high; j++)
+                  cycols[j] = cycols[j+1];
+               cycols[cyc-&#062;low] = temp;
+               }
+            else  {
+               temp = cycols[cyc-&#062;high];
+               for (j=cyc-&#062;high; j &#062; cyc-&#062;low; j--)
+                  cycols[j] = cycols[j-1];
+               cycols[cyc-&#062;low] = temp;
+               }
+            }
+         }
+      if (anyChange) LoadRGB4(vport,cycols,nColors);
+      }
+
+#ifdef IS_AZTEC
+      ;   /* this is necessary */
+#asm
+      movem.l  (sp)+,a2-a7/d2-d7
+#endasm
+#endif
+
+   return(0);  /* interrupt routines have to do this */
+   }
+
+
+/*
+ *  Code to install/remove cycling interrupt handler
+ */
+
+LOCAL char myname[] = &#034;MyVB&#034;;  /* Name of interrupt handler */
+LOCAL struct Interrupt intServ;
+
+typedef void (*VoidFunc)();
+
+StartVBlank()  {
+#ifdef IS_AZTEC
+   intServ.is_Data = GETAZTEC();  /* returns contents of register a4 */
+#else
+   intServ.is_Data = NULL;
+#endif
+   intServ.is_Code = (VoidFunc)&#038;MyVBlank;
+   intServ.is_Node.ln_Succ = NULL;
+   intServ.is_Node.ln_Pred = NULL;
+   intServ.is_Node.ln_Type = NT_INTERRUPT;
+   intServ.is_Node.ln_Pri  = 0;
+   intServ.is_Node.ln_Name = myname;
+   AddIntServer(5,&#038;intServ);
+   }
+
+StopVBlank() { RemIntServer(5,&#038;intServ); }
+
+/**/
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

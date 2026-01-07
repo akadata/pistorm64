@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="SetVBuf()" TITLE="dos.library/SetVBuf" -->
+<head>
+<title>dos.library/SetVBuf</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02FE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0300.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SetVBuf -- set buffering modes and size (V36)
+
+SYNOPSIS
+    error = SetVBuf(fh, buff, type, size)
+    D0              D1   D2    D3    D4
+
+    LONG SetVBuf(BPTR, STRPTR, LONG, LONG)
+
+FUNCTION
+    Changes the buffering modes and buffer size for a filehandle.
+    With buff == NULL, the current buffer will be deallocated and a
+    new one of (approximately) size will be allocated.  If buffer is
+    non-NULL, it will be used for buffering and must be at least
+    max(size,208) bytes long.  If buff is NULL and size is -1,
+    then only the buffering mode will be changed.
+
+INPUTS
+    fh   - Filehandle
+    buff - buffer pointer for buffered I/O
+    type - buffering mode (see <a href="../Includes_and_Autodocs_2._guide/node006B.html">&#060;dos/stdio.h&#062;</a>)
+    size - size of buffer for buffered I/O (sizes less than 208 bytes
+           will be ignored).
+
+RESULT
+    error - 0 if successful.  NOTE: opposite of most dos functions!
+
+BUGS
+    Not implemented yet, always returns 0.
+
+SEE ALSO
+    FputC(), <a href="../Includes_and_Autodocs_2._guide/node02A2.html">FGetC()</a>, <a href="../Includes_and_Autodocs_2._guide/node0305.html">UnGetC()</a>, <a href="../Includes_and_Autodocs_2._guide/node02AA.html">Flush()</a>, <a href="../Includes_and_Autodocs_2._guide/node02AE.html">FRead()</a>, <a href="../Includes_and_Autodocs_2._guide/node02B3.html">FWrite()</a>, <a href="../Includes_and_Autodocs_2._guide/node02A3.html">FGets()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node02AD.html">FPuts()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

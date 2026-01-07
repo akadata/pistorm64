@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-5-3" TITLE="3 / DrawInfo and the 3D Look / Cloning a Public Screen (Workbench)" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / DrawInfo and the 3D Look / Cloning a Public Screen (Workbench)</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00ED.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00EF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+User preferences for screen attributes are generally reflected in the
+Workbench screen or in the default <a href="../Libraries_Manual_guide/node00E6.html">public screen</a>.  In some cases it may be
+useful to create a new screen with the same attributes.
+
+Under V34, information on a screen was available through the
+<a href="../Libraries_Manual_guide/node00FC.html#line20">GetScreenData()</a> call.  Due to extensions in V36 screen and graphics
+capabilities, this call is no longer sufficient to completely describe the
+display.  Applications should now use a variety of calls; the specific
+call depends on the information required.
+
+<a name="line12"><a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a> returns a pointer to the Screen structure of a specific</a>
+screen.  <a href="../Libraries_Manual_guide/node00EE.html#line16">GetScreenDrawInfo()</a> returns rendering information on the screen,
+such as the pen array and font used.  <a href="../Libraries_Manual_guide/node00F0.html#line76">QueryOverscan()</a> returns the overscan
+information of a specific display mode (for more information, see the
+<a name="line16">section on &#034;<a href="../Libraries_Manual_guide/node00F0.html">Overscan and the Display Clip</a>&#034;).</a>
+
+The example below shows how to use <a href="../Includes_and_Autodocs_2._guide/node0220.html">GetScreenDrawInfo()</a> to examine the
+attributes of the Workbench screen so that a new screen with the same
+attributes can be created.
+
+<a name="line22">    struct DrawInfo *GetScreenDrawInfo( struct Screen * )</a>
+
+The attributes required to clone an existing screen are its width, height,
+depth, pens and mode.  The pens and screen depth are available through the
+<a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> structure.  The width and height may be obtained from the <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a>
+structure.  (The width and height may be larger than the overscan area if
+the screen is scrollable, and autoscroll may always be enabled as it does
+<a name="line29">not effect displays smaller than or equal to the overscan area.)</a>
+
+The screen's display mode can be obtained using the graphics library call
+<a href="../Libraries_Manual_guide/node033C.html#line19">GetVPModeID()</a>.  This call returns the display ID of an existing screen
+which can then be used as the data for the <a href="../Libraries_Manual_guide/node00E5.html#line74">SA_DisplayID</a> tag in
+<a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreenTagList()</a>.  Note that the example assumes the screen should be
+open to the user's text overscan preference.  If an exact copy of the
+display clip of the existing screen is required, use the <a href="../Libraries_Manual_guide/node0339.html#line15">VideoControl()</a>
+<a name="line37">command of the graphics library to access the <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line78">ViewPortExtra</a> structure.</a>
+
+The colors of the screen may be copied using the graphics library calls
+<a href="../Libraries_Manual_guide/node0331.html#line41">GetRGB4()</a>, <a href="../Libraries_Manual_guide/node0331.html">SetRGB4()</a>, <a href="../Libraries_Manual_guide/node0331.html#line41">SetRGB4CM()</a> and <a href="../Libraries_Manual_guide/node0331.html#line41">LoadRGB4()</a>.  The example code does
+<a name="line41">not copy the colors.</a>
+
+The example copies the font from the cloned screen.  A reasonable
+alternative would be to use the user's preference font, which may be
+accessed through the <a href="../Libraries_Manual_guide/node00E5.html#line130">SA_SysFont</a> tag.
+
+     <a href="../Libraries_Manual_guide/node05B2.html">clonescreen.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/appmenuitem.c" NODE="MAIN" TITLE="Lib_examples/appmenuitem.c" -->
+<head>
+<title>Lib_examples/appmenuitem.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05C0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05C2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* This example shows how to create an AppMenuItem.  The example adds a
+ * menu item named &#034;Browse Files&#034; to the Workbench Tools menu.  (All
+ * AppMenuItems appear in the Workbench Tools menu.)  When the menu item
+ * is activated, the example program receives a message from Workbench
+ * and then attempts to start up an instance of the More program. (The
+ * More program is in the Utilities directory of the Workbench disk.)
+ *
+ * The example starts up the More program as a separate, asynchronous
+ * process using the new SystemTags() function of Release 2 AmigaDOS.
+ * For more about the SystemTags() function refer to the AmigaDOS
+ * Manual, 3rd Edition from Bantam Books.  When the AppMenuItem has been
+ * activated five times, the program exits after freeing any system
+ * resources it has used.
+ */
+
+/* appmenuitem.c - Compiled under SAS C 5.10 with lc -L appmenuitem.c       */
+/* Requires Kickstart version 37 or later.  Works from the Shell (CLI) only */
+
+#include &#060;exec/types.h&#062;          /* Need this for the Amiga variable types  */
+#include &#060;workbench/workbench.h&#062; /* This has DiskObject and AppIcon structs */
+#include &#060;workbench/startup.h&#062;   /* This has WBStartup and WBArg structs    */
+#include &#060;exec/libraries.h&#062;
+#include &#060;dos/dostags.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;    /* Exec message, port and library functions*/
+#include &#060;clib/wb_protos.h&#062;      /* AppMenuItem function protos             */
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }   /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }/* really */
+#endif
+
+extern struct Library *SysBase;
+struct Library *WorkbenchBase;
+
+void main(int argc, char **argv)
+{
+struct MsgPort      *myport=NULL;
+struct AppMenuItem *appitem=NULL;
+struct AppMessage   *appmsg=NULL;
+LONG result, x, count=0L;
+BOOL success=0L;
+BPTR file;
+
+if (WorkbenchBase = OpenLibrary(&#034;workbench.library&#034;,37))
+  {
+  /* The CreateMsgPort() function is in Exec version 37 and later only */
+  if(myport = CreateMsgPort())
+    {
+    /* Add our own AppMenuItem to the Workbench Tools Menu */
+    appitem=AddAppMenuItemA(0L,                   /* Our ID# for item */
+                    (ULONG)&#034;SYS:Utilities/More&#034;,  /* Our UserData     */
+                           &#034;Browse Files&#034;,        /* MenuItem Text    */
+                            myport,NULL);         /* MsgPort, no tags */
+    if(appitem)
+      {
+      printf(&#034;Select Workbench Tools demo menuitem 'Browse Files'\n&#034;);
+
+      /* For this example, we allow the AppMenuItem to be selected */
+      /* only once, then we remove it and exit                     */
+      WaitPort(myport);
+      while((appmsg=(struct AppMessage *)GetMsg(myport)) &#038;&#038; (count&#060;1))
+        {
+        /* Handle messages from the AppMenuItem - we have only one  */
+        /* item so we don't have to check its appmsg-&#062;am_ID number. */
+        /* We'll System() the command string that we passed as      */
+        /* userdata when we added the menu item.                    */
+        /* We find our userdata pointer in appmsg-&#062;am_UserData      */
+
+        printf(&#034;User picked AppMenuItem with %ld icons selected\n&#034;,
+                                                appmsg-&#062;am_NumArgs);
+        for(x=0;x&#060;appmsg-&#062;am_NumArgs;x++)
+           printf(&#034;  #%ld name='%s'\n&#034;,x+1,appmsg-&#062;am_ArgList[x].wa_Name);
+
+        count++;
+        if( file=Open(&#034;CON:0/40/640/150/AppMenu Example/auto/close/wait&#034;,
+                         MODE_OLDFILE)  )     /* for any stdio output */
+          {
+          result=SystemTags((UBYTE *)appmsg-&#062;am_UserData,SYS_Input,file,
+                                                         SYS_Output,NULL,
+                                                         SYS_Asynch,TRUE,
+                                                         TAG_DONE);
+          /* If Asynch System() itself fails, we must close file */
+          if(result == -1) Close(file);
+          }
+        ReplyMsg((struct Message *)appmsg);
+        }
+      success=RemoveAppMenuItem(appitem);
+      }
+
+    /* Clear away any messages that arrived at the last moment */
+    /* and let Workbench know we're done with the messages     */
+    while(appmsg=(struct AppMessage *)GetMsg(myport))
+      {
+      ReplyMsg((struct Message *)appmsg);
+      }
+    DeleteMsgPort(myport);
+    }
+  CloseLibrary(WorkbenchBase);
+  }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

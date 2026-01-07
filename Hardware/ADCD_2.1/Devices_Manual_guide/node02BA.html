@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_SMUS" NODE="16-5-3-8" TITLE=" Standard Data and Property Chunks / Set Time Signature SEvent " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Data and Property Chunks / Set Time Signature SEvent </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02B9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02BB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a> SID_TimeSig sets the time signature for the track.  A &#034;time
+signature&#034; SEvent has the following structure overlaid on the <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a>
+structure:
+
+    typedef struct {
+	UBYTE    type;		/* = SID_TimeSig */
+	unsigned timeNSig :5,	/* time sig. &#034;numerator&#034; is timeNSig + 1 */
+		 timeDSig :3;	/* time sig. &#034;denominator&#034; is 2^timeDSig:*
+				 * 0 = whole note, 1 = half note, 2 =    *
+				 * quarter note,....7 = 128th note 	 */
+	} STimeSig;
+
+
+[Implementation details.  Unsigned &#034;:n&#034; fields are packed into n bits in
+the order shown, most significant bit to least significant bit.  An
+STimeSig fits into 16 bits like any other <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a>.  Warning: Some compilers
+don't implement bit-packed fields properly.  E.g., Lattice C pads a group
+of bit fields out to a LONG, which would make an STimeSig take 5-bytes!
+In that situation, use the bit-field constants defined below.]
+
+The field type contains the value SID_TimeSig, indicating that this <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a>
+is a &#034;time signature&#034; event.  The field timeNSig indicates the time
+signature &#034;numerator&#034; is timeNSig + 1, that is, 1 through 32 beats per
+measure.  The field timeDSig indicates the time signature &#034;denominator&#034; is
+2^(timeDSig), that is each &#034;beat&#034; is a 2^(-timeDSig) note (see SNote
+division, above).  So 4/4 time is expressed as timeNSig = 3, timeDSig = 2.
+
+The default time signature is 4/4 time.  Be aware that the time signature
+has no effect on the score's playback.  Tempo is uniformly expressed in
+quarter notes per minute, independent of time signature.  (Quarter notes
+per minute would equal beats per minute only if timeDSig = 2, n/4 time).
+Nonetheless, any program that has time signatures should put them at the
+beginning of each <a href="../Devices_Manual_guide/node02B7.html">TRAK</a> when creating a FORM <a href="../Devices_Manual_guide/node02AB.html">SMUS</a> because music editors
+need them.
+
+Instead of the bit-packed structure STimeSig, it might be easier to
+assemble data values by or-ing constants and to disassemble them by
+masking and shifting.  In that case, use the following definitions.
+
+	#define timeNMask  0xF8	/* bit mask for the timeNSig field	*/
+	#define timeNShift 3	/* shift count for  timeNSig field	*/
+	#define timeDMask  0x07	/* bit mask for the timeDSig field	*/
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

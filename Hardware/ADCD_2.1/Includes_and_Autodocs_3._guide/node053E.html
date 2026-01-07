@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="resource" NODE="--background--" TITLE="resource.library/--background--" -->
+<head>
+<title>resource.library/--background--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node053D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node053F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	resource.library -- resource handling for BOOPSI classes
+
+<b>   DESCRIPTION</b>
+	The resource.library offers an API to handle resource objects
+	(an object file created from ReActor or similar BOOPSI creator
+	tools). One can create BOOPSI objects and groups of BOOPSI
+	objects and resource tracking is completly done by
+	resource.library.
+
+	A resource object ist an AmigaDOS hunk object file that contains
+	data structures with all necessary informations for creating BOOPSI
+	objects. Special class informations allows to handle intuition
+	BOOPSI objects.
+
+	Strings are automatically localized if needed. The resource
+	objects contains references to labels (for the locale string IDs)
+	and strings (for the default strings) which has to be linked with
+	symbol definitions from the application (a new catcomp version is
+	available to create assembler source files for those definitions).
+
+	The default label for the resource object is _RCTResource (defined
+	by ReActor). Use a statement like
+
+		extern char RCTResource[];
+
+	to access the resource object. The variable RCTResource has to be
+	used as the first argument to <a href="../Includes_and_Autodocs_3._guide/node0545.html">RL_OpenResource</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="Examine()" TITLE="dos.library/Examine" -->
+<head>
+<title>dos.library/Examine</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node015B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node015D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	Examine -- Examine a directory or file associated with a lock
+
+<b>    SYNOPSIS</b>
+	success = Examine( lock, <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line60">FileInfoBlock</a> )
+	D0		    D1	      D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> Examine(BPTR,struct <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line60">FileInfoBlock</a> *)
+
+<b>    FUNCTION</b>
+	Examine() fills in information in the <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line60">FileInfoBlock</a> concerning the
+	file or directory associated with the lock. This information
+	includes the name, size, creation date and whether it is a file or
+	directory.  <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line60">FileInfoBlock</a> must be longword aligned.  Examine() gives
+	a return code of zero if it fails.
+
+	You may make a local copy of the <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line60">FileInfoBlock</a>, as long as it is
+	never passed to <a href="../Includes_and_Autodocs_3._guide/node0160.html">ExNext()</a>.
+
+<b>    INPUTS</b>
+	lock	  - BCPL pointer to a lock
+	infoBlock - pointer to a <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line60">FileInfoBlock</a> (MUST be longword aligned)
+
+<b>    RESULTS</b>
+	success - boolean
+
+<b>    SPECIAL NOTE</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05F8.html#line60">FileInfoBlock</a> must be longword-aligned.  <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a> will
+	allocate them correctly for you.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock()</a>, <a href="../Includes_and_Autodocs_3._guide/node01C8.html">UnLock()</a>, <a href="../Includes_and_Autodocs_3._guide/node0160.html">ExNext()</a>, <a href="../Includes_and_Autodocs_3._guide/node015D.html">ExamineFH()</a>, <a href="../Includes_and_Autodocs_3._guide/node05F8.html">&#060;dos/dos.h&#062;</a>, <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node015A.html">ExAll()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

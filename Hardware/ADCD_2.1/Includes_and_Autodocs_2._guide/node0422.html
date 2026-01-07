@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="BltMaskBitMapRastPort()" TITLE="graphics.library/BltMaskBitMapRastPort" -->
+<head>
+<title>graphics.library/BltMaskBitMapRastPort</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0421.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0423.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    BltMaskBitMapRastPort -- blit from source bitmap to destination
+    rastport with masking of source image.
+
+SYNOPSIS
+    BltMaskBitMapRastPort
+        (srcbm, srcx, srcy, destrp, destX, destY, sizeX, sizeY,
+         A0     D0    D1    A1      D2     D3     D4     D5
+         minterm, bltmask)
+         D6       A2
+
+    void BltMaskBitMapRastPort
+         (struct <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a> *, WORD, WORD, struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *, WORD, WORD,
+          WORD, WORD, UBYTE, APTR);
+
+FUNCTION
+    Blits from source bitmap to position specified in destination rastport
+    using bltmask to determine where source overlays destination, and
+    minterm to determine whether to copy the source image &#034;as is&#034; or
+    to &#034;invert&#034; the sense of the source image when copying. In either
+    case, blit only occurs where the mask is non-zero.
+
+INPUTS
+    srcbm   - a pointer to the source bitmap
+    srcx    - x offset into source bitmap
+    srcy    - y offset into source bitmap
+    destrp  - a pointer to the destination rastport
+    destX   - x offset into dest rastport
+    destY   - y offset into dest rastport
+    sizeX   - width of blit in pixels
+    sizeY   - height of blit in rows
+    minterm - either (ABC|ABNC|ANBC) if copy source and blit thru mask
+              or     (ANBC)          if invert source and blit thru mask
+    bltmask - pointer to the single bit-plane mask, which must be the
+              same size and dimensions as the planes of the
+              source bitmap.
+
+RESULT
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0420.html">BltBitMapRastPort()</a> <a href="../Includes_and_Autodocs_2._guide/node00A6.html">graphics/gfx.h</a> <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

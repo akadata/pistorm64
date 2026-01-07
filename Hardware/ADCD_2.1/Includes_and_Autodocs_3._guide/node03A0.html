@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="CloseWindow()" TITLE="intuition.library/CloseWindow" -->
+<head>
+<title>intuition.library/CloseWindow</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node039F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03A1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	CloseWindow -- <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close</a> an Intuition window.
+
+<b>    SYNOPSIS</b>
+	CloseWindow( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> )
+		     A0
+
+	VOID CloseWindow( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> * );
+
+<b>    FUNCTION</b>
+	Closes an Intuition window.  Unlinks it from the system, deallocates
+	its memory, and makes it disappear.
+
+	When this function is called, all IDCMP messages which have been sent
+	to your window are deallocated.  If the window had shared a message
+	Port with other windows, you must be sure that there are no unreplied
+	messages for this window in the message queue.  Otherwise, your program
+	will try to make use of a linked list (the queue) which contains free
+	memory (the old messages).  This will give you big problems.
+	See the code fragment CloseWindowSafely(), below.
+
+	NOTE:  If you have added a <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line59">Menu</a> strip to this <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> (via
+	a call to <a href="../Includes_and_Autodocs_3._guide/node03F2.html">SetMenuStrip()</a>) you must be sure to remove that <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line59">Menu</a> strip
+	(via a call to <a href="../Includes_and_Autodocs_3._guide/node039D.html">ClearMenuStrip()</a>) before closing your <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>.
+
+	NOTE: This function may block until it is safe to de-link and free
+	your window.  Your program may thus be suspended while the user
+	plays with gadgets, menus, or window sizes and position.
+
+	New for V36: If your window is a &#034;Visitor Window&#034; (see OpenWindow)
+	CloseWindow will decrement the &#034;visitor count&#034; in the public screen
+	on which the window was open.  When the last visitor window is
+	closed, a signal will be sent to the public screen task, if this
+	was pre-arranged (see OpenScreen).
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = a pointer to a <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> structure
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a>, <a href="../Includes_and_Autodocs_3._guide/node03D3.html">OpenScreen()</a>, <a href="../Includes_and_Autodocs_3._guide/node039F.html">CloseScreen()</a>
+
+<b>    EXAMPLE</b>
+    /*	CloseWindowSafely */
+
+	/* these functions close an Intuition window
+	 * that shares a port with other Intuition
+	 * windows or IPC customers.
+	 *
+	 * We are careful to set the UserPort to
+	 * null before closing, and to free
+	 * any messages that it might have been
+	 * sent.
+	 */
+	#include &#034;exec/types.h&#034;
+	#include &#034;exec/nodes.h&#034;
+	#include &#034;exec/lists.h&#034;
+	#include &#034;exec/ports.h&#034;
+	#include &#034;intuition/intuition.h&#034;
+
+	CloseWindowSafely( win )
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *win;
+	{
+	    /* we forbid here to keep out of race conditions with Intuition */
+	    Forbid();
+
+	    /* send back any messages for this window
+	     * that have not yet been processed
+	     */
+	    StripIntuiMessages( win-&#062;UserPort, win );
+
+	    /* clear UserPort so Intuition will not free it */
+	    win-&#062;UserPort = NULL;
+
+	    /* tell Intuition to stop sending more messages */
+	    ModifyIDCMP( win, 0L );
+
+	    /* turn multitasking back on */
+	    Permit();
+
+	    /* and really close the window */
+	    CloseWindow( win );
+	}
+
+	/* remove and reply all IntuiMessages on a port that
+	 * have been sent to a particular window
+	 * (note that we don't rely on the ln_Succ pointer
+	 *  of a message after we have replied it)
+	 */
+	StripIntuiMessages( mp, win )
+	struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *mp;
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *win;
+	{
+	    struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> *msg;
+	    struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *succ;
+
+	    msg = (struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> *) mp-&#062;mp_MsgList.lh_Head;
+
+	    while( succ =  msg-&#062;ExecMessage.mn_Node.ln_Succ ) {
+
+		if( msg-&#062;IDCMPWindow ==  win ) {
+
+		    /* Intuition is about to free this message.
+		     * Make sure that we have politely sent it back.
+		     */
+		    Remove( msg );
+
+		    ReplyMsg( msg );
+		}
+
+		msg = (struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> *) succ;
+	    }
+	}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

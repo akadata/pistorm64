@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-8" TITLE="27 / Display Routines and Structures / Loading and Displaying the View" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / Display Routines and Structures / Loading and Displaying the View</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0332.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0334.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To display the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a>, you need to load it using <a href="../Includes_and_Autodocs_2._guide/node0459.html">LoadView()</a> and turn on the
+direct memory access (DMA). A typical call is shown below.
+
+    LoadView(&#038;view);
+
+The &#038;view argument is the address of the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> structure defined in the
+<a href="../Libraries_Manual_guide/node032C.html">example above</a>.
+
+There are two macros, defined in &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00B6.html#line22">gfxmacros.h</a>&#062;, that control
+display DMA: ON_DISPLAY and OFF_DISPLAY. They simply turn the display DMA
+control bit in the DMA control register on or off.
+
+If you are drawing to the display area and do not want the user to see
+intermediate steps in the drawing, you can turn off the display.  Because
+OFF_DISPLAY shuts down the display DMA and possibly speeds up other system
+operations, it can be used to provide additional memory cycles to the
+blitter or the 68000.  The distribution of system DMA, however, allows
+four-channel sound, disk read/write, and a sixteen-color, low-resolution
+display (or four-color, high-resolution display) to operate at the same
+time with no slowdown (7.1 megahertz effective rate) in the operation of
+the 68000.  Using OFF_DISPLAY in a multitasking environment may, however,
+be an unfriendly thing to do to the other running processes.  Use
+OFF_DISPLAY with discretion.
+
+ <a href="../Libraries_Manual_guide/node059D.html">A Custom ViewPort Example</a>    <a href="../Libraries_Manual_guide/node0334.html">Exiting Gracefully</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

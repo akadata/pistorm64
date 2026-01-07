@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-10" TITLE="5 Intuition Gadgets / Boolean Gadget Type" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 Intuition Gadgets / Boolean Gadget Type</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node014B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node014D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A boolean gadget gets yes/no or on/off responses from the user.  To make a
+boolean gadget set the <a href="../Libraries_Manual_guide/node0149.html#line58">GadgetType</a> field to <a href="../Libraries_Manual_guide/node0149.html#line63">GTYP_BOOLGADGET</a> in the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>
+<a name="line4">structure.</a>
+
+Boolean gadgets come in two types: hit-select and toggle-select.
+Hit-select gadgets are only active while the user holds down the mouse
+select button.  When the button is released, the gadget is unhighlighted.
+<a name="line9">Action buttons, such as &#034;OK&#034; and &#034;Cancel&#034;, are hit-select.</a>
+
+Toggle-select gadgets become selected when the user clicks them.  To
+&#034;unselect&#034; the gadget, the user has to click the gadget again.  Switches,
+<a name="line13">such as a checkbox, are toggle-select.</a>
+
+Set the <a href="../Libraries_Manual_guide/node014B.html#line2">GACT_TOGGLESELECT</a> flag in the <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field of the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>
+structure to create a toggle-select gadget.
+
+The <a href="../Libraries_Manual_guide/node014A.html#line63">GFLG_SELECTED</a> flag in <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure <a href="../Libraries_Manual_guide/node0149.html#line48">Flags</a> field determines the
+initial and current on/off selected state of a toggle-select gadget.  If
+GFLG_SELECTED is set, the gadget will be highlighted.  The application can
+set the GFLG_SELECTED flag before submitting the gadget to Intuition.  The
+program may examine this flag at any time to determine the current state
+of this gadget.
+
+Try to make the imagery for toggle-select gadgets visually distinct from
+hit-select gadgets so that their operation can be determined by the user
+through visual inspection.
+
+ <a href="../Libraries_Manual_guide/node014D.html">Masked Boolean Gadgets</a>    <a href="../Libraries_Manual_guide/node014E.html">BoolInfo Structure</a>    <a href="../Libraries_Manual_guide/node014F.html">Mutual Exclude</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

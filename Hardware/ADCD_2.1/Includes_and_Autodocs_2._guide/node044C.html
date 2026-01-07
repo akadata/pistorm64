@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="GfxFree()" TITLE="graphics.library/GfxFree" -->
+<head>
+<title>graphics.library/GfxFree</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node044B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node044D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GfxFree -- free a graphics extended data structure (V36)
+
+SYNOPSIS
+    GfxFree( node );
+          a0
+
+    void GfxFree(struct <a href="../Includes_and_Autodocs_2._guide/node00BA.html#line18">ExtendedNode</a> *);
+
+FUNCTION
+    Free a special graphics extended data structure (each of which
+    begins with an <a href="../Includes_and_Autodocs_2._guide/node00BA.html#line18">ExtendedNode</a> structure).
+
+INPUTS
+    node = pointer to a graphics extended data structure obtained via
+           <a href="../Includes_and_Autodocs_2._guide/node044E.html">GfxNew()</a>.
+
+RESULT
+    the node is deallocated from memory. graphics will dissassociate
+    this special graphics extended node from any associated data
+    structures, if necessary, before freeing it (see <a href="../Includes_and_Autodocs_2._guide/node044B.html">GfxAssociate()</a>).
+
+BUGS
+    an <a href="../Includes_and_Autodocs_2._guide/node032E.html">Alert()</a> will be called if you attempt to free any structure
+    other than a graphics extended data strucure obtained via GfxFree().
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00BA.html">graphics/gfxnodes.h</a> <a href="../Includes_and_Autodocs_2._guide/node044E.html">GfxNew()</a> <a href="../Includes_and_Autodocs_2._guide/node044B.html">GfxAssociate()</a> GfxLookUp()
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

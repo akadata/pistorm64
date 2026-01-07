@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amigaguide" NODE="SetAmigaGuideContextA()" TITLE="amigaguide.library/SetAmigaGuideContextAgaguide.library/SetAmigaGuideContextA" -->
+<head>
+<title>amigaguide.library/SetAmigaGuideContextAgaguide.library/SetAmigaGuideContextA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0014.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0016.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+        SetAmigaGuideContextA - Set the context ID for an AmigaGuide system.
+                                                               (V34)
+<b>   SYNOPSIS</b>
+        success = SetAmigaGuideContextA ( handle, context, attrs );
+        d0                                 a0       d0      d1
+
+        <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> SetAmigaGuideContextA (AMIGAGUIDECONTEXT, ULONG,
+                                    struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+        success = SetAmigaGuideContext (handle, context, tag1, ...);
+
+        <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> SetAmigaGuideContext (AMIGAGUIDECONTEXT, ULONG, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...);
+
+<b>   FUNCTION</b>
+        This function, and the SendAmigaGuideContext() function, are used to
+        provide a simple way to display a node based on a numeric value,
+        instead of having to build up a slightly more complex command
+        string.
+
+<b>   INPUTS</b>
+        handle -- Handle to an AmigaGuide system.
+
+        context -- Index value of the desired node to display.
+
+        future -- Future expansion, must be set to NULL for now.
+
+<b>   EXAMPLE</b>
+
+        /* sample context table */
+        <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> ContextArray[] =
+        {
+            &#034;MAIN&#034;,
+            &#034;FILEREQ&#034;,
+            &#034;PRINT&#034;,
+            &#034;ABOUT&#034;,
+            NULL
+        };
+
+        /* quickie defines */
+        #define HELP_MAIN      0
+        #define HELP_FILEREQ   1
+        #define HELP_PRINT     2
+        #define HELP_ABOUT     3
+
+        ...
+
+        struct <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line102">NewAmigaGuide</a> nag = {NULL};
+
+        /* initialize the context table */
+        nag.nag_Context = ContextArray;
+
+        ...
+
+        /* bring up help on a particular subject */
+        SetAmigaGuideContext(handle, HELP_ABOUT, NULL);
+
+<b>   RETURNS</b>
+        success - Returns TRUE if a valid context ID was passed,
+            otherwise returns FALSE.
+
+<b>   SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node0013.html">SendAmigaGuideContextA()</a>, <a href="../Includes_and_Autodocs_3._guide/node0012.html">SendAmigaGuideCmdA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

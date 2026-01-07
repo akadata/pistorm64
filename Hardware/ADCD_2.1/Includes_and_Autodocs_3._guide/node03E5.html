@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="Request()" TITLE="intuition.library/Request" -->
+<head>
+<title>intuition.library/Request</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03E4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03E6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	Request -- Activate a requester.
+
+<b>    SYNOPSIS</b>
+	Success = Request( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> )
+	D0		   A0         A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> Request( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> * );
+
+<b>    FUNCTION</b>
+	Links in and displays a requester into the specified window.
+
+	This routine ignores the window's IDCMP_REQVERIFY flag.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> = pointer to the requester to be displayed
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to the window into which this requester goes
+
+	New for V36: the POINTREL flag now has meaning if the requester
+	is not a DMR (Double-Menu Requester):
+	If POINTREL is set this requester should be placed in the center
+	of the window, offset by Requester.RelLeft and Requester.RelTop.
+	If the requester doesn't fit in the window, its position will be
+	adjusted to show the upper-left corner.
+
+<b>    RESULT</b>
+	If the requester is successfully opened, TRUE is returned.  Otherwise,
+	if the requester could not be opened, FALSE is returned.
+
+<b>    BUGS</b>
+	It turns out that the return code of this function is not
+	always correct under V34 and prior.  If your requester does
+	not have an ENDGADGET, then you can examine window-&#062;FirstRequest
+	to see if your requester successfully opened.  (A requester with
+	an ENDGADGET can go away all by itself before you get the chance
+	to look).  Under V36 and higher, the return code from this routine
+	is fine.
+
+	There is a maximum of 8 requesters that are supported in
+	a window that can be changed in size, position, or depth.
+
+<b>    SEE ALSO</b>
+	The Requesters section of the Intuition Reference Manual
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

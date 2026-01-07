@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_2" NODE="2-3-3" TITLE="2 / Device Interface / Scope Of Audio Commands" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>2 / Device Interface / Scope Of Audio Commands</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0020.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0022.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Most audio commands can operate on multiple channels.  The exceptions are
+<a href="../Devices_Manual_guide/node0038.html">ADCMD_WAITCYCLE</a>, <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a> and <a href="../Includes_and_Autodocs_2._guide/node04B1.html">CMD_READ</a>, which can only operate on one
+channel at a time.  You specify the channel(s) that you want to use by
+setting the appropriate bits in the <a href="../Devices_Manual_guide/node001E.html#line11">ioa_Request.io_Unit</a> field of the
+IOAudio block.  If you send a command for a channel that you do not own,
+your command will be ignored.  For more details, see the section on
+&#034;<a href="../Devices_Manual_guide/node0029.html">Allocation and Arbitration</a>&#034; below.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

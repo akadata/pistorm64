@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="printer" NODE="PWrite()" TITLE="printer.device/PWrite" -->
+<head>
+<title>printer.device/PWrite</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0516.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0518.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	PWrite -- internal write to printer port
+
+<b>   SYNOPSIS</b>
+	error = (*PrinterData-&#062;pd_PWrite)(buffer, length);
+	D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> PWrite(UBYTE *, ULONG);
+
+<b>   FUNCTION</b>
+	PWrite writes 'length' bytes directly to the printer.  This
+	function is generally called by printer drivers to send
+	their buffer(s) to the printer.
+
+	This function is accessed by referencing off the <a href="../Includes_and_Autodocs_3._guide/node05FC.html#line103">PrinterData</a> (PD)
+	structure.  Below is a code fragment to show how to do get access
+	to a pointer to the <a href="../Includes_and_Autodocs_3._guide/node05FC.html#line103">PrinterData</a> (PD) structure.
+
+	#include <a href="../Includes_and_Autodocs_3._guide/node0654.html">&#060;exec/types.h&#062;</a>
+	#include <a href="../Includes_and_Autodocs_3._guide/node0605.html">&#060;devices/printer.h&#062;</a>
+	#include <a href="../Includes_and_Autodocs_3._guide/node05FC.html">&#060;devices/prtbase.h&#062;</a>
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node0605.html#line173">IODRPReq</a> PReq;
+	struct <a href="../Includes_and_Autodocs_3._guide/node05FC.html#line103">PrinterData</a> *PD;
+	struct <a href="../Includes_and_Autodocs_3._guide/node05FC.html#line275">PrinterExtendedData</a> *PED;
+
+	/* open the printer device (any version); if it opened... */
+	if (OpenDevice(&#034;printer.device&#034;, 0, &#038;PReq, 0) == NULL) {
+
+	    /* get pointer to printer data structure */
+	    PD = (struct <a href="../Includes_and_Autodocs_3._guide/node05FC.html#line103">PrinterData</a> *)PReq.io_Device;
+
+	    /* write something directly to the printer */
+	    (*PD-&#062;pd_PWrite)(&#034;Hello worldn&#034;, 12);
+
+	    CloseDevice(&#038;PReq); /* close the printer device */
+	}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="CurrentDir()" TITLE="dos.library/CurrentDir" -->
+<head>
+<title>dos.library/CurrentDir</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node014D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node014F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	CurrentDir -- Make a directory lock the current directory
+
+<b>    SYNOPSIS</b>
+	oldLock = CurrentDir( lock )
+	D0		      D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node05F8.html#line129">BPTR</a> CurrentDir(BPTR)
+
+<b>    FUNCTION</b>
+	CurrentDir() causes a directory associated with a lock to be made
+	the current directory.	The old current directory lock is returned.
+
+	A value of zero is a valid result here, this 0 lock represents the
+	root of file system that you booted from.
+
+	Any call that has to <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open()</a> or <a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock()</a> files (etc) requires that
+	the current directory be a valid lock or 0.
+
+<b>    INPUTS</b>
+	lock - BCPL pointer to a lock
+
+<b>    RESULTS</b>
+	oldLock - BCPL pointer to a lock
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock()</a>, <a href="../Includes_and_Autodocs_3._guide/node01C8.html">UnLock()</a>, <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open()</a>, <a href="../Includes_and_Autodocs_3._guide/node0156.html">DupLock()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

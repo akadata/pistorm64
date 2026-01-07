@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-12-8-4" TITLE="5 / / Custom String Editing / The SGH_KEY Command" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / / Custom String Editing / The SGH_KEY Command</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0171.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0173.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The SGH_KEY command indicates that the user has pressed a key while the
+gadget is active.  This may be any key, including non-character keys such
+as Shift, Ctrl and Alt.  Repeat keys (one call per repeat) and the Amiga
+keys also cause the hook to be called with the SGH_KEY command.  The hook
+is not called for &#034;key up&#034; events.
+
+The SGH_KEY command must be supported by any custom string editing hook.
+There are no parameters following the SGH_KEY command longword.  All
+information on the event must be derived from the <a href="../Libraries_Manual_guide/node016F.html">SGWork</a> structure.
+
+Intuition has already processed the event and filled-in the <a href="../Libraries_Manual_guide/node016F.html">SGWork</a>
+structure before calling the hook.  The information included in this
+structure includes the type of action taken (<a href="../Libraries_Manual_guide/node016F.html#line57">EditOp</a>), the new cursor
+position (<a href="../Libraries_Manual_guide/node016F.html#line30">BufferPos</a>), the new value in the buffer (<a href="../Libraries_Manual_guide/node016F.html#line30">WorkBuffer</a>),  the
+previous value in the buffer (<a href="../Libraries_Manual_guide/node016F.html#line26">PrevBuffer</a>), the input event that caused
+this call (<a href="../Libraries_Manual_guide/node016F.html#line35">IEvent</a>) and more.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="debug_lib" NODE="KPrintF()" TITLE="debug.lib/KPrintF" -->
+<head>
+<title>debug.lib/KPrintF</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0127.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0129.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	KPrintF - print formatted data to the console
+	          (defaults to the serial port at 9600 baud)
+
+<b>   SYNOPSIS</b>
+	KPrintF(&#034;format string&#034;,values)
+	         A0             A1
+
+<b>   FUNCTION</b>
+	print a formatted C-type string to the console.  See the
+	exec <a href="../Includes_and_Autodocs_3._guide/node0227.html">RawDoFmt()</a> call for the supported % formatting commands.
+
+<b>   INPUTS</b>
+	&#034;format string&#034; - A C style string with % commands to indicate
+	                  where paramters are to be inserted.
+	values - A pointer to an array of paramters, to be inserted into
+	         specified places in the string.
+
+	KPutFmt and KPrintF are identical assembly interfaces that want the
+	two pointers in registers.  _KPrintF and _kprintf are C interfaces
+	that expect the format string pointer on the stack, and the
+	paramters on the stack above that.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0227.html">exec.library/RawDoFmt</a>, any C compiler's &#034;printf&#034; call.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

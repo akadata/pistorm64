@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="gadtools" NODE="GT_BeginRefresh()" TITLE="gadtools.library/GT_BeginRefresh" -->
+<head>
+<title>gadtools.library/GT_BeginRefresh</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node027B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node027D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GT_BeginRefresh -- begin refreshing friendly to GadTools. (V36)
+
+<b>   SYNOPSIS</b>
+	GT_BeginRefresh(win)
+	                A0
+
+	VOID GT_BeginRefresh(struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *);
+
+<b>   FUNCTION</b>
+	Invokes the <a href="../Includes_and_Autodocs_3._guide/node0397.html">intuition.library/BeginRefresh()</a> function in a manner
+	friendly to the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> Toolkit.  This function call permits the
+	GadTools gadgets to refresh themselves at the correct time.
+	Call <a href="../Includes_and_Autodocs_3._guide/node027D.html">GT_EndRefresh()</a> function when done.
+
+<b>   INPUTS</b>
+	win - pointer to <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> structure for which a IDCMP_REFRESHWINDOW
+	      IDCMP event was received.
+
+<b>   NOTES</b>
+	The nature of GadTools precludes the use of the IDCMP flag
+	WFLG_NOCAREREFRESH.  You must handle IDCMP_REFRESHWINDOW events
+	in at least the minimal way, namely:
+
+		case IDCMP_REFRESHWINDOW:
+		    GT_BeginRefresh(win);
+		    GT_EndRefresh(win, TRUE);
+		    break;
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0397.html">intuition.library/BeginRefresh()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

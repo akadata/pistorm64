@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="ObtainBestPenA()" TITLE="graphics.library/ObtainBestPenA" -->
+<head>
+<title>graphics.library/ObtainBestPenA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0305.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0307.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ObtainBestPenA --- Search for the closest color match, or allocate a
+	                   new one. (V39)
+	ObtainBestPen  --- varargs stub for ObtainBestPenA
+
+<b>   SYNOPSIS</b>
+	color | -1 =ObtainBestPenA(  cm,  R,   G,    B,    taglist)
+	                             a0   d1   d2    d3       a1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> ObtainBestPenA( struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> *, ULONG, ULONG,
+			ULONG, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	color = ObtainBestPen(cm,r,g,b,tags....);
+
+<b>   INPUTS</b>
+	cm = colormap
+	R = red level   (32 bit left justified fraction)
+	G = green level (32 bit left justified fraction)
+	B = blue level  (32 bit left justified fraction)
+	taglist = a pointer to a standard tag list specifying the color
+	          matching settings desired:
+
+	        OBP_Precision - specifies the desired precision for the
+	                match. Should be PRECISION_GUI, PRECISION_ICON, or
+	                PRECISION_IMAGE or PRECISION_EXACT.
+	                Defaults to PRECISION_IMAGE.
+
+	        OBP_FailIfBad - specifies that you want ObtainBestPen to return
+	                a failure value if there is not a color within the
+	                given tolerance, instead of returning the closest color.
+	                With OBP_FailIfBad==FALSE, ObtainBestPen will only fail
+	                if the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> contains no sharable colors.
+	                Defaults to FALSE.
+
+
+<b>   FUNCTION</b>
+	This function can be used by applications to figure out
+	what pen to use to represent a given color.
+
+	The system will attempt to find the color in your viewport closest
+	to the specified color. If there is no color within your tolerance,
+	then a new one will be allocated, if available. If none is available,
+	then the closest one found will be returned.
+
+<b>   RESULT</b>
+	The correct pen value, or -1 if no sharable palette entries are available.
+
+
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+	If this call succceeds, then you must call <a href="../Includes_and_Autodocs_3._guide/node0314.html">ReleasePen()</a> when you are
+	done with the color.
+
+	The error metric used for ObtainBestPen() is based on the magnitude
+	squared between the two RGB values, scaled by the percentage of free
+	entries.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a> <a href="../Includes_and_Autodocs_3._guide/node0307.html">ObtainPen()</a> <a href="../Includes_and_Autodocs_3._guide/node0314.html">ReleasePen()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-6" TITLE="30 / Layers / Creating and Using New Layers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / Layers / Creating and Using New Layers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03EE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03F0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The functions described in this section are generally not safe to use with
+Intuition.  To create new layers for Intuition you use Intuition window
+calls (see the &#034;<a href="../Libraries_Manual_guide/node0102.html">Intuition Windows</a>&#034; chapter earlier in this book).
+
+Only applications that create and mange their own <a href="../Libraries_Manual_guide/node00F1.html#line4">View</a> will be able to
+call the layer creation and updating functions discussed here.
+
+
+         Table 30-3: Functions for Creating and Updating Layers
+   ___________________________________________________________________
+  |                                                                   |
+<a name="line13">  |              <a href="../Libraries_Manual_guide/node03F2.html">NewLayerInfo()</a>  Allocating a <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> structure.   |</a>
+  |          <a href="../Libraries_Manual_guide/node03F2.html#line5">DisposeLayerInfo()</a>  Deallocating a Layer_Info structure. |
+  |-------------------------------------------------------------------|
+  |        <a href="../Libraries_Manual_guide/node03F3.html">CreateUpfrontLayer()</a>  Make a new layer in front of others. |
+<a name="line17">  |         <a href="../Libraries_Manual_guide/node03F3.html#line9">CreateBehindLayer()</a>  Make a new layer behind others.      |</a>
+  |               <a href="../Libraries_Manual_guide/node03F3.html#line28">DeleteLayer()</a>  Remove and delete an existing layer. |
+  |-------------------------------------------------------------------|
+  |                 <a href="../Libraries_Manual_guide/node03F4.html">MoveLayer()</a>  Change the position (not depth) of a |
+  |                              layer.                               |
+  |                 <a href="../Libraries_Manual_guide/node03F4.html">SizeLayer()</a>  Change the size of a layer.          |
+<a name="line23">  |               <a href="../Libraries_Manual_guide/node03F5.html">ScrollLayer()</a>  Change the internal coordinates of a |</a>
+  |                              layer.                               |
+  |-------------------------------------------------------------------|
+  |               <a href="../Libraries_Manual_guide/node03F6.html">BehindLayer()</a>  Depth arrange a layer behind others. |
+  |              <a href="../Libraries_Manual_guide/node03F6.html">UpfrontLayer()</a>  Depth arrange a layer in front of    |
+  |                              others.                              |
+  |        <a href="../Libraries_Manual_guide/node03F6.html">MoveLayerInFrontOf()</a>  Depth arrange a layer to a specific  |
+  |                              position.                            |
+  |-------------------------------------------------------------------|
+<a name="line32">  |  <a href="../Libraries_Manual_guide/node03F7.html">SwapBitsRastPortClipRect()</a>  Fast, non-layered and non-damaging   |</a>
+  |                              display operation.                   |
+  |-------------------------------------------------------------------|
+  |               <a href="../Libraries_Manual_guide/node03F6.html#line13">BeginUpdate()</a>  Synchronize optimized refreshing for |
+  |                              layer.                               |
+  |                 <a href="../Libraries_Manual_guide/node03F6.html#line13">EndUpdate()</a>  End optimized layer refresh.         |
+  |___________________________________________________________________|
+
+
+ <a href="../Libraries_Manual_guide/node03F0.html">Creating a Viewing Workspace</a> 
+ <a href="../Libraries_Manual_guide/node03F1.html">Creating the Layers</a> 
+ <a href="../Libraries_Manual_guide/node03F2.html">Allocating and Deallocating Layer_Info</a> 
+ <a href="../Libraries_Manual_guide/node03F3.html">Allocating and Deallocating Layers</a> 
+ <a href="../Libraries_Manual_guide/node03F4.html">Moving and Sizing Layers</a> 
+ <a href="../Libraries_Manual_guide/node03F5.html">Changing a Viewpoint</a> 
+ <a href="../Libraries_Manual_guide/node03F6.html">Reordering Layers</a> 
+ <a href="../Libraries_Manual_guide/node03F7.html">Sub-Layer Rectangle Operations</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

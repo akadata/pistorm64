@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-8-4-1" TITLE="28 / / / Linking the AnimComp Sequences to the AnimOb" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / / Linking the AnimComp Sequences to the AnimOb</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03C4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03C6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Within each <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a> there may be one or more <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a> sequences.  The
+<a href="../Libraries_Manual_guide/node03B9.html#line50">HeadComp</a> of the AnimOb points to the first AnimComp in the list of
+sequences.
+
+Each sequence is identified by its &#034;active&#034; <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a>.  There can only be
+one active AnimComp in each sequence.  The sequences are linked together
+by their active AnimComps; for each of these the <a href="../Libraries_Manual_guide/node03C2.html">NextComp</a> and <a href="../Libraries_Manual_guide/node03C2.html">PrevComp</a>
+fields link the sequences together to create a list.  The first sequence
+in the list (<a href="../Libraries_Manual_guide/node03B9.html#line50">HeadComp</a> of the <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a>), has its PrevComp set to NULL.  The
+last sequence in the list has its NextComp set to NULL.  None of the
+inactive AnimComps should have NextComp or PrevComp fields set.
+
+To find the active <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a> at run time, you can look in the <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a>'s
+<a href="../Libraries_Manual_guide/node03B9.html#line50">HeadComp</a> field.  To find the active AnimComp from any another AnimComp,
+use the <a href="../Libraries_Manual_guide/node03B9.html#line22">HeadOb</a> field to find the controlling AnimOb first and then look in
+its HeadComp field to find the active AnimComp.
+
+The figure below shows all the linkages in data structures needed to
+create the animation GELs.
+
+  ___________________
+ |                   |
+ |    Next AnimOb    |
+ |___________________|
+ |                   |
+ |  Previous AnimOb  |                                  Non-Current
+ |___________________|          Original                -----------
+ |                   |          --------             Additional views
+ | \\\\\\\\\\\\\\\\\ |        (first view)          of each component,
+ | \\\\\\\\\\\\\\\\\ |        of an AnimOb          waiting to be used.
+ |___________________|     ___________________      _ _ _ _ _ _ _ _ _ _
+ |                   |----|                   |    |                   |
+ |     HeadComp      |  _\|   Next AnimComp   |__  |   Next AnimComp   |
+ |___________________| | /|___________________|  | |_ _ _ _ _ _ _ _ _ _|
+                       |  |                   |  | |                   |
+                       |  | Previous AnimComp |  | | Previous AnimComp |
+                       |  |___________________|  | |_ _ _ _ _ _ _ _ _ _|
+                       |  |                   |  | |                   |
+                       |  | Sequence Linkage  |--|-| Sequence linkage  |--
+                       |  |___________________|  | |_ _ _ _ _ _ _ _ _ _|
+                       |  |                   |  | |                   |
+                       |  | \\\\\\\\\\\\\\\\\ |  | | \\\\\\\\\\\\\\\\\ |
+                       |  |___________________|  | |_ _ _ _ _ _ _ _ _ _|
+                       |                         |
+                       |                         |
+                       |   ___________________   |  _ _ _ _ _ _ _ _ _ _
+                       |  |                   |/_| |                   |
+                      _|_\|   Next AnimComp   |\   |   Next AnimComp   |
+                     | | /|___________________|--. |_ _ _ _ _ _ _ _ _ _|
+                     | |  |                   |  | |                   |
+                     | |__| Previous AnimComp |  | | Previous AnimComp |
+                     |    |___________________|  | |_ _ _ _ _ _ _ _ _ _|
+                     |    |                   |  | |                   |
+                     |    | Sequence Linkage  |--|-| Sequence linkage  |--
+                     |    |___________________|  | |_ _ _ _ _ _ _ _ _ _|
+                     |    |                   |  | |                   |
+                     |    | \\\\\\\\\\\\\\\\\ |  | | \\\\\\\\\\\\\\\\\ |
+                     |    |___________________|  | |_ _ _ _ _ _ _ _ _ _|
+                     |                           |
+                     |                           |
+                     |     ___________________   |  _ _ _ _ _ _ _ _ _ _
+                     |    |                   |/_| |                   |
+                     |    |   Next AnimComp   |\   |   Next AnimComp   |
+                     |    |___________________|    |_ _ _ _ _ _ _ _ _ _|
+                     |    |                   |    |                   |
+                     |____| Previous AnimComp |    | Previous AnimComp |
+                          |___________________|    |_ _ _ _ _ _ _ _ _ _|
+                          |                   |    |                   |
+                          | Sequence Linkage  |----| Sequence linkage  |--
+                          |___________________|    |_ _ _ _ _ _ _ _ _ _|
+                          |                   |    |                   |
+                          | \\\\\\\\\\\\\\\\\ |    | \\\\\\\\\\\\\\\\\ |
+                          |___________________|    |_ _ _ _ _ _ _ _ _ _|
+
+
+                    Figure 28-6: Linking of an AnimOb
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

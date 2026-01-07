@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-8-1" TITLE="28 / Animation with GELs / Animation Data Structures" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Animation with GELs / Animation Data Structures</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03B8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03BA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are two main data structures involved in Amiga animation: AnimComp
+<a name="line3">and AnimOb.</a>
+
+The <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line169">AnimComp</a> (Animation Component), is an extension of the <a href="../Libraries_Manual_guide/node0398.html">Bob</a> structure
+discussed in the <a href="../Libraries_Manual_guide/node03B7.html">previous section</a>.  An AnimComp provides a convenient way
+to link together a series of images so that they can be sequenced
+automatically, and so multiple sequences can be grouped together.  An
+AnimComp is analogous to one sheet of celluloid representing a single
+<a name="line10">image to be placed over the background.</a>
+
+<a name="line12">    struct AnimComp</a>
+    {
+        WORD Flags;                 /* AnimComp flags for system &#038; user */
+        WORD Timer;
+        WORD TimeSet;
+        struct AnimComp  *NextComp;
+        struct AnimComp  *PrevComp;
+        struct AnimComp  *NextSeq;
+        struct AnimComp  *PrevSeq;
+        WORD (*AnimCRoutine)();
+<a name="line22">        WORD YTrans;</a>
+        WORD XTrans;
+        struct AnimOb    *HeadOb;
+                           /* Pointer back to the controlling AnimOb */
+        struct Bob       *AnimBob;
+                           /* Underlying Bob structure for this AnimComp */
+    };
+
+The AnimComp structure contains pointers, <a href="../Libraries_Manual_guide/node03BF.html">PrevSeq</a> and <a href="../Libraries_Manual_guide/node03BF.html">NextSeq</a>, that lets
+you group these cells into stacks that will be viewed sequentially.  The
+AnimComp structure also has <a href="../Libraries_Manual_guide/node03C2.html">PrevComp</a> and <a href="../Libraries_Manual_guide/node03C2.html">NextComp</a> pointers that let you
+group stacks into complex objects containing multiple independently moving
+<a name="line34">parts.</a>
+
+The second animation data structure is the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line204">AnimOb</a> which provides the
+variables needed for overall control over a group of AnimComps.  The
+AnimOb itself contains no imagery; it simply provides a common reference
+point for the sequenced images and specifies how the system should move
+<a name="line40">that point.</a>
+
+    struct AnimOb
+    {
+<a name="line44">        struct AnimOb    *NextOb, *PrevOb;</a>
+        LONG Clock;
+<a name="line46">        WORD AnOldY, AnOldX;            /* old y,x coordinates          */</a>
+        WORD AnY, AnX;                  /* y,x coordinates of the AnimOb*/
+<a name="line48">        WORD YVel, XVel;                /* velocities of this object    */</a>
+        WORD YAccel, XAccel;            /* accelerations of this object */
+<a name="line50">        WORD RingYTrans, RingXTrans;    /* ring translation values      */</a>
+        WORD (*AnimORoutine)();         /* address of user procedure    */
+        struct AnimComp  *HeadComp;     /* pointer to first component   */
+        AUserStuff AUserExt;            /* AnimOb user extension        */
+    };
+
+These structures can be used in various ways.  A simple animation of a
+rotating ball could be created with three or four AnimComps linked
+together in a circular list by their <a href="../Libraries_Manual_guide/node03BF.html">NextSeq</a> and <a href="../Libraries_Manual_guide/node03BF.html">PrevSeq</a> fields.  The
+system displays the initial AnimComp (the &#034;top of the stack&#034;), then
+switches to the AnimComp pointed to by NextSeq, and then switches to its
+NextSeq and so on until it reaches the end of the sequence.  The sequence
+starts over again automatically if the last AnimComp.NextSeq points back
+to the first AnimComp in the stack.
+
+For a more complex animation of a walking human, you could use five
+stacks, i.e., five circular lists of AnimComps; four stacks for the arms
+and legs and a single stack for the head and torso.  To group these stacks
+into one cohesive unit showing a human figure, you use the <a href="../Libraries_Manual_guide/node03C2.html">PrevComp</a> and
+<a href="../Libraries_Manual_guide/node03C2.html">NextComp</a> pointers in the AnimComp structure.  All the stacks would also
+share a common AnimOb, so that the combined sequences can be moved as a
+single object.
+
+     <a href="../Libraries_Manual_guide/node05F4.html">Figure 28-4: Linking AnimComps For a Multiple Component AnimOb</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="wb" NODE="AddAppWindowA()" TITLE="workbench.library/AddAppWindowA" -->
+<head>
+<title>workbench.library/AddAppWindowA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05BB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05BD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AddAppWindowA - add a window to Workbench's list of AppWindows.  (V36)
+
+<b>   SYNOPSIS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> = AddAppWindowA(id, userdata, window, msgport, taglist)
+	D0                        D0     D1       A0      A1       A2
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> *AddAppWindowA(ULONG, ULONG, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+	                                struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	Alternate, varargs version:
+	struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> *AddAppWindow(ULONG, ULONG, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+	                               struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *
+	                               tag1, data1,
+	                               tag2, data2,
+	                               ...
+	                               TAG_END );
+
+<b>   FUNCTION</b>
+	Attempt to add the window to Workbench's list of AppWindows.
+	Normally non-Workbench windows (those not opened by Workbench)
+	cannot have icons dropped in them.  This call is provided to
+	allow applications to be notified when an icon or icons get
+	dropped inside a window that they have registered with Workbench.
+	The notification consists of an <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line115">AppMessage</a> (found in workbench.h/i)
+	of type 'MTYPE_APPWINDOW' arriving at the message port you specified.
+	What you do with the list of icons (pointed to by am_ArgList) is
+	up to you, but generally you would want to call <a href="../Includes_and_Autodocs_3._guide/node034E.html">GetDiskObjectNew</a> on
+	them.
+
+<b>   INPUTS</b>
+	id - this variable is strictly for your own use and is ignored by
+	     Workbench.  Typical uses in C are in switch and case statements,
+	     and in assembly language table lookup.
+	userdata - this variable is strictly for your own use and is ignored
+	           by Workbench.
+	window - pointer to window to add.
+	msgport - pointer to message port Workbench will use to send you an
+	          <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line115">AppMessage</a> message of type 'MTYPE_APPWINDOW' when your
+	          window gets an icon or icons dropped in it.
+	taglist - ptr to a list of tag items.  Must be NULL for V2.0.
+
+<b>   RESULTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> - a pointer to an <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> structure which you pass to
+	            <a href="../Includes_and_Autodocs_3._guide/node05C4.html">RemoveAppWindow</a> when you want to remove the window
+	            from Workbench's list of AppWindows.  NULL
+	            if Workbench was unable to add your window; typically
+	            happens when Workbench is not running or under low
+	            memory conditions.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05BD.html">workbench.library/AddAppWindowDropZoneA</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05C4.html">workbench.library/RemoveAppWindow</a>
+
+<b>   NOTES</b>
+	The V2.0 icon editor is an example of an <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a>.  Note that app
+	window applications generally want to call <a href="../Includes_and_Autodocs_3._guide/node034E.html">GetDiskObjectNew</a>
+	(as opposed to GetDiskObject) to get the disk object for the icon
+	dropped in the window.
+
+	For this function call to succeed, Workbench must be open. This
+	means that the LoadWB command was executed and the Workbench
+	screen has been opened.
+
+	When removing an <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a>, all its drop zones will be automatically
+	removed.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

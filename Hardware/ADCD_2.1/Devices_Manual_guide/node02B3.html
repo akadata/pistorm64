@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_SMUS" NODE="16-5-3-1" TITLE=" Standard Data and Property Chunks / Required Property SHDR " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Data and Property Chunks / Required Property SHDR </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02B2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02B4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The required property &#034;SHDR&#034; holds an SScoreHeader as defined in these C
+declarations and following documentation.  An SHDR specifies global
+information for the score.  It must appear before the <a href="../Devices_Manual_guide/node02B7.html">TRAK</a>s in a FORM <a href="../Devices_Manual_guide/node02AB.html">SMUS</a>.
+
+    #define ID_SMUS MakeID('S', 'M', 'U', 'S')
+    #define ID_SHDR MakeID('S', 'H', 'D', 'R')
+
+    typedef struct {
+	UWORD tempo;	/* tempo, 128ths quarter note/minute */
+	UBYTE volume;	/* overall playback volume 0 through 127 */
+	UBYTE ctTrack;	/* count of tracks in the score */
+	} SScoreHeader;
+
+[Implementation details.  In the C struct definitions in this memo, fields
+are filed in the order shown.  A UBYTE field is packed into an 8-bit byte.
+Programs should set all &#034;pad&#034; fields to 0.  MakeID is a C macro defined in
+the main IFF document and in the source file <a href="../Devices_Manual_guide/node02E5.html">IFF.h</a>.]
+
+The field tempo gives the nominal tempo for all tracks in the score.  It
+is expressed in 128ths of a quarter note per minute, i.e., 1 represents 1
+quarter note per 128 minutes while 12800 represents 100 quarter notes per
+minute.  You may think of this as a fixed point fraction with a 9-bit
+integer part and a 7-bit fractional part (to the right of the point).  A
+coarse-tempoed program may simply shift tempo right by 7 bits to get a
+whole number of quarter notes per minute.  The tempo field can store tempi
+in the range 0 up to 512.  The playback program may adjust this tempo,
+perhaps under user control.
+
+Actually, this global tempo could actually be just an initial tempo if
+there are any &#034;set tempo&#034; <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a>s inside the score (see <a href="../Devices_Manual_guide/node02B7.html">TRAK</a>, below).  Or
+the global tempo could be scaled by &#034;scale tempo&#034; SEvents inside the
+score.  These are potential extensions that can safely be ignored by
+current programs.  [See <a href="../Devices_Manual_guide/node02C1.html">More SEvents To Be Defined</a>, below.]
+
+The field volume gives an overall nominal playback volume for all tracks
+in the score.  The range of volume values 0 through 127 is like a MIDI key
+velocity value.  The playback program may adjust this volume, perhaps
+under direction of a user &#034;volume control&#034;.
+
+Actually, this global volume level could be scaled by dynamic-mark <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a>s
+inside the score (see <a href="../Devices_Manual_guide/node02B7.html">TRAK</a>, below).
+
+The field ctTrack holds the count of tracks, i.e., the number of <a href="../Devices_Manual_guide/node02B7.html">TRAK</a>
+chunks in the FORM <a href="../Devices_Manual_guide/node02AB.html">SMUS</a> (see below).  This information helps the reader
+prepare for the following data.
+
+A playback program will typically load the score and call a driver routine
+PlayScore(tracks, tempo, volume), supplying the tempo and volume from the
+<a href="../Devices_Manual_guide/node02B3.html">SHDR</a>  chunk.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-8-9" TITLE="15 / / The Kinds of GadTools Gadgets / Palette Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / / The Kinds of GadTools Gadgets / Palette Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0267.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0269.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Palette gadgets (PALETTE_KIND) let the user pick a color from a set of
+several.  A palette gadget consists of a number of colored squares, one
+for each color available.  There may also be an optional indicator square
+which is filled with the currently selected color.  To create a color
+editor, a palette gadget would be combined with some sliders to control
+red, green and blue components, for example.
+
+<a name="line9">Palette gadgets use the following tags:</a>
+
+GTPA_Depth (UWORD)
+    The number of bitplanes that the palette represents.  There will be 1
+    &#060;&#060; depth squares in the palette gadget.  The default is one.  (Create
+<a name="line14">    only.)</a>
+
+GTPA_Color (UBYTE)
+    The selected color of the palette.  The default is one.  (Create and
+<a name="line18">    set.)</a>
+
+GTPA_ColorOffset (UBYTE)
+    The first color to use in the palette.  For example, if GTPA_Depth is
+    two and GTPA_ColorOffset is four, then the palette will have squares
+    for colors four, five, six and seven.  The default is zero.  (Create
+<a name="line24">    only.)</a>
+
+GTPA_IndicatorWidth (UWORD)
+    The desired width of the current-color indicator.  By specifying this
+    tag, the application is asking for an indicator to be placed to the
+    left of the color selection squares.  The indicator will be as tall
+    as the gadget itself.  By default there is no indicator.  (Create
+<a name="line31">    only.)</a>
+
+GTPA_IndicatorHeight (UWORD)
+    The desired height of the current-color indicator.  By specifying
+    this tag, the application is asking for an indicator to be placed
+    above the color selection squares.  The indicator will be as wide as
+<a name="line37">    the gadget itself.  By default there is no indicator.  (Create only.)</a>
+
+GA_Disabled (BOOL)
+    Set this attribute to TRUE to disable the palette gadget, to FALSE
+    otherwise.  The default is FALSE.  (Create and set.)
+
+An <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a> will be received when the user selects a
+color from the palette.  The current-color indicator is recessed,
+indicating that clicking on it has no effect.
+
+If the palette is wide and not tall, use the GTPA_IndicatorWidth tag to
+put the indicator on the left.  If the palette is tall and narrow, put the
+indicator on top using GTPA_IndicatorHeight.
+
+By default, the gadget's label will go above the palette gadget, unless
+GTPA_IndicatorWidth is specified, in which case the label will go on the
+left.  In either case, the default may be overridden by setting the
+appropriate flag in the <a href="../Libraries_Manual_guide/node0259.html">NewGadget</a>'s <a href="../Libraries_Manual_guide/node0259.html#line38">ng_Flags</a> field.
+
+The size specified for the palette gadget will determine how the area is
+subdivided to make the individual color squares.  The actual size of the
+palette gadget will be no bigger than the size given, but it can be
+smaller in order to make the color squares all exactly the same size.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

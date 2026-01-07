@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-3-1-4" TITLE="3 / / Creating A New Custom Screen / Closing the Screen" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / / Creating A New Custom Screen / Closing the Screen</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00E3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00E5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When an application has finished using a screen, the memory that the
+screen occupied should be returned to the system by calling <a href="../Includes_and_Autodocs_2._guide/node0207.html">CloseScreen()</a>.
+Normally, an application should close only those screens that it created.
+Under V34 and earlier versions of the OS, CloseScreen() returns no values.
+Under Release 2, CloseScreen() returns a boolean value, TRUE for success
+and FALSE for failure.  CloseScreen() can fail if the screen is <a href="../Libraries_Manual_guide/node00E6.html">public</a> and
+another task is still using the screen.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

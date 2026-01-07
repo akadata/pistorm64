@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-8-2" TITLE="27 / / Loading and Displaying the View / Exiting Gracefully" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Loading and Displaying the View / Exiting Gracefully</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0333.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0335.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The preceding sample program provides a way of exiting gracefully with the
+cleanup() subroutine.  This function returns to the memory manager all
+dynamically-allocated memory chunks.  Notice the calls to <a href="../Includes_and_Autodocs_2._guide/node0442.html">FreeRaster()</a> and
+<a href="../Includes_and_Autodocs_2._guide/node043E.html">FreeColorMap()</a>. These calls correspond directly to the allocation calls
+<a href="../Libraries_Manual_guide/node032E.html">AllocRaster()</a> and <a href="../Libraries_Manual_guide/node0331.html">GetColorMap()</a> located in the body of the program. Now
+look at the calls within cleanup() to <a href="../Includes_and_Autodocs_2._guide/node0444.html">FreeVPortCopLists()</a> and
+<a href="../Includes_and_Autodocs_2._guide/node0440.html">FreeCprList()</a>. When you call <a href="../Libraries_Manual_guide/node0332.html#line9">MakeVPort()</a>, the graphics system dynamically
+allocates some space to hold intermediate instructions from which a final
+Copper instruction list is created. When you call <a href="../Libraries_Manual_guide/node0332.html#line27">MrgCop()</a>, these
+intermediate Copper lists are merged together into the final Copper list,
+which is then given to the hardware for interpretation. It is this list
+that provides the stable display on the screen, split into separate
+<a name="line14"><a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>s with their own colors and resolutions and so on.</a>
+
+When your program completes, you must see that it returns all of the
+memory resources that it used so that those memory areas are again
+available to the system for reassignment to other tasks.  Therefore, if
+you use the routines <a href="../Libraries_Manual_guide/node0332.html#line9">MakeVPort()</a> or <a href="../Libraries_Manual_guide/node0332.html#line27">MrgCop()</a>, you must also arrange to use
+<a href="../Includes_and_Autodocs_2._guide/node0440.html">FreeCprList()</a> (pointing to each of those lists in the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> structure) and
+<a href="../Includes_and_Autodocs_2._guide/node0444.html">FreeVPortCopLists()</a> (pointing to the <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> that is about to be
+deallocated).  If your View is interlaced, you will also have to call
+FreeCprList(&#038;view.SHFCprList) because an interlaced view has a separate
+Copper list for each of the two fields displayed. Do not confuse
+FreeVPortCopLists() with FreeCprList(). The former works on intermediate
+Copper lists for a specific ViewPort, the latter directly on a hardware
+<a name="line27">Copper list from the View.</a>
+
+As a final caveat, notice that when you do free everything, the memory
+manager or other programs may immediately change the contents of the freed
+memory.  Therefore, if the Copper is still executing an instruction stream
+(as a result of a previous <a href="../Libraries_Manual_guide/node0333.html">LoadView()</a>) when you free that memory, the
+display will malfunction. Once another <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> has been installed via
+LoadView(), do a <a href="../Libraries_Manual_guide/node0390.html">WaitTOF()</a> for the new View to begin displaying, and then
+you can begin freeing up your resources.  WaitTOF() waits for the vertical
+blanking period to begin and all vertical blank interrupts to complete
+before returning to the caller. The routine <a href="../Includes_and_Autodocs_2._guide/node048A.html">WaitBOVP()</a> (for
+&#034;WaitBottomOfViewPort&#034;) busy waits until the vertical beam reaches the
+bottom of the specified <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> before returning to the caller.  This
+means no other tasks run until this function returns.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="wb" NODE="RemoveAppWindow()" TITLE="workbench.library/RemoveAppWindow" -->
+<head>
+<title>workbench.library/RemoveAppWindow</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05C3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05C5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	RemoveAppWindow - remove a window from Workbench's list         (V36)
+                          of AppWindows.
+
+<b>   SYNOPSIS</b>
+	success = RemoveAppWindow(AppWindow)
+         D0                        A0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> RemoveAppWindow(struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> *);
+
+<b>   FUNCTION</b>
+	Attempt to remove an appwindow from Workbench's list of AppWindows.
+
+<b>   INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> - pointer to an <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> structure returned by
+	            AddAppWindow.
+
+<b>   RESULTS</b>
+	success - TRUE if the window could be removed, FALSE otherwise.
+
+<b>   NOTES</b>
+	As with anything that deals with asynchronous operation, you will need
+	to do a final check for messages on your <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line115">AppMessage</a> port for messages
+	that may have come in between the last time you checked and the
+	call to removed the <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a>.
+
+	Before the <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> is removed, all its drop zones will be removed
+	first. There is no need for you to call <a href="../Includes_and_Autodocs_3._guide/node05C5.html">RemoveAppWindowDropZone()</a>
+	for every single one.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05BC.html">workbench.library/AddAppWindowA</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05C5.html">workbench.library/RemoveAppWindowDropZone</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

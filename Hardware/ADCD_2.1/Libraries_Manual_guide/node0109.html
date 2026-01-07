@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-2-5-1" TITLE="4 / / Window Dimensions / A Display Sized Window Example" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / / Window Dimensions / A Display Sized Window Example</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0108.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node010A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A full screen window is not always desirable.  If the user is working on a
+large, scrolling screen, they may only want a window the size of the
+visible display.  The following example calculates the visible area on a
+screen and opens a window in that area.  The example assumes that the
+screen display clip is as large or larger than text overscan (OSCAN_TEXT)
+which is set by the user.  The window is opened in the text overscan area,
+not within the actual display clip that is used for the screen.  Use
+<a href="../Libraries_Manual_guide/node00F0.html#line76">QueryOverscan()</a> to find the standard overscan rectangles (display clips)
+for a screen.  Use the graphics library call <a href="../Libraries_Manual_guide/node0339.html#line15">VideoControl()</a> to find the
+true display clip of the screen (see the chapter on &#034;<a href="../Libraries_Manual_guide/node0339.html">Graphics Primitives</a>&#034;
+for more information on VideoControl()).  The ViewPortExtra structure
+<a name="line13">contains the display clip information.</a>
+
+    About Screen Coordinates.
+    -------------------------
+    The screen's actual position may not exactly equal the coordinates
+    given in the LeftEdge and TopEdge fields of the <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a>
+    structure.  This is due to hardware constraints that limit the
+    fineness of the positioning of the underlying constructs.  This may
+    cause a window which is opened in the visible part of the screen to
+    be incorrectly positioned by a small number of pixels in each
+    direction.  See the discussion of the screen's LeftEdge and
+    TopEdge in the &#034;<a href="../Libraries_Manual_guide/node00DD.html#line36">Intuition Screens</a>&#034; chapter for more information.
+
+     <a href="../Libraries_Manual_guide/node05BF.html">visiblewindow.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

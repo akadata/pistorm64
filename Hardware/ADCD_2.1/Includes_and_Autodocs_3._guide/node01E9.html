@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="AllocSignal()" TITLE="exec.library/AllocSignal" -->
+<head>
+<title>exec.library/AllocSignal</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01E8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01EA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AllocSignal -- allocate a signal bit
+
+<b>   SYNOPSIS</b>
+	signalNum = AllocSignal(signalNum)
+	D0			D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line48">BYTE</a> AllocSignal(BYTE);
+
+<b>   FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> a signal bit from the current tasks' pool.  Either a
+	particular bit, or the next free bit may be allocated.	The signal
+	associated with the bit will be properly initialized (cleared).  At
+	least 16 user signals are available per task.  Signals should be
+	deallocated before the task exits.
+
+	If the signal is already in use (or no free signals are available)
+	a -1 is returned.
+
+	Allocated signals are only valid for use with the task that
+	allocated them.
+
+
+<b>   WARNING</b>
+	Signals may not be allocated or freed from exception handling code.
+
+<b>   INPUTS</b>
+	signalNum - the desired signal number {of 0..31} or -1 for no
+		    preference.
+
+<b>   RESULTS</b>
+	signalNum - the signal bit number allocated {0..31}. If no signals
+		    are available, this function returns -1.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0210.html">FreeSignal()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

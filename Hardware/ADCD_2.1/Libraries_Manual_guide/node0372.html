@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-1-1-1" TITLE="28 / / Types Of GELs / Simple Sprites" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Types Of GELs / Simple Sprites</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0371.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0373.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Simple Sprites (also known as hardware sprites) are not really part of the
+GELs system but are the basis for VSprites.  Simple Sprites are graphic
+objects implemented in hardware that are easy to define and easy to
+animate. The Amiga hardware has the ability to handle up to eight such
+sprite objects.  Each Simple Sprite is produced by one of the Amiga's
+eight sprite DMA channels.  They are 16-bits wide and arbitrarily tall.
+
+The Amiga system software offers a choice of how to use these hardware
+sprites.  After a sprite DMA channel has displayed the last line of a
+Simple Sprite, the system can reuse the channel for a different sprite
+lower on the screen.  This is how VSprites are implemented--as a software
+construct based on the sprite hardware.
+
+Hence, Simple Sprites are not really part of the animation system (they
+are not GELs).  In fact, if Simple Sprites and GELs are used in the same
+display, the GELs system must be told specifically which Simple Sprites to
+avoid.  Simple Sprites are described in this chapter because they are
+alternatives to VSprites.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

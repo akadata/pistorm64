@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-5-5" TITLE="B / imageclass / New Methods: IM_HITFRAME" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / imageclass / New Methods: IM_HITFRAME</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04D5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04D7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This method is a special version of <a href="../Libraries_Manual_guide/node04D3.html">IM_HITTEST</a> for images that support
+<a href="../Libraries_Manual_guide/node04D5.html">IM_DRAWFRAME</a>.  It asks an image if a point would be inside it if the image
+was confined (scaled, clipped, etc.) to a rectangular bounds.  The return
+value for this method is not explicitly defined.
+
+This method uses a custom message structure:
+
+    struct impHitTest
+    {
+        ULONG MethodID;    /* IM_HITFRAME */
+        struct
+        {
+            WORD X;        /* Coordinates of point to test for hit */
+            WORD Y;
+        } imp_Point;
+
+        struct
+        {
+            WORD Width;  /* scale, clip, restrict, etc. to these bounds */
+            WORD Height;
+        } imp_Dimensions;
+    };
+
+The <a href="../Libraries_Manual_guide/node04D1.html">imageclass</a> dispatcher treats IM_HITFRAME just like <a href="../Libraries_Manual_guide/node04D3.html">IM_HITTEST</a>,
+ignoring the restricting dimensions.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

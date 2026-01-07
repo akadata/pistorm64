@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-4" TITLE="10 Printer Device / Sending Printer Commands to a Printer" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 Printer Device / Sending Printer Commands to a Printer</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0048.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node004A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As mentioned before, it is possible to include printer commands (escape
+sequences) in the character stream and send them to the printer using the
+<a href="../Includes_and_Autodocs_2._guide/node0518.html">CMD_WRITE</a> device I/O command. It is also possible to use the printer
+command names using the device I/O command <a href="../Includes_and_Autodocs_2._guide/node051A.html">PRD_PRTCOMMAND</a> with the
+<a href="../Devices_Manual_guide/node0044.html#line43">IOPrtCmdReq</a> data structure. This gives you a mnemonic way of setting the
+printer to your program needs.
+
+You send printer commands to the device by passing an <a href="../Devices_Manual_guide/node0044.html#line43">IOPrtCmdReq</a> to the
+device with <a href="../Includes_and_Autodocs_2._guide/node051A.html">PRD_PRTCOMMAND</a> set in io_Command, the printer command set in
+io_PrtCommand and up to four parameters set in Parm0 through Parm3.
+
+   #include &#060;devices/printer.h&#062;
+
+   PrintIO-&#062;iopc.io_PrtCommand = aSLRM;  /* Set left &#038; right margins */
+   PrintIO-&#062;iopc.io_Parm0 = 1;           /* Set left margin = 1 */
+   PrintIO-&#062;iopc.io_Parm1 = 79;          /* Set right margin = 79 */
+   PrintIO-&#062;iopc.io_Parm2 = 0;
+   PrintIO-&#062;iopc.io_Parm3 = 0;
+   PrintIO-&#062;iopc.io_Command = PRD_PRTCOMMAND;
+   DoIO((struct IORequest *)PrintIO);
+
+Consult the command function table listed below for other printer commands.
+
+ <a href="../Devices_Manual_guide/node004A.html">Printer Command Definitions</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

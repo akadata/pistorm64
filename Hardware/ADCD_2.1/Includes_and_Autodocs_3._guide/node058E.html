@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="trackdisk" NODE="TD_REMCHANGEINT" TITLE="trackdisk.device/TD_REMCHANGEINT" -->
+<head>
+<title>trackdisk.device/TD_REMCHANGEINT</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node058D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node058F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	TD_REMCHANGEINT -- remove a disk change software interrupt handler.
+
+<b>   FUNCTION</b>
+	This command removes a disk change software interrupt added
+	by a previous use of <a href="../Includes_and_Autodocs_3._guide/node0582.html">TD_ADDCHANGEINT</a>.
+
+<b>   IO REQUEST INPUT</b>
+	The same IO request used for <a href="../Includes_and_Autodocs_3._guide/node0582.html">TD_ADDCHANGEINT</a>.
+
+	io_Device	preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice()</a>
+	io_Unit		preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice()</a>
+	io_Command	TD_REMCHANGEINT
+	io_Flags	0
+	io_Length	sizeof(struct Interrupt)
+	io_Data		pointer to <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> structure
+
+<b>   IO REQUEST RESULT</b>
+	io_Error - 0 for success, or an error code as defined in
+	           <a href="../Includes_and_Autodocs_3._guide/node0604.html">&#060;devices/trackdisk.h&#062;</a>
+
+<b>   BUGS</b>
+	This command did not function properly under versions of Kickstart
+	earlier than V36. A valid workaround under these older versions of
+	Kickstart is:
+
+		Forbid();
+		Remove(ioRequest);
+		Permit();
+
+	Do not use this workaround in versions of Kickstart &#062;= V36, use
+	TD_REMCHANGEINT instead (for future compatibility with V38+).
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0582.html">TD_ADDCHANGEINT</a>, <a href="../Includes_and_Autodocs_3._guide/node0604.html">&#060;devices/trackdisk.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

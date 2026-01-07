@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-3-3" TITLE="33 / Stream Management / Custom Streams" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Stream Management / Custom Streams</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node042F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0431.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A custom stream handler can allow you (and iffparse.library) to use your
+compiler's own file I/O functions such as fopen(), fread() and fwrite(),
+rather than the lower-level AmigaDOS equivalents <a href="../Libraries_Manual_guide/node042E.html#line10">Open()</a>, <a href="../Includes_and_Autodocs_2._guide/node02E0.html">Read()</a>, and
+<a href="../Includes_and_Autodocs_2._guide/node0310.html">Write()</a>.  A custom stream handler could also be used to read or write <a href="../Libraries_Manual_guide/node0428.html">IFF</a>
+files from an Exec device or an unusual handler or filesystem.
+
+If you install your own stream handler function, iffparse.library will
+call your function whenever it needs to read, write, or seek on your file.
+Your stream handler function will then perform these stream actions for
+iffparse.library.  See the &#034;<a href="../Libraries_Manual_guide/node0454.html">Custom Stream Handlers</a>&#034; section for more
+information on custom stream handlers.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

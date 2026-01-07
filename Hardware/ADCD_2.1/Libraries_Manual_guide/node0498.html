@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_37" NODE="37-1-2" TITLE="37 / Tags / Simple Tag Usage" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>37 / Tags / Simple Tag Usage</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0497.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0499.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+One way tags are passed to system functions is in the form of tag lists. A
+tag list is an array or chain of arrays of <a href="../Libraries_Manual_guide/node0497.html">TagItem</a> structures.  Within
+this array, different data items are identified by the value of <a href="../Libraries_Manual_guide/node0497.html#line5">ti_Tag</a>.
+Items specific to a subsystem (Intuition, Graphics,...) have a ti_Tag
+value which has the TAG_USER bit set. Global system tags have a ti_Tag
+value with TAG_USER bit clear.  The global system tags include:
+<a name="line8"></a>
+
+                      Table 37-2: Global System Tags
+  ____________________________________________________________________
+ |                                                                    |
+ | Tag Value   Meaning                                                |
+ |====================================================================|
+ | TAG_IGNORE  A no-op.  The data item is ignored.                    |
+ |                                                                    |
+ | TAG_MORE    The <a href="../Libraries_Manual_guide/node0497.html#line5">ti_Data</a> points to another tag list, to support     |
+ |             chaining of <a href="../Libraries_Manual_guide/node0497.html">TagItem</a> arrays.                            |
+ |                                                                    |
+ | TAG_DONE    Terminates the <a href="../Libraries_Manual_guide/node0497.html">TagItem</a> array (or chain).               |
+ |                                                                    |
+ | TAG_SKIP    Ignore the current tag item, and skip the next n array |
+ |             elements, where n is kept in <a href="../Libraries_Manual_guide/node0497.html#line5">ti_Data</a>.                  |
+ |____________________________________________________________________|
+
+
+Note that user tags need only be unique within the particular context of
+their use.  For example, the attribute tags defined for <a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a> have
+the same numeric value as some tags used by <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreen()</a>, but the same
+numeric value has different meaning in the different contexts.
+
+System functions receive <a href="../Libraries_Manual_guide/node0497.html">TagItem</a>s in several ways.  One way is illustrated
+in the Intuition function <a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a>.  This function supports an
+extented <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a> structure called <a href="../Libraries_Manual_guide/node0102.html#line8">ExtNewWindow</a>.  When the <a href="../Libraries_Manual_guide/node0123.html">NW_EXTENDED</a>
+flag is set in the ExtNewWindow.Flags field, OpenWindow() assumes that the
+ExtNewWindow.Extension field contains a pointer to a tag list.
+
+Another method of passing a tag list is to directly pass a pointer to a
+tag list, as <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> does in the following code fragment.
+
+    struct TagItem tagitem[3];
+    struct Screen *screen;
+    struct Window *window;
+
+    tagitem[0].ti_Tag = WA_CustomScreen;
+    tagitem[0].ti_Data = screen;    /* Open on my own screen */
+    tagitem[1].ti_Tag = WA_Title;
+    tagitem[1].ti_Data = &#034;RKM Test Window&#034;;
+    tagitem[2].ti_Tag = TAG_DONE;   /* Marks the end of the tag array. */
+
+    /* Use defaults for everything else. Will open as big as the screen. */
+    /* Because all window parameters are specified using tags, we don't  */
+    /* need a NewWindow structure                                        */
+
+    if (window = OpenWindowTagList(NULL, tagitem))
+    {
+        /* rest of code */
+        CloseWindow(window);
+    }
+
+Notice that window parameters need not be explicitly specified. Functions
+that utilize tags have reasonable defaults to fall back on in case no
+valid attribute/value pair was supplied for a particular parameter. This
+fall back capability is a useful feature. An application only has to
+specify the attributes that differ from the default, rather than
+unnecessarily listing all the possible attributes.
+
+The amiga.lib support library offers another way to pass <a href="../Libraries_Manual_guide/node0497.html">TagItem</a>s to a
+function.  Rather than passing a tag list, the function <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTags()</a>
+receives the attribute/value pairs in the argument list, much like
+<a href="../Includes_and_Autodocs_2._guide/node0162.html">printf()</a> receives its arguments.  Any number of attribute/value pairs can
+be specified.  This type of argument passing is called VarArgs. The
+following code fragment illustrates the usage of OpenWindowTags().
+
+    struct Window *window;
+
+    /* Just pass NULL to show we aren't using a NewWindow */
+    window = OpenWindowTags( NULL,
+                             WA_CustomScreen, screen,
+                             WA_Title, &#034;RKM Test Window&#034;,
+                             TAG_DONE );
+
+Tags are not exclusively for use with the operating system; the programmer
+can implement them as well.  The run-time utility library contains several
+functions to make using tags easier.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

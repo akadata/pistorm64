@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/dualplayfield.c" NODE="MAIN" TITLE="Lib_examples/dualplayfield.c" -->
+<head>
+<title>Lib_examples/dualplayfield.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05B3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05B5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* dualplayfield.c
+** Shows how to turn on dual-playfield mode in a screen.
+**
+** SAS/C 5.10a
+** lc -b1 -cfist -v -y dualplayfield
+** blink FROM LIB:c.o dualplayfield.o TO dualplayfield LIB LIB:lc.lib LIB:amiga.lib
+*/
+
+#define INTUI_V36_NAMES_ONLY
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;graphics/displayinfo.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+
+VOID doDualPF ( struct Window * );
+BOOL installDualPF( struct Screen *, struct RastInfo * );
+VOID drawSomething( struct RastPort * );
+VOID handleIDCMP ( struct Window * );
+VOID removeDualPF( struct Screen *s );
+
+struct Library *IntuitionBase;
+struct Library *GfxBase;
+
+VOID main(int argc, char **argv)
+{
+struct Window *win;
+struct Screen *scr;
+
+IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,37);
+if (IntuitionBase != NULL)
+    {
+    GfxBase = OpenLibrary(&#034;graphics.library&#034;, 37);
+    if (GfxBase != NULL)
+        {
+        scr = OpenScreenTags(NULL,
+                             SA_Depth,     2,
+                             SA_DisplayID, HIRES_KEY,
+                             SA_Title,     &#034;Dual Playfield Test Screen&#034;,
+                             TAG_END);
+        if ( scr != NULL )
+            {
+            win = OpenWindowTags(NULL,
+                                 WA_Title,        &#034;Dual Playfield Mode&#034;,
+                                 WA_IDCMP,        IDCMP_CLOSEWINDOW,
+                                 WA_Width,        200,
+                                 WA_Height,       100,
+                                 WA_DragBar,      TRUE,
+                                 WA_CloseGadget,  TRUE,
+                                 WA_CustomScreen, scr,
+                                 TAG_END);
+            if ( win != NULL )
+                {
+                doDualPF(win);
+
+                CloseWindow(win);
+                }
+            CloseScreen(scr);
+            }
+        CloseLibrary(GfxBase);
+        }
+    CloseLibrary(IntuitionBase);
+    }
+}
+
+
+/*
+** Allocate all of the stuff required to add dual playfield to a screen.
+*/
+VOID doDualPF(struct Window *win)
+{
+struct Screen   *myscreen;
+struct RasInfo  *rinfo2;
+struct BitMap   *bmap2;
+struct RastPort *rport2;
+
+myscreen = win-&#062;WScreen;   /* Find the window's screen */
+
+/* Allocate the second playfield's rasinfo, bitmap, and bitplane */
+rinfo2 = (struct RasInfo *) AllocMem(sizeof(struct RasInfo), MEMF_PUBLIC | MEMF_CLEAR);
+if ( rinfo2 != NULL )
+    {
+    /* Get a rastport, and set it up for rendering into bmap2 */
+    rport2 = (struct RastPort *) AllocMem(sizeof(struct RastPort), MEMF_PUBLIC );
+    if (rport2 != NULL )
+        {
+        bmap2 = (struct BitMap *) AllocMem(sizeof(struct BitMap), MEMF_PUBLIC | MEMF_CLEAR);
+        if (bmap2 != NULL )
+            {
+            InitBitMap(bmap2, 1, myscreen-&#062;Width, myscreen-&#062;Height);
+
+            /* extra playfield will only use one bitplane here. */
+            bmap2-&#062;Planes[0] = (PLANEPTR) AllocRaster(myscreen-&#062;Width, myscreen-&#062;Height);
+            if (bmap2-&#062;Planes[0] != NULL )
+                {
+                InitRastPort(rport2);
+                rport2-&#062;BitMap = rinfo2-&#062;BitMap = bmap2;
+
+                SetRast(rport2, 0);
+
+                if (installDualPF(myscreen,rinfo2))
+                    {
+                    /* Set foreground color; color 9 is color 1 for
+                    ** second playfield of hi-res viewport
+                    */
+                    SetRGB4(&#038;myscreen-&#062;ViewPort, 9, 0, 0xF, 0);
+
+                    drawSomething(rport2);
+
+                    handleIDCMP(win);
+
+                    removeDualPF(myscreen);
+                    }
+                FreeRaster(bmap2-&#062;Planes[0], myscreen-&#062;Width, myscreen-&#062;Height);
+                }
+            FreeMem(bmap2, sizeof(struct BitMap));
+            }
+        FreeMem(rport2, sizeof(struct RastPort));
+        }
+    FreeMem(rinfo2, sizeof(struct RasInfo));
+    }
+}
+
+/*
+** Manhandle the viewport:
+** install second playfield and change modes
+*/
+BOOL installDualPF(struct Screen *scrn, struct RastInfo *rinfo2)
+{
+ULONG screen_modeID;
+BOOL return_code = FALSE;
+
+screen_modeID = GetVPModeID(&#038;(scrn-&#062;ViewPort));
+if( screen_modeID != INVALID_ID )
+    {
+    /* you can only play with the bits in the Modes field
+    ** if the upper half of the screen mode ID is zero!!!
+    */
+    if ( (screen_modeID &#038; 0xFFFF0000L) == 0L )
+        {
+        return_code = TRUE;
+
+        Forbid();
+
+        /* Install rinfo for viewport's second playfield */
+        scrn-&#062;ViewPort.RasInfo-&#062;Next = rinfo2;
+        scrn-&#062;ViewPort.Modes |= DUALPF;
+
+        Permit();
+
+        /* Put viewport change into effect */
+        MakeScreen(scrn);
+        RethinkDisplay();
+        }
+    }
+return(return_code);
+}
+
+/*
+** Draw some lines in a rast port...This is used to get some data into
+** the second playfield.  The windows on the screen will move underneath
+** these graphics without disturbing them.
+*/
+VOID drawSomething(struct RastPort *rp)
+{
+int width, height;
+int r, c;
+
+width = rp-&#062;BitMap-&#062;BytesPerRow * 8;
+height = rp-&#062;BitMap-&#062;Rows;
+
+SetAPen(rp, 1);
+
+for (r = 0; r &#060; height; r += 40)
+    {
+    for (c = 0; c &#060; width; c += 40)
+        {
+        Move(rp, 0L, r);
+        Draw(rp, c, 0L);
+        }
+    }
+}
+
+/*
+** simple event loop to wait for the user to hit the close gadget
+** on the window.
+*/
+VOID handleIDCMP(struct Window *win)
+{
+BOOL done = FALSE;
+struct IntuiMessage *message = NULL;
+ULONG class;
+ULONG signals;
+
+while (!done)
+    {
+    signals = Wait(1L &#060;&#060; win-&#062;UserPort-&#062;mp_SigBit);
+    if (signals &#038; (1L &#060;&#060; win-&#062;UserPort-&#062;mp_SigBit))
+        {
+        while ((!done) &#038;&#038;
+               (message = (struct IntuiMessage *)GetMsg(win-&#062;UserPort)))
+            {
+            class = message-&#062;Class;
+            ReplyMsg((struct Message *)message);
+
+            switch (class)
+                {
+                case IDCMP_CLOSEWINDOW:
+                    done = TRUE;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+/*
+** remove the effects of installDualPF().
+** only call if installDualPF() succeeded.
+*/
+VOID removeDualPF(struct Screen *scrn)
+{
+Forbid();
+
+scrn-&#062;ViewPort.RasInfo-&#062;Next = NULL;
+scrn-&#062;ViewPort.Modes &#038;= ~DUALPF;
+
+Permit();
+
+MakeScreen(scrn);
+RethinkDisplay();
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

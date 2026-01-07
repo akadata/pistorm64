@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/iffp/ilbmapp.h" NODE="MAIN" TITLE="Devices/iffp/ilbmapp.h" -->
+<head>
+<title>Devices/iffp/ilbmapp.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02E9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02EB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* ilbmapp.h
+ * - definition of ILBMInfo structure
+ * - inclusion of includes needed by modules and application
+ * - application-specific definitions
+ *
+ * 07/03/91 - added ilbm-&#062;stags for screen.c
+ */
+#ifndef ILBMAPP_H
+#define ILBMAPP_H
+
+#include &#034;iffp/ilbm.h&#034;
+
+struct ILBMInfo {
+	/* general parse.c related */
+	struct  ParseInfo ParseInfo;
+
+	/* The following variables are for
+	 * programs using the ILBM-related modules.
+	 * They may be removed or replaced for
+	 * programs parsing other forms.
+	 */
+	/* ILBM */
+	BitMapHeader Bmhd;		/* filled in by load and save ops */
+	ULONG	camg;			/* filled in by load and save ops */
+	Color4	*colortable;		/* allocated by getcolors */
+	ULONG	ctabsize;		/* size of colortable in bytes */
+	USHORT	ncolors;		/* number of color registers loaded */
+	USHORT  Reserved1;
+
+	/* for getbitmap.c */
+	struct BitMap *brbitmap;	/* for loaded brushes only */
+
+	/* for screen.c */
+	struct Screen *scr;		/* screen of loaded display   */
+	struct Window *win;		/* window of loaded display   */
+	struct ViewPort *vp;		/* viewport of loaded display */
+	struct RastPort	*srp;		/* screen's rastport */
+	struct RastPort *wrp;		/* window's rastport */
+	BOOL TBState;			/* state of titlebar hiddenness */
+
+	/* caller preferences */
+	struct NewWindow *windef;	/* definition for window */
+	UBYTE *stitle;		/* screen title */
+	LONG stype;		/* additional screen types */
+	WORD ucliptype;		/* overscan display clip type */
+	BOOL EHB;		/* default to EHB for 6-plane/NoCAMG */
+	BOOL Video;		/* Max Video Display Clip (non-adjustable) */
+	BOOL Autoscroll;	/* Enable Autoscroll of screens */
+	BOOL Notransb;		/* Borders not transparent to genlock */
+	ULONG *stags;		/* Additional screen tags for 2.0 screens */
+
+	ULONG Reserved[7];	/* must be 0 for now */
+
+	/* Application-specific variables may go here */
+	};
+
+/* referenced by modules */
+
+extern struct Library *IFFParseBase;
+
+/* protos for application module(s) */
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

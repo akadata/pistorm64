@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amigaguide" NODE="SendAmigaGuideCmdA()" TITLE="amigaguide.library/SendAmigaGuideCmdA" -->
+<head>
+<title>amigaguide.library/SendAmigaGuideCmdA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0011.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0013.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+        SendAmigaGuideCmdA - Send a command string to AmigaGuide (V34)
+
+<b>   SYNOPSIS</b>
+        success = SendAmigaGuideCmdA (handle, cmd, attrs );
+          d0                            a0    d0   d1
+
+        <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> SendAmigaGuideCmdA (AMIGAGUIDECONTEXT, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *)
+;
+
+        success = SendAmigaGuideCmd (handle, cmd, tag1, ...);
+
+        <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> SendAmigaGuideCmd (AMIGAGUIDECONTEXT, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, Tag);
+
+<b>   FUNCTION</b>
+        This function sends a command string to an AmigaGuide system.  The
+        command can consist of any valid AmigaGuide action command.
+
+        The following are the currently valid action commands:
+
+        ALINK &#060;name&#062; - Load the named node into a new window.
+
+        LINK &#060;name&#062; - Load the named node.
+
+        RX &#060;macro&#062; - <a href="../Includes_and_Autodocs_3._guide/node015E.html">Execute</a> an ARexx macro.
+
+        RXS &#060;cmd&#062; - <a href="../Includes_and_Autodocs_3._guide/node015E.html">Execute</a> an ARexx string file.  To display a picture,
+            use 'ADDRESS COMMAND DISPLAY &#060;picture name&#062;', to
+            display a text file 'ADDRESS COMMAND MORE &#060;doc&#062;'.
+
+        CLOSE - <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close</a> the window (should only be used on windows
+            that were started with ALINK).
+
+        QUIT - Shutdown the current database.
+
+<b>   INPUTS</b>
+        handle - Handle to an AmigaGuide system.
+
+        cmd - Command string.
+
+        attrs - Future expansion, must be set to NULL for now.
+
+<b>   TAGS</b>
+        AGA_Context (ULONG) - Data is used as an index into nag_Context
+            array.  This is used to build and send a LINK command.
+
+<b>   EXAMPLE</b>
+
+        /* bring up help on a particular subject */
+        SendAmigaGuideCmd(handle, &#034;LINK MAIN&#034;, NULL);
+
+<b>   RETURNS</b>
+        Returns TRUE if the message was sent, otherwise returns FALSE.
+
+<b>   BUGS</b>
+        ALINK does not open a new window when using V39.
+
+<b>   SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

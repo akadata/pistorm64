@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_1" NODE="1-6" TITLE="1 Introduction to Amiga System Devices / Ending Device Access" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>1 Introduction to Amiga System Devices / Ending Device Access</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node000A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node000C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You end device access by reversing the steps you took to access it.  This
+means you close the device, deallocate the I/O request memory and delete
+<a name="line4">the message port.  In that order!</a>
+
+Closing a device is how you tell Exec that you are finished using a device
+and any associated resources.  This can result in housecleaning being
+performed by the device.  However, before you close a device, you might
+have to do some housecleaning of your own.
+
+A device is closed by calling the CloseDevice() function. The
+CloseDevice() function does not return a value. It has this format:
+
+  CloseDevice(IORequest)
+
+<a name="line16">where <a href="../Includes_and_Autodocs_2._guide/node0094.html#line20">IORequest</a> is the I/O request used to open the device.</a>
+
+You should not close a device while there are outstanding I/O requests,
+otherwise you can cause major and minor problems.  Let's begin with the
+minor problem: memory.  If an I/O request is outstanding at the time you
+close a device, you won't be able to reclaim the memory you allocated for
+it.
+
+The major problem: the device will try to respond to the I/O request.  If
+the device tries to respond to an I/O request, and you've deleted the
+message port (which is covered below), you will probably crash the system.
+
+One solution would be to wait until all I/O requests you sent to the
+device return.  This is not always practical if you've sent a few requests
+<a name="line30">and the user wants to exit the application immediately.</a>
+
+In that case, the only solution is to abort and remove any outstanding I/O
+requests. You do this with the functions <a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a> and <a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a>.  They
+must be used together for cleaning up. AbortIO() will abort an I/O
+request, but will not prevent a reply message from being sent to the
+application requesting the abort. <a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a> will wait for an I/O request to
+complete and remove it from the message port.  This is why they must be
+used together.
+
+   Be Careful With AbortIO().
+   --------------------------
+   Do not <a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a> an I/O request which has not been sent to a device.
+   If you do, you may crash the system.
+
+After the device is closed, you must deallocate the I/O request memory.
+The exact method you use depends on how you allocated the memory in the
+first place.  For <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a> you call <a href="../Includes_and_Autodocs_2._guide/node0355.html">FreeMem()</a>, for <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a> you
+call <a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>, and for <a href="../Includes_and_Autodocs_2._guide/node0344.html">CreateIORequest()</a> you call <a href="../Includes_and_Autodocs_2._guide/node0348.html">DeleteIORequest()</a>.
+If you allocated the I/O request memory at compile time, you naturally
+have nothing to free.
+
+Finally, you must delete the message port you created.  You delete the
+message port by calling <a href="../Includes_and_Autodocs_2._guide/node0349.html">DeleteMsgPort()</a> if you used <a href="../Includes_and_Autodocs_2._guide/node0345.html">CreateMsgPort()</a>, or
+<a name="line54"><a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a> if you used <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>.</a>
+
+Here is the checklist for gracefully exiting:
+
+   1. Abort any outstanding I/O requests with <a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a>
+
+   2. Wait for the completion of any outstanding or aborted I/O requests
+      with <a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a>.
+
+   3. Close the device with CloseDevice().
+
+   4. Release the I/O request memory with either <a href="../Includes_and_Autodocs_2._guide/node0348.html">DeleteIORequest()</a>,
+      <a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a> or <a href="../Includes_and_Autodocs_2._guide/node0355.html">FreeMem()</a> (as appropriate).
+
+   5. Delete the message port with <a href="../Includes_and_Autodocs_2._guide/node0349.html">DeleteMsgPort()</a> or <a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

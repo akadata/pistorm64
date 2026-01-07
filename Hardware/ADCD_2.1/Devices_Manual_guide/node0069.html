@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_3" NODE="3-2-2" TITLE="3 / Device Interface / Clipboard Data" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>3 / Device Interface / Clipboard Data</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0068.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node006A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Data on the clipboard resides in one of three places. When an application
+posts a cut, the data resides in the private memory space of that
+application. When an application writes to the clipboard, either of its
+own volition or in response to a message from the clipboard requesting
+that it satisfy a post, the data is copied to the clipboard which is
+either memory or a special disk file. When the clipboard is not open, the
+data resides in the special disk file located in the directory specified
+<a name="line9">by the CLIPS: logical AmigaDOS assign.</a>
+
+Data on the clipboard is self-identifying. It must be a correct IFF
+(Interchange File Format) file; the rest of this section refers to IFF
+concepts. See the <a href="../Devices_Manual_guide/node0129.html">Appendix A</a> in this manual for a complete description of
+IFF. If the top-level chunk is of type CAT with an identifier of CLIP,
+that indicates that the contained chunks are different representations of
+the same data, in decreasing order of preference on the part of the
+producer of the clip. Any other data is as defined elsewhere (probably a
+<a name="line18">single representation of the cut data produced by an application).</a>
+
+The <a href="../Libraries_Manual_guide/node0427.html">IFFParse.Library</a> also contains functions which simplify reading and
+writing of IFF data to the clipboard device.  See the &#034;<a href="../Libraries_Manual_guide/node0427.html">IFFParse Library</a>&#034;
+chapter of the Amiga ROM Kernel Reference Manual: Libraries for more
+<a name="line23">information.</a>
+
+A clipboard tool, which is an application that allows a Workbench user to
+view a clip, should understand the text (FTXT) and graphics (ILBM) form
+types. Applications using the clipboard to export data should include at
+least one of these types in a CAT CLIP so that their data can be
+represented on the clipboard in some form for user feedback.
+
+You should not, in any way, rely on the specifics of how files in CLIPS:
+are handled or named.  The only proper way to read or write clipboard data
+is via the clipboard device.
+
+   Play Nice!
+   ----------
+   Keep in mind that while your task is reading from or writing to a
+   clipboard unit, other tasks cannot.  Therefore, it is important to be
+   fast.  If possible, make a copy of the clipboard data in RAM instead
+   of processing it while the read or write is in progress.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

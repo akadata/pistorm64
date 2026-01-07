@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-3-1" TITLE="8 / Creating Borders / Border Structure Definition" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Borders / Border Structure Definition</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01C0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01C2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To use a border, the application must create one or more instances of the
+<a href="../Includes_and_Autodocs_2._guide/node00D4.html#line591">Border</a> structure.  Here is the specification:
+
+    struct Border
+        {
+        WORD LeftEdge, TopEdge;
+        UBYTE FrontPen, BackPen;
+        UBYTE DrawMode;
+        BYTE Count;
+        WORD *XY;
+        struct Border *NextBorder;
+<a name="line13">        };</a>
+
+<a name="line15">Here is a brief description of the fields of the Border structure.</a>
+
+LeftEdge, TopEdge
+    These fields are used to determine the position of the Border
+    relative to its base position (the base position is the upper left
+    corner for requesters, menus, or gadgets and is specified in the call
+<a name="line21">    to <a href="../Libraries_Manual_guide/node01C2.html">DrawBorder()</a> for windows and screens).</a>
+
+FrontPen, BackPen
+    These fields contain color registers numbers.  FrontPen is the color
+<a name="line25">    used to draw the lines.  BackPen is currently unused.</a>
+
+DrawMode
+<a name="line28">    Set the DrawMode field to one of the following:</a>
+
+    JAM1
+<a name="line31">        Use FrontPen to draw the line.</a>
+
+    COMPLEMENT
+<a name="line34">        Change the pixels within the lines to their complement color.</a>
+
+Count
+    Specify the number of data points used in this border.  Each data
+<a name="line38">    point is described by two words of data in the XY array.</a>
+
+XY  A pointer to an array of coordinate pairs, one pair for each point.
+<a name="line41">    These coordinates are measured relative to the position of the border.</a>
+
+NextBorder
+    This field is a pointer to another instance of a Border structure.
+    Set this field to NULL if this is the last Border structure in the
+    linked list.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

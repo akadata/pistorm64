@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="listbrowser_gc" NODE="GetListBrowserNodeAttrsA()" TITLE="listbrowser_gc/GetListBrowserNodeAttrsA" -->
+<head>
+<title>listbrowser_gc/GetListBrowserNodeAttrsA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0446.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0448.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        GetListBrowserNodeAttrsA -- Get attributes about a ListBrowser node.
+
+<b>    SYNOPSIS</b>
+        VOID GetListBrowserNodeAttrs(struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...)
+        GetListBrowserNodeAttrs(node, firsttag, ...)
+
+        VOID GetListBrowserNodeAttrsA(struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *)
+        GetListBrowserNodeAttrsA(node, taglist)
+
+<b>    FUNCTION</b>
+        The ListBrowser uses a private node structure and all attributes
+        are hidden, and must therefore be accessed with this function.
+
+<b>    TAGS</b>
+        See <a href="../Includes_and_Autodocs_3._guide/node044B.html">SetListBrowserNodeAttrsA()</a> for the list of supported tags.
+
+<b>    INPUTS</b>
+        node - The ListBrowser node to get the information on.
+        taglist - A tag list of attributes to get.  ti_Tag is the attribute
+            to get and ti_Data is a pointer to a location to copy the result
+            to.  The exception is LBNA_Column, which is used to specify a
+            column to get attributes on.
+
+<b>    SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node044B.html">SetListBrowserNodeAttrsA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

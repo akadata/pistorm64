@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VIII-51/sana2device.doc" NODE="VIII-51-4" TITLE="sana2.device/CMD_FLUSH" -->
+<head>
+<title>sana2.device/CMD_FLUSH</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01E3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01E5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+NAME
+    Flush -- Clear all queued I/O requests for the SANA-II device.
+
+FUNCTION
+    This command aborts all I/O requests in both the read and write
+    request queues of the device.  All pending I/O requests are
+    returned with an error message (IOERR_ABORTED).  CMD_FLUSH does not
+    affect active requests.
+
+IO REQUEST
+    ios2_Command    - CMD_FLUSH.
+
+RESULTS
+    ios2_Error      - Zero if successful; non-zero otherwise.
+
+NOTES
+
+SEE ALSO
+
+BUGS
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

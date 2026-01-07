@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="AIFF-12" TITLE="AIFF.doc / AIFF / The MIDI Data Chunk " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>AIFF.doc / AIFF / The MIDI Data Chunk </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0224.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0226.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The MIDI Data Chunk can be used to store MIDI data.  Please refer to
+Musical Instrument Digital Interface Specification 1.0, available from the
+International MIDI Association, for more details on MIDI.
+
+The primary purpose of this chunk is to store MIDI System Exclusive
+messages, although other types of MIDI data can be stored in the block as
+well.  As more instruments come to market, they will likely have
+parameters that have not been included in the Audio IFF specification.
+The MIDI System Exclusive messages for these instruments may contain many
+parameters that are not included in the Instrument Chunk.  For example, a
+new sampling instrument may have more than the two loops defined in the
+Instrument Chunk.  These loops will likely be represented in the MIDI
+System Exclusive message for the new machine.  This MIDI System Exclusive
+message can be stored in the MIDI Data Chunk.
+
+    #define		MIDIDataID   'MIDI' /* ckID for MIDI Data Chunk */
+
+    typedef struct {
+	ID		ckID;
+	long		ckSize;
+
+	unsigned char	MIDIdata[];
+    } MIDIDataChunk;
+
+The ckID is always 'MIDI'.  ckSize of the data portion of the chunk, in
+bytes. It does not include the 8 bytes used by ckID and ckSize.
+
+The MIDIData field contains a stream of MIDI data.
+
+The MIDI Data Chunk is optional.  Any number of MIDI Data Chunks may exist
+in a FORM AIFF.  If MIDI System Exclusive messages for several instruments
+are to be stored in a FORM AIFF, it is better to use one MIDI Data Chunk
+per instrument than one big MIDI Data Chunk for all of the instruments.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

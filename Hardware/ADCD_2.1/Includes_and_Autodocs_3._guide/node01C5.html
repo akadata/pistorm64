@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="SystemTagList()" TITLE="dos.library/SystemTagList" -->
+<head>
+<title>dos.library/SystemTagList</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01C4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01C6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SystemTagList -- Have a shell execute a command line (V36)
+
+<b>   SYNOPSIS</b>
+	error = SystemTagList(command, tags)
+	D0		        D1      D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> SystemTagList(STRPTR, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *)
+
+	error = System(command, tags)
+	D0		 D1      D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> System(STRPTR, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *)
+
+	error = SystemTags(command, Tag1, ...)
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> SystemTags(STRPTR, ULONG, ...)
+
+<b>   FUNCTION</b>
+	Similar to <a href="../Includes_and_Autodocs_3._guide/node015E.html">Execute()</a>, but does not read commands from the input
+	filehandle.  Spawns a Shell process to execute the command, and
+	returns the returncode the command produced, or -1 if the command
+	could not be run for any reason.  The input and output filehandles
+	will not be closed by System, you must close them (if needed) after
+	System returns, if you specified them via SYS_Input or SYS_Output.
+
+	By default the new process will use your current <a href="../Includes_and_Autodocs_3._guide/node017F.html">Input()</a> and <a href="../Includes_and_Autodocs_3._guide/node0198.html">Output()</a>
+	filehandles.  Normal Shell command-line parsing will be done
+	including redirection on 'command'.  The current directory and path
+	will be inherited from your process.  Your path will be used to find
+	the command (if no path is specified).
+
+	Note that you may NOT pass the same filehandle for both SYS_Input
+	and SYS_Output.  If you want input and output to both be to the same
+	CON: window, pass a SYS_Input of a filehandle on the CON: window,
+	and pass a SYS_Output of NULL.  The shell will automatically set
+	the default <a href="../Includes_and_Autodocs_3._guide/node0198.html">Output()</a> stream to the window you passed via SYS_Input,
+	by opening &#034;*&#034; on that handler.
+
+	If used with the SYS_Asynch flag, it WILL close both it's input and
+	output filehandles after running the command (even if these were
+	your <a href="../Includes_and_Autodocs_3._guide/node017F.html">Input()</a> and Output()!)
+
+	Normally uses the boot (ROM) shell, but other shells can be specified
+	via SYS_UserShell and SYS_CustomShell.  Normally, you should send
+	things written by the user to the UserShell.  The UserShell defaults
+	to the same shell as the boot shell.
+
+	The tags are passed through to <a href="../Includes_and_Autodocs_3._guide/node014C.html">CreateNewProc()</a> (tags that conflict
+	with SystemTagList() will be filtered out).  This allows setting
+	things like priority, etc for the new process.  The tags that are
+	currently filtered out are:
+
+		NP_Seglist
+		NP_FreeSeglist
+		NP_Entry
+		NP_Input
+		NP_Output
+		NP_CloseInput
+		NP_CloseOutput
+		NP_HomeDir
+		NP_Cli
+
+<b>   INPUTS</b>
+	command - Program and arguments
+	tags    - see <a href="../Includes_and_Autodocs_3._guide/node0658.html">&#060;dos/dostags.h&#062;</a>.  Note that both SystemTagList()-
+		  specific tags and tags from <a href="../Includes_and_Autodocs_3._guide/node014C.html">CreateNewProc()</a> may be passed.
+
+<b>   RESULT</b>
+	error	- 0 for success, result from command, or -1.  Note that on
+		  error, the caller is responsible for any filehandles or other
+		  things passed in via tags.  -1 will only be returned if
+		  dos could not create the new shell.  If the command is not
+		  found the shell will return an error value, normally
+		  RETURN_ERROR.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node015E.html">Execute()</a>, <a href="../Includes_and_Autodocs_3._guide/node014C.html">CreateNewProc()</a>, <a href="../Includes_and_Autodocs_3._guide/node0658.html">&#060;dos/dostags.h&#062;</a>, <a href="../Includes_and_Autodocs_3._guide/node017F.html">Input()</a>, <a href="../Includes_and_Autodocs_3._guide/node0198.html">Output()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

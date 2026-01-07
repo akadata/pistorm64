@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-12-8-1" TITLE="5 / / Custom String Editing / SGWork Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / / Custom String Editing / SGWork Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node016E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0170.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+    struct SGWork&#034; link Includes/intuition/sghooks.h/MAIN 32}
+        {
+        struct Gadget       *Gadget;
+        struct StringInfo   *StringInfo;
+        UBYTE               *WorkBuffer;
+        UBYTE               *PrevBuffer;
+        ULONG               Modes;
+        struct InputEvent   *IEvent;
+        UWORD               Code;
+        WORD                BufferPos;
+        WORD                NumChars;
+        ULONG               Actions;
+        LONG                LongInt;
+        struct GadgetInfo   *GadgetInfo;
+        UWORD               EditOp;
+        };
+
+The local (application) hook may only change the Code, Actions,
+WorkBuffer, NumChars, BufferPos and LongInt fields.  None of the other
+fields in the SGWork structure may be modified.
+
+Gadget and StringInfo
+    The values in the <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget before any modification are available
+<a name="line26">    through the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> and <a href="../Libraries_Manual_guide/node016B.html">StringInfo</a> pointers.</a>
+
+PrevBuffer
+    The PrevBuffer provides a shortcut to the old, unmodified string
+<a name="line30">    buffer.</a>
+
+WorkBuffer, BufferPos, NumChars and LongInt
+    WorkBuffer, BufferPos, NumChars and LongInt contain the values that
+    the <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget will take if the edits are accepted.  If the edit
+<a name="line35">    hook updates these values, the gadget will take on the updated values.</a>
+
+IEvent
+    IEvent contains the input event that caused this call to the hook.
+    This input event is not keymapped.  Only use this event for action
+<a name="line40">    keys, like the Return key, function keys or the Esc key.</a>
+
+Code
+    If the input event maps to a single character, the keymapped value
+    will be in the Code field.  The Code field may also be modified, and
+    the value placed in it will be passed back to the application in the
+    <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> message when <a href="../Libraries_Manual_guide/node0171.html#line5">SGA_END</a> is specified in the Actions field.
+
+GadgetInfo
+    A structure of information defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D2.html">cghooks.h</a>&#062;.  This
+    structure is read only.  See the &#034;<a href="../Libraries_Manual_guide/node0219.html">BOOPSI</a>&#034; chapter for more
+    information.
+
+Modes
+<a name="line54">    The modes of the gadget such as insert mode, defined below.</a>
+
+Actions
+<a name="line57">    The action taken by the edit hook, <a href="../Libraries_Manual_guide/node0171.html">defined below</a>.</a>
+
+EditOp
+    The type of edit operation done by the global hook, <a href="../Libraries_Manual_guide/node0170.html">defined below</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

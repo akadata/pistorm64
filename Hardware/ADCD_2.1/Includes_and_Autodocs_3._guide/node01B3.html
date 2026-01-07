@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="SetConsoleTask()" TITLE="dos.library/SetConsoleTask" -->
+<head>
+<title>dos.library/SetConsoleTask</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01B2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01B4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetConsoleTask -- Sets the default console for the process (V36)
+
+<b>   SYNOPSIS</b>
+	oldport = SetConsoleTask(port)
+	D0			  D1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *SetConsoleTask(struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *)
+
+<b>   FUNCTION</b>
+	Sets the default console task's port (pr_ConsoleTask) for the
+	current process.
+
+<b>   INPUTS</b>
+	port - The pr_MsgPort of the default console handler for the process
+
+<b>   RESULT</b>
+	oldport - The previous ConsoleTask value.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0175.html">GetConsoleTask()</a>, <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

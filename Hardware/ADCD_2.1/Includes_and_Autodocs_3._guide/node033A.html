@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="WaitBOVP()" TITLE="graphics.library/WaitBOVP" -->
+<head>
+<title>graphics.library/WaitBOVP</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0339.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node033B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	WaitBOVP -- <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait</a> till vertical beam reached bottom of
+		    this viewport.
+
+<b>   SYNOPSIS</b>
+	WaitBOVP( vp )
+		  a0
+
+	void WaitBOVP( struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> * );
+
+<b>   FUNCTION</b>
+	Returns when the vertical beam has reached the bottom of this viewport
+
+<b>   INPUTS</b>
+	vp - pointer to <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> structure
+
+<b>   RESULT</b>
+	This function will return sometime after the beam gets beyond
+	the bottom of the viewport.  Depending on the multitasking load
+	of the system, the actual beam position may be different than
+	what would be expected in a lightly loaded system.
+
+<b>   BUGS</b>
+	Horrors! This function currently busy waits waiting for the
+	beam to get to the right place.  It should use the copper
+	interrupt to trigger and send signals like <a href="../Includes_and_Autodocs_3._guide/node033B.html">WaitTOF</a> does.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node033B.html">WaitTOF()</a> <a href="../Includes_and_Autodocs_3._guide/node0337.html">VBeamPos()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

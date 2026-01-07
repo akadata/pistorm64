@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/iffparse" NODE="CurrentChunk()" TITLE="iffparse.library/CurrentChunk" -->
+<head>
+<title>iffparse.library/CurrentChunk</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01BD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01BF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CurrentChunk -- Get context node for current chunk.
+
+SYNOPSIS
+    top = CurrentChunk (iff)
+    d0                  a0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node010B.html#line68">ContextNode</a>        *top;
+    struct <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a>  *iff;
+
+FUNCTION
+    Returns top context node for the given <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a> struct.  The top
+    context node corresponds to the chunk most recently pushed on the
+    stack, which is the chunk where the stream is currently positioned.
+    The <a href="../Includes_and_Autodocs_2._guide/node010B.html#line68">ContextNode</a> structure contains information on the type of chunk
+    currently being parsed (or written), its size and the current
+    position within the chunk.
+
+INPUTS
+    iff     - pointer to <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a> struct.
+
+RESULT
+    top     - pointer to top context node or NULL if none.
+
+EXAMPLE
+
+NOTES
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01D5.html">PushChunk()</a>, <a href="../Includes_and_Autodocs_2._guide/node01D2.html">PopChunk()</a>, <a href="../Includes_and_Autodocs_2._guide/node01D1.html">ParseIFF()</a>, <a href="../Includes_and_Autodocs_2._guide/node01D0.html">ParentChunk()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="MoveSprite()" TITLE="graphics.library/MoveSprite" -->
+<head>
+<title>graphics.library/MoveSprite</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node045D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node045F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    MoveSprite -- Move sprite to a point relative to top of viewport.
+
+SYNOPSIS
+    MoveSprite(vp, sprite, x, y)
+               A0  A1      D0 D1
+
+    void MoveSprite(struct <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a> *,struct <a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">SimpleSprite</a> *, WORD, WORD);
+
+FUNCTION
+    Move sprite image to new place on display.
+
+INPUTS
+    vp - pointer to <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a> structure
+         if vp = 0, sprite is positioned relative to <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">View</a>.
+    sprite - pointer to <a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">SimpleSprite</a> structure
+    (x,y)  - new position relative to top of viewport or view.
+
+RESULTS
+    Calculate the hardware information for the sprite and
+    place it in the posctldata array. During next video display
+    the sprite will appear in new position.
+
+BUGS
+    Sprites really appear one pixel to the left of the position you
+    specify.  This bug affects the apparent display position of the sprite
+    on the screen, but does not affect the numeric position relative to
+    the viewport or view.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0443.html">FreeSprite()</a>  <a href="../Includes_and_Autodocs_2._guide/node0427.html">ChangeSprite()</a>  <a href="../Includes_and_Autodocs_2._guide/node0449.html">GetSprite()</a>  <a href="../Includes_and_Autodocs_2._guide/node00C5.html">graphics/sprite.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/hardware/dmabits.h" NODE="MAIN" TITLE="Includes/hardware/dmabits.h" -->
+<head>
+<title>Includes/hardware/dmabits.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00C7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00C9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	HARDWARE_DMABITS_H
+#define	HARDWARE_DMABITS_H
+/*
+**	$Filename: hardware/dmabits.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.2 $
+**	$Date: 90/07/10 $
+**
+**	include file for defining dma control stuff
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+<a name="line15">/* write definitions for dmaconw */</a>
+<a name="line16">#define DMAF_SETCLR  0x8000</a>
+<a name="line17">#define DMAF_AUDIO   0x000F   /* 4 bit mask */</a>
+<a name="line18">#define DMAF_AUD0    0x0001</a>
+<a name="line19">#define DMAF_AUD1    0x0002</a>
+<a name="line20">#define DMAF_AUD2    0x0004</a>
+<a name="line21">#define DMAF_AUD3    0x0008</a>
+<a name="line22">#define DMAF_DISK    0x0010</a>
+<a name="line23">#define DMAF_SPRITE  0x0020</a>
+<a name="line24">#define DMAF_BLITTER 0x0040</a>
+<a name="line25">#define DMAF_COPPER  0x0080</a>
+<a name="line26">#define DMAF_RASTER  0x0100</a>
+<a name="line27">#define DMAF_MASTER  0x0200</a>
+<a name="line28">#define DMAF_BLITHOG 0x0400</a>
+#define DMAF_ALL     0x01FF   /* all dma channels */
+
+/* read definitions for dmaconr */
+<a name="line32">/* bits 0-8 correspnd to dmaconw definitions */</a>
+<a name="line33">#define DMAF_BLTDONE 0x4000</a>
+#define DMAF_BLTNZERO	0x2000
+<a name="line35"></a>
+<a name="line36">#define DMAB_SETCLR  15</a>
+<a name="line37">#define DMAB_AUD0    0</a>
+<a name="line38">#define DMAB_AUD1    1</a>
+<a name="line39">#define DMAB_AUD2    2</a>
+<a name="line40">#define DMAB_AUD3    3</a>
+<a name="line41">#define DMAB_DISK    4</a>
+<a name="line42">#define DMAB_SPRITE  5</a>
+<a name="line43">#define DMAB_BLITTER 6</a>
+<a name="line44">#define DMAB_COPPER  7</a>
+<a name="line45">#define DMAB_RASTER  8</a>
+<a name="line46">#define DMAB_MASTER  9</a>
+<a name="line47">#define DMAB_BLITHOG 10</a>
+<a name="line48">#define DMAB_BLTDONE 14</a>
+#define DMAB_BLTNZERO	13
+
+#endif	/* HARDWARE_DMABITS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

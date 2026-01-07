@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="VFWritef()" TITLE="dos.library/VFWritef" -->
+<head>
+<title>dos.library/VFWritef</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01CC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01CE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	VFWritef - write a BCPL formatted string to a file (buffered) (V36)
+
+<b>   SYNOPSIS</b>
+	count = VFWritef(fh, fmt, argv)
+	D0               D1  D2    D3
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> VFWritef(BPTR, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> *)
+
+	count = FWritef(fh, fmt, ...)
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> FWritef(BPTR, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, ...)
+
+<b>   FUNCTION</b>
+	Writes the formatted string and values to the specified file.  This
+	routine is assumed to handle all internal buffering so that the
+	formatting string and resultant formatted values can be arbitrarily
+	long.  The formats are in BCPL form.  This routine is buffered.
+
+	Supported formats are:  (Note x is in base 36!)
+		%S  - string (CSTR)
+		%Tx - writes a left-justified string in a field at least
+		      x bytes long.
+		%C  - writes a single character
+		%Ox - writes a number in octal, maximum x characters wide
+		%Xx - writes a number in hex, maximum x characters wide
+		%Ix - writes a number in decimal, maximum x characters wide
+		%N  - writes a number in decimal, any length
+		%Ux - writes an unsigned number, maximum x characters wide
+		%$  - ignore parameter
+
+	Note: 'x' above is actually the character value - '0'.
+
+<b>   INPUTS</b>
+	fh    - filehandle to write to
+	fmt   - BCPL style formatting string
+	argv  - Pointer to array of formatting values
+
+<b>   RESULT</b>
+	count - Number of bytes written or -1 for error
+
+<b>   BUGS</b>
+	As of V37, VFWritef() does NOT return a valid return value.  In
+	order to reduce possible errors, the prototypes supplied for the
+	system as of V37 have it typed as VOID.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01CC.html">VFPrintf()</a>, <a href="../Includes_and_Autodocs_3._guide/node01CC.html">VFPrintf()</a>, <a href="../Includes_and_Autodocs_3._guide/node016C.html">FPutC()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

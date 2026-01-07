@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-2-3-1" TITLE="15 / / Functions for GadTools Menus / Creating Menus" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / / Functions for GadTools Menus / Creating Menus</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0250.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0252.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenus()</a> function takes an array of <a href="../Libraries_Manual_guide/node024F.html">NewMenu</a>s and creates a set of
+initialized and linked Intuition <a href="../Libraries_Manual_guide/node0199.html">Menu</a>, <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a>, <a href="../Libraries_Manual_guide/node01BA.html">Image</a> and <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a>
+structures, that need only to be formatted before being used.  Like the
+other tag-based functions, there is a <a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenusA()</a> call that takes a
+pointer to an array of <a href="../Libraries_Manual_guide/node0497.html">TagItem</a>s and a CreateMenus() version that expects
+to find its tags on the stack.
+
+    struct Menu *CreateMenusA( struct NewMenu *newmenu,
+                               struct TagItem *taglist );
+    struct Menu *CreateMenus( struct NewMenu *newmenu, Tag tag1, ... );
+
+The first argument to these functions, newmenu, is a pointer to an array
+of <a href="../Libraries_Manual_guide/node024F.html">NewMenu</a> structures as described earlier.  The tag arguments can be any
+<a name="line15">of the following items:</a>
+
+GTMN_FrontPen (ULONG)
+    The pen number to use for menu text and separator bars.  The default
+    is zero.
+
+GTMN_FullMenu (BOOL)
+    (New for V37, ignored under V36).  This tag instructs <a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenus()</a>
+    to fail if the supplied <a href="../Libraries_Manual_guide/node024F.html">NewMenu</a> structure does not describe a
+    complete <a href="../Libraries_Manual_guide/node0199.html">Menu</a> structure.  This is useful if the application does not
+    have direct control over the NewMenu description, for example if it
+<a name="line26">    has user-configurable menus.  The default is FALSE.</a>
+
+GTMN_SecondaryError (ULONG *)
+    (New for V37, ignored under V36).  This tag allows <a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenus()</a> to
+    return some secondary error codes.  Supply a pointer to a
+    NULL-initialized ULONG, which will receive an appropriate error code
+<a name="line32">    as follows:</a>
+
+    GTMENU_INVALID
+        Invalid menu specification.  For instance, a sub-item directly
+        following a menu-title or an incomplete menu.  <a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenus()</a>
+<a name="line37">        failed in this case, returning NULL.</a>
+
+    GTMENU_NOMEM
+<a name="line40">        Failed for lack of memory.  <a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenus()</a> returned NULL.</a>
+
+    GTMENU_TRIMMED
+        The number of menus, items or sub-items exceeded the maximum
+        number allowed so the menu was trimmed.  In this case,
+        <a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenus()</a> does not fail but returns a pointer to the trimmed
+        <a href="../Libraries_Manual_guide/node0199.html">Menu</a> structure.
+
+    NULL
+        If no error was detected.
+
+<a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenus()</a> returns a pointer to the first <a href="../Libraries_Manual_guide/node0199.html">Menu</a> structure created, while
+all the <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structures and any other Menu structures are attached
+through the appropriate pointers.  If the <a href="../Libraries_Manual_guide/node024F.html">NewMenu</a> structure begins with an
+entry of type <a href="../Libraries_Manual_guide/node024F.html#line22">NM_ITEM</a> or <a href="../Libraries_Manual_guide/node024F.html#line22">IM_ITEM</a>, then CreateMenus() will return a pointer
+to the first MenuItem created, since there will be no first Menu
+structure.  If the creation fails, usually due to a lack of memory,
+<a name="line57">CreateMenus() will return NULL.</a>
+
+Starting with V37, GadTools will not create any menus, menu items or
+sub-items in excess of the maximum number allowed by Intuition.  Up to 31
+menus may be defined, each menu with up to 63 items, each item with up to
+31 sub-items.  See the &#034;<a href="../Libraries_Manual_guide/node017E.html">Intuition Menus</a>&#034; chapter for more information on
+menus and their limitations.  If the <a href="../Libraries_Manual_guide/node024F.html">NewMenu</a> array describes a menu that
+is too big, <a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenus()</a> will return a trimmed version.
+GTMN_SecondaryError can be used to learn when this happens.
+
+Menus need to be added to the window with Intuition's <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a>
+function.  Before doing this, they must be formatted with a call to
+<a href="../Libraries_Manual_guide/node0252.html">LayoutMenus()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

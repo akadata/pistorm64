@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-3-1" TITLE="10 / Device Interface / Opening The Printer Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 / Device Interface / Opening The Printer Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0044.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0046.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Three primary steps are required to open the printer device:
+
+   *  Create a message port using <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>.  Reply messages from the
+      device must be directed to a message port.
+
+   *  Create an extended I/O request structure of type <a href="../Devices_Manual_guide/node0044.html#line16">printerIO</a> with the
+      <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a> function.  This means that one memory area can be used
+      to represent three distinct forms of memory layout for the three
+      different types of data structures that must be used to pass commands
+      to the printer device. By using CreateExtIO(), you automatically
+      allocate enough memory to hold the largest structure in the union
+      statement.
+
+   *  Open the printer device.  Call <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>, passing the I/O request.
+
+    union printerIO
+    {
+        struct IOStdReq    ios;
+        struct IODRPReq    iodrp;
+        struct IOPrtCmdReq iopc;
+    };
+
+    struct MsgPort  *PrintMP;         /* Message port pointer */
+    union printerIO *PrintIO;         /* I/O request pointer */
+
+    if (PrintMP=CreateMsgPort() )
+      if (PrintIO=(union printerIO *)
+                   CreateExtIO(PrintMP,sizeof(union printerIO)) )
+         if (OpenDevice(&#034;printer.device&#034;,0L,(struct IORequest *)PrintIO,0))
+              printf(&#034;printer.device did not open\n&#034;);
+
+The printer device automatically fills in default settings for all printer
+device parameters from Preferences.  In addition, information about the
+printer itself is placed into the appropriate fields of <a href="../Devices_Manual_guide/node0044.html#line16">printerIO</a>. (See
+the <a href="../Devices_Manual_guide/node004B.html">Obtaining Printer Specific Data</a> section below.)
+
+   Pre-V36 Tasks and <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>.
+   -------------------------------
+   Tasks in pre-V36 versions of the operating system are not able to
+   safely OpenDevice() the printer device because it may be necessary to
+   load it in from disk, something only a process could do under
+   pre-V36.  V36 and higher versions of the operating system do not have
+   such a limitation.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-3-3" TITLE="Primitive Data Types / Characters " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Primitive Data Types / Characters </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01D9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01DB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following character set is assumed wherever characters are used, e.g.,
+in text strings, IDs, and TEXT chunks (see below).  Characters are encoded
+in 8-bit ASCII.  Characters in the range NUL (hex 0) through DEL (hex 7F)
+are well defined by the 7-bit ASCII standard.  IFF uses the graphic group
+&#034; &#034; (SP, hex 20) through &#034;~&#034; (hex 7E).
+
+Most of the control character group hex 01 through hex 1F have no standard
+meaning in IFF.  The control character LF (hex 0A) is defined as a
+&#034;newline&#034; character.  It denotes an intentional line break, that is, a
+paragraph or line terminator.  (There is no way to store an automatic line
+break.  That is strictly a function of the margins in the environment the
+text is placed.) The controlcharacter ESC (hex 1B) is a reserved escape
+character under the rules of ANSI standard 3.64-1979 American National
+Standard Additional Control Codes for Use with ASCII, ISO standard 2022,
+and ISO/DIS standard 6429.2.
+
+Characters in the range hex 7F through hex FF are not globally defined in
+IFF. They are best left reserved for future standardization.  (Note that
+the <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> type <a href="../Devices_Manual_guide/node0168.html">FTXT</a> (formatted text) defines the meaning of these
+characters within FTXT forms.)  In particular, character values hex 7F
+through hex 9F are control codes while characters hex A0 through hex FF
+are extended graphic characters like &#197;, as per the ISO and ANSI standards
+cited above.  [See the supplementary document &#034;FTXT&#034; IFF Formatted Text.]
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

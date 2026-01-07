@@ -1,0 +1,463 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-3/ScreenDisplayModes.c" NODE="MAIN" TITLE="IV-3/ScreenDisplayModes.c" -->
+<head>
+<title>IV-3/ScreenDisplayModes.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node019C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node019E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* ScreenDisplayModes.c - V36 Screen Displaymode selector example
+; Compiled with SAS/C 6.56
+sc NMINC STRMERGE NOSTKCHK LINK IGNORE=73 ScreenDisplayModes.c
+quit
+
+Copyright (c) 1990-1999 Amiga, Inc.
+
+This example is provided in electronic form by Amiga, Inc.
+for use with the Amiga Mail Volume II technical publication.
+Amiga Mail Volume II contains additional information on the correct
+usage of the techniques and operating system functions presented in
+these examples.  The source and executable code of these examples may
+only be distributed in free electronic form, via bulletin board or
+as part of a fully non-commercial and freely redistributable
+diskette.  Both the source and executable code (including comments)
+must be included, without modification, in any copy.  This example
+may not be published in printed form or distributed with any
+commercial product. However, the programming techniques and support
+routines set forth in these examples may be used in the development
+of original executable software products for Amiga
+computers.
+
+All other rights reserved.
+
+This example is provided &#034;as-is&#034; and is subject to change; no
+warranties are made.  All use is at your own risk. No liability or
+responsibility is assumed.
+*/
+
+#include &#060;string.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;libraries/gadtools.h&#062;
+#include &#060;graphics/displayinfo.h&#062;
+#include &#060;graphics/text.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/ports.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/gadtools_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#include &#060;pragmas/exec_pragmas.h&#062;
+#include &#060;pragmas/intuition_pragmas.h&#062;
+#include &#060;pragmas/graphics_pragmas.h&#062;
+#include &#060;pragmas/gadtools_pragmas.h&#062;
+
+#define SWITCH 888
+#define QUIT   999
+
+struct IntuitionBase *IntuitionBase;
+struct GfxBase *GfxBase;
+struct Library *GadToolsBase;
+extern struct Library *SysBase;
+
+void main(void);
+void ShowDisplayModes(struct List * dlist);
+struct Screen *OpenAScreen(struct DimensionInfo * di, UBYTE * name,
+			   ULONG overscantype);
+struct Window *OpenAWindow(struct Screen * screen, ULONG overscantype);
+
+struct DisplayNode {
+    struct Node dn_Node;
+    struct DimensionInfo dn_Dimensioninfo;
+};
+
+/* The workbench compatible pens we'll use for that New Look. */
+static UWORD dri_Pens[] = {0, 1, 1, 2, 1, 3, 1, 0, 3, ~0};
+
+/* Gadtools menu stuff */
+struct NewMenu sdm_menu[] =
+{
+    {NM_TITLE, &#034;Project&#034;, 0, 0, 0, 0,},
+    {NM_ITEM, &#034;Switch Mode&#034;, &#034;S&#034;, 0, 0, (void *) SWITCH,},
+    {NM_ITEM, &#034;Set Overscan&#034;, 0, 0, 0, 0,},
+    {NM_SUB, &#034;Text&#034;, 0, CHECKIT | CHECKED, ~1, (void *) OSCAN_TEXT,},
+    {NM_SUB, &#034;Standard&#034;, 0, CHECKIT, ~2, (void *) OSCAN_STANDARD,},
+    {NM_SUB, &#034;Max&#034;, 0, CHECKIT, ~4, (void *) OSCAN_MAX,},
+    {NM_SUB, &#034;Video&#034;, 0, CHECKIT, ~8, (void *) OSCAN_VIDEO,},
+    {NM_ITEM, NM_BARLABEL, 0, CHECKIT, 0, 0,},
+    {NM_ITEM, &#034;Quit&#034;, &#034;Q&#034;, 0, 0, (void *) QUIT,},
+    {NM_END, NULL, 0, 0, 0, 0,},
+};
+
+UBYTE *OScanDescr[] = {NULL, &#034;OSCAN_TEXT&#034;, &#034;OSCAN_STANDARD&#034;,
+			 &#034;OSCAN_MAX&#034;, &#034;OSCAN_VIDEO&#034;};
+
+struct EasyStruct failedES =
+{
+    sizeof(struct EasyStruct), 0, &#034;SDM&#034;,
+    &#034;%s&#034;,
+    &#034;OK&#034;,
+};
+
+void
+main(void)
+{
+    struct List *dlist;
+    struct DisplayNode *dnode;
+    struct DisplayNode *wnode, *nnode;
+
+    ULONG modeID;
+    ULONG skipID;
+
+    ULONG result;
+    struct DisplayInfo displayinfo;
+    struct NameInfo nameinfo;
+
+    /* Fails silently if not V36 */
+    if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 36)) {
+        if (GfxBase = OpenLibrary(&#034;graphics.library&#034;, 36)) {
+            if (GadToolsBase = OpenLibrary(&#034;gadtools.library&#034;, 36)) {
+                if (dlist = AllocMem(sizeof(struct List), MEMF_CLEAR)) {
+                    NewList(dlist);
+
+                    /*
+                     * Don't want duplicate entries in the list for the
+                     * 'default monitor', so we'll skip the the videomode
+                     * for which default.monitor is the alias.
+                     */
+
+                    /* INVALID_ID indicates the beginning and the end
+		     * of the list of available keys.
+		     */
+                    modeID = INVALID_ID;
+
+                    GetDisplayInfoData(NULL, (UBYTE *) &#038; displayinfo,
+				       sizeof(struct DisplayInfo),
+				       DTAG_DISP, LORES_KEY);
+                    if (displayinfo.PropertyFlags &#038; DIPF_IS_PAL)
+                        skipID = PAL_MONITOR_ID;
+                    else
+                        skipID = NTSC_MONITOR_ID;
+                    while ((modeID = NextDisplayInfo(modeID)) != INVALID_ID) {
+                        if ((modeID &#038; MONITOR_ID_MASK) != skipID) {
+			    /*
+			     * For this example,only 'named' keys are accepted.  Others
+			     * which have no description are left out
+ 			     * even though they may be available.
+ 			     * HAM and EXTRAHALFBRIGHT are examples of this.
+ 			     * If needed a name could be made like '320x400 HAM Interlace'.
+ 			     */
+
+                            if (result = GetDisplayInfoData(NULL,
+							    (UBYTE *) &#038; nameinfo,
+							    sizeof(struct NameInfo),
+							    DTAG_NAME,
+							    modeID)) {
+                                result = GetDisplayInfoData(NULL,
+							    (UBYTE *) &#038; displayinfo,
+							    sizeof(struct DisplayInfo),
+							    DTAG_DISP,
+							    modeID);
+                                if (!(displayinfo.NotAvailable)) {
+                                    if (dnode =
+					(struct DisplayNode *)
+					AllocMem(sizeof(struct DisplayNode),
+						 MEMF_CLEAR)) {
+                                        result = GetDisplayInfoData(NULL,
+						   (UBYTE *) &#038;
+						   (dnode-&#062;dn_Dimensioninfo),
+						   sizeof(struct DimensionInfo),
+						   DTAG_DIMS,
+						   modeID);
+                                        /* to keep it short: if NOMEM,
+					 * just don't copy
+					 */
+                                        if (dnode-&#062;dn_Node.ln_Name
+					    = AllocMem(strlen(nameinfo.Name)
+						       + 1, MEMF_CLEAR))
+                                            strcpy(dnode-&#062;dn_Node.ln_Name,
+						   nameinfo.Name);
+                                        AddTail(dlist, (struct Node *) dnode);
+                                    } else {
+                                        EasyRequest(NULL, &#038;failedES, NULL,
+						    &#034;Out of memory&#034;);
+                                        /* Force modeID to INVALID to break */
+                                        modeID = INVALID_ID;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    ShowDisplayModes(dlist);
+
+                    wnode = (struct DisplayNode *) dlist-&#062;lh_Head;
+                    while (nnode = (struct DisplayNode *)
+			   (wnode-&#062;dn_Node.ln_Succ)) {
+
+                        if (wnode-&#062;dn_Node.ln_Name)
+                            FreeMem(wnode-&#062;dn_Node.ln_Name,
+				    strlen(wnode-&#062;dn_Node.ln_Name) +1);
+                        Remove((struct Node *) wnode);
+                        FreeMem(wnode, sizeof(struct DisplayNode));
+                        wnode = nnode;
+                    }
+                    FreeMem(dlist, sizeof(struct List));
+                } else
+                    EasyRequest(NULL, &#038;failedES, NULL, &#034;Out of memory&#034;);
+                CloseLibrary(GadToolsBase);
+            }
+            CloseLibrary(GfxBase);
+        }
+        CloseLibrary(IntuitionBase);
+    }
+}
+
+void
+ShowDisplayModes(struct List * dlist)
+{
+    struct Screen *screen;
+    struct Window *window;
+    struct Gadget *glist, *gadget, *hitgadget;
+    struct DrawInfo *drawinfo;
+    struct TextFont *defaultfont;
+    struct TextAttr *textattr;
+    struct IntuiMessage *imsg;
+    struct NewGadget *ng;
+    struct Menu *menu;
+    struct MenuItem *item;
+    void *vi;
+    ULONG iclass, icode, code;
+    struct DisplayNode *dnode;
+    struct DimensionInfo *dimensioninfo;
+    ULONG overscantype = OSCAN_TEXT;
+    ULONG curmode = 0;
+    BOOL ABORT = TRUE, OK;
+    int i;
+
+
+    if (ng = AllocMem(sizeof(struct NewGadget), MEMF_CLEAR)) {
+        if (textattr = AllocMem(sizeof(struct TextAttr), MEMF_CLEAR)) {
+            if (textattr-&#062;ta_Name = AllocMem(48, MEMF_CLEAR)) {
+
+                dnode = (struct DisplayNode *) dlist-&#062;lh_Head;
+
+                if (menu = CreateMenus(sdm_menu, TAG_DONE)) {
+                    do {
+                        dimensioninfo = &#038;(dnode-&#062;dn_Dimensioninfo);
+                        OK = FALSE;
+                        if (screen = OpenAScreen(dimensioninfo,
+						 dnode-&#062;dn_Node.ln_Name,
+						 overscantype)) {
+                            drawinfo = GetScreenDrawInfo(screen);
+                            defaultfont = drawinfo-&#062;dri_Font;
+                            strcpy(textattr-&#062;ta_Name,
+				   defaultfont-&#062;tf_Message.mn_Node.ln_Name);
+
+                            textattr-&#062;ta_YSize = defaultfont-&#062;tf_YSize;
+                            textattr-&#062;ta_Style = defaultfont-&#062;tf_Style;
+                            textattr-&#062;ta_Flags = defaultfont-&#062;tf_Flags;
+
+                            if (window = OpenAWindow(screen, overscantype)) {
+                                vi = GetVisualInfo(screen, TAG_END);
+                                if (LayoutMenus(menu, vi, TAG_DONE)) {
+                                    if (gadget = CreateContext(&#038;glist)) {
+                                        ng-&#062;ng_LeftEdge =
+					  window-&#062;BorderLeft + 10;
+                                        ng-&#062;ng_TopEdge =
+					  window-&#062;BorderTop + 10;
+                                        ng-&#062;ng_Width =
+					  window-&#062;Width -
+					    (window-&#062;BorderLeft + 10) -
+					      (window-&#062;BorderRight + 10);
+                                        ng-&#062;ng_Height =
+					  window-&#062;Height -
+					    (window-&#062;BorderTop + 10) -
+					      (window-&#062;BorderBottom + 10) -
+						(4 + defaultfont-&#062;tf_YSize + 2);
+                                        ng-&#062;ng_TextAttr = textattr;
+                                        ng-&#062;ng_GadgetText = NULL;
+                                        ng-&#062;ng_VisualInfo = vi;
+                                        ng-&#062;ng_GadgetID = 1;
+                                        ng-&#062;ng_Flags = PLACETEXT_ABOVE;
+                                        gadget =
+					  CreateGadget(LISTVIEW_KIND, gadget,
+						       ng, GTLV_Labels, dlist,
+						       GTLV_ShowSelected, NULL,
+						       GTLV_Selected, curmode,
+						       TAG_END);
+
+                                        ng-&#062;ng_TopEdge +=
+					  gadget-&#062;Height +
+					    defaultfont-&#062;tf_YSize + 10;
+                                        ng-&#062;ng_Width = 80;
+                                        ng-&#062;ng_LeftEdge =
+					  ((window-&#062;Width - window-&#062;BorderLeft
+					    - window-&#062;BorderRight) / 2) - 30;
+                                        ng-&#062;ng_Height = defaultfont-&#062;tf_YSize + 8;
+                                        ng-&#062;ng_GadgetID = 2;
+                                        ng-&#062;ng_GadgetText = &#034;OK&#034;;
+                                        ng-&#062;ng_VisualInfo = vi;
+                                        ng-&#062;ng_Flags = PLACETEXT_IN;
+                                        gadget =
+					  CreateGadget(BUTTON_KIND, gadget,
+						       ng, TAG_END);
+
+                                        AddGList(window, glist, -1, -1, NULL);
+                                        RefreshGList(glist, window, NULL, -1);
+                                        GT_RefreshWindow(window, NULL);
+                                        SetMenuStrip(window, menu);
+                                        ABORT = FALSE;
+                                    } else
+                                        EasyRequest(window, &#038;failedES, NULL,
+						    &#034;Can't create gadget context&#034;);
+                                } else
+                                    EasyRequest(window, &#038;failedES, NULL,
+						&#034;Can't layout menus&#034;);
+
+                                do {
+                                    WaitPort(window-&#062;UserPort);
+                                    while (imsg = GT_GetIMsg(window-&#062;UserPort)) {
+                                        iclass = imsg-&#062;Class;
+                                        icode = imsg-&#062;Code;
+                                        hitgadget =
+					  (struct Gadget *) imsg-&#062;IAddress;
+                                        GT_ReplyIMsg(imsg);
+
+                                        switch (iclass) {
+                                        case GADGETUP:
+                                            if (hitgadget-&#062;GadgetID == 1) {
+                                                dnode =
+						  (struct DisplayNode *)
+						    dlist-&#062;lh_Head;
+                                                for (i = 0; i &#060; icode; i++)
+                                                dnode =
+						  (struct DisplayNode *)
+						    dnode-&#062;dn_Node.ln_Succ;
+                                                curmode = i;
+                                            }
+                                            if (hitgadget-&#062;GadgetID == 2)
+                                                OK = TRUE;
+                                            break;
+                                        case MENUPICK:
+                                            while ((icode != MENUNULL)
+						   &#038;&#038; (ABORT == FALSE)) {
+                                                item = ItemAddress(menu, icode);
+
+                                                code = (ULONG) MENU_USERDATA(item);
+                                                if (code == QUIT)
+                                                    ABORT = TRUE;
+                                                else if
+                                                    (code == SWITCH)
+                                                    OK = TRUE;
+                                                else
+                                                    overscantype = (ULONG) code;
+                                                icode = item-&#062;NextSelect;
+                                            }
+                                            break;
+                                        case CLOSEWINDOW:
+                                            ABORT = TRUE;
+                                            break;
+                                        }
+                                    }
+                                } while (ABORT == FALSE &#038;&#038; OK == FALSE);
+                                ClearMenuStrip(window);
+                                CloseWindow(window);
+                                FreeVisualInfo(vi);
+                                FreeGadgets(glist);
+                            } else
+                                EasyRequest(NULL, &#038;failedES, NULL,
+					    &#034;Can't open window&#034;);
+                            FreeScreenDrawInfo(screen, drawinfo);
+                            CloseScreen(screen);
+                        } else
+                            EasyRequest(NULL, &#038;failedES, NULL,
+					&#034;Can't open screen&#034;);
+                    } while (ABORT == FALSE);
+                    FreeMenus(menu);
+                } else
+                    EasyRequest(NULL, &#038;failedES, NULL, &#034;Can't create menus&#034;);
+                FreeMem(textattr-&#062;ta_Name, 48);
+            } else
+                EasyRequest(NULL, &#038;failedES, NULL, &#034;Out of memory&#034;);
+            FreeMem(textattr, sizeof(struct TextAttr));
+        } else
+            EasyRequest(NULL, &#038;failedES, NULL, &#034;Out of memory&#034;);
+        FreeMem(ng, sizeof(struct NewGadget));
+    } else
+        EasyRequest(NULL, &#038;failedES, NULL, &#034;Out of memory&#034;);
+}
+
+
+/*
+ * It's advised to use one of the overscan constants and
+ * STDSCREENWIDTH and STDSCREENHEIGHT. For this example however, we'll
+ * skip all that an use QueryOverscan to get the rectangle describing the
+ * requested overscantype and pass that as the displayclip description.
+ * Actually, since we pass the standard rectangle from the display database,
+ * it is equivalent to the prefered:
+ *
+ * screen = OpenScreenTags(NULL,
+ *                         SA_DisplayID, di-&#062;Header.DisplayID,
+ *                         SA_Overscan, overscantype,
+ *                         SA_Width, STDSCREENWIDTH,
+ *                         SA_Height, STDSCREENHEIGHT,
+ *                         SA_Title, name,
+ *                         SA_Depth, 2,
+ *                         SA_SysFont, 1,
+ *                         SA_Pens, dri_Pens,
+ *                         TAG_END);
+ */
+
+struct Screen *
+OpenAScreen(struct DimensionInfo * di, UBYTE * name, ULONG overscantype)
+{
+
+    struct Rectangle rectangle;
+
+    /* Can't fail, already made sure it's a valid displayID */
+    QueryOverscan(di-&#062;Header.DisplayID, &#038;rectangle, overscantype);
+
+
+    return (OpenScreenTags(NULL,
+                           SA_DisplayID, di-&#062;Header.DisplayID,
+                           SA_DClip, &#038;rectangle,
+                           SA_Title, name,
+                           SA_Depth, 2,
+                           SA_SysFont, 1,   /* Use the prefered WB screen font */
+                           SA_Pens, dri_Pens,
+                           TAG_END));
+}
+
+struct Window *
+OpenAWindow(struct Screen * screen, ULONG overscantype)
+{
+    return (OpenWindowTags(NULL,
+                           WA_Top, screen-&#062;BarHeight + 1,
+                           WA_Height, screen-&#062;Height - (screen-&#062;BarHeight + 1),
+                           WA_CustomScreen, screen,
+                           WA_IDCMP, CLOSEWINDOW | LISTVIEWIDCMP | MENUPICK,
+                           WA_Flags, WINDOWCLOSE | ACTIVATE,
+                           WA_Title, OScanDescr[overscantype],
+                           TAG_END));
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

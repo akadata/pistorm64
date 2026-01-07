@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_14" NODE="14-2-2" TITLE="14 / Workbench Environment / WBStartup Message" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>14 / Workbench Environment / WBStartup Message</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node023D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node023F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When Workbench loads and starts a program, its sends the program a
+WBStartup message containing the arguments as summarized above.  Normally,
+the startup code supplied with your compiler will place a pointer to
+<a name="line5">WBStartup in argv for you, set argc to zero and call your program.</a>
+
+The WBStartup message, whose structure is outlined in
+&#060;workbench/<a href="../Includes_and_Autodocs_2._guide/node0134.html#line26">startup.h</a>&#062;, has the following structure elements:
+
+    struct WBStartup
+    {
+        struct Message   sm_Message;    /* a standard message structure */
+        struct MsgPort * sm_Process;    /* process descriptor for you */
+        BPTR             sm_Segment;    /* a descriptor for your code */
+        LONG             sm_NumArgs;    /* number of elements in ArgList */
+        char *           sm_ToolWindow; /* reserved for future use */
+        struct WBArg *   sm_ArgList;    /* the arguments themselves */
+    };
+
+The fields of the WBStartup structure are used as follows.
+
+    sm_Message
+        A standard Exec message.  The reply port is set to the Workbench.
+
+    sm_Process
+        The process descriptor for the tool (as returned by
+        <a href="../Includes_and_Autodocs_2._guide/node028E.html">CreateProc()</a>)
+
+    sm_Segment
+        The loaded code for the tool (returned by <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a>)
+
+    sm_NumArgs
+        The number of arguments in sm_ArgList
+
+    sm_ToolWindow
+<a name="line36">        Reserved (not currently passed in startup message)</a>
+
+    sm_ArgList
+        This is the argument list itself.  It is a pointer to an array
+<a name="line40">        of WBArg structures with sm_NumArgs elements.</a>
+
+Workbench arguments are passed as an array of <a href="../Includes_and_Autodocs_2._guide/node0134.html#line35">WBArg</a> structures in the
+sm_ArgList field of WBStartup.  The first WBArg in the list is always the
+tool itself.  If multiple icons have been selected when a tool is
+activated, the selected icons are passed to the tool as additional WBArgs.
+If the tool was derived from a default tool, the project will be the
+second WBArg.  If extended select was used, arguments other than the tool
+are passed in the order of selection; the first icon selected will be
+<a name="line49">first (after the tool), and so on.</a>
+
+Each argument is a struct <a href="../Includes_and_Autodocs_2._guide/node0134.html#line35">WBArg</a> and has two parts:  wa_Name and wa_Lock.
+
+    struct WBArg
+    {
+        BPTR      wa_Lock;    /* a lock descriptor */
+        BYTE *    wa_Name;    /* a string relative to that lock */
+    };
+
+The wa_Name element is the name of an AmigaDOS filing system object.  The
+wa_Name field of the first WBArg is always the name of your program and
+the wa_Lock field is an AmigaDOS Lock on the directory where your program
+is stored.
+
+If your program was started by activating a project icon, then you get a
+second WBarg with the wa_Name field containing the file name of the
+project and the wa_Lock containing an AmigaDOS Lock on the directory where
+the project file is stored.
+
+If your program was started through extended select, then you get one
+WBArg for each icon in the selected group in the order they were selected.
+The wa_Name field contains the file name corresponding to each icon unless
+the icon is for a directory, disk, or the Trashcan in which case the
+wa_Name is set to NULL.  The wa_Lock field contains an AmigaDOS Lock on
+the directory where the file is stored.  (For disk or drawer icons the
+wa_Lock is a lock on the directory represented by the icon.  Or, wa_Lock
+<a name="line76">may be NULL if the icon type does not support locks.)</a>
+
+    Workbench Locks Belong to Workbench.
+    ------------------------------------
+    You must never call <a href="../Includes_and_Autodocs_2._guide/node0307.html">UnLock()</a> on a wa_Lock.  These locks belong to
+    Workbench, and Workbench will UnLock() them when the WBStartup
+    message is replied by your startup code.  You must also never
+    UnLock() your program's initial current directory lock (i.e., the
+    lock returned by an initial <a href="../Includes_and_Autodocs_2._guide/node028F.html">CurrentDir()</a> call).  The classic symptom
+    caused by unlocking Workbench locks is a system hang after your
+    program exits, even though the same program exits with no problems
+    when started from the Shell.
+
+    You should save the lock returned from an initial <a href="../Includes_and_Autodocs_2._guide/node028F.html">CurrentDir()</a>, and
+    CurrentDir() back to it before exiting.  In the Workbench
+    environment, depending on your startup code, the current directory
+    will generally be set to one of the wa_Locks.  By using
+    CurrentDir(wa_Lock) and then referencing wa_Name, you can find, read,
+    and modify the files that have been passed to your program as WBArgs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

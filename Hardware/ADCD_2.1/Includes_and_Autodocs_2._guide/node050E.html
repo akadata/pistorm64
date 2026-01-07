@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/keyboard" NODE="KBD_READEVENT" TITLE="keyboard.device/KBD_READEVENT" -->
+<head>
+<title>keyboard.device/KBD_READEVENT</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node050D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node050F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    KBD_READEVENT -- Return the next keyboard event.
+
+FUNCTION
+    Read raw keyboard events from the keyboard and put them in the
+    data area of the iORequest.  If there are no pending keyboard
+    events, this command will not be satisfied, but if there are
+    some events, but not as many as can fill IO_LENGTH, the
+    request will be satisfied with those currently available.
+
+IO REQUEST
+    io_Message      mn_ReplyPort set if quick I/O is not possible
+    io_Device       preset by the call to <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice</a>
+    io_Command      KBD_READEVENT
+    io_Flags        IOB_QUICK set if quick I/O is possible
+    io_Length       the size of the io_Data area in bytes: there
+                    are sizeof(inputEvent) bytes per input event.
+    io_Data         a buffer area to fill with input events.  The
+                    fields of the input event are:
+        ie_NextEvent
+                    links the events returned
+        ie_Class
+                    is IECLASS_RAWKEY
+        ie_Code
+                    contains the next key up/down reports
+        ie_Qualifier
+                    only the shift and numeric pad bits are set
+        ie_SubClass, ie_X, ie_Y, ie_TimeStamp
+                    are not used, and set to zero
+
+RESULTS
+    This function sets the error field in the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a>, and fills
+    the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> with the next keyboard events (but not partial
+    events).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

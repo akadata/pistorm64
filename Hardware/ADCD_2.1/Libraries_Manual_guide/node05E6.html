@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/allocate.c" NODE="MAIN" TITLE="lib_examples/allocate.c" -->
+<head>
+<title>lib_examples/allocate.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05E5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05E7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* allocate.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 allocate.c
+Blink FROM LIB:c.o,allocate.o TO allocate LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit ;
+allocate.c - example of allocating and using a private memory pool.
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;stdlib.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)  { return(0); }  /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }  /* really */
+#endif
+
+#define BLOCKSIZE 4000     /* or whatever you need */
+
+VOID main(VOID)
+{
+    struct MemHeader *mh;
+    struct MemChunk  *mc;
+    APTR   block1, block2;
+
+    /* Get the MemHeader needed to keep track of our new block. */
+    mh = (struct MemHeader *)AllocMem((LONG)sizeof(struct MemHeader), MEMF_CLEAR);
+    if (!mh) exit(10);
+
+    /* Get the actual block the above MemHeader will manage. */
+    if ( !(mc = (struct MemChunk *)AllocMem(BLOCKSIZE, 0)) );
+    {
+        FreeMem(mh, (LONG)sizeof(struct MemHeader));
+        exit(10);
+    }
+    mh-&#062;mh_Node.ln_Type = NT_MEMORY;
+    mh-&#062;mh_First        = mc;
+    mh-&#062;mh_Lower        = (APTR)mc;
+    mh-&#062;mh_Upper        = (APTR)(BLOCKSIZE + (ULONG)mc);
+    mh-&#062;mh_Free         = BLOCKSIZE;
+
+    mc-&#062;mc_Next  = NULL;                     /* Set up first chunk in the freelist */
+    mc-&#062;mc_Bytes = BLOCKSIZE;
+
+    block1 = (APTR)Allocate(mh,20);
+    block2 = (APTR)Allocate(mh, 314);
+
+    printf(&#034;Our MemHeader struct at $%lx. Our block of memory at $%lx\n&#034;, mh, mc);
+    printf(&#034;Allocated from our pool: block1 at $%lx, block2 at $%lx\n&#034;, block1, block2);
+
+    FreeMem(mh, (LONG)sizeof(struct MemHeader));
+    FreeMem(mc, (LONG)BLOCKSIZE);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

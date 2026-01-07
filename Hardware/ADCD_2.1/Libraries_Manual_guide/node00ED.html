@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-5-2" TITLE="3 / DrawInfo and the 3D Look / The Font Specification in DrawInfo" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / DrawInfo and the 3D Look / The Font Specification in DrawInfo</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00EC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00EE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a name="line2">Font information for a screen comes from a number of different places.</a>
+
+<a href="../Libraries_Manual_guide/node00E5.html#line125">SA_Font</a>
+    The application may specify the font to be used in a screen by
+    providing the SA_Font tag with a <a href="../Libraries_Manual_guide/node03D6.html#line21">TextAttr</a> structure.  In this case,
+    the font will be used by the screen and will be the default font for
+<a name="line8">    the <a href="../Libraries_Manual_guide/node0102.html#line8">RastPort</a> of any window opening in the screen.</a>
+
+<a href="../Libraries_Manual_guide/node00E5.html#line130">SA_SysFont</a>, 0
+    If the application requests the user's preferred monospace font, it
+    is taken from <a href="../Includes_and_Autodocs_2._guide/node00AE.html#line24">GfxBase-&#062;DefaultFont</a>.  Any window's <a href="../Libraries_Manual_guide/node0102.html#line8">RastPorts</a> are also
+<a name="line13">    initialized to use this same font.</a>
+
+SA_SysFont, 1
+    The screen font selected by the user from the Preferences font editor
+    may be used for the screen by using the SA_SysFont tag.  This font,
+    the &#034;preferred screen font&#034;, may be proportional.  For compatibility
+    reasons, if this font is specified for the screen, the window's
+    <a href="../Libraries_Manual_guide/node0102.html#line8">RastPort</a> will be initialized to <a href="../Includes_and_Autodocs_2._guide/node00AE.html#line24">GfxBase-&#062;DefaultFont</a> (a
+<a name="line21">    non-proportional font).</a>
+
+To access information on an open screen's font, the application may
+reference <a href="../Libraries_Manual_guide/node00DD.html#line76">Screen.Font</a> or <a href="../Libraries_Manual_guide/node00EB.html#line8">DrawInfo.dri_Font</a>.  These fonts are identical,
+the <a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> structure simply provides an alternate method of accessing
+the information.  Note that Screen.Font is a pointer to a <a href="../Libraries_Manual_guide/node03D6.html#line21">TextAttr</a>
+structure and that DrawInfo.dri_Font is a pointer to a <a href="../Libraries_Manual_guide/node03DE.html">TextFont</a> structure.
+<a name="line28">The application may use whichever form is best suited to its requirements.</a>
+
+It is illegal to change the screen's font after the screen is opened.
+This means that the font specified in the <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a> and <a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> structures
+is guaranteed to remain open as long is the screen is open.
+
+The menu bar, window titles, menu items, and the contents of a string
+gadget all use the screen's font.  The font used for menu items can be
+overridden in the menu item's <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structure.  Under V36 and higher,
+the font used in a string gadget can be overridden through the
+<a href="../Libraries_Manual_guide/node016D.html">StringExtend</a> structure.  The font of the menu bar and window titles cannot
+be overridden.
+
+For more information on screen fonts, see the description of the <a href="../Libraries_Manual_guide/node00E5.html#line125">SA_Font</a>
+and <a href="../Libraries_Manual_guide/node00E5.html#line130">SA_SysFont</a> tags in the &#034;Screen Attributes&#034; section above.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

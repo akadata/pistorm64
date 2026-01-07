@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="Flood()" TITLE="graphics.library/Flood" -->
+<head>
+<title>graphics.library/Flood</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node043B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node043D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Flood -- Flood rastport like areafill.
+
+SYNOPSIS
+    error = Flood( rp, mode, x, y)
+    d0            a1   d2  d0  d1
+
+    BOOL Flood(struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *, ULONG, SHORT, SHORT);
+
+FUNCTION
+    Search the <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a> starting at (x,y).
+    Fill all adjacent pixels if they are:
+        Mode 0: not the same color as AOLPen
+        Mode 1: the same color as the pixel at (x,y)
+
+    When actually doing the fill use the modes that apply to
+    standard areafill routine such as drawmodes and patterns.
+
+INPUTS
+    rp - pointer to <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>
+    (x,y) - coordinate in <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a> to start the flood fill at.
+    mode -  0 fill all adjacent pixels searching for border.
+            1 fill all adjacent pixels that have same pen number
+            as the one at (x,y).
+
+NOTES
+    In order to use Flood, the destination <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> must
+    have a valid <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line33">TmpRas</a> raster whose size is as large as
+    that of the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0419.html">AreaEnd()</a> <a href="../Includes_and_Autodocs_2._guide/node0455.html">InitTmpRas()</a> <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

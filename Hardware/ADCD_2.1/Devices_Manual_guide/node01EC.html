@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-5-2" TITLE=" LISTs, CATs, and Shared Properties (Advanced topics) / Group LIST " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> LISTs, CATs, and Shared Properties (Advanced topics) / Group LIST </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01EB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01ED.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a> defines a group very much like <a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a>  but it also gives a scope for
+<a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>s (see below).  And unlike CATs, LISTs should not be merged without
+understanding their contents.
+
+Structurally, a <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a> is a <a href="../Devices_Manual_guide/node01DD.html">chunk</a> with ckID &#034;LIST&#034; containing a &#034;contents
+type&#034; ID, optional shared properties, and the nested contents (<a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>s,
+LISTs, and <a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a> s), in that order.  The ckSize of each contained <a href="../Devices_Manual_guide/node01DD.html">chunk</a> is a
+relative pointer to the next one.  A LIST is not an arbitrary linked
+list - the cells are simply concatenated.
+
+    LIST         ::= &#034;LIST&#034; #{ ContentsType PROP* (FORM | LIST | CAT)* }
+    ContentsType ::= ID
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

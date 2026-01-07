@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_13" NODE="13-4-1" TITLE="13 / Adding a Time Request / Multiple Timer Requests" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>13 / Adding a Time Request / Multiple Timer Requests</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00C4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00C6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Multiple requests may be posted to the timer driver. For example, you can
+make three timer requests in a row:
+
+    Signal me in 20 seconds (request 1)
+    Signal me in 30 seconds (request 2)
+    Signal me in 10 seconds (request 3)
+
+As the timer queues these requests, it changes the time values and sorts
+the timer requests to service each request at the desired interval,
+resulting effectively in the following order:
+
+    (request 3) in now+10 seconds
+    (request 1) 10 seconds after request 3 is satisfied
+    (request 2) 10 seconds after request 1 is satisfied
+
+If you wish to send out multiple timer requests, you have to create
+multiple request blocks. You can do this by allocating memory for each
+<a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> you need and filling in the appropriate fields with command
+data.  Some fields are initialized by the call to the <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>
+function.  So, for convenience, you may allocate memory for the
+<a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> you need, call <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> with one of them, and then copy
+the initialized fields into all the other <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a>.
+
+It is also permissible to open the timer device multiple times.  In some
+cases this may be easier than opening it once and using multiple requests.
+When multiple requests are given, <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> should be used to transmit each
+one to the timer.
+
+     <a href="../Devices_Manual_guide/node0198.html">Multiple_Timers.c</a> 
+
+If all goes according to plan, TimerIO[1] will finish first, TimerIO[2]
+will finish next, and TimerIO[0] will finish last.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

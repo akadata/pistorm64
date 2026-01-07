@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/display.h" NODE="MAIN" TITLE="Includes/graphics/display.h" -->
+<head>
+<title>Includes/graphics/display.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00B4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00B6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_DISPLAY_H
+#define	GRAPHICS_DISPLAY_H
+/*
+**	$Filename: graphics/display.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**	include define file for display control registers
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+<a name="line15">/* bplcon0 defines */</a>
+<a name="line16">#define MODE_640    0x8000</a>
+#define PLNCNTMSK   0x7	    /* how many bit planes? */
+<a name="line18">				    /* 0 = none, 1-&#062;6 = 1-&#062;6, 7 = reserved */</a>
+<a name="line19">#define PLNCNTSHFT  12		    /* bits to shift for bplcon0 */</a>
+<a name="line20">#define PF2PRI	    0x40	    /* bplcon2 bit */</a>
+<a name="line21">#define COLORON     0x0200	    /* disable color burst */</a>
+<a name="line22">#define DBLPF	    0x400</a>
+<a name="line23">#define HOLDNMODIFY 0x800</a>
+#define INTERLACE   4		    /* interlace mode for 400 */
+
+<a name="line26">/* bplcon1 defines */</a>
+<a name="line27">#define PFA_FINE_SCROLL       0xF</a>
+<a name="line28">#define PFB_FINE_SCROLL_SHIFT 4</a>
+#define PF_FINE_SCROLL_MASK   0xF
+
+<a name="line31">/* display window start and stop defines */</a>
+<a name="line32">#define DIW_HORIZ_POS	0x7F	   /* horizontal start/stop */</a>
+<a name="line33">#define DIW_VRTCL_POS	0x1FF	   /* vertical start/stop */</a>
+#define DIW_VRTCL_POS_SHIFT 7
+
+<a name="line36">/* Data fetch start/stop horizontal position */</a>
+#define DFTCH_MASK	0xFF
+
+<a name="line39">/* vposr bits */</a>
+#define VPOSRLOF	0x8000
+
+#endif	/* GRAPHICS_DISPLAY_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

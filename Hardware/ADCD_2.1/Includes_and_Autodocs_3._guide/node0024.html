@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="CallHook()" TITLE="amiga.lib/CallHook" -->
+<head>
+<title>amiga.lib/CallHook</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0023.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0025.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CallHook -- Invoke a hook given a message on the stack.
+
+<b>   SYNOPSIS</b>
+	result = CallHook( hookPtr, obj, ... )
+
+	ULONG CallHook( struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *, <a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> *, ... );
+
+<b>   FUNCTION</b>
+	Like <a href="../Includes_and_Autodocs_3._guide/node0025.html">CallHookA()</a>, CallHook() invoke a hook on the supplied
+	hook-specific data (an &#034;object&#034;) and a parameter packet (&#034;message&#034;).
+	However, CallHook() allows you to build the message on your stack.
+
+<b>   INPUTS</b>
+	hookPtr - A system-standard hook
+	obj - hook-specific data object
+	... - The hook-specific message you wish to send.  The hook is
+	    expecting a pointer to the message, so a pointer into your
+	    stack will be sent.
+
+<b>   RESULT</b>
+	result - a hook-specific result.
+
+<b>   NOTES</b>
+	This function first appeared in the V37 release of amiga.lib.
+	However, it does not depend on any particular version of the OS,
+	and works fine even in V34.
+
+<b>   EXAMPLE</b>
+	If your hook's message was
+
+	    struct myMessage
+	    {
+		ULONG mm_FirstGuy;
+		ULONG mm_SecondGuy;
+		ULONG mm_ThirdGuy;
+	    };
+
+	You could write:
+
+	    result = CallHook( hook, obj, firstguy, secondguy, thirdguy );
+
+	as a shorthand for:
+
+	    struct myMessage msg;
+
+	    msg.mm_FirstGuy = firstguy;
+	    msg.mm_SecondGuy = secondguy;
+	    msg.mm_ThirdGuy = thirdguy;
+
+	    result = CallHookA( hook, obj, &#038;msg );
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0025.html">CallHookA()</a>, <a href="../Includes_and_Autodocs_3._guide/node0599.html">utility.library/CallHookPkt()</a>, <a href="../Includes_and_Autodocs_3._guide/node0617.html">&#060;utility/hooks.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="SetRexxVar()" TITLE="amiga.lib/SetRexxVar" -->
+<head>
+<title>amiga.lib/SetRexxVar</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node004A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node004C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetRexxVar - Sets the value of a variable of a running ARexx program
+
+<b>   SYNOPSIS</b>
+	error = SetRexxVar(message,varname,value,length)
+	D0                 A0      A1      D0    D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> SetRexxVar(struct <a href="../Includes_and_Autodocs_3._guide/node0633.html#line97">RexxMsg</a> *,char *,char *,ULONG);
+
+<b>   FUNCTION</b>
+	This function will attempt to the the value of the symbol
+	varname in the ARexx script that sent the message.
+
+	While this function is new in the V37 amiga.lib, it is safe to
+	call it in all versions of the operating system.  It is also
+	PURE code, thus usable in resident/pure executables.
+
+<b>   NOTE</b>
+	This is a stub in amiga.lib.  It is only available via amiga.lib.
+	The stub has two labels.  One, _SetRexxVar, takes the arguments
+	from the stack.  The other, SetRexxVar, takes the arguments in
+	registers.
+
+	This routine does a <a href="../Includes_and_Autodocs_3._guide/node0026.html">CheckRexxMsg()</a> on the message.
+
+<b>   EXAMPLE</b>
+
+	char	*value;
+
+	/* <a href="../Includes_and_Autodocs_3._guide/node062E.html#line46">Message</a> is one from ARexx */
+	if (!SetRexxVar(rxmsg,&#034;TheVar&#034;,&#034;25 Dollars&#034;,10))
+	{
+		/* The value of TheVar will now be &#034;25 Dollars&#034; */
+	}
+
+<b>   INPUTS</b>
+	message		A message gotten from an ARexx script
+	varname		The name of the variable to set
+	value		A string that will be the new value of the variable
+	length		The length of the value string
+
+
+<b>   RESULTS</b>
+	error		0 for success, otherwise an error code.
+			(Other codes may exists, these are documented)
+			3  == Insufficient Storage
+			9  == String too long
+			10 == invalid message
+
+<b>   SEE ALSO</b>
+	SetRexxVar(), <a href="../Includes_and_Autodocs_3._guide/node0026.html">CheckRexxMsg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="TextFit()" TITLE="graphics.library/TextFit" -->
+<head>
+<title>graphics.library/TextFit</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0483.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0485.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    TextFit - count characters that will fit in a given extent (V36)
+
+SYNOPSIS
+    chars = TextFit(rastport, string, strLen, textExtent,
+    D0              A1        A0      D0      A2
+            constrainingExtent, strDirection,
+            A3                  D1
+            constrainingBitWidth, constrainingBitHeight)
+            D2                    D3
+
+    ULONG TextFit(struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *, STRPTR, UWORD,
+        struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line165">TextExtent</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line165">TextExtent</a> *, WORD, UWORD, UWORD);
+
+FUNCTION
+    This function determines how many of the characters of the
+    provided string will fit into the space described by the
+    constraining parameters.  It also returns the extent of
+    that number of characters.
+
+INPUTS
+    rp     - a pointer to the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> which describes where the
+             text attributes reside.
+    string - the address of string to determine the constraint of
+    strLen - The number of characters in the string.
+             If zero, there are no characters in the string.
+    textExtent - a structure to hold the extent result.
+    constrainingExtent - the extent that the text must fit in.
+        This can be NULL, indicating only the constrainingBit
+        dimensions will describe the constraint.
+    strDirection - the offset to add to the string pointer to
+        get to the next character in the string.  Usually 1.
+        Set to -1 and the string to the end of the string to
+        perform a TextFit() anchored at the end.  No other value
+        is valid.
+    constrainingBitWidth - an alternative way to specify the
+        rendering box constraint width that is independent of
+        the rendering origin.  Range 0..32767.
+    constrainingBitHeight - an alternative way to specify the
+        rendering box constraint height that is independent of
+        the rendering origin.  Range 0..32767.
+
+RESULTS
+    chars - the number of characters from the origin of the
+            given string that will fit in both the constraining
+            extent (which specifies a CP bound and a rendering
+            box relative to the origin) and in the rendering width
+            and height specified.
+
+NOTES
+    The result is zero chars and an empty textExtent when the fit
+    cannot be performed.  This occurs not only when no text will
+    fit in the provided constraints, but also when:
+    -   the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> rp's rp_TxSpacing sign and magnitude is so
+        great it reverses the path of the text.
+    -   the constrainingExtent does not include x = 0.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0483.html">TextExtent()</a>  <a href="../Includes_and_Autodocs_2._guide/node0485.html">TextLength()</a>  <a href="../Includes_and_Autodocs_2._guide/node0482.html">Text()</a>
+    <a href="../Includes_and_Autodocs_2._guide/node00A8.html">graphics/text.h</a>  <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

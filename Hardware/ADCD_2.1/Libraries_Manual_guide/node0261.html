@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-8-2" TITLE="15 / / Kinds of GadTools Gadgets / Text-Entry and Number-Entry Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / / Kinds of GadTools Gadgets / Text-Entry and Number-Entry Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0260.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0262.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Text-entry (STRING_KIND) and number-entry (INTEGER_KIND) gadgets are
+fairly typical Intuition string gadgets.  The typing area is contained by
+a border which is a raised ridge.
+
+<a name="line6">Text-entry gadgets accept the following tags:</a>
+
+GTST_String (STRPTR)
+    A pointer to the string to be placed into the text-entry gadget
+    buffer or NULL to get an empty text-entry gadget.  The string itself
+    is actually copied into the gadget's buffer.  The default is NULL.
+<a name="line12">    (Create and set.)</a>
+
+GTST_MaxChars (UWORD)
+    The maximum number of characters that the text-entry gadget should
+    hold.  The string buffer that gets created for the gadget will
+    actually be one bigger than this number, in order to hold the
+    trailing NULL.  The default is 64.  (Create only.)
+
+
+<a name="line21">Number-entry gadgets accept the following tags:</a>
+
+GTIN_Number (ULONG)
+    The number to be placed into the number-entry gadget.  The default is
+<a name="line25">    zero. (Create and set.)</a>
+
+GTIN_MaxChars (UWORD)
+    The maximum number of digits that the number-entry gadget should
+    hold.  The string buffer that gets created for the gadget will
+    actually be one bigger than this, in order to hold the trailing NULL.
+    The default is 10. (Create only.)
+
+
+Both text-entry and number-entry gadgets, which are collectively called
+<a name="line35">string gadgets, accept these common tags:</a>
+
+STRINGA_Justification
+    This attribute controls the placement of the string or number within
+    its box and can be one of <a href="../Libraries_Manual_guide/node014B.html#line87">GACT_STRINGLEFT</a>, <a href="../Libraries_Manual_guide/node014B.html#line83">GACT_STRINGRIGHT</a> or
+<a name="line40">    <a href="../Libraries_Manual_guide/node014B.html#line79">GACT_STRINGCENTER</a>.  The default is GACT_STRINGLEFT.  (Create only.)</a>
+
+STRINGA_ReplaceMode (BOOL)
+    Set STRINGA_ReplaceMode to TRUE to get a string gadget which is in
+<a name="line44">    replace-mode, as opposed to auto-insert mode.  (Create only.)</a>
+
+GA_Disabled (BOOL)
+    Set this attribute to TRUE to disable the string gadget, otherwise to
+<a name="line48">    FALSE.  The default is FALSE.  (Create and set.)</a>
+
+STRINGA_ExitHelp (BOOL)
+    (New for V37, ignored under V36).  Set this attribute to TRUE if the
+    application wants to hear the Help key from within this string
+    gadget.  This feature allows the program to hear the press of the
+    Help key in all cases.  If TRUE, pressing the help key while this
+    gadget is active will terminate the gadget and send a message.  The
+    program will receive an <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> message having a <a href="../Libraries_Manual_guide/node01D9.html#line33">Code</a> value of
+    0x5F, the rawkey code for Help.  Typically, the program will want to
+    reactivate the gadget after performing the help-display.  The default
+<a name="line59">    is FALSE.  (Create only.)</a>
+
+GA_TabCycle (BOOL)
+    (New for V37, ignored under V36).  If the user types Tab or Shift Tab
+    into a GA_TabCycle gadget, Intuition will activate the next or
+    previous such gadget in sequence.  This gives the user easy keyboard
+    control over which text-entry or number-entry gadget is active.  Tab
+    moves to the next GA_TabCycle gadget in the gadget list and Shift Tab
+    moves to the previous one.  When the user presses Tab or Shift Tab,
+    Intuition will deactivate the gadget and send this program an
+    <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> message with the code field set to 0x09, the ASCII
+    value for a tab.  Intuition will then activate the next indicated
+    gadget.  Check the shift bits of the qualifier field to learn if
+    Shift Tab was typed.  The ordering of the gadgets may only be
+    controlled by the order in which they were added to the window.  For
+    special cases, for example, if there is only one string gadget in the
+    window, this feature can be suppressed by specifying the tagitem pair
+    {GA_TabCycle, FALSE}.  The default is TRUE.  (Create only.)
+
+GTST_EditHook (struct Hook *)
+    (New for V37, ignored under V36).  Pointer to a custom editing hook
+    for this string or integer gadget.  See the &#034;<a href="../Libraries_Manual_guide/node016E.html">Intuition Gadgets</a>&#034;
+    chapter for more information on string gadget edit-hooks.
+
+As with all Intuition string gadgets, the program will receive an
+<a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> message only when the user presses Enter, Return, Help, Tab
+or Shift Tab while typing in the gadget.  Note that, like Intuition string
+gadgets, the program will not hear anything if the user deactivates the
+string gadget by clicking elsewhere.  Therefore, it is a good idea to
+always check the string gadget's buffer before using its contents, instead
+of just tracking its value as IDCMP_GADGETUP messages are received for
+this gadget.
+
+Be sure the code is designed so that nothing drastic happens, like closing
+a requester or opening a file, if the <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> message has a
+non-zero <a href="../Libraries_Manual_guide/node01D9.html#line33">Code</a> field; the program will want to handle the Tab and Help
+cases intelligently.
+
+To read the string gadget's buffer, look at the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>'s <a href="../Libraries_Manual_guide/node016B.html">StringInfo</a> <a href="../Libraries_Manual_guide/node016B.html#line19">Buffer</a>:
+
+    ((struct StringInfo *)gad-&#062;SpecialInfo)-&#062;Buffer
+
+To determine the value of an integer gadget, look at the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>'s
+<a href="../Libraries_Manual_guide/node016B.html">StringInfo</a> <a href="../Libraries_Manual_guide/node016B.html#line80">LongInt</a> in the same way.
+
+Always use the GTST_String or GTIN_Number tags to set these values.  Never
+write to the <a href="../Libraries_Manual_guide/node016B.html#line19">StringInfo-&#062;Buffer</a> or <a href="../Libraries_Manual_guide/node016B.html#line80">StringInfo-&#062;LongInt</a> fields directly.
+
+GadTools string and integer gadgets do not directly support the
+GA_Immediate property (which would cause Intuition to send an
+<a href="../Libraries_Manual_guide/node01DD.html">IDCMP_GADGETDOWN</a> event when such a gadget is first selected).  However,
+this property can be very important.  Therefore, the following technique
+can be used to enable this property.
+
+    Warning:
+    --------
+    Note that the technique shown here relies on directly setting flags
+    in a GadTools gadget; this is not normally allowed since it hinders
+    future compatibility.  Do not attempt to change other flags or
+    properties of GadTools gadgets except through the defined interfaces
+    of <a href="../Libraries_Manual_guide/node025A.html">CreateGadgetA()</a> and <a href="../Libraries_Manual_guide/node025E.html">GT_SetGadgetAttrsA()</a>.  Directly modifying
+    flags or properties is legal only when officially sanctioned by
+    Amiga, Inc..
+
+To get the GA_Immediate property, pass the {GA_Immediate,TRUE} tag to
+<a href="../Libraries_Manual_guide/node025A.html">CreateGadgetA()</a>.  Even though this tag is ignored for string and integer
+gadgets under V37, this will allow future versions of GadTools to learn of
+your request in the correct way.  Then, under V37 only, set the
+<a href="../Libraries_Manual_guide/node014B.html#line9">GACT_IMMEDIATE</a> flag in the gadget's <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field:
+
+    gad = CreateGadget( STRING_KIND, gad, &#038;ng,
+            /* string gadget tags go here */
+            GTST_...,
+
+            /* Add this tag for future GadTools releases */
+            GA_Immediate, TRUE,
+            ...
+            TAG_DONE );
+
+    if ( ( gad ) &#038;&#038; ( GadToolsBase-&#062;lib_Version == 37) )
+    {
+            /* Under GadTools V37 only, set this attribute
+             * directly.  Do not set this attribute under
+             * future versions of GadTools, or for gadgets
+             * other than STRING_KIND or INTEGER_KIND.
+             */
+            gad-&#062;Activation |= GACT_IMMEDIATE;
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

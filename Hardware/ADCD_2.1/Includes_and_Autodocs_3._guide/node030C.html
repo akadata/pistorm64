@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="OwnBlitter()" TITLE="graphics.library/OwnBlitter" -->
+<head>
+<title>graphics.library/OwnBlitter</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node030B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node030D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       OwnBlitter -- get the blitter for private usage
+
+<b>   SYNOPSIS</b>
+       OwnBlitter()
+
+	void OwnBlitter( void );
+
+<b>   FUNCTION</b>
+	If blitter is available return immediately with the blitter
+	locked for your exclusive use. If the blitter is not available
+	put task to sleep. It will be awakened as soon as the blitter
+	is available. When the task first owns the blitter the blitter
+	may still be finishing up a blit for the previous owner. You
+	must do a <a href="../Includes_and_Autodocs_3._guide/node0339.html">WaitBlit</a> before actually using the blitter registers.
+
+	Calls to OwnBlitter() do not nest. If a task that owns the
+	blitter calls OwnBlitter() again, a lockup will result.
+	(Same situation if the task calls a system function
+	that tries to own the blitter).
+
+<b>   INPUTS</b>
+	NONE
+
+<b>   RETURNS</b>
+	NONE
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02CA.html">DisownBlitter()</a> <a href="../Includes_and_Autodocs_3._guide/node0339.html">WaitBlit()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

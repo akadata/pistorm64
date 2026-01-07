@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/timer.h" NODE="MAIN" TITLE="Includes/devices/timer.h" -->
+<head>
+<title>Includes/devices/timer.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0052.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0054.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DEVICES_TIMER_H
+#define DEVICES_TIMER_H 1
+/*
+**	$Filename: devices/timer.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.16 $
+**	$Date: 91/01/25 $
+**
+**	Timer device name and useful definitions.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**		All Rights Reserved
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/io.h&#062;
+
+<a name="line18">/* unit defintions */</a>
+<a name="line19">#define UNIT_MICROHZ	0</a>
+<a name="line20">#define UNIT_VBLANK	1</a>
+<a name="line21">#define UNIT_ECLOCK	2</a>
+<a name="line22">#define UNIT_WAITUNTIL	3</a>
+#define	UNIT_WAITECLOCK	4
+<a name="line24"></a>
+#define TIMERNAME	&#034;timer.device&#034;
+<a name="line26"></a>
+<a name="line27">struct timeval {</a>
+<a name="line28">    ULONG tv_secs;</a>
+    ULONG tv_micro;
+};
+<a name="line31"></a>
+<a name="line32">struct EClockVal {</a>
+<a name="line33">    ULONG ev_hi;</a>
+    ULONG ev_lo;
+};
+<a name="line36"></a>
+<a name="line37">struct timerequest {</a>
+<a name="line38">    struct IORequest tr_node;</a>
+    struct timeval tr_time;
+};
+<a name="line41"></a>
+<a name="line42">/* IO_COMMAND to use for adding a timer */</a>
+<a name="line43">#define TR_ADDREQUEST	CMD_NONSTD</a>
+<a name="line44">#define TR_GETSYSTIME	(CMD_NONSTD+1)</a>
+#define TR_SETSYSTIME	(CMD_NONSTD+2)
+
+#endif /* DEVICES_TIMER_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

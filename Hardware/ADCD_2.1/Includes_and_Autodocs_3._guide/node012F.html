@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="disk" NODE="GetUnitID()" TITLE="disk.resource/GetUnitID" -->
+<head>
+<title>disk.resource/GetUnitID</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node012E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0130.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       GetUnitID - find out what type of disk is out there
+
+<b>   SYNOPSIS</b>
+       idtype = GetUnitID( unitNum ), DRResource
+	D0	            D0         A6
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> GetUnitID(LONG);
+
+<b>   FUNCTION</b>
+	Gets the drive ID for a given unit.  Note that this value may
+	change if someone calls <a href="../Includes_and_Autodocs_3._guide/node0131.html">ReadUnitID</a>, and the drive id changes.
+
+<b>   INPUTS</b>
+	unitNum -- a legal unit number (zero through three)
+
+<b>   RESULTS</b>
+	idtype -- the type of the disk drive.  Standard types are
+		defined in the resource include file.
+
+<b>   EXCEPTIONS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0131.html">ReadUnitID()</a>
+
+<b>   BUGS</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

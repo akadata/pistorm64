@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/icclass.i" NODE="MAIN" TITLE="Includes/intuition/icclass.i" -->
+<head>
+<title>Includes/intuition/icclass.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00DE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00E0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+    IFND INTUITION_ICCLASS_I
+INTUITION_ICCLASS_I SET 1
+**
+**  $Filename: intuition/icclass.i $
+**  $Release: 2.04 Includes, V37.4 $
+**  $Revision: 36.4 $
+**  $Date: 91/11/08 $
+**
+**  Gadget/object interconnection classes
+**
+**  (C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+
+    IFND UTILITY_TAGITEM_I
+    INCLUDE &#034;utility/tagitem.i&#034;
+    ENDC
+
+ICM_SETLOOP   EQU $402	; set/increment loop counter
+ICM_CLEARLOOP EQU $403	; clear/decrement loop counter
+ICM_CHECKLOOP EQU $404	; set/increment loop
+
+* no arguments for ICM_SETLOOP, ICM_CLEARLOOP, ICM_CHECKLOOP
+
+* interconnection attributes used by icclass, modelclass, and gadgetclass
+
+ICA_Dummy EQU		$40000
+ICA_TARGET EQU		(ICA_Dummy+1)	; interconnection target
+ICA_MAP EQU		(ICA_Dummy+2)	; interconnection map tagitem list
+ICSPECIAL_CODE EQU	(ICA_Dummy+3)	; a &#034;pseudo-attribute&#034;,  see below.
+
+* Normally, the value for ICA_TARGET is some object pointer,
+* but if you specify the special value ICTARGET_IDCMP, notification
+* will be send as an IDCMP_IDCMPUPDATE message to the appropriate window's
+* IDCMP port.  See the definition of IDCMP_IDCMPUPDATE.
+*
+* When you specify ICTARGET_IDCMP for ICA_TARGET, the map you
+* specify will be applied to derive the attribute list that is
+* sent with the IDCMP_IDCMPUPDATE message.  If you specify a map list
+* which results in the attribute tag id ICSPECIAL_CODE, the
+* lower sixteen bits of the corresponding ti_Data value will
+* be copied into the Code field of the IDCMP_IDCMPUPDATE IntuiMessage.
+
+ICTARGET_IDCMP	EQU $ffffffff
+
+    ENDC
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

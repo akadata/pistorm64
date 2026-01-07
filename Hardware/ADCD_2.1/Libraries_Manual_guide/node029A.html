@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_19" NODE="19-1" TITLE="19 Exec Device I/O / What is a Device?" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>19 Exec Device I/O / What is a Device?</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0299.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node029B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An Amiga device is a software module that accepts commands and data and
+performs I/O operations based on the commands it receives.  In most cases,
+it interacts with either internal or external hardware, (the exceptions
+are the clipboard device and ramdrive device which simply use memory).
+Generally, an Amiga device runs as a separate task which is capable of
+processing your commands while your application attends to other things.
+
+
+                  Table 19-1: Amiga System Devices
+
+    Amiga Device  Purpose
+    ------------  -------
+    <a href="../Devices_Manual_guide/node001A.html">Audio</a>         Controls the use of the audio hardware.
+    <a href="../Devices_Manual_guide/node0065.html">Clipboard</a>     Manages the cutting and pasting of common data blocks
+    <a href="../Devices_Manual_guide/node0080.html">Console</a>       Provides the line-oriented user interface.
+    <a href="../Devices_Manual_guide/node00AE.html">Gameport</a>      Controls the two mouse/joystick ports.
+    <a href="../Devices_Manual_guide/node00CA.html">Input</a>         Processes input from the gameport and keyboard devices.
+    <a href="../Devices_Manual_guide/node00FC.html">Keyboard</a>      Controls the keyboard.
+    <a href="../Devices_Manual_guide/node0113.html">Narrator</a>      Produces the Amiga synthesized speech.
+    <a href="../Devices_Manual_guide/node000E.html">Parallel</a>      Controls the parallel port.
+    <a href="../Devices_Manual_guide/node003E.html">Printer</a>       Converts a standard set of printer control codes to
+                  printer specific codes.
+    <a href="../Devices_Manual_guide/node0073.html">SCSI</a>          Controls the Small Computer Standard Interface hardware.
+    <a href="../Devices_Manual_guide/node009A.html">Serial</a>        Controls the serial port.
+    <a href="../Devices_Manual_guide/node00BD.html">Timer</a>         Provides timing functions to measure time intervals and
+                  send interrupts.
+    <a href="../Devices_Manual_guide/node00DC.html">Trackdisk</a>     Controls the Amiga floppy disk drives.
+
+
+The philosophy behind the devices is that I/O operations should be
+consistent and uniform.  You print a file in the same manner as you play
+an audio sample, i.e., you send the device in question a <a href="../Libraries_Manual_guide/node029F.html#line40">WRITE</a> command and
+the address of the buffer holding the data you wish to write.
+
+The result is that the interface presented to the programmer is
+essentially device independent and accessible from any computer language.
+This greatly expands the power the Amiga brings to the programmer and,
+ultimately, to the user.
+
+Devices support two types of commands: Exec standard commands like <a href="../Libraries_Manual_guide/node029F.html#line40">READ</a>
+and <a href="../Libraries_Manual_guide/node029F.html#line40">WRITE</a>, and device specific commands like the trackdisk device <a href="../Libraries_Manual_guide/node029F.html#line68">MOTOR</a>
+command which controls the floppy drive motor, and the keyboard device
+<a href="../Libraries_Manual_guide/node029F.html#line59">READMATRIX</a> command which returns the state of each key on the keyboard.
+You should keep in mind, however, that supporting standard commands does
+not mean that all devices execute them in exactly the same manner.
+
+This chapter contains an introduction to the Exec and amiga.lib functions
+that are used when accessing Amiga devices.  Consult the Amiga ROM Kernel
+Manual: <a href="../Devices_Manual_guide/node0000.html">Devices</a> volume for chapters on each of the Amiga devices and the
+commands they support.  In addition, the Amiga ROM Kernel Reference
+Manual: Includes and Autodocs contains Autodocs summarizing the commands
+of each device, and listings of the device include files.  Both are very
+useful manuals to have around when you are programming the devices.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

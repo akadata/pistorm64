@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-3-7" TITLE="Primitive Data Types / Strings, String Chunks, and String Properties " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Primitive Data Types / Strings, String Chunks, and String Properties </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01DD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01DF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In a string of ASCII text, linefeed (0x0A) denotes a forced line break
+(paragraph or line terminator).  Other control characters are not used.
+(Cf. Characters.)  For maximum compatibility with line editors, two
+linefeed characters are often used to indicate a paragraph boundary.
+
+The ckID for a chunk that contains a string of plain, unformatted text is
+&#034;TEXT&#034;.  As a practical matter, a text string should probably not be
+longer than 32767 bytes.  The standard allows up to 2^31 - 1 bytes.  The
+ckID &#034;TEXT&#034; is globally reserved for this use.
+
+When used as a data property (see below), a text string chunk may be 0 to
+255 characters long.  Such a string is readily converted to a C string or
+a Pascal STRING[255].  The ckID of a property must have a unique property
+name, not &#034;TEXT&#034;.
+
+When used as a part of a chunk or data property, restricted C string
+format is normally used.  That means 0 to 255 characters followed by a
+NULL byte (ASCII value 0).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

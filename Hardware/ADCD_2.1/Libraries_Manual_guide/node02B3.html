@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_20" NODE="20-2-2" TITLE="20 / Allocating Multiple Memory Blocks / Result" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>20 / Allocating Multiple Memory Blocks / Result</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02B2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02B4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node02B1.html">MemList</a> created by <a href="../Libraries_Manual_guide/node02B1.html">AllocEntry()</a> contains <a href="../Libraries_Manual_guide/node02B1.html#line23">MemEntry</a> entries.  MemEntrys
+are defined by a union statement, which allows one memory space to be
+defined in more than one way.
+
+If <a href="../Libraries_Manual_guide/node02B1.html">AllocEntry()</a> returns a value with bit 31 clear, then all of the
+<a href="../Libraries_Manual_guide/node02B1.html#line25">meu_Addr</a> positions in the returned <a href="../Libraries_Manual_guide/node02B1.html">MemList</a> will contain valid memory
+addresses meeting the requirements you have provided.  To use this memory
+area, you would use code similar to the following:
+
+    #define ALLOCERROR 0x80000000
+    struct  MemList *ml;
+    APTR    data, moredata;
+
+    if ( ! ((ULONG)ml &#038; ALLOCERROR)))    /* After calling AllocEntry to */
+                                         /* allocate ml */
+    {
+        data     = ml-&#062;ml_ME[0].me_Addr;
+        moredata = ml-&#062;ml_ME[1].me_Addr;
+    }
+    else  exit(200);                     /* error during AllocEntry */
+
+If <a href="../Libraries_Manual_guide/node02B1.html">AllocEntry()</a> has problems while trying to allocate the memory you have
+requested, instead of the address of a new <a href="../Libraries_Manual_guide/node02B1.html">MemList</a>, it will return the
+memory requirements value with which it had the problem.  Bit 31 of the
+value returned will be set, and no memory will be allocated.  Entries in
+the list that were already allocated will be freed.  For example, a failed
+allocation of cleared Chip memory (<a href="../Libraries_Manual_guide/node02A8.html#line37">MEMF_CLEAR</a> | <a href="../Libraries_Manual_guide/node02A8.html#line11">MEMF_CHIP</a>) could be
+indicated with 0x80010002, where bit 31 indicates failure, bit 16 is the
+MEMF_CLEAR flag and bit 1 is the MEMF_CHIP flag.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

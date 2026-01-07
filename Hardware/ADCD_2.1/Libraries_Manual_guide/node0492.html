@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_36" NODE="36-2" TITLE="36 Translator Library / Using the Translate Function" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>36 Translator Library / Using the Translate Function</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0491.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0493.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Once the library is open, you can call the translate function:
+
+    #define BUFLEN 500
+
+    STRPTR EnglStr;                 /* pointer to sample input string */
+    LONG EnglLen;                   /* input length */
+    UBYTE PhonBuffer[BUFLEN];       /* place to put the translation */
+    LONG rtnCode;                   /* return code from function */
+
+    EnglStr = &#034;This is Amiga speaking.&#034;;    /* a test string */
+    EnglLen = strlen(EnglStr);
+<a name="line13">    rtnCode = Translate(EnglStr, EnglLen, (STRPTR)&#038;PhonBuffer[0], BUFLEN);</a>
+
+The input string will be translated into its phonetic equivalent and can
+be used to feed the narrator device. If you receive a non-zero return
+code, you haven't provided enough output buffer space to hold the entire
+translation. In this case, the <a href="../Includes_and_Autodocs_2._guide/node03AC.html">Translate()</a> function breaks the translation
+at the end of a word in the input stream and returns the position in the
+input stream at which the translation ended. You can use the output
+buffer, then call the Translate() function again, starting at this
+original ending position, to continue the translation where you left off.
+This method will sound smoothest if the ending position ends on sentence
+boundaries.
+
+    <a href="../Includes_and_Autodocs_2._guide/node03AC.html">Translate()</a> returns negative values.
+    ------------------------------------
+    To get the proper character offset, you must use -(rtnCode) as
+    the starting point for a new translation.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-7-2-1" TITLE="28 / / / Parameters To Your Boundary Collision Routine" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / / Parameters To Your Boundary Collision Routine</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03B3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03B5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+During the operation of the <a href="../Libraries_Manual_guide/node03D1.html#line16">DoCollision()</a> routine, if you have enabled
+boundary collisions for a GEL (by setting the least significant bit of its
+<a href="../Libraries_Manual_guide/node03B2.html">HitMask</a>) and it has crossed a boundary, the system calls the boundary
+routine you have defined.  The system will call the routine once for every
+GEL that has hit, or gone outside of the boundary.  The system will call
+your routine with the following two arguments:
+
+<a name="line9">  * A pointer to the <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure of the GEL that hit the boundary</a>
+
+  * A flag word containing one to four bits set, representing top,
+    bottom, left and right boundaries, telling you which of the
+    boundaries it has hit or exceeded. To test these bits, compare to the
+    constants TOPHIT, BOTTOMHIT, LEFTHIT, and RIGHTHIT.
+
+See the <a href="../Libraries_Manual_guide/node05F2.html#line73">VSprite example</a> given earlier for an example of using boundary
+collision.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-10" TITLE="3 Intuition Screens / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 Intuition Screens / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00FC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00FE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following are brief descriptions of the Intuition functions that
+relate to the use of Intuition screens.  See the Amiga ROM Kernel
+Reference Manual: Includes and Autodocs for details on each function call.
+<a name="line5"></a>
+
+             Table 3-10: Functions for Intuition Screens
+  ______________________________________________________________________
+ |                                                                      |
+ |          Function                  Description                       |
+ |======================================================================|
+ |    <a href="../Includes_and_Autodocs_2._guide/node0238.html">OpenScreenTagList()</a>  Open a screen.                               |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0238.html">OpenScreenTags()</a>  Alternate calling sequence for               |
+ |                         OpenScreenTagList().                         |
+ |           <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a>  Pre-V36 open screen function.                |
+ |          <a href="../Includes_and_Autodocs_2._guide/node0207.html">CloseScreen()</a>  Close an open screen.                        |
+ |----------------------------------------------------------------------|
+ |           <a href="../Includes_and_Autodocs_2._guide/node022B.html">MoveScreen()</a>  Change the position of an open screen.       |
+ |         <a href="../Includes_and_Autodocs_2._guide/node024C.html">ScreenToBack()</a>  Move a screen behind all other screens.      |
+ |        <a href="../Includes_and_Autodocs_2._guide/node024D.html">ScreenToFront()</a>  Move a screen in front of all other screens. |
+<a name="line21"> |            <a href="../Includes_and_Autodocs_2._guide/node0259.html">ShowTitle()</a>  Show the screen in front of through backdrop |</a>
+ |                         windows.                                     |
+ |----------------------------------------------------------------------|
+ |    <a href="../Includes_and_Autodocs_2._guide/node0220.html">GetScreenDrawInfo()</a>  Get the DrawInfo information for an open     |
+ |                         screen.                                      |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0218.html">FreeScreenDrawInfo()</a>  Free the DrawInfo information for a screen.  |
+ |----------------------------------------------------------------------|
+ |        <a href="../Includes_and_Autodocs_2._guide/node023F.html">QueryOverscan()</a>  Find overscan information for a specific     |
+ |                         display type.                                |
+ |----------------------------------------------------------------------|
+ |        <a href="../Includes_and_Autodocs_2._guide/node0225.html">LockPubScreen()</a>  Obtain a lock on a public screen.            |
+ |      <a href="../Includes_and_Autodocs_2._guide/node025D.html">UnlockPubScreen()</a>  Release a lock on a public screen.           |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0231.html">NextPubScreen()</a>  Return the name of the next public screen in |
+ |                         the list.                                    |
+ |      <a href="../Includes_and_Autodocs_2._guide/node023E.html">PubScreenStatus()</a>  Make a public screen private or private      |
+ |                         screen public.                               |
+ |----------------------------------------------------------------------|
+ |    <a href="../Includes_and_Autodocs_2._guide/node0226.html">LockPubScreenList()</a>  Lock the public screen list (for a public    |
+ |                         screen utility).                             |
+ |  <a href="../Includes_and_Autodocs_2._guide/node025E.html">UnlockPubScreenList()</a>  Unlock the public screen list.               |
+ |  <a href="../Includes_and_Autodocs_2._guide/node024F.html">SetDefaultPubScreen()</a>  Change the default public screen.            |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0257.html">SetPubScreenModes()</a>  Establish global public screen behavior.     |
+ |  <a href="../Includes_and_Autodocs_2._guide/node021C.html">GetDefaultPubScreen()</a>  Copies the name of the default public screen |
+ |                         to a buffer.                                 |
+ |----------------------------------------------------------------------|
+ |        <a href="../Includes_and_Autodocs_2._guide/node023B.html">OpenWorkBench()</a>  Open the Workbench screen, if closed.        |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0209.html">CloseWorkBench()</a>  Close the Workbench screen, if possible.     |
+ |         <a href="../Includes_and_Autodocs_2._guide/node0261.html">WBenchToBack()</a>  Move the Workbench screen behind all other   |
+ |                         screens.                                     |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0262.html">WBenchToFront()</a>  Move the Workbench screen in front of all    |
+ |                         other screens.                               |
+<a name="line52"> |        <a href="../Includes_and_Autodocs_2._guide/node021F.html">GetScreenData()</a>  Pre-V36 way to return information on an open |</a>
+ |                         screen.                                      |
+ |----------------------------------------------------------------------|
+ |          <a href="../Includes_and_Autodocs_2._guide/node025F.html">ViewAddress()</a>  Return the address of a screen's View.       |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0260.html">ViewPortAddress()</a>  Use &#038;screen-&#062;ViewPort instead.               |
+ |----------------------------------------------------------------------|
+ |           <a href="../Includes_and_Autodocs_2._guide/node0228.html">MakeScreen()</a>  Low level screen handling--rebuild Copper    |
+ |                         list.                                        |
+ |       <a href="../Includes_and_Autodocs_2._guide/node024B.html">RethinkDisplay()</a>  Low level screen handling--incorporate       |
+ |                         Copper list changes.                         |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0244.html">RemakeDisplay()</a>  MakeScreen() for all screens, then           |
+ |                         RethinkDisplay().                            |
+ |______________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

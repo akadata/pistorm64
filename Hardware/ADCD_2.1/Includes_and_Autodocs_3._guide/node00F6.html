@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="commodities" NODE="SetCxObjPri()" TITLE="commodities.library/SetCxObjPri" -->
+<head>
+<title>commodities.library/SetCxObjPri</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00F5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00F7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetCxObjPri -- set the priority of a commodity object. (V36)
+
+<b>   SYNOPSIS</b>
+	oldPri = SetCxObjPri(co,pri)
+	D0                   A0 D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> SetCxObjPri(CxObj *,LONG);
+
+<b>   FUNCTION</b>
+	This function sets the priority of a commodity object for the
+	purposes of <a href="../Includes_and_Autodocs_3._guide/node00EF.html">EnqueueCxObj()</a>.
+
+	It is strongly recommended that the ToolTypes environment be
+	utilized to provide end-user control over the priority of
+ 	brokers, but application specific ordering of other objects
+	within their lists is not dictated.
+
+<b>   INPUTS</b>
+	co - the commodity object to affect (may be NULL)
+	pri - the object's new priority in the range -128 to +127. A value
+	      of 0 is normal.
+
+<b>   RESULTS</b>
+	oldPri - the previous priority of the object or 0 if 'co' was NULL.
+		 This value is only returned in V38 and beyond.
+
+<b>   BUGS</b>
+	This function will not reposition an object within its list when
+	its priority changes. To attain the same effect, first remove the
+	object from its list using <a href="../Includes_and_Autodocs_3._guide/node00F4.html">RemoveCxObj()</a>, set its priority using
+	SetCxObjPri(), and reinsert it in the list using <a href="../Includes_and_Autodocs_3._guide/node00EF.html">EnqueueCxObj()</a>.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node00EF.html">EnqueueCxObj()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="InitRastPort()" TITLE="graphics.library/InitRastPort" -->
+<head>
+<title>graphics.library/InitRastPort</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0453.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0455.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    InitRastPort -- Initialize raster port structure
+
+SYNOPSIS
+    InitRastPort( rp )
+                  a1
+
+    void InitRastPort(struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *);
+
+
+FUNCTION
+   Initialize a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> structure to standard values.
+
+INPUTS
+    rp = pointer to a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> structure.
+
+RESULT
+    all entries in <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> get zeroed out, with the following exceptions:
+
+        Mask, FgPen, AOLPen, and LinePtrn are set to -1.
+        The DrawMode is set to JAM2
+        The font is set to the standard system font
+
+NOTES
+    The struct Rastport describes a control structure
+    for a write-able raster. The <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> structure
+    describes how a complete single playfield display
+    will be written into. A <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> structure is
+    referenced whenever any drawing or filling
+    operations are to be performed on a section of
+    memory.
+
+    The section of memory which is being used in this
+    way may or may not be presently a part of the
+    current actual onscreen display memory. The name
+    of the actual memory section which is linked to
+    the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> is referred to here as a &#034;raster&#034; or
+    as a bitmap.
+
+    NOTE: Calling the routine InitRastPort only
+    establishes various defaults. It does NOT
+    establish where, in memory, the rasters are
+    located. To do graphics with this <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> the user
+    must set up the <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a> pointer in the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

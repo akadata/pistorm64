@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-10-10" TITLE="B / gadgetclass / Attributes: ICA_MAP (IS)" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / gadgetclass / Attributes: ICA_MAP (IS)</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04FB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04FD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This attribute points to a tag list of attribute mappings which the gadget
+uses to change the attribute IDs of an <a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a>'s attribute/value pairs.
+For example, if a gadget had the following ICA_MAP:
+
+    struct TagItem map[] =
+    {
+        {PGA_Top, STRINGA_LongVal},
+        {MYATTR, MYNEWATTR},
+        {TAG_END, }
+    };
+
+before it sends an <a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a> to its <a href="../Libraries_Manual_guide/node04FB.html">ICA_TARGET</a>, the gadget scans through
+the OM_UPDATE message's attribute/value pairs looking for the <a href="../Libraries_Manual_guide/node050F.html">PGA_Top</a> and
+MYATTR attributes.  If it finds the PGA_Top attribute, it changes PGA_Top
+to <a href="../Libraries_Manual_guide/node0512.html">STRINGA_LongVal</a>.  Likewise, if the gadget finds the MYATTR attribute,
+it changes MYATTR to MYNEWATTR.  The gadget does not disturb the
+attribute's value, only its ID.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

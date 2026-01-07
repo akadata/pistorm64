@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="disk" NODE="ReadUnitID()" TITLE="disk.resource/ReadUnitID" -->
+<head>
+<title>disk.resource/ReadUnitID</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0130.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0132.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       ReadUnitID - reread and return the type of drive (V37)
+
+<b>   SYNOPSIS</b>
+       idtype = ReadUnitID( unitNum ), DRResource
+	D0	               D0         A6
+
+	ULONG ReadUnitID(LONG);
+
+<b>   FUNCTION</b>
+	Rereads the drive id for a specific unit (for handling drives
+	that change ID according to what sort of disk is in them.  You
+	MUST have done a <a href="../Includes_and_Autodocs_3._guide/node012E.html">GetUnit</a> before calling this function!
+
+<b>   INPUTS</b>
+	unitNum -- a legal unit number (zero through three)
+
+<b>   RESULTS</b>
+	idtype -- the type of the disk drive.  Standard types are
+		defined in the resource include file.
+
+<b>   EXCEPTIONS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node012F.html">GetUnitID()</a>
+
+<b>   BUGS</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

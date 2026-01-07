@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Printer_Data.c" NODE="MAIN" TITLE="Devices/Dev_examples/Printer_Data.c" -->
+<head>
+<title>Devices/Dev_examples/Printer_Data.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0162.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0164.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Printer_Data.c
+ *
+ * Example getting driver specifics.
+ *
+ * Compiled with SAS C 5.10a. lc -cfist -v -L Printer_Data
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/ports.h&#062;
+#include &#060;devices/printer.h&#062;
+#include &#060;devices/prtbase.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/alib_stdio_protos.h&#062;
+
+union printerIO
+{
+    struct IOStdReq    ios;
+    struct IODRPReq    iodrp;
+    struct IOPrtCmdReq iopc;
+};
+
+VOID main(VOID);
+
+VOID main(VOID)
+{
+struct MsgPort  *PrinterMP;
+union printerIO *PIO;
+struct PrinterData *PD;
+struct PrinterExtendedData *PED;
+
+/* Create non-public messageport. Could use CreateMsgPort() for this, that's
+ * V37 specific however.
+ */
+if (PrinterMP = (struct MsgPort *)CreatePort(0,0))
+    {
+    /* Allocate printerIO union */
+    if (PIO = (union printerIO *)CreateExtIO(PrinterMP, sizeof(union printerIO)))
+        {
+        /* Open the printer.device */
+        if (!(OpenDevice(&#034;printer.device&#034;,0,(struct IORequest *)PIO,0)))
+            {
+
+            /* Now that we've got the device opened, let's see what we've got.
+             * First, get a pointer to the printer data.
+             */
+            PD = (struct PrinterData *)PIO-&#062;iodrp.io_Device;
+            /* And a pointer to the extended data */
+            PED = (struct PrinterExtendedData *)&#038;PD-&#062;pd_SegmentData-&#062;ps_PED;
+
+            /* See the &#060;devices/prtbase.h&#062; include file for more details on
+             * the PrinterData and PrinterExtendedData structures.
+             */
+            printf(&#034;Printername: '%s', Version: %ld, Revision: %ld\n&#034;,
+            PED-&#062;ped_PrinterName, PD-&#062;pd_SegmentData-&#062;ps_Version,
+            PD-&#062;pd_SegmentData-&#062;ps_Revision);
+
+            printf(&#034;PrinterClass: 0x%lx, ColorClass: 0x%lx\n&#034;,
+            PED-&#062;ped_PrinterClass, PED-&#062;ped_ColorClass);
+
+            printf(&#034;MaxColumns: %ld, NumCharSets: %ld, NumRows: %ld\n&#034;,
+                PED-&#062;ped_MaxColumns, PED-&#062;ped_NumCharSets,PED-&#062;ped_NumRows);
+
+            printf(&#034;MaxXDots: %ld, MaxYDots: %ld, XDotsInch: %ld, YDotsInch: %ld\n&#034;,
+                PED-&#062;ped_MaxXDots, PED-&#062;ped_MaxYDots, PED-&#062;ped_XDotsInch, PED-&#062;ped_YDotsInch);
+
+            CloseDevice((struct IORequest *)PIO);
+            }
+         else
+             printf(&#034;Can't open printer.device\n&#034;);
+        DeleteExtIO((struct IORequest *)PIO);
+        }
+    else
+        printf(&#034;Can't CreateExtIO\n&#034;);
+    DeletePort((struct MsgPort *)PrinterMP);
+    }
+else
+   printf(&#034;Can't CreatePort\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="layers" NODE="LockLayer()" TITLE="layers.library/LockLayer" -->
+<head>
+<title>layers.library/LockLayer</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0426.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0428.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	LockLayer -- <a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock</a> layer to make changes to ClipRects.
+
+<b>    SYNOPSIS</b>
+	LockLayer( dummy, l )
+	           a0     a1
+
+	void LockLayer( <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, struct <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> *);
+
+<b>    FUNCTION</b>
+	Make this layer unavailable for other tasks to use.
+	If another task is already using this layer then wait for
+	it to complete and then reserve the layer for your own use.
+	(this function does the same thing as graphics.library/LockLayerRom)
+
+	Note: if you wish to lock MORE THAN ONE layer at a time, you
+	    must call <a href="../Includes_and_Autodocs_3._guide/node0428.html">LockLayerInfo()</a> before locking those layers and
+	    then call <a href="../Includes_and_Autodocs_3._guide/node0433.html">UnlockLayerInfo()</a> when you have finished. This
+	    is to prevent system &#034;deadlocks&#034;.
+
+	Further Note: while you hold the lock on a layer, Intuition will block
+	    on operations such as windowsizing, dragging, menus, and depth
+	    arranging windows in this layer's screen.  It is recommended that
+	    YOU do not make Intuition function calls while the layer is locked.
+
+<b>    INPUTS</b>
+	dummy - unused
+	l - pointer to a layer
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0432.html">UnlockLayer()</a>, <a href="../Includes_and_Autodocs_3._guide/node0428.html">LockLayerInfo()</a>, <a href="../Includes_and_Autodocs_3._guide/node0433.html">UnlockLayerInfo()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node02FE.html">graphics.library/LockLayerRom()</a>, <a href="../Includes_and_Autodocs_3._guide/node0625.html">graphics/layers.h</a>, <a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

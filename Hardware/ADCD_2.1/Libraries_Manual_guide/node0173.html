@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-12-8-5" TITLE="5 / / Custom String Editing / Actions with SGH_KEY" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / / Custom String Editing / Actions with SGH_KEY</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0172.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0174.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+If <a href="../Libraries_Manual_guide/node0171.html#line5">SGA_USE</a> is set in the <a href="../Libraries_Manual_guide/node016F.html">SGWork</a> structure <a href="../Libraries_Manual_guide/node016F.html#line54">Actions</a> field when the hook
+returns, Intuition will use the values in the SGWork fields <a href="../Libraries_Manual_guide/node016F.html#line30">WorkBuffer</a>,
+<a href="../Libraries_Manual_guide/node016F.html#line30">NumChars</a>, <a href="../Libraries_Manual_guide/node016F.html#line30">BufferPos</a>, and <a href="../Libraries_Manual_guide/node016F.html#line30">LongInt</a>; copying the WorkBuffer to the <a href="../Libraries_Manual_guide/node016B.html">StringInfo</a>
+<a href="../Libraries_Manual_guide/node016B.html#line19">Buffer</a>.  SGA_USE is set by Intuition prior to calling the hook, and must
+be cleared by the hook if the changes are to be ignored.  If SGA_USE is
+<a name="line7">cleared when the hook returns, the <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget will be unchanged.</a>
+
+If <a href="../Libraries_Manual_guide/node0171.html#line5">SGA_END</a> is set when the hook returns, Intuition will deactivate the
+<a href="../Libraries_Manual_guide/node0164.html">string</a> gadget.  In this case, Intuition will place the value found in
+<a href="../Libraries_Manual_guide/node016F.html">SGWork</a> structure <a href="../Libraries_Manual_guide/node016F.html#line40">Code</a> field into the <a href="../Libraries_Manual_guide/node01D9.html#line33">IntuiMessage.Code</a> field of the
+<a name="line12"><a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> message it sends to the application.</a>
+
+If <a href="../Libraries_Manual_guide/node0171.html#line5">SGA_REUSE</a> and <a href="../Libraries_Manual_guide/node0171.html#line5">SGA_END</a> are set when the hook returns, Intuition will
+<a name="line15">reuse the input event after it deactivates the gadget.</a>
+
+Starting in V37, the hook may set <a href="../Libraries_Manual_guide/node0171.html#line5">SGA_PREVACTIVE</a> or <a href="../Libraries_Manual_guide/node0171.html#line5">SGA_NEXTACTIVE</a> with
+<a href="../Libraries_Manual_guide/node0171.html#line5">SGA_END</a>.  This tells Intuition to activate the next or previous gadget
+<a name="line19">that has the <a href="../Libraries_Manual_guide/node014A.html#line89">GFLG_TABCYCLE</a> flag set.</a>
+
+If <a href="../Libraries_Manual_guide/node0171.html#line5">SGA_BEEP</a> is set when the hook returns, Intuition will call
+<a name="line22"><a href="../Libraries_Manual_guide/node00FC.html">DisplayBeep()</a>.  Use this if the user has typed in error, or buffer is full.</a>
+
+Set <a href="../Libraries_Manual_guide/node0171.html#line5">SGA_REDISPLAY</a> if the changes to the gadget warrant a gadget redisplay.
+Changes to the cursor position require redisplay.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

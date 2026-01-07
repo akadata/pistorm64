@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="GetExtSpriteA()" TITLE="graphics.library/GetExtSpriteA" -->
+<head>
+<title>graphics.library/GetExtSpriteA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02E5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02E7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetExtSpriteA -- Attempt to get a sprite for the extended sprite
+					 manager. (V39)
+	GetExtSprite -- varargs stub for GetExtSpriteA. (V39)
+
+<b>   SYNOPSIS</b>
+	Sprite_Number = GetExtSpriteA( sprite, tags )  (V39)
+	    d0			        a2      a1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> GetExtSpriteA( struct <a href="../Includes_and_Autodocs_3._guide/node060B.html#line26">ExtSprite</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> * );
+
+	spritenum=GetExtSprite(sprite,tags,...);
+
+<b>   FUNCTION</b>
+	Attempt to allocate one of the eight sprites for private use
+	with the extended sprite manager.
+
+<b>   INPUTS</b>
+	sprite - ptr to programmer's <a href="../Includes_and_Autodocs_3._guide/node060B.html#line26">ExtSprite</a> (from AllocSpriteData()).
+	tags - a standard tag list:
+
+		GSTAG_SPRITE_NUM	specifies a specific sprite to get by number.
+
+		GSTAG_ATTACHED specifies that you wish to get a sprite pair.
+			the tag data field points to a <a href="../Includes_and_Autodocs_3._guide/node060B.html#line26">ExtSprite</a> structure
+			for the second sprite. You must free both sprites.
+
+
+<b>   RESULTS</b>
+	Sprite_number = a sprite number or -1 for an error.
+		This call will fail if no sprites could be allocated, or
+		if you try to allocate a sprite which would require
+		a mode change when there are other sprites of incompatible
+		modes in use.
+
+<b>   BUGS</b>
+
+	GSTAG_ATTACHED does not work in version 39. When running under V39,
+	you should attach the second sprite with a separate GetExtSprite call.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02DD.html">FreeSprite()</a> <a href="../Includes_and_Autodocs_3._guide/node02BC.html">ChangeSprite()</a> <a href="../Includes_and_Autodocs_3._guide/node0302.html">MoveSprite()</a> <a href="../Includes_and_Autodocs_3._guide/node02EC.html">GetSprite()</a> <a href="../Includes_and_Autodocs_3._guide/node060B.html">graphics/sprite.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

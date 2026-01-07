@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="GetDefPrefs()" TITLE="intuition.library/GetDefPrefs" -->
+<head>
+<title>intuition.library/GetDefPrefs</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node021C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node021E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GetDefPrefs -- Get a copy of the the Intuition default <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a>.
+
+SYNOPSIS
+    Prefs = GetDefPrefs( PrefBuffer, Size )
+    D0                   A0          D0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> *GetDefPrefs( struct <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> *, WORD );
+
+FUNCTION
+    Gets a copy of the Intuition default preferences data.  Writes the
+    data into the buffer you specify.  The number of bytes you want
+    copied is specified by the size argument.
+
+    The default preferences are those that Intuition uses when it
+    is first opened.  If no preferences file is found, these are
+    the preferences that are used.  These would also be the startup
+    preferences in an AmigaDOS-less environment.
+
+    It is legal to take a partial copy of the <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> structure.
+    The more pertinent preferences variables have been grouped near
+    the top of the structure to facilitate the memory conservation
+    that can be had by taking a copy of only some of the <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a>
+    structure.
+
+INPUTS
+    PrefBuffer = pointer to the memory buffer to receive your copy of the
+            Intuition <a href="../Includes_and_Autodocs_2._guide/node00D5.html#line43">Preferences</a> structure
+    Size = the number of bytes in your PrefBuffer, the number of bytes
+      you want copied from the system's internal Preference settings
+
+RESULT
+    Returns your parameter PrefBuffer.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node021E.html">GetPrefs()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

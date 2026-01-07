@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="glyph_ic" NODE="--datasheet--" TITLE="glyph_ic/--datasheet--" -->
+<head>
+<title>glyph_ic/--datasheet--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0296.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0298.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        glyph_ic -- create glyph BOOPSI objects
+
+<b>    SUPERCLASS</b>
+        imageclass
+
+<b>    REQUIRES</b>
+        drawlist.image
+
+<b>    DESCRIPTION</b>
+        This image class can create scaled glyphs suitable for use
+        as gadget imagery or informational requestor imagery.
+        Either a penmap or drawlist scaled image is created internally,
+        and external user prefered glyph style sets may become possible
+        at a later date.
+
+<b>    METHODS</b>
+        OM_NEW -- Create the glyph image. Passed to superclass, then OM_SET.
+
+        OM_GET -- Get object attributes. Passed to superclass first.
+
+        OM_SET -- Set object attributes.
+            Passed to superclass first.
+
+        OM_UPDATE -- Set object notification attributes. Passed to
+            superclass first.
+
+        IM_DRAW -- Renders the image. Overrides the superclass.
+
+        IM_DRAWFRAME -- Renders the image scaled to fit in the frame.
+            Following IM_DRAW will be this size. Overrides the superclass.
+
+        All other methods are passed to the superclass.
+
+<b>    ATTRIBUTES</b>
+        GLYPH_Glyph (LONG)
+            Selects any one of the built-in scaled image glyphs.
+
+            Current supported and defined in &#060;gadgets/glyph.h&#062;:
+
+            GLYPH_NONE - No image.
+            GLYPH_DOWNARROW - Indicates downward movement control.
+            GLYPH_UPARROW - Indicates upward movement control.
+            GLYPH_LEFTARROW - Indicates left movement control.
+            GLYPH_RIGHTARROW - Indicates right movement control.
+            GLYPH_DROPDOWN - Denotes a drop-down menu.
+            GLYPH_POPUP - Denotes a pop-up menu.
+            GLYPH_CHECKMARK - Indicates a toggle.
+            GLYPH_POPFONT - Font selection.
+            GLYPH_POPFILE - File selection.
+            GLYPH_POPDRAWER - Drawer (directory) selection.
+            GLYPH_POPSCREENMODE - Screenmode selection.
+            GLYPH_POPTIME - Time selection.
+            GLYPH_RADIOBUTTON - Mutual exclusion item.
+            GLYPH_RETURNARROW - RETURN key controlled.
+
+            Defaults to GLYPH_POPFILE.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-5" TITLE="21 Exec Tasks / Task Exceptions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 Exec Tasks / Task Exceptions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02C4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02C6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Exec can provide a task with its own task-local &#034;interrupt&#034; called an
+exception.  When some exceptional event occurs, an Exec exception occurs
+which stops a particular task from executing its normal code and forces it
+<a name="line5">to execute a special, task-specific exception handling routine.</a>
+
+If you are familiar with the 680x0, you may be used to using the term
+&#034;exceptions&#034; in a different way.  The 680x0 has its own form of exception
+that has nothing to do with an Exec exception.  These are discussed in
+more detail in the &#034;<a href="../Libraries_Manual_guide/node02C6.html">Task Traps</a>&#034; section of this chapter.  Do not confuse
+<a name="line11">Exec exceptions with 680x0 exceptions.</a>
+
+To set up an exception routine for a task requires setting values in the
+task's control structure (the <a href="../Libraries_Manual_guide/node02BB.html">Task</a> structure).  The <a href="../Libraries_Manual_guide/node02BB.html#line19">tc_ExceptCode</a> field
+should point to the task's exception handling routine.  If this field is
+zero, Exec will ignore all exceptions.  The <a href="../Libraries_Manual_guide/node02BB.html#line19">tc_ExceptData</a> field should
+<a name="line17">point to any data the exception routine needs.</a>
+
+Exec exceptions work using signals.  When a specific signal or signals
+occur, Exec will stop a task and execute its exception routine.  Use the
+Exec function <a href="../Includes_and_Autodocs_2._guide/node037B.html">SetExcept()</a> to tell Exec which of the task's signals should
+trigger the exception.
+
+When an exception occurs, Exec stops executing the tasks normal code and
+jumps immediately into the exception routine, no matter what the task was
+doing.  The exception routine operates in the same context the task's
+normal code; it operates in the CPU's user mode and uses the task's stack.
+
+Before entering the exception routine, Exec pushes the normal task code's
+context onto the stack.  This includes the PC, SR, D0-D7, and A0-A6
+registers.  Exec then puts certain parameters in the processor registers
+for the exception routine to use.  D0 contains a signal mask indicating
+which signal bit or bits caused the exception. Exec disables these signals
+when the task enters its exception routine.  If more than one signal bit
+is set (i.e. if two signals occurred simultaneously), it is up to the
+exception routine to decide in what order to process the two different
+signals.  A1 points to the related exception data (from <a href="../Libraries_Manual_guide/node02BB.html#line19">tc_ExceptData</a>),
+and A6 contains the Exec library base. You can think of an exception as a
+subtask outside of your normal task. Because task exception code executes
+in user mode, however, the task stack must be large enough to supply the
+extra space consumed during an exception.
+
+While processing a given exception, Exec prevents that exception from
+occurring recursively.  At exit from your exception-processing code, you
+should make sure D0 contains the signal mask the exception routine
+received in D0 because Exec looks here to see which signals it should
+reactivate.  When the task executes the RTS instruction at the end of the
+exception routine, the system restores the previous contents of all of the
+task registers and resumes the task at the point where it was interrupted
+by the exception signal.
+
+    Exceptions Are Tricky.
+    ----------------------
+    Exceptions are difficult to use safely.  An exception can interrupt
+    a task that is executing a critical section of code within a system
+    function, or one that has locked a system resource such as the disk
+    or blitter (note that even simple text output uses the blitter.)
+    This possibility makes it dangerous to use most system functions
+    within an exception unless you are sure that your interrupted task
+    was performing only local, non-critical operations.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

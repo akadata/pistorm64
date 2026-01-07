@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/tasks.h" NODE="MAIN" TITLE="Includes/exec/tasks.h" -->
+<head>
+<title>Includes/exec/tasks.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node008D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node008F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_TASKS_H
+#define	EXEC_TASKS_H
+/*
+**	$Filename: exec/tasks.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.9 $
+**	$Date: 91/11/06 $
+**
+**	Task Control Block, Singals, and Task flags.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+#endif /* EXEC_NODES_H */
+<a name="line18"></a>
+#ifndef EXEC_LISTS_H
+#include &#034;exec/lists.h&#034;
+#endif /* EXEC_LISTS_H */
+
+<a name="line23"></a>
+/* Please use Exec functions to modify task structure fields, where available.
+<a name="line25"> */</a>
+<a name="line26">struct Task {</a>
+<a name="line27">    struct  Node tc_Node;</a>
+<a name="line28">    UBYTE   tc_Flags;</a>
+<a name="line29">    UBYTE   tc_State;</a>
+<a name="line30">    BYTE    tc_IDNestCnt;	    /* intr disabled nesting*/</a>
+<a name="line31">    BYTE    tc_TDNestCnt;	    /* task disabled nesting*/</a>
+<a name="line32">    ULONG   tc_SigAlloc;	    /* sigs allocated */</a>
+<a name="line33">    ULONG   tc_SigWait;	    /* sigs we are waiting for */</a>
+<a name="line34">    ULONG   tc_SigRecvd;	    /* sigs we have received */</a>
+<a name="line35">    ULONG   tc_SigExcept;	    /* sigs we will take excepts for */</a>
+<a name="line36">    UWORD   tc_TrapAlloc;	    /* traps allocated */</a>
+<a name="line37">    UWORD   tc_TrapAble;	    /* traps enabled */</a>
+<a name="line38">    APTR    tc_ExceptData;	    /* points to except data */</a>
+<a name="line39">    APTR    tc_ExceptCode;	    /* points to except code */</a>
+<a name="line40">    APTR    tc_TrapData;	    /* points to trap code */</a>
+<a name="line41">    APTR    tc_TrapCode;	    /* points to trap data */</a>
+<a name="line42">    APTR    tc_SPReg;		    /* stack pointer	    */</a>
+<a name="line43">    APTR    tc_SPLower;	    /* stack lower bound    */</a>
+<a name="line44">    APTR    tc_SPUpper;	    /* stack upper bound + 2*/</a>
+<a name="line45">    VOID    (*tc_Switch)();	    /* task losing CPU	  */</a>
+<a name="line46">    VOID    (*tc_Launch)();	    /* task getting CPU  */</a>
+<a name="line47">    struct  List tc_MemEntry;	    /* Allocated memory. Freed by RemTask() */</a>
+    APTR    tc_UserData;	    /* For use by the task; no restrictions! */
+};
+
+<a name="line51">/*</a>
+<a name="line52"> * Stack swap structure as passed to StackSwap()</a>
+<a name="line53"> */</a>
+<a name="line54">struct	StackSwapStruct {</a>
+<a name="line55">	APTR	stk_Lower;	/* Lowest byte of stack */</a>
+<a name="line56">	ULONG	stk_Upper;	/* Upper end of stack (size + Lowest) */</a>
+	APTR	stk_Pointer;	/* Stack pointer at switch point */
+<a name="line58">};</a>
+<a name="line59"></a>
+<a name="line60">/*----- Flag Bits ------------------------------------------*/</a>
+<a name="line61">#define TB_PROCTIME	0</a>
+<a name="line62">#define TB_ETASK	3</a>
+<a name="line63">#define TB_STACKCHK	4</a>
+#define TB_EXCEPT	5
+#define TB_SWITCH	6
+<a name="line66">#define TB_LAUNCH	7</a>
+<a name="line67"></a>
+<a name="line68">#define TF_PROCTIME	(1&#060;&#060;0)</a>
+<a name="line69">#define TF_ETASK	(1&#060;&#060;3)</a>
+<a name="line70">#define TF_STACKCHK	(1&#060;&#060;4)</a>
+<a name="line71">#define TF_EXCEPT	(1&#060;&#060;5)</a>
+<a name="line72">#define TF_SWITCH	(1&#060;&#060;6)</a>
+#define TF_LAUNCH	(1&#060;&#060;7)
+
+<a name="line75">/*----- Task States ----------------------------------------*/</a>
+<a name="line76">#define TS_INVALID	0</a>
+<a name="line77">#define TS_ADDED	1</a>
+<a name="line78">#define TS_RUN		2</a>
+<a name="line79">#define TS_READY	3</a>
+<a name="line80">#define TS_WAIT	4</a>
+#define TS_EXCEPT	5
+<a name="line82">#define TS_REMOVED	6</a>
+<a name="line83"></a>
+<a name="line84">/*----- Predefined Signals -------------------------------------*/</a>
+<a name="line85">#define SIGB_ABORT	0</a>
+<a name="line86">#define SIGB_CHILD	1</a>
+<a name="line87">#define SIGB_BLIT	4	/* Note: same as SINGLE */</a>
+#define SIGB_SINGLE	4	/* Note: same as BLIT */
+#define SIGB_INTUITION	5
+#define SIGB_DOS	8
+
+#define SIGF_ABORT	(1L&#060;&#060;0)
+#define SIGF_CHILD	(1L&#060;&#060;1)
+#define SIGF_BLIT	(1L&#060;&#060;4)
+#define SIGF_SINGLE	(1L&#060;&#060;4)
+#define SIGF_INTUITION	(1L&#060;&#060;5)
+#define SIGF_DOS	(1L&#060;&#060;8)
+
+#endif	/* EXEC_TASKS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

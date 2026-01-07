@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_25" NODE="25-1" TITLE="25 Exec Semaphores / Semaphore Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>25 Exec Semaphores / Semaphore Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02F5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02F7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Exec provides a variety of useful functions for setting, checking and
+freeing semaphores.  The prototypes for these functions are as follows.
+
+    VOID  AddSemaphore ( struct SignalSemaphore *sigSem );
+    ULONG AttemptSemaphore( struct SignalSemaphore *sigSem );
+    struct SignalSemaphore *FindSemaphore( UBYTE *sigSem );
+    VOID InitSemaphore( struct SignalSemaphore *sigSem );
+
+    VOID ObtainSemaphore( struct SignalSemaphore *sigSem );
+    VOID ObtainSemaphoreList( struct List *sigSem );
+    void ObtainSemaphoreShared( struct SignalSemaphore *sigSem );
+
+    VOID ReleaseSemaphore( struct SignalSemaphore *sigSem );
+    VOID ReleaseSemaphoreList( struct List *sigSem );
+    VOID RemSemaphore( struct SignalSemaphore *sigSem );
+
+ <a href="../Libraries_Manual_guide/node02F7.html">The Signal Semaphore</a>    <a href="../Libraries_Manual_guide/node02FF.html">Multiple Semaphores</a>    <a href="../Libraries_Manual_guide/node058D.html">Semaphore Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

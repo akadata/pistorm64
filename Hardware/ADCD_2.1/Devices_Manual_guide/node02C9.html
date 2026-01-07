@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_8SVX" NODE="16-6-1" TITLE=" 8SVX IFF 8-Bit Sampled Voice / Introduction " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> 8SVX IFF 8-Bit Sampled Voice / Introduction </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02C8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02CA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This is the IFF supplement for FORM &#034;8SVX&#034;.  An 8SVX is an IFF &#034;data
+section&#034; or &#034;<a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a>&#034; (which can be an IFF file or a part of one) containing
+a digitally sampled audio voice consisting of 8-bit samples.  A voice can
+be a one-shot sound or - with repetition and pitch scaling - a musical
+instrument.  &#034;<a href="../Devices_Manual_guide/node01C5.html">EA IFF 85</a>&#034; is Electronic Arts' standard interchange file
+format.  [See <a href="../Devices_Manual_guide/node01C5.html">EA IFF 85</a> Standard for Interchange Format Files.]
+
+The 8SVX format is designed for playback hardware that uses 8-bit samples
+attenuated by a volume control for good overall signal-to-noise ratio.  So
+a FORM 8SVX stores 8-bit samples and a volume level.
+
+A similar data format (or two) will be needed for higher resolution
+samples (typically 12 or 16 bits).  Properly converting a high resolution
+sample down to 8 bits requires one pass over the data to find the minimum
+and maximum values and a second pass to scale each sample into the range
+-128 through 127. So it's reasonable to store higher resolution data in a
+different <a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a> type and convert between them.
+
+For instruments, FORM 8SVX can record a repeating waveform optionally
+preceded by a startup transient waveform.  These two recorded signals can
+be pre-synthesized or sampled from an acoustic instrument.  For many
+instruments, this representation is compact.  FORM 8SVX is less practical
+for an instrument whose waveform changes from cycle to cycle like a
+plucked string, where a long sample is needed for accurate results.
+
+FORM 8SVX can store an &#034;envelope&#034; or &#034;amplitude contour&#034; to enrich musical
+notes.  A future voice <a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a> could also store amplitude, frequency, and
+filter modulations.
+
+FORM 8SVX is geared for relatively simple musical voices, where one
+waveform per octave is sufficient, the waveforms for the different octaves
+follow a factor-of-two size rule, and one envelope is adequate for all
+octaves.  You could store a more general voice as a LIST containing one or
+more <a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a>s 8SVX per octave.  A future voice FORM could go beyond one
+&#034;one-shot&#034; waveform and one &#034;repeat&#034; waveform per octave.
+
+Section 2 defines the required property sound header &#034;<a href="../Devices_Manual_guide/node02CD.html">VHDR</a>&#034;, optional
+properties name &#034;<a href="../Devices_Manual_guide/node02CE.html">NAME</a>&#034;, copyright &#034;<a href="../Devices_Manual_guide/node02CE.html">(c)</a>&#034;, and author &#034;<a href="../Devices_Manual_guide/node02CE.html">AUTH</a>&#034;, the optional
+annotation data chunk &#034;<a href="../Devices_Manual_guide/node02CE.html">ANNO</a>&#034;, the required data chunk &#034;<a href="../Devices_Manual_guide/node02D0.html">BODY</a>&#034;, and optional
+envelope chunks &#034;<a href="../Devices_Manual_guide/node02CF.html">ATAK</a>&#034; and &#034;<a href="../Devices_Manual_guide/node02CF.html">RLSE</a>&#034;.  These are the &#034;standard&#034; chunks.
+Specialized chunks for private or future needs can be added later, e.g.,
+to hold a frequency contour or Fourier series coefficients.  The 8SVX
+syntax is summarized in <a href="../Devices_Manual_guide/node02D2.html">Appendix A</a> as a regular expression and in
+<a href="../Devices_Manual_guide/node02D5.html">Appendix B</a> as an example box diagram.  <a href="../Devices_Manual_guide/node02D6.html">Appendix C</a> explains the optional
+Fibonacci-delta compression algorithm.
+
+ <a href="../Devices_Manual_guide/node02CA.html">Reference</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

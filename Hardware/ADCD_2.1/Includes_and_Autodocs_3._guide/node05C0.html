@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="wb" NODE="MakeWorkbenchObjectVisibleA()" TITLE="workbench.library/MakeWorkbenchObjectVisibleArary/MakeWorkbenchObjectVisibleA" -->
+<head>
+<title>workbench.library/MakeWorkbenchObjectVisibleArary/MakeWorkbenchObjectVisibleA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05BF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05C1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	MakeWorkbenchObjectVisibleA -- Change a Workbench window in such a
+	    way as to make a particular icon visible. (V44)
+
+<b>   SYNOPSIS</b>
+	success = MakeWorkbenchObjectVisibleA(name,tags)
+	   D0                                  A0   A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> MakeWorkbenchObjectVisibleA(STRPTR name,struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *tags);
+
+	success = MakeWorkbenchObjectVisible(name,...);
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> MakeWorkbenchObjectVisible(STRPTR name,...);
+
+<b>   FUNCTION</b>
+	Due to how the scrollers of a Workbench window affect the positions
+	of the icons inside that window, some icons may not be drawn inside
+	the bounds of the window. By using MakeWorkbenchObjectVisibleA()
+	the window scrollers can be made to scroll such a &#034;hidden&#034; icon
+	into view.
+
+<b>   INPUTS</b>
+	name -- Name of the icon to make visible. Note that the window
+	    the icon resides in must already be open.
+
+	tags -- Additional options.
+
+<b>   TAGS</b>
+	No tags are defined yet (V44).
+
+<b>   RESULTS</b>
+	result -- FALSE if the icon in question could not be found,
+	    TRUE otherwise. If FALSE is returned, you can query the error
+	    code using <a href="../Includes_and_Autodocs_3._guide/node0182.html">dos.library/IoErr()</a>.
+
+<b>   EXAMPLE</b>
+	/* Make the icon for the drawer &#034;SYS:&#034; visible. */
+	MakeWorkbenchObjectVisible(&#034;SYS:&#034;,TAG_END);
+
+<b>   NOTES</b>
+	The name of the icon to make visible is interpreted relative
+	to the current directory of the program to call
+	MakeWorkbenchObjectVisibleA().
+
+	For this function call to succeed, Workbench must be open. This
+	means that the LoadWB command was executed and the Workbench
+	screen has been opened.
+
+	While the user is dragging icons, no on-screen rendering may
+	take place. In this state Workbench may refuse to execute the
+	MakeWorkbenchObjectVisible() call and return an error code instead
+	(ERROR_OBJECT_IN_USE).
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0182.html">dos.library/IoErr</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

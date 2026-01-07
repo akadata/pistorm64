@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="ChangeWindowBox()" TITLE="intuition.library/ChangeWindowBox" -->
+<head>
+<title>intuition.library/ChangeWindowBox</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0202.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0204.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ChangeWindowBox -- Change window position and dimensions. (V36)
+
+SYNOPSIS
+    ChangeWindowBox( <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a>, Left, Top, Width, Height )
+                     A0      D0    D1   D2     D3
+
+    VOID ChangeWindowBox( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> *, WORD, WORD, WORD, WORD );
+
+FUNCTION
+    Makes simultaneous changes in window position and dimensions,
+    in absolute (not relative) coordinates.
+
+    Like <a href="../Includes_and_Autodocs_2._guide/node022C.html">MoveWindow()</a> and <a href="../Includes_and_Autodocs_2._guide/node025A.html">SizeWindow()</a>, the effect of this function
+    is deferred until the next input comes along.  Unlike these
+    functions, ChangeWindowBox() specifies absolute window position
+    and dimensions, not relative.  This makes for more reliable
+    results considering that the action is deferred, so this
+    function is typically preferable to <a href="../Includes_and_Autodocs_2._guide/node022C.html">MoveWindow()</a> and <a href="../Includes_and_Autodocs_2._guide/node025A.html">SizeWindow()</a>
+    paired.
+
+    You can detect that this operation has completed by receiving
+    the IDCMP_CHANGEWINDOW IDCMP message
+
+    The dimensions are limited to legal range, but you should still
+    take care to specify sensible inputs based on the window's dimension
+    limits and the size of its screen.
+
+    This function limits the position and dimensions to legal
+    values.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> = the window to change position/dimension
+    Left, Top, Width, Height = new position and dimensions
+
+RESULT
+    Position and dimension are changed to your specification,
+    or as close as possible.
+    Returns nothing.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node022C.html">MoveWindow()</a>, <a href="../Includes_and_Autodocs_2._guide/node025A.html">SizeWindow()</a>, <a href="../Includes_and_Autodocs_2._guide/node0266.html">ZipWindow()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node03A0.html">layers.library/MoveSizeLayer()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

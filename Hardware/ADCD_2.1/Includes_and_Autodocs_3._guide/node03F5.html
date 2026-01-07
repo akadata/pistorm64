@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="SetPrefs()" TITLE="intuition.library/SetPrefs" -->
+<head>
+<title>intuition.library/SetPrefs</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03F4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03F6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	SetPrefs -- Set Intuition preferences data.
+
+<b>    SYNOPSIS</b>
+	Prefs = SetPrefs( PrefBuffer, Size, Inform )
+	D0		  A0          D0    D1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> *SetPrefs( struct <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> );
+
+<b>    FUNCTION</b>
+	Sets new preferences values.  Copies the first 'Size' bytes
+	from your preferences buffer to the system preferences table,
+	and puts them into effect.
+
+	The 'Inform' parameter, if TRUE, indicates that an IDCMP_NEWPREFS
+	message is to be sent to all windows that have the IDCMP_NEWPREFS
+	IDCMPFlag set.
+
+	It is legal to set a partial copy of the <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> structure.
+	The most frequently changed values are grouped at the beginning
+	of the <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> structure.
+
+	New for V36:  A new and more extensible method for supplying
+	<a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> has been introduced in V36, and relies on file
+	system notification.  The Intuition preferences items rely
+	also on the IPrefs program.  Certain elements of the
+	<a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> structure have been superseded by this new method.
+	(Elements are generally superseded as new hardware or software
+	features demand more information than fits in struct <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a>.
+	Parts of struct <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> must be ignored so that applications
+	calling <a href="../Includes_and_Autodocs_3._guide/node03B8.html">GetPrefs()</a>, modifying some other part of struct <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a>,
+	then calling SetPrefs(), don't end up truncating the extended
+	data).
+
+	Pointer Preferences:  Starting with V36, pointer changes
+	submitted through SetPrefs() are only heeded until the first
+	time IPrefs informs Intuition of a V36-style pointer preferences
+	file.  In V39 and higher, only the pointer from the initial
+	SetPrefs() (i.e. devs:system-configuration) is heeded.
+
+	Palette Preferences:  Starting with V39, color changes submitted
+	through SetPrefs() are ignored after the first time IPrefs sends
+	Intuition new style palette preferences.
+
+	FontHeight and LaceWB:  These are only respected from
+	devs:system-configuration.
+
+	<a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a> centering and size:  Changes to ViewX/YOffset and
+	Row/ColumnSizeChange only apply to the default monitor
+	(NTSC or PAL), and not to other monitors such as Productivity.
+
+	Other fields may be superseded in the future.
+
+<b>    INPUTS</b>
+	PrefBuffer = pointer to the memory buffer which contains your
+	    desired settings for Intuition preferences
+	Size = the number of bytes in your PrefBuffer, the number of bytes
+           you want copied to the system's internal preference settings
+	Inform = whether you want the information of a new preferences
+	    setting propagated to all windows.
+
+<b>    NOTES</b>
+	Unless you are responding to a user's explicit request to
+	change <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> (for example, you are writing a <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a>
+	editor), you should probably avoid using this function.
+	The user's <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> should be respected, not overridden.
+
+<b>    RESULT</b>
+	Returns your parameter PrefBuffer.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03B7.html">GetDefPrefs()</a>, <a href="../Includes_and_Autodocs_3._guide/node03B8.html">GetPrefs()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

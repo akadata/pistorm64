@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-4-2" TITLE="31 / CxMessages / Controller Commands" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 / CxMessages / Controller Commands</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0403.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0405.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The commands that a commodity can receive from the controller program (as
+defined in &#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node00F0.html#line121">commodities.h</a>&#062;) are:
+
+    CXCMD_DISABLE     /* please disable yourself       */
+    CXCMD_ENABLE      /* please enable yourself        */
+    CXCMD_KILL        /* go away for good              */
+    CXCMD_APPEAR      /* open your window, if you can  */
+<a name="line9">    CXCMD_DISAPPEAR   /* hide your window              */</a>
+
+The CXCMD_DISABLE, CXCMD_ENABLE, and CXCMD_KILL commands correspond to the
+similarly named controller program gadgets, Disable, Enable, and Kill;
+CXCMD_APPEAR and CXCMD_DISAPPEAR correspond to the controller program
+gadgets, Show and Hide.  These gadgets are ghosted in <a href="../Libraries_Manual_guide/node0586.html">Broker.c</a> because it
+has no window (It doesn't make much sense to give the user a chance to
+click the Show and Hide gadgets).  In order to do this, Broker.c  has to
+tell Commodities Exchange to ghost these gadgets.  When <a href="../Libraries_Manual_guide/node0402.html#line14">CxBroker()</a> sets up
+a <a href="../Libraries_Manual_guide/node0402.html">broker</a>, it looks at the <a href="../Libraries_Manual_guide/node0402.html#line28">NewBroker.nb_Flags</a> field to see if the
+COF_SHOW_HIDE bit (from &#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node00F0.html#line64">commodities.h</a>&#062;) is set.  If it is, the
+&#034;Show&#034; and &#034;Hide&#034; gadgets for this broker will be selectable.  Otherwise
+they are ghosted and disabled.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

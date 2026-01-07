@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/rexx/rexxio.h" NODE="MAIN" TITLE="Includes/rexx/rexxio.h" -->
+<head>
+<title>Includes/rexx/rexxio.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0124.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0126.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef REXX_REXXIO_H
+#define REXX_REXXIO_H
+/*
+**	$Filename: rexx/rexxio.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 1.4 $
+**	$Date: 91/11/08 $
+**
+**	Header file for ARexx Input/Output related structures
+**
+**	(C) Copyright 1986,1987,1988,1989,1990 William S. Hawes
+**	(C) Copyright 1990-1999 Amiga, Inc.
+**		All Rights Reserved
+*/
+
+#ifndef REXX_STORAGE_H
+#include &#034;rexx/storage.h&#034;
+<a name="line18">#endif</a>
+
+#define RXBUFFSZ  204		       /* buffer length		*/
+
+/*
+ * The IoBuff is a resource node used to maintain the File List.  Nodes
+<a name="line24"> * are allocated and linked into the list whenever a file is opened.</a>
+<a name="line25"> */</a>
+<a name="line26">struct IoBuff {</a>
+<a name="line27">   struct RexxRsrc iobNode;	       /* structure for files/strings	*/</a>
+<a name="line28">   APTR     iobRpt;		       /* read/write pointer		*/</a>
+<a name="line29">   LONG     iobRct;		       /* character count		*/</a>
+<a name="line30">   LONG     iobDFH;		       /* DOS filehandle		*/</a>
+<a name="line31">   APTR     iobLock;		       /* DOS lock			*/</a>
+   LONG     iobBct;		       /* buffer length		*/
+   BYTE     iobArea[RXBUFFSZ];	       /* buffer area			*/
+   };				       /* size: 256 bytes		*/
+<a name="line35"></a>
+<a name="line36">/* Access mode definitions						*/</a>
+<a name="line37">#define RXIO_EXIST   -1	       /* an external filehandle	*/</a>
+<a name="line38">#define RXIO_STRF    0		       /* a &#034;string file&#034;		*/</a>
+<a name="line39">#define RXIO_READ    1		       /* read-only access		*/</a>
+#define RXIO_WRITE   2		       /* write mode			*/
+#define RXIO_APPEND  3		       /* append mode (existing file)	*/
+
+/*
+<a name="line44"> * Offset anchors for SeekF()</a>
+<a name="line45"> */</a>
+<a name="line46">#define RXIO_BEGIN   -1L	       /* relative to start		*/</a>
+#define RXIO_CURR    0L	       /* relative to current position	*/
+#define RXIO_END     1L	       /* relative to end		*/
+
+<a name="line50">/* The Library List contains just plain resource nodes.		*/</a>
+<a name="line51"></a>
+#define LLOFFSET(rrp) (rrp-&#062;rr_Arg1)   /* &#034;Query&#034; offset		*/
+#define LLVERS(rrp)   (rrp-&#062;rr_Arg2)   /* library version		*/
+
+/*
+ * The RexxClipNode structure is used to maintain the Clip List.  The value
+<a name="line57"> * string is stored as an argstring in the rr_Arg1 field.</a>
+ */
+#define CLVALUE(rrp) ((STRPTR) rrp-&#062;rr_Arg1)
+
+/*
+ * A message port structure, maintained as a resource node.  The ReplyList
+<a name="line63"> * holds packets that have been received but haven't been replied.</a>
+<a name="line64"> */</a>
+<a name="line65">struct RexxMsgPort {</a>
+<a name="line66">   struct RexxRsrc rmp_Node;	       /* linkage node			*/</a>
+   struct MsgPort  rmp_Port;	       /* the message port		*/
+   struct List	   rmp_ReplyList;      /* messages awaiting reply	*/
+   };
+
+/*
+<a name="line72"> * DOS Device types</a>
+<a name="line73"> */</a>
+<a name="line74">#define DT_DEV	  0L		       /* a device			*/</a>
+#define DT_DIR	  1L		       /* an ASSIGNed directory	*/
+#define DT_VOL	  2L		       /* a volume			*/
+
+/*
+<a name="line79"> * Private DOS packet types</a>
+<a name="line80"> */</a>
+#define ACTION_STACK 2002L	       /* stack a line			*/
+#define ACTION_QUEUE 2003L	       /* queue a line			*/
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

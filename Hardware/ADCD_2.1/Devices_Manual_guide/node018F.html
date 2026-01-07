@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/SCSI_Direct.c" NODE="MAIN" TITLE="Devices/Dev_examples/SCSI_Direct.c" -->
+<head>
+<title>Devices/Dev_examples/SCSI_Direct.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node018E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0190.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * SCSI_Direct.c
+ *
+ * The following program demonstrates the use of the HD_SCSICmd to send a
+ * MODE SENSE to a unit on the requested device (default scsi.device).  This
+ * code can be easily modified to send other commands to the drive.
+ *
+ * Compile with SAS C 5.10  lc -b1 -cfistq -v -y -L
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/io.h&#062;
+#include &#060;devices/scsidisk.h&#062;
+#include &#060;dos/dosextens.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#include &#060;stdlib.h&#062;
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+#define BUFSIZE 256
+
+UBYTE *buffer;                  /* a data buffer used for mode sense data */
+struct IOStdReq SCSIReq;        /* a standard IORequest structure */
+struct SCSICmd Cmd;             /* where the actual SCSI command goes */
+UBYTE  Sense[20];               /* buffer for request sense data */
+struct MsgPort Port;            /* our ReplyPort */
+
+void ShowSenseData(void);
+
+static UBYTE TestReady[] = { 0,0,0,0,0,0 };     /* not used but here for  */
+static UBYTE StartUnit[] = { 0x1b,0,0,0,1,0 };  /* illustration of other  */
+static UBYTE StopUnit[] =  { 0x1b,0,0,0,0,0 };  /* commands.              */
+
+static UBYTE ModeSense[]={ 0x1a,0,0xff,0,254,0 }; /* the command being sent */
+
+void main(int argc, char **argv)
+{
+int unit,tval,i;
+char *dname = &#034;scsi.device&#034;;
+UBYTE *tbuf;
+
+if ((argc &#060; 2) || (argc &#062; 3))
+    {
+    printf(&#034;Usage: %s unit [xxxx.device]\n&#034;,argv[0]);
+    exit(100);
+    }
+
+unit = atoi( argv[1] );
+if (argc == 3)
+    dname = argv[2];
+
+buffer = (UBYTE *) AllocMem(BUFSIZE, MEMF_PUBLIC|MEMF_CLEAR);
+
+if (!buffer)
+    {
+    printf(&#034;Couldn't get memory\n&#034;);
+    exit(100);
+    }
+
+Port.mp_Node.ln_Pri = 0;                        /* setup the ReplyPort */
+Port.mp_SigBit      = AllocSignal(-1);
+Port.mp_SigTask     = (struct Task *)FindTask(0);
+NewList( &#038;(Port.mp_MsgList) );
+
+SCSIReq.io_Message.mn_ReplyPort = &#038;Port;
+
+if (OpenDevice( dname, unit, &#038;SCSIReq, 0))
+    {
+    printf(&#034;Couldn't open unit %ld on %s\n&#034;,unit,dname);
+    FreeMem( buffer,BUFSIZE );
+    exit(100);
+    }
+
+SCSIReq.io_Length  = sizeof(struct SCSICmd);
+SCSIReq.io_Data    = (APTR)&#038;Cmd;
+SCSIReq.io_Command = HD_SCSICMD;        /* the command we are sending   */
+
+Cmd.scsi_Data = (UWORD *)buffer;        /* where we put mode sense data */
+Cmd.scsi_Length = 254;          /* how much we will accept      */
+Cmd.scsi_CmdLength = 6;         /* length of the command        */
+Cmd.scsi_Flags = SCSIF_AUTOSENSE|SCSIF_READ;
+                                /* do automatic REQUEST_SENSE   */
+                                /* set expected data direction  */
+Cmd.scsi_SenseData =(UBYTE *)Sense;     /* where sense data will go     */
+Cmd.scsi_SenseLength = 18;              /* how much we will accept      */
+Cmd.scsi_SenseActual = 0;               /* how much has been received   */
+
+Cmd.scsi_Command=(UBYTE *)ModeSense;/* issuing a MODE_SENSE command     */
+DoIO( &#038;SCSIReq );                       /* send it to the device driver */
+
+if (Cmd.scsi_Status)
+    ShowSenseData();      /* if bad status then show it */
+
+else
+    {
+    printf(&#034;\nBlock descriptor header\n&#034;);
+    printf(&#034;=======================\n&#034;);
+    printf(&#034;Mode Sense data length  = %d\n&#034;,(short)buffer[0]);
+    printf(&#034;Block descriptor length = %d\n&#034;,(short)buffer[3]);
+    tbuf = &#038;buffer[4];
+    printf(&#034;Density code            = %d\n&#034;,(short)tbuf[0]);
+    tval = (tbuf[1]&#060;&#060;16) + (tbuf[2]&#060;&#060;8) + tbuf[3];
+    printf(&#034;Number of blocks        = %ld\n&#034;,tval);
+    tval = (tbuf[5]&#060;&#060;16) + (tbuf[6]&#060;&#060;8) + tbuf[7];
+    printf(&#034;Block size              = %ld\n&#034;,tval);
+
+    tbuf += buffer[3];          /* move to page descriptors */
+
+    while ((tbuf - buffer) &#060; buffer[0])
+           {
+
+           switch (tbuf[0] &#038; 0x7f)
+                   {
+                   case 1:
+                          printf(&#034;\nError Recovery Parameters\n&#034;);
+                          printf(&#034;=========================\n&#034;);
+                          printf(&#034;Page length             = %d\n&#034;,(short)tbuf[1]);
+                          printf(&#034;DISABLE CORRECTION      = %d\n&#034;,(short)tbuf[2]&#038;1);
+                          printf(&#034;DISABLE XFER ON ERROR   = %d\n&#034;,(short)(tbuf[2]&#062;&#062;1)&#038;1);
+                          printf(&#034;POST ERROR              = %d\n&#034;,(short)(tbuf[2]&#062;&#062;2)&#038;1);
+                          printf(&#034;ENABLE EARLY CORRECTION = %d\n&#034;,(short)(tbuf[2]&#062;&#062;3)&#038;1);
+                          printf(&#034;READ CONTINUOUS         = %d\n&#034;,(short)(tbuf[2]&#062;&#062;4)&#038;1);
+                          printf(&#034;TRANSFER BLOCK          = %d\n&#034;,(short)(tbuf[2]&#062;&#062;5)&#038;1);
+                          printf(&#034;AUTO READ REALLOCATION  = %d\n&#034;,(short)(tbuf[2]&#062;&#062;6)&#038;1);
+                          printf(&#034;AUTO WRITE REALLOCATION = %d\n&#034;,(short)(tbuf[2]&#062;&#062;7)&#038;1);
+                          printf(&#034;Retry count             = %d\n&#034;,(short)tbuf[3]);
+                          printf(&#034;Correction span         = %d\n&#034;,(short)tbuf[4]);
+                          printf(&#034;Head offset count       = %d\n&#034;,(short)tbuf[5]);
+                          printf(&#034;Data strobe offset count= %d\n&#034;,(short)tbuf[6]);
+                          printf(&#034;Recovery time limit     = %d\n&#034;,(short)tbuf[7]);
+
+                          tbuf += tbuf[1]+2;
+                          break;
+
+                   case 2:
+                          printf(&#034;\nDisconnect/Reconnect Control\n&#034;);
+                          printf(&#034;============================\n&#034;);
+                          printf(&#034;Page length             = %d\n&#034;,(short)tbuf[1]);
+                          printf(&#034;Buffer full ratio       = %d\n&#034;,(short)tbuf[2]);
+                          printf(&#034;Buffer empty ratio      = %d\n&#034;,(short)tbuf[3]);
+                          tval = (tbuf[4]&#060;&#060;8)+tbuf[5];
+                          printf(&#034;Bus inactivity limit    = %d\n&#034;,tval);
+                          tval = (tbuf[6]&#060;&#060;8)+tbuf[7];
+                          printf(&#034;Disconnect time limit   = %d\n&#034;,tval);
+                          tval = (tbuf[8]&#060;&#060;8)+tbuf[9];
+                          printf(&#034;Connect time limit      = %d\n&#034;,tval);
+                          tval = (tbuf[10]&#060;&#060;8)+tbuf[11];
+                          printf(&#034;Maximum burst size      = %d\n&#034;,tval);
+                          printf(&#034;Disable disconnection   = %d\n&#034;,(short)tbuf[12]&#038;1);
+
+                          tbuf += tbuf[1]+2;
+                          break;
+
+                   case 3:
+                          printf(&#034;\nDevice Format Parameters\n&#034;);
+                          printf(&#034;========================\n&#034;);
+                          printf(&#034;Page length             = %d\n&#034;,(short)tbuf[1]);
+                          tval = (tbuf[2]&#060;&#060;8)+tbuf[3];
+                          printf(&#034;Tracks per zone         = %d\n&#034;,tval);
+                          tval = (tbuf[4]&#060;&#060;8)+tbuf[5];
+                          printf(&#034;Alternate sectors/zone  = %d\n&#034;,tval);
+                          tval = (tbuf[6]&#060;&#060;8)+tbuf[7];
+                          printf(&#034;Alternate tracks/zone   = %d\n&#034;,tval);
+                          tval = (tbuf[8]&#060;&#060;8)+tbuf[9];
+                          printf(&#034;Alternate tracks/volume = %d\n&#034;,tval);
+                          tval = (tbuf[10]&#060;&#060;8)+tbuf[11];
+                          printf(&#034;Sectors per track       = %d\n&#034;,tval);
+                          tval = (tbuf[12]&#060;&#060;8)+tbuf[13];
+                          printf(&#034;Bytes per sector        = %d\n&#034;,tval);
+                          tval = (tbuf[14]&#060;&#060;8)+tbuf[15];
+                          printf(&#034;Interleave              = %d\n&#034;,tval);
+                          tval = (tbuf[16]&#060;&#060;8)+tbuf[17];
+                          printf(&#034;Track skew factor       = %d\n&#034;,tval);
+                          tval = (tbuf[18]&#060;&#060;8)+tbuf[19];
+                          printf(&#034;Cylinder skew factor    = %d\n&#034;,tval);
+
+                          tbuf += tbuf[1]+2;
+                          break;
+
+                   case 4:
+                          printf(&#034;\nDrive Geometry Parameters\n&#034;);
+                          printf(&#034;=========================\n&#034;);
+                          printf(&#034;Page length             = %d\n&#034;,(short)tbuf[1]);
+                          tval = (tbuf[2]&#060;&#060;16)+(tbuf[3]&#060;&#060;8)+tbuf[4];
+                          printf(&#034;Number of cylinders     = %ld\n&#034;,tval);
+                          printf(&#034;Number of heads         = %d\n&#034;,(short)tbuf[5]);
+                          tval = (tbuf[6]&#060;&#060;16)+(tbuf[6]&#060;&#060;8)+tbuf[8];
+                          printf(&#034;Start write precomp     = %ld\n&#034;,tval);
+                          tval = (tbuf[9]&#060;&#060;16)+(tbuf[10]&#060;&#060;8)+tbuf[11];
+                          printf(&#034;Start reduced write     = %ld\n&#034;,tval);
+                          tval = (tbuf[12]&#060;&#060;8)+tbuf[13];
+                          printf(&#034;Drive step rate         = %d\n&#034;,tval);
+                          tval = (tbuf[14]&#060;&#060;16)+(tbuf[15]&#060;&#060;8)+tbuf[16];
+                          printf(&#034;Landing zone cylinder   = %ld\n&#034;,tval);
+
+                          tbuf += tbuf[1]+2;
+                          break;
+
+                   default:
+                           printf(&#034;\nVendor Unique Page Code %2x\n&#034;,(short)tbuf[0]);
+                           printf(&#034;==========================\n&#034;);
+                           for (i=0; i&#060;=tbuf[1]+1; i++ )
+                                printf(&#034;%x &#034;,(short)tbuf[i]);
+
+                           printf(&#034;\n&#034;);
+                           tbuf += tbuf[1]+2;
+                   }
+           }
+    }
+
+CloseDevice( &#038;SCSIReq );
+FreeMem( buffer, BUFSIZE );
+FreeSignal(Port.mp_SigBit);
+}
+
+
+
+void ShowSenseData(void)
+{
+int i;
+
+for (i=0; i&#060;18; i++)
+     printf(&#034;%x &#034;,(int)Sense[i]);
+
+printf(&#034;\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

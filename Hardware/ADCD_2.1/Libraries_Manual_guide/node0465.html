@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-9-2" TITLE="33 / IFF FORM Specifications / FORM FTXT" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / IFF FORM Specifications / FORM FTXT</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0464.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0466.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The FTXT (Formatted TeXT) form is the standard format for sharing text on
+the Amiga.  The Release 2 console device clip and paste functions, in
+conjunction with the startup-sequence conclip command, pass clipped
+console text through the clipboard as FTXT.
+
+By supporting reading and writing of clipboard device FTXT, your
+application will allow users to cut and paste text between your
+<a name="line9">application, other applications, and Amiga Shell windows.</a>
+
+The FTXT form is very simple.  Generally, for clip and paste operations,
+you will only be concerned with the CHRS (character string) chunks of an
+FTXT.  There may be one or more CHRS chunks, each of which contains a
+non-NULL-terminated string of ASCII characters whose length is equal to
+the length (<a href="../Includes_and_Autodocs_2._guide/node010B.html#line90">StoredProperty.sp_Size</a>) of the chunk.
+
+Be aware that if you <a href="../Libraries_Manual_guide/node0437.html">CollectionChunk()</a> the CHRS chunks of an FTXT, the
+list accumulated by IFFParse will be in reverse order from the chunk order
+in the file.  See the <a href="../Libraries_Manual_guide/node059F.html">ClipFTXT.c</a> example at the end of this chapter for a
+simple example of reading (and optionally writing) FTXT to and from the
+clipboard.  See also the &#034;<a href="../Devices_Manual_guide/node0065.html">Clipboard Device</a>&#034; and &#034;<a href="../Devices_Manual_guide/node0080.html">Console Device</a>&#034; chapters
+of the Amiga ROM Kernel Reference Manual: Devices for more information on
+Release 2 console clip and paste.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

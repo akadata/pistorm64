@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_14" NODE="14-3-1-1" TITLE="14 / / Icon Library Data Structures / The DiskObject Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>14 / / Icon Library Data Structures / The DiskObject Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0240.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0242.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The actual data present in the <a href="../Libraries_Manual_guide/node0238.html">.info</a> file is organized as a DiskObject
+structure which is defined in the include file &#060;workbench/<a href="../Includes_and_Autodocs_2._guide/node0135.html#line61">workbench.h</a>&#062;.
+For a complete listing, see the Amiga ROM Kernel Reference Manual:
+Includes and Autodocs.  The DiskObject structure contains the following
+elements:
+
+    struct DiskObject
+        {
+        UWORD              do_Magic;   /* magic number at start of file */
+        UWORD              do_Version; /* so we can change structure    */
+        struct Gadget      do_Gadget;  /* a copy of in core gadget      */
+        UBYTE              do_Type;
+        char              *do_DefaultTool;
+        char             **do_ToolTypes;
+        LONG               do_CurrentX;
+        LONG               do_CurrentY;
+        struct DrawerData *do_DrawerData;
+        char              *do_ToolWindow;  /* only applies to tools */
+        LONG               do_StackSize;   /* only applies to tools */
+        };
+
+do_Magic
+    A magic number that the icon library looks for to make sure that the
+    file it is reading really contains an icon.  It should be the
+    manifest constant WB_DISKMAGIC.  <a href="../Libraries_Manual_guide/node0243.html#line4">PutDiskObject()</a> will put this value
+    in the structure, and <a href="../Libraries_Manual_guide/node0243.html#line4">GetDiskObject()</a> will not believe that a file is
+    really an icon unless this value is correct.
+
+do_Version
+    This provides a way to enhance the <a href="../Libraries_Manual_guide/node0238.html">.info</a> file in an
+    upwardly-compatible way.  It should be WB_DISKVERSION.  The icon
+    library will set this value for you and will not believe weird values.
+
+do_Gadget
+    This contains all the imagery for the icon. See the &#034;<a href="../Libraries_Manual_guide/node0242.html">Gadget Structure</a>&#034;
+    section below for more details.
+
+do_Type
+    The type of the icon; can be set to any of the following values.
+
+
+            WBDISK     The root of a disk
+            WBDRAWER   A directory on the disk
+            WBTOOL     An executable program
+            WBPROJECT  A data file
+            WBGARBAGE  The Trashcan directory
+            WBKICK     A Kickstart disk
+            WBAPPICON  Any object not directly associated
+                       with a filing system object, such as
+                       a print spooler (new in Release 2).
+
+
+               Table 14-2: Workbench Object Types
+
+
+do_DefaultTool
+    Default tools are used for project and disk icons.  For projects
+    (data files), the default tool is the program Workbench runs when the
+    project is activated.  Any valid AmigaDOS path may be entered in this
+    field such as &#034;SYS:myprogram&#034;, &#034;df0:mypaint&#034;, &#034;myeditor&#034; or
+    &#034;:work/mytool&#034;.
+
+    For disk icons, the default tool is the diskcopy program
+    (&#034;SYS:System/DiskCopy&#034;) that will be used when this disk is the
+<a name="line66">    source of a copy.</a>
+
+do_ToolTypes
+    This is an array of free-format strings.  Workbench does not enforce
+    any rules on these strings, but they are useful for passing
+    environment information.  See the section on &#034;<a href="../Libraries_Manual_guide/node0244.html">The Tool Types Array</a>&#034;
+<a name="line72">    below for more information.</a>
+
+do_CurrentX, do_CurrentY
+    Drawers have a virtual coordinate system.  The user can scroll around
+    in this system using the scroll gadgets on the window that opens when
+    the drawer is activated.  Each icon in the drawer has a position in
+    the coordinate system.  CurrentX and CurrentY contain the icon's
+    current position in the drawer.  Picking a position for a newly
+    created icon can be tricky.  NO_ICON_POSITION is a system constant
+    for do_CurrentX and do_CurrentY that instructs Workbench to pick a
+    reasonable place for the icon.  Workbench will place the icon in an
+    unused region of the drawer.  If there is no space in the drawers
+    window, the icon will be placed just to the right of the visible
+<a name="line85">    region.</a>
+
+do_DrawerData
+    If the icon is associated with a directory (WBDISK, WBDRAWER,
+    WBGARBAGE), it needs a <a href="../Includes_and_Autodocs_2._guide/node0135.html#line51">DrawerData</a> structure to go with it.  This
+    structure contains an Intuition <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a> structure (see the
+    &#034;<a href="../Libraries_Manual_guide/node0102.html">Intuition Windows</a>&#034; chapter for more information):
+
+        struct DrawerData
+            {
+            struct NewWindow dd_NewWindow; /* structure to open window */
+            LONG             dd_CurrentX;  /* current x coordinate of  */
+                                           /* origin                   */
+            LONG             dd_CurrentY;  /* current y coordinate of  */
+                                           /* origin                   */
+            };
+
+    Workbench uses this to hold the current window position and size of
+    the window so it will reopen in the same place.
+
+do_ToolWindow
+<a name="line106">    This field is reserved for future use.</a>
+
+do_StackSize
+    This is the size of the stack (in bytes) used for running the tool.
+    If this is NULL, then Workbench will use a reasonable default stack
+    size (currently 4K bytes).
+
+    Stack Size is Taken from the Project Icon.
+    -----------------------------------------
+    When a tool is run via the default tool mechanism (i.e., a project
+    was activated, not the tool itself), Workbench uses the stack size
+    specified in the project's <a href="../Libraries_Manual_guide/node0238.html">.info</a> file and the tool's .info file is
+    ignored.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

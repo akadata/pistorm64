@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-7-2" TITLE="4 / Window Attributes / Window Attribute Tags" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Window Attributes / Window Attribute Tags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0123.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0125.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+WA_Left, WA_Top, WA_Width and WA_Height
+    Describe where the window will first appear on the screen and how
+<a name="line4">    large it will be initially. These dimensions are relative to the top</a>
+<a name="line5">    left corner of the screen, which has the coordinates (0,0).</a>
+
+    WA_Left is the initial x position, or offset, from the left edge of
+    the screen.  The leftmost pixel is pixel 0, and values increase to
+<a name="line9">    the right.  Equivalent to <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.LeftEdge.</a>
+
+    WA_Top is the initial y position, or offset, from the top edge of the
+    screen.  The topmost pixel is pixel 0, and values increase to the
+<a name="line13">    bottom.  Equivalent to <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.TopEdge.</a>
+
+    WA_Width is the initial window width in pixels.  Equivalent to
+<a name="line16">    <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.Width.</a>
+
+    WA_Height is the initial window height in lines.  Equivalent to
+<a name="line19">    <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.Height.</a>
+
+WA_DetailPen and WA_BlockPen
+    WA_DetailPen specifies the pen number for the rendering of window
+    details like gadgets or text in the title bar.  WA_BlockPen specifies
+    the pen number for window block fills, like the title bar.  These
+    pens are also used for rendering menus.  Equivalent to
+<a name="line26">    <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.DetailPen and NewWindow.BlockPen.</a>
+
+    The specific color associated with each pen number depends on the
+    screen.  Specifying -1 for these values sets the window's detail and
+    block pen the same as the screen's detail and block pen.
+
+    Detail pen and block pen have largely been replaced starting with V36
+    by the pen array in the <a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> structure.  See the section on
+    &#034;<a href="../Libraries_Manual_guide/node00EC.html">DrawInfo and the 3D Look</a>&#034; in the &#034;Intuition Screens&#034; chapter for
+<a name="line35">    more information.</a>
+
+WA_IDCMP
+    IDCMP flags tell Intuition what user input events the application
+    wants to be notified about.  The IDCMP flags are listed and described
+    in the <a href="../Includes_and_Autodocs_2._guide/node023A.html">OpenWindowTagList()</a> description in the Amiga ROM Kernel
+    Reference Manual: Includes and Autodocs and in the chapter
+    &#034;<a href="../Libraries_Manual_guide/node01E0.html">Intuition Input and Output Methods</a>&#034; in this book.  Equivalent to
+    <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.IDCMPFlags.
+
+    If any of these flags are set, Intuition creates a pair of message
+    ports for the window (one internal to Intuition and one used by the
+    application). These ports are for handling messages about user input
+    events.  If WA_IDCMP is NULL or unspecified, no IDCMP is created for
+<a name="line49">    this window.</a>
+
+    The <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> function can be used to change the window's IDCMP
+<a name="line52">    flags after it is open.</a>
+
+WA_Gadgets
+    A pointer to the first in the linked list of <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structures that
+    are to be included in this window.  These gadgets are application
+    gadgets, not system gadgets.  See the &#034;<a href="../Libraries_Manual_guide/node0132.html">Intuition Gadgets</a>&#034; chapter for
+<a name="line58">    more information.  Equivalent to <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.FirstGadget.</a>
+
+WA_Checkmark
+    A pointer to an <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structure, which is to be used as the checkmark
+    image in this window's menus.  To use the default checkmark, do not
+    specify this tag or set this field to NULL.  Equivalent to
+<a name="line64">    <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.CheckMark.</a>
+
+WA_Title
+    A pointer to a NULL terminated text string, which is used as the
+<a name="line68">    window title and is displayed in the window's title bar.</a>
+
+    Intuition draws the text using the colors defined in the <a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> pen
+    array (DrawInfo.dri_Pens) and displays as much as possible of the
+    window title, depending upon the current width of the title bar.
+    Equivalent to <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.Title.  See the section on
+    &#034;<a href="../Libraries_Manual_guide/node00EC.html">DrawInfo and the 3D Look</a>&#034; in the &#034;Intuition Screens&#034; chapter for
+<a name="line75">    more information on the pen array.</a>
+
+<a name="line77">    The title is rendered in the screen's default font.</a>
+
+    A title bar is added to the window if any of the properties
+    <a href="../Libraries_Manual_guide/node0125.html#line23">WA_DragBar</a> (WFLG_DRAGBAR), <a href="../Libraries_Manual_guide/node0125.html#line29">WA_DepthGadget</a> (WFLG_DEPTHGADGET),
+    <a href="../Libraries_Manual_guide/node0125.html#line36">WA_CloseGadget</a> (WFLG_CLOSEGADGET) or WA_Zoom are specified, or if
+    text is specified for a window title.  If no text is provided for the
+    title, but one or more of these system gadgets are specified, the
+<a name="line84">    title bar will be blank.  Equivalent to <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.Title.</a>
+
+WA_ScreenTitle
+    A pointer to a NULL terminated text string, which is used as the
+    screen title and is displayed, when the window is active, in the
+    screen's title bar.  After the screen has been opened the screen's
+    title may be changed by calling <a href="../Libraries_Manual_guide/node012A.html">SetWindowTitles()</a> (which is the only
+<a name="line91">    method of setting the window's screen title prior to V36).</a>
+
+WA_CustomScreen
+    A pointer to the <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a> structure of a screen created by this
+    application.  The window will be opened on this screen.  The custom
+    screen must already be opened when the <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> call is
+    made.  Equivalent to <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.Screen, also implies NewWindow.Type of
+<a name="line98">    CUSTOMSCREEN.</a>
+
+WA_MinWidth, WA_MinHeight, WA_MaxWidth and WA_MaxHeight
+    These tags set the minimum and maximum values to which the user may
+    size the window.  If the flag <a href="../Libraries_Manual_guide/node0125.html#line4">WFLG_SIZEGADGET</a> is not set, then
+    these variables are ignored.  Values are measured in pixels.  Use
+    (~0) for the WA_MaxWidth (WA_MaxHeight) to allow for a window as wide
+    (tall) as the screen.  This is the complete screen, not the visible
+    part or display clip.
+
+    Setting any of these variables to 0, will take the setting for that
+    dimension from its initial value.  For example, setting MinWidth to
+    0, will make the minimum width of this window equal to the initial
+<a name="line111">    width of the window.</a>
+
+    Equivalent to <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.MinWidth, NewWindow.MinHeight,
+    NewWindow.MaxWidth and NewWindow.MaxHeight.  Use the <a href="../Libraries_Manual_guide/node010B.html">WindowLimits()</a>
+<a name="line115">    function to change window size limits after the window is opened.</a>
+
+WA_InnerWidth and WA_InnerHeight
+    Specify the dimensions of the interior region of the window, i.e.,
+    inside the border, independent of the border widths.  When using
+    WA_InnerWidth and WA_InnerHeight an application will probably want to
+<a name="line121">    set <a href="../Libraries_Manual_guide/node0125.html#line135">WA_AutoAdjust</a>.</a>
+
+WA_PubScreen
+    Open the window as a visitor window on the public screen whose
+    address is in the ti_Data field of the WA_PubScreen <a href="../Libraries_Manual_guide/node0102.html#line8">TagItem</a>.  To
+    ensure that this screen remains open until <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> has
+    completed, the application must either be the screen's owner, have a
+    window open on the screen, or use <a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a>.  Setting this tag
+<a name="line129">    implies screen type of PUBLICSCREEN.</a>
+
+WA_PubScreenName
+    Declares that the window is to be opened as a visitor on the public
+    screen whose name is pointed to by the ti_Data field of the
+    WA_PubScreenName <a href="../Libraries_Manual_guide/node0102.html#line8">TagItem</a>.  The <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> call will fail if
+    it cannot obtain a lock on the named public screen and no fall back
+    name (WA_PubScreenFallBack) is specified.  Setting this tag implies
+<a name="line137">    screen type of PUBLICSCREEN.</a>
+
+WA_PubScreenFallBack
+    A Boolean, specifies whether a visitor window should &#034;fall back&#034; to
+    the default public screen (or Workbench) if the named public screen
+    isn't available This tag is only meaningful when used in conjunction
+<a name="line143">    with WA_PubScreenName.</a>
+
+WA_Zoom
+    Pointer to an array of four WORDs, the initial <a href="../Libraries_Manual_guide/node0121.html#line42">LeftEdge</a>, <a href="../Libraries_Manual_guide/node0121.html#line42">TopEdge</a>,
+    <a href="../Libraries_Manual_guide/node0121.html#line32">Width</a> and <a href="../Libraries_Manual_guide/node0121.html#line32">Height</a> values for the alternate zoom position and size.  It
+    also specifies that the application wants a zoom gadget for the
+    window, whether or not it has a sizing gadget.
+
+    A zoom gadget is always supplied to a window if it has both depth and
+    sizing gadgets.  This tag allows the application to open a window
+    with a zoom gadget when the window does not have both the depth and
+<a name="line154">    sizing gadgets.</a>
+
+WA_MouseQueue
+    An initial value for the mouse message backlog limit for this window.
+    The <a href="../Libraries_Manual_guide/node012B.html#line27">SetMouseQueue()</a> function will change this limit after the window
+<a name="line159">    is opened.</a>
+
+WA_RptQueue
+    An initial value of repeat key backlog limit for this window.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

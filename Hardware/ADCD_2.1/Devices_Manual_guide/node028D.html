@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="RGBN-3" TITLE="RGBN-RGB8.doc / Sample BODY Code " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>RGBN-RGB8.doc / Sample BODY Code </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node028C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node028E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+    if(!count) {
+            if (Rgb8) {
+                    fread (&#038;w, 4, 1, RGBFile);
+                    lock = w &#038; 0x00000080;
+                    rgb = w &#062;&#062; 8;
+                    count = w &#038; 0x0000007f;
+            } else {
+                    w = (UWORD) getw (RGBFile);
+                    lock = w &#038; 8;
+                    rgb = w &#062;&#062; 4;
+                    count = w &#038; 7;
+            }
+            if (!count)
+                    if (!(count = (UBYTE) getc (RGBFile)))
+                            count = (UWORD) getw (RGBFile);
+    }
+
+The pixels are scanned from left to right across horizontal lines,
+processing from top to bottom.  The (12 or 24 bit) RGB values are stored
+with the red bits as the MSB's, the green bits next, and the blue bits as
+the LSB's.
+
+Special note:  As of this writing (Sep 88), Silver does NOT support
+anything but black for color zero.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

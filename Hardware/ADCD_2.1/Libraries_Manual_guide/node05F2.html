@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/vsprite.c" NODE="MAIN" TITLE="lib_examples/vsprite.c" -->
+<head>
+<title>lib_examples/vsprite.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* The listing given here shows a complete VSprite example.  This
+** program requires the animtools.c, animtools.h and animtools_proto.h
+** support files in order to compile and run.  These files are listed at
+** the end of this chapter.
+**
+** vsprite.c
+**
+** SAS/C V5.10a
+** lc -b1 -cfist -v -y vsprite.c
+** blink FROM LIB:c.o vsprite.o animtools.o LIB LIB:lc.lib LIB:amiga.lib TO vsprite
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;intuition/intuitionbase.h&#062;
+#include &#060;graphics/gfx.h&#062;
+#include &#060;graphics/gfxbase.h&#062;
+#include &#060;graphics/gels.h&#062;
+#include &#060;graphics/collide.h&#062;
+#include &#060;libraries/dos.h&#062;
+#include &#060;stdlib.h&#062;
+#include &#034;animtools.h&#034;
+
+VOID borderCheck(struct VSprite *hitVSprite, LONG borderflags);
+VOID process_window(struct Window *win, struct RastPort *myRPort, struct VSprite *MyVSprite);
+VOID do_VSprite(struct Window *win, struct RastPort *myRPort);
+VOID vspriteDrawGList(struct Window *win, struct RastPort *myRPort);
+
+struct GfxBase		 *GfxBase;   /* pointer to Graphics library  */
+struct IntuitionBase *IntuitionBase; /* pointer to Intuition library */
+
+int return_code;
+#define GEL_SIZE	4 /* number of lines in the vsprite */
+
+/* VSprite data - there are two sets that are alternated between. */
+/* note that this data is always displayed as low resolution.	  */
+WORD chip vsprite_data1[] = { 0x7ffe, 0x80ff,
+                              0x7c3e, 0x803f,
+                              0x7c3e, 0x803f,
+                              0x7ffe, 0x80ff,
+                              0, 0 };
+
+WORD chip vsprite_data2[] = { 0x7ffe, 0xff01,
+                              0x7c3e, 0xfc01,
+                              0x7c3e, 0xfc01,
+                              0x7ffe, 0xff01,
+                              0, 0 };
+
+WORD mySpriteColors[] =     { 0x0000, 0x00f0, 0x0f00 };
+WORD mySpriteAltColors[] =  { 0x000f, 0x0f00, 0x0ff0 };
+
+NEWVSPRITE myNewVSprite = {              /* information for the new VSprite       */
+        /* Image data, sprite color array word width (must be 1 for true VSprite) */
+        vsprite_data1, mySpriteColors,1,
+        /* Line height, image depth (must be 2 for true VSprite), x, y position   */                                                           */
+        GEL_SIZE, 2, 160, 100,
+        /* Flags (VSPRITE == true VSprite), hit mask and me mask                  */
+        VSPRITE, 1 &#060;&#060; BORDERHIT, 0
+        };
+
+struct NewWindow myNewWindow = {        /* information for the new window */
+    80, 20, 400, 150, -1, -1, CLOSEWINDOW | INTUITICKS,
+    ACTIVATE | WINDOWCLOSE | WINDOWDEPTH | RMBTRAP | WINDOWDRAG,
+    NULL, NULL, &#034;VSprite&#034;, NULL, NULL, 0, 0, 0, 0, WBENCHSCREEN
+    };
+
+/* Basic VSprite display subroutine */
+VOID vspriteDrawGList(struct Window *win, struct RastPort *myRPort)
+{
+SortGList(myRPort);
+DrawGList(myRPort, ViewPortAddress(win));
+RethinkDisplay();
+}
+<a name="line73"></a>
+/* Collision routine for vsprite hitting border.  Note that when the collision is VSprite to */
+/* VSprite (or Bob to Bob, Bob to AnimOb, etc), then the parameters are both pointers to a VSprite. */
+VOID borderCheck(struct VSprite *hitVSprite, LONG borderflags)
+{
+if (borderflags &#038; RIGHTHIT)
+    {
+    hitVSprite-&#062;SprColors = mySpriteAltColors;
+    hitVSprite-&#062;VUserExt  = -40;
+    }
+if (borderflags &#038; LEFTHIT)
+    {
+    hitVSprite-&#062;SprColors = mySpriteColors;
+    hitVSprite-&#062;VUserExt  = 20;
+    }
+}
+
+/* Process window and dynamically change vsprite. Get messages. Go away on           */
+/* CLOSEWINDOW.  Update and redisplay vsprite on INTUITICKS. Wait for more messages. */
+VOID process_window(struct Window *win, struct RastPort *myRPort, struct VSprite *myVSprite)
+{
+struct IntuiMessage *msg;
+
+FOREVER
+    {
+    Wait(1L &#060;&#060; win-&#062;UserPort-&#062;mp_SigBit);
+    while (NULL != (msg = (struct IntuiMessage *)GetMsg(win-&#062;UserPort)))
+        {
+        /* Only CLOSEWINDOW and INTUITICKS are active */
+        if (msg-&#062;Class == CLOSEWINDOW)
+            {
+            ReplyMsg((struct Message *)msg);
+            return;
+            }
+        /* Must be an INTUITICKS:  change x and y values on the fly.  Note offset by
+        ** window left and top edge--sprite relative to the screen, not window.  Divide
+        ** the MouseY in half to adjust for Lores movement increments on a Hires screen.
+        */
+        myVSprite-&#062;X = win-&#062;LeftEdge + msg-&#062;MouseX + myVSprite-&#062;VUserExt;
+        myVSprite-&#062;Y = win-&#062;TopEdge  + msg-&#062;MouseY/2 + 1;
+        ReplyMsg((struct Message *)msg);
+        }
+    /* Got a message, change image data on the fly */
+    myVSprite-&#062;ImageData = (myVSprite-&#062;ImageData == vsprite_data1) ? vsprite_data2 : vsprite_data1;
+    SortGList(myRPort);
+    DoCollision(myRPort);
+    vspriteDrawGList(win, myRPort);
+    }
+}
+
+/* Working with the VSprite.  Setup the GEL system and get a new VSprite (makeVSprite()).   */
+/* Add VSprite to the system and display.  Use the vsprite.  When done, remove VSprite and  */
+/* update the display without the VSprite.  Cleanup everything.                             */
+VOID do_VSprite(struct Window *win, struct RastPort *myRPort)
+{
+struct VSprite       *myVSprite;
+struct GelsInfo       *my_ginfo;
+
+if (NULL == (my_ginfo = setupGelSys(myRPort, 0xfc)))
+    return_code = RETURN_WARN;
+else
+    {
+    if (NULL == (myVSprite = makeVSprite(&#038;myNewVSprite)))
+        return_code = RETURN_WARN;
+    else
+        {
+        AddVSprite(myVSprite, myRPort);
+        vspriteDrawGList(win, myRPort);
+        myVSprite-&#062;VUserExt = 20;
+        SetCollision(BORDERHIT, borderCheck, myRPort-&#062;GelsInfo);
+        process_window(win, myRPort, myVSprite);
+        RemVSprite(myVSprite);
+        freeVSprite(myVSprite);
+        }
+    vspriteDrawGList(win, myRPort);
+    cleanupGelSys(my_ginfo, myRPort);
+    }
+}
+
+/* Example VSprite program.  First open up the libraries and a window. */
+VOID main(int argc, char **argv)
+{
+struct Window       *win;
+struct RastPort    myRPort = {0};
+
+return_code = RETURN_OK;
+
+if (NULL == (GfxBase = (struct GfxBase *)OpenLibrary(GRAPHICSNAME,37L)))
+    return_code = RETURN_FAIL;
+else
+    {
+    if (NULL == (IntuitionBase = (struct IntuitionBase *)OpenLibrary(INTUITIONNAME,37L)))
+        return_code = RETURN_FAIL;
+    else
+        {
+        if (NULL == (win = OpenWindow(&#038;myNewWindow)))
+            return_code = RETURN_WARN;
+        else
+            {
+            InitRastPort(&#038;myRPort);
+            myRPort = win-&#062;WScreen-&#062;RastPort;       /* Copy the structure. */
+            do_VSprite(win, &#038;myRPort);
+            CloseWindow(win);
+            }
+        CloseLibrary((struct Library *)IntuitionBase);
+        }
+    CloseLibrary((struct Library *)GfxBase);
+    }
+exit(return_code);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

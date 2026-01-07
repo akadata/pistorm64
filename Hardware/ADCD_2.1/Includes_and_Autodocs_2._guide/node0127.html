@@ -1,0 +1,261 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/rexx/storage.h" NODE="MAIN" TITLE="Includes/rexx/storage.h" -->
+<head>
+<title>Includes/rexx/storage.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0126.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0128.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef REXX_STORAGE_H
+#define REXX_STORAGE_H
+/*
+**	$Filename: rexx/storage.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 1.4 $
+**	$Date: 91/11/08 $
+**
+**	Header file to define ARexx data structures.
+**
+**	(C) Copyright 1986,1987,1988,1989,1990 William S. Hawes
+**	(C) Copyright 1990-1999 Amiga, Inc.
+**		All Rights Reserved
+<a name="line14">*/</a>
+
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+<a name="line18">#endif</a>
+
+#ifndef EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+<a name="line22">#endif</a>
+
+#ifndef EXEC_LISTS_H
+#include &#034;exec/lists.h&#034;
+<a name="line26">#endif</a>
+
+#ifndef EXEC_PORTS_H
+#include &#034;exec/ports.h&#034;
+<a name="line30">#endif</a>
+
+#ifndef EXEC_LIBRARIES_H
+#include &#034;exec/libraries.h&#034;
+#endif
+
+/* The NexxStr structure is used to maintain the internal strings in REXX.
+ * It includes the buffer area for the string and associated attributes.
+ * This is actually a variable-length structure; it is allocated for a
+ * specific length string, and the length is never modified thereafter
+ * (since it's used for recycling).
+<a name="line41"> */</a>
+<a name="line42"></a>
+<a name="line43">struct NexxStr {</a>
+<a name="line44">   LONG     ns_Ivalue;		       /* integer value		*/</a>
+<a name="line45">   UWORD    ns_Length;		       /* length in bytes (excl null)	*/</a>
+<a name="line46">   UBYTE    ns_Flags;		       /* attribute flags		*/</a>
+   UBYTE    ns_Hash;		       /* hash code			*/
+   BYTE     ns_Buff[8];	       /* buffer area for strings	*/
+<a name="line49">   };				       /* size: 16 bytes (minimum)	*/</a>
+<a name="line50"></a>
+#define NXADDLEN 9		       /* offset plus null byte	*/
+#define IVALUE(nsPtr) (nsPtr-&#062;ns_Ivalue)
+<a name="line53"></a>
+<a name="line54">/* String attribute flag bit definitions				*/</a>
+<a name="line55">#define NSB_KEEP     0		       /* permanent string?		*/</a>
+<a name="line56">#define NSB_STRING   1		       /* string form valid?		*/</a>
+<a name="line57">#define NSB_NOTNUM   2		       /* non-numeric?			*/</a>
+<a name="line58">#define NSB_NUMBER   3		       /* a valid number?		*/</a>
+<a name="line59">#define NSB_BINARY   4		       /* integer value saved?		*/</a>
+<a name="line60">#define NSB_FLOAT    5		       /* floating point format?	*/</a>
+#define NSB_EXT      6		       /* an external string?		*/
+#define NSB_SOURCE   7		       /* part of the program source?	*/
+<a name="line63"></a>
+<a name="line64">/* The flag form of the string attributes				*/</a>
+<a name="line65">#define NSF_KEEP     (1 &#060;&#060; NSB_KEEP  )</a>
+<a name="line66">#define NSF_STRING   (1 &#060;&#060; NSB_STRING)</a>
+<a name="line67">#define NSF_NOTNUM   (1 &#060;&#060; NSB_NOTNUM)</a>
+<a name="line68">#define NSF_NUMBER   (1 &#060;&#060; NSB_NUMBER)</a>
+<a name="line69">#define NSF_BINARY   (1 &#060;&#060; NSB_BINARY)</a>
+<a name="line70">#define NSF_FLOAT    (1 &#060;&#060; NSB_FLOAT )</a>
+#define NSF_EXT      (1 &#060;&#060; NSB_EXT   )
+#define NSF_SOURCE   (1 &#060;&#060; NSB_SOURCE)
+<a name="line73"></a>
+<a name="line74">/* Combinations of flags						*/</a>
+<a name="line75">#define NSF_INTNUM   (NSF_NUMBER | NSF_BINARY | NSF_STRING)</a>
+<a name="line76">#define NSF_DPNUM    (NSF_NUMBER | NSF_FLOAT)</a>
+<a name="line77">#define NSF_ALPHA    (NSF_NOTNUM | NSF_STRING)</a>
+<a name="line78">#define NSF_OWNED    (NSF_SOURCE | NSF_EXT    | NSF_KEEP)</a>
+#define KEEPSTR      (NSF_STRING | NSF_SOURCE | NSF_NOTNUM)
+#define KEEPNUM      (NSF_STRING | NSF_SOURCE | NSF_NUMBER | NSF_BINARY)
+
+/* The RexxArg structure is identical to the NexxStr structure, but
+ * is allocated from system memory rather than from internal storage.
+ * This structure is used for passing arguments to external programs.
+ * It is usually passed as an &#034;argstring&#034;, a pointer to the string buffer.
+<a name="line86"> */</a>
+<a name="line87"></a>
+<a name="line88">struct RexxArg {</a>
+<a name="line89">   LONG     ra_Size;		       /* total allocated length	*/</a>
+<a name="line90">   UWORD    ra_Length;		       /* length of string		*/</a>
+<a name="line91">   UBYTE    ra_Flags;		       /* attribute flags		*/</a>
+   UBYTE    ra_Hash;		       /* hash code			*/
+   BYTE     ra_Buff[8];	       /* buffer area			*/
+   };				       /* size: 16 bytes (minimum)	*/
+<a name="line95"></a>
+/* The RexxMsg structure is used for all communications with REXX
+ * programs.  It is an EXEC message with a parameter block appended.
+<a name="line98"> */</a>
+<a name="line99"></a>
+<a name="line100">struct RexxMsg {</a>
+<a name="line101">   struct Message rm_Node;	       /* EXEC message structure	*/</a>
+<a name="line102">   APTR     rm_TaskBlock;	       /* global structure (private)	*/</a>
+<a name="line103">   APTR     rm_LibBase;	       /* library base (private)	*/</a>
+<a name="line104">   LONG     rm_Action;		       /* command (action) code	*/</a>
+<a name="line105">   LONG     rm_Result1;	       /* primary result (return code)	*/</a>
+   LONG     rm_Result2;	       /* secondary result		*/
+<a name="line107">   STRPTR   rm_Args[16];	       /* argument block (ARG0-ARG15)	*/</a>
+<a name="line108"></a>
+<a name="line109">   struct MsgPort *rm_PassPort;        /* forwarding port		*/</a>
+<a name="line110">   STRPTR   rm_CommAddr;	       /* host address (port name)	*/</a>
+<a name="line111">   STRPTR   rm_FileExt;	       /* file extension		*/</a>
+<a name="line112">   LONG     rm_Stdin;		       /* input stream (filehandle)	*/</a>
+   LONG     rm_Stdout;		       /* output stream (filehandle)	*/
+   LONG     rm_avail;		       /* future expansion		*/
+   };				       /* size: 128 bytes		*/
+<a name="line116"></a>
+<a name="line117">/* Field definitions							*/</a>
+<a name="line118">#define ARG0(rmp) (rmp-&#062;rm_Args[0])    /* start of argblock		*/</a>
+#define ARG1(rmp) (rmp-&#062;rm_Args[1])    /* first argument		*/
+<a name="line120">#define ARG2(rmp) (rmp-&#062;rm_Args[2])    /* second argument		*/</a>
+
+#define MAXRMARG  15		       /* maximum arguments		*/
+<a name="line123"></a>
+<a name="line124">/* Command (action) codes for message packets				*/</a>
+<a name="line125">#define RXCOMM	  0x01000000	       /* a command-level invocation	*/</a>
+<a name="line126">#define RXFUNC	  0x02000000	       /* a function call		*/</a>
+<a name="line127">#define RXCLOSE   0x03000000	       /* close the REXX server	*/</a>
+<a name="line128">#define RXQUERY   0x04000000	       /* query for information	*/</a>
+<a name="line129">#define RXADDFH   0x07000000	       /* add a function host		*/</a>
+<a name="line130">#define RXADDLIB  0x08000000	       /* add a function library	*/</a>
+<a name="line131">#define RXREMLIB  0x09000000	       /* remove a function library	*/</a>
+<a name="line132">#define RXADDCON  0x0A000000	       /* add/update a ClipList string	*/</a>
+<a name="line133">#define RXREMCON  0x0B000000	       /* remove a ClipList string	*/</a>
+#define RXTCOPN   0x0C000000	       /* open the trace console	*/
+#define RXTCCLS   0x0D000000	       /* close the trace console	*/
+<a name="line136"></a>
+<a name="line137">/* Command modifier flag bits						*/</a>
+<a name="line138">#define RXFB_NOIO    16	       /* suppress I/O inheritance?	*/</a>
+<a name="line139">#define RXFB_RESULT  17	       /* result string expected?	*/</a>
+<a name="line140">#define RXFB_STRING  18	       /* program is a &#034;string file&#034;?	*/</a>
+#define RXFB_TOKEN   19	       /* tokenize the command line?	*/
+#define RXFB_NONRET  20	       /* a &#034;no-return&#034; message?	*/
+<a name="line143"></a>
+<a name="line144">/* The flag form of the command modifiers				*/</a>
+<a name="line145">#define RXFF_NOIO    (1L &#060;&#060; RXFB_NOIO  )</a>
+<a name="line146">#define RXFF_RESULT  (1L &#060;&#060; RXFB_RESULT)</a>
+<a name="line147">#define RXFF_STRING  (1L &#060;&#060; RXFB_STRING)</a>
+#define RXFF_TOKEN   (1L &#060;&#060; RXFB_TOKEN )
+<a name="line149">#define RXFF_NONRET  (1L &#060;&#060; RXFB_NONRET)</a>
+<a name="line150"></a>
+#define RXCODEMASK   0xFF000000
+#define RXARGMASK    0x0000000F
+
+/* The RexxRsrc structure is used to manage global resources.  Each node
+ * has a name string created as a RexxArg structure, and the total size
+ * of the node is saved in the &#034;rr_Size&#034; field.  The REXX systems library
+ * provides functions to allocate and release resource nodes.  If special
+ * deletion operations are required, an offset and base can be provided in
+ * &#034;rr_Func&#034; and &#034;rr_Base&#034;, respectively.  This &#034;autodelete&#034; function will
+ * be called with the base in register A6 and the node in A0.
+<a name="line161"> */</a>
+<a name="line162"></a>
+<a name="line163">struct RexxRsrc {</a>
+<a name="line164">   struct Node rr_Node;</a>
+<a name="line165">   WORD     rr_Func;		       /* &#034;auto-delete&#034; offset		*/</a>
+<a name="line166">   APTR     rr_Base;		       /* &#034;auto-delete&#034; base		*/</a>
+<a name="line167">   LONG     rr_Size;		       /* total size of node		*/</a>
+   LONG     rr_Arg1;		       /* available ...		*/
+   LONG     rr_Arg2;		       /* available ...		*/
+   };				       /* size: 32 bytes		*/
+<a name="line171"></a>
+<a name="line172">/* Resource node types							*/</a>
+<a name="line173">#define RRT_ANY      0		       /* any node type ...		*/</a>
+<a name="line174">#define RRT_LIB      1		       /* a function library		*/</a>
+<a name="line175">#define RRT_PORT     2		       /* a public port		*/</a>
+<a name="line176">#define RRT_FILE     3		       /* a file IoBuff		*/</a>
+#define RRT_HOST     4		       /* a function host		*/
+#define RRT_CLIP     5		       /* a Clip List node		*/
+
+/* The RexxTask structure holds the fields used by REXX to communicate with
+ * external processes, including the client task.  It includes the global
+ * data structure (and the base environment).  The structure is passed to
+ * the newly-created task in its &#034;wake-up&#034; message.
+<a name="line184"> */</a>
+
+<a name="line186">#define GLOBALSZ  200		       /* total size of GlobalData	*/</a>
+<a name="line187"></a>
+<a name="line188">struct RexxTask {</a>
+<a name="line189">   BYTE     rt_Global[GLOBALSZ];       /* global data structure	*/</a>
+<a name="line190">   struct MsgPort rt_MsgPort;	       /* global message port		*/</a>
+   UBYTE    rt_Flags;		       /* task flag bits		*/
+<a name="line192">   BYTE     rt_SigBit;		       /* signal bit			*/</a>
+<a name="line193"></a>
+<a name="line194">   APTR     rt_ClientID;	       /* the client's task ID		*/</a>
+<a name="line195">   APTR     rt_MsgPkt;		       /* the packet being processed	*/</a>
+   APTR     rt_TaskID;		       /* our task ID			*/
+<a name="line197">   APTR     rt_RexxPort;	       /* the REXX public port		*/</a>
+<a name="line198"></a>
+   APTR     rt_ErrTrap;	       /* Error trap address		*/
+<a name="line200">   APTR     rt_StackPtr;	       /* stack pointer for traps	*/</a>
+<a name="line201"></a>
+<a name="line202">   struct List rt_Header1;	       /* Environment list		*/</a>
+<a name="line203">   struct List rt_Header2;	       /* Memory freelist		*/</a>
+<a name="line204">   struct List rt_Header3;	       /* Memory allocation list	*/</a>
+   struct List rt_Header4;	       /* Files list			*/
+   struct List rt_Header5;	       /* Message Ports List		*/
+   };
+<a name="line208"></a>
+<a name="line209">/* Definitions for RexxTask flag bits					*/</a>
+<a name="line210">#define RTFB_TRACE   0		       /* external trace flag		*/</a>
+<a name="line211">#define RTFB_HALT    1		       /* external halt flag		*/</a>
+<a name="line212">#define RTFB_SUSP    2		       /* suspend task?		*/</a>
+<a name="line213">#define RTFB_TCUSE   3		       /* trace console in use?	*/</a>
+#define RTFB_WAIT    6		       /* waiting for reply?		*/
+#define RTFB_CLOSE   7		       /* task completed?		*/
+<a name="line216"></a>
+<a name="line217">/* Definitions for memory allocation constants				*/</a>
+#define MEMQUANT  16L		       /* quantum of memory space	*/
+<a name="line219">#define MEMMASK   0xFFFFFFF0	       /* mask for rounding the size	*/</a>
+<a name="line220"></a>
+#define MEMQUICK  (1L &#060;&#060; 0 )	       /* EXEC flags: MEMF_PUBLIC	*/
+#define MEMCLEAR  (1L &#060;&#060; 16)	       /* EXEC flags: MEMF_CLEAR	*/
+
+/* The SrcNode is a temporary structure used to hold values destined for
+ * a segment array.  It is also used to maintain the memory freelist.
+<a name="line226"> */</a>
+<a name="line227"></a>
+<a name="line228">struct SrcNode {</a>
+<a name="line229">   struct SrcNode *sn_Succ;	       /* next node			*/</a>
+<a name="line230">   struct SrcNode *sn_Pred;	       /* previous node		*/</a>
+   APTR     sn_Ptr;		       /* pointer value		*/
+   LONG     sn_Size;		       /* size of object		*/
+   };				       /* size: 16 bytes		*/
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="Forbid()" TITLE="exec.library/Forbid" -->
+<head>
+<title>exec.library/Forbid</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node020B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node020D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	Forbid -- forbid task rescheduling.
+
+<b>    SYNOPSIS</b>
+	Forbid()
+
+	void Forbid(void);
+
+<b>    FUNCTION</b>
+	Prevents other tasks from being scheduled to run by the dispatcher,
+	until a matching <a href="../Includes_and_Autodocs_3._guide/node0224.html">Permit()</a> is executed, or this task is scheduled to
+	<a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait()</a>.  Interrupts are NOT disabled.
+
+	DO NOT USE THIS CALL WITHOUT GOOD JUSTIFICATION.  THIS CALL IS
+	DANGEROUS!
+
+<b>    RESULTS</b>
+	The current task will not be rescheduled as long as it is ready to
+	run.  In the event that the current task enters a wait state, other
+	tasks may be scheduled.  Upon return from the wait state, the original
+	task will continue to run without disturbing the Forbid().
+
+	Calls to Forbid() nest. In order to restore normal task rescheduling,
+	the programmer must execute exactly one call to <a href="../Includes_and_Autodocs_3._guide/node0224.html">Permit()</a> for every
+	call to Forbid().
+
+<b>    WARNING</b>
+	In the event of a task entering a <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait()</a> after a Forbid(), the system
+	&#034;breaks&#034; the forbidden state and runs normally until the task which
+	called Forbid() is rescheduled.  If caution is not taken, this can
+	cause subtle bugs, since any device or DOS call will (in effect)
+	cause your task to wait.
+
+	Forbid() is not useful or safe from within interrupt code
+	(All interrupts are always higher priority than tasks, and
+	interrupts are allowed to break a Forbid()).
+
+<b>    NOTE</b>
+	This call is guaranteed to preserve all registers.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0224.html">Permit()</a>, <a href="../Includes_and_Autodocs_3._guide/node0203.html">Disable()</a>, <a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node021F.html">ObtainSemaphoreShared()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

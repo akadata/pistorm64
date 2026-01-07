@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_FTXT" NODE="16-4-3" TITLE=" FTXT IFF Formatted / FTXT Stripper " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> FTXT IFF Formatted / FTXT Stripper </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0170.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0172.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An FTXT reader program can read the text and ignore all formatting and
+structural information in a document <a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a> that uses <a href="../Devices_Manual_guide/node0168.html">FORMs FTXT</a> for the
+leaf nodes.  This amounts to stripping a document down to a stream of
+plain text. It would do this by skipping over all chunks except FTXT.<a href="../Devices_Manual_guide/node016D.html">CHRS</a>
+(CHRS chunks found inside a <a href="../Devices_Manual_guide/node0168.html">FORM FTXT</a>) and within the FTXT.CHRS chunks
+skipping all control characters and control sequences.  (<a href="../Devices_Manual_guide/node0174.html">Appendix C</a>
+diagrams this text scanner.) It may also read FTXT.<a href="../Devices_Manual_guide/node016E.html">FONS</a> chunks to find a
+description for font 1.
+
+Here's a Pascal-ish program for an <a href="../Devices_Manual_guide/node0168.html">FTXT</a> stripper.  Given a <a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a> (a
+document of some kind), it scans for all FTXT.<a href="../Devices_Manual_guide/node016D.html">CHRS</a> chunks.  This would
+likely be applied to the first FORM in an IFF file.
+
+  PROCEDURE ReadFORM4CHRS();    {Read an IFF FORM for FTXT.CHRS chunks.}
+    BEGIN
+    IF the FORM's subtype = &#034;FTXT&#034;
+        THEN ReadFTXT4CHRS()
+    ELSE WHILE something left to read in the FORM
+       DO BEGIN
+          read the next chunk header;
+          CASE the chunk's ID OF
+               &#034;LIST&#034;, &#034;CAT &#034;: ReadCAT4CHRS();
+               &#034;FORM&#034;: ReadFORM4CHRS();
+                OTHERWISE skip the chunk's body;
+          END
+       END
+    END;
+
+  {Read a LIST or CAT for all FTXT.CHRS chunks.}
+  PROCEDURE ReadCAT4CHRS();
+    BEGIN
+    WHILE something left to read in the LIST or CAT
+    DO BEGIN
+       read the next chunk header;
+       CASE the chunk's ID OF
+             &#034;LIST&#034;, &#034;CAT &#034;: ReadCAT4CHRS();
+             &#034;FORM&#034;: ReadFORM4CHRS();
+             &#034;PROP&#034;: IF we're reading a LIST AND the PROP's subtype = &#034;FTXT&#034;
+                    THEN read the PROP for &#034;FONS&#034; chunks;
+             OTHERWISE error--malformed IFF file;
+          END
+       END
+    END;
+
+  PROCEDURE ReadFTXT4CHRS();    {Read a FORM FTXT for CHRS chunks.}
+    BEGIN
+    WHILE something left to read in the FORM FTXT
+    DO BEGIN
+       read the next chunk header;
+       CASE the chunk's ID OF
+          &#034;CHRS&#034;: ReadCHRS();
+          &#034;FONS&#034;: BEGIN
+                   read the chunk's contents into a FontSpecifier variable;
+                   IF the font specifier's id = 1
+                   THEN use this font;
+                  END;
+            OTHERWISE skip the chunk's body;
+        END
+      END
+    END;
+
+
+
+  {Read an FTXT.CHRS. Skip all control sequences and unused control chars.}
+  PROCEDURE ReadCHRS();
+    BEGIN
+    WHILE something left to read in the CHRS chunk
+    DO
+       CASE read the next character OF
+          LF:  start a new output line;
+          ESC: SkipControl([' '..'/'], ['0'..'~']);
+          IN [' '..'~'], IN [NBSP..'&#255;']: output the character;
+          SS2, SS3: ; {Just handle the following G0 character directly,
+                      ignoring the shift to G2 or G3.}
+          CSI: SkipControl([' '..'?'], ['@'..'~']);
+            DCS, OSC, PM, APC: SkipControl([' '..'~'] + [NBSP..'&#255;'], [ST]);
+       END
+    END;
+
+
+  {Skip a control sequence of the format (rSet)* (tSet), i.e., any number of
+  characters in the set rSet followed by a character in the set tSet.}
+  PROCEDURE SkipControl(rSet, tSet);
+  VAR c: CHAR;
+    BEGIN
+       REPEAT c := read the next character
+       UNTIL c NOT IN rSet;
+
+       IF c NOT IN tSet
+          THEN put character c back into the input stream;
+    END
+
+
+The following program is an optimized version of the above routines
+ReadFORM4CHRS and ReadCAT4CHRS for the case where you're ignoring fonts as
+well as formatting.  It takes advantage of certain facts of the IFF format
+to read a document <a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a> and its nested FORMs, <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>s, and <a href="../Devices_Manual_guide/node01CA.html">CAT</a> s without a
+stack. In other words, it's a hack that ignores all fonts and faces to
+cheaply get to the plain text of the document.
+
+
+  {Cheap scan of an IFF FORM for FTXT.CHRS chunks.}
+  PROCEDURE ScanFORM4CHRS();
+    BEGIN
+    IF the document FORM's subtype = &#034;FTXT&#034;
+        THEN ReadFTXT4CHRS()
+    ELSE WHILE something left to read in the FORM
+         DO BEGIN
+            read the next chunk header;
+	    IF it's a group chunk (LIST, FORM, PROP, or CAT)
+		THEN read its subtype ID;
+	    CASE the chunk's ID OF
+		&#034;LIST&#034;, &#034;CAT &#034;:;	{NOTE: See explanation below.*}
+		&#034;FORM&#034;: IF this FORM's subtype = &#034;FTXT&#034;
+			    THEN ReadFTXT4CHRS()
+			ELSE;	{NOTE: See explanation below.*}
+		OTHERWISE skip the chunk's body;
+	    END
+	END
+    END;
+
+*Note: This implementation is subtle.  After reading a group header other
+than <a href="../Devices_Manual_guide/node0168.html">FORM FTXT</a> it just continues reading.  This amounts to reading all the
+chunks inside that group as if they weren't nested in a group.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

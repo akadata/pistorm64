@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_2" NODE="2-7-1" TITLE="2 / Hardware Control Commands / CMD_WRITE" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>2 / Hardware Control Commands / CMD_WRITE</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0032.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0034.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This is a single-channel command and is the main command for making
+sounds. You pass the following to <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a>:
+
+   *  A pointer to the waveform to be played (must start on a word boundary
+      and must be in memory accessible by the custom chips, MEMF_CHIP)
+
+   *  The length of the waveform in bytes (must be an even number)
+
+   *  A count of how many times you want to play the waveform
+
+If the count is 0, <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a> will play the waveform from beginning to end,
+<a name="line13">then repeat the waveform continuously until something aborts it.</a>
+
+If you want period and volume to be set at the start of the sound, set the
+WRITE command's ADIOF_PERVOL flag. If you do not do this, the previous
+volume and period for that channel will be used. This is one of the flags
+that is cleared by <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> and <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>. The ioa_WriteMsg field in the
+IOAudio block is an extra message field that can be replied to at the
+start of the <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a>. This second message is used only to tell you when
+the CMD_WRITE command starts processing, and it is used only when the
+ADIOF_WRITEMESSAGE flag is set to 1.
+
+If a <a href="../Devices_Manual_guide/node0039.html">CMD_STOP</a> has been performed, the <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a> requests are queued up.
+The CMD_WRITE command does not make its own copy of the waveform, so any
+modification of the waveform before the CMD_WRITE command is finished may
+affect the sound. This is sometimes desirable for special effects. To
+splice together two waveforms without clicks or pops, you must send a
+separate, second CMD_WRITE command while the first is still in progress.
+This technique is used in double-buffering, which is described below.
+
+By using two waveform buffers and two <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a> requests you can compute a
+waveform continuously. This is called double-buffering. The following
+<a name="line34">describes how you use double-buffering.</a>
+
+   1. Compute a waveform in memory buffer A.
+
+   2. Issue <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a> A with io_Data pointing to buffer A.
+
+   3. Continue the waveform in memory buffer B.
+
+   4. Issue <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a> B with io_Data pointing to Buffer B.
+
+   5. Wait for <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a> A to finish.
+
+   6. Continue the waveform in memory buffer A.
+
+   7. Issue <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a> A with io_Data pointing to Buffer A.
+
+   8. Wait for <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a> B to finish.
+
+   9. Loop back to step 3 until the waveform is finished.
+
+  10. At the end, remember to wait until both <a href="../Includes_and_Autodocs_2._guide/node04B6.html">CMD_WRITE</a> A and B are
+      finished.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

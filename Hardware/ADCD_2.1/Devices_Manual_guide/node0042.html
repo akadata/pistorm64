@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-2-2" TITLE="10 / Printer Device Access / Writing To Prt:" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 / Printer Device Access / Writing To Prt:</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0041.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0043.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Once you've opened it, you can print by calling the AmigaDOS <a href="../Includes_and_Autodocs_2._guide/node0310.html">Write()</a>
+standard I/O routine.
+
+    actual_length = Write(file, dataLocation, length);
+
+    where
+
+    file is a file handle.
+
+dataLocation
+   is a pointer to the first character in the output stream you wish to
+   write.  This stream can contain the standard escape sequences as
+   shown in the command table below. The printer command aRAW (see the
+   <a href="../Devices_Manual_guide/node004A.html#line11">Printer Device Command Functions</a> table below) can be used in the
+   stream if character translation is not desired.
+
+length
+   is the length of the output stream.
+
+actual_length
+   is the actual length of the write. For the printer device, if there
+   are no errors, this will be the same as the length of write
+   requested. The only exception is if you specify a value of -1 for
+   length. In this case, -1 for length means that a null (0) terminated
+   stream is being written to the printer device. The device returns the
+   count of characters written prior to encountering the null.  If it
+   returns a value of -1 in actual_length, there has been an error.
+
+   -1 = STOP!
+   ----------
+   If a -1 is returned by <a href="../Includes_and_Autodocs_2._guide/node0310.html">Write()</a>, do not do any additional printing.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

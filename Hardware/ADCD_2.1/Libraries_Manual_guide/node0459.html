@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-8-2-2" TITLE="33 / / Custom Chunk Handlers / Inside a Custom Chunk Handler" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / / Custom Chunk Handlers / Inside a Custom Chunk Handler</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0458.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node045A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The mechanics of receiving parameters through the <a href="../Libraries_Manual_guide/node04A3.html">Hook</a> are covered in the
+&#034;<a href="../Libraries_Manual_guide/node0454.html">Custom Stream Handlers</a>&#034; section, and are not duplicated here.  Refer to
+the <a href="../Includes_and_Autodocs_2._guide/node01BF.html">EntryHandler()</a> and <a href="../Includes_and_Autodocs_2._guide/node01C0.html">ExitHandler()</a> Autodocs for the contents of the
+registers upon entry.
+
+Once inside your handler, you can call nearly all functions in the
+iffparse.library, however, you should avoid calling <a href="../Libraries_Manual_guide/node0432.html">ParseIFF()</a> from within
+chunk handlers.
+
+Your handler runs in the same environment as whoever called <a href="../Libraries_Manual_guide/node0432.html">ParseIFF()</a>.
+The propagation sequence is:
+
+     __________            ____________            ________________
+    |          |          |            |          |                |
+    | mainline |--calls--&#062;| ParseIFF() |--calls--&#062;| your_handler() |
+    |__________|          |____________|          |________________|
+
+
+Thus, your handler runs on your mainline's stack, and can call any OS
+functions the mainline code can.  (Your handler will have to set the
+global base pointer if your code uses base-relative addressing.)
+
+When leaving the handler, you must follow the standard register
+preservation conventions (D0/D1/A0/A1 may be trashed, all others must be
+preserved).  D0 contains your return code, which will affect the parser in
+a number of ways:
+
+If you return zero (a normal, uneventful return), <a href="../Libraries_Manual_guide/node0432.html">ParseIFF()</a> will continue
+normally.  If you return the value IFFERR_RETURN2CLIENT, ParseIFF() will
+stop and return the value zero to the mainline code.
+
+If you return any other value, <a href="../Libraries_Manual_guide/node0432.html">ParseIFF()</a> will stop and return that value
+to the mainline code.  This is how you should return error conditions to
+the client code.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

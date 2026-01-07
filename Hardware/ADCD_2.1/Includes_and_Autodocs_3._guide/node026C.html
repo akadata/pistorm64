@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="expansion" NODE="SetCurrentBinding()" TITLE="expansion.library/SetCurrentBinding" -->
+<head>
+<title>expansion.library/SetCurrentBinding</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node026B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node026D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetCurrentBinding - sets static board configuration area
+
+<b>   SYNOPSIS</b>
+	SetCurrentBinding( currentBinding, size )
+	                   A0		   D0:16
+
+<b>   FUNCTION</b>
+	This function records the contents of the &#034;currentBinding&#034;
+	structure in a private place.  It may be read via
+	<a href="../Includes_and_Autodocs_3._guide/node0265.html">GetCurrentBinding()</a>.  This is really a kludge, but it is
+	the only way to pass extra arguments to a newly configured
+	device.
+
+	A <a href="../Includes_and_Autodocs_3._guide/node05F1.html#line60">CurrentBinding</a> structure has the name of the currently
+	loaded file, the product string that was associated with
+	this driver, and a pointer to the head of a singly linked
+	list of <a href="../Includes_and_Autodocs_3._guide/node05F1.html#line31">ConfigDev</a> structures (linked through the cd_NextCD
+	field).
+
+	Many devices may not need this information; they have hard
+	coded into themselves their manufacture number.  It is
+	recommended that you at least check that you can deal with
+	the product code in the linked <a href="../Includes_and_Autodocs_3._guide/node05F1.html#line31">ConfigDev</a> structures.
+
+<b>   INPUTS</b>
+	currentBinding - a pointer to a <a href="../Includes_and_Autodocs_3._guide/node05F1.html#line60">CurrentBinding</a> structure
+
+	size - The size of the user's binddriver structure.  No
+	    more than this much data will be copied.  If size is
+	    less than the library's idea a <a href="../Includes_and_Autodocs_3._guide/node05F1.html#line60">CurrentBinding</a> size,
+	    then the library's structure will be null padded.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0265.html">GetCurrentBinding()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

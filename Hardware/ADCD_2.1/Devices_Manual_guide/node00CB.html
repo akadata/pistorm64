@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_6" NODE="6-1" TITLE="6 Input Device / Input Device Commands and Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>6 Input Device / Input Device Commands and Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00CA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00CC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Command          Operation
+-------          ---------
+CMD_FLUSH        Purge all active and queued requests for the input device.
+
+CMD_RESET        Reset the input port to its initialized state.  All
+                 active and queued I/O requests will be aborted.  Restarts
+                 the device if it has been stopped.
+
+CMD_START        Restart the currently active input (if any) and resume
+                 queued I/O requests.
+
+CMD_STOP         Stop any currently active input and prevent queued I/O
+                 requests from starting.
+
+<a href="../Devices_Manual_guide/node00D2.html">IND_ADDHANDLER</a>   Add an input-stream handler into the handler chain.
+
+<a href="../Devices_Manual_guide/node00D4.html">IND_REMHANDLER</a>   Remove an input-stream handler from the handler chain.
+
+<a href="../Devices_Manual_guide/node00D0.html">IND_SETMPORT</a>     Set the controller port to which the mouse is connected.
+
+<a href="../Devices_Manual_guide/node00D1.html">IND_SETMTRIG</a>     Set conditions that must be met by a mouse before a
+                 pending read request will be satisfied.
+
+<a href="../Includes_and_Autodocs_2._guide/node04E5.html">IND_SETMTYPE</a>     Set the type of device at the mouse port.
+
+<a href="../Devices_Manual_guide/node00D8.html">IND_SETPERIOD</a>    Set the period at which a repeating key repeats.
+
+<a href="../Devices_Manual_guide/node00D7.html">IND_SETTHRESH</a>    Set the repeating key hold-down time before repeat starts.
+
+<a href="../Devices_Manual_guide/node00D6.html">IND_WRITEEVENT</a>   Propagate an input event stream to all devices.
+
+
+Input Device Function
+---------------------
+<a href="../Includes_and_Autodocs_2._guide/node04E9.html">PeekQualifier()</a>  Return the input device's current qualifiers. (V36)
+
+
+Exec Functions as Used in This Chapter
+--------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a>        Abort a command to the input device.
+
+<a href="../Includes_and_Autodocs_2._guide/node033E.html">CheckIO()</a>        Return the status of an I/O request.
+
+<a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>    Relinquish use of the input device.
+
+<a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>           Initiate a command and wait for completion (synchronous
+                 request).
+
+<a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>     Obtain shared use of the input device.
+
+<a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>         Initiate a command and return immediately (asynchronous
+                 request).
+
+Exec Support Functions as Used in This Chapter
+----------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>    Create an extended I/O request structure of type
+                 <a href="../Devices_Manual_guide/node00CC.html#line12">IOStdReq</a>.  This structure will be used to communicate
+                 commands to the input device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>     Create a signal message port for reply messages from the
+                 input device.  Exec will signal a task when a message
+                 arrives at the reply port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>    Delete an I/O request structure created by <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>.
+
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>     Delete the message port created by <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

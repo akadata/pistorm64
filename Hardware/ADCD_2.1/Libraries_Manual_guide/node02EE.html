@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_24" NODE="24-1-3" TITLE="24 / Message Ports / How To Rendezvous at a Message Port" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>24 / Message Ports / How To Rendezvous at a Message Port</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02ED.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02EF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node034F.html">FindPort()</a> function provides a means of finding the address of a
+public port given its symbolic name.  For example, FindPort(&#034;Griffin&#034;)
+will return either the address of the message port named &#034;Griffin&#034; or NULL
+indicating that no such public port exists.  Since FindPort() does not do
+any arbitration over access to public ports, the usage of FindPort() must
+be protected with <a href="../Libraries_Manual_guide/node02C2.html#line9">Forbid()/Permit()</a>. Names should be unique to prevent
+collisions among multiple applications.  It is a good idea to use your
+application name as a prefix for your port name.  FindPort() does not
+arbitrate for access to the port list.  The owner of a port might remove
+it at any time.  For these reasons a Forbid()/Permit() pair is required
+for the use of FindPort().  The port address can no longer be regarded as
+being valid after Permit() unless your application knows that the port
+cannot go away (for example, if your application created the port).
+
+The following is an example of how to safely put a message to a specific
+port:
+
+    #include &#060;exec/types.h&#062;
+    #include &#060;exec/ports.h&#062;
+
+       BOOL MsgPort SafePutToPort(struct Message *message, STRPTR portname)
+       {
+           struct MsgPort *port;
+
+           Forbid();
+           port = FindPort(portname);
+           if (port) PutMsg(port,message);
+           Permit();
+           return(port ? TRUE : FALSE);
+                           /* If FALSE, the port was not found */
+
+           /* Once we've done a Permit(), the port might go away */
+           /* and leave us with an invalid port address. So we   */
+           /* return just a BOOL to indicate whether the message */
+           /* has been sent or not.                              */
+       }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

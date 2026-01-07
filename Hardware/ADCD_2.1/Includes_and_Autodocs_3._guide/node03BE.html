@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="ItemAddress()" TITLE="intuition.library/ItemAddress" -->
+<head>
+<title>intuition.library/ItemAddress</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03BD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03BF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ItemAddress -- Returns the address of the specified <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line87">MenuItem</a>.
+
+<b>    SYNOPSIS</b>
+	Item = ItemAddress( MenuStrip, MenuNumber )
+	D0		    A0         D0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line87">MenuItem</a> *ItemAddress( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line59">Menu</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a> );
+
+<b>    FUNCTION</b>
+	This routine feels through the specified menu strip and returns the
+	address of the item specified by the menu number.  Typically,
+	you will use this routine to get the address of a menu item from
+	a menu number sent to you by Intuition after user has chosen from
+	a window's menus.
+
+       This routine requires that the arguments are well-defined.
+	MenuNumber may be equal to MENUNULL, in which case this routine returns
+	NULL.  If MenuNumber doesn't equal MENUNULL, it's presumed to be a
+	valid item number selector for your menu strip, which includes:
+           - a valid menu number
+           - a valid item number
+           - if the item specified by the above two components has a
+             sub-item, the menu number may have a sub-item component, too.
+
+	Note that there must be BOTH a menu number and an item number.
+	Because a sub-item specifier is optional, the address returned by
+	this routine may point to either an item or a sub-item.
+
+<b>    INPUTS</b>
+	MenuStrip = a pointer to the first menu in your menu strip
+	MenuNumber = the value which contains the packed data that selects
+           the menu and item (and sub-item).  See the Intuition Reference
+	    Manual for information on menu numbers.
+
+<b>    RESULT</b>
+	If MenuNumber == MENUNULL, this routine returns NULL,
+	else this routine returns the address of the menu item specified
+	by MenuNumber.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	The &#034;Menus&#034; chapter of the Intuition Reference Manual,
+	or the Amiga ROM Kernel Manual
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

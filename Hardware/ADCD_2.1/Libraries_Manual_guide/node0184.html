@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-4" TITLE="6 / Setting Up Menus / Changing Menu Strips" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Setting Up Menus / Changing Menu Strips</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0183.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0185.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Direct changes to a menu strip attached to a window may be made only after
+the menu strip has been removed from the window.  Use the <a href="../Libraries_Manual_guide/node0181.html#line11">ClearMenuStrip()</a>
+function to remove the menu strip.  It may be added back to the window
+after the changes are complete.
+
+Major changes include such things as adding or removing menus, items and
+sub-items; changing text or image data; and changing the placement of the
+<a name="line9">data.  These changes require the system to completely re-layout the menus.</a>
+
+An additional function, <a href="../Includes_and_Autodocs_2._guide/node024A.html">ResetMenuStrip()</a>, is available to let the
+application make small changes to the menus without the overhead of
+<a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a>.  Only two things in the menu strip may be changed before a
+call to ResetMenuStrip(), they are: changing the <a href="../Libraries_Manual_guide/node019B.html#line7">CHECKED</a> flag to turn
+checkmarks on or off, and changing the <a href="../Libraries_Manual_guide/node019B.html#line30">ITEMENABLED</a> flag to enable/disable
+menus, items or sub-items.
+
+<a name="line18">    BOOL ResetMenuStrip( struct Window *window, struct Menu *menu );</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node024A.html">ResetMenuStrip()</a> is called in place of <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a>, and may only be
+called on menus that were previously initialized with a call to
+SetMenuStrip().  As with SetMenuStrip(), the menu strip must be removed
+from the window before calling ResetMenuStrip().  Note that the window
+used in the ResetMenuStrip() call does not have to be the same window to
+which the menu was previously attached.  The window, however, must be on a
+screen of the same mode to prevent the need for recalculating the layout
+of the menu.
+
+If the application wishes to attach a different menu strip to a window
+that already has an existing menu strip, the application must call
+<a name="line31"><a href="../Libraries_Manual_guide/node0181.html#line11">ClearMenuStrip()</a> before calling <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a> with the new menu strip.</a>
+
+The flow of events for menu operations should be:
+
+     1. <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a>.
+
+     2. <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a>.
+
+     3. Zero or more iterations of <a href="../Libraries_Manual_guide/node0181.html#line11">ClearMenuStrip()</a> and
+        <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a>/<a href="../Includes_and_Autodocs_2._guide/node024A.html">ResetMenuStrip()</a>.
+
+     4. <a href="../Libraries_Manual_guide/node0181.html#line11">ClearMenuStrip()</a>.
+
+     5. <a href="../Libraries_Manual_guide/node0105.html">CloseWindow()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

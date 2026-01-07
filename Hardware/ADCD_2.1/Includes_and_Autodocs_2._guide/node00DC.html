@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/intuitionbase.h" NODE="MAIN" TITLE="Includes/intuition/intuitionbase.h" -->
+<head>
+<title>Includes/intuition/intuitionbase.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00DB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00DD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef INTUITION_INTUITIONBASE_H
+#define INTUITION_INTUITIONBASE_H 1
+/*
+**  $Filename: intuition/intuitionbase.h $
+**  $Release: 2.04 Includes, V37.4 $
+**  $Revision: 36.19 $
+**  $Date: 90/07/12 $
+**
+**  Public part of IntuitionBase structure and supporting structures
+**
+**  (C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+#ifndef EXEC_LIBRARIES_H
+#include &#060;exec/libraries.h&#062;
+#endif
+<a name="line22"></a>
+#ifndef INTUITION_INTUITION_H
+#include &#060;intuition/intuition.h&#062;
+#endif
+
+<a name="line27"></a>
+#ifndef EXEC_INTERRUPTS_H
+#include &#060;exec/interrupts.h&#062;
+#endif
+
+/* these are the display modes for which we have corresponding parameter
+ *  settings in the config arrays
+<a name="line34"> */</a>
+<a name="line35">#define DMODECOUNT	0x0002	/* how many modes there are */</a>
+<a name="line36">#define HIRESPICK	0x0000</a>
+#define LOWRESPICK	0x0001
+<a name="line38"></a>
+#define EVENTMAX 10		/* size of event array */
+
+<a name="line41">/* these are the system Gadget defines */</a>
+<a name="line42">#define RESCOUNT	2</a>
+<a name="line43">#define HIRESGADGET	0</a>
+#define LOWRESGADGET	1
+<a name="line45"></a>
+<a name="line46">#define GADGETCOUNT	8</a>
+<a name="line47">#define UPFRONTGADGET	0</a>
+<a name="line48">#define DOWNBACKGADGET	1</a>
+<a name="line49">#define SIZEGADGET	2</a>
+<a name="line50">#define CLOSEGADGET	3</a>
+<a name="line51">#define DRAGGADGET	4</a>
+<a name="line52">#define SUPFRONTGADGET	5</a>
+<a name="line53">#define SDOWNBACKGADGET	6</a>
+#define SDRAGGADGET	7
+
+/* ======================================================================== */
+/* === IntuitionBase ====================================================== */
+/* ======================================================================== */
+<a name="line59">/*</a>
+ * Be sure to protect yourself against someone modifying these data as
+ * you look at them.  This is done by calling:
+ *
+ * lock = LockIBase(0), which returns a ULONG.	When done call
+ * UnlockIBase(lock) where lock is what LockIBase() returned.
+ */
+
+<a name="line67">/* This structure is strictly READ ONLY */</a>
+struct IntuitionBase
+<a name="line69">{</a>
+    struct Library LibNode;
+<a name="line71"></a>
+    struct View ViewLord;
+<a name="line73"></a>
+<a name="line74">    struct Window *ActiveWindow;</a>
+    struct Screen *ActiveScreen;
+
+    /* the FirstScreen variable points to the frontmost Screen.  Screens are
+     * then maintained in a front to back order using Screen.NextScreen
+<a name="line79">     */</a>
+    struct Screen *FirstScreen; /* for linked list of all screens */
+<a name="line81"></a>
+<a name="line82">    ULONG Flags;	/* values are all system private */</a>
+    WORD	MouseY, MouseX;
+			/* note &#034;backwards&#034; order of these		*/
+<a name="line85"></a>
+<a name="line86">    ULONG Seconds;	/* timestamp of most current input event */</a>
+    ULONG Micros;	/* timestamp of most current input event */
+
+    /* I told you this was private.
+     * The data beyond this point has changed, is changing, and
+     * will continue to change.
+     */
+};
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

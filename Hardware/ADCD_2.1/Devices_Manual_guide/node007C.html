@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_11" NODE="11-5" TITLE="11 SCSI Device / Amiga BootStrap" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>11 SCSI Device / Amiga BootStrap</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node007B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node007D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+At priority -40 in the system module initialization sequence, after most
+other modules are initialized, appropriate expansion boards are
+configured.  Appropriate boards will match a <a href="../Includes_and_Autodocs_2._guide/node03B4.html">FindConfigDev</a>(, -1,-1)
+ - these are all boards on the expansion library board list.
+Furthermore, they will meet all of the following conditions:
+
+   1. CDB_CONFIGME set in cd_Flags,
+
+   2. ERTB_DIAGVALID set in cd_Rom-&#062;er_Type,
+
+   3. diagnostic area pointer (in cd_Rom-&#062;er_Reserved0c) is non-zero,
+
+   4. DAC_CONFIGTIME set in da_Config, and
+
+   5. at least one valid resident tag within the diagnostic area, the first
+      of which is used by <a href="../Includes_and_Autodocs_2._guide/node035C.html">InitResident()</a> below.  This resident structure
+      was patched to be valid during the ROM diagnostic routine run when
+      the expansion library first initialized the board.
+
+Boards meeting all these conditions are initialized with the standard
+<a href="../Includes_and_Autodocs_2._guide/node035C.html">InitResident()</a> mechanism, with a NULL SegList.  The board initialization
+code can find its <a href="../Includes_and_Autodocs_2._guide/node00FC.html#line32">ConfigDev</a> structure with the expansion library's
+<a href="../Includes_and_Autodocs_2._guide/node03B7.html">GetCurrentBinding()</a> function.  This is an appropriate time for drivers to
+<a href="../Includes_and_Autodocs_2._guide/node034D.html">Enqueue()</a> a boot node on the expansion library's eb_MountList for use by
+the strap module below, and clear CDB_CONFIGME so a C:BindDrivers command
+<a name="line27">will not try to initialize the board a second time.</a>
+
+This module will also enqueue nodes for 3.5&#034; trackdisk device
+units.  These nodes will be at the following priorities:
+
+                           Priority     Drive
+                           --------     -----
+                             5          df0:
+                           -10          df1:
+                           -20          df2:
+                           -30          df3:
+
+Next, at priority -60 in the system module initialization sequence, the
+strap module is invoked.  Nodes from the prioritized eb_MountList list is
+used in priority order in attempts to boot. An item on the list is given a
+chance to boot via one of two different mechanisms, depending on whether
+it it uses boot code read in off the disk (<a href="../Devices_Manual_guide/node007D.html">BootBlock booting</a>), or uses
+boot code provided in the device <a href="../Includes_and_Autodocs_2._guide/node00FC.html#line32">ConfigDev</a> diagnostic area
+(<a href="../Devices_Manual_guide/node007E.html">BootPoint booting</a>).  Floppies always use the BootBlock method.  Other
+entries put on the eb_MountList (e.g. hard disk partitions) used the
+BootPoint mechanism for pre-V36 Kickstart, but can use either for V36/V37.
+
+The eb_MountList is modified before each boot attempt, and then
+restored and re-modified for the next attempt if the boot fails:
+
+   1. The node associated with the current boot attempt is placed at the
+      head of the eb_MountList.
+
+   2. Nodes marked as unusable under AmigaDOS are removed from the list.
+      Nodes that are unusable are marked by the longword
+      bn_DeviceNode-&#062;dn_Handler having the most significant bit set.  This
+      is used, for example, to keep UNIX partitions off the AmigaDOS device
+<a name="line59">      list when booting AmigaDOS instead of UNIX.</a>
+
+The selection of which of the two different boot mechanisms to use
+proceeds as follows:
+
+   1. The node must be valid boot node, i.e. meet both of the following
+      conditions:
+
+       a) ln_Type is NT_BOOTNODE,
+       b) bn_DeviceNode is non-zero,
+
+   2. The type of boot is determined by looking at the DosEnvec pointed to
+      by fssm_Environ pointed to by the dn_Startup in the bn_DeviceNode:
+
+       a) if the de_TableSize is less than DE_BOOTBLOCKS, or the
+          de_BootBlocks entry is zero, BootPoint booting is specified,
+          otherwise
+
+       b) de_BootBlocks contains the number of blocks to read in from
+          the beginning of the partition, checksum, and try to boot from.
+
+ <a href="../Devices_Manual_guide/node007D.html">Bootblock Booting</a> 
+ <a href="../Devices_Manual_guide/node007E.html">Bootpoint Booting</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

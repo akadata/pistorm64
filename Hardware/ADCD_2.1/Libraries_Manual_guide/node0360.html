@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-3" TITLE="27 / Drawing Routines / Performing Data Move Operations" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / Drawing Routines / Performing Data Move Operations</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node035F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0361.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The graphics library includes several routines that use the hardware
+blitter to handle the rectangularly organized data that you work with when
+doing raster-based graphics.  These blitter routines do the following:
+
+      * Clear an entire segment of memory
+
+      * Set a raster to a specific color
+
+      * Scroll a subrectangle of a raster
+
+      * Draw a pattern &#034;through a stencil&#034;
+
+      * Extract a pattern from a bit-packed array and draw it into a
+        raster
+
+      * Copy rectangular regions from one bitmap to another
+
+      * Control and utilize the hardware-based data mover, the blitter
+
+<a name="line21">The following sections cover these routines in detail.</a>
+
+    WARNING:
+    --------
+    The graphics library rendering and data movement routines generally
+    wait to get access to the blitter, start their blit, and then exit
+    without waiting for the blit to finish.  Therefore, you must
+    <a href="../Libraries_Manual_guide/node0368.html">WaitBlit()</a> after a graphics rendering or data movement call if you
+    intend to immediately deallocate, examine, or perform order-dependent
+    processor operations on the memory used in the call.
+
+ <a href="../Libraries_Manual_guide/node0361.html">Clearing a Memory Area</a> 
+ <a href="../Libraries_Manual_guide/node0362.html">Setting a Whole Raster to a Color</a> 
+ <a href="../Libraries_Manual_guide/node0363.html">Scrolling a Sub-rectangle of a Raster</a> 
+ <a href="../Libraries_Manual_guide/node0364.html">Drawing through a Stencil</a> 
+ <a href="../Libraries_Manual_guide/node0365.html">Extracting from a Bit-packed Array</a> 
+ <a href="../Libraries_Manual_guide/node0366.html">Copying Rectangular Areas</a> 
+ <a href="../Libraries_Manual_guide/node0367.html">Scaling Rectangular Areas</a> 
+ <a href="../Libraries_Manual_guide/node0368.html">When to Wait for the Blitter</a> 
+ <a href="../Libraries_Manual_guide/node0369.html">Accessing the Blitter Directly</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

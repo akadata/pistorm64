@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="AttemptLockDosList()" TITLE="dos.library/AttemptLockDosList" -->
+<head>
+<title>dos.library/AttemptLockDosList</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0142.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0144.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AttemptLockDosList -- Attempt to lock the Dos Lists for use (V36)
+
+<b>   SYNOPSIS</b>
+	dlist = AttemptLockDosList(flags)
+	D0			    D1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05D9.html#line371">DosList</a> *AttemptLockDosList(ULONG)
+
+<b>   FUNCTION</b>
+	Locks the dos device list in preparation to walk the list.  If the
+	list is 'busy' then this routine will return NULL.  See <a href="../Includes_and_Autodocs_3._guide/node0187.html">LockDosList()</a>
+	for more information.
+
+<b>   INPUTS</b>
+	flags - Flags stating which types of nodes you want to lock.
+
+<b>   RESULT</b>
+	dlist - Pointer to the beginning of the list or NULL.  Not a valid
+		node!
+
+<b>   BUGS</b>
+	In V36 through V39.23 dos, this would return NULL or 0x00000001 for
+	failure.  Fixed in V39.24 dos (after kickstart 39.106).
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0187.html">LockDosList()</a>, <a href="../Includes_and_Autodocs_3._guide/node01C9.html">UnLockDosList()</a>, <a href="../Includes_and_Autodocs_3._guide/node020C.html">Forbid()</a>, <a href="../Includes_and_Autodocs_3._guide/node0195.html">NextDosEntry()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

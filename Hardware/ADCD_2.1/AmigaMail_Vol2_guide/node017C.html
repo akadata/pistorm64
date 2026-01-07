@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="II-77/ASyncExample.c" NODE="MAIN" TITLE="II-77/ASyncExample.c" -->
+<head>
+<title>II-77/ASyncExample.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node017B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node017D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* ASyncExample.c - Execute me to compile me with SAS/C 6.56
+sc NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 ASyncExample.c
+slink FROM LIB:c.o,ASyncExample.o TO ASyncExample LIBRARY LIB:sc.lib,LIB:amiga.lib,asyncio.o
+quit ;*/
+
+/*
+(c)  Copyright 1992-1999 Amiga, Inc.   All rights reserved.
+The information contained herein is subject to change without notice,
+and is provided &#034;as is&#034; without warranty of any kind, either expressed
+or implied.  The entire risk as to the use of this information is
+assumed by the user.
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/exec.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;dos/dosextens.h&#062;
+#include &#060;stdio.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+
+#include &#034;asyncio.h&#034;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }
+#endif
+
+VOID main(VOID)
+{
+struct AsyncFile *in;
+LONG              num;
+struct AsyncFile *out;
+
+    if (in = OpenAsync(&#034;s:Startup-Sequence&#034;, MODE_READ, 8192))
+    {
+        if (out = OpenAsync(&#034;t:test_sync&#034;, MODE_WRITE, 8192))
+        {
+            while ((num = ReadCharAsync(in)) &#062;= 0)
+            {
+                WriteCharAsync(out,num);
+            }
+            CloseAsync(out);
+        }
+        CloseAsync(in);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

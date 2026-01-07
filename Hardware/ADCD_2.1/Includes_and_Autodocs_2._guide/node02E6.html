@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="RemDosEntry()" TITLE="dos.library/RemDosEntry" -->
+<head>
+<title>dos.library/RemDosEntry</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02E5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02E7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    RemDosEntry -- Removes a Dos <a href="../Includes_and_Autodocs_2._guide/node007D.html#line21">List</a> entry from it's list (V36)
+
+SYNOPSIS
+    success = RemDosEntry(dlist)
+    D0                     D1
+
+    BOOL RemDosEntry(struct <a href="../Includes_and_Autodocs_2._guide/node0078.html#line369">DosList</a> *)
+
+FUNCTION
+    This removes an entry from the Dos <a href="../Includes_and_Autodocs_2._guide/node0087.html#line25">Device</a> list.  The memory associated
+    with the entry is NOT freed.  NOTE: you must have locked the Dos <a href="../Includes_and_Autodocs_2._guide/node007D.html#line21">List</a>
+    with the appropriate flags before calling this routine.  Handler
+    writers should see the <a href="../Includes_and_Autodocs_2._guide/node027C.html">AddDosEntry()</a> caveats about locking and use
+    a similar workaround to avoid deadlocks.
+
+INPUTS
+    dlist   - <a href="../Includes_and_Autodocs_2._guide/node0087.html#line25">Device</a> list entry to be removed.
+
+RESULT
+    success - Success/failure indicator
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node027C.html">AddDosEntry()</a>, <a href="../Includes_and_Autodocs_2._guide/node02A7.html">FindDosEntry()</a>, <a href="../Includes_and_Autodocs_2._guide/node02D5.html">NextDosEntry()</a>, <a href="../Includes_and_Autodocs_2._guide/node02C7.html">LockDosList()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node02CA.html">MakeDosEntry()</a>, <a href="../Includes_and_Autodocs_2._guide/node02B1.html">FreeDosEntry()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

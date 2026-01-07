@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="Rename()" TITLE="dos.library/Rename" -->
+<head>
+<title>dos.library/Rename</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01A7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01A9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	Rename -- Rename a directory or file
+
+<b>    SYNOPSIS</b>
+	success = Rename( oldName, newName )
+	D0		  D1	   D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> Rename(STRPTR, STRPTR)
+
+<b>    FUNCTION</b>
+	Rename() attempts to rename the file or directory specified as
+	'oldName' with the name 'newName'. If the file or directory
+	'newName' exists, Rename() fails and returns an error. Both
+	'oldName' and the 'newName' can contain a directory specification.
+	In this case, the file will be moved from one directory to another.
+
+	Note: it is impossible to Rename() a file from one volume to
+	another.
+
+<b>    INPUTS</b>
+	oldName - pointer to a null-terminated string
+	newName - pointer to a null-terminated string
+
+<b>    RESULTS</b>
+	success - boolean
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01A4.html">Relabel()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="serial" NODE="OpenDevice()" TITLE="serial.device/OpenDevice" -->
+<head>
+<title>serial.device/OpenDevice</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node055F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0561.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       OpenDevice -- <a href="../Includes_and_Autodocs_3._guide/node03E5.html">Request</a> an opening of the serial device.
+
+<b>   SYNOPSIS</b>
+       error = OpenDevice(&#034;serial.device&#034;, unit, ioRequest, flags)
+       D0                  A0              D0    A1         D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line48">BYTE</a> OpenDevice(STRPTR, ULONG, struct IOExtSer *, ULONG);
+
+<b>   FUNCTION</b>
+       This is an exec call.  Exec will search for the serial.device, and
+       if found, will pass this call on to the device.
+
+       Unless the shared-access bit (bit 5 of io_SerFlags) is set,
+       exclusive use is granted and no other access to that unit is
+       allowed until the owner closes it.  All the serial-specific fields
+       in the ioRequest are initialized to their most recent values (or
+       the <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a> default, for the first time open).
+
+       If support of 7-wire handshaking (i.e. RS232-C CTS/RTS protocol)
+       is required, use the <a href="../Includes_and_Autodocs_3._guide/node0563.html">serial.device/SDCMD_SETPARAMS</a> command.
+	This feature should also be specified at inital OpenDevice() time.
+
+<b>   INPUTS</b>
+       &#034;serial.device&#034;	- pointer to literal string &#034;serial.device&#034;
+       unit      	- Must be zero, or a user setable unit number.
+			  (This field is used by multiple port controllers)
+                         Zero specifies the default serial port.
+       ioRequest 	- pointer to an ioRequest block of size io_ExtSerSize
+                         to be initialized by the serial.device.
+                   	  (see <a href="../Includes_and_Autodocs_3._guide/node0668.html">devices/serial.h</a> for the definition)
+                     	  NOTE use of io_SerFlags (see FUNCTION above)
+		IMPORTANT: The ioRequest block MUST be of size io_ExtSerSize,
+			   and zeroed (with the exeptions as noted)!
+       flags     	- Must be zero for future compatibility
+
+<b>   RESULTS</b>
+       D0 	  - same as io_Error
+       io_Error  - If the <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open</a> succeded, then io_Error will be null.
+           	    If the <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open</a> failed, then io_Error will be non-zero.
+       io_Device - A pointer to whatever device will handle the calls
+                   for this unit.  This pointer may be different depending
+                   on what unit is requested.
+
+<b>   BUGS</b>
+	If 7-wire handshaking is specified, a timeout &#034;feature&#034; is enabled.
+	If the device holds off the computer for more than about 30-60
+	seconds, the device will return the write request with the error
+	SerErr_TimerErr.  Don't depend on this, however.  If you want a timeout,
+	set up the timer.device and wait for either timer, or serial IO to
+	complete.
+
+	On open, the serial.device allocates the misc.resource for the
+	serial port.  It does not return it until the serial.device is
+	expunged from memory.  It should return it when no more openers
+	exist.   This code can force a specified device to try and
+	expunge.  Of course, if the device is in use nothing will happen:
+
+	#include &#034;exec/types.h&#034;
+	#include &#034;exec/execbase.h&#034;
+	#include &#034;proto/exec.h&#034;
+
+	void FlushDevice(char *);
+	extern struct <a href="../Includes_and_Autodocs_3._guide/node0609.html#line33">ExecBase</a> *SysBase;
+
+	void main()
+	{
+		FlushDevice(&#034;serial.device&#034;);	/* or parallel.device */
+	}
+
+	/*
+	 * Attempts to flush the named device out of memory.
+	 * If it fails, no status is returned; examination of
+	 * the problem will reveal that information has no
+	 * valid use after the <a href="../Includes_and_Autodocs_3._guide/node0224.html">Permit()</a>.
+	 */
+	void FlushDevice(name)
+	char  *name;
+	{
+	struct <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line23">Device</a> *result;
+
+	    Forbid();
+	    if( result=(struct <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line23">Device</a> *)FindName(&#038;SysBase-&#062;DeviceList,name) )
+		RemDevice(result);
+	    Permit();
+	}
+
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0558.html">serial.device/CloseDevice()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0563.html">serial.device/SDCMD_SETPARAMS</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0668.html">devices/serial.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

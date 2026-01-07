@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-7-5" TITLE="21 / Processor and Cache Control / DMA Cache Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 / Processor and Cache Control / DMA Cache Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02CD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02CF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node033C.html">CachePreDMA()</a> and <a href="../Includes_and_Autodocs_2._guide/node033B.html">CachePostDMA()</a> functions allow you to flush the data
+cache before and after Direct Memory Access. Typically only DMA device
+drivers benefit from this. These functions take the processor type,
+possible MMU and cache mode into account. When no cache is available they
+end up doing nothing.  These functions can be replaced with ones suitable
+for different cache hardware.  Refer to the ROM Kernel Reference Manual:
+Includes and Autodocs for implementation specifics.
+
+Since DMA device drivers read and write directly to memory, they are
+effected by the <a href="../Libraries_Manual_guide/node02CF.html#line10">CopyBack</a> feature of the <a href="../Libraries_Manual_guide/node02CF.html">MC68040</a> (explained below).  Using
+DMA with CopyBack mode requires a cache flush.  If a DMA device needs to
+read RAM via DMA, it must make sure that the data in the caches has been
+written to memory first, by calling <a href="../Includes_and_Autodocs_2._guide/node033C.html">CachePreDMA()</a>.  In case of a write to
+memory, the DMA device should first clear the caches with CachePreDMA(),
+write the data and flush the caches again with <a href="../Includes_and_Autodocs_2._guide/node033B.html">CachePostDMA()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

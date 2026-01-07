@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_20" NODE="20-4" TITLE="20 Exec Memory Allocation / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>20 Exec Memory Allocation / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02B8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02BA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following are brief descriptions of the Exec functions that handle
+memory management.  See the Amiga ROM Kernel Reference Manual: Includes
+and Autodocs for details on each call.
+
+
+                    Table 20-1: Exec Memory Functions
+  ________________________________________________________________________
+ |                                                                        |
+ |  Memory Function               Description                             |
+ |========================================================================|
+ |      <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a>  Allocate memory with specified attributes.  If an     |
+ |                  application needs to allocate some memory, it will    |
+ |                  usually use this function.                            |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0328.html">AddMemList()</a>  Add memory to the system free pool.                   |
+ |      <a href="../Includes_and_Autodocs_2._guide/node032F.html">AllocAbs()</a>  Allocate memory at a specified location.              |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0330.html">Allocate()</a>  Allocate memory from a private memory pool.           |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0331.html">AllocEntry()</a>  Allocate multiple memory blocks.                      |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0335.html">AllocVec()</a>  Allocate memory with specified attributes and keep    |
+ |                  track of the size (V36).                              |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0337.html">AvailMem()</a>  Return the amount of free memory, given certain       |
+ |                  conditions.                                           |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0342.html">CopyMem()</a>  Copy memory block, which can be non-aligned and of    |
+ |                  arbitrary length.                                     |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0343.html">CopyMemQuick()</a>  Copy aligned memory block.                            |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0346.html">Deallocate()</a>  Return memory block allocated, with Allocate() to the |
+ |                  private memory pool.                                  |
+ |     <a href="../Includes_and_Autodocs_2._guide/node0354.html">FreeEntry()</a>  Free multiple memory blocks, allocated with           |
+ |                  AllocEntry().                                         |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0355.html">FreeMem()</a>  Free a memory block of specified size, allocated with |
+ |                  AllocMem().                                           |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0358.html">FreeVec()</a>  Free a memory block allocated with AllocVec().        |
+ |    <a href="../Includes_and_Autodocs_2._guide/node035E.html">InitStruct()</a>  Initialize memory from a table.                       |
+ |     <a href="../Includes_and_Autodocs_2._guide/node0387.html">TypeOfMem()</a>  Determine attributes of a specified memory address.   |
+ |________________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

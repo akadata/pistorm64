@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_13" NODE="13-2-3-2" TITLE="13 / / Preference File Format in Release 2 / The Data Chunk" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>13 / / Preference File Format in Release 2 / The Data Chunk</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node022B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node022D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The data Chunk that follows the header Chunk depends on the kind of
+Preferences data the file contains.  The types of Preferences data Chunks
+that are currently part of the system are:
+<a name="line5"></a>
+
+    Table 13-2: <a href="../Libraries_Manual_guide/node0428.html">IFF</a> Chunk Types in Release 2 Preferences Data Files
+
+    Chunk Name     Used With
+    ----------     ---------
+       <a href="../Libraries_Manual_guide/node022D.html">FONT</a>        Fonts, used for all font Preferences files.
+                   In future the PrefHeader may indicate what the
+                   font is used for.
+       <a href="../Libraries_Manual_guide/node022E.html">ICTL</a>        IControl
+       <a href="../Libraries_Manual_guide/node022F.html">INPT</a>        Input
+       <a href="../Libraries_Manual_guide/node0230.html">OSCN</a>        Overscan
+       <a href="../Libraries_Manual_guide/node0231.html">PGFX</a>        PrinterGfx
+       <a href="../Libraries_Manual_guide/node0232.html">PTXT</a>        PrinterText
+       <a href="../Libraries_Manual_guide/node0233.html">SCRM</a>        ScreenMode
+       <a href="../Libraries_Manual_guide/node0234.html">SERL</a>        Serial
+
+
+Each chunk contains a structure applicable to the type.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

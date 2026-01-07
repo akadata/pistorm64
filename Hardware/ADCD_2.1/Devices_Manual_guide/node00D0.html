@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_6" NODE="6-3" TITLE="6 Input Device / Using the Mouse Port With the Input Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>6 Input Device / Using the Mouse Port With the Input Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00CF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00D1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To get mouse port information you must first set the current mouse port by
+passing an <a href="../Devices_Manual_guide/node00CC.html#line12">IOStdReq</a> to the device with <a href="../Includes_and_Autodocs_2._guide/node04E3.html">IND_SETMPORT</a> set in io_Command and
+a pointer to a byte set in io_Data.  If the byte is set to 0 the left
+controller port will be used as the current mouse port; if it is set to 1,
+the right controller port will be used.
+
+   BYTE port = 1;      /* set mouse port to right controller */
+
+   InputIO-&#062;io_Data = &#038;port;
+   InputIO-&#062;io_Flags = IOF_QUICK;
+   InputIO-&#062;io_Length = 1;
+   InputIO-&#062;io_Command = IND_SETMPORT;
+   BeginIO((struct IORequest *)InputIO);
+   if (InputIO-&#062;io_Error)
+       printf(&#034;\nSETMPORT failed %d\n&#034;,InputIO-&#062;io_Error);
+
+   Put That Back!
+   --------------
+   The default mouse port is the left controller.  Don't forget to set
+   the mouse port back to the left controller before exiting if you
+   change it to the right controller during your application.
+
+ <a href="../Devices_Manual_guide/node00D1.html">Setting The Conditions For A Mouse Port Report</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

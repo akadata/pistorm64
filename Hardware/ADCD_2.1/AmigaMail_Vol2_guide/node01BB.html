@@ -1,0 +1,303 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-91/WheelGrad.c" NODE="MAIN" TITLE="IV-91/WheelGrad.c" -->
+<head>
+<title>IV-91/WheelGrad.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01BA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01BC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/*
+sc DATA=NEAR OPTSIZE OPTIMIZE OPTGLOBAL NOSTKCHK NMINC STRMERGE STREQ MCCONS COMNEST IGNORE=73 WheelGrad.c
+slink from lib:c.o WheelGrad.o to WheelGrad lib lib:sc.lib lib:amiga.lib
+quit
+*/
+
+/*
+(c)  Copyright 1992-1999 Amiga, Inc.   All rights reserved.
+The information contained herein is subject to change without notice,
+and is provided &#034;as is&#034; without warranty of any kind, either expressed
+or implied.  The entire risk as to the use of this information is
+assumed by the user.
+*/
+
+/*
+ * WheelGrad.c - simple example of colorwheel and gradient slider
+ *
+ * Puts up a colorwheel and gradient slider and changes the gradient slider
+ * color based on where the colorwheel knob is moved.  This will get you
+ * pointed in the right direction.
+ *
+ * The code will attempt to open the deepest possible screen by querying
+ * the display database.
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/intuitionbase.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;graphics/displayinfo.h&#062;
+#include &#060;intuition/gadgetclass.h&#062;
+#include &#060;gadgets/colorwheel.h&#062;
+#include &#060;gadgets/gradientslider.h&#062;
+#include &#060;dos/dos.h&#062;
+
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/colorwheel_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+#include &#060;stdlib.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+struct Library *IntuitionBase = NULL;
+struct Library *GfxBase = NULL;
+struct Library *ColorWheelBase = NULL;
+struct Library *GradientSliderBase = NULL;
+
+struct load32
+{
+    UWORD	l32_len;
+    UWORD	l32_pen;
+    ULONG	l32_red;
+    ULONG	l32_grn;
+    ULONG	l32_blu;
+};
+
+void main(void)
+{
+struct Screen *Myscreen;
+struct Window *Mywindow;
+struct IntuiMessage *msg;
+struct Gadget *colwheel, *gradslid;
+
+#define GRADCOLORS 16  /* Set to 4 for ECS to ensure enough color wheel pens */
+
+ULONG colortable[96], mywinsig;
+struct load32 color_list[GRADCOLORS + 1];
+WORD penns[GRADCOLORS + 1];
+WORD  i;
+BOOL   Closeflag = FALSE;
+struct ColorWheelRGB rgb;
+struct ColorWheelHSB hsb;
+WORD numPens;
+ULONG modeID = HIRES_KEY;
+UWORD maxdepth;
+DisplayInfoHandle displayhandle;
+struct DimensionInfo dimensioninfo;
+ULONG gdidres;
+ULONG exitvalue = RETURN_FAIL;
+
+    if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,39))
+    if (GfxBase = OpenLibrary(&#034;graphics.library&#034;,39))
+    if (ColorWheelBase = OpenLibrary(&#034;gadgets/colorwheel.gadget&#034;,39L))
+    if (GradientSliderBase=OpenLibrary(&#034;gadgets/gradientslider.gadget&#034;,39L))
+    if (displayhandle = FindDisplayInfo(modeID))
+    if (gdidres=GetDisplayInfoData(displayhandle,(UBYTE *) &#038;dimensioninfo,
+				   sizeof(struct DimensionInfo),
+				   DTAG_DIMS,NULL))
+    {
+	maxdepth = dimensioninfo.MaxDepth;
+
+        Myscreen = OpenScreenTags(NULL,
+				  SA_Depth,         maxdepth,
+				  SA_SharePens,     TRUE,
+				  SA_LikeWorkbench, TRUE,
+				  SA_Interleaved,   TRUE,
+				  SA_Title,         &#034;WheelGrad Screen&#034;,
+				  TAG_DONE);
+
+        if (Myscreen)
+        {
+            /* Get colors and set up gradient slider as color 0. */
+
+            /* get the RGB components of color 0 */
+            GetRGB32(Myscreen-&#062;ViewPort.ColorMap,0L,32L,colortable);
+            rgb.cw_Red   = colortable[0];
+            rgb.cw_Green = colortable[1];
+            rgb.cw_Blue  = colortable[2];
+
+            /* now convert the RGB values to HSB, and max out B component */
+            ConvertRGBToHSB(&#038;rgb,&#038;hsb);
+            hsb.cw_Brightness = 0xffffffff;
+
+            numPens = 0;
+            while (numPens &#060; GRADCOLORS)
+            {
+                hsb.cw_Brightness = 0xffffffff - ((0xffffffff / GRADCOLORS) * numPens);
+                ConvertHSBToRGB(&#038;hsb,&#038;rgb);
+
+                penns[numPens] = ObtainPen(Myscreen-&#062;ViewPort.ColorMap,-1,
+                                 rgb.cw_Red,rgb.cw_Green,rgb.cw_Blue,PEN_EXCLUSIVE);
+                if (penns[numPens] == -1)
+                    break;
+
+                /* Set up LoadRGB32() structure for this pen */
+		color_list[numPens].l32_len = 1;
+		color_list[numPens].l32_pen = penns[numPens];
+                numPens++;
+            }
+            penns[numPens] = ~0;
+	    color_list[numPens].l32_len = 0;
+
+	    /* Create gradient slider and colorwheel gadgets */
+	    gradslid = (struct Gadget *)NewObject(NULL,&#034;gradientslider.gadget&#034;,
+						 GA_Top,        50,
+						 GA_Left,       177,
+						 GA_Width,      20,
+						 GA_Height,     100,
+						 GA_ID,         1L,
+						 GRAD_PenArray, penns,
+						 PGA_Freedom,   LORIENT_VERT,
+						 TAG_END);
+
+	    colwheel = (struct Gadget *)NewObject(NULL, &#034;colorwheel.gadget&#034;,
+			      GA_Top,               50,
+			      GA_Left,              50,
+			      GA_Width,             120,
+			      GA_Height,            100,
+			      WHEEL_Red,            colortable[0],
+			      WHEEL_Green,          colortable[1],
+			      WHEEL_Blue,           colortable[2],
+			      WHEEL_Screen,         Myscreen,
+			      WHEEL_GradientSlider, gradslid,  /* connect gadgets */
+			      GA_FollowMouse,       TRUE,
+			      GA_Previous,          gradslid,
+			      GA_ID,                7L,
+			      TAG_END);
+
+
+	    if (gradslid &#038;&#038; colwheel)
+	    {
+		if (Mywindow = OpenWindowTags(NULL, WA_Left,         10,
+						    WA_Top,          20,
+						    WA_Height,       200,
+						    WA_Width,        400,
+						    WA_Title,        &#034;WheelGrad Window&#034;,
+						    WA_CustomScreen, Myscreen,
+						    WA_IDCMP,        IDCMP_CLOSEWINDOW | IDCMP_MOUSEMOVE,
+						    WA_SizeGadget,   TRUE,
+						    WA_DragBar,      TRUE,
+						    WA_CloseGadget,  TRUE,
+						    WA_Gadgets,      gradslid,
+						    TAG_DONE))
+		{
+		    mywinsig = 1 &#060;&#060; Mywindow-&#062;UserPort-&#062;mp_SigBit;
+
+		    do
+		    {
+			Wait(mywinsig);
+
+			while (msg = (struct IntuiMessage *)GetMsg(Mywindow-&#062;UserPort))
+			{
+			    switch (msg-&#062;Class)
+			    {
+			    case IDCMP_CLOSEWINDOW:
+			       Closeflag = TRUE;
+			       break;
+			    case IDCMP_MOUSEMOVE:
+
+			       /*
+				* Change gradient slider color each time
+				* colorwheel knob is moved.  This is one
+				* method you can use.
+				*/
+
+			       /* Query the colorwheel */
+			       GetAttr(WHEEL_HSB,colwheel,(ULONG *)&#038;hsb);
+
+			       i = 0;
+
+			       while (i &#060; numPens)
+			       {
+				   hsb.cw_Brightness =
+                                  0xffffffff - ((0xffffffff / numPens) * i);
+				   ConvertHSBToRGB(&#038;hsb,&#038;rgb);
+
+				   color_list[i].l32_red = rgb.cw_Red;
+				   color_list[i].l32_grn = rgb.cw_Green;
+				   color_list[i].l32_blu = rgb.cw_Blue;
+				   i++;
+			       }
+			       LoadRGB32(&#038;Myscreen-&#062;ViewPort,(ULONG *)color_list);
+			       break;
+			    }
+			    ReplyMsg((struct Message *)msg);
+			}
+		    }
+		    while (Closeflag == FALSE);
+		}
+		CloseWindow(Mywindow);
+	    }
+
+
+            /* Get rid of the gadgets */
+            DisposeObject(colwheel);
+            DisposeObject(gradslid);
+
+            /* Always release the pens */
+            while (numPens &#062; 0)
+            {
+                numPens--;
+                ReleasePen(Myscreen-&#062;ViewPort.ColorMap,penns[numPens]);
+            }
+
+            CloseScreen(Myscreen);
+	    exitvalue = RETURN_OK;
+        }
+	else
+	    printf(&#034;Failed to open screen\n&#034;);
+    }
+
+    if (gdidres == 0)
+	printf(&#034;Screen mode dimension information not available\n&#034;);
+
+    if (displayhandle == NULL)
+	printf(&#034;Failed to find HIRES_KEY in display database\n&#034;);
+
+    if (GradientSliderBase)
+        CloseLibrary(GradientSliderBase);
+    else
+	printf(&#034;Failed to open gadgets/gradientslider.gadget\n&#034;);
+
+    if (ColorWheelBase)
+        CloseLibrary(ColorWheelBase);
+    else
+	printf(&#034;Failed to open gadgets/colorwheel.gadget\n&#034;);
+
+    if (GfxBase)
+        CloseLibrary(GfxBase);
+    else
+	printf(&#034;Failed to open graphics.library\n&#034;);
+
+    if (IntuitionBase)
+        CloseLibrary(IntuitionBase);
+    else
+	printf(&#034;Failed to open intuition.library\n&#034;);
+
+    exit(exitvalue);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

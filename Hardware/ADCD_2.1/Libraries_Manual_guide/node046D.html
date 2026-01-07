@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_34" NODE="34-1-4" TITLE="34 / Keymap Functions / Mapping Key Codes To ANSI Strings" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>34 / Keymap Functions / Mapping Key Codes To ANSI Strings</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node046C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node046E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Includes_and_Autodocs_2._guide/node0315.html">MapRawKey()</a> is converts raw key codes to ANSI characters based on a
+default or supplied keymap.
+
+    WORD MapRawKey(struct InputEvent *inputevent, UBYTE *buffer,
+                   WORD bufferlength, struct Keymap *keymap);
+
+<a href="../Includes_and_Autodocs_2._guide/node0315.html">MapRawKey()</a> takes an <a href="../Libraries_Manual_guide/node0407.html#line16">IECLASS_RAWKEY</a> inputevent, which may be chained, and
+converts the key codes to ANSI characters which are placed in the
+specified buffer. If the buffer would overflow, for example because a
+longer string is attached to a key, -1 will be returned. If no error
+occurred, MapRawKey() will return the number of bytes written in the
+buffer.  The keymap argument can be set to NULL if the default keymap is
+to be used for translation, or can be a pointer to a specific <a href="../Libraries_Manual_guide/node046F.html">KeyMap</a>
+structure.
+
+The following example shows how to implement the <a href="../Includes_and_Autodocs_2._guide/node0315.html">MapRawKey()</a> function.
+
+     <a href="../Libraries_Manual_guide/node05AD.html">maprawkey.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

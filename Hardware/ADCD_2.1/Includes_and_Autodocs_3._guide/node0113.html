@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="datatypes" NODE="ObtainDTDrawInfoA()" TITLE="datatypes.library/ObtainDTDrawInfoA" -->
+<head>
+<title>datatypes.library/ObtainDTDrawInfoA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0112.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0114.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ObtainDTDrawInfoA - Obtain a DataTypes object for drawing. (V44)
+
+<b>    SYNOPSIS</b>
+	handle = ObtainDTDrawInfoA (o, attrs);
+	d0			    a0 a1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> ObtainDTDrawInfoA (Object *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	handle = ObtainDTDrawInfo (o, tag1, ...);
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> ObtainDTDrawInfo (Object *, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...);
+
+<b>    FUNCTION</b>
+	This function is used to prepare a DataTypes object for
+	drawing into a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+
+	This function will send the DTM_OBTAINDRAWINFO method
+	to the object using the <a href="../Includes_and_Autodocs_3._guide/node0636.html#line76">opSet</a> message structure.
+
+<b>    INPUTS</b>
+	o - Pointer to an object as returned by <a href="../Includes_and_Autodocs_3._guide/node0111.html">NewDTObjectA()</a>.
+	attrs - Additional attributes.
+
+<b>    RETURNS</b>
+	Returns a opaque handle that must be passed to <a href="../Includes_and_Autodocs_3._guide/node0117.html">ReleaseDTDrawInfo()</a>
+	when the application is done drawing the object.
+
+<b>    NOTE</b>
+	This function implies a layout operation. Thus, you must not
+	add the object in question to a window or requester and use
+	ObtainDTDrawInfo() on it.
+
+<b>    TAGS</b>
+	none defined at this time.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node010C.html">DrawDTObjectA()</a>, <a href="../Includes_and_Autodocs_3._guide/node0117.html">ReleaseDTDrawInfo()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

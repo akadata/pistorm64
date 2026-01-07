@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/utility" NODE="AllocateTagItems()" TITLE="utility.library/AllocateTagItems" -->
+<head>
+<title>utility.library/AllocateTagItems</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03CD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03CF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AllocateTagItems --  Allocate a <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> array (or chain). (V36)
+
+SYNOPSIS
+    tagList = AllocateTagItems( numItems )
+    D0                          D0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *AllocateTagItems( ULONG numItems);
+
+FUNCTION
+    Allocates the specified number of usable TagItems slots, and does
+    so in a format that the function <a href="../Includes_and_Autodocs_2._guide/node03D7.html">FreeTagItems</a> can handle.
+
+    Note that to access the TagItems in 'tagList', you should use
+    the function <a href="../Includes_and_Autodocs_2._guide/node03DA.html">NextTagItem()</a>.  This will insure you respect any
+    chaining (TAG_MORE) that the list uses, and will skip any
+    TAG_IGNORE items that AllocateTagItems() might use to stash
+    size and other information.
+
+INPUTS
+    numItems        - the number of <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> slots you want to allocate.
+
+RESULT
+    tagList         - the allocated chain of <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> structures.  Will
+                      return NULL if unsuccessful.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node03D7.html">FreeTagItems()</a>, <a href="../Includes_and_Autodocs_2._guide/node03D2.html">CloneTagItems()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

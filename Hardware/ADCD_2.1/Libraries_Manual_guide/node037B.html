@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-2-1-1" TITLE="28 / / Simple Sprite Functions / Accessing A Hardware Sprite" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Simple Sprite Functions / Accessing A Hardware Sprite</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node037A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node037C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Includes_and_Autodocs_2._guide/node0449.html">GetSprite()</a> is used to gain exclusive access to one of the eight hardware
+sprites.  Once you have gained control of a hardware sprite, it can no
+longer be allocated by the GELs system for use as a VSprite.  The call is
+made like this:
+
+    struct SimpleSprite *sprite;
+    SHORT               number;
+
+    if (-1 == (sprite_num = GetSprite(sprite, number)))
+        return_code = RETURN_WARN;  /* did not get the sprite */
+
+The inputs to the <a href="../Includes_and_Autodocs_2._guide/node0449.html">GetSprite()</a> function are a pointer to a <a href="../Libraries_Manual_guide/node0379.html#line6">SimpleSprite</a>
+structure and the number (0-7) of the hardware sprite to be accessed, or
+-1 to get the first available sprite.
+
+A value of 0-7 is returned if the request was granted, specifying which
+sprite was allocated.  A returned value of -1 means the requested sprite
+was not available.  If the call succeeds, the <a href="../Libraries_Manual_guide/node0379.html#line6">SimpleSprite</a> data structure
+will have its sprite number field filled in with the appropriate number.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

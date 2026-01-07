@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Epsonx_data.c" NODE="MAIN" TITLE="Devices/Dev_examples/Epsonx_data.c" -->
+<head>
+<title>Devices/Dev_examples/Epsonx_data.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node017A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node017C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+        Data.c table for EpsonX driver.
+*/
+
+char *CommandTable[] ={
+        &#034;\375\033@\375&#034;,/* 00 aRIS reset                        */
+        &#034;\377&#034;,         /* 01 aRIN initialize                   */
+        &#034;\012&#034;,         /* 02 aIND linefeed                     */
+        &#034;\015\012&#034;,     /* 03 aNEL CRLF                         */
+        &#034;\377&#034;,         /* 04 aRI reverse LF                    */
+
+                        /* 05 aSGR0 normal char set             */
+        &#034;\0335\033-\376\033F&#034;,
+        &#034;\0334&#034;,        /* 06 aSGR3 italics on                  */
+        &#034;\0335&#034;,        /* 07 aSGR23 italics off                */
+        &#034;\033-\001&#034;,    /* 08 aSGR4 underline on                */
+        &#034;\033-\376&#034;,    /* 09 aSGR24 underline off              */
+        &#034;\033E&#034;,        /* 10 aSGR1 boldface on                 */
+        &#034;\033F&#034;,        /* 11 aSGR22 boldface off               */
+        &#034;\377&#034;,         /* 12 aSFC set foreground color         */
+        &#034;\377&#034;,         /* 13 aSBC set background color         */
+
+                        /* 14 aSHORP0 normal pitch              */
+        &#034;\033P\022\033W\376&#034;,
+                        /* 15 aSHORP2 elite on                  */
+        &#034;\033M\022\033W\376&#034;,
+        &#034;\033P&#034;,        /* 16 aSHORP1 elite off                 */
+                        /* 17 aSHORP4 condensed fine on         */
+        &#034;\017\033P\033W\376&#034;,
+        &#034;\022&#034;,         /* 18 aSHORP3 condensed fine off        */
+        &#034;\033W\001&#034;,    /* 19 aSHORP6 enlarge on                */
+        &#034;\033W\376&#034;,    /* 20 aSHORP5 enlarge off               */
+
+        &#034;\377&#034;,         /* 21 aDEN6 shadow print on             */
+        &#034;\377&#034;,         /* 22 aDEN5 shadow print off            */
+        &#034;\033G&#034;,        /* 23 aDEN4 double strike on            */
+        &#034;\033H&#034;,        /* 24 aDEN3 double strike off           */
+        &#034;\033x\001&#034;,    /* 25 aDEN2 NLQ on                      */
+        &#034;\033x\376&#034;,    /* 26 aDEN1 NLQ off                     */
+
+        &#034;\033S\376&#034;,    /* 27 aSUS2 superscript on              */
+        &#034;\033T&#034;,        /* 28 aSUS1 superscript off             */
+        &#034;\033S\001&#034;,    /* 29 aSUS4 subscript on                */
+        &#034;\033T&#034;,        /* 30 aSUS3 subscript off               */
+        &#034;\033T&#034;,        /* 31 aSUS0 normalize the line          */
+        &#034;\377&#034;,         /* 32 aPLU partial line up              */
+        &#034;\377&#034;,         /* 33 aPLD partial line down            */
+
+        &#034;\033R\376&#034;,    /* 34 aFNT0 Typeface 0                  */
+        &#034;\033R\001&#034;,    /* 35 aFNT1 Typeface 1                  */
+        &#034;\033R\002&#034;,    /* 36 aFNT2 Typeface 2                  */
+        &#034;\033R\003&#034;,    /* 37 aFNT3 Typeface 3                  */
+        &#034;\033R\004&#034;,    /* 38 aFNT4 Typeface 4                  */
+        &#034;\033R\005&#034;,    /* 39 aFNT5 Typeface 5                  */
+        &#034;\033R\006&#034;,    /* 40 aFNT6 Typeface 6                  */
+        &#034;\033R\007&#034;,    /* 41 aFNT7 Typeface 7                  */
+        &#034;\033R\010&#034;,    /* 42 aFNT8 Typeface 8                  */
+        &#034;\033R\011&#034;,    /* 43 aFNT9 Typeface 9                  */
+        &#034;\033R\012&#034;,    /* 44 aFNT10 Typeface 10                */
+
+        &#034;\033p1&#034;,       /* 45 aPROP2 proportional on            */
+        &#034;\033p0&#034;,       /* 46 aPROP1 proportional off           */
+        &#034;\377&#034;,         /* 47 aPROP0 proportional clear         */
+        &#034;\377&#034;,         /* 48 aTSS set proportional offset      */
+        &#034;\377&#034;,         /* 49 aJFY5 auto left justify           */
+        &#034;\377&#034;,         /* 50 aJFY7 auto right justify          */
+        &#034;\377&#034;,         /* 51 aJFY6 auto full jusitfy           */
+        &#034;\377&#034;,         /* 52 aJFY0 auto jusity off             */
+        &#034;\377&#034;,         /* 53 aJFY3 letter space                */
+        &#034;\377&#034;,         /* 54 aJFY1 word fill                   */
+
+        &#034;\0330&#034;,        /* 55 aVERP0 1/8&#034; line spacing          */
+        &#034;\0332&#034;,        /* 56 aVERP1 1/6&#034; line spacing          */
+        &#034;\033C&#034;,        /* 57 aSLPP set form length             */
+        &#034;\033N&#034;,        /* 58 aPERF perf skip n (n &#062; 0)         */
+        &#034;\033O&#034;,        /* 59 aPERF0 perf skip off              */
+
+        &#034;\377&#034;,         /* 60 aLMS set left margin              */
+        &#034;\377&#034;,         /* 61 aRMS set right margin             */
+        &#034;\377&#034;,         /* 62 aTMS set top margin               */
+        &#034;\377&#034;,         /* 63 aBMS set bottom margin            */
+        &#034;\377&#034;,         /* 64 aSTBM set T&#038;B margins             */
+        &#034;\377&#034;,         /* 65 aSLRM set L&#038;R margins             */
+        &#034;\377&#034;,         /* 66 aCAM clear margins                */
+
+        &#034;\377&#034;,         /* 67 aHTS set horiz tab                */
+        &#034;\377&#034;,         /* 68 aVTS set vert tab                 */
+        &#034;\377&#034;,         /* 69 aTBC0 clear horiz tab             */
+        &#034;\033D\376&#034;,    /* 70 aTBC3 clear all horiz tabs        */
+        &#034;\377&#034;,         /* 71 aTBC1 clear vert tab              */
+        &#034;\033B\376&#034;,    /* 72 aTBC4 clear all vert tabs         */
+                        /* 73 aTBCALL clear all h &#038; v tabs      */
+        &#034;\033D\376\033B\376&#034;,
+                        /* 74 aTBSALL set default tabs          */
+        &#034;\033D\010\020\030\040\050\060\070\100\110\120\130\376&#034;,
+
+        &#034;\377&#034;,         /* 75 aEXTEND extended commands         */
+        &#034;\377&#034;          /* 76 aRAW next 'n' chars are raw       */
+};
+
+/*
+   For each character from character 160 to character 255, there is
+   an entry in this table, which is used to print (or simulate printing of)
+   the full Amiga character set. (see AmigaDos Developer's Manual, pp A-3)
+   This table is used only if there is a valid pointer to this table
+   in the PEDData table in the printertag.asm file, and the VERSION is
+   33 or greater.  Otherwise, a default table is used instead.
+   To place non-printable characters in this table, you can either enter
+   them as in C strings (ie \011, where 011 is an octal number, or as
+   \\000 where 000 is any decimal number, from 1 to 3 digits.  This is
+   usually used  to enter a NUL into the array (C has problems with it
+   otherwise.), or if you forgot your octal calculator.  On retrospect,
+   was a poor choice for this function, as you must say \\\\ to enter a
+   backslash as a backslash.  Live and learn...
+*/
+char *ExtendedCharTable[] = {
+        &#034; &#034;,                                    /* NBSP*/
+        &#034;\033R\007[\033R\\0&#034;,                   /* i */
+        &#034;c\010|&#034;,                               /* c| */
+        &#034;\033R\003#\033R\\0&#034;,                   /* L- */
+        &#034;\033R\005$\033R\\0&#034;,                   /* o */
+        &#034;\033R\010\\\\\033R\\0&#034;,                /* Y- */
+        &#034;|&#034;,                                    /* | */
+        &#034;\033R\002@\033R\\0&#034;,                   /* SS */
+
+        &#034;\033R\001~\033R\\0&#034;,                   /* &#034; */
+        &#034;c&#034;,                                    /* copyright */
+        &#034;\033S\\0a\010_\033T&#034;,                  /* a_ */
+        &#034;&#060;&#034;,                                    /* &#060;&#060; */
+        &#034;~&#034;,                                    /* - */
+        &#034;-&#034;,                                    /* SHY */
+        &#034;r&#034;,                                    /* registered trademark */
+        &#034;-&#034;,                                    /* - */
+
+        &#034;\033R\001[\033R\\0&#034;,                   /* degrees */
+        &#034;+\010_&#034;,                               /* +_ */
+        &#034;\033S\\0002\033T&#034;,                     /* 2 */
+        &#034;\033S\\0003\033T&#034;,                     /* 3 */
+        &#034;'&#034;,                                    /* ' */
+        &#034;u&#034;,                                    /* u */
+        &#034;P&#034;,                                    /* reverse P */
+        &#034;\033S\\000.\033T&#034;,                     /* . */
+
+        &#034;,&#034;,                                    /* , */
+        &#034;\033S\\0001\033T&#034;,                     /* 1 */
+        &#034;\033R\001[\033R\\0\010-&#034;,              /* o_ */
+        &#034;&#062;&#034;,                                    /* &#062;&#062; */
+        &#034;\033S\\0001\033T\010-\010\033S\0014\033T&#034;,     /* 1/4 */
+        &#034;\033S\\0001\033T\010-\010\033S\0012\033T&#034;,     /* 1/2 */
+        &#034;\033S\\0003\033T\010-\010\033S\0014\033T&#034;,     /* 3/4 */
+        &#034;\033R\007]\033R\\0&#034;,                   /* upside down ? */
+
+        &#034;A\010`&#034;,                               /* ``A */
+        &#034;A\010'&#034;,                               /* 'A */
+        &#034;A\010^&#034;,                               /* ^A */
+        &#034;A\010~&#034;,                               /* ~A */
+        &#034;\033R\002[\033R\\0&#034;,                   /* &#034;A */
+        &#034;\033R\004]\033R\\0&#034;,                   /* oA */
+        &#034;\033R\004[\033R\\0&#034;,                   /* AE */
+        &#034;C\010,&#034;,                               /* C, */
+
+        &#034;E\010`&#034;,                               /* ``E */
+        &#034;\033R\011@\033R\\0&#034;,                   /* 'E */
+        &#034;E\010^&#034;,                               /* ^E */
+        &#034;E\010\033R\001~\033R\\0&#034;,              /* &#034;E */
+        &#034;I\010`&#034;,                               /* ``I */
+        &#034;I\010`&#034;,                               /* 'I */
+        &#034;I\010^&#034;,                               /* ^I */
+        &#034;I\010\033R\001~\033R\\0&#034;,              /* &#034;I */
+
+        &#034;D\010-&#034;,                               /* -D */
+        &#034;\033R\007\\\\\033R\\0&#034;,                /* ~N */
+        &#034;O\010`&#034;,                               /* ``O */
+        &#034;O\010'&#034;,                               /* 'O */
+        &#034;O\010^&#034;,                               /* ^O */
+        &#034;O\010~&#034;,                               /* ~O */
+        &#034;\033R\002\\\\\033R\\0&#034;,                /* &#034;O */
+        &#034;x&#034;,                                    /* x */
+
+        &#034;\033R\004\\\\\033R\\0&#034;,                /* 0 */
+        &#034;U\010`&#034;,                               /* ``U */
+        &#034;U\010'&#034;,                               /* 'U */
+        &#034;U\010^&#034;,                               /* ^U */
+        &#034;\033R\002]\033R\\0&#034;,                   /* &#034;U */
+        &#034;Y\010'&#034;,                               /* 'Y */
+        &#034;T&#034;,                                    /* Thorn */
+        &#034;\033R\002~\033R\\0&#034;,                   /* B */
+
+        &#034;\033R\001@\033R\\0&#034;,                   /* ``a */
+        &#034;a\010'&#034;,                               /* 'a */
+        &#034;a\010^&#034;,                               /* ^a */
+        &#034;a\010~&#034;,                               /* ~a */
+        &#034;\033R\002{\033R\\0&#034;,                   /* &#034;a */
+        &#034;\033R\004}\033R\\0&#034;,                   /* oa */
+        &#034;\033R\004{\033R\\0&#034;,                   /* ae */
+        &#034;\033R\001\\\\\033R\\0&#034;,                /* c, */
+
+        &#034;\033R\001}\033R\\0&#034;,                   /* ``e */
+        &#034;\033R\001{\033R\\0&#034;,                   /* 'e */
+        &#034;e\010^&#034;,                               /* ^e */
+        &#034;e\010\033R\001~\033R\\0&#034;,              /* &#034;e */
+        &#034;\033R\006~\033R\\0&#034;,                   /* ``i */
+        &#034;i\010'&#034;,                               /* 'i */
+        &#034;i\010^&#034;,                               /* ^i */
+        &#034;i\010\033R\001~\033R\\0&#034;,              /* &#034;i */
+
+        &#034;d&#034;,                                    /* d */
+        &#034;\033R\007|\033R\\0&#034;,                   /* ~n */
+        &#034;\033R\006|\033R\\0&#034;,                   /* ``o */
+        &#034;o\010'&#034;,                               /* 'o */
+        &#034;o\010^&#034;,                               /* ^o */
+        &#034;o\010~&#034;,                               /* ~o */
+        &#034;\033R\002|\033R\\0&#034;,                   /* &#034;o */
+        &#034;:\010-&#034;                                /* :- */
+
+        &#034;\033R\004|\033R\\0&#034;,                   /* o/ */
+        &#034;\033R\001|\033R\\0&#034;,                   /* ``u */
+        &#034;u\010'&#034;,                               /* 'u */
+        &#034;u\010^&#034;,                               /* ^u */
+        &#034;\033R\002}\033R\\0&#034;,                   /* &#034;u */
+        &#034;y\010'&#034;,                               /* 'y */
+        &#034;t&#034;,                                    /* thorn */
+        &#034;y\010\033R\001~\033R\\0&#034;               /* &#034;y */
+};
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

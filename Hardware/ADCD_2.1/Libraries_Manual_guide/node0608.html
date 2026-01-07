@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/samplebase.i" NODE="MAIN" TITLE="lib_examples/samplebase.i" -->
+<head>
+<title>lib_examples/samplebase.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0607.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0609.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+* samplebase.i -- definition of sample.library base
+
+   IFND  SAMPLE_BASE_I
+SAMPLE_BASE_I SET 1
+
+
+   IFND  EXEC_TYPES_I
+   INCLUDE  &#034;exec/types.i&#034;
+   ENDC   ; EXEC_TYPES_I
+
+   IFND  EXEC_LIBRARIES_I
+   INCLUDE  &#034;exec/libraries.i&#034;
+   ENDC   ; EXEC_LIBRARIES_I
+
+;--------------------------
+; library data structures
+;--------------------------
+
+;  Note that the library base begins with a library node
+
+   STRUCTURE SampleBase,LIB_SIZE
+   UBYTE   sb_Flags
+   UBYTE   sb_pad
+   ;We are now longword aligned
+   ULONG   sb_SysLib
+   ULONG   sb_DosLib
+   ULONG   sb_SegList
+   LABEL   SampleBase_SIZEOF
+
+
+SAMPLENAME   MACRO
+      DC.B   'sample.library',0
+      ENDM
+
+   ENDC  ;SAMPLE_BASE_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

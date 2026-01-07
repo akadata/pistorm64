@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-15" TITLE="B Boopsi Class Reference / groupgclass" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B Boopsi Class Reference / groupgclass</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node052A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node052C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Class:                  groupgclass
+Superclass:             <a href="../Libraries_Manual_guide/node04F2.html">gadgetclass</a>
+Include File:           &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D3.html">gadgetclass.h</a>&#062;
+
+This is a class of objects that maintains an internal list of gadgets.
+Its purpose is to make it easier to layout a group of gadgets.  Any
+gadgets that are a member of a groupgclass object are rendered relative to
+the groupgclass object's GA_Left and GA_Top attributes.  As new gadgets
+are added to the groupgclass object, the groupgclass object's dimensions
+grow to enclose the new gadgets.  When the groupgclass object receives an
+<a href="../Libraries_Manual_guide/node04BD.html">OM_DISPOSE</a> message, it not only disposes of itself, it also disposes of
+all the gadgets in its list.  Groupgclass does not support the gadget
+relative flags (<a href="../Libraries_Manual_guide/node04FE.html">GA_RelWidth, GA_RelHeight, GA_RelBottom, and GA_RelRight</a>).
+
+New Methods:
+------------
+None.
+
+Changed Methods:
+----------------
+ <a href="../Libraries_Manual_guide/node052C.html">OM_SET</a>          <a href="../Libraries_Manual_guide/node0530.html">GM_HITTEST</a> 
+ <a href="../Libraries_Manual_guide/node052D.html">OM_ADDMEMBER</a>    <a href="../Libraries_Manual_guide/node0531.html">GM_RENDER</a> 
+ <a href="../Libraries_Manual_guide/node052E.html">OM_REMMEMBER</a>    <a href="../Libraries_Manual_guide/node0532.html">GM_GOACTIVE/GM_GOINACTIVE/GM_HANDLEINPUT</a> 
+ <a href="../Libraries_Manual_guide/node052F.html">OM_DISPOSE</a> 
+
+Attributes:
+-----------
+ <a href="../Libraries_Manual_guide/node0533.html">GA_Left, GA_Top (IS)</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

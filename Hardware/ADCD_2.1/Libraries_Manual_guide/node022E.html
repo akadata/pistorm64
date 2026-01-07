@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_13" NODE="13-2-5" TITLE="13 / Preferences in Release 2 / ICTL" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>13 / Preferences in Release 2 / ICTL</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node022D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node022F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+    struct IControlPrefs
+    {
+        LONG  ic_Reserved[4];        /* System reserved            */
+        UWORD ic_TimeOut;            /* Verify timeout             */
+        WORD  ic_MetaDrag;           /* Meta drag mouse event      */
+        ULONG ic_Flags;              /* IControl flags (see below) */
+        UBYTE ic_WBtoFront;          /* CKey: WB to front          */
+        UBYTE ic_FrontToBack;        /* CKey: front screen to back */
+        UBYTE ic_ReqTrue;            /* CKey: Requester TRUE       */
+        UBYTE ic_ReqFalse;           /* CKey: Requester FALSE      */
+    };
+
+The ic_Flags field can have the following values:
+
+ICF_COERCE_COLORS
+    This indicates that a displaymode with a matching number of colors
+    has preference over a correct aspect ration when screen coercing
+    takes place.
+
+ICF_COERCE_LACE
+    This indicates that chosing an interlaced display mode is allowed
+    when coercing screens. Otherwise a non-interlaced display mode will
+    be selected.
+
+ICF_STRGAD_FILTER
+    This indicates that control characters should be filtered out of
+    string gadget user input.
+
+ICF_MENUSNAP
+    This indicates that an autoscroll screen should be snapped back to
+    origin when the mouse menu-button is selected.
+
+Note that the command key values in the last four fields of the
+IControlPrefs structure are ANSI codes, not RAWKEY codes.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

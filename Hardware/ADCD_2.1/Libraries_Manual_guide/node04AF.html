@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_A" NODE="A-1" TITLE="A Appendix A: Linker Libraries / Amiga.lib" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>A Appendix A: Linker Libraries / Amiga.lib</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04AE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04B0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This is the main Amiga scanned linker library, linked with most programs
+for the Amiga.  The major components of amiga.lib are:
+
+  * stubs        Functions for each Amiga ROM routine that copy
+                 arguments from the stack to the CPU registers --
+                 thereby enabling stack-based C compilers to call
+                 register-based Amiga ROM routines.
+
+  * offsets      The negative offset from the library base for each
+                 Amiga function. These are called Library Vector
+                 Offsets (_LVO).
+
+  * Exec         C functions which simplify many Exec procedures such
+                 as the creation and deletion of tasks, ports, and I/O
+                 request structures.
+
+  * clib         C support functions including pseudo-random number
+                 generation and a limited set of file and stdio
+                 functions designed to work directly with AmigaDOS file
+                 handles.
+
+  * Math         C functions which provide some basic conversions to
+                 and from Fast Floating Point (FFP) format numbers.
+
+  * Graphics     C support functions to add and remove tasks from the
+                 vertical-blanking interval interrupt server chain.
+
+  * ARexx        C support functions for ARexx variable handling and
+                 message checking.
+
+    NOTE:
+    -----
+    The Timer, Commodities, and Intuition support functions listed below
+    are valid only for use with Release 2.04 (V37) or a later version of
+    the system software.
+
+  * Timer        C support functions to do common timer device
+                 operations.
+
+  * Commodities  C functions which support the Commodities system.
+                 Included are functions to deal with ToolTypes, and to
+                 create various Commodities objects.
+
+  * Intuition    Functions which provide support for Intuition's hook
+                 and Boopsi sub-systems.
+
+Most applications link with and use at least one function in amiga.lib.
+The functions available are as follows.
+
+ <a href="../Libraries_Manual_guide/node04B0.html">Exec Support</a>      <a href="../Libraries_Manual_guide/node04B2.html">Math</a>          <a href="../Libraries_Manual_guide/node04B4.html">Arexx</a>      <a href="../Libraries_Manual_guide/node04B6.html">Commodities</a> 
+ <a href="../Libraries_Manual_guide/node04B1.html">Clib</a>              <a href="../Libraries_Manual_guide/node04B3.html">Graphics</a>      <a href="../Libraries_Manual_guide/node04B5.html">Timer</a>      <a href="../Libraries_Manual_guide/node04B7.html">Intuition</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

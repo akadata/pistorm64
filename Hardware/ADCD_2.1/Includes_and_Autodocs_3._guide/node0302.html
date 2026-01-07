@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="MoveSprite()" TITLE="graphics.library/MoveSprite" -->
+<head>
+<title>graphics.library/MoveSprite</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0301.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0303.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	MoveSprite -- <a href="../Includes_and_Autodocs_3._guide/node0301.html">Move</a> sprite to a point relative to top of viewport.
+
+<b>   SYNOPSIS</b>
+	MoveSprite(vp, sprite, x, y)
+	           A0  A1      D0 D1
+
+	void MoveSprite(struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *,struct <a href="../Includes_and_Autodocs_3._guide/node060B.html#line18">SimpleSprite</a> *, WORD, WORD);
+
+<b>   FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0301.html">Move</a> sprite image to new place on display.
+
+<b>   INPUTS</b>
+	vp - pointer to <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> structure
+	     if vp = 0, sprite is positioned relative to <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a>.
+	sprite - pointer to <a href="../Includes_and_Autodocs_3._guide/node060B.html#line18">SimpleSprite</a> structure
+	(x,y)  - new position relative to top of viewport or view.
+
+<b>   RESULTS</b>
+	Calculate the hardware information for the sprite and
+	place it in the posctldata array. During next video display
+	the sprite will appear in new position.
+
+<b>   BUGS</b>
+	Sprites really appear one pixel to the left of the position you specify.
+	This bug affects the apparent display position of the sprite on the
+	screen,	but does not affect the numeric position relative to the
+	viewport or view. This behaviour only applies to SimpleSprites,
+	not to ExtSprites.
+
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02DD.html">FreeSprite()</a>  <a href="../Includes_and_Autodocs_3._guide/node02BC.html">ChangeSprite()</a>  <a href="../Includes_and_Autodocs_3._guide/node02EC.html">GetSprite()</a>  <a href="../Includes_and_Autodocs_3._guide/node060B.html">graphics/sprite.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-3-5" TITLE="28 / Using Virtual Sprites / VSprite Image Size" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Virtual Sprites / VSprite Image Size</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0384.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0386.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A true VSprite is always one word (16 pixels) wide and may be any number
+of lines high.  It can be made to appear thinner by making some pixels
+transparent.  Like Simple Sprites, VSprite pixels are always the size of a
+pixel in low-resolution mode (320x200); regardless of the resolution the
+display is set to.  To specify how many lines make up the VSprite image,
+the <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure member, <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line102">Height</a>, is used. VSprites always have a
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line102">Depth</a> of two, allowing for three colors.  The values may be set like this:
+
+    myVSprite.Width  = 1;      /* ALWAYS 1 for true VSprites. */
+    myVSprite.Height = 5;      /* The example height. */
+    myVSprite.Depth  = 2;      /* ALWAYS 2 for true VSprites. */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

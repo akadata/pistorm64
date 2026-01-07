@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_24" NODE="24-2-1" TITLE="24 / Messages / Putting a Message" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>24 / Messages / Putting a Message</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02EF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02F1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A message is delivered to a given destination port with the <a href="../Includes_and_Autodocs_2._guide/node036B.html">PutMsg()</a>
+function.  The message is queued to the port, and that port's arrival
+action is invoked.  If the action specifies a task signal or a software
+interrupt, the originating task may temporarily lose the processor while
+the destination processes the message.  If a reply to the message is
+required, the <a href="../Libraries_Manual_guide/node02EF.html#line14">mn_ReplyPort</a> field must be set up prior to the call to
+PutMsg().
+
+Here is a code fragment for putting a message to a public port.  A
+<a href="../Libraries_Manual_guide/node05E7.html">complete example</a> is printed at the end of the chapter.
+
+
+#Include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/ports.h&#062;
+#include &#060;libraries/dos.h&#062;
+
+VOID main(VOID);
+BOOL SafePutToPort(struct Message *, STRPTR);
+
+struct XYMessage {
+    struct Message xy_Msg;
+    UWORD          xy_X;
+    UWORD          xy_Y;
+};
+
+VOID main(VOID)
+{
+    struct MsgPort *xyport, *xyreplyport;
+    struct XYMessage *xymsg, *msg;
+    BOOL   foundport;
+
+    /* Allocate memory for the message we're going to send. */
+    if (xymsg = (struct XYMessage *) AllocMem(sizeof(struct XYMessage),
+                                             MEMF_PUBLIC | MEMF_CLEAR))
+    {
+
+        /* The replyport we'll use to get response */
+        if (xyreplyport = CreateMsgPort()) {
+                                         /* or use CreatePort(0,0) */
+
+            xymsg-&#062;xy_Msg.mn_Node.ln_Type = NT_MESSAGE;
+                                         /* Compose the message    */
+            xymsg-&#062;xy_Msg.mn_Length = sizeof(struct XYMessage);
+            xymsg-&#062;xy_Msg.mn_ReplyPort = xyreplyport;
+            xymsg-&#062;xy_X = 10;
+            xymsg-&#062;xy_Y = 20;
+
+            /* Now try to send that message to a public port named
+             *  &#034;xyport&#034;. If foundport eq 0, the port isn't out there.
+             */
+            if (foundport = SafePutToPort((struct Message *)xymsg,
+                                           &#034;xyport&#034;))
+            {
+
+            . . .   /* Now let's wait till the someone responds... */
+
+            }
+            else printf(&#034;Couldn't find 'xyport'\n&#034;);
+
+            DeleteMsgPort(xyreplyport);  /* Use DeletePort() if    */
+                                         /* the port was created   */
+        }                                /* with CreatePort().     */
+        else printf(&#034;Couldn't create message port\n&#034;);
+        FreeMem(xymsg, sizeof(struct XYMessage));
+    }
+    else printf(&#034;Couldn't get memory for xymessage\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

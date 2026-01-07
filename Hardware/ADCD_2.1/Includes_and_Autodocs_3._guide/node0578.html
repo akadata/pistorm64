@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="timer" NODE="ReadEClock()" TITLE="timer.device/ReadEClock" -->
+<head>
+<title>timer.device/ReadEClock</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0577.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0579.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ReadEClock -- Get the current value of the E-Clock. (V36)
+
+<b>   SYNOPSIS</b>
+	E_Freq = ReadEClock( Dest )
+	D0                   A0
+
+	ULONG ReadEClock ( struct <a href="../Includes_and_Autodocs_3._guide/node0607.html#line34">EClockVal</a> * );
+
+<b>   FUNCTION</b>
+	This routine calculates the current 64 bit value of the E-Clock
+	and stores it in the destination <a href="../Includes_and_Autodocs_3._guide/node0607.html#line34">EClockVal</a> structure. The count
+	rate of the E-Clock is also returned.
+
+	A0 will be left unchanged
+
+	This is a low overhead function designed so that very short
+	intervals may be timed.
+
+<b>   INPUTS</b>
+	Dest -- pointer to an <a href="../Includes_and_Autodocs_3._guide/node0607.html#line34">EClockVal</a> structure.
+
+<b>   RETURNS</b>
+	Dest -- the <a href="../Includes_and_Autodocs_3._guide/node0607.html#line34">EClockVal</a> structure will contain the E-Clock time
+	E_Freq -- The count rate of the E-Clock (tics/sec).
+
+<b>   NOTES</b>
+	This function may be called from interrupts.
+
+<b>   SEE ALSO</b>
+
+<b>   BUGS</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

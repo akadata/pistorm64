@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-5-2" TITLE="27 / / Viewport Display Modes / Low- vs. High-resolution Mode" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Viewport Display Modes / Low- vs. High-resolution Mode</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0328.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node032A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In LORES mode, horizontal lines of 320 pixels fill most of the ordinary
+viewing area.  The system software lets you define a screen segment width
+up to 362 pixels in this mode, or you can define a screen segment as
+narrow as you desire (minimum of 16 pixels).  In <a href="../Libraries_Manual_guide/node0327.html#line25">HIRES</a> mode, 640 pixels
+fill a horizontal line. In this mode you can specify any width from 16 to
+724 pixels. In <a href="../Libraries_Manual_guide/node0327.html#line29">SUPERHIRES</a> mode, 1280 pixels fill a horizontal line. In
+this mode you can specify any width from 16 to 1448 pixels. The fact that
+many monitor manufacturers set their monitors to overscan the video
+display normally limits you to showing only 16 to 320 pixels per line in
+LORES, 16 to 640 pixels per line in HIRES, or 16 to 1280 pixels per line
+in SUPERHIRES. Under Release 2, the user can set the monitor's viewable
+<a name="line13">screen size with the Preferences Overscan editor.</a>
+
+
+  |   |   |   |   |   |   |   |   |   |   |
+  |   |   |   |   |   |   |   |   |   |   |
+  |   |   |                       |   |   |
+  |   |   |   320 Pixels Across   |   |   |  <a href="../Libraries_Manual_guide/node0327.html">ViewPort.Modes</a> = 0
+  |   |   | width of 352 possible |   |   |
+  |   |   |                       |   |   |
+  |   |   |   |   |   |   |   |   |   |   |
+  |   |   |   |   |   |   |   |   |   |   |
+
+
+  | | | | | | | | | | | | | | | | | | | | |
+  | | | | | | | | | | | | | | | | | | | | |
+  | | | | | |                   | | | | | |
+  | | | | |   640 Pixels Across   | | | | |  <a href="../Libraries_Manual_guide/node0327.html">ViewPort.Modes</a> = HIRES
+  | | | | | width of 704 possible | | | | |
+  | | | | |                       | | | | |
+  | | | | | | | | | | | | | | | | | | | | |
+  | | | | | | | | | | | | | | | | | | | | |
+
+
+  |||||||||||||||||||||||||||||||||||||||||
+  |||||||||||||||||||||||||||||||||||||||||
+  |||||||||||                   |||||||||||
+  ||||||||||  1280 Pixels Across  |||||||||  <a href="../Libraries_Manual_guide/node0327.html">ViewPort.Modes</a> = SUPERHIRES
+  ||||||||| width of 1408 possible ||||||||
+  ||||||||||                      |||||||||
+  |||||||||||||||||||||||||||||||||||||||||
+  |||||||||||||||||||||||||||||||||||||||||
+
+
+    Figure 27-14: How HIRES and SUPERHIRES Affect the Width of Pixels
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="InitBitMap()" TITLE="graphics.library/InitBitMap" -->
+<head>
+<title>graphics.library/InitBitMap</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node044F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0451.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    InitBitMap -- Initialize bit map structure with input values.
+
+SYNOPSIS
+    InitBitMap( bm, depth, width, height )
+                a0   d0     d1      d2
+
+    void InitBitMap( struct <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a> *, BYTE, UWORD, UWORD );
+
+FUNCTION
+    Initialize various elements in the <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a> structure to
+    correctly reflect depth, width, and height.
+    Must be used before use of <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a> in other graphics calls.
+    The Planes[8] are not initialized and need to be set up
+    by the caller.  The Planes table was put at the end of the
+    structure so that it may be truncated to conserve space,
+    as well as extended. All routines that use <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a> should
+    only depend on existence of depth number of bitplanes.
+    The Flagsh and pad fields are reserved for future use and
+    should not be used by application programs.
+
+INPUTS
+    bm - pointer to a <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a> structure (gfx.h)
+    depth - number of bitplanes that this bitmap will have
+    width - number of bits (columns) wide for this <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a>
+    height- number of bits (rows) tall for this <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a>
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00A6.html">graphics/gfx.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

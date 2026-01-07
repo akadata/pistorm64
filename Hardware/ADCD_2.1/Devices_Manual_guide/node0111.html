@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_15" NODE="15-8-1" TITLE="15 / Misc Resource / C Example Of Allocating Misc Resources" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>15 / Misc Resource / C Example Of Allocating Misc Resources</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0110.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0112.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<a name="line3">     <a href="../Devices_Manual_guide/node01A6.html">Allocate_Misc.c</a> </a>
+
+The example below will try to open the serial device and execute the
+SDCMD_QUERY command.  If it cannot open the serial device, it will do an
+<a href="../Includes_and_Autodocs_2._guide/node054D.html">AllocMiscResource()</a> on the serial port and return the name of the owner.
+
+     <a href="../Devices_Manual_guide/node01A7.html">Query_Serial.c</a> 
+
+   Take Over Everything.
+   ---------------------
+   There are two serial.device resources to take over, MR_SERIALBITS and
+   MR_SERIALPORT.  You should get both resources when you take over the
+   serial port to prevent other tasks from using them.  The
+   parallel.device also has two resources to take over.  See the
+   resources/<a href="../Includes_and_Autodocs_2._guide/node010E.html">misc.h</a> include file for the relevant definitions and
+   structures.
+
+Under V1.3 and earlier versions of the Amiga system software the
+MR_GETMISCRESOURCE routine will always fail if the serial device has been
+used at all by another task (even if that task has finished using the
+resource.  In other words, once a printer driver or communication package
+has been activated, it will keep the associated resource locked up
+preventing your task from using it. Under these conditions, you must get
+the resource back from the system yourself.
+
+You do this by calling the function FlushDevice() as follows:
+
+/*
+ * A safe way to expunge ONLY a certain device.  The serial.device holds
+ * on to the misc serial resource until a general expunge occurs.
+ * This code attempts to flush ONLY the named device out of memory and
+ * nothing else.  If it fails, no status is returned since it would have
+ * no valid use after the Permit().
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/execbase.h&#062;
+
+<a name="line41">#include &#060;clib/exec_protos.h&#062;</a>
+
+void FlushDevice(char *);
+
+extern struct ExecBase *SysBase;
+
+void FlushDevice(char *name)
+{
+struct Device *devpoint;
+
+Forbid();
+
+if (devpoint=(struct Device *)FindName(&#038;SysBase-&#062;DeviceList,name) )
+    RemDevice(devpoint);
+
+Permit();
+<a name="line57">}</a>
+
+Additional programming information on the misc resource can be found in
+the include files and the Autodocs for the misc resource.
+
+
+
+                       Misc Resource Information
+                    ---------------------------------
+                    INCLUDES        resources/<a href="../Includes_and_Autodocs_2._guide/node010E.html">misc.h</a>
+                                    resources/<a href="../Includes_and_Autodocs_2._guide/node0111.html">misc.i</a>
+                                    hardware/<a href="../Includes_and_Autodocs_2._guide/node00CD.html">custom.h</a>
+                                    hardware/<a href="../Includes_and_Autodocs_2._guide/node00D0.html">custom.i</a>
+                    AUTODOCS        <a href="../Includes_and_Autodocs_2._guide/node054C.html">misc.doc</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

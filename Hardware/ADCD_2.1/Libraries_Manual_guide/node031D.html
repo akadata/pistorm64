@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-1-5-4" TITLE="27 / / About ECS / Determining Chip Versions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / About ECS / Determining Chip Versions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node031C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node031E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+It is possible to ascertain whether the ECS chips are in the machine at
+run time by looking in the ChipRevBits0 field of the GfxBase structure.
+If this field contains the flag for the chip you are interested in (as
+defined in the &#060;<a href="../Includes_and_Autodocs_2._guide/node00AE.html#line102">gfxbase.h</a>&#062; include file), then that chip is present.
+
+For example, if the C statement (<a href="../Includes_and_Autodocs_2._guide/node00AE.html#line102">GfxBase</a>-&#062;ChipRevBits0 &#038; GFXF_HR_AGNUS)
+evaluates to non-zero, then the machine contains the ECS version of the
+Agnus chip and has advanced features such as the ability to handle larger
+rasters.  Older Agnus chips were capable of handling rasters up to 1,024
+by 1,024 pixels.  The ECS Agnus can handle rasters up to 16,384 by 16,384
+pixels.
+
+If (<a href="../Includes_and_Autodocs_2._guide/node00AE.html#line102">GfxBase</a>-&#062;ChipRevBits0 &#038; GFXF_HR_DENISE) is non-zero, then the ECS
+version of the Denise chip is present.  Having both the ECS Agnus and ECS
+Denise present allows for the special SuperHires, VGA and Productivity
+display modes available in Release 2.  For more information on ECS and the
+custom chips, refer to the Amiga <a href="../Hardware_Manual_guide/node0099.html">Hardware</a> Reference Manual.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

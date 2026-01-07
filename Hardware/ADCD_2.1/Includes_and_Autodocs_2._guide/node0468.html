@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="QBlit()" TITLE="graphics.library/QBlit" -->
+<head>
+<title>graphics.library/QBlit</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0467.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0469.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    QBlit -- Queue up a request for blitter usage
+
+SYNOPSIS
+    QBlit( bp )
+           a1
+
+    void QBlit( struct <a href="../Includes_and_Autodocs_2._guide/node00CC.html#line89">bltnode</a> * );
+
+FUNCTION
+    Link a request for the use of the blitter to the end of the
+    current blitter queue.  The pointer bp points to a blit structure
+    containing, among other things, the link information, and the
+    address of your routine which is to be called when the blitter
+    queue finally gets around to this specific request.  When your
+    routine is called, you are in control of the blitter ... it is
+    not busy with anyone else's requests.  This means that you can
+    directly specify the register contents and start the blitter.
+    See the description of the blit structure and the uses of QBlit
+    in the section titled Graphics Support in the OS Kernel Manual.
+    Your code must be written to run either in supervisor or user
+    mode on the 68000.
+
+INPUTS
+    bp - pointer to a blit structure
+
+RESULT
+    Your routine is called when the blitter is ready for you.
+    In general requests for blitter usage through this channel are
+    put in front of those who use the blitter via <a href="../Includes_and_Autodocs_2._guide/node0466.html">OwnBlitter</a> and
+    <a href="../Includes_and_Autodocs_2._guide/node0433.html">DisownBlitter</a>. However for small blits there is more overhead
+    using the queuer than Own/Disown Blitter.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0469.html">QBSBlit()</a> <a href="../Includes_and_Autodocs_2._guide/node00CC.html">hardware/blit.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

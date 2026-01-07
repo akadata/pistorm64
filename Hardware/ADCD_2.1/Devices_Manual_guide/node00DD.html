@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-1" TITLE="14 Trackdisk Device / Trackdisk Device Commands and Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 Trackdisk Device / Trackdisk Device Commands and Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00DC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00DE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Command          Operation
+--------         ----------
+<a href="../Devices_Manual_guide/node00E6.html">CMD_CLEAR</a>        Mark track buffer as invalid. Forces the track to be
+ETD_CLEAR        re-read.  ETD_CLEAR also checks for a diskchange.
+
+<a href="../Devices_Manual_guide/node00E1.html">CMD_READ</a>         Read one or more sectors from a disk.  ETD_READ also
+<a href="../Devices_Manual_guide/node00E1.html#line24">ETD_READ</a>         reads the sector label area and checks for a diskchange.
+
+<a href="../Devices_Manual_guide/node00E8.html">CMD_UPDATE</a>       Write out track buffer if it has been changed. ETD_UPDATE
+ETD_UPDATE       also checks for a diskchange.
+
+<a href="../Devices_Manual_guide/node00E2.html">CMD_WRITE</a>        Write one or more sectors to a disk.  ETD_WRITE also
+<a href="../Devices_Manual_guide/node00E2.html#line18">ETD_WRITE</a>        writes the sector label area and checks for a diskchange.
+
+<a href="../Devices_Manual_guide/node00F4.html">TD_ADDCHANGEINT</a>  Add an interrupt handler to be activated on a diskchange.
+
+<a href="../Devices_Manual_guide/node00F0.html">TD_CHANGENUM</a>     Return the current value of the diskchange counter used
+                 by the ETD commands to determine if a diskchange has
+                 occurred.
+
+<a href="../Devices_Manual_guide/node00EC.html">TD_CHANGESTATE</a>   Return the disk present/not-present status of a drive.
+
+<a href="../Devices_Manual_guide/node00EA.html">TD_EJECT</a>         Eject a disk from a drive.  This command will only work
+                 on drives that support an eject command (V36).
+
+<a href="../Devices_Manual_guide/node00E9.html">TD_FORMAT</a>        Initialize one or more tracks with a data buffer.
+ETD_FORMAT       ETD_FORMAT also initializes the sector label area.
+
+<a href="../Devices_Manual_guide/node00EE.html">TD_GETDRIVETYPE</a>  Return the type of disk drive in use by the unit.
+
+<a href="../Devices_Manual_guide/node00E5.html">TD_GETGEOMETRY</a>   Return the disk geometry table (V36).
+
+<a href="../Devices_Manual_guide/node00EF.html">TD_GETNUMTRACKS</a>  Return the number of tracks usable with the unit.
+
+<a href="../Devices_Manual_guide/node00E7.html">TD_MOTOR</a>         Turn the motor on or off.  ETD_MOTOR also checks for a
+ETD_MOTOR        diskchange.
+
+<a href="../Devices_Manual_guide/node00ED.html">TD_PROTSTATUS</a>    Return the write-protect status of a disk.
+
+<a href="../Devices_Manual_guide/node00F7.html">TD_RAWREAD</a>       Read RAW sector data from disk (unencoded MFM).
+<a href="../Devices_Manual_guide/node00F7.html">ETD_RAWREAD</a>      ETD_RAWREAD also checks for a diskchange.
+
+<a href="../Devices_Manual_guide/node00F8.html">TD_RAWWRITE</a>      Write RAW sector data to disk.  ETD_RAWWRITE also checks
+<a href="../Devices_Manual_guide/node00F8.html">ETD_RAWWRITE</a>     for a diskchange.
+
+<a href="../Devices_Manual_guide/node00F5.html">TD_REMCHANGEINT</a>  Remove a diskchange interrupt handler.
+
+<a href="../Devices_Manual_guide/node00F2.html">TD_SEEK</a>          Move the head to a specific track.  ETD_SEEK also checks
+                 for a
+
+<a href="../Devices_Manual_guide/node00F2.html">ETD_SEEK</a>         diskchange.
+
+
+Exec Functions as Used in This Chapter
+--------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a>        Abort a command to the trackdisk device.
+
+BeginIO()        Initiate a command and return immediately (asynchronous
+                 request).
+
+<a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>    Relinquish use of a disk unit.
+
+<a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>           Initiate a command and wait for completion (synchronous
+                 request).
+
+<a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>     Obtain exclusive use of a particular disk unit.
+
+
+Exec Support Functions as Used in This Chapter
+----------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>    Create an extended I/O request structure of type <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a>.
+                 This structure will be used to communicate commands to
+                 the trackdisk device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>     Create a signal message port for reply messages from the
+                 trackdisk device.  Exec will signal a task when a message
+                 arrives at the reply port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>    Delete an I/O request structure created by <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>.
+
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>     Delete the message port created by <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

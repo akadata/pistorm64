@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_7" NODE="7-2-9" TITLE="7 / True Requesters / IDCMP Requester Features" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>7 / True Requesters / IDCMP Requester Features</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01A9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01AB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Intuition can notify your application about user activity in the requester
+by sending a message to the parent window's IDCMP port (<a href="../Libraries_Manual_guide/node01D6.html#line16">Window.UserPort</a>).
+When using the IDCMP for input, the following IDCMP flags control how
+<a name="line5">requester input events will be handled.</a>
+
+<a href="../Libraries_Manual_guide/node01DF.html">IDCMP_REQSET</a>
+    With this flag set, the program will receive a message whenever a
+    requester opens in its window.  The application will receive one
+<a name="line10">    IDCMP_REQSET event for each requester opened in the window.</a>
+
+<a href="../Libraries_Manual_guide/node01DF.html#line4">IDCMP_REQCLEAR</a>
+    With this flag set, the program will receive a message whenever a
+    requester is cleared from its window.  The application will receive
+    one IDCMP_REQCLEAR event for each requester closed in the window.  By
+    counting the number of IDCMP_REQSET and IDCMP_REQCLEAR events, the
+    application may determine how many requesters are currently open in a
+<a name="line18">    window.</a>
+
+<a href="../Libraries_Manual_guide/node01DF.html#line8">IDCMP_REQVERIFY</a>
+    With this flag set, the application can ensure that it is ready to
+    allow a requester to appear in the window before the requester is
+    displayed.
+
+    When the program receives an IDCMP_REQVERIFY message, it must reply
+    to that message before the requester is added to the window.  If
+    multiple requesters are opened in the window at the same time, only
+    the first one will cause an IDCMP_REQVERIFY event.  It is assumed
+    that once a requester is in a window others may be added without the
+    program's consent.  After the requester count drops to zero and there
+    are no open requesters in the window, the next requester to open will
+<a name="line32">    cause another IDCMP_REQVERIFY event.</a>
+
+    IDCMP_REQVERIFY is ignored by the <a href="../Libraries_Manual_guide/node01A2.html#line12">Request()</a> function.  Since
+    Request() is controlled by the application, it is assumed that the
+    program is prepared to handle the request when calling this function.
+    Since the system does not render <a href="../Libraries_Manual_guide/node01A1.html">true</a> requesters into an
+    application's window (<a href="../Libraries_Manual_guide/node01AC.html">EasyRequest()</a> and <a href="../Libraries_Manual_guide/node01B4.html#line21">AutoRequest()</a> come up in
+    their own window, not in the application's window), IDCMP_REQVERIFY
+<a name="line40">    will only control the timing of <a href="../Libraries_Manual_guide/node01A9.html">double menu</a> requesters.</a>
+
+These flags are set when the parent window is first opened by using either
+the <a href="../Libraries_Manual_guide/node0124.html#line35">WA_IDCMP</a> tag or NewWindow.IDCMPFlags.  They can also be set after the
+parent window is open by using the <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> call.  See the chapter
+entitled &#034;<a href="../Libraries_Manual_guide/node01DF.html">Intuition Input and Output Methods</a>,&#034; for further information
+about these IDCMP flags.  See the &#034;<a href="../Libraries_Manual_guide/node010D.html">Intuition Windows</a>&#034; chapter for details
+on setting IDCMP flags when a window is opened.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

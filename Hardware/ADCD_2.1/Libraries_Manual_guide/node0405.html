@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-4-3" TITLE="31 / CxMessages / Shutting Down the Commodity" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 / CxMessages / Shutting Down the Commodity</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0404.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0406.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Shutting down a commodity is easy.  After replying to all <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a>
+waiting at the <a href="../Libraries_Manual_guide/node0402.html">broker</a>'s message port, a commodity can delete its
+<a href="../Libraries_Manual_guide/node0401.html">CxObjects</a>.  The <a href="../Includes_and_Autodocs_2._guide/node01A8.html">DeleteCxObj()</a> function removes a single CxObject from the
+Commodities network.  <a href="../Includes_and_Autodocs_2._guide/node01A9.html">DeleteCxObjAll()</a> removes multiple objects.
+
+    void DeleteCxObj( CxObj *co );
+    void DeleteCxObjAll( CxObj *delete_co );
+
+If a commodity has a lot of <a href="../Libraries_Manual_guide/node0401.html">CxObjects</a>, deleting each individually can be a
+bit tedious.  <a href="../Includes_and_Autodocs_2._guide/node01A9.html">DeleteCxObjAll()</a> will delete a CxObject and any other
+CxObjects that are attached to it.  The <a href="../Libraries_Manual_guide/node0587.html">HotKey.c</a> example given later in
+this chapter uses this function to delete all its CxObjects.  A commodity
+that uses DeleteCxObjAll() to delete all its CxObjects should make sure
+that they are all connected to the main one.  (See the section
+&#034;<a href="../Libraries_Manual_guide/node0408.html">Connecting CxObjects</a>&#034; below.)
+
+After deleting its <a href="../Libraries_Manual_guide/node0401.html">CxObjects</a>, a commodity must take care of any <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a>
+that might have arrived at the message port just before the commodity
+deleted its objects.
+
+    while(msg = (CxMsg *)GetMsg(broker_mp))
+        ReplyMsg((struct Message *)msg);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

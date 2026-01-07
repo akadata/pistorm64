@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_FTXT" NODE="16-4-6" TITLE=" FTXT IFF Formatted / Appendix C. ISO/ANSI Control Sequences " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> FTXT IFF Formatted / Appendix C. ISO/ANSI Control Sequences </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0173.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0175.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This is a racetrack diagram of the ISO/ANSI characters and control
+sequences as used in FTXT CHRS chunks.
+
+     line terminator
+---+-----------------&#062; LF------------------------------------------------&#062;
+   |
+   |\  ESC-Seq
+   | +---------------&#062; ESC--------------------------+---&#062; 0 through ~ ---&#062;
+   |                        |                       |
+   |                        +&#060;----SP through \  &#060;---+
+   |
+   |\  printable
+   | +----------+----&#062; SP through ~ -------------------------------------&#062;
+   |            |                      /
+   |            +----&#062; G1------------&#062;+
+   |
+   |\  ShiftToG2
+   | +---------------&#062; G0----------------------&#062; (produces a G2 character)
+   |
+   |\  ShiftToG3
+   | +---------------&#062; G0----------------------&#062; (produces a G3 character)
+   |
+   |
+   |\  CSI-Seq
+   | +--------------&#062; CSI--+-----------------------+----&#062; @ through ~ ---&#062;
+   |                       |                       |
+   |                       +&#060;--- SP through ?  &#060;---+
+   |
+   |\  DCS-Seq
+   | +---------&#062; DCS, OSC,-+-----------------------+----------&#062; ST ------&#062;
+   |             PM, APC   |                       |    \
+   |                       +&#060;--- SP through ~  &#060;---+     +----&#062; G1 ------&#062;
+   |
+    \  discard
+     +--------------------&#062; any other character--------------------------&#062;
+
+
+Of the various control sequences, only CSI-Seq is used for <a href="../Devices_Manual_guide/node0168.html">FTXT</a> character
+formatting information.  The others are reserved for future use and for
+compatibility with ISO/ANSI standards.  Certain character sequences are
+syntactically malformed, e.g., CSI followed by a C0, C1, or G1 character.
+Writer programs should not generate reserved or malformed sequences and
+reader programs should skip them.
+
+Consult the ISO/ANSI standards for the meaning of the CSI-Seq control
+sequences.
+
+The two character set shifts SS2 and SS3 may be used when the graphic
+character groups G2 and G3 become standardized.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_24" NODE="MAIN" TITLE="Amiga® RKM Libraries: 24 Exec Messages and Ports" TOC="Libraries_Manual/Exec" -->
+<head>
+<title>Amiga&#174; RKM Libraries: 24 Exec Messages and Ports</title>
+</head>
+<body>
+<a href="../Libraries_Manual_guide/node0003.html"><img src="../images/toc.gif" alt="[Contents]" border=0></a>
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02E9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02EB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For interprocess communication, Exec provides a consistent,
+high-performance mechanism of messages and ports.  This mechanism is used
+to pass message structures of arbitrary sizes from task to task, interrupt
+to task, or task to software interrupt.  In addition, messages are often
+used to coordinate operations between cooperating tasks.  This chapter
+describes many of the details of using messages and ports that the casual
+<a name="line10">Amiga programmer won't need.  See the &#034;<a href="../Libraries_Manual_guide/node028C.html">Introduction to Exec</a>&#034; chapter of</a>
+this manual for a general introduction to using messages and ports.
+
+A message data structure has two parts: system linkage and message body.
+The system linkage is used by Exec to attach a given message to its
+<a name="line15">destination.  The message body contains the actual data of interest.  The</a>
+<a name="line16">message body is any arbitrary data up to 64K bytes in size.  The message</a>
+body data can include pointers to other data blocks of any size.
+
+Messages are always sent to a predetermined destination port. At a port,
+incoming messages are queued in a first-in-first-out (FIFO) order.  There
+are no system restrictions on the number of ports or the number of
+messages that may be queued to a port (other than the amount of available
+system memory).
+
+Messages are always queued by reference, i.e., by a pointer to the
+message.  For performance reasons message copying is not performed.  In
+essence, a message between two tasks is a temporary license for the
+receiving task to use a portion of the memory space of the sending task;
+that portion being the message itself.  This means that if task A sends a
+message to task B, the message is still part of the task A context.  Task
+A, however, should not access the message until it has been replied; that
+is, until task B has sent the message back, using the <a href="../Libraries_Manual_guide/node02F3.html">ReplyMsg()</a> function.
+This technique of message exchange imposes important restrictions on
+message access.
+
+ <a href="../Libraries_Manual_guide/node02EB.html">Message Ports</a>    <a href="../Libraries_Manual_guide/node02EF.html">Messages</a>    <a href="../Libraries_Manual_guide/node02F4.html">Function Reference</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

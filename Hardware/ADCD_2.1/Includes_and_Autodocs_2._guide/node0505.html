@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/console" NODE="CDInputHandler()" TITLE="console.device/CDInputHandler" -->
+<head>
+<title>console.device/CDInputHandler</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0504.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0506.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CDInputHandler -- handle an input event for the console device
+
+SYNOPSIS
+    events = CDInputHandler(events, consoleDevice)
+                   a0      a1
+
+FUNCTION
+    Accept input events from the producer, which is usually the
+    rom input.task.
+
+INPUTS
+    events - a pointer to a list of input events.
+    consoleDevice - a pointer to the library base address of the
+        console device.  This has the same value as ConsoleDevice
+        described below.
+
+RESULTS
+    events - a pointer to a list of input events not used by this
+        handler.
+
+NOTES
+    This function is available for historical reasons.  It is
+    preferred that input events be fed to the system via the
+    WriteEvent command of the input.device.
+
+    This function is different from standard device commands in
+    that it is a function in the console device library vectors.
+    In order to obtain a valid library base pointer for the
+    console device (a.k.a. ConsoleDevice) call
+    OpenDevice(&#034;console.device&#034;, -1, <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a>, 0),
+    and then grab the io_Device pointer field out of the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a>
+    and use as ConsoleDevice.
+
+BUGS
+
+SEE ALSO
+    input.device
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

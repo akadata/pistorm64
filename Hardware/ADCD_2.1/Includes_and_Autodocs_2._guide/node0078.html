@@ -1,0 +1,518 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/dosextens.h" NODE="MAIN" TITLE="Includes/dos/dosextens.h" -->
+<head>
+<title>Includes/dos/dosextens.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0077.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0079.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_DOSEXTENS_H
+#define DOS_DOSEXTENS_H
+/*
+**	$Filename: dos/dosextens.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.38 $
+**	$Date: 91/11/08 $
+**
+**	DOS structures not needed for the casual AmigaDOS user
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TASKS_H
+#include &#034;exec/tasks.h&#034;
+<a name="line17">#endif</a>
+#ifndef EXEC_PORTS_H
+#include &#034;exec/ports.h&#034;
+<a name="line20">#endif</a>
+#ifndef EXEC_LIBRARIES_H
+#include &#034;exec/libraries.h&#034;
+<a name="line23">#endif</a>
+#ifndef EXEC_SEMAPHORES_H
+#include &#034;exec/semaphores.h&#034;
+<a name="line26">#endif</a>
+#ifndef DEVICES_TIMER_H
+#include &#034;devices/timer.h&#034;
+#endif
+
+#ifndef DOS_DOS_H
+#include &#034;dos/dos.h&#034;
+#endif
+<a name="line34"></a>
+/* All DOS processes have this structure */
+/* Create and Device Proc returns pointer to the MsgPort in this structure */
+/* dev_proc = (struct Process *) (DeviceProc(..) - sizeof(struct Task)); */
+<a name="line38"></a>
+<a name="line39">struct Process {</a>
+<a name="line40">    struct  Task    pr_Task;</a>
+<a name="line41">    struct  MsgPort pr_MsgPort; /* This is BPTR address from DOS functions  */</a>
+<a name="line42">    WORD    pr_Pad;		/* Remaining variables on 4 byte boundaries */</a>
+<a name="line43">    BPTR    pr_SegList;		/* Array of seg lists used by this process  */</a>
+<a name="line44">    LONG    pr_StackSize;	/* Size of process stack in bytes	    */</a>
+<a name="line45">    APTR    pr_GlobVec;		/* Global vector for this process (BCPL)    */</a>
+<a name="line46">    LONG    pr_TaskNum;		/* CLI task number of zero if not a CLI	    */</a>
+<a name="line47">    BPTR    pr_StackBase;	/* Ptr to high memory end of process stack  */</a>
+<a name="line48">    LONG    pr_Result2;		/* Value of secondary result from last call */</a>
+<a name="line49">    BPTR    pr_CurrentDir;	/* Lock associated with current directory   */</a>
+<a name="line50">    BPTR    pr_CIS;		/* Current CLI Input Stream		    */</a>
+<a name="line51">    BPTR    pr_COS;		/* Current CLI Output Stream		    */</a>
+<a name="line52">    APTR    pr_ConsoleTask;	/* Console handler process for current window*/</a>
+<a name="line53">    APTR    pr_FileSystemTask;	/* File handler process for current drive   */</a>
+<a name="line54">    BPTR    pr_CLI;		/* pointer to CommandLineInterface	    */</a>
+<a name="line55">    APTR    pr_ReturnAddr;	/* pointer to previous stack frame	    */</a>
+<a name="line56">    APTR    pr_PktWait;		/* Function to be called when awaiting msg  */</a>
+    APTR    pr_WindowPtr;	/* Window for error printing		    */
+
+<a name="line59">    /* following definitions are new with 2.0 */</a>
+<a name="line60">    BPTR    pr_HomeDir;		/* Home directory of executing program	    */</a>
+<a name="line61">    LONG    pr_Flags;		/* flags telling dos about process	    */</a>
+<a name="line62">    void    (*pr_ExitCode)();	/* code to call on exit of program or NULL  */</a>
+<a name="line63">    LONG    pr_ExitData;	/* Passed as an argument to pr_ExitCode.    */</a>
+<a name="line64">    UBYTE   *pr_Arguments;	/* Arguments passed to the process at start */</a>
+<a name="line65">    struct MinList pr_LocalVars; /* Local environment variables		    */</a>
+<a name="line66">    ULONG   pr_ShellPrivate;	/* for the use of the current shell	    */</a>
+    BPTR    pr_CES;		/* Error stream - if NULL, use pr_COS	    */
+};  /* Process */
+
+/*
+ * Flags for pr_Flags
+<a name="line72"> */</a>
+<a name="line73">#define	PRB_FREESEGLIST		0</a>
+<a name="line74">#define	PRF_FREESEGLIST		1</a>
+<a name="line75">#define	PRB_FREECURRDIR		1</a>
+<a name="line76">#define	PRF_FREECURRDIR		2</a>
+<a name="line77">#define	PRB_FREECLI		2</a>
+<a name="line78">#define	PRF_FREECLI		4</a>
+<a name="line79">#define	PRB_CLOSEINPUT		3</a>
+<a name="line80">#define	PRF_CLOSEINPUT		8</a>
+<a name="line81">#define	PRB_CLOSEOUTPUT		4</a>
+<a name="line82">#define	PRF_CLOSEOUTPUT		16</a>
+<a name="line83">#define	PRB_FREEARGS		5</a>
+#define	PRF_FREEARGS		32
+
+/* The long word address (BPTR) of this structure is returned by
+ * Open() and other routines that return a file.  You need only worry
+ * about this struct to do async io's via PutMsg() instead of
+ * standard file system calls */
+<a name="line90"></a>
+<a name="line91">struct FileHandle {</a>
+<a name="line92">   struct Message *fh_Link;	 /* EXEC message	      */</a>
+<a name="line93">   struct MsgPort *fh_Port;	 /* Reply port for the packet */</a>
+   struct MsgPort *fh_Type;	 /* Port to do PutMsg() to
+<a name="line95">				  * Address is negative if a plain file */</a>
+<a name="line96">   LONG fh_Buf;</a>
+<a name="line97">   LONG fh_Pos;</a>
+<a name="line98">   LONG fh_End;</a>
+<a name="line99">   LONG fh_Funcs;</a>
+<a name="line100">#define fh_Func1 fh_Funcs</a>
+<a name="line101">   LONG fh_Func2;</a>
+<a name="line102">   LONG fh_Func3;</a>
+<a name="line103">   LONG fh_Args;</a>
+<a name="line104">#define fh_Arg1 fh_Args</a>
+   LONG fh_Arg2;
+}; /* FileHandle */
+
+/* This is the extension to EXEC Messages used by DOS */
+<a name="line109"></a>
+<a name="line110">struct DosPacket {</a>
+<a name="line111">   struct Message *dp_Link;	 /* EXEC message	      */</a>
+   struct MsgPort *dp_Port;	 /* Reply port for the packet */
+<a name="line113">				 /* Must be filled in each send. */</a>
+   LONG dp_Type;		 /* See ACTION_... below and
+				  * 'R' means Read, 'W' means Write to the
+<a name="line116">				  * file system */</a>
+   LONG dp_Res1;		 /* For file system calls this is the result
+				  * that would have been returned by the
+				  * function, e.g. Write ('W') returns actual
+<a name="line120">				  * length written */</a>
+   LONG dp_Res2;		 /* For file system calls this is what would
+				  * have been returned by IoErr() */
+<a name="line123">/*  Device packets common equivalents */</a>
+<a name="line124">#define dp_Action  dp_Type</a>
+<a name="line125">#define dp_Status  dp_Res1</a>
+<a name="line126">#define dp_Status2 dp_Res2</a>
+<a name="line127">#define dp_BufAddr dp_Arg1</a>
+<a name="line128">   LONG dp_Arg1;</a>
+<a name="line129">   LONG dp_Arg2;</a>
+<a name="line130">   LONG dp_Arg3;</a>
+<a name="line131">   LONG dp_Arg4;</a>
+<a name="line132">   LONG dp_Arg5;</a>
+<a name="line133">   LONG dp_Arg6;</a>
+   LONG dp_Arg7;
+}; /* DosPacket */
+
+/* A Packet does not require the Message to be before it in memory, but
+ * for convenience it is useful to associate the two.
+ * Also see the function init_std_pkt for initializing this structure */
+<a name="line140"></a>
+<a name="line141">struct StandardPacket {</a>
+<a name="line142">   struct Message   sp_Msg;</a>
+   struct DosPacket sp_Pkt;
+}; /* StandardPacket */
+
+<a name="line146">/* Packet types */</a>
+<a name="line147">#define ACTION_NIL		0</a>
+<a name="line148">#define ACTION_STARTUP		0</a>
+<a name="line149">#define ACTION_GET_BLOCK	2	/* OBSOLETE */</a>
+<a name="line150">#define ACTION_SET_MAP		4</a>
+<a name="line151">#define ACTION_DIE		5</a>
+<a name="line152">#define ACTION_EVENT		6</a>
+<a name="line153">#define ACTION_CURRENT_VOLUME	7</a>
+<a name="line154">#define ACTION_LOCATE_OBJECT	8</a>
+<a name="line155">#define ACTION_RENAME_DISK	9</a>
+<a name="line156">#define ACTION_WRITE		'W'</a>
+<a name="line157">#define ACTION_READ		'R'</a>
+<a name="line158">#define ACTION_FREE_LOCK	15</a>
+<a name="line159">#define ACTION_DELETE_OBJECT	16</a>
+<a name="line160">#define ACTION_RENAME_OBJECT	17</a>
+<a name="line161">#define ACTION_MORE_CACHE	18</a>
+<a name="line162">#define ACTION_COPY_DIR		19</a>
+<a name="line163">#define ACTION_WAIT_CHAR	20</a>
+<a name="line164">#define ACTION_SET_PROTECT	21</a>
+<a name="line165">#define ACTION_CREATE_DIR	22</a>
+<a name="line166">#define ACTION_EXAMINE_OBJECT	23</a>
+<a name="line167">#define ACTION_EXAMINE_NEXT	24</a>
+<a name="line168">#define ACTION_DISK_INFO	25</a>
+<a name="line169">#define ACTION_INFO		26</a>
+<a name="line170">#define ACTION_FLUSH		27</a>
+<a name="line171">#define ACTION_SET_COMMENT	28</a>
+<a name="line172">#define ACTION_PARENT		29</a>
+<a name="line173">#define ACTION_TIMER		30</a>
+<a name="line174">#define ACTION_INHIBIT		31</a>
+<a name="line175">#define ACTION_DISK_TYPE	32</a>
+<a name="line176">#define ACTION_DISK_CHANGE	33</a>
+#define ACTION_SET_DATE		34
+<a name="line178"></a>
+#define ACTION_SCREEN_MODE	994
+<a name="line180"></a>
+<a name="line181">#define ACTION_READ_RETURN	1001</a>
+<a name="line182">#define ACTION_WRITE_RETURN	1002</a>
+<a name="line183">#define ACTION_SEEK		1008</a>
+<a name="line184">#define ACTION_FINDUPDATE	1004</a>
+<a name="line185">#define ACTION_FINDINPUT	1005</a>
+<a name="line186">#define ACTION_FINDOUTPUT	1006</a>
+<a name="line187">#define ACTION_END		1007</a>
+<a name="line188">#define ACTION_SET_FILE_SIZE	1022	/* fast file system only in 1.3 */</a>
+#define ACTION_WRITE_PROTECT	1023	/* fast file system only in 1.3 */
+
+<a name="line191">/* new 2.0 packets */</a>
+<a name="line192">#define ACTION_SAME_LOCK	40</a>
+<a name="line193">#define ACTION_CHANGE_SIGNAL	995</a>
+<a name="line194">#define ACTION_FORMAT		1020</a>
+#define ACTION_MAKE_LINK	1021
+/**/
+<a name="line197">/**/</a>
+<a name="line198">#define ACTION_READ_LINK	1024</a>
+<a name="line199">#define ACTION_FH_FROM_LOCK	1026</a>
+<a name="line200">#define ACTION_IS_FILESYSTEM	1027</a>
+#define ACTION_CHANGE_MODE	1028
+<a name="line202">/**/</a>
+<a name="line203">#define ACTION_COPY_DIR_FH	1030</a>
+<a name="line204">#define ACTION_PARENT_FH	1031</a>
+<a name="line205">#define ACTION_EXAMINE_ALL	1033</a>
+#define ACTION_EXAMINE_FH	1034
+<a name="line207"></a>
+<a name="line208">#define ACTION_LOCK_RECORD	2008</a>
+#define ACTION_FREE_RECORD	2009
+<a name="line210"></a>
+<a name="line211">#define ACTION_ADD_NOTIFY	4097</a>
+#define ACTION_REMOVE_NOTIFY	4098
+
+/* Tell a file system to serialize the current volume. This is typically
+ * done by changing the creation date of the disk. This packet does not take
+ * any arguments.  NOTE: be prepared to handle failure of this packet for
+<a name="line217"> * V37 ROM filesystems.</a>
+<a name="line218"> */</a>
+<a name="line219">#define	ACTION_SERIALIZE_DISK	4200</a>
+
+/*
+ * A structure for holding error messages - stored as array with error == 0
+ * for the last entry.
+<a name="line224"> */</a>
+struct ErrorString {
+	LONG  *estr_Nums;
+<a name="line227">	UBYTE *estr_Strings;</a>
+<a name="line228">};</a>
+<a name="line229"></a>
+<a name="line230">/* DOS library node structure.</a>
+<a name="line231"> * This is the data at positive offsets from the library node.</a>
+<a name="line232"> * Negative offsets from the node is the jump table to DOS functions</a>
+<a name="line233"> * node = (struct DosLibrary *) OpenLibrary( &#034;dos.library&#034; .. )	     */</a>
+<a name="line234"></a>
+<a name="line235">struct DosLibrary {</a>
+<a name="line236">    struct Library dl_lib;</a>
+    struct RootNode *dl_Root; /* Pointer to RootNode, described below */
+    APTR    dl_GV;	      /* Pointer to BCPL global vector	      */
+    LONG    dl_A2;	      /* BCPL standard register values	      */
+    LONG    dl_A5;
+    LONG    dl_A6;
+<a name="line242">    struct ErrorString *dl_Errors;	  /* PRIVATE pointer to array of error msgs */</a>
+    struct timerequest *dl_TimeReq;	  /* PRIVATE pointer to timer request */
+    struct Library     *dl_UtilityBase;   /* PRIVATE ptr to utility library */
+<a name="line245">    struct Library     *dl_IntuitionBase; /* PRIVATE ptr to intuition library */</a>
+<a name="line246">};  /*	DosLibrary */</a>
+<a name="line247"></a>
+<a name="line248">/*			       */</a>
+<a name="line249"></a>
+<a name="line250">struct RootNode {</a>
+    BPTR    rn_TaskArray;	     /* [0] is max number of CLI's
+<a name="line252">				      * [1] is APTR to process id of CLI 1</a>
+<a name="line253">				      * [n] is APTR to process id of CLI n */</a>
+<a name="line254">    BPTR    rn_ConsoleSegment; /* SegList for the CLI			   */</a>
+    struct  DateStamp rn_Time; /* Current time				   */
+    LONG    rn_RestartSeg;     /* SegList for the disk validator process   */
+<a name="line257">    BPTR    rn_Info;	       /* Pointer to the Info structure		   */</a>
+<a name="line258">    BPTR    rn_FileHandlerSegment; /* segment for a file handler	   */</a>
+<a name="line259">    struct MinList rn_CliList; /* new list of all CLI processes */</a>
+<a name="line260">			       /* the first cpl_Array is also rn_TaskArray */</a>
+    struct MsgPort *rn_BootProc; /* private ptr to msgport of boot fs	   */
+    BPTR    rn_ShellSegment;   /* seglist for Shell (for NewShell)	   */
+<a name="line263">    LONG    rn_Flags;	       /* dos flags */</a>
+<a name="line264">};  /* RootNode */</a>
+<a name="line265"></a>
+<a name="line266">#define RNB_WILDSTAR	24</a>
+#define RNF_WILDSTAR	(1L&#060;&#060;24)
+#define RNB_PRIVATE1	1	/* private for dos */
+#define RNF_PRIVATE1	2
+
+<a name="line271">/* ONLY to be allocated by DOS! */</a>
+struct CliProcList {
+<a name="line273">	struct MinNode cpl_Node;</a>
+<a name="line274">	LONG cpl_First;	     /* number of first entry in array */</a>
+<a name="line275">	struct MsgPort **cpl_Array;</a>
+<a name="line276">			     /* [0] is max number of CLI's in this entry (n)</a>
+<a name="line277">			      * [1] is CPTR to process id of CLI cpl_First</a>
+<a name="line278">			      * [n] is CPTR to process id of CLI cpl_First+n-1</a>
+<a name="line279">			      */</a>
+<a name="line280">};</a>
+<a name="line281"></a>
+struct DosInfo {
+    BPTR    di_McName;	       /* PRIVATE: system resident module list	    */
+#define di_ResList di_McName
+    BPTR    di_DevInfo;	       /* Device List				    */
+    BPTR    di_Devices;	       /* Currently zero			    */
+<a name="line287">    BPTR    di_Handlers;       /* Currently zero			    */</a>
+<a name="line288">    APTR    di_NetHand;	       /* Network handler processid; currently zero */</a>
+<a name="line289">    struct  SignalSemaphore di_DevLock;	   /* do NOT access directly! */</a>
+<a name="line290">    struct  SignalSemaphore di_EntryLock;  /* do NOT access directly! */</a>
+<a name="line291">    struct  SignalSemaphore di_DeleteLock; /* do NOT access directly! */</a>
+};  /* DosInfo */
+
+<a name="line294">/* structure for the Dos resident list.  Do NOT allocate these, use	  */</a>
+<a name="line295">/* AddSegment(), and heed the warnings in the autodocs!			  */</a>
+<a name="line296"></a>
+struct Segment {
+	BPTR seg_Next;
+	LONG seg_UC;
+	BPTR seg_Seg;
+	UBYTE seg_Name[4];	/* actually the first 4 chars of BSTR name */
+<a name="line302">};</a>
+<a name="line303"></a>
+<a name="line304">#define CMD_SYSTEM	-1</a>
+<a name="line305">#define CMD_INTERNAL	-2</a>
+<a name="line306">#define CMD_DISABLED	-999</a>
+<a name="line307"></a>
+<a name="line308"></a>
+<a name="line309">/* DOS Processes started from the CLI via RUN or NEWCLI have this additional</a>
+<a name="line310"> * set to data associated with them */</a>
+<a name="line311"></a>
+<a name="line312">struct CommandLineInterface {</a>
+<a name="line313">    LONG   cli_Result2;	       /* Value of IoErr from last command	  */</a>
+<a name="line314">    BSTR   cli_SetName;	       /* Name of current directory		  */</a>
+<a name="line315">    BPTR   cli_CommandDir;     /* Head of the path locklist		  */</a>
+<a name="line316">    LONG   cli_ReturnCode;     /* Return code from last command		  */</a>
+<a name="line317">    BSTR   cli_CommandName;    /* Name of current command		  */</a>
+<a name="line318">    LONG   cli_FailLevel;      /* Fail level (set by FAILAT)		  */</a>
+    BSTR   cli_Prompt;	       /* Current prompt (set by PROMPT)	  */
+    BPTR   cli_StandardInput;  /* Default (terminal) CLI input		  */
+    BPTR   cli_CurrentInput;   /* Current CLI input			  */
+    BSTR   cli_CommandFile;    /* Name of EXECUTE command file		  */
+    LONG   cli_Interactive;    /* Boolean; True if prompts required	  */
+    LONG   cli_Background;     /* Boolean; True if CLI created by RUN	  */
+    BPTR   cli_CurrentOutput;  /* Current CLI output			  */
+    LONG   cli_DefaultStack;   /* Stack size to be obtained in long words */
+    BPTR   cli_StandardOutput; /* Default (terminal) CLI output		  */
+    BPTR   cli_Module;	       /* SegList of currently loaded command	  */
+};  /* CommandLineInterface */
+<a name="line330"></a>
+<a name="line331">/* This structure can take on different values depending on whether it is</a>
+<a name="line332"> * a device, an assigned directory, or a volume.  Below is the structure</a>
+<a name="line333"> * reflecting volumes only.  Following that is the structure representing</a>
+<a name="line334"> * only devices. Following that is the unioned structure representing all</a>
+<a name="line335"> * the values</a>
+<a name="line336"> */</a>
+<a name="line337"></a>
+<a name="line338">/* structure representing a volume */</a>
+<a name="line339"></a>
+struct DeviceList {
+    BPTR		dl_Next;	/* bptr to next device list */
+    LONG		dl_Type;	/* see DLT below */
+    struct MsgPort *	dl_Task;	/* ptr to handler task */
+<a name="line344">    BPTR		dl_Lock;	/* not for volumes */</a>
+<a name="line345">    struct DateStamp	dl_VolumeDate;	/* creation date */</a>
+<a name="line346">    BPTR		dl_LockList;	/* outstanding locks */</a>
+<a name="line347">    LONG		dl_DiskType;	/* 'DOS', etc */</a>
+<a name="line348">    LONG		dl_unused;</a>
+<a name="line349">    BSTR		dl_Name;	/* bptr to bcpl name */</a>
+<a name="line350">};</a>
+<a name="line351"></a>
+<a name="line352">/* device structure (same as the DeviceNode structure in filehandler.h) */</a>
+<a name="line353"></a>
+<a name="line354">struct	      DevInfo {</a>
+<a name="line355">    BPTR  dvi_Next;</a>
+    LONG  dvi_Type;
+    APTR  dvi_Task;
+    BPTR  dvi_Lock;
+    BSTR  dvi_Handler;
+<a name="line360">    LONG  dvi_StackSize;</a>
+<a name="line361">    LONG  dvi_Priority;</a>
+<a name="line362">    LONG  dvi_Startup;</a>
+<a name="line363">    BPTR  dvi_SegList;</a>
+<a name="line364">    BPTR  dvi_GlobVec;</a>
+    BSTR  dvi_Name;
+};
+<a name="line367"></a>
+<a name="line368">/* combined structure for devices, assigned directories, volumes */</a>
+<a name="line369"></a>
+<a name="line370">struct DosList {</a>
+<a name="line371">    BPTR		dol_Next;	 /* bptr to next device on list */</a>
+<a name="line372">    LONG		dol_Type;	 /* see DLT below */</a>
+    struct MsgPort     *dol_Task;	 /* ptr to handler task */
+    BPTR		dol_Lock;
+<a name="line375">    union {</a>
+	struct {
+	BSTR	dol_Handler;	/* file name to load if seglist is null */
+<a name="line378">	LONG	dol_StackSize;	/* stacksize to use when starting process */</a>
+<a name="line379">	LONG	dol_Priority;	/* task priority when starting process */</a>
+<a name="line380">	ULONG	dol_Startup;	/* startup msg: FileSysStartupMsg for disks */</a>
+<a name="line381">	BPTR	dol_SegList;	/* already loaded code for new task */</a>
+	BPTR	dol_GlobVec;	/* BCPL global vector to use when starting
+				 * a process. -1 indicates a C/Assembler
+<a name="line384">				 * program. */</a>
+<a name="line385">	} dol_handler;</a>
+<a name="line386"></a>
+	struct {
+<a name="line388">	struct DateStamp	dol_VolumeDate;	 /* creation date */</a>
+	BPTR			dol_LockList;	 /* outstanding locks */
+<a name="line390">	LONG			dol_DiskType;	 /* 'DOS', etc */</a>
+	} dol_volume;
+
+	struct {
+	UBYTE	*dol_AssignName;     /* name for non-or-late-binding assign */
+	struct AssignList *dol_List; /* for multi-directory assigns (regular) */
+<a name="line396">	} dol_assign;</a>
+<a name="line397"></a>
+    } dol_misc;
+
+    BSTR		dol_Name;	 /* bptr to bcpl name */
+<a name="line401">    };</a>
+<a name="line402"></a>
+<a name="line403">/* structure used for multi-directory assigns. AllocVec()ed. */</a>
+<a name="line404"></a>
+<a name="line405">struct AssignList {</a>
+<a name="line406">	struct AssignList *al_Next;</a>
+	BPTR		   al_Lock;
+};
+<a name="line409"></a>
+<a name="line410">/* definitions for dl_Type */</a>
+<a name="line411">#define DLT_DEVICE	0</a>
+<a name="line412">#define DLT_DIRECTORY	1	/* assign */</a>
+<a name="line413">#define DLT_VOLUME	2</a>
+#define DLT_LATE	3	/* late-binding assign */
+#define DLT_NONBINDING	4	/* non-binding assign */
+#define DLT_PRIVATE	-1	/* for internal use only */
+<a name="line417"></a>
+<a name="line418">/* structure return by GetDeviceProc() */</a>
+<a name="line419">struct DevProc {</a>
+<a name="line420">	struct MsgPort *dvp_Port;</a>
+	BPTR		dvp_Lock;
+	ULONG		dvp_Flags;
+<a name="line423">	struct DosList *dvp_DevNode;	/* DON'T TOUCH OR USE! */</a>
+<a name="line424">};</a>
+<a name="line425"></a>
+<a name="line426">/* definitions for dvp_Flags */</a>
+<a name="line427">#define DVPB_UNLOCK	0</a>
+<a name="line428">#define DVPF_UNLOCK	(1L &#060;&#060; DVPB_UNLOCK)</a>
+<a name="line429">#define DVPB_ASSIGN	1</a>
+<a name="line430">#define DVPF_ASSIGN	(1L &#060;&#060; DVPB_ASSIGN)</a>
+
+/* Flags to be passed to LockDosList(), etc */
+<a name="line433">#define LDB_DEVICES	2</a>
+<a name="line434">#define LDF_DEVICES	(1L &#060;&#060; LDB_DEVICES)</a>
+<a name="line435">#define LDB_VOLUMES	3</a>
+<a name="line436">#define LDF_VOLUMES	(1L &#060;&#060; LDB_VOLUMES)</a>
+#define LDB_ASSIGNS	4
+#define LDF_ASSIGNS	(1L &#060;&#060; LDB_ASSIGNS)
+<a name="line439">#define LDB_ENTRY	5</a>
+#define LDF_ENTRY	(1L &#060;&#060; LDB_ENTRY)
+#define LDB_DELETE	6
+<a name="line442">#define LDF_DELETE	(1L &#060;&#060; LDB_DELETE)</a>
+<a name="line443"></a>
+<a name="line444">/* you MUST specify one of LDF_READ or LDF_WRITE */</a>
+<a name="line445">#define LDB_READ	0</a>
+<a name="line446">#define LDF_READ	(1L &#060;&#060; LDB_READ)</a>
+<a name="line447">#define LDB_WRITE	1</a>
+#define LDF_WRITE	(1L &#060;&#060; LDB_WRITE)
+
+/* actually all but LDF_ENTRY (which is used for internal locking) */
+<a name="line451">#define LDF_ALL		(LDF_DEVICES|LDF_VOLUMES|LDF_ASSIGNS)</a>
+<a name="line452"></a>
+<a name="line453">/* a lock structure, as returned by Lock() or DupLock() */</a>
+<a name="line454">struct FileLock {</a>
+<a name="line455">    BPTR		fl_Link;	/* bcpl pointer to next lock */</a>
+    LONG		fl_Key;		/* disk block number */
+    LONG		fl_Access;	/* exclusive or shared */
+<a name="line458">    struct MsgPort *	fl_Task;	/* handler task's port */</a>
+<a name="line459">    BPTR		fl_Volume;	/* bptr to DLT_VOLUME DosList entry */</a>
+};
+
+/* error report types for ErrorReport() */
+<a name="line463">#define REPORT_STREAM		0	/* a stream */</a>
+<a name="line464">#define REPORT_TASK		1	/* a process - unused */</a>
+<a name="line465">#define REPORT_LOCK		2	/* a lock */</a>
+#define REPORT_VOLUME		3	/* a volume node */
+#define REPORT_INSERT		4	/* please insert volume */
+
+/* Special error codes for ErrorReport() */
+#define ABORT_DISK_ERROR	296	/* Read/write error */
+#define ABORT_BUSY		288	/* You MUST replace... */
+<a name="line472"></a>
+<a name="line473">/* types for initial packets to shells from run/newcli/execute/system. */</a>
+<a name="line474">/* For shell-writers only */</a>
+<a name="line475">#define RUN_EXECUTE		-1</a>
+<a name="line476">#define RUN_SYSTEM		-2</a>
+<a name="line477">#define RUN_SYSTEM_ASYNCH	-3</a>
+
+/* Types for fib_DirEntryType.	NOTE that both USERDIR and ROOT are	 */
+/* directories, and that directory/file checks should use &#060;0 and &#062;=0.	 */
+/* This is not necessarily exhaustive!	Some handlers may use other	 */
+/* values as needed, though &#060;0 and &#062;=0 should remain as supported as	 */
+/* possible.								 */
+#define ST_ROOT		1
+#define ST_USERDIR	2
+#define ST_SOFTLINK	3	/* looks like dir, but may point to a file! */
+#define ST_LINKDIR	4	/* hard link to dir */
+#define ST_FILE		-3	/* must be negative for FIB! */
+#define ST_LINKFILE	-4	/* hard link to file */
+#define ST_PIPEFILE	-5	/* for pipes that support ExamineFH */
+
+#endif	/* DOS_DOSEXTENS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="PRSP.doc" TITLE="A / IFF Third Party Public Form and Chunk Specification / PRSP.doc" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>A / IFF Third Party Public Form and Chunk Specification / PRSP.doc</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0288.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node028A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+DPaint IV perspective move form (EA)
+
+Submitted by Lee Taran
+
+/* --------------------------------------------------------------------
+   IFF Information:
+       PRSP ::= &#034;FORM&#034; # {&#034;PSRP&#034; MOVE }
+       MOVE ::= &#034;MOVE&#034; # { MoveState  }
+ * -------------------------------------------------------------------- */
+
+    typedef struct {
+       BYTE reserved;        /* initialize to 0 */
+       BYTE moveDir;         /* 0 = from point  1 = to point  */
+       BYTE recordDir;       /* 0 = FORWARD,    1 = STILL, 2 = BACKWARD */
+       BYTE rotationType;    /* 0 = SCREEN_RELATIVE, 1 = BRUSH_RELATIVE */
+       BYTE translationType; /* 0 = SCREEN_RELATIVE, 1 = BRUSH_RELATIVE */
+       BYTE cyclic;          /* 0 = NO, 1 = YES */
+       SHORT distance[3];    /* x,y,z distance displacement */
+       SHORT angle[3];       /* x,y,z rotation angles */
+       SHORT nframes;        /* number of frames to move */
+       SHORT easeout;        /* number of frames to ease out */
+       SHORT easein;         /* number of frames to ease in */
+       } MoveState;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

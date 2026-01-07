@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-3-4" TITLE="8 / Creating Borders / Border Colors and Drawing Modes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Borders / Border Colors and Drawing Modes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01C2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01C4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Borders can select their colors from the values set in the color registers
+for the screen in which they are rendered.  The available number of colors
+and palette settings are screen attributes and may not be changed through
+<a name="line5">border rendering.</a>
+
+Two drawing modes pertain to border lines: <a href="../Libraries_Manual_guide/node01C1.html#line28">JAM1</a> and <a href="../Libraries_Manual_guide/node01C1.html#line31">COMPLEMENT</a>.  To draw
+the line in a specific color, use the JAM1 draw mode.  This mode converts
+each pixel in the line to the color set in the <a href="../Libraries_Manual_guide/node01C1.html#line21">FrontPen</a> field.
+
+Selecting the <a href="../Libraries_Manual_guide/node01C1.html#line31">COMPLEMENT</a> draw mode causes the line to be drawn in an
+exclusive-or mode that inverts the color of each pixel within the line.
+The data bits of the pixel are changed to their binary complement.  This
+complement is formed by reversing all bits in the binary representation of
+the color register number.  In a three bitplane display, for example,
+color 6 is 110 in binary. In COMPLEMENT draw mode, if a pixel is color 6,
+it will be changed to the 001 (binary), which is color 1.  Note that a
+border drawn in COMPLEMENT mode can be removed from a static display by
+drawing the border again in the same position.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

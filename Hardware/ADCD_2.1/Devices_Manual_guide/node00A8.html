@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_12" NODE="12-6" TITLE="12 Serial Device / Querying the Serial Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>12 Serial Device / Querying the Serial Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00A7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00A9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You query the serial device by passing an <a href="../Devices_Manual_guide/node009C.html#line7">IOExtSer</a> to the device with
+<a href="../Includes_and_Autodocs_2._guide/node04D6.html">SDCMD_QUERY</a> set in io_Command.  The serial device will respond with the
+status of the serial port lines and registers, and the number of unread
+characters in the read buffer.
+
+   UWORD Serial_Status;
+   ULONG Unread_Chars;
+
+   SerialIO-&#062;IOSer.io_Command  = SDCMD_QUERY; /* indicate query */
+   SendIO((struct IORequest *)SerialIO);
+
+   Serial_Status = SerialIO-&#062;io_Status; /* store returned status */
+   Unread_Chars = SerialIO-&#062;IOSer.io_Actual; /* store unread count */
+
+The 16 status bits of the serial device are returned in io_Status; the
+<a name="line17">number of unread characters is returned in io_Actual.</a>
+
+                       SERIAL DEVICE STATUS BITS
+
+         Bit     Active     Symbol      Function
+         ---     ------     ------      --------
+          0        -                    Reserved
+          1        -                    Reserved
+          2      high       (RI)        Parallel Select on the A1000.  On
+                                        the A500 and A2000, Select is also
+                                        connected to the serial port's
+                                        Ring Indicator.  (Be cautious when
+                                        making cables.)
+
+          3      low        (DSR)       Data set ready
+          4      low        (CTS)       Clear to send
+          5      low        (CD)        Carrier detect
+          6      low        (RTS)       Ready to send
+          7      low        (DTR)       Data terminal ready
+          8      high                   Read overrun
+          9      high                   Break sent
+          10     high                   Break received
+          11     high                   Transmit x-OFFed
+          12     high                   Receive x-OFFed
+          13-15    -                    (reserved)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-3-1" TITLE="27 / / Viewport Size Specifications / ViewPort Height" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Viewport Size Specifications / ViewPort Height</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0323.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0325.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">DHeight</a> field of the <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> structure determines how many video
+lines will be reserved to show the height of this display segment.  The
+size of the actual segment depends on whether you define a non-interlaced
+or an interlaced display.  An interlaced ViewPort displays twice as many
+lines as does a non-interlaced ViewPort in the same physical height.
+
+For example, a complete <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> consisting of two <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>s might be defined
+as follows:
+
+  * <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> 1 is 150 lines, high-resolution mode (uses the top
+    three-quarters of the display).
+
+  * <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> 2 is 49 lines of low-resolution mode (uses the bottom
+    quarter of the display and allows the space for the required
+    blank line between ViewPorts).
+
+Initialize the height directly in DHeight.  Nominal height for a
+non-interlaced display is 200 lines for NTSC, 256 for PAL.  Nominal height
+for an interlaced display is 400 lines for NTSC, 512 for PAL.
+
+To set your <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> to the maximum supported (displayable) height, use
+the following code fragment (this requires Release 2):
+
+    struct DimensionInfo querydims;
+    struct Rectangle *oscan;
+    struct ViewPort viewport;
+
+    if (GetDisplayInfoData( NULL,(UBYTE *)&#038;querydims,
+                            sizeof(struct DimensionInfo),
+                            DTAG_DIMS, modeID ))
+    {
+            /* Use StdOScan instead of MaxOScan to get standard   */
+            /* overscan dimensions as set by the user in Overscan */
+            /* Preferences                                        */
+            oscan = &#038;querydims.MaxOScan;
+            viewPort-&#062;DHeight = oscan-&#062;MaxY - oscan-&#062;MinY + 1;
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

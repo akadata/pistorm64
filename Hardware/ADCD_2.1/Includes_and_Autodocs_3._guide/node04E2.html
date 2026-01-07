@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="nonvolatile" NODE="StoreNV()" TITLE="nonvolatile.library/StoreNV" -->
+<head>
+<title>nonvolatile.library/StoreNV</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04E1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04E3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	StoreNV -- store data in nonvolatile storage. (V40)
+
+<b>   SYNOPSIS</b>
+	error = StoreNV(appName, itemName, data, length, killRequesters);
+	D0		A0	 A1	   A2    D0	 D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a> StoreNV(STRPTR, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a>, ULONG, BOOL);
+
+<b>   FUNCTION</b>
+	Saves some data in nonvolatile storage. The data is tagged with
+	AppName and ItemName so it can be retrieved later. No single
+	item should be larger than one fourth of the maximum storage as
+	returned by <a href="../Includes_and_Autodocs_3._guide/node04DF.html">GetNVInfo()</a>.
+
+	There is no data compression associated with this function.
+
+	The strings, AppName and ItemName, should be short, but descriptive.
+	They need to be short since the string is stored with the data and
+	the nonvolatile storage for a stand alone game system is limited.
+	The game system allows the user to selectively remove entries from
+	storage, so the string should be desriptive.
+
+	The strings AppName and ItemName may not contain the '/' or ':'
+	characters. It is recommended that these characters be blocked
+	from user input when requesting AppName and ItemName strings.
+
+<b>   INPUTS</b>
+	appName - NULL terminated string identifying the application
+		  creating the data. Maximum length is 31.
+	itemName - NULL terminated string uniquely identifying the data
+		   within the application. Maximum length is 31.
+	data - pointer to the memory block to be stored.
+	length - number of bytes to be stored in the units of tens of
+		 bytes. For example, if you have 23 bytes to store length = 3;
+		 147 byte then length = 15.
+	killRequesters - suppress system requesters flag. TRUE if all system
+			 requesters are to be suppressed during this function.
+			 FALSE if system requesters are allowed.
+
+<b>   RESULT</b>
+	error - 0                means no error,
+	        NVERR_BADNAME    error in AppName, or ItemName.
+	        NVERR_WRITEPROT  Nonvolatile storage is read only.
+	        NVERR_FAIL       Failure in writing data (nonvolatile storage
+				 full, or write protected).
+	        NVERR_FATAL      Fatal error when accessing nonvolatile
+				 storage, possible loss of previously saved
+				 nonvolatile data.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node04DE.html">GetCopyNV()</a>, <a href="../Includes_and_Autodocs_3._guide/node04DF.html">GetNVInfo()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

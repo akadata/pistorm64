@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="CreateProc()" TITLE="dos.library/CreateProc" -->
+<head>
+<title>dos.library/CreateProc</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node014C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node014E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+
+	CreateProc -- Create a new process
+
+<b>    SYNOPSIS</b>
+	process = CreateProc( name, pri, seglist, stackSize )
+	D0		      D1    D2	 D3	  D4
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *CreateProc(STRPTR, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line129">BPTR</a>, LONG)
+
+<b>    FUNCTION</b>
+	CreateProc() creates a new AmigaDOS process of name 'name'.  AmigaDOS
+	processes are a superset of exec tasks.
+
+	A seglist, as returned by <a href="../Includes_and_Autodocs_3._guide/node0185.html">LoadSeg()</a>, is passed as 'seglist'.
+	This represents a section of code which is to be run as a new
+	process. The code is entered at the first hunk in the segment list,
+	which should contain suitable initialization code or a jump to
+	such.  A process control structure is allocated from memory and
+	initialized.  If you wish to fake a seglist (that will never
+	have DOS <a href="../Includes_and_Autodocs_3._guide/node01C7.html">UnLoadSeg()</a> called on it), use this code:
+
+		    DS.L    0	;Align to longword
+		    DC.L    16	;Segment &#034;length&#034; (faked)
+		    DC.L    0	;Pointer to next segment
+		    ...start of code...
+
+	The size of the root stack upon activation is passed as
+	'stackSize'.  'pri' specifies the required priority of the new
+	process.  The result will be the process msgport address of the new
+	process, or zero if the routine failed.  The argument 'name'
+	specifies the new process name.  A zero return code indicates
+	error.
+
+	The seglist passed to CreateProc() is not freed when it exits; it
+	is up to the parent process to free it, or for the code to unload
+	itself.
+
+	Under V36 and later, you probably should use <a href="../Includes_and_Autodocs_3._guide/node014C.html">CreateNewProc()</a> instead.
+
+<b>    INPUTS</b>
+	name      - pointer to a null-terminated string
+	pri       - signed long (range -128 to +127)
+	seglist   - BCPL pointer to a seglist
+	stackSize - integer (must be a multiple of 4 bytes)
+
+<b>    RESULTS</b>
+	process   - pointer to new process msgport
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node014C.html">CreateNewProc()</a>, <a href="../Includes_and_Autodocs_3._guide/node0185.html">LoadSeg()</a>, <a href="../Includes_and_Autodocs_3._guide/node01C7.html">UnLoadSeg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

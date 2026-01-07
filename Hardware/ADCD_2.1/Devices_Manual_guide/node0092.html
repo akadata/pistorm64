@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_4" NODE="4-5-3" TITLE="4 / Reading from the Console Device / Window Bounds Report" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>4 / Reading from the Console Device / Window Bounds Report</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0091.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0093.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A user may have either moved or resized the window to which your console
+is bound.  By issuing a WINDOW STATUS REPORT to the console, you can read
+the current position and size in the input stream.  This window bounds
+report takes the following form:
+
+    &#060;CSI&#062;1;1;&#060;bottom margin&#062;;&#060;right margin&#062; r
+
+The bottom and right margins give you the window row and column dimensions
+as well. For a window that holds 20 lines with 60 characters per line, you
+will receive the following in the input stream:
+
+    9B 31 3B 31 3B 32 30 3B 36 30 20 72
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

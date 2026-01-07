@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="StackSwap()" TITLE="exec.library/StackSwap" -->
+<head>
+<title>exec.library/StackSwap</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0381.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0383.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    StackSwap - EXEC supported method of replacing task's stack      (V37)
+
+SYNOPSIS
+    StackSwap(newStack)
+              A0
+
+    VOID StackSwap(struct <a href="../Includes_and_Autodocs_2._guide/node008E.html#line53">StackSwapStruct</a> *);
+
+FUNCTION
+    This function will, in an EXEC supported manner, swap the
+    stack of your task with the given values in StackSwap.
+    The <a href="../Includes_and_Autodocs_2._guide/node008E.html#line53">StackSwapStruct</a> structure will then contain the values
+    of the old stack such that the old stack can be restored.
+    This function is new in V37.
+
+NOTE
+    If you do a stack swap, only the new stack is set up.
+    This function does not copy the stack or do anything else
+    other than set up the new stack for the task.  It is
+    generally required that you restore your stack before
+    exiting.
+
+INPUTS
+    newStack - A structure that contains the values for the
+            new upper and lower stack bounds and the new stack
+            pointer.  This structure will have its values
+            replaced by those in you task such that you can
+            restore the stack later.
+
+RESULTS
+    newStack - The structure will now contain the old stack.
+            This means that StackSwap(foo); StackSwap(foo);
+            will effectively do nothing.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node032D.html">AddTask</a>, <a href="../Includes_and_Autodocs_2._guide/node0378.html">RemTask</a>, <a href="../Includes_and_Autodocs_2._guide/node008E.html">exec/tasks.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

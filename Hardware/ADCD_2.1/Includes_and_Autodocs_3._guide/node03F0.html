@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="SetEditHook()" TITLE="intuition.library/SetEditHook" -->
+<head>
+<title>intuition.library/SetEditHook</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03EF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03F1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	SetEditHook -- Set global processing for string gadgets. (V36)
+
+<b>    SYNOPSIS</b>
+	OldHook = SetEditHook( <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> )
+	D0                     A0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *SetEditHook( struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> * );
+
+<b>    FUNCTION</b>
+	Sets new global editing hook for string gadgets.
+
+	WARNING: The use and integration of this function has not
+	been explored, and thus should be considered a risky function.
+	Do *NOT* use this in a commercial product until further notice.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> -- A pointer to a struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> which determines a function
+	  in your code to be called every time the user types a key.
+	  This is done before control is passed to the gadget custom
+	  editing hook, so affects ALL string gadgets.
+
+<b>    RESULT</b>
+	Returns previous global edit hook structure.  You may need this
+	hook if you wish to invoke the previous edit hook's behavior
+	in addition to your own.
+
+<b>    NOTES</b>
+	There are a few key differences between a global edit hook and the
+	more famililar per-gadget StringExtend-&#062;EditHook field.  In the
+	case of the latter, the hook's creator supplies a WorkBuffer.
+	Intuition's idea of the result of a keystroke is stored in
+	the <a href="../Includes_and_Autodocs_3._guide/node0649.html#line30">SGWork</a> structure (which references the WorkBuffer).  The
+	state of the gadget before Intuition's hook acted is available in
+	the StringInfo-&#062;Buffer, -&#062;BufferPos, and -&#062;NumChars fields.
+
+	In the case of a global editing hook, your hook _becomes_
+	Intuition's hook, which affects all gadgets, most of which
+	do not have a WorkBuffer.  This means that if you invoke
+	Intuition's original hook (which you got as the result of this
+	function), there isn't any easy way for you to &#034;undo&#034; that after
+	the fact.  This means that if Intuition's behavior for certain
+	keystrokes is incompatible with your hook's objectives, then
+	you must avoid calling Intuition's hook for those keys.  One
+	approach is to run through your hook's code first, acting on
+	those keys you wish to recognize.  Then, call Intuition's
+	hook for those keys you do not recognize, or for those keys
+	whose default actions you wish to add to.
+
+	Do not forget to set SGA_REDISPLAY when needed (see sghooks.h),
+	and please be sure to give the SGWork-&#062;EditOp field a value
+	which is as meaningful as possible.
+
+	Currently, only SGH_KEY messages are sent to the global edit
+	hook, though custom edit hooks do receive SGH_CLICK messages
+	in addition.
+
+	Finally, there is currently no arbitration between a global
+	edit hook and a custom edit hook as to ownership of keystrokes.
+	It would be fair to expect that a custom edit hook would be
+	written to match the current Intuition edit hook.  If your
+	global edit hook acts on (say) up and down arrow keystrokes,
+	an undesirable result may occur if some string gadget's custom
+	hook also acts on these keystrokes.  There is currently
+	no easy way to resolve this issue.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

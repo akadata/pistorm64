@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_14" NODE="14-3-2" TITLE="14 / The Icon Library / Icon Library Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>14 / The Icon Library / Icon Library Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0242.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0244.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The icon library functions do all the work needed to read, write and
+examine an icon's <a href="../Libraries_Manual_guide/node0238.html">.info</a> file and corresponding <a href="../Libraries_Manual_guide/node0241.html">DiskObject</a> structure:
+<a name="line4"></a>
+
+struct DiskObject *GetDiskObject(UBYTE *name);
+struct DiskObject *GetDiskObjectNew(UBYTE *name);                     (V36)
+BOOL               PutDiskObject(UBYTE *name, struct DiskObject *diskobj);
+void               FreeDiskObject(struct DiskObject *diskobj);
+BOOL               DeleteDiskObject(UBYTE *);                         (V37)
+
+UBYTE             *FindToolType(UBYTE **toolTypeArray, UBYTE *typeName);
+BOOL               MatchToolValue(UBYTE *typeString, UBYTE *value);
+
+struct DiskObject *GetDefDiskObjectNew(LONG type);                    (V36)
+BOOL               PutDefDiskObject(struct DiskObject *diskobj);      (V36)
+
+UBYTE             *BumpRevision(UBYTE *newbuf, UBYTE *oldname);
+<a name="line19"></a>
+
+The icon library routine <a href="../Includes_and_Autodocs_2._guide/node018A.html">GetDiskObject()</a> reads an icon's <a href="../Libraries_Manual_guide/node0238.html">.info</a> file from
+disk into a <a href="../Libraries_Manual_guide/node0241.html">DiskObject</a> structure it creates in memory where it can be
+examined or altered.  <a href="../Includes_and_Autodocs_2._guide/node018E.html">PutDiskObject()</a> writes the DiskObject out to disk
+and <a href="../Includes_and_Autodocs_2._guide/node0187.html">FreeDiskObject()</a> frees the memory it used. If you modify any pointers
+in a DiskObject acquired via GetDiskObject(), replace the old pointers
+before calling FreeDiskObject() so that the proper memory will be freed.
+
+Release 2 includes a new function named <a href="../Includes_and_Autodocs_2._guide/node018B.html">GetDiskObjectNew()</a> that works the
+same as <a href="../Includes_and_Autodocs_2._guide/node018A.html">GetDiskObject()</a>, except that if no <a href="../Libraries_Manual_guide/node0238.html">.info</a> file is found, a default
+<a href="../Libraries_Manual_guide/node0241.html">DiskObject</a> will be created for you.  Also new for Release 2 is
+<a href="../Includes_and_Autodocs_2._guide/node0185.html">DeleteDiskObject()</a> for removing .info files from disk, and the functions
+<a href="../Includes_and_Autodocs_2._guide/node0189.html">GetDefDiskObject()</a> and <a href="../Includes_and_Autodocs_2._guide/node018D.html">PutDefDiskObject()</a> which allow the default icons in
+ROM to be copied or replaced with new defaults in RAM.
+
+Once an icon's <a href="../Libraries_Manual_guide/node0238.html">.info</a> file has been read into a <a href="../Libraries_Manual_guide/node0241.html">DiskObject</a> structure, the
+functions <a href="../Libraries_Manual_guide/node0244.html#line44">FindToolType()</a> and <a href="../Libraries_Manual_guide/node0244.html#line44">MatchToolValue()</a> can be used to examine the
+icon's Tool Types array.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

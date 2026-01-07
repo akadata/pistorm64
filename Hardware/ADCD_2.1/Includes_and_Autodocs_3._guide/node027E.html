@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="gadtools" NODE="GT_FilterIMsg()" TITLE="gadtools.library/GT_FilterIMsg" -->
+<head>
+<title>gadtools.library/GT_FilterIMsg</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node027D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node027F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GT_FilterIMsg -- filter an <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> through GadTools. (V36)
+
+<b>   SYNOPSIS</b>
+	modimsg = GT_FilterIMsg(imsg)
+	D0                      A1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> *GT_FilterIMsg(struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> *);
+
+<b>   FUNCTION</b>
+	NOTE WELL:  Extremely few programs will actually need this function.
+	You almost certainly should be using <a href="../Includes_and_Autodocs_3._guide/node0280.html">GT_GetIMsg()</a> and <a href="../Includes_and_Autodocs_3._guide/node0283.html">GT_ReplyIMsg()</a>
+	only, and not GT_FilterIMsg() and <a href="../Includes_and_Autodocs_3._guide/node0281.html">GT_PostFilterIMsg()</a>.
+
+	GT_FilterIMsg() takes the supplied <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> and asks the
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> Toolkit to consider and possibly act on it.  Returns
+	NULL if the message was only of significance to a GadTools gadget
+	(i.e. not to you), else returns a pointer to a modified IDCMP
+	message, which may contain additional information.
+
+	You should examine the Class, Code, and IAddress fields of
+	the returned message to learn what happened.  Do not make
+	interpretations based on the original imsg.
+
+	You should use <a href="../Includes_and_Autodocs_3._guide/node0281.html">GT_PostFilterIMsg()</a> to revert to the original
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> once you are done with the modified one.
+
+<b>   INPUTS</b>
+	imsg - an <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> you obtained from a Window's UserPort.
+
+<b>   RESULT</b>
+	modimsg - a modified <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a>, possibly with extra information
+	          from GadTools, or NULL. When NULL, the message passed in to
+		  the function should be sent back to Intuition via <a href="../Includes_and_Autodocs_3._guide/node0235.html">ReplyMsg()</a>
+
+<b>   NOTES</b>
+	Starting with V39, this function actually expects and returns
+	pointers to <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line821">ExtIntuiMessage</a> structures, but the prototype was not
+	changed for source code compatibility with older software.
+
+<b>   WARNING</b>
+	If this function returns NULL, you must call <a href="../Includes_and_Autodocs_3._guide/node0235.html">ReplyMsg()</a> on the
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a> you passed in to GT_FilterIMsg(). That is, if the
+	message was processed by the toolkit you must reply this message
+	to Intuition since gadtools will not do this automatically.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0280.html">GT_GetIMsg()</a>, <a href="../Includes_and_Autodocs_3._guide/node0281.html">GT_PostFilterIMsg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

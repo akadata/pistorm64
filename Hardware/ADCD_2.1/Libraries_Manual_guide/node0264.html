@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-8-5" TITLE="15 / / The Kinds of GadTools Gadgets / Cycle Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / / The Kinds of GadTools Gadgets / Cycle Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0263.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0265.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Like mutually exclusive gadgets, cycle gadgets (CYCLE_KIND) allow the user
+to choose exactly one option from among several.
+
+The cycle gadget appears as a raised rectangular button with a vertical
+divider near the left side.  A circular arrow glyph appears to the left of
+the divider, while the current choice appears to the right.  Clicking on
+the cycle gadget advances to the next choice, while shift-clicking on it
+changes it to the previous choice.
+
+Cycle gadgets are more compact than mutually exclusive gadgets, since only
+the current choice is displayed.  They are preferable to mutually
+exclusive gadgets when a window needs to have several such gadgets as in
+the PrinterGfx Preferences editor, or when there is a medium number of
+choices.  If the number of choices is much more than about a dozen, it may
+become too frustrating and inefficient for the user to find the desired
+choice.  In that case, use a listview (scrolling list) instead.
+
+<a name="line19">The tags recognized by cycle gadgets are:</a>
+
+GTCY_Labels (STRPTR *)
+    Like <a href="../Libraries_Manual_guide/node0263.html#line15">GTMX_Labels</a>, this tag is associated with a
+    NULL-pointer-terminated array of strings which are the choices that
+    this gadget allows.  This array must be supplied to <a href="../Libraries_Manual_guide/node025A.html">CreateGadget()</a>,
+    and can only be changed starting in V37.  The strings themselves must
+    remain valid for the lifetime of the gadget.  (Create only (V36),
+<a name="line27">    Create and set (V37).)</a>
+
+GTCY_Active (UWORD)
+    The ordinal number, counting from zero, of the active choice of the
+<a name="line31">    cycle gadget.  The default is zero.  (Create and set.)</a>
+
+GA_Disabled (BOOL)
+    (New for V37, ignored by V36.)  Set this attribute to TRUE to disable
+    the cycle gadget, to FALSE otherwise.  The default is FALSE.  (Create
+    and set.)
+
+When the user clicks or shift-clicks on a cycle gadget, the program will
+receive an <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> IntuiMessage.  Look in the <a href="../Libraries_Manual_guide/node01D9.html#line33">Code</a> field of the
+<a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a> for the ordinal number of the new active selection.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

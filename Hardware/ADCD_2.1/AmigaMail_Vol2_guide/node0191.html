@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="III-19/PoolTime.c" NODE="MAIN" TITLE="III-19/PoolTime.c" -->
+<head>
+<title>III-19/PoolTime.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0190.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0192.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/*  Pooltime.c
+sc DATA=NEAR NMINC STRMERGE NOSTKCHK SAVEDS IGNORE=73 pooltime
+slink FROM LIB:c.o pooltime.o TO pooltime LIB LIB:sc.lib LIB:amiga.lib
+quit
+
+This program demonstrates the use of a memory pool to allocate memory
+for two timerequest structures.  Before pools, the memory required for
+the timerequests was allocated using AllocMem().
+*/
+
+/* (c)  Copyright 1993-1999 Amiga, Inc.   All rights reserved. */
+/* The information contained herein is subject to change without    */
+/* notice, and is provided &#034;as is&#034; without warranty of any kind,    */
+/* either expressed or implied.  The entire risk as to the use of   */
+/* this information is assumed by the user.                         */
+
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;devices/timer.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }     /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+VOID main(VOID);
+
+void main()
+{
+struct timerequest *TimerIO[3];
+struct MsgPort *TimerMP;
+struct Message *TimerMSG;
+APTR *TimerPool;            /* pointer to memory pool */
+ULONG x,seconds[3]={4,1,2}, microseconds[3]={0,0,0};
+int allin = 3;
+char *position[]={&#034;last&#034;,&#034;second&#034;,&#034;first&#034;};
+
+if (TimerMP = CreateMsgPort())
+    {
+    if (TimerIO[0] = CreateIORequest(TimerMP,sizeof(struct timerequest)) )
+        {
+        if (!OpenDevice(TIMERNAME, UNIT_VBLANK,(struct IORequest *) TimerIO[0], 0L))
+            {
+            /* Set command to TR_ADDREQUEST */
+            TimerIO[0]-&#062;tr_node.io_Command = TR_ADDREQUEST;
+
+                /* Create the memory pool */
+            if (TimerPool = CreatePool(MEMF_FAST,400,200))
+                {
+                     /* Allocate pooled memory from TimerPool */
+                if (TimerIO[1]=(struct timerequest *)
+                        AllocPooled(TimerPool,sizeof(struct timerequest)))
+                    {
+                        /* Allocate pooled memory from TimerPool */
+                    if (TimerIO[2]=(struct timerequest *)
+                            AllocPooled(TimerPool,sizeof(struct timerequest)))
+                        {
+                        /* Copy fields from request used to open the timer device */
+                        *TimerIO[1] = *TimerIO[0];
+                        *TimerIO[2] = *TimerIO[0];
+
+                        /* Initialize other fields */
+                        for (x=0;x&#060;3;x++)
+                            {
+                            TimerIO[x]-&#062;tr_time.tv_secs   = seconds[x];
+                            TimerIO[x]-&#062;tr_time.tv_micro  = microseconds[x];
+                            }
+
+                        printf(&#034;\n\nSending multiple requests\n\n&#034;);
+
+                        /* Send multiple requests asynchronously */
+                        SendIO(TimerIO[0]);
+                        SendIO(TimerIO[1]);
+                        SendIO(TimerIO[2]);
+
+                        /* Now go to sleep with WaitPort() waiting for the requests */
+                        while (allin)
+                              {
+                              WaitPort(TimerMP);
+                              TimerMSG=GetMsg(TimerMP);  /* Get the reply message */
+                              for (x=0;x&#060;3;x++)
+                                if (TimerMSG==(struct Message *)TimerIO[x])
+                                    printf(&#034;Request %ld finished %s\n&#034;,
+                                           x,position[--allin]);
+                              }
+                        }
+                    else
+                        printf(&#034;Error: Could not allocate memory for TimerIO[2]\n&#034;);
+                    }
+                else
+                    printf(&#034;Error: Could not allocate memory for TimerIO[1]\n&#034;);
+
+
+                /* Delete the entire pool.  You could also free each individual
+                 * allocation using FreePooled(), but this is quicker because a pool's
+                 * puddles are automatically drained when you delete the pool.
+                 */
+                DeletePool(TimerPool);
+                }
+            else
+                printf(&#034;Error: Could not allocate memory pool\n&#034;);
+
+            CloseDevice(TimerIO[0]);
+            }
+        else
+            printf(&#034;Error: Could not open %s\n&#034;, TIMERNAME);
+
+        DeleteIORequest(TimerIO[0]);
+        }
+    else
+        printf(&#034;Error: could not create IORequest\n&#034;);
+
+    DeleteMsgPort(TimerMP);
+    }
+else
+    printf(&#034;Error: Could not create message port\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

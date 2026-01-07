@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-17-4" TITLE="6 / / Intercepting Menu Operations / IDCMP_MENUVERIFY and Deadlock" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / / Intercepting Menu Operations / IDCMP_MENUVERIFY and Deadlock</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0196.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0198.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The program may call <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> to turn <a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> and the other
+VERIFY IDCMP options off.  It is important that this be done each and
+every time that the application is directly or indirectly waiting for
+Intuition, since Intuition may be waiting for the application, but not
+watching the window message port for IDCMP_MENUVERIFY events.  The program
+cannot wait for a gadget or mouse event without checking also for any
+<a name="line8">IDCMP_MENUVERIFY event messages that may require program response.</a>
+
+The most common problem area is System Requesters (<a href="../Libraries_Manual_guide/node01B4.html#line21">AutoRequest()</a> and
+<a href="../Libraries_Manual_guide/node01AC.html">EasyRequest()</a>).  Before AutoRequest() and EasyRequest() return control to
+the application, Intuition must be free to run and accept a response from
+the user.  If the user presses the menu button, Intuition will wait for
+<a name="line14">the program to reply to the <a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> event and a deadlock results.</a>
+
+Therefore, it is extremely important to use <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> to turn off all
+verify messages before calling <a href="../Libraries_Manual_guide/node01B4.html#line21">AutoRequest()</a>, <a href="../Libraries_Manual_guide/node01AC.html">EasyRequest()</a> or, directly
+or indirectly, AmigaDOS, since many error conditions in the DOS require
+user input in the form of an EasyRequest().  Indirect DOS calls include
+<a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a>, <a href="../Libraries_Manual_guide/node029E.html">OpenDevice()</a>, and <a href="../Libraries_Manual_guide/node03D6.html#line5">OpenDiskFont()</a>.
+
+Beginning with V36, all windows that have the <a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> bit set
+must respond to Intuition within a set time period, or the menu operation
+will time out and the menu action will be canceled.  This prevents the
+deadlocks that were possible under previous versions of the operating
+system.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_11" NODE="11-1" TITLE="11 Intuition Special Functions / Locking IntuitionBase" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>11 Intuition Special Functions / Locking IntuitionBase</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01F5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01F7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+It is sometimes necessary to examine the <a href="../Includes_and_Autodocs_2._guide/node00DC.html#line59">IntuitionBase</a> structure.  Items
+such as the address of the active screen and window, current mouse
+coordinates and more can be found there.  It is never a good idea to
+simply read these fields, as they are prone to sudden change.  The
+<a name="line6">IntuitionBase structure must always be locked before looking at its fields.</a>
+
+It is necessary to inform Intuition that an application is about to
+examine <a href="../Includes_and_Autodocs_2._guide/node00DC.html#line59">IntuitionBase</a> so that Intuition will not change any variables and
+IntuitionBase will remain static during the access.  The call <a href="../Includes_and_Autodocs_2._guide/node0224.html">LockIBase()</a>
+will lock the state of IntuitionBase so that it may be examined.  During
+the time that the application has IntuitionBase locked, all Intuition
+input processing is frozen.  Make every effort to examine IntuitionBase
+and release the lock as quickly as possible.  The values in IntuitionBase
+are read-only.  Applications should never write values to IntuitionBase.
+
+<a name="line17">    ULONG LockIBase( unsigned long dontknow );</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0224.html">LockIBase()</a> is passed a ULONG (dontknow in the prototype above) indicating
+the Intuition lock desired.  For all foreseeable uses of the call this
+value should be 0.  LockIBase() returns a ULONG, that must be passed to
+<a href="../Includes_and_Autodocs_2._guide/node025C.html">UnlockIBase()</a> later to allow <a href="../Includes_and_Autodocs_2._guide/node00DC.html#line59">IntuitionBase</a> to change once again.
+
+Every call to <a href="../Includes_and_Autodocs_2._guide/node0224.html">LockIBase()</a> must be matched by a subsequent call to
+<a href="../Includes_and_Autodocs_2._guide/node025C.html">UnlockIBase()</a>:
+
+    void UnlockIBase( unsigned long ibLock );
+
+Set the ibLock argument to the value returned by the previous call to
+<a name="line30"><a href="../Includes_and_Autodocs_2._guide/node0224.html">LockIBase()</a>.</a>
+
+    About LockIBase().
+    ------------------
+    This function should not be called while holding any other system
+    locks such as <a href="../Libraries_Manual_guide/node03E4.html">Layer</a> and <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> locks.  Between calls to
+    <a href="../Includes_and_Autodocs_2._guide/node0224.html">LockIBase()</a> and <a href="../Includes_and_Autodocs_2._guide/node025C.html">UnlockIBase()</a>, you may not call any Intuition
+    or other high-level system functions so it is best to copy the
+    information you need and release the lock as quickly as possible.
+
+    About IntuitionBase.
+    --------------------
+    Never, ever, modify any of the fields in <a href="../Includes_and_Autodocs_2._guide/node00DC.html#line59">IntuitionBase</a> directly.
+    Also, there are fields in IntuitionBase that are considered system
+    private that should not be accessed, even for reading.  (Refer to the
+    &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DC.html">intuitionbase</a>&#062; include file.) Application programs
+    cannot depend on (and should not use) the contents of these fields;
+    their usage is subject to change in future revisions of Intuition.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-2" TITLE="3 Intuition Screens / Screen Data Structures" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 Intuition Screens / Screen Data Structures</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00DB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00DD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Amiga uses <a href="../Libraries_Manual_guide/node031E.html#line103">color registers</a> and <a href="../Libraries_Manual_guide/node031E.html#line33">bitplane</a> organization as its internal
+representation of display data.  Screens require a color table and display
+raster memory for each bitplane.  This is the memory where imagery is
+rendered and later translated by the hardware into the actual video
+display.  This information is contained in data structures from the
+<a name="line7">Amiga's graphics library.</a>
+
+A <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a> is the main data structure used by the graphics library to
+represent a screen.  Pointers to each of the screen's bitplanes are stored
+in the graphics library <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> structure.  Color table information is
+stored in a graphics structure called a <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a>.  And the screen's
+drawing and font information is stored in the <a href="../Libraries_Manual_guide/node00F1.html#line4">RastPort</a> structure.
+
+The graphics <a href="../Libraries_Manual_guide/node00F1.html#line4">RastPort</a> structure is a general-purpose handle that the
+graphics library uses for drawing operations.  Many Intuition drawing
+functions also take a RastPort address as a parameter.  This makes sense
+since the RastPort structure contains drawing variables as well as a
+pointer to the <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> telling where to draw.  See the
+&#034;<a href="../Libraries_Manual_guide/node034A.html">Graphics Primitives</a>&#034; chapter for more information on these structures and
+how they are used.
+
+ <a href="../Libraries_Manual_guide/node00DD.html">The Intuition Screen Data Structure</a>    <a href="../Libraries_Manual_guide/node00DE.html">Other Screen Data Structures</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

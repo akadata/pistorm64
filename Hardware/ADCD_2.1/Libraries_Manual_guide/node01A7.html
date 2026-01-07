@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_7" NODE="7-2-6" TITLE="7 / True Requesters / Gadgets in Requesters" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>7 / True Requesters / Gadgets in Requesters</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01A6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01A8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Each requester gadget must have the <a href="../Libraries_Manual_guide/node0149.html#line88">GTYP_REQGADGET</a> flag set in the
+<a href="../Libraries_Manual_guide/node0149.html#line58">GadgetType</a> field of its <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure.  This informs Intuition that
+<a name="line4">this gadget is to be rendered in a requester rather than a window.</a>
+
+Requesters can have gadgets in them that automatically satisfy the request
+and end the requester.  When one of these gadgets is selected, Intuition
+will remove the requester from the window.  This is equivalent to the
+application calling <a href="../Libraries_Manual_guide/node01A2.html#line24">EndRequest()</a>, and, if the request is terminated by
+selection of such a gadget, the application should not call EndRequest()
+<a name="line11">for that requester.</a>
+
+Set the <a href="../Libraries_Manual_guide/node014B.html#line31">GACT_ENDGADGET</a> flag in the <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field of the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>
+structure to create a gadget that automatically terminates the requester.
+Every time one of the requester's gadgets is selected, Intuition examines
+the GACT_ENDGADGET flag.  If GACT_ENDGADGET is set, the requester is
+removed from the display and unlinked from the window's active requester
+<a name="line18">list.</a>
+
+Requesters rendered via Intuition and those that use a custom bitmap
+differ in how their gadgets are rendered.  For requesters rendered via
+Intuition, the application supplies a regular gadget list just as it would
+for application gadgets in a window.
+
+In custom bitmap requesters, however, any gadget imagery is part of the
+bitmap supplied for the requester.  Therefore the list of gadgets supplied
+for custom bitmap requesters should not provide gadget imagery but rather
+it should define only the select boxes, highlighting, and gadget types for
+<a name="line29">the gadgets.</a>
+
+The <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structures used with a custom bitmap requester should have
+their <a href="../Libraries_Manual_guide/node0149.html#line91">GadgetRender</a>, <a href="../Libraries_Manual_guide/node0149.html#line102">SelectRender</a> and <a href="../Libraries_Manual_guide/node0149.html#line111">GadgetText</a> fields set to NULL as
+these will be ignored.  Other gadget information--select box dimensions,
+highlighting, and gadget type--is still relevant.  The select box
+information is especially important since the select box must have a well
+defined correspondence with the custom bitmap imagery supplied.  The basic
+idea is to make sure that the user understands the requester imagery and
+gadgets.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

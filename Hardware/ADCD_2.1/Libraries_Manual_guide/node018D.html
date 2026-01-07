@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-11" TITLE="6 / Setting Up Menus / Attribute Items and the Checkmark" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Setting Up Menus / Attribute Items and the Checkmark</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node018C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node018E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Attribute items are items that have two states: selected and unselected.
+In the menu system, these items are often represented as items with
+checkmarks.  If the checkmark is visible, then the item (or attribute) is
+<a name="line5">selected.  Otherwise, the attribute is not selected.</a>
+
+Checkmarked items (attributes) may be toggle selected or mutually
+exclusive.  Selecting a toggle selected item toggles its state--if it was
+selected, it will become unselected; and if it was unselected, it will
+become selected.  Selecting a mutually exclusive item puts it in the
+selected state, while possibly clearing one or more other items, where it
+<a name="line12">remains until it is cleared by the selection of some other item.</a>
+
+A menu item is specified as a checkmark item by setting the <a href="../Libraries_Manual_guide/node019B.html#line3">CHECKIT</a> flag
+<a name="line15">in the <a href="../Libraries_Manual_guide/node019A.html#line35">Flags</a> variable of the item's <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structure.</a>
+
+The program can initialize the state of the checkmark (checked or not) by
+presetting the item's <a href="../Libraries_Manual_guide/node019B.html#line7">CHECKED</a> flag.  If this flag is set when the menu
+strip is submitted to Intuition, then the item is considered selected and
+<a name="line20">the checkmark will be drawn.</a>
+
+The program can use the default Intuition checkmark or provide a custom
+checkmark for the menus.  To use a custom checkmark, the application must
+provide a pointer to the image with the <a href="../Libraries_Manual_guide/node0124.html#line58">WA_Checkmark</a> tag when the window
+is opened.  See the chapter &#034;<a href="../Libraries_Manual_guide/node0124.html#line58">Intuition Windows</a>&#034; for details about
+<a name="line26">supplying a custom checkmark.</a>
+
+The application must provide sufficient blank space at the left edge of
+the select box for the checkmark imagery.  Constants are provided to
+standardize the space reserved in the menu for the checkmark.
+LOWCHECKWIDTH gives the amount of space required for checkmarks on low
+<a name="line32">resolution screens and CHECKWIDTH gives space for all other screens.</a>
+
+These constants specify the space required by the default checkmarks (with
+a bit of space for aesthetic purposes).  If the item box would normally be
+placed such that the <a href="../Libraries_Manual_guide/node019A.html#line28">LeftEdge</a> of the item box without the checkmark is 5, the
+item box should start at 5 + CHECKWIDTH if <a href="../Libraries_Manual_guide/node019B.html#line3">CHECKIT</a> is set.  Also, the select
+box must be made CHECKWIDTH wider than it would be without the checkmark.
+It is generally accepted on the Amiga that only checkmarked items should
+be indented by the size of the checkmark, other items are left justified
+within their column.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

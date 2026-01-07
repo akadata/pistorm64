@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="TDDD.doc" TITLE="A / IFF Third Party Public Form and Chunk Specification / TDDD.doc" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>A / IFF Third Party Public Form and Chunk Specification / TDDD.doc</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02A0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02A2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+3-D rendering data, Turbo Silver (Impulse)
+
+                               FORM TDDD
+                               ---------
+FORM TDDD is used by Impulse's Turbo Silver 3.0 for 3D rendering data.
+TDDD stands for &#034;3D data description&#034;.  The files contain object and
+(optionally) observer data.
+
+Turbo Silver's successor, &#034;Imagine&#034;, uses an upgraded FORM TDDD when it
+reads/writes object data.
+
+Currently, in &#034;standard IFF&#034; terms, a FORM TDDD has only two chunk types:
+an INFO chunk describing observer data;  and an OBJ chunk describing an
+object heirarchy.  The INFO chunk appears only in Turbo Silver's &#034;cell&#034;
+files, and the OBJ chunk appears in both &#034;cell&#034; files and &#034;object&#034; files.
+
+The FORM has an (optional) INFO chunk followed by some number of OBJ
+chunks.  (Note:  OBJ is followed by a space - ckID = &#034;OBJ &#034;)
+
+The INFO and OBJ chunks, in turn, are made up of smaller chunks with the
+standard IFF structure:  &#060;ID&#062; &#060;data-size&#062; &#060;data&#062;.
+
+The INFO &#034;sub-chunks&#034; are relatively straightforward to interpret.
+
+The OBJ &#034;sub-chunks&#034; support object heirarchies, and are slightly more
+difficult to interpret.  Currently, there are 3 types of OBJ sub-chunks:
+an EXTR chunk, describing an &#034;external&#034; object in a seperate file; a DESC
+chunk, describing one node of a heirarchy; and a TOBJ chunk marking the
+end of a heirarchy chain.  For each DESC chunk, there must be a
+corresponding TOBJ chunk.  And an EXTR chunk is equivalent to a DESC/TOBJ
+pair.
+
+In Turbo Silver and Imagine, the structure of the object heirarchy is as
+follows.  There is a head object, and its (sexist) brothers. Each brother
+may have child objects.  The children may have grandchildren, and so on.
+The brother nodes are kept in a doubly linked list, and each node has a
+(possibly NULL) pointer to a doubly linked &#034;child&#034; list. The children
+point to the &#034;grandchildren&#034; lists, and so on.  (In addition, each node
+has a &#034;back&#034; pointer to its parent).
+
+Each of the &#034;head&#034; brothers is written in a seperate OBJ chunk, along with
+all its descendants.  The descendant heirarchy is supported as follows:
+
+    for each node of a doubly linked list,
+
+    1)  A DESC chunk is written, describing its object.
+    2)  If it has children, steps 1) to 3) are performed
+            for each child.
+    3)  A TOBJ chunk is written, marking the end of the children.
+
+For &#034;external&#034; objects, steps 1) to 3) are not performed, but an EXTR
+chunk is written instead.  (This means that an external object cannot have
+children unless they are stored in the same &#034;external&#034; file).
+
+The TOBJ sub-chunks have zero size -- and no data.  The DESC and EXTR
+sub-chunks are made up of &#034;sub-sub-chunks&#034;, again, with the standard IFF
+structure:  &#060;ID&#062; &#060;data-size&#062; &#060;data&#062;.
+
+( &#034;External&#034; objects were used by Turbo Silver to allow a its &#034;cell&#034; data
+files to refer to an &#034;object&#034; data file that is &#034;external&#034; to the cell
+file.  Imagine abandons the idea of individual cell files, and deals only
+in TDDD &#034;object&#034; files. Currently, Imagine does not support EXTR chunks in
+TDD files.)
+
+Reader software WILL FOLLOW the standard IFF procedure of skipping over
+any un-recognized chunks -- and &#034;sub-chunks&#034; or &#034;sub-sub-chunks&#034;. The
+&#060;data-size&#062; field indicates how many bytes to skip.  In addition it WILL
+OBSERVE the IFF rule that an odd &#060;data-size&#062; may appear, in which case the
+corredponding &#060;data&#062; field will be padded at the end with one extra byte
+to give it an even size.
+
+ <a href="../Devices_Manual_guide/node02A2.html">Now, on with the details</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

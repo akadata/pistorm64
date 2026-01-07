@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="Insert()" TITLE="exec.library/Insert" -->
+<head>
+<title>exec.library/Insert</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node035E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0360.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Insert -- insert a node into a list
+
+SYNOPSIS
+    Insert(list, node, listNode)
+           A0    A1    A2
+
+    void Insert(struct <a href="../Includes_and_Autodocs_2._guide/node007D.html#line21">List</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node0091.html#line23">Node</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node0091.html#line23">Node</a> *);
+
+FUNCTION
+    Insert a node into a doubly linked list AFTER a given node
+    position.  Insertion at the head of a list is possible by passing a
+    zero value for listNode, though the <a href="../Includes_and_Autodocs_2._guide/node0325.html">AddHead</a> function is slightly
+    faster for that special case.
+
+WARNING
+    This function does not arbitrate for access to the list.  The
+    calling task must be the owner of the involved list.
+
+INPUTS
+    list - a pointer to the target list header
+    node - the node to insert
+    listNode - the node after which to insert
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0325.html">AddHead</a>, <a href="../Includes_and_Autodocs_2._guide/node032C.html">AddTail</a>, <a href="../Includes_and_Autodocs_2._guide/node034D.html">Enqueue</a>, <a href="../Includes_and_Autodocs_2._guide/node0370.html">RemHead</a>, Remove, <a href="../Includes_and_Autodocs_2._guide/node0377.html">RemTail</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_24" NODE="24-2-2" TITLE="24 / Messages / Waiting For a Message" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>24 / Messages / Waiting For a Message</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02F0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02F2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A task may go to sleep waiting for a message to arrive at one or more
+ports.  This technique is widely used on the Amiga as a general form of
+event notification.  For example, it is used extensively by tasks for I/O
+request completion.
+
+The <a href="../Libraries_Manual_guide/node02EB.html#line36">MsgPort.mp_SigTask</a> field contains the address of the task to be
+signaled and <a href="../Libraries_Manual_guide/node02EB.html#line32">mp_SigBit</a> contains a preallocated signal number (as described
+<a name="line9">in the &#034;<a href="../Libraries_Manual_guide/node02BA.html">Exec Tasks</a>&#034; chapter).</a>
+
+You can call the <a href="../Includes_and_Autodocs_2._guide/node038C.html">WaitPort()</a> function to wait for a message to arrive at a
+port.  This function will return the first message (it may not be the
+only) queued to a port.  Note that your application must still call
+<a href="../Libraries_Manual_guide/node02F2.html">GetMsg()</a> to remove the message from the port.  If the port is empty, your
+task will go to sleep waiting for the first message.  If the port is not
+empty, your task will not go to sleep.  It is possible to receive a signal
+for a port without a message being present yet.  The code processing the
+messages should be able to handle this.  The following code illustrates
+WaitPort().
+
+    struct XYMessage *xy_msg;
+    struct MsgPort   *xyport;
+
+    xyport = CreatePort(&#034;xyport&#034;, 0);
+    if (xyport == 0)
+    {
+        printf(&#034;Couldn't create xyport\n&#034;);
+        exit(31);
+    }
+
+<a name="line31">    xy_msg = WaitPort(xyport);     /* go to sleep until message arrives */</a>
+
+A more general form of waiting for a message involves the use of the
+<a href="../Libraries_Manual_guide/node02D4.html">Wait()</a> function (see the &#034;<a href="../Libraries_Manual_guide/node02D4.html">Exec Signals</a>&#034; chapter).  This function waits for
+task event signals directly.  If the signal assigned to the message port
+occurs, the task will awaken.  Using the Wait() function is more general
+because you can wait for more than one signal.  By combining the signal
+bits from each port into one mask for the Wait() function, a loop can be
+set up to process all messages at all ports.
+
+Here's an example using <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a>:
+
+    struct XYMessage *xy_msg;
+    struct MsgPort   *xyport;
+    ULONG usersig, portsig;
+    BOOL ABORT = FALSE;
+
+    if (xyport = CreatePort(&#034;xyport&#034;, 0))
+    {
+        portsig = 1 &#060;&#060; xyport-&#062;mp_SigBit;
+        usersig = SIGBREAKF_CTRL_C;     /* User can break with CTRL-C.  */
+        for (;;)
+        {
+            signal = Wait(portsig | usersig);
+                                        /* Sleep till someone signals.  */
+
+            if (signal &#038; portsig)       /* Got a signal at the msgport. */
+            {   .  .  .
+            }
+            if (signal &#038; usersig)       /* Got a signal from the user.  */
+            {
+                ABORT = TRUE;           /* Time to clean up.            */
+                 . . .
+            }
+            if (ABORT) break;
+        }
+        DeletePort(xyport);
+    }
+    else printf(&#034;Couldn't create xyport\n&#034;);
+
+
+    WaitPort() Does Not Remove A Message.
+    -------------------------------------
+    <a href="../Includes_and_Autodocs_2._guide/node038C.html">WaitPort()</a> only returns a pointer to the first message in a port.
+    It does not actually remove the message from the port queue.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

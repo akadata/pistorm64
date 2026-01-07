@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_7" NODE="7-6" TITLE="7 Intuition Requesters and Alerts / Alerts" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>7 Intuition Requesters and Alerts / Alerts</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01B0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01B2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Alerts are for emergency messages.  They can be displayed even when the
+system is in a very fragile state, such as when the system is low on
+<a name="line4">memory or when some of the system lists are corrupt.</a>
+
+Alerts can be displayed by either the system or an application.  They are
+reserved for urgent messages and dire warnings in situations that require
+the user to take some immediate action.  Alerts should only be used where
+no other display type is possible.  For instance, when the system has
+crashed or is about to crash, an alert could be used to inform the user of
+the cause.
+
+The sudden display of an alert is a jarring experience for the user.  The
+system stops dead while the alert is displayed and waits for the user
+input.  For this reason, alerts should only be used when there is no
+recourse.  If possible, use requesters or windows to display warning
+<a name="line17">messages in place of alerts.</a>
+<a name="line18"></a>
+System alerts are managed entirely by Intuition.  The program does not
+have to take any action to invoke or process these alerts.  Alerts do not
+have access to the display database or other information required to open
+in specialized display modes.  For this reason, alerts must appear in a
+display mode available on all machines, namely high resolution,
+non-interlaced.  Alerts do not use overscan, so the display is limited to
+640 by 200 on an NTSC machine, and 640 by 256 on a PAL machine.
+<a name="line26"></a>
+The alert appears at the top of the video display.  They are displayed the
+full 640 pixels wide and as tall as needed, up to the limits described
+above.  Alerts are always displayed on a black background.  The text of
+the alert is displayed within a rectangular border.  Both the text and the
+border are displayed in a single color which is determined by the type of
+<a name="line32">the alert.</a>
+
+The user responds to an alert by pressing one of the mouse buttons.  The
+left mouse button signifies a positive response such as &#034;Retry&#034; or &#034;OK&#034;.
+The right mouse button signifies a negative response such as &#034;Cancel&#034; or
+&#034;Abort&#034;.
+
+    Alerts Save Up User Input.
+    --------------------------
+    The events produced by the user during an alert are not consumed by
+    the alert.  These events are passed through to the program when the
+    alert returns.  There could be a great deal of input queued and
+    waiting for processing by the application.
+
+ <a href="../Libraries_Manual_guide/node01B2.html">Types of Alerts</a>    <a href="../Libraries_Manual_guide/node01B3.html">Creating Alerts</a>    <a href="../Libraries_Manual_guide/node05A4.html">Display Alert Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

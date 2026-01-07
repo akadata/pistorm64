@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="TimedDisplayAlert()" TITLE="intuition.library/TimedDisplayAlert" -->
+<head>
+<title>intuition.library/TimedDisplayAlert</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03FB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03FD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	TimedDisplayAlert -- Display an alert with automatic time-out. (V39)
+
+<b>    SYNOPSIS</b>
+	Response = TimedDisplayAlert( AlertNumber, String, Height, Time )
+	D0                            D0           A0      D1      A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> TimedDisplayAlert( ULONG, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>, ULONG );
+
+<b>    FUNCTION</b>
+	This function is equivalent to <a href="../Includes_and_Autodocs_3._guide/node03A3.html">DisplayAlert()</a>, except that if
+	the user fails to respond in a given time, the alert comes
+	down automatically.  See the autodoc for <a href="../Includes_and_Autodocs_3._guide/node03A3.html">DisplayAlert()</a> for
+	full details.
+
+<b>    INPUTS</b>
+	AlertNumber = the number of this alert message.  The only pertinent
+	    bits of this number are the ALERT_TYPE bit(s).  The rest of the
+           number is ignored by this routine.
+	String = pointer to the alert message string, as described above
+	Height = minimum display lines required for your message
+	Time = length of time the alert should wait for the user to
+	    respond.  This time is the number of video frames the
+	    alert should remain up for.
+
+<b>    RESULT</b>
+	A <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> value of TRUE or FALSE.  If this is a DEADEND_ALERT, FALSE
+	is always the return value.  If this is a RECOVERY_ALERT. The return
+	value will be TRUE if the user presses the left mouse button in
+	response to your message, and FALSE if the user presses the right hand
+	button is response to your text, or if the alert could not
+	be posted.  If the alert times out, the return value will be FALSE.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03A3.html">DisplayAlert()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>
