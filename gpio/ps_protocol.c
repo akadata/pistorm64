@@ -44,6 +44,10 @@ static int bplw_cop1_hi_set;
 static int bplw_cop1_lo_set;
 static int bplw_cop2_hi_set;
 static int bplw_cop2_lo_set;
+static uint32_t bplw_cop2_last;
+static uint32_t bplw_cop2_prev;
+static unsigned int bplw_cop2_flip_count;
+static int bplw_cop2_suppress;
 
 struct bplw_reg_cache {
   uint32_t addr;
@@ -140,7 +144,21 @@ static void bpl_log_write(unsigned int address, unsigned int data, int width_bit
       bplw_cop2_hi = (uint16_t)data;
       bplw_cop2_hi_set = 1;
       if (bplw_cop2_lo_set) {
-        fprintf(stderr, "[BPLW] COP2LC=0x%04X%04X\n", bplw_cop2_hi, bplw_cop2_lo);
+        uint32_t combined = ((uint32_t)bplw_cop2_hi << 16) | bplw_cop2_lo;
+        if (!bplw_cop2_suppress) {
+          fprintf(stderr, "[BPLW] COP2LC=0x%08X\n", combined);
+        }
+        if (combined == bplw_cop2_prev && bplw_cop2_last != 0 && bplw_cop2_prev != 0) {
+          bplw_cop2_flip_count++;
+          if (bplw_cop2_flip_count >= 8) {
+            bplw_cop2_suppress = 1;
+          }
+        } else {
+          bplw_cop2_flip_count = 0;
+          bplw_cop2_suppress = 0;
+        }
+        bplw_cop2_prev = bplw_cop2_last;
+        bplw_cop2_last = combined;
       }
     }
     return;
@@ -149,7 +167,21 @@ static void bpl_log_write(unsigned int address, unsigned int data, int width_bit
       bplw_cop2_lo = (uint16_t)data;
       bplw_cop2_lo_set = 1;
       if (bplw_cop2_hi_set) {
-        fprintf(stderr, "[BPLW] COP2LC=0x%04X%04X\n", bplw_cop2_hi, bplw_cop2_lo);
+        uint32_t combined = ((uint32_t)bplw_cop2_hi << 16) | bplw_cop2_lo;
+        if (!bplw_cop2_suppress) {
+          fprintf(stderr, "[BPLW] COP2LC=0x%08X\n", combined);
+        }
+        if (combined == bplw_cop2_prev && bplw_cop2_last != 0 && bplw_cop2_prev != 0) {
+          bplw_cop2_flip_count++;
+          if (bplw_cop2_flip_count >= 8) {
+            bplw_cop2_suppress = 1;
+          }
+        } else {
+          bplw_cop2_flip_count = 0;
+          bplw_cop2_suppress = 0;
+        }
+        bplw_cop2_prev = bplw_cop2_last;
+        bplw_cop2_last = combined;
       }
     }
     return;
