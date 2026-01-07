@@ -579,6 +579,8 @@ static void bpl_state_seed_from_hw(void) {
   pthread_mutex_unlock(&bpl_state_lock);
 }
 
+static void bpl_update_cop_cache(uint32_t cop2lc);
+
 static void* state_socket_thread_fn(void* arg) {
   const char* path = (const char*)arg;
   struct sockaddr_un addr;
