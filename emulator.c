@@ -169,6 +169,8 @@ static uint64_t monotonic_us(void) {
 
 static void bpl_log_update(uint32_t addr, uint16_t val) {
   int changed = 0;
+  int update_cop_cache = 0;
+  uint32_t cop2_combined = 0;
 
   pthread_mutex_lock(&bpl_state_lock);
   switch (addr) {
@@ -292,10 +294,17 @@ static void bpl_log_update(uint32_t addr, uint16_t val) {
   if (changed) {
     bpl_last_update_us = monotonic_us();
   }
+  if (addr == REG_COP2LCH || addr == REG_COP2LCL) {
+    cop2_combined = ((uint32_t)cop2_pth_last << 16) | cop2_ptl_last;
+    update_cop_cache = 1;
+  }
   pthread_mutex_unlock(&bpl_state_lock);
 
   if (bpl_log_enabled && changed) {
     bpl_log_print();
+  }
+  if (update_cop_cache) {
+    bpl_update_cop_cache(cop2_combined);
   }
 }
 
@@ -333,6 +342,9 @@ struct bpl_cop_state {
   int have_ptl[6];
 };
 
+static struct bpl_cop_state bpl_cop_cache;
+static int bpl_cop_cache_valid = 0;
+
 static void bpl_snapshot_fill(struct bpl_state_snapshot* snap) {
   pthread_mutex_lock(&bpl_state_lock);
   snap->ts_us = bpl_last_update_us;
@@ -350,6 +362,29 @@ static void bpl_snapshot_fill(struct bpl_state_snapshot* snap) {
   for (int i = 0; i < 6; i++) {
     snap->bpl[i] = ((uint32_t)bpl_pth_last[i] << 16) | bpl_ptl_last[i];
     snap->bpl_valid[i] = (bpl_pth_seen[i] && bpl_ptl_seen[i]) ? 1 : 0;
+  }
+  if (bpl_cop_cache_valid) {
+    if (bpl_cop_cache.have_bplcon0) {
+      snap->bplcon0 = bpl_cop_cache.bplcon0;
+    }
+    if (bpl_cop_cache.have_mod1) {
+      snap->bpl1mod = bpl_cop_cache.bpl1mod;
+    }
+    if (bpl_cop_cache.have_mod2) {
+      snap->bpl2mod = bpl_cop_cache.bpl2mod;
+    }
+    if (bpl_cop_cache.diwstrt) snap->diwstrt = bpl_cop_cache.diwstrt;
+    if (bpl_cop_cache.diwstop) snap->diwstop = bpl_cop_cache.diwstop;
+    if (bpl_cop_cache.ddfstrt) snap->ddfstrt = bpl_cop_cache.ddfstrt;
+    if (bpl_cop_cache.ddfstop) snap->ddfstop = bpl_cop_cache.ddfstop;
+    for (int i = 0; i < 6; i++) {
+      if (bpl_cop_cache.have_pth[i] && bpl_cop_cache.have_ptl[i]) {
+        snap->bpl[i] = (((uint32_t)bpl_cop_cache.bpl_pth[i] << 16) |
+                        bpl_cop_cache.bpl_ptl[i]) &
+                       CHIP_MASK;
+        snap->bpl_valid[i] = 1;
+      }
+    }
   }
   pthread_mutex_unlock(&bpl_state_lock);
 }
@@ -444,6 +479,18 @@ static void bpl_parse_copper_list(uint32_t addr, struct bpl_cop_state* st) {
       break;
     }
   }
+}
+
+static void bpl_update_cop_cache(uint32_t cop2lc) {
+  if (cop2lc == 0 || cop2lc == 0xFFFFFFFFu) {
+    return;
+  }
+  struct bpl_cop_state st;
+  bpl_parse_copper_list(cop2lc, &st);
+  pthread_mutex_lock(&bpl_state_lock);
+  bpl_cop_cache = st;
+  bpl_cop_cache_valid = 1;
+  pthread_mutex_unlock(&bpl_state_lock);
 }
 
 static void bpl_snapshot_refresh_from_hw(struct bpl_state_snapshot* snap) {
@@ -592,7 +639,7 @@ static void* state_socket_thread_fn(void* arg) {
     if (n <= 0 || strncmp(req, "SNAPSHOT", 8) == 0) {
       struct bpl_state_snapshot snap;
       bpl_snapshot_fill(&snap);
-      if (snap.ts_us == 0) {
+      if (snap.ts_us == 0 && !bpl_cop_cache_valid) {
         bpl_snapshot_refresh_from_hw(&snap);
       }
       bpl_snapshot_format_json(&snap, resp, sizeof(resp));
