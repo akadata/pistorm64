@@ -96,6 +96,58 @@ static double elapsed_sec(const struct timespec *a, const struct timespec *b) {
          (double)(b->tv_nsec - a->tv_nsec) / 1000000000.0;
 }
 
+static double bench_write8(uint32_t base, uint32_t size) {
+  uint32_t bytes = size;
+  struct timespec t0, t1;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  for (uint32_t i = 0; i < bytes; i++) {
+    uint32_t addr = base + i;
+    write8(addr, (uint8_t)(addr ^ 0xA5u));
+  }
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  return elapsed_sec(&t0, &t1);
+}
+
+static double bench_read8(uint32_t base, uint32_t size, uint32_t *sink) {
+  uint32_t bytes = size;
+  struct timespec t0, t1;
+  uint32_t acc = 0;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  for (uint32_t i = 0; i < bytes; i++) {
+    uint32_t addr = base + i;
+    acc ^= read8(addr);
+  }
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  *sink = acc;
+  return elapsed_sec(&t0, &t1);
+}
+
+static double bench_write16(uint32_t base, uint32_t size) {
+  uint32_t words = size / 2u;
+  struct timespec t0, t1;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  for (uint32_t i = 0; i < words; i++) {
+    uint32_t addr = base + (i * 2u);
+    write16(addr, (uint16_t)(addr ^ 0xA5A5u));
+  }
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  return elapsed_sec(&t0, &t1);
+}
+
+static double bench_read16(uint32_t base, uint32_t size, uint32_t *sink) {
+  uint32_t words = size / 2u;
+  struct timespec t0, t1;
+  uint32_t acc = 0;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+  for (uint32_t i = 0; i < words; i++) {
+    uint32_t addr = base + (i * 2u);
+    acc ^= read16(addr);
+  }
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  *sink = acc;
+  return elapsed_sec(&t0, &t1);
+}
+
 static double bench_write32(uint32_t base, uint32_t size) {
   uint32_t words = size / 4u;
   struct timespec t0, t1;
@@ -129,22 +181,36 @@ static void run_region(const struct region *r, int repeats) {
   }
 
   uint32_t size = r->size & ~3u;
-  double best_w = 1e9, best_r = 1e9;
+  double best_w8 = 1e9, best_r8 = 1e9;
+  double best_w16 = 1e9, best_r16 = 1e9;
+  double best_w32 = 1e9, best_r32 = 1e9;
   uint32_t sink = 0;
 
   for (int i = 0; i < repeats; i++) {
-    double tw = bench_write32(r->base, size);
-    double tr = bench_read32(r->base, size, &sink);
-    if (tw < best_w) best_w = tw;
-    if (tr < best_r) best_r = tr;
+    double tw8 = bench_write8(r->base, size);
+    double tr8 = bench_read8(r->base, size, &sink);
+    double tw16 = bench_write16(r->base, size);
+    double tr16 = bench_read16(r->base, size, &sink);
+    double tw32 = bench_write32(r->base, size);
+    double tr32 = bench_read32(r->base, size, &sink);
+    if (tw8 < best_w8) best_w8 = tw8;
+    if (tr8 < best_r8) best_r8 = tr8;
+    if (tw16 < best_w16) best_w16 = tw16;
+    if (tr16 < best_r16) best_r16 = tr16;
+    if (tw32 < best_w32) best_w32 = tw32;
+    if (tr32 < best_r32) best_r32 = tr32;
   }
 
   double mb = (double)size / (1024.0 * 1024.0);
-  double w_mbs = (best_w > 0.0) ? (mb / best_w) : 0.0;
-  double r_mbs = (best_r > 0.0) ? (mb / best_r) : 0.0;
+  double w8_mbs = (best_w8 > 0.0) ? (mb / best_w8) : 0.0;
+  double r8_mbs = (best_r8 > 0.0) ? (mb / best_r8) : 0.0;
+  double w16_mbs = (best_w16 > 0.0) ? (mb / best_w16) : 0.0;
+  double r16_mbs = (best_r16 > 0.0) ? (mb / best_r16) : 0.0;
+  double w32_mbs = (best_w32 > 0.0) ? (mb / best_w32) : 0.0;
+  double r32_mbs = (best_r32 > 0.0) ? (mb / best_r32) : 0.0;
 
-  printf("[REG] %-8s base=0x%06X size=%u KB | write32=%.2f MB/s read32=%.2f MB/s (sink=0x%08X)\n",
-         r->name, r->base, size / SIZE_KILO, w_mbs, r_mbs, sink);
+  printf("[REG] %-8s base=0x%06X size=%u KB | w8=%.2f r8=%.2f w16=%.2f r16=%.2f w32=%.2f r32=%.2f MB/s (sink=0x%08X)\n",
+         r->name, r->base, size / SIZE_KILO, w8_mbs, r8_mbs, w16_mbs, r16_mbs, w32_mbs, r32_mbs, sink);
 }
 
 static int parse_region_arg(const char *arg, struct region *out) {
