@@ -166,7 +166,7 @@ static uint32_t try_read_plld_hz_from_debugfs(void) {
 
 static void setup_gpclk() {
     const char *env_target = getenv("PISTORM_CLK_HZ");
-    uint32_t target_hz = 200000000u;
+    uint32_t target_hz = 250000000u;
     if (env_target && *env_target) {
       unsigned long parsed = strtoul(env_target, NULL, 10);
       if (parsed >= 100000000u && parsed <= 500000000u) {
@@ -189,18 +189,13 @@ static void setup_gpclk() {
 
     double div = (double)src_hz / (double)target_hz;
     if (div < 1.0) div = 1.0;
-    if (div > 4095.999) div = 4095.999;
-    uint32_t divi = (uint32_t)div;
-    double frac = div - (double)divi;
-    uint32_t divf = (uint32_t)(frac * 4096.0 + 0.5);
-    if (divf >= 4096u) {
-      divi += 1u;
-      divf -= 4096u;
-    }
+    if (div > 4095.0) div = 4095.0;
+    uint32_t divi = (uint32_t)(div + 0.5); // nearest integer divider
     if (divi < 1u) divi = 1u;
     if (divi > 4095u) divi = 4095u;
-    uint32_t div_reg = (divi << 12) | (divf & 0xFFFu);
-    uint32_t mash = (divf != 0u) ? 1u : 0u;
+    uint32_t divf = 0u; // force integer divider for stability
+    uint32_t div_reg = (divi << 12);
+    uint32_t mash = 0u;
 
     *gp0ctl = CLK_PASSWD | GPCLK_CTL_KILL;
     if (wait_busy(gp0ctl, 0, 2000) < 0) {
