@@ -21,6 +21,7 @@ struct wait_stats {
   uint32_t max_us;
   uint32_t *samples;
   uint32_t sample_count;
+  uint32_t sample_max;
   uint32_t sample_stride;
   uint32_t sample_next;
 };
@@ -89,8 +90,9 @@ static void stats_init(struct wait_stats *st, uint64_t total_txns, uint32_t *sam
   st->max_us = 0;
   st->samples = samples;
   st->sample_count = 0;
-  if (total_txns > max_samples && max_samples > 0) {
-    st->sample_stride = (uint32_t)(total_txns / max_samples);
+  st->sample_max = max_samples;
+  if (max_samples > 0 && total_txns > max_samples) {
+    st->sample_stride = (uint32_t)((total_txns + max_samples - 1) / max_samples);
     if (st->sample_stride == 0) st->sample_stride = 1;
   } else {
     st->sample_stride = 1;
@@ -104,7 +106,7 @@ static void stats_update(struct wait_stats *st, uint32_t wait_us) {
   if (wait_us > st->max_us) st->max_us = wait_us;
   if (st->sample_stride > 0) {
     if (st->sample_next == 0) {
-      if (st->samples) {
+      if (st->samples && st->sample_count < st->sample_max) {
         st->samples[st->sample_count++] = wait_us;
       }
       st->sample_next = st->sample_stride;
@@ -291,11 +293,10 @@ static double bench_read8(uint32_t base, uint32_t size, int burst, int pacing_us
     uint32_t todo = (uint32_t)burst;
     if (todo > bytes - i) todo = bytes - i;
     set_ctrl_pins_output();
+    set_data_pins_input();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + i + j;
-      set_data_pins_output();
       uint8_t v = read8_raw(addr, st, pacing_us);
-      set_data_pins_input();
       acc ^= v;
     }
     i += todo;
@@ -334,11 +335,10 @@ static double bench_read16(uint32_t base, uint32_t size, int burst, int pacing_u
     uint32_t todo = (uint32_t)burst;
     if (todo > words - i) todo = words - i;
     set_ctrl_pins_output();
+    set_data_pins_input();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 2u);
-      set_data_pins_output();
       uint16_t v = read16_raw(addr, st, pacing_us);
-      set_data_pins_input();
       acc ^= v;
     }
     i += todo;
@@ -377,11 +377,10 @@ static double bench_read32(uint32_t base, uint32_t size, int burst, int pacing_u
     uint32_t todo = (uint32_t)burst;
     if (todo > words - i) todo = words - i;
     set_ctrl_pins_output();
+    set_data_pins_input();
     for (uint32_t j = 0; j < todo; j++) {
       uint32_t addr = base + ((i + j) * 4u);
-      set_data_pins_output();
       uint32_t v = read32_raw(addr, st, pacing_us);
-      set_data_pins_input();
       acc ^= v;
     }
     i += todo;
