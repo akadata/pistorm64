@@ -901,6 +901,7 @@ int main(int argc, char* argv[]) {
 
   if (getenv("PISTORM_BPL_LOG")) {
     bpl_log_enabled = 1;
+    LOG_INFO("[BPL] logging enabled (CPU writes only)\n");
   }
 
   // const struct sched_param priority = {99};
@@ -1610,6 +1611,9 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
 }
 
 void m68k_write_memory_8(unsigned int address, unsigned int value) {
+  if (bpl_log_enabled && (address & 0xFFFF0000u) == 0xDFF00000u) {
+    bpl_log_update(address, (uint16_t)(value & 0xFFu));
+  }
   if (platform_write_check(OP_TYPE_BYTE, address, value)) {
     return;
   }
