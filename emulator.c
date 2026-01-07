@@ -135,6 +135,7 @@ static int state_sock_path_set = 0;
 #define REG_COP1LCL 0xDFF082
 #define REG_COP2LCH 0xDFF084
 #define REG_COP2LCL 0xDFF086
+#define CHIP_MASK 0x1FFFFF
 
 static void bpl_log_print(void) {
   pthread_mutex_lock(&bpl_state_lock);
@@ -315,6 +316,23 @@ struct bpl_state_snapshot {
   uint8_t bpl_valid[6];
 };
 
+struct bpl_cop_state {
+  uint16_t bplcon0;
+  int have_bplcon0;
+  uint16_t bpl1mod;
+  uint16_t bpl2mod;
+  int have_mod1;
+  int have_mod2;
+  uint16_t diwstrt;
+  uint16_t diwstop;
+  uint16_t ddfstrt;
+  uint16_t ddfstop;
+  uint16_t bpl_pth[6];
+  uint16_t bpl_ptl[6];
+  int have_pth[6];
+  int have_ptl[6];
+};
+
 static void bpl_snapshot_fill(struct bpl_state_snapshot* snap) {
   pthread_mutex_lock(&bpl_state_lock);
   snap->ts_us = bpl_last_update_us;
@@ -334,6 +352,137 @@ static void bpl_snapshot_fill(struct bpl_state_snapshot* snap) {
     snap->bpl_valid[i] = (bpl_pth_seen[i] && bpl_ptl_seen[i]) ? 1 : 0;
   }
   pthread_mutex_unlock(&bpl_state_lock);
+}
+
+static void bpl_parse_copper_list(uint32_t addr, struct bpl_cop_state* st) {
+  memset(st, 0, sizeof(*st));
+  addr &= CHIP_MASK;
+  for (int i = 0; i < 2048; i++) {
+    uint16_t w1 = (uint16_t)ps_read_16(addr + (uint32_t)(i * 4));
+    uint16_t w2 = (uint16_t)ps_read_16(addr + (uint32_t)(i * 4 + 2));
+    if (w1 == 0xFFFF && w2 == 0xFFFE) {
+      break;
+    }
+    if (w1 & 0x0001u) {
+      continue;
+    }
+    uint32_t reg = 0xDFF000u + (uint32_t)(w1 & 0x01FEu);
+    switch (reg) {
+    case REG_BPLCON0:
+      st->bplcon0 = w2;
+      st->have_bplcon0 = 1;
+      break;
+    case REG_BPL1MOD:
+      st->bpl1mod = w2;
+      st->have_mod1 = 1;
+      break;
+    case REG_BPL2MOD:
+      st->bpl2mod = w2;
+      st->have_mod2 = 1;
+      break;
+    case REG_DIWSTRT:
+      st->diwstrt = w2;
+      break;
+    case REG_DIWSTOP:
+      st->diwstop = w2;
+      break;
+    case REG_DDFSTRT:
+      st->ddfstrt = w2;
+      break;
+    case REG_DDFSTOP:
+      st->ddfstop = w2;
+      break;
+    case REG_BPL1PTH:
+      st->bpl_pth[0] = w2;
+      st->have_pth[0] = 1;
+      break;
+    case REG_BPL1PTL:
+      st->bpl_ptl[0] = w2;
+      st->have_ptl[0] = 1;
+      break;
+    case REG_BPL2PTH:
+      st->bpl_pth[1] = w2;
+      st->have_pth[1] = 1;
+      break;
+    case REG_BPL2PTL:
+      st->bpl_ptl[1] = w2;
+      st->have_ptl[1] = 1;
+      break;
+    case REG_BPL3PTH:
+      st->bpl_pth[2] = w2;
+      st->have_pth[2] = 1;
+      break;
+    case REG_BPL3PTL:
+      st->bpl_ptl[2] = w2;
+      st->have_ptl[2] = 1;
+      break;
+    case REG_BPL4PTH:
+      st->bpl_pth[3] = w2;
+      st->have_pth[3] = 1;
+      break;
+    case REG_BPL4PTL:
+      st->bpl_ptl[3] = w2;
+      st->have_ptl[3] = 1;
+      break;
+    case REG_BPL5PTH:
+      st->bpl_pth[4] = w2;
+      st->have_pth[4] = 1;
+      break;
+    case REG_BPL5PTL:
+      st->bpl_ptl[4] = w2;
+      st->have_ptl[4] = 1;
+      break;
+    case REG_BPL6PTH:
+      st->bpl_pth[5] = w2;
+      st->have_pth[5] = 1;
+      break;
+    case REG_BPL6PTL:
+      st->bpl_ptl[5] = w2;
+      st->have_ptl[5] = 1;
+      break;
+    default:
+      break;
+    }
+  }
+}
+
+static void bpl_snapshot_refresh_from_hw(struct bpl_state_snapshot* snap) {
+  memset(snap, 0, sizeof(*snap));
+  snap->bplcon0 = (uint16_t)ps_read_16(REG_BPLCON0);
+  snap->bplcon1 = (uint16_t)ps_read_16(REG_BPLCON1);
+  snap->bplcon2 = (uint16_t)ps_read_16(REG_BPLCON2);
+  snap->bpl1mod = (uint16_t)ps_read_16(REG_BPL1MOD);
+  snap->bpl2mod = (uint16_t)ps_read_16(REG_BPL2MOD);
+  snap->diwstrt = (uint16_t)ps_read_16(REG_DIWSTRT);
+  snap->diwstop = (uint16_t)ps_read_16(REG_DIWSTOP);
+  snap->ddfstrt = (uint16_t)ps_read_16(REG_DDFSTRT);
+  snap->ddfstop = (uint16_t)ps_read_16(REG_DDFSTOP);
+  snap->cop1lc = ((uint32_t)ps_read_16(REG_COP1LCH) << 16) | ps_read_16(REG_COP1LCL);
+  snap->cop2lc = ((uint32_t)ps_read_16(REG_COP2LCH) << 16) | ps_read_16(REG_COP2LCL);
+  if (snap->cop2lc) {
+    struct bpl_cop_state st;
+    bpl_parse_copper_list(snap->cop2lc, &st);
+    if (st.have_bplcon0) {
+      snap->bplcon0 = st.bplcon0;
+    }
+    if (st.have_mod1) {
+      snap->bpl1mod = st.bpl1mod;
+    }
+    if (st.have_mod2) {
+      snap->bpl2mod = st.bpl2mod;
+    }
+    if (st.diwstrt) snap->diwstrt = st.diwstrt;
+    if (st.diwstop) snap->diwstop = st.diwstop;
+    if (st.ddfstrt) snap->ddfstrt = st.ddfstrt;
+    if (st.ddfstop) snap->ddfstop = st.ddfstop;
+    for (int i = 0; i < 6; i++) {
+      if (st.have_pth[i] && st.have_ptl[i]) {
+        snap->bpl[i] = (((uint32_t)st.bpl_pth[i] << 16) | st.bpl_ptl[i]) & CHIP_MASK;
+        snap->bpl_valid[i] = 1;
+      }
+    }
+  }
+  snap->ts_us = monotonic_us();
 }
 
 static void bpl_snapshot_format_json(const struct bpl_state_snapshot* snap, char* buf,
@@ -443,6 +592,9 @@ static void* state_socket_thread_fn(void* arg) {
     if (n <= 0 || strncmp(req, "SNAPSHOT", 8) == 0) {
       struct bpl_state_snapshot snap;
       bpl_snapshot_fill(&snap);
+      if (snap.ts_us == 0) {
+        bpl_snapshot_refresh_from_hw(&snap);
+      }
       bpl_snapshot_format_json(&snap, resp, sizeof(resp));
       (void)write(client, resp, strlen(resp));
     }
