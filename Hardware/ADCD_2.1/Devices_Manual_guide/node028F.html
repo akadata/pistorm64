@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="SAMP-1" TITLE="SAMP.doc / Similarities and Differences from the 8SVX Form " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>SAMP.doc / Similarities and Differences from the 8SVX Form </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node028E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0290.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Like &#034;8SVX&#034;, this new format uses headers to separate the various sections
+of the sound file into chunks. Some of the chunks are exactly the same
+since there wasn't a need to improve them. The chunks that remain
+unchanged are as follows:
+
+   &#034;(c) &#034;
+   &#034;AUTH&#034;
+   &#034;ANNO&#034;
+
+Since these properties are all described in the original &#034;8SVX&#034; document,
+please refer to that for a description of these chunks and their uses.
+Like the &#034;8SVX&#034; form, none of these chunks are required to be in a sound
+file. If they do appear, they must be padded out to an even number of
+bytes.
+
+Furthermore, two &#034;8SVX&#034; chunks no longer exist as they have been incorpo-
+rated into the &#034;BODY&#034; chunk. They are:
+
+   &#034;ATAK&#034;
+   &#034;RLSE&#034;
+
+Since each wave can be completely different than the other waves in the
+sound file (one wave might be middle C on a piano, and another might be a
+snare drum hit), it is necessary for each wave to have its own envelope
+description, and name.
+
+The major changes from the &#034;8SVX&#034; format are in the &#034;MHDR&#034;, &#034;NAME&#034;, and
+&#034;BODY&#034; chunks.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

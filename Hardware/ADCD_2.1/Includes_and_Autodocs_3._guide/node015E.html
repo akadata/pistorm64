@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="Execute()" TITLE="dos.library/Execute" -->
+<head>
+<title>dos.library/Execute</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node015D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node015F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	Execute -- Execute a CLI command
+
+<b>    SYNOPSIS</b>
+	success = Execute( commandString, input, output )
+	D0		   D1		  D2	 D3
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> Execute(STRPTR, <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line129">BPTR</a>, BPTR)
+
+<b>    FUNCTION</b>
+	This function attempts to execute the string commandString as a
+	Shell command and arguments. The string can contain any valid input
+	that you could type directly in a Shell, including input and output
+	redirection using &#060; and &#062;.  Note that Execute() doesn't return until
+	the command(s) in commandstring have returned.
+
+	The input file handle will normally be zero, and in this case
+	Execute() will perform whatever was requested in the commandString
+	and then return. If the input file handle is nonzero then after the
+	(possibly empty) commandString is performed subsequent input is read
+	from the specified input file handle until end of that file is
+	reached.
+
+	In most cases the output file handle must be provided, and is used
+	by the Shell commands as their output stream unless output
+	redirection was specified. If the output file handle is set to zero
+	then the current window, normally specified as *, is used. Note
+	that programs running under the Workbench do not normally have a
+	current window.
+
+	Execute() may also be used to create a new interactive Shell process
+	just like those created with the NewShell command. In order to do
+	this you would call Execute() with an empty commandString, and pass
+	a file handle relating to a new window as the input file handle.
+	The output file handle would be set to zero. The Shell will read
+	commands from the new window, and will use the same window for
+	output. This new Shell window can only be terminated by using the
+	EndCLI command.
+
+	Under V37, if an input filehandle is passed, and it's either
+	interactive or a NIL: filehandle, the pr_ConsoleTask of the new
+	process will be set to that filehandle's process (the same applies
+	to <a href="../Includes_and_Autodocs_3._guide/node01C5.html">SystemTagList()</a>).
+
+	For this command to work the program Run must be present in C: in
+	versions before V36 (except that in 1.3.2 and any later 1.3 versions,
+	the system first checks the resident list for Run).
+
+<b>    INPUTS</b>
+	commandString - pointer to a null-terminated string
+	input	      - BCPL pointer to a file handle
+	output	      - BCPL pointer to a file handle
+
+<b>    RESULTS</b>
+	success - BOOLEAN indicating whether Execute was successful
+		  in finding and starting the specified program.  Note this
+		  is NOT the return code of the command(s).
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01C5.html">SystemTagList()</a>, NewShell, EndCLI, Run
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

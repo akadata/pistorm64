@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-9" TITLE="27 / Routines and Structures / Monitors, Modes and Display Database" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / Routines and Structures / Monitors, Modes and Display Database</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0334.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0336.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Release 2 graphics library supports a variety of new video monitors,
+and new programmable video modes not available in older versions of the
+operating system.  Inquiries about the availability of these modes, their
+dimensions and currently accessible options can be made through a database
+indexed by the same key information used to open Intuition screens.  This
+design provides a good degree of compatibility with existing software,
+between differently equipped hardware platforms and for both static and
+dynamic data storage.
+
+The Release 2 software may be running on A1000 computers which will not
+have ECS, on A500 computers which may not have the latest ECS upgrade, and
+on A2000 computers which generally have the latest ECS but may not have a
+multi-sync monitor currently attached.  This means that there are
+compatibility issues to consider--what should happen when a required ECS
+or monitor resource is not available for the desired mode.
+
+Here are the compatibility criteria, in a simplified fashion:
+
+Requires Release 2, and ECS Chips only
+    SuperHires mode (35nS pixel resolutions).  This allows for very high
+    horizontal resolutions with the new ECS chip set and a standard NTSC
+    or PAL monitor.  (SuperHires has twice as much horizontal resolution
+<a name="line24">    as the old Hires mode.)</a>
+
+Requires Release 2, ECS Chips, and appropriate monitor
+    Productivity mode.  This allows for flicker-free 640 x 480 color
+    displays with the addition of a multi-sync or bi-sync 31 Khz monitor.
+    (Productivity mode conforms, in a general way, to the VGA Mode 3
+    Standard 8514/A.)
+
+Requires Release 2 (or the V35 of graphics.library under 1.3)
+and appropriate monitor only
+    A2024 Scan Conversion.  This allows for a very high resolution
+    grayscale display, typically 1008x800, suitable for desktop
+    publishing or similar applications.  A special video monitor is
+    required (the monitor also supports the normal Amiga modes in
+    greyscale).
+
+Requires Release 2 but not ECS Chips or appropriate monitor
+    Display database inquiries.  This allows for programmers to determine
+    if the required resources are currently available for the requested
+    mode.
+
+In addition, there are fallback modes (which do not require Release 2)
+which resort to some reasonable display when a required resource is not
+available.
+
+ <a href="../Libraries_Manual_guide/node0336.html">New Monitors</a> 
+ <a href="../Libraries_Manual_guide/node0337.html">New Modes</a> 
+ <a href="../Libraries_Manual_guide/node0338.html">Mode Specification, Screen Interface</a> 
+ <a href="../Libraries_Manual_guide/node0339.html">Mode Specification, ViewPort Interface</a> 
+ <a href="../Libraries_Manual_guide/node033A.html">Coexisting Modes</a> 
+ <a href="../Libraries_Manual_guide/node033B.html">ModeID Identifiers</a> 
+ <a href="../Libraries_Manual_guide/node033C.html">The Display Database and the DisplayInfo Record</a> 
+ <a href="../Libraries_Manual_guide/node033D.html">Accessing the DisplayInfo</a> 
+ <a href="../Libraries_Manual_guide/node033E.html">Mode Availability</a> 
+ <a href="../Libraries_Manual_guide/node033F.html">Accessing the MonitorSpec</a> 
+ <a href="../Libraries_Manual_guide/node0340.html">Mode Properties</a> 
+ <a href="../Libraries_Manual_guide/node0341.html">Nominal Values</a> 
+ <a href="../Libraries_Manual_guide/node0342.html">Preference Items</a> 
+ <a href="../Libraries_Manual_guide/node0343.html">Run-Time Name Binding of Mode Information</a> 
+ <a href="../Libraries_Manual_guide/node059B.html">Relase 2 Custom ViewPort Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

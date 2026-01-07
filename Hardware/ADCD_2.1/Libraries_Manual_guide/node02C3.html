@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-4-2" TITLE="21 / Task Exclusion / Disabling Tasks" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 / Task Exclusion / Disabling Tasks</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02C2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02C4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Disabling is similar to forbidding, but it also prevents interrupts from
+occurring during a critical section.  Disabling is required when a task
+accesses structures that are shared by interrupt code.  It eliminates the
+possibility of an interrupt accessing shared structures by preventing
+<a name="line6">interrupts from occurring.  Use of disabling is strongly discouraged.</a>
+
+To disable interrupts you can call the <a href="../Includes_and_Autodocs_2._guide/node034A.html">Disable()</a> function.  To enable
+interrupts again, use the <a href="../Includes_and_Autodocs_2._guide/node034C.html">Enable()</a> function.  Although assembler DISABLE
+and ENABLE macros are provided, assembler programmers should use the
+system functions rather than the macros for upwards compatibility, ease of
+<a name="line12">debugging, and smaller code size.</a>
+
+Like forbidden sections, disabled sections can be nested.  To restore
+normal interrupt processing, an <a href="../Includes_and_Autodocs_2._guide/node034C.html">Enable()</a> call must be made for every
+<a href="../Includes_and_Autodocs_2._guide/node034A.html">Disable()</a>.  Also like forbidden sections, any direct or indirect call to
+the <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a> function will enable interrupts until the task regains the
+<a name="line18">processor.</a>
+
+    WARNING:
+    --------
+    It is important to realize that there is a danger in using disabled
+    sections.  Because the software on the Amiga depends heavily on its
+    interrupts occurring in nearly real time, you cannot disable for more
+    than a very brief instant. Disabling interrupts for more than 250
+    microseconds can interfere with the normal operation of vital system
+<a name="line27">    functions, especially serial I/O.</a>
+
+    WARNING:
+    --------
+    Masking interrupts by changing the 68000 processor interrupt
+    priority levels with the MOVE SR instruction can also be dangerous
+    and is very strongly discouraged.  The disable- and enable-related
+    functions control interrupts through the 4703 custom chip and not
+    through the 68000 priority level.  In addition, the processor
+    priority level can be altered only from <a href="../Libraries_Manual_guide/node02CA.html">supervisor mode</a> (which means
+    this process is much less efficient).
+
+It is never necessary to both <a href="../Includes_and_Autodocs_2._guide/node034A.html">Disable()</a> and <a href="../Libraries_Manual_guide/node02C2.html#line9">Forbid()</a>.  Because disabling
+prevents interrupts, it also prevents preemptive task scheduling.  When
+disable is used within an interrupt, it will have the effect of locking
+out all higher level interrupts (lower level interrupts are automatically
+disabled by the CPU).  Many Exec lists can only be accessed while
+disabled.  Suppose you want to print the names of all system tasks.  You
+would need to access both the <a href="../Includes_and_Autodocs_2._guide/node009E.html#line83">TaskReady</a> and <a href="../Includes_and_Autodocs_2._guide/node009E.html#line83">TaskWait</a> lists from within a
+single disabled section.  In addition, you must avoid calling system
+functions that would break a disable by an indirect call to <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a>
+(<a href="../Includes_and_Autodocs_2._guide/node0162.html">printf()</a> for example).  In this example, the names are gathered into a
+list while task switching is disabled. Then task switching is enabled and
+the names are printed.
+
+     <a href="../Libraries_Manual_guide/node0590.html">tasklist.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

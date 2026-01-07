@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-6-1" TITLE="27 / ECS and Genlocking Features / Genlock Control" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / ECS and Genlocking Features / Genlock Control</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node036C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node036E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Using <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a>, a program can enable, disable, or obtain the state
+of a <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>'s genlocking features.  It returns NULL if no error
+occurred.  The function uses a tag based interface:
+
+    error = BOOL VideoControl( struct ColorMap *cm, struct TagItem *ti );
+
+The ti argument is a list of video commands stored in an array of <a href="../Libraries_Manual_guide/node0497.html">TagItem</a>
+structures.  The cm argument specifies which <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> and, indirectly,
+which <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> these genlock commands will be applied to.  The possible
+commands are:
+
+    VTAG_BITPLANEKEY_GET, _SET, _CLR
+    VTAG_CHROMA_PLANE_GET, _SET
+    VTAG_BORDERBLANK_GET, _SET, _CLR
+    VTAG_BORDERNOTRANS_GET, _SET, _CLR
+    VTAG_CHROMAKEY_GET, _SET, _CLR
+    VTAG_CHROMAPEN_GET, _SET, _CLR
+
+This section covers only the genlock <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a> tags.  See
+&#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00B0.html#line22">videocontrol.h</a>&#062; for a complete list of all the available tags
+you can use with VideoControl().
+
+VTAG_BITPLANEKEY_GET is used to find out the status of the bitplane keying
+mode.  VTAG_BITPLANEKEY_SET and VTAG_BITPLANEKEY_CLR activate and
+deactivate bitplane keying mode.  If bitplane key mode is on, genlocking
+will key on the bits set in a specific bitplane from the <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> (the
+specific bitplane is set with a different tag).  The data portion of these
+tags is NULL.
+
+For inquiry commands like VTAG_BITPLANEKEY_GET (tags ending in _GET),
+<a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a> changes the _GET tag ID (<a href="../Libraries_Manual_guide/node0497.html">ti_Tag</a>) to the corresponding _SET
+or _CLR tag ID, reflecting the current state of the genlock mode.  For
+example, when passed the following tag array:
+
+    struct TagItem videocommands[] =
+    {
+        {VTAG_BITPLANEKEY_GET, NULL},
+        {VTAG_END_CM, NULL}
+    };
+
+<a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a> changes the VTAG_BITPLANEKEY_GET tag ID (<a href="../Libraries_Manual_guide/node0497.html">ti_Tag</a>) to
+VTAG_BITPLANEKEY_SET if bitplane keying is currently on, or to
+VTAG_BITPLANEKEY_CLR if bitplane keying is off.  In both of these cases,
+VideoControl() only uses the tag's ID, ignoring the tag's data field
+(<a href="../Libraries_Manual_guide/node0497.html">ti_Data</a>).
+
+The VTAG_CHROMA_PLANE_GET tag returns the number of the bitplane keyed on
+when bitplane keying mode is on.  <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a> changes the tag's data
+value to the bitplane number.  VTAG_CHROMA_PLANE_SET sets the bitplane
+number to the tag's data value.
+
+VTAG_BORDERBLANK_GET is used to obtain the border blank mode status. This
+tag works exactly like VTAG_BITPLANEKEY_GET.  <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a> changes the
+tag's ID to reflect the current border blanking state.
+VTAG_BORDERBLANK_SET and VTAG_BORDERBLANK_CLR activate and deactivate
+border blanking.  If border blanking is on, the Amiga will not display
+anything in its display border, allowing an external video signal to show
+through the border area.  On the Amiga display, the border appears black.
+The data portion of these tags is NULL.
+
+The VTAG_BORDERNOTRANS_GET, _SET and _CLR tags are used, respectively, to
+obtain the status of border-not-transparent mode, and to activate and to
+deactivate this mode.  If set, the Amiga display's border will overlay
+external video with the color in register 0.  Because border blanking mode
+takes precedence over border-not-transparent mode, setting
+border-not-transparent has no effect if border blanking is on.  The data
+portion of these tags is NULL.
+
+The VTAG_CHROMAKEY_GET, _SET and _CLR tags are used, respectively, to
+obtain the status of chroma keying mode, and to activate and deactivate
+chroma keying mode.  If set, the genlock will key on colors from specific
+color registers (the specific color registers are set using a different
+tag).  If chroma keying is not set, the genlock will key on color register
+0.  The data portion of these tags is NULL.
+
+VTAG_CHROMAPEN_GET obtains the chroma keying status of an individual color
+register.  The tag's <a href="../Libraries_Manual_guide/node0497.html">ti_Data</a> field contains the register number.  Like the
+other _GET tags, <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a> changes the tag ID (<a href="../Libraries_Manual_guide/node0497.html">ti_Tag</a>) to one that
+reflects the current state of the mode.  VTAG_CHROMAPEN_SET and
+VTAG_CHROMAPEN_CLR activate and deactivate chroma keying for each
+individual color register.  Chroma keying can be active for more than one
+register.  By turning off border blanking and activating chroma keying
+mode, but turning off chroma keying for each color register, a program can
+overlay every part of an external video source, completely blocking it out.
+
+After using <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a> to set values in the <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a>, the
+corresponding <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> has to be rebuilt with <a href="../Libraries_Manual_guide/node0332.html#line9">MakeVPort()</a>, <a href="../Libraries_Manual_guide/node0332.html#line27">MrgCop()</a> and
+<a href="../Libraries_Manual_guide/node0333.html">LoadView()</a>, so the changes can take effect.  A program that uses a
+screen's ViewPort rather than its own ViewPort should use the Intuition
+functions <a href="../Libraries_Manual_guide/node00F4.html#line5">MakeScreen()</a> and <a href="../Libraries_Manual_guide/node00F4.html#line5">RethinkDisplay()</a> to make the display changes
+<a name="line92">take effect.</a>
+
+The following code fragment shows how to access the genlock modes.
+
+
+struct Screen *genscreen;
+struct ViewPort *vp;
+struct TagItem vtags [24];
+
+    /* The complete example opened a window, rendered some colorbars,  */
+    /* and added gadgets to allow the user to turn the various genlock */
+    /* modes on and off.                                               */
+
+    vp = &#038;(genscreen-&#062;ViewPort);
+
+    /* Ascertain the current state of the various modes. */
+
+    /* Is borderblanking on? */
+    vtags[0].ti_Tag = VTAG_BORDERBLANK_GET;
+    vtags[0].ti_Data = NULL;
+
+    /* Is bordertransparent set? */
+    vtags[1].ti_Tag = VTAG_BORDERNOTRANS_GET;
+    vtags[1].ti_Data = NULL;
+
+    /* Key on bitplane? */
+    vtags[2].ti_Tag = VTAG_BITPLANEKEY_GET;
+    vtags[2].ti_Tag = NULL;
+
+    /* Get plane which is used to key on */
+    vtags[3].ti_Tag = VTAG_CHROMA_PLANE_GET;
+    vtags[3].ti_Data = NULL;
+
+    /* Chromakey overlay on? */
+    vtags[4].ti_Tag = VTAG_CHROMAKEY_GET;
+    vtags[4].ti_Data = NULL;
+
+    for (i = 0; i &#060; 16; i++)
+    {
+        /* Find out which colors overlay */
+        vtags[i + 5].ti_Tag = VTAG_CHROMA_PEN_GET;
+        vtags[i + 5].ti_Data = i;
+    }
+
+    /* Indicate end of tag array */
+    vtags[21].ti_Tag = VTAG_END_CM;
+    vtags[21].ti_Data = NULL;
+
+    /* And send the commands. On return the Tags themselves will
+    * indicate the genlock settings for this ViewPort's ColorMap.
+    */
+    error = VideoControl(vp-&#062;ColorMap, vtags);
+
+    /* The complete program sets gadgets to reflect current states. */
+
+    /* Will only send single commands from here on. */
+    vtags[1].ti_Tag = VTAG_END_CM;
+
+    /* At this point the complete program gets an input event and
+       sets/clears the genlock modes as requested using the vtag list and
+       VideoControl().
+    */
+
+    /* send video command */
+    error = VideoControl(vp-&#062;ColorMap, vtags);
+
+    /* Now use MakeScreen() and RethinkDisplay() to make the VideoControl()
+    *  changes take effect.  If we were using our own ViewPort rather than
+    *  borrowing one from a screen, we would instead do:
+    *
+    *   MakeVPort(ViewAddress(),vp);
+    *   MrgCop(ViewAddress());
+    *   LoadView(ViewAddres());
+    */
+    MakeScreen(genscreen);
+    RethinkDisplay();
+
+/* The complete program closes and frees everything it had opened or
+   allocated.
+*/
+
+
+/* The complete example calls the CheckPAL function, which is included
+   below in its entirety for illustrative purposes.
+*/
+
+BOOL CheckPAL(STRPTR screenname)
+{
+    struct Screen *screen;
+    ULONG modeID = LORES_KEY;
+    struct DisplayInfo displayinfo;
+    BOOL IsPAL;
+
+    if (GfxBase-&#062;LibNode.lib_Version &#062;= 36)
+    {
+        /*
+        * We got at least V36, so lets use the new calls to find out what
+        * kind of videomode the user (hopefully) prefers.
+        */
+
+        if (screen = LockPubScreen(screenname))
+        {
+            /*
+            * Use graphics.library/GetVPModeID() to get the ModeID of the
+            * specified screen.  Will use the default public screen
+            * (Workbench most of the time) if NULL It is _very_ unlikely
+            * that this would be invalid, heck it's impossible.
+            */
+            if ((modeID = GetVPModeID(&#038;(screen-&#062;ViewPort))) != INVALID_ID)
+            {
+                /*
+                * If the screen is in VGA mode, we can't tell whether the
+                * system is PAL or NTSC. So to be foolproof we fall back
+                * to the displayinfo of the default monitor by inquiring
+                * about just the LORES_KEY displaymode if we don't know.
+                * The default.monitor reflects the initial video setup of
+                * the system, thus for either ntsc.monitor or pal.monitor.
+                * We only use the displaymode of the is an alias specified
+                * public screen if it's display mode is PAL or NTSC and
+                * NOT the default.
+                */
+                if (!((modeID &#038; MONITOR_ID_MASK) == NTSC_MONITOR_ID ||
+                (modeID &#038; MONITOR_ID_MASK) == PAL_MONITOR_ID))
+                modeID = LORES_KEY;
+            }
+            UnlockPubScreen(NULL, screen);
+        } /* if fails modeID = LORES_KEY. Can't lock screen, so fall back
+          *  on default monitor.
+          */
+
+        if (GetDisplayInfoData(NULL, (UBYTE *) &#038; displayinfo,
+        sizeof(struct DisplayInfo), DTAG_DISP, modeID))
+        {
+            if (displayinfo.PropertyFlags &#038; DIPF_IS_PAL)
+                IsPAL = TRUE;
+            else
+                IsPAL = FALSE;
+            /* Currently the default monitor is always either PAL or
+            *  NTSC.
+            */
+        }
+    }
+    else
+        /* &#060; V36. The enhancements to the videosystem in V36 (and above)
+        *  cannot be better expressed than with the simple way to determine
+        *  PAL in V34.
+        */
+        IsPAL= (GfxBase-&#062;DisplayFlags &#038; PAL) ? TRUE : FALSE;
+
+    return(IsPAL);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="devices/modules/screen.c" NODE="MAIN" TITLE="devices/modules/screen.c" -->
+<head>
+<title>devices/modules/screen.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05D1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05D3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* screen.c - 2.0 screen module for Display
+ * based on scdemo, oscandemo, looki
+ */
+
+/*
+Copyright (c) 1989-1999 Amiga, Inc.
+
+Executables based on this information may be used in software
+for Amiga computers. All other rights reserved.
+This information is provided &#034;as is&#034;; no warranties are made.
+All use is at your own risk, and no liability or responsibility
+is assumed.
+*/
+
+#include &#034;iffp/ilbmapp.h&#034;
+
+BOOL   VideoControlTags(struct ColorMap *,ULONG tags, ...);
+
+extern struct Library *GfxBase;
+extern struct Library *IntuitionBase;
+
+struct TextAttr SafeFont = { (UBYTE *) &#034;topaz.font&#034;, 8, 0, 0, };
+UWORD  penarray[] = {~0};
+
+/* default new window if none supplied in ilbm-&#062;nw */
+struct   NewWindow      defnw = {
+   0, 0,                                  /* LeftEdge and TopEdge */
+   0, 0,                          	  /* Width and Height */
+   -1, -1,                                /* DetailPen and BlockPen */
+   VANILLAKEY|MOUSEBUTTONS,               /* IDCMP Flags with Flags below */
+   BACKDROP|BORDERLESS|SMART_REFRESH|NOCAREREFRESH|ACTIVATE|RMBTRAP,
+   NULL, NULL,                            /* Gadget and Image pointers */
+   NULL,                                  /* Title string */
+   NULL,                                  /* Screen ptr null till opened */
+   NULL,                                  /* BitMap pointer */
+   50, 20,                                /* MinWidth and MinHeight */
+   0 , 0,                                 /* MaxWidth and MaxHeight */
+   CUSTOMSCREEN                           /* Type of window */
+   };
+
+
+/* opendisplay - passed ILBMInfo, dimensions, modeID
+ *
+ *    Attempts to open correct 2.0 modeID screen and window,
+ *    else an old 1.3 mode screen and window.
+ *
+ * Returns *window or NULL.
+ */
+
+struct Window *opendisplay(struct ILBMInfo *ilbm,
+			   SHORT wide, SHORT high, SHORT deep,
+			   ULONG mode)
+    {
+    struct NewWindow newwin, *nw;
+
+    closedisplay(ilbm);
+    if(ilbm-&#062;scr = openidscreen(ilbm, wide, high, deep, mode))
+	{
+	nw = &#038;newwin;
+	if(ilbm-&#062;windef) *nw = *(ilbm-&#062;windef);
+	else *nw = *(&#038;defnw);
+	nw-&#062;Screen	= ilbm-&#062;scr;
+
+	D(bug(&#034;sizes: scr= %ld x %ld  passed= %ld x %ld\n&#034;,
+		ilbm-&#062;scr-&#062;Width,ilbm-&#062;scr-&#062;Height,wide,high));
+
+	nw-&#062;Width	= wide;
+	nw-&#062;Height	= high;
+	if (!(ilbm-&#062;win = OpenWindow(nw)))
+	    {
+	    closedisplay(ilbm);
+	    D(bug(&#034;Failed to open window.&#034;));
+	    }
+	else
+	    {
+	    if(ilbm-&#062;win-&#062;Flags &#038; BACKDROP)
+		{
+		ShowTitle(ilbm-&#062;scr, FALSE);
+		ilbm-&#062;TBState = FALSE;
+		}
+	    }
+	}
+
+    if(ilbm-&#062;scr)	/* nulled out by closedisplay if OpenWindow failed */
+	{
+	ilbm-&#062;vp  = &#038;ilbm-&#062;scr-&#062;ViewPort;
+	ilbm-&#062;srp = &#038;ilbm-&#062;scr-&#062;RastPort;
+	ilbm-&#062;wrp = ilbm-&#062;win-&#062;RPort;
+	}
+    return(ilbm-&#062;win);
+    }
+
+
+void closedisplay(struct ILBMInfo *ilbm)
+    {
+    if(ilbm)
+	{
+    	if (ilbm-&#062;win)	CloseWindow(ilbm-&#062;win), ilbm-&#062;win = NULL;
+    	if (ilbm-&#062;scr)	CloseScreen(ilbm-&#062;scr), ilbm-&#062;scr = NULL;
+    	ilbm-&#062;vp  = NULL;
+    	ilbm-&#062;srp = ilbm-&#062;wrp = NULL;
+	}
+    }
+
+
+
+/* openidscreen - ILBMInfo, dimensions, modeID
+ *
+ *    Attempts to open correct 2.0 modeID screen with centered
+ *    overscan based on user's prefs,
+ *    else old 1.3 mode screen.
+ *
+ * If ilbm-&#062;stype includes CUSTOMBITMAP, ilbm-&#062;brbitmap will be
+ *   	used as the screen's bitmap.
+ * If ilbm-&#062;stags is non-NULL, these tags will be added to the
+ *	end of the taglist.
+ *
+ * Returns *screen or NULL.
+ */
+
+struct Screen *openidscreen(struct ILBMInfo *ilbm,
+			    SHORT wide, SHORT high, SHORT deep,
+			    ULONG mode)
+    {
+    struct NewScreen ns;			/* for old style OpenScreen */
+    struct Rectangle spos, dclip, txto, stdo, maxo, uclip;  /* display rectangles */
+    struct Rectangle *uclipp;
+    struct Screen   *scr = NULL;
+    LONG   error, trynew;
+    ULONG  bitmaptag, passedtags;
+    BOOL   vctl;
+
+    if (trynew = ((((struct Library *)GfxBase)-&#062;lib_Version &#062;= 36)&#038;&#038;
+          (((struct Library *)IntuitionBase)-&#062;lib_Version &#062;= 36)))
+	{
+    	/* if &#062;= v36, see if mode is available */
+	if(error = ModeNotAvailable(mode))
+	    {
+	    D(bug(&#034;Mode $%08lx not available, error=%ld:\n&#034;,mode,error));
+	    /* if not available, try fall back mode */
+	    mode = modefallback(mode,wide,high,deep);
+	    error = ModeNotAvailable(mode);
+
+	    D(bug(&#034;$%08lx ModeNotAvailable=%ld:\n&#034;,mode,error));
+	    }
+
+	if(error) trynew = FALSE;
+	else trynew=((QueryOverscan(mode,&#038;txto,OSCAN_TEXT))&#038;&#038;
+			(QueryOverscan(mode,&#038;stdo,OSCAN_STANDARD))&#038;&#038;
+			    (QueryOverscan(mode,&#038;maxo,OSCAN_MAX)));
+	}
+
+    D(bug(&#034;\nILBM: w=%ld, h=%ld, d=%ld, mode=0x%08lx\n&#034;,
+		wide,high,deep,mode));
+    D(bug(&#034;OPEN: %s.\n&#034;,
+        trynew	? &#034;Is &#062;= 2.0 and mode available, trying OpenScreenTags&#034;
+		: &#034;Not 2.0, doing old OpenScreen&#034;));
+
+    if(trynew)
+	{
+	/* If user clip type specified and available, use it */
+	if(ilbm-&#062;Video) ilbm-&#062;ucliptype = OSCAN_VIDEO;
+	if((ilbm-&#062;ucliptype)&#038;&#038;(QueryOverscan(mode,&#038;uclip,ilbm-&#062;ucliptype)))
+		uclipp = &#038;uclip;
+	else uclipp = NULL;
+
+	clipit(wide,high,&#038;spos,&#038;dclip,&#038;txto,&#038;stdo,&#038;maxo,uclipp);
+
+	D(bug(&#034;Using dclip  %ld,%ld  to  %ld,%ld... width=%ld height=%ld\n&#034;,
+			dclip.MinX,dclip.MinY,dclip.MaxX,dclip.MaxY,
+			dclip.MaxX-dclip.MinX+1,dclip.MaxY-dclip.MinY+1));
+	D(bug(&#034;spos-&#062;minx = %ld, spos-&#062;miny = %ld\n&#034;,spos.MinX,spos.MinY));
+	D(bug(&#034;DEBUG: About to attempt OpenScreenTags\n&#034;));
+
+	bitmaptag = ((ilbm-&#062;brbitmap)&#038;&#038;(ilbm-&#062;stype &#038; CUSTOMBITMAP)) ?
+		SA_BitMap : TAG_IGNORE;
+	passedtags = ilbm-&#062;stags ? TAG_MORE : TAG_IGNORE;
+
+	scr=(struct Screen *)OpenScreenTags((struct NewScreen *)NULL,
+		SA_DisplayID,	mode,
+		SA_Type,	ilbm-&#062;stype,
+		SA_Behind,	TRUE,
+		SA_Top,		spos.MinY,
+		SA_Left,	spos.MinX,
+		SA_Width,	wide,
+		SA_Height,	high,
+		SA_Depth,	deep,
+		SA_DClip,	&#038;dclip,
+		SA_AutoScroll,	ilbm-&#062;Autoscroll ? TRUE : FALSE,
+		SA_Title,	ilbm-&#062;stitle,
+		SA_Font,	&#038;SafeFont,
+		SA_Pens,	penarray,
+		SA_ErrorCode,	&#038;error,
+		bitmaptag,	ilbm-&#062;brbitmap,
+		passedtags,	ilbm-&#062;stags,
+		TAG_DONE
+		);
+
+	    D(bug(&#034;DEBUG: OpenScreenTags scr at 0x%lx\n&#034;,scr));
+
+	    if(scr)
+		{
+		if(ilbm-&#062;Notransb)
+		    {
+		    vctl=VideoControlTags(scr-&#062;ViewPort.ColorMap,
+				VTAG_BORDERNOTRANS_SET, TRUE,
+				TAG_DONE);
+
+	D(bug(&#034;VideoControl to set bordernotrans, error = %ld\n&#034;,vctl));
+
+		    MakeScreen(scr);
+		    RethinkDisplay();
+		    }
+		}
+	    else modeErrorMsg(mode,error);
+        }
+
+    if(!scr)
+	{
+	/* ns initialization for 1.3 old style OpenScreen only
+         */
+	ns.LeftEdge = ns.TopEdge = 0;
+	ns.Width 	=	wide;
+	ns.Height 	=	high;
+	ns.Depth	=	deep;
+	ns.ViewModes	= 	modefallback(mode,wide,high,deep);
+	ns.DetailPen	=	0;
+	ns.BlockPen	=	1;
+	ns.Gadgets	=	NULL;
+	ns.CustomBitMap	=	((ilbm-&#062;brbitmap)&#038;&#038;(ilbm-&#062;stype &#038; CUSTOMBITMAP))
+					? ilbm-&#062;brbitmap : NULL;
+	ns.Font		=	&#038;SafeFont;
+	ns.DefaultTitle = 	ilbm-&#062;stitle;
+	ns.Type		=	ilbm-&#062;stype &#038; 0x01FF;  /* allow only 1.3 types */
+
+	scr=(struct Screen *)OpenScreen(&#038;ns);
+
+	D(bug(&#034;DEBUG: ns.ViewModes=0x%lx, vp-&#062;Modes=0x%lx\n&#034;,
+                 ns.ViewModes,scr-&#062;ViewPort.Modes));
+	D(bug(&#034;DEBUG: non-extended scr at 0x%lx (0=failure)\n&#034;,scr));
+	}
+    return(scr);
+    }
+
+
+/*
+ * modefallback - passed a mode id, attempts to provide a
+ *                suitable old mode to use instead
+ */
+
+/* for old 1.3 screens */
+#define MODE_ID_MASK (LACE|HIRES|HAM|EXTRA_HALFBRITE)
+
+ULONG modefallback(ULONG mode, SHORT wide, SHORT high, SHORT deep)
+{
+ULONG newmode;
+
+    /* For now, simply masks out everything but old mode bits.
+     * This is just a cheap way to get some kind of display open
+     *   and may be totally invalid for future modes.
+     * Should search the display database for a suitable mode
+     * based on the specific needs of your application.
+     */
+    newmode = mode &#038; MODE_ID_MASK;
+
+    D(bug(&#034;Try 0x%08lx instead of 0x%08lx\n&#034;,newmode,mode));
+    return(newmode);
+}
+
+
+/*
+ * clipit - passed width and height of a display, and the text, std, and
+ *          max overscan rectangles for the mode, clipit fills in the
+ *          spos (screen pos) and dclip rectangles to use in centering.
+ *          Centered around smallest containing user-editable oscan pref,
+ *          with dclip confined to legal maxoscan limits.
+ *          Screens which center such that their top is below text
+ *          oscan top, will be moved up.
+ *          If a non-null uclip is passed, that clip is used instead.
+ */
+void clipit(SHORT wide, SHORT high,
+	    struct Rectangle *spos, struct Rectangle *dclip,
+	    struct Rectangle *txto, struct Rectangle *stdo,
+	    struct Rectangle *maxo, struct Rectangle *uclip)
+{
+struct  Rectangle *besto;
+SHORT	minx, maxx, miny, maxy;
+SHORT	txtw, txth, stdw, stdh, maxw, maxh, bestw, besth;
+
+    /* get the txt, std and max widths and heights */
+    txtw = txto-&#062;MaxX - txto-&#062;MinX + 1;
+    txth = txto-&#062;MaxY - txto-&#062;MinY + 1;
+    stdw = stdo-&#062;MaxX - stdo-&#062;MinX + 1;
+    stdh = stdo-&#062;MaxY - stdo-&#062;MinY + 1;
+    maxw = maxo-&#062;MaxX - maxo-&#062;MinX + 1;
+    maxh = maxo-&#062;MaxY - maxo-&#062;MinY + 1;
+
+    if((wide &#060;= txtw)&#038;&#038;(high &#060;= txth))
+	{
+	besto = txto;
+	bestw = txtw;
+	besth = txth;
+
+	D(bug(&#034;Best clip is txto\n&#034;));
+	}
+    else
+	{
+	besto = stdo;
+	bestw = stdw;
+	besth = stdh;
+
+	D(bug(&#034;Best clip is stdo\n&#034;));
+	}
+
+    D(bug(&#034;TXTO: mnx=%ld mny=%ld mxx=%ld mxy=%ld  stdw=%ld stdh=%ld\n&#034;,
+		txto-&#062;MinX,txto-&#062;MinY,txto-&#062;MaxX,txto-&#062;MaxY,txtw,txth));
+    D(bug(&#034;STDO: mnx=%ld mny=%ld mxx=%ld mxy=%ld  stdw=%ld stdh=%ld\n&#034;,
+		stdo-&#062;MinX,stdo-&#062;MinY,stdo-&#062;MaxX,stdo-&#062;MaxY,stdw,stdh));
+    D(bug(&#034;MAXO: mnx=%ld mny=%ld mxx=%ld mxy=%ld  maxw=%ld maxh=%ld\n&#034;,
+		maxo-&#062;MinX,maxo-&#062;MinY,maxo-&#062;MaxX,maxo-&#062;MaxY,maxw,maxh));
+
+    if(uclip)
+	{
+	*dclip = *uclip;
+    	spos-&#062;MinX = uclip-&#062;MinX;
+	spos-&#062;MinY = uclip-&#062;MinY;
+
+	D(bug(&#034;UCLIP: mnx=%ld mny=%ld maxx=%ld maxy=%ld\n&#034;,
+			dclip-&#062;MinX,dclip-&#062;MinY,dclip-&#062;MaxX,dclip-&#062;MaxY));
+	}
+    else
+	{
+	/* CENTER the screen based on best oscan prefs
+ 	* but confine dclip within max oscan limits
+ 	*
+ 	* FIX MinX first */
+	spos-&#062;MinX = minx = besto-&#062;MinX - ((wide - bestw) &#062;&#062; 1);
+	maxx = wide + minx - 1;
+	if(maxx &#062; maxo-&#062;MaxX)  maxx = maxo-&#062;MaxX;	/* too right */
+	if(minx &#060; maxo-&#062;MinX)  minx = maxo-&#062;MinX;	/* too left  */
+
+	D(bug(&#034;DCLIP: minx adjust from %ld to %ld\n&#034;,spos-&#062;MinX,minx));
+
+	/* FIX MinY */
+	spos-&#062;MinY = miny = besto-&#062;MinY - ((high - besth) &#062;&#062; 1);
+	/* if lower than top of txto, move up */
+	spos-&#062;MinY = miny = MIN(spos-&#062;MinY,txto-&#062;MinY);
+	maxy = high + miny - 1;
+	if(maxy &#062; maxo-&#062;MaxY)  maxy = maxo-&#062;MaxY;	/* too down  */
+	if(miny &#060; maxo-&#062;MinY)  miny = maxo-&#062;MinY;	/* too up    */
+
+	D(bug(&#034;DCLIP: miny adjust from %ld to %ld\n&#034;,spos-&#062;MinY,miny));
+
+	/* SET up dclip */
+	dclip-&#062;MinX = minx;
+	dclip-&#062;MinY = miny;
+	dclip-&#062;MaxX = maxx;
+	dclip-&#062;MaxY = maxy;
+
+	D(bug(&#034;CENTER: mnx=%ld mny=%ld maxx=%ld maxy=%ld\n&#034;,
+			dclip-&#062;MinX,dclip-&#062;MinY,dclip-&#062;MaxX,dclip-&#062;MaxY));
+	}
+}
+
+
+void modeErrorMsg(ULONG mode, ULONG errorcode)
+   {
+   UBYTE *s=NULL;
+
+	D(bug(&#034;DEBUG: Can't open mode ID 0x%08lx screen: &#034;,mode));
+
+    	switch ( errorcode )
+	{
+	case OSERR_NOMEM:
+	    s=&#034;Not enough memory.&#034;;
+	    break;
+	case OSERR_NOCHIPMEM:
+	    s=&#034;Not enough chip memory.&#034;;
+	    break;
+#ifdef DEBUG
+	case OSERR_NOMONITOR:
+	    s=&#034;monitor not available.&#034;;
+	    break;
+
+	case OSERR_NOCHIPS:
+	    s=&#034;new chipset not available.&#034;;
+	    break;
+
+	case OSERR_PUBNOTUNIQUE:
+	    s=&#034;public screen already open.&#034;;
+	    break;
+	case OSERR_UNKNOWNMODE:
+	    s=&#034;mode ID is unknown.&#034;;
+	    break;
+	default:
+	    message(&#034;unknown mode error %ld\n&#034;,errorcode);
+#endif
+	}
+    if(s) message(&#034;%s\n&#034;,s);
+    }
+
+
+/*----------------------------------------------------------------------*/
+
+BOOL VideoControlTags(struct ColorMap *cm, ULONG tags, ...)
+    {
+    return (VideoControl(cm, (struct TagItem *)&#038;tags));
+    }
+
+
+/*----------------------------------------------------------------------*/
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

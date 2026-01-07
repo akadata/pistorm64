@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_4" NODE="4-2" TITLE="4 Console Device / Device Interface" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>4 Console Device / Device Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0081.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0083.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The console device operates like the other Amiga devices.  To use it, you
+must first open the console device, then send I/O requests to it, and then
+close it when finished.  See the &#034;<a href="../Devices_Manual_guide/node0006.html">Introduction to Amiga System Devices</a>&#034;
+chapter for general information on device usage.
+
+<a name="line7">The I/O request used by the console device is called IOStdReq.</a>
+
+   struct IOStdReq
+   {
+       struct  Message io_Message;
+       struct  Device  *io_Device;/* device node pointer  */
+       struct  Unit    *io_Unit;  /* unit (driver private)*/
+       UWORD   io_Command;        /* device command */
+       UBYTE   io_Flags;
+       BYTE    io_Error;          /* error or warning num */
+       ULONG   io_Actual;         /* actual number of bytes transferred */
+       ULONG   io_Length;         /* requested number bytes transferred*/
+       APTR    io_Data;           /* points to data area */
+       ULONG   io_Offset;         /* offset for block structured devices */
+   };
+
+See the include file exec/<a href="../Includes_and_Autodocs_2._guide/node0094.html">io.h</a> for the complete structure definition.
+
+ <a href="../Devices_Manual_guide/node0083.html">Console Device Units</a> 
+ <a href="../Devices_Manual_guide/node0084.html">Opening The Console Device</a> 
+ <a href="../Devices_Manual_guide/node0085.html">Closing The Console Device</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

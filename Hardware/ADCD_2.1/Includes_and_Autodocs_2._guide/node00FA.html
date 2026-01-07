@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/libraries/expansionbase.h" NODE="MAIN" TITLE="Includes/libraries/expansionbase.h" -->
+<head>
+<title>Includes/libraries/expansionbase.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00F9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00FB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef LIBRARIES_EXPANSIONBASE_H
+#define LIBRARIES_EXPANSIONBASE_H
+/*
+**	$Filename: libraries/expansionbase.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.15 $
+**	$Date: 91/10/21 $
+**
+**	Definitions for the expansion library base
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif	/* EXEC_TYPES_H */
+<a name="line18"></a>
+#ifndef EXEC_LIBRARIES_H
+#include &#034;exec/libraries.h&#034;
+#endif	/* EXEC_LIBRARIES_H */
+<a name="line22"></a>
+#ifndef EXEC_SEMAPHORES_H
+#include &#034;exec/semaphores.h&#034;
+#endif	/* EXEC_SEMAPHORES_H */
+<a name="line26"></a>
+#ifndef LIBRARIES_CONFIGVARS_H
+#include &#034;libraries/configvars.h&#034;
+#endif	/* LIBRARIES_CONFIGVARS_H */
+
+<a name="line31"></a>
+/* BootNodes are scanned by dos.library at startup.  Items found on the
+   list are started by dos. BootNodes are added with the AddDosNode() or
+<a name="line34">   the V36 AddBootNode() calls. */</a>
+struct BootNode
+<a name="line36">{</a>
+<a name="line37">	struct Node bn_Node;</a>
+<a name="line38">	UWORD	bn_Flags;</a>
+	APTR	bn_DeviceNode;
+};
+
+<a name="line42"></a>
+/* expansion.library has functions to manipulate most of the information in
+   ExpansionBase.  Direct access is not permitted.  Use FindConfigDev()
+<a name="line45">   to scan the board list. */</a>
+struct	ExpansionBase
+<a name="line47">{</a>
+<a name="line48">	struct Library	LibNode;</a>
+<a name="line49">	UBYTE	Flags;				/* read only (see below) */</a>
+<a name="line50">	UBYTE	eb_Private01;			/* private */</a>
+<a name="line51">	ULONG	eb_Private02;			/* private */</a>
+<a name="line52">	ULONG	eb_Private03;			/* private */</a>
+<a name="line53">	struct	CurrentBinding	eb_Private04;	/* private */</a>
+<a name="line54">	struct	List	eb_Private05;		/* private */</a>
+	struct	List	MountList;	/* contains struct BootNode entries */
+	/* private */
+};
+
+<a name="line59">/* error codes */</a>
+<a name="line60">#define EE_OK		0</a>
+<a name="line61">#define EE_LASTBOARD	40  /* could not shut him up */</a>
+<a name="line62">#define EE_NOEXPANSION	41  /* not enough expansion mem; board shut up */</a>
+<a name="line63">#define EE_NOMEMORY	42  /* not enough normal memory */</a>
+<a name="line64">#define EE_NOBOARD	43  /* no board at that address */</a>
+#define EE_BADMEM	44  /* tried to add bad memory card */
+
+<a name="line67">/* Flags */</a>
+<a name="line68">#define EBB_CLOGGED	0	/* someone could not be shutup */</a>
+<a name="line69">#define EBF_CLOGGED	(1&#060;&#060;0)</a>
+<a name="line70">#define EBB_SHORTMEM	1	/* ran out of expansion mem */</a>
+<a name="line71">#define EBF_SHORTMEM	(1&#060;&#060;1)</a>
+<a name="line72">#define EBB_BADMEM	2	/* tried to add bad memory card */</a>
+<a name="line73">#define EBF_BADMEM	(1&#060;&#060;2)</a>
+<a name="line74">#define EBB_DOSFLAG	3	/* reserved for use by AmigaDOS */</a>
+<a name="line75">#define EBF_DOSFLAG	(1&#060;&#060;3)</a>
+<a name="line76">#define EBB_KICKBACK33	4	/* reserved for use by AmigaDOS */</a>
+<a name="line77">#define EBF_KICKBACK33	(1&#060;&#060;4)</a>
+<a name="line78">#define EBB_KICKBACK36	5	/* reserved for use by AmigaDOS */</a>
+#define EBF_KICKBACK36	(1&#060;&#060;5)
+/* If the following flag is set by a floppy's bootblock code, the initial
+   open of the initial shell window will be delayed until the first output
+<a name="line82">   to that shell.  Otherwise the 1.3 compatible behavior applies. */</a>
+<a name="line83">#define EBB_SILENTSTART	6</a>
+#define EBF_SILENTSTART	(1&#060;&#060;6)
+
+/* Magic kludge for CC0 use */
+#define	EBB_START_CC0	7
+#define	EBF_START_CC0	(1&#060;&#060;7)
+
+
+#endif	/* LIBRARIES_EXPANSIONBASE_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

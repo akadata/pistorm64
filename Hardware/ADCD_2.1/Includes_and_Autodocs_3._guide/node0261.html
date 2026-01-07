@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="expansion" NODE="ConfigBoard()" TITLE="expansion.library/ConfigBoard" -->
+<head>
+<title>expansion.library/ConfigBoard</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0260.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0262.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ConfigBoard - configure a board
+
+<b>   SYNOPSIS</b>
+	error = ConfigBoard( board, configDev )
+	D0                   A0     A1
+
+<b>   FUNCTION</b>
+	This routine configures an expansion board.  The board
+	will generally live at E_EXPANSIONBASE, but the base is
+	passed as a parameter to allow future compatibility.
+	The configDev parameter must be a valid configDev that
+	has already had <a href="../Includes_and_Autodocs_3._guide/node0269.html">ReadExpansionRom()</a> called on it.
+
+	ConfigBoard will allocate expansion memory and place
+	the board at its new address.  It will update configDev
+	accordingly.  If there is not enough expansion memory
+	for this board then an error will be returned.
+
+<b>   INPUTS</b>
+	board - the current address that the expansion board is
+		responding.
+	configDev - an initialized <a href="../Includes_and_Autodocs_3._guide/node05F1.html#line31">ConfigDev</a> structure, returned
+		by <a href="../Includes_and_Autodocs_3._guide/node025F.html">AllocConfigDev</a>.
+
+<b>   RESULTS</b>
+	error - non-zero if there was a problem configuring this board
+		(Can return EE_OK or EE_NOEXPANSION)
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0263.html">FreeConfigDev()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

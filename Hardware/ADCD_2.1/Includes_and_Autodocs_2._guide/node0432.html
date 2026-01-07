@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="CWAIT" TITLE="graphics.library/CWAIT" -->
+<head>
+<title>graphics.library/CWAIT</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0431.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0433.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CWAIT -- Append copper wait instruction to user copper list.
+
+SYNOPSIS
+    CWAIT( c , v , h )
+
+    CWait( c , v , h )
+           a1  d0  d1
+    CBump( c )
+          a1
+
+    void CWait( struct <a href="../Includes_and_Autodocs_2._guide/node00AD.html#line82">UCopList</a> *, WORD, WORD)
+
+FUNCTION
+    Add instruction to wait for vertical beam position v and
+    horizontal position h to this intermediate copper list.
+
+INPUTS
+    c - pointer to <a href="../Includes_and_Autodocs_2._guide/node00AD.html#line82">UCopList</a> structure
+    v - vertical beam position (relative to top of viewport)
+    h - horizontal beam position
+
+RESULTS
+    this is actually a macro that calls CWait(c,v,h)
+    and then calls CBump(c) to bump the local pointer
+    to the next instruction.
+
+BUGS
+    User waiting for horizontal values of greater than 222 decimal
+    is illegal.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0428.html">CINIT</a> <a href="../Includes_and_Autodocs_2._guide/node0430.html">CMOVE</a> <a href="../Includes_and_Autodocs_2._guide/node0426.html">CEND</a> <a href="../Includes_and_Autodocs_2._guide/node00AD.html">graphics/copper.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

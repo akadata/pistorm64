@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_9" NODE="9-2-2" TITLE="9 / Intuition Input / Receiving Input Events from Intuition" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>9 / Intuition Input / Receiving Input Events from Intuition</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01D1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01D3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are two channels through which a window can receive events destined
+for it.  The usual way is for the application to ask Intuition to send it
+messages which are based on the input event that Intuition has processed.
+These messages, called <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>s, are standard Amiga Exec messages,
+and are sent to a port called an Intuition Direct Communications Message
+Port, or IDCMP.  Every window may have an IDCMP associated with it
+(pointed to by <a href="../Libraries_Manual_guide/node01D6.html#line16">Window.UserPort</a>).
+
+There are many classes of <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>s, and the application can control
+which classes of events are routed to its window's port by setting the
+appropriate IDCMP flags.  When Intuition has an event to send, but the
+window does not have the corresponding IDCMP flag set, the event is
+generally passed along to the next input handler in the chain.  One input
+handler that resides below Intuition's is the console device's handler.
+If your application's window has a console attached to it, the console
+device will generally convert events it receives into console code
+sequences, and send those to your console. In this manner, you can hear
+these events.
+
+Because <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>s and the IDCMP are the primary way in which
+applications receive communication from Intuition, discussions elsewhere
+in the manual frequently refer to events from Intuition as messages,
+IntuiMessages, or IDCMP messages.  However, most of the information sent
+as IntuiMessages is also available through the console device, though that
+option is used less often.  Elsewhere in this chapter, you can learn how
+getting your events through the console differs from getting them through
+your IDCMP.
+
+Whichever way an application chooses to get its messages, it is frequently
+designed to be event-driven.  That is to say, after some amount of
+initialization, the application will go into a state where it is waiting
+for some event to happen.  This event could be an input event, or some
+other kind of event.  Based on the event received, the application would
+take appropriate action, and return to its waiting state.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

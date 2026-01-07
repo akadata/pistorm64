@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/semaphores.h" NODE="MAIN" TITLE="Includes/exec/semaphores.h" -->
+<head>
+<title>Includes/exec/semaphores.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0081.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0083.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_SEMAPHORES_H
+#define	EXEC_SEMAPHORES_H
+/*
+**	$Filename: exec/semaphores.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.6 $
+**	$Date: 90/05/10 $
+**
+**	Definitions for locking functions.
+**
+**	(C) Copyright 1986-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+#endif /* EXEC_NODES_H */
+<a name="line18"></a>
+#ifndef EXEC_LISTS_H
+#include &#034;exec/lists.h&#034;
+#endif /* EXEC_LISTS_H */
+<a name="line22"></a>
+#ifndef EXEC_PORTS_H
+#include &#034;exec/ports.h&#034;
+#endif /* EXEC_PORTS_H */
+<a name="line26"></a>
+#ifndef EXEC_TASKS_H
+#include &#034;exec/tasks.h&#034;
+#endif /* EXEC_TASKS_H */
+
+
+/****** SignalSemaphore *********************************************/
+<a name="line33"></a>
+<a name="line34">/* Private structure used by ObtainSemaphore() */</a>
+<a name="line35">struct SemaphoreRequest {</a>
+<a name="line36">    struct  MinNode sr_Link;</a>
+    struct  Task *sr_Waiter;
+};
+<a name="line39"></a>
+<a name="line40">/* Signal Semaphore data structure */</a>
+<a name="line41">struct SignalSemaphore {</a>
+<a name="line42">    struct  Node ss_Link;</a>
+<a name="line43">    WORD    ss_NestCount;</a>
+<a name="line44">    struct  MinList ss_WaitQueue;</a>
+<a name="line45">    struct  SemaphoreRequest ss_MultipleLink;</a>
+<a name="line46">    struct  Task *ss_Owner;</a>
+    WORD    ss_QueueCount;
+};
+
+
+
+/****** Semaphore (Procure/Vacate type) *****************************/
+<a name="line53"></a>
+<a name="line54">struct Semaphore {</a>
+<a name="line55">    struct MsgPort sm_MsgPort;</a>
+    WORD   sm_Bids;
+};
+<a name="line58"></a>
+#define sm_LockMsg	mp_SigTask
+
+
+#endif	/* EXEC_SEMAPHORES_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

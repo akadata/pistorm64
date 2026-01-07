@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/gadtools" NODE="LayoutMenusA()" TITLE="gadtools.library/LayoutMenusA" -->
+<head>
+<title>gadtools.library/LayoutMenusA</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03F7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03F9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    LayoutMenusA -- Position all the menus and menu items. (V36)
+    LayoutMenus -- Varargs stub for LayoutMenusA(). (V36)
+
+SYNOPSIS
+    success = LayoutMenusA(menu, vi, taglist)
+    D0                     A0    A1  A2
+
+    BOOL LayoutMenusA(struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line61">Menu</a> *, APTR, struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *);
+
+    success = LayoutMenus(menu, vi, firsttag, ...)
+
+    BOOL LayoutMenus(struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line61">Menu</a> *, APTR, Tag, ...);
+
+FUNCTION
+    Lays out all the menus, menu items and sub-items in the supplied
+    menu according to the supplied visual information and tag parameters.
+    This routine attempts to columnize and/or shift the MenuItems in
+    the event that a menu would be too tall or too wide.
+
+INPUTS
+    menu - Pointer to menu obtained from <a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenusA()</a>.
+    vi - Pointer returned by <a href="../Includes_and_Autodocs_2._guide/node03EE.html">GetVisualInfoA()</a>.
+    taglist - Pointer to a <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> list.
+
+TAGS
+    GTMN_TextAttr (struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line66">TextAttr</a> *) - Text Attribute to use for
+        menu-items and sub-items.  If not supplied, the screen's
+        font will be used.  This font must be openable via <a href="../Includes_and_Autodocs_2._guide/node0462.html">OpenFont()</a>
+        when this function is called.
+
+RESULT
+    success - TRUE if successful, false otherwise (signifies that
+        the <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line66">TextAttr</a> wasn't openable).
+
+EXAMPLE
+
+NOTES
+    When using this function, there is no need to also call
+    <a href="../Includes_and_Autodocs_2._guide/node03F7.html">LayoutMenuItemsA()</a>.
+
+BUGS
+    If a menu ends up being wider than the whole screen, it will
+    run off the right-hand side.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node03E9.html">CreateMenusA()</a>, <a href="../Includes_and_Autodocs_2._guide/node03EE.html">GetVisualInfoA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

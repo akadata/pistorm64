@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-2-4" TITLE="4 / Window Structures and Functions / Graphics and Text in Windows" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Window Structures and Functions / Graphics and Text in Windows</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0106.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0108.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Applications can call functions in both the graphics library and the
+Intuition library to render images, lines, text and other graphic elements
+in windows.  The graphics library provides primitive operations such as
+area fill, line drawing, text and animation.
+
+The number of colors and the palette available in a window are defined by
+the screen in which the window opens.  Applications should never change
+the palette of a screen unless the screen is a custom screen created by
+<a name="line10">the application.</a>
+
+Graphics rendered into the window should respect the drawing pens defined
+for the screen.  See the section on &#034;<a href="../Libraries_Manual_guide/node00EC.html">DrawInfo and the 3D Look</a>&#034; in the
+<a name="line14">&#034;Intuition Screens&#034; chapter for more information.</a>
+
+Default window fonts come from one of two places, depending on the screen
+on which the window opens.  The window title font is always taken from the
+screen font.  If the screen is opened with a font specified, either by
+specifying the tag <a href="../Libraries_Manual_guide/node00E5.html#line125">SA_Font</a> or the variable <a href="../Libraries_Manual_guide/node00DE.html#line6">NewScreen</a>.Font, then
+<a href="../Libraries_Manual_guide/node0121.html#line66">Window.RPort</a>-&#062;Font is taken from the screen's font.  Otherwise, the
+window's rastport's font is taken from <a href="../Includes_and_Autodocs_2._guide/node00AE.html#line24">GfxBase-&#062;DefaultFont</a>. This
+<a name="line22">information is available to the application if it opened the screen.</a>
+
+If the application did not open the screen, it has no way of knowing which
+font has been used for the window.  Applications that require to know the
+window's font before the window is open must explicitly set the font
+(using <a href="../Libraries_Manual_guide/node03D6.html">SetFont()</a>) for that window after opening it.  In this case, the
+application may use any font it desires.  It is recommended that
+applications use the screen's font if they support proportional fonts, and
+<a href="../Includes_and_Autodocs_2._guide/node00AE.html#line24">GfxBase-&#062;DefaultFont</a> otherwise, as these fonts are generally the user's
+preference.
+
+Intuition also provides a minimal high level interface to some of the
+functions in the Graphics library.  This includes calls to draw lines,
+text and images.  See the chapter entitled
+&#034;<a href="../Libraries_Manual_guide/node01B5.html">Intuition Images, Line Drawing and Text</a>,&#034; for more information about
+using Intuition to render graphics.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

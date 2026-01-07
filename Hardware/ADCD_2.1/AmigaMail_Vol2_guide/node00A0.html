@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-41/imageclass.txt" NODE="IV-41-2" TITLE="Initializing a Boopsi Class" -->
+<head>
+<title>Initializing a Boopsi Class</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node009F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00A1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You need some simple code to initialize a class and its hook.  When
+initializing a class, you specify the size of the class's instance and
+what the superclass is, and you also have to supply a pointer to a hook
+entry stub.
+
+The following code fragment illustrates the initialization of a private
+subclass of imageclass.
+
+
+    ULONG __saveds dispatchmyTextLabel();
+
+    /* This is the data that each instance of our class will need. */
+    struct localObjData
+    {
+        /* Font to use */
+        struct TextFont *lod_Font;
+
+        /* The key that is underlined */
+        UWORD lod_Key;
+
+        /* DrawMode */
+        UBYTE lod_Mode;
+    };
+
+    #define MYCLASSID           NULL
+    #define SUPERCLASSID        (IMAGECLASS)
+    #define LSIZE               (sizeof(struct localObjData))
+
+    Class *initmyTextLabelClass (VOID)
+    {
+        extern ULONG __saveds dispatchmyTextLabel();
+        extern ULONG hookEntry ();        /* defined in hookface.asm */
+        Class *cl;
+
+        if (cl = MakeClass (MYCLASSID, SUPERCLASSID, NULL, LSIZE, 0))
+        {
+            /* Fill in the callback hook */
+            cl-&#062;cl_Dispatcher.h_Entry = hookEntry;
+            cl-&#062;cl_Dispatcher.h_SubEntry = dispatchmyTextLabel;
+        }
+
+        /* Return a pointer to the class */
+        return (cl);
+    }
+
+
+In order to make the class public instead of private, do the following:
+
+
+    #define MYCLASSID           &#034;mytextlabelclass&#034;
+
+    ULONG __saveds dispatchmyTextLabel();
+
+    Class *initmyTextLabelClass (VOID)
+    {
+        extern ULONG __saveds dispatchmyTextLabel();
+        extern ULONG hookEntry ();
+        Class *cl;
+
+        if (cl = MakeClass (MYCLASSID, SUPERCLASSID, NULL, LSIZE, 0))
+        {
+            /* Fill in the callback hook */
+            cl-&#062;cl_Dispatcher.h_Entry = hookEntry;
+            cl-&#062;cl_Dispatcher.h_SubEntry = dispatchmyTextLabel;
+
+            /* Make the class public */
+            AddClass (cl);
+        }
+
+        /* Return a pointer to the class */
+        return (cl);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

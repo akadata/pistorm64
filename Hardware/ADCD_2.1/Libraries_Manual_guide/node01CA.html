@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-4-5" TITLE="8 / Creating Text / Text Colors and Drawing Modes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Text / Text Colors and Drawing Modes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01C9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01CB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> gets its colors from the values set in the color registers for
+the screen in which they are rendered.  The available number of colors and
+palette settings are screen attributes and cannot be changed through
+<a name="line5">IntuiText rendering.</a>
+
+Text characters in general are made up of two areas: the character image
+itself and the background area surrounding the character image.  The color
+used in each area is determined by the draw mode which can be set to <a href="../Libraries_Manual_guide/node01C7.html#line26">JAM1</a>,
+<a name="line10"><a href="../Libraries_Manual_guide/node01C7.html#line29">JAM2</a> or <a href="../Libraries_Manual_guide/node01C7.html#line33">COMPLEMENT</a>.  The flag <a href="../Libraries_Manual_guide/node01C7.html#line37">INVERSVID</a> may also be specified.</a>
+
+<a href="../Libraries_Manual_guide/node01C7.html#line26">JAM1</a> draw mode renders each character with <a href="../Libraries_Manual_guide/node01C7.html#line16">FrontPen</a> and leaves the
+background area unaffected.  Because the background of a character is not
+drawn, the pixels of the destination memory  around the character image
+are not disturbed.  Graphics beneath the text will be visible in the
+<a name="line16">background area of each character cell.</a>
+
+<a href="../Libraries_Manual_guide/node01C7.html#line29">JAM2</a> draw mode renders each character with <a href="../Libraries_Manual_guide/node01C7.html#line16">FrontPen</a> and renders each
+character background with <a href="../Libraries_Manual_guide/node01C7.html#line19">BackPen</a>.  Using this mode, any graphics that
+previously appeared beneath the character cells will be totally
+<a name="line21">overwritten.</a>
+
+<a href="../Libraries_Manual_guide/node01C7.html#line33">COMPLEMENT</a> draw mode renders the pixels of each character as the binary
+complement of the color that is currently at the destination pixel.  The
+destination is the display memory where the text is drawn.  As with <a href="../Libraries_Manual_guide/node01C7.html#line26">JAM1</a>,
+nothing is drawn into the background.  <a href="../Libraries_Manual_guide/node01C7.html#line16">FrontPen</a> and <a href="../Libraries_Manual_guide/node01C7.html#line19">BackPen</a> are not used
+in COMPLEMENT mode.  To determine the complement color, invert all the
+bits in the binary representation of the color register number.  The
+resulting number specifies the color register to use for that pixel.  In a
+three bitplane display, for example, color 6 (110 in binary) is the
+<a name="line31">complement of color 1 (001 in binary).</a>
+
+The <a href="../Libraries_Manual_guide/node01C7.html#line37">INVERSVID</a> flag inverses the video for each of the drawing modes.  For
+<a href="../Libraries_Manual_guide/node01C7.html#line26">JAM1</a>, nothing is drawn into the character area and the background is drawn
+in <a href="../Libraries_Manual_guide/node01C7.html#line16">FrontPen</a>.  For <a href="../Libraries_Manual_guide/node01C7.html#line29">JAM2</a>, the character area is drawn in <a href="../Libraries_Manual_guide/node01C7.html#line19">BackPen</a> and the
+background is drawn in FrontPen.  For <a href="../Libraries_Manual_guide/node01C7.html#line33">COMPLEMENT</a> mode, nothing is drawn
+into the character area and the background is complemented.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

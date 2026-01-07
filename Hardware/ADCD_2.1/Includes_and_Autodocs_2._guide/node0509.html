@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/console" NODE="OpenDevice()" TITLE="console.device/OpenDevice" -->
+<head>
+<title>console.device/OpenDevice</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0508.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node050A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    OpenDevice -- a request to open a Console device
+
+SYNOPSIS
+    error = OpenDevice(&#034;console.device&#034;, unit, <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a>, flags )
+    d0                  a0               d0    a1        d1
+
+FUNCTION
+    The open routine grants access to a device.  There are two
+    fields in the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a> block that will be filled in: the
+    io_Device field and possibly the io_Unit field.
+
+    As of (V37) the flags field may also be filled in with
+    a value described below (see conunit.h or conunit.i).
+
+    This open command differs from most other device open commands
+    in that it requires some information to be supplied in the
+    io_Data field of the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a> block.  This initialization
+    information supplies the window that is used by the console
+    device for output.
+
+    The unit number that is a standard parameter for an open call
+    is used specially by this device.  See conunit.h, or conunit.i
+    for defined valid unit numbers.
+
+
+    unit number: -1 (CONU_LIBRARY)
+
+            Used to get a pointer to the device library vector
+    which is returned in the io_Device field of the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a>
+    block.  No actual console is opened.  You must still close
+    the device when you are done with it.
+
+    unit number: 0 (CONU_STANDARD)
+
+            A unit number of zero binds the supplied window to
+    a unique console.  Sharing a console must be done at a level
+    higher than the device.
+
+
+    unit number: 1 (CONU_CHARMAP) (V36)
+
+            A unit number of one is similar to a unit number of
+    zero, but a console map is also created, and maintained by
+    the console.device.  The character map is used by the console
+    device to restore obscured portions of windows which are
+    revealed, and to redraw a window after a resize.  Character
+    mapped console.device windows must be opened as SIMPLE REFRESH
+    windows.
+
+            The character map is currently for internal use
+    only, and is not accessible by the programmer.  The character
+    map stores characters, attributes, and style information for
+    each character written with the <a href="../Includes_and_Autodocs_2._guide/node0508.html">CMD_WRITE</a> command.
+
+    unit number: 3 (CONU_SNIPMAP) (V36)
+
+            A unit number of three is similar to a unit number
+    of one, but also gives the user the ability to highlight
+    text with the mouse which can be copied by pressing
+    RIGHT AMIGA C.  See NOTES below.
+
+
+    flags: 0 (CONFLAG_DEFAULT)
+
+            The flags field should be set to 0 under V34, or less.
+
+    flags: 1 (CONFLAG_NODRAW_ON_NEWSIZE) (V37)
+
+            The flags field can be set to 0, or 1 as of V37.  The
+    flags field is ignored under V36, so can be set, though it
+    will have no effect.  When set to 1, it means that you don't
+    want the console.device to redraw the window when the window
+    size is changed (assuming you have opened the console.device
+    with a character map - unit numbers 1, or 3).  This flag is
+    ignored if you have opened a console.device with a unit
+    number of 0.  Typically you would use this flag when you
+    want to perform your own window refresh on a newsize, and
+    you want the benefits of a character mapped console.
+
+IO REQUEST
+    io_Data         struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> *window
+                    This is the window that will be used for this
+                    console.  It must be supplied if the unit in
+                    the OpenDevice call is 0 (see above).  The
+                    RPort of this window is potentially in use by
+                    the console whenever there is an outstanding
+                    write command.
+INPUTS
+    &#034;console.device&#034; - a pointer to the name of the device to be opened.
+    unit - the unit number to open on that device.
+    <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a> - a pointer to a standard request block
+    0 - a flag field of zero (CONFLAG_DEFAULT)
+    1 - a flag field of one  (CONFLAG_NODRAW_ON_NEWSIZE) (V37)
+
+RESULTS
+    error - zero if successful, else an error is returned.
+
+NOTES
+    As noted above, opening the console.device with a unit number of 3
+    allows the user to drag select text, and copy the selection with
+    RIGHT AMIGA C.  The snip is copied to a private buffered managed
+    by the console.device (as of V36).  The snip can be copied to
+    any console.device window unless you are running a console to
+    clipboard utility such as that provided with V37.
+
+    The user pastes text into console.device windows by pressing
+    RIGHT AMIGA V.  Both RIGHT AMIGA V, and RIGHT AMIGA C are swallowed
+    by the console.device (unless you have asked for key presses as
+    RAW INPUT EVENTS).  Text pasted in this way appears in the
+    console read stream as if the user had typed all of the characters
+    manually.  Additional input (e.g., user input, RAW INPUT EVENTS)
+    are queued up after pastes.  Pastes can theoretically be quite
+    large, though they are no larger than the amount of text
+    which is visible in a console.device window.
+
+    When running the console to clipboard utility, text snips
+    are copied to the clipboard.device, and RIGHT AMIGA V key
+    presses are broadcast as an escape sequence as part of the
+    console.device read stream (&#034;&#060;CSI&#062;0 v&#034; - $9B,$30,$20,$76).
+
+    It is left up to the application to decide what to do when this
+    escape sequence is received.  Ideally the application
+    will read the contents of the clipboard, and paste the text
+    by using successive writes to the console.device.
+
+    Because the contents of the clipboard.device can be quite
+    large, your program should limit the size of writes to something
+    reasonable (e.g., no more than 1K characters per <a href="../Includes_and_Autodocs_2._guide/node0508.html">CMD_WRITE</a>, and
+    ideally no more than 256 characters per write).  Your program
+    should continue to read events from the console.device looking
+    for user input, and possibly RAW INPUT EVENTS.  How you decide
+    to deal with these events is left up to the application.
+
+    If you are using a character mapped console you should receive
+    Intuition events as RAW INPUT EVENTS from the console.device.
+    By doing this you will hear about these events after the console
+    device does.  This allows the console.device to deal with events
+    such as window resizing, and refresh before your application.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0094.html">exec/io.h</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html">intuition/intuition.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

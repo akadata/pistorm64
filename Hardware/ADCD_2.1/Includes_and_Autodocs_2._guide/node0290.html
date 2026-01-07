@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="DateStamp()" TITLE="dos.library/DateStamp" -->
+<head>
+<title>dos.library/DateStamp</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node028F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0291.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    <a href="../Includes_and_Autodocs_2._guide/node0068.html#line53">DateStamp</a> -- Obtain the date and time in internal format
+
+SYNOPSIS
+    ds = DateStamp( ds );
+    D0              D1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node0068.html#line53">DateStamp</a> *DateStamp(struct <a href="../Includes_and_Autodocs_2._guide/node0068.html#line53">DateStamp</a> *)
+
+FUNCTION
+    DateStamp() takes a structure of three longwords that is set to the
+    current time.  The first element in the vector is a count of the
+    number of days.  The second element is the number of minutes elapsed
+    in the day.  The third is the number of ticks elapsed in the current
+    minute.  A tick happens 50 times a second.  DateStamp() ensures that
+    the day and minute are consistent.  All three elements are zero if
+    the date is unset. DateStamp() currently only returns even
+    multiples of 50 ticks.  Therefore the time you get is always an even
+    number of ticks.
+
+    Time is measured from Jan 1, 1978.
+
+INPUTS
+    ds - pointer a struct <a href="../Includes_and_Autodocs_2._guide/node0068.html#line53">DateStamp</a>
+
+RESULTS
+    The array is filled as described and returned (for pre-V36
+    compabability).
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0291.html">DateToStr()</a>, <a href="../Includes_and_Autodocs_2._guide/node0302.html">StrToDate()</a>, <a href="../Includes_and_Autodocs_2._guide/node02F5.html">SetFileDate()</a>, <a href="../Includes_and_Autodocs_2._guide/node028B.html">CompareDates()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

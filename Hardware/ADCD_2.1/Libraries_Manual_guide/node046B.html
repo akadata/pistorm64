@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_34" NODE="34-1-2" TITLE="34 / Keymap Functions / Setting the Default Keymap" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>34 / Keymap Functions / Setting the Default Keymap</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node046A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node046C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The system default keymap can be set with the <a href="../Includes_and_Autodocs_2._guide/node0316.html">SetKeyMapDefault()</a> function.
+This function takes a pointer to a loaded keymap. In general, this
+function should never be used by an application unless the application is
+a system Preferences editor, or an application that takes over the system.
+Normal applications should instead attach a console.device unit to their
+own Intuition window (see the <a href="../Devices_Manual_guide/node0080.html">Devices</a> volume), and use the console.device
+command <a href="../Libraries_Manual_guide/node0469.html#line13">CD_SETKEYMAP</a> to set a keymap only for their own console.
+
+When making a keymap the system default, first check whether the keymap
+has been loaded previously by checking the keymap list of the
+keymap.resource.  If it has not been loaded already, it can be loaded from
+devs:Keymaps, and added to the keymap list of keymap.resource. This will
+ensure that other applications which may want the keymap will not have to
+load a second instance. Once made the default, the keymap can never be
+safely removed from memory, even after if it is no longer the default,
+since other applications may still have and use a pointer to it.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

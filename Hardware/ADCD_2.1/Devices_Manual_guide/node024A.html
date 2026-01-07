@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="DR2D.doc" TITLE="A / IFF Third Party Public Form and Chunk Specification / DR2D.doc" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>A / IFF Third Party Public Form and Chunk Specification / DR2D.doc</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0249.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node024B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+2-D Object standard format
+
+FORM DR2D
+
+Description by Ross Cunniff and John Orr
+
+A standard IFF FORM to describe 2D drawings has been sorely needed for a
+long time.  Several commercial drawing packages have been available for
+some time but none has established its file format as the Amiga standard.
+The absence of a 2D drawing standard hinders the development of
+applications that use 2D drawings as it forces each application to
+understand several private standards instead of a single one.  Without a
+standard, data exchange for both the developer and the user is difficult,
+if not impossible.
+
+The DR2D FORM fills this void.  This FORM was developed by Taliesin, Inc.
+for use as the native file format for their two-dimensional structured
+drawing package, ProVector.  Saxon Industries and Soft Logik Publishing
+Corporation are planning to support this new FORM in the near future.
+
+Many of the values stored in the DR2D FORM are stored as IEEE single
+precision floating point numbers.  These numbers consist of 32 bits,
+arranged as follows:
+
+
+ _______________________________________________________________________
+| s e e e e e e e | e m m m m m m m | m m m m m m m m | m m m m m m m m |
+ -----------------------------------------------------------------------
+  31            24  23            16  15            8   7             0
+
+
+where:
+
+    s   is the sign of the number where 1 is negative and 0 is
+          positive.
+    e   is the 8 bit exponent in excess 127 form.  This number
+          is the power of two to which the mantissa is raised
+          (Excess 127 form means that 127 is added to the
+          exponent before packing it into the IEEE number.)
+    m   is the 23 bit mantissa.  It ranges from 1.0000000 to
+          1.999999..., where the leading base-ten one is
+          assumed.
+
+An IEEE single precision with the value of 0.0000000 has all its bits
+cleared.
+
+ <a href="../Devices_Manual_guide/node024B.html">The DR2D Chunks</a> 
+ <a href="../Devices_Manual_guide/node025F.html">Simple DR2D Example</a> 
+ <a href="../Devices_Manual_guide/node0260.html">OFNT Form</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

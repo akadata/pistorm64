@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_5" NODE="5-1" TITLE="5 Gameport Device / Gameport Device Commands and Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>5 Gameport Device / Gameport Device Commands and Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00AE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00B0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Command         Operation
+-------         ---------
+CMD_CLEAR       Clear the gameport input buffer.
+
+<a href="../Devices_Manual_guide/node00B9.html">GPD_ASKCTYPE</a>    Return the type of gameport controller being used.
+
+<a href="../Devices_Manual_guide/node00B7.html">GPD_ASKTRIGGER</a>  Return the conditions that have been preset for triggering.
+
+<a href="../Devices_Manual_guide/node00B5.html">GPD_READEVENT</a>   Read one or more gameport events.
+
+<a href="../Devices_Manual_guide/node00BA.html">GPD_SETCTYPE</a>    Set the type of the controller to be used.
+
+<a href="../Devices_Manual_guide/node00B6.html">GPD_SETTRIGGER</a>  Preset the conditions that will trigger a gameport event.
+
+
+Exec Functions as Used in This Chapter
+--------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a>       Abort a command to the gameport device.
+
+<a href="../Includes_and_Autodocs_2._guide/node033E.html">CheckIO()</a>       Return the status of an I/O request.
+
+<a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>   Relinquish use of the gameport device.  All requests must
+                be complete before closing.
+
+<a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>          Initiate a command and wait for completion (synchronous
+                request).
+
+<a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>    Obtain shared use of one unit of the gameport device. The
+                unit number specified is placed in the I/O request
+                structure for use by gameport commands.
+
+<a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>        Initiate a command and return immediately (asynchronous
+                request).
+
+<a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a>        Wait for the completion of an asynchronous request.  When
+                the request is complete the message will be removed from
+                reply port.
+
+
+Exec Support Functions as Used in This Chapter
+----------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>   Create an extended I/O request structure of type <a href="../Devices_Manual_guide/node00B0.html#line7">IOStdReq</a>.
+                This structure will be used to communicate commands to the
+                gameport device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>    Create a signal message port for reply messages from the
+                gameport device.  Exec will signal a task when a message
+                arrives at the port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>   Delete an I/O request structure created by <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>.
+
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>    Delete the message port created by <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>.
+
+   Who Runs The Mouse?
+   -------------------
+   When the input device or Intution is operating, unit 0 is usually
+   dedicated to gathering mouse events.  The input device uses the
+   gameport device to read the mouse events.  (For applications that
+   take over the machine without starting up the input device or
+   Intuition, unit 0 can perform the same functions as unit 1.)  See the
+   &#034;<a href="../Devices_Manual_guide/node00CA.html">Input Device</a>&#034; chapter for more information on the input device.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

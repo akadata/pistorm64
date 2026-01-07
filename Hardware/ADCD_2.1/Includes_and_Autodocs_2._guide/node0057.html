@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/timer.i" NODE="MAIN" TITLE="Includes/devices/timer.i" -->
+<head>
+<title>Includes/devices/timer.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0056.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0058.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	DEVICES_TIMER_I
+DEVICES_TIMER_I	SET	1
+**
+**	$Filename: devices/timer.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.10 $
+**	$Date: 91/03/05 $
+**
+**	Timer device name and useful definitions.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**		All Rights Reserved
+**
+
+
+	IFND	EXEC_TYPES_I
+	INCLUDE &#034;exec/types.i&#034;
+	ENDC
+
+	IFND	EXEC_IO_I
+	INCLUDE &#034;exec/io.i&#034;
+	ENDC
+
+* unit defintions
+UNIT_MICROHZ	EQU	0
+UNIT_VBLANK	EQU	1
+UNIT_ECLOCK	EQU	2
+UNIT_WAITUNTIL	EQU	3
+UNIT_WAITECLOCK	EQU	4
+
+TIMERNAME	MACRO
+		DC.B	'timer.device',0
+		DS.W	0
+		ENDM
+
+ STRUCTURE TIMEVAL,0
+	ULONG	TV_SECS
+	ULONG	TV_MICRO
+	LABEL	TV_SIZE
+
+ STRUCTURE ECLOCKVAL,0
+	ULONG	EV_HI
+	ULONG	EV_LO
+	LABEL	EV_SIZE
+
+ STRUCTURE TIMEREQUEST,IO_SIZE
+	STRUCT	IOTV_TIME,TV_SIZE
+	LABEL	IOTV_SIZE
+
+* IO_COMMAND to use for adding a timer
+	DEVINIT
+	DEVCMD	TR_ADDREQUEST
+	DEVCMD	TR_GETSYSTIME
+	DEVCMD	TR_SETSYSTIME
+
+	ENDC	; DEVICES_TIMER_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

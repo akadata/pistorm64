@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_25" NODE="25-1-1-4" TITLE="25 / / The Signal Semaphore / Obtaining a Shared SignalSemaphore" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>25 / / The Signal Semaphore / Obtaining a Shared SignalSemaphore</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02FA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02FC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For read-only purposes, multiple tasks may have a shared lock on a signal
+semaphore.  If a semaphore is already exclusively locked, all attempts to
+obtain the semaphore shared will be blocked until the <a href="../Libraries_Manual_guide/node02FA.html">exclusive lock</a> is
+<a href="../Libraries_Manual_guide/node02FD.html">released</a>.  At that point, all shared locks will be obtained and the
+calling tasks will wake up.
+
+To obtain a shared semaphore, use:
+
+    struct SignalSemaphore *semaphore;
+    ObtainSemaphoreShared(semaphore);
+
+To obtain a <a href="../Libraries_Manual_guide/node02F9.html">public</a> shared semaphore, the following code should be used:
+
+    UBYTE *name;
+    struct SignalSemaphore *semaphore;
+
+    Forbid();
+    if (semaphore = FindSemaphore(name))
+        ObtainSemaphoreShared(semaphore);
+    Permit();
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

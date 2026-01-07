@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="SetProtection()" TITLE="dos.library/SetProtection" -->
+<head>
+<title>dos.library/SetProtection</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01BD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01BF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	SetProtection -- Set protection for a file or directory
+
+<b>    SYNOPSIS</b>
+	success = SetProtection( name, mask )
+	D0			 D1    D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> SetProtection (STRPTR, LONG)
+
+<b>    FUNCTION</b>
+	SetProtection() sets the protection attributes on a file or
+	directory.  See <a href="../Includes_and_Autodocs_3._guide/node05F8.html">&#060;dos/dos.h&#062;</a> for a listing of protection bits.
+
+	Before V36, the ROM filesystem didn't respect the <a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> and <a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a>
+	bits.  In V36 or later and in the FFS, the <a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> and <a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a>
+	bits are respected.
+
+	The archive bit should be cleared by the filesystem whenever the file
+	is changed.  Backup utilities will generally set the bit after
+	backing up each file.
+
+	The V36 Shell looks at the execute bit, and will refuse to execute
+	a file if it is set.
+
+	Other bits will be defined in the <a href="../Includes_and_Autodocs_3._guide/node05F8.html">&#060;dos/dos.h&#062;</a> include files.  Rather
+	than referring to bits by number you should use the definitions in
+	<a href="../Includes_and_Autodocs_3._guide/node05F8.html">&#060;dos/dos.h&#062;</a>.
+
+<b>    INPUTS</b>
+	name - pointer to a null-terminated string
+	mask - the protection mask required
+
+<b>    RESULTS</b>
+	success - boolean
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01B2.html">SetComment()</a>, <a href="../Includes_and_Autodocs_3._guide/node015C.html">Examine()</a>, <a href="../Includes_and_Autodocs_3._guide/node0160.html">ExNext()</a>, <a href="../Includes_and_Autodocs_3._guide/node05F8.html">&#060;dos/dos.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

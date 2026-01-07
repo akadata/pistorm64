@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/apps/RawtoILBM/RawtoILBM.c" NODE="MAIN" TITLE="Devices/apps/RawtoILBM/RawtoILBM.c" -->
+<head>
+<title>Devices/apps/RawtoILBM/RawtoILBM.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02F7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02F9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* RawtoILBM
+ * Converts raw file (from ILBMtoRaw) into an ILBM
+ * Requires linkage with several iffparse modiules - See Makefile
+ */
+
+#include &#034;iffp/ilbmapp.h&#034;
+
+#include &#060;intuition/intuitionbase.h&#062;
+#include &#060;workbench/workbench.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+char *vers = &#034;\0$VER: RawtoILBM 37.5&#034;;
+char *Copyright =
+  &#034;RawtoILBM v37.5 - converts raw file to ILBM - Freely Redistributable&#034;;
+#define MINARGS 6
+char *usage = &#034;Usage: RawtoILBM rawname ilbmname width height depth\n&#034;;
+
+void bye(UBYTE *s,int e);
+void cleanup(void);
+
+struct Library	*IntuitionBase = NULL;
+struct Library	*GfxBase = NULL;
+struct Library	*IFFParseBase = NULL;
+
+struct ILBMInfo ilbm = {0};
+
+USHORT	colortable[MAXAMCOLORREG];
+
+BOOL fromWB;
+
+
+void main(int argc, char **argv)
+    {
+    LONG	error = 0L, rawfile, rlen;
+    USHORT	width, height, depth, pwidth, pheight, pmode, extra;
+    ULONG 	plsize;
+    char        *rawname,*ilbmname;
+    int 	k;
+
+    fromWB = (argc==0) ? TRUE : FALSE;
+
+    if(!(IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 0)))
+      bye(&#034;Can't open intuition library.\n&#034;,RETURN_WARN);
+
+    if(!(GfxBase = OpenLibrary(&#034;graphics.library&#034;,0)))
+      bye(&#034;Can't open graphics library.\n&#034;,RETURN_WARN);
+
+    if(!(IFFParseBase = OpenLibrary(&#034;iffparse.library&#034;,0)))
+      bye(&#034;Can't open iffparse library.\n&#034;,RETURN_WARN);
+
+    if(!(ilbm.ParseInfo.iff = AllocIFF()))
+      bye(IFFerr(IFFERR_NOMEM),RETURN_WARN);
+
+    if(argc==MINARGS)                 /* Passed filenames via command line  */
+      	{
+      	rawname  = argv[1];
+      	ilbmname = argv[2];
+	width  = atoi(argv[3]);
+	height = atoi(argv[4]);
+	depth  = atoi(argv[5]);
+
+	/* Page width, height, and mode for saved ILBM */
+	pwidth  = width  &#060; 320 ? 320 : width;
+	pheight = height &#060; 200 ? 200 : height;
+	pmode	= pwidth &#062;= 640  ? HIRES : 0L;
+	pmode  |= pheight &#062;= 400 ? LACE  : 0L;
+
+	plsize = RASSIZE(width,height);
+	}
+    else
+	{
+	printf(&#034;%s\n%s\n&#034;,Copyright,usage);
+	bye(&#034;\n&#034;,RETURN_OK);
+	}
+
+
+    if(!(rawfile = Open(rawname,MODE_OLDFILE)))
+	{
+	printf(&#034;Can't open raw file '%s'\n&#034;,rawname);
+	bye(&#034; &#034;,RETURN_WARN);
+	}
+
+    /*
+     * Allocate Bitmap and planes
+     */
+     extra = depth &#062; 8 ? depth - 8 : 0;
+     if(ilbm.brbitmap = AllocMem(sizeof(struct BitMap) + (extra&#060;&#060;2),
+				MEMF_CLEAR))
+        {
+        InitBitMap(ilbm.brbitmap,depth,width,height);
+        for(k=0, error=0, rlen=1; k&#060;depth &#038;&#038; (!error) &#038;&#038; (rlen &#062;0); k++)
+            {
+            if(!(ilbm.brbitmap-&#062;Planes[k] = AllocRaster(width,height)))
+			error = IFFERR_NOMEM;
+            if(! error)
+		{
+                BltClear(ilbm.brbitmap-&#062;Planes[k], RASSIZE(width,height),0);
+		/* Read a plane */
+		rlen = Read(rawfile,ilbm.brbitmap-&#062;Planes[k],plsize);
+                }
+	    }
+
+	/* get colortable */
+	if((!error)&#038;&#038;(rlen &#062; 0))
+		rlen=Read(rawfile,colortable,(MIN(1&#060;&#060;depth,MAXAMCOLORREG)&#060;&#060;1));
+
+        if((error)||(rlen&#060;=0))
+            {
+	    if(rlen &#060;= 0)  	printf(&#034;Error loading raw file - check dimensions\n&#034;);
+    	    else 		printf(&#034;Error allocating planes\n&#034;);
+	    }
+	else
+	    {
+	    error = saveilbm(&#038;ilbm, ilbm.brbitmap, pmode,
+                width,  height, pwidth, pheight,
+                colortable, MIN(1&#060;&#060;depth,MAXAMCOLORREG), 4,    /* colors */
+		mskNone, 0,		/* masking. transColor */
+		NULL, NULL,		/* additional chunk lists */
+		ilbmname);
+	    }
+
+        for(k=0; k&#060;depth; k++)
+            {
+            if(ilbm.brbitmap-&#062;Planes[k])
+			FreeRaster(ilbm.brbitmap-&#062;Planes[k],width,height);
+	    }
+	FreeMem(ilbm.brbitmap, sizeof(struct BitMap) + (extra &#060;&#060; 2));
+	}
+
+    Close(rawfile);
+
+    if(error)
+	{
+	printf(&#034;%s\n&#034;,IFFerr(error));
+	bye(&#034; &#034;, RETURN_FAIL);
+	}
+    else bye(&#034;&#034;,RETURN_OK);
+    }
+
+
+void bye(UBYTE *s,int e)
+    {
+    if(s&#038;&#038;(*s)) printf(&#034;%s\n&#034;,s);
+    if ((fromWB)&#038;&#038;(*s))    /* Wait so user can read messages */
+        {
+        printf(&#034;\nPRESS RETURN TO EXIT\n&#034;);
+        while(getchar() != '\n');
+        }
+    cleanup();
+    exit(e);
+    }
+
+void cleanup()
+    {
+    if(ilbm.ParseInfo.iff)	FreeIFF(ilbm.ParseInfo.iff);
+
+    if(GfxBase)		CloseLibrary(GfxBase);
+    if(IntuitionBase)	CloseLibrary(IntuitionBase);
+    if(IFFParseBase)	CloseLibrary(IFFParseBase);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

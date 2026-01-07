@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-1-1-5" TITLE="28 / / Types Of GELs / VSprites vs. Bobs" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Types Of GELs / VSprites vs. Bobs</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0375.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0377.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+If you are going to manage the movement and sequencing of GELS yourself,
+you need to decide if sprite animation (VSprites) or blitter animation
+(Bobs, AnimComps and AnimObs) best suit your needs.  If you've got simple
+requirements or lots of coding time, you may even opt to use only Simple
+Sprites, and control them yourself.  On the other hand if you want the
+system to manage your animations,  AnimComps must be used and they are
+Bobs at heart.
+
+Some fundamental differences between VSprites and Bobs are:
+
+  * VSprite images and coordinates currently low-resolution pixels, even
+    on a high resolution display.  Bob images and coordinates have the
+    same resolution as the playfield they are rendered into.
+
+  * VSprites have a maximum width of 16 (low resolution) pixels.  Bobs
+    can be any width (although large Bobs tend to slow down the system).
+    The height of either VSprites or Bobs can be as tall as the display.
+
+  * VSprites have a maximum of three colors (Simple Sprites can have
+    fifteen if they're attached).  Because the system uses the Copper to
+    control VSprite colors on the fly, the colors are not necessarily the
+    same as those in the background playfield.  Bobs can use any or all
+    of the colors in the background playfield.  Limiting factors include
+    playfield resolution and display time.  Bobs with more colors take
+    longer to display.
+
+  * VSprites are positioned using absolute display coordinates, and don't
+    move with screens.  Bobs follow screen movement.
+
+In general, VSprites offer speed, while Bobs offer flexibility.
+
+The following figure shows how the various GEL data structures, <a href="../Libraries_Manual_guide/node0381.html">VSprite</a>s,
+<a href="../Libraries_Manual_guide/node0398.html">Bobs</a> and <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComps</a> are linked together.
+
+
+       VSPRITE                  BOB                 ANIMCOMP
+     ____________           ____________          ____________
+    |            |       _\|            |      _\|            |
+    | VSprite    |      | /| VSprite    |     | /| VSprite    |
+    |____________|      |  |____________|     |  |____________|
+    |            |  _   |  |            |     |  |            |
+    | VSpriteBob |-|_|  |  | VSpriteBob |__   |  | VSpriteBob |__
+    |____________|      |  |____________|  |  |  |____________|  |
+                        |                  |  |                  |
+                        |                  |  |                  |
+                        |   ____________   |  |   ____________   |
+                        |  |            |/_|  |  |            |/_|
+                        |  | Bob        |\    |  | Bob        |&#062;___
+                        |  |____________|     |  |____________|\   |
+                        |  |            |     |  |            |    |
+                        |__| BobVSprite |     |__| BobVSprite |__  |
+                           |____________|        |____________|  | |
+                           |            |  _                     | |
+                           | BobComp    |-|_|                    | |
+                           |____________|         ____________   | |
+                                                 |            |/_| |
+                                                 | AnimComp   |\   |
+                                                 |____________|    |
+                                                 |            |    |
+                                                 | Bob        |____|
+                                                 |____________|
+
+
+                  Figure 28-1: GEL Structure Layout
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

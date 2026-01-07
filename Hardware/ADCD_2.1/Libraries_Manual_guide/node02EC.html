@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_24" NODE="24-1-1" TITLE="24 / Message Ports / Creating a Message Port" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>24 / Message Ports / Creating a Message Port</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02EB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02ED.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To create a new message port using an operating system release prior to
+V36, you must allocate and initialize a <a href="../Libraries_Manual_guide/node02EB.html#line12">MsgPort</a> structure. If you want to
+make the port public, you will also need to call the <a href="../Includes_and_Autodocs_2._guide/node0329.html">AddPort()</a> function.
+Don't make a port public when it is not necessary for it to be so.  The
+easiest way to create a port is to use the amiga.lib function
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort</a>(name,priority).  If NULL is passed for the name, the port will
+not be made public. Port structure initialization involves setting up a
+<a href="../Libraries_Manual_guide/node02D9.html#line19">Node</a> structure, establishing the message arrival action with its
+parameters, and initializing the list header.  The following example of
+port creation is equivalent to the CreatePort() function as supplied in
+amiga.lib:
+
+    struct MsgPort *CreatePort(UBYTE *name, LONG pri)
+    {
+        LONG sigBit;
+        struct MsgPort *mp;
+
+        if ((sigBit = AllocSignal(-1L)) == -1) return(NULL);
+
+        mp = (struct MsgPort *) AllocMem((ULONG)sizeof(struct MsgPort),
+                 (ULONG)MEMF_PUBLIC | MEMF_CLEAR);
+        if (!mp) {
+            FreeSignal(sigBit);
+            return(NULL);
+        }
+        mp-&#062;mp_Node.ln_Name = name;
+        mp-&#062;mp_Node.ln_Pri  = pri;
+        mp-&#062;mp_Node.ln_Type = NT_MSGPORT;
+        mp-&#062;mp_Flags        = PA_SIGNAL;
+        mp-&#062;mp_SigBit       = sigBit;
+        mp-&#062;mp_SigTask      = (struct Task *)FindTask(0L);
+                                                  /* Find THIS task.   */
+
+        if (name) AddPort(mp);
+        else NewList(&#038;(mp-&#062;mp_MsgList));          /* init message list */
+
+        return(mp);
+<a name="line39">    }</a>
+
+As of V36 the Exec <a href="../Includes_and_Autodocs_2._guide/node0345.html">CreateMsgPort()</a> function can be used to create a
+message port.  This function allocates and initializes a new message port.
+Just like <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>, a signal bit will be allocated and the port will
+be initialized to signal the creating task (<a href="../Libraries_Manual_guide/node02EB.html#line36">mp_SigTask</a>) when a message
+arrives at this port.  To make the port public after CreateMsgPort(), you
+must fill out the <a href="../Libraries_Manual_guide/node02D9.html#line38">ln_Name</a> field and call <a href="../Includes_and_Autodocs_2._guide/node0329.html">AddPort()</a>.  If you do this, you
+must remember to <a href="../Libraries_Manual_guide/node02ED.html">RemPort()</a> the port from the public list in your cleanup.
+If you need to create a message port and your application already requires
+Release 2 or greater, you can use CreateMsgPort() instead of CreatePort().
+The following is an example of the usage of CreateMsgPort().
+
+    struct MsgPort *newmp;
+            /* A private message port has been created. CreateMsgPort() */
+    if (newmp = CreateMsgPort())
+            /* returns NULL if the creation of the message port failed. */
+    {
+        newmp-&#062;mp_Node.ln_Name = &#034;Griffin&#034;;
+        newmp-&#062;mp_Node.ln_Pri  = 0;
+                                /* To make it public fill in the fields */
+        AddPort(newmp);         /* with appropriate values.             */
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

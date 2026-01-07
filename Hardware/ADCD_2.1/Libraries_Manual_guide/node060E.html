@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_startup/lmkfile" NODE="MAIN" TITLE="lib_startup/lmkfile" -->
+<head>
+<title>lib_startup/lmkfile</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node060D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node060F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+ASM = casm
+
+SNAME	= startup
+AFILE  	= $(SNAME).asm
+AFLAGS 	= -c s -i V36:include
+OFILES	= Astartup.obj AWstartup.obj Rstartup.obj RWstartup.obj RXstartup.obj Qstartup.obj
+.SUFFIXES:	.obj .c .h .asm .i
+
+Qstartup.obj:	startup.asm
+	$(ASM) -a startup.asm $(AFLAGS) -hastartup.i -o Astartup.obj
+
+	$(ASM) -a startup.asm $(AFLAGS) -hawstartup.i -o AWstartup.obj
+
+	$(ASM) -a startup.asm $(AFLAGS) -hrstartup.i -o Rstartup.obj
+
+	$(ASM) -a startup.asm $(AFLAGS) -hrwstartup.i -o RWstartup.obj
+
+	$(ASM) -a startup.asm $(AFLAGS) -hrxstartup.i -o RXstartup.obj
+
+	$(ASM) -a startup.asm $(AFLAGS) -hqstartup.i -o Qstartup.obj
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

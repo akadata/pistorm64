@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/gadtools" NODE="GT_RefreshWindow()" TITLE="gadtools.library/GT_RefreshWindow" -->
+<head>
+<title>gadtools.library/GT_RefreshWindow</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03F3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03F5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GT_RefreshWindow -- Refresh all the GadTools gadgets. (V36)
+
+SYNOPSIS
+    GT_RefreshWindow(win, req)
+                     A0   A1
+
+    VOID GT_RefreshWindow(struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> *);
+
+FUNCTION
+    Perform the initial refresh of all the GadTools gadgets you have
+    created.  After you have opened your window, you must call this
+    function.  Or, if you have opened your window without gadgets,
+    you add the gadgets with <a href="../Includes_and_Autodocs_2._guide/node01FD.html">intuition.library/AddGList()</a>,
+    refresh them using <a href="../Includes_and_Autodocs_2._guide/node0241.html">intuition.library/RefreshGList()</a>, then call
+    this function.
+    You should not need this function at other times.
+
+INPUTS
+    win - Pointer to the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> containing GadTools gadgets.
+    req - Pointer to requester, or NULL if not a requester (currently
+        ignored - use NULL).
+
+RESULT
+    None.
+
+EXAMPLE
+
+NOTES
+    req must currently be NULL.  GadTools gadgets are not supported
+    in requesters.  This field may allow such support at a future date.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node03EF.html">GT_BeginRefresh()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

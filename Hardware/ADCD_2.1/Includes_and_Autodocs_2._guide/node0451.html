@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="InitGels()" TITLE="graphics.library/InitGels" -->
+<head>
+<title>graphics.library/InitGels</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0450.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0452.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    InitGels -- initialize a gel list; must be called before using gels.
+
+SYNOPSIS
+    InitGels(head, tail, GInfo)
+             A0    A1    A2
+
+    void InitGels(struct <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line73">VSprite</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line73">VSprite</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line40">GelsInfo</a> *);
+
+FUNCTION
+    Assigns the VSprites as the head and tail of the gel list in <a href="../Includes_and_Autodocs_2._guide/node00AE.html#line24">GfxBase</a>.
+    Links these two gels together as the keystones of the list.
+    If the collHandler vector points to some memory array, sets
+    the BORDERHIT vector to NULL.
+
+INPUTS
+    head  = pointer to the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line73">VSprite</a> structure to be used as the
+            gel list head
+    tail  = pointer to the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line73">VSprite</a> structure to be used as the
+            gel list tail
+    GInfo = pointer to the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line40">GelsInfo</a> structure to be initialized
+
+RESULT
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00C3.html">graphics/gels.h</a>  <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

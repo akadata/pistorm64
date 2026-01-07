@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="ILBM.DPI.doc" TITLE="A / IFF Third Party Public Form and Chunk Specification / ILBM.DPI.doc" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>A / IFF Third Party Public Form and Chunk Specification / ILBM.DPI.doc</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node027A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node027C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Dots per inch chunk
+
+ILBM DPI chunk
+--------------
+
+Registered by:
+
+Spencer Shanson
+16 Genesta Rd
+Plumstead
+London SE18 3ES
+ENGLAND
+
+1-16-90
+
+ILBM.DPI   Dots Per Inch   to allow output of an image at the
+same resolution it was scanned at
+
+typedef struct {
+	UWORD dpi_x;
+	UWORD dpi_y;
+	} DPIHeader ;
+
+For example, an image scanned at horizontal resolution of
+240dpi and vertical resolution of 300dpi would be saved as:
+
+44504920 00000004 00F0 012C
+D P I    size     dpi_x dpi_y
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

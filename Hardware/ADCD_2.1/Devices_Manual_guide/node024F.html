@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="DR2D-1-1-3" TITLE="The Global Drawing Attribute Chunks / CMAP " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>The Global Drawing Attribute Chunks / CMAP </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node024E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0250.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+CMAP (0x434D4150)   	/* Color map (Same as ILBM CMAP) */
+
+This chunk is identical to the ILBM CMAP chunk as described in the IFF
+ILBM documentation.
+
+    struct CMAPstruct {
+        ULONG       ID;
+        ULONG       Size;
+        UBYTE       ColorMap[Size];
+    };
+
+ColorMap is an array of 24-bit RGB color values.  The 24-bit value is
+spread across three bytes, the first of which contains the red intensity,
+the next contains the green intensity, and the third contains the blue
+intensity.  Because DR2D stores its colors with 24-bit accuracy, DR2D
+readers must not make the mistake that some ILBM readers do in assuming
+the CMAP chunk colors correspond directly to Amiga color registers.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

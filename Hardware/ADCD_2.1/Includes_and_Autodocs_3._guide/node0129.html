@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="debug_lib" NODE="KPutChar()" TITLE="debug.lib/KPutChar" -->
+<head>
+<title>debug.lib/KPutChar</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0128.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node012A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	KPutChar - put a character to the console
+		   (defaults to the serial port at 9600 baud)
+
+<b>   SYNOPSIS</b>
+	char = KPutChar(char)
+	D0	        D0
+
+<b>   FUNCTION</b>
+	Put a character to the console.  This function will not return
+	until the character has been completely transmitted.
+
+<b>   INPUTS</b>
+	KPutChar is the assembly interface, the character must be in D0.
+	_KPutChar and _kputc are the C interfaces, the character must be
+	a longword on the stack.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

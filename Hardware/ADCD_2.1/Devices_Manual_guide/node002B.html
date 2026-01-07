@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_2" NODE="2-6-1-1" TITLE="2 / ADCMD_ALLOCATE / How ADCMD_ALLOCATE Operates" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>2 / ADCMD_ALLOCATE / How ADCMD_ALLOCATE Operates</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node002A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node002C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node04A6.html">ADCMD_ALLOCATE</a> command tries the first  <a href="../Devices_Manual_guide/node002A.html#line15">combination</a> , 3, to see if
+channels 0 and 1 are not being used. If they are available, the 3 is
+copied into the io_Unit field and you get an allocation key for these
+channels in the ioa_AllocKey field. You copy the key into other I/O blocks
+for any other commands you may want to perform on these channels.
+
+If channels 0 and 1 are being used, <a href="../Includes_and_Autodocs_2._guide/node04A6.html">ADCMD_ALLOCATE</a> tries the other
+combinations in turn.  If all the combinations are in use, ADCMD_ALLOCATE
+checks the precedence number of the users of the channels and finds the
+combination that requires it to steal the channel or channels of the
+lowest precedence. If all the combinations require stealing a channel or
+channels of equal or higher precedence, the ADCMD_ALLOCATE request fails.
+Precedence is in the ln_Pri field of the io_Message in the <a href="../Devices_Manual_guide/node001E.html#line9">IOAudio</a> block
+you pass to ADCMD_ALLOCATE; it has a value from -128 to 127.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-23/ClassDoc.txt" NODE="IV-23-3" TITLE="frameiclass" -->
+<head>
+<title>frameiclass</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01A1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01A3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Class:                  frameiclass
+Superclass:             imageclass
+Description:            A raised, sunken, or chisled image class
+                        supporting frame dimensions and Intuition new
+                        look parameters.
+Include File:           &#060;intuition/imageclass.h&#062;
+
+
+New Methods:
+------------
+
+None, but implements some of the no-ops in imageclass.
+
+
+Changed Methods:
+----------------
+
+OM_GET - A no-op for this class.
+
+
+IM_DRAW - Draws the embossed frame in its natural (Image) dimensions.
+Frame thickness support of IA_LineWidth is currently not implemented.
+Frame type is determined by attributes below, colors determined by
+DrawInfo and supports these drawing states:
+
+        IDS_NORMAL, IDS_INACTIVENORMAL, IDS_DISABLED:
+
+Renders edges in shadowPen, shinePen, and backgroundPen for the
+interior.  NOTE: No ghosting is done for IDS_DISABLED.
+
+        IDS_SELECTED, IDS_INACTIVESELECTED:
+
+Renders edges in shadowPen, shinePen, and hifillPen, for the interior.
+
+
+IM_DRAWFRAME - Same as IM_DRAW, but draws frame to specified exterior
+dimensions.
+
+
+IM_FRAMEBOX - Centers contents, adds dimension for frame thickness, plus
+an interior margin of the same thickness.
+
+
+Attributes:
+-----------
+
+IA_Recessed                     (IS)
+
+Specifies that the frame should be recessed into the drawing surface
+(shadowPen used on upper and left edges).  Default is FALSE, a raised
+frame.
+
+
+IA_DoubleEmboss                 (IS)
+
+Two nested embossed frames for &#034;chisled&#034; boxes or &#034;ridges&#034;.  Not
+currently supported.
+
+
+IA_EdgesOnly                    (IS)
+
+Does not fill frame, just draws the edges.
+
+
+IA_LineWidth                    ()
+
+Not currently supported.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

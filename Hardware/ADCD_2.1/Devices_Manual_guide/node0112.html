@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_15" NODE="15-9" TITLE="15 Resources / Potgo Resource" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>15 Resources / Potgo Resource</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0111.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0113.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The potgo resource is used to get control of the hardware POTGO register
+connected to the proportional I/O pins on the game controller ports. There
+are two registers, POTGO (write-only) and POTINP (read-only). These pins
+could also be used for digital I/O.
+
+The potgo resource provides three functions for working with the POTGO
+<a name="line8">hardware.</a>
+
+                       Potgo Resource Functions
+                       ------------------------
+     <a href="../Includes_and_Autodocs_2._guide/node053D.html">AllocPotBits()</a>    Allocate bits in the POTGO register.
+
+     <a href="../Includes_and_Autodocs_2._guide/node053E.html">FreePotBits()</a>     Free previously allocated bits in the POTGO
+                       register.
+
+     <a href="../Includes_and_Autodocs_2._guide/node053F.html">WritePotgo()</a>      Set and clear bits in the POTGO register.
+                       The bits must have been allocated before
+                       calling this function.
+
+The example program shown below demonstrates how to use the ptogo resource
+to track mouse button presses on port 1.
+
+<a name="line24">     <a href="../Devices_Manual_guide/node01A8.html">Read_Potinp.c</a> </a>
+
+Additional programming information on the potgo resource can be found in
+the include files and the Autodocs for the potgo resource.
+
+                         Potgo Resource Information
+                      ---------------------------------
+                      INCLUDES        resources/<a href="../Includes_and_Autodocs_2._guide/node0114.html">potgo.h</a>
+                                      resources/<a href="../Includes_and_Autodocs_2._guide/node0117.html">potgo.i</a>
+                                      utility/<a href="../Includes_and_Autodocs_2._guide/node012D.html">hooks.h</a>
+                                      utility/<a href="../Includes_and_Autodocs_2._guide/node0131.html">hooks.i</a>
+
+                      AUTODOCS        <a href="../Includes_and_Autodocs_2._guide/node053C.html">potgo.doc</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

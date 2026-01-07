@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="Format()" TITLE="dos.library/Format" -->
+<head>
+<title>dos.library/Format</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node016A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node016C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	Format -- Causes a filesystem to initialize itself (V36)
+
+<b>   SYNOPSIS</b>
+	success = Format(filesystem, volumename, dostype)
+	D0                   D1          D2         D3
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> Format(STRPTR, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, ULONG)
+
+<b>   FUNCTION</b>
+	Interface for initializing new media on a device.  This causes the
+	filesystem to write out an empty disk structure to the media, which
+	should then be ready for use.  This assumes the media has been low-
+	level formatted and verified already.
+
+	The filesystem should be inhibited before calling Format() to make
+	sure you don't get an ERROR_OBJECT_IN_USE.
+
+<b>   INPUTS</b>
+	filesystem - Name of device to be formatted.  ':' must be supplied.
+	volumename - Name for volume (if supported).  No ':'.
+	dostype    - Type of format, if filesystem supports multiple types.
+
+<b>   RESULT</b>
+	success - Success/failure indicator.
+
+<b>   BUGS</b>
+	Existed, but was non-functional in V36 dos.  (The volumename wasn't
+	converted to a BSTR.)  Workaround: require V37, or under V36
+	convert volumename to a <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line129">BPTR</a> to a BSTR before calling Format().
+	Note: a number of printed packet docs for ACTION_FORMAT are wrong
+	as to the arguments.
+
+<b>   SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

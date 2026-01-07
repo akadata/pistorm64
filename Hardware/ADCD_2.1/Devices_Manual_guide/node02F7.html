@@ -1,0 +1,434 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/apps/ILBMDemo/ILBMDemo.c" NODE="MAIN" TITLE="Devices/apps/ILBMDemo/ILBMDemo.c" -->
+<head>
+<title>Devices/apps/ILBMDemo/ILBMDemo.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02F6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02F8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* ILBMDemo.c  05/91   C. Scheppner CBM
+ *
+ * Demonstrates displaying an ILBM, loading a brush,
+ *   saving an ILBM, and optionally printing a screen (CTRL-p)
+ *   Use -c (or -c1, -c2, etc) as filename to read from or save to clipboard.
+ *
+ * requires linkage with several iffp modules - see Makefile
+ */
+
+#include &#034;iffp/ilbmapp.h&#034;
+
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+void chkmsg(void);
+void cleanup(void);
+void bye(UBYTE *s,int error);
+
+#define SAVECHANGES
+
+#define MINARGS 3
+char *vers = &#034;\0$VER: ILBMDemo 37.5&#034;;
+char *Copyright = &#034;ILBMDemo v37.5 (Freely Redistributable)&#034;;
+char *usage =
+&#034;Usage: ILBMDemo sourceilbm destilbm [brushname]  (CTRL-p to print screen)\n&#034;
+&#034;Displays source, optionally loads and blits brush, saves to dest\n&#034;
+&#034;Use filename -c[unit] (ie. -c, -c1, -c2, etc.) for clipboard\n&#034;;
+
+char *savename;
+
+struct Library *IntuitionBase  = NULL;
+struct Library *GfxBase        = NULL;
+struct Library *IFFParseBase   = NULL;
+
+/* Note - these fields are also available in the ILBMInfo structure */
+struct   Screen         *scr;         /* for ptr to screen structure */
+struct   Window         *win;         /* for ptr to window structure */
+struct   RastPort       *wrp;         /* for ptr to RastPort  */
+struct   ViewPort       *vp;          /* for ptr to Viewport  */
+
+struct   IntuiMessage   *msg;
+
+struct   NewWindow      mynw = {
+   0, 0,                                  /* LeftEdge and TopEdge */
+   0, 0,                          	  /* Width and Height */
+   -1, -1,                                /* DetailPen and BlockPen */
+   VANILLAKEY|MOUSEBUTTONS,               /* IDCMP Flags with Flags below */
+   BACKDROP|BORDERLESS|SMART_REFRESH|NOCAREREFRESH|ACTIVATE|RMBTRAP,
+   NULL, NULL,                            /* Gadget and Image pointers */
+   NULL,                                  /* Title string */
+   NULL,                                  /* Screen ptr null till opened */
+   NULL,                                  /* BitMap pointer */
+   50, 20,                                /* MinWidth and MinHeight */
+   0 , 0,                                 /* MaxWidth and MaxHeight */
+   CUSTOMSCREEN                           /* Type of window */
+   };
+
+
+BOOL   FromWb, Done;
+
+
+/* ILBM Property chunks to be grabbed
+ * List BMHD, CMAP and CAMG first so we can skip them when we write
+ * the file back out (they will be written out with separate code)
+ */
+LONG	ilbmprops[] = {
+		ID_ILBM, ID_BMHD,
+		ID_ILBM, ID_CMAP,
+		ID_ILBM, ID_CAMG,
+		ID_ILBM, ID_CCRT,
+		ID_ILBM, ID_AUTH,
+		ID_ILBM, ID_Copyright,
+		TAG_DONE
+		};
+
+/* ILBM Collection chunks (more than one in file) to be gathered */
+LONG	ilbmcollects[] = {
+		ID_ILBM, ID_CRNG,
+		TAG_DONE
+		};
+
+/* ILBM Chunk to stop on */
+LONG	ilbmstops[] = {
+		ID_ILBM, ID_BODY,
+		TAG_DONE
+		};
+
+
+/* For test of adding new chunks to saved FORM */
+struct Chunk newchunks[2] = {
+	{
+	&#038;newchunks[1],
+	ID_ILBM, ID_AUTH, IFFSIZE_UNKNOWN,
+	&#034;CAS_CBM&#034;},
+	{
+	NULL,
+	ID_ILBM, ID_NAME, IFFSIZE_UNKNOWN,
+	&#034;Untitled No. 27&#034;},
+	};
+
+
+UBYTE nomem[]  = &#034;Not enough memory\n&#034;;
+UBYTE noiffh[] = &#034;Can't alloc iff\n&#034;;
+
+/* our indexes to reference our frames
+ * DEFault, BRUsh, and SCReen
+ */
+#define DEF	0
+#define BRU	1
+#define SCR	2
+#define UICOUNT 3
+
+/* For our ILBM frames */
+struct ILBMInfo  *ilbms[UICOUNT]  = { NULL };
+
+
+/*
+ * MAIN
+ */
+void main(int argc, char **argv)
+   {
+#ifdef SAVECHANGES
+   struct Chunk *chunk;
+   CamgChunk *camg;
+   LONG saverror;
+#endif
+   UBYTE *ilbmname=NULL, *brushname=NULL, ans, c;
+   BPTR lock;
+   LONG error;
+
+   FromWb = argc ? FALSE : TRUE;
+
+   if((argc&#060;MINARGS)||(argv[argc-1][0]=='?'))
+	{
+	printf(&#034;%s\n%s\n&#034;,Copyright,usage);
+        bye(&#034;&#034;,RETURN_OK);
+	}
+
+   switch(argc)
+      {
+      case 4:
+         brushname	= argv[3];
+      case 3:
+         savename	= argv[2];
+         ilbmname	= argv[1];
+         break;
+      }
+
+   /* if dest not clipboard, warn if dest file already exists */
+   if(strcmp(savename,&#034;-c&#034;))
+	{
+	if(lock = Lock(savename,ACCESS_READ))
+	    {
+	    UnLock(lock);
+	    printf(&#034;Dest file \&#034;%s\&#034; already exists.  Overwrite (y or n) ? &#034;,
+			savename);
+	    ans = 0;
+	    while((c = getchar()) != '\n') if(!ans)  ans = c | 0x20;
+	    if(ans == 'n')   bye(&#034;Exiting.\n&#034;,RETURN_OK);
+	    }
+	}
+
+   /* Open Libraries */
+
+   if(!(IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 0)))
+      bye(&#034;Can't open intuition library.\n&#034;,RETURN_WARN);
+
+   if(!(GfxBase = OpenLibrary(&#034;graphics.library&#034;,0)))
+      bye(&#034;Can't open graphics library.\n&#034;,RETURN_WARN);
+
+   if(!(IFFParseBase = OpenLibrary(&#034;iffparse.library&#034;,0)))
+      bye(&#034;Can't open iffparse library.\n&#034;,RETURN_WARN);
+
+
+
+/*
+ * Alloc three ILBMInfo structs (one each for defaults, screen, brush)
+ */
+    if(!(ilbms[0] = (struct ILBMInfo *)
+	AllocMem(UICOUNT * sizeof(struct ILBMInfo),MEMF_PUBLIC|MEMF_CLEAR)))
+		bye(nomem,RETURN_FAIL);
+    else
+	{
+	ilbms[BRU] = ilbms[0] + 1;
+	ilbms[SCR] = ilbms[0] + 2;
+	}
+
+/*
+ * Here we set up default ILBMInfo fields for our
+ * application's frames.
+ * Above we have defined the propery and collection chunks
+ * we are interested in (some required like BMHD)
+ * Since all of our frames are for ILBM's, we'll initialize
+ * one default frame and clone the others from it.
+ */
+    ilbms[DEF]-&#062;ParseInfo.propchks	= ilbmprops;
+    ilbms[DEF]-&#062;ParseInfo.collectchks	= ilbmcollects;
+    ilbms[DEF]-&#062;ParseInfo.stopchks	= ilbmstops;
+
+    ilbms[DEF]-&#062;windef	= &#038;mynw;
+/*
+ * Initialize our working ILBM frames from our default one
+ */
+    *ilbms[SCR] = *ilbms[DEF];	/* for our screen */
+    *ilbms[BRU] = *ilbms[DEF];	/* for our brush  */
+
+/*
+ * Alloc two IFF handles (one for screen frame, one for brush frame)
+ */
+    if(!(ilbms[SCR]-&#062;ParseInfo.iff = AllocIFF())) bye(noiffh,RETURN_FAIL);
+    if(!(ilbms[BRU]-&#062;ParseInfo.iff = AllocIFF())) bye(noiffh,RETURN_FAIL);
+
+/* Load and display an ILBM
+ */
+    if(error = showilbm(ilbms[SCR],ilbmname))
+	{
+	printf(&#034;Can't load background \&#034;%s\&#034;\n&#034;,ilbmname);
+	bye(&#034;&#034;,RETURN_WARN);
+	}
+
+    /* These were set up by our successful showilbm() above */
+    win = ilbms[SCR]-&#062;win;	/* our window */
+    wrp = ilbms[SCR]-&#062;wrp;	/* our window's RastPort */
+    scr = ilbms[SCR]-&#062;scr;	/* our screen */
+    vp  = ilbms[SCR]-&#062;vp;		/* our screen's ViewPort */
+
+    ScreenToFront(scr);
+
+
+ /* Now let's load a brush and blit it into the window
+  */
+    if(brushname)
+	{
+	if (error = loadbrush(ilbms[BRU],brushname))
+	    {
+	    printf(&#034;Can't load brush \&#034;%s\&#034;\n&#034;,brushname);
+	    bye(&#034;&#034;,RETURN_WARN);
+	    }
+	else	/* Success */
+	    {
+	    D(bug(&#034;About to Blt bitmap $%lx to rp $%lx, w=%ld h=%ld\n&#034;,
+		ilbms[BRU]-&#062;brbitmap,wrp,ilbms[BRU]-&#062;Bmhd.w,ilbms[BRU]-&#062;Bmhd.h));
+            BltBitMapRastPort(ilbms[BRU]-&#062;brbitmap,0,0,
+                     		wrp,0,0,
+                     		ilbms[BRU]-&#062;Bmhd.w, ilbms[BRU]-&#062;Bmhd.h,
+                     		0xC0);
+     	    }
+	}
+
+#ifdef SAVECHANGES
+
+ /* This code is an example for Read/Modify/Write programs
+  *
+  * We copy off the parsed chunks we want to preserve,
+  * close the IFF read file, reopen it for write,
+  * and save a new ILBM which
+  * will include the chunks we have preserved, but
+  * with newly computed and set-up BMHD, CMAP, and CAMG.
+  */
+
+   if(!(ilbms[SCR]-&#062;ParseInfo.copiedchunks =
+	copychunks(ilbms[SCR]-&#062;ParseInfo.iff,
+		   ilbmprops, ilbmcollects,
+		   MEMF_PUBLIC)))
+		printf(&#034;error cloning chunks\n&#034;);
+   else
+	{
+        /* we can close the file now */
+   	closeifile(ilbms[SCR]);
+
+   	printf(&#034;Test of copychunks and findchunk:\n&#034;);
+
+   	/* Find copied CAMG chunk if any */
+   	if(chunk = findchunk(ilbms[SCR]-&#062;ParseInfo.copiedchunks,ID_ILBM,ID_CAMG))
+	    {
+	    camg = (CamgChunk *)chunk-&#062;ch_Data;
+	    printf(&#034;CAMG: $%08lx\n&#034;,camg-&#062;ViewModes);
+	    }
+        else printf(&#034;No CAMG found\n&#034;);
+
+   	/* Find copied CRNG chunks if any */
+   	if(chunk = findchunk(ilbms[SCR]-&#062;ParseInfo.copiedchunks,ID_ILBM,ID_CRNG))
+	    {
+   	    while((chunk)&#038;&#038;(chunk-&#062;ch_ID == ID_CRNG))
+		{
+		printf(&#034;Found a CRNG chunk\n&#034;);
+		chunk = chunk-&#062;ch_Next;
+		}
+	    }
+   	else printf(&#034;No CRNG chunks found\n&#034;);
+	}
+
+    printf(&#034;\nAbout to save screen as %s, adding NAME and AUTH chunks\n&#034;,
+		savename);
+
+    if(saverror = screensave(ilbms[SCR], ilbms[SCR]-&#062;scr,
+				ilbms[SCR]-&#062;ParseInfo.copiedchunks,
+				newchunks,
+				savename))
+			printf(&#034;%s\n&#034;,IFFerr(saverror));
+
+#endif
+
+   Done = FALSE;
+   while(!Done)
+      {
+      Wait(1&#060;&#060;win-&#062;UserPort-&#062;mp_SigBit);
+      chkmsg();
+      }
+
+
+   cleanup();
+   exit(RETURN_OK);
+   }
+
+
+void chkmsg(void)
+    {
+    LONG  error;
+    ULONG class;
+    UWORD code;
+    WORD  mousex, mousey;
+
+    while(msg = (struct IntuiMessage *)GetMsg(win-&#062;UserPort))
+	{
+	class = msg-&#062;Class;
+      	code  = msg-&#062;Code;
+      	mousex = msg-&#062;MouseX;
+      	mousey = msg-&#062;MouseY;
+
+      	ReplyMsg(msg);
+      	switch(class)
+   	    {
+	    case MOUSEBUTTONS:
+	    switch(code)
+		{
+		/* emulate a close gadget */
+		case SELECTDOWN:
+		   if((mousex &#060; 12)&#038;&#038;(mousey &#060; 12))	Done = TRUE;
+		   break;
+		default:
+		   break;
+		}
+            case VANILLAKEY:
+            switch(code)
+               	{
+		/* also quit on CTRL-C, CTRL-D, or q */
+               	case 'q': case 0x04: case 0x03:
+                  Done = TRUE;
+                  break;
+		case 0x10:	/* CTRL-p means print */
+
+		  /* Print the whole screen */
+		  if(error=screendump(ilbms[SCR]-&#062;scr,
+				0,0,
+				ilbms[SCR]-&#062;scr-&#062;Width,
+				ilbms[SCR]-&#062;scr-&#062;Height,
+				0,0))
+			printf(&#034;Screendump printer error=%ld\n&#034;,error);
+		  break;
+
+               	default:
+                  break;
+		}
+            default:
+            break;
+            }
+      	}
+    }
+
+
+void bye(UBYTE *s,int error)
+   {
+   if((*s)&#038;&#038;(!FromWb)) printf(&#034;%s\n&#034;,s);
+   cleanup();
+   exit(error);
+   }
+
+
+void cleanup()
+   {
+   if(ilbms[SCR])
+	{
+   	if(ilbms[SCR]-&#062;scr)		unshowilbm(ilbms[SCR]);
+#ifdef SAVECHANGES
+   	freechunklist(ilbms[SCR]-&#062;ParseInfo.copiedchunks);
+#endif
+   	if(ilbms[SCR]-&#062;ParseInfo.iff)	FreeIFF(ilbms[SCR]-&#062;ParseInfo.iff);
+	}
+
+   if(ilbms[BRU])
+	{
+   	if(ilbms[BRU]-&#062;brbitmap)	unloadbrush(ilbms[BRU]);
+   	if(ilbms[BRU]-&#062;ParseInfo.iff) 	FreeIFF(ilbms[BRU]-&#062;ParseInfo.iff);
+	}
+
+   if(ilbms[0])
+	{
+	FreeMem(ilbms[0],UICOUNT * sizeof(struct ILBMInfo));
+	}
+
+   if(GfxBase) 	     CloseLibrary(GfxBase);
+   if(IntuitionBase) CloseLibrary(IntuitionBase);
+   if(IFFParseBase)  CloseLibrary(IFFParseBase);
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

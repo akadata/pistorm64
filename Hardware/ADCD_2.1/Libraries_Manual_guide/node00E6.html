@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-4" TITLE="3 Intuition Screens / Public Screen Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 Intuition Screens / Public Screen Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00E5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00E7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Public screens are a new feature of Release 2 (V36).  A public screen
+allows multiple applications to share a single screen thus saving memory.
+If your application opens a public screen, then other applications will be
+able to open their windows on your screen.  In older versions of the
+operating system, only the Workbench screen could be shared so
+applications had to live within its limitations or use up Chip memory
+creating their own private, <a href="../Libraries_Manual_guide/node00DF.html">custom screens</a>.
+
+Now the system allows any screen to be set up as a public screen so there
+may be many public screens in memory at once, not just Workbench.  This
+permits the power user to set up different work environments that multiple
+applications can share in a way that is memory efficient (each one with a
+display mode appropriate to a particular job).
+
+Workbench is a special case public screen because it is the initial
+default public screen.  The default public screen is the screen
+applications will get when they ask for a public screen but don't specify
+a name.  Under normal conditions, Workbench is the default public screen
+and is created by the system at startup time.  However, keep in mind that
+the default public screen can be changed (it's not always guaranteed to be
+Workbench).
+
+    Screens for the Novice.
+    -----------------------
+    If you're not sure what kind of screen to use, then use the default
+    public screen.  Under Release 2, you can open a window on the default
+    public screen without doing any screen set-up work.  See the
+    &#034;<a href="../Libraries_Manual_guide/node0106.html">Intuition Windows</a>&#034; chapter for more details.
+
+Generally, it is much easier to use an existing, public screen than to set
+up one of your own.  Here are the basic functions you use to work with an
+existing public screen.
+<a name="line34"></a>
+
+                Table 3-5: Public Screen Functions
+  ______________________________________________________________________
+ |                                                                      |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0225.html">LockPubScreen()</a>  Find Workbench or any other public screen;   |
+ |                         prevent it from closing while a window is    |
+ |                         opened or its attributes copied.             |
+ |                                                                      |
+ |      <a href="../Includes_and_Autodocs_2._guide/node025D.html">UnlockPubScreen()</a>  Release the lock allowing the screen to      |
+ |                         later be closed.                             |
+ |                                                                      |
+ |  <a href="../Includes_and_Autodocs_2._guide/node024F.html">SetDefaultPubScreen()</a>  Establishes a given public screen as the     |
+ |                         default.                                     |
+ |                                                                      |
+ |  <a href="../Includes_and_Autodocs_2._guide/node021C.html">GetDefaultPubScreen()</a>  Copies the name of the default screen to a   |
+ |                         user supplied buffer for use by the screen   |
+ |                         manager utility (the name is not needed by   |
+ |                         normal applications, use LockPubScreen(NULL) |
+ |                         instead).                                    |
+ |                                                                      |
+ |      <a href="../Includes_and_Autodocs_2._guide/node023E.html">PubScreenStatus()</a>  Converts a screen to private or public       |
+ |                         status.                                      |
+ |                                                                      |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0257.html">SetPubScreenModes()</a>  Controls the public screen global mode bits. |
+ |______________________________________________________________________|
+
+
+By using an existing public screen, an application is no longer
+responsible for setting up the display, however, it also loses flexibility
+and control.  It can no longer set the palette or depth, and it cannot
+write directly into screen memory without cooperation from the owner of
+the public screen.  (If these limitations are too confining, the
+application can create a new screen instead.)
+
+ <a href="../Libraries_Manual_guide/node00E7.html">Accessing a Public Screen by Name</a> 
+ <a href="../Libraries_Manual_guide/node00E8.html">The Default Public Screen and Workbench</a> 
+ <a href="../Libraries_Manual_guide/node00E9.html">Taking a New Custom Screen Public</a> 
+ <a href="../Libraries_Manual_guide/node00EA.html">Searching the Public Screen List</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_13" NODE="13-2-8" TITLE="13 / Preferences in Release 2 / PGFX" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>13 / Preferences in Release 2 / PGFX</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0230.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0232.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+    struct PrinterGfxPrefs
+    {
+        LONG  pg_Reserved[4];
+        UWORD pg_Aspect;          /* Horizontal or vertical */
+        UWORD pg_Shade;           /* B&#038;W, Greyscale, Color */
+        UWORD pg_Image;           /* Positive or negative image */
+        WORD  pg_Threshold;       /* Black threshold */
+        UBYTE pg_ColorCorrect;    /* RGB color correction */
+        UBYTE pg_Dimensions;      /* Dimension type */
+        UBYTE pg_Dithering;       /* Type of dithering */
+        UWORD pg_GraphicFlags;    /* Rastport dump flags */
+        UBYTE pg_PrintDensity;    /* Print density 1 - 7 */
+        UWORD pg_PrintMaxWidth;   /* Maximum width */
+        UWORD pg_PrintMaxHeight;  /* Maximum height */
+        UBYTE pg_PrintXOffset;    /* X Offset */
+        UBYTE pg_PrintYOffset;    /* Y Offset */
+    };
+
+The possible values of each field are defined in &#060;prefs/<a href="../Libraries_Manual_guide/node05E0.html#line29">printergfx.h</a>&#062;.
+Note that your application is responsible for checking if the supplied
+values are valid.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="ChangeMode()" TITLE="dos.library/ChangeMode" -->
+<head>
+<title>dos.library/ChangeMode</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0284.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0286.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ChangeMode - Change the current mode of a lock or filehandle (V36)
+
+SYNOPSIS
+    success = ChangeMode(type, object, newmode)
+    D0                    D1     D2      D3
+
+    BOOL ChangeMode(ULONG, BPTR, ULONG)
+
+FUNCTION
+    This allows you to attempt to change the mode in use by a lock or
+    filehandle.  For example, you could attempt to turn a shared lock
+    into an exclusive lock.  The handler may well reject this request.
+    Warning: if you use the wrong type for the object, the system may
+    crash.
+
+INPUTS
+    type    - Either CHANGE_FH or CHANGE_LOCK
+    object  - A lock or filehandle
+    newmode - The new mode you want
+
+RESULT
+    success - Boolean
+
+BUGS
+    Did not work in 2.02 or before (V36).  Works in V37.  In the
+    earlier versions, it can crash the machine.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02C6.html">Lock()</a>, <a href="../Includes_and_Autodocs_2._guide/node02D6.html">Open()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

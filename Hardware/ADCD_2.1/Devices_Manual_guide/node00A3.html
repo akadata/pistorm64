@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_12" NODE="12-4-2" TITLE="12 / / Use Of BeginIO() With The Serial Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>12 / / Use Of BeginIO() With The Serial Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00A2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00A4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Instead of transmitting the read command with either <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> or <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>,
+<a name="line3">you might elect to use the low level <a href="../Includes_and_Autodocs_2._guide/node04CB.html">BeginIO()</a> interface to a device.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node04CB.html">BeginIO()</a> works much like <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>, i.e., asynchronously, except it gives
+you control over the quick I/O bit (IOB_QUICK) in the io_Flags field.
+Quick I/O saves the overhead of a reply message, and perhaps the overhead
+of a task switch. If a quick I/O request is actually completed quickly,
+the entire command will execute in the context of the caller. See the
+&#034;<a href="../Libraries_Manual_guide/node0299.html">Exec: Device Input/Output</a>&#034; chapter of the Amiga ROM Kernel Reference
+Manual: Libraries for more detailed information on quick I/O.
+
+The device will determine if a quick I/O request will be handled quickly.
+Most non-I/O commands will execute quickly; read and write commands may or
+may not finish quickly.
+
+   SerialIO.IOSer.io_Flags |= IOF_QUICK;  /* Set QuickIO Flag */
+
+   BeginIO((struct IORequest *)SerialIO);
+   if (SerialIO-&#062;IOSer.io_Flags &#038; IOF_QUICK )
+       /* If flag is still set, I/O was synchronous and is now finished.
+        * The IORequest was NOT appended a reply port.  There is no
+        * need to remove or WaitIO() for the message.
+        */
+       printf(&#034;QuickIO\n&#034;);
+   else
+        /* The device cleared the QuickIO bit.  QuickIO could not happen
+         * for some reason; the device processed the command normally.
+         * In this case BeginIO() acted exactly like SendIO().
+         */
+        printf(&#034;Regular I/O\n&#034;);
+   WaitIO(SerialIO);
+
+The way you read from the device depends on your need for processing
+speed. Generally the <a href="../Includes_and_Autodocs_2._guide/node04CB.html">BeginIO()</a> route provides the lowest system overhead
+when quick I/O is possible.  However, if quick I/O does not work, the same
+reply message overhead still exists.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

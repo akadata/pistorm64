@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_6" NODE="6-3-1" TITLE="6 / Setting The Conditions For A Mouse Port Report" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>6 / Setting The Conditions For A Mouse Port Report</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00D0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00D2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You set the conditions for a mouse port report by passing an <a href="../Devices_Manual_guide/node00CC.html#line12">IOStdReq</a> to
+the device with <a href="../Includes_and_Autodocs_2._guide/node04E4.html">IND_SETMTRIG</a> set in io_Command, the address of a
+GamePortTrigger structure set in io_Data and the length of the structure
+set in io_Length.
+
+   struct GamePortTrigger InputTR;
+
+   InputIO-&#062;io_Data = (APTR)InputTR;     /* set trigger conditions */
+   InputIO-&#062;io_Command = IND_SETMTRIG;   /* from InputTR */
+   InputIO-&#062;io_Length = sizeof(struct GamePortTrigger);
+   DoIO(InputIO);
+
+The information needed for mouse port report setting is contained in a
+GamePortTrigger data structure which is defined in the include file
+<a name="line16">devices/<a href="../Includes_and_Autodocs_2._guide/node0039.html">gameport.h</a>.</a>
+
+   struct GamePortTrigger
+   {
+       UWORD    gpt_Keys;      /* key transition triggers */
+       UWORD    gpt_Timeout;   /* time trigger (vertical blank units) */
+       UWORD    gpt_XDelta;    /* X distance trigger */
+       UWORD    gpt_YDelta;    /* Y distance trigger */
+   };
+
+See the <a href="../Devices_Manual_guide/node00AE.html">Gameport Device</a> chapter of this manual for a full description
+of setting mouse port trigger conditions.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-10-1-4" TITLE="10 / / Writing An Alphanumeric Printer Driver / Extended Character Table" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 / / Writing An Alphanumeric Printer Driver / Extended Character Table</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0058.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node005A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The 8BitChars field could contain a pointer to a table of characters for
+the ASCII codes $A0 to $FF. The symbols for these codes are shown in the
+<a href="../Devices_Manual_guide/node0172.html#line9">IFF Appendix</a> of this manual. If this field contains a NULL, it means
+no specific table is provided for the driver, and the default table is to
+be used instead.
+
+Care should be taken when generating this table because of the way the
+table is parsed by the printer device. Valid expressions in the table
+include \011 where 011 is an octal number, \\000 for null and \\n
+where n is a 1 to 3 digit decimal number. To enter an actual backslash in
+the table requires the somewhat awkward \\\\. As an example, here is a
+list of the first entries of the EpsonxX[CBM_MPS-1250] table:
+
+   char *ExtendedCharTable[] =
+        {
+        &#034; &#034;,                       /* NBSP */
+        &#034;\033R\007[\033R\\0&#034;,      /* i */
+        &#034;c\010|&#034;,                  /* c| */
+        &#034;\033R\003#\033R\\0&#034;,      /* L- */
+        &#034;\033R\005$\033R\\0&#034;,      /* o */
+        &#034;\033R\010\\\\\033R\\0&#034;,   /* Y- */
+        &#034;|&#034;,                       /* | */
+        &#034;\033R\002@\033R\\0&#034;,      /* SS */
+        &#034;\033R\001~\033R\\0&#034;,      /* &#034; */
+        &#034;c&#034;,                       /* copyright */
+        &#034;\033S\\0a\010_\033T&#034;,     /* a_ */
+        &#034;&#060;&#034;,                       /* &#060;&#060; */
+        &#034;~&#034;,                       /* - */
+        &#034;-&#034;,                       /* SHY */
+        &#034;r&#034;,                       /* registered trademark */
+        &#034;-&#034;,                       /* - */
+        /* more entries go here */
+   };
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

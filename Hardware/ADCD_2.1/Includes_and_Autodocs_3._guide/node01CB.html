@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="UnLockRecords()" TITLE="dos.library/UnLockRecords" -->
+<head>
+<title>dos.library/UnLockRecords</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01CA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01CC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	UnLockRecords -- Unlock a list of records (V36)
+
+<b>   SYNOPSIS</b>
+	success = UnLockRecords(record_array)
+	D0		             D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> UnLockRecords(struct <a href="../Includes_and_Autodocs_3._guide/node0641.html#line26">RecordLock</a> *)
+
+<b>   FUNCTION</b>
+	This releases an array of record locks obtained using <a href="../Includes_and_Autodocs_3._guide/node0189.html">LockRecords</a>.
+	You should NOT modify the record_array while you have the records
+	locked.  Every <a href="../Includes_and_Autodocs_3._guide/node0189.html">LockRecords()</a> call must be balanced with an
+	UnLockRecords() call.
+
+<b>   INPUTS</b>
+	record_array - <a href="../Includes_and_Autodocs_3._guide/node0628.html#line19">List</a> of records to be unlocked
+
+<b>   RESULT</b>
+	success      - Success or failure.
+
+<b>   BUGS</b>
+	See <a href="../Includes_and_Autodocs_3._guide/node0188.html">LockRecord()</a>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0189.html">LockRecords()</a>, <a href="../Includes_and_Autodocs_3._guide/node0188.html">LockRecord()</a>, <a href="../Includes_and_Autodocs_3._guide/node01CA.html">UnLockRecord()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

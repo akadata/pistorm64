@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="iffparse" NODE="OpenIFF()" TITLE="iffparse.library/OpenIFF" -->
+<head>
+<title>iffparse.library/OpenIFF</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node036F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0371.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	OpenIFF -- prepare an <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> to read or write a new IFF stream.
+	           (V36)
+
+<b>   SYNOPSIS</b>
+	error = OpenIFF(iff, rwMode);
+	D0              A0   D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> OpenIFF(struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> *, LONG);
+
+<b>   FUNCTION</b>
+	Initializes an <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> structure for a new read or write. The
+	direction of the I/O is given by the value of rwMode, which can be
+	either IFFF_READ or IFFF_WRITE.
+
+	As part of its initialization procedure, OpenIFF() calls the client-
+	supplied stream hook vector. The <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line65">IFFStreamCmd</a> packet will contain
+	the following:
+
+		sc_Command:	IFFCMD_INIT
+		sc_Buf:		(Not applicable)
+		sc_NBytes:	(Not applicable)
+
+	This operation is permitted to fail. DO NOT write to this structure.
+
+<b>   INPUTS</b>
+	iff - pointer to <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> structure. Starting with V39, this may be
+	      NULL, in which case IFFERR_NOMEM is returned.
+	rwMode - IFFF_READ or IFFF_WRITE
+
+<b>   RESULT</b>
+	error - contains an error code or 0 if successful
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node035C.html">CloseIFF()</a>, <a href="../Includes_and_Autodocs_3._guide/node036B.html">InitIFF()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E8.html">&#060;libraries/iffparse.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

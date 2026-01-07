@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="SetIoErr()" TITLE="dos.library/SetIoErr" -->
+<head>
+<title>dos.library/SetIoErr</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01B7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01B9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetIoErr -- Sets the value returned by <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a> (V36)
+
+<b>   SYNOPSIS</b>
+	oldcode = SetIoErr(code)
+	D0		    D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> SetIoErr(LONG);
+
+<b>   FUNCTION</b>
+	This routine sets up the secondary result (pr_Result2) return code
+	(returned by the <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a> function).
+
+<b>   INPUTS</b>
+	code - Code to be returned by a call to <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr</a>.
+
+<b>   RESULT</b>
+	oldcode - The previous error code.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>, <a href="../Includes_and_Autodocs_3._guide/node0161.html">Fault()</a>, <a href="../Includes_and_Autodocs_3._guide/node019E.html">PrintFault()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

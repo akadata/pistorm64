@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-77/Optim.txt" NODE="IV-77-2" TITLE="When To Refresh" -->
+<head>
+<title>When To Refresh</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00BD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00BF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The way in which an application determines that it needs to refresh a
+layer depends on whether an application deals with layers directly
+via the Layers library, or indirectly via Intuition.  It is important
+to keep in mind that each Intuition window has a Layer at its core.
+If an application uses Intuition windows it may not use the Layers
+library to create, delete, move, resize, or update the window layers.
+The application must use the corresponding Intuition functions
+instead.
+
+If an application uses layers directly, it must look at a layer's
+LAYERREFRESH bit to tell if the layer sustained damage and needs
+repair.  Since the application created and maintains its layers, it
+knows when damage can occur, so it checks for damage at those times.
+
+Intuition manages an arbitrary number of layers on behalf of any
+number of client applications.  All windowing operations happen on
+Intuition's time frame.  Since other applications and the user can
+ask Intuition to manipulate window layers around at any time, it is
+not possible for a window-based application to know by itself when to
+refresh its window.  That would involve polling the window layer's
+LAYERREFRESH bit, which is a big no-no in a multitasking system.
+Instead, Intuition provides a refresh notification mechanism through
+the IDCMP system.
+
+Whenever Intuition performs a layer operation that can damage a
+window layer, it checks the damage state of each layer in the current
+screen by inspecting each layer's LAYERREFRESH bit.  If Intuition
+finds that a layer's LAYERREFRESH bit is set, Intuition takes care of
+refreshing the damaged areas of the window that are Intuition's
+responsibility (for example, the window borders and gadgets).
+Following that, Intuition looks at the WFLG_NOCAREREFRESH bit in the
+Window structure.  If this bit is set, Intuition's refresh processing
+for the window is complete, and all damage region information is
+discarded.  However, If the bit is clear, Intuition sends an
+IDCMP_REFRESHWINDOW message to the window's IDCMP port, essentially
+asking the window to refresh itself.
+
+So, instead of having to poll the LAYERREFRESH bit, an application
+can just wait for Intuition to tell it to refresh its window.  This
+is convenient and fits in well with the IDCMP mechanism.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-1" TITLE="5 Intuition Gadgets / About Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 Intuition Gadgets / About Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node012F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0131.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are two kinds of gadgets: system gadgets and application gadgets.
+System gadgets are set up by Intuition to handle the positioning and depth
+arranging of screens, and to handle the positioning, sizing, closing and
+depth arranging of windows.  System gadgets always use the same imagery
+and location giving the windows and screens of any application a basic set
+of controls that are familiar and easy to operate.  In general,
+applications do not have to do any processing for system gadgets;
+Intuition does all the work.
+
+Application gadgets are set up by an application program.  These may be
+the basic gadget types described in this chapter, the pre-fabricated
+gadgets supplied by the GadTools library, or special gadget types defined
+through Intuition's <a href="../Libraries_Manual_guide/node0176.html">custom</a> gadget and BOOPSI facilities.  Application
+gadgets can be placed anywhere within a window and can use just about any
+image.  The action associated with an application gadget is carried out by
+<a name="line17">the application.</a>
+
+There are four basic types of application gadgets:
+
+  * <a href="../Libraries_Manual_guide/node014C.html">Boolean</a> (or button) gadgets elicit true/false or yes/no kinds of
+    answers from the user.
+
+  * <a href="../Libraries_Manual_guide/node0153.html">Proportional</a> gadgets allow the user to select from a continuous range
+    of options, such as volume or speed.
+
+  * <a href="../Libraries_Manual_guide/node0164.html">String</a> gadgets are used to get or display character based information
+    (a special class of string gadget allows entry of numeric data.)
+
+  * <a href="../Libraries_Manual_guide/node0176.html">Custom</a> gadgets, a new, generalized form of gadget, provide
+    flexibility to perform any type of function.
+
+The way a gadget is used varies according to the type of gadget.  For a
+<a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadget, the user operates the gadget by simply clicking the mouse
+select button.  For a <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget, a cursor appears, allowing the user
+to enter data from the keyboard.  For a <a href="../Libraries_Manual_guide/node0153.html">proportional</a> gadget, the user can
+either drag the <a href="../Libraries_Manual_guide/node015A.html">knob</a> with the mouse or click in the gadget <a href="../Libraries_Manual_guide/node0159.html">container</a> to
+<a name="line38">move the knob by a set increment.</a>
+
+Gadgets are chosen by positioning the pointer within an area called the
+select box, which is application defined, and pressing the mouse select
+<a name="line42">button (left mouse button).</a>
+
+When a gadget is selected, its imagery is changed to indicate that it is
+activated.  The highlighting method for the gadget may be set by the
+application.  Highlighting methods include alternate image, alternate
+border, a box around the gadget and color complementing.
+
+<a name="line49">     <a href="../Libraries_Manual_guide/node05D4.html">Figure 5-1: System and Application Gadgets</a> </a>
+
+A gadget can be either enabled or disabled.  Disabled gadgets cannot be
+operated and are indicated by ghosting the gadget, that is, overlaying its
+image with a pattern of dots.  Gadgets may also be directly modified and
+redrawn by first removing the gadget from the system.
+
+ <a href="../Libraries_Manual_guide/node0131.html">System Gadgets</a>         <a href="../Libraries_Manual_guide/node0133.html">Adding and Removing Gadgets</a> 
+ <a href="../Libraries_Manual_guide/node0132.html">Application Gadgets</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

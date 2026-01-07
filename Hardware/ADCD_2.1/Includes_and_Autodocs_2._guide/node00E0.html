@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/intuitionbase.i" NODE="MAIN" TITLE="Includes/intuition/intuitionbase.i" -->
+<head>
+<title>Includes/intuition/intuitionbase.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00DF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00E1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND  INTUITION_INTUITIONBASE_I
+INTUITION_INTUITIONBASE_I SET  1
+**
+** $Filename: intuition/intuitionbase.i $
+** $Release: 2.04 Includes, V37.4 $
+** $Revision: 36.5 $
+** $Date: 90/07/12 $
+**
+** The public part of  IntuitionBase structure and supporting structures
+**
+**  (C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+	IFND EXEC_TYPES_I
+	INCLUDE &#034;exec/types.i&#034;
+	ENDC
+
+	IFND EXEC_LIBRARIES_I
+	INCLUDE &#034;exec/libraries.i&#034;
+	ENDC
+
+	IFND	GRAPHICS_VIEW_I
+	INCLUDE	&#034;graphics/view.i&#034;
+	ENDC
+
+* Be sure to protect yourself against someone modifying these data as
+* you look at them.  This is done by calling:
+*
+* lock = LockIBase(0), which returns a ULONG.  When done call
+*  D0		  D0
+* UnlockIBase(lock) where lock is what LockIBase() returned.
+*	       A0
+* NOTE: these library functions are simply stubs now, but should be called
+* to be compatible with future releases.
+
+* ======================================================================== *
+* === IntuitionBase ====================================================== *
+* ======================================================================== *
+ STRUCTURE IntuitionBase,0
+
+	STRUCT	ib_LibNode,LIB_SIZE
+	STRUCT	ib_ViewLord,v_SIZEOF
+	APTR	ib_ActiveWindow
+	APTR	ib_ActiveScreen
+
+* the FirstScreen variable points to the frontmost Screen.  Screens are
+* then maintained in a front to back order using Screen.NextScreen
+
+	APTR	ib_FirstScreen
+	ULONG	ib_Flags	; private meaning
+	WORD	ib_MouseY	; these are supposed to be backwards,
+	WORD	ib_MouseX	;  but weren't, recently
+
+	ULONG	ib_Seconds
+	ULONG	ib_Micros
+
+* there is not 'sizeof' here because...
+*
+*
+	ENDC
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

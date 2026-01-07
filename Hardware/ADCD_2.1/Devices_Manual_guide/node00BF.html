@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_13" NODE="13-2" TITLE="13 Timer Device / Device Interface" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>13 Timer Device / Device Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00BE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00C0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The timer device operates in a similar manner to the other Amiga devices.
+To use it, you must first open it, then send I/O requests to it, and then
+close it when finished. See the <a href="../Devices_Manual_guide/node0006.html">Introduction to Amiga System Devices</a>
+chapter for general information on device usage.
+
+The timer device also provides timer functions in addition to the usual
+I/O request protocol.  These functions still require the device to be
+opened with the proper timer device unit, but do not require a message
+port. However, the base address of the timer library must be obtained in
+order to use the timer functions.
+
+The two modes of timer device operation are not mutually exclusive.  You
+<a name="line14">may use them both within the same application.</a>
+
+<a name="line16">The I/O request used by the timer device is called timerequest.</a>
+
+   struct timerequest
+   {
+       struct IORequest tr_node;
+       struct timeval tr_time;
+<a name="line22">   };</a>
+
+The timer device functions are passed a time structure, either timeval for
+<a name="line25">non E-Clock units or EClockVal for E-Clock units.</a>
+
+   struct timeval
+   {
+        ULONG tv_secs;   /* seconds */
+        ULONG tv_micro;  /* microseconds */
+<a name="line31">   };</a>
+
+   struct EClockVal
+   {
+       ULONG ev_hi;   /* Upper longword of E-Clock time */
+       ULONG ev_lo;   /* Lower longword of E-Clock time */
+<a name="line37">   };</a>
+
+See the include file devices/<a href="../Includes_and_Autodocs_2._guide/node0053.html">timer.h</a> for the complete structure
+definitions. Time requests fall into three categories:
+
+   *  Time delay - wait a specified period of time.  A time delay causes an
+      application to wait a certain length of time. When a time delay is
+      requested, the number of seconds and microseconds to delay are
+      specified in the I/O request.
+
+   *  Time measure - how long something takes to complete.  A time measure
+      is a three-step procedure where the system or E-Clock time is
+      retrieved, an operation or series of operations is performed, and
+      then another time retrieval is done.  The difference between the two
+      time values is the measure of the duration of the operation.
+
+   *  Time alarm - wait till a specific time.  A time alarm is a request to
+      be notified when a specific time value has occurred.  It is similar
+      to a time delay except that the absolute time value is specified in
+      the I/O request.
+
+   What is an E-Clock?
+   -------------------
+   The E-Clock is the clock used by the Motorola 68000 processor family
+   to communicate with other Motorola 8-bit chips.  The E-Clock returns
+   two distinct values - the E-Clock value in the form of two longwords
+   and the count rate (tics/second) of the E-Clock.  The count rate is
+   related to the master frequency of the machine and is different
+   between PAL and NTSC machines.
+
+ <a href="../Devices_Manual_guide/node00C0.html">Timer Device Units</a> 
+ <a href="../Devices_Manual_guide/node00C1.html">Opening The Timer Device</a> 
+ <a href="../Devices_Manual_guide/node00C2.html">Closing The Timer Device</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

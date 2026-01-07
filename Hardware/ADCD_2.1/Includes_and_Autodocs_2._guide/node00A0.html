@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/resident.h" NODE="MAIN" TITLE="Includes/exec/resident.h" -->
+<head>
+<title>Includes/exec/resident.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node009F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00A1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_RESIDENT_H
+#define	EXEC_RESIDENT_H
+/*
+**	$Filename: exec/resident.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.8 $
+**	$Date: 90/11/01 $
+**
+**	Resident/ROMTag stuff.	Used to identify and initialize code modules.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif /* EXEC_TYPES_H */
+
+<a name="line19"></a>
+<a name="line20">struct Resident {</a>
+<a name="line21">    UWORD rt_MatchWord;	/* word to match on (ILLEGAL)	*/</a>
+<a name="line22">    struct Resident *rt_MatchTag; /* pointer to the above	*/</a>
+<a name="line23">    APTR  rt_EndSkip;		/* address to continue scan	*/</a>
+<a name="line24">    UBYTE rt_Flags;		/* various tag flags		*/</a>
+<a name="line25">    UBYTE rt_Version;		/* release version number	*/</a>
+<a name="line26">    UBYTE rt_Type;		/* type of module (NT_XXXXXX)	*/</a>
+<a name="line27">    BYTE  rt_Pri;		/* initialization priority */</a>
+<a name="line28">    char  *rt_Name;		/* pointer to node name	*/</a>
+<a name="line29">    char  *rt_IdString;	/* pointer to identification string */</a>
+    APTR  rt_Init;		/* pointer to init code	*/
+};
+<a name="line32"></a>
+#define RTC_MATCHWORD	0x4AFC	/* The 68000 &#034;ILLEGAL&#034; instruction */
+<a name="line34"></a>
+<a name="line35">#define RTF_AUTOINIT	(1&#060;&#060;7)	/* rt_Init points to data structure */</a>
+<a name="line36">#define RTF_AFTERDOS	(1&#060;&#060;2)</a>
+<a name="line37">#define RTF_SINGLETASK	(1&#060;&#060;1)</a>
+#define RTF_COLDSTART	(1&#060;&#060;0)
+
+/* Compatibility: (obsolete) */
+<a name="line41">/* #define RTM_WHEN	   3 */</a>
+<a name="line42">#define RTW_NEVER	0</a>
+#define RTW_COLDSTART	1
+
+#endif	/* EXEC_RESIDENT_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

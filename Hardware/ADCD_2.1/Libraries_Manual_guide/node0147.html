@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-7" TITLE="5 Intuition Gadgets / Gadget Enabling and Disabling" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 Intuition Gadgets / Gadget Enabling and Disabling</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0146.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0148.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A gadget may be disabled so that it cannot be chosen by the user.  When a
+gadget is disabled, its image is ghosted.  A ghosted gadget is overlaid
+with a pattern of dots, thereby making the imagery less distinct.  The
+dots are drawn into the select box of the gadget and any imagery that
+<a name="line6">extends outside of the select box is not affected by the ghosting.</a>
+
+The application may initialize whether a gadget is disabled by setting the
+<a href="../Libraries_Manual_guide/node014A.html#line73">GFLG_DISABLED</a> flag in the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure's <a href="../Libraries_Manual_guide/node0149.html#line48">Flags</a> field before a gadget
+<a name="line10">is submitted to Intuition.  Clear this flag to create an enabled gadget.</a>
+
+After a gadget is submitted to Intuition for display, its current enable
+state may be changed by calling <a href="../Includes_and_Autodocs_2._guide/node0235.html">OnGadget()</a> or <a href="../Includes_and_Autodocs_2._guide/node0233.html">OffGadget()</a>.  If the gadget
+is in a requester, the requester must currently be displayed when calling
+these functions.
+
+    void OnGadget ( struct Gadget *gadget, struct Window *window,
+                    struct Requester *requester );
+    void OffGadget( struct Gadget *gadget, struct Window *window,
+                    struct Requester *requester );
+
+Depending on what sort of imagery you choose for your gadget, <a href="../Includes_and_Autodocs_2._guide/node0235.html">OnGadget()</a>
+may not be smart enough to correct the gadget's displayed imagery.  See
+the section on &#034;<a href="../Libraries_Manual_guide/node0145.html">Updating a Gadget's Imagery</a>&#034; for more details.
+
+Multiple gadgets may be enabled or disabled by calling <a href="../Includes_and_Autodocs_2._guide/node0235.html">OnGadget()</a> or
+<a href="../Includes_and_Autodocs_2._guide/node0233.html">OffGadget()</a> for each gadget, or by removing the gadgets with
+<a href="../Libraries_Manual_guide/node0133.html#line27">RemoveGList()</a>, setting or clearing the <a href="../Libraries_Manual_guide/node014A.html#line73">GFLG_DISABLED</a> flag on each,
+replacing the gadgets with <a href="../Libraries_Manual_guide/node0133.html#line7">AddGList()</a>, and refreshing with <a href="../Libraries_Manual_guide/node0146.html">RefreshGList()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

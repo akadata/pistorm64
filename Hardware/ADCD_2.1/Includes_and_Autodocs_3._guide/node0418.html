@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="layers" NODE="BeginUpdate()" TITLE="layers.library/BeginUpdate" -->
+<head>
+<title>layers.library/BeginUpdate</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0417.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0419.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	BeginUpdate -- Prepare to repair damaged layer.
+
+<b>    SYNOPSIS</b>
+	result = BeginUpdate( l )
+	d0                    a0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> BeginUpdate( struct <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> *);
+
+<b>    FUNCTION</b>
+	Convert damage list to <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line56">ClipRect</a> list and swap in for
+	programmer to redraw through. This routine simulates
+	the ROM library environment. The idea is to only render in the
+	&#034;damaged&#034; areas, saving time over redrawing all of the layer.
+	The layer is locked against changes made by the layer library.
+
+<b>    INPUTS</b>
+	l - pointer to a layer
+
+<b>    RESULTS</b>
+	result - TRUE if damage list converted to <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line56">ClipRect</a> list successfully.
+	         FALSE if list conversion aborted. (probably out of memory)
+
+<b>    BUGS</b>
+	If BeginUpdate returns FALSE, programmer must abort the attempt to
+	refresh this layer and instead call EndUpdate( l, FALSE ) to restore
+	original <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line56">ClipRect</a> and damage list.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0421.html">EndUpdate()</a>, <a href="../Includes_and_Autodocs_3._guide/node0625.html">graphics/layers.h</a>, <a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

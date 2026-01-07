@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Complex_Serial.c" NODE="MAIN" TITLE="Devices/Dev_examples/Complex_Serial.c" -->
+<head>
+<title>Devices/Dev_examples/Complex_Serial.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0192.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0194.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Complex_Serial.c
+ *
+ * Complex tricky example of serial.device usage
+ *
+ * Compile with SAS C 5.10  lc -b1 -cfistq -v -y -L
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/io.h&#062;
+#include &#060;devices/serial.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+
+void main(void)
+{
+struct MsgPort  *SerialMP;          /* Define storage for one pointer */
+struct IOExtSer *SerialIO;         /* Define storage for one pointer */
+
+#define READ_BUFFER_SIZE 32
+char SerialReadBuffer[READ_BUFFER_SIZE]; /* Reserve SIZE bytes storage */
+
+struct IOExtSer *SerialWriteIO = 0;
+struct MsgPort  *SerialWriteMP = 0;
+
+ULONG Temp;
+ULONG WaitMask;
+
+if (SerialMP=CreatePort(0,0) )
+    {
+    if (SerialIO=(struct IOExtSer *)
+                 CreateExtIO(SerialMP,sizeof(struct IOExtSer)) )
+        {
+        SerialIO-&#062;io_SerFlags=0;    /* Example of setting flags */
+
+        if (OpenDevice(SERIALNAME,0L,SerialIO,0) )
+            printf(&#034;%s did not open\n&#034;,SERIALNAME);
+        else
+            {
+            SerialIO-&#062;IOSer.io_Command  = SDCMD_SETPARAMS;
+            SerialIO-&#062;io_SerFlags      &#038;= ~SERF_PARTY_ON;
+            SerialIO-&#062;io_SerFlags      |= SERF_XDISABLED;
+            SerialIO-&#062;io_Baud           = 9600;
+            if (Temp=DoIO(SerialIO))
+                printf(&#034;Error setting parameters - code %ld!\n&#034;,Temp);
+
+            SerialIO-&#062;IOSer.io_Command  = CMD_WRITE;
+            SerialIO-&#062;IOSer.io_Length   = -1;
+            SerialIO-&#062;IOSer.io_Data     = (APTR)&#034;Amiga.&#034;;
+            SendIO(SerialIO);
+            printf(&#034;CheckIO %lx\n&#034;,CheckIO(SerialIO));
+            printf(&#034;The device will process the request in the background\n&#034;);
+            printf(&#034;CheckIO %lx\n&#034;,CheckIO(SerialIO));
+            WaitIO(SerialIO);
+
+            SerialIO-&#062;IOSer.io_Command  = CMD_WRITE;
+            SerialIO-&#062;IOSer.io_Length   = -1;
+            SerialIO-&#062;IOSer.io_Data     = (APTR)&#034;Save the whales! &#034;;
+            DoIO(SerialIO);             /* execute write */
+
+
+            SerialIO-&#062;IOSer.io_Command  = CMD_WRITE;
+            SerialIO-&#062;IOSer.io_Length   = -1;
+            SerialIO-&#062;IOSer.io_Data     = (APTR)&#034;Life is but a dream.&#034;;
+            DoIO(SerialIO);             /* execute write */
+
+            SerialIO-&#062;IOSer.io_Command  = CMD_WRITE;
+            SerialIO-&#062;IOSer.io_Length   = -1;
+            SerialIO-&#062;IOSer.io_Data     = (APTR)&#034;Row, row, row your boat.&#034;;
+            SerialIO-&#062;IOSer.io_Flags = IOF_QUICK;
+            BeginIO(SerialIO);
+
+            if (SerialIO-&#062;IOSer.io_Flags &#038; IOF_QUICK )
+                {
+
+                /*
+                 * Quick IO could not happen for some reason; the device
+                 *  processed the command normally.  In this case
+                 *  BeginIO() acted exactly like SendIO().
+                 */
+
+                printf(&#034;Quick IO\n&#034;);
+                }
+            else
+                {
+
+                /* If flag is still set, IO was synchronous and is now finished.
+                 * The IO request was NOT appended a reply port.  There is no
+                 * need to remove or WaitIO() for the message.
+                 */
+
+                printf(&#034;Regular IO\n&#034;);
+                }
+
+            WaitIO(SerialIO);
+
+
+            SerialIO-&#062;IOSer.io_Command  = CMD_UPDATE;
+            SerialIO-&#062;IOSer.io_Length   = -1;
+            SerialIO-&#062;IOSer.io_Data     = (APTR)&#034;Row, row, row your boat.&#034;;
+            SerialIO-&#062;IOSer.io_Flags = IOF_QUICK;
+            BeginIO(SerialIO);
+
+            if (0 == SerialIO-&#062;IOSer.io_Flags &#038; IOF_QUICK )
+                {
+
+                /*
+                 * Quick IO could not happen for some reason; the device processed
+                 * the command normally.  In this case BeginIO() acted exactly
+                 * like SendIO().
+                 */
+
+                printf(&#034;Regular IO\n&#034;);
+
+                WaitIO(SerialIO);
+                }
+            else
+                {
+
+                /* If flag is still set, IO was synchronous and is now finished.
+                 * The IO request was NOT appended a reply port.  There is no
+                 * need to remove or WaitIO() for the message.
+                 */
+
+                printf(&#034;Quick IO\n&#034;);
+                }
+
+
+            /* Precalculate a wait mask for the CTRL-C, CTRL-F and message
+             * port signals.  When one or more signals are received,
+             * Wait() will return.  Press CTRL-C to exit the example.
+             * Press CTRL-F to wake up the example without doing anything.
+             * NOTE: A signal may show up without an associated message!
+             */
+
+            WaitMask = SIGBREAKF_CTRL_C|
+                        SIGBREAKF_CTRL_F|
+                         1L &#060;&#060; SerialMP-&#062;mp_SigBit;
+
+            SerialIO-&#062;IOSer.io_Command  = CMD_READ;
+            SerialIO-&#062;IOSer.io_Length   = READ_BUFFER_SIZE;
+            SerialIO-&#062;IOSer.io_Data     = (APTR)&#038;SerialReadBuffer[0];
+            SendIO(SerialIO);
+
+            printf(&#034;Sleeping until CTRL-C, CTRL-F, or serial input\n&#034;);
+
+            while (1)
+                   {
+                   Temp = Wait(WaitMask);
+                   printf(&#034;Just woke up (YAWN!)\n&#034;);
+
+                   if (SIGBREAKF_CTRL_C &#038; Temp)
+                       break;
+
+                   if (CheckIO(SerialIO) ) /* If request is complete... */
+                       {
+                       WaitIO(SerialIO);   /* clean up and remove reply */
+
+                       printf(&#034;%ld bytes received\n&#034;,SerialIO-&#062;IOSer.io_Actual);
+                       break;
+                       }
+                   }
+
+            AbortIO(SerialIO);  /* Ask device to abort request, if pending */
+            WaitIO(SerialIO);   /* Wait for abort, then clean up */
+
+
+            /*
+             * If two tasks will use the same device at the same time, it is preferred
+             * use two OpenDevice() calls and SHARED mode.  If exclusive access mode
+             * is required, then you will need to copy an existing IO request.
+             *
+             * Remember that two separate tasks will require two message ports.
+             */
+
+            SerialWriteMP = CreatePort(0,0);
+            SerialWriteIO = (struct IOExtSer *)
+                            CreateExtIO( SerialWriteMP,sizeof(struct IOExtSer) );
+
+            if (SerialWriteMP &#038;&#038; SerialWriteIO )
+                {
+
+                /* Copy over the entire old IO request, then stuff the
+                 * new Message port pointer.
+                 */
+
+                CopyMem( SerialIO, SerialWriteIO, sizeof(struct IOExtSer) );
+                SerialWriteIO-&#062;IOSer.io_Message.mn_ReplyPort = SerialWriteMP;
+
+                SerialWriteIO-&#062;IOSer.io_Command  = CMD_WRITE;
+                SerialWriteIO-&#062;IOSer.io_Length   = -1;
+                SerialWriteIO-&#062;IOSer.io_Data     = (APTR)&#034;A poet's food is love and fame&#034;;
+                DoIO(SerialWriteIO);
+                }
+
+            if (SerialWriteMP)
+                DeletePort(SerialWriteMP);
+
+            if (SerialWriteIO)
+                DeleteExtIO(SerialWriteIO);
+
+            CloseDevice(SerialIO);
+            }
+
+        DeleteExtIO(SerialIO);
+        }
+    else
+        printf(&#034;Unable to create IORequest\n&#034;);
+
+    DeletePort(SerialMP);
+    }
+else
+    printf(&#034;Unable to create message port\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

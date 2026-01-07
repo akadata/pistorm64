@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-2" TITLE="8 Intuition Images, Line Drawing and Text / Creating Images" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 Intuition Images, Line Drawing and Text / Creating Images</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01B8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01BA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+With an <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structure an application can create graphic objects quickly
+and easily and display them almost anywhere.  Images have an additional
+attribute that makes them even more economical--by changing two simple
+data elements in the Image structure, the color of the image may be
+changed.
+
+Images are rectangular bitmaps which individually define the color of each
+pixel represented.  Images may not be masked to allow part of the
+background to show through.  The entire rectangular image is drawn into
+the target element, overwriting any data it may overlap.  All bitplanes
+defined in the target <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> within the image's rectangle are
+<a name="line13">overwritten either with image data, ones or zeros.</a>
+
+<a href="../Libraries_Manual_guide/node01BA.html">Image</a>s may be directly drawn by the application by using the <a href="../Libraries_Manual_guide/node01BB.html">DrawImage()</a>
+function, described below.  The image may be rendered into any screen or
+window <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> with this function.  (<a href="../Includes_and_Autodocs_2._guide/node0211.html">DrawImageState()</a> can also be used to
+<a name="line18">draw the image.</a>
+
+The visual imagery for an <a href="../Libraries_Manual_guide/node01BA.html">Image</a> can be removed from the display by calling
+<a href="../Includes_and_Autodocs_2._guide/node0215.html">EraseImage()</a>.  For a normal Image structure, this will call the graphics
+function <a href="../Includes_and_Autodocs_2._guide/node0439.html">EraseRect()</a>, which clears the Image rectangle by using the
+<a name="line23">layer's backfill pen to overwrite it.</a>
+
+Alternately, images can be used indirectly by attaching them to menus,
+gadgets or requesters when they are initialized.  For instance, in menus
+the <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structure has the <a href="../Libraries_Manual_guide/node019A.html#line47">ItemFill</a> and <a href="../Libraries_Manual_guide/node019A.html#line64">SelectFill</a> fields.  If the
+<a href="../Libraries_Manual_guide/node019B.html#line14">ITEMTEXT</a> flag is cleared and the <a href="../Libraries_Manual_guide/node019B.html#line53">HIGHIMAGE</a> flag is set, the application
+may place a pointer to a list of <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structures in each of these fields.
+The system will display the ItemFill images when the menu item is not
+selected and the SelectFill images when the menu item is selected.  The
+application does not have to take any specific action to display these
+images.  Once the menus have been added to a window, their management and
+<a name="line34">display is under Intuition control.</a>
+
+The number of bitplanes in an image does not have to match the number of
+bitplanes in the display element in which the image is rendered.  This
+provides great flexibility in using <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structures, as the same image
+<a name="line39">may be reused in many places.</a>
+
+If the application's window is on the Workbench or some other public
+screen, it must use caution with hard-coded or constant image data, as the
+color palette of that screen is subject to change.  If the application has
+its own custom screen, and it is appropriate for the colors of that screen
+to change, the same situation arises.  Starting with V36, Intuition allows
+the screen opener to provide a mapping of pen number and rendering
+functions.  For example, pens are specified for the bright and dark edges
+of three dimensional objects.  Applications can obtain this mapping from
+the <a href="../Libraries_Manual_guide/node00DE.html#line6">DrawInfo</a> structure.  See the &#034;<a href="../Libraries_Manual_guide/node00EB.html">Intuition Screens</a>&#034; chapter for more
+<a name="line50">information on DrawInfo and the new 3D look of Intuition in Release 2.</a>
+
+A suitably designed image may be drawn into a screen or window of any
+depth.  To accomplish this, the application must ensure that detail is not
+lost when the image is displayed in a single bitplane <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>, where only
+the first bitplane of image data will be displayed.  This is important if
+the image will ever be displayed on the Workbench screen or any other
+public screen.
+
+ <a href="../Libraries_Manual_guide/node01BA.html">Image Structure</a>               <a href="../Libraries_Manual_guide/node01BE.html">Picking Bitplanes for Image Display</a> 
+ <a href="../Libraries_Manual_guide/node01BB.html">Directly Drawing the Image</a>    <a href="../Libraries_Manual_guide/node01BF.html">Image Example</a> 
+ <a href="../Libraries_Manual_guide/node01BC.html">Image Data</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

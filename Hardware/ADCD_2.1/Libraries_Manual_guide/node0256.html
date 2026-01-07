@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-2-5" TITLE="15 / GadTools Menus / Restrictions on GadTools Menus" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / GadTools Menus / Restrictions on GadTools Menus</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0255.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0257.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+GadTools menus are regular Intuition menus.  Once the menus have been laid
+out, the program may do anything with them, including attaching them or
+removing them from windows, enabling or disabling items, checking or
+unchecking checkmarked menu items, etc.  See the documentation for
+<a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a>, <a href="../Libraries_Manual_guide/node0181.html#line11">ClearMenuStrip()</a>, <a href="../Libraries_Manual_guide/node0184.html#line9">ResetMenuStrip()</a>, <a href="../Libraries_Manual_guide/node0192.html#line15">OnMenu()</a> and <a href="../Libraries_Manual_guide/node0192.html#line15">OffMenu()</a>
+in the &#034;Intuition Menus&#034; chapter for full details.
+
+If a GadTools-created menu strip is not currently attached to any window,
+the program may change the text in the menu headers (<a href="../Libraries_Manual_guide/node0199.html#line45">Menu-&#062;MenuName</a>), the
+command-key equivalents (<a href="../Libraries_Manual_guide/node019A.html#line72">MenuItem-&#062;Command</a>) or the text or imagery of menu
+items and sub-items, which can be reached as:
+
+    ((struct IntuiText *)MenuItem-&#062;ItemFill)-&#062;IText
+or
+    ((struct Image *)MenuItem-&#062;ItemFill)
+
+The application may also link in or unlink menus, menu items or sub-items.
+However, do not add sub-items to a menu item that was not created with
+sub-items and do not remove all the sub-items from an item that was
+created with some.
+
+Any of these changes may be made, provided the program subsequently calls
+<a href="../Libraries_Manual_guide/node0252.html">LayoutMenus()</a> or <a href="../Libraries_Manual_guide/node0253.html">LayoutMenuItems()</a> as appropriate.  Then, reattach the
+menu strip using <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a>.
+
+Some of these manipulations require walking the menu strip using the usual
+Intuition-specified linkages.  Beginning with the first <a href="../Libraries_Manual_guide/node0199.html">Menu</a> structure,
+simply follow its <a href="../Libraries_Manual_guide/node0199.html#line51">FirstItem</a> pointer to get to the first <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a>.  The
+<a href="../Libraries_Manual_guide/node019A.html#line84">MenuItem-&#062;SubItem</a> pointer will lead to the sub-menus.  MenuItems are
+connected via the <a href="../Libraries_Manual_guide/node019A.html#line24">MenuItem-&#062;NextItem</a> field.  Successive menus are linked
+together with the <a href="../Libraries_Manual_guide/node0199.html#line15">Menu-&#062;NextMenu</a> pointer.  Again, see the chapter
+&#034;<a href="../Libraries_Manual_guide/node0188.html">Intuition Menus</a>&#034; for details.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

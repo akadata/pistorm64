@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="I-7/asl.txt" NODE="I-7-4" TITLE="The Save Requester" -->
+<head>
+<title>The Save Requester</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0016.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0018.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Save requester is a special type of file requester.  The release 2.0
+save requester differs from the regular file requester in several ways.
+The first is its appearance.  The color of the text making up the file
+name list and the color of the backround the text is rendered on are
+swapped for the save requester.  This makes the difference between the
+save and file requesters visual as well as functional.  Another
+difference, is that a save requester does not allow the user to select by
+double-clicking on a file name.  This prevents the user from accidentally
+double-clicking, and thus over-writing, the wrong file.  The other
+difference is that if the user types a directory name into the save
+requester and the directory doesn't exist, the save requester will create
+that directory (after getting the user's permission via another requester).
+
+The FILF_SAVE flag from the ASL_FuncFlags tag creates a save requester.
+Note that it does not make sense to have multiple selection in a save
+requester, so the FILF_SAVE flag overrides the FILF_MULTISELECT flag.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-6-3" TITLE="33 / Context Functions / Context-Specific Data: LocalContextItems" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Context Functions / Context-Specific Data: LocalContextItems</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0449.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node044B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Libraries_Manual_guide/node0446.html">ContextNode</a>s can contain application data specific to that context.  These
+data objects are called <a href="../Includes_and_Autodocs_2._guide/node010B.html#line77">LocalContextItem</a>s.  LocalContextItems (LCIs) are a
+grey-box structure which contain a type, ID and identification field.
+LCIs are used to store context-sensitive data.  The format of this data is
+<a name="line6">application-defined.  A ContextNode can contain as many LCIs as you want.</a>
+
+        __________________
+       |                  |
+       |   ContextNode    |
+       |   -----------    |
+       |  Type - ID_ILBM  |
+       |  ID   - ID_BODY  |
+       |__________________|
+                |
+        ________|_________      _______________________________
+       |                  |    |                               |
+       |   ContextNode    |    |       LocalContextItem        |
+       |   -----------    |____|       ----------------        |
+       |  Type - ID_ILBM  |    |  Type  - ID_ILBM              |
+       |  ID   - ID_FORM  |    |  ID    - ID_BMHD              |
+       |__________________|    |  Ident - IFFLCI_PROP          |
+                |              |_______________________________|
+        ________|_________      _______________________________
+       |                  |    |                               |
+       |   ContextNode    |    |       LocalContextItem        |
+       |   -----------    |    |       ----------------        |
+       |  Type - ID_ZOID  |____|  Type  - ID_ILBM              |
+       |  ID   - ID_LIST  |    |  ID    - ID_BMHD              |
+       |__________________|    |  Ident - IFFLCI_ENTRYHANDLER  |
+                |              |_______________________________|
+        ________|______________________________________________
+       |                                                       |
+       |                   I F F H a n d l e                   |
+       |_______________________________________________________|
+
+
+                 Figure 33-3: IFFParse Context Stack
+
+
+Figure 33-3 shows the relationship between the <a href="../Libraries_Manual_guide/node042C.html">IFFHandle</a>, the
+<a href="../Libraries_Manual_guide/node0446.html">ContextNode</a>s, and the LCIs.  The IFFHandle is the root of the tree, so to
+speak.  ContextNodes &#034;grow&#034; out of the IFFHandle.  In turn, LCIs &#034;grow&#034;
+out of the ContextNodes.  What grows out of an LCI is client-defined.
+
+ <a href="../Libraries_Manual_guide/node044B.html">AllocLocalItem()</a>    <a href="../Libraries_Manual_guide/node044C.html">LocalItemData()</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

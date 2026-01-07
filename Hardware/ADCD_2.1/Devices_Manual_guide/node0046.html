@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-3-2" TITLE="10 / Device Interface / Writing Text To The Printer Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 / Device Interface / Writing Text To The Printer Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0045.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0047.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Text written to a printer can be either processed text or unprocessed text.
+
+Processed text is written to the device using the <a href="../Includes_and_Autodocs_2._guide/node0518.html">CMD_WRITE</a> command. The
+printer device accepts a character stream, translates any embedded escape
+sequences into the proper sequences for the printer being used and then
+sends it to the printer.  The escape sequence translation is based on the
+printer driver selected either through Preferences or through your
+<a name="line9">application.  You may also send a NULL-terminated string as processed text.</a>
+
+Unprocessed text is written to the device using the <a href="../Includes_and_Autodocs_2._guide/node051C.html">PRD_RAWWRITE</a> command.
+The printer device accepts a character stream and sends it unchanged to
+the printer.  This implies that you know the exact escape sequences
+required by the printer you are using.  You may not send a NULL-terminated
+string as unprocessed text.
+
+One additional point to keep in mind when using <a href="../Includes_and_Autodocs_2._guide/node051C.html">PRD_RAWWRITE</a> is that
+Preference settings for the printer are ignored.  Unless the printer has
+already been initialized by another command, the printer's own default
+settings will be used when printing raw, not the user's Preferences
+settings.
+
+You write processed text to the printer device by passing an <a href="../Includes_and_Autodocs_2._guide/node0094.html#line29">IOStdReq</a> to
+the device with <a href="../Includes_and_Autodocs_2._guide/node0518.html">CMD_WRITE</a> set in io_Command, the number of bytes to be
+written set in io_Length and the address of the write buffer set in
+<a name="line26">io_Data.</a>
+
+To write a NULL-terminated string, set the length to -1; the device will
+output from your buffer until it encounters a value of zero (0x00).
+
+    PrintIO-&#062;ios.io_Length  = -1;
+    PrintIO-&#062;ios.io_Data    =
+         (APTR)&#034;I went to a fight and a hockey game broke out.&#034;
+    PrintIO-&#062;ios.io_Command = CMD_WRITE;
+    DoIO((struct IORequest *)PrintIO);
+
+The length of the request is -1, meaning we are writing a NULL-terminated
+string. The number of characters sent will be found in io_Actual after the
+write request has completed.
+
+You write unprocessed text to the printer device by passing an <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a> to
+the device with <a href="../Includes_and_Autodocs_2._guide/node051C.html">PRD_RAWWRITE</a> set in io_Command, the number of bytes to be
+written set in io_Length and the address of the write buffer set in
+io_Data.
+
+    UBYTE *outbuffer;
+
+    PrintIO-&#062;ios.io_Length   = strlen(outbuffer);
+    PrintIO-&#062;ios.io_Data     = (APTR)outbuffer;
+    PrintIO-&#062;ios.io_Command  = PRD_RAWWRITE;
+    DoIO((struct IORequest *)PrintIO);
+
+   IOStdReq Only.
+   --------------
+   I/O requests with <a href="../Includes_and_Autodocs_2._guide/node0518.html">CMD_WRITE</a> and <a href="../Includes_and_Autodocs_2._guide/node051C.html">PRD_RAWWRITE</a> must use the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a>
+   structure of the union <a href="../Devices_Manual_guide/node0044.html#line16">printerIO</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

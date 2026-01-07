@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-1-4" TITLE="12 / OOP Overview / Making Gadgets Talk to an Application" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / OOP Overview / Making Gadgets Talk to an Application</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node020B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node020D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are two questions that the <a href="../Libraries_Manual_guide/node0582.html">example</a> above brings to mind.  The first
+is, &#034;What happens if the user types a value into the string gadget that is
+beyond the bounds of the prop gadget?&#034;  The answer is simple: very little.
+The prop gadget is smart enough to make sure its integer value does not go
+beyond the bounds of its display.  In the example, the prop gadget can
+only have values from 0 to 90.  If the user tries to type a value greater
+than 90, the prop gadget will set itself to its maximum of 90.  Because
+the integer string gadget doesn't have any bounds checking built into it,
+the example needs to find an alternative way to check the bounds.
+
+The other question is, &#034;How does <a href="../Libraries_Manual_guide/node0582.html">talk2boopsi.c</a> know the current value of
+the gadgets?&#034;  That answer is simple too: it doesn't.  The example doesn't
+ask the gadgets what their current values are (which it would do using
+<a href="../Libraries_Manual_guide/node0206.html">GetAttr()</a>) and the example doesn't pay attention to gadget events at the
+window's IDCMP port, so it isn't going to hear about them.
+
+One easy way to hear about changes to the gadget events is to listen for a
+&#034;release verify&#034;.  Conventional Intuition gadgets can trigger a release
+verify IDCMP event when the user finishes manipulating the gadget.  Boopsi
+<a name="line21">gadgets can do this, too, while continuing to update each other.</a>
+
+To make <a href="../Libraries_Manual_guide/node0582.html">Talk2boopsi.c</a> do this would require only a few changes. First, the
+window's IDCMP port has to be set up to listen for <a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a> events.
+Next, the example needs to set the gadget's <a href="../Libraries_Manual_guide/node014B.html#line14">GACT_RELVERIFY</a> flags.  It can
+do this by setting the <a href="../Libraries_Manual_guide/node020A.html">gadgetclass</a> <a href="../Libraries_Manual_guide/node0504.html">GA_RelVerify</a> attribute to TRUE for both
+gadgets.  That's enough to trigger the release verify message, so all
+Talk2boopsi.c needs to do is account for the new type of IDCMP message,
+IDCMP_GADGETUP.  When Talk2boopsi.c gets a release verify message, it can
+use <a href="../Libraries_Manual_guide/node0206.html">GetAttr()</a> to ask the integer gadget its value.  If this value is out
+of range, it should explicitly set the value of the integer gadget to a
+more suitable value using <a href="../Libraries_Manual_guide/node0205.html#line5">SetGadgetAttrs()</a>.
+
+Using the <a href="../Libraries_Manual_guide/node014B.html#line14">GACT_RELVERIFY</a> scheme above, an application will only hear about
+changes to the gadgets after the user is finished changing them.  The
+application does not hear all of the interim updates that, for example, a
+prop gadget generates.  This is useful if an application only needs to
+<a name="line38">hear the final value and not the interim update.</a>
+
+It is also possible to make the IDCMP port of a Boopsi gadget's window the
+<a href="../Libraries_Manual_guide/node020B.html#line20">ICA_TARGET</a> of the gadget.  There is a special value for ICA_TARGET called
+<a name="line42">ICTARGET_IDCMP (defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DB.html#line35">icclass.h</a>&#062;). This tells the gadget</a>
+to send an <a href="../Libraries_Manual_guide/node01E1.html#line98">IDCMP_IDCMPUPDATE</a> class <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a> to its window's IDCMP
+port.  Of course, the window has to be set up to listen for
+IDCMP_IDCMPUPDATE IntuiMessages.  The Boopsi gadget passes an address in
+the <a href="../Libraries_Manual_guide/node01D9.html#line73">IntuiMessage.IAddress</a> field.  It points to an attribute tag list
+containing the attribute (and its new value) that triggered the
+IDCMP_IDCMPUPDATE message.  An application can use the utility.library tag
+functions to access the gadget's attributes in this list.  Using this
+scheme, an application will hear all of the interim gadget updates.  If
+the application is using a gadget that generates a lot of interim
+<a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> messages (like a prop gadget), the application should be
+<a name="line53">prepared to handle a lot of messages.</a>
+
+Using this <a href="../Libraries_Manual_guide/node01E1.html#line98">IDCMP_IDCMPUPDATE</a> scheme, if the gadget uses an <a href="../Libraries_Manual_guide/node020B.html#line63">ICA_MAP</a> to map
+the attribute to a special dummy attribute ICSPECIAL_CODE (defined in
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DB.html#line26">icclass.h</a>&#062;), the <a href="../Libraries_Manual_guide/node01D9.html#line33">IntuiMessage.Code</a> field will contain the value
+of the attribute.  Because the attribute's value is a 32-bit quantity and
+the IntuiMessage.Code field is only 16 bits wide, only the least
+significant 16 bits of the attribute will appear in the IntuiMessage.Code
+field, so it can't hold a 32-bit quantity, like a pointer.  Applications
+should only use the lower 16 bits of the attribute value.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

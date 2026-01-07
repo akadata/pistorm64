@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="MoveScreen()" TITLE="intuition.library/MoveScreen" -->
+<head>
+<title>intuition.library/MoveScreen</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03C6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03C8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	MoveScreen -- Attempt to move the screen by the increments provided.
+
+<b>    SYNOPSIS</b>
+	MoveScreen( <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a>, DeltaX, DeltaY )
+		    A0      D0      D1
+
+	VOID MoveScreen( struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *, WORD, WORD );
+
+<b>    FUNCTION</b>
+	Moves the screen the specified increment, specified in screen
+	pixel resolution coordinates.
+
+	New for V36: <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> movement limits have been greatly relaxed,
+	to support screen scrolling.  In particular, negative values
+	for screen LeftEdge and TopEdge may now be valid.
+
+       If the DeltaX and DeltaY variables you specify would move the screen
+       in a way that violates any restrictions, the screen will be moved
+       as far as possible.  You may examine the LeftEdge and TopEdge fields
+	of the <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> structure after this function returns to see where
+	the screen really ended up.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> = pointer to a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> structure
+	DeltaX = amount to move the screen on the x-axis
+		Note that DeltaX no longer (V36) need be set to zero
+	DeltaY = amount to move the screen on the y-axis
+		Note that these coordinates are in the same resolution
+		as the screen (such as HIRES or INTERLACE)
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03E9.html">ScreenPosition()</a>, <a href="../Includes_and_Autodocs_3._guide/node03E7.html">RethinkDisplay()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

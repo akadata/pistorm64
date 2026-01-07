@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-9" TITLE="28 Graphics Sprites, Bobs and Animation / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 Graphics Sprites, Bobs and Animation / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03D0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03D2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following are brief descriptions of the Amiga's graphics animation
+functions.  See the Amiga ROM Kernel Reference Manual: Includes and
+Autodocs for details on each function call.
+<a name="line5"></a>
+
+                 Table 28-1: Graphics Animation Functions
+  ________________________________________________________________________
+ |                                                                        |
+ |     Animation                                                          |
+ |     Function                   Description                             |
+ |========================================================================|
+ |     <a href="../Includes_and_Autodocs_2._guide/node040E.html">AddAnimOb()</a>  Add an AnimOb to the linked list of AnimObs.          |
+ |        <a href="../Includes_and_Autodocs_2._guide/node040F.html">AddBob()</a>  Add a Bob to the current gel list.                    |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0411.html">AddVSprite()</a>  Add a VSprite to the current gel list.                |
+<a name="line16"> |       <a href="../Includes_and_Autodocs_2._guide/node0415.html">Animate()</a>  Process every AnimOb in the current animation list.   |</a>
+ |  <a href="../Includes_and_Autodocs_2._guide/node0427.html">ChangeSprite()</a>  Change the sprite image pointer.                      |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0435.html">DoCollision()</a>  Test every gel in gel list for collisions.            |
+ |     <a href="../Includes_and_Autodocs_2._guide/node0438.html">DrawGList()</a>  Process the gel list, queueing VSprites, drawing Bobs.|
+ |  <a href="../Includes_and_Autodocs_2._guide/node0441.html">FreeGBuffers()</a>  Deallocate memory obtained by GetGBuffers().          |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0443.html">FreeSprite()</a>  Return sprite for use by others and virtual sprite    |
+ |                  machine.                                              |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0447.html">GetGBuffers()</a>  Attempt to allocate all buffers of an entire AnimOb.  |
+ |     <a href="../Includes_and_Autodocs_2._guide/node0449.html">GetSprite()</a>  Attempt to get a sprite for the simple sprite manager.|
+<a name="line25"> |      <a href="../Includes_and_Autodocs_2._guide/node0451.html">InitGels()</a>  Initialize a gel list; must be called before using    |</a>
+ |                  gels.                                                 |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0452.html">InitGMasks()</a>  Initialize all of the masks of an AnimOb.             |
+ |     <a href="../Includes_and_Autodocs_2._guide/node0453.html">InitMasks()</a>  Initialize the <a href="../Libraries_Manual_guide/node03B0.html">BorderLine</a> and <a href="../Libraries_Manual_guide/node03AF.html">CollMask</a> masks of a     |
+ |                  VSprite.                                              |
+ |    <a href="../Includes_and_Autodocs_2._guide/node045E.html">MoveSprite()</a>  Move sprite to a point relative to top of <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a>.   |
+ |        <a href="../Includes_and_Autodocs_2._guide/node046E.html">RemBob()</a>  Remove a Bob from the gel list.                       |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0470.html">RemIBob()</a>  Immediately remove a Bob from the gel list and the    |
+ |                  <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>.                                             |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0471.html">RemVSprite()</a>  Remove a VSprite from the current gel list.           |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0477.html">SetCollision()</a>  Set a pointer to a user collision routine.            |
+ |     <a href="../Includes_and_Autodocs_2._guide/node047F.html">SortGList()</a>  Sort the current gel list, ordering its y,x           |
+ |                  coordinates.                                          |
+ |________________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

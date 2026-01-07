@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-101/dtpic.c" NODE="MAIN" TITLE="IV-101/dtpic.c" -->
+<head>
+<title>IV-101/dtpic.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01BC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01BE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+; /* Compiled with SAS/C 6.56.  Run from CLI only.
+sc DATA=NEAR NMINC STRMERGE NOSTKCHK IGNORE=73 dtpic.c
+slink from lib:c.o dtpic.o TO dtpic LIBRARY lib:sc.lib lib:amiga.lib
+quit ; */
+
+#include &#060;exec/types.h&#062;
+#include &#060;datatypes/datatypes.h&#062;      /* Datatypes definitions we need */
+#include &#060;datatypes/pictureclass.h&#062;
+#include &#060;stdio.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;         /* Prototypes for system functions */
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/datatypes_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }     /* Disable SAS/C CTRL-C handling */
+int chkabort(void) { return(0); }
+#endif
+
+struct Library *IntuitionBase=NULL;   /* System library bases */
+struct Library *GfxBase=NULL;
+struct Library *DataTypesBase=NULL;
+
+VOID main(int argc, char **argv)
+{
+APTR dtobject=NULL;                   /* Pointer to a datatypes object       */
+ULONG res;                            /* Variable for function return values */
+struct dtFrameBox mydtFrameBox;       /* Use this with DTM_FRAMEBOX method   */
+struct FrameInfo myFrameInfo;         /* For info returned from DTM_FRAMEBOX */
+struct gpLayout mygpLayout;           /* Use this with DTM_PROCLAYOUT method */
+
+ULONG modeID = INVALID_ID;            /* Variables for storing the display */
+struct Screen *myScreen=NULL;         /* environment information obtained  */
+struct BitMap *bm = NULL;             /* the datatype object.              */
+ULONG *cregs = NULL;
+ULONG i,r,g,b,numcolors;
+
+if (IntuitionBase=OpenLibrary(&#034;intuition.library&#034;,39L))
+  {
+  if (GfxBase=OpenLibrary(&#034;graphics.library&#034;,39L))
+    {
+    if(DataTypesBase=OpenLibrary(&#034;datatypes.library&#034;,0L))
+        {
+        if(argc &#062; 1 ) /* CLI only, at least one argument please.  */
+            {
+            /* Attempt to create a picture object in memory from the file    */
+            /* name given by the user in the command line.  If we wanted to  */
+            /* show the picture in a screen set up ahead of time, we could   */
+            /* set PDTA_Remap to TRUE and provide a pointer to the screen    */
+            /* with the PDTA_Screen tag (datatypes.library handles the rest).*/
+            /* However in this case we want to first find out the attributes */
+            /* of the picture object and set up a matching screen and do the */
+            /* remapping later.  Therefore PDTA_Remap is set to false.       */
+            /* The group ID tag ensures that we get only a picture file type.*/
+            if (dtobject = NewDTObject(argv[1], PDTA_Remap,  FALSE,
+                                                DTA_GroupID, GID_PICTURE,
+                                                TAG_END) )
+                {
+                /* Here we want to find the display environment required by  */
+                /* this picture.  To do that, perform the DTM_FRAMEBOX method */
+                /* on the object.  The datatypes library fills in the struct */
+                /* FrameBox you give it with the info on the display needed.  */
+                mydtFrameBox.MethodID         = DTM_FRAMEBOX;
+                mydtFrameBox.dtf_GInfo        = NULL;
+                mydtFrameBox.dtf_ContentsInfo = NULL;
+                mydtFrameBox.dtf_FrameInfo    = &#038;myFrameInfo;
+                mydtFrameBox.dtf_SizeFrameInfo= sizeof (struct FrameInfo);
+                mydtFrameBox.dtf_FrameFlags   = 0L;
+
+                /* The return value from DTM_FRAMEBOX is currently undefined */
+                res = DoMethodA(dtobject, &#038;mydtFrameBox);
+
+                /* OK, now do the layout (remap) of the object on our process */
+                mygpLayout.MethodID   = DTM_PROCLAYOUT;
+                mygpLayout.gpl_GInfo  = NULL;
+                mygpLayout.gpl_Initial= 1L;
+
+                /* The return value of DTM_PROCLAYOUT is non-zero for success */
+                if( res = DoMethodA(dtobject, &#038;mygpLayout) )
+                   {
+                   /* Get the attributes of this picture object.  You could  */
+                   /* use a series of GetAttr() function calls here instead.  */
+                   res = GetDTAttrs(dtobject, PDTA_ModeID, &#038;modeID,
+                                              PDTA_CRegs, &#038;cregs,
+                                              PDTA_BitMap, &#038;bm,
+                                              TAG_END);
+
+                   /* Did we get all threee attributes? */
+                   if( (modeID!=INVALID_ID) &#038;&#038; (cregs) &#038;&#038; (bm) )
+                       {
+                       /* Open a screen that matches the picture object */
+                       if( myScreen = OpenScreenTags( NULL,
+                           SA_Width,     myFrameInfo.fri_Dimensions.Width,
+                           SA_Height,    myFrameInfo.fri_Dimensions.Height,
+                           SA_Depth,     myFrameInfo.fri_Dimensions.Depth,
+                           SA_DisplayID, modeID,
+                           SA_BitMap,    bm,
+                           TAG_END) )
+                           {
+                           /* Now fill in the color registers for this screen */
+                           numcolors = 2&#060;&#060;(myFrameInfo.fri_Dimensions.Depth-1);
+                           for( i=0; i &#060; numcolors; i++ )
+                              {
+                              r = cregs[i * 3 + 0];
+                              g = cregs[i * 3 + 1];
+                              b = cregs[i * 3 + 2];
+                              SetRGB32(&#038;myScreen-&#062;ViewPort, i, r, g, b);
+                              }
+
+                           printf(&#034;Ctrl-C in this window to quit\n&#034;);
+                           /* Wait for the user to have a look...  */
+                           Wait(SIGBREAKF_CTRL_C);
+
+                           CloseScreen(myScreen);
+                           }
+                       else printf(&#034;Couldn't open required screen\n&#034;);
+                       }
+                   else printf(&#034;Couldn't get picture attributes\n&#034;);
+
+                  DisposeDTObject(dtobject);
+                  }
+               else printf(&#034;Couldn't perform PROC_LAYOUT\n&#034;);
+               }
+            else printf(&#034;Couldn't create new object or not a picture file\n&#034;);
+            }
+        else printf(&#034;Give a file name too.\n&#034;);
+
+        CloseLibrary(DataTypesBase);
+        }
+    else printf(&#034;Can't open datatypes library\n&#034;);
+
+    CloseLibrary(GfxBase);
+    }
+  else printf(&#034;Can't open V39 graphics\n&#034;);
+
+  CloseLibrary(IntuitionBase);
+  }
+else printf(&#034;Can't open V39 Intuition\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

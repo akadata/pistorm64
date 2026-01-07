@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_11" NODE="11-4-1" TITLE="11 / RigidDiskBlock-Fields and Implementation / How A Driver Uses RDB" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>11 / RigidDiskBlock-Fields and Implementation / How A Driver Uses RDB</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0079.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node007B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The information contained in the <a href="../Devices_Manual_guide/node0079.html#line59">RigidDiskBlock</a> and subsequent
+<a href="../Devices_Manual_guide/node0079.html#line144">PartitionBlocks</a>, et al., is used by a driver in the following manner.
+
+After determining that the target device is a hard disk (using the
+SCSI-direct command INQUIRY), the driver will scan the first
+RDB_LOCATION_LIMIT (16) blocks looking for a block with the &#034;RDSK&#034;
+identifier and a correct sum-to-zero checksum.  If no RDB is found then
+the driver will give up and not attempt to mount any partitions for this
+unit.  If the RDB is found then the driver looks to see if there's a
+partition list for this unit (rdb_PartitionList). If none, then just the
+rdb_Flags will be used to determine if there are any LUNs or units after
+this one.  This is used for early termination of the search for units on
+bootup.
+
+If a partition list is present, and the partition blocks have the correct
+ID and checksum, then for each partition block the driver does the
+<a name="line18">following.</a>
+
+   1. Checks the PBFB_NOMOUNT flag.  If set then this partition is just
+      reserving space.  Skip to the next partition without mounting the
+      current one.
+
+   2. If PBFB_NOMOUNT is false, then the partition is to be mounted.  The
+      driver fetches the given drive name from pb_DriveName.  This name
+      will be of the form dh0, work, wb_2.x etc.  A check is made to see if
+      this name already exists on eb_MountList or DOS's device list. If it
+      does, then the name is algorithmically altered to remove duplicates.
+      The A590, A2091 and A3000 append .n (where n is a number) unless
+      another name ending with .n is found.  In that case the name is
+      changed to .n+1 and the search for duplicates is retried.
+
+   3. Next the driver constructs a parameter packet for <a href="../Includes_and_Autodocs_2._guide/node03B8.html">MakeDosNode()</a> using
+      the (possibly altered) drive name and information about the Exec
+      device name and unit number.  MakeDosNode() is called to create a DOS
+      device node.  MakeDosNode() constructs a filesystem startup message
+      from the given information and fills in defaults for the ROM filing
+      system.
+
+   4. If <a href="../Includes_and_Autodocs_2._guide/node03B8.html">MakeDosNode()</a> succeeds then the driver checks to see if the entry
+      is using a standard (&#034;DOS\0&#034;) filing system.  If not then the
+      routine for patching in non-standard filing systems is called (see
+      &#034;<a href="../Devices_Manual_guide/node007B.html">Alien File Systems</a>&#034; below).
+
+   5. Now that the DOS node has been set up and the correct filing system
+      segment has been associated with it, the driver checks PBFB_BOOTABLE
+      to see if this partition is marked as bootable.  If the partition is
+      not bootable, or this is not autoboot time (DiagArea == 0) then the
+      driver simply calls <a href="../Includes_and_Autodocs_2._guide/node03B0.html">AddDosNode()</a> to enqueue the DOS device node.  If
+      the partition is bootable, then the driver constructs a boot node and
+      enqueues it on eb_MountList using the boot priority from the
+      environment vector.  If this boot priority is -128 then the partition
+      is not considered bootable.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

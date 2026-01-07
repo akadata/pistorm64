@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-1-1-2" TITLE="12 / / Using Boopsi / Creating an Object" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / Using Boopsi / Creating an Object</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0202.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0204.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Intuition function <a href="../Includes_and_Autodocs_2._guide/node022F.html">NewObjectA()</a> creates a Boopsi object:
+
+    mynewobject = APTR NewObjectA(Class *privclass, UBYTE *pubclass,
+                                  struct TagItem *myattrs)
+
+The pointer that <a href="../Includes_and_Autodocs_2._guide/node022F.html">NewObjectA()</a> returns is a pointer to a Boopsi object.  In
+general, Boopsi objects are &#034;black boxes&#034;.  This means the inner workings
+of Boopsi objects are not visible to the application programmer, so the
+programmer does not know what goes on inside it.  This really means the
+inner workings of these objects are none of your business.  Unless
+otherwise documented, only use an object pointer as a handle to the object.
+
+To create an object, <a href="../Includes_and_Autodocs_2._guide/node022F.html">NewObjectA()</a> needs to know what class the new object
+is an instance of.  To create a public class object, pass a NULL pointer
+in privclass and an ASCII string in pubclass naming the object's public
+class.  The privclass pointer is used to create a private class object,
+which is covered in the &#034;<a href="../Libraries_Manual_guide/node0215.html">Creating a Boopsi Class</a>&#034; section later in this
+chapter.
+
+The myattrs tag list is a list of tag/value pairs, each of which contains
+an initial value for some object attribute.  Most objects have a set of
+attributes associated with them, so each attribute has a tag name.  For
+Boopsi gadgets and images, the attributes include some of the values from
+<a name="line25">the old <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> and <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structures (position, size, etc.).</a>
+
+Most applications use the stack-based version of <a href="../Includes_and_Autodocs_2._guide/node022F.html">NewObjectA()</a>,
+<a href="../Includes_and_Autodocs_2._guide/node022F.html">NewObject()</a>, to create objects.  This allows an application to build the
+tag list of object attributes on the stack rather than having to allocate
+and initialize a tag list.  A code sample from a program that creates a
+Boopsi string gadget might look like this:
+
+    mystringgadget = (struct Gadget *)NewObject(NULL, &#034;strgclass&#034;,
+                                                GA_ID,           1L,
+                                                GA_Left,         0L,
+                                                GA_Top,          0L,
+                                                STRINGA_LongVal, 100L,
+                                                TAG_END);
+
+If <a href="../Includes_and_Autodocs_2._guide/node022F.html">NewObject()</a> is successful, it returns a pointer to a new Boopsi gadget
+object.  Otherwise, it returns NULL.  The class &#034;<a href="../Libraries_Manual_guide/node020A.html#line7">strgclass</a>&#034; is one of the
+public classes built into Release 2.  It is a class of string gadgets.
+
+If you look at the diagram of the public classes built into Intuition,
+you'll see that <a href="../Libraries_Manual_guide/node020A.html#line7">strgclass</a> is a subclass of <a href="../Libraries_Manual_guide/node020A.html">gadgetclass</a>. In the example
+above, the attribute tag IDs that start with &#034;GA_&#034; are defined by
+gadgetclass and not by strgclass.  This is because strgclass inherits
+these attributes from its superclass, gadgetclass. The other attribute,
+<a href="../Libraries_Manual_guide/node0512.html">STRINGA_LongVal</a>, is defined by strgclass.  It does two things.  First, it
+tells the object that it is a special type of string gadget which only
+handles an integer value rather than a generic ASCII string.  Second, it
+passes the object its initial integer value.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-59/AppWorkbench.txt" NODE="MAIN" TITLE="IV-59: AppWindows, AppIcons, and AppMenuItems" TOC="AmigaMail_Vol2/IV" -->
+<head>
+<title>IV-59: AppWindows, AppIcons, and AppMenuItems</title>
+</head>
+<body>
+<a href="../AmigaMail_Vol2_guide/node0004.html"><img src="../images/toc.gif" alt="[Contents]" border=0></a>
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00B1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00B3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+By Fred Mitchell and John Orr
+
+
+Since its inception, the Workbench&#228; has had a limitation.  Although it is
+a fairly powerful user interface, that power is not accessible to
+application programs.   The power is limited to an interface that only
+launches other programs.  After Workbench launches a program, the program
+no longer has any ties to the Workbench GUI.  If an application needs an
+iconic interface, it has to create its own, independent of Workbench.
+
+Workbench 2.0 is different.  Through the workbench.library, applications
+can utilize the iconic interface of Workbench 2.0.  There are three
+elements to this interface: AppWindows, AppIcons, and AppMenuItems.  In
+this article, they are referred to as AppObjects.
+
+When the user drops a Workbench icon onto a special kind of application
+window called an AppWindow, Workbench sends a message to the application
+that created the AppWindow.  This message contains a complete list of the
+icons that the user dropped on the window.  This is useful for an
+application like an editor.  The editor can open an Intuition window on
+the Workbench screen and make it into an AppWindow so that when the user
+drops an icon on the AppWindow, the editor will load the icon's
+corresponding file.  The IconEdit utility that comes on the 2.0 release
+disks does this.
+
+An application can also create its own icons for the Workbench window.
+These icons are called AppIcons.  They are similar to AppWindows in that
+Workbench will tell an application what icons the user dropped on its
+AppIcon.  In addition, Workbench will notify the application if the user
+double-clicks the AppIcon.  This makes AppIcons useful not only as a
+&#034;drop box&#034; (like an AppWindow), but they can also be used as some sort
+of activator for an application.  For example, a word processor that opens
+a window on the Workbench can use an AppIcon to &#034;iconify&#034; its window.
+When the user wants to get rid of a cumbersome window, he iconifies it,
+which gets rid of the window and leaves an AppIcon on the Workbench window
+in its place.  When the user wants the window back, he double-clicks the
+AppIcon and the window reappears.
+
+The release 2.0 Workbench has a special menu called &#034;Tools&#034;.  It is
+special because unlike the other Workbench menus, any application can add
+its own menu items to this menu.  These menu items are called
+AppMenuItems.  Like the AppIcon, the AppMenu can be used both as an
+activator and as a &#034;drop box&#034;. When the user selects one of these menu
+items, Workbench sends a message to the application that created the
+AppMenuItem.  If there were any icons selected when the user selected the
+AppMenuItem, the application will also get a list of those icons.
+
+ <a href="../AmigaMail_Vol2_guide/node00B3.html">The AppMessage Structure</a>      <a href="../AmigaMail_Vol2_guide/node00B5.html">AppWindows</a>      <a href="../AmigaMail_Vol2_guide/node00B7.html">AppMenuItems</a> 
+ <a href="../AmigaMail_Vol2_guide/node00B4.html">Adding AppObjects</a>             <a href="../AmigaMail_Vol2_guide/node00B6.html">AppIcons</a>        <a href="../AmigaMail_Vol2_guide/node01B1.html">adc.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

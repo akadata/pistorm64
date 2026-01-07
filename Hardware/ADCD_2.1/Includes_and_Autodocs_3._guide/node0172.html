@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="FreeDosObject()" TITLE="dos.library/FreeDosObject" -->
+<head>
+<title>dos.library/FreeDosObject</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0171.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0173.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FreeDosObject -- Frees an object allocated by <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a> (V36)
+
+<b>   SYNOPSIS</b>
+	FreeDosObject(type, ptr)
+		       D1   D2
+
+	void FreeDosObject(ULONG, void *)
+
+<b>   FUNCTION</b>
+	Frees an object allocated by <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>.  Do NOT call for
+	objects allocated in any other way.
+
+<b>   INPUTS</b>
+	type - type passed to <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>
+	ptr  - ptr returned by <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>
+
+<b>   BUGS</b>
+	Before V39, DOS_CLI objects will only have the struct
+	<a href="../Includes_and_Autodocs_3._guide/node05D9.html#line313">CommandLineInterface</a> freed, not the strings it points to.  This
+	is fixed in V39 dos.  Before V39, you can workaround this bug by
+	using <a href="../Includes_and_Autodocs_3._guide/node0212.html">FreeVec()</a> on cli_SetName, cli_CommandFile, cli_CommandName,
+	and cli_Prompt, and then setting them all to NULL.  In V39 or
+	above, do NOT use the workaround.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>, <a href="../Includes_and_Autodocs_3._guide/node0212.html">FreeVec()</a>, <a href="../Includes_and_Autodocs_3._guide/node05F8.html">&#060;dos/dos.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/utility" NODE="CallHookPkt()" TITLE="utility.library/CallHookPkt" -->
+<head>
+<title>utility.library/CallHookPkt</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03CF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03D1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CallHookPkt -- Invoke a <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> function callback. (V36)
+
+SYNOPSIS
+    return = CallHookPkt( hook, object, paramPkt )
+    D0                    A0    A2      A1
+
+    ULONG CallHookPkt( struct <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> *hook, VOID *object, VOID *paramPkt );
+
+FUNCTION
+    Performs the callback standard defined by a <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> structure.
+    This function is really very simple; it effectively performs
+    a JMP to Hook-&#062;h_Entry.
+
+    It is probably just as well to do this operation in an
+    assembly language function linked in to your program, possibly
+    from a compiler supplied library or a builtin function.
+
+    It is anticipated that C programs will often call a 'varargs'
+    variant of this function which will be named <a href="../Includes_and_Autodocs_2._guide/node0142.html">CallHook</a>.  This
+    function must be provided in a compiler specific library, but
+    an example of use would be:
+
+    returnval = CallHook( hook, dataobject, COMMAND_ID, param1, param2 );
+
+    This function <a href="../Includes_and_Autodocs_2._guide/node0142.html">CallHook</a> can be implemented in many C compilers
+    like this:
+    CallHook( hook, object, command, ... )
+    struct <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a>    *hook;
+    VOID            *object;
+    ULONG           command;
+    {
+            return ( CallHookPkt( hook, object, (VOID *) &#038;command ) );
+    }
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a>           - pointer to <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> structure as defined in
+                      <a href="../Includes_and_Autodocs_2._guide/node012D.html">utility/hooks.h</a>
+    Object          - useful data structure in the particular context the
+                      hook is being used for.
+    ParamPkt        - pointer to a parameter packet (often built on the
+                      stack); by convention this packet should start off
+                      with a longword command code, and the remaining
+                      data in the packet depends on that command.
+
+RESULT
+    return          - The meaning of the value returned in D0 depends on
+                      the context in which the <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> is being used.
+
+NOTES
+    The functions called through this function should follow normal
+    register conventions unless EXPLICITLY documented otherwise (and
+    they have a good reason too).
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node012D.html">utility/hooks.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

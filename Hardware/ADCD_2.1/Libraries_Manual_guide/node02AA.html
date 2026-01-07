@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_20" NODE="20-1-3" TITLE="20 / Memory Functions / Freeing System Memory" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>20 / Memory Functions / Freeing System Memory</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02A9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02AB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following examples free the memory chunks shown in the previous calls
+<a name="line3">to <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a>.</a>
+
+    FreeMem(apointer, 100);
+    FreeMem(anotherptr, 1000);
+
+A memory block allocated with <a href="../Libraries_Manual_guide/node02A9.html#line21">AllocVec()</a> must be returned to the system
+pool with the <a href="../Includes_and_Autodocs_2._guide/node0358.html">FreeVec()</a>.  This function uses the stored size in the
+allocation to free the memory block, so there is no need to specify the
+size of the memory block to free.
+
+    FreeVec(yap);
+
+<a href="../Libraries_Manual_guide/node02A7.html#line11">FreeMem()</a> and <a href="../Includes_and_Autodocs_2._guide/node0358.html">FreeVec()</a> return no status.  However, if you attempt to free
+a memory block in the middle of a chunk that the system believes is
+already free, you will cause a system crash. Applications must free the
+same size memory blocks that they allocated.  An allocated block may not
+be deallocated as smaller pieces.  Due to the internal way the system
+rounds up and aligns allocations.  Partial deallocations can corrupt the
+system memory list.
+
+    Leave Memory Allocations Out Of Interrupt Code.
+    -----------------------------------------------
+    Do not allocate or deallocate system memory from within interrupt
+    code.  The &#034;<a href="../Libraries_Manual_guide/node0308.html#line13">Exec Interrupts</a>&#034; chapter explains that an interrupt may
+    occur at any time, even during a memory allocation process.  As a
+    result, system data structures may not be internally consistent at
+    this time.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_18" NODE="18-1-4" TITLE="18 / What is a Library? / Changing the Contents of a Library" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>18 / What is a Library? / Changing the Contents of a Library</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0295.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0297.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The way in which an Amiga library is organized allows a programmer to
+change where the system looks for a library routine.  Exec provides a
+function to do this: <a href="../Includes_and_Autodocs_2._guide/node037C.html">SetFunction()</a>.  The SetFunction() routine redirects a
+library function call to an application-supplied function. (Although it's
+not addressed here, SetFunction() can also be used on Exec devices.)  For
+instance, the AmigaDOS command SetPatch uses SetFunction() to replace some
+OS routines with improved ones, primarily to fix bugs in ROM libraries.
+
+The format of the <a href="../Includes_and_Autodocs_2._guide/node037C.html">SetFunction()</a> routine is as follows:
+
+    SetFunction( struct Library *lib, LONG funcOffset, APTR funcEntry)
+                                 A1            A0               D0
+
+The lib argument is a pointer to the library containing the function entry
+to be changed.  The funcOffset is the Library Vector Offset (negative) of
+the function and funcEntry is the address of the new function you want to
+replace it with.  The <a href="../Includes_and_Autodocs_2._guide/node037C.html">SetFunction()</a> routine replaces the entry in the
+library's vector table at the given Library Vector Offset with a new
+address that points to the new routine and returns the old vector address.
+The old address can be used in the new routine to call the original
+library function.
+
+Normally, programs should not attempt to &#034;improve&#034; library functions.
+Because most programmers do not know exactly what system library functions
+do internally, OS patches can do more harm than good.  However, a
+legitimate use for <a href="../Includes_and_Autodocs_2._guide/node037C.html">SetFunction()</a> is in a debugger utility.  Using
+SetFunction(), a debugger could reroute system calls to a debugging
+routine.  The debugging routine can inspect the arguments to a library
+function call before calling the original library function (if everything
+is OK).  Such a debugger doesn't do any OS patching, it merely inspects.
+
+    <a href="../Includes_and_Autodocs_2._guide/node037C.html">SetFunction()</a> is for Advanced Users Only.
+    -----------------------------------------
+    It is very difficult to cleanly exit after performing SetFunction()
+    because other tasks may be executing your code and also because
+    additional SetFunction()'s may have occurred on the same function.
+    Also note that certain libraries (for example the V33 version of DOS
+    library) and some individual library function vectors are of
+    non-standard format and cannot be replaced via SetFunction().
+
+Although useful, performing <a href="../Includes_and_Autodocs_2._guide/node037C.html">SetFunction()</a> on a library routines poses
+several problems.  If a second task performs SetFunction() on the same
+library entry, SetFunction() returns the address of the new routine to the
+second task, not the original system vector.  In that case, the first task
+can no longer exit cleanly since that would leave the second task with an
+invalid pointer to a function which it could be relying on.
+
+You also need to know when it is safe to unload your replacement function.
+Removing it while another task is executing it will quickly lead to a
+crashed system.  Also, the replacement function will have to be
+re-entrant, like all Exec library functions.
+
+    Don't Do This!
+    --------------
+    For those of you who might be thinking about writing down the ROM
+    addresses returned by <a href="../Includes_and_Autodocs_2._guide/node037C.html">SetFunction()</a> and using them in some other
+    programs: Forget It.  The address returned by SetFunction() is
+    only good on the current system at the current time.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-3-7" TITLE="27 / / Performing Data Move Operations / Scaling Rectangular Areas" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Performing Data Move Operations / Scaling Rectangular Areas</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0366.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0368.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Includes_and_Autodocs_2._guide/node041E.html">BitMapScale()</a> will scale a single bitmap any integral size up to 16,383
+times its original size.  This function is available only in Release 2 and
+later versions of the OS.  It is called with the address of a BitScaleArgs
+structure (see &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00BF.html#line18">scale.h</a>&#062;).
+
+    void BitMapScale(struct BitScaleArgs *bsa)
+
+The bsa argument specifies the <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>s to use, the source and destination
+rectangles, as well as the scaling factor.  The source and destination may
+not overlap.  The caller must ensure that the destination BitMap is large
+enough to receive the scaled-up copy of the source rectangle.  The
+function <a href="../Includes_and_Autodocs_2._guide/node0472.html">ScalerDiv()</a> is provided to help in the calculation of the
+destination BitMap's size.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

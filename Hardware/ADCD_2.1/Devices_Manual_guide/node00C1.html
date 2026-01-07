@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_13" NODE="13-2-2" TITLE="13 / Device Interface / Opening The Timer Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>13 / Device Interface / Opening The Timer Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00C0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00C2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Three primary steps are required to open the timer device:
+
+   *  Create a message port using <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>. Reply messages from the
+      device must be directed to a message port.
+
+   *  Create an I/O request structure of type <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> using
+      <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>.
+
+   *  Open the timer device with one of the five timer device units. Call
+      <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> passing a pointer to the  <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a>.
+
+   struct MsgPort *TimerMP;   /* Message port pointer */
+   struct timerequest *TimerIO;  /* I/O structure pointer */
+
+     /* Create port for timer device communications */
+   if (!(TimerMP = CreatePort(0,0)))
+       cleanexit(&#034; Error: Can't create port\n&#034;,RETURN_FAIL);
+
+     /* Create message block for device IO */
+   if (!(TimerIO = (struct timerequest *)
+                   CreateExtIO(TimerMP)(sizeof timerequest)) )
+       cleanexit(&#034; Error: Can't create IO request\n&#034;,RETURN_FAIL);
+
+     /* Open the timer device with UNIT_MICROHZ */
+   if (error=OpenDevice(TIMERNAME,UNIT_MICROHZ,TimerIO,0))
+       cleanexit(&#034; Error: Can't open Timer.device\n&#034;,RETURN_FAIL);
+
+The procedure for applications which only use the timer device functions
+<a name="line30">is slightly different:</a>
+
+   *  Declare the timer device base address variable TimerBase in the
+      global data area.
+
+   *  Allocate memory for a <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> structure and a  <a href="../Devices_Manual_guide/node00BF.html#line25">timeval</a> structure
+      using <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a>.
+
+   *  Call <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>, passing the allocated <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> structure.
+
+   *  Set the timer device base address variable to point to the timer
+      device base.
+
+   struct Library *TimerBase;  /* global library pointer */
+
+   struct timerequest *TimerIO;
+   struct timeval *time1;
+
+     /* Allocate memory for timerequest and timeval structures */
+   TimerIO=(struct timerequest *)AllocMem(sizeof(struct timerequest),
+                                  MEMF_PUBLIC | MEMF_CLEAR);
+   time1=(struct timeval *)AllocMem(sizeof(struct timeval),
+                                  MEMF_PUBLIC | MEMF_CLEAR);
+   if (!TimerIO | !time1)
+       cleanexit(&#034; Error: Can't allocate memory for I/O structures\n&#034;,
+                          RETURN_FAIL);
+
+   if (error=OpenDevice(TIMERNAME,UNIT_MICROHZ,TimerIO,0))
+       cleanexit(&#034; Error: Can't open Timer.device\n&#034;,RETURN_FAIL);
+
+     /* Set up pointer for timer functions */
+   TimerBase = (struct Library *)TimerIO-&#062;tr_node.io_Device;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

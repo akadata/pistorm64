@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/graphics/gfx.h" NODE="MAIN" TITLE="include/graphics/gfx.h" -->
+<head>
+<title>include/graphics/gfx.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05DB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05DD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_GFX_H
+#define	GRAPHICS_GFX_H
+/*
+**	$VER: gfx.h 39.5 (19.3.1992)
+**	Includes Release 44.1
+**
+**	general include file for application programs
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+
+#define BITSET	0x8000
+#define BITCLR	0
+
+#define AGNUS
+#ifdef AGNUS
+#define TOBB(a)      ((long)(a))
+#else
+#define TOBB(a)      ((long)(a)&#062;&#062;1)  /* convert Chip adr to Bread Board Adr */
+#endif
+<a name="line26"></a>
+struct Rectangle
+{
+    WORD   MinX,MinY;
+    WORD   MaxX,MaxY;
+};
+<a name="line32"></a>
+struct Rect32
+{
+    LONG    MinX,MinY;
+    LONG    MaxX,MaxY;
+};
+
+typedef struct tPoint
+{
+    WORD x,y;
+} Point;
+<a name="line43"></a>
+typedef UBYTE *PLANEPTR;
+<a name="line45"></a>
+struct BitMap
+{
+    UWORD   BytesPerRow;
+    UWORD   Rows;
+    UBYTE   Flags;
+    UBYTE   Depth;
+    UWORD   pad;
+    PLANEPTR Planes[8];
+};
+
+/* This macro is obsolete as of V39. AllocBitMap() should be used for allocating
+   bitmap data, since it knows about the machine's particular alignment
+   restrictions.
+*/
+#define RASSIZE(w,h)	((ULONG)(h)*( ((ULONG)(w)+15)&#062;&#062;3&#038;0xFFFE))
+
+/* flags for AllocBitMap, etc. */
+#define BMB_CLEAR 0
+#define BMB_DISPLAYABLE 1
+#define BMB_INTERLEAVED 2
+#define BMB_STANDARD 3
+#define BMB_MINPLANES 4
+
+#define BMF_CLEAR (1l&#060;&#060;BMB_CLEAR)
+#define BMF_DISPLAYABLE (1l&#060;&#060;BMB_DISPLAYABLE)
+#define BMF_INTERLEAVED (1l&#060;&#060;BMB_INTERLEAVED)
+#define BMF_STANDARD (1l&#060;&#060;BMB_STANDARD)
+#define BMF_MINPLANES (1l&#060;&#060;BMB_MINPLANES)
+
+/* the following are for GetBitMapAttr() */
+#define BMA_HEIGHT 0
+#define BMA_DEPTH 4
+#define BMA_WIDTH 8
+#define BMA_FLAGS 12
+
+#endif	/* GRAPHICS_GFX_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

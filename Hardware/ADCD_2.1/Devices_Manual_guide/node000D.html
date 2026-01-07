@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_1" NODE="1-8" TITLE="1 Introduction to Amiga System Devices / Example Device Programs" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>1 Introduction to Amiga System Devices / Example Device Programs</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node000C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node000E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following short programs are examples of how to use a device.  Both
+send the serial device command SDCMD_QUERY to the serial device to
+determine the status of the serial device lines and registers.  The first
+program is for pre-V36 versions of the operating system (before Release 2)
+and the second is for V36 and higher.  You may use the pre-V36 version
+with V36 and higher, but you may not use the V36 version with older
+systems.
+
+The programs differ in the way they create the message port and I/O
+request.  The pre-V36 version uses the amiga.lib functions <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a> to
+create the message port and <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a> to create the I/O request; the
+V36 version uses the Exec functions <a href="../Includes_and_Autodocs_2._guide/node0345.html">CreateMsgPort()</a> to create the message
+port and <a href="../Includes_and_Autodocs_2._guide/node0344.html">CreateIORequest()</a> to create the I/O request.  Those are the only
+differences.
+
+     <a href="../Devices_Manual_guide/node015D.html">Device Usage Example (Pre-V36)</a> 
+     <a href="../Devices_Manual_guide/node015E.html">Device Usage Example (Kickstart V36 And Up)</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

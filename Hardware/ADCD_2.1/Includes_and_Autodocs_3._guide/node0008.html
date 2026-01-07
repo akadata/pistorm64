@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amigaguide" NODE="AmigaGuideSignal()" TITLE="amigaguide.library/AmigaGuideSignal" -->
+<head>
+<title>amigaguide.library/AmigaGuideSignal</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0007.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0009.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+        AmigaGuideSignal - Obtain aysnc AmigaGuide signal.      (V34)
+
+<b>   SYNOPSIS</b>
+        signal = AmigaGuideSignal ( handle );
+        d0                           a0
+
+        ULONG AmigaGuideSignal (AMIGAGUIDECONTEXT);
+
+<b>   FUNCTION</b>
+        This function returns the signal bit to <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait</a> on for AmigaGuideMsg's
+        for a particular AmigaGuide database.
+
+<b>   INPUTS</b>
+        handle -- Handle to a AmigaGuide system.
+
+<b>   EXAMPLE</b>
+        ULONG sigw, sigh;
+        <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line86">AMIGAGUIDECONTEXT</a> handle;
+
+        /* get the signal bit to wait on for a AmigaGuide message */
+        sigh = AmigaGuideSignal(handle);
+
+        /* add the signal bit into the total signals to wait on */
+        sigw |= sigh;
+
+<b>   RETURNS</b>
+        signal -- <a href="../Includes_and_Autodocs_3._guide/node023D.html">Signal</a> bit to <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait</a> on.
+
+<b>   SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node000F.html">OpenAmigaGuideAsyncA()</a>, <a href="../Includes_and_Autodocs_3._guide/node000B.html">GetAmigaGuideMsg()</a>, <a href="../Includes_and_Autodocs_3._guide/node0011.html">ReplyAmigaGuideMsg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

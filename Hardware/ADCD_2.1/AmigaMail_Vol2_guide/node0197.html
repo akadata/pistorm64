@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="III-29/dillo_test.c" NODE="MAIN" TITLE="III-29/dillo_test.c" -->
+<head>
+<title>III-29/dillo_test.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0196.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0198.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* dillo_test.c - Execute me to compile me with SAS/C 6.56
+sc data=far nominc strmer streq nostkchk saveds ign=73 dillo_test.c
+slink FROM LIB:c.o,dillo_test.o TO dillo_test LIB LIB:SC.lib,LIB:Amiga.lib
+quit
+*/
+
+/*
+**  dillo_test.c
+**
+**  This is the sample program to test the functions inside
+**  armadillo.library.  It creates a small array of Armadillos
+**  and after assigning various values, prints out their status.
+**
+*/
+
+#include    &#060;exec/types.h&#062;
+#include    &#060;exec/libraries.h&#062;
+
+#include    &#060;clib/exec_protos.h&#062;
+#include    &#060;pragmas/exec_pragmas.h&#062;
+
+#include    &#060;stdio.h&#062;
+
+#include    &#034;dillo_protos.h&#034;
+#include    &#034;armadillo_pragmas.h&#034;
+
+extern struct ExecBase *SysBase;	/* olsen 30-Jan-96 */
+
+/* Global data for the test program */
+
+struct Library *DilloBase;      /* armadillo.library library base */
+
+APTR dillo[5];                  /* Array of generic pointers to     */
+                                /* armadillos, since programs don't */
+                                /* need to know what the insides of */
+                                /* an armadillo look like.          */
+
+STRPTR names[5] = { &#034;Alex&#034;, &#034;Bob&#034;, &#034;Chris&#034;, &#034;Daniel&#034;, &#034;Eustace&#034; };
+ULONG namlen[5] = { 5, 4, 6, 7, 8 };
+ULONG weight[5] = { 18, 20, 19, 17, 354 };
+
+void
+main(void)
+{
+    BOOL okay = FALSE;
+    ULONG i = 0L;
+
+    if (DilloBase = OpenLibrary(&#034;armadillo.library&#034;,0))
+    {
+
+        for (i=0;i&#060;5;i++)
+        {
+            if (dillo[i] = CreateArmadillo())
+            {
+                if (okay = NameArmadillo( dillo[i], names[i], namlen[i] ))
+                {
+                    printf(&#034;Armadillo %ld named %s.\n&#034;,i,names[i]);
+                }
+                else
+                {
+                    printf(&#034;Armadillo %ld naming failure, it's anonymous.\n&#034;,i);
+                }
+
+                if (okay = FillArmadillo( dillo[i], weight[i] ))
+                {
+                    printf(&#034;Armadillo %ld weighs %ld.\n&#034;,i,weight[i]);
+                }
+                else
+                {
+                    printf(&#034;Armadillo %ld fill failure, it's dieting.\n&#034;,i);
+                }
+
+                if (i&#062;2)
+                {
+                    if (okay = FlattenArmadillo( dillo[i], TRUE ))
+                    {
+                        printf(&#034;Armadillo %ld had a slight mishap.\n&#034;,i);
+                    }
+                }
+            }
+            else
+            {
+                printf(&#034;Couldn't create Armadillo %ld\n&#034;,i);
+            }
+        }
+
+        /* Okay, all the armadillos are created (hopefully) and */
+        /* so as proof of concept and to test the data access   */
+        /* functions, now the program shows the status of each  */
+        /* of the armadillos.                                   */
+
+        printf(&#034;\nArmadillo Status Report\n&#034;);
+        printf(&#034;-----------------------\n&#034;);
+
+        for(i=0;i&#060;5;i++)
+        {
+            UBYTE namebuf[33];
+
+            printf(&#034;Armadillo #%ld\n&#034;,i);
+            if (DilloName(dillo[i],(STRPTR)&#038;namebuf,32))
+            {
+                printf(&#034;  Name   = \&#034;%s\&#034;\n&#034;,namebuf);
+            }
+            else
+            {
+                printf(&#034;  Name is invalid.\n&#034;);
+            }
+            printf(&#034;  Weight = %ld pounds\n\n&#034;,DilloWeight(dillo[i]));
+            printf(&#034;  Dillo is %s\n&#034;,
+                   (DilloFlat(dillo[i])?&#034;flat&#034;:&#034;lucky&#034;));
+            printf(&#034;-----\n&#034;);
+        }
+
+        printf(&#034;Total Dillos created: %ld\n\n&#034;,DilloBirths());
+
+        /* Now that the armadillos have been tested, we can */
+        /* delete them with gleeful abandon.                */
+
+        for(i=0;i&#060;5;i++)
+        {
+            DeleteArmadillo( dillo[i] );
+        }
+
+        /* We're done, so close the library... */
+        CloseLibrary(DilloBase);
+    }
+    else
+    {
+        printf(&#034;Couldn't open armadillo.library!\n&#034;);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

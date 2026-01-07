@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="XII-9/A570.txt" NODE="XII-9-21" TITLE="Level Three-Full Multitasking Support" -->
+<head>
+<title>Level Three-Full Multitasking Support</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0156.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0158.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A title conforming to Level Three support allows users to multitask
+freely (given sufficient memory).  These titles must include support
+for points 1) through 7) above.  Furthermore, Level Three titles may
+not re-assign any directory assigns that the system requires (i.e.
+fonts:, sys:, s:, etc.).
+
+If a title in this category needs to access a particular font on the
+CD-ROM, it should not re-assign fonts: to cd0:fonts.  Instead, it
+should refer to the full path name of the CD via the volume name of the
+disc (for example, MyDisk:Data/MyFile).  You should not refer to the
+device name (cd0:) since this may vary, either with more than one
+CD-ROM peripheral attached, or a different device name for a
+third-party drive.
+
+If your title does refer to a volume name, be careful when
+pre-mastering the title.  Make sure you enter the correct volume name
+when running the ISO utility.  If another company does the
+pre-mastering for you, make sure they use the correct volume name.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

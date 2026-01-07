@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/libraries/configregs.h" NODE="MAIN" TITLE="Includes/libraries/configregs.h" -->
+<head>
+<title>Includes/libraries/configregs.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00F5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00F7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef LIBRARIES_CONFIGREGS_H
+#define LIBRARIES_CONFIGREGS_H
+/*
+**	$Filename: libraries/configregs.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.13 $
+**	$Date: 91/02/15 $
+**
+**	AutoConfig (tm) hardware register and bit definitions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+<a name="line15"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif	/* EXEC_TYPES_H */
+
+
+/*
+** AutoConfig (tm) boards each contain a 32 byte &#034;ExpansionRom&#034; area that is
+** read by the system software at configuration time.  Configuration of each
+** board starts when the ConfigIn* signal is passed from the previous board
+** (or from the system for the first board).  Each board will present it's
+** ExpansionRom structure at location $00E80000 to be read by the system.
+** This file defines the appearance of the ExpansionRom area.
+**
+** Expansion boards are actually organized such that only one nybble per
+** 16 bit word contains valid information.  The low nybbles of each
+** word are combined to fill the structure below. (This table is structured
+** as LOGICAL information.  This means that it never corresponds exactly
+** with a physical implementation.)
+**
+** The ExpansionRom space is further split into two regions:  The first 16
+** bytes are read-only.  Except for the er_type field, this area is inverted
+** by the system software when read in.  The second 16 bytes contain the
+** control portion, where all read/write registers are located.
+**
+** The system builds one &#034;ConfigDev&#034; structure for each board found.  The
+** list of boards can be examined using the expansion.library/FindConfigDev
+** function.
+**
+** A special &#034;hacker&#034; Manufacturer ID number is reserved for test use:
+<a name="line45">** 2011 ($7DB).  When inverted this will look like $F824.</a>
+*/
+<a name="line47"></a>
+<a name="line48">struct ExpansionRom {		/* -First 16 bytes of the expansion ROM */</a>
+<a name="line49">    UBYTE	er_Type;	/* Board type, size and flags */</a>
+<a name="line50">    UBYTE	er_Product;	/* Product number, assigned by manufacturer */</a>
+<a name="line51">    UBYTE	er_Flags;	/* Flags */</a>
+<a name="line52">    UBYTE	er_Reserved03;	/* Must be zero ($ff inverted) */</a>
+<a name="line53">    UWORD	er_Manufacturer; /* Unique ID,ASSIGNED BY AMIGA, INC.! */</a>
+<a name="line54">    ULONG	er_SerialNumber; /* Available for use by manufacturer */</a>
+<a name="line55">    UWORD	er_InitDiagVec; /* Offset to optional &#034;DiagArea&#034; structure */</a>
+<a name="line56">    UBYTE	er_Reserved0c;</a>
+<a name="line57">    UBYTE	er_Reserved0d;</a>
+<a name="line58">    UBYTE	er_Reserved0e;</a>
+    UBYTE	er_Reserved0f;
+};
+
+
+/*
+** Note that use of the ec_BaseAddress register is tricky.  The system
+** will actually write twice.  First the low order nybble is written
+** to the ec_BaseAddress register+2 (D15-D12).	Then the entire byte is
+** written to ec_BaseAddress (D15-D8).	This allows writing of a byte-wide
+** address to nybble size registers.
+*/
+<a name="line70"></a>
+<a name="line71">struct ExpansionControl {	/* -Second 16 bytes of the expansion ROM */</a>
+<a name="line72">    UBYTE	ec_Interrupt;	/* Optional interrupt control register */</a>
+<a name="line73">    UBYTE	ec_Z3_HighBase; /* Zorro III   : Config address bits 24-31 */</a>
+<a name="line74">    UBYTE	ec_BaseAddress; /* Zorro II/III: Config address bits 16-23 */</a>
+<a name="line75">    UBYTE	ec_Shutup;	/* The system writes here to shut up a board */</a>
+<a name="line76">    UBYTE	ec_Reserved14;</a>
+<a name="line77">    UBYTE	ec_Reserved15;</a>
+<a name="line78">    UBYTE	ec_Reserved16;</a>
+<a name="line79">    UBYTE	ec_Reserved17;</a>
+<a name="line80">    UBYTE	ec_Reserved18;</a>
+<a name="line81">    UBYTE	ec_Reserved19;</a>
+<a name="line82">    UBYTE	ec_Reserved1a;</a>
+<a name="line83">    UBYTE	ec_Reserved1b;</a>
+<a name="line84">    UBYTE	ec_Reserved1c;</a>
+<a name="line85">    UBYTE	ec_Reserved1d;</a>
+<a name="line86">    UBYTE	ec_Reserved1e;</a>
+    UBYTE	ec_Reserved1f;
+};
+
+/*
+** many of the constants below consist of a triplet of equivalent
+** definitions: xxMASK is a bit mask of those bits that matter.
+** xxBIT is the starting bit number of the field.  xxSIZE is the
+** number of bits that make up the definition.	This method is
+** used when the field is larger than one bit.
+**
+** If the field is only one bit wide then the xxB_xx and xxF_xx convention
+** is used (xxB_xx is the bit number, and xxF_xx is mask of the bit).
+*/
+
+<a name="line101">/* manifest constants */</a>
+<a name="line102">#define E_SLOTSIZE		0x10000</a>
+<a name="line103">#define E_SLOTMASK		0xffff</a>
+#define E_SLOTSHIFT		16
+
+/* these define the free regions of Zorro memory space.
+** THESE MAY WELL CHANGE FOR FUTURE PRODUCTS!
+<a name="line108">*/</a>
+<a name="line109">#define E_EXPANSIONBASE	0x00e80000	/* Zorro II  config address */</a>
+#define EZ3_EXPANSIONBASE	0xff000000	/* Zorro III config address */
+<a name="line111"></a>
+<a name="line112">#define E_EXPANSIONSIZE	0x00080000	/* Zorro II  I/O type cards */</a>
+#define E_EXPANSIONSLOTS	8
+<a name="line114"></a>
+<a name="line115">#define E_MEMORYBASE		0x00200000	/* Zorro II  8MB space */</a>
+<a name="line116">#define E_MEMORYSIZE		0x00800000</a>
+#define E_MEMORYSLOTS		128
+<a name="line118"></a>
+<a name="line119">#define EZ3_CONFIGAREA		0x40000000	/* Zorro III space */</a>
+<a name="line120">#define EZ3_CONFIGAREAEND	0x7FFFFFFF	/* Zorro III space */</a>
+#define EZ3_SIZEGRANULARITY	0x00080000	/* 512K increments */
+
+
+
+/**** er_Type definitions (ttldcmmm) ***************************************/
+
+<a name="line127">/* er_Type board type bits -- the OS ignores &#034;old style&#034; boards */</a>
+<a name="line128">#define ERT_TYPEMASK		0xc0	/* Bits 7-6 */</a>
+<a name="line129">#define ERT_TYPEBIT		6</a>
+<a name="line130">#define ERT_TYPESIZE		2</a>
+<a name="line131">#define ERT_NEWBOARD		0xc0</a>
+<a name="line132">#define ERT_ZORROII		ERT_NEWBOARD</a>
+#define ERT_ZORROIII		0x80
+
+<a name="line135">/* other bits defined in er_Type */</a>
+<a name="line136">#define ERTB_MEMLIST		5   /* Link RAM into free memory list */</a>
+<a name="line137">#define ERTB_DIAGVALID		4   /* ROM vector is valid */</a>
+#define ERTB_CHAINEDCONFIG	3   /* Next config is part of the same card */
+<a name="line139"></a>
+<a name="line140">#define ERTF_MEMLIST		(1&#060;&#060;5)</a>
+<a name="line141">#define ERTF_DIAGVALID		(1&#060;&#060;4)</a>
+#define ERTF_CHAINEDCONFIG	(1&#060;&#060;3)
+
+<a name="line144">/* er_Type field memory size bits */</a>
+<a name="line145">#define ERT_MEMMASK		0x07	/* Bits 2-0 */</a>
+<a name="line146">#define ERT_MEMBIT		0</a>
+#define ERT_MEMSIZE		3
+
+
+<a name="line150"></a>
+/**** er_Flags byte -- for those things that didn't fit into the type byte ****/
+<a name="line152">/**** the hardware stores this byte in inverted form			   ****/</a>
+<a name="line153">#define ERFF_MEMSPACE		(1&#060;&#060;7)	/* Wants to be in 8 meg space. */</a>
+#define ERFB_MEMSPACE		7	/* (NOT IMPLEMENTED) */
+<a name="line155"></a>
+<a name="line156">#define ERFF_NOSHUTUP		(1&#060;&#060;6)	/* Board can't be shut up */</a>
+#define ERFB_NOSHUTUP		6
+<a name="line158"></a>
+<a name="line159">#define ERFF_EXTENDED		(1&#060;&#060;5)	/* Zorro III: Use extended size table */</a>
+#define ERFB_EXTENDED		5	/*	      for bits 0-2 of er_Type */
+					/* Zorro II : Must be 0 */
+<a name="line162"></a>
+<a name="line163">#define ERFF_ZORRO_III		(1&#060;&#060;4)	/* Zorro III: must be 1 */</a>
+#define ERFB_ZORRO_III		4	/* Zorro II : must be 0 */
+<a name="line165"></a>
+<a name="line166">#define ERT_Z3_SSMASK		0x0F	/* Bits 3-0.  Zorro III Sub-Size.  How */</a>
+<a name="line167">#define ERT_Z3_SSBIT		0	/* much space the card actually uses   */</a>
+#define ERT_Z3_SSSIZE		4	/* (regardless of config granularity)  */
+					/* Zorro II : must be 0	       */
+
+
+<a name="line172">/* ec_Interrupt register (unused) ********************************************/</a>
+<a name="line173">#define ECIB_INTENA		1</a>
+<a name="line174">#define ECIB_RESET		3</a>
+<a name="line175">#define ECIB_INT2PEND		4</a>
+<a name="line176">#define ECIB_INT6PEND		5</a>
+<a name="line177">#define ECIB_INT7PEND		6</a>
+#define ECIB_INTERRUPTING	7
+<a name="line179"></a>
+<a name="line180">#define ECIF_INTENA		(1&#060;&#060;1)</a>
+<a name="line181">#define ECIF_RESET		(1&#060;&#060;3)</a>
+<a name="line182">#define ECIF_INT2PEND		(1&#060;&#060;4)</a>
+<a name="line183">#define ECIF_INT6PEND		(1&#060;&#060;5)</a>
+<a name="line184">#define ECIF_INT7PEND		(1&#060;&#060;6)</a>
+#define ECIF_INTERRUPTING	(1&#060;&#060;7)
+
+
+
+/* figure out amount of memory needed by this box/board */
+<a name="line190">#define ERT_MEMNEEDED(t)	\</a>
+	(((t)&#038;ERT_MEMMASK)? 0x10000 &#060;&#060; (((t)&#038;ERT_MEMMASK) -1) : 0x800000 )
+
+/* same as ERT_MEMNEEDED, but return number of slots */
+<a name="line194">#define ERT_SLOTSNEEDED(t)	\</a>
+	(((t)&#038;ERT_MEMMASK)? 1 &#060;&#060; (((t)&#038;ERT_MEMMASK)-1) : 0x80 )
+
+
+
+<a name="line199">/* convert a expansion slot number into a memory address */</a>
+#define EC_MEMADDR(slot)		((slot) &#060;&#060; (E_SLOTSHIFT) )
+
+<a name="line202">/* a kludge to get the byte offset of a structure */</a>
+#define EROFFSET(er)	((int)&#038;((struct ExpansionRom *)0)-&#062;er)
+<a name="line204">#define ECOFFSET(ec)	\</a>
+ (sizeof(struct ExpansionRom)+((int)&#038;((struct ExpansionControl *)0)-&#062;ec))
+
+
+
+/***************************************************************************
+**
+** these are the specifications for the diagnostic area.  If the Diagnostic
+** Address Valid bit is set in the Board Type byte (the first byte in
+** expansion space) then the Diag Init vector contains a valid offset.
+**
+** The Diag Init vector is actually a word offset from the base of the
+** board.  The resulting address points to the base of the DiagArea
+** structure.  The structure may be physically implemented either four,
+** eight, or sixteen bits wide.  The code will be copied out into
+** ram first before being called.
+**
+** The da_Size field, and both code offsets (da_DiagPoint and da_BootPoint)
+** are offsets from the diag area AFTER it has been copied into ram, and
+** &#034;de-nibbleized&#034; (if needed).  (In other words, the size is the size of
+** the actual information, not how much address space is required to
+** store it.)
+**
+** All bits are encoded with uninverted logic (e.g. 5 volts on the bus
+** is a logic one).
+**
+** If your board is to make use of the boot facility then it must leave
+** its config area available even after it has been configured.  Your
+** boot vector will be called AFTER your board's final address has been
+** set.
+**
+****************************************************************************/
+<a name="line236"></a>
+<a name="line237">struct DiagArea {</a>
+<a name="line238">    UBYTE	da_Config;	/* see below for definitions */</a>
+<a name="line239">    UBYTE	da_Flags;	/* see below for definitions */</a>
+<a name="line240">    UWORD	da_Size;	/* the size (in bytes) of the total diag area */</a>
+<a name="line241">    UWORD	da_DiagPoint;	/* where to start for diagnostics, or zero */</a>
+<a name="line242">    UWORD	da_BootPoint;	/* where to start for booting */</a>
+    UWORD	da_Name;	/* offset in diag area where a string */
+				/*   identifier can be found (or zero if no */
+				/*   identifier is present). */
+<a name="line246"></a>
+<a name="line247">    UWORD	da_Reserved01;	/* two words of reserved data.	must be zero. */</a>
+    UWORD	da_Reserved02;
+};
+
+/* da_Config definitions */
+/*
+** DAC_BYTEWIDE can be simulated using DAC_NIBBLEWIDE.
+<a name="line254">*/</a>
+<a name="line255">#define DAC_BUSWIDTH	0xC0 /* two bits for bus width */</a>
+<a name="line256">#define DAC_NIBBLEWIDE	0x00</a>
+<a name="line257">#define DAC_BYTEWIDE	0x40 /* BUG: Will not work under V34 Kickstart! */</a>
+#define DAC_WORDWIDE	0x80
+<a name="line259"></a>
+<a name="line260">#define DAC_BOOTTIME	0x30	/* two bits for when to boot */</a>
+<a name="line261">#define DAC_NEVER	0x00	/* obvious */</a>
+#define DAC_CONFIGTIME	0x10	/* call da_BootPoint when first configing */
+<a name="line263">				/*   the device */</a>
+#define DAC_BINDTIME	0x20	/* run when binding drivers to boards */
+
+/*
+**
+** These are the calling conventions for the diagnostic callback
+** (from da_DiagPoint):
+**
+** A7 -- points to at least 2K of stack
+** A6 -- ExecBase
+** A5 -- ExpansionBase
+** A3 -- your board's ConfigDev structure
+** A2 -- Base of diag/init area that was copied
+** A0 -- Base of your board
+**
+** Your board must return a value in D0.  If this value is NULL, then
+** the diag/init area that was copied in will be returned to the free
+** memory pool.
+*/
+
+
+#endif /* LIBRARIES_CONFIGREGS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

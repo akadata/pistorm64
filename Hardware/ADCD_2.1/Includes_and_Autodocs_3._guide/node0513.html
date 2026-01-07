@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="printer" NODE="PRD_SETERRHOOK" TITLE="printer.device/PRD_SETERRHOOK" -->
+<head>
+<title>printer.device/PRD_SETERRHOOK</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0512.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0514.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	PRD_SETERRHOOK -- set a hook for error messages (V44)
+
+<b>   FUNCTION</b>
+	This command sets a hook that will be called if the printer.device
+	returns with an error from any other I/O command. This allows
+	printer drivers to use private error messages.
+
+<b>   IO REQUEST</b>
+	io_Message	mn_ReplyPort set if quick I/O is not possible
+	io_Device	preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Command	PRD_SETERRORHOOK
+	io_Hook		a pointer to a hook that will be called
+
+	Two standard hook values a defined:
+
+	PDHOOK_NONE	no error hook is to be used
+	PDHOOK_STD	EasyRequest() is used to display the error message
+
+	The hook gets a pointer to the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> that caused the error as
+	the object and a pointer to the following structure as message:
+
+struct <a href="../Includes_and_Autodocs_3._guide/node0605.html#line383">PrtErrMsg</a> {
+	ULONG pe_Version;
+	ULONG pe_ErrorLevel;
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *pe_Window; /* window for EasyRequest() */
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1456">EasyStruct</a> *pe_ES;
+	ULONG *pe_IDCMP;
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> pe_ArgList;
+};
+	pe_Version	the message version number PDHOOK_VERSION
+	pe_ErrorLevel	one of RETURN_WARN, RETURN_ERROR, RETURN_FAIL
+	pe_Window	a window pointer (for EasyRequest()) or NULL
+	pe_ES		a pointer to the error message structure
+	pe_IDCMP	a pointer to IDCMP Flags for EasyRequest()
+	pe_ArgList	a pointer to an array of arguments
+
+	The simplest case is to use that structure to call EasyRequest()
+	or to <a href="../Includes_and_Autodocs_3._guide/node0048.html">printf()</a> a message to a console (use the error message from
+	pe_ES and the pe_ArgList).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

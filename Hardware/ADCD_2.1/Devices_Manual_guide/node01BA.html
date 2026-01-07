@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_ILBM" NODE="16-3-4-2" TITLE=" Nonstandard Data Chunks / CCRT " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Nonstandard Data Chunks / CCRT </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01B9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01BB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Commodore's Graphicraft program uses a similar chunk &#034;CCRT&#034; (for Color
+Cycling Range and Timing).  This chunk contains a CycleInfo structure.
+
+    typedef struct {
+        WORD  direction;    /* 0 = don't cycle.  1 = cycle forwards      */
+                            /* (1, 2, 3). -1 = cycle backwards (3, 2, 1) */
+        UBYTE start, end;   /* lower and upper color registers selected  */
+        LONG  seconds;      /* # seconds between changing colors plus... */
+        LONG  microseconds; /* # microseconds between changing colors    */
+        WORD  pad;          /* reserved for future use; store 0 here     */
+        } CycleInfo;
+
+This is very similar to a CRNG chunk.  A program would probably only use
+one of these two methods of expressing color cycle data, new programs
+should use CRNG.  You could write out both if you want to communicate this
+information to both Deluxe Paint and Graphicraft.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

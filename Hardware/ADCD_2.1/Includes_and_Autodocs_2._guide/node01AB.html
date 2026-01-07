@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/commodities" NODE="DivertCxMsg()" TITLE="commodities.library/DivertCxMsg" -->
+<head>
+<title>commodities.library/DivertCxMsg</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01AA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01AC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    DivertCxMsg -- send a commodity message down an object list. (V36)
+
+SYNOPSIS
+    DivertCxMsg(cxm,headObj,returnObj);
+                A0  A1      A2
+
+    VOID DivertCxMsg(struct CxMsg *,CxObj *,CxObj *);
+
+FUNCTION
+    This function sends the commodity message 'cxm' down the list of
+    objects attached to 'headObj'. The pointer 'returnObj' is first
+    pushed onto the routing stack of 'cxm' so that when the end of the
+    list of 'headObj' is reached the SUCCESSOR of 'returnObj' is the
+    next destination.
+
+    For example, when a filter finds a match with a message, the
+    message is diverted down the filter's list like this:
+
+            DivertCxMsg(cxm,filter,filter);
+
+INPUTS
+    cxm - the commodity message to divert
+    headObj - the list of objects to divert the message to
+    returnObj - the object to use as a place holder
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01B1.html">RouteCxMsg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

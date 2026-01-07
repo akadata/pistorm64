@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="AllocVec()" TITLE="exec.library/AllocVec" -->
+<head>
+<title>exec.library/AllocVec</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0334.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0336.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AllocVec -- allocate memory and keep track of the size  (V36)
+
+SYNOPSIS
+    memoryBlock = AllocVec(byteSize, attributes)
+    D0                     D0        D1
+
+    void *AllocVec(ULONG, ULONG);
+
+FUNCTION
+    This function works identically to <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a>, but tracks the size
+    of the allocation.
+
+    See the <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a> documentation for details.
+
+WARNING
+    The result of any memory allocation MUST be checked, and a viable
+    error handling path taken.  ANY allocation may fail if memory has
+    been filled.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0358.html">FreeVec</a>, <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

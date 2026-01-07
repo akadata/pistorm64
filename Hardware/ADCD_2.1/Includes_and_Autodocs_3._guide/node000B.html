@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amigaguide" NODE="GetAmigaGuideMsg()" TITLE="amigaguide.library/GetAmigaGuideMsg" -->
+<head>
+<title>amigaguide.library/GetAmigaGuideMsg</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node000A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node000C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+        GetAmigaGuideMsg - Receive async AmigaGuide message.    (V34)
+
+<b>   SYNOPSIS</b>
+        msg = GetAmigaGuideMsg (handle);
+        d0                       a0
+
+        struct <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line88">AmigaGuideMsg</a> *GetAmigaGuideMsg (AMIGAGUIDECONTEXT);
+
+<b>   FUNCTION</b>
+        This function returns a SIPC message from the AmigaGuide system,
+        if there is a message available.
+
+<b>   INPUTS</b>
+        handle - Handle to a AmigaGuide system.
+
+<b>   EXAMPLE</b>
+
+        <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line86">AMIGAGUIDECONTEXT</a> handle;
+        struct <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line88">AmigaGuideMsg</a> *agm;
+
+        /* get a AmigaGuide message */
+        while (agm = GetAmigaGuideMsg(handle))
+        {
+            /* process the event */
+            switch (agm-&#062;agm_Type)
+            {
+                case ToolCmdReplyID: /* a command has completed */
+                    if (agm-&#062;agm_Pri_Ret)
+                    {
+                        /* An error occurred, the reason is in agm_Sec_Ret.
+                         * The command string is in agm_Data
+                         */
+                    }
+                    break;
+
+                case ToolStatusID: /* status message */
+                    if (agm-&#062;agm_Pri_Ret)
+                    {
+                        /* an error occurred, the reason is in agm_Sec_Ret */
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+            /* reply to the AmigaGuide message */
+            ReplyAmigaGuideMsg(agm);
+        }
+
+<b>   RETURNS</b>
+        msg -- Pointer to a SIPC message or NULL if no message was
+            available.
+
+<b>   SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node000F.html">OpenAmigaGuideAsyncA()</a>, <a href="../Includes_and_Autodocs_3._guide/node0008.html">AmigaGuideSignal()</a>, <a href="../Includes_and_Autodocs_3._guide/node0011.html">ReplyAmigaGuideMsg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

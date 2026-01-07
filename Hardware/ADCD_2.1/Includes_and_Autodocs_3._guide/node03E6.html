@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="ResetMenuStrip()" TITLE="intuition.library/ResetMenuStrip" -->
+<head>
+<title>intuition.library/ResetMenuStrip</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03E5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03E7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ResetMenuStrip -- Re-attach a menu strip to a window. (V36)
+
+<b>    SYNOPSIS</b>
+	Success = ResetMenuStrip( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line59">Menu</a> )
+	D0		          A0      A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> ResetMenuStrip( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line59">Menu</a> * );
+
+<b>    FUNCTION</b>
+	This function is simply a &#034;fast&#034; version of <a href="../Includes_and_Autodocs_3._guide/node03F2.html">SetMenuStrip()</a> that
+	doesn't perform the precalculations of menu page sizes that
+	<a href="../Includes_and_Autodocs_3._guide/node03F2.html">SetMenuStrip()</a> does.
+
+	You may call this function ONLY IF the menu strip and all items
+	and sub-items have not changed since the menu strip was passed to
+	<a href="../Includes_and_Autodocs_3._guide/node03F2.html">SetMenuStrip()</a>, with the following exceptions:
+
+	- You may change the CHECKED flag to turn a checkmark on or off.
+	- You may change the ITEMENABLED flag to enable/disable some
+	  <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line87">MenuItem</a> or <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line59">Menu</a> structures.
+
+	In all other ways, this function performs like <a href="../Includes_and_Autodocs_3._guide/node03F2.html">SetMenuStrip()</a>.
+
+	The new sequence of events you can use is:
+	- <a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a>
+	- <a href="../Includes_and_Autodocs_3._guide/node03F2.html">SetMenuStrip()</a>
+	zero or more iterations of:
+	    - <a href="../Includes_and_Autodocs_3._guide/node039D.html">ClearMenuStrip()</a>
+	    - change CHECKED or ITEMENABLED flags
+	    - ResetMenuStrip()
+	- <a href="../Includes_and_Autodocs_3._guide/node039D.html">ClearMenuStrip()</a>
+	- <a href="../Includes_and_Autodocs_3._guide/node03A0.html">CloseWindow()</a>
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to a <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> structure
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line59">Menu</a> = pointer to the first menu in the menu strip
+
+<b>    RESULT</b>
+	TRUE always.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03F2.html">SetMenuStrip()</a>, <a href="../Includes_and_Autodocs_3._guide/node039D.html">ClearMenuStrip()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

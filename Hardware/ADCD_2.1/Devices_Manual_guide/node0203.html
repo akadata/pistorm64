@@ -1,0 +1,388 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/modules/ilbmr.c" NODE="MAIN" TITLE="Devices/modules/ilbmr.c" -->
+<head>
+<title>Devices/modules/ilbmr.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0202.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0204.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* ilbmr.c --- ILBM loading routines for use with iffparse */
+
+/*----------------------------------------------------------------------*
+ * ILBMR.C  Support routines for reading ILBM files.
+ * (IFF is Interchange Format File.)
+ *
+ * Based on code by Jerry Morrison and Steve Shaw, Electronic Arts.
+ * This software is in the public domain.
+ * Modified for iffparse.library 05/90
+ * This version for the Amiga computer.
+ *----------------------------------------------------------------------*/
+
+#include &#034;iffp/ilbm.h&#034;
+#include &#034;iffp/packer.h&#034;
+#include &#034;iffp/ilbmapp.h&#034;
+
+#define movmem CopyMem
+
+#define MaxSrcPlanes (25)
+
+extern struct Library *GfxBase;
+
+/*---------- loadbody ---------------------------------------------------*/
+
+LONG loadbody(iff, bitmap, bmhd)
+struct IFFHandle *iff;
+struct BitMap *bitmap;
+BitMapHeader *bmhd;
+	{
+	BYTE *buffer;
+	ULONG bufsize;
+	LONG error = 1;
+
+	D(bug(&#034;In loadbody\n&#034;));
+
+	if(!(currentchunkis(iff,ID_ILBM,ID_BODY)))
+	    {
+	    message(&#034;ILBM has no BODY\n&#034;);	/* Maybe it's a palette */
+	    return(IFF_OKAY);
+	    }
+
+	if((bitmap)&#038;&#038;(bmhd))
+	    {
+	    D(bug(&#034;Have bitmap and bmhd\n&#034;));
+
+	    bufsize = MaxPackedSize(RowBytes(bmhd-&#062;w)) &#060;&#060; 4;
+            if(!(buffer = AllocMem(bufsize,0L)))
+		{
+		D(bug(&#034;Buffer alloc of %ld failed\n&#034;,bufsize));
+		return(IFFERR_NOMEM);
+		}
+	    error = loadbody2(iff, bitmap, NULL, bmhd, buffer, bufsize);
+	    D(bug(&#034;Returned from getbody, error = %ld\n&#034;,error));
+	    }
+	FreeMem(buffer,bufsize);
+	return(error);
+	}
+
+
+/* like the old GetBODY */
+LONG loadbody2(iff, bitmap, mask, bmhd, buffer, bufsize)
+struct IFFHandle *iff;
+struct BitMap *bitmap;
+BYTE *mask;
+BitMapHeader *bmhd;
+BYTE *buffer;
+ULONG bufsize;
+   {
+   UBYTE srcPlaneCnt = bmhd-&#062;nPlanes;   /* Haven't counted for mask plane yet*/
+   WORD srcRowBytes = RowBytes(bmhd-&#062;w);
+   WORD destRowBytes = bitmap-&#062;BytesPerRow;
+   LONG bufRowBytes = MaxPackedSize(srcRowBytes);
+   int nRows = bmhd-&#062;h;
+   WORD compression = bmhd-&#062;compression;
+   register int iPlane, iRow, nEmpty;
+   register WORD nFilled;
+   BYTE *buf, *nullDest, *nullBuf, **pDest;
+   BYTE *planes[MaxSrcPlanes]; /* array of ptrs to planes &#038; mask */
+   struct ContextNode *cn;
+
+   D(bug(&#034;srcRowBytes = %ld\n&#034;,srcRowBytes));
+
+   cn = CurrentChunk(iff);
+
+   if (compression &#062; cmpByteRun1)
+      return(CLIENT_ERROR);
+
+   D(bug(&#034;loadbody2: compression=%ld srcBytes=%ld bitmapBytes=%ld\n&#034;,
+		compression, srcRowBytes, bitmap-&#062;BytesPerRow));
+   D(bug(&#034;loadbody2: bufsize=%ld bufRowBytes=%ld, srcPlaneCnt=%ld\n&#034;,
+			bufsize, bufRowBytes, srcPlaneCnt));
+
+   /* Complain if client asked for a conversion GetBODY doesn't handle.*/
+   if ( srcRowBytes  &#062;  bitmap-&#062;BytesPerRow  ||
+         bufsize &#060; bufRowBytes * 2  ||
+         srcPlaneCnt &#062; MaxSrcPlanes )
+      return(CLIENT_ERROR);
+
+   D(bug(&#034;loadbody2: past conversion checks\n&#034;));
+
+   if (nRows &#062; bitmap-&#062;Rows)   nRows = bitmap-&#062;Rows;
+
+   D(bug(&#034;loadbody2: srcRowBytes=%ld, srcRows=%ld, srcDepth=%ld, destDepth=%ld\n&#034;,
+		srcRowBytes, nRows, bmhd-&#062;nPlanes, bitmap-&#062;Depth));
+
+   /* Initialize array &#034;planes&#034; with bitmap ptrs; NULL in empty slots.*/
+   for (iPlane = 0; iPlane &#060; bitmap-&#062;Depth; iPlane++)
+      planes[iPlane] = (BYTE *)bitmap-&#062;Planes[iPlane];
+   for ( ;  iPlane &#060; MaxSrcPlanes;  iPlane++)
+      planes[iPlane] = NULL;
+
+   /* Copy any mask plane ptr into corresponding &#034;planes&#034; slot.*/
+   if (bmhd-&#062;masking == mskHasMask)
+	{
+      	if (mask != NULL)
+             planes[srcPlaneCnt] = mask;  /* If there are more srcPlanes than
+               * dstPlanes, there will be NULL plane-pointers before this.*/
+      	else
+             planes[srcPlaneCnt] = NULL;  /* In case more dstPlanes than src.*/
+      	srcPlaneCnt += 1;  /* Include mask plane in count.*/
+      	}
+
+   /* Setup a sink for dummy destination of rows from unwanted planes.*/
+   nullDest = buffer;
+   buffer  += srcRowBytes;
+   bufsize -= srcRowBytes;
+
+   /* Read the BODY contents into client's bitmap.
+    * De-interleave planes and decompress rows.
+    * MODIFIES: Last iteration modifies bufsize.*/
+
+   buf = buffer + bufsize;  /* Buffer is currently empty.*/
+   for (iRow = nRows; iRow &#062; 0; iRow--)
+	{
+      	for (iPlane = 0; iPlane &#060; srcPlaneCnt; iPlane++)
+	    {
+ 	    pDest = &#038;planes[iPlane];
+
+            /* Establish a sink for any unwanted plane.*/
+            if (*pDest == NULL)
+		{
+	    	nullBuf = nullDest;
+            	pDest   = &#038;nullBuf;
+            	}
+
+            /* Read in at least enough bytes to uncompress next row.*/
+            nEmpty  = buf - buffer;	  /* size of empty part of buffer.*/
+            nFilled = bufsize - nEmpty;	  /* this part has data.*/
+	    if (nFilled &#060; bufRowBytes)
+		{
+	    	/* Need to read more.*/
+
+	    	/* Move the existing data to the front of the buffer.*/
+	    	/* Now covers range buffer[0]..buffer[nFilled-1].*/
+            	movmem(buf, buffer, nFilled);  /* Could be moving 0 bytes.*/
+
+            	if(nEmpty &#062; ChunkMoreBytes(cn))
+		    {
+               	    /* There aren't enough bytes left to fill the buffer.*/
+               	    nEmpty = ChunkMoreBytes(cn);
+               	    bufsize = nFilled + nEmpty;  /* heh-heh */
+               	    }
+
+	    	/* Append new data to the existing data.*/
+            	if(ReadChunkBytes(iff, &#038;buffer[nFilled], nEmpty) &#060; nEmpty)
+			return(CLIENT_ERROR);
+
+            	buf     = buffer;
+	    	nFilled = bufsize;
+	    	nEmpty  = 0;
+	    	}
+
+ 	    /* Copy uncompressed row to destination plane.*/
+            if(compression == cmpNone)
+		{
+            	if(nFilled &#060; srcRowBytes)  return(IFFERR_MANGLED);
+	    	movmem(buf, *pDest, srcRowBytes);
+	    	buf    += srcRowBytes;
+            	*pDest += destRowBytes;
+            	}
+	    else
+		{
+         	/* Decompress row to destination plane.*/
+            	if ( unpackrow(&#038;buf, pDest, nFilled,  srcRowBytes) )
+                    /*  pSource, pDest, srcBytes, dstBytes  */
+               		return(IFFERR_MANGLED);
+	    	else *pDest += (destRowBytes - srcRowBytes);
+		}
+	    }
+	}
+   return(IFF_OKAY);
+   }
+
+
+/* ----------- getcolors ------------- */
+
+/* getcolors - allocates a ilbm-&#062;colortable for at least MAXAMCOLORREG
+ *      and loads CMAP colors into it, setting ilbm-&#062;ncolors to number
+ *      of colors actually loaded.
+ */
+LONG getcolors(struct ILBMInfo *ilbm)
+	{
+	struct IFFHandle	*iff;
+	int error = 1;
+
+	if(!(iff=ilbm-&#062;ParseInfo.iff))	return(CLIENT_ERROR);
+
+	if(!(error = alloccolortable(ilbm)))
+	   error = loadcmap(iff, ilbm-&#062;colortable, &#038;ilbm-&#062;ncolors);
+	if(error) freecolors(ilbm);
+	D(bug(&#034;getcolors: error = %ld\n&#034;,error));
+	return(error);
+	}
+
+
+/* alloccolortable - allocates ilbm-&#062;colortable and sets ilbm-&#062;ncolors
+ *	to the number of colors we have room for in the table.
+ */
+
+LONG alloccolortable(struct ILBMInfo *ilbm)
+	{
+	struct IFFHandle	*iff;
+	struct	StoredProperty	*sp;
+
+	LONG	error = CLIENT_ERROR;
+	ULONG	ctabsize;
+	USHORT	ncolors;
+
+	if(!(iff=ilbm-&#062;ParseInfo.iff))	return(CLIENT_ERROR);
+
+	if(sp = FindProp (iff, ID_ILBM, ID_CMAP))
+		{
+		/*
+		 * Compute the size table we need
+		 */
+		ncolors = sp-&#062;sp_Size / 3;		/* how many in CMAP */
+		ncolors = MAX(ncolors, MAXAMCOLORREG);
+
+		ctabsize = ncolors * sizeof(Color4);
+		if(ilbm-&#062;colortable =
+		   (Color4 *)AllocMem(ctabsize,MEMF_CLEAR|MEMF_PUBLIC))
+		    {
+		    ilbm-&#062;ncolors = ncolors;
+		    ilbm-&#062;ctabsize = ctabsize;
+		    error = 0L;
+		    }
+		else error = IFFERR_NOMEM;
+		}
+	D(bug(&#034;alloccolortable for %ld colors: error = %ld\n&#034;,ncolors,error));
+	return(error);
+	}
+
+
+void freecolors(struct ILBMInfo *ilbm)
+	{
+	if(ilbm-&#062;colortable)
+		{
+		FreeMem(ilbm-&#062;colortable, ilbm-&#062;ctabsize);
+		}
+	ilbm-&#062;colortable = NULL;
+	ilbm-&#062;ctabsize = 0;
+	}
+
+
+
+/* Passed IFFHandle, pointer to colortable array, and pointer to
+ * a USHORT containing number of colors caller has space to hold,
+ * loads the colors and sets pNcolors to the number actually read.
+ *
+ * NOTE !!! - Old GetCMAP passed a pointer to a UBYTE for pNcolors
+ *            This one is passed a pointer to a USHORT
+ */
+LONG loadcmap(struct IFFHandle *iff, WORD *colortable,USHORT *pNcolors)
+	{
+	register struct StoredProperty	*sp;
+	register LONG			idx;
+	register ULONG			ncolors;
+	register UBYTE			*rgb;
+	LONG				r, g, b;
+
+	if(!(colortable))
+		{
+		message(&#034;No colortable allocated\n&#034;);
+		return(1);
+		}
+
+	if(!(sp = FindProp (iff, ID_ILBM, ID_CMAP)))	return(1);
+
+	rgb = sp-&#062;sp_Data;
+	ncolors = sp-&#062;sp_Size / sizeofColorRegister;
+	if(*pNcolors &#060; ncolors)	ncolors = *pNcolors;
+	*pNcolors = ncolors;
+
+	idx = 0;
+        while (ncolors--)
+                {
+                r = (*rgb++ &#038; 0xF0) &#060;&#060; 4;
+                g = *rgb++ &#038; 0xF0;
+                b = *rgb++ &#062;&#062; 4;
+                colortable[idx] = r | g | b;
+                idx++;
+                }
+        return(0);
+        }
+
+/*
+ * Returns CAMG or computed mode for storage in ilbm-&#062;camg
+ *
+ * ilbm-&#062;Bmhd structure must be initialized prior to this call.
+<a name="line310"> */</a>
+ULONG getcamg(struct ILBMInfo *ilbm)
+	{
+	struct IFFHandle *iff;
+	struct StoredProperty *sp;
+	UWORD  wide,high,deep;
+	ULONG modeid = 0L;
+
+    	if(!(iff=ilbm-&#062;ParseInfo.iff))	return(0L);
+
+	wide = ilbm-&#062;Bmhd.pageWidth;
+	high = ilbm-&#062;Bmhd.pageHeight;
+	deep = ilbm-&#062;Bmhd.nPlanes;
+
+	D(bug(&#034;Getting CAMG for w=%ld h=%ld d=%ld ILBM\n&#034;,wide,high,deep));
+
+        /*
+         * Grab CAMG's idea of the viewmodes.
+         */
+        if (sp = FindProp (iff, ID_ILBM, ID_CAMG))
+                {
+                modeid = (* (ULONG *) sp-&#062;sp_Data);
+
+                /* knock bad bits out of old-style 16-bit viewmode CAMGs
+                 */
+                if((!(modeid &#038; MONITOR_ID_MASK))||
+		  ((modeid &#038; EXTENDED_MODE)&#038;&#038;(!(modeid &#038; 0xFFFF0000))))
+                   modeid &#038;=
+		    (~(EXTENDED_MODE|SPRITES|GENLOCK_AUDIO|GENLOCK_VIDEO|VP_HIDE));
+
+                /* check for bogus CAMG like DPaintII brushes
+                 * with junk in upper word and extended bit
+                 * not set in lower word.
+                 */
+                if((modeid &#038; 0xFFFF0000)&#038;&#038;(!(modeid &#038; 0x00001000))) sp=NULL;
+                }
+
+        if(!sp) {
+                /*
+                 * No CAMG (or bad CAMG) present; use computed modes.
+                 */
+                if (wide &#062;= 640)        modeid = HIRES;
+                if (high &#062;= 400)        modeid |= LACE;
+                if (deep == 6)
+                        {
+                        modeid |= ilbm-&#062;EHB ? EXTRA_HALFBRITE : HAM;
+                        }
+		D(bug(&#034;No CAMG found - using mode $%08lx\n&#034;,modeid));
+                }
+
+	D(bug(&#034;getcamg: modeid = $%08lx\n&#034;,modeid));
+	return(modeid);
+	}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

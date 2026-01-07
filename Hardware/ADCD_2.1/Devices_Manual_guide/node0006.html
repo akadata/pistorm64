@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_1" NODE="1-3" TITLE="1 Introduction to Amiga System Devices / Using a Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>1 Introduction to Amiga System Devices / Using a Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0005.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0007.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Once a device has been opened, you use it by passing the I/O request to
+it. When the device processes the I/O request, it acts on the information
+the I/O request contains and returns a reply message, i.e., the I/O
+request, to the reply port specified in the I/O request when it is
+finished. The I/O request is passed to a device using one of three
+functions, <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>, <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> and <a href="../Includes_and_Autodocs_2._guide/node0141.html">BeginIO()</a>. They take only one argument:
+the I/O request you wish to pass to the device.
+<a name="line9"></a>
+
+   *  <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> is a synchronous function. It will not return until the device
+<a name="line12">      has responded to the I/O request.</a>
+
+   *  <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> is an asynchronous function.  It can return immediately, but
+      the I/O operation it initiates may take a short or long time.  Using
+      <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> requires you to monitor the message port for a return
+      message from the device.  In addition, some devices do not actually
+      respond asynchronously even though you called SendIO(); they will
+<a name="line19">      return when the I/O operation is finished.</a>
+
+   *  <a href="../Includes_and_Autodocs_2._guide/node0141.html">BeginIO()</a> is commonly used to control the quick I/O bit when sending
+      an I/O request to a device.  When the quick I/O flag (IOF_QUICK) is
+      set in the I/O request, a device is allowed to take certain shortcuts
+      in performing and completing a request.  If the request can complete
+      immediately, the device will not return a reply message and the quick
+      I/O flag will remain set.  If the request cannot be completed
+      immediately, the QUICK_IO flag will be clear.  <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> normally
+      requests quick I/O; <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> does not.
+<a name="line29"></a>
+<a name="line30"><a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> and <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> are most commonly used.</a>
+
+An I/O request typically has three fields set for every command sent to a
+device.  You set the command itself in the io_Command field, a pointer to
+the data for the command in the io_Data field, and the length of the data
+in the io_Length field.
+
+  SerialIO-&#062;IOSer.io_Length = sizeof(ReadBuffer);
+  SerialIO-&#062;IOSer.io_Data = ReadBuffer;
+  SerialIO-&#062;IOSer.io_Command  = CMD_READ;
+<a name="line40">  SendIO((struct IORequest *)SerialIO);</a>
+
+Commands consist of two parts - a prefix and the command word separated by
+an underscore, all in upper case.  The prefix indicates whether the
+ command is an Exec or device specific command.  All Exec commands have
+CMD as the prefix.  They are defined in the include file exec/<a href="../Includes_and_Autodocs_2._guide/node0094.html">io.h</a>.
+
+ <a href="../Devices_Manual_guide/node0007.html">Amiga Exec Commands</a> 
+ <a href="../Devices_Manual_guide/node0008.html">Amiga System Device Command Prefixes and Examples</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

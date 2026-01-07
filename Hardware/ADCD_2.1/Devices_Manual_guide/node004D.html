@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-7" TITLE="10 Printer Device / Querying the Printer Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 Printer Device / Querying the Printer Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node004C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node004E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The status of the printer port and registers can be determined by querying
+the printer device.  The information returned will vary depending on the
+type of printer - parallel or serial - selected by the user.  If parallel,
+the data returned will reflect the current state of the parallel port; if
+serial, the data returned will reflect the current state of the serial
+<a name="line7">port.</a>
+
+You query the printer device by passing an <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">IOStdReq</a> to the device with
+<a href="../Includes_and_Autodocs_2._guide/node051B.html">PRD_QUERY</a> set in io_Command and a pointer to a structure to hold the
+
+status set in io_Data.
+
+
+   struct PStat
+   {
+       UBYTE LSB;       /* least significant byte of status */
+       UBYTE MSB;       /* most significant byte of status */
+   };
+
+   union printerIO *PrintIO;
+
+   struct PStat status;
+
+   PrintIO-&#062;ios.io_Data = &#038;status;      /* point to status structure */
+<a name="line26">   PrintIO-&#062;ios.io_Command = PRD_QUERY;</a>
+   DoIO((struct IORequest *)request);
+
+The status is returned in the two UBYTES set in the io_Data field.  The
+printer type, either serial or parallel, is returned in the io_Actual
+field.
+
+   io_Data         Bit     Active          Function (Serial Device)
+   -------         ---     ------          ------------------------
+     LSB           0       low             reserved
+                   1       low             reserved
+                   2       low             reserved
+                   3       low             Data Set Ready
+                   4       low             Clear To Send
+                   5       low             Carrier Detect
+                   6       low             Ready To Send
+                   7       low             Data Terminal Ready
+     MSB           8       high            read buffer overflow
+                   9       high            break sent (most recent output)
+                   10      high            break received (as latest input)
+                   11      high            transmit x-OFFed
+                   12      high            receive x-OFFed
+                   13-15   high            reserved
+
+   io_Data         Bit     Active          Function (Parallel Device)
+   -------         ---     ------          --------------------------
+     LSB           0       high            printer busy (offline)
+                   1       high            paper out
+                   2       high            printer selected
+                   3        -              read=0; write=1
+                   4-7                     reserved
+     MSB           8-15                    reserved
+
+   io_Actual                               1-parallel, 2-serial
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

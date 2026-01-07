@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="console" NODE="CD_SETKEYMAP" TITLE="console.device/CD_SETKEYMAP" -->
+<head>
+<title>console.device/CD_SETKEYMAP</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00FD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00FF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	CD_SETKEYMAP -- set the current key map structure for this console
+
+<b>    FUNCTION</b>
+	Set the current <a href="../Includes_and_Autodocs_3._guide/node0623.html#line20">KeyMap</a> structure used by this console unit to
+	the structure pointed to by io_Data.
+
+<b>    IO REQUEST</b>
+	io_Message	mn_ReplyPort set if quick I/O is not possible
+	io_Device	preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Unit		preset by the call to <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Command	CD_SETKEYMAP
+	io_Flags	IOF_QUICK if quick I/O possible, else zero
+	io_Length	sizeof(*keyMap)
+	io_Data		struct <a href="../Includes_and_Autodocs_3._guide/node0623.html#line20">KeyMap</a> *keyMap
+			pointer to a structure that describes
+			the raw keycode to byte stream conversion.
+
+<b>    RESULTS</b>
+	This function sets the io_Error field in the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line26">IOStdReq</a>, and fills
+	the current key map from the structure pointed to by io_Data.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0621.html">exec/io.h</a>, <a href="../Includes_and_Autodocs_3._guide/node0623.html">devices/keymap.h</a>, <a href="../Includes_and_Autodocs_3._guide/node0657.html">devices/console.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

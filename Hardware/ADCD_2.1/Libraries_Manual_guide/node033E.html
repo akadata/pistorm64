@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-9-9" TITLE="27 / / Monitors, Modes and the Display Database / Mode Availability" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Monitors, Modes and the Display Database / Mode Availability</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node033D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node033F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Even if the video monitor (NTSC, PAL, VGA, A2024) or ECS chips required to
+support a given mode are not available, there will be a <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line49">DisplayInfo</a> for
+all of the display modes.  (This will not be the case for disk-based modes
+<a name="line5">such as Euro36, Euro72, etc.)</a>
+
+Thus, the graphics library provides the <a href="../Includes_and_Autodocs_2._guide/node045C.html">ModeNotAvailable()</a> function to
+determine whether a given mode is available, and if not, why not.  Data
+corruption might cause the look-up function, <a href="../Libraries_Manual_guide/node033C.html#line19">GetVPModeID()</a>, to fail even
+when it should not, so the careful programmer will always test the look-up
+function's return value.
+
+    error =  ULONG ModeNotAvailable( ULONG modeID )
+
+The modeID argument is again a 32-bit ModeID as shown in
+&#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line152">displayinfo.h</a>&#062;.  This function returns an error code, indicating
+why this modeID is not available, or NULL if there is no known reason why
+this mode should not be there.  The ULONG return values from this function
+are a proper superset of the DisplayInfo.NotAvailable field (defined in
+&#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line63">displayinfo.h</a>&#062;).
+
+The graphics library checks for the presence of the ECS chips at power up,
+but the monitor attached to the system cannot be detected and so must be
+specified by the user through a separate utility named AddMonitor.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="ActivateGadget()" TITLE="intuition.library/ActivateGadget" -->
+<head>
+<title>intuition.library/ActivateGadget</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node038E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0390.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ActivateGadget -- Activate a (string or custom) gadget.
+
+<b>    SYNOPSIS</b>
+	Success = ActivateGadget( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, <a href="../Includes_and_Autodocs_3._guide/node03E5.html">Request</a> )
+	D0			  A0      A1      A2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> ActivateGadget( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+		struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> * );
+
+<b>    FUNCTION</b>
+	Activates a string or custom gadget.  If successful, this means
+	that the user does not need to click in the gadget before typing.
+
+	The window parameter must point to the window which contains the gadget.
+	If the gadget is actually in a requester, the window must contain
+	the requester, and a pointer to the requester must also be
+	passed.	The requester parameter must only be valid if the gadget
+	has the	GTYP_REQGADGET flag set, a requirement for all requester
+	gadgets.
+
+	The success of this function depends on a rather complex set
+	of conditions.  The intent is that the user is never interrupted from
+	what interactions he may have underway.
+
+	The current set of conditions includes:
+	-   The window must be active.  If you are opening a new window
+	    and want an active gadget in it, it is not sufficient to
+	    assume that the WFLG_ACTIVATE flag has taken effect by the time
+	    <a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a> returns, even if you insert a delay of some
+	    finite amount of time.  Use the IDCMP_ACTIVEWINDOW <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line762">IntuiMessage</a>
+	    to tell when your window really becomes active.  Many
+	    programs use an event loop that calls ActivateGadget()
+	    whenever they receive the IDCMP_ACTIVEWINDOW message, and also
+	    the IDCMP_MOUSEBUTTONS messages, and so on, to keep the
+	    gadget active until it is used (or the user selects some
+	    other &#034;Cancel&#034; gadget).
+
+	-   No other gadgets may be in use.  This includes system gadgets,
+	    such as those for window sizing, dragging, etc.
+	-   If the gadget is in a requester, that requester must
+	    be active. (Use IDCMP_REQSET and IDCMP_REQCLEAR).
+	-   The right mouse button cannot be held down (e.g. menus)
+
+	NOTE: Don't try to activate a gadget which is disabled or
+	not attached to a window or requester.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> = pointer to the gadget that you want activated.
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to a window structure containing the gadget.
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> = pointer to a requester (may by NULL if this isn't
+           a requester gadget (i.e. GTYP_REQGADGET is not set)).
+
+<b>    RESULT</b>
+	If the conditions above are met, and the gadget is in fact a string
+	gadget, then this function will return TRUE, else FALSE.
+
+<b>    BUGS</b>
+	At present, this function will not return FALSE if a custom
+	gadget declines to be activated.
+
+<b>    SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

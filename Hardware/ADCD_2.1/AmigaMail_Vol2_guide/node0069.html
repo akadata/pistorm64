@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="II-37/pattern.txt" NODE="II-37-1" TITLE="Patterns" -->
+<head>
+<title>Patterns</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0068.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node006A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An AmigaDOS pattern matching string is a combination of alphanumeric
+characters and a series of special token characters.  These token
+characters are part of the ASCII character set and they denote such things
+as string matching wildcards, string repetitions, and string negation.
+Pattern matching strings can use parentheses to delimit pattern matching
+substrings.
+
+
+?    The question mark matches any single character.  For example,
+     the pattern matching string &#034;A?B&#034; matches any string that is
+     three letters long, that starts with an &#034;A&#034; and ends with a
+     &#034;B&#034;.
+
+
+#    The number sign matches strings containing zero or more
+     repetitions of the expression that immediately follows the # in
+     the pattern matching string.  For example, the pattern matching
+     string &#034;#A&#034; matches any string that consists of one or more of
+     the &#034;A&#034; character.  The pattern matching string &#034;#?&#034; matches
+     any non-NULL string.  The # can apply to entire substrings
+     delimited by parentheses.  For example, the pattern string
+     &#034;#(AB)&#034; matches any string consisting of one or more
+     repetitions of the substring &#034;AB&#034; (AB, ABAB, ABABAB...).
+
+
+%    Matches the NULL string.
+
+
+|    This is the OR symbol.  This matches strings that contain the
+     expressions on either side of the OR sign.  The expressions and
+     the OR symbol need to be enclosed in parentheses.  For example,
+     the pattern matching string &#034;(A|B)&#034; matches the string &#034;A&#034;
+     or the string &#034;B&#034;.  The pattern matching string A(B|%|C)
+     matches the strings &#034;AB&#034;, &#034;A&#034;, and &#034;AC&#034;.
+
+
+~    The tilde negates the expression that follows it.  All
+     strings that do not match the expression that follows the tilde
+     will match the expression with the tilde.  For example, the
+     pattern matching string &#034;~(#?.info)&#034; matches any string that
+     does not match the string &#034;#?.info&#034; (does not end with the
+     substring &#034;.info&#034;).
+
+
+*    The star is provided as an synonym to &#034;#?&#034;.  This is an
+     option which can be turned on.  Note that the star can not be
+     used by itself on all non-FileSystem devices, like a logical
+     device name assigned to a directory on a file system.  For
+     example:
+                Assign A: dh0:tmp
+                cd a:
+                list *
+
+     will produce an error.  The <a href="../AmigaMail_Vol2_guide/node0170.html">SetStar.c</a> example at the end of this
+     article is a small, stand-alone utility to turn this option on
+     and off.
+
+
+[]   All characters within brackets indicate a character class.  Any
+     character in the character class qualifies.  Within a character
+     class, a character range can be indicated by specifing the start
+     and stop character, separated with a minus sign.  Note that
+     character classes are case sensitive.  If character classes are
+     to be used in a case insensitive form, they should be translated
+     to uppercase.  Here are some example:
+
+       [ACF]#?         matches strings starting with `A', `C', or `F'
+       [A-D]#?         matches strings starting with `A', `B', `C', or `D'
+       [~ACF]#?        matches strings not starting with `A', `C', or `F'
+
+
+'    The quote character neutralizes the special meaning of a
+     special character.  Here are some examples:
+
+       '#'? matches only the literal string &#034;#?&#034;
+       '?(A|B|C|%)'# matches the literal strings &#034;?#&#034;, &#034;?A#&#034;, &#034;?B#&#034;, &#034;?C#&#034;
+       &#034; matches '
+
+
+()   Parentheses group special characters.  The expression within the
+     parentheses is a subpattern.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-7-1-6" TITLE="28 / / Detecting Gel Collisions / Using HitMask and MeMask" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Detecting Gel Collisions / Using HitMask and MeMask</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03B1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03B3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This section illustrates the use of the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line106">HitMask</a> and <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line106">MeMask</a> to define one
+type of collision.
+
+Suppose there are two classes of objects that you wish to control on the
+display:  ENEMYTANK and MYMISSILE.  Objects of class ENEMYTANK should be
+able to pass across one another without registering any collisions.
+Objects of class MYMISSILE should also be able to pass across one another
+without collisions.  However, when MYMISSILE and ENEMYTANK collide, the
+system should generate a call to a collision routine.
+
+Choose a pair of collision detect bits not yet assigned within <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line106">MeMask</a>, one
+to represent ENEMYTANK, the other to represent MYMISSILE.  You will use
+the same two bits in the corresponding <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line106">HitMask</a>.  In this example, bit 1
+represents ENEMYTANK objects and bit 2 represents MYMISSLE objects.
+
+                          MeMask  HitMask
+                          ------  -------
+              Bit Number   2  1    2  1
+              --- ------   -  -    -  -
+              ENEMYTANK 1  0  1    1  0
+              ENEMYTANK 2  0  1    1  0
+              MYMISSILE    1  0    0  1
+
+In the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line106">MeMask</a>, bit 1 is set to indicate that this object is an ENEMYTANK.
+Bit 2 is clear (zero) indicating this object is not a MYMISSILE object.
+In the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line106">HitMask</a> for ENEMYTANK objects, bit 1 is clear (zero) which means,
+&#034;I will not register collisions with other ENEMYTANK objects.&#034;  However,
+bit 2 is set (one) which means, &#034;I will register collisions with MYMISSILE
+objects.&#034;
+
+Thus when a call to <a href="../Libraries_Manual_guide/node03D1.html#line16">DoCollision()</a> occurs, for any objects that appear to
+be colliding, the system ANDs the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line106">MeMask</a> of one object with the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line106">HitMask</a> of
+the other object.  If there are non-zero bits present, the system will
+call one of your collision routines.
+
+In this example, suppose that the system senses a collision between
+ENEMYTANK 1 and ENEMYTANK 2.  Suppose also that ENEMYTANK 1 is the
+top/leftmost object of the pair.  Here is the way that the collision
+testing routine performs the test to see if the system will call any
+collision-handling routines:
+
+              Bit Number             2  1
+              --- ------             -  -
+              ENEMYTANK 1  MeMask    0  1
+              ENEMYTANK 2  HitMask   1  0
+
+              Result of logical-AND  0  0
+
+Therefore, the system does not call a collision routine.  But suppose that
+<a href="../Libraries_Manual_guide/node03D1.html#line16">DoCollision()</a> finds an overlap between ENEMYTANK 1 and MYMISSILE, where
+MYMISSILE is the top/leftmost of the pair:
+
+              Bit Number             2  1
+              --- ------             -  -
+              MYMISSILE MeMask       1  0
+              ENEMYTANK 2 HitMask    1  0
+
+              Result of logical-AND  1  0
+
+Therefore, the system calls the collision routine at position 2 in the
+table of collision-handling routines.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

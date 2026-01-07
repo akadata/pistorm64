@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-12-8" TITLE="5 / String Gadget Type / Custom String Editing" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / String Gadget Type / Custom String Editing</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node016D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node016F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The application may choose to control the editing features provided in
+<a href="../Libraries_Manual_guide/node0164.html">string</a> gadgets used within the application.  To locally install the custom
+string editing features, the application provides a hook in the
+<a href="../Libraries_Manual_guide/node016D.html">StringExtend</a> structure <a href="../Libraries_Manual_guide/node016D.html#line89">EditHook</a> field.
+
+A hook is a well defined calling interface for a user provided subroutine
+or function.  Hooks are more fully described in the &#034;<a href="../Libraries_Manual_guide/node04A2.html">Utility Library</a>&#034;
+chapter.  A <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget hook is called in the standard way, where the
+hook object is a pointer to a <a href="../Libraries_Manual_guide/node016F.html">SGWork</a> structure, and the hook message is a
+pointer to a command block.  However, unlike a function callback hook, a
+string gadget editing hook is called on Intuition's task context, not on
+the application's own context.  Therefore, a string gadget editing hook
+must not use dos.library, and may not <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a> on application signals or
+message ports, and may not call any Intuition function which might wait
+<a name="line16">for Intuition.</a>
+
+The command block starts with either (longword) <a href="../Libraries_Manual_guide/node0172.html">SGH_KEY</a> or <a href="../Libraries_Manual_guide/node0174.html">SGH_CLICK</a>.
+There may be new commands added in the future, so the application should
+not assume that these are the only possible commands. The hook should
+return zero if it doesn't understand the command and non-zero if the
+command is supported.
+
+The <a href="../Libraries_Manual_guide/node016F.html">SGWork</a> structure, defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00E5.html#line32">sghooks.h</a>&#062;, is listed on the
+next page.  Use this structure as the hook object for custom string
+editing hooks.
+
+ <a href="../Libraries_Manual_guide/node016F.html">SGWork Structure</a>       <a href="../Libraries_Manual_guide/node0173.html">Actions with SGH_KEY</a> 
+ <a href="../Libraries_Manual_guide/node0170.html">EditOp Definitions</a>     <a href="../Libraries_Manual_guide/node0174.html">The SGH_CLICK Command</a> 
+ <a href="../Libraries_Manual_guide/node0171.html">Actions Definitions</a>    <a href="../Libraries_Manual_guide/node0175.html">Actions with SGH_CLICK</a> 
+ <a href="../Libraries_Manual_guide/node0172.html">The SGH_KEY Command</a>    <a href="../Libraries_Manual_guide/node0596.html">Example String Gadget Editing Hook</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

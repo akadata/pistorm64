@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="UnlockLayerRom()" TITLE="graphics.library/UnlockLayerRom" -->
+<head>
+<title>graphics.library/UnlockLayerRom</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0335.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0337.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	UnlockLayerRom -- Unlock <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> structure by ROM(gfx lib) code.
+
+<b>   SYNOPSIS</b>
+	UnlockLayerRom( layer )
+			 a5
+
+	void UnlockLayerRom( struct <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> * );
+
+<b>   FUNCTION</b>
+	Release the lock on this layer. If the same task has called
+	<a href="../Includes_and_Autodocs_3._guide/node02FE.html">LockLayerRom</a> more than once than the same number of calls to
+	UnlockLayerRom must happen before the layer is actually freed
+	so that other tasks may use it.
+	This call does destroy scratch registers.
+	This call is identical to <a href="../Includes_and_Autodocs_3._guide/node0432.html">UnlockLayer</a> (layers.library).
+
+<b>   INPUTS</b>
+	layer - pointer to <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> structure
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02FE.html">LockLayerRom()</a> <a href="../Includes_and_Autodocs_3._guide/node0432.html">layers.library/UnlockLayer()</a> <a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

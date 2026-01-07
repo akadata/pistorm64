@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="AIFF-16" TITLE="AIFF.doc / AIFF / The Text Chunks, Name, Author, Copyright, Annotation " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>AIFF.doc / AIFF / The Text Chunks, Name, Author, Copyright, Annotation </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node022A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node022C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+These four chunks are included in the definition of every &#034;EA IFF 85&#034;
+file. All are text chunks; their data portion consists solely of text.
+Each of these chunks is optional.
+
+    #define 	NameID 'NAME' 	/* ckID for Name Chunk */
+    #define 	NameID 'AUTH' 	/* ckID for Author Chunk */
+    #define 	NameID '(c) ' 	/* ckID for Copyright Chunk */
+    #define 	NameID 'ANNO' 	/* ckID for Annotation Chunk */
+
+    typedef struct {
+	ID	ckID;
+	long	ckSize;
+	char 	text[];
+    }TextChunk;
+
+The ckID is either 'NAME', 'AUTH', '(c) ', or 'ANNO' depending on whether
+the chunk is a Name Chunk, Author Chunk, Copyright Chunk, or  Annotation
+Chunk, respectively.  For the Copyright Chunk, the 'c' is lowercase and
+there is a space (0x20) after the close parenthesis.
+
+The ckSize is the size of the data portion of the chunk, in this case the
+text.
+
+The text field contains pure ASCII characters.  it is not a pstring or a C
+string.  The number of characters in text is determined by ckSize.  The
+contents of text depend on the chunk, as described below:
+
+ <a href="../Devices_Manual_guide/node022C.html">Name Chunk</a> 
+ <a href="../Devices_Manual_guide/node022D.html">Author Chunk</a> 
+ <a href="../Devices_Manual_guide/node022E.html">Copyright Chunk</a> 
+ <a href="../Devices_Manual_guide/node022F.html">Annotation Chunk</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

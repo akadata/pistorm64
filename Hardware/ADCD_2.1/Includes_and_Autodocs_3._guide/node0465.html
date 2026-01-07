@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="lowlevel" NODE="GetKey()" TITLE="lowlevel.library/GetKey" -->
+<head>
+<title>lowlevel.library/GetKey</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0464.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0466.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetKey -- returns the currently pressed rawkey code and qualifiers.
+		  (V40)
+
+<b>   SYNOPSIS</b>
+	key = GetKey();
+	D0
+
+	ULONG GetKey(VOID);
+
+<b>   FUNCTION</b>
+	This function returns the currently pressed non-qualifier key and
+	all pressed qualifiers.
+
+	This function is safe within an interrupt.
+
+	This is a low level function that does not fit the normal Amiga
+	multitasking model. The values returned by this function are
+	not modified by which window/screen currently has input focus.
+
+<b>   RESULT</b>
+	key - key code for the last non-qualifier key pressed in the low
+	      order word. If no key is pressed this word will be FF. The
+	      upper order word contains the qualifiers which can be found
+	      within the long word as follows:
+	                Qualifier               Key
+	                LLKB_LSHIFT             Left Shift
+	                LLKB_RSHIFT             Rigt Shift
+	                LLKB_CAPSLOCK           Caps <a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock</a>
+	                LLKB_CONTROL            Control
+	                LLKB_LALT               Left Alt
+	                LLKB_RALT               Right Alt
+	                LLKB_LAMIGA             Left Amiga
+	                LLKB_RAMIGA             Right Amiga
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0624.html">&#060;libraries/lowlevel.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

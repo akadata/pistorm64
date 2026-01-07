@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_16" NODE="16-2-5" TITLE="16 / Creating a File Requester / The Save Requester" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>16 / Creating a File Requester / The Save Requester</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node027E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0280.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The save requester is a special type of file requester used for save
+operations.  It differs from the regular ASL file requester in several
+ways.  First, the color of the text making up the file names and the
+background color are interchanged.  This makes it more apparent to the
+user that they are looking at a save requester (instead of the usual load
+requester).
+
+Another difference, is that a save requester does not allow the user to
+select an existing file name by double-clicking on an entry in the
+scrolling list gadget.  This helps prevent the user from accidentally
+overwriting the wrong file.
+
+Save requesters can also create directories.  If the user types a
+directory name into the save requester and the directory doesn't exist,
+the save requester will create that directory (after getting the user's
+permission via another requester).
+
+To create a save requester, set the <a href="../Libraries_Manual_guide/node027D.html#line8">FILF_SAVE</a> flag of the ASL_FuncFlags
+tag. Remember that ASL tags and flag values are preserved across calls to
+<a href="../Libraries_Manual_guide/node027B.html#line43">AslRequest()</a>, so if you use a save requester, you must clear the FILF_SAVE
+bit and reset your ASL_FuncFlags when you want a load requester. Note that
+it does not make sense to have multiselection in a save requester, so the
+FILF_SAVE flag overrides the <a href="../Libraries_Manual_guide/node027D.html#line8">FILF_MULTISELECT</a> flag.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

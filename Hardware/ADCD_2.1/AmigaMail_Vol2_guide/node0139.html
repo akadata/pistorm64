@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="XI-1/amcx.txt" NODE="XI-1-11" TITLE="Other CxObjects" -->
+<head>
+<title>Other CxObjects</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0138.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node013A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are three remaining CxObjects:
+
+    signalCxObj = CxObj  *CxSignal(struct Task *,LONG signal);
+    debugCxObj  = CxObj  *CxDebug(LONG ID);
+    customCxObj = CxObj  *CxCustom(LONG *customfunction(), LONG  cxmID);
+
+When a signal CxObject receives a CxMessage, it signals a task.  When
+a debug CxObject receives a CxMessage, it sends debugging information
+to the serial port using kprintf().  Note that the debug CxObj did not
+work before V37.
+
+A custom CxObject is the only means by which a commodity can directly
+modify input events as they pass through the Commodities network as
+CxMessages.  The custom CxObject is probably the most dangerous of the
+CxObjects to use.  Unlike the rest of the code
+ a commodities programmer writes, the code passed to a custom CxObject
+runs as part of the input.device task, putting severe restrictions on
+the function.  No DOS or Intuition functions can be called.  No
+assumptions can be made about the values of regist ers upon entry.
+Any function passed to CxCustom() should be very quick and very
+simple, with a minimum of stack usage.
+
+Commodities Exchange calls a custom CxObject's function as follows:
+
+    void customfunction(CxMsg *cxm, CxObj *customcxobj);
+
+where cxm is a pointer to a CxMessage corresponding to a real input
+event, and customcxobj is a pointer to the custom CxObject.  The
+custom function can extract the pointer to the input event by calling
+CxMsgData().  Before passing the CxMessage to the cu stom function,
+Commodities Exchange sets the CxMessage's ID to the ID passed to
+CxCustom().
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

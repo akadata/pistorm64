@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/fontreq.c" NODE="MAIN" TITLE="Lib_examples/fontreq.c" -->
+<head>
+<title>Lib_examples/fontreq.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node057D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node057F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* fontreq.c - Execute me to compile me with Lattice 5.10
+LC -b1 -cfistq -v -y -j73 fontreq.c
+Blink FROM LIB:c.o,fontreq.o TO fontreq LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+**
+** The following example illustrates how to use a font requester.
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;libraries/asl.h&#062;
+
+#include &#060;clib/asl_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)     { return(0); }  /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }     /* really */
+#endif
+
+UBYTE *vers = &#034;$VER: fontreq 37.0&#034;;
+
+struct Library *AslBase = NULL;
+
+/* Our replacement strings for the &#034;mode&#034; cycle gadget.  The
+** first string is the cycle gadget's label.  The other strings
+** are the actual strings that will appear on the cycle gadget.
+*/
+UBYTE *modelist[] =
+{
+    &#034;RKM Modes&#034;,
+    &#034;Mode 0&#034;,
+    &#034;Mode 1&#034;,
+    &#034;Mode 2&#034;,
+    &#034;Mode 3&#034;,
+    &#034;Mode 4&#034;,
+    NULL
+};
+
+
+void main(int argc, char **argv)
+{
+    struct FontRequester *fr;
+
+    if (AslBase = OpenLibrary(&#034;asl.library&#034;, 37L))
+    {
+        if (fr = (struct FontRequester *)
+            AllocAslRequestTags(ASL_FontRequest,
+                /* tell the requester to use my custom mode names */
+                ASL_ModeList, modelist,
+
+                /* Supply initial values for requester */
+                ASL_FontName, (ULONG)&#034;topaz.font&#034;,
+                ASL_FontHeight, 11L,
+                ASL_FontStyles, FSF_BOLD | FSF_ITALIC,
+                ASL_FrontPen,  0x00L,
+                ASL_BackPen,   0x01L,
+
+                /* Only display font sizes between 8 and 14, inclusive. */
+                ASL_MinHeight, 8L,
+                ASL_MaxHeight, 14L,
+
+                /* Give all the gadgetry, but only display fixed width fonts */
+                ASL_FuncFlags, FONF_FRONTCOLOR | FONF_BACKCOLOR |
+                    FONF_DRAWMODE | FONF_STYLES | FONF_FIXEDWIDTH,
+                TAG_DONE))
+        {
+            /* Pop up the requester */
+            if (AslRequest(fr, NULL))
+            {
+                /* The user selected something,  report their choice */
+                printf(&#034;%s\n  YSize = %d  Style = 0x%x   Flags = 0x%x\n&#034;
+                       &#034;  FPen = 0x%x   BPen = 0x%x   DrawMode = 0x%x\n&#034;,
+                               fr-&#062;fo_Attr.ta_Name,
+                               fr-&#062;fo_Attr.ta_YSize,
+                               fr-&#062;fo_Attr.ta_Style,
+                               fr-&#062;fo_Attr.ta_Flags,
+                               fr-&#062;fo_FrontPen,
+                               fr-&#062;fo_BackPen,
+                               fr-&#062;fo_DrawMode);
+            }
+            else
+                /* The user cancelled the requester, or some kind of error
+                ** occurred preventing the requester from opening. */
+                printf(&#034;Request Cancelled\n&#034;);
+            FreeAslRequest(fr);
+        }
+        CloseLibrary(AslBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

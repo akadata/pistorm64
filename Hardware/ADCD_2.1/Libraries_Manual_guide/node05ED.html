@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/timersoftint.c" NODE="MAIN" TITLE="lib_examples/timersoftint.c" -->
+<head>
+<title>lib_examples/timersoftint.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05EC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05EE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* timersoftint.c - Execute me to compile me with SAS C 5.10
+LC -b1 -d0 -cfistq -v -y -j73 timersoftint.c
+Blink FROM LIB:c.o,timersoftint.o TO timersoftint LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit ; */
+/* timersoftint.c - Timer device software interrupt message port example. */
+
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/interrupts.h&#062;
+#include &#060;devices/timer.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }  /* really */
+#endif
+
+#define MICRO_DELAY 1000
+#define OFF     0
+#define ON      1
+#define STOPPED 2
+
+struct TSIData {
+    ULONG tsi_Counter;
+    ULONG tsi_Flag;
+    struct MsgPort *tsi_Port;
+};
+
+struct TSIData *tsidata;
+
+void tsoftcode(void);    /* Prototype for our software interrupt code */
+
+void main(void)
+{
+    struct MsgPort *port;
+    struct Interrupt *softint;
+    struct timerequest *tr;
+
+    ULONG endcount;
+
+    /* Allocate message port, data &#038; interrupt structures. Don't use CreatePort() */
+    /* or CreateMsgPort() since they allocate a signal (don't need that) for a    */
+    /* PA_SIGNAL type port. We need PA_SOFTINT.                                   */
+    if (tsidata = AllocMem(sizeof(struct TSIData), MEMF_PUBLIC|MEMF_CLEAR))
+    {
+        if(port = AllocMem(sizeof(struct MsgPort), MEMF_PUBLIC|MEMF_CLEAR))
+        {
+            NewList(&#038;(port-&#062;mp_MsgList));                             /* Initialize message list */
+            if (softint = AllocMem(sizeof(struct Interrupt), MEMF_PUBLIC|MEMF_CLEAR))
+            {
+                /* Set up the (software)interrupt structure. Note that this task runs at  */
+                /* priority 0. Software interrupts may only be priority -32, -16, 0, +16, */
+                /* +32. Also not that the correct node type for a software interrupt is   */
+                /* NT_INTERRUPT. (NT_SOFTINT is an internal Exec flag). This is the same  */
+                /* setup as that for a software interrupt which you Cause(). If our       */
+                /* interrupt code was in assembler, you could initialize is_Data here to  */
+                /* contain a pointer to shared data structures. An assembler software     */
+                /* interrupt routine would receive the is_Data in A1.                     */
+
+                softint-&#062;is_Code = tsoftcode;    /* The software interrupt routine */
+                softint-&#062;is_Data = tsidata;
+                softint-&#062;is_Node.ln_Pri = 0;
+
+                port-&#062;mp_Node.ln_Type = NT_MSGPORT;       /* Set up the PA_SOFTINT message port  */
+                port-&#062;mp_Flags = PA_SOFTINT;              /* (no need to make this port public). */
+                port-&#062;mp_SigTask = (struct Task *)softint;     /* pointer to interrupt structure */
+
+                /* Allocate timerequest */
+                if (tr = (struct timerequest *) CreateExtIO(port, sizeof(struct timerequest)))
+                {
+                    /* Open timer.device. NULL is success. */
+                    if (!(OpenDevice(&#034;timer.device&#034;, UNIT_MICROHZ, (struct IORequest *)tr, 0)))
+                    {
+                        tsidata-&#062;tsi_Flag = ON;        /* Init data structure to share globally. */
+                        tsidata-&#062;tsi_Port = port;
+
+                        /* Send of the first timerequest to start. IMPORTANT: Do NOT   */
+                        /* BeginIO() to any device other than audio or timer from      */
+                        /* within a software or hardware interrupt. The BeginIO() code */
+                        /* may allocate memory, wait or perform other functions which  */
+                        /* are illegal or dangerous during interrupts.                 */
+                        printf(&#034;starting softint. CTRL-C to break...\n&#034;);
+
+
+                        tr-&#062;tr_node.io_Command = TR_ADDREQUEST;    /* Initial iorequest to start */
+                        tr-&#062;tr_time.tv_micro = MICRO_DELAY;        /* software interrupt.        */
+                        BeginIO((struct IORequest *)tr);
+
+                        Wait(SIGBREAKF_CTRL_C);
+                        endcount = tsidata-&#062;tsi_Counter;
+                        printf(&#034;timer softint counted %ld milliseconds.\n&#034;, endcount);
+
+                        printf(&#034;Stopping timer...\n&#034;);
+                        tsidata-&#062;tsi_Flag = OFF;
+
+                        while (tsidata-&#062;tsi_Flag != STOPPED) Delay(10);
+
+                        CloseDevice((struct IORequest *)tr);
+                    }
+                    else printf(&#034;couldn't open timer.device\n&#034;);
+                    DeleteExtIO(tr);
+                }
+                else printf(&#034;couldn't create timerequest\n&#034;);
+                FreeMem(softint, sizeof(struct Interrupt));
+            }
+            FreeMem(port, sizeof(struct MsgPort));
+        }
+        FreeMem(tsidata, sizeof(struct TSIData));
+    }
+}
+
+void tsoftcode(void)
+{
+    struct timerequest *tr;
+
+    /* Remove the message from the port. */
+    tr = (struct timerequest *)GetMsg(tsidata-&#062;tsi_Port);
+
+    /* Keep on going if main() hasn't set flag to OFF. */
+    if ((tr) &#038;&#038; (tsidata-&#062;tsi_Flag == ON))
+    {
+        /* increment counter and re-send timerequest--IMPORTANT: This         */
+        /* self-perpetuating technique of calling BeginIO() during a software */
+        /* interrupt may only be used with the audio and timer device.        */
+        tsidata-&#062;tsi_Counter++;
+        tr-&#062;tr_node.io_Command = TR_ADDREQUEST;
+        tr-&#062;tr_time.tv_micro = MICRO_DELAY;
+        BeginIO((struct IORequest *)tr);
+    }
+    /* Tell main() we're out of here. */
+    else tsidata-&#062;tsi_Flag = STOPPED;
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-6-1" TITLE="6 / / Menu Selection Messages / Multi-Selection of Menu Items" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / / Menu Selection Messages / Multi-Selection of Menu Items</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0186.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0188.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Each activation of the menu system generates only a single event.  The
+user may select none, one or many items using any of the selection
+<a name="line4">techniques described above; still, only one event is sent.</a>
+
+The program finds out whether or not multiple items have been chosen by
+examining the field called <a href="../Libraries_Manual_guide/node019A.html#line93">NextSelect</a> in the <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structure.  The
+selected items are chained together through this field.  This list is only
+valid until the user next activates the menu system, as the items are
+chained together through the actual MenuItem structures used in the menu
+system.  If the user reselects an item, the NextSelect field of that item
+<a name="line12">will be overwritten.</a>
+
+In processing the menu events, the application should first take the
+appropriate action for the item selected by the user, then check the
+<a href="../Libraries_Manual_guide/node019A.html#line93">NextSelect</a> field.  If the number there is equal to the constant <a href="../Libraries_Manual_guide/node0188.html#line20">MENUNULL</a>,
+there is no next selection.  However, if it is not equal to MENUNULL, the
+user has selected another option after this one.  The program should
+process the next item as well, by checking its NextSelect field, until it
+<a name="line20">finds a NextSelect equal to MENUNULL.</a>
+
+The following code fragment shows the correct way to process a menu event:
+
+    struct IntuiMessage *msg;
+    struct Menu *menuStrip;
+    UWORD menuNumber;
+    struct MenuItem *item;
+
+    menuNumber = msg-&#062;Code;
+
+    while (menuNumber != MENUNULL)
+        {
+        item = ItemAddress(menuStrip, menuNumber);
+
+        /* process this item */
+
+        menuNumber = item-&#062;NextSelect;
+<a name="line38">        }</a>
+
+Intuition specifies which item or sub-item was selected in the
+<a href="../Libraries_Manual_guide/node01DE.html">IDCMP_MENUPICK</a> event by using a shorthand code known as a menu number.
+Programs can locate the <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structure that corresponds to a given
+menu number by using the <a href="../Includes_and_Autodocs_2._guide/node0223.html">ItemAddress()</a> function.  This function translates
+a menu number into a pointer to the MenuItem structure represented by the
+menu number.
+
+    struct MenuItem *ItemAddress( struct Menu *menuStrip,
+<a name="line48">                                  unsigned long menuNumber );</a>
+
+This allows the application to gain access to the <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structure and
+to correctly process multi-select events.  Again, when the user performs
+multiple selection, the program will receive only one message of class
+<a href="../Libraries_Manual_guide/node01DE.html">IDCMP_MENUPICK</a>.  For the program to behave correctly, it must pay
+attention to the <a href="../Libraries_Manual_guide/node019A.html#line93">NextSelect</a> field of the MenuItem, which will lead to the
+other menu selections.
+
+There may be some cases in an application's logical flow where the
+selection of a menu item voids any further menu processing.  For instance,
+after processing a &#034;quit&#034; menu selection, the application will, in
+general, ignore all further menu selections.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

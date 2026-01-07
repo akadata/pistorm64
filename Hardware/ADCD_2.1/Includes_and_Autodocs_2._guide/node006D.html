@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/dostags.h" NODE="MAIN" TITLE="Includes/dos/dostags.h" -->
+<head>
+<title>Includes/dos/dostags.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node006C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node006E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_DOSTAGS_H
+#define DOS_DOSTAGS_H
+/*
+**
+**	$Filename: dos/dostags.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.11 $
+**	$Date: 91/04/29 $
+**
+**	Tag definitions for all Dos routines using tags
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+<a name="line16"></a>
+#ifndef UTILITY_TAGITEM_H
+#include &#034;utility/tagitem.h&#034;
+#endif
+
+/*****************************************************************************/
+/* definitions for the System() call */
+<a name="line23"></a>
+<a name="line24">#define SYS_Dummy	(TAG_USER + 32)</a>
+#define	SYS_Input	(SYS_Dummy + 1)
+<a name="line26">				/* specifies the input filehandle  */</a>
+#define	SYS_Output	(SYS_Dummy + 2)
+<a name="line28">				/* specifies the output filehandle */</a>
+#define	SYS_Asynch	(SYS_Dummy + 3)
+<a name="line30">				/* run asynch, close input/output on exit(!) */</a>
+#define	SYS_UserShell	(SYS_Dummy + 4)
+<a name="line32">				/* send to user shell instead of boot shell */</a>
+#define	SYS_CustomShell	(SYS_Dummy + 5)
+				/* send to a specific shell (data is name) */
+/*	SYS_Error, */
+
+
+/*****************************************************************************/
+/* definitions for the CreateNewProc() call */
+/* you MUST specify one of NP_Seglist or NP_Entry.  All else is optional. */
+<a name="line41"></a>
+<a name="line42">#define	NP_Dummy (TAG_USER + 1000)</a>
+#define	NP_Seglist	(NP_Dummy + 1)
+<a name="line44">				/* seglist of code to run for the process  */</a>
+#define	NP_FreeSeglist	(NP_Dummy + 2)
+				/* free seglist on exit - only valid for   */
+<a name="line47">				/* for NP_Seglist.  Default is TRUE.	   */</a>
+#define	NP_Entry	(NP_Dummy + 3)
+				/* entry point to run - mutually exclusive */
+<a name="line50">				/* with NP_Seglist! */</a>
+#define	NP_Input	(NP_Dummy + 4)
+<a name="line52">				/* filehandle - default is Open(&#034;NIL:&#034;...) */</a>
+#define	NP_Output	(NP_Dummy + 5)
+<a name="line54">				/* filehandle - default is Open(&#034;NIL:&#034;...) */</a>
+#define	NP_CloseInput	(NP_Dummy + 6)
+				/* close input filehandle on exit	   */
+<a name="line57">				/* default TRUE				   */</a>
+#define	NP_CloseOutput	(NP_Dummy + 7)
+				/* close output filehandle on exit	   */
+<a name="line60">				/* default TRUE				   */</a>
+#define	NP_Error	(NP_Dummy + 8)
+<a name="line62">				/* filehandle - default is Open(&#034;NIL:&#034;...) */</a>
+#define	NP_CloseError	(NP_Dummy + 9)
+				/* close error filehandle on exit	   */
+<a name="line65">				/* default TRUE				   */</a>
+#define	NP_CurrentDir	(NP_Dummy + 10)
+<a name="line67">				/* lock - default is parent's current dir  */</a>
+#define	NP_StackSize	(NP_Dummy + 11)
+<a name="line69">				/* stacksize for process - default 4000    */</a>
+#define	NP_Name		(NP_Dummy + 12)
+<a name="line71">				/* name for process - default &#034;New Process&#034;*/</a>
+#define	NP_Priority	(NP_Dummy + 13)
+<a name="line73">				/* priority - default same as parent	   */</a>
+#define	NP_ConsoleTask	(NP_Dummy + 14)
+<a name="line75">				/* consoletask - default same as parent    */</a>
+#define	NP_WindowPtr	(NP_Dummy + 15)
+<a name="line77">				/* window ptr - default is same as parent  */</a>
+#define	NP_HomeDir	(NP_Dummy + 16)
+<a name="line79">				/* home directory - default curr home dir  */</a>
+#define	NP_CopyVars	(NP_Dummy + 17)
+<a name="line81">				/* boolean to copy local vars-default TRUE */</a>
+#define	NP_Cli		(NP_Dummy + 18)
+<a name="line83">				/* create cli structure - default FALSE    */</a>
+#define	NP_Path		(NP_Dummy + 19)
+				/* path - default is copy of parents path  */
+<a name="line86">				/* only valid if a cli process!	   */</a>
+#define	NP_CommandName	(NP_Dummy + 20)
+<a name="line88">				/* commandname - valid only for CLI	   */</a>
+#define	NP_Arguments	(NP_Dummy + 21)
+/* cstring of arguments - passed with str in a0, length in d0.	*/
+/* (copied and freed on exit.)	Default is 0-length NULL ptr.	*/
+/* NOTE: not operational until V37 - see BIX/TechNotes for	*/
+/* more info/workaround.  In V36, the registers were random.	*/
+/* You must NEVER use NP_Arguments with a NP_Input of NULL.	*/
+
+/* FIX! should this be only for cli's? */
+<a name="line97">#define	NP_NotifyOnDeath (NP_Dummy + 22)</a>
+				/* notify parent on death - default FALSE  */
+				/* Not functional yet. */
+<a name="line100">#define	NP_Synchronous	(NP_Dummy + 23)</a>
+				/* don't return until process finishes -   */
+				/* default FALSE.			   */
+				/* Not functional yet. */
+<a name="line104">#define	NP_ExitCode	(NP_Dummy + 24)</a>
+				/* code to be called on process exit	   */
+<a name="line106">#define	NP_ExitData	(NP_Dummy + 25)</a>
+				/* optional argument for NP_EndCode rtn -  */
+				/* default NULL				   */
+
+
+/*****************************************************************************/
+/* tags for AllocDosObject */
+
+<a name="line114">#define ADO_Dummy	(TAG_USER + 2000)</a>
+<a name="line115">#define	ADO_FH_Mode	(ADO_Dummy + 1)</a>
+				/* for type DOS_FILEHANDLE only		   */
+				/* sets up FH for mode specified.
+				   This can make a big difference for buffered
+				   files.				   */
+	/* The following are for DOS_CLI */
+	/* If you do not specify these, dos will use it's preferred values */
+	/* which may change from release to release.  The BPTRs to these   */
+	/* will be set up correctly for you.  Everything will be zero,	   */
+	/* except cli_FailLevel (10) and cli_Background (DOSTRUE).	   */
+	/* NOTE: you may also use these 4 tags with CreateNewProc.	   */
+
+<a name="line127">#define	ADO_DirLen	(ADO_Dummy + 2)</a>
+				/* size in bytes for current dir buffer    */
+<a name="line129">#define	ADO_CommNameLen	(ADO_Dummy + 3)</a>
+				/* size in bytes for command name buffer   */
+<a name="line131">#define	ADO_CommFileLen	(ADO_Dummy + 4)</a>
+				/* size in bytes for command file buffer   */
+<a name="line133">#define	ADO_PromptLen	(ADO_Dummy + 5)</a>
+				/* size in bytes for the prompt buffer	   */
+
+/*****************************************************************************/
+/* tags for NewLoadSeg */
+/* no tags are defined yet for NewLoadSeg */
+
+#endif /* DOS_DOSTAGS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

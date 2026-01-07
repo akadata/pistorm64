@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-4" TITLE="31 Commodities Exchange Library / CxMessages" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / CxMessages</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0402.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0404.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are actually two types of CxMessages.  The first, <a href="../Includes_and_Autodocs_2._guide/node00F0.html#line100">CXM_IEVENT</a>,
+corresponds to an input event and travels through the Commodities Exchange
+network.  The other type, <a href="../Includes_and_Autodocs_2._guide/node00F0.html#line113">CXM_COMMAND</a>, carries a command to a commodity.
+A CXM_COMMAND normally comes from the controller program and is used to
+pass user commands on to a commodity.  A commodity receives these commands
+<a name="line7">through an Exec message port that the commodity sets up before it calls</a>
+<a href="../Libraries_Manual_guide/node0402.html#line14">CxBroker()</a>.  The <a href="../Libraries_Manual_guide/node0402.html#line20">NewBroker</a>'s <a href="../Libraries_Manual_guide/node0402.html#line32">nb_Port</a> field points to this message port.  A
+commodity can tell the difference between the two types of CxMessages by
+<a name="line10">calling the <a href="../Includes_and_Autodocs_2._guide/node01A5.html">CxMsgType()</a> function.</a>
+
+    ULONG  CxMsgType( CxMsg *cxm );
+    UBYTE *CxMsgData( CxMsg *cxm );
+    LONG   CxMsgID  ( CxMsg *cxm );
+
+A CxMessage not only has a type, it can also have a data pointer as well
+as an ID associated with it.  The data associated with a <a href="../Includes_and_Autodocs_2._guide/node00F0.html#line100">CXM_IEVENT</a>
+CxMessage is an <a href="../Libraries_Manual_guide/node01D0.html">InputEvent</a> structure.  By using the <a href="../Includes_and_Autodocs_2._guide/node01A3.html">CxMsgData()</a> function,
+a commodity can obtain a pointer to the corresponding InputEvent of a
+CXM_IEVENT message.  Commodities Exchange gives an ID of zero to any
+CXM_IEVENT CxMessage that it introduces to the Commodities network but
+certain <a href="../Libraries_Manual_guide/node0401.html">CxObjects</a> can assign an ID to them.
+
+For a <a href="../Includes_and_Autodocs_2._guide/node00F0.html#line113">CXM_COMMAND</a> CxMessages, the data pointer is generally not used but
+the ID specifies a command passed to the commodity from the user operating
+the controller program.  The <a href="../Includes_and_Autodocs_2._guide/node01A4.html">CxMsgID()</a> macro extracts the ID from a
+CxMessage.
+
+ <a href="../Libraries_Manual_guide/node0586.html">A Simple Commodity Example</a> 
+ <a href="../Libraries_Manual_guide/node0404.html">Controller Commands</a> 
+ <a href="../Libraries_Manual_guide/node0405.html">Shutting Down the Commodity</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

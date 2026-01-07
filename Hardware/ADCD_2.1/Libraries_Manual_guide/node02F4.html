@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_24" NODE="24-3" TITLE="24 Exec Messages and Ports / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>24 Exec Messages and Ports / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02F3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02F5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following chart gives a brief description of the Exec functions that
+control inter-task communication with messages and ports.  See the Amiga
+ROM Kernel Reference Manual: Includes and Autodocs for details about each
+call.
+
+               Table 24-1: Exec Message and Port Functions
+  _____________________________________________________________________
+ |                                                                     |
+ |       Function                   Description                        |
+ |=====================================================================|
+ |        <a href="../Includes_and_Autodocs_2._guide/node0329.html">AddPort()</a>  Add a public message port to the system list.     |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0345.html">CreateMsgPort()</a>  Allocate and initialize a new message port (V37). |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0349.html">DeleteMsgPort()</a>  Free a message port, created with CreateMsgPort() |
+ |                   (V37).                                            |
+ |       <a href="../Includes_and_Autodocs_2._guide/node034F.html">FindPort()</a>  Find a public message port in the system list.    |
+ |         <a href="../Includes_and_Autodocs_2._guide/node035A.html">GetMsg()</a>  Get next message from the message port.           |
+ |         <a href="../Includes_and_Autodocs_2._guide/node036B.html">PutMsg()</a>  Put a message to a message port.                  |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0374.html">RemPort()</a>  Remove a message port from the system list.       |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0379.html">ReplyMsg()</a>  Reply to a message on its reply port.             |
+ |_____________________________________________________________________|
+
+
+               Table 24-2: Amiga.lib Exec Support Functions
+  _____________________________________________________________________
+ |                                                                     |
+ |       Function                   Description                        |
+ |=====================================================================|
+ |     <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>  Allocate and initialize a new message port, make  |
+ |                   public if named                                   |
+ |     <a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>  Delete a message port, created with CreatePort(). |
+ |_____________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

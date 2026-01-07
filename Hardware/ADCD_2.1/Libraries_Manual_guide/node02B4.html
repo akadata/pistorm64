@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_20" NODE="20-2-3" TITLE="20 / Allocating Multiple Memory / Multiple Memory Blocks and Tasks" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>20 / Allocating Multiple Memory / Multiple Memory Blocks and Tasks</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02B3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02B5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+If you want to take advantage of Exec's automatic cleanup, use the <a href="../Libraries_Manual_guide/node02B1.html">MemList</a>
+<a name="line3">and <a href="../Libraries_Manual_guide/node02B1.html">AllocEntry()</a> facility to do your dynamic memory allocation.</a>
+
+In the <a href="../Libraries_Manual_guide/node02BB.html">Task</a> control block structure, there is a list header named
+<a href="../Libraries_Manual_guide/node02BB.html#line5">tc_MemEntry</a>. This is the list header that you initialize to include
+<a href="../Libraries_Manual_guide/node02B1.html">MemList</a>s that your task has created by call(s) to <a href="../Libraries_Manual_guide/node02B1.html">AllocEntry()</a>.  Here is a
+short program segment that handles task memory list header initialization
+only.  It assumes that you have already run AllocEntry() as shown in the
+simple AllocEntry() example above.
+
+    struct Task *tc;
+    struct MemList *ml;
+
+    /* First initialize the task pointer and AllocEntry() the memlist ml */
+
+    if(!tc-&#062;tc_MemEntry)
+        NewList(tc-&#062;tc_MemEntry);  /* Initialize the task's memory    */
+                                   /* list header. Do this once only! */
+    AddTail(tc-&#062;tc_MemEntry, ml);
+
+Assuming that you have only used the <a href="../Libraries_Manual_guide/node02B1.html">AllocEntry()</a> method (or <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a>
+and built your own custom <a href="../Libraries_Manual_guide/node02B1.html">MemList</a>), the system now knows where to find the
+blocks of memory that your task has dynamically allocated.  The <a href="../Libraries_Manual_guide/node02D0.html#line5">RemTask()</a>
+function automatically frees all memory found on <a href="../Libraries_Manual_guide/node02BB.html#line5">tc_MemEntry</a>.
+
+    <a href="../Libraries_Manual_guide/node02BD.html">CreateTask()</a> Sets Up A <a href="../Libraries_Manual_guide/node02B1.html">MemList</a>.
+    -------------------------------
+    The amiga.lib CreateTask() function, and other system task and
+    process creation functions use a MemList in <a href="../Libraries_Manual_guide/node02BB.html#line5">tc_MemEntry</a> so that
+    the Task structure and stack will be automatically deallocated when
+    the Task is removed.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

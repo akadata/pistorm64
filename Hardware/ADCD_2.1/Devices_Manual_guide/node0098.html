@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_4" NODE="4-11" TITLE="4 Console Device / Console Device Caveats" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>4 Console Device / Console Device Caveats</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0097.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0099.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+   *  Only one console unit can be attached per window.  Sharing a console
+      window must be done at a level higher than the device.
+
+   *  Do not mix graphics.library calls with console rendering in the same
+      areas of a window.  It is permissible to send console sequences to
+      adjust the area in which console renders, and use graphics.library
+      calls to render outside of the area console is using.
+
+For example, do not render text with console sequences and scroll using
+the graphics.library <a href="../Includes_and_Autodocs_2._guide/node0473.html">ScrollRaster()</a> function.
+
+   *  The character map feature is private and cannot be accessed by the
+      programmer.  Implementation details and behaviors of the character
+      map my change in the future.
+
+   *  Do not use an IDCMP with character mapped consoles.  All Intuition
+      messages should be obtained via RAW INPUT EVENTS from the console
+      device.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

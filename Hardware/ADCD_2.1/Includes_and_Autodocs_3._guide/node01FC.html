@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="CreateMsgPort()" TITLE="exec.library/CreateMsgPort" -->
+<head>
+<title>exec.library/CreateMsgPort</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01FB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01FD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CreateMsgPort - <a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> and initialize a new message port  (V36)
+
+<b>   SYNOPSIS</b>
+	CreateMsgPort()
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> * CreateMsgPort(void);
+
+<b>   FUNCTION</b>
+	Allocates and initializes a new message port.  The message list
+	of the new port will be prepared for use (via NewList).  A signal
+	bit will be allocated, and the port will be set to signal your
+	task when a message arrives (PA_SIGNAL).
+
+	You *must* use <a href="../Includes_and_Autodocs_3._guide/node0201.html">DeleteMsgPort()</a> to delete ports created with
+	CreateMsgPort()!
+
+<b>   RESULT</b>
+	<a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> - A new <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> structure ready for use, or NULL if out of
+		memory or signals.  If you wish to add this port to the public
+		port list, fill in the ln_Name and ln_Pri fields, then call
+		<a href="../Includes_and_Autodocs_3._guide/node01DE.html">AddPort()</a>.  Don't forget RemPort()!
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0201.html">DeleteMsgPort()</a>, <a href="../Includes_and_Autodocs_3._guide/node01DE.html">exec/AddPort()</a>, <a href="../Includes_and_Autodocs_3._guide/node062E.html">exec/ports.h</a>, <a href="../Includes_and_Autodocs_3._guide/node002A.html">amiga.lib/CreatePort()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

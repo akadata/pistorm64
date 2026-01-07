@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/scale.i" NODE="MAIN" TITLE="Includes/graphics/scale.i" -->
+<head>
+<title>Includes/graphics/scale.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00C1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	GRAPHICS_SCALE_I
+GRAPHICS_SCALE_I	SET	1
+**
+**	$Filename: graphics/scale.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**	structure argument to BitMapScale()
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+    IFND    EXEC_TYPES_I
+    include 'exec/types.i'
+    ENDC
+
+ STRUCTURE	BitScaleArgs,0
+    UWORD   bsa_SrcX		; source origin
+    UWORD   bsa_SrcY
+    UWORD   bsa_SrcWidth	; source size
+    UWORD   bsa_SrcHeight
+    UWORD   bsa_XSrcFactor	; scale factor denominators
+    UWORD   bsa_YSrcFactor
+    UWORD   bsa_DestX		; destination origin
+    UWORD   bsa_DestY
+    UWORD   bsa_DestWidth	; destination size result
+    UWORD   bsa_DestHeight
+    UWORD   bsa_XDestFactor	; scale factor numerators
+    UWORD   bsa_YDestFactor
+    APTR    bsa_SrcBitMap	; source BitMap
+    APTR    bsa_DestBitMap	; destination BitMap
+    ULONG   bsa_Flags		; reserved.  Must be zero!
+    UWORD   bsa_XDDA		; reserved
+    UWORD   bsa_YDDA
+    LONG    bsa_Reserved1
+    LONG    bsa_Reserved2
+    LABEL   bsa_SIZEOF
+
+	ENDC	; GRAPHICS_SCALE_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

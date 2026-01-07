@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_20" NODE="20-1-4-2" TITLE="20 / / Memory Info Functions / Calling Memory Information Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>20 / / Memory Info Functions / Calling Memory Information Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02AC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02AE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following example shows how to find out how much memory of a
+particular type is available.
+
+    ULONG size;
+
+    size = AvailMem(MEMF_CHIP|MEMF_LARGEST);
+
+<a href="../Includes_and_Autodocs_2._guide/node0337.html">AvailMem()</a> returns the size of the largest chunk of available chip memory.
+
+    <a href="../Includes_and_Autodocs_2._guide/node0337.html">AvailMem()</a> May Not Be Totally Accurate.
+    ---------------------------------------
+    Because of multitasking, the return value from AvailMem() may be
+<a name="line14">    inaccurate by the time you receive it.</a>
+
+The following example shows how to determine the type of memory of a
+specified memory address.
+
+    ULONG memtype;
+
+    memtype = TypeOfMem((APTR)0x090000);
+    if ((memtype &#038; MEMF_CHIP) == MEMF_CHIP) {/* ...It's chip memory... */}
+
+<a href="../Includes_and_Autodocs_2._guide/node0387.html">TypeOfMem()</a> returns the attributes of the memory at a specific address. If
+it is passed an invalid memory address, TypeOfMem() returns NULL. This
+routine is normally used to determine if a particular chunk of memory is
+in chip memory.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

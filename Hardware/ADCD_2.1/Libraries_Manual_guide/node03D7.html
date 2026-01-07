@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_29" NODE="29-2-2" TITLE="29 / The Text Function / Setting the Text Drawing Attributes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>29 / The Text Function / Setting the Text Drawing Attributes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03D6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03D8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In addition to <a href="../Libraries_Manual_guide/node03D6.html">SetFont()</a>, there are three rastport control functions that
+set attributes for text rendering:
+
+    void SetAPen( struct RastPort *rp, ULONG pen );
+    void SetBPen( struct RastPort *rp, ULONG pen );
+<a name="line7">    void SetDrMd( struct RastPort *rp, ULONG drawMode );</a>
+
+The color of the text depends upon the rastport's current drawing mode and
+pen colors.  You set the draw mode with the <a href="../Includes_and_Autodocs_2._guide/node0478.html">SetDrMd()</a> function passing it
+a pointer to a rastport and a drawing mode: <a href="../Libraries_Manual_guide/node0351.html#line2">JAM1</a>, <a href="../Libraries_Manual_guide/node0351.html#line8">JAM2</a>, <a href="../Libraries_Manual_guide/node0351.html#line17">COMPLEMENT</a> or
+<a href="../Libraries_Manual_guide/node0351.html#line24">INVERSEID</a>.
+
+If the drawing mode is <a href="../Libraries_Manual_guide/node0351.html#line2">JAM1</a>, the text will be rendered in the
+<a href="../Libraries_Manual_guide/node0350.html#line3">RastPort.FgPen</a> color.  Wherever there is a set bit in the character's
+bitmap image, <a href="../Libraries_Manual_guide/node03D5.html">Text()</a> will set the corresponding bit in the rastport to the
+FgPen color.  This is known as overstrike mode.  You set the FgPen color
+with the <a href="../Libraries_Manual_guide/node0350.html#line36">SetAPen()</a> function by passing it a pointer to the rastport and a
+<a name="line19">color number.</a>
+
+If the drawing mode is set to <a href="../Libraries_Manual_guide/node0351.html#line8">JAM2</a>, <a href="../Libraries_Manual_guide/node03D5.html">Text()</a> will place the <a href="../Libraries_Manual_guide/node0350.html#line3">FgPen</a> color as
+in the <a href="../Libraries_Manual_guide/node0351.html#line2">JAM1</a> mode, but it will also set the bits in the rastport to the
+<a href="../Libraries_Manual_guide/node0350.html#line6">RastPort.BgPen</a> color wherever there is a corresponding cleared bit in the
+character's bitmap image.  Basically, this prints the character themselves
+in the FgPen color and fills in the surrounding parts of the character
+image with the BgPen color.   You set the BgPen color with the <a href="../Includes_and_Autodocs_2._guide/node0476.html">SetBPen()</a>
+<a name="line27">function by passing it a pointer to the rastport and a color number.</a>
+
+If the drawing mode is <a href="../Libraries_Manual_guide/node0351.html#line17">COMPLEMENT</a>, for every bit set in the character's
+bitmap image, the corresponding bits in the rastport (in all of the
+rastport's bitplanes) will have their state reversed.  cleared bits in the
+character's bitmap image have no effect on the destination rastport.  As
+with the other drawing modes, the write mask can be used to protect
+certain bitplanes from being modified (see the &#034;<a href="../Libraries_Manual_guide/node034F.html">graphics primitives</a>&#034;
+<a name="line35">chapter for more details).</a>
+
+The <a href="../Libraries_Manual_guide/node0351.html#line2">JAM1</a>, <a href="../Libraries_Manual_guide/node0351.html#line8">JAM2</a>, and <a href="../Libraries_Manual_guide/node0351.html#line17">COMPLEMENT</a> drawing modes are mutually exclusive of
+each other but each can be modified by the <a href="../Libraries_Manual_guide/node0351.html#line24">INVERSVID</a> drawing mode.  If you
+combine any of the drawing modes with INVERSVID, the Amiga will reverse
+the state of all the bits in the source drawing area before writing
+<a name="line41">anything into the rastport.</a>
+
+The idea of using a <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> structure to hold all the rendering
+attributes is convenient if the rastport's drawing attributes aren't going
+to change much.  This is not the case where several processes need to
+render into a rastport using very different drawing attributes.  An easy
+way around this problem is to clone the RastPort.  By making an exact
+duplicate of a RastPort, you can change the various rendering parameters
+of your RastPort without effecting other programs that render into the
+RastPort you cloned.  Because a RastPort only contains a pointer to the
+rendering area (the bitmap), the original RastPort and the cloned RastPort
+both render into the bitmap, but they can use different drawing parameters
+(font, drawing mode, colors, etc.).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-6-6" TITLE="28 / Using Bobs / Specifying the Shape of a Bob" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Bobs / Specifying the Shape of a Bob</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node039B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node039D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The layout of the data of a Bob's image is different from that of a
+VSprite because of the way the system retrieves data to draw Bobs.
+VSprite images are organized in a way convenient to the Sprite hardware;
+Bob images are set up for easy blitter manipulation.  The <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line109">ImageData</a>
+pointer is still initialized to point to the first word of the image
+definition.
+
+    Note:
+    -----
+    As with all image data, a Bob's <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line102">ImageData</a> must be in Chip memory
+    for access by the blitter.
+
+The sample image below shows the same image defined as a VSprite in the
+&#034;<a href="../Libraries_Manual_guide/node0387.html">Using Virtual Sprites</a>&#034; section above.  The data here, however, is laid
+out for a Bob.  The shape is 2 planes deep and is triangular:
+
+
+            &#060;first bitplane data&#062;
+
+  mem        1111 1111 1111 1111    Least significant bit of sprite line 1
+  mem + 1    0011 1100 0011 1100    Least significant bit of sprite line 2
+  mem + 2    0000 1100 0011 0000    Least significant bit of sprite line 3
+  mem + 3    0000 0010 0100 0000    Least significant bit of sprite line 4
+  mem + 4    0000 0001 1000 0000    Least significant bit of sprite line 5
+
+            &#060;second bitplane data&#062;
+
+  mem + 5    1111 1111 1111 1111    Most significant bit of sprite line 1
+  mem + 6    0011 0000 0000 1100    Most significant bit of sprite line 2
+  mem + 7    0000 1111 1111 0000    Most significant bit of sprite line 3
+  mem + 8    0000 0011 1100 0000    Most significant bit of sprite line 4
+  mem + 9    0000 0001 1000 0000    Most significant bit of sprite line 5
+
+            &#060;more bitplanes of data if Bob is deeper&#062;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="OnGadget()" TITLE="intuition.library/OnGadget" -->
+<head>
+<title>intuition.library/OnGadget</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03D0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03D2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	OnGadget -- <a href="../Includes_and_Autodocs_3._guide/node0205.html">Enable</a> the specified gadget.
+
+<b>    SYNOPSIS</b>
+	OnGadget( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> )
+		  A0      A1      A2
+
+	VOID OnGadget( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+		struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> * );
+
+<b>    FUNCTION</b>
+	This command enables the specified gadget.  When a gadget is
+	enabled, these things happen:
+        - its imagery is displayed normally (not ghosted)
+        - the GFLG_DISABLED flag is cleared
+        - the gadget can thereafter be selected by the user
+
+	The window parameter must point to the window which contains the
+	gadget, or which contains the requester that contains the gadget
+	The requester parameter must only be valid if the gadget has the
+	GTYP_REQGADGET flag set, a requirement for all requester gadgets.
+
+       NOTE:  it's never safe to tinker with the gadget list yourself.  Don't
+       supply some gadget that Intuition hasn't already processed in
+       the usual way.
+
+<b>    	NOTE: for compatibility reasons, this function will refresh all</b>
+	gadgets in a requester, and all gadgets from gadget to the
+	end of the gadget list if gadget is in a window.
+
+	If you want to improve on this behavior, you may perform the
+	equivalent operation yourself: remove a gadget or gadgets,
+	change the state of their GFLG_DISABLED flag, replace the
+	gadgets using <a href="../Includes_and_Autodocs_3._guide/node0393.html">AddGList()</a>, and selectively call <a href="../Includes_and_Autodocs_3._guide/node03DD.html">RefreshGList()</a>.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> = pointer to the gadget that you want disabled
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to a window structure containing the gadget or
+	    containing the requester which contains the gadget
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> = pointer to a requester (may by NULL if this isn't
+           a requester gadget (i.e. GTYP_REQGADGET is not set)).
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+	Traditional gadgets are rendered very simply.  This can result
+	in incomplete clearing away of the ghosting pattern when
+	OnGadget() is used.  For example, a button whose imagery consists
+	of an <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> inside a rectangular <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line683">Border</a> doesn't have the
+	button interior cleared by OnGadget().  This is because OnGadget()
+	clears the GFLG_DISABLED flag then redraws the gadget.  Redrawing
+	this gadget consists of redrawing the border and text.  Nothing
+	redraws the field.
+
+	The solution to this type of problem is to either use a gadget
+	whose imagery is a struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> that covers the whole select area,
+	or to manually remove the gadget, erase the gadget's select area
+	(say using <a href="../Includes_and_Autodocs_3._guide/node02D0.html">EraseRect()</a>), then clear the GFLG_DISABLED flag,
+	add the gadget back to the window, and refresh it.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03CF.html">OffGadget()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-8-3-1" TITLE="28 / / Specifying Animation Components / Sequencing AnimComps" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Specifying Animation Components / Sequencing AnimComps</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03BE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03C0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To specify the sequencing of <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a> images, the pointers called <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line190">PrevSeq</a>
+and <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line190">NextSeq</a> are used to build a doubly-linked list.  The sequence can be
+made circular (and usually is) by linking the first and last AnimComps in
+the sequence: the NextSeq of the last AnimComp must point back to the
+first AnimComp, and the PrevSeq of the first AnimComp must point to the
+last AnimComp.  If the list is a loop, then the system will continue to
+cycle through the list until it is stopped.  If the list is not a loop,
+then the program must act to restart the sequence after the last item is
+displayed.  The AnimCRoutine field of the last AnimComp can be used to do
+this.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

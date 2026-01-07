@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-3-4-1" TITLE="4 / / The IDCMP And Gadgets / System Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / / The IDCMP And Gadgets / System Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0110.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0112.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+System gadgets on each window provide the user with the ability to manage
+the following aspects of the window:  size, position and depth.  These
+gadgets are managed by Intuition and the application does not need to take
+any action for them to operate properly.  An additional system gadget is
+provided for the &#034;close window&#034; function.  The close action is not
+directly managed by Intuition; selecting the close gadget will simply send
+a message to the application, which is responsible for closing the window.
+
+All of these gadgets are optional, and independent of each other.  The
+<a name="line11">graphic representations of these gadgets are predefined, and Intuition</a>
+<a name="line12">always displays them in the same standard locations in the window borders.</a>
+
+The application may choose to be notified when the window changes size, or
+it may choose to control the timing of the sizing of the window.
+Controlling the timing of sizing operations is done through the use of the
+<a href="../Libraries_Manual_guide/node01E0.html#line28">IDCMP_SIZEVERIFY</a> message.  IDCMP_SIZEVERIFY messages time out if the
+application does not respond fast enough.  When these an IDCMP_SIZEVERIFY
+message times out the window sizing operation is cancelled by Intuition.
+
+No information is available to the program on user changes to the depth
+arrangement of a window.  However a refresh message will be sent if part
+<a name="line23">of the window needs to be redrawn as a result of a change to the depth</a>
+arrangement.
+
+Notification of changes to the position of the window or the size of the
+window are available through the <a href="../Libraries_Manual_guide/node01E1.html#line104">IDCMP_CHANGEWINDOW</a> and <a href="../Libraries_Manual_guide/node01E0.html">IDCMP_NEWSIZE</a>
+flags.  The application specifies the initial size, the maximum and
+minimum limits for sizing, and whether the sizing gadget is contained in
+the right border, bottom border or both borders.  (See the section on
+&#034;<a href="../Libraries_Manual_guide/node010A.html">Border Dimensions</a>&#034; for information on how the specification of the sizing
+gadget affects the border sizes.)
+
+The drag gadget has no imagery other than the implicit imagery of the
+title bar.  Setting the window title does not interfere with drag gadget
+operation, nor does the drag gadget interfere with the display of the
+window title.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

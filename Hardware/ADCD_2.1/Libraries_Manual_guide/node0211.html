@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-2-2" TITLE="12 / Creating a Boopsi Class / Writing the Dispatcher" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / Creating a Boopsi Class / Writing the Dispatcher</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0210.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0212.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The C prototype for a Boopsi dispatcher looks like this:
+
+<a name="line4">    ULONG dispatchRKMModel(Class *cl, Object *recvobject, Msg msg);</a>
+
+where cl points to the Class (defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DA.html">classes.h</a>&#062;) of the
+dispatcher, recvobject points to the object that received the message, and
+msg is that Boopsi message.  The format of the message varies according to
+the method.  The default Boopsi message is an Msg (from
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00E2.html#line24">classusr.h</a>&#062;):
+
+    typedef struct {
+        ULONG MethodID;
+    } *Msg;
+
+Boopsi methods that require parameters use custom message structures. The
+first field of any message structure is always the method's methodID.
+This makes custom messages look like an Msg.  The dispatcher looks at an
+incoming message's first field to tell what its method is.  <a href="../Libraries_Manual_guide/node020F.html">Rkmmodelclass</a>
+<a name="line20">objects respond to several <a href="../Libraries_Manual_guide/node0200.html#line50">rootclass</a> methods:</a>
+
+<a href="../Libraries_Manual_guide/node04BC.html">OM_NEW</a>
+    This method creates a new <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> object.  It uses an <a href="../Libraries_Manual_guide/node0211.html">opSet</a>
+<a name="line24">    structure as its Boopsi message.</a>
+
+<a href="../Libraries_Manual_guide/node04BD.html">OM_DISPOSE</a>
+    This method tells an object to dispose of itself.  It uses an Msg as
+<a name="line28">    its Boopsi message.</a>
+
+<a href="../Libraries_Manual_guide/node04C3.html">OM_SET</a>
+    This method tells an object to set one or more of its attribute
+<a name="line32">    values.  It uses an <a href="../Libraries_Manual_guide/node020E.html#line37">opSet</a> structure as its Boopsi message.</a>
+
+<a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a>
+    This method tells an object to update one or more of its attribute
+<a name="line36">    values.  It uses an <a href="../Libraries_Manual_guide/node0213.html#line14">opUpdate</a> structure as its Boopsi message.</a>
+
+<a href="../Libraries_Manual_guide/node04C2.html">OM_GET</a>
+    This method tells an object to report an attribute value.  It uses an
+<a name="line40">    <a href="../Libraries_Manual_guide/node0214.html">opGet</a> structure as its Boopsi message.</a>
+
+<a href="../Libraries_Manual_guide/node04BE.html">OM_ADDTAIL</a>
+    This method tells an object to add itself to the end of an Exec list.
+<a name="line44">    It uses an <a href="../Includes_and_Autodocs_2._guide/node00E2.html#line115">opAddTail</a> structure as its Boopsi message.</a>
+
+<a href="../Libraries_Manual_guide/node04BF.html">OM_REMOVE</a>
+    This method tells an object to remove itself from an Exec list.  It
+<a name="line48">    uses an Msg as its Boopsi message.</a>
+
+<a href="../Libraries_Manual_guide/node04C0.html">OM_ADDMEMBER</a>
+    This method tells an object to add an object to its broadcast list.
+<a name="line52">    It uses an <a href="../Libraries_Manual_guide/node020D.html#line42">opMember</a> structure as its Boopsi message.</a>
+
+<a href="../Libraries_Manual_guide/node04C1.html">OM_REMMEMBER</a>
+    This method tells an object to remove an object from its broadcast
+<a name="line56">    list.  It uses an <a href="../Libraries_Manual_guide/node020D.html#line42">opMember</a> structure as its Boopsi message.</a>
+
+<a href="../Libraries_Manual_guide/node04C5.html">OM_NOTIFY</a>
+    This method tells an object to broadcast an attribute change to its
+    broadcast list.  It uses an <a href="../Libraries_Manual_guide/node020E.html#line37">opSet</a> structure as its Boopsi message.
+
+Of these, <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> has to process OM_NEW, OM_SET, OM_UPDATE, and
+OM_GET.
+
+ <a href="../Libraries_Manual_guide/node0212.html">OM_NEW</a>              <a href="../Libraries_Manual_guide/node0214.html">OM_GET</a>                  <a href="../Libraries_Manual_guide/node0216.html">RKMModel.c</a> 
+ <a href="../Libraries_Manual_guide/node0213.html">OM_SET/OM_UPDATE</a>    <a href="../Libraries_Manual_guide/node0215.html">Making the New Class</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

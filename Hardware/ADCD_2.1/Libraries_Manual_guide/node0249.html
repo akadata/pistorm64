@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_14" NODE="14-5-2" TITLE="14 / Workbench and the Startup Code Module / Shell Startup" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>14 / Workbench and the Startup Code Module / Shell Startup</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0248.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node024A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When a program is started from the Shell (or a Shell script), standard
+startup modules will parse the command line (received in A0, with length
+in D0) into an array of pointers to individual argument strings placing
+them in argv, and an argument count in argc.
+
+If a program is started from the Shell, argc will always equal at least
+one and the first element in argv will always be a pointer to the command
+name.  Other command line arguments are stored in turn. For example, if
+the command line was:
+
+     df0:myprogram   &#034;my file1&#034;   file2    ;this is a comment
+
+then argc will be 3, argv[0] will be &#034;df0:myprogram&#034;, argv[1] will be &#034;my
+file1&#034;, and argv[2] will be &#034;file2&#034;.  Correct startup code will strip
+spaces between arguments and trailing spaces from the last argument and
+will also properly deal with quoted arguments with embedded spaces.
+
+As with Workbench, standard startup code for the Shell sets up <a href="../Libraries_Manual_guide/node0013.html#line5">SysBase</a>,
+the pointer to the Exec master library, and opens the DOS library setting
+up <a href="../Libraries_Manual_guide/node0290.html#line128">DOSBase</a>.  C applications that are linked with standard startup code can
+call an Exec or AmigaDOS functions without opening the library first.
+
+The startup code also fills in the stdio file handles (_stdin, _stdout,
+etc.) for the application.  Finally argv and argc, are pushed onto the
+stack and the application is called via a JSR.  When the application
+returns or exits back to the startup code, the startup code closes and
+frees all opens and allocations it has made for the application, and then
+returns to the system with the whatever value the program exited with.
+
+Link your applications only with standard, tested startup code of some
+type such as the module supplied with your compiler.  Startup code
+provides your programs with correct, consistent handling of Shell command
+line and Workbench arguments and will perform some initializations and
+cleanups which would otherwise need to be handled by your own code.  Very
+small startups can be used for programs that do not require command line
+<a name="line37">arguments.</a>
+
+A few words of warning for those of you who do not use standard startup
+code:
+
+  * If you are started as a Workbench process, you must <a href="../Libraries_Manual_guide/node02F2.html">GetMsg()</a> the
+    <a href="../Libraries_Manual_guide/node023E.html">WBStartup</a> message before using any functions in the DOS library.
+
+  * You must turn off task switching (with <a href="../Libraries_Manual_guide/node02D0.html#line10">Forbid()</a>) before replying the
+    <a href="../Libraries_Manual_guide/node023E.html">WBStartup</a> message from Workbench.  This will prevent Workbench from
+    unloading your code before you can exit properly.
+
+  * If you do your own command line parsing, you must provide the user
+    with consistent and correct handling of command line arguments.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

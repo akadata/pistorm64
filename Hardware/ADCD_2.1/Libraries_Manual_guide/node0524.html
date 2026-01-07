@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-14" TITLE="B Boopsi Class Reference / frbuttonclass" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B Boopsi Class Reference / frbuttonclass</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0523.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0525.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Class:                  frbuttonclass
+Superclass:             <a href="../Libraries_Manual_guide/node051F.html">buttongclass</a>
+Include File:           &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D3.html">gadgetclass.h</a>&#062;
+
+This is a special class of button gadget that puts a Boopsi framing image
+around some other display element.  This display element can be one of
+three things: plain text from the <a href="../Libraries_Manual_guide/node04FF.html">GA_Text</a> attribute, an <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> from the
+<a href="../Libraries_Manual_guide/node04FF.html">GA_IntuiText</a> attribute, or an Image from the <a href="../Libraries_Manual_guide/node04FF.html">GA_LabelImage</a> attribute.
+
+The user activates the gadget by clicking within the bounds of the
+gadget's framing image, which it gets from the <a href="../Libraries_Manual_guide/node0500.html">GA_Image</a> attribute.
+Usually the framing image is an instance of an image class that supports
+the IM_FRAMEBOX method (like <a href="../Libraries_Manual_guide/node04DF.html">frameiclass</a>).  If the framing image supports
+the IM_FRAMEBOX method, the frbuttonclass object centers the frame image
+around the display element.  See the <a href="../Libraries_Manual_guide/node04D1.html">imageclass</a> description of <a href="../Libraries_Manual_guide/node04D8.html">IM_FRAMEBOX</a>
+for more information.
+
+New Methods:
+------------
+None.
+
+Changed Methods:
+----------------
+ <a href="../Libraries_Manual_guide/node0525.html">OM_NEW</a>    <a href="../Libraries_Manual_guide/node0526.html">GM_HITTEST</a>    <a href="../Libraries_Manual_guide/node0527.html">GM_RENDER</a> 
+
+Attributes:
+-----------
+ <a href="../Libraries_Manual_guide/node0528.html">GA_Width, GA_Height (S)</a> 
+ <a href="../Libraries_Manual_guide/node0529.html">GA_DrawInfo (I)</a> 
+ <a href="../Libraries_Manual_guide/node052A.html">GA_Text, GA_IntuiText, GA_LabelImage (IS)</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

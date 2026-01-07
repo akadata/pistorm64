@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-3" TITLE="10 Printer Device / Device Interface" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 Printer Device / Device Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0043.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0045.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The printer device operates like the other Amiga devices.  To use it, you
+must first open the printer device, then send I/O requests to it, and then
+close it when finished.  See the <a href="../Devices_Manual_guide/node0006.html">Introduction to Amiga Devices</a> chapter
+<a name="line5">for general information on device usage.</a>
+
+There are three distinct kinds of data structures required by the printer
+I/O routines. Some of the printer device I/O commands, such as <a href="../Includes_and_Autodocs_2._guide/node0516.html">CMD_START</a>
+and <a href="../Includes_and_Autodocs_2._guide/node0518.html">CMD_WRITE</a> require only an IOStdReq data structure. Others, such as
+<a href="../Includes_and_Autodocs_2._guide/node0519.html">PRD_DUMPRPORT</a> and <a href="../Includes_and_Autodocs_2._guide/node051A.html">PRD_PRTCOMMAND</a>, require an extended data structure
+called IODRPReq (for &#034;Dump a RastPort Request&#034;) or IOPrtCmdReq (for
+<a name="line12">&#034;Printer Command Request&#034;).</a>
+
+For convenience, it is strongly recommended that you define a single data
+structure called printerIO, that can be used to represent any of the three
+<a name="line16">pre-defined printer communications request blocks.</a>
+
+    union printerIO
+    {
+        struct IOStdReq    ios;
+        struct IODRPReq    iodrp;
+        struct IOPrtCmdReq iopc;
+<a name="line23">    };</a>
+
+    struct IODRPReq
+    {
+        struct  Message io_Message;
+        struct  Device  *io_Device;     /* device node pointer  */
+        struct  Unit    *io_Unit;       /* unit (driver private)*/
+        UWORD   io_Command;             /* device command */
+        UBYTE   io_Flags;
+        BYTE    io_Error;               /* error or warning num */
+        struct  RastPort *io_RastPort;  /* raster port */
+        struct  ColorMap *io_ColorMap;  /* color map */
+        ULONG   io_Modes;               /* graphics viewport modes */
+        UWORD   io_SrcX;                /* source x origin */
+        UWORD   io_SrcY;                /* source y origin */
+        UWORD   io_SrcWidth;            /* source x width */
+        UWORD   io_SrcHeight;           /* source x height */
+        LONG    io_DestCols;            /* destination x width */
+        LONG    io_DestRows;            /* destination y height */
+        UWORD   io_Special;             /* option flags */
+<a name="line43">    };</a>
+
+    struct IOPrtCmdReq
+    {
+        struct  Message io_Message;
+        struct  Device  *io_Device;     /* device node pointer  */
+        struct  Unit    *io_Unit;       /* unit (driver private)*/
+        UWORD   io_Command;             /* device command */
+        UBYTE   io_Flags;
+        BYTE    io_Error;               /* error or warning num */
+        UWORD   io_PrtCommand;          /* printer command */
+        UBYTE   io_Parm0;               /* first command parameter */
+        UBYTE   io_Parm1;               /* second command parameter */
+        UBYTE   io_Parm2;               /* third command parameter */
+        UBYTE   io_Parm3;               /* fourth command parameter */
+<a name="line58">    };</a>
+
+See the include file exec/<a href="../Includes_and_Autodocs_2._guide/node0094.html">io.h</a> for more information on IOStdReq and the
+include file devices/<a href="../Includes_and_Autodocs_2._guide/node0052.html">printer.h</a> for more information on IODRPReq and
+IOPrtCmdReq.
+
+ <a href="../Devices_Manual_guide/node0045.html">Opening The Printer Device</a> 
+ <a href="../Devices_Manual_guide/node0046.html">Writing Text To The Printer Device</a> 
+ <a href="../Devices_Manual_guide/node0047.html">Important Points About Print Requests</a> 
+ <a href="../Devices_Manual_guide/node0048.html">Closing The Printer Device</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

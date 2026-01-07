@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/bootblock.i" NODE="MAIN" TITLE="Includes/devices/bootblock.i" -->
+<head>
+<title>Includes/devices/bootblock.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0043.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0045.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	DEVICES_BOOTBLOCK_I
+DEVICES_BOOTBLOCK_I	SET	1
+**
+**	$Filename: devices/bootblock.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.6 $
+**	$Date: 90/11/05 $
+**
+**	floppy BootBlock definition
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+	IFND	EXEC_TYPES_I
+	INCLUDE	&#034;exec/types.i&#034;
+	ENDC
+
+ STRUCTURE BB,0
+	STRUCT	BB_ID,4			; 4 character identifier
+	LONG	BB_CHKSUM		; boot block checksum (balance)
+	LONG	BB_DOSBLOCK		; reserved for DOS patch
+	LABEL	BB_ENTRY		; bootstrap entry point
+	LABEL	BB_SIZE
+
+BOOTSECTS	EQU	2		; 1K bootstrap
+
+BBID_DOS	macro			; something that is bootable
+		dc.b	'DOS',0
+		endm
+
+BBID_KICK	macro			; firmware image disk
+		dc.b	'KICK'
+		endm
+
+
+BBNAME_DOS	EQU	$444F5300	; 'DOS\0'
+BBNAME_KICK	EQU	$4B49434B	; 'KICK'
+
+	ENDC	; DEVICES_BOOTBLOCK_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

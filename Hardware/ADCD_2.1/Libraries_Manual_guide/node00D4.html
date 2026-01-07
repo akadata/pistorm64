@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_2" NODE="2-3-3-4" TITLE="2 / / Gadgets, Menus And Requesters / The Intuition Input Event Loop" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>2 / / Gadgets, Menus And Requesters / The Intuition Input Event Loop</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00D3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00D5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Once an application has set up the appropriate <a href="../Libraries_Manual_guide/node00CF.html">screen</a>, <a href="../Libraries_Manual_guide/node00CF.html">window</a>, <a href="../Libraries_Manual_guide/node00D1.html">gadgets</a>
+<a href="../Libraries_Manual_guide/node00D2.html">menus</a> and <a href="../Libraries_Manual_guide/node00D3.html">requesters</a>, it waits for the user to do something.  Intuition
+can notify an application whenever user activity occurs by sending a
+<a href="../Libraries_Manual_guide/node01D0.html">message</a>.  The message is simply a pointer to some memory owned by
+Intuition that contains an <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a> data structure describing the user
+activity that occurred.
+
+To wait for user activity or other events, the Exec library provides a
+special function named <a href="../Libraries_Manual_guide/node02F1.html">Wait()</a>.  The Exec Wait() function suspends your
+task allowing other applications or system tasks to run while your
+application is waiting for input or events from Intuition and other
+sources.
+
+Thus, the basic outline for any Intuition program is:
+
+  * Set up the <a href="../Libraries_Manual_guide/node00CF.html">window</a>, <a href="../Libraries_Manual_guide/node00CF.html">screen</a> and any required <a href="../Libraries_Manual_guide/node00D1.html">gadgets</a>, <a href="../Libraries_Manual_guide/node00D2.html">menus</a> or
+    <a href="../Libraries_Manual_guide/node00D3.html">requesters</a>.
+
+  * <a href="../Libraries_Manual_guide/node02F1.html">Wait()</a> for a message from Intuition about user activity or other
+    events. Copy needed data from the message and tell Intuition you
+    received it by replying. Look at the data and take the appropriate
+    action.
+
+  * Repeat until the user wants to quit.
+
+These steps, sometimes referred to as the Intuition input <a href="../Libraries_Manual_guide/node01D7.html">event loop</a> are
+basically the same for any Intuition application.
+
+As you might expect, Intuition can send a message to your application
+whenever the user presses a key on the keyboard or moves the mouse.  Other
+types of input events Intuition will notify you about include gadget hits,
+menu item selection, time elapsing, disk insertion, disk removal, and
+window rearrangement.
+
+<a href="../Libraries_Manual_guide/node00D1.html">Gadgets</a>, <a href="../Libraries_Manual_guide/node00D2.html">menus</a>, <a href="../Libraries_Manual_guide/node00D3.html">requesters</a> are the nuts and bolts of the Intuition <a href="../Libraries_Manual_guide/node00C8.html">GUI</a>
+toolkit.  Much of the code in an application that uses Intuition deals
+with the set up and operation of these important data objects.  No matter
+how simple, complex, or fanciful your program design, it will fit within
+the basic Intuition framework of <a href="../Libraries_Manual_guide/node00CF.html">windows and screens</a>, gadgets, menus and
+requesters.  The users of the Amiga understand these basic Intuition
+elements and trust that the building blocks remain constant.  This
+consistency ensures that a well-designed program will be understandable to
+the naive user as well as to the sophisticate.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

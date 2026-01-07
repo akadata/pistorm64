@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_11" NODE="11-1" TITLE="11 SCSI Device / SCSI Device Commands and Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>11 SCSI Device / SCSI Device Commands and Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0073.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0075.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+SCSI Device Command  Operation
+-------------------  ---------
+<a href="../Devices_Manual_guide/node0078.html">HD_SCSICMD</a>           Issue a SCSI-direct command to a SCSI unit.
+
+
+Trackdisk Device Commands Supported by the SCSI Device
+------------------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0525.html">TD_CHANGESTATE</a>       Return the disk present/not-present status of a drive.
+<a href="../Includes_and_Autodocs_2._guide/node0527.html">TD_FORMAT</a>            Initialize one or more tracks with a data buffer.
+<a href="../Includes_and_Autodocs_2._guide/node052C.html">TD_PROTSTATUS</a>        Return the write-protect status of a disk.
+<a href="../Includes_and_Autodocs_2._guide/node0530.html">TD_SEEK</a>              Move the head to a specific track.
+
+
+Exec Commands Supported by SCSI Device
+--------------------------------------
+CMD_READ             Read one or more sectors from a disk.
+CMD_START            Restart a SCSI unit that was previously stopped with
+                     CMD_STOP.
+CMD_STOP             Stop a SCSI unit.
+CMD_WRITE            Write one or more sectors to a disk.
+
+
+Exec Functions as Used in This Chapter
+--------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a>            Abort an I/O request to the SCSI device.
+<a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a>           Allocate a block of memory.
+<a href="../Includes_and_Autodocs_2._guide/node0333.html">AllocSignal()</a>        Allocate a signal bit.
+<a href="../Includes_and_Autodocs_2._guide/node033E.html">CheckIO()</a>            Return the status of an I/O request.
+<a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>        Relinquish use of the SCSI device. All requests must
+                     be complete before closing.
+
+<a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>               Initiate a command and wait for completion
+                     (synchronous request).
+
+<a href="../Includes_and_Autodocs_2._guide/node0355.html">FreeMem()</a>            Free a block of previously allocated memory.
+<a href="../Includes_and_Autodocs_2._guide/node0356.html">FreeSignal()</a>         Free a previously allocated signal.
+<a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>         Obtain use of the SCSI device.  You specify the type
+                     of unit and its characteristics in the call to
+                     OpenDevice().
+
+<a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a>             Wait for completion of an I/O request and remove it
+                     from the reply port.
+
+
+Exec Support Functions as Used in This Chapter
+----------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>        Create an extended <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> structure for use in
+                     communicating with the SCSI device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>         Create a message port for reply messages from the
+                     SCSI device.  Exec will signal a task when a message
+                     arrives at the port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>        Delete the extended <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> structure created by
+                     <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>.
+
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>         Delete the message port created by <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/interrupts.h" NODE="MAIN" TITLE="Includes/exec/interrupts.h" -->
+<head>
+<title>Includes/exec/interrupts.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node008B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node008D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_INTERRUPTS_H
+#define	EXEC_INTERRUPTS_H
+/*
+**	$Filename: exec/interrupts.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.4 $
+**	$Date: 90/05/10 $
+**
+**	Callback structures used by hardware &#038; software interrupts
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+#endif /* EXEC_NODES_H */
+<a name="line18"></a>
+#ifndef EXEC_LISTS_H
+#include &#034;exec/lists.h&#034;
+#endif /* EXEC_LISTS_H */
+
+<a name="line23"></a>
+<a name="line24">struct Interrupt {</a>
+<a name="line25">    struct  Node is_Node;</a>
+<a name="line26">    APTR    is_Data;		    /* server data segment  */</a>
+    VOID    (*is_Code)();	    /* server code entry    */
+};
+
+<a name="line30"></a>
+<a name="line31">struct IntVector {		/* For EXEC use ONLY! */</a>
+<a name="line32">    APTR    iv_Data;</a>
+<a name="line33">    VOID    (*iv_Code)();</a>
+    struct  Node *iv_Node;
+};
+
+<a name="line37"></a>
+<a name="line38">struct SoftIntList {		/* For EXEC use ONLY! */</a>
+<a name="line39">    struct List sh_List;</a>
+    UWORD  sh_Pad;
+};
+<a name="line42"></a>
+#define SIH_PRIMASK (0xf0)
+
+<a name="line45">/* this is a fake INT definition, used only for AddIntServer and the like */</a>
+<a name="line46">#define INTB_NMI	15</a>
+#define INTF_NMI	(1&#060;&#060;15)
+
+#endif	/* EXEC_INTERRUPTS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

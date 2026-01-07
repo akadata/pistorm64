@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_35" NODE="35-8" TITLE="35 Math Libraries / IEEE Single-Precision Transcendental Math Library" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>35 Math Libraries / IEEE Single-Precision Transcendental Math Library</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0486.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0488.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The IEEE single-precision transcendental math library was introduced in
+V36.  It contains entries for transcendental math functions such as sine,
+cosine, and square root.
+
+This library resides on disk and is opened by calling <a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a> with
+&#034;mathieeesingtrans.library&#034; as the argument.  Do not share the library
+base pointer between tasks -- <a href="../Libraries_Manual_guide/node047B.html#line12">see note</a> at beginning of chapter.
+
+   #include &#060;exec/types.h&#062;
+   #include &#060;libraries/mathieeesp.h&#062;
+
+   struct Library *MathIeeeSingTransBase;
+
+   #include &#060;clib/mathsingtrans_protos.h&#062;
+
+   VOID main()
+   {
+   if (MathIeeeSingTransBase = OpenLibrary(&#034;mathieeesingtrans.library&#034;,37))
+       {
+              . . .
+
+       CloseLibrary(MathIeeeSingTransBase);
+       }
+   else  printf(&#034;Can't open mathieeesingtrans.library\n&#034;);
+<a name="line26">   }</a>
+
+The global variable MathIeeeSingTransBase is used internally for all
+future library references.
+
+The IEEE single-precision transcendental math library is dependent upon
+the IEEE single-precision basic math library, which it will open if it is
+not open already.  If you want to use the IEEE single-precision basic math
+functions in conjunction with the transcendental math functions however,
+you have to specifically open the basic math library yourself.
+
+Just as the IEEE single-precision basic math library, the IEEE
+single-precision transcendental math library will take advantage of a
+680X0/68881 combination or another math resource, if present.
+
+ <a href="../Libraries_Manual_guide/node0488.html">SP IEEE Transcendental Functions (V36 Or Greater)</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

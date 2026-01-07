@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="AIFF-9" TITLE="AIFF.doc / AIFF / Block-Aligning Sound Data " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>AIFF.doc / AIFF / Block-Aligning Sound Data </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node021D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node021F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There may be some applications that, to ensure real time recording and
+playback of audio, wish to align sampled sound data with fixed-size
+blocks. This alignment can be accomplished with the offset and blockSize
+parameters of the Sound Data Chunk, as shown in Figure 7.
+
+        ____________ __________________________________ ____________
+       |\\ unused \\|          sample frames           |\\ unused \\|
+       |____________|__________________________________|____________|
+       &#060;-- offset --&#062;&#060;- numSampleFrames sample frames -&#062;
+
+    |   blockSize   |               |               |               |
+    |&#060;- bytes     -&#062;|               |               |               |
+    |_______________|_______________|_______________|_______________|
+       block N-1       block N         block N+1       block N+2
+
+                     Figure 7: Block-Aligned Sound Data
+
+In Figure 7, the first sample frame starts at the beginning of block N.
+This is accomplished by skipping the first offset bytes of the soundData.
+Note too, that the soundData bytes can extend beyond valid sample frames,
+allowing the soundData bytes to end on a block boundary as well.
+
+The blockSize specifies the size in bytes of the block to which you would
+align the sound data.  A blockSize of zero indicates that the sound data
+does not need to be block-aligned.  Applications that don't care about
+block alignment should set the blockSize and offset to zero when creating
+Audio IFF files.  Applications that write block-aligned sound data should
+set blockSize to the appropriate block size.  Applications that modify an
+existing Audio IFF file should try to preserve alignment of the sound
+data, although this is not required.  If an application does not preserve
+alignment, it should set the blockSize and offset to zero.  If an
+application needs to realign sound data to a different sized block, it
+should update blockSize and offset accordingly.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

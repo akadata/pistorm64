@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="LockPubScreen()" TITLE="intuition.library/LockPubScreen" -->
+<head>
+<title>intuition.library/LockPubScreen</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0224.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0226.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    LockPubScreen -- Prevent a public screen from closing. (V36)
+
+SYNOPSIS
+    screen = LockPubScreen( Name )
+    D0                      A0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> *LockPubScreen( UBYTE * );
+
+FUNCTION
+    Prevents a public screen (or the Workbench) from closing
+    while you examine it in preparation of opening a visitor window.
+
+    The sequence you use to open a visitor window that needs to
+    examine fields in the screen it is about to open on is:
+            LockPubScreen()
+            ... examine fields ...
+            <a href="../Includes_and_Autodocs_2._guide/node0239.html">OpenWindow()</a> on public screen
+            <a href="../Includes_and_Autodocs_2._guide/node025D.html">UnlockPubScreen()</a>
+            ... use your window ...
+            <a href="../Includes_and_Autodocs_2._guide/node0208.html">CloseWindow()</a>
+
+NOTE
+    You needn't hold the &#034;pubscreen lock&#034; for the duration that
+    your window is opened.  LockPubScreen() basically has the
+    same effect as an open visitor window: it prevents the
+    screen from being closed.
+
+    If you pass the string &#034;Workbench&#034; or you pass NULL and there
+    is no default public screen, the Workbench screen will
+    be automatically opened if it is not already present.
+
+INPUTS
+    Name = name string for public screen or NULL for default public
+    screen.  The string &#034;Workbench&#034; indicates the Workbench
+    screen.
+
+RESULT
+    Returns pointer to a screen, if successful, else NULL.
+    The call can fail for reasons including that the named
+    public screen doesn't exist or is in private state.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0239.html">OpenWindow()</a>, <a href="../Includes_and_Autodocs_2._guide/node025D.html">UnlockPubScreen()</a>, <a href="../Includes_and_Autodocs_2._guide/node021F.html">GetScreenData()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

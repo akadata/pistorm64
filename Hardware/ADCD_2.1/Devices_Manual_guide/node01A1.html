@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Read_BattClock.c" NODE="MAIN" TITLE="Devices/Dev_examples/Read_BattClock.c" -->
+<head>
+<title>Devices/Dev_examples/Read_BattClock.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01A0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01A2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Read_BattClock.c
+ *
+ * Example of reading the BattClock and converting its output to
+ * a useful measure of time by calling the Amiga2Date() utility function.
+ *
+ * Compile with SAS C 5.10  lc -b1 -cfistq -v -y -L
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;utility/date.h&#062;
+#include &#060;resources/battclock.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/battclock_protos.h&#062;
+#include &#060;clib/utility_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+VOID main(VOID);
+
+struct Library *UtilityBase = NULL;
+struct Library *BattClockBase;
+
+VOID main(VOID)
+{
+UBYTE *Days[] ={&#034;Sunday&#034;,&#034;Monday&#034;,&#034;Tuesday&#034;,&#034;Wednesday&#034;,&#034;Thursday&#034;,&#034;Friday&#034;,&#034;Saturday&#034;};
+UBYTE *Months[] = {&#034;January&#034;,&#034;February&#034;,&#034;March&#034;,&#034;April&#034;,&#034;May&#034;,&#034;June&#034;,
+                   &#034;July&#034;,&#034;August&#034;,&#034;September&#034;,&#034;October&#034;,&#034;November&#034;,&#034;December&#034;};
+UBYTE *ampm;
+ULONG AmigaTime;
+struct ClockData MyClock;
+
+if (UtilityBase = (struct Library *)OpenLibrary(&#034;utility.library&#034;,33))
+    {
+    if (BattClockBase= OpenResource(BATTCLOCKNAME))
+        {
+        /* Get number of seconds till now */
+        AmigaTime = ReadBattClock();
+
+        /* Convert to a ClockData structure */
+        Amiga2Date(AmigaTime,&#038;MyClock);
+
+        printf(&#034;\nRobin, tell everyone the BatDate and BatTime&#034;);
+
+        /* Print the Date */
+        printf(&#034;\n\nOkay Batman, the BatDate is &#034;);
+        printf(&#034;%s, %s %d, %d&#034;,Days[MyClock.wday],Months[MyClock.month-1],
+                               MyClock.mday,MyClock.year);
+
+        /* Convert military time to normal time and set AM/PM */
+        if (MyClock.hour &#060; 12)
+            ampm = &#034;AM&#034;;        /* hour less than 12, must be morning */
+        else
+            {
+            ampm = &#034;PM&#034;;         /* hour greater than 12,must be night */
+            MyClock.hour -= 12;  /* subtract the extra 12 of military */
+            };
+
+        if (MyClock.hour == 0)
+            MyClock.hour = 12;   /* don't forget the 12s */
+
+        /* Print the time */
+        printf(&#034;\n             the BatTime is &#034;);
+        printf(&#034;%d:%02d:%02d %s\n\n&#034;,MyClock.hour,MyClock.min,MyClock.sec,ampm);
+        }
+    else
+       printf(&#034;Error: Unable to open the %s\n&#034;,BATTCLOCKNAME);
+
+    /* Close the utility library */
+    CloseLibrary(UtilityBase);
+    }
+
+else
+    printf(&#034;Error: Unable to open utility.library\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

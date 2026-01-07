@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VIII-51/sana2device.doc" NODE="VIII-51-16" TITLE="sana2.device/S2_DELMULTICASTADDRESS" -->
+<head>
+<title>sana2.device/S2_DELMULTICASTADDRESS</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01EF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01F1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+NAME
+    DelMultiCastAddress -- Disable an interface multicast address.
+
+FUNCTION
+    This command causes device driver to disable multicast packet
+    reception for the requested address.
+
+    It is an error to disable a multicast address that is not enabled.
+
+IO REQUEST
+    ios2_Command    - S2_DELMULTICASTADDRESS
+    ios2_SrcAddr    - Multicast address to disable.
+
+RESULTS
+    ios2_Error      - Zero if successful; non-zero otherwise.
+    ios2_WireError  - More specific error number.
+
+NOTES
+    Multicast addresses are added globally -- anyone using the device
+    may receive packets as a result of any multicast address which has
+    been added for the device.
+
+    Since multicast addresses are not &#034;bound&#034; to a particular packet type,
+    each enabled multicast address has an &#034;enabled&#034; count associated with
+    it so that if two protocols add the same multicast address and later
+    one removes it, it is still enabled until the second removes it.
+
+SEE ALSO
+    S2_ADDMULTICASTADDRESS
+
+BUGS
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

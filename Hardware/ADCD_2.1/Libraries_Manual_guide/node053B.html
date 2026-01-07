@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-1-5" TITLE="D / Errors / Crashes and Memory Corruption" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D / Errors / Crashes and Memory Corruption</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node053A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node053C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Memory corruption, address errors, and illegal instruction errors are
+generally caused by use of an uninitialized, incorrectly initialized, or
+already freed/closed pointer or memory.  You may be using the pointer
+directly, or it may be one that you placed (or forgot to place) in a
+structure passed to system calls.  Or you may be overwriting one of your
+arrays, or accidentally modifying or incrementing a pointer later used in
+a free/close.  Be sure to test the return of all open/allocation type
+functions before using the result, and only close/free things that you
+successfully opened/allocated.  Use watchdog/torture utilities such as
+Enforcer and MungWall in combination to catch use of uninitialized
+pointers or freed memory, and other memory misuse problems.  Use the
+debugging tool TNT to get additional debugging information instead of a
+Software Error requester.  You may also be overflowing your stack--your
+compiler's stack checking option may be able to catch this.  Cut stack
+usage by dynamically allocating large structures, buffers, and arrays
+which are currently defined inside your functions.
+
+Corruption or crashes can also be caused by passing wrong or missing
+arguments to a system call (for example <a href="../Includes_and_Autodocs_2._guide/node0475.html">SetAPen</a>(3) or SetAPen(win,3),
+instead of SetAPen(rp,3)).  C programmers should use function prototypes
+to catch such errors.  If using short integers be sure to explicitly type
+long constants as long (e.g., 42L). (For example, with short ints, 1 &#060;&#060; 17
+may become zero).  If corruption is occurring during exit, use <a href="../Includes_and_Autodocs_2._guide/node0162.html">printf()</a>
+(or <a href="../Includes_and_Autodocs_2._guide/node0178.html">KPrintF()</a>, etc.) with <a href="../Includes_and_Autodocs_2._guide/node0292.html">Delay</a>(n) to slow down your cleanup and broadcast
+each step. A bad pointer that causes a system crash will often be reported
+as an standard 680x0 processor exception $00000003 or 4, or less often a
+number in the range of $00000006-B.  Or an Amiga-specific alert number may
+result.  See &#060;exec/<a href="../Includes_and_Autodocs_2._guide/node007F.html#line90">alerts.h</a>&#062; for Amiga-specific alert numbers. Also see
+&#034;<a href="../Libraries_Manual_guide/node053C.html">Crashes--After Exit</a>&#034; below.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-2-4" TITLE="Background for Designers / Data Abstraction " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Background for Designers / Data Abstraction </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01D4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01D6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The basic problem is how to represent information  in a way that's
+program- independent, compiler- independent, machine-independent, and
+device-independent.
+
+The computer science approach is &#034;data abstraction&#034;, also known as
+&#034;objects&#034;, &#034;actors&#034;, and &#034;abstract data types&#034;.  A data abstraction has a
+&#034;concrete representation&#034; (its storage format), an &#034;abstract
+representation&#034; (its capabilities and uses), and access procedures that
+isolate all the calling software from the concrete representation.  Only
+the access procedures touch the data storage.  Hiding mutable details
+behind an interface is called &#034;information hiding&#034;.  What is hidden are
+the non-portable details of implementing the object, namely the selected
+storage representation and algorithms for manipulating it.
+
+The power of this approach is modularity.  By adjusting the access
+procedures we can extend and restructure the data without impacting the
+interface or its callers.  Conversely, we can extend and restructure the
+interface and callers without making existing data obsolete.  It's great
+for interchange!
+
+But we seem to need the opposite: fixed file formats for all programs to
+access.  Actually, we could file data abstractions (&#034;filed objects&#034;) by
+storing the data and access procedures together.  We'd have to encode the
+access procedures in a standard machine-independent programming language &#225;
+la PostScript.  Even with this, the interface can't evolve freely since we
+can't update all copies of the access procedures.  So we'll have to design
+our abstract representations for limited evolution and occasional
+revolution (conversion).
+
+In any case, today's microcomputers can't practically store true data
+abstractions.  They can do the next best thing: store arbitrary types of
+data in &#034;data chunks&#034;, each with a type identifier and a length count.
+The type identifier is a reference by name to the access procedures (any
+local implementation).  The length count enables storage-level object
+operations like &#034;copy&#034; and &#034;skip to next&#034; independent of object type or
+contents.
+
+Chunk writing is straightforward.  Chunk reading requires a trivial parser
+to scan each chunk and dispatch to the proper access/conversion procedure.
+Reading chunks nested inside other chunks may require recursion, but no
+look ahead or backup.
+
+That's the main idea of IFF.  There are, of course, a few other
+details....
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

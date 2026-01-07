@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-1-1-2" TITLE="28 / / Types Of GELs / VSprites" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Types Of GELs / VSprites</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0372.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0374.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The VSprite, or virtual sprite, is the simplest type of GEL.  The <a href="../Libraries_Manual_guide/node0381.html">VSprite</a>
+data structure contains just a bit more information than is needed to
+define a hardware sprite.  VSprites take advantage of the system's ability
+to reuse sprite DMA channels--each VSprite can be temporarily assigned to
+a hardware sprite, as needed.  This makes it appear to an application
+program that it has a virtually unlimited supply of VSprites.
+
+Since VSprites are based on hardware sprites, rules that apply to hardware
+sprites apply to VSprites too.  VSprites are not rendered into the
+underlying <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> of the playfield and so do not affect any bits in the
+BitMap.  Because they are hardware based, they are positioned at absolute
+display coordinates and are not affected by the movement of screens.  The
+starting position of a sprite must not occur before scanline 20, because
+of certain hardware DMA time constraints.  VSprites have the same size
+limitations as hardware sprites, they are 16-bits wide and arbitrarily
+tall.
+
+The <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> data structure also serves as the root structure of more
+complex GEL types--Bobs and AnimComps.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

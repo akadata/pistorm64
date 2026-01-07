@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/iffparse" NODE="CloseIFF()" TITLE="iffparse.library/CloseIFF" -->
+<head>
+<title>iffparse.library/CloseIFF</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01BA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01BC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CloseIFF -- Close an IFF context.
+
+SYNOPSIS
+    CloseIFF (iff)
+              a0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a> *iff;
+
+FUNCTION
+    Completes an IFF read or write operation by closing the IFF context
+    established for this <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a> struct.  The <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a> struct itself
+    is left ready for re-use and a new context can be opened with
+    <a href="../Includes_and_Autodocs_2._guide/node01CF.html">OpenIFF()</a>.  This function can be used for cleanup if a read or write
+    fails partway through.
+
+    As part of its cleanup operation, CloseIFF() calls the client-
+    supplied stream hook vector.  The <a href="../Includes_and_Autodocs_2._guide/node010B.html#line55">IFFStreamCmd</a> packet will be set
+    as follows:
+
+            sc_Command:     IFFCMD_CLEANUP
+            sc_Buf:         (Not applicable)
+            sc_NBytes:      (Not applicable)
+
+    This operation is NOT permitted to fail;  any error code returned
+    will be ignored (best to return 0, though).  DO NOT write to this
+    structure.
+
+INPUTS
+    iff     - pointer to <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a> struct previously opened with
+              <a href="../Includes_and_Autodocs_2._guide/node01CF.html">OpenIFF()</a>.
+
+RESULT
+
+EXAMPLE
+
+NOTES
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01CF.html">OpenIFF()</a>, <a href="../Includes_and_Autodocs_2._guide/node01CA.html">InitIFF()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

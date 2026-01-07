@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Addl" NODE="ADDL-3" TITLE="Additional Info / Body Compression " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Additional Info / Body Compression </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02D9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02DB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The BODY contains pixel data for the image.  Width, Height, and depth
+(Planes) is specified in the BMHD.
+
+If the BMHD Compression byte is 0, then the scan line data is not
+compressed. If Compression=1, then each scan line is individually
+compressed as follows:
+
+More than 2 bytes the same stored as BYTE code value n from  -1 to -127
+  followed by byte to be repeated (-n) + 1 times.
+Varied bytes stored as BYTE code n from 0 to 127 followed by n+1 bytes
+of data.
+
+The byte code -128 is a NOP.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

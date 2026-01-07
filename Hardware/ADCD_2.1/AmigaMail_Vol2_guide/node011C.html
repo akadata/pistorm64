@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VIII-51/standard.txt" NODE="VIII-51-3" TITLE="Buffer Management" -->
+<head>
+<title>Buffer Management</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node011B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node011D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Unlike most other Exec Device drivers, SANA-II drivers have no internal
+buffers. Instead, they read/write to/from an abstract data structure
+allocated by the driver user. The driver accesses these buffers only via
+functions that the driver user provides to the driver. The driver user
+must provide two functions--one copies data to the abstract data structure
+and one copies data from the abstract data structure. The driver user can
+therefore choose the data structure used for buffer management by both the
+driver and driver user in order to have efficient memory and CPU usage
+overall.
+
+The IOSana2Req contains a pointer to data and the length of said data. A
+driver is not allowed to make assumptions about how the data is stored.
+The driver cannot directly manipulate or examine the buffer in any manner.
+The driver can only access the buffer by calling the functions provided by
+the driver user.
+
+Before calling OpenDevice(), the driver user points ios2_BufferManagement
+to a list of tags (defined in &#060;devices/sana2.h&#062;) which include pointers to
+the buffer management functions required by the driver (defined below).
+The driver will fail to open if the driver user does not supply all of the
+required functions.  If the device opens successfully, the driver sets
+ios2_BufferManagement to a value which this opener must use in all future
+calls to the driver.  This &#034;magic cookie&#034; is used from then on to access
+these functions (a &#034;magic cookie&#034; is a value which one software entity
+passes to another but which is only meaningful to one of the software
+entities).  The driver user may not use the &#034;magic cookie&#034; in any way--it
+is for the driver to do with as it wishes.  The driver could in theory
+choose to just copy the tag list to driver-owned memory and then parse the
+list for every IORequest, but it is much more efficient for the driver to
+create some sort of table of functions and to point ios2_BufferManagement
+to that table.
+
+The specification currently includes only two tags for the OpenDevice()
+ios2_BufferManagement tag list:
+
+    S2_CopyToBuff  - This is a pointer to a function which conforms to
+             the CopyToBuff Autodoc.
+
+    S2_CopyFromBuff - This is a pointer to a function which conforms to
+             the CopyFromBuff Autodoc.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_12" NODE="12-10" TITLE="12 Serial Device / Taking Over the Hardware" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>12 Serial Device / Taking Over the Hardware</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00AB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00AD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For some applications use of the device driver interface is not possible.
+By following the established rules, applications may take over the serial
+interface at the hardware level.  This extreme step is not, however,
+encouraged.  Taking over means losing the ability to work with additional
+<a name="line6">serial ports, and will limit future compatibility.</a>
+
+Access to the hardware registers is controlled by the misc.resource. See
+the &#034;<a href="../Devices_Manual_guide/node0110.html">Resources</a>&#034; chapter, and exec/<a href="../Includes_and_Autodocs_2._guide/node0111.html">misc.i</a> for details.  The MR_SERIALBITS
+and MR_SERIALPORT units control the serial registers.
+
+One additional complication exists.  The current serial device will not
+release the misc.resource bits until after an expunge.  This code provides
+a work around:
+
+   /*
+   * A safe way to expunge ONLY a certain device.
+   * This code attempts to flush ONLY the named device out of memory and
+   * nothing else.  If it fails, no status is returned (the information
+   * would have no valid use after the Permit().
+   */
+   #include &#060;exec/types.h&#062;
+   #include &#060;exec/execbase.h&#062;
+
+   void FlushDevice(char *);
+
+   extern struct ExecBase *SysBase;
+
+   void FlushDevice(name)
+   char  *name;
+   {
+   struct Device *devpoint;
+
+   Forbid();   /* ugly */
+   if (devpoint = (struct Device *)FindName(&#038;SysBase-&#062;DeviceList,name) )
+       RemDevice(devpoint);
+   Permit();
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

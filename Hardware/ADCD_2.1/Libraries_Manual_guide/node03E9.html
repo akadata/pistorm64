@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-3-3" TITLE="30 / / Types of Layers / Super Bitmap Layer" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / / Types of Layers / Super Bitmap Layer</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03E8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03EA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A super bitmap layer is similar to a <a href="../Libraries_Manual_guide/node03E8.html">smart refresh</a> layer.  It too has a
+back-up area for rendering graphics for currently obscured parts of the
+display.  Whenever an obscured area is made visible, the corresponding
+part of the backup area is copied to the display automatically.
+
+However, it differs from <a href="../Libraries_Manual_guide/node03E8.html">smart refresh</a> in that:
+
+  * The back-up <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> is user-supplied, rather than being allocated
+<a name="line10">    dynamically by the system.</a>
+
+  * The back-up <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> may be as large or larger than the the current
+    size of the layer. It may also be larger than the maximum size of the
+<a name="line14">    layer.</a>
+
+To see a larger portion of a super bitmap on-display, use <a href="../Libraries_Manual_guide/node03EF.html#line17">SizeLayer()</a>.  To
+see a different portion of the super bitmap in the layer, use
+<a name="line18"><a href="../Libraries_Manual_guide/node03EF.html#line17">ScrollLayer()</a>.</a>
+
+When the graphics routines perform drawing commands, part of the drawing
+appears in the common <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> (the on-display portion). Any drawing outside
+the displayed portion itself is rendered into the super bitmap. When the
+layer is scrolled or sized, the layer contents are copied into the super
+bitmap, the scroll or size positioning is modified, and the appropriate
+portions are then copied back into the layer. (Refer to the graphics
+library functions <a href="../Libraries_Manual_guide/node0120.html#line12">SyncSBitMap()</a> and <a href="../Libraries_Manual_guide/node0120.html#line26">CopySBitMap()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

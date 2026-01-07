@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="MoveWindow()" TITLE="intuition.library/MoveWindow" -->
+<head>
+<title>intuition.library/MoveWindow</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03C7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03C9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	MoveWindow -- Ask Intuition to move a window.
+
+<b>    SYNOPSIS</b>
+	MoveWindow( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, DeltaX, DeltaY )
+		    A0      D0      D1
+
+	VOID MoveWindow( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *, WORD, WORD );
+
+<b>    FUNCTION</b>
+	This routine sends a request to Intuition asking to move the window
+	the specified distance.  The delta arguments describe how far to
+	move the window along the respective axes.
+
+	Note that the window will not be moved immediately, but rather
+	will be moved the next time Intuition receives an input event,
+	which happens currently at a minimum rate of ten times per second,
+	and a maximum of sixty times a second.
+
+	Interactions with other arbitration of Intuition data structures
+	may defer this operation longer.  For V36, you can use the new
+	IDCMP class IDCMP_CHANGEWINDOW to detect when this operation has
+	completed.
+
+	New for V36: Intuition now will do validity checking on the final
+	position.  To send absolute movements, or to move and size a
+	window in one step, use <a href="../Includes_and_Autodocs_3._guide/node039B.html">ChangeWindowBox()</a>.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to the structure of the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> to be moved
+	DeltaX = how far to move the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> on the x-axis
+	DeltaY = how far to move the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> on the y-axis
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node039B.html">ChangeWindowBox()</a>, <a href="../Includes_and_Autodocs_3._guide/node03FA.html">SizeWindow()</a>, <a href="../Includes_and_Autodocs_3._guide/node0406.html">WindowToFront()</a>, <a href="../Includes_and_Autodocs_3._guide/node0405.html">WindowToBack()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

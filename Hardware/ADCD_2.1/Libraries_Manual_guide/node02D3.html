@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_22" NODE="22-1-1" TITLE="22 / The Signal System / Signal Allocation" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>22 / The Signal System / Signal Allocation</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02D2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02D4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As mentioned above, a task assigns its own meaning to a particular signal.
+Because certain system libraries may occasionally require the use of a
+signal, there is a convention for signal allocation.  It is unwise ever to
+<a name="line5">make assumptions about which signals are actually in use.</a>
+
+Before a signal can be used, it must be allocated with the <a href="../Includes_and_Autodocs_2._guide/node0333.html">AllocSignal()</a>
+function.  When a signal is no longer needed, it should be freed for reuse
+with <a href="../Includes_and_Autodocs_2._guide/node0356.html">FreeSignal()</a>.
+
+    BYTE AllocSignal( LONG signalNum );
+    VOID FreeSignal( LONG signalNum );
+
+<a href="../Includes_and_Autodocs_2._guide/node0333.html">AllocSignal()</a> marks a signal as being in use and prevents the accidental
+use of the same signal for more than one event.  You may ask for either a
+specific signal number, or more commonly, you would pass -1 to request the
+next available signal.  The state of the newly allocated signal is cleared
+(ready for use).  Generally it is best to let the system assign you the
+next free signal.  Of the 32 available signals, the lower 16 are reserved
+for system use.  This leaves the upper 16 signals free for application
+programs to allocate.  Other subsystems that you may call depend on
+AllocSignal().
+
+The following C example asks for the next free signal to be allocated for
+its use:
+
+    if (-1 == (signal = AllocSignal(-1)))
+        printf(&#034;no signal bits available\n&#034;);
+    else
+        {
+        printf(&#034;allocated signal number %ld\n&#034;, signal);
+        /* Other code could go here */
+        FreeSignal(signal)
+        }
+
+The value returned by <a href="../Includes_and_Autodocs_2._guide/node0333.html">AllocSignal()</a> is a signal bit number. This value
+cannot be used directly in calls to signal-related functions without first
+being converted to a mask:
+
+    mask = 1L &#060;&#060; signal;
+
+It is important to realize that signal bit allocation is relevant only to
+the running task.  You cannot allocate a signal from another task.  Note
+that functions which create a signal <a href="../Libraries_Manual_guide/node02EB.html#line12">MsgPort</a> will allocate a signal from
+the task that calls the function.  Such functions include <a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a>,
+<a href="../Libraries_Manual_guide/node02EC.html">CreatePort()</a>, and <a href="../Libraries_Manual_guide/node02EC.html#line39">CreateMsgPort()</a>.  For this reason, only the creating
+task may <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a> (directly or indirectly) on the MsgPort's signal.
+Functions which call Wait() include <a href="../Libraries_Manual_guide/node029F.html#line8">DoIO()</a>, <a href="../Libraries_Manual_guide/node02A0.html#line48">WaitIO()</a> and <a href="../Libraries_Manual_guide/node02F1.html#line9">WaitPort()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

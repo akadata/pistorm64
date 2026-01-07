@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="FreeClass()" TITLE="intuition.library/FreeClass" -->
+<head>
+<title>intuition.library/FreeClass</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03AE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03B0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	FreeClass -- Frees a boopsi class created by <a href="../Includes_and_Autodocs_3._guide/node03C3.html">MakeClass()</a>. (V36)
+
+<b>    SYNOPSIS</b>
+	success = FreeClass( ClassPtr )
+	D0                   A0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> FreeClass( struct <a href="../Includes_and_Autodocs_3._guide/node05E6.html#line35">IClass</a> * );
+
+<b>    FUNCTION</b>
+	For class implementors only.
+
+	Tries to free a boopsi class created by <a href="../Includes_and_Autodocs_3._guide/node03C3.html">MakeClass()</a>.  This
+	won't always succeed: classes with outstanding objects or
+	with subclasses cannot be freed.  You cannot allow the code
+	which implements the class to be unloaded in this case.
+
+	For public classes, this function will *always* remove
+	the class (see <a href="../Includes_and_Autodocs_3._guide/node03E1.html">RemoveClass()</a> ) making it unavailable, whether
+	it succeeds or not.
+
+	If you have a dynamically allocated data for your class (hanging
+	off of cl_UserData), try to free the class before you free the
+	user data, so you don't get stuck with a half-freed class.
+
+<b>    INPUTS</b>
+	ClassPtr - pointer to a class created by <a href="../Includes_and_Autodocs_3._guide/node03C3.html">MakeClass()</a>.
+
+<b>    RESULT</b>
+	Returns FALSE if the class could not be freed.  Reasons include,
+	but will not be limited to, having non-zero cl_ObjectCount or
+	cl_SubclassCount.
+
+	Returns TRUE if the class could be freed.
+
+	Calls <a href="../Includes_and_Autodocs_3._guide/node03E1.html">RemoveClass()</a> for the class in either case.
+
+<b>    EXAMPLE</b>
+	Freeing a private class with dynamically allocated user data:
+
+	freeMyClass( cl )
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E6.html#line35">IClass</a>	*cl;
+	{
+	    struct MyPerClassData	*mpcd;
+
+	    mpcd = (struct MyPerClassData *) cl-&#062;cl_UserData;
+	    if ( FreeClass( cl ) )
+	    {
+		FreeMem( mpcd, sizeof mpcd );
+		return ( TRUE );
+	    }
+	    else
+	    {
+		return ( FALSE );
+	    }
+	}
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03C3.html">MakeClass()</a>,
+	Document &#034;Basic Object-Oriented Programming System for Intuition&#034;
+	and the &#034;boopsi Class Reference&#034; document.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

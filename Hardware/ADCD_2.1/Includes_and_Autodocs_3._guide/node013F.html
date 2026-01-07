@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="AssignAdd()" TITLE="dos.library/AssignAdd" -->
+<head>
+<title>dos.library/AssignAdd</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node013E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0140.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AssignAdd -- Adds a lock to an assign for multi-directory assigns (V36)
+
+<b>   SYNOPSIS</b>
+	success = AssignAdd(name,lock)
+	D0                   D1   D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> AssignAdd(STRPTR,BPTR)
+
+<b>   FUNCTION</b>
+	Adds a lock to an assign, making or adding to a multi-directory
+	assign.  Note that this only will succeed on an assign created with
+	<a href="../Includes_and_Autodocs_3._guide/node0141.html">AssignLock()</a>, or an assign created with <a href="../Includes_and_Autodocs_3._guide/node0140.html">AssignLate()</a> which has been
+	resolved (converted into a AssignLock()-assign).
+
+	NOTE: you should not use the lock in any way after making this call
+	successfully.  It becomes the part of the assign, and will be unlocked
+	by the system when the assign is removed.  If you need to keep the
+	lock, pass a lock from <a href="../Includes_and_Autodocs_3._guide/node0156.html">DupLock()</a> to <a href="../Includes_and_Autodocs_3._guide/node0141.html">AssignLock()</a>.
+
+<b>   INPUTS</b>
+	name - Name of device to assign lock to (without trailing ':')
+	lock - <a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock</a> associated with the assigned name
+
+<b>   RESULT</b>
+	success - Success/failure indicator.  On failure, the lock is not
+		  unlocked.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock()</a>, <a href="../Includes_and_Autodocs_3._guide/node0141.html">AssignLock()</a>, <a href="../Includes_and_Autodocs_3._guide/node0142.html">AssignPath()</a>, <a href="../Includes_and_Autodocs_3._guide/node0140.html">AssignLate()</a>, <a href="../Includes_and_Autodocs_3._guide/node0156.html">DupLock()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node01A5.html">RemAssignList()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_19" NODE="19-3" TITLE="19 Exec Device I/O / Using a Device" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>19 Exec Device I/O / Using a Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node029E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02A0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Once a device has been opened, you use it by passing the I/O request to
+it.  When the device processes the I/O request, it acts on the information
+the I/O request contains and returns a reply message, i.e., the I/O
+request, to the message port when it is finished.  The I/O request is
+passed to a device using one of three functions, <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>, <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> and
+<a href="../Includes_and_Autodocs_2._guide/node0141.html">BeginIO()</a>.  They take only one argument: the I/O request you wish to pass
+<a name="line8">to the device.</a>
+
+  * <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> is a synchronous function.  It will not return until the
+    device has finished with the I/O request.  DoIO() will wait, if
+    necessary, for the request to complete, and will remove (<a href="../Libraries_Manual_guide/node02F2.html">GetMsg()</a>)
+<a name="line13">    any reply message from the message port.</a>
+
+  * <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> is an asynchronous function.  It can return immediately, but
+    the I/O operation it initiates may take a short or long time. SendIO
+    is normally used when your application has other work to do while the
+    I/O request is being acted upon, or if your application wishes to
+    allow the user to cancel the I/O. Using SendIO() requires that you
+    wait on or check for completion of the request, and remove the
+<a name="line21">    completed request from the message port with <a href="../Libraries_Manual_guide/node02F2.html">GetMsg()</a>.</a>
+
+  * <a href="../Includes_and_Autodocs_2._guide/node0141.html">BeginIO()</a> is commonly used to control the QuickIO bit when sending an
+    I/O request to a device.  When the QuickIO flag (<a href="../Includes_and_Autodocs_2._guide/node0094.html#line45">IOF_QUICK</a>) is set in
+    the I/O request, a device is allowed to take certain shortcuts in
+    performing and completing a request.  If the request can complete
+    immediately, the device will not return a reply message and the
+    QuickIO flag will remain set.  If the request cannot be completed
+    immediately, the QUICK_IO flag will be clear.  <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> normally
+<a name="line30">    requests QuickIO; <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> does not.</a>
+
+An I/O request typically has three fields set for every command sent to a
+device.  You set the command itself in the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">io_Command</a> field, a pointer to
+the data for the command in the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">io_Data</a> field, and the length of the data
+in the <a href="../Includes_and_Autodocs_2._guide/node0094.html#line28">io_Length</a> field.
+
+    SerialIO-&#062;IOSer.io_Length   = sizeof(ReadBuffer);
+    SerialIO-&#062;IOSer.io_Data     = ReadBuffer;
+    SerialIO-&#062;IOSer.io_Command  = CMD_READ;
+<a name="line40">    SendIO((struct IORequest *)SerialIO);</a>
+
+Commands consist of two parts (separated by an underscore, all in upper
+case): a prefix and the command word.  The prefix indicates whether the
+command is an Exec or device specific command.  All Exec standard commands
+have &#034;CMD&#034; as the prefix.  They are defined in the include file
+<a name="line46">&#060;exec/<a href="../Includes_and_Autodocs_2._guide/node0094.html#line49">io.h</a>&#062;.</a>
+
+             Table 19-2: Standard Exec Device Commands
+
+            CMD_READ   CMD_START  CMD_UPDATE  CMD_CLEAR
+            CMD_WRITE  CMD_STOP   CMD_FLUSH   CMD_RESET
+<a name="line52"></a>
+
+You should not assume that a device supports all standard Exec device
+commands.  Always check the documentation before attempting to use one of
+them.  Device-specific command prefixes vary with the device.
+<a name="line57"></a>
+
+<a name="line59">             Table 19-3: System Device Command Prefixes</a>
+
+        Device     Prefix                       Example
+        ------     ------                       -------
+        <a href="../Devices_Manual_guide/node001A.html">Audio</a>      <a href="../Includes_and_Autodocs_2._guide/node0038.html#line25">ADCMD</a>                        ADCMD_ALLOCATE
+        <a href="../Devices_Manual_guide/node0065.html">Clipboard</a>  <a href="../Includes_and_Autodocs_2._guide/node0048.html#line27">CBD</a>                          CBD_POST
+        <a href="../Devices_Manual_guide/node0080.html">Console</a>    <a href="../Includes_and_Autodocs_2._guide/node0050.html#line22">CD</a>                           CD_ASKKEYMAP
+        <a href="../Devices_Manual_guide/node00AE.html">Gameport</a>   <a href="../Includes_and_Autodocs_2._guide/node0039.html#line22">GPD</a>                          GPD_SETCTYPE
+        <a href="../Devices_Manual_guide/node00CA.html">Input</a>      <a href="../Includes_and_Autodocs_2._guide/node0049.html#line18">IND</a>                          IND_SETMPORT
+<a name="line68">        <a href="../Devices_Manual_guide/node00FC.html">Keyboard</a>   <a href="../Includes_and_Autodocs_2._guide/node0059.html#line18">KBD</a>                          KBD_READMATRIX</a>
+        <a href="../Devices_Manual_guide/node0113.html">Narrator</a>   no device specific commands  -
+        <a href="../Devices_Manual_guide/node000E.html">Parallel</a>   <a href="../Includes_and_Autodocs_2._guide/node004A.html#line92">PDCMD</a>                        PDCMD_QUERY
+        <a href="../Devices_Manual_guide/node003E.html">Printer</a>    <a href="../Includes_and_Autodocs_2._guide/node0052.html#line30">PRD</a>                          PRD_PRTCOMMAND
+        <a href="../Devices_Manual_guide/node0073.html">SCSI</a>       <a href="../Includes_and_Autodocs_2._guide/node0043.html#line67">HD</a>                           HD_SCSICMD
+        <a href="../Devices_Manual_guide/node009A.html">Serial</a>     <a href="../Includes_and_Autodocs_2._guide/node004B.html#line94">SDCMD</a>                        SDCMD_BREAK
+        <a href="../Devices_Manual_guide/node00BD.html">Timer</a>      <a href="../Includes_and_Autodocs_2._guide/node0053.html#line41">TR</a>                           TR_ADDREQUEST
+        <a href="../Devices_Manual_guide/node00DC.html">Trackdisk</a>  <a href="../Includes_and_Autodocs_2._guide/node005B.html#line73">TD</a> and <a href="../Includes_and_Autodocs_2._guide/node005B.html#line97">ETD</a>                   TD_MOTOR/ETD_MOTOR
+
+
+Each device maintains its own I/O request queue.  When a device receives
+an I/O request, it either processes the request immediately or puts it in
+the queue because one is already being processed. After an I/O request is
+completely processed, the device checks its queue and if it finds another
+I/O request, begins to process that request.
+
+ <a href="../Libraries_Manual_guide/node02A0.html">Synchronous Vs. Asynchronous Requests</a>    <a href="../Libraries_Manual_guide/node02A1.html">I/O Request Completion</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

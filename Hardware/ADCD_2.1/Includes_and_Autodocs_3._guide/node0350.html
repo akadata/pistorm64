@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="icon" NODE="GetIconTagList()" TITLE="icon.library/GetIconTagList" -->
+<head>
+<title>icon.library/GetIconTagList</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node034F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0351.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetIconTagList -- Retrieve an icon (V44)
+
+<b>   SYNOPSIS</b>
+	icon = GetIconTagList(name,tags);
+	D0                    A0   A1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line64">DiskObject</a> * GetIconTagList(STRPTR name,struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *tags);
+
+	icon = GetIconTags(name,tag1,...);
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line64">DiskObject</a> * GetIconTags(STRPTR name,<a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a> tag1,...);
+
+<b>   FUNCTION</b>
+
+	This function is used to retrieve an icon; the icon can
+	belong to a file/drawer/volume or it can be a default icon.
+
+<b>   INPUTS</b>
+	name -- Name of the object an icon is to be retrieved for,
+	    or NULL if a default icon is to be retrieved.
+	tags -- Retrieval options.
+
+<b>   TAGS</b>
+	ICONGETA_GetDefaultType (LONG) -- Type of the default icon
+	    to retrieve; must be one of WBDISK, WBDRAWER, WBTOOL,
+	    WBPROJECT, WBGARBAGE, WBDEVICE or WBKICK.
+
+	    If this tag is used, the &#034;name&#034; parameter will be ignored.
+
+	ICONGETA_GetDefaultName (STRPTR) -- Name of the default object
+	    type to retrieve a default icon for. If the named default
+	    icon cannot be found, NULL will be returned. To avoid
+	    this, also specify ICONGETA_GetDefaultType: this will provide
+	    a fall-back and return a &#034;default&#034; default icon instead.
+
+	    If this tag is used, the &#034;name&#034; parameter will be ignored.
+
+	ICONGETA_FailIfUnavailable (BOOL) -- If there is no icon for
+	    the specified object, this tag will control how to
+	    proceed: if ICONGETA_FailIfUnavailable is set to TRUE,
+	    NULL and an error code will be returned; if set to FALSE,
+	    icon.library will first invoke the global identification
+	    hook (see icon.library/IconControlA) and then, if necessary,
+	    provide a default icon for the object in question.
+
+	    This tag defaults to TRUE.
+
+	ICONGETA_GetPaletteMappedIcon (BOOL) -- By default, icon.library
+	    will try to retrieve the palette mapped version of an icon. To
+	    change this, set the ICONGETA_GetPaletteMappedIcon tag to FALSE.
+
+	    This tag defaults to TRUE.
+
+	ICONGETA_RemapIcon (BOOL) -- Palette mapped icons will usually
+	    be automatically remapped for display on the screen
+	    selected using <a href="../Includes_and_Autodocs_3._guide/node0351.html">IconControlA()</a>. If you do not want this to
+	    happen because, for example, you want to use LayoutIcon()
+	    instead, you can set the ICONGETA_RemapIcon tag to FALSE.
+	    Take care when doing this as the icon returned to you
+	    will have NULL pointers in the do_Gadget.GadgetRender
+	    and do_Gadget.SelectRender members.
+
+	    This tag defaults to TRUE.
+
+	ICONGETA_IsDefaultIcon (LONG *) -- When retrieving an icon with
+	    the ICONGETA_FailIfUnavailable tag set to FALSE, you may
+	    receive a default icon because there is no on-disk icon
+	    file for the object you wanted to retrieve it for. This
+	    type of default icon is also known as a &#034;fake&#034; icon.
+	    To find out whether you have received a fake icon, use the
+	    ICONGETA_IsDefaultIcon tag.
+
+	ICONGETA_GenerateImageMasks (BOOL) -- When loading icons with
+	    transparent colours or backfill imagery, bit plane masks
+	    will be generated for later use with <a href="../Includes_and_Autodocs_3._guide/node0347.html">DrawIconStateA()</a>.
+	    If you do not need these masks, set this tag to FALSE.
+
+	    This tag defaults to TRUE.
+
+	ICONGETA_Screen (struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *) -- Pointer to the screen
+	    to remap the icon to; if set to NULL, this keeps the
+	    icon from getting remapped in the first place (see
+	    ICONGETA_RemapIcon for the consequences).
+
+	    This tag defaults to the default screen to remap to, as
+	    preset by <a href="../Includes_and_Autodocs_3._guide/node0351.html">IconControlA()</a>.
+
+	ICONGETA_Label (STRPTR) -- The label text to be printed below
+	    the icon when it is put to use lateron. This parameter
+	    can be useful to figure out the type of the icon to
+	    be retrieved by the identification hook. For example,
+	    Workbench may label unreadable disk icons as &#034;DF0:????&#034;.
+	    The identification hook could key on this and supply an
+	    appropriate icon for the disk.
+
+	    This tag defaults to NULL.
+
+	ICONA_ErrorCode (LONG *) -- Pointer to a <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> word variable to
+	    store error codes in. Note that this variable will be
+	    initialized regardless of whether an error occured or not.
+	    Thus, you can check for an error condition by comparing the
+	    variable contents against 0; 0 indicates success, all other
+	    values are error codes as defined by dos.library.
+
+<b>   RESULT</b>
+	icon -- Pointer to a struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line64">DiskObject</a> or NULL in case of error.
+	    You can use <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a> to retrieve the error code or use the
+	    ICONA_ErrorCode tag instead.
+
+<b>   EXAMPLE</b>
+
+	/* Retrieve the default drawer icon. */
+	struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line64">DiskObject</a> *icon;
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> errorCode;
+
+	icon = GetIconTags(NULL,
+	    ICONGETA_GetDefaultType,WBDRAWER,
+	    ICONA_ErrorCode,&#038;errorCode,
+	TAG_DONE);
+
+	if(icon == NULL)
+	{
+	    Printf(&#034;could not retrieve default drawer icon;n&#034;);
+	    PrintFault(errorCode,NULL);
+	}
+
+	/* Retrieve the default &#034;picture&#034; icon. */
+	icon = GetIconTags(NULL,
+	    ICONGETA_GetDefaultName,&#034;picture&#034;,
+	TAG_DONE);
+
+	/* Retrieve the default &#034;picture&#034; icon; if there is no
+	 * such default icon, retrieve the default project
+	 * icon instead.
+	 */
+	icon = GetIconTags(NULL,
+	    ICONGETA_GetDefaultName,&#034;picture&#034;,
+	    ICONGETA_GetDefaultType,WBPROJECT,
+	TAG_DONE);
+
+	/* Retrieve the regular, non-palette-mapped version of
+	 * an icon.
+	 */
+	icon = GetIconTags(&#034;file&#034;,
+	    ICONGETA_GetPaletteMappedIcon,FALSE,
+	TAG_DONE);
+
+	/* Retrieve the icon for a file; if there is no icon associated
+	 * with it, retrieve a default icon that matches the file.
+	 * Also, remember whether we got a real icon or a fake one.
+	 */
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> isFakeIcon;
+
+	icon = GetIconTags(&#034;file&#034;,
+	    ICONGETA_FailIfUnavailable,FALSE,
+	    ICONGETA_IsDefaultIcon,&#038;isFakeIcon,
+	TAG_DONE);
+
+	if(icon != NULL)
+	{
+	    Printf(&#034;got an icon at 0x%08lx, and it is a %s icon.n&#034;,
+	        icon,isFakeIcon ? &#034;fake&#034; : &#034;real&#034;);
+	}
+
+<b>   NOTES</b>
+	This function is a superset of <a href="../Includes_and_Autodocs_3._guide/node034C.html">GetDefDiskObject()</a>, <a href="../Includes_and_Autodocs_3._guide/node034D.html">GetDiskObject()</a>
+	and <a href="../Includes_and_Autodocs_3._guide/node034E.html">GetDiskObjectNew()</a>.
+
+	If a palette-mapped icon is set to allocate its colours from the
+	default screen, such as the Workbench screen, icon.library may
+	resort to remap its colours in the course of Workbench screen
+	close/reopen transitions. This means that you cannot depend upon
+	the icon's image bitmaps to stay the same size, shape or colour.
+	If this is what you need, you should either create your own images
+	from the palette mapped data or make copies of the icon image
+	bitmaps and the associated colour table.
+
+	If during Workbench close/open transitions the global remap
+	screen becomes NULL, GetIconTagList() may refuse to return a
+	remapped icon and return with an error (ERROR_REQUIRED_ARG_MISSING)
+	instead.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0618.html">workbench/icon.h</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05D6.html">workbench/workbench.h</a>
+	<a href="../Includes_and_Autodocs_3._guide/node034D.html">icon.library/GetDiskObject</a>
+	<a href="../Includes_and_Autodocs_3._guide/node034E.html">icon.library/GetDiskObjectNew</a>
+	<a href="../Includes_and_Autodocs_3._guide/node034C.html">icon.library/GetDefDiskObject</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0351.html">icon.library/IconControlA</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0357.html">icon.library/PutIconTagList</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

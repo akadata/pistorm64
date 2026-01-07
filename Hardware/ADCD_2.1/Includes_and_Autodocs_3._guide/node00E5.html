@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="commodities" NODE="CxBroker()" TITLE="commodities.library/CxBroker" -->
+<head>
+<title>commodities.library/CxBroker</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00E4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00E6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CxBroker -- create a commodity broker. (V36)
+
+<b>   SYNOPSIS</b>
+	broker = CxBroker(nb,error);
+	D0		  A0 D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0632.html#line74">CxObj</a> *CxBroker(struct <a href="../Includes_and_Autodocs_3._guide/node0632.html#line39">NewBroker</a> *,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> *);
+
+<b>   FUNCTION</b>
+	This function creates a broker from the specification found in the
+	<a href="../Includes_and_Autodocs_3._guide/node0632.html#line39">NewBroker</a> structure pointed to by 'nb'. The purpose and meaning of the
+	fields of the <a href="../Includes_and_Autodocs_3._guide/node0632.html#line39">NewBroker</a> structure are described below. Also see
+	<a href="../Includes_and_Autodocs_3._guide/node0632.html">&#060;libraries/commodities.h&#062;</a> for more info.
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node0632.html#line39">NewBroker</a>
+	{
+	    <a href="../Includes_and_Autodocs_3._guide/node0654.html#line48">BYTE</a>            nb_Version;
+	    <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>          nb_Name;
+	    <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>          nb_Title;
+	    <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>          nb_Descr;
+	    WORD            nb_Unique;
+	    WORD	    nb_Flags;
+	    <a href="../Includes_and_Autodocs_3._guide/node0654.html#line48">BYTE</a>            nb_Pri;
+	    struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *nb_Port;
+	    WORD            nb_ReservedChannel;
+	};
+
+	nb_Version
+	This is the way that future versions of commodities can identify
+	which version of the <a href="../Includes_and_Autodocs_3._guide/node0632.html#line39">NewBroker</a> structure you are using. This should be
+	set to NB_VERSION as defined in <a href="../Includes_and_Autodocs_3._guide/node0632.html">&#060;libraries/commodities.h&#062;</a>
+
+	nb_Name
+	This is the name of the broker. This name is used to find the broker
+	in commodities' object list and is the name shown in the listview
+	gadget of the Exchange program. The name string is copied in the
+	broker object upon creation so it can be discarded right after
+	CxBroker() returns. The maximum length of the name string is defined
+	by a constant in <a href="../Includes_and_Autodocs_3._guide/node0632.html">&#060;libraries/commodities.h&#062;</a>.
+
+	nb_Title, nb_Descr
+	These are two strings which appear to the user in the Exchange
+	program and describe the application the broker is representing.
+	Note that these strings are copied into the broker object so they
+	can be discarded right after CxBroker() returns. The maximum length
+	of these strings that will be recognized are defined by constants in
+	<a href="../Includes_and_Autodocs_3._guide/node0632.html">&#060;libraries/commodities.h&#062;</a>.
+
+	nb_Unique
+	This field indicates what should happen if a broker of the same name
+	(nb_Name) already exists in commodities' object list. Constants
+	in <a href="../Includes_and_Autodocs_3._guide/node0632.html">&#060;libraries/commodities.h&#062;</a> allow the caller to specify whether
+	another broker is to be created, and whether any existing broker of
+	the same name should be notified that an attempt at creating a
+	duplicate has been made.
+
+	nb_Pri
+	This specifies with what priority the new broker is to be inserted
+	within commodities' object list. Higher priority nodes appear
+	earlier in a list. It is strongly recommended that the ToolTypes
+	environment of an application be used to allow the end-user to set
+	the priority of the broker.
+
+<b>   INPUTS</b>
+	nb - an initialized <a href="../Includes_and_Autodocs_3._guide/node0632.html#line39">NewBroker</a> structure
+	error - a pointer to a longword where to store a failure code (may be
+		NULL)
+
+<b>   RESULTS</b>
+	broker - a pointer to the broker object or NULL upon failure. If the
+		 'error' pointer is not NULL, a further diagnostic code is
+		 placed at that address. Error codes are defined in
+		 <a href="../Includes_and_Autodocs_3._guide/node0632.html">&#060;libraries/commodities.h&#062;</a> and include:
+
+			CBERR_OK
+			No problems; broker created OK.
+
+ 			CBERR_SYSERR
+			System problems, not your fault, sign of low memory.
+
+			CBERR_DUP
+			The nb_Unique field specified that only one broker of
+			'nb_Name' should be allowed, and one already exists.
+
+			CBERR_VERSION
+			The version specified in 'nb_Version' is unknown to the
+			library.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node00F6.html">SetCxObjPri()</a>, <a href="../Includes_and_Autodocs_3._guide/node0632.html">&#060;libraries/commodities.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

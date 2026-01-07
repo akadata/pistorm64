@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-1-2" TITLE="8 / Intuition Graphic Objects / Positioning Graphic Objects" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Intuition Graphic Objects / Positioning Graphic Objects</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01B7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01B9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The position of these objects is specified as the sum of two independent
+components: an external component which gives the position of a base
+reference point for the list of objects, and an internal component which
+<a name="line5">gives the relative offset of a specific object to the base reference point.</a>
+
+The external component is used to position the object list within the
+display element.  For objects drawn indirectly by attaching them to a
+menu, gadget or requester, this is always a point within the menu, gadget
+or requester (the top left corner).
+
+For objects drawn directly with the <a href="../Libraries_Manual_guide/node01BB.html">DrawImage()</a>, <a href="../Libraries_Manual_guide/node01C2.html">DrawBorder()</a> or
+<a href="../Libraries_Manual_guide/node01C8.html">PrintIText()</a> functions, specific x and y coordinates are provided as
+arguments that specify an offset within the screen's or window's <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>
+<a name="line15">at which to display the list of objects.</a>
+
+Each object also has an internal, relative component that is added to the
+external component described above to determine the final position of the
+object.  This allows the application to reuse a graphical object and have
+it appear relative to each object to which it is attached.  For example,
+if the application has numerous gadgets of the same size, it can use a
+single <a href="../Libraries_Manual_guide/node01C1.html">Border</a> structure to draw lines around all the gadgets.  When the
+gadgets are drawn, the base position of the lines will be taken from each
+specific gadget in turn.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

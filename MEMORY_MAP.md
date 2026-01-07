@@ -53,6 +53,17 @@ Active config file:
 - Passed via `--config-file`, or
 - `default.cfg` if present, otherwise an empty config.
 
+### Current config: `myamiga3.cfg`
+
+These entries are Pi-side in your setup:
+
+```
+map type=rom address=0xF80000 size=0x80000 file=Kickstart-v3.1-r40.068.rom id=kickstart
+map type=ram address=0x10000000 size=32M  id=z3_autoconf_fast
+map type=ram address=0x08000000 size=128M id=cpu_slot_ram
+map type=ram address=0x200000 size=8M id=z2_autoconf_fast
+```
+
 ## Amiga-side (GPIO/CPLD) ranges
 
 Everything **not** matched by the above is Amiga-side and goes through:

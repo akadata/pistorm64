@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-13-2" TITLE="B / buttongclass / Changed Methods: GM_HANDLEINPUT" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / buttongclass / Changed Methods: GM_HANDLEINPUT</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0520.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0522.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This method continuously issues <a href="../Libraries_Manual_guide/node04C5.html">OM_NOTIFY</a> messages for each IECLASS_TIMER
+event it gets.  The OM_NOTIFY message's OPUF_INTERIM flag (from
+<a href="../Libraries_Manual_guide/node04C4.html#line26">opUpdate.opu_Flags</a>) is set for all but the final OM_NOTIFY.
+
+The <a href="../Libraries_Manual_guide/node04C5.html">OM_NOTIFY</a> message contains one attribute/value pair, GA_ID.  If the
+pointer is currently over the gadget image, the value of this
+attribute/value pair is the gadget's actual GA_ID (from the
+<a href="../Libraries_Manual_guide/node0149.html#line137">Gadget.GadgetID</a> field).  If the pointer isn't over the image, the value is
+the negative of the gadget's actual GA_ID.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

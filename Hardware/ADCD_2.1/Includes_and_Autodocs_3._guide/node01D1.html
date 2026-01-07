@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="Write()" TITLE="dos.library/Write" -->
+<head>
+<title>dos.library/Write</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01D0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01D2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	Write -- Write bytes of data to a file
+
+<b>    SYNOPSIS</b>
+	returnedLength =  Write( file, buffer, length )
+	D0			 D1    D2      D3
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> Write (BPTR, void *, LONG)
+
+<b>    FUNCTION</b>
+	Write() writes bytes of data to the opened file 'file'. 'length'
+	indicates the length of data to be transferred; 'buffer' is a
+	pointer to the buffer. The value returned is the length of
+	information actually written. So, when 'length' is greater than
+	zero, the value of 'length' is the number of characters written.
+	Errors are indicated by a value of -1.
+
+	Note: this is an unbuffered routine (the request is passed directly
+	to the filesystem.)  Buffered I/O is more efficient for small
+	reads and writes; see <a href="../Includes_and_Autodocs_3._guide/node016C.html">FPutC()</a>.
+
+<b>    INPUTS</b>
+	file - BCPL pointer to a file handle
+	buffer - pointer to the buffer
+	length - integer
+
+<b>    RESULTS</b>
+	returnedLength - integer
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read()</a>, <a href="../Includes_and_Autodocs_3._guide/node01AD.html">Seek()</a>, <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open()</a>, <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close()</a>, <a href="../Includes_and_Autodocs_3._guide/node016C.html">FPutC</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

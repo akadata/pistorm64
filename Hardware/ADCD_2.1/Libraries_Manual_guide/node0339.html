@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-9-4" TITLE="27 / / / Mode Specification, ViewPort Interface" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / / Mode Specification, ViewPort Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0338.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node033A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When working directly with graphics, the interface is based on <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> and
+<a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> structures, rather than on Intuition's <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a> structure.  As
+previously mentioned, new information must be associated with the ViewPort
+to specify the new Release 2 modes, and also with the View to specify what
+virtual monitor the whole View will be displayed on.  There is also a lot
+of information to associate with a ViewPort regarding enhanced genlock
+<a name="line8">capabilities.</a>
+
+This association of this new data with the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> is made through a display
+database system which has been added to the Release 2 graphics library.
+All correctly written programs that allocate a <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> structure for a
+<a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> use the <a href="../Libraries_Manual_guide/node0331.html">GetColorMap()</a> function to do it.  Hence, in Release 2 the
+ColorMap structure is used as the general purpose black box extension of
+<a name="line15">the ViewPort data.</a>
+
+To set or obtain the data in the extended structures, Release 2 provides a
+new function named <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a> which takes a <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> as an argument.
+This allows the setting and getting of the new extended display data.
+This mechanism is used to associate a <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line49">DisplayInfo</a> handle (not a ModeID)
+with a <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.  A DisplayInfo handle is an abstract link to the display
+database area associated with a particular ModeID.  This handle is passed
+to the graphics database functions when getting or setting information
+about the mode. Using VideoControl(), a program can enable, disable, or
+obtain the state of a ViewPort's ColorMap, mode, genlock and other
+features.  The function uses a tag based interface and returns NULL if no
+error occurred.
+
+    error = BOOL VideoControl( struct ColorMap *cm, struct TagItem *tag );
+
+The first argument is a pointer to a <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> structure as returned by the
+<a href="../Libraries_Manual_guide/node0331.html">GetColorMap()</a> function.  The second argument is a pointer to an array of
+video control tag items, used to indicate whether information is being
+given or requested as well as to pass (or receive the information).  The
+tags you can use with <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a> include the following:
+
+VTAG_ATTACH_CM_GET (or _SET) is used to obtain the <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> structure from
+<a name="line38">the indicated <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> or attach a given ColorMap to it.</a>
+
+VTAG_VIEWPORTEXTRA_GET (or _SET) is used to obtain the <a href="../Libraries_Manual_guide/node032C.html#line16">ViewPortExtra</a>
+structure from the indicated <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> structure or attach a given
+ViewPortExtra to it.  A ViewPortExtra structure is an extension of the
+<a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> structure and should be allocated and freed with <a href="../Libraries_Manual_guide/node032C.html#line22">GfxNew()</a> and
+<a name="line44"><a href="../Includes_and_Autodocs_2._guide/node044C.html">GfxFree()</a> and associated with the ViewPort with <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a>.</a>
+
+VTAG_NORMAL_DISP_GET (or _SET) is used to obtain or set the <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line49">DisplayInfo</a>
+structure for the standard or &#034;normal&#034; mode.
+
+See &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00B0.html#line22">videocontrol.h</a>&#062; for a list of all the available tags.  See
+the <a href="../Libraries_Manual_guide/node036C.html">section on genlocking</a> for information on using <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a> to
+interact with the Amiga's genlock capabilities.  Note that the graphics
+library will modify the tag list passed to VideoControl().
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

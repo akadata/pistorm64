@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="rexxsyslib" NODE="CreateArgstring()" TITLE="rexxsyslib.library/CreateArgstring" -->
+<head>
+<title>rexxsyslib.library/CreateArgstring</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0548.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node054A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	CreateArgstring - Create an argument string structure
+
+<b>    SYNOPSIS</b>
+	argstr = CreateArgstring(string, length)
+	D0,A0                    A0      D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *CreateArgstring(UBYTE *, ULONG);
+
+<b>    FUNCTION</b>
+	Allocates a <a href="../Includes_and_Autodocs_3._guide/node0633.html#line85">RexxArg</a> structure and copies the supplied string into it.
+	The returned pointer points at the string part of the structure
+	and can be treated like an ordinary string pointer.  (However, care
+	must be taken that you do not change the string)
+
+<b>    INPUTS</b>
+	string - A pointer at your input string
+	length - The number of bytes of your input string you wish copied.
+	         (NOTE:  You are limited to 65,535 byte strings)
+
+<b>    RESULTS</b>
+	argstr - A pointer to the argument string.  The results are returned
+	         in both A0 and D0.  You should always check the result
+	         as an allocation failure would cause an error.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node054B.html">DeleteArgstring()</a>, <a href="../Includes_and_Autodocs_3._guide/node054F.html">LengthArgstring()</a>, <a href="../Includes_and_Autodocs_3._guide/node0548.html">ClearRexxMsg()</a>, <a href="../Includes_and_Autodocs_3._guide/node054D.html">FillRexxMsg()</a>
+
+<b>    BUGS</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

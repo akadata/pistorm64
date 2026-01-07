@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_18" NODE="18-2" TITLE="18 Exec Libraries / Adding a Library" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>18 Exec Libraries / Adding a Library</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0296.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0298.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Exec provides several ways to add your own libraries to the system library
+list.  One rarely used way is to call <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a> (a DOS library function)
+to load your library and then use the Exec <a href="../Includes_and_Autodocs_2._guide/node0361.html">MakeLibrary()</a> and <a href="../Includes_and_Autodocs_2._guide/node0327.html">AddLibrary()</a>
+functions to initialize your library and add it to the system.
+
+<a href="../Includes_and_Autodocs_2._guide/node0361.html">MakeLibrary()</a> allocates space for the code vectors and data area,
+initializes the library node, and initializes the data area according to
+your specifications, returning to you a library base pointer.  The base
+pointer may then be passed to <a href="../Includes_and_Autodocs_2._guide/node0327.html">AddLibrary()</a> to add your library to the
+system.
+
+Another way to initialize and add a library or device to the system is
+through the use of a <a href="../Libraries_Manual_guide/node0298.html">Resident</a> structure or romtag (see &#060;exec/<a href="../Includes_and_Autodocs_2._guide/node00A0.html#line19">resident.h</a>&#062;).
+A romtag allows you to place your library or device in a directory
+(default LIBS: for libraries, DEVS: for devices) and have the OS
+automatically load and initialize it when an application tries to open it
+with <a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a> or <a href="../Libraries_Manual_guide/node029E.html">OpenDevice()</a>.
+
+Two additional initialization methods exist for a library or device which
+is bound to a particular Amiga expansion board.  The library or device
+(containing a romtag) may be placed in the SYS:Expansion drawer, along
+with an icon containing the Manufacturer and Product number of the board
+it requires.  If the startup-sequence BindDrivers command finds that board
+in the system, it will load and initialize the matching Expansion drawer
+device or library. In addition, since 1.3, the Amiga system software
+supports ROM drivers on expansion boards.  See the &#034;<a href="../Libraries_Manual_guide/node0418.html">Expansion Library</a>&#034;
+chapter for additional information on ROM drivers and Expansion drawer
+drivers.  The <a href="../Devices_Manual_guide/node0159.html">sample device code</a> in the Amiga ROM Kernel Reference Manual:
+Devices volume of this manual set may be conditionally assembled as an
+Expansion drawer driver.
+
+ <a href="../Libraries_Manual_guide/node0298.html">Resident (Romtag) Structure</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

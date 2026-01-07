@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/HP_Laserjet_dospecial.c" NODE="MAIN" TITLE="Devices/Dev_examples/HP_Laserjet_dospecial.c" -->
+<head>
+<title>Devices/Dev_examples/HP_Laserjet_dospecial.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0187.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0189.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+        DoSpecial for HP_LaserJet driver.
+*/
+
+#include &#034;exec/types.h&#034;
+#include &#034;devices/printer.h&#034;
+#include &#034;devices/prtbase.h&#034;
+
+#define LPI             7
+#define CPI             15
+#define QUALITY         17
+#define INIT_LEN        30
+#define LPP             7
+#define FORM_LEN        11
+#define LEFT_MARG       3
+#define RIGHT_MARG      7
+#define MARG_LEN        12
+
+DoSpecial(command, outputBuffer, vline, currentVMI, crlfFlag, Parms)
+char outputBuffer[];
+UWORD *command;
+BYTE *vline;
+BYTE *currentVMI;
+BYTE *crlfFlag;
+UBYTE Parms[];
+{
+        extern struct PrinterData *PD;
+        extern struct PrinterExtendedData *PED;
+
+        static UWORD textlength, topmargin;
+        int x, y, j;
+        static char initThisPrinter[INIT_LEN] =
+                &#034;\033&#038;d@\033&#038;l6D\033(s0b10h1q0p0s3t0u12V&#034;;
+        static char initForm[FORM_LEN] = &#034;\033&#038;l002e000F&#034;;
+        static char initMarg[MARG_LEN] = &#034;\033&#038;a000l000M\015&#034;;
+        static char initTMarg[] = &#034;\033&#038;l000e000F&#034;;
+
+        x = y = j = 0;
+
+        if (*command == aRIN) {
+                while(x &#060; INIT_LEN) {
+                        outputBuffer[x] = initThisPrinter[x];
+                        x++;
+                }
+                outputBuffer[x++] = '\015';
+
+                if (PD-&#062;pd_Preferences.PrintSpacing == EIGHT_LPI) {
+                        outputBuffer[LPI] = '8';
+                }
+
+                if (PD-&#062;pd_Preferences.PrintPitch == ELITE) {
+                        outputBuffer[CPI] = '2';
+                }
+                else if (PD-&#062;pd_Preferences.PrintPitch == FINE) {
+                        outputBuffer[CPI] = '5';
+                }
+
+                if (PD-&#062;pd_Preferences.PrintQuality == LETTER) {
+                        outputBuffer[QUALITY] = '2';
+                }
+
+                j = x; /* set the formlength = textlength, top margin = 2 */
+                textlength = PD-&#062;pd_Preferences.PaperLength;
+                topmargin = 2;
+
+                while (y &#060; FORM_LEN) {
+                        outputBuffer[x++] = initForm[y++];
+                }
+                numberString(textlength, j + LPP, outputBuffer);
+
+                Parms[0] = PD-&#062;pd_Preferences.PrintLeftMargin;
+                Parms[1] = PD-&#062;pd_Preferences.PrintRightMargin;
+                *command = aSLRM;
+        }
+
+        if (*command == aSLRM) {
+                j = x;
+                y = 0;
+                while(y &#060; MARG_LEN) {
+                        outputBuffer[x++] = initMarg[y++];
+                }
+                numberString(Parms[0] - 1, j + LEFT_MARG, outputBuffer);
+                numberString(Parms[1] - 1, j + RIGHT_MARG, outputBuffer);
+                return(x);
+        }
+
+        if ((*command == aSUS2) &#038;&#038; (*vline == 0)) {
+                *command = aPLU;
+                *vline = 1;
+                return(0);
+        }
+
+        if ((*command == aSUS2) &#038;&#038; (*vline &#060; 0)) {
+                *command = aRI;
+                *vline = 1;
+                return(0);
+        }
+
+        if ((*command == aSUS1) &#038;&#038; (*vline &#062; 0)) {
+                *command = aPLD;
+                *vline = 0;
+                return(0);
+        }
+
+        if ((*command == aSUS4) &#038;&#038; (*vline == 0)) {
+                *command = aPLD;
+                *vline = -1;
+                return(0);
+        }
+
+        if ((*command == aSUS4) &#038;&#038; (*vline &#062; 0)) {
+                *command = aIND;
+                *vline = -1;
+                return(0);
+        }
+
+        if ((*command == aSUS3) &#038;&#038; (*vline &#060; 0)) {
+                *command = aPLU;
+                *vline = 0;
+                return(0);
+        }
+
+        if(*command == aSUS0) {
+                if (*vline &#062; 0) {
+                        *command = aPLD;
+                }
+                if (*vline &#060; 0) {
+                        *command = aPLU;
+                }
+                *vline = 0;
+                return(0);
+        }
+
+        if (*command == aPLU) {
+                (*vline)++;
+                return(0);
+        }
+
+        if (*command == aPLD){
+                (*vline)--;
+                return(0);
+        }
+
+        if (*command == aSTBM) {
+                if (Parms[0] == 0) {
+                        Parms[0] = topmargin;
+                }
+                else {
+                        topmargin = --Parms[0];
+                }
+
+                if (Parms[1] == 0) {
+                        Parms[1] = textlength;
+                }
+                else {
+                        textlength=Parms[1];
+                }
+                while (x &#060; 11) {
+                        outputBuffer[x] = initTMarg[x];
+                        x++;
+                }
+                numberString(Parms[0], 3, outputBuffer);
+                numberString(Parms[1] - Parms[0], 7, outputBuffer);
+                return(x);
+        }
+
+        if (*command == aSLPP) {
+                while(x &#060; 11) {
+                        outputBuffer[x] = initForm[x];
+                        x++;
+                }
+                /*restore textlength, margin*/
+                numberString(topmargin, 3, outputBuffer);
+                numberString(textlength, 7, outputBuffer);
+                return(x);
+        }
+
+        if (*command == aRIS) {
+                PD-&#062;pd_PWaitEnabled = 253;
+        }
+
+        return(0);
+}
+
+numberString(Param, x, outputBuffer)
+UBYTE Param;
+int x;
+char outputBuffer[];
+{
+        if (Param &#062; 199) {
+                outputBuffer[x++] = '2';
+                Param -= 200;
+        }
+        else if (Param &#062; 99) {
+                outputBuffer[x++] = '1';
+                Param -= 100;
+        }
+        else {
+                outputBuffer[x++] = '0'; /* always return 3 digits */
+        }
+
+        if (Param &#062; 9) {
+                outputBuffer[x++] = Param / 10 + '0';
+        }
+        else {
+                outputBuffer[x++] = '0';
+        }
+
+        outputBuffer[x++] = Param % 10 + '0';
+}
+
+ConvFunc(buf, c, flag)
+char *buf, c;
+int flag; /* expand lf into lf/cr flag (0-yes, else no ) */
+{
+        if (c == '\014') { /* if formfeed (page eject) */
+                PED-&#062;ped_PrintMode = 0; /* no data to print */
+        }
+        return(-1); /* pass all chars back to the printer device */
+}
+
+Close(ior)
+struct printerIO *ior;
+{
+        if (PED-&#062;ped_PrintMode) { /* if data has been printed */
+                (*(PD-&#062;pd_PWrite))(&#034;\014&#034;,1); /* eject page */
+                (*(PD-&#062;pd_PBothReady))(); /* wait for it to finish */
+                PED-&#062;ped_PrintMode = 0; /* no data to print */
+        }
+        return(0);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-9-1-3" TITLE="33 / / FORM ILBM / Interpreting ILBMs" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / / FORM ILBM / Interpreting ILBMs</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0460.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0462.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Libraries_Manual_guide/node045D.html#line8">ILBM</a> is a fairly simple <a href="../Libraries_Manual_guide/node042A.html#line7">IFF FORM</a>.  All you really need to deal with to
+<a name="line3">extract the image are the following chunks:</a>
+
+<a href="../Libraries_Manual_guide/node045F.html">BMHD</a>
+    Information about the size, depth, compaction method (see interpreted
+<a name="line7">    <a href="../Libraries_Manual_guide/node0460.html">hex dump</a> above).</a>
+
+CAMG
+    Optional Amiga ViewModes chunk.  Most HAM and HALFBRITE <a href="../Libraries_Manual_guide/node045D.html#line8">ILBM</a>s should
+    have this chunk.  If no CAMG chunk is present, and image is 6 planes
+    deep, assume HAM and you'll probably be right.  Some Amiga ViewModes
+    flags are HIRES=0x8000, LACE=0x4, HAM=0x800, HALFBRITE=0x80.  2.0
+    ILBM writers should write a full 32-bit mode ID in the CAMG.  See the
+    <a href="../Devices_Manual_guide/node0129.html">IFF Manual</a> for more information on writing and interpreting 32-bit
+<a name="line16">    CAMG values.</a>
+
+CMAP
+    RGB values for color registers 0 to N.  Previously, 4-bit RGB
+    components each left justified in a byte.  These should now be stored
+    as a full 8-bit RGB values by duplicating 4-bit values in the high
+    and low nibble of the byte.
+
+<a href="../Libraries_Manual_guide/node0462.html">BODY</a>
+    The pixel data, stored in an interleaved fashion as follows (each
+    line individually compacted if BMHD Compression = 1):
+
+                plane 0 scan line 0
+                plane 1 scan line 0
+                plane 2 scan line 0
+                ...
+                plane n scan line 0
+                plane 0 scan line 1
+                plane 1 scan line 1
+                etc.
+
+Optional Chunks
+    Also watch for AUTH Author chunks and (c) copyright chunks and
+    preserve any copyright information if you rewrite the <a href="../Libraries_Manual_guide/node045D.html#line8">ILBM</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

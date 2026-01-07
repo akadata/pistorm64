@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="ANIM-1-2-1" TITLE="Introduction Recording ANIMs / XOR mode " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Introduction Recording ANIMs / XOR mode </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node023D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node023F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This mode is the original and is included here for historical interest.
+In general, the delta modes are far superior. The creation of XOR mode is
+quite simple.  One simply performs an exclusive-or (XOR) between all
+corresponding bytes of the new frame and two frames back.  This results in
+a new bitmap with 0 bits wherever the two frames were identical, and 1
+bits where they are different.  Then this new bitmap is saved using
+run-length-encoding.  A major obstacle of this mode is in the time
+consumed in performing the XOR upon reconstructing the image.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

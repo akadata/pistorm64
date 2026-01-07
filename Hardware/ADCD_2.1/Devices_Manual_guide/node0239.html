@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="ANIM.BRUSH-3" TITLE="ANIM.brush.doc / RIFF " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>ANIM.brush.doc / RIFF </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0238.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node023A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following description of the method is based on Gary Bonham's
+rewording of Jim Kent's RIFF documentation.
+
+Compression/decompression is performed on a plane-by-plane
+basis.
+
+Each byte-column of the bitplane is compressed separately.  A
+320x200 bitplane would have 40 columns of 200 bytes each.  In
+general, the bitplanes are always an even number of bytes wide,
+so for instance a 17x20 bitplane would have 4 columns of 20
+bytes each.
+
+Each column starts with an op-count followed by a number of
+ops.  If the op-count is zero, that's ok, it just means there's
+no change in this column from the last frame.  The ops are of
+three kinds, and followed by a varying amount of data depending
+on which kind:
+
+     1. SKIP - this is a byte with the hi bit clear that   says
+        how many rows to move the &#034;dest&#034; pointer forward, ie to
+        skip. It is non-zero.
+
+     2. DUMP - this is a byte with the hi bit set.  The hi bit is
+        masked off and the remainder is a count of the number of
+        bytes of data to XOR directly.  It is followed by the
+        bytes to copy.
+
+     3. RUN - this is a 0 byte followed by a count byte, followed
+        by a byte value to repeat &#034;count&#034; times, XOR'ing it into
+        the destination.
+
+Bear in mind that the data is compressed vertically rather than
+horizontally, so to get to the next byte in the destination  you
+add the number of bytes per row instead of one.
+
+The Format of DLTA chunks is as described in section 2.2.2 of the Anim
+Spec. The encoding for type 5 is described in section 2.2.3 of the Anim
+Spec.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/record.h" NODE="MAIN" TITLE="Includes/dos/record.h" -->
+<head>
+<title>Includes/dos/record.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0062.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0064.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_RECORD_H
+#define DOS_RECORD_H
+/*
+**
+**	$Filename: dos/record.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.5 $
+**	$Date: 90/07/12 $
+**
+**	include file for record locking
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+<a name="line16"></a>
+#ifndef DOS_DOS_H
+#include &#034;dos/dos.h&#034;
+#endif
+
+<a name="line21">/* Modes for LockRecord/LockRecords() */</a>
+<a name="line22">#define REC_EXCLUSIVE		0</a>
+<a name="line23">#define REC_EXCLUSIVE_IMMED	1</a>
+<a name="line24">#define REC_SHARED		2</a>
+#define REC_SHARED_IMMED	3
+
+/* struct to be passed to LockRecords()/UnLockRecords() */
+<a name="line28"></a>
+<a name="line29">struct RecordLock {</a>
+<a name="line30">	BPTR	rec_FH;		/* filehandle */</a>
+<a name="line31">	ULONG	rec_Offset;	/* offset in file */</a>
+<a name="line32">	ULONG	rec_Length;	/* length of file to be locked */</a>
+	ULONG	rec_Mode;	/* Type of lock */
+};
+
+#endif /* DOS_RECORD_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

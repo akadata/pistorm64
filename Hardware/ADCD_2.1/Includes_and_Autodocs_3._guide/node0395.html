@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="AllocScreenBuffer()" TITLE="intuition.library/AllocScreenBuffer" -->
+<head>
+<title>intuition.library/AllocScreenBuffer</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0394.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0396.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	AllocScreenBuffer -- Get a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> for double-buffering. (V39)
+
+<b>    SYNOPSIS</b>
+	sbuffer = AllocScreenBuffer( <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a>, <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>, flags )
+	D0                           A0      A1      D0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> *AllocScreenBuffer( struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *,
+	    struct <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> *, ULONG );
+
+<b>    FUNCTION</b>
+	Allocates a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> structure and usually a <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.  This
+	structure can be used for double (or multiple) buffering in
+	Intuition screens.  You may use this call to obtain a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a>
+	structure for the screen's initial <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>, or for other BitMaps
+	you intend to swap in.
+
+	AllocScreenBuffer() also allocates a graphics.library <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line278">DBufInfo</a>
+	structure.  The <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> structure this call returns contains
+	a pointer to that <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line278">DBufInfo</a> structure, which is free for your use.
+	See <a href="../Includes_and_Autodocs_3._guide/node02A1.html">graphics.library/AllocDBufInfo()</a> for full details on using
+	this structure to achieve notification of when it is safe to
+	render into an old buffer and when it is right to switch again.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> = pointer to the screen to double-buffer
+	<a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> = For CUSTOMBITMAP screens, you may pre-allocate
+		a <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> matching the screen's BitMap's properties, and
+		pass that in, to get a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> referring to that
+		<a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.  Set this parameter to NULL if you'd prefer
+		that Intuition allocate the alternate buffer.  This parameter
+		must be NULL for non-CUSTOMBITMAP screens.
+	Flags = Set a combination of these flags:
+	    For non-CUSTOMBITMAP screens, set SB_SCREEN_BITMAP in order to
+		get a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> referring to the screen's actual <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.
+		(For CUSTOMBITMAP screens, just set the <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> parameter
+		to the <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> you passed to <a href="../Includes_and_Autodocs_3._guide/node03D3.html">OpenScreen()</a>).
+	    Set SB_COPY_BITMAP if you would like the screen's <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>
+		copied into this ScreenBuffer's <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.  This is required
+		to get any menu-bar or gadget imagery into each
+		ScreenBuffer's <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.  If the screen has no Intuition
+		rendering, you may omit this flag.  Also, when allocating
+		a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> for the screen's initial <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>, this flag
+		should not be set.
+
+<b>    RESULT</b>
+	Pointer to a valid <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> structure, or NULL if failure.
+	You may render into the resulting <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> as appropriate.
+	You may use the sb_DBufInfo field to access graphics.library
+	ViewPort-buffering features such as learning when it is safe
+	to reuse the previous <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.  If not, you risk writing into
+	the on-screen <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>, which can damage menu or gadget rendering!
+
+<b>    NOTES</b>
+
+	The role of SB_SCREEN_BITMAP is to wrap a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> around
+	the actual current <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> used by the non-CUSTOMBITMAP screen.
+	The words actual or current are used instead of initial, since
+	an application could do some double-buffering, leave the
+	non-initial buffer installed into the screen, free up the
+	others, then re-allocate <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> structures to do more
+	double-buffering.  In that case, the actual screen <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> is
+	not necessarily the initial one.
+
+	The role of SB_COPY_BITMAP is to say &#034;please put whatever
+	imagery is currently on-screen into this new <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> too&#034;.
+	That's how the screen titlebar and other imagery get copied
+	over into each buffer.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03B1.html">FreeScreenBuffer()</a>, <a href="../Includes_and_Autodocs_3._guide/node039A.html">ChangeScreenBuffer()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node02A1.html">graphics.library/AllocDBufInfo()</a>, <a href="../Includes_and_Autodocs_3._guide/node02BD.html">graphics.library/ChangeVPBitMap()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

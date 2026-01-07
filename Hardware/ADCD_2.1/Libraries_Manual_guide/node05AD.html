@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/maprawkey.c" NODE="MAIN" TITLE="Lib_examples/maprawkey.c" -->
+<head>
+<title>Lib_examples/maprawkey.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05AC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05AE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* maprawkey.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 maprawkey.c
+Blink FROM LIB:c.o,maprawkey.o TO maprawkey LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+* maprawkey.c - Map Intuition RAWKEY events to ANSI with MapRawKey();
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;devices/inputevent.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/keymap_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+#include &#060;stdlib.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)  { return(0); }  /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }  /* really */
+#endif
+
+/* our function prototypes */
+void openall(void);
+void closeall(void);
+void closeout(UBYTE *errstring, LONG rc);
+
+struct Library    *IntuitionBase = NULL;
+struct Library    *KeymapBase    = NULL;
+struct Window     *window        = NULL;
+
+void main(int argc, char **argv)
+{
+    struct IntuiMessage *imsg;
+    APTR                *eventptr;
+    struct InputEvent   inputevent = {0};
+    LONG                windowsignal;
+    UBYTE               buffer[8];
+    COUNT               i;
+    BOOL                Done = FALSE;
+
+    openall();
+
+    window = OpenWindowTags(NULL,
+                            WA_Width,  500,
+                            WA_Height, 60,
+                            WA_Title, &#034;MapRawKey - Press Keys&#034;,
+                            WA_Flags, WFLG_CLOSEGADGET | WFLG_ACTIVATE,
+                            WA_IDCMP, IDCMP_RAWKEY | IDCMP_CLOSEWINDOW,
+                            TAG_DONE);
+    if(window == NULL)   closeout(&#034;Can't open window&#034;,RETURN_FAIL);
+
+    windowsignal = 1L &#060;&#060; window-&#062;UserPort-&#062;mp_SigBit;
+
+    /* Initialize InputEvent structure (already cleared to 0) */
+    inputevent.ie_Class = IECLASS_RAWKEY;
+
+    while(!Done)
+       {
+       Wait(windowsignal);
+
+       while (imsg = (struct IntuiMessage *)GetMsg(window-&#062;UserPort))
+           {
+           switch(imsg-&#062;Class)
+               {
+                case IDCMP_CLOSEWINDOW:
+                    Done = TRUE;
+                    break;
+
+                case IDCMP_RAWKEY:
+                    inputevent.ie_Code = imsg-&#062;Code;
+                    inputevent.ie_Qualifier = imsg-&#062;Qualifier;
+
+                    printf(&#034;RAWKEY: Code=$%04x  Qualifier=$%04lx\n&#034;,
+                             imsg-&#062;Code, imsg-&#062;Qualifier);
+
+                    /* Make sure deadkeys and qualifiers are taken
+                     * into account.
+                     */
+                    eventptr = imsg-&#062;IAddress;
+                    inputevent.ie_EventAddress = *eventptr;
+
+                    /* Map RAWKEY to ANSI */
+                    i = MapRawKey(&#038;inputevent, buffer, 8, NULL);
+
+                    if (i == -1) Write(Output(),&#034;*Overflow*&#034;,10);
+                    else if (i)
+                        {
+                        /* This key or key combination mapped to something */
+                        printf(&#034;MAPS TO: &#034;);
+                        Write(Output(),buffer,i);
+                        printf(&#034;\n&#034;);
+                        }
+                    break;
+                }
+            ReplyMsg((struct Message *)imsg);
+            }
+        }
+    CloseWindow(window);
+    closeall();
+    exit(RETURN_OK);
+}
+
+void openall(void)
+{
+
+    KeymapBase = OpenLibrary(&#034;keymap.library&#034;, 37);
+    if (KeymapBase == NULL)    closeout(&#034;Kickstart 2.0 required&#034;,RETURN_FAIL);
+
+    IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 37);
+    if (IntuitionBase == NULL) closeout(&#034;Can't open intuition&#034;,RETURN_FAIL);
+}
+
+void closeall(void)
+{
+    if (IntuitionBase)  CloseLibrary(IntuitionBase);
+    if (KeymapBase)     CloseLibrary(KeymapBase);
+}
+
+void closeout(UBYTE *errstring, LONG rc)
+{
+    if (*errstring)  printf(&#034;%s\n&#034;,errstring);
+    closeall();
+    exit(rc);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

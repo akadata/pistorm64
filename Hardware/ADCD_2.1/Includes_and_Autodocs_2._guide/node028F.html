@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="CurrentDir()" TITLE="dos.library/CurrentDir" -->
+<head>
+<title>dos.library/CurrentDir</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node028E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0290.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CurrentDir -- Make a directory lock the current directory
+
+SYNOPSIS
+    oldLock = CurrentDir( lock )
+    D0                    D1
+
+    BPTR CurrentDir(BPTR)
+
+FUNCTION
+    CurrentDir() causes a directory associated with a lock to be made
+    the current directory.  The old current directory lock is returned.
+
+    A value of zero is a valid result here, this 0 lock represents the
+    root of file system that you booted from.
+
+    Any call that has to <a href="../Includes_and_Autodocs_2._guide/node02D6.html">Open()</a> or <a href="../Includes_and_Autodocs_2._guide/node02C6.html">Lock()</a> files (etc) requires that
+    the current directory be a valid lock or 0.
+
+INPUTS
+    lock - BCPL pointer to a lock
+
+RESULTS
+    oldLock - BCPL pointer to a lock
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02C6.html">Lock()</a>, <a href="../Includes_and_Autodocs_2._guide/node0307.html">UnLock()</a>, <a href="../Includes_and_Autodocs_2._guide/node02D6.html">Open()</a>, <a href="../Includes_and_Autodocs_2._guide/node0297.html">DupLock()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

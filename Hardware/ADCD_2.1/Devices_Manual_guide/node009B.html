@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_12" NODE="12-1" TITLE="12 Serial Device / Serial Device Commands and Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>12 Serial Device / Serial Device Commands and Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node009A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node009C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Device Command   Operation
+--------------   ---------
+<a href="../Includes_and_Autodocs_2._guide/node04CD.html">CMD_CLEAR</a>        Reset the serial port's read buffer pointers.
+
+<a href="../Includes_and_Autodocs_2._guide/node04CE.html">CMD_FLUSH</a>        Purge all queued requests for the serial device (does not
+                 affect active requests).
+
+<a href="../Devices_Manual_guide/node009E.html">CMD_READ</a>         Read a stream of characters from the serial port buffer.
+                 The number of characters can be specified or a
+                 termination character(s) used.
+
+<a href="../Includes_and_Autodocs_2._guide/node04D0.html">CMD_RESET</a>        Reset the serial port to its initialized state.  All
+                 active and queued I/O requests will be aborted and the
+                 current buffer will be released.
+
+<a href="../Includes_and_Autodocs_2._guide/node04D1.html">CMD_START</a>        Restart all paused I/O over the serial port.  Also sends
+                 an &#034;xON&#034;.
+
+<a href="../Includes_and_Autodocs_2._guide/node04D2.html">CMD_STOP</a>         Pause all active I/O over the serial port.  Also sends an
+                 &#034;xOFF&#034;.
+
+<a href="../Devices_Manual_guide/node009F.html">CMD_WRITE</a>        Write out a stream of characters to the serial port.  The
+                 number of characters can be specified or a
+                 NULL-terminated string can be sent.
+
+<a href="../Devices_Manual_guide/node00A9.html">SDCMD_BREAK</a>      Send a break signal out the serial port.  May be done
+                 immediately or queued. Duration of the break (in
+                 microseconds) can be set by the application.
+
+<a href="../Devices_Manual_guide/node00A8.html">SDCMD_QUERY</a>      Return the status of the serial port lines and registers,
+                 and the number of bytes in the serial port's read buffer.
+
+<a href="../Devices_Manual_guide/node00A6.html">SDCMD_SETPARAMS</a>  Set the parameters of the serial port.  This ranges from
+                 baud rate to number of microseconds a break will last.
+
+
+Exec Functions as Used in This Chapter
+--------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node04CA.html">AbortIO()</a>        Abort a command to the serial device. If the command is
+                 in progress, it is stopped immediately.  If it is queued,
+                 it is removed from the queue.
+
+<a href="../Includes_and_Autodocs_2._guide/node04CB.html">BeginIO()</a>         Initiate a command and return immediately (asynchronous
+                 request).  This is used to minimize the amount of system
+                 overhead.
+
+<a href="../Includes_and_Autodocs_2._guide/node033E.html">CheckIO()</a>        Determine the current state of an I/O request.
+
+<a href="../Includes_and_Autodocs_2._guide/node04CC.html">CloseDevice()</a>    Relinquish use of the serial device.  All requests must
+                 be complete.
+
+<a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>           Initiate a command and wait for completion (synchronous
+                 request).
+
+<a href="../Includes_and_Autodocs_2._guide/node04D4.html">OpenDevice()</a>     Obtain use of the serial device.
+
+<a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>         Initiate a command and return immediately (asynchronous
+                 request).
+
+<a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a>         Wait for the completion of an asynchronous request. When
+                 the request is complete the message will be removed from
+                 your reply port.
+
+
+Exec Support Functions as Used in This Chapter
+----------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>    Create an extended I/O request structure of type
+                 <a href="../Devices_Manual_guide/node009C.html#line7">IOExtSer</a>.  This structure will be used to communicate
+                 commands to the serial device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>     Create a signal message port for reply messages from the
+                 serial device.  Exec will signal a task when a message
+                 arrives at the port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>    Delete an extended I/O request structure created by
+                 <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>.
+
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>     Delete the message port created by <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

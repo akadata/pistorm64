@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-2-3" TITLE="14 / Device Interface / Reading From The Trackdisk Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 / Device Interface / Reading From The Trackdisk Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00E0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00E2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You read from the trackdisk device by passing an <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> to the device
+with <a href="../Includes_and_Autodocs_2._guide/node0520.html">CMD_READ</a> set in io_Command, the number of bytes to be read set in
+io_Length, the address of the read buffer set in io_Data and the track you
+want to read - specified as a byte offset from the start of the disk - set
+in io_Offset.
+
+The byte offset of a particular track is calculated by multiplying the
+number of the track you want to read by the number of bytes in a track.
+The number of bytes in a track is obtained by multiplying the number of
+sectors (NUMSECS) by the number of bytes per sector (TD_SECTOR). Thus you
+would multiply 11 by 512 to get 5632 bytes per track. To read track 15,
+you would multiply 15 by 5632 giving 84,480 bytes offset from the
+beginning of the disk.
+
+    #define TRACK_SIZE ((LONG) (NUMSECS * TD_SECTOR))
+    UBYTE *Readbuffer;
+    SHORT tracknum;
+
+    if (Readbuffer = AllocMem(TRACK_SIZE,MEMF_CLEAR|MEMF_CHIP))
+        {
+        DiskIO-&#062;iotd_Req.io_Length = TRACK_SIZE;
+        DiskIO-&#062;iotd_Req.io_Data = (APTR)Readbuffer;
+<a name="line24">        DiskIO-&#062;iotd_Req.io_Offset = (ULONG)(TRACK_SIZE * track);</a>
+        DiskIO-&#062;iotd_Req.io_Command = CMD_READ;
+        DoIO((struct IORequest *)DiskIO);
+        }
+
+For reads using the enhanced read command ETD_READ, the <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> is set the
+same as above with the addition of setting iotd_Count to the current
+diskchange number.  The diskchange number is returned by the <a href="../Includes_and_Autodocs_2._guide/node0524.html">TD_CHANGENUM</a>
+command (<a href="../Devices_Manual_guide/node00F0.html">see below</a>).  If you wish to also read the sector label area, you
+must set iotd_SecLabel to a non-NULL value.
+
+    DiskIO-&#062;iotd_Req.io_Length = TRACK_SIZE;
+    DiskIO-&#062;iotd_Req.io_Data = (APTR)Readbuffer;
+    DiskIO-&#062;iotd_Req.io_Offset = (ULONG)(TRACK_SIZE * track);
+    DiskIO-&#062;iotd_Count = change_count;
+    DiskIO-&#062;iotd_Req.io_Command = ETD_READ;
+    DoIO((struct IORequest *)DiskIO);
+
+ETD_READ and <a href="../Includes_and_Autodocs_2._guide/node0520.html">CMD_READ</a> obey all of the trackdisk device restrictions noted
+above. They transfer data from the track buffer to the user's buffer. If
+the desired sector is already in the track buffer, no disk activity is
+initiated. If the desired sector is not in the buffer, the track
+containing that sector is automatically read in. If the data in the
+current track buffer has been modified, it is written out to the disk
+before a new track is read.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

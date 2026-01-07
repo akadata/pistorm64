@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_26" NODE="26-2" TITLE="26 Exec Interrupts / Servicing Interrupts" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>26 Exec Interrupts / Servicing Interrupts</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0305.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0307.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Interrupts are serviced on the Amiga through the use of interrupt <a href="../Libraries_Manual_guide/node0309.html">handlers</a>
+and <a href="../Libraries_Manual_guide/node030B.html">servers</a>.  An interrupt handler is a system routine that exclusively
+handles all processing related to a particular 4703 interrupt.  An
+interrupt server is one of possibly many system routines that are invoked
+as the result of a single 4703 interrupt.  Interrupt servers provide a
+means of interrupt sharing. This concept is useful for general-purpose
+<a name="line8">interrupts such as vertical blanking.</a>
+
+At system start, Exec designates certain interrupts as handlers and others
+as server chains.  The <a href="../Libraries_Manual_guide/node0303.html#line79">PORTS</a>, <a href="../Libraries_Manual_guide/node0303.html#line81">COPER</a>, <a href="../Libraries_Manual_guide/node0303.html#line81">VERTB</a>, <a href="../Libraries_Manual_guide/node0303.html#line99">EXTER</a>, and <a href="../Libraries_Manual_guide/node0303.html#line103">NMI</a> interrupts are
+initialized as server chains.  Therefore, each of these may execute
+multiple interrupt routines per each interrupt.  All other interrupts are
+designated as handlers and are always used exclusively.
+
+ <a href="../Libraries_Manual_guide/node0307.html">Interrupt Data Structure</a>    <a href="../Libraries_Manual_guide/node0309.html">Interrupt Handlers</a> 
+ <a href="../Libraries_Manual_guide/node0308.html">Environment</a>                 <a href="../Libraries_Manual_guide/node030B.html">Interrupt Servers</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

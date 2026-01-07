@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/asmsupp.i" NODE="MAIN" TITLE="Devices/asmsupp.i" -->
+<head>
+<title>Devices/asmsupp.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01FF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0201.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+*************************************************************************
+*
+*	Copyright (C) 1985-1999, Amiga, Inc.  All rights reserved.
+*	Permission granted for non-commercial use
+*
+* asmsupp.i -- random low level assembly support routines
+*	       used by the sample Library &#038; Device
+*
+*************************************************************************
+CLEAR	MACRO		;quick way to clear a D register on 68000
+	MOVEQ	#0,\1
+	ENDM
+
+;BHS	 MACRO
+;	 BCC.\0  \1 ;\0 is the extension used on the macro (such as &#034;.s&#034;)
+;	 ENDM
+;BLO	 MACRO
+;	 BCS.\0  \1
+;	 ENDM
+;EVEN	 MACRO		 ; word align code stream
+;	 DS.W	 0
+;	 ENDM
+
+LINKSYS MACRO		; link to a library without having to see a _LVO
+	MOVE.L	A6,-(SP)
+	MOVE.L	\2,A6
+	JSR	_LVO\1(A6)
+	MOVE.L	(SP)+,A6
+	ENDM
+
+CALLSYS MACRO		; call a library via A6 without having to see _LVO
+	JSR	_LVO\1(A6)
+	ENDM
+
+XLIB	MACRO		; define a library reference without the _LVO
+	XREF	_LVO\1
+	ENDM
+;
+; Put a message to the serial port at 9600 baud.  Used as so:
+;
+;     PUTMSG   30,&#060;'%s/Init: called'&#062;
+;
+; Parameters can be printed out by pushing them on the stack and
+; adding the appropriate C printf-style % formatting commands.
+;
+		XREF	KPutFmt
+PUTMSG: 	MACRO	* level,msg
+
+		IFGE	INFO_LEVEL-\1
+
+		PEA	subSysName(PC)
+		MOVEM.L A0/A1/D0/D1,-(SP)
+		LEA	msg\@(pc),A0    ;Point to static format string
+		LEA	4*4(SP),A1      ;Point to args
+		JSR	KPutFmt
+		MOVEM.L (SP)+,D0/D1/A0/A1
+		ADDQ.L	#4,SP
+		BRA.S	end\@
+
+msg\@		DC.B	\2
+		DC.B	10
+		DC.B	0
+		DS.W	0
+end\@
+		ENDC
+		ENDM
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

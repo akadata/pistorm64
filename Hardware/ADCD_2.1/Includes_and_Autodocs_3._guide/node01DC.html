@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="AddMemHandler()" TITLE="exec.library/AddMemHandler" -->
+<head>
+<title>exec.library/AddMemHandler</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01DB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01DD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AddMemHandler - Add a low memory handler to exec                 (V39)
+
+<b>   SYNOPSIS</b>
+	AddMemHandler(memHandler)
+	              A1
+
+	VOID AddMemHandler(struct <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> *);
+
+<b>   FUNCTION</b>
+	This function adds a low memory handler to the system.  The handler
+	is described in the <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> structure.  Due to multitasking
+	issues, the handler must be ready to run the moment this function
+	call is made.  (The handler may be called before the call returns)
+
+<b>   NOTE</b>
+	Adding a handler from within a handler will cause undefined
+	actions.  It is safe to add a handler to the list while within
+	a handler but the newly added handler may or may not be called
+	for the specific failure currently running.
+
+<b>   EXAMPLE</b>
+	struct <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> *myInt;  /* Assume it is allocated */
+
+	myInt-&#062;is_Node.ln_Pri=50;  /* Relatively early; before RAMLIB */
+
+	/* Please fill in the name field! */
+	myInt-&#062;is_Node.ln_Name=&#034;Example Handler&#034;;
+
+	myInt-&#062;is_Data=(APTR)mydata_pointer;
+	myInt-&#062;is_Code=myhandler_code;
+
+	AddMemHandler(myInt);
+	... /* and so on */
+
+	_myhandler_code:
+			; This is the handler code
+			; We are passed a pointer to struct <a href="../Includes_and_Autodocs_3._guide/node062D.html#line89">MemHandlerData</a>
+			; in a0, the value of is_Data in a1 and
+			; <a href="../Includes_and_Autodocs_3._guide/node0609.html#line33">ExecBase</a> in a6.
+			; We must not break forbid!!!
+	;
+	; Start off assuming we did nothing
+	;
+		moveq.l	#MEM_DID_NOTHING,d0
+		move.l	memh_RequestFlags(a0),d1
+		btst.l	#MEMB_CHIP,d1	; Did the failure happen in CHIP
+		beq.s	handler_nop	; If not, we have nothing to do
+		bsr	DoMyMagic	; Do the magic...
+		; DoMyMagic frees whatever we can and returns d0 set...
+	handler_nop:
+		rts			; Return with d0 set...
+
+<b>   INPUTS</b>
+	memHandler - A pointer to a completely filled in <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> structure
+	             The priority field determine the position of the handler
+	             with respect to other handlers in the system.  The higher
+	             the priority, the earlier the handler is called.
+	             Positive priorities will have the handler called before
+	             any of the library expunge vectors are called.  Negative
+	             priority handlers will be called after the library
+	             expunge routines are called.
+	             (Note:  RAMLIB is a handler at priority 0)
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node022E.html">RemMemHandler()</a>, exec/interrupts.i
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

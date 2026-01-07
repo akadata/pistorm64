@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-13" TITLE="31 Commodities Exchange Library / Custom CxObjects" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / Custom CxObjects</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node040D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node040F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Although the <a href="../Libraries_Manual_guide/node0401.html">CxObjects</a> mentioned so far take care of most of the input
+event handling a commodity needs to do, they cannot do it all.  This is
+<a name="line4">why Commodities Exchange has a custom CxObject.  When a custom CxObject</a>
+receives a <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a>, it calls a function provided by the commodity.
+
+    customCxObj = CxObj  *CxCustom(LONG *customfunction(), LONG  cxmID);
+
+A custom <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> is the only means by which a commodity can directly
+modify input events as they pass through the Commodities network as
+<a href="../Libraries_Manual_guide/node0403.html">CxMessages</a>.  For this reason, it is probably the most dangerous of the
+CxObjects to use.
+
+    A Warning About Custom CxObjects.
+    ---------------------------------
+    Unlike the rest of the code a commodities programmer writes, the
+    code passed to a custom <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> runs as part of the input.device
+    task, putting severe restrictions on the function.  No DOS or
+    Intuition functions can be called.  No assumptions can be made about
+    the values of registers upon entry.  Any function passed to
+    <a href="../Includes_and_Autodocs_2._guide/node014B.html">CxCustom()</a> should be very quick and very simple, with a minimum of
+<a name="line22">    stack usage.</a>
+
+Commodities Exchange calls a custom <a href="../Libraries_Manual_guide/node0401.html">CxObject</a>'s function as follows:
+
+    void customfunction(CxMsg *cxm, CxObj *customcxobj);
+
+where cxm is a pointer to a <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a> corresponding to a real input event,
+and customcxobj is a pointer to the custom <a href="../Libraries_Manual_guide/node0401.html">CxObject</a>.  The custom function
+can extract the pointer to the input event by calling <a href="../Libraries_Manual_guide/node0403.html#line10">CxMsgData()</a>.  Before
+passing the CxMessage to the custom function, Commodities Exchange sets
+<a name="line32">the CxMessage's ID to the ID passed to <a href="../Includes_and_Autodocs_2._guide/node014B.html">CxCustom()</a>.</a>
+
+The following is an example of a custom <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> function that swaps
+the function of the left and right mouse buttons.
+
+
+custom = CxCustom(CxFunction, 0L)
+
+/* The custom function for the custom CxObject.  Any code for a */
+/* custom CxObj must be short and sweet. This code runs as part */
+/* of the input.device task                                     */
+#define CODEMASK (0x00FF &#038; IECODE_LBUTTON &#038; IECODE_RBUTTON)
+void CxFunction(register CxMsg *cxm, CxObj *co)
+{
+    struct InputEvent *ie;
+    UWORD mousequals = 0x0000;
+
+    /* Get the struct InputEvent associated with this CxMsg.  Unlike
+     * the InputEvent extracted from a CxSender's CxMsg, this is a
+     *  *REAL* input event, be careful with it.
+     */
+    ie = (struct InputEvent *)CxMsgData(cxm);
+
+    /* Check to see if this input event is a left or right mouse button
+     * by itself (a mouse button can also be a qualifier).  If it is,
+     * flip the low order bit to switch leftbutton &#060;--&#062; rightbutton.
+     */
+    if (ie-&#062;ie_Class == IECLASS_RAWMOUSE)
+        if ((ie-&#062;ie_Code &#038; CODEMASK) == CODEMASK)  ie-&#062;ie_Code ^= 0x0001;
+
+    /* Check the qualifiers. If a mouse button was down when this */
+    /* input event occurred, set the other mouse button bit.      */
+    if (ie-&#062;ie_Qualifier &#038; IEQUALIFIER_RBUTTON)  mousequals |=
+                                                   IEQUALIFIER_LEFTBUTTON;
+    if (ie-&#062;ie_Qualifier &#038; IEQUALIFIER_LEFTBUTTON)  mousequals |=
+                                                      IEQUALIFIER_RBUTTON;
+
+    /* clear the RBUTTON and LEFTBUTTON qualifier bits */
+    ie-&#062;ie_Qualifier &#038;= ~(IEQUALIFIER_LEFTBUTTON | IEQUALIFIER_RBUTTON);
+
+    /* set the mouse button qualifier bits to their new values */
+    ie-&#062;ie_Qualifier |= mousequals;
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

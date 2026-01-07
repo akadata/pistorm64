@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/interrupts.i" NODE="MAIN" TITLE="Includes/exec/interrupts.i" -->
+<head>
+<title>Includes/exec/interrupts.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node008F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0091.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	EXEC_INTERRUPTS_I
+EXEC_INTERRUPTS_I	SET	1
+**
+**	$Filename: exec/interrupts.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.5 $
+**	$Date: 90/05/10 $
+**
+**	Callback structures used by hardware &#038; software interrupts
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+    IFND EXEC_NODES_I
+    INCLUDE &#034;exec/nodes.i&#034;
+    ENDC	; EXEC_NODES_I
+
+    IFND EXEC_LISTS_I
+    INCLUDE &#034;exec/lists.i&#034;
+    ENDC	; EXEC_LISTS_I
+
+
+*----------------------------------------------------------------
+*
+*   Interrupt Structure
+*
+*----------------------------------------------------------------
+
+ STRUCTURE  IS,LN_SIZE
+    APTR    IS_DATA
+    APTR    IS_CODE
+    LABEL   IS_SIZE
+
+
+*---------------------------------------------------------------------
+*
+*   Exec Internal Interrupt Vectors
+*
+*---------------------------------------------------------------------
+
+ STRUCTURE  IV,0
+    APTR    IV_DATA
+    APTR    IV_CODE
+    APTR    IV_NODE
+    LABEL   IV_SIZE
+
+
+*------ System Flag bits (in SysBase.SysFlags )
+
+    BITDEF  S,SAR,15	    ; scheduling attention required (TOP BIT)
+    BITDEF  S,TQE,14	    ; time quantum expended -- time to resched
+    BITDEF  S,SINT,13
+
+
+*---------------------------------------------------------------------
+*
+*   Software Interrupt List Headers
+*
+*---------------------------------------------------------------------
+
+ STRUCTURE  SH,LH_SIZE
+    UWORD   SH_PAD
+    LABEL   SH_SIZE
+
+SIH_PRIMASK  EQU	$0F0
+SIH_QUEUES   EQU	5
+
+** this is a fake INT definition, used only for AddIntServer and the like
+	BITDEF	INT,NMI,15
+
+	ENDC	; EXEC_INTERRUPTS_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/amiga_lib" NODE="RangeRand()" TITLE="amiga.lib/RangeRand" -->
+<head>
+<title>amiga.lib/RangeRand</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0162.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0164.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    RangeRand - generate a random number within a specific integer range
+
+SYNOPSIS
+    number = RangeRand(maxValue);
+
+    UWORD RangeRand(UWORD);
+
+FUNCTION
+    RangeRand() accepts a value from 0 to 65535, and returns a value
+    within that range.
+
+    maxValue is passed on stack as a 32-bit integer but used as though
+    it is only a 16-bit integer. Variable named RangeSeed is available
+    beginning with V33 that contains the global seed value passed from
+    call to call and thus can be changed in a program by declaring:
+
+      extern ULONG RangeSeed;
+
+INPUTS
+    maxValue - the returned random number will be in the range
+               [0..maxValue-1]
+
+RESULT
+    number - pseudo random number in the range of [0..maxValue-1].
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node015A.html">FastRand()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="DoPkt()" TITLE="dos.library/DoPkt" -->
+<head>
+<title>dos.library/DoPkt</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0154.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0156.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	DoPkt -- Send a dos packet and wait for reply (V36)
+
+<b>   SYNOPSIS</b>
+	result1 = DoPkt(port,action,arg1,arg2,arg3,arg4,arg5)
+	D0               D1    D2    D3   D4   D5   D6   D7
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> DoPkt(struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>,LONG)
+
+<b>   FUNCTION</b>
+	Sends a packet to a handler and waits for it to return.  Any secondary
+	return will be available in D1 AND from <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>.  DoPkt() will work
+	even if the caller is an exec task and not a process; however it will
+	be slower, and may fail for some additional reasons, such as being
+	unable to allocate a signal.  DoPkt() uses your pr_MsgPort for the
+	reply, and will call pr_PktWait.  (See BUGS regarding tasks, though).
+
+	Only allows 5 arguments to be specified.  For more arguments (packets
+	support a maximum of 7) create a packet and use <a href="../Includes_and_Autodocs_3._guide/node01D0.html">SendPkt()/WaitPkt()</a>.
+
+<b>   INPUTS</b>
+	port    - pr_MsgPort of the handler process to send to.
+	action  - the action requested of the filesystem/handler
+	arg1, arg2, arg3, arg4,arg5 - arguments, depend on the action, may not
+		   be required.
+
+<b>   RESULT</b>
+	result1 - the value returned in dp_Res1, or FALSE if there was some
+		  problem in sending the packet or recieving it.
+	result2 - Available from <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a> AND in register D1.
+
+<b>   BUGS</b>
+	Using DoPkt() from tasks doesn't work in V36. Use <a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node0226.html">PutMsg()</a>, and <a href="../Includes_and_Autodocs_3._guide/node0214.html">WaitPort()/GetMsg()</a> for a workaround, or you can call
+	<a href="../Includes_and_Autodocs_3._guide/node014C.html">CreateNewProc()</a> to start a process to do Dos I/O for you.  In V37,
+	DoPkt() will allocate, use, and free the <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> required.
+
+<b>   NOTES</b>
+	Callable from a task (under V37 and above).
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node013E.html">AllocDosObject()</a>, <a href="../Includes_and_Autodocs_3._guide/node0172.html">FreeDosObject()</a>, <a href="../Includes_and_Autodocs_3._guide/node01B0.html">SendPkt()</a>, <a href="../Includes_and_Autodocs_3._guide/node01D0.html">WaitPkt()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node014C.html">CreateNewProc()</a>, <a href="../Includes_and_Autodocs_3._guide/node0139.html">AbortPkt()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

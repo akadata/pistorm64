@@ -1,0 +1,435 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/screens.h" NODE="MAIN" TITLE="Includes/intuition/screens.h" -->
+<head>
+<title>Includes/intuition/screens.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00DC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00DE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef INTUITION_SCREENS_H
+#define INTUITION_SCREENS_H TRUE
+/*
+**  $Filename: intuition/screens.h $
+**  $Release: 2.04 Includes, V37.4 $
+**  $Revision: 36.36 $
+**  $Date: 91/10/07 $
+**
+**  The Screen and NewScreen structures and attributes
+**
+**  (C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+#ifndef GRAPHICS_GFX_H
+#include &#060;graphics/gfx.h&#062;
+#endif
+<a name="line22"></a>
+#ifndef GRAPHICS_CLIP_H
+#include &#060;graphics/clip.h&#062;
+#endif
+<a name="line26"></a>
+#ifndef GRAPHICS_VIEW_H
+#include &#060;graphics/view.h&#062;
+#endif
+<a name="line30"></a>
+#ifndef GRAPHICS_RASTPORT_H
+#include &#060;graphics/rastport.h&#062;
+#endif
+<a name="line34"></a>
+#ifndef GRAPHICS_LAYERS_H
+#include &#060;graphics/layers.h&#062;
+#endif
+<a name="line38"></a>
+#ifndef UTILITY_TAGITEM_H
+#include &#060;utility/tagitem.h&#062;
+#endif
+
+/*
+ * NOTE:  intuition/iobsolete.h is included at the END of this file!
+ */
+<a name="line46"></a>
+/* ======================================================================== */
+/* === DrawInfo ========================================================= */
+/* ======================================================================== */
+
+/* This is a packet of information for graphics rendering.  It originates
+ * with a Screen, and is gotten using GetScreenDrawInfo( screen );
+ */
+
+/* If you find dri_Version &#062;= DRI_VERSION, you know this structure
+ * has at least the fields defined in this version of the include file
+<a name="line57"> */</a>
+<a name="line58">#define RI_VERSION	(1)	/* obsolete, will be removed		*/</a>
+#define DRI_VERSION	(1)
+<a name="line60"></a>
+struct DrawInfo
+<a name="line62">{</a>
+<a name="line63">    UWORD	dri_Version;	/* will be  DRI_VERSION			*/</a>
+<a name="line64">    UWORD	dri_NumPens;	/* guaranteed to be &#062;= numDrIPens	*/</a>
+    UWORD	*dri_Pens;	/* pointer to pen array			*/
+<a name="line66"></a>
+<a name="line67">    struct TextFont	*dri_Font;	/* screen default font		*/</a>
+    UWORD	dri_Depth;	/* (initial) depth of screen bitmap	*/
+
+<a name="line70">    struct {	  /* from DisplayInfo database for initial display mode	*/</a>
+<a name="line71">	UWORD	X;</a>
+<a name="line72">	UWORD	Y;</a>
+    }		dri_Resolution;
+<a name="line74"></a>
+<a name="line75">    ULONG	dri_Flags;		/* defined below		*/</a>
+    ULONG	dri_Reserved[7];	/* avoid recompilation ;^)	*/
+};
+<a name="line78"></a>
+#define DRIF_NEWLOOK	0x00000001	/* specified SA_Pens, full treatment */
+
+<a name="line81">/* rendering pen number indexes into DrawInfo.dri_Pens[]	*/</a>
+<a name="line82">#define DETAILPEN	 (0x0000)	/* compatible Intuition rendering pens	*/</a>
+<a name="line83">#define BLOCKPEN	 (0x0001)	/* compatible Intuition rendering pens	*/</a>
+<a name="line84">#define TEXTPEN		 (0x0002)	/* text on background			*/</a>
+<a name="line85">#define SHINEPEN	 (0x0003)	/* bright edge on 3D objects		*/</a>
+<a name="line86">#define SHADOWPEN	 (0x0004)	/* dark edge on 3D objects		*/</a>
+<a name="line87">#define FILLPEN		 (0x0005)	/* active-window/selected-gadget fill	*/</a>
+<a name="line88">#define FILLTEXTPEN	 (0x0006)	/* text over FILLPEN			*/</a>
+<a name="line89">#define BACKGROUNDPEN	 (0x0007)	/* always color 0			*/</a>
+#define HIGHLIGHTTEXTPEN (0x0008)	/* special color text, on background	*/
+<a name="line91"></a>
+#define NUMDRIPENS	 (0x0009)
+
+
+/* ======================================================================== */
+/* === Screen ============================================================= */
+<a name="line97">/* ======================================================================== */</a>
+struct Screen
+<a name="line99">{</a>
+<a name="line100">    struct Screen *NextScreen;		/* linked list of screens */</a>
+    struct Window *FirstWindow;		/* linked list Screen's Windows */
+<a name="line102"></a>
+<a name="line103">    WORD LeftEdge, TopEdge;		/* parameters of the screen */</a>
+    WORD Width, Height;			/* parameters of the screen */
+<a name="line105"></a>
+    WORD MouseY, MouseX;		/* position relative to upper-left */
+<a name="line107"></a>
+    UWORD Flags;			/* see definitions below */
+<a name="line109"></a>
+<a name="line110">    UBYTE *Title;			/* null-terminated Title text */</a>
+    UBYTE *DefaultTitle;		/* for Windows without ScreenTitle */
+
+    /* Bar sizes for this Screen and all Window's in this Screen */
+    /* Note that BarHeight is one less than the actual menu bar
+     * height.	We're going to keep this in V36 for compatibility,
+     * although V36 artwork might use that extra pixel
+     *
+     * Also, the title bar height of a window is calculated from the
+     * screen's WBorTop field, plus the font height, plus one.
+<a name="line120">     */</a>
+<a name="line121">    BYTE BarHeight, BarVBorder, BarHBorder, MenuVBorder, MenuHBorder;</a>
+    BYTE WBorTop, WBorLeft, WBorRight, WBorBottom;
+<a name="line123"></a>
+    struct TextAttr *Font;		/* this screen's default font	   */
+
+<a name="line126">    /* the display data structures for this Screen */</a>
+<a name="line127">    struct ViewPort ViewPort;		/* describing the Screen's display */</a>
+<a name="line128">    struct RastPort RastPort;		/* describing Screen rendering	   */</a>
+<a name="line129">    struct BitMap BitMap;		/* extra copy of RastPort BitMap   */</a>
+    struct Layer_Info LayerInfo;	/* each screen gets a LayerInfo    */
+
+    /* Only system gadgets may be attached to a screen.
+     *	You get the standard system Screen Gadgets automatically
+<a name="line134">     */</a>
+    struct Gadget *FirstGadget;
+<a name="line136"></a>
+    UBYTE DetailPen, BlockPen;		/* for bar/border/gadget rendering */
+
+    /* the following variable(s) are maintained by Intuition to support the
+     * DisplayBeep() color flashing technique
+<a name="line141">     */</a>
+    UWORD SaveColor0;
+
+<a name="line144">    /* This layer is for the Screen and Menu bars */</a>
+    struct Layer *BarLayer;
+<a name="line146"></a>
+    UBYTE *ExtData;
+<a name="line148"></a>
+    UBYTE *UserData;	/* general-purpose pointer to User data extension */
+
+    /**** Data below this point are SYSTEM PRIVATE ****/
+};
+
+
+/* --- FLAGS SET BY INTUITION --------------------------------------------- */
+/* The SCREENTYPE bits are reserved for describing various Screen types
+ * available under Intuition.
+<a name="line158"> */</a>
+#define SCREENTYPE	0x000F	/* all the screens types available	*/
+<a name="line160">/* --- the definitions for the Screen Type ------------------------------- */</a>
+<a name="line161">#define WBENCHSCREEN	0x0001	/* identifies the Workbench screen	*/</a>
+<a name="line162">#define PUBLICSCREEN	0x0002	/* public shared (custom) screen	*/</a>
+#define CUSTOMSCREEN	0x000F	/* original custom screens		*/
+<a name="line164"></a>
+#define SHOWTITLE	0x0010	/* this gets set by a call to ShowTitle() */
+<a name="line166"></a>
+#define BEEPING		0x0020	/* set when Screen is beeping (private)	*/
+<a name="line168"></a>
+#define CUSTOMBITMAP	0x0040	/* if you are supplying your own BitMap */
+
+#define SCREENBEHIND	0x0080	/* if you want your screen to open behind
+<a name="line172">				 * already open screens</a>
+				 */
+#define SCREENQUIET	0x0100	/* if you do not want Intuition to render
+<a name="line175">				 * into your screen (gadgets, title)</a>
+<a name="line176">				 */</a>
+#define SCREENHIRES	0x0200	/* do not use lowres gadgets  (private)	*/
+<a name="line178"></a>
+#define NS_EXTENDED	0x1000		/* ExtNewScreen.Extension is valid	*/
+/* V36 applications can use OpenScreenTagList() instead of NS_EXTENDED	*/
+<a name="line181"></a>
+#define AUTOSCROLL	0x4000	/* screen is to autoscoll		*/
+<a name="line183"></a>
+<a name="line184">#define STDSCREENHEIGHT -1	/* supply in NewScreen.Height		*/</a>
+#define STDSCREENWIDTH -1	/* supply in NewScreen.Width		*/
+
+/*
+ * Screen attribute tag ID's.  These are used in the ti_Tag field of
+ * TagItem arrays passed to OpenScreenTagList() (or in the
+ * ExtNewScreen.Extension field).
+ */
+
+/* Screen attribute tags.  Please use these versions, not those in
+ * iobsolete.h.
+ */
+<a name="line196"></a>
+#define SA_Dummy	(TAG_USER + 32)
+/*
+ * these items specify items equivalent to fields in NewScreen
+<a name="line200"> */</a>
+<a name="line201">#define SA_Left		(SA_Dummy + 0x0001)</a>
+<a name="line202">#define SA_Top		(SA_Dummy + 0x0002)</a>
+<a name="line203">#define SA_Width	(SA_Dummy + 0x0003)</a>
+#define SA_Height	(SA_Dummy + 0x0004)
+<a name="line205">			/* traditional screen positions	and dimensions	*/</a>
+#define SA_Depth	(SA_Dummy + 0x0005)
+<a name="line207">			/* screen bitmap depth				*/</a>
+#define SA_DetailPen	(SA_Dummy + 0x0006)
+<a name="line209">			/* serves as default for windows, too		*/</a>
+<a name="line210">#define SA_BlockPen	(SA_Dummy + 0x0007)</a>
+#define SA_Title	(SA_Dummy + 0x0008)
+<a name="line212">			/* default screen title				*/</a>
+#define SA_Colors	(SA_Dummy + 0x0009)
+			/* ti_Data is an array of struct ColorSpec,
+			 * terminated by ColorIndex = -1.  Specifies
+			 * initial screen palette colors.
+<a name="line217">			 */</a>
+#define SA_ErrorCode	(SA_Dummy + 0x000A)
+<a name="line219">			/* ti_Data points to LONG error code (values below)*/</a>
+#define SA_Font		(SA_Dummy + 0x000B)
+<a name="line221">			/* equiv. to NewScreen.Font			*/</a>
+#define SA_SysFont	(SA_Dummy + 0x000C)
+			/* Selects one of the preferences system fonts:
+			 *	0 - old DefaultFont, fixed-width
+			 *	1 - WB Screen preferred font
+<a name="line226">			 */</a>
+#define SA_Type		(SA_Dummy + 0x000D)
+<a name="line228">			/* equiv. to NewScreen.Type			*/</a>
+#define SA_BitMap	(SA_Dummy + 0x000E)
+			/* ti_Data is pointer to custom BitMap.  This
+			 * implies type of CUSTOMBITMAP
+<a name="line232">			 */</a>
+#define SA_PubName	(SA_Dummy + 0x000F)
+			/* presence of this tag means that the screen
+			 * is to be a public screen.  Please specify
+			 * BEFORE the two tags below
+<a name="line237">			 */</a>
+<a name="line238">#define SA_PubSig	(SA_Dummy + 0x0010)</a>
+#define SA_PubTask	(SA_Dummy + 0x0011)
+			/* Task ID and signal for being notified that
+			 * the last window has closed on a public screen.
+<a name="line242">			 */</a>
+#define SA_DisplayID	(SA_Dummy + 0x0012)
+			/* ti_Data is new extended display ID from
+			 * &#060;graphics/displayinfo.h&#062;.
+<a name="line246">			 */</a>
+#define SA_DClip	(SA_Dummy + 0x0013)
+			/* ti_Data points to a rectangle which defines
+			 * screen display clip region
+<a name="line250">			 */</a>
+#define SA_Overscan	(SA_Dummy + 0x0014)
+			/* was S_STDDCLIP.  Set to one of the OSCAN_
+			 * specifiers below to get a system standard
+			 * overscan region for your display clip,
+			 * screen dimensions (unless otherwise specified),
+			 * and automatically centered position (partial
+			 * support only so far).
+			 * If you use this, you shouldn't specify
+			 * SA_DClip.  SA_Overscan is for &#034;standard&#034;
+			 * overscan dimensions, SA_DClip is for
+			 * your custom numeric specifications.
+<a name="line262">			 */</a>
+#define SA_Obsolete1	(SA_Dummy + 0x0015)
+			/* obsolete S_MONITORNAME			*/
+
+<a name="line266">/** booleans **/</a>
+#define SA_ShowTitle	(SA_Dummy + 0x0016)
+<a name="line268">			/* boolean equivalent to flag SHOWTITLE		*/</a>
+#define SA_Behind	(SA_Dummy + 0x0017)
+<a name="line270">			/* boolean equivalent to flag SCREENBEHIND	*/</a>
+#define SA_Quiet	(SA_Dummy + 0x0018)
+<a name="line272">			/* boolean equivalent to flag SCREENQUIET	*/</a>
+#define SA_AutoScroll	(SA_Dummy + 0x0019)
+<a name="line274">			/* boolean equivalent to flag AUTOSCROLL	*/</a>
+#define SA_Pens		(SA_Dummy + 0x001A)
+			/* pointer to ~0 terminated UWORD array, as
+			 * found in struct DrawInfo
+<a name="line278">			 */</a>
+#define SA_FullPalette	(SA_Dummy + 0x001B)
+			/* boolean: initialize color table to entire
+			 *  preferences palette (32 for V36), rather
+			 * than compatible pens 0-3, 17-19, with
+			 * remaining palette as returned by GetColorMap()
+			 */
+
+/* this is an obsolete tag included only for compatibility with V35
+ * interim release for the A2024 and Viking monitors
+ */
+<a name="line289">#ifndef NSTAG_EXT_VPMODE</a>
+#define NSTAG_EXT_VPMODE (TAG_USER | 1)
+#endif
+
+
+/* OpenScreen error codes, which are returned in the (optional) LONG
+ * pointed to by ti_Data for the SA_ErrorCode tag item
+<a name="line296"> */</a>
+<a name="line297">#define OSERR_NOMONITOR	(1)	/* named monitor spec not available	*/</a>
+<a name="line298">#define OSERR_NOCHIPS	(2)	/* you need newer custom chips		*/</a>
+<a name="line299">#define OSERR_NOMEM	(3)	/* couldn't get normal memory		*/</a>
+<a name="line300">#define OSERR_NOCHIPMEM	(4)	/* couldn't get chipmem			*/</a>
+<a name="line301">#define OSERR_PUBNOTUNIQUE (5)	/* public screen name already used	*/</a>
+#define OSERR_UNKNOWNMODE (6)	/* don't recognize mode asked for	*/
+<a name="line303"></a>
+/* ======================================================================== */
+/* === NewScreen ========================================================== */
+/* ======================================================================== */
+/* note: to use the Extended field, you must use the
+ * new ExtNewScreen structure, below
+<a name="line309"> */</a>
+struct NewScreen
+<a name="line311">{</a>
+    WORD LeftEdge, TopEdge, Width, Height, Depth;  /* screen dimensions */
+<a name="line313"></a>
+    UBYTE DetailPen, BlockPen;	/* for bar/border/gadget rendering	*/
+<a name="line315"></a>
+    UWORD ViewModes;		/* the Modes for the ViewPort (and View) */
+<a name="line317"></a>
+    UWORD Type;			/* the Screen type (see defines above)	*/
+<a name="line319"></a>
+    struct TextAttr *Font;	/* this Screen's default text attributes */
+<a name="line321"></a>
+    UBYTE *DefaultTitle;	/* the default title for this Screen	*/
+<a name="line323"></a>
+    struct Gadget *Gadgets;	/* UNUSED:  Leave this NULL		*/
+
+    /* if you are opening a CUSTOMSCREEN and already have a BitMap
+     * that you want used for your Screen, you set the flags CUSTOMBITMAP in
+     * the Type field and you set this variable to point to your BitMap
+     * structure.  The structure will be copied into your Screen structure,
+     * after which you may discard your own BitMap if you want
+<a name="line331">     */</a>
+    struct BitMap *CustomBitMap;
+};
+
+/*
+ * For compatibility reasons, we need a new structure for extending
+ * NewScreen.  Use this structure is you need to use the new Extension
+ * field.
+ *
+ * NOTE: V36-specific applications should use the
+ * OpenScreenTagList( newscreen, tags ) version of OpenScreen().
+ * Applications that want to be V34-compatible as well may safely use the
+ * ExtNewScreen structure.  Its tags will be ignored by V34 Intuition.
+ *
+<a name="line345"> */</a>
+struct ExtNewScreen
+<a name="line347">{</a>
+<a name="line348">    WORD LeftEdge, TopEdge, Width, Height, Depth;</a>
+<a name="line349">    UBYTE DetailPen, BlockPen;</a>
+<a name="line350">    UWORD ViewModes;</a>
+<a name="line351">    UWORD Type;</a>
+<a name="line352">    struct TextAttr *Font;</a>
+<a name="line353">    UBYTE *DefaultTitle;</a>
+<a name="line354">    struct Gadget *Gadgets;</a>
+    struct BitMap *CustomBitMap;
+<a name="line356"></a>
+    struct TagItem	*Extension;
+				/* more specification data, scanned if
+				 * NS_EXTENDED is set in NewScreen.Type
+				 */
+};
+
+<a name="line363">/* === Overscan Types ===	*/</a>
+<a name="line364">#define OSCAN_TEXT	(1)	/* entirely visible	*/</a>
+<a name="line365">#define OSCAN_STANDARD	(2)	/* just past edges	*/</a>
+<a name="line366">#define OSCAN_MAX	(3)	/* as much as possible	*/</a>
+#define OSCAN_VIDEO	(4)	/* even more than is possible	*/
+
+
+/* === Public Shared Screen Node ===	*/
+
+/* This is the representative of a public shared screen.
+ * This is an internal data structure, but some functions may
+ * present a copy of it to the calling application.  In that case,
+ * be aware that the screen pointer of the structure can NOT be
+ * used safely, since there is no guarantee that the referenced
+ * screen will remain open and a valid data structure.
+ *
+ * Never change one of these.
+ */
+<a name="line381"></a>
+<a name="line382">struct PubScreenNode	{</a>
+<a name="line383">    struct Node		psn_Node;	/* ln_Name is screen name */</a>
+<a name="line384">    struct Screen	*psn_Screen;</a>
+<a name="line385">    UWORD		psn_Flags;	/* below		*/</a>
+<a name="line386">    WORD		psn_Size;	/* includes name buffer	*/</a>
+<a name="line387">    WORD		psn_VisitorCount; /* how many visitor windows */</a>
+<a name="line388">    struct Task		*psn_SigTask;	/* who to signal when visitors gone */</a>
+    UBYTE		psn_SigBit;	/* which signal	*/
+};
+<a name="line391"></a>
+#define PSNF_PRIVATE	(0x0001)
+<a name="line393"></a>
+/* NOTE: Due to a bug in NextPubScreen(), make sure your buffer
+ * actually has MAXPUBSCREENNAME+1 characters in it!
+<a name="line396"> */</a>
+<a name="line397">#define MAXPUBSCREENNAME	(139)	/* names no longer, please	*/</a>
+
+/* pub screen modes	*/
+#define SHANGHAI	0x0001	/* put workbench windows on pub screen */
+#define POPPUBSCREEN	0x0002	/* pop pub screen to front when visitor opens */
+
+
+/* Include obsolete identifiers: */
+#ifndef INTUITION_IOBSOLETE_H
+#include &#060;intuition/iobsolete.h&#062;
+#endif
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

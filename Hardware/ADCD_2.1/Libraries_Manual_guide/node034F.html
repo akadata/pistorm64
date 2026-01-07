@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-1-5" TITLE="27 / / The RastPort Structure / RastPort Write Mask" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / The RastPort Structure / RastPort Write Mask</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node034E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0350.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The write mask is a <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> variable that determines which of the
+bitplanes are currently writable. For most applications, this variable is
+set to all bits on.  This means that all bitplanes defined in the <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>
+are affected by a graphics writing operation.  You can selectively disable
+one or more bitplanes by simply specifying a 0 bit in that specific
+position in the control byte.  For example:
+
+    #include &#060;graphics/gfxmacros.h&#062;
+
+<a name="line11">    SetWrMsk(&#038;rastPort, 0xFB);    /* disable bitplane 2 */</a>
+
+A useful application for the <a href="../Libraries_Manual_guide/node034A.html#line13">Mask</a> field is to set or clear plane 6 while
+in the Extra-Half-Brite display mode to create shadow effects.  For
+example:
+
+
+    SetWrMsk(&#038;rastPort, 0xE0);          /* Disable planes 1 through 5. */
+
+    SetAPen(&#038;rastPort, 0);           /* Clear the Extra-Half-Brite bit */
+    RectFill(&#038;rastPort, 20, 20, 40, 30);    /*   in the old rectangle. */
+
+    SetAPen(&#038;rastPort, 32);            /* Set the Extra-Half-Brite bit */
+    RectFill(&#038;rastPort, 30, 25, 50, 35);    /*   in the new rectangle. */
+
+    SetWrMsk(&#038;rastPort, -1);                  /* Re-enable all planes. */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

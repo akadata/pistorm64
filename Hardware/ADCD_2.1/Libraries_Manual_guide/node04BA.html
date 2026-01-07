@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-1" TITLE="B Boopsi Class Reference / Introduction" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B Boopsi Class Reference / Introduction</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04B9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04BB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are 14 public classes built into the Release 2.04 ROM:
+
+
+                            <a href="../Libraries_Manual_guide/node04BB.html">rootclass</a>
+                               /
+                 _____________/____________
+                /         /                \
+               /         /                  \
+           <a href="../Libraries_Manual_guide/node04C6.html">icclass</a>      /                <a href="../Libraries_Manual_guide/node04F2.html">gadgetclass</a>
+             /         /                      \
+            /         /         _______________\___________________
+           /     <a href="../Libraries_Manual_guide/node04D1.html">imageclass</a>    /           /         \             \
+          /         /         /           /           \             \
+     <a href="../Libraries_Manual_guide/node04CC.html">modelclass</a>    /      <a href="../Libraries_Manual_guide/node0507.html">propgclass</a>  <a href="../Libraries_Manual_guide/node0510.html">strgclass</a>  <a href="../Libraries_Manual_guide/node051F.html">buttongclass</a>  <a href="../Libraries_Manual_guide/node052B.html">groupgclass</a>
+                  /                                     \
+                 /                                       \
+         _______/___________________________        <a href="../Libraries_Manual_guide/node0524.html">frbuttongclass</a>
+        /         \            \            \
+       /           \            \            \
+  <a href="../Libraries_Manual_guide/node04DF.html">frameiclass</a>  <a href="../Libraries_Manual_guide/node04E7.html">sysiclass</a>  <a href="../Libraries_Manual_guide/node04EB.html">fillrectclass</a>  <a href="../Libraries_Manual_guide/node04F0.html">itexticlass</a>
+
+
+This appendix documents all the standard Boopsi classes, including their
+methods and attributes.
+
+Each class entry in this document can have two sets of methods: new
+methods that the class defines and inherited methods that the class has
+modified significantly.  Similarly, each class entry can have two sets of
+attributes: those that the class defines and those that the class
+inherited and modified.  Unless documented otherwise,  all classes inherit
+all of its superclass's methods and attributes.
+
+Each method has a Boopsi message associated with it.  These messages are
+in the form of C structures.  Many methods use the default message
+structure:
+
+    typedef struct
+    {
+        ULONG MethodID;
+    } *Msg;
+
+Some methods require a customized message so they can pass other
+parameters besides the Method ID.  If a method requires a custom message,
+its custom message structure is documented along with the method.
+
+All methods have to return some sort of return value.  The meaning of the
+return value depends on the class and method.  Normally a return value of
+zero indicates that either the method failed or it is not supported by the
+class.  A method can use the return value to return a pointer to an
+object.  If a class does not directly support a particular method, the
+class's dispatcher should pass the method on to its superclass for
+processing.  The class dispatcher should record the return value it gets
+from its superclass and use that as its return value.  Methods that assign
+no meaning to their return value can return 1L to indicate that the method
+<a name="line56">is implemented.</a>
+
+The description of each attribute contains a code which lists the
+<a href="../Libraries_Manual_guide/node04BB.html">rootclass</a> methods that apply to that attribute:
+
+    I  <a href="../Libraries_Manual_guide/node04BC.html">OM_NEW</a>     Attribute can be set at initialization
+    S  <a href="../Libraries_Manual_guide/node04C3.html">OM_SET</a>     Attribute can be set with OM_SET method
+    G  <a href="../Libraries_Manual_guide/node04C2.html">OM_GET</a>     Attribute can be read with OM_GET method
+    N  <a href="../Libraries_Manual_guide/node04C5.html">OM_NOTIFY</a>  Changing the attribute triggers object to send
+                  notifications
+    U  <a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a>  Attribute can be set with OM_UPDATE method
+
+For example, the <a href="../Libraries_Manual_guide/node04F0.html">itexticlass</a> attribute <a href="../Libraries_Manual_guide/node04DB.html">IA_Left</a> has the code (ISG) after
+it.  This means an application can set IA_Left when it creates an instance
+of itexticlass (<a href="../Libraries_Manual_guide/node04BC.html">OM_NEW</a>) and when it uses the OM_SET method.  The
+application can also ask an itexticlass object what the IA_Left value is,
+using the <a href="../Libraries_Manual_guide/node04C2.html">OM_GET</a> method.
+
+The <a href="../Libraries_Manual_guide/node04BC.html">OM_NEW</a>, <a href="../Libraries_Manual_guide/node04C3.html">OM_SET</a>, <a href="../Libraries_Manual_guide/node04C5.html">OM_NOTIFY</a>, and <a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a> messages all contain a
+pointer to a tag list.  This tag list contains the attributes and
+corresponding values that the method affects.  Each <a href="../Libraries_Manual_guide/node0497.html">TagItem</a> in this list
+makes up an attribute/value pair.  The <a href="../Libraries_Manual_guide/node0497.html">ti_Tag</a> portion of the TagItem
+contains the attribute's ID while the <a href="../Libraries_Manual_guide/node0497.html">ti_Data</a> field contains the
+attribute's value.  Note that these tag lists can also contain
+utility.library Global System control tags (like <a href="../Libraries_Manual_guide/node0498.html#line8">TAG_SKIP</a> and <a href="../Libraries_Manual_guide/node0498.html#line8">TAG_DONE</a>),
+so dispatchers should use the tag functions from utility.library to
+process these lists.  See documentation on the <a href="../Libraries_Manual_guide/node0495.html">Utility</a> library for more
+information.
+
+All methods are called via a class dispatcher:
+
+    classDispatcher(Class *class, Object *object, Msg msg);
+
+The first argument, class, is a pointer to the dispatcher's Class
+structure (defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DA.html#line22">classes.h</a>&#062;).  The second parameter,
+object, is a pointer to the Boopsi object to which the Boopsi message (the
+third argument, msg) refers.  Both <a href="../Includes_and_Autodocs_2._guide/node00E2.html#line19">Object</a> and <a href="../Includes_and_Autodocs_2._guide/node00E2.html#line30">Msg</a> are defined in
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00E2.html">classusr.h</a>&#062;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

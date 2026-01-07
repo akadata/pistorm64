@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-1-1-1" TITLE="12 / / Using Boopsi / Boopsi and Tags" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / Using Boopsi / Boopsi and Tags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0201.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0203.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Boopsi uses tag lists to pass and manipulate its attributes.  To Boopsi,
+each <a href="../Libraries_Manual_guide/node0497.html">TagItem</a> (defined in &#060;utility/<a href="../Includes_and_Autodocs_2._guide/node012E.html#line21">tagitem.h</a>&#062;) in a tag list is an
+attribute/value pair.  The TagItem.ti_Tag field contains an ID for the
+attribute and the ti_Data field holds the attribute's value.
+
+For example, the string gadget class defines an attribute called
+<a href="../Libraries_Manual_guide/node0512.html">STRINGA_LongVal</a>, which is the current integer value of the gadget. Certain
+<a href="../Libraries_Manual_guide/node020A.html">gadgetclass</a> objects have an attribute called GA_Image.  Its value is not
+an integer, it is a pointer to an image.
+
+Note that these tag lists can also contain utility.library Global System
+control tags (like <a href="../Libraries_Manual_guide/node0498.html#line8">TAG_SKIP</a> and <a href="../Libraries_Manual_guide/node0498.html#line8">TAG_DONE</a>), which Boopsi uses in processing
+its tag lists.  Any application that ends up processing these lists should
+do so using the tag manipulation functions from utility.library.  For more
+information on tags and utility.library, see the &#034;<a href="../Libraries_Manual_guide/node0495.html">Utility Library</a>&#034; chapter
+of this manual.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

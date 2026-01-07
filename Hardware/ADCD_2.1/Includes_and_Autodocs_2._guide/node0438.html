@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="DrawGList()" TITLE="graphics.library/DrawGList" -->
+<head>
+<title>graphics.library/DrawGList</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0437.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0439.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    DrawGList -- <a href="../Includes_and_Autodocs_2._guide/node0078.html#line38">Process</a> the gel list, queueing VSprites, drawing Bobs.
+
+SYNOPSIS
+    DrawGList(rp, vp)
+              A1  A0
+
+    void DrawGList(struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a> *);
+
+FUNCTION
+    Performs one pass of the current gel list.
+       - If nextLine and lastColor are defined, these are
+         initialized for each gel.
+      - If it's a <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line73">VSprite</a>, build it into the copper list.
+      - If it's a <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line140">Bob</a>, draw it into the current raster.
+      - Copy the save values into the &#034;old&#034; variables,
+         double-buffering if required.
+
+INPUTS
+    rp = pointer to the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> where Bobs will be drawn
+    vp = pointer to the <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a> for which VSprites will be created
+
+RESULT
+
+BUGS
+    MUSTDRAW isn't implemented yet.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0451.html">InitGels()</a>  <a href="../Includes_and_Autodocs_2._guide/node00C3.html">graphics/gels.h</a> <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>  <a href="../Includes_and_Autodocs_2._guide/node00B8.html">graphics/view.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

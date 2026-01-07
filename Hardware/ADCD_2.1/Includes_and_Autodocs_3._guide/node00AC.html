@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="cd" NODE="CD_PLAYLSN" TITLE="cd.device/CD_PLAYLSN" -->
+<head>
+<title>cd.device/CD_PLAYLSN</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00AB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00AD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+        CD_PLAYLSN -- Play a selected portion of CD audio (LSN form).
+
+<b>   IO REQUEST</b>
+       io_Device       preset by the call to <a href="../Includes_and_Autodocs_3._guide/node00BB.html">OpenDevice()</a>
+       io_Unit         preset by the call to <a href="../Includes_and_Autodocs_3._guide/node00BB.html">OpenDevice()</a>
+       io_Command      CD_PLAYLSN
+       io_Data         NULL
+       io_Length       length of play
+       io_Offset       starting position
+
+<b>   RESULTS</b>
+       io_Error        0 for success, or an error code as defined in
+                       <a href="../Includes_and_Autodocs_3._guide/node05E4.html">&#060;devices/cd.h&#062;</a>
+
+<b>   FUNCTION</b>
+       This command causes the drive to start playing CD audio from the
+       specified position until the specified length has passed.
+
+       io_Offset specifies the starting position.  io_Length contains
+       the amount of time to play.  All data is specified in LSN format.
+
+       A <a href="../Includes_and_Autodocs_3._guide/node0204.html">DoIO()</a> will not return until the requested number of sectors
+       have been played.  A <a href="../Includes_and_Autodocs_3._guide/node0236.html">SendIO()</a> will return as soon as the PLAY
+       has been started.  At this time other commands can be sent (like
+       CD_PAUSE).  To stop a play before the specified length has been
+       reached, use <a href="../Includes_and_Autodocs_3._guide/node0574.html">AbortIO()</a>.
+
+<b>   EXAMPLE</b>
+       /* Play two minutes, ten seconds of audio starting at 20 minutes, */
+       /* 58 seconds, and 10 frames.                                     */
+
+       ior-&#062;io_Command = CD_PLAYLSN;   /* Play CD audio           */
+       ior-&#062;io_Offset  = 94360;        /* 20*(60*75) + 58*75 + 10 */
+       ior-&#062;io_Length  = 9750;         /* 02*(60*75) + 10*75 + 00 */
+       <a href="../Includes_and_Autodocs_3._guide/node0204.html">DoIO</a> (ior);
+
+<b>   NOTES</b>
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node00AE.html">CD_PLAYTRACK</a>, <a href="../Includes_and_Autodocs_3._guide/node00AB.html">CD_PAUSE</a>, <a href="../Includes_and_Autodocs_3._guide/node00B6.html">CD_SEARCH</a>, <a href="../Includes_and_Autodocs_3._guide/node00A3.html">CD_ATTENUATE</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

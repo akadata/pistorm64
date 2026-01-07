@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="BeginRefresh()" TITLE="intuition.library/BeginRefresh" -->
+<head>
+<title>intuition.library/BeginRefresh</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0396.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0398.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	BeginRefresh -- Sets up a window for optimized refreshing.
+
+<b>    SYNOPSIS</b>
+	BeginRefresh( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> )
+		      A0
+
+	VOID BeginRefresh( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> * );
+
+<b>    FUNCTION</b>
+	This routine sets up your window for optimized refreshing.
+
+	Its role is to provide Intuition integrated access to the Layers
+	library function <a href="../Includes_and_Autodocs_3._guide/node0418.html">BeginUpdate()</a>.  Its additional contribution is
+	to be sure that locking protocols for layers are followed, by
+	locking both layers of a WFLG_GIMMEZEROZERO window only after the
+	parent <a href="../Includes_and_Autodocs_3._guide/node0625.html#line30">Layer_Info</a> has been locked.  Also, the WFLG_WINDOWREFRESH
+	flag is set in your window, for your information.
+
+	The purpose of <a href="../Includes_and_Autodocs_3._guide/node0418.html">BeginUpdate()</a>, and hence BeginRefresh(), is to
+	restrict rendering in a window (layer) to the region that needs
+	refreshing after an operation such as window sizing or uncovering.
+	This restriction to the &#034;damage region&#034; persists until you call
+	<a href="../Includes_and_Autodocs_3._guide/node03AC.html">EndRefresh()</a>.
+
+	For instance, if you have a WFLG_SIMPLE_REFRESH window which is
+	partially concealed and the user brings it to the front, you can
+	receive an IDCMP_REFRESHWINDOW message asking you to refresh your
+	display.  If you call BeginRefresh() before doing any of the
+	rendering, then the layer that underlies your window will be arranged
+	so that the only rendering that will actually take place will be that
+	which goes to the newly-revealed areas.  This is very performance-
+	efficient, and visually attractive.
+
+	After you have performed your refresh of the display, you should call
+	<a href="../Includes_and_Autodocs_3._guide/node03AC.html">EndRefresh()</a> to reset the state of the layer and the window.  Then you
+	may proceed with rendering to the entire window as usual.
+
+	You learn that your window needs refreshing by receiving either a
+	message of class IDCMP_REFRESHWINDOW through the IDCMP, or an input
+	event of class IECLASS_REFRESHWINDOW through the Console device.
+	Whenever you are told that your window needs refreshing, you should
+	call BeginRefresh() and <a href="../Includes_and_Autodocs_3._guide/node03AC.html">EndRefresh()</a> to clear the refresh-needed
+	state, even if you don't plan on doing any rendering.  You may relieve
+	yourself of even this burden by setting the WFLG_NOCAREREFRESH flag
+	when opening your window.
+
+<b>    NOTES</b>
+	WARNING: You should only perform simple graphics refreshing
+	operations between BeginRefresh() and <a href="../Includes_and_Autodocs_3._guide/node03AC.html">EndRefresh()</a>.  These include
+	any graphics.library drawing functions or the simple Intuition
+	rendering functions (DrawImage(), <a href="../Includes_and_Autodocs_3._guide/node03D9.html">PrintIText()</a>, <a href="../Includes_and_Autodocs_3._guide/node03A8.html">DrawBorder()</a>, and
+	so on).  In particular, do not call <a href="../Includes_and_Autodocs_3._guide/node03DC.html">RefreshGadgets()</a>, <a href="../Includes_and_Autodocs_3._guide/node03DD.html">RefreshGList()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node03DE.html">RefreshWindowFrame()</a>, etc., since any of the complex Intuition
+	functions run the risk of creating a deadlock.  Also avoid any
+	other high-level calls in Intuition or ones that might invoke
+	Intuition.  This means no calling <a href="../Includes_and_Autodocs_3._guide/node03F4.html">SetPointer()</a>, no calling
+	<a href="../Includes_and_Autodocs_3._guide/node03C0.html">LockIBase()</a>, no dos.library functions (since an EasyRequest()
+	might result), etc.  Keep it simple.
+
+	By the time the application receives its IDCMP_REFRESHWINDWOW
+	message, Intuition has already repaired any damaged regions
+	of the window border or the gadgets in the window, so attempts
+	to redraw gadgets or borders are as unnecessary as they are
+	dangerous.
+
+	ANOTHER WARNING: The concept of multiple refresh passes using
+	EndRefresh( w, FALSE ) is not completely sound without further
+	protection.  The reason is that between two sessions, more
+	damage can occur to your window.  Your final EndRefresh( w, TRUE )
+	will dispose of all damage, including the new, and your
+	initial refreshing pass will never get the chance to refresh
+	the new damage.
+
+	To avoid this, you must protect your session using <a href="../Includes_and_Autodocs_3._guide/node0428.html">LockLayerInfo()</a>
+	which will prevent Intuition from performing window operations
+	or anything else which might cause further damage from occurring.
+	Again, while holding the LayerInfo lock make no Intuition
+	function calls dealing with gadgets; just render.
+
+	You can, however, call <a href="../Includes_and_Autodocs_3._guide/node0424.html">InstallClipRegion()</a> for the different
+	refresh passes, if you have two clip regions.
+
+	SIMILAR WARNING: Your program and Intuition &#034;share&#034; your window
+	layer's DamageList.  BeginRefresh() helps arbitrate this
+	sharing, but the lower-level function <a href="../Includes_and_Autodocs_3._guide/node0418.html">layers.library/BeginUpdate()</a>
+	does not.  It isn't really supported to use <a href="../Includes_and_Autodocs_3._guide/node0418.html">BeginUpdate()</a> on
+	a window's layer, but if you do--for whatever reason--it is
+	critical that you first acquire the LayerInfo lock as in
+	the above example: even if you only have one pass of refresh
+	rendering to do.  Otherwise, the refreshing of your window's
+	borders and gadgets can be incomplete, and the problem might
+	occur only under certain conditions of task priority and
+	system load.
+
+<b>    EXAMPLE</b>
+	Code fragment for &#034;two pass&#034; window refreshing, in response
+	to an IDCMP_REFRESHWINDOW message:
+	switch ( imsg-&#062;Class )
+	{
+	...
+	case IDCMP_REFRESHWINDOW:
+	    window = imsg-&#062;IDCMPWindow;
+
+	    /* this lock only needed for &#034;two-pass&#034; refreshing */
+	    LockLayerInfo( &#038;window-&#062;WScreen-&#062;LayerInfo );
+
+	    /* refresh pass for region 1 */
+	    origclip = InstallClipRegion( window-&#062;WLayer, region1 );
+	    BeginRefresh( window );
+	    myRefreshRegion1( window );
+	    EndRefresh( window, FALSE );
+
+	    /* refresh pass for region 2 */
+	    InstallClipRegion( window-&#062;WLayer, region2 );
+	    BeginRefresh( window );
+	    myRefreshRegion2( window );
+	    EndRefresh( window, TRUE );		/* and dispose damage list */
+
+	    /* restore and unlock */
+	    InstallClipRegion( window-&#062;WLayer, origclip );
+	    UnlockLayerInfo( &#038;window-&#062;WScreen-&#062;LayerInfo );
+	    break;
+	...
+	}
+
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to the window structure which needs refreshing
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+	This function should check the return code of
+	<a href="../Includes_and_Autodocs_3._guide/node0418.html">layers.library/BeginUpdate()</a>, and abort if that function fails.
+
+<b>    SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node03AC.html">EndRefresh()</a>, <a href="../Includes_and_Autodocs_3._guide/node0418.html">layers.library/BeginUpdate()</a>, <a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0424.html">layer.library/InstallClipRegion()</a>, <a href="../Includes_and_Autodocs_3._guide/node0428.html">layers.library/LockLayerInfo()</a>
+	The &#034;Windows&#034; chapter of the Intuition Reference Manual
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

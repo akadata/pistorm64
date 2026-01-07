@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="gadtools" NODE="GT_GetGadgetAttrsA()" TITLE="gadtools.library/GT_GetGadgetAttrsA" -->
+<head>
+<title>gadtools.library/GT_GetGadgetAttrsA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node027E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0280.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GT_GetGadgetAttrsA -- request the attributes of a GadTools gadget. (V39)
+	GT_GetGadgetAttrs -- varargs stub for GT_GetGadgetAttrsA(). (V39)
+
+<b>   SYNOPSIS</b>
+	numProcessed = GT_GetGadgetAttrsA(gad, win, req, taglist)
+	                                  A0   A1   A2   A3
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> GT_GetGadgetAttrsA(struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+	                        struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	numProcessed = GT_GetGadgetAttrs(gad, win, req, firsttag, ...)
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> GT_GetGadgetAttrs(struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+                              struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> *, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...);
+
+<b>   FUNCTION</b>
+	Retrieve the attributes of the specified gadget, according to the
+	attributes chosen in the tag list.  For each entry in the tag list,
+	ti_Tag identifies the attribute, and ti_Data is a pointer to
+	the long variable where you wish the result to be stored.
+
+<b>   INPUTS</b>
+	gad - pointer to the gadget in question. May be NULL, in which case
+	      this function returns 0
+	win - pointer to the window containing the gadget.
+	req - reserved for future use, should always be NULL
+	taglist - pointer to <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> list.
+
+<b>   TAGS</b>
+	BUTTON_KIND:
+	GA_Disabled (BOOL) - TRUE if this gadget is disabled,
+	    FALSE otherwise. (V39)
+
+	CHECKBOX_KIND:
+	GA_Disabled (BOOL) - TRUE if this gadget is disabled,
+	    FALSE otherwise. (V39)
+	GTCB_Checked (BOOL) - TRUE if this gadget is currently checked,
+	    FALSE otherwise. (V39)
+
+	CYCLE_KIND:
+	GA_Disabled (BOOL) - TRUE if this gadget is disabled,
+	    FALSE otherwise. (V39)
+	GTCY_Active (UWORD) - The ordinal number (counting from zero) of
+	    the active choice of a cycle gadget. (V39)
+	GTCY_Labels (STRPTR *) - The NULL-terminated array of strings
+	    that are the choices offered by the cycle gadget. (V39)
+
+	INTEGER_KIND:
+	GA_Disabled (BOOL) - TRUE if this gadget is disabled,
+	    FALSE otherwise. (V39)
+	GTIN_Number (ULONG) - The contents of the integer gadget. (V39)
+
+	LISTVIEW_KIND:
+	GA_Disabled (BOOL) - TRUE if this gadget is disabled,
+	    FALSE otherwise. (V39)
+	GTLV_Top (WORD) - Ordinal number of the top item visible
+	    in the listview. (V39)
+	GTLV_Labels (struct <a href="../Includes_and_Autodocs_3._guide/node0628.html#line19">List</a> *) - The list of nodes whose ln_Name fields
+	    are displayed in the listview. (V39)
+	GTLV_Selected (UWORD) - Ordinal number of currently selected
+	    item. Returns ~0 if no item is selected. (V39)
+
+	MX_KIND:
+	GA_Disabled (BOOL) - TRUE if this gadget is disabled,
+	    FALSE otherwise. (V39)
+	GTMX_Active (UWORD) - The ordinal number (counting from zero) of
+	    the active choice of an mx gadget. (V39)
+
+	NUMBER_KIND:
+	GTNM_Number - The signed long integer that is displayed in
+	    the read-only number. (V39)
+
+	PALETTE_KIND:
+	GA_Disabled (BOOL) - TRUE if this gadget is disabled,
+	    FALSE otherwise. (V39)
+	GTPA_Color (UBYTE) - The selected color of the palette. (V39)
+	GTPA_ColorOffset (UBYTE) - First color used in palette. (V39)
+	GTPA_ColorTable (UBYTE *) - Pointer to a table of pen numbers
+	    indicating  which colors should be used and edited by the palette
+	    gadget. May be NULL, which causes a 1-to-1 mapping of pen numbers.
+	    (V39)
+
+	SCROLLER_KIND:
+	GA_Disabled (BOOL) - TRUE if this gadget is disabled,
+	    FALSE otherwise. (V39)
+	GTSC_Top (WORD) - Top visible in scroller. (V39)
+	GTSC_Total (WORD) - Total in scroller area. (V39)
+	GTSC_Visible (WORD) - Number visible in scroller. (V39)
+
+	SLIDER_KIND:
+	GA_Disabled (BOOL) - TRUE if this gadget is disabled,
+	    FALSE otherwise. (V39)
+	GTSL_Min (WORD) - Minimum level for slider. (V39)
+	GTSL_Max (WORD) - Maximum level for slider. (V39)
+	GTSL_Level (WORD) - Current level of slider. (V39)
+
+	STRING_KIND:
+	GA_Disabled (BOOL) - TRUE if this gadget is disabled,
+	    FALSE otherwise. (V39)
+	GTST_String (STRPTR) - Returns a pointer to the string gadget's
+	    buffer. (V39)
+
+	TEXT_KIND:
+	GTTX_Text - Pointer to the string to be displayed in the
+	    read-only text-display gadget. (V39)
+
+<b>   RESULT</b>
+	numProcessed - the number of attributes successfully filled in.
+
+<b>   EXAMPLE</b>
+		long top = 0;
+		long selected = 0;
+		long result;
+		result = GT_GetGadgetAttrs( listview_gad, win, NULL,
+			GTLV_Top, &#038;top,
+			GTLV_Selected, &#038;selected,
+			TAG_DONE );
+		if ( result != 2 )
+		{
+			printf( &#034;Something's wrong!&#034; );
+		}
+
+<b>   WARNING</b>
+	The pointers you provide within the tag list to store the return
+	values MUST POINT TO LONGWORDS. That is, even if the type of a
+	return value is defined as (UWORD *), you must pass a pointer to
+	a longword of memory.
+
+<b>   SEE ALSO</b>
+	GT_SetGadgetAttrs()
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

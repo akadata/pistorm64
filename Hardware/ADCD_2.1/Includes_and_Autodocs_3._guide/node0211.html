@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="FreeTrap()" TITLE="exec.library/FreeTrap" -->
+<head>
+<title>exec.library/FreeTrap</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0210.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0212.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FreeTrap -- free a processor trap
+
+<b>   SYNOPSIS</b>
+	FreeTrap(trapNum)
+		 D0
+
+	void FreeTrap(ULONG);
+
+<b>   FUNCTION</b>
+	This function frees a previously allocated trap number for reuse.
+	This call must be performed while running in the same task in which
+	the trap was allocated.
+
+<b>   WARNING</b>
+	Traps may not be allocated or freed from exception handling code.
+
+<b>   INPUTS</b>
+	trapNum - the trap number to free {of 0..15}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

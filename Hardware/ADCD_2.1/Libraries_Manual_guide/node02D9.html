@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_23" NODE="23-1-1" TITLE="23 / List Structure / Node Structure Definition" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>23 / List Structure / Node Structure Definition</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02D8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02DA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A Node structure is divided into three parts: linkage, information, and
+content.  The linkage part contains memory pointers to the node's
+successor and predecessor nodes.  The information part contains the node
+type, the priority, and a name pointer.  The content part stores the
+actual data structure of interest.  For nodes that require linkage only, a
+<a name="line7">small <a href="../Includes_and_Autodocs_2._guide/node0091.html#line31">MinNode</a> structure is used.</a>
+
+    struct MinNode
+    {
+        struct MinNode *mln_Succ;
+        struct MinNode *mln_Pred;
+<a name="line13">    };</a>
+
+ln_Succ
+    points to the next node in the list (successor).
+
+ln_Pred
+<a name="line19">    points to the previous node in the list (predecessor).</a>
+
+When a type, priority, or name is required, a full-featured <a href="../Includes_and_Autodocs_2._guide/node0091.html#line23">Node</a> structure
+is used.
+
+    struct Node
+    {
+        struct Node *ln_Succ;
+        struct Node *ln_Pred;
+        UBYTE        ln_Type;
+        BYTE         ln_Pri;
+        char        *ln_Name;
+<a name="line31">    };</a>
+
+ln_Type
+<a name="line34">    defines the type of the node (see &#060;exec/<a href="../Includes_and_Autodocs_2._guide/node0091.html#line43">nodes.h</a>&#062; for a list).</a>
+
+ln_Pri
+    specifies the priority of the node  (+127 (highest) to -128
+<a name="line38">    (lowest)).</a>
+
+ln_Name
+    points to a printable name for the node (a NULL-terminated
+    string).
+
+The Node and MinNode structures are often incorporated into larger
+structures, so groups of the larger structures can easily be linked
+together.   For example, the Exec Interrupt structure is defined as
+<a name="line47">follows:</a>
+
+    struct Interrupt
+    {
+        struct Node is_Node;
+        APTR        is_Data;
+        VOID        (*is_Code)();
+    };
+
+Here the is_Data and is_Code fields represent the useful content of the
+node.  Because the Interrupt structure begins with a Node structure, it
+may be passed to any of the Exec <a href="../Libraries_Manual_guide/node02DB.html#line23">List</a> manipulation functions.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

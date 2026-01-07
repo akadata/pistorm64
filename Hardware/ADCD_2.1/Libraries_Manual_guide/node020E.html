@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-2" TITLE="12 Boopsi--Object Oriented Intuition / Creating a Boopsi Class" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 Boopsi--Object Oriented Intuition / Creating a Boopsi Class</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node020D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node020F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+So far this chapter has only hinted at what is possible with Boopsi. Its
+power lies in its extensibility.  Boopsi grants the application programmer
+the power to add custom features to existing classes.  If an existing
+class comes close to your needs, you can build on that class so it does
+exactly what you want.  If you want a class that is unlike an existing
+<a name="line7">class, you can create it.</a>
+
+The heart of a Boopsi class is its method Dispatcher function. According
+to the OOP metaphor, when an application wants a Boopsi object to perform
+a method, it sends the object a message.  In reality, that object is only
+a data structure, so it does not have the power to do anything.  When an
+object receives a Boopsi message, a Boopsi message structure is passed to
+the dispatcher of that object's class.  The dispatcher examines the
+<a name="line15">message and figures out what to do about it.</a>
+
+For example, when an application calls <a href="../Libraries_Manual_guide/node0205.html#line5">SetGadgetAttrs()</a> on an integer
+gadget:
+
+    SetGadgetAttrs(myintegergadget, mywindow, NULL,
+                   STRINGA_LongVal, 75L,
+                   GA_ID,           2L,
+<a name="line23">                   TAG_END));</a>
+
+the <a href="../Libraries_Manual_guide/node0205.html#line5">SetGadgetAttrs()</a> function calls the <a href="../Libraries_Manual_guide/node020A.html#line7">strgclass</a> dispatcher.  A Boopsi
+dispatcher receives three arguments: a pointer to the dispatcher's Class
+(defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DA.html">classes.h</a>&#062;), a pointer to the object that is going
+to perform the method, and a pointer to the Boopsi message.  In this case,
+the SetGadgetAttrs() function builds an <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> message, finds the
+strgclass dispatcher, and &#034;sends&#034; the dispatcher the OM_SET message.
+SetGadgetAttrs() can find the dispatcher because an object contains a
+<a name="line32">reference to its dispatcher.</a>
+
+When the dispatcher function &#034;gets&#034; the message, it examines the message
+to find out its corresponding method.  In this case, the dispatcher
+recognizes the message as an <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> message and proceeds to set
+<a name="line37">myintegergadget's attributes.</a>
+
+An <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> message looks like this (defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00E2.html#line76">classusr.h</a>&#062;):
+
+    struct opSet {
+        ULONG MethodID;               /* This will be set to OM_SET      */
+        struct TagItem *ops_AttrList; /* A tag list containing the       */
+                                      /*     attribute/value pairs of    */
+                                      /*     the attributes to set.      */
+        struct GadgetInfo *ops_GInfo; /* Special information for gadgets */
+    }
+
+The <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> message contains a pointer to a tag list in ops_AttrList that
+looks like this:
+
+    {STRINGA_LongVal, 75L},
+    {GA_ID, 2L},
+    {TAG_END,}
+
+The <a href="../Libraries_Manual_guide/node020A.html#line7">strgclass</a> dispatcher scans through this tag list and recognizes the
+<a href="../Libraries_Manual_guide/node0512.html">STRINGA_LongVal</a> attribute.  The dispatcher sets myintegergadget's internal
+STRINGA_LongVal value to the corresponding value (75L) from the
+<a name="line59">attribute/value pair.</a>
+
+The <a href="../Libraries_Manual_guide/node020A.html#line7">strgclass</a> dispatcher continues to scan through the tag list.  When it
+finds <a href="../Libraries_Manual_guide/node0501.html">GA_ID</a>, it does not process it like <a href="../Libraries_Manual_guide/node0512.html">STRINGA_LongVal</a>.  The strgclass
+dispatcher's <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> method does not recognize the GA_ID attribute because
+strgclass inherited the GA_ID attribute from <a href="../Libraries_Manual_guide/node020A.html">gadgetclass</a>.  To handle
+setting the GA_ID attribute, the strgclass dispatcher passes on the OM_SET
+message to its superclass's dispatcher.  The strgclass dispatcher passes
+control to the gadgetclass dispatcher, which knows about the GA_ID
+attribute.
+
+ <a href="../Libraries_Manual_guide/node020F.html">Building On Existing Public Classes</a> 
+ <a href="../Libraries_Manual_guide/node0211.html">Writing the Dispatcher</a> 
+ <a href="../Libraries_Manual_guide/node0217.html">White Boxes - The Transparent Base Classes</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

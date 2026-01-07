@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="SetSignal()" TITLE="exec.library/SetSignal" -->
+<head>
+<title>exec.library/SetSignal</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0239.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node023B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetSignal -- define the state of this task's signals
+
+<b>   SYNOPSIS</b>
+	oldSignals = SetSignal(newSignals, signalMask)
+	D0		       D0	   D1
+
+	ULONG SetSignal(ULONG,ULONG);
+
+<b>   FUNCTION</b>
+	This function can query or modify the state of the current task's
+	received signal mask.  Setting the state of signals is considered
+	dangerous.  Reading the state of signals is safe.
+
+<b>   INPUTS</b>
+	newSignals - the new values for the signals specified in
+		     signalSet.
+	signalMask - the set of signals to be affected.
+
+<b>   RESULTS</b>
+	oldSignals - the prior values for all signals
+
+<b>   EXAMPLES</b>
+	Get the current state of all signals:
+	    SetSignal(0L,0L);
+	Clear the CTRL-C signal:
+	    SetSignal(0L,SIGBREAKF_CTRL_C);
+
+
+	Check if the CTRL-C signal was pressed:
+
+	    #include <a href="../Includes_and_Autodocs_3._guide/node0659.html">&#060;libraries/dos.h&#062;</a>
+
+	    /* Check &#038; clear CTRL_C signal */
+	    if(SetSignal(0L,SIGBREAKF_CTRL_C) &#038; SIGBREAKF_CTRL_C)
+		{
+		printf(&#034;CTRL-C pressed!n&#034;);
+		}
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node023D.html">Signal()</a>, <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

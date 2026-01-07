@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="AIFF-15-1" TITLE="AIFF / The Comments Chunk / Comment " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>AIFF / The Comments Chunk / Comment </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0228.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node022A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A comment consists of a time stamp, marker id, and a text count followed
+by text.
+
+    typedef struct {
+	unsigned long	timeStamp;
+	MarkerID	marker;
+	unsigned short	count;
+	char		text;
+    } Comment;
+
+The timeStamp indicates when the comment was created.  On the Amiga, units
+are the number of seconds since January 1, 1978.  On the Macintosh, units
+are the number of seconds since January 1, 1904.
+
+A comment can be linked to a marker.  This allows applications to store
+long descriptions of markers as a comment.  If the comment is referring to
+a marker, then the marker field is the ID of that marker.  Otherwise,
+marker is zero, indicating that this comment is not linked to a marker.
+
+The count is the length of the text that makes up the comment.  This is a
+16-bit quantity, allowing much longer comments than would be available
+with a pstring.
+
+The text field contains the comment itself.
+
+The Comments Chunk is optional.  No more than one Comments Chunk may
+appear in a single FORM AIFF.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

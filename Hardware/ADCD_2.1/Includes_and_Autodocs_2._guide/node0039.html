@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/gameport.h" NODE="MAIN" TITLE="Includes/devices/gameport.h" -->
+<head>
+<title>Includes/devices/gameport.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0038.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node003A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DEVICES_GAMEPORT_H
+#define DEVICES_GAMEPORT_H
+/*
+**	$Filename: devices/gameport.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.1 $
+**	$Date: 90/11/05 $
+**
+**	GamePort device command definitions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef	EXEC_TYPES_H
+#include	&#034;exec/types.h&#034;
+#endif
+<a name="line18"></a>
+#ifndef	EXEC_IO_H
+#include	&#034;exec/io.h&#034;
+#endif
+<a name="line22"></a>
+<a name="line23">/******	 GamePort commands ******/</a>
+<a name="line24">#define	 GPD_READEVENT	   (CMD_NONSTD+0)</a>
+<a name="line25">#define	 GPD_ASKCTYPE	   (CMD_NONSTD+1)</a>
+<a name="line26">#define	 GPD_SETCTYPE	   (CMD_NONSTD+2)</a>
+<a name="line27">#define	 GPD_ASKTRIGGER	   (CMD_NONSTD+3)</a>
+#define	 GPD_SETTRIGGER	   (CMD_NONSTD+4)
+
+/******	 GamePort structures ******/
+
+<a name="line32">/* gpt_Keys */</a>
+<a name="line33">#define	 GPTB_DOWNKEYS	   0</a>
+<a name="line34">#define	 GPTF_DOWNKEYS	   (1&#060;&#060;0)</a>
+<a name="line35">#define	 GPTB_UPKEYS	   1</a>
+#define	 GPTF_UPKEYS	   (1&#060;&#060;1)
+<a name="line37"></a>
+<a name="line38">struct GamePortTrigger {</a>
+<a name="line39">   UWORD gpt_Keys;	   /* key transition triggers */</a>
+<a name="line40">   UWORD gpt_Timeout;	   /* time trigger (vertical blank units) */</a>
+<a name="line41">   UWORD gpt_XDelta;	   /* X distance trigger */</a>
+   UWORD gpt_YDelta;	   /* Y distance trigger */
+};
+
+<a name="line45">/****** Controller Types ******/</a>
+<a name="line46">#define	 GPCT_ALLOCATED	   -1	 /* allocated by another user */</a>
+#define	 GPCT_NOCONTROLLER 0
+<a name="line48"></a>
+<a name="line49">#define	 GPCT_MOUSE	   1</a>
+<a name="line50">#define	 GPCT_RELJOYSTICK  2</a>
+#define	 GPCT_ABSJOYSTICK  3
+
+
+<a name="line54">/****** Errors ******/</a>
+#define	 GPDERR_SETCTYPE   1	 /* this controller not valid at this time */
+
+#endif	/* DEVICES_GAMEPORT_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

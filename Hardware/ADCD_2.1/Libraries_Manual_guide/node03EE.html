@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-5-2" TITLE="30 / / Working With Existing Layers / Determining Layer Position" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / / Working With Existing Layers / Determining Layer Position</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03ED.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03EF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+If the viewing area has been separated into several layers, the
+application may need to find out which layer is topmost at a particular
+x,y coordinate.  Use the <a href="../Includes_and_Autodocs_2._guide/node03AA.html">WhichLayer()</a> function for this:
+
+<a name="line6">    struct Layer *WhichLayer( struct Layer_Info *li, long x, long y );</a>
+
+To be sure that no task adds, deletes, or changes the sequence of layers
+before this information is used, call <a href="../Libraries_Manual_guide/node03EC.html#line11">LockLayerInfo()</a> before calling
+<a href="../Includes_and_Autodocs_2._guide/node03AA.html">WhichLayer()</a>, and call <a href="../Libraries_Manual_guide/node03EC.html#line11">UnlockLayerInfo()</a> when the operation is complete.
+In this way, the program may ensure that it is acting on valid
+information.  Always check for a NULL return value (coordinate not in a
+layer) from WhichLayer().
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

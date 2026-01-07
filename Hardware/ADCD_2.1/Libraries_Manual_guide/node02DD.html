@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_23" NODE="23-2" TITLE="23 Exec Lists and Queues / List Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>23 Exec Lists and Queues / List Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02DC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02DE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Exec provides a number of symmetric functions for handling lists.  There
+are functions for inserting and removing nodes, for adding and removing
+head and tail nodes, for inserting nodes in a priority order, and for
+searching for nodes by name.  The prototypes for Exec list handling
+functions are as follows.
+
+   Exec Functions
+   --------------
+   VOID AddHead( struct List *list, struct Node *node );
+   VOID AddTail( struct List *list, struct Node *node );
+   VOID Enqueue( struct List *list, struct Node *node );
+   struct Node *FindName( struct List *list, UBYTE *name );
+   VOID Insert( struct List *list, struct Node *node, struct Node *pred );
+   VOID Remove( struct Node *node );
+   struct Node *RemHead( struct List *list );
+   struct Node *RemTail( struct List *list );
+
+   Exec Support Functions in amiga.lib
+   -----------------------------------
+<a name="line21">   VOID NewList( struct List *list );</a>
+
+In this discussion of the Exec list handling functions, header represents
+a pointer to <a href="../Libraries_Manual_guide/node02DB.html#line23">List</a> header, and node represents pointer to a <a href="../Libraries_Manual_guide/node02D9.html#line19">Node</a>.
+
+ <a href="../Libraries_Manual_guide/node02DE.html">Insertion and Removal</a> 
+ <a href="../Libraries_Manual_guide/node02DF.html">Special Case Insertion</a> 
+ <a href="../Libraries_Manual_guide/node02E0.html">Special Case Removal</a> 
+ <a href="../Libraries_Manual_guide/node02E1.html">MinList/MinNode Operations</a> 
+ <a href="../Libraries_Manual_guide/node02E2.html">Prioritized Insertion</a> 
+ <a href="../Libraries_Manual_guide/node02E3.html">Searching by Name</a> 
+ <a href="../Libraries_Manual_guide/node02E4.html">More on the Use of Named Lists</a> 
+ <a href="../Libraries_Manual_guide/node02E5.html">List Macros for Assembly Language Programmers</a> 
+ <a href="../Libraries_Manual_guide/node02E6.html">Empty Lists</a> 
+ <a href="../Libraries_Manual_guide/node02E7.html">Scanning a List</a> 
+ <a href="../Libraries_Manual_guide/node02E8.html">Important Note About Shared Lists</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

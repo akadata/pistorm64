@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-8" TITLE="14 Trackdisk Device / Trackdisk Device Errors" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 Trackdisk Device / Trackdisk Device Errors</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00F9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00FB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The trackdisk device returns error codes whenever an operation is
+attempted.
+
+    DiskIO-&#062;iotd_Req.io_Length = TRACK_SIZE;
+    DiskIO-&#062;iotd_Req.io_Data = (APTR)Writebuffer;
+    DiskIO-&#062;iotd_Req.io_Offset = (ULONG)(TRACK_SIZE * tracknum);
+    DiskIO-&#062;iotd_Count = change_count;
+    DiskIO-&#062;iotd_Req.io_Command = ETD_WRITE;
+    if (DoIO((struct IORequest *)DiskIO))
+        printf(&#034;ETD_WRITE failed.  Error: %ld\n&#034;,DiskIO-iotd.io_Error);
+
+When an error occurs, these error numbers will be returned in the io_Error
+<a name="line14">field of your <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> block.</a>
+
+              TRACKDISK DEVICE ERROR CODES
+
+        Error       Value         Explanation
+------------------  ----- -----------------------------
+TDERR_NotSpecified   20   Error could not be determined
+TDERR_NoSecHdr       21   Could not find sector header
+TDERR_BadSecPreamble 22   Error in sector preamble
+TDERR_BadSecID       23   Error in sector identifier
+TDERR_BadHdrSum      24   Header field has bad checksum
+TDERR_BadSecSum      25   Sector data field has bad checksum
+TDERR_TooFewSecs     26   Incorrect number of sectors on track
+TDERR_BadSecHdr      27   Unable to read sector header
+TDERR_WriteProt      28   Disk is write-protected
+TDERR_DiskChanged    29   Disk has been changed or is not currently present
+TDERR_SeekError      30   While verifying seek position, found seek error
+TDERR_NoMem          31   Not enough memory to do this operation
+TDERR_BadUnitNum     32   Bad unit number (unit # not attached)
+TDERR_BadDriveType   33   Bad drive type (not an Amiga 3 1/2 inch disk)
+TDERR_DriveInUse     34   Drive already in use (only one task exclusive)
+TDERR_PostReset      35   User hit reset; awaiting doom
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

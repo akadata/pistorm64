@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-9-14" TITLE="27 / / / Run-Time Name Binding of Mode Information" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / / Run-Time Name Binding of Mode Information</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0342.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0344.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+It is useful to associate common names with the various display modes.
+The Release 2 graphics library includes a provision for binding a name to
+a display mode so that it will be available via a query.  This will be
+useful in the implementation of a standard screen-format requester.  Note
+however that no names are bound initially since the bound names will take
+up RAM at all times.  Instead defaults are used.
+
+Bound names will override the defaults though, so that, until the
+screen-format requester is localized to a non-English language, the modes
+can be localized by binding foreign language names to them.  Here is an
+example of how to query the run-time name binding of a given mode from a
+<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line32">DisplayInfoHandle</a>.
+
+
+#include &#060;graphics/displayinfo.h&#062;
+
+check_name_bound( handle )
+DisplayInfoHandle handle;
+{
+    struct NameInfo query;
+
+    /* fill the buffer with Mode dimension information */
+
+    if(GetDisplayInfoData(handle, (UBYTE *)&#038;query,sizeof(query),
+       DTAG_NAME,NULL)))
+    {
+        printf(&#034;%s&#034;, query.Name);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

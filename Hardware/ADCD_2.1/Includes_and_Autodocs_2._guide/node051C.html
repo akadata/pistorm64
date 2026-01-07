@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/printer" NODE="PRD_RAWWRITE" TITLE="printer.device/PRD_RAWWRITE" -->
+<head>
+<title>printer.device/PRD_RAWWRITE</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node051B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node051D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    PRD_RAWWRITE -- transparent write command
+
+FUNCTION
+    This is a non standard write command that performs no
+    processing on the data passed to it.
+
+IO REQUEST
+    io_Message      mn_ReplyPort set if quick I/O is not possible
+    io_Command      PRD_RAWWRITE
+    io_Flags        IOB_QUICK set if quick I/O is possible
+    io_Length       the number of bytes in io_Data
+    io_Data         the raw bytes to write to the printer
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

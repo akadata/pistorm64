@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_32" NODE="32-3-1" TITLE="32 / Expansion Board Drivers / Disk Based Drivers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>32 / Expansion Board Drivers / Disk Based Drivers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0418.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node041A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Disk-based expansion board drivers and their icons are generally placed in
+the SYS:Expansion drawer of the user's SYS: disk or partition.  The icon
+Tool Type field must contain the unique Hardware Manufacturer number, and
+the Product number of the expansion board(s) the driver is written for.
+(For more about icon Tool Type fields refer to the chapter on
+<a name="line7">&#034;<a href="../Libraries_Manual_guide/node0244.html">Workbench and Icon Library</a>&#034;.)</a>
+
+The BindDrivers command issued during the disk startup-sequence attempts
+to match disk-based drivers with their expansion boards.  To do this,
+BindDrivers looks in the Tool Types field of all icon files in
+SYS:Expansion.  If the Tool Type &#034;PRODUCT&#034; is found in the icon, then this
+is an icon file for a driver.  Binddrivers will then attempt to match the
+manufacturer and product number in this PRODUCT Tool Type with those of a
+board that was configured at expansion time.
+
+For example, suppose you are manufacturer #1019.  You have two products,
+#1 and #2 which both use the same driver.  The icon for your driver for
+these two products would have a Tool Type set to &#034;PRODUCT=1019/1|1019/2&#034;.
+This means: I am an icon for a driver that works with product number 1 or
+2 from manufacturer 1019, now bind me.  Spaces are not legal.  Here are
+two other examples:
+
+        PRODUCT=1208/11    is the Tool Type for a driver for product
+                           11 from manufacturer number 1208.
+
+        PRODUCT=1017       is the Tool Type for a driver for any
+<a name="line28">                           product from manufacturer number 1017.</a>
+
+If a matching board is found for the disk-based driver, the driver code is
+loaded and then initialized with the Exec <a href="../Includes_and_Autodocs_2._guide/node035C.html">InitResident()</a> function.  From
+within its initialization code, the driver can get information about the
+board it is bound to by calling the expansion.library function
+<a href="../Includes_and_Autodocs_2._guide/node03B7.html">GetCurrentBinding()</a>.  This function will provide the driver with a copy of
+a <a href="../Includes_and_Autodocs_2._guide/node00FC.html#line59">CurrentBinding</a> structure, including a pointer to a <a href="../Libraries_Manual_guide/node0416.html#line6">ConfigDev</a> structure
+<a name="line36">(possibly linked to additional ConfigDevs via the <a href="../Libraries_Manual_guide/node0416.html#line25">cd_NextCD</a> field) of the</a>
+expansion board(s) that matched the manufacturer and product IDs.
+
+    /* this structure is used by GetCurrentBinding() */
+    /* and SetCurrentBinding()                       */
+    struct CurrentBinding {
+        struct ConfigDev *cb_ConfigDev;    /* first configdev in chain */
+        UBYTE *          cb_FileName;      /* file name of driver */
+        UBYTE *          cb_ProductString; /* product # string */
+        UBYTE **         cb_ToolTypes;     /* tooltypes from disk object */
+    };
+
+<a href="../Includes_and_Autodocs_2._guide/node03B7.html">GetCurrentBinding()</a> allows the driver to find out the base address and
+other information about its board(s).  The driver must unset the CONFIGME
+bit in the cd_Flags field of the <a href="../Libraries_Manual_guide/node0416.html#line6">ConfigDev</a> structure for each board it
+intends to drive, and record the driver's Exec node pointer in the
+cd_Driver structure.  This node should contain the LN_NAME and LN_TYPE
+<a name="line53">(i.e., NT_DEVICE, NT_TASK, etc.) of the driver.</a>
+
+    Important Note:
+    ---------------
+    The <a href="../Includes_and_Autodocs_2._guide/node03B7.html">GetCurrentBinding()</a> function, and driver binding in general, must
+    be bracketed by an <a href="../Includes_and_Autodocs_2._guide/node03B9.html">ObtainConfigBinding()</a> and <a href="../Includes_and_Autodocs_2._guide/node03BC.html">ReleaseConfigBinding()</a>
+    semaphore. The BindDrivers command obtains this semaphore and
+    performs a <a href="../Includes_and_Autodocs_2._guide/node03BE.html">SetCurrentBinding()</a> before calling <a href="../Includes_and_Autodocs_2._guide/node035C.html">InitResident()</a>,
+    allowing the driver to simply do a GetCurrentBinding().
+
+Full source code for a disk-based Expansion or DEVS: sample device driver
+may be found in the Addison-Wesley Amiga ROM Kernel Reference Manual:
+Devices.  Autodocs for expansion.library functions may be found in the
+Addison-Wesley Amiga ROM Kernel Reference Manual: Includes and Autodocs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

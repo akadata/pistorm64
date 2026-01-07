@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_2" NODE="2-7-2" TITLE="2 / Hardware Control Commands / ADCMD_FINISH" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>2 / Hardware Control Commands / ADCMD_FINISH</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0033.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0035.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node04A7.html">ADCMD_FINISH</a> command aborts (calls <a href="../Includes_and_Autodocs_2._guide/node04A5.html">AbortIO()</a> ) the current write
+request on a channel or channels. This is useful if you have something
+playing, such as a long buffer or some repetitions of a buffer, and you
+want to stop it.
+
+<a href="../Includes_and_Autodocs_2._guide/node04A7.html">ADCMD_FINISH</a> has a flag you can set (ADIOF_SYNCCYCLE) that allows the
+waveform to finish the current cycle before aborting it. This is useful
+for splicing together sounds at zero crossings or some other place in the
+waveform where the amplitude at the end of one waveform matches the
+amplitude at the beginning of the next. Zero crossings are positions
+within the waveform at which the amplitude is zero. Splicing at zero
+crossings gives you fewer clicks and pops when the audio channel is turned
+off or the volume is changed.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

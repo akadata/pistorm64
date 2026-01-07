@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/hardblocks.h" NODE="MAIN" TITLE="Includes/devices/hardblocks.h" -->
+<head>
+<title>Includes/devices/hardblocks.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0040.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0042.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	DEVICES_HARDBLOCKS_H
+#define	DEVICES_HARDBLOCKS_H
+/*
+**	$Filename: devices/hardblocks.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.3 $
+**	$Date: 91/08/23 $
+**
+**	File System identifier blocks for hard disks
+**
+**	(C) Copyright 1988-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif /* EXEC_TYPES_H */
+
+
+/*--------------------------------------------------------------------
+ *
+ *	This file describes blocks of data that exist on a hard disk
+ *	to describe that disk.	They are not generically accessable to
+ *	the user as they do not appear on any DOS drive.  The blocks
+ *	are tagged with a unique identifier, checksummed, and linked
+ *	together.  The root of these blocks is the RigidDiskBlock.
+ *
+ *	The RigidDiskBlock must exist on the disk within the first
+ *	RDB_LOCATION_LIMIT blocks.  This inhibits the use of the zero
+ *	cylinder in an AmigaDOS partition: although it is strictly
+ *	possible to store the RigidDiskBlock data in the reserved
+ *	area of a partition, this practice is discouraged since the
+ *	reserved blocks of a partition are overwritten by &#034;Format&#034;,
+ *	&#034;Install&#034;, &#034;DiskCopy&#034;, etc.  The recommended disk layout,
+ *	then, is to use the first cylinder(s) to store all the drive
+ *	data specified by these blocks: i.e. partition descriptions,
+ *	file system load images, drive bad block maps, spare blocks,
+ *	etc.
+ *
+ *	Though only 512 byte blocks are currently supported by the
+ *	file system, this proposal tries to be forward-looking by
+ *	making the block size explicit, and by using only the first
+ *	256 bytes for all blocks but the LoadSeg data.
+ *
+ *------------------------------------------------------------------*/
+
+/*
+<a name="line48"> *  NOTE</a>
+<a name="line49"> *	optional block addresses below contain $ffffffff to indicate</a>
+<a name="line50"> *	a NULL address, as zero is a valid address</a>
+<a name="line51"> */</a>
+<a name="line52">struct RigidDiskBlock {</a>
+<a name="line53">    ULONG   rdb_ID;		/* 4 character identifier */</a>
+<a name="line54">    ULONG   rdb_SummedLongs;	/* size of this checksummed structure */</a>
+    LONG    rdb_ChkSum;		/* block checksum (longword sum to zero) */
+<a name="line56">    ULONG   rdb_HostID;		/* SCSI Target ID of host */</a>
+<a name="line57">    ULONG   rdb_BlockBytes;	/* size of disk blocks */</a>
+<a name="line58">    ULONG   rdb_Flags;		/* see below for defines */</a>
+<a name="line59">    /* block list heads */</a>
+    ULONG   rdb_BadBlockList;	/* optional bad block list */
+<a name="line61">    ULONG   rdb_PartitionList;	/* optional first partition block */</a>
+    ULONG   rdb_FileSysHeaderList; /* optional file system header block */
+<a name="line63">    ULONG   rdb_DriveInit;	/* optional drive-specific init code */</a>
+<a name="line64">				/* DriveInit(lun,rdb,ior): &#034;C&#034; stk &#038; d0/a0/a1 */</a>
+<a name="line65">    ULONG   rdb_Reserved1[6];	/* set to $ffffffff */</a>
+<a name="line66">    /* physical drive characteristics */</a>
+<a name="line67">    ULONG   rdb_Cylinders;	/* number of drive cylinders */</a>
+<a name="line68">    ULONG   rdb_Sectors;	/* sectors per track */</a>
+<a name="line69">    ULONG   rdb_Heads;		/* number of drive heads */</a>
+<a name="line70">    ULONG   rdb_Interleave;	/* interleave */</a>
+<a name="line71">    ULONG   rdb_Park;		/* landing zone cylinder */</a>
+<a name="line72">    ULONG   rdb_Reserved2[3];</a>
+    ULONG   rdb_WritePreComp;	/* starting cylinder: write precompensation */
+<a name="line74">    ULONG   rdb_ReducedWrite;	/* starting cylinder: reduced write current */</a>
+<a name="line75">    ULONG   rdb_StepRate;	/* drive step rate */</a>
+<a name="line76">    ULONG   rdb_Reserved3[5];</a>
+<a name="line77">    /* logical drive characteristics */</a>
+<a name="line78">    ULONG   rdb_RDBBlocksLo;	/* low block of range reserved for hardblocks */</a>
+<a name="line79">    ULONG   rdb_RDBBlocksHi;	/* high block of range for these hardblocks */</a>
+<a name="line80">    ULONG   rdb_LoCylinder;	/* low cylinder of partitionable disk area */</a>
+    ULONG   rdb_HiCylinder;	/* high cylinder of partitionable data area */
+<a name="line82">    ULONG   rdb_CylBlocks;	/* number of blocks available per cylinder */</a>
+    ULONG   rdb_AutoParkSeconds; /* zero for no auto park */
+<a name="line84">    ULONG   rdb_HighRDSKBlock;	/* highest block used by RDSK */</a>
+<a name="line85">				/* (not including replacement bad blocks) */</a>
+<a name="line86">    ULONG   rdb_Reserved4;</a>
+<a name="line87">    /* drive identification */</a>
+<a name="line88">    char    rdb_DiskVendor[8];</a>
+    char    rdb_DiskProduct[16];
+    char    rdb_DiskRevision[4];
+<a name="line91">    char    rdb_ControllerVendor[8];</a>
+<a name="line92">    char    rdb_ControllerProduct[16];</a>
+    char    rdb_ControllerRevision[4];
+    ULONG   rdb_Reserved5[10];
+<a name="line95">};</a>
+
+<a name="line97">#define	IDNAME_RIGIDDISK	0x5244534B	/* 'RDSK' */</a>
+<a name="line98"></a>
+<a name="line99">#define	RDB_LOCATION_LIMIT	16</a>
+
+<a name="line101">#define	RDBFB_LAST	0	/* no disks exist to be configured after */</a>
+#define	RDBFF_LAST	0x01L	/*   this one on this controller */
+<a name="line103">#define	RDBFB_LASTLUN	1	/* no LUNs exist to be configured greater */</a>
+#define	RDBFF_LASTLUN	0x02L	/*   than this one at this SCSI Target ID */
+<a name="line105">#define	RDBFB_LASTTID	2	/* no Target IDs exist to be configured */</a>
+#define	RDBFF_LASTTID	0x04L	/*   greater than this one on this SCSI bus */
+#define	RDBFB_NORESELECT 3	/* don't bother trying to perform reselection */
+<a name="line108">#define	RDBFF_NORESELECT 0x08L	/*   when talking to this drive */</a>
+<a name="line109">#define	RDBFB_DISKID	4	/* rdb_Disk... identification valid */</a>
+<a name="line110">#define	RDBFF_DISKID	0x10L</a>
+#define	RDBFB_CTRLRID	5	/* rdb_Controller... identification valid */
+#define	RDBFF_CTRLRID	0x20L
+<a name="line113">				/* added 7/20/89 by commodore: */</a>
+<a name="line114">#define RDBFB_SYNCH	6	/* drive supports scsi synchronous mode */</a>
+<a name="line115">#define RDBFF_SYNCH	0x40L	/* CAN BE DANGEROUS TO USE IF IT DOESN'T! */</a>
+<a name="line116"></a>
+<a name="line117">/*------------------------------------------------------------------*/</a>
+<a name="line118">struct BadBlockEntry {</a>
+<a name="line119">    ULONG   bbe_BadBlock;	/* block number of bad block */</a>
+<a name="line120">    ULONG   bbe_GoodBlock;	/* block number of replacement block */</a>
+};
+<a name="line122"></a>
+struct BadBlockBlock {
+<a name="line124">    ULONG   bbb_ID;		/* 4 character identifier */</a>
+    ULONG   bbb_SummedLongs;	/* size of this checksummed structure */
+    LONG    bbb_ChkSum;		/* block checksum (longword sum to zero) */
+<a name="line127">    ULONG   bbb_HostID;		/* SCSI Target ID of host */</a>
+<a name="line128">    ULONG   bbb_Next;		/* block number of the next BadBlockBlock */</a>
+<a name="line129">    ULONG   bbb_Reserved;</a>
+<a name="line130">    struct BadBlockEntry bbb_BlockPairs[61]; /* bad block entry pairs */</a>
+<a name="line131">    /* note [61] assumes 512 byte blocks */</a>
+<a name="line132">};</a>
+<a name="line133"></a>
+<a name="line134">#define	IDNAME_BADBLOCK		0x42414442	/* 'BADB' */</a>
+<a name="line135"></a>
+<a name="line136">/*------------------------------------------------------------------*/</a>
+struct PartitionBlock {
+<a name="line138">    ULONG   pb_ID;		/* 4 character identifier */</a>
+<a name="line139">    ULONG   pb_SummedLongs;	/* size of this checksummed structure */</a>
+<a name="line140">    LONG    pb_ChkSum;		/* block checksum (longword sum to zero) */</a>
+    ULONG   pb_HostID;		/* SCSI Target ID of host */
+    ULONG   pb_Next;		/* block number of the next PartitionBlock */
+<a name="line143">    ULONG   pb_Flags;		/* see below for defines */</a>
+    ULONG   pb_Reserved1[2];
+<a name="line145">    ULONG   pb_DevFlags;	/* preferred flags for OpenDevice */</a>
+<a name="line146">    UBYTE   pb_DriveName[32];	/* preferred DOS device name: BSTR form */</a>
+<a name="line147">				/* (not used if this name is in use) */</a>
+<a name="line148">    ULONG   pb_Reserved2[15];	/* filler to 32 longwords */</a>
+    ULONG   pb_Environment[17];	/* environment vector for this partition */
+    ULONG   pb_EReserved[15];	/* reserved for future environment vector */
+<a name="line151">};</a>
+<a name="line152"></a>
+<a name="line153">#define	IDNAME_PARTITION	0x50415254	/* 'PART' */</a>
+<a name="line154"></a>
+<a name="line155">#define	PBFB_BOOTABLE	0	/* this partition is intended to be bootable */</a>
+<a name="line156">#define	PBFF_BOOTABLE	1L	/*   (expected directories and files exist) */</a>
+<a name="line157">#define	PBFB_NOMOUNT	1	/* do not mount this partition (e.g. manually */</a>
+<a name="line158">#define	PBFF_NOMOUNT	2L	/*   mounted, but space reserved here) */</a>
+<a name="line159"></a>
+<a name="line160">/*------------------------------------------------------------------*/</a>
+<a name="line161">struct FileSysHeaderBlock {</a>
+<a name="line162">    ULONG   fhb_ID;		/* 4 character identifier */</a>
+    ULONG   fhb_SummedLongs;	/* size of this checksummed structure */
+    LONG    fhb_ChkSum;		/* block checksum (longword sum to zero) */
+    ULONG   fhb_HostID;		/* SCSI Target ID of host */
+<a name="line166">    ULONG   fhb_Next;		/* block number of next FileSysHeaderBlock */</a>
+<a name="line167">    ULONG   fhb_Flags;		/* see below for defines */</a>
+<a name="line168">    ULONG   fhb_Reserved1[2];</a>
+<a name="line169">    ULONG   fhb_DosType;	/* file system description: match this with */</a>
+<a name="line170">				/* partition environment's DE_DOSTYPE entry */</a>
+<a name="line171">    ULONG   fhb_Version;	/* release version of this code */</a>
+<a name="line172">    ULONG   fhb_PatchFlags;	/* bits set for those of the following that */</a>
+<a name="line173">				/*   need to be substituted into a standard */</a>
+				/*   device node for this file system: e.g. */
+				/*   0x180 to substitute SegList &#038; GlobalVec */
+<a name="line176">    ULONG   fhb_Type;		/* device node type: zero */</a>
+<a name="line177">    ULONG   fhb_Task;		/* standard dos &#034;task&#034; field: zero */</a>
+<a name="line178">    ULONG   fhb_Lock;		/* not used for devices: zero */</a>
+    ULONG   fhb_Handler;	/* filename to loadseg: zero placeholder */
+    ULONG   fhb_StackSize;	/* stacksize to use when starting task */
+<a name="line181">    LONG    fhb_Priority;	/* task priority when starting task */</a>
+    LONG    fhb_Startup;	/* startup msg: zero placeholder */
+    LONG    fhb_SegListBlocks;	/* first of linked list of LoadSegBlocks: */
+<a name="line184">				/*   note that this entry requires some */</a>
+<a name="line185">				/*   processing before substitution */</a>
+<a name="line186">    LONG    fhb_GlobalVec;	/* BCPL global vector when starting task */</a>
+<a name="line187">    ULONG   fhb_Reserved2[23];	/* (those reserved by PatchFlags) */</a>
+<a name="line188">    ULONG   fhb_Reserved3[21];</a>
+<a name="line189">};</a>
+<a name="line190"></a>
+#define	IDNAME_FILESYSHEADER	0x46534844	/* 'FSHD' */
+
+<a name="line193">/*------------------------------------------------------------------*/</a>
+<a name="line194">struct LoadSegBlock {</a>
+    ULONG   lsb_ID;		/* 4 character identifier */
+    ULONG   lsb_SummedLongs;	/* size of this checksummed structure */
+    LONG    lsb_ChkSum;		/* block checksum (longword sum to zero) */
+    ULONG   lsb_HostID;		/* SCSI Target ID of host */
+    ULONG   lsb_Next;		/* block number of the next LoadSegBlock */
+    ULONG   lsb_LoadData[123];	/* data for &#034;loadseg&#034; */
+    /* note [123] assumes 512 byte blocks */
+};
+
+#define	IDNAME_LOADSEG		0x4C534547	/* 'LSEG' */
+
+#endif	/* DEVICES_HARDBLOCKS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

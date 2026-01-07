@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="locale" NODE="ParseDate()" TITLE="locale.library/ParseDate" -->
+<head>
+<title>locale.library/ParseDate</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node045C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node045E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ParseDate -- interpret a string according to the date formatting
+		     template and convert it into a <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line51">DateStamp</a>. (V38)
+
+<b>   SYNOPSIS</b>
+	state = ParseDate(locale,date,fmtTemplate,getCharFunc);
+	D0	          A0     A1   A2          A3
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> ParseDate(struct <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> *,struct <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line51">DateStamp</a> *,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>,struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *);
+
+<b>   FUNCTION</b>
+	This function converts a stream of characters into an AmigaDOS
+	<a href="../Includes_and_Autodocs_3._guide/node05F8.html#line51">DateStamp</a> structure. The characters are obtained from the
+	getCharFunc callback hook and the formatting template is used
+	to direct the parse.
+
+<b>   INPUTS</b>
+	locale - the locale to use for the formatting
+	date - place to put the converted date, this may be NULL in which
+	       case this routine can be used to simply validate a date
+	fmtTemplate - the date template describing the expected format of the
+		      data. See <a href="../Includes_and_Autodocs_3._guide/node0456.html">FormatDate()</a> documentation for a description of
+		      date templates. The following formatting controls from
+		      <a href="../Includes_and_Autodocs_3._guide/node0456.html">FormatDate()</a> can be used in ParseDate():
+	                %a %A %b %B %d %e %h %H %I %m %M %p %S %y %Y
+	getCharFunc - a callback hook invoked whenever a character is required.
+		      The hook should return the next character to process,
+		      with a NULL character to indicate the end of the string.
+		      The hook is called with:
+
+		 	A0 - address of <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> structure
+	                A1 - locale pointer
+			A2 - NULL
+
+	              The hook returns the character to process in D0. Note
+		      that a complete 32-bit result is expected in D0, not
+		      just 8 bits.
+
+<b>   RESULT</b>
+	state - TRUE if the parsing went OK, or FALSE if the input did not
+		match the template
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0456.html">FormatDate()</a>, <a href="../Includes_and_Autodocs_3._guide/node05F8.html">&#060;dos/dos.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

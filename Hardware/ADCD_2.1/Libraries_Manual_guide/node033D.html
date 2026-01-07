@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-9-8" TITLE="27 / / Monitors, Modes and Display Database / Accessing DisplayInfo" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Monitors, Modes and Display Database / Accessing DisplayInfo</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node033C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node033E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Basic information about a display can be obtained by calling the Release 2
+graphics function <a href="../Includes_and_Autodocs_2._guide/node0446.html">GetDisplayInfoData()</a>.  You also call this function
+during the set up of a <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.
+
+   result = ULONG GetDisplayInfoData( DisplayInfoHandle handle, UBYTE *buf,
+<a name="line7">                                  ULONG size, ULONG tagID, ULONG modeID )</a>
+
+Set the handle argument to the <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line32">DisplayInfoHandle</a> returned by a previous
+call to <a href="../Libraries_Manual_guide/node033C.html#line4">FindDisplayInfo()</a>.  This function will also accept a 32-bit ModeID
+directly as an argument.  The handle argument should be set to NULL in
+that case.
+
+The buf argument points to a destination buffer you have set up to hold
+the information about the properties of the display.  The size argument
+gives the size of the buffer which depends on the type of inquiry you make.
+
+The tagID argument specifies the type information you want to know about
+and may be set as follows:
+
+    DTAG_DISP  Returns display properties and availability information
+               (the buffer should be set to the size of a <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line49">DisplayInfo</a>
+               structure).
+
+    DTAG_DIMS  Returns default dimensions and overscan information (the
+               buffer should be set to the size of a <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line91">DimensionInfo</a>
+               structure).
+
+    DTAG_MNTR  Returns monitor type, view position, scan rate, and
+               compatibility (the buffer should be set to the size of a
+               <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line108">MonitorInfo</a> structure).
+
+    DTAG_NAME  Returns the user friendly name for this mode (the buffer
+<a name="line34">               should be set to the size of a <a href="../Includes_and_Autodocs_2._guide/node00BD.html#line133">NameInfo</a> structure).</a>
+
+If the call succeeds, result is positive and reports the number of bytes
+actually transferred to the buffer.  If the call fails (no information for
+the ModeID was available), result is zero.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

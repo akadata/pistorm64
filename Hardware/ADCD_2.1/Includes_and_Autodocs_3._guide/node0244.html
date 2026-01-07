@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="UserState()" TITLE="exec.library/UserState" -->
+<head>
+<title>exec.library/UserState</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0243.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0245.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	UserState -- return to user state with user stack
+
+<b>   SYNOPSIS</b>
+	UserState(sysStack)
+		  D0
+
+	void UserState(APTR);
+
+<b>   FUNCTION</b>
+	Return to user state with user stack, from supervisor state with
+	user stack.  This function is normally used in conjunction with the
+	<a href="../Includes_and_Autodocs_3._guide/node0241.html">SuperState</a> function above.
+
+	This function must not be called from the user state.
+
+<b>   INPUT</b>
+	sysStack - supervisor stack pointer
+
+<b>   BUGS</b>
+	This function is broken in V33/34 Kickstart.  Fixed in V1.31 setpatch.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0241.html">SuperState()</a>, <a href="../Includes_and_Autodocs_3._guide/node0242.html">Supervisor()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

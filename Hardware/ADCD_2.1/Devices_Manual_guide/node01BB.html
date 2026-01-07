@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_ILBM" NODE="16-3-5" TITLE=" ILBM IFF Interleaved Bitmap / Appendix A. ILBM Regular Expression " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> ILBM IFF Interleaved Bitmap / Appendix A. ILBM Regular Expression </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01BA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01BC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here's a regular expression summary of the FORM ILBM syntax.  This could
+be an IFF file or a part of one.
+
+    ILBM ::= &#034;FORM&#034; #{    &#034;ILBM&#034; BMHD [CMAP] [GRAB] [DEST] [SPRT] [CAMG]
+                            CRNG* CCRT* [BODY]    }
+
+    BMHD ::= &#034;BMHD&#034; #{    BitMapHeader    }
+    CMAP ::= &#034;CMAP&#034; #{    (red green blue)*    } [0]
+    GRAB ::= &#034;GRAB&#034; #{    Point2D    }
+    DEST ::= &#034;DEST&#034; #{    DestMerge    }
+    SPRT ::= &#034;SPRT&#034; #{    SpritePrecedence    }
+    CAMG ::= &#034;CAMG&#034; #{    LONG    }
+
+    CRNG ::= &#034;CRNG&#034; #{    CRange    }
+    CCRT ::= &#034;CCRT&#034; #{    CycleInfo    }
+    BODY ::= &#034;BODY&#034; #{    UBYTE*    } [0]
+
+The token &#034;#&#034; represents a ckSize LONG count of the following {braced}
+data bytes.  E.g., a <a href="../Devices_Manual_guide/node01AF.html">BMHD</a>'s &#034;#&#034; should equal sizeof(BitMapHeader).
+Literal strings are shown in &#034;quotes&#034;, [square bracket items] are
+optional, and &#034;*&#034; means 0 or more repetitions.  A sometimes-needed pad
+byte is shown as &#034;[0]&#034;.
+
+The property chunks <a href="../Devices_Manual_guide/node01AF.html">BMHD</a>, <a href="../Devices_Manual_guide/node01B0.html">CMAP</a>, <a href="../Devices_Manual_guide/node01B1.html">GRAB</a>, <a href="../Devices_Manual_guide/node01B2.html">DEST</a>, <a href="../Devices_Manual_guide/node01B3.html">SPRT</a>, <a href="../Devices_Manual_guide/node01B4.html">CAMG</a> and any CRNG and
+CCRT data chunks may actually be in any order but all must appear before
+the <a href="../Devices_Manual_guide/node01B7.html">BODY</a> chunk since ILBM readers usually stop as soon as they read the
+BODY.  If any of the 6 property chunks are missing, default values are
+inherited from any shared properties (if the ILBM appears inside an IFF
+<a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a> with <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>s) or from the reader program's defaults.  If any property
+appears more than once, the last occurrence before the BODY is the one
+that counts since that's the one that modifies the BODY.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

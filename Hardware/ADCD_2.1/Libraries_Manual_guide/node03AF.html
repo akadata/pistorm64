@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-7-1-3" TITLE="28 / / Detecting Gel Collisions / VSprite Collision Mask" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Detecting Gel Collisions / VSprite Collision Mask</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03AE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03B0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line111">CollMask</a> member of the <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> is a pointer to a memory area allocated
+for holding the collision mask of that GEL.  This area must be in Chip
+memory and its size is the equivalent of one bitplane of the GEL's image.
+The collision mask is usually the same as the shadow mask of the GEL,
+formed from a logical-OR combination of all planes of the image.  The
+following figure shows an example collision mask.
+
+
+     If this is the        ...and this is the        ...then its
+    image in plane 1...    image in plane 2...       CollMask is:
+
+     &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;
+     &#183;*************&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;*************&#183;
+     &#183;&#183;*&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;*&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;*&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;*&#183;&#183;
+     &#183;&#183;&#183;*&#183;&#183;&#183;&#183;&#183;&#183;&#183;*&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;***&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;*&#183;&#183;***&#183;&#183;*&#183;&#183;&#183;
+     &#183;&#183;&#183;&#183;*&#183;&#183;&#183;&#183;&#183;*&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;*&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;*&#183;&#183;*&#183;&#183;*&#183;&#183;&#183;&#183;
+     &#183;&#183;&#183;&#183;&#183;*&#183;&#183;&#183;*&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;*&#183;&#183;&#183;*&#183;&#183;&#183;&#183;&#183;
+     &#183;&#183;&#183;&#183;&#183;&#183;*&#183;*&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;*&#183;*&#183;&#183;&#183;&#183;&#183;&#183;
+     &#183;&#183;&#183;&#183;&#183;&#183;&#183;*&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;*&#183;&#183;&#183;&#183;&#183;&#183;&#183;
+     &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;        &#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;
+
+                     Figure 28-3: A Collision Mask
+<a name="line24"></a>
+
+Alternatively, you may have a collision mask that is not derived from the
+image.  In this case, the actual image isn't relevant.  The system will
+not register collisions unless the other objects touch the collision mask.
+If the collision mask is smaller than the image, other objects will pass
+through the edges without a collision.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

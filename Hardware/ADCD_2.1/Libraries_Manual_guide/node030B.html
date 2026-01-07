@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_26" NODE="26-2-4" TITLE="26 / Servicing Interrupts / Interrupt Servers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>26 / Servicing Interrupts / Interrupt Servers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node030A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node030C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As <a href="../Libraries_Manual_guide/node0306.html">mentioned above</a>, an interrupt server is one of possibly many system
+interrupt routines that are invoked as the result of a single 4703
+interrupt. Interrupt servers provide an essential mechanism for interrupt
+<a name="line5">sharing.</a>
+
+Interrupt servers must be used for <a href="../Libraries_Manual_guide/node0303.html#line79">PORTS</a>, <a href="../Libraries_Manual_guide/node0303.html#line81">COPER</a>, <a href="../Libraries_Manual_guide/node0303.html#line81">VERTB</a>, <a href="../Libraries_Manual_guide/node0303.html#line99">EXTER</a>, or <a href="../Libraries_Manual_guide/node0303.html#line103">NMI</a>
+interrupts. For these interrupts, all servers are linked together in a
+chain. Every server in the chain will be called in turn as long as the
+previous server returned with the processor's Z (zero) flag set.  If you
+determine that an interrupt was specifically for your server, you should
+return with the processor's Z flag cleared (non-zero condition) so that
+the remaining servers on the chain will be skipped.
+
+    Use The Z Flag.
+    ---------------
+    <a href="../Libraries_Manual_guide/node0303.html#line81">VERTB</a> (vertical blank) servers should always return with the Z (zero)
+    flag set.  The processor Z flag is used rather than the normal
+    function convention of returning a result in D0 because it may be
+    tested more quickly by Exec upon the server's return.
+
+The easiest way to set the condition code register is to do an immediate
+move to the D0 register as follows:
+
+   SetZflag_Calls_Next:
+           MOVEQ   #0,D0
+           RTS
+
+   ClrZflag_Ends_Chain:
+           MOVEQ   #1,D0
+<a name="line31">           RTS</a>
+
+The same Exec <a href="../Libraries_Manual_guide/node0307.html">Interrupt</a> structure used for handlers is also used for
+servers.  Also, like interrupt handlers, servers must terminate their code
+<a name="line35">with an RTS instruction.</a>
+
+Interrupt servers are called in priority order.  The priority of a server
+is specified in its <a href="../Libraries_Manual_guide/node0307.html">is_Node</a>.<a href="../Libraries_Manual_guide/node02D9.html#line34">ln_Pri</a> field. Higher-priority servers are
+called earlier than lower-priority servers.  Adding and removing interrupt
+servers from a particular chain is accomplished with the Exec
+<a href="../Includes_and_Autodocs_2._guide/node0326.html">AddIntServer()</a> and <a href="../Includes_and_Autodocs_2._guide/node0371.html">RemIntServer()</a> functions.  These functions require you
+to specify both the 4703 interrupt number and a properly initialized
+<a name="line43"><a href="../Libraries_Manual_guide/node0307.html">Interrupt</a> structure.</a>
+
+Servers have different register values passed than handlers do.  A server
+cannot count on the D0, D1, A0, or A6 registers containing any useful
+information.  However, the highest priority system vertical blank server
+currently expects to receive a pointer to the custom chips A0.  Therefore,
+if you install a vertical blank server at priority 10 or greater, you must
+place custom ($DFF000) in A0 before exiting.  Other than that, a server is
+free to use D0-D1 and A0-A1/A5-A6 as scratch.
+
+ <a href="../Libraries_Manual_guide/node030C.html">Interrupt Server Register Usage</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

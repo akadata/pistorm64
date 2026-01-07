@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="commodities" NODE="AddIEvents()" TITLE="commodities.library/AddIEvents" -->
+<head>
+<title>commodities.library/AddIEvents</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00E0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00E2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AddIEvents -- add input events to commodities' input stream. (V36)
+
+<b>   SYNOPSIS</b>
+	AddIEvents(events)
+		   A0
+
+	VOID AddIEvents(struct <a href="../Includes_and_Autodocs_3._guide/node061A.html#line256">InputEvent</a> *);
+
+<b>   FUNCTION</b>
+	This function adds a null-terminated linked list of input events to
+	the input stream processed by commodities. It is a touch easier than
+	using the input device directly.
+
+	The contents of the input events are copied into commodity messages,
+	so they may be disposed of as soon as this call returns.
+
+	The messages are initially routed to the first broker in
+	commodities' object list.
+
+<b>   INPUTS</b>
+	events - the list of input events to add (may be NULL)
+
+<b>   WARNING</b>
+	The <a href="../Includes_and_Autodocs_3._guide/node0042.html">cx_lib/InvertString()</a> function creates lists of input events that
+	are in reverse order. Thus, passing the result of <a href="../Includes_and_Autodocs_3._guide/node0042.html">InvertString()</a>
+	to this function will insert a series of input events that will
+	generate a string that's a mirror image of the string passed to
+	<a href="../Includes_and_Autodocs_3._guide/node0042.html">InvertString()</a> originally.
+
+	The solution to the above is to either flip the string before
+	passing it to <a href="../Includes_and_Autodocs_3._guide/node0042.html">InvertString()</a>, or flip the resulting list of input
+	events.
+
+<b>   BUGS</b>
+	Prior to V40, this function did not copy the data pointed to by
+	ie_EventAddress for any events of type IECLASS_NEWPOINTERPOS.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node003E.html">cx_lib/FreeIEvents()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

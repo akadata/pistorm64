@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-2-6" TITLE="15 / GadTools Menus / Language-Sensitive Menus" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / GadTools Menus / Language-Sensitive Menus</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0256.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0258.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Allowing the application to switch the language displayed in the menus,
+can be done quite easily.  Simply detach the menu strip and replace the
+strings in the <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structures as described above.  It may be
+convenient to store some kind of index number in the <a href="../Libraries_Manual_guide/node0199.html">Menu</a> and <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a>
+<a href="../Libraries_Manual_guide/node024F.html#line118">UserData</a> which can be used to retrieve the appropriate string for the
+desired language.  After all the strings have been installed, call
+<a href="../Libraries_Manual_guide/node0252.html">LayoutMenus()</a> and <a href="../Libraries_Manual_guide/node0181.html">SetMenuStrip()</a>.
+
+If the application has the localized strings when the menus are being
+created, it simply places the pointers to the strings and command
+shortcuts into the appropriate fields of the <a href="../Libraries_Manual_guide/node024F.html">NewMenu</a> structure.  The menus
+may then be processed in the normal way.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

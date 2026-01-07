@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-2-2-5" TITLE="12 / / Writing The Dispatcher / RKMModel.c" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / Writing The Dispatcher / RKMModel.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0215.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0217.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following code, RKMModel.c,  makes up an initialization function and
+the dispatcher function for a private class informally called
+<a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a>.
+
+     <a href="../Libraries_Manual_guide/node0581.html">RKMModel.c</a> 
+
+Below is a diagram showing how an application could use an <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a>
+object:
+
+     <a href="../Libraries_Manual_guide/node05DF.html">Figure 12-5: Rkmmodelclass Object Diagram</a> 
+
+In this diagram, the application uses <a href="../Libraries_Manual_guide/node020A.html#line14">buttongclass</a> Boopsi gadgets to send
+<a name="line14">the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> the <a href="../Libraries_Manual_guide/node0210.html#line8">RKMMOD_Up</a> and <a href="../Libraries_Manual_guide/node0210.html#line8">RKMMOD_Down</a> attribute pulses.</a>
+
+The example takes advantage of an odd feature of <a href="../Libraries_Manual_guide/node020A.html#line14">buttongclass</a>.  When the
+user clicks on a buttongclass gadget, it sends an <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> to its
+<a href="../Libraries_Manual_guide/node020B.html#line20">ICA_TARGET</a>, even though no Boopsi attribute of buttongclass has changed.
+It does this because it's a convenient way to report button clicks.
+
+Whenever a gadget sends a notification, the list of attribute/value pairs
+in the <a href="../Libraries_Manual_guide/node0211.html#line56">OM_NOTIFY</a> message always contains the gadget's <a href="../Libraries_Manual_guide/node0501.html">GA_ID</a>. This is an
+easy way for the button to inform its target of its ID so the target knows
+which gadget sent the <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> message.  When a <a href="../Libraries_Manual_guide/node020A.html#line14">buttongclass</a> sends a
+notification because of a button click, it only sends out an OM_UPDATE
+about its GA_ID because none of its attributes changed.
+
+When the user clicks one of the buttons in the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> diagram, the
+button uses an <a href="../Libraries_Manual_guide/node020B.html#line63">ICA_MAP</a> to map its <a href="../Libraries_Manual_guide/node0501.html">GA_ID</a> to one of the &#034;dummy&#034; pulse
+attributes, <a href="../Libraries_Manual_guide/node0210.html#line8">RKMMOD_Up</a> and <a href="../Libraries_Manual_guide/node0210.html#line8">RKMMOD_Down</a>.  When the rkmmodel receives the
+<a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> message about RKMMOD_Up or RKMMOD_Down, it increments or
+decrements its internal value.
+
+There is one more important thing to note about <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a>. Looking at
+the rkmmodelclass Object diagram above, an rkmmodel's <a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a>
+changes because it received an <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> message from one of its gadgets.
+RKMMOD_CurrVal can also change if the application explicitly set
+<a name="line38">RKMMOD_CurrVal using <a href="../Libraries_Manual_guide/node0205.html">SetAttrs()</a> or <a href="../Libraries_Manual_guide/node0205.html#line5">SetGadgetAttrs()</a>.</a>
+
+The primary difference between the <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> message that <a href="../Libraries_Manual_guide/node0205.html">SetAttrs()</a> sends
+and the OM_SET message that <a href="../Libraries_Manual_guide/node0205.html#line5">SetGadgetAttrs()</a> sends is that SetAttrs()
+passes a NULL in <a href="../Libraries_Manual_guide/node020E.html#line37">opSet.ops_GInfo</a> instead of a <a href="../Libraries_Manual_guide/node0219.html#line23">GadgetInfo</a> pointer.  This
+doesn't present a problem for the rkmmodel object, because it doesn't use
+the GadgetInfo structure.  The problem is that when the rkmmodel notifies
+its targets, some of which are gadgets, they can't update their visual
+state because they need a GadgetInfo to render themselves.  For this
+reason, the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> dispatcher returns a positive non-zero value
+when an attribute change occurs that could cause a change in the visual
+state of any objects in its broadcast list.  An application that uses
+rkmmodelclass must test the return value when calling SetAttrs() on an
+rkmmodelclass object to tell if the attribute change requires a visual
+refresh of the gadgets (see the Intuition Autodocs for <a href="../Includes_and_Autodocs_2._guide/node0240.html">RefreshGadgets()</a>).
+
+    Boopsi Dispatchers Can Execute on Intuition's Context.
+    ------------------------------------------------------
+    Notice that the gadgets in the figure above send <a href="../Libraries_Manual_guide/node0211.html#line32">OM_UPDATE</a> messages
+    to the rkmmodel when the user manipulates them.  Because Intuition
+    handles the user input that triggers the OM_UPDATE messages,
+    Intuition itself is sending the OM_UPDATE messages.  This means the
+    <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> dispatcher must be able to run on Intuition's context,
+    which puts some limitations on what the dispatcher is permitted to
+    do: it can't use dos.library, it can't wait on application signals or
+    message ports, and it can't call any Intuition functions which might
+    wait on Intuition.
+
+Although <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> serves as an example of a class, it leaves a little
+to be desired in a real-world implementation.  To create the
+&#034;prop-integer-up/down&#034; super gadget from the diagram above, the
+application has to create, initialize, and link nine Boopsi objects, which
+is tedious, especially if the application needs several of these super
+gadgets.  Ideally, all these functions would be rolled into some subclass
+of <a href="../Libraries_Manual_guide/node020A.html">gadgetclass</a>.  If there were such a class, an application would only
+have to create one instance of this subclass to get such a gadget.  When
+the subclass received an <a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a> message, it would take care of creating,
+initializing, and linking all of the Boopsi objects that make up the whole
+super gadget.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

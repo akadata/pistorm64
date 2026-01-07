@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_18" NODE="18-1" TITLE="18 Exec Libraries / What is a Library?" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>18 Exec Libraries / What is a Library?</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0291.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0293.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A library consists of a group of functions somewhere in memory (ROM or
+RAM), a vector table, and a <a href="../Includes_and_Autodocs_2._guide/node009C.html#line32">Library</a> structure which can be followed by an
+optional private data area for the library.  The library's base pointer
+(as returned by <a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a>) points to the library's Library data
+<a name="line6">structure:</a>
+<a name="line7"></a>
+
+struct Library
+{
+    struct  Node lib_Node;
+    UBYTE   lib_Flags;
+    UBYTE   lib_pad;
+    UWORD   lib_NegSize;            /* number of bytes before library */
+    UWORD   lib_PosSize;            /* number of bytes after library */
+    UWORD   lib_Version;
+    UWORD   lib_Revision;
+    APTR    lib_IdString;
+    ULONG   lib_Sum;                /* the checksum itself */
+    UWORD   lib_OpenCnt;            /* number of current opens */
+};
+/* Meaning of the flag bits: */
+                               /* A task is currently running a checksum */
+#define LIBF_SUMMING (1 &#060;&#060; 0)  /* on this library (system maintains this */
+                               /* flag)                                  */
+#define LIBF_CHANGED (1 &#060;&#060; 1)  /* One or more entries have been changed  */
+                               /* in the library code vectors used by    */
+                               /* SumLibrary (system maintains this flag)*/
+
+#define LIBF_SUMUSED (1 &#060;&#060; 2)  /* A checksum fault should cause a system */
+                               /* panic (library flag)                   */
+#define LIBF_DELEXP (1 &#060;&#060; 3)   /* A user has requested expunge but       */
+                               /* another user still has the library     */
+                               /* open (this is maintained by library)   */
+
+
+ <a href="../Libraries_Manual_guide/node0293.html">Using a Library to Reference Data</a>    <a href="../Libraries_Manual_guide/node0294.html">Relationship of Libraries to Devices</a> 
+ <a href="../Libraries_Manual_guide/node0295.html">Minimum Subset of Library Vectors</a>    <a href="../Libraries_Manual_guide/node0296.html">Changing the Contents of a Library</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

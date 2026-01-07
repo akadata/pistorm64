@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-8-4-4" TITLE="28 / / Specifying Animation Object / Setting Up Ring Motion Control" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Specifying Animation Object / Setting Up Ring Motion Control</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03C7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03C9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To make a given component trigger a move of the <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a> you set the
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line44">RINGTRIGGER</a> bit of that <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a>'s <a href="../Libraries_Manual_guide/node03B9.html#line12">Flags</a> field. When the system software
+encounters this flag, it adds the values of <a href="../Libraries_Manual_guide/node03B9.html#line48">RingXTrans</a> and <a href="../Libraries_Manual_guide/node03B9.html#line48">RingYTrans</a> to
+the <a href="../Libraries_Manual_guide/node03C6.html">AnX and AnY</a> values of the controlling AnimOb.  The next time you
+execute <a href="../Libraries_Manual_guide/node038C.html">DrawGList()</a>, the drawing sequence will use the new position.
+
+You usually set <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line44">RINGTRIGGER</a> in only one of the animation components in a
+sequence (the last one); however, you can use this flag and the
+translation variables any way you wish.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

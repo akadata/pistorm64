@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_17" NODE="17-5-1" TITLE="17 / Libraries and Devices / Library Vector Offsets (LVOs)" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>17 / Libraries and Devices / Library Vector Offsets (LVOs)</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node028E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0290.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+After an application has successfully opened a library, it can start using
+the library's functions.  To access a library function, an application
+needs the library base address returned by <a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a> and the
+function's Library Vector Offset (LVO).  A function's LVO is the offset
+from the library's base address to the function's vector in the vector
+table, which means an LVO is a negative number (the vectors precedes the
+library base in memory).  Application code enters a library function by
+doing a jump to subroutine (the 680x0 instruction JSR) to the proper
+negative offset (LVO) from the address of the library base.  The library
+vector itself is a jump instruction (the 680x0 instruction JMP) to the
+actual library function which is somewhere in memory.
+
+
+                                Low Memory
+                                   /|\
+                                    |
+                    ________________|________________
+                   |                                 |
+                   |   JMP Function N (LVO=-(N*6))   |
+                   |                &#183;                |
+                   |                &#183;                |
+                   |    JMP Function 6 (LVO=-36)     |
+                   |    JMP Function 5 (LVO=-30)     |
+                   | JMP Function Reserved (LVO=-24) |
+                   | JMP Function Expunge (LVO=-18)  |
+                   |  JMP Function Close (LVO=-12)   |
+                   |   JMP Function Open (LVO=-6)    |
+   Library Base____|_________________________________|
+                   |                                 |
+                   |        Library Structure        |
+                   |_________________________________|
+                   |                                 |
+                   |            Data Area            |
+                   |_________________________________|
+                                    |
+                                    |
+                                   \|/
+                              High Memory
+
+
+                 Figure 17-1: An Exec Library Base in RAM
+
+
+The only legal way for an application to access a library function is
+through the vector table.  A function's LVO is always the same on every
+system and is not subject to change.  A function's jump vector can, and
+does, change.  Assuming that a function's jump vector is static is very
+<a name="line49">bad, so don't do it.</a>
+
+Each library has four vectors set aside for library housekeeping: <a href="../Libraries_Manual_guide/node0295.html#line2">OPEN</a>,
+<a href="../Libraries_Manual_guide/node0295.html#line7">CLOSE</a>, <a href="../Libraries_Manual_guide/node0295.html#line12">EXPUNGE</a>, and <a href="../Libraries_Manual_guide/node0295.html#line18">RESERVED</a>.  The OPEN vector points to a function that
+performs any custom initialization that this library needs, for example,
+opening other libraries that this library uses.  The CLOSE function takes
+care of any clean up necessary when an application closes a library.  The
+EXPUNGE vector points to a function that prepares the library for removal
+from the system.  Normally the OS will not remove a library from memory
+until the system needs the memory the library occupies.  The other vector,
+RESERVED, does not do anything at present and is reserved for future
+system use.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

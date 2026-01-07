@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="Vacate()" TITLE="exec.library/Vacate" -->
+<head>
+<title>exec.library/Vacate</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0388.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node038A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Vacate -- release a message lock (semaphore)
+
+SYNOPSIS
+    Vacate(semaphore)
+           A0
+
+    void Vacate(struct <a href="../Includes_and_Autodocs_2._guide/node0082.html#line53">Semaphore</a> *);
+
+FUNCTION
+    This function releases a previously locked semaphore (see
+    the <a href="../Includes_and_Autodocs_2._guide/node036A.html">Procure()</a> function).
+    If another task is waiting for the semaphore, its bidMessage
+    will be sent to its reply port.
+
+INPUT
+    semaphore - the semaport message port representing the
+    semaphore to be freed.
+
+BUGS
+    <a href="../Includes_and_Autodocs_2._guide/node036A.html">Procure()</a> and Vacate() do not have proven reliability.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node036A.html">Procure</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

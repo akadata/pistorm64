@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-6" TITLE="31 Commodities Exchange / Filter Objects and Input Description Strings" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange / Filter Objects and Input Description Strings</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0406.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0408.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Because not all commodities are interested in every input event that makes
+it way down the input chain, Commodities Exchange has a method for
+filtering them.  A filter <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> compares the <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a> it receives to
+<a name="line5">a pattern.  If a CxMessage matches the pattern, the filter diverts the</a>
+CxMessage down its personal list of CxObjects.
+
+<a name="line8">    CxObj *CxFilter(UBYTE *descriptionstring);</a>
+
+The C macro <a href="../Includes_and_Autodocs_2._guide/node014D.html">CxFilter()</a> (defined in &#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node00F0.html#line19">commodities.h</a>&#062;) returns a
+pointer to a filter <a href="../Libraries_Manual_guide/node0401.html">CxObject</a>.  The macro has only one argument, a pointer
+to a string describing which input events to filter.  The following
+regular expression outlines the format of the input event description
+string (<a href="../Libraries_Manual_guide/node0406.html">CX_POPKEY</a> uses the same description string format):
+
+<a name="line16">    [class]  {[-] (qualifier|synonym)}  [[-] upstroke]  [highmap|ANSICode]</a>
+
+Class can be any one of the class strings in the table below.  Each class
+string corresponds to a class of input event as defined in
+&#060;devices/<a href="../Includes_and_Autodocs_2._guide/node0051.html#line20">inputevent.h</a>&#062;.  Commodities Exchange will assume the class is
+rawkey if the class is not explicitly stated.
+
+
+     Class String      Input Event Class
+     ------------      -----------------
+    &#034;rawkey&#034;           IECLASS_RAWKEY
+    &#034;rawmouse&#034;         IECLASS_RAWMOUSE
+    &#034;event&#034;            IECLASS_EVENT
+    &#034;pointerpos&#034;       IECLASS_POINTERPOS
+    &#034;timer&#034;            IECLASS_TIMER
+    &#034;newprefs&#034;         IECLASS_NEWPREFS
+    &#034;diskremoved&#034;      IECLASS_DISKREMOVED
+    &#034;diskinserted&#034;     IECLASS_DISKINSERTED
+
+
+Qualifier is one of the qualifier strings from the table below.  Each
+string corresponds to an input event qualifier as defined in
+&#060;devices/<a href="../Includes_and_Autodocs_2._guide/node0051.html#line161">inputevent.h</a>&#062;).  A dash preceding the qualifier string tells the
+filter object not to care if that qualifier is present in the input event.
+Notice that there can be more than one qualifier (or none at all) in the
+input description string.
+
+
+   Qualifier String    Input Event Class
+   ----------------    -----------------
+    &#034;lshift&#034;           IEQUALIFIER_LSHIFT
+    &#034;rshift&#034;           IEQUALIFIER_RSHIFT
+    &#034;capslock&#034;         IEQUALIFIER_CAPSLOCK
+    &#034;control&#034;          IEQUALIFIER_CONTROL
+    &#034;lalt&#034;             IEQUALIFIER_LALT
+    &#034;ralt&#034;             IEQUALIFIER_RALT
+    &#034;lcommand&#034;         IEQUALIFIER_LCOMMAND
+    &#034;rcommand&#034;         IEQUALIFIER_RCOMMAND
+    &#034;numericpad&#034;       IEQUALIFIER_NUMERICPAD
+    &#034;repeat&#034;           IEQUALIFIER_REPEAT
+    &#034;midbutton&#034;        IEQUALIFIER_MIDBUTTON
+    &#034;rbutton&#034;          IEQUALIFIER_RBUTTON
+    &#034;leftbutton&#034;       IEQUALIFIER_LEFTBUTTON
+    &#034;relativemouse&#034;    IEQUALIFIER_RELATIVEMOUSE
+
+
+Synonym is one of the synonym strings from the table below.  These
+strings act as synonyms for groups of qualifiers.  Each string corresponds
+to a synonym identifier as defined in &#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node00F0.html#line184">commodities.h</a>&#062;.  A dash
+preceding the synonym string tells the filter object not to care if that
+synonym is present in the input event.  Notice that there can be more
+than one synonym (or none at all) in the input description string.
+
+
+    Synonym     Synonym
+    String     Identifier
+    -------    ----------
+    &#034;shift&#034;    IXSYM_SHIFT    /* look for either shift key */
+    &#034;caps&#034;     IXSYM_CAPS     /* look for either shift key or capslock */
+    &#034;alt&#034;      IXSYM_ALT      /* look for either alt key */
+
+
+Upstroke is the literal string &#034;upstroke&#034;.  If this string is absent, the
+filter considers only downstrokes.  If it is present alone, the filter
+considers only upstrokes.  If preceded by a dash, the filter considers
+both upstrokes and downstrokes.
+
+Highmap is one of the following strings:
+
+    &#034;space&#034;, &#034;backspace&#034;, &#034;tab&#034;, &#034;enter&#034;, &#034;return&#034;, &#034;esc&#034;, &#034;del&#034;,
+    &#034;up&#034;, &#034;down&#034;, &#034;right&#034;, &#034;left&#034;, &#034;f1&#034;, &#034;f2&#034;, &#034;f3&#034;, &#034;f4&#034;, &#034;f5&#034;,
+    &#034;f6&#034;, &#034;f7&#034;, &#034;f8&#034;, &#034;f9&#034;, &#034;f10&#034;, &#034;help&#034;.
+
+ANSICode is a single character (for example `a') that Commodities Exchange
+<a name="line90">looks up in the system default keymap.</a>
+
+Here are some example description strings.  For function key F2 with the
+left Shift and either Alt key pressed, the input description string would
+be:
+
+    &#034;rawkey lshift alt f2&#034;
+
+To specify the key that produces an `a' (this may or may not be the A key
+depending on the keymap), with or without any Shift, Alt, or control keys
+pressed use:
+
+    &#034;-shift -alt -control a&#034;
+
+For a mouse move with the right mouse button down, use:
+
+    &#034;rawmouse rbutton&#034;
+
+To specify a timer event use:
+
+    &#034;timer&#034;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

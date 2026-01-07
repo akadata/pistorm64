@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="MatchNext()" TITLE="dos.library/MatchNext" -->
+<head>
+<title>dos.library/MatchNext</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02CD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02CF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    MatchNext - Finds the next file or directory that matches pattern (V36)
+
+SYNOPSIS
+    error = MatchNext(AnchorPath)
+    D0                    D1
+
+    LONG MatchNext(struct <a href="../Includes_and_Autodocs_2._guide/node0070.html#line53">AnchorPath</a> *)
+
+FUNCTION
+    Locates the next file or directory that matches a given pattern.
+    See <a href="../Includes_and_Autodocs_2._guide/node0070.html">&#060;dos/dosasl.h&#062;</a> for more information.  Various bits in the flags
+    allow the application to control the operation of MatchNext().
+
+    See <a href="../Includes_and_Autodocs_2._guide/node02CD.html">MatchFirst()</a> for other notes.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node0070.html#line53">AnchorPath</a> - Place holder for search.  MUST be longword aligned!
+
+RESULT
+    error - 0 for success or error code.  (Opposite of most Dos calls)
+
+BUGS
+    See <a href="../Includes_and_Autodocs_2._guide/node02CD.html">MatchFirst()</a>.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02CD.html">MatchFirst()</a>, <a href="../Includes_and_Autodocs_2._guide/node02DB.html">ParsePattern()</a>, <a href="../Includes_and_Autodocs_2._guide/node029C.html">Examine()</a>, <a href="../Includes_and_Autodocs_2._guide/node028F.html">CurrentDir()</a>, <a href="../Includes_and_Autodocs_2._guide/node029C.html">Examine()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node02CC.html">MatchEnd()</a>, <a href="../Includes_and_Autodocs_2._guide/node02A0.html">ExNext()</a>, <a href="../Includes_and_Autodocs_2._guide/node0070.html">&#060;dos/dosasl.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

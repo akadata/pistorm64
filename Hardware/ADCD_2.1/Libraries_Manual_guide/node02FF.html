@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_25" NODE="25-1-2" TITLE="25 / Semaphore Functions / Multiple Semaphores" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>25 / Semaphore Functions / Multiple Semaphores</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02FE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0300.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The semaphore system has the ability to ask for ownership of a complete
+list of semaphores.  This can help prevent deadlocks when there are two or
+more tasks trying to get the same set of semaphores.  If task A gets
+semaphore 1 and tries to obtain semaphore 2 after task B has obtained
+semaphore 2 but before task B tries to obtain semaphore 1 then both tasks
+will hang.  Exec provides <a href="../Includes_and_Autodocs_2._guide/node0363.html">ObtainSemaphoreList()</a> and <a href="../Includes_and_Autodocs_2._guide/node036E.html">ReleaseSemaphoreList()</a>
+to prevent this problem.
+
+A semaphore list is a list header to a list that contains <a href="../Libraries_Manual_guide/node02F7.html">SignalSemaphore</a>
+structures.  The semaphore list must not contain any <a href="../Libraries_Manual_guide/node02F9.html">public</a> semaphores.
+This is because the semaphore list functions use the standard node
+<a name="line13">structures in the semaphore.</a>
+
+To arbitrate access to a semaphore list use another semaphore.  Create a
+<a href="../Libraries_Manual_guide/node02F9.html">public</a> semaphore and use it to arbitrate access to the list header of the
+semaphore list.  This also gives you a locking semaphore, protecting the
+<a href="../Includes_and_Autodocs_2._guide/node0363.html">ObtainSemaphoreList()</a> call.  Once you have gained access to the list with
+<a href="../Libraries_Manual_guide/node02FA.html">ObtainSemaphore()</a>, you may obtain all the semaphores on the list via
+ObtainSemaphoreList() (or get individual semaphores with
+ObtainSemaphore()).  When you are finished with the protected objects,
+release the semaphores on the list with <a href="../Includes_and_Autodocs_2._guide/node036E.html">ReleaseSemaphoreList()</a>, and then
+release the list semaphore via <a href="../Libraries_Manual_guide/node02FD.html">ReleaseSemaphore()</a>.
+
+For example:
+
+    ObtainSemaphore((struct SignalSemaphore *)SemaphoreList);
+    ObtainSemaphoreList(SemaphoreList-&#062;sl_List);
+
+    /* At this point the objects are protected, and can be manipulated */
+
+    ReleaseSemaphoreList(SemaphoreList-&#062;sl_List);
+    ReleaseSemaphore((struct SignalSemaphore *)SemaphoreList);
+
+See the <a href="../Libraries_Manual_guide/node02F7.html#line37">SharedList</a> structure above for an example of a semaphore structure
+with a list header.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

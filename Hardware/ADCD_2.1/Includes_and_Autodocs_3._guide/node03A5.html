@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="DisposeObject()" TITLE="intuition.library/DisposeObject" -->
+<head>
+<title>intuition.library/DisposeObject</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03A4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03A6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	DisposeObject -- Deletes a 'boopsi' object. (V36)
+
+<b>    SYNOPSIS</b>
+	DisposeObject( <a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> )
+	               A0
+
+	VOID DisposeObject( <a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> );
+
+<b>    FUNCTION</b>
+	Deletes a boopsi object and all of it auxiliary data.
+	These objects are all created by <a href="../Includes_and_Autodocs_3._guide/node03CB.html">NewObject()</a>.  Objects
+	of certain classes &#034;own&#034; other objects, which will also
+	be deleted when the object is passed to DisposeObject().
+	<a href="../Includes_and_Autodocs_3._guide/node01A0.html">Read</a> the per-class documentation carefully to be aware
+	of these instances.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> = abstract pointer to a boopsi object returned by <a href="../Includes_and_Autodocs_3._guide/node03CB.html">NewObject()</a>.
+		The pointer may be NULL, in which case this function has
+		no effect.
+
+<b>    NOTES</b>
+	This function invokes the OM_DISPOSE method.
+
+<b>    RESULT</b>
+	None.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03CB.html">NewObject()</a>, SetAttrs(), <a href="../Includes_and_Autodocs_3._guide/node03B5.html">GetAttr()</a>, <a href="../Includes_and_Autodocs_3._guide/node03C3.html">MakeClass()</a>,
+	Document &#034;Basic Object-Oriented Programming System for Intuition&#034;
+	and the &#034;boopsi Class Reference&#034; document.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

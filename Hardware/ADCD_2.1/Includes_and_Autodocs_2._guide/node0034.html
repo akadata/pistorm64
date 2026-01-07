@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/clib/utility_protos.h" NODE="MAIN" TITLE="Includes/clib/utility_protos.h" -->
+<head>
+<title>Includes/clib/utility_protos.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0033.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0035.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef  CLIB_UTILITY_PROTOS_H
+#define  CLIB_UTILITY_PROTOS_H
+/*
+**	$Filename: clib/utility_protos.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.6 $
+**	$Date: 91/02/13 $
+**
+**	C prototypes. For use with 32 bit integers only.
+**
+**	(C) Copyright 1990-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+#ifndef  UTILITY_TAGITEM_H
+#include &#060;utility/tagitem.h&#062;
+#endif
+#ifndef  UTILITY_DATE_H
+#include &#060;utility/date.h&#062;
+#endif
+#ifndef  UTILITY_HOOKS_H
+#include &#060;utility/hooks.h&#062;
+#endif
+/* *** TagItem FUNCTIONS *** */
+struct TagItem *FindTagItem( Tag tagVal, struct TagItem *tagList );
+ULONG GetTagData( Tag tagVal, unsigned long defaultVal,
+	struct TagItem *tagList );
+ULONG PackBoolTags( unsigned long initialFlags, struct TagItem *tagList,
+	struct TagItem *boolMap );
+struct TagItem *NextTagItem( struct TagItem **tagListPtr );
+void FilterTagChanges( struct TagItem *newTagList, struct TagItem *oldTagList,
+	long apply );
+void MapTags( struct TagItem *tagList, struct TagItem *mapList,
+	long includeMiss );
+struct TagItem *AllocateTagItems( unsigned long numItems );
+struct TagItem *CloneTagItems( struct TagItem *tagList );
+void FreeTagItems( struct TagItem *tagList );
+void RefreshTagItemClones( struct TagItem *cloneList,
+	struct TagItem *origList );
+BOOL TagInArray( Tag tagVal, Tag *tagArray );
+LONG FilterTagItems( struct TagItem *tagList, Tag *filterArray, long logic );
+
+/* *** HOOK FUNCTIONS *** * */
+ULONG CallHookPkt( struct Hook *hook, APTR object, APTR paramPacket );
+
+/* *** DATE FUNCTIONS *** * */
+void Amiga2Date( unsigned long amigaTime, struct ClockData *date );
+ULONG Date2Amiga( struct ClockData *date );
+ULONG CheckDate( struct ClockData *date );
+
+/* *** 32 BIT MATH FUNCTIONS *** * */
+LONG SMult32( long factor1, long factor2 );
+ULONG UMult32( unsigned long factor1, unsigned long factor2 );
+/* NOTE: Quotient:Remainder returned in d0:d1 */
+LONG SDivMod32( long dividend, long divisor );
+ULONG UDivMod32( unsigned long dividend, unsigned long divisor );
+
+/* *** International string routines *** */
+LONG Stricmp( UBYTE *string1, UBYTE *string2 );
+LONG Strnicmp( UBYTE *string1, UBYTE *string2, long length );
+UBYTE ToUpper( unsigned long character );
+UBYTE ToLower( unsigned long character );
+#endif	 /* CLIB_UTILITY_PROTOS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

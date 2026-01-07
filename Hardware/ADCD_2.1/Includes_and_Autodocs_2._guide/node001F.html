@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/clib/cia_protos.h" NODE="MAIN" TITLE="Includes/clib/cia_protos.h" -->
+<head>
+<title>Includes/clib/cia_protos.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node001E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0020.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef  CLIB_CIA_PROTOS_H
+#define  CLIB_CIA_PROTOS_H
+/*
+**	$Filename: clib/cia_protos.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 1.7 $
+**	$Date: 90/07/19 $
+**
+**	C prototypes. For use with 32 bit integers only.
+**
+**	(C) Copyright 1990-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+#ifndef  EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+#ifndef  EXEC_INTERRUPTS_H
+#include &#060;exec/interrupts.h&#062;
+#endif
+#ifndef  EXEC_LIBRARIES_H
+#include &#060;exec/libraries.h&#062;
+#endif
+struct Interrupt *AddICRVector( struct Library *resource, long iCRBit,
+	struct Interrupt *interrupt );
+void RemICRVector( struct Library *resource, long iCRBit,
+	struct Interrupt *interrupt );
+WORD AbleICR( struct Library *resource, long mask );
+WORD SetICR( struct Library *resource, long mask );
+#endif	 /* CLIB_CIA_PROTOS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/input" NODE="IND_SETMTRIG" TITLE="input.device/IND_SETMTRIG" -->
+<head>
+<title>input.device/IND_SETMTRIG</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04E3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04E5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    IND_SETMTRIG -- Set the conditions for a mouse port report
+
+FUNCTION
+    This command sets what conditions must be met by a mouse
+    before a pending Read request will be satisfied.  The trigger
+    specification is that used by the gameport device.
+
+IO REQUEST
+    io_Message      mn_ReplyPort set if quick I/O is not possible
+    io_Device       preset by the call to <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice</a>
+    io_Unit         preset by the call to <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice</a>
+    io_Command      IND_SETMTRIG
+    io_Flags        IOB_QUICK set if quick I/O is possible
+    io_Length       sizeof(gameportTrigger)
+    io_Data         a structure of type GameportTrigger, which
+                    has the following elements
+        gpt_Keys -
+                GPTB_DOWNKEYS set if button down transitions
+                trigger a report, and GPTB_UPKEYS set if button up
+                transitions trigger a report
+        gpt_Timeout -
+                a time which, if exceeded, triggers a report;
+                measured in vertical blank units (60/sec)
+        gpt_XDelta  -
+                a distance in x which, if exceeded, triggers a
+                report
+        gpt_YDelta  -
+                a distance in x which, if exceeded, triggers a
+                report
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

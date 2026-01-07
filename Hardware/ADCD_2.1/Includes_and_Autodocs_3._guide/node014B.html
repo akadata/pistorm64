@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="CreateDir()" TITLE="dos.library/CreateDir" -->
+<head>
+<title>dos.library/CreateDir</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node014A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node014C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	CreateDir -- Create a new directory
+
+<b>    SYNOPSIS</b>
+	lock = CreateDir( name )
+	D0		  D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node05F8.html#line129">BPTR</a> CreateDir(STRPTR)
+
+<b>    FUNCTION</b>
+	CreateDir creates a new directory with the specified name. An error
+	is returned if it fails.  Directories can only be created on
+	devices which support them, e.g. disks.  CreateDir returns an
+	exclusive lock on the new directory if it succeeds.
+
+<b>    INPUTS</b>
+	name - pointer to a null-terminated string
+
+<b>    RESULTS</b>
+	lock - BCPL pointer to a lock or NULL for failure.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock()</a>, <a href="../Includes_and_Autodocs_3._guide/node01C8.html">UnLock()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

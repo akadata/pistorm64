@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="III-1/SetFunc.txt" NODE="MAIN" TITLE="III-1: Using SetFunction() in a Debugger" TOC="AmigaMail_Vol2/III" -->
+<head>
+<title>III-1: Using SetFunction() in a Debugger</title>
+</head>
+<body>
+<a href="../AmigaMail_Vol2_guide/node0003.html"><img src="../images/toc.gif" alt="[Contents]" border=0></a>
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node007E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0080.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+By Ewout Walraven
+
+
+The Amiga OS consists of a set of libraries (and devices), which reside in
+ROM or on disk.  These libraries provide a set of routines which are
+shared by the Amiga tasks (hence the name shared library).
+
+The way in which an Amiga library is organized allows a programmer to
+change where the system looks for a library routine.  Exec provides a
+function to do this: SetFunction().  The SetFunction() routine redirects a
+library function call to an application-supplied function (Although this
+article doesn't address it, SetFunction() can also be used on Exec
+devices).  The SetPatch utility uses SetFunction().  SetPatch is a program
+which replaces some OS routines with improved ones, primarily to fix bugs
+in ROM libraries.
+
+Normally, programs should not attempt to ``improve'' library functions.
+Because most programmers do not know exactly what system library functions
+do internally, OS patches can do more harm than good. However, a useful
+place to use SetFunction() is in a debugger.  Using SetFunction(), a
+debugger can reroute library calls to a debugging function.  The debugging
+function can inspect the arguments to a library function call before
+calling the original library routine (if everything is OK).  Such a
+debugging function doesn't do any OS patching, it merely inspects.
+
+SetFunction() is also useful for testing an application under conditions
+it does not encounter normally.  For example, a debugging program can
+force a program's memory allocations to fail or prevent a program's window
+from opening.  This allows a programmer to find bugs that only arise under
+special circumstances.  Some programs that use SetFunction() for debugging
+purposes are IO_Torture, Memoration and MungWall.  A real watchdog is
+Wedge, which, as its name implies, allows you to install a wedge for
+practically every function of a standard library and inform you about the
+register values passed to the function.  These types of debugging tools
+helped debug release 2.0 of the OS and found bugs and 1.3 dependencies in
+commercial applications.
+
+Although useful, SetFunction()ing library routines poses several problems.
+First of all, the wedge routine will have to be re-entrant, like all Exec
+library functions.  Secondly, there is always a problem with removing the
+wedge.  If another task has SetFunction()ed the same library routine as
+the debugger (a very real possibility), it is not normally possible to
+remove the first wedge, since the other task depends on the presence of
+your task's code.  This would force your task to hang around, waiting for
+the other task(s) to remove their wedges. You also need to know when it is
+safe to unload your debugging code. Removing it while another task is
+executing it will quickly lead to a hopelessly crashed system.
+
+For those of you who might be thinking about writing down the ROM
+addresses returned by SetFunction() and using them in some other programs:
+Forget It.  The address returned by SetFunction() is only good on the
+current system at the current time.  Blindly jumping into ROM will cause
+your programs to break.
+
+ <a href="../AmigaMail_Vol2_guide/node0080.html">Exec Library Structure</a> 
+ <a href="../AmigaMail_Vol2_guide/node0081.html">Caveats</a> 
+ <a href="../AmigaMail_Vol2_guide/node0082.html">An Example Debugger</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

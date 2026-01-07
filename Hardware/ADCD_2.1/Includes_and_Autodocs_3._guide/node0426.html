@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="layers" NODE="InstallLayerInfoHook()" TITLE="layers.library/InstallLayerInfoHook" -->
+<head>
+<title>layers.library/InstallLayerInfoHook</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0425.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0427.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	InstallLayerInfoHook - Install a backfill hook for non-layer      (V39)
+
+<b>    SYNOPSIS</b>
+	oldhook=InstallLayerInfoHook(li,hook)
+	d0                           a0 a1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *InstallLayerInfoHook(struct <a href="../Includes_and_Autodocs_3._guide/node0625.html#line30">Layer_Info</a> *,struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *);
+
+<b>    FUNCTION</b>
+	This function will install a backfill hook for the <a href="../Includes_and_Autodocs_3._guide/node0625.html#line30">Layer_Info</a>
+	structure passed.  This backfill hook will be used to clear the
+	background area where no layer exists.  The hook function is
+	passed the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> and the bounds just like the layer backfill
+	hook.  Note that this hook could be called for any layer.
+
+<b>    INPUTS</b>
+	li - pointer to LayerInfo structure
+
+	hook -  pointer to layer callback <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> which will be called
+	        with object == (struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *) result-&#062;RastPort
+	        and message == [ (ULONG) undefined, (struct Rectangle) bounds ]
+
+	        This hook should fill the <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line26">Rectangle</a> in the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+	        with the BackFill pattern appropriate for rectangle given.
+
+	        If hook is LAYERS_BACKFILL, the default backfill is
+	        used.  (Same as pre-2.0)
+
+		If hook is LAYERS_NOBACKFILL, there will be no
+	        backfill.  (NO-OP).
+
+<b>    RESULTS</b>
+	oldhook - Returns the backfill hook that was in the <a href="../Includes_and_Autodocs_3._guide/node0625.html#line30">Layer_Info</a>.
+	          Returns LAYERS_BACKFILL if the default was installed.
+	          Returns LAYERS_NOBACKFILL if there was a NO-OP hook.
+	          Returns -1 if there was some failure.
+
+<b>    EXAMPLE</b>
+	See the example in <a href="../Includes_and_Autodocs_3._guide/node0425.html">InstallLayerHook</a>.  Note that both the <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a>
+	pointer and the OffsetX/Y values are not available in the
+	LayerInfo backfill hook.
+
+<b>    NOTES</b>
+	When the hook is first installed, it is *NOT* called.  It is up
+	to the application to know if it is safe to fill in the area.
+	Since the hook will be called when a layer is deleted, the easiest
+	way to have layers call this hook is to create and delete a backdrop
+	layer that is the size of the area.
+
+	Also, note that currently the first long word of the hook message
+	contains an undefined value.  This value may look like a layer pointer.
+	It is *not* a layer pointer.
+
+	The <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> you are passed back is the same one passed to the
+	function.  You should *not* use &#034;layered&#034; rendering functions
+	on this <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.  Generally, you will wish to do <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> operations
+	such as <a href="../Includes_and_Autodocs_3._guide/node02B2.html">BltBitMap()</a>.  The callback is a raw, low-level rendering
+	call-back.  If you need to call a rendering operation with a
+	<a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, make sure you use a copy of the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> and NULL the
+	<a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> pointer.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0425.html">InstallLayerHook()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

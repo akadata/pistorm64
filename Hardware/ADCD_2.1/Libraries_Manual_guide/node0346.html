@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-3-2" TITLE="27 / Advanced Topics / Creating a Double-Buffered Display" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / Advanced Topics / Creating a Double-Buffered Display</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0345.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0347.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To produce smooth animation or similar effects, it is occasionally
+necessary to double-buffer your display.  To prevent the user from seeing
+your graphics rendering while it is in progress, you will want to draw
+into one memory area while actually displaying a different area.
+
+There are two methods of creating and displaying a double-buffered
+display.  The simplest method is to create two complete Views and switch
+back and forth between them with <a href="../Libraries_Manual_guide/node0333.html">LoadView()</a> and <a href="../Libraries_Manual_guide/node0390.html">WaitTOF()</a>.
+
+The second method consists of creating two separate display areas and two
+sets of pointers to those areas for a single <a href="../Libraries_Manual_guide/node032B.html#line51">View</a>.  This is more
+complicated but takes less memory.
+
+  * Allocate one <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> structure and one <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> structure.
+
+  * Allocate two <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> structures and one <a href="../Libraries_Manual_guide/node032B.html#line69">RasInfo</a> structure. Initialize
+    each BitMap structure to describe one drawing area and allocate
+    memory for the bitplanes themselves. Initialize the RasInfo
+    structure, setting the <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line106">RasInfo.BitMap</a> field to the address of one of
+<a name="line21">    the two BitMaps you created.</a>
+
+  * Call <a href="../Libraries_Manual_guide/node0332.html#line9">MakeVPort()</a>, <a href="../Libraries_Manual_guide/node0332.html#line27">MrgCop()</a> and <a href="../Libraries_Manual_guide/node0333.html">LoadView()</a>. When you call MrgCop(),
+    the system uses the information you have provided to create a Copper
+    instruction list for the Copper to execute.  The system allocates
+    memory for a long-frame (LOF) Copper list and, if this is an
+    interlaced display, a short-frame (SHF) Copper list as well.  The
+    system places a pointer to the long-frame Copper list in
+    <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">View.LOFCprList</a> and a pointer to a short-frame Copper list (if this
+    is an interlaced display) in <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">View.SHFCprList</a>.  The Copper instruction
+    stream referenced by these pointers applies to the first <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>.
+
+  * Save the values in <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">View.LOFCprList</a> and <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">View.SHFCprlist</a> and reset
+    these fields to zero.  Place a pointer to the second <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> structure
+<a name="line35">    in the <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">RasInfo.BitMap</a> field.  Next call <a href="../Libraries_Manual_guide/node0332.html#line9">MakeVPort()</a> and <a href="../Libraries_Manual_guide/node0332.html#line27">MrgCop()</a>.</a>
+
+  * When you perform <a href="../Libraries_Manual_guide/node0332.html#line27">MrgCop()</a> with the Copper instruction list fields of
+    the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> set to zero, the system automatically allocates and fills in
+    a new list of instructions for the Copper.  Now you have created two
+    sets of instruction streams for the Copper, one that works with data
+    in the first <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> and the other that works with data in the second
+    BitMap.
+
+  * You can save pointers to the second list of Copper instructions as
+    well.  Then, to perform the double-buffering, alternate between the
+    two Copper lists.  The code for the double-buffering loop would be as
+    follows: call <a href="../Libraries_Manual_guide/node0390.html">WaitTOF()</a>, change the Copper instruction list pointers
+    in the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a>, call <a href="../Libraries_Manual_guide/node0333.html">LoadView()</a> to show one of the <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>s while drawing
+    into the other BitMap, and repeat.
+
+Remember that you will have to call <a href="../Libraries_Manual_guide/node0334.html">FreeCprList()</a> on both sets of Copper
+lists when you have finished.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

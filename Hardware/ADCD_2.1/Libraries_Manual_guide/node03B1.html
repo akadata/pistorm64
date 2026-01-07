@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-7-1-5" TITLE="28 / / Detecting Gel Collisions / VSprite HitMask and MeMask" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Detecting Gel Collisions / VSprite HitMask and MeMask</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03B0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03B2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Software collision detection is independently enabled and disabled for
+each GEL. Further, you can specify which of 16 possible collision routines
+you wish to have automatically executed.  <a href="../Libraries_Manual_guide/node03D1.html#line16">DoCollision()</a>, in addition to
+sensing an overlap between objects, uses these masks to determine which
+routine (if any) the system will call when a collision occurs.
+
+When the system determines a collision, it performs a logical-AND of the
+<a href="../Libraries_Manual_guide/node03B2.html">HitMask</a> of the upper-leftmost object in the colliding pair with the <a href="../Libraries_Manual_guide/node03B2.html">MeMask</a>
+of the lower-rightmost object of the pair.  The bits that are 1s after the
+logical-AND operation choose which one of the 16 possible collision
+<a name="line12">routines to perform.</a>
+
+  * If the collision is with the boundary, bit 0 is always a 1 and the
+    system calls the collision handling routine number 0.  Always assign
+    the routine that handles boundary collisions to vector 0 in the
+    collision handling table. The system uses the flag called BORDERHIT
+    to indicate that an object has landed on or moved beyond the
+    outermost bounds of the drawing area (the edge of the clipping
+    region).  The <a href="../Libraries_Manual_guide/node05F2.html#line73">VSprite example</a> earlier in this chapter uses collision
+    detection to check for border hits.
+
+  * If any one of the other bits (1 to 15) is set, then the system calls
+    your collision handling routine corresponding to the bit set.
+
+  * If more than one bit is set in both masks, the system calls the
+    vector corresponding to the rightmost (the least significant) bit
+    only.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

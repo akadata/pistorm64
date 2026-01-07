@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-3-1" TITLE="28 / Using Virtual Sprites / Specification of VSprite Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Virtual Sprites / Specification of VSprite Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0380.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0382.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The VSprite structure is defined in the include file &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line73">gels.h</a>&#062; as
+follows:
+
+    /* VSprite structure definition */
+    struct VSprite {
+        struct VSprite *NextVSprite;
+        struct VSprite *PrevVSprite;
+        struct VSprite *DrawPath;
+        struct VSprite *ClearPath;
+        WORD            OldY, OldX;
+        WORD            Flags;
+        WORD            Y, X;
+        WORD            Height;
+        WORD            Width;
+        WORD            Depth;
+        WORD            MeMask;
+        WORD            HitMask;
+        WORD           *ImageData;
+        WORD           *BorderLine;
+        WORD           *CollMask;
+        WORD           *SprColors;
+        struct Bob     *VSBob;
+        BYTE            PlanePick;
+        BYTE            PlaneOnOff;
+        VUserStuff      VUserExt;
+        };
+
+There are two primary ways to allocate and fill in space for VSprite data.
+They can be statically declared, or a memory allocation function can be
+called and they can be filled in programmatically.  The declaration to
+statically set up a VSprite structure is listed below.
+
+    /* VSprite static data definition.
+    ** must set the following for TRUE VSprites:
+    **    VSPRITE flag.
+    **    Width to 1.
+    **    Depth to 2.
+    **    VSBob to NULL.
+    */
+    struct VSprite myVSprite =
+        {
+        NULL, NULL, NULL, NULL, 0, 0, VSPRITE, 0, 0, 5, 1, 2, 0, 0,
+        &#038;myImage, 0, 0, &#038;mySpriteColors, NULL, 0x3, 0, 0
+        };
+
+This static allocation gives the required VSprite structure, but does not
+allocate or set up collision masks for the VSprite.  Note that the VSprite
+structure itself does not need to reside in Chip memory.
+
+Refer to the <a href="../Libraries_Manual_guide/node059C.html#line89">makeVSprite()</a> and <a href="../Libraries_Manual_guide/node059C.html#line288">freeVSprite()</a> functions in the <a href="../Libraries_Manual_guide/node059C.html">animtools.c</a>
+listing at the end of the chapter for an example of dynamically
+allocating, initializing and freeing a VSprite structure.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

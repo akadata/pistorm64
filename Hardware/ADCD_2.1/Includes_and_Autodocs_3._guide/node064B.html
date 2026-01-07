@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/exec/tasks.h" NODE="MAIN" TITLE="include/exec/tasks.h" -->
+<head>
+<title>include/exec/tasks.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node064A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node064C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_TASKS_H
+#define	EXEC_TASKS_H
+/*
+**	$VER: tasks.h 39.3 (18.9.1992)
+**	Includes Release 44.1
+**
+**	Task Control Block, Signals, and Task flags.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_NODES_H
+#include &#060;exec/nodes.h&#062;
+#endif /* EXEC_NODES_H */
+
+#ifndef EXEC_LISTS_H
+#include &#060;exec/lists.h&#062;
+#endif /* EXEC_LISTS_H */
+
+
+/* Please use Exec functions to modify task structure fields, where available.
+<a name="line23"> */</a>
+struct Task {
+    struct  Node tc_Node;
+    UBYTE   tc_Flags;
+    UBYTE   tc_State;
+    BYTE    tc_IDNestCnt;	    /* intr disabled nesting*/
+    BYTE    tc_TDNestCnt;	    /* task disabled nesting*/
+    ULONG   tc_SigAlloc;	    /* sigs allocated */
+    ULONG   tc_SigWait;	    /* sigs we are waiting for */
+    ULONG   tc_SigRecvd;	    /* sigs we have received */
+    ULONG   tc_SigExcept;	    /* sigs we will take excepts for */
+    UWORD   tc_TrapAlloc;	    /* traps allocated */
+    UWORD   tc_TrapAble;	    /* traps enabled */
+    APTR    tc_ExceptData;	    /* points to except data */
+    APTR    tc_ExceptCode;	    /* points to except code */
+    APTR    tc_TrapData;	    /* points to trap data */
+    APTR    tc_TrapCode;	    /* points to trap code */
+    APTR    tc_SPReg;		    /* stack pointer	    */
+    APTR    tc_SPLower;	    /* stack lower bound    */
+    APTR    tc_SPUpper;	    /* stack upper bound + 2*/
+    VOID    (*tc_Switch)();	    /* task losing CPU	  */
+    VOID    (*tc_Launch)();	    /* task getting CPU  */
+    struct  List tc_MemEntry;	    /* Allocated memory. Freed by RemTask() */
+    APTR    tc_UserData;	    /* For use by the task; no restrictions! */
+};
+
+/*
+ * Stack swap structure as passed to StackSwap()
+<a name="line51"> */</a>
+struct	StackSwapStruct {
+	APTR	stk_Lower;	/* Lowest byte of stack */
+	ULONG	stk_Upper;	/* Upper end of stack (size + Lowest) */
+	APTR	stk_Pointer;	/* Stack pointer at switch point */
+};
+
+/*----- Flag Bits ------------------------------------------*/
+#define TB_PROCTIME	0
+#define TB_ETASK	3
+#define TB_STACKCHK	4
+#define TB_EXCEPT	5
+#define TB_SWITCH	6
+#define TB_LAUNCH	7
+
+#define TF_PROCTIME	(1L&#060;&#060;0)
+#define TF_ETASK	(1L&#060;&#060;3)
+#define TF_STACKCHK	(1L&#060;&#060;4)
+#define TF_EXCEPT	(1L&#060;&#060;5)
+#define TF_SWITCH	(1L&#060;&#060;6)
+#define TF_LAUNCH	(1L&#060;&#060;7)
+
+/*----- Task States ----------------------------------------*/
+#define TS_INVALID	0
+#define TS_ADDED	1
+#define TS_RUN		2
+#define TS_READY	3
+#define TS_WAIT	4
+#define TS_EXCEPT	5
+#define TS_REMOVED	6
+
+/*----- Predefined Signals -------------------------------------*/
+#define SIGB_ABORT	0
+#define SIGB_CHILD	1
+#define SIGB_BLIT	4	/* Note: same as SINGLE */
+#define SIGB_SINGLE	4	/* Note: same as BLIT */
+#define SIGB_INTUITION	5
+#define	SIGB_NET	7
+#define SIGB_DOS	8
+
+#define SIGF_ABORT	(1L&#060;&#060;0)
+#define SIGF_CHILD	(1L&#060;&#060;1)
+#define SIGF_BLIT	(1L&#060;&#060;4)
+#define SIGF_SINGLE	(1L&#060;&#060;4)
+#define SIGF_INTUITION	(1L&#060;&#060;5)
+#define	SIGF_NET	(1L&#060;&#060;7)
+#define SIGF_DOS	(1L&#060;&#060;8)
+
+#endif	/* EXEC_TASKS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

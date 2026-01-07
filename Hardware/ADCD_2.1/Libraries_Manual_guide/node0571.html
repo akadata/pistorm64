@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_E" NODE="E-2-17" TITLE="E / Release 2 Changes That Can Affect Compatibility / Fonts" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>E / Release 2 Changes That Can Affect Compatibility / Fonts</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0570.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0572.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+  * Some font format changes (old format supported).
+
+  * Private format of .font files has changed (use FixFonts to create).
+
+  * Default fonts may be larger, proportional.
+
+  * Topaz is now sans-serif.
+
+  * Any size font will be created via scaling as long as <a href="../Libraries_Manual_guide/node03D6.html#line56">TextAttr.Flags</a>
+    <a href="../Libraries_Manual_guide/node03D6.html#line70">FPF_DESIGNED</a> bit is not set.  If you were asking for an extreme size,
+    like size 1 to get smallest available, or 999 to get largest
+    available, you will get a big (or very very small) surprise now.
+
+  * Do not use -1 for <a href="../Libraries_Manual_guide/node03D6.html#line56">TextAttr.Flags</a> or <a href="../Libraries_Manual_guide/node03D6.html#line47">Styles</a>, nor as the flags for
+    <a href="../Includes_and_Autodocs_2._guide/node0102.html#line94">AvailFonts</a> (one high bit now causes AvailFonts to return different
+    structures).  Only set what you know you want.  A kludge has been
+    added to the OS to protect applications which currently pass -1 for
+    AvailFonts flags.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

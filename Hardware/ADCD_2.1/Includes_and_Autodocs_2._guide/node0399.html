@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/layers" NODE="InstallClipRegion()" TITLE="layers.library/InstallClipRegion" -->
+<head>
+<title>layers.library/InstallClipRegion</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0398.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node039A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    InstallClipRegion -- Install clip region in layer
+
+SYNOPSIS
+    oldclipregion = InstallClipRegion( l,  region )
+    d0                                 a0  a1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00B7.html#line28">Region</a> *InstallClipRegion( struct <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line33">Layer</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00B7.html#line28">Region</a> *);
+
+FUNCTION
+    Installs a transparent Clip region in the layer. All
+    subsequent graphics calls will be clipped to this region.
+    You MUST remember to call InstallClipRegion(l,NULL) before
+    calling DeleteLayer(l) or the Intuition function <a href="../Includes_and_Autodocs_2._guide/node0208.html">CloseWindow()</a>
+    if you have installed a non-NULL ClipRegion in l.
+
+INPUTS
+    l - pointer to a layer
+    region - pointer to a region
+
+RESULTS
+    oldclipregion - The pointer to the previous ClipRegion that
+        was installed. Returns NULL if no previous ClipRegion installed.
+
+        Note: If the system runs out of memory while computing the
+            resulting ClipRects the LAYERS_CLIPRECTS_LOST bit will
+            be set in l-&#062;Flags.
+
+BUGS
+    If the system runs out of memory during normal layer operations,
+    the <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line63">ClipRect</a> list may get swept away and not restored.
+    As soon as there is enough memory and the layer library
+    gets called again the <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line63">ClipRect</a> list will be rebuilt.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node038E.html">BeginUpdate</a> <a href="../Includes_and_Autodocs_2._guide/node0396.html">EndUpdate</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node00C4.html">graphics/layers.h</a>, <a href="../Includes_and_Autodocs_2._guide/node00A1.html">graphics/clip.h</a>, <a href="../Includes_and_Autodocs_2._guide/node00B7.html">graphics/regions.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

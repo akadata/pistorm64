@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-23/ClassDoc.txt" NODE="IV-23-14" TITLE="frbuttonclass" -->
+<head>
+<title>frbuttonclass</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01AC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01AE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Class:                  frbuttonclass
+Superclass:             buttongclass
+Description:            A button gadget that knows how to outline its
+                        &#034;label&#034; within a shared &#034;frame image&#034;.
+
+New Methods:
+------------
+
+None.
+
+
+Changed Methods:
+----------------
+
+OM_NEW - Will set up its dimensions depending on GA_Image, including
+support for frame images.  If GA_Image understands the IM_FRAMEBOX
+method, dimensions are calculated to surround the &#034;label&#034; stashed in
+GadgetText, which can be GA_IntuiText, GA_Text, or GA_LabelImage.
+
+
+OM_SET - If you change the dimensions, this method will adjust the
+contents by using IM_FRAMEBOX with FRAMEIF_SPECIFY.
+
+
+GM_HITTEST - uses IM_HITFRAME.
+
+
+GM_RENDER - uses IM_DRAWFRAME.  First draws the frame, then draws the
+contents or label described under OM_NEW.
+
+
+Attributes:
+-----------
+
+GA_Width                        (IS)
+GA_Height                       (IS)
+
+If you change these, the contents will be readjusted and the gadget re-
+rendered.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

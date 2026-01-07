@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-2-1-2" TITLE="4 / / Opening A Window / Setting Window Attributes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / / Opening A Window / Setting Window Attributes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0103.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0105.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Depending on which function is used to open a window, the window's
+attributes may be specified using <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a>s, or a <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a> structure or an
+<a href="../Libraries_Manual_guide/node0102.html#line8">ExtNewWindow</a> structure.  In the <a href="../Libraries_Manual_guide/node05BC.html">code above</a>, the window attributes are set
+up with an array of TagItems:
+
+    struct TagItem win_tags[] =
+        {
+        {WA_Left,       MY_WIN_LEFT},
+        {WA_Top,        MY_WIN_TOP},
+        {WA_Width,      MY_WIN_WIDTH},
+        {WA_Height,     MY_WIN_HEIGHT},
+        {WA_CloseGadget,TRUE},
+        {WA_IDCMP,      IDCMP_CLOSEWINDOW},
+        {TAG_DONE, NULL},
+        };
+
+These window attributes set the window's position (<a href="../Libraries_Manual_guide/node0124.html">WA_Left, WA_Top</a>) and
+size (<a href="../Libraries_Manual_guide/node0124.html">WA_Width, WA_Height</a>), request a close gadget on the window
+(<a href="../Libraries_Manual_guide/node0125.html#line36">WA_CloseGadget</a>) and ask Intuition to send a message whenever the user
+activates the close gadget (<a href="../Libraries_Manual_guide/node0124.html#line35">WA_IDCMP</a>).
+
+Throughout this chapter window attributes are referred to by their TagItem
+ID name (the name is always prefixed with &#034;WA_&#034;).  See the section below
+on &#034;<a href="../Libraries_Manual_guide/node0122.html">Window Attributes</a>&#034; for a complete list.
+
+    Old and New Flag Names.
+    -----------------------
+    The names used for IDCMP flags and window flags have been changed
+    under Release 2.  IDCMP flag names are now preceded by &#034;IDCMP_&#034;.
+    Likewise window flag names are now preceded by &#034;WFLG_&#034;.  The old
+    names (and their new equivalents) are listed in
+    &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00E4.html">iobsolete.h</a>&#062;.  You may want to refer to this file if
+    you are working with example code written for V34 and older versions
+    of the OS.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

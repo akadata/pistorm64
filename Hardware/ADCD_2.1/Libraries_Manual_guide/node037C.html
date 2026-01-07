@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-2-1-2" TITLE="28 / / Sprite Functions / Changing The Appearance Of A Simple Sprite" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Sprite Functions / Changing The Appearance Of A Simple Sprite</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node037B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node037D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node0427.html">ChangeSprite()</a> function can be used to alter the appearance of a
+Simple Sprite.  ChangeSprite() substitutes new image data for the data
+currently used to display a Simple Sprite.  It is called by the following
+sequence:
+
+    struct ViewPort     *vp;
+    struct SimpleSprite *sprite;
+    APTR                newdata;
+
+    ChangeSprite(vp, sprite, newdata);
+
+The vp input to this function is a pointer to the <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a> for this Sprite
+or 0 if this Sprite is relative only to the current <a href="../Libraries_Manual_guide/node00F1.html#line4">View</a>.  The sprite
+argument is a pointer to a <a href="../Libraries_Manual_guide/node0379.html#line6">SimpleSprite</a> data structure.  (You must
+allocate an actual SimpleSprite structure for sprite to point to.)  Set
+newdata to the address of an image data structure containing the new
+<a name="line18">image.  The data must reside in Chip (<a href="../Libraries_Manual_guide/node02A8.html#line11">MEMF_CHIP</a>) memory.</a>
+
+The structure for the new sprite image data is shown below.  It is not a
+system structure, so it will not be found in the system includes, but it
+is described in the documentation for the <a href="../Includes_and_Autodocs_2._guide/node0427.html">ChangeSprite()</a> call.
+
+    struct spriteimage
+        {
+        UWORD posctl[2];  /* position and control data for this Sprite */
+
+        /* Two words per line of Sprite height, first of the two words
+         *  contains the MSB for color selection, second word contains
+         * LSB (colors 0,1,2,3 from allowable color register selection
+         *  set). Color '0' for any Sprite pixel makes it transparent.
+         */
+        UWORD data[height][2];  /* actual Sprite image */
+
+        UWORD reserved[2];  /* reserved, initialize to 0, 0 */
+        };
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

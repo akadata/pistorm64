@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="DrawImage()" TITLE="intuition.library/DrawImage" -->
+<head>
+<title>intuition.library/DrawImage</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03A8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03AA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	DrawImage -- <a href="../Includes_and_Autodocs_3._guide/node02CD.html">Draw</a> the specified <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> structure into a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+
+<b>    SYNOPSIS</b>
+	DrawImage( <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a>, LeftOffset, TopOffset )
+		   A0        A1     D0          D1
+
+	VOID DrawImage( struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a>	*, WORD, WORD );
+
+<b>    FUNCTION</b>
+	First, sets up the draw mode and pens in the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> according to the
+	arguments of the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> structure.  Then, moves the image data of
+	the image argument into the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, offset by the left and top
+	offsets.
+
+	This routine does window layer clipping if you pass your window's
+	(layered) <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> -- if you draw an image outside of your window,
+	your imagery will be clipped at the window's edge.  If you pass
+	a (non-layered) screen <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, you MUST be sure your image is
+	wholly contained within the rastport bounds.
+
+	If the NextImage field of the image argument is non-NULL,
+	the next image is rendered as well, and so on until some
+	NextImage field is found to be NULL.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> = pointer to the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> to receive image rendering
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> = pointer to an image structure
+	LeftOffset = the offset which will be added to the image's x coordinate
+	TopOffset = the offset which will be added to the image's y coordinate
+
+<b>    RESULT</b>
+	None
+
+<b>    NOTES</b>
+	Intuition always has and will continue to assume there are
+	at least as many planes of data pointed to by ImageData as there
+	are '1' bits in the PlanePick field.  Please ensure that
+	this is so.  (See the intuition.h include file for full details
+	on using PlanePick).
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03AA.html">DrawImageState()</a>, <a href="../Includes_and_Autodocs_3._guide/node03AE.html">EraseImage()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

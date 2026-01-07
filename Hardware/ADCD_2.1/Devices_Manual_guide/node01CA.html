@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-1-7" TITLE=" A Quick Introduction to IFF/ Advanced Topics" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> A Quick Introduction to IFF/ Advanced Topics</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01C9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01CB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a name="line2">CAT, LIST, and PROP</a>
+
+Sometimes you want to put several &#034;files&#034; into one, such as a picture
+library. This is what CAT is for.  It &#034;concatenates&#034; FORM and LIST chunks.
+
+          +--------------------+
+          |                    |
+          |   &#034;CAT &#034;           |  concatenation
+          |                    |
+          +--------------------+
+          |   48160            |  48160 data bytes
+          +--------------------+
+          |                    |
+          |   &#034;ILBM&#034;           |  This concatenation contains FORMs ILBM
+          |                    |
+          |  +--------------+  |
+          |  |  &#034;FORM&#034;      |  |  A FORM ILBM
+          |  |--------------|  |
+          |  |   24070      |  |
+          |  |--------------|  |
+          |  |  &#034;ILBM&#034;      |  |
+          |  |--------------|  |
+          |  |  ....        |  |
+          |  +--------------+  |
+          |                    |
+          |  +--------------+  |
+          |  |  &#034;FORM&#034;      |  |  Another FORM ILBM
+          |  |--------------|  |
+          |  |   24070      |  |
+          |  |--------------|  |
+          |  |  &#034;ILBM&#034;      |  |
+          |  |--------------|  |
+          |  |  ....        |  |
+          |  +--------------+  |
+          |                    |
+          +--------------------+
+
+This example CAT holds two ILBMs. It can be shown outline-style:
+
+  CAT ILBM
+  ..FORM ILBM   \
+  ....BMHD      | a complete FORM ILBM picture
+  ....CMAP      |
+  ....BODY      /
+  ..FORM ILBM
+  ....BMHD
+  ....CMAP
+<a name="line49">  ....BODY</a>
+
+Sometimes you want to share the same color map across many pictures. LIST
+and PROP do this:
+
+  LIST ILBM
+  ..PROP ILBM   default properties for FORMs ILBM
+  ....CMAP      an ILBM CMAP chunk (there could be a BMHD chunk here, too)
+  ..FORM ILBM
+  ....BMHD      (there could be a CMAP here to override the default)
+  ....BODY
+  ..FORM ILBM
+  ....BMHD      (there could be a CMAP here to override the default)
+	....BODY
+
+A LIST holds PROPs and <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>s (and occasionally LISTs and CATs).  A PROP
+<a href="../Devices_Manual_guide/node01AC.html">ILBM</a> contains default data (in the above example, just one <a href="../Devices_Manual_guide/node01B0.html">CMAP</a> chunk) for
+all FORMs ILBM in the LIST.  Any FORM may override the PROP-defined
+default with its own <a href="../Devices_Manual_guide/node01B0.html">CMAP</a>.  All PROPs must appear at the beginning of a
+LIST.  Each FORM type standardizes (among other things) which of its
+chunks are &#034;property chunks&#034; (may appear in PROPs) and which are &#034;data
+chunks&#034; (may not appear in PROPs).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

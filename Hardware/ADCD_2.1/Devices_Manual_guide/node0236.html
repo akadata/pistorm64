@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="ANIM.BRUSH.doc" TITLE="A / IFF Third Party Public Form and Chunk Specification / ANIM.brush.doc" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>A / IFF Third Party Public Form and Chunk Specification / ANIM.brush.doc</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0235.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0237.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+ANIM brush format
+
+                    Dpaint Anim Brush IFF Format
+
+             From a description by the author of DPaint,
+                      Dan Silva, Electronic Arts
+
+The &#034;Anim Brushes&#034; of DPaint III are saved on disk in the IFF &#034;ANIM&#034;
+format. Basically, an ANIM Form consists of an initial ILBM which is the
+first frame of the animation, and any number of subsequent &#034;ILBM&#034;S (which
+aren't really ILBM's) each of which contains an ANHD animation header
+chunk and a DLTA chunk comprised of the encoded difference between a frame
+and a previous one.
+
+To use ANIM terminology (for a description of the ANIM format, see the IFF
+Anim Spec, by Gary Bonham). Anim Brushes use a &#034;type 5&#034; encoding, which is
+a vertical, byte-oriented delta encoding (based on Jim Kent's RIFF).  The
+deltas have an interleave of 1, meaning deltas are computed between
+adjacent frames, rather than between frames 2 apart, which is the usual
+ANIM custom for the purpose of fast hardware page-flipping.  Also, the
+deltas use Exclusive Or to allow reversable play.
+
+However, to my knowledge, all the existing Anim players in the Amiga world
+will only play type 5 &#034;Anim&#034;s which have an interleave of 0 (i.e. 2) and
+which use a Store operation rather than Exclusive Or, so no existing
+programs will read Anim Brushes anyway.  The job of modifying existing
+Anim readers to read Anim Brushes should be simplified, however.
+
+Here is an outline of the structure of the IFF Form output by DPaint III
+as an &#034;Anim Brush&#034;.  The IFF Reader should of course be flexible enough to
+tolerate variation in what chunks actually appear in the initial ILBM.
+
+                  FORM ANIM
+                      . FORM ILBM         first frame
+                      . . BMHD
+                      . . CMAP
+                      . . DPPS
+                      . . GRAB
+                      . . CRNG
+                      . . CRNG
+                      . . CRNG
+                      . . CRNG
+                      . . CRNG
+                      . . CRNG
+                      . . DPAN     my own little chunk.
+                      . . CAMG
+                      . . BODY
+
+                      . FORM ILBM         frame 2
+                      . . ANHD                animation header chunk
+                      . . DLTA                delta mode data
+
+                      . FORM ILBM         frame 3
+                      . . ANHD                animation header chunk
+                      . . DLTA                delta mode data
+
+                      . FORM ILBM         frame 4
+                      . . ANHD                animation header chunk
+                      . . DLTA                delta mode data
+       ...
+                   . FORM ILBM         frame N
+                      . . ANHD                animation header chunk
+                      . . DLTA                delta mode data
+
+ <a href="../Devices_Manual_guide/node0237.html">DPAN Chunk Format</a> 
+ <a href="../Devices_Manual_guide/node0238.html">ANHD Chunk Format</a> 
+ <a href="../Devices_Manual_guide/node0239.html">RIFF</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

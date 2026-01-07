@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="afp()" TITLE="amiga.lib/afp" -->
+<head>
+<title>amiga.lib/afp</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node001C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node001E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	afp - Convert ASCII string variable into fast floating point
+
+<b>   SYNOPSIS</b>
+	ffp_value = afp(string);
+
+<b>    FUNCTION</b>
+	Accepts the address of the ASCII string in C format that is
+	converted into an FFP floating point number.
+
+	The string is expected in this Format:
+	{S}{digits}{'.'}{digits}{'E'}{S}{digits}
+	&#060;*******MANTISSA*******&#062;&#060;***EXPONENT***&#062;
+
+
+	Syntax rules:
+	Both signs are optional and are '+' or '-'. The mantissa must be
+	present. The exponent need not be present. The mantissa may lead
+	with a decimal point. The mantissa need not have a decimal point.
+	Examples: All of these values represent the number fourty-two.
+		     42 	   .042e3
+		     42.	  +.042e+03
+		    +42.	  0.000042e6
+		0000042.00	 420000e-4
+			     420000.00e-0004
+
+	Floating point range:
+	Fast floating point supports the value zero and non-zero values
+	within the following bounds -
+			18			       20
+	 9.22337177 x 10   &#062; +number &#062;	5.42101070 x 10
+			18			       -20
+	-9.22337177 x 10   &#062; -number &#062; -2.71050535 x 10
+
+	Precision:
+	This conversion results in a 24 bit precision with guaranteed
+	error less than or equal to one-half least significant bit.
+
+	INPUTS
+	string - Pointer to the ASCII string to be converted.
+
+
+	OUTPUTS
+	string - points to the character which terminated the scan
+	equ - fast floating point equivalent
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

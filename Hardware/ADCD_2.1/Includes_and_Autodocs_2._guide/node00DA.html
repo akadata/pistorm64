@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/classes.h" NODE="MAIN" TITLE="Includes/intuition/classes.h" -->
+<head>
+<title>Includes/intuition/classes.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00D9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00DB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	INTUITION_CLASSES_H
+#define INTUITION_CLASSES_H	1
+/*
+**  $Filename: intuition/classes.h $
+**  $Release: 2.04 Includes, V37.4 $
+**  $Revision: 36.2 $
+**  $Date: 91/11/08 $
+**
+**  Used only by class implementors
+**
+**  (C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef UTILITY_HOOKS_H
+#include &#060;utility/hooks.h&#062;
+#endif
+
+#ifndef	INTUITION_CLASSUSR_H
+#include &#060;intuition/classusr.h&#062;
+#endif
+<a name="line22"></a>
+/*******************************************/
+/*** &#034;White box&#034; access to struct IClass ***/
+/*******************************************/
+
+<a name="line27">/* This structure is READ-ONLY, and allocated only by Intuition */</a>
+<a name="line28">typedef struct IClass {</a>
+<a name="line29">    struct Hook		cl_Dispatcher;</a>
+<a name="line30">    ULONG		cl_Reserved;	/* must be 0  */</a>
+<a name="line31">    struct IClass	*cl_Super;</a>
+    ClassID		cl_ID;
+
+<a name="line34">    /* where within an object is the instance data for this class? */</a>
+<a name="line35">    UWORD		cl_InstOffset;</a>
+    UWORD		cl_InstSize;
+<a name="line37"></a>
+<a name="line38">    ULONG		cl_UserData;	/* per-class data of your choice */</a>
+    ULONG		cl_SubclassCount;
+<a name="line40">					/* how many direct subclasses?	*/</a>
+    ULONG		cl_ObjectCount;
+<a name="line42">				/* how many objects created of this class? */</a>
+<a name="line43">    ULONG		cl_Flags;</a>
+<a name="line44">#define	CLF_INLIST	0x00000001	/* class is in public class list */</a>
+} Class;
+<a name="line46"></a>
+<a name="line47">/* add offset for instance data to an object handle */</a>
+#define INST_DATA( cl, o )	((VOID *) (((UBYTE *)o)+cl-&#062;cl_InstOffset))
+
+/* sizeof the instance data for a given class */
+<a name="line51">#define SIZEOF_INSTANCE( cl )	((cl)-&#062;cl_InstOffset + (cl)-&#062;cl_InstSize \</a>
+			+ sizeof (struct _Object ))
+
+/**************************************************/
+/*** &#034;White box&#034; access to struct _Object	***/
+/**************************************************/
+
+/*
+ * We have this, the instance data of the root class, PRECEDING
+ * the &#034;object&#034;.  This is so that Gadget objects are Gadget pointers,
+ * and so on.  If this structure grows, it will always have o_Class
+ * at the end, so the macro OCLASS(o) will always have the same
+ * offset back from the pointer returned from NewObject().
+ *
+ * This data structure is subject to change.  Do not use the o_Node
+ * embedded structure.
+<a name="line67"> */</a>
+<a name="line68">struct _Object {</a>
+<a name="line69">    struct MinNode	o_Node;</a>
+    struct IClass	*o_Class;
+};
+
+<a name="line73">/* convenient typecast	*/</a>
+#define _OBJ( o )	((struct _Object *)(o))
+
+<a name="line76">/* get &#034;public&#034; handle on baseclass instance from real beginning of obj data */</a>
+#define BASEOBJECT( _obj )	( (Object *) (_OBJ(_obj)+1) )
+
+<a name="line79">/* get back to object data struct from public handle */</a>
+#define _OBJECT( o )		(_OBJ(o) - 1)
+
+<a name="line82">/* get class pointer from an object handle	*/</a>
+#define OCLASS( o )	( (_OBJECT(o))-&#062;o_Class )
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-12-6" TITLE="5 / String Gadget Type / StringInfo Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / String Gadget Type / StringInfo Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node016A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node016C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Libraries_Manual_guide/node0164.html">String</a> gadgets require their own special structure called the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line524">StringInfo</a>
+structure.
+
+    struct StringInfo
+        {
+        UBYTE *Buffer;
+        UBYTE *UndoBuffer;
+        WORD BufferPos;
+        WORD MaxChars;
+        WORD DispPos;
+        WORD UndoPos;
+        WORD NumChars;
+        WORD DispCount;
+        WORD CLeft, CTop;
+        struct StringExtend *Extension;
+        LONG LongInt;
+        struct KeyMap *AltKeyMap;
+<a name="line19">        };</a>
+
+Buffer
+    The application must supply an input buffer (Buffer) and an optional
+    undo buffer (UndoBuffer) for the gadget.  The input buffer is where
+    data typed into the gadget is placed by Intuition.  The program can
+    examine this buffer at any time.
+
+    A string copied into the input buffer before the gadget is added to
+    the system will be displayed in the gadget when it is displayed, and
+    may then be edited by the user.  The input buffer may be initialized
+    to any starting value, as long as the initial string is NULL
+    terminated and fits within the buffer.  To initialize the buffer to
+    the empty string (no characters), put a NULL in the first position of
+    the buffer.
+
+    <a href="../Libraries_Manual_guide/node0165.html">Integer</a> gadgets must have the ASCII value of the initial number
+<a name="line36">    placed into the Buffer before the gadget is added to the system.</a>
+
+UndoBuffer
+    If a <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget has an undo buffer, the undo feature will be
+    enabled.  &#034;Undo&#034; allows the user to revert to the initial string (the
+    value in the buffer before gadget activation) at any time before the
+    gadget becomes inactive.  The UndoBuffer is used to hold a copy of
+    the previous string while the user edits the current string.  When
+    the gadget is activated, the Buffer is copied to the UndoBuffer. The
+    Buffer may be restored at any time up to the time the gadget is
+    deactivated, by typing right-Amiga Q.
+
+    Multiple <a href="../Libraries_Manual_guide/node0164.html">string</a> gadgets may share the same undo buffer as long as the
+<a name="line49">    buffer is as large as the largest input buffer.</a>
+
+MaxChars
+    MaxChars tells Intuition the size of the input buffer. This count
+    includes the trailing NULL of any data entered into the buffer, so
+<a name="line54">    the number of characters the gadget may hold is MaxChars - 1.</a>
+
+BufferPos
+    BufferPos is initialized to the current position of the cursor in the
+    buffer.  BufferPos runs from zero to one less than the length of the
+    string.  If this position is not within the characters that will be
+    displayed, Intuition will adjust DispPos for the gadget to make the
+    cursor visible.
+
+DispPos
+    DispPos is initialized to the starting character in the string to
+    display on screen.  This allows strings longer than the number of
+    displayable characters to be positioned within the gadget.  Intuition
+    will not position the string such that there is empty character space
+    to the right of the string and characters scrolled out of the gadget
+    box to the left.
+
+UndoPos, NumChars, DispCount, CLeft and CTop
+    These variables are maintained by Intuition and should not be
+    modified by the application.  UndoPos specifies the character
+    position in the undo buffer.  NumChars specifies the number of
+    characters currently in the buffer.  DispCount specifies the number
+<a name="line76">    of whole characters visible in the <a href="../Libraries_Manual_guide/node0159.html">container</a>.</a>
+
+Extension
+    The StringInfo Extension allows for additional control over <a href="../Libraries_Manual_guide/node0164.html">string</a>
+<a name="line80">    gadget behavior and appearance.  <a href="../Libraries_Manual_guide/node016D.html">See below</a> for details.</a>
+
+LongInt
+    LongInt contains the integer value entered into an Integer type of
+    <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget.  After the user has finished entering an integer, the
+    application can read the value in this variable.
+
+ <a href="../Libraries_Manual_guide/node016C.html">Gadget Key Mapping</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

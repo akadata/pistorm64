@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_36" NODE="36-1" TITLE="36 Translator Library / Opening the Translator Library" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>36 Translator Library / Opening the Translator Library</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0490.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0492.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To use the <a href="../Libraries_Manual_guide/node0492.html">Translate()</a> function, you must first open the translator
+library. Setting a global variable, TranslatorBase, to the value returned
+from the call to <a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a> enables the Amiga linker to correctly
+locate the translator library:
+
+    struct Library *TranslatorBase;
+
+    TranslatorBase = OpenLibrary(&#034;translator.library&#034;,REVISION);
+    if(TranslatorBase != NULL)
+        {
+        /* use translator here -- library open */
+        }
+
+
+    LIBS: must contain translator.library.
+    --------------------------------------
+    Since translator is a disk-based library, the call to
+    <a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a> will work only if the LIBS: directory contains
+    translator.library.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

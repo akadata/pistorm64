@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-6-3" TITLE=" Standard File Structure / Scrap Files (not currently used) " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard File Structure / Scrap Files (not currently used) </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A &#034;scrap file&#034; is for maximum interconnectivity in getting data between
+programs; the core of a clipboard function.  Scrap files may have type
+&#034;IFF &#034; or filename extension &#034;.IFF&#034;.
+
+A scrap file is typically a <a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a>  containing alternate representations of
+the same basic information.  Include as many alternatives as you can
+readily generate.  This redundancy improves interconnectivity in
+situations where we can't make all programs read and write super-general
+formats.  [Inside Macintosh chapter &#034;Scrap Manager&#034;.]  E.g., a
+graphically-annotated musical score might be supplemented by a stripped
+down 4-voice melody and by a text (the lyrics).
+
+The originating program should write the alternate representations in
+order of &#034;preference&#034;: most preferred (most comprehensive) type to least
+preferred (least comprehensive) type.  A receiving program should either
+use the first appearing type that it understands or search for its own
+&#034;preferred&#034; type.
+
+A scrap file should have at most one alternative of any type.  (A <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a> of
+same type objects is OK as one of the alternatives.)  But don't count on
+this when reading; ignore extra sections of a type.  Then a program that
+reads scrap files can read something out of single purpose files.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

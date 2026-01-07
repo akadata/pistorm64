@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="NewObject()" TITLE="intuition.library/NewObject" -->
+<head>
+<title>intuition.library/NewObject</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03CA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03CC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	NewObjectA -- Create an object from a class. (V36)
+	NewObject -- Varargs stub for NewObjectA(). (V36)
+
+<b>    SYNOPSIS</b>
+	object = NewObjectA( class, classID, tagList )
+	D0                   A0     A1       A2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> NewObjectA( struct <a href="../Includes_and_Autodocs_3._guide/node05E6.html#line35">IClass</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> * );
+
+	object = NewObject( class, classID, Tag1, ... )
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> NewObject( struct <a href="../Includes_and_Autodocs_3._guide/node05E6.html#line35">IClass</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *, ULONG, ... );
+
+<b>    FUNCTION</b>
+	This is the general method of creating objects from 'boopsi' classes.
+	('Boopsi' stands for &#034;basic object-oriented programming system for
+	Intuition&#034;.)
+
+	You specify a class either as a pointer (for a private class) or
+	by its ID string (for public classes).  If the class pointer
+	is NULL, then the classID is used.
+
+	You further specify initial &#034;create-time&#034; attributes for the
+	object via a <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> list, and they are applied to the resulting
+	generic data object that is returned.  The attributes, their meanings,
+	attributes applied only at create-time, and required attributes
+	are all defined and documented on a class-by-class basis.
+
+<b>    INPUTS</b>
+	class = abstract pointer to a boopsi class gotten via <a href="../Includes_and_Autodocs_3._guide/node03C3.html">MakeClass()</a>.
+	classID = the name/ID string of a public class.  This parameter is
+		only used if 'class' is NULL.
+	tagList = pointer to array of TagItems containing attribute/value
+		pairs to be applied to the object being created
+
+<b>    RESULT</b>
+	A boopsi object, which may be used in different contexts such
+	as a gadget or image, and may be manipulated by generic functions.
+	You eventually free the object using <a href="../Includes_and_Autodocs_3._guide/node03A5.html">DisposeObject()</a>.
+
+<b>    NOTES</b>
+	This function invokes the OM_NEW &#034;method&#034; for the class specified.
+
+<b>    BUGS</b>
+	Typedef's for 'Object' and 'Class' are defined in the include
+	files but not used consistently.  The generic type <a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> is
+	probably best used for object and class &#034;handles&#034;, with the
+	type (UBYTE *) used for classID strings.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03A5.html">DisposeObject()</a>, SetAttrs(), <a href="../Includes_and_Autodocs_3._guide/node03B5.html">GetAttr()</a>, <a href="../Includes_and_Autodocs_3._guide/node03C3.html">MakeClass()</a>,
+	Document &#034;Basic Object-Oriented Programming System for Intuition&#034;
+	and the &#034;boopsi Class Reference&#034; document.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

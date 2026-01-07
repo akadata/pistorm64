@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/HP_Laserjet_Makefile" NODE="MAIN" TITLE="Devices/Dev_examples/HP_Laserjet_Makefile" -->
+<head>
+<title>Devices/Dev_examples/HP_Laserjet_Makefile</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0180.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0182.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+LC = lc:lc
+ASM = lc:asm
+CFLAGS = -iINCLUDE: -b0 -d0 -v
+ASMFLAGS = -iINCLUDE:
+LINK = lc:blink
+LIB = lib:amiga.lib+lib:lc.lib
+OBJ = printertag.o+init.o+data.o+dospecial.o+render.o+transfer.o+density.o
+TARGET = hp_laserjet
+
+        @$(LC) $(CFLAGS) $*
+
+$(TARGET): printertag.o init.o data.o dospecial.o render.o density.o transfer.o
+        @$(LINK) &#060;WITH &#060;
+        FROM $(OBJ)
+        TO $(TARGET)
+        LIBRARY $(LIB)
+        NODEBUG SC SD VERBOSE MAP $(TARGET).map H
+        &#060;
+
+init.o: init.asm
+        @$(ASM) $(ASMFLAGS) init.asm
+
+printertag.o: printertag.asm hp_rev.i
+        @$(ASM) $(ASMFLAGS) printertag.asm
+
+transfer.o: transfer.asm
+        @$(ASM) $(ASMFLAGS) transfer.asm
+
+dospecial.o: dospecial.c
+
+data.o: data.c
+
+density.o: density.c
+
+render.o: render.c
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

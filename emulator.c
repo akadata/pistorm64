@@ -120,6 +120,7 @@ static void set_realtime_priority(const char* name, int prio);
 static void apply_realtime_from_env(const char* role, int default_prio);
 static void amiga_reset_and_wait(const char* tag);
 static void amiga_warmup_bus(void);
+static void configure_ipl_nops(void);
 
 #define MUSASHI_HAX
 
@@ -143,10 +144,12 @@ extern int m68ki_remaining_cycles;
 #endif
 
 #define NOP                                                                                        \
-  asm("nop");                                                                                      \
-  asm("nop");                                                                                      \
-  asm("nop");                                                                                      \
-  asm("nop");
+  do {                                                                                             \
+    asm volatile("nop");                                                                           \
+    asm volatile("nop");                                                                           \
+    asm volatile("nop");                                                                           \
+    asm volatile("nop");                                                                           \
+  } while (0)
 
 #define DEBUG_EMULATOR
 #ifdef DEBUG_EMULATOR
@@ -184,9 +187,28 @@ static void amiga_reset_and_wait(const char* tag) {
   printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
 }
 
+static void configure_ipl_nops(void) {
+  unsigned int value = ipl_nop_count_default;
+  const char* env = getenv("PISTORM_IPL_NOP_COUNT");
+  if (env && *env) {
+    unsigned long parsed = strtoul(env, NULL, 10);
+    if (parsed > 4096ul) parsed = 4096ul;
+    value = (unsigned int)parsed;
+  } else if (loop_cycles > 300) {
+    unsigned long scaled = ((unsigned long)ipl_nop_count_default * (unsigned long)loop_cycles) / 300ul;
+    if (scaled < ipl_nop_count_default) scaled = ipl_nop_count_default;
+    if (scaled > 4096ul) scaled = 4096ul;
+    value = (unsigned int)scaled;
+  }
+  ipl_nop_count = value;
+  printf("[CFG] IPL NOP count: %u\n", ipl_nop_count);
+}
+
 // Configurable emulator options
 unsigned int cpu_type = M68K_CPU_TYPE_68000;
 unsigned int loop_cycles = 300;
+static unsigned int ipl_nop_count = 8;
+static const unsigned int ipl_nop_count_default = 8;
 unsigned int irq_status = 0;
 
 static const unsigned int loop_cycles_cap = 10000; // cap slices to keep service latency reasonable
@@ -264,10 +286,12 @@ void* ipl_task(void* args) {
       Deterministic, low-jitter pacing for the IPL/status polling path.
       This prevents hammering TXN_IN_PROGRESS, gives the CPLD state machine
       time to advance, and avoids scheduler noise vs usleep(). It also reduces
-      contention with the main emulation loop. Removing or shrinking this can
-      cause instability, missed edges, or worse overall latency.
+      contention with the main emulation loop. Removing or reducing this can
+      destabilize polling and steal time from the main emulation loop.
     */
-    NOP NOP NOP NOP NOP NOP NOP NOP
+    for (unsigned int i = 0; i < ipl_nop_count; i++) {
+      NOP;
+    }
     // NOP NOP NOP NOP NOP NOP NOP NOP
     // NOP NOP NOP NOP NOP NOP NOP NOP
     /*NOP NOP NOP NOP NOP NOP NOP NOP
@@ -821,6 +845,7 @@ switch_config:
              loop_cycles_cap);
       loop_cycles = loop_cycles_cap;
     }
+    configure_ipl_nops();
     if (!enable_jit_backend && cfg->enable_jit) {
       enable_jit_backend = 1;
       printf("[CFG] JIT backend enabled via config.\n");

@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/diskfont" NODE="OpenDiskFont()" TITLE="diskfont.library/OpenDiskFont" -->
+<head>
+<title>diskfont.library/OpenDiskFont</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01F6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01F8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    OpenDiskFont - load and get a pointer to a disk font.
+
+SYNOPSIS
+    font = OpenDiskFont(textAttr)
+    D0                  A0
+
+FUNCTION
+    This function finds the font with the specified textAttr on
+    disk, loads it into memory, and returns a pointer to the font
+    that can be used in subsequent <a href="../Includes_and_Autodocs_2._guide/node0479.html">SetFont</a> and <a href="../Includes_and_Autodocs_2._guide/node042E.html">CloseFont</a> calls.
+    It is important to match this call with a corresponding
+    <a href="../Includes_and_Autodocs_2._guide/node042E.html">CloseFont</a> call for effective management of font memory.
+
+    If the font is already in memory, the copy in memory is used.
+    The disk copy is not reloaded.
+
+INPUTS
+    textAttr - a <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line66">TextAttr</a> structure that describes the text font
+            attributes desired.
+
+RESULTS
+    D0 is zero if the desired font cannot be found.
+
+NOTES
+    As of V36, OpenDiskFont() will automatically attempt to
+    construct a font for you if:
+
+            You have requested a font size which does not exist
+            as a designed font, and
+
+            You have not set the DESIGNED bit in the ta_Flags
+            field of the <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line66">TextAttr</a>, or <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line73">TTextAttr</a> struct.
+
+    Constructed fonts are created by scaling a designed font.
+    A designed font is one which typically resides on disk,
+    or in ROM (e.g., a font which has been designed by hand
+    using a drawing tool).  Designed fonts generally look better
+    than fonts constructed by the font scaler, but designed
+    fonts also require disk space for each font size.
+
+    Always set the DESIGNED bit if you do not want constructed fonts,
+    or use <a href="../Includes_and_Autodocs_2._guide/node01F3.html">AvailFonts()</a> to find out which font sizes already exist.
+
+BUGS
+    This routine will not work well with font names whose file
+    name components are longer than the maximum allowed
+    (30 characters).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

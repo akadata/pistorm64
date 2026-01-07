@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="FindPort()" TITLE="exec.library/FindPort" -->
+<head>
+<title>exec.library/FindPort</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node034E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0350.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    FindPort -- find a given system message port
+
+SYNOPSIS
+    port = FindPort(name)
+    D0              A1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *FindPort(STRPTR);
+
+FUNCTION
+    This function will search the system message port list for a port
+    with the given name.  The first port matching this name will be
+    returned.  No arbitration of the port list is done.  This function
+    MUST be protected with A <a href="../Includes_and_Autodocs_2._guide/node0369.html">Forbid()/Permit()</a> pair!
+
+EXAMPLE
+    #include <a href="../Includes_and_Autodocs_2._guide/node0096.html">&#060;exec/types.h&#062;</a>
+    struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *FindPort();
+
+    ULONG SafePutToPort(message, portname)
+    struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line48">Message</a> *message;
+    STRPTR          portname;
+    {
+    struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *port;
+
+        Forbid();
+            port = FindPort(portname);
+            if (port)
+                PutMsg(port,message);
+        Permit();
+        return((ULONG)port); /* If zero, the port has gone away */
+    }
+
+INPUT
+    name - name of the port to find
+
+RETURN
+    port - a pointer to the message port, or zero if
+            not found.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

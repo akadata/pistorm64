@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="AddBuffers()" TITLE="dos.library/AddBuffers" -->
+<head>
+<title>dos.library/AddBuffers</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0139.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node013B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AddBuffers -- Changes the number of buffers for a filesystem (V36)
+
+<b>   SYNOPSIS</b>
+	success = AddBuffers(filesystem, number)
+	D0		       D1          D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> AddBuffers(STRPTR, LONG)
+
+<b>   FUNCTION</b>
+	Adds buffers to a filesystem.  If it succeeds, the number of current
+	buffers is returned in <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>.  Note that &#034;number&#034; may be negative.
+	The amount of memory used per buffer, and any limits on the number of
+	buffers, are dependant on the filesystem in question.
+	If the call succeeds, the number of buffers in use on the filesystem
+	will be returned by <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>.
+
+<b>   INPUTS</b>
+	filesystem - Name of device to add buffers to (with ':').
+	number     - Number of buffers to add.  May be negative.
+
+<b>   RESULT</b>
+	success    - Success or failure of command.
+
+<b>   BUGS</b>
+	The V36 ROM filesystem (FFS/OFS) doesn't return the right number of
+	buffers unless preceded by an AddBuffers(fs,-1) (in-use buffers aren't
+	counted).  This is fixed in V37.
+
+	The V37 and before ROM filesystem doesn't return success, it returns
+	the number of buffers.  The best way to test for this is to consider
+	0 (FALSE) failure, -1 (DOSTRUE) to mean that <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a> will have the
+	number of buffers, and any other positive value to be the number of
+	buffers.  It may be fixed in some future ROM revision.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

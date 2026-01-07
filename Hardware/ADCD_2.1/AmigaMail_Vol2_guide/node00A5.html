@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-41/imageclass.txt" NODE="IV-41-7" TITLE="OM_SET" -->
+<head>
+<title>OM_SET</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00A4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00A6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This method is used to set an object's attributes.  The Intuition function
+SetAttr() calls this method.  It receives the following arguments:
+
+    struct opSet
+    {
+        ULONG MethodID;
+        struct TagItem *ops_AttrList;
+        struct GadgetInfo *ops_GInfo;
+    };
+
+For the OM_SET method, the new class's dispatcher should process the
+attributes your class recognizes and have the superclass process any
+unrecognized attributes.  Note that a subclass dispatcher can directly
+process attributes it inherits from a superclass, rather than passing the
+message on to the superclass.
+
+Note that mytextlabelclass treats the OM_UPDATE method exactly like the
+OM_SET method.  This is OK because these two methods are functionally
+equivalent for imageclass classes.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

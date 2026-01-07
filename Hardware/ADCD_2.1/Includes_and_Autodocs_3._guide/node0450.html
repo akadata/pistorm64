@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="locale" NODE="--rexxhost--" TITLE="locale.library/--rexxhost--" -->
+<head>
+<title>locale.library/--rexxhost--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node044F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0451.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   HOST INTERFACE</b>
+	locale.library provides an ARexx function host interface that enables
+	ARexx programs to take advantage of system localization. The
+	functions provided by the interface are directly related to the
+	functions described herein, with the differences mostly being
+	in the way they are called.
+
+	The function host library vector is located at offset -30 from the
+	library. This is the value you provide to ARexx in the AddLib()
+	function call.
+
+<b>   FUNCTIONS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0452.html">CloseCatalog</a> (CATALOG/N/A)
+	<a href="../Includes_and_Autodocs_3._guide/node0454.html">ConvToLower</a> (CHARACTER/A)
+	<a href="../Includes_and_Autodocs_3._guide/node0455.html">ConvToUpper</a> (CHARACTER/A)
+	<a href="../Includes_and_Autodocs_3._guide/node0458.html">GetCatalogStr</a> (CATALOG/A,STRING/N/A,DEFAULT/A)
+	IsAlNum (CHARACTER/A)
+	IsAlpha (CHARACTER/A)
+	IsCntrl (CHARACTER/A)
+	IsDigit (CHARACTER/A)
+	IsGraph (CHARACTER/A)
+	IsLower (CHARACTER/A)
+	IsPrint (CHARACTER/A)
+	IsPunct (CHARACTER/A)
+	IsSpace (CHARACTER/A)
+	IsUpper (CHARACTER/A)
+	IsXDigit (CHARACTER/A)
+	<a href="../Includes_and_Autodocs_3._guide/node045B.html">OpenCatalog</a> (NAME/A,BUILTINLANGUAGE/A,VERSION/N/A)
+	Strncmp (STRING1/A,STRING2/A,TYPE/N/A)
+
+<b>   EXAMPLE</b>
+	/* localetest.rexx */
+
+	/* Make sure locale is loaded as a function host */
+	IF ~SHOW(L,'locale.library') THEN DO
+	  CALL ADDLIB('locale.library',0,-30)
+	END;
+
+	say ConvToLower(&#034;A&#034;);
+	say ConvToUpper(&#034;b&#034;);
+	say IsAlpha(&#034;1&#034;);
+
+	catalog = OpenCatalog(&#034;sys/workbench.catalog&#034;,&#034;english&#034;,0);
+	say GetCatalogStr(catalog,34,&#034;default&#034;);
+	say CloseCatalog(catalog);
+	say StrnCmp(&#034;test&#034;,&#034;test&#034;,2);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

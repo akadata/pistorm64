@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-10-5" TITLE="B / gadgetclass / New Methods: GM_GOINACTIVE" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / gadgetclass / New Methods: GM_GOINACTIVE</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04F6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04F8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This method tells the active gadget to become inactive.  The return value
+for this method is not explicitly defined.
+
+GM_GOINACTIVE uses a custom message structure (defined in
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D3.html#line229">gadgetclass.h</a>&#062;):
+
+    struct gpGoInactive
+    {
+        ULONG             MethodID;    /* GM_GOINACTIVE */
+        struct GadgetInfo *gpgi_GInfo;
+
+    /* V37 field only!  DO NOT attempt to read under V36! */
+        ULONG             gpgi_Abort; /* gpgi_Abort=1 if gadget was    */
+                                      /* aborted by Intuition and 0 if */
+                                      /* gadget went inactive at its   */
+                                      /* own request.                  */
+    };
+
+The gpgi_Abort field contains either a 0 or 1.  If it is 0, the gadget
+became inactive at its own request (because the <a href="../Libraries_Manual_guide/node04F6.html">GM_HANDLEINPUT</a> method
+returned something besides <a href="../Libraries_Manual_guide/node04F6.html#line26">GMR_MEACTIVE</a>).  If gpgi_Abort is 1, Intuition
+aborted this active gadget.  Some cases where Intuition aborts a gadget
+include: the user clicked in another window or screen, an application
+removed the active gadget with <a href="../Libraries_Manual_guide/node0133.html#line27">RemoveGList()</a>, and an application called
+<a href="../Libraries_Manual_guide/node010F.html#line19">ActivateWindow()</a> on a window other than the gadget's window.
+
+If the gadget allocated any resources to cache or precalculate information
+in the <a href="../Libraries_Manual_guide/node04F5.html">GM_GOACTIVE</a> method, it should deallocate those resources in this
+method.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

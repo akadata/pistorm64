@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="FreeRaster()" TITLE="graphics.library/FreeRaster" -->
+<head>
+<title>graphics.library/FreeRaster</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02DB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02DD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       FreeRaster -- Release an allocated area to the system free memory pool
+.
+
+
+<b>   SYNOPSIS</b>
+       FreeRaster( p, width, height)
+		   a0   d0:16  d1:16
+
+	void FreeRaster( <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line43">PLANEPTR</a>, USHORT, USHORT);
+
+<b>   FUNCTION</b>
+	Return the memory associated with this <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line43">PLANEPTR</a> of size
+	width and height to the MEMF_CHIP memory pool.
+
+<b>   INPUTS</b>
+       p  =  a pointer to a memory space  returned  as  a
+             result of a call to <a href="../Includes_and_Autodocs_3._guide/node02A2.html">AllocRaster</a>.
+
+	width - the width in bits of the bitplane.
+	height - number of rows in bitplane.
+
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+       Width and height should be the same values with which you
+       called <a href="../Includes_and_Autodocs_3._guide/node02A2.html">AllocRaster</a> in the first place.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02A2.html">AllocRaster()</a> <a href="../Includes_and_Autodocs_3._guide/node05DC.html">graphics/gfx.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

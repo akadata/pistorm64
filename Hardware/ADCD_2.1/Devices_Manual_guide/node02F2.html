@@ -1,0 +1,439 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/apps/24bitDemo/24bitDemo.c" NODE="MAIN" TITLE="Devices/apps/24bitDemo/24bitDemo.c" -->
+<head>
+<title>Devices/apps/24bitDemo/24bitDemo.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* 24bitDemo.c 05/91  C. Scheppner CBM
+ *
+ * Example which creates a 24-bit raster, saves it as a 24-bit ILBM,
+ *   then loads it as a brush and shows it to you 4 planes at a time
+ *   Optionally (if given a filename) just displays 4 planes at a time.
+ *
+ * requires linkage with several IFF modules
+ * see Makefile
+ */
+
+#include &#034;iffp/ilbmapp.h&#034;
+
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+void cleanup(void);
+void bye(UBYTE *s,int error);
+
+#define MINARGS 1
+char *vers = &#034;\0$VER: 24bitDemo 37.5&#034;;
+char *Copyright = &#034;24bitDemo v37.5 (Freely Redistributable)&#034;;
+char *usage = &#034;Usage: 24bitDemo [loadname] (saves/loads if no loadname given)&#034;;
+
+
+struct Library *IntuitionBase  = NULL;
+struct Library *GfxBase        = NULL;
+struct Library *IFFParseBase   = NULL;
+
+/* Note - these fields are also available in the ILBMInfo structure */
+struct   Screen         *scr;         /* for ptr to screen structure */
+struct   Window         *win;         /* for ptr to window structure */
+struct   RastPort       *wrp;         /* for ptr to RastPort  */
+struct   ViewPort       *vp;          /* for ptr to Viewport  */
+
+
+struct   NewWindow      mynw = {
+   0, 0,                                  /* LeftEdge and TopEdge */
+   0, 0,                          	  /* Width and Height */
+   -1, -1,                                /* DetailPen and BlockPen */
+   VANILLAKEY|MOUSEBUTTONS,               /* IDCMP Flags with Flags below */
+   BACKDROP|BORDERLESS|SMART_REFRESH|NOCAREREFRESH|ACTIVATE|RMBTRAP,
+   NULL, NULL,                            /* Gadget and Image pointers */
+   NULL,                                  /* Title string */
+   NULL,                                  /* Screen ptr null till opened */
+   NULL,                                  /* BitMap pointer */
+   50, 20,                                /* MinWidth and MinHeight */
+   0 , 0,                                 /* MaxWidth and MaxHeight */
+   CUSTOMSCREEN                           /* Type of window */
+   };
+
+
+BOOL   FromWb;
+
+
+/* ILBM Property chunks to be grabbed
+ * List BMHD, CMAP and CAMG first so we can skip them when we write
+ * the file back out (they will be written out with separate code)
+ */
+LONG	ilbmprops[] = {
+		ID_ILBM, ID_BMHD,
+		ID_ILBM, ID_CMAP,
+		ID_ILBM, ID_CAMG,
+		ID_ILBM, ID_CCRT,
+		ID_ILBM, ID_AUTH,
+		ID_ILBM, ID_Copyright,
+		TAG_DONE
+		};
+
+/* ILBM Collection chunks (more than one in file) to be gathered */
+LONG	ilbmcollects[] = {
+		ID_ILBM, ID_CRNG,
+		TAG_DONE
+		};
+
+/* ILBM Chunk to stop on */
+LONG	ilbmstops[] = {
+		ID_ILBM, ID_BODY,
+		TAG_DONE
+		};
+
+
+UBYTE nomem[]  = &#034;Not enough memory\n&#034;;
+UBYTE noiffh[] = &#034;Can't alloc iff\n&#034;;
+
+
+/* For our allocated ILBM frames */
+struct ILBMInfo  *ilbm[2];
+
+#define SCRPLANES 4
+
+USHORT colortable[32];
+USHORT cstarts[]= { 0x000, 0x800, 0x000, 0x080, 0x000, 0x008 };
+USHORT coffs[]	= { 0x100, 0x100, 0x010, 0x010, 0x001, 0x001 };
+
+UBYTE *ilbmname = &#034;RAM:24bit.ilbm&#034;;
+UBYTE *rgbnames[]={&#034;R0&#034;,&#034;R1&#034;,&#034;R2&#034;,&#034;R3&#034;,&#034;R4&#034;,&#034;R5&#034;,&#034;R6&#034;,&#034;R7&#034;,
+		   &#034;G0&#034;,&#034;G1&#034;,&#034;G2&#034;,&#034;G3&#034;,&#034;G4&#034;,&#034;G5&#034;,&#034;G6&#034;,&#034;G7&#034;,
+		   &#034;B0&#034;,&#034;B1&#034;,&#034;B2&#034;,&#034;B3&#034;,&#034;B4&#034;,&#034;B5&#034;,&#034;B6&#034;,&#034;B7&#034; };
+
+UBYTE *endtext1 = &#034;Displayed 24 planes, 4 at a time.&#034;;
+UBYTE *endtext2 = &#034;Press mousebutton or key to exit.&#034;;
+
+/*
+ * MAIN
+ */
+void main(int argc, char **argv)
+   {
+    struct RastPort *rp = NULL;
+    struct BitMap dummy = {0};
+    struct BitMap *bm = NULL, *xbm, *sbm;
+    LONG	error = 0L;
+    USHORT	width, height, depth, pwidth, pheight, pmode, extra, rgb;
+    ULONG 	plsize;
+    UBYTE	*tpp;
+    BOOL	DoSave = TRUE;
+    int 	k, p, s, n;
+
+   FromWb = argc ? FALSE : TRUE;
+
+   if((argc &#062; 1)&#038;&#038;(argv[argc-1][0]=='?'))
+	{
+	printf(&#034;%s\n%s\n&#034;,Copyright,usage);
+        bye(&#034;&#034;,RETURN_OK);
+	}
+
+   if(argc==2)
+	{
+	ilbmname = argv[1];
+	DoSave = FALSE;
+	}
+
+   /* Open Libraries */
+
+   if(!(IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 0)))
+      bye(&#034;Can't open intuition library.\n&#034;,RETURN_WARN);
+
+   if(!(GfxBase = OpenLibrary(&#034;graphics.library&#034;,0)))
+      bye(&#034;Can't open graphics library.\n&#034;,RETURN_WARN);
+
+   if(!(IFFParseBase = OpenLibrary(&#034;iffparse.library&#034;,0)))
+      bye(&#034;Can't open iffparse library.\n&#034;,RETURN_WARN);
+
+
+/*
+ * Alloc ILBMInfo structs
+ */
+    if(!(ilbm[0] = (struct ILBMInfo *)
+	AllocMem(sizeof(struct ILBMInfo),MEMF_PUBLIC|MEMF_CLEAR)))
+		bye(nomem,RETURN_FAIL);
+    if(!(ilbm[1] = (struct ILBMInfo *)
+	AllocMem(sizeof(struct ILBMInfo),MEMF_PUBLIC|MEMF_CLEAR)))
+		bye(nomem,RETURN_FAIL);
+
+/*
+ * Here we set up our ILBMInfo fields for our
+ * application.
+ * Above we have defined the propery and collection chunks
+ * we are interested in (some required like BMHD)
+ */
+
+    ilbm[0]-&#062;ParseInfo.propchks		= ilbmprops;
+    ilbm[0]-&#062;ParseInfo.collectchks	= ilbmcollects;
+    ilbm[0]-&#062;ParseInfo.stopchks		= ilbmstops;
+
+    ilbm[0]-&#062;windef	= &#038;mynw;
+
+    *ilbm[1] = *ilbm[0];
+
+
+/*
+ * Alloc IFF handles for frame
+ */
+    if(!(ilbm[0]-&#062;ParseInfo.iff = AllocIFF())) bye(noiffh,RETURN_FAIL);
+    if(!(ilbm[1]-&#062;ParseInfo.iff = AllocIFF())) bye(noiffh,RETURN_FAIL);
+
+
+/* for saving our demo 24-bit ILBM */
+
+    width  = 320;
+    height = 200;
+    depth  = 24;
+
+    /* Page width, height, and mode for saved ILBM */
+    pwidth  = width  &#060; 320 ? 320 : width;
+    pheight = height &#060; 200 ? 200 : height;
+    pmode   = pwidth &#062;= 640  ? HIRES : 0L;
+    pmode  |= pheight &#062;= 400 ? LACE  : 0L;
+
+    plsize = RASSIZE(width,height);
+
+    if(!DoSave)	goto nosave;
+
+    /*
+     * Allocate Bitmap and planes
+     */
+    extra = depth &#062; 8 ? depth - 8 : 0;
+    if(ilbm[0]-&#062;brbitmap = AllocMem(sizeof(struct BitMap) + (extra&#060;&#060;2),
+				MEMF_CLEAR))
+	{
+	bm = ilbm[0]-&#062;brbitmap;
+        InitBitMap(bm,depth,width,height);
+        for(k=0, error=0; k&#060;depth &#038;&#038; (!error); k++)
+            {
+            if(!(bm-&#062;Planes[k] = AllocRaster(width,height)))
+			error = IFFERR_NOMEM;
+            if(! error)
+		{
+                BltClear(bm-&#062;Planes[k], RASSIZE(width,height),0);
+                }
+	    }
+
+	if(!error)
+	    {
+	    if(!(rp = AllocMem(sizeof(struct RastPort),MEMF_CLEAR)))
+		error = IFFERR_NOMEM;
+	    else
+		{
+		InitRastPort(rp);
+		rp-&#062;BitMap = bm;
+		rp-&#062;Mask = 0x01;	/* we'll render 1 plane at a time */
+		SetAPen(rp,1);
+		SetDrMd(rp,JAM1);
+		}
+	    }
+
+	if(!error)
+	    {
+	    /* Put something recognizable in the planes.
+	     * Our bitmap is not part of a screen or viewport
+	     * so we can fiddle with the pointers and depth
+	     */
+	    tpp = bm-&#062;Planes[0];	/* save first plane pointer */
+	    bm-&#062;Depth = 1;
+	    for(k=0; k&#060;depth; k++)	/* swap in planeptrs 1 at a time */
+		{
+		bm-&#062;Planes[0] = bm-&#062;Planes[k];
+		Move(rp,k * 10, (k * 8) + 8);	/* render rgb bitname text */
+		Text(rp, rgbnames[k], 2);
+		}
+	    bm-&#062;Depth = depth;		/* restore depth */
+	    bm-&#062;Planes[0] = tpp;	/* and first pointer */
+
+	    /* Save the 24-bit ILBM */
+	    printf(&#034;Saving %s\n&#034;,ilbmname);
+	    error = saveilbm(ilbm[0], ilbm[0]-&#062;brbitmap, pmode,
+                width,  height, pwidth, pheight,
+                NULL, 0, 0,	/* colortable */
+		mskNone, 0,	/* masking, transparent */
+		NULL, NULL, 	/* chunklists */
+		ilbmname);
+	    }
+
+	/* Free our bitmap */
+        for(k=0; k&#060;depth; k++)
+            {
+            if(ilbm[0]-&#062;brbitmap-&#062;Planes[k])
+			FreeRaster(ilbm[0]-&#062;brbitmap-&#062;Planes[k],width,height);
+	    }
+	FreeMem(ilbm[0]-&#062;brbitmap, sizeof(struct BitMap) + (extra &#060;&#060; 2));
+	ilbm[0]-&#062;brbitmap = NULL;
+	if(rp)	FreeMem(rp, sizeof(struct RastPort));
+	}
+
+    if(error)
+	{
+	printf(&#034;%s\n&#034;,IFFerr(error));
+	bye(&#034; &#034;, RETURN_FAIL);
+	}
+
+nosave:
+
+/* Normally you would use showilbm() to open an appropriate acreen
+ * and display an ILBM in it.  However, this is a 24-bit ILBM
+ * so we will load it as a brush (bitmap).
+ * Here we are demonstrating
+ *  - first querying an ILBM to get its BMHD and CAMG (real or computed)
+ *  - then opening our own display
+ *  - then loading the 24-bit ILBM as a brush (bitmap) and displaying
+ *	it 4 planes at a time in our 4-plane screen.
+ */
+
+    printf(&#034;Attempting to load %s as a bitmap and display 4 planes at a time\n&#034;,
+		ilbmname);
+
+    if(!(error = queryilbm(ilbm[0],ilbmname)))
+	{
+	D(bug(&#034;24bitDemo: after query, this ILBM is %ld x %ld x %ld,modeid=$%lx\n&#034;,
+          ilbm[0]-&#062;Bmhd.w, ilbm[0]-&#062;Bmhd.h, ilbm[0]-&#062;Bmhd.nPlanes, ilbm[0]-&#062;camg));
+
+	/* Note - you could use your own routines to open your
+	 * display, but if so, you must initialize ilbm[0]-&#062;scr,
+	 * ilbm[0]-&#062;win, ilbm[0]-&#062;wrp, ilbm[0]-&#062;srp, and ilbm[0]-&#062;vp for your
+         * display.  Here we will use opendisplay() which will initialize
+	 * those fields.
+	 */
+
+	if(!(opendisplay(ilbm[0],
+			MAX(ilbm[0]-&#062;Bmhd.pageWidth, ilbm[0]-&#062;Bmhd.w),
+			MAX(ilbm[0]-&#062;Bmhd.pageHeight,ilbm[0]-&#062;Bmhd.h),
+			MIN(ilbm[0]-&#062;Bmhd.nPlanes, SCRPLANES),
+			ilbm[0]-&#062;camg)))
+	    {
+	    printf(&#034;Failed to open display\n&#034;);
+	    }
+	else
+	    {
+	    D(bug(&#034;24bitDemo: opendisplay (%ld planes) successful\n&#034;,SCRPLANES));
+
+	    scr = ilbm[0]-&#062;scr;
+	    win = ilbm[0]-&#062;win;
+	    wrp = ilbm[0]-&#062;wrp;
+	    vp  = ilbm[0]-&#062;vp;
+
+	    if(!(error = loadbrush(ilbm[1], ilbmname)))
+		{
+	    	D(bug(&#034;24bitDemo: loadbrush successful\n&#034;));
+
+		/* Note - we don't need to examine or copy any
+		 * chunks from the file, so we will close file now
+		 */
+		closeifile(ilbm[0]);
+		ScreenToFront(ilbm[0]-&#062;scr);
+
+		xbm = &#038;dummy;		/* spare bitmap */
+		sbm = &#038;scr-&#062;BitMap;	/* screen's bitmap */
+		bm = ilbm[1]-&#062;brbitmap;	/* the 24-plane bitmap */
+		depth = bm-&#062;Depth;
+
+        	InitBitMap(xbm,SCRPLANES,scr-&#062;Width,scr-&#062;Height);
+
+		/* Show the 24 planes */
+		for(p=0; p&#060;depth; p+=SCRPLANES)	/* 4 at a time */
+		    {
+		    SetRast(&#038;scr-&#062;RastPort, 0);
+		    for(s=0; s&#060;SCRPLANES; s++)
+			{
+			if((p+s) &#060; depth) xbm-&#062;Planes[s] = bm-&#062;Planes[p+s];
+			else  		  xbm-&#062;Planes[s] = NULL, xbm-&#062;Depth--;
+			}
+		    /* Blit planes to the screen */
+		    BltBitMap(xbm, 0, 0,
+			      sbm, 0, 0,
+			      scr-&#062;Width, scr-&#062;Height,
+			      0xC0, 0x0F, NULL);
+
+		    /* Emulate 8-bit color with 4-bit per gun colors
+		     * by using each rgb value twice
+		     */
+		    for(n=0, rgb=cstarts[p /SCRPLANES]; n &#060; 16; n++)
+			{
+			if(!n)	colortable[n] = 0xFFF;
+			else	colortable[n] = rgb;
+			/* bump gun for every 2 planes since
+			 * we only have 8 bits per gun
+			 */
+			if(n &#038; 1)  rgb += coffs[ p / SCRPLANES];
+			}
+		    LoadRGB4(vp, colortable, 16);
+		    Delay(50);
+		    }
+
+		SetRast(&#038;scr-&#062;RastPort, 0);
+
+		SetAPen(wrp, 1);
+		Move(wrp, 24, 80);
+		Text(wrp, endtext1, strlen(endtext1));
+		Move(wrp, 24, 120);
+		Text(wrp, endtext2, strlen(endtext2));
+
+		Wait(1&#060;&#060;win-&#062;UserPort-&#062;mp_SigBit);
+		unloadbrush(ilbm[1]);	/* deallocs colors, closeifile if needed */
+		}
+	    closedisplay(ilbm[0]);
+	    printf(&#034;Done\n&#034;);
+ 	    }
+      	}
+
+    if(error)	printf(&#034;%s\n&#034;,IFFerr(error));
+
+    cleanup();
+    exit(RETURN_OK);
+    }
+
+
+
+void bye(UBYTE *s,int error)
+   {
+   if((*s)&#038;&#038;(!FromWb)) printf(&#034;%s\n&#034;,s);
+   cleanup();
+   exit(error);
+   }
+
+
+void cleanup()
+   {
+   if(ilbm[0])
+	{
+	if(ilbm[0]-&#062;ParseInfo.iff) 	FreeIFF(ilbm[0]-&#062;ParseInfo.iff);
+	FreeMem(ilbm[0],sizeof(struct ILBMInfo));
+	}
+   if(ilbm[1])
+	{
+	if(ilbm[1]-&#062;ParseInfo.iff) 	FreeIFF(ilbm[1]-&#062;ParseInfo.iff);
+	FreeMem(ilbm[1],sizeof(struct ILBMInfo));
+	}
+
+   if(GfxBase) 	     	CloseLibrary(GfxBase);
+   if(IntuitionBase) 	CloseLibrary(IntuitionBase);
+   if(IFFParseBase)  	CloseLibrary(IFFParseBase);
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

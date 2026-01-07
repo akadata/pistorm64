@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_8" NODE="8-2-3" TITLE="8 / Device Interface / Closing The Narrator Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>8 / Device Interface / Closing The Narrator Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0117.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0119.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Each <a href="../Includes_and_Autodocs_2._guide/node04C8.html">OpenDevice()</a> must be eventually matched by a call to <a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>.
+This is necessary to allow the system to expunge the device in low memory
+conditions.  As long as any task has the device open, or has forgotten to
+close it before terminating, the narrator device will not be expunged.
+
+All I/O requests must have completed before the task can close the device.
+If any requests are still pending, the user must abort them before closing
+the device.
+
+    if (!(CheckIO(VoiceIO)
+        {
+        AbortIO(VoiceIO);  /* Abort queued or in progress request */
+        }
+    WaitIO((struct IORequest *)VoiceIO); /* Wait for abort to do its job */
+    CloseDevice(VoiceIO);                /* Close the device */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

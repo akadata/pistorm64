@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="I-47/EnfMung.txt" NODE="I-47-4" TITLE="Using Enforcer and Mungwall Together" -->
+<head>
+<title>Using Enforcer and Mungwall Together</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0056.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0058.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Alone, Mungwall can catch a large variety of memory-related software
+problems.  If Mungwall and Enforcer are used together, they can catch
+many more well-hidden bugs.  One bug that is hard to catch is when a
+program either mistakenly reads memory that does not belong to the
+program or reads its own memory without initializing the memory first.
+
+These bugs are normally hard to catch because the behavior of the
+errant program usually depends on how it reacts to the data that
+happens to be stored in that memory.  This makes the behavior of the
+bug erratic.  Sometimes the errant program may crash.  Sometimes the
+errant program may write over another program's data, causing the other
+program to crash.  At other times, no noticeable abnormality takes
+place.
+
+Mungwall and Enforcer together can help find these bugs.  Because
+Mungwall fills freed memory with the same odd 32-bit values, when an
+errant program mistakenly accesses memory,  the behavior of the bug
+will be consistent while Mungwall is running.  Also, the values
+Mungwall puts in memory are more likely to cause the errant program to
+access Enforcer-protected memory, triggering an Enforcer hit.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

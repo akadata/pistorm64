@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/iffparse" NODE="SetLocalItemPurge()" TITLE="iffparse.library/SetLocalItemPurge" -->
+<head>
+<title>iffparse.library/SetLocalItemPurge</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01D7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01D9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SetLocalItemPurge -- Set purge vector for a local context item.
+
+SYNOPSIS
+    SetLocalItemPurge (item, purgehook)
+                        a0      a1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node010B.html#line82">LocalContextItem</a>   *item;
+    struct <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a>            *purgehook;
+
+FUNCTION
+    Sets a local context item to use a client-supplied cleanup (purge)
+    vector for disposal when its context is popped.  The purge vector
+    will be called when the <a href="../Includes_and_Autodocs_2._guide/node010B.html#line68">ContextNode</a> containing this local item is
+    popped off the context stack and is about to be deleted itself.  If
+    the purge vector has not been set, the parser will use <a href="../Includes_and_Autodocs_2._guide/node01C6.html">FreeLocalItem</a>
+    to delete the item, but if this function is used to set the purge
+    vector, the supplied vector will be called with the following
+    arguments:
+
+            A0:     pointer to purgehook.
+            A2:     pointer to <a href="../Includes_and_Autodocs_2._guide/node010B.html#line82">LocalContextItem</a> to be freed.
+            A1:     pointer to a LONG containing the value
+                    IFFCMD_PURGELCI.
+
+    The user purge vector is then responsible for calling <a href="../Includes_and_Autodocs_2._guide/node01C6.html">FreeLocalItem()</a>
+    as part of its own cleanup.  Although the purge vector can return a
+    value, it will be ignored -- purge vectors must always work (best to
+    return 0, though).
+
+INPUTS
+    item      - pointer to local context item.
+    purgehook - pointer to a <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> structure.
+
+RESULT
+
+EXAMPLE
+
+NOTES
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01B9.html">AllocLocalItem()</a>, <a href="../Includes_and_Autodocs_2._guide/node01C6.html">FreeLocalItem()</a>, <a href="../Includes_and_Autodocs_2._guide/node012D.html">utility/hooks.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

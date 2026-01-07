@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-10" TITLE="10 Printer Device / Creating a Printer Driver" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 Printer Device / Creating a Printer Driver</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0053.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0055.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Creating the printer-dependent modules for the printer device involves
+writing the data structures and code, compiling and assembling them, and
+linking to produce an Amiga binary object file. The modules a driver
+contains varies depending on whether the printer is non-graphics or
+graphics capable.
+
+All drivers contain these modules:
+
+<a name="line10">   macros.i        -  include file for init.asm,contains printer device</a>
+                      macro definitions
+   printertag.asm  -  printer specific capabilities such as density,
+                      character sets and color
+   init.asm        -  opens the various libraries required by the printer
+                      driver.  This will be the same for all printers
+   data.c          -  contains printer device RAW commands and the extended
+                      character set supported by the printer
+   dospecial.c     -  printer specific special processing required for
+<a name="line19">                      printer device commands like aSLRM and aSFC</a>
+
+Graphic printer drivers require these additional modules:
+
+   render.c        -  printer specific processing to do graphics output
+                      and fill the output buffer
+   transfer.c      -  printer specific processing called by render.c
+                      to output the buffer to the printer.  Code it in
+                      assembly if speed is important
+   density.c       -  printer specific processing to construct the proper
+<a name="line29">                      print density commands</a>
+<a name="line30"></a>
+The first piece of the printer driver is the PrinterSegment structure
+described in devices/<a href="../Includes_and_Autodocs_2._guide/node005A.html#line161">prtbase.h</a> (this is pointed to by the BPTR returned by
+the <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a> of the object file). The PrinterSegment contains the
+<a href="../Includes_and_Autodocs_2._guide/node005A.html#line134">PrinterExtendedData</a> (PED) structures (also described in devices/prtbase.h)
+at the beginning of the object.  The PED structure contains data
+describing the capabilities of the printer, as well as pointers to code
+and other data. Here is the assembly code for a sample PrinterSegment,
+which would be linked to the beginning of the sequence of files as
+printertag.asm.
+
+<a name="line41">     <a href="../Devices_Manual_guide/node0166.html">printertag.asm</a> </a>
+
+The printer name should be the brand name of the printer that is available
+for use by programs wishing to be specific about the printer name in any
+diagnostic or instruction messages. The four functions at the top of the
+structure are used to initialize this printer-dependent code:
+
+   (*(PED-&#062;ped_Init))(PD) ;
+      This is called when the printer-dependent code is loaded and provides
+      a pointer to the printer device for use by the printer-dependent
+      code. It can also be used to open up any libraries or devices needed
+      by the printer-dependent code.
+
+   (*(PED-&#062;ped_Expunge))() ;
+      This is called immediately before the printer-dependent code is
+      unloaded, to allow it to close any resources obtained at
+      initialization time.
+
+   (*(PED-&#062;ped_Open))(ior) ;
+      This is called in the process of an <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> call, after the
+      Preferences are read and the correct primitive I/O device (parallel
+      or serial) is opened.  It must return zero if the open is successful,
+      or non-zero to terminate the open and return an error to the user.
+
+   (*(PED-&#062;ped_Close))(ior) ;
+      This is called in the process of a <a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a> call to allow the
+<a name="line67">      printer-dependent code to close any resources obtained at open time.</a>
+
+The pd_ variable provided as a parameter to the initialization call is a
+pointer to the <a href="../Includes_and_Autodocs_2._guide/node005A.html#line65">PrinterData</a> structure described in devices/prtbase.h. This
+is also the same as the io_Device entry in printer I/O requests.
+
+   pd_SegmentData
+      This points back to the PrinterSegment, which contains the PED.
+
+   pd_PrintBuf
+      This is available for use by the printer-dependent code - it is not
+      otherwise used by the printer device.
+
+   (*pd_PWrite)(data, length);
+      This is the interface routine to the primitive I/O device.  This
+      routine uses two I/O requests to the primitive device, so writes are
+      double-buffered. The data parameter points to the byte data to send,
+      and the length is the number of bytes.
+
+   (*pd_PBothReady)();
+      This waits for both primitive I/O requests to complete.  This is
+      useful if your code does not want to use double buffering.  If you
+      want to use the same data buffer for successive pd_PWrites, you must
+<a name="line90">      separate them with a call to this routine.</a>
+
+   pd_Preferences
+<a name="line93">      This is the copy of Preferences in use by the printer device,</a>
+      obtained when the printer was opened.
+
+The timeout field is the number of seconds that an I/O request from the
+printer device to the primitive I/O device (parallel or serial) will
+remain posted and unsatisfied before the timeout requester is presented to
+the user. The timeout value should be long enough to avoid the requester
+during normal printing.
+
+The PrintMode field is a flag which indicates whether text has been
+printed or not (1 means printed, 0 means not printed). This flag is used
+in drivers for page oriented printers to indicate that there is no
+alphanumeric data waiting for a formfeed.
+
+ <a href="../Devices_Manual_guide/node0055.html">Writing Alphanumeric Printer Drivers</a> 
+ <a href="../Devices_Manual_guide/node005B.html">Writing A Graphics Printer Driver</a> 
+ <a href="../Devices_Manual_guide/node0060.html">Testing The Printer Driver</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

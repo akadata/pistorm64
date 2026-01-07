@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/timer" NODE="TR_ADDREQUEST" TITLE="timer.device/TR_ADDREQUEST" -->
+<head>
+<title>timer.device/TR_ADDREQUEST</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04FC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04FE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    TR_ADDREQUEST -- Submit a request to wait a period of time.
+
+FUNCTION
+    Ask the timer to wait a specified amount of time before
+    replying the <a href="../Includes_and_Autodocs_2._guide/node0053.html#line36">timerequest</a>.
+
+    The message may be forced to finish early with an
+    <a href="../Includes_and_Autodocs_2._guide/node038B.html">AbortIO()/WaitIO()</a> pair.
+
+TIMER REQUEST
+    io_Message      mn_ReplyPort initialized
+    io_Device       preset by timer in <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice</a>
+    io_Unit         preset by timer in <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice</a>
+    io_Command      TR_ADDREQUEST
+    io_Flags        IOF_QUICK permitted (but ignored)
+    tr_time         a <a href="../Includes_and_Autodocs_2._guide/node0053.html#line26">timeval</a> structure specifying how long the
+                        device will wait before replying
+
+RESULTS
+    tr_time         will be zeroed
+
+NOTES
+    This function may be called from interrupts.
+
+    Previous to 2.0, the tr_time field was documented as containing
+    junk when the <a href="../Includes_and_Autodocs_2._guide/node0053.html#line36">timerequest</a> was returned.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node04F7.html">timer.device/AbortIO()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node0169.html">timer.device/TimeDelay()</a>,
+
+BUGS
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

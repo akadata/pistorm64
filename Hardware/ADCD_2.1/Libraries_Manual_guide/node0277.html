@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-16" TITLE="15 / GadTools Gadgets / Documented Side-Effects" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / GadTools Gadgets / Documented Side-Effects</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0276.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0278.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are certain aspects of the behavior of GadTools gadgets that should
+not be depended on. This will help current applications remain compatible
+with future releases of the GadTools library.
+
+When using <a href="../Libraries_Manual_guide/node0271.html">GT_FilterIMsg()</a> and <a href="../Libraries_Manual_guide/node0271.html">GT_PostFilterIMsg()</a>, never make assumptions
+about the message before or after filtering.  I.e., do not interpret the
+unfiltered message, assume that it will or will not result in certain
+kinds of filtered message or assume it will result in a consumed message
+(i.e., when GT_FilterIMsg() returns NULL).
+
+<a href="../Libraries_Manual_guide/node01E1.html#line80">IDCMP_INTUITICKS</a> messages are consumed when a scroller's arrows are
+repeating.  That is, IDCMP_INTUITICKS will not be received while the user
+is pressing a scroller arrows.  Do not depend or rely on this side effect,
+though, it will not necessarily remain so in the future.
+
+A single call to <a href="../Libraries_Manual_guide/node025A.html">CreateGadget()</a> may create one or more actual gadgets.
+These gadgets, along with the corresponding code in GadTools, define the
+behavior of the particular kind of GadTools gadget requested.  Only the
+behavior of these gadgets is documented, the number or type of actual
+gadgets is subject to change.  Always refer to the gadget pointer received
+from CreateGadget() when calling <a href="../Libraries_Manual_guide/node025E.html">GT_SetGadgetAttrs()</a>.  Never refer to
+other gadgets created by GadTools, nor create code which depends on their
+number or form.
+
+For text-display gadgets, the <a href="../Libraries_Manual_guide/node0269.html#line24">GTTX_CopyText</a> tag does not cause the text to
+be copied when the text is later changed with <a href="../Libraries_Manual_guide/node0269.html#line16">GTTX_Text</a>.
+
+The PLACETEXT <a href="../Libraries_Manual_guide/node0259.html#line38">ng_Flags</a> are currently ignored by <a href="../Libraries_Manual_guide/node026A.html">GENERIC_KIND</a> gadgets.
+However, this may not always be so.
+
+All GadTools gadgets set GADTOOL_TYPE in the gadget's <a href="../Libraries_Manual_guide/node0149.html#line58">GadgetType</a> field.
+Do not use this flag to identify GadTools gadgets, as this flag is not
+guaranteed to be set in the future.
+
+The palette gadget subdivides its total area into the individual color
+squares. Do not assume that the subdivision algorithm won't change.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

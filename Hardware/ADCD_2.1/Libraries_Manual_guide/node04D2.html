@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-5-1" TITLE="B / imageclass / New Methods: IM_DRAW" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / imageclass / New Methods: IM_DRAW</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04D1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04D3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This method tells an image object to draw itself.  Applications should not
+call this method directly, instead use the intuition.library function
+<a href="../Includes_and_Autodocs_2._guide/node0211.html">DrawImageState()</a>.  The return value for this method is not explicitly
+defined.
+
+<a name="line7">The IM_DRAW method uses a custom message structure:</a>
+
+    struct impDraw
+    {
+        ULONG           MethodID;    /* IM_DRAW                    */
+        struct RastPort *imp_RPort;  /* RastPort to render into    */
+        struct
+        {                            /* X and Y offset relative to */
+            WORD X;                  /* the image's IA_Left and    */
+            WORD Y;                  /* IA_Top attributes          */
+        } imp_Offset;
+        ULONG           imp_State;   /* Visual state of image      */
+        struct DrawInfo *imp_DrInfo; /* describing rendering area  */
+    };
+n
+
+<a name="line23"></a>
+The imp_State field contains the visual state to render the image.  The
+visual states (defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00E3.html#line124">imageclass.h</a>&#062;) are:
+<a name="line26"></a>
+IDS_NORMAL            Render using normal imagery.  This is the only
+                      kind of imagery available to non-Boopsi images.
+
+IDS_SELECTED          Render using &#034;selected&#034; imagery.  &#034;Selected&#034;
+                      refers to the state of a gadget's imagery when it
+                      is the selected gadget.
+
+IDS_DISABLED          Render using &#034;disabled&#034; imagery.  &#034;Disabled&#034;
+<a name="line35">                      refers to the state of a gadget's imagery when it</a>
+                      is disabled.  Typically, a disabled image has a
+                      ghosting pattern on top of it.
+
+<a name="line39">IDS_INACTIVENORMAL    This is a special version of IDS_NORMAL for a</a>
+                      &#034;normal&#034; image that is in the border of an
+                      inactive window.
+
+IDS_INACTIVESELECTED  This is a special version of IDS_SELECTED for a
+                      &#034;selected&#034; image that is in the border of an
+                      inactive window.
+
+IDS_INACTIVEDISABLED  This is a special version of IDS_DISABLED for a
+                      &#034;disabled&#034; image that is in the border of an
+                      inactive window.
+
+IDS_BUSY              Render using &#034;busy&#034; imagery as if the object
+                      was the image of a gadget in a busy state.  The
+                      busy gadget state is not yet supported by
+                      Intuition.
+
+IDS_INDETERMINATE     Render using &#034;indeterminate&#034; imagery as if the
+                      object was the image of a gadget in an
+                      indeterminate state.  The indeterminate gadget
+                      state is not yet supported by Intuition.
+
+Most image objects do not have different visual states for each possible
+imp_State.  See the <a href="../Libraries_Manual_guide/node04D1.html">imageclass</a> entries in this index for more details.
+
+When setting the pens to render an image, use the values from the
+imp_DrInfo-&#062;dri_Pens pen array (Note that it is possible for imp_DrInfo to
+be NULL).  The possible pen values are defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DD.html#line78">screens.h</a>&#062;.
+See the &#034;<a href="../Libraries_Manual_guide/node00EB.html">Intuition Screens</a>&#034; chapter of the Amiga ROM Kernel Reference
+Manual: Libraries for more information on the pen array.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

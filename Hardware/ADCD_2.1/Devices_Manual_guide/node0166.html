@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/printertag.asm" NODE="MAIN" TITLE="Devices/Dev_examples/printertag.asm" -->
+<head>
+<title>Devices/Dev_examples/printertag.asm</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0165.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0167.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+**********************************************************************
+*
+*       printer device dependent code tag
+*
+*
+*
+**********************************************************************
+
+        SECTION         printer
+
+*------ Included Files -----------------------------------------------
+
+        INCLUDE         &#034;exec/types.i&#034;
+        INCLUDE         &#034;exec/nodes.i&#034;
+        INCLUDE         &#034;exec/strings.i&#034;
+
+        INCLUDE         &#034;epsonX_rev.i&#034;  ; contains VERSION &#038; REVISION
+
+        INCLUDE         &#034;devices/prtbase.i&#034;
+
+
+*------ Imported Names -----------------------------------------------
+
+        XREF            _Init
+        XREF            _Expunge
+        XREF            _Open
+        XREF            _Close
+        XREF            _CommandTable
+        XREF            _PrinterSegmentData
+        XREF            _DoSpecial
+        XREF            _Render
+        XREF            _ExtendedCharTable
+
+*------ Exported Names -----------------------------------------------
+
+        XDEF            _PEDData
+
+**********************************************************************
+        ; in case anyone tries to execute this
+        MOVEQ   #0,D0
+        RTS
+
+        DC.W    VERSION        ; must be at least 35 (V1.3 and up)
+        DC.W    REVISION       ; your own revision number
+_PEDData:
+        DC.L    printerName    ; pointer to the printer name
+        DC.L    _Init          ; pointer to the initialization code
+        DC.L    _Expunge       ; pointer to the expunge code
+        DC.L    _Open          ; pointer to the open code
+        DC.L    _Close         ; pointer to the close code
+        DC.B    PPC_COLORGFX   ; PrinterClass
+        DC.B    PCC_YMCB       ; ColorClass
+        DC.B    136            ; MaxColumns
+        DC.B    10             ; NumCharSets
+        DC.W    8              ; NumRows
+        DC.L    1632           ; MaxXDots
+        DC.L    0              ; MaxYDots
+        DC.W    120            ; XDotsInch
+        DC.W    72             ; YDotsInch
+        DC.L    _CommandTable  ; pointer to Command strings
+        DC.L    _DoSpecial     ; pointer to Command Code function
+        DC.L    _Render        ; pointer to Graphics Render function
+        DC.L    30             ; Timeout
+
+        DC.L    _ExtendedCharTable  ; pointer to 8BitChar table
+
+        DS.L    1              ; Flag for PrintMode (reserve space)
+        DC.L    0              ; pointer to ConvFunc (char conversion function)
+
+printerName:
+        DC.B    'EpsonX'
+        DC.B    0
+        END
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

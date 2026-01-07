@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/HP_Laserjet_render.c" NODE="MAIN" TITLE="Devices/Dev_examples/HP_Laserjet_render.c" -->
+<head>
+<title>Devices/Dev_examples/HP_Laserjet_render.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node018A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node018C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+        HP_LaserJet driver.
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/nodes.h&#062;
+#include &#060;exec/lists.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;devices/prtbase.h&#062;
+#include &#060;devices/printer.h&#062;
+
+#define NUMSTARTCMD     7       /* # of cmd bytes before binary data */
+#define NUMENDCMD       0       /* # of cmd bytes after binary data */
+#define NUMTOTALCMD (NUMSTARTCMD + NUMENDCMD)   /* total of above */
+
+extern SetDensity();
+/*
+        00-04   \033&#038;l0L        perf skip mode off
+        05-11   \033*t075R      set raster graphics resolution (dpi)
+        12-16   \033*r0A        start raster graphics
+*/
+char StartCmd[18] = &#034;\033&#038;l0L\033*t075R\033*r0A&#034;;
+
+Render(ct, x, y, status)
+long ct, x, y, status;
+{
+        extern void *AllocMem(), FreeMem();
+
+        extern struct PrinterData *PD;
+        extern struct PrinterExtendedData *PED;
+
+        static UWORD RowSize, BufSize, TotalBufSize, dataoffset;
+        static UWORD huns, tens, ones; /* used to program buffer size */
+        UBYTE *ptr, *ptrstart;
+        int i, err;
+
+        err=PDERR_NOERR;
+        switch(status) {
+                case 0 : /* Master Initialization */
+                        /*
+                                ct      - pointer to IODRPReq structure.
+                                x       - width of printed picture in pixels.
+                                y       - height of printed picture in pixels.
+                        */
+                        RowSize = (x + 7) / 8;
+                        BufSize = RowSize + NUMTOTALCMD;
+                        TotalBufSize = BufSize * 2;
+                        PD-&#062;pd_PrintBuf = AllocMem(TotalBufSize, MEMF_PUBLIC);
+                        if (PD-&#062;pd_PrintBuf == NULL) {
+                                err = PDERR_BUFFERMEMORY; /* no mem */
+                        }
+                        else {
+                                ptr = PD-&#062;pd_PrintBuf;
+                                *ptr++ = 27;
+                                *ptr++ = '*';
+                                *ptr++ = 'b';   /* transfer raster graphics */
+                                *ptr++ = huns | '0';
+                                *ptr++ = tens | '0';
+                                *ptr++ = ones | '0';    /* printout width */
+                                *ptr = 'W';             /* terminator */
+                                ptr = &#038;PD-&#062;pd_PrintBuf[BufSize];
+                                *ptr++ = 27;
+                                *ptr++ = '*';
+                                *ptr++ = 'b';   /* transfer raster graphics */
+                                *ptr++ = huns | '0';
+                                *ptr++ = tens | '0';
+                                *ptr++ = ones | '0';    /* printout width */
+                                *ptr = 'W';             /* terminator */
+                                dataoffset = NUMSTARTCMD;
+                        /* perf skip mode off, set dpi, start raster gfx */
+                                err = (*(PD-&#062;pd_PWrite))(StartCmd, 17);
+                        }
+                        break;
+
+                case 1 : /* Scale, Dither and Render */
+                        /*
+                                ct      - pointer to PrtInfo structure.
+                                x       - 0.
+                                y       - row # (0 to Height - 1).
+                        */
+                        Transfer(ct, y, &#038;PD-&#062;pd_PrintBuf[dataoffset]);
+                        err = PDERR_NOERR; /* all ok */
+                        break;
+
+                case 2 : /* Dump Buffer to Printer */
+                        /*
+                                ct      - 0.
+                                x       - 0.
+                                y       - # of rows sent (1 to NumRows).
+                                White-space strip.
+                        */
+                        i = RowSize;
+                        ptrstart = &#038;PD-&#062;pd_PrintBuf[dataoffset - NUMSTARTCMD];
+                        ptr = ptrstart + NUMSTARTCMD + i - 1;
+                        while (i &#062; 0 &#038;&#038; *ptr == 0) {
+                                i--;
+                                ptr--;
+                        }
+                        ptr = ptrstart + 3; /* get ptr to density info */
+                        *ptr++ = (huns = i / 100) | '0';
+                        *ptr++ = (i - huns * 100) / 10 | '0';
+                        *ptr = i % 10 | '0'; /* set printout width */
+                        err = (*(PD-&#062;pd_PWrite))(ptrstart, i + NUMTOTALCMD);
+                        if (err == PDERR_NOERR) {
+                                dataoffset = (dataoffset == NUMSTARTCMD ?
+                                        BufSize : 0) + NUMSTARTCMD;
+                        }
+                        break;
+
+                case 3 : /* Clear and Init Buffer */
+                        /*
+                                ct      - 0.
+                                x       - 0.
+                                y       - 0.
+                        */
+                        ptr = &#038;PD-&#062;pd_PrintBuf[dataoffset];
+                        i = RowSize;
+                        do {
+                                *ptr++ = 0;
+                        } while (--i);
+                        break;
+
+                case 4 : /* Close Down */
+                        /*
+                                ct      - error code.
+                                x       - io_Special flag from IODRPReq struct
+                                y       - 0.
+                        */
+                        err = PDERR_NOERR; /* assume all ok */
+                        /* if user did not cancel the print */
+                        if (ct != PDERR_CANCEL) {
+                                /* end raster graphics, perf skip mode on */
+                                if ((err = (*(PD-&#062;pd_PWrite))
+                                        (&#034;\033*rB\033&#038;l1L&#034;, 9)) == PDERR_NOERR) {
+                                        /* if want to unload paper */
+                                        if (!(x &#038; SPECIAL_NOFORMFEED)) {
+                                                /* eject paper */
+                                                err = (*(PD-&#062;pd_PWrite))
+                                                        (&#034;\014&#034;, 1);
+                                        }
+                                }
+                        }
+                        /*
+                                flag that there is no alpha data waiting that
+                                needs a formfeed (since we just did one)
+                        */
+                        PED-&#062;ped_PrintMode = 0;
+                         /* wait for both buffers to empty */
+                        (*(PD-&#062;pd_PBothReady))();
+                        if (PD-&#062;pd_PrintBuf != NULL) {
+                                FreeMem(PD-&#062;pd_PrintBuf, TotalBufSize);
+                        }
+                        break;
+
+                case 5 : /* Pre-Master Initialization */
+                        /*
+                                ct      - 0 or pointer to IODRPReq structure.
+                                x       - io_Special flag from IODRPReq struct
+                                y       - 0.
+                        */
+                        /* select density */
+                        SetDensity(x &#038; SPECIAL_DENSITYMASK);
+                        break;
+        }
+        return(err);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

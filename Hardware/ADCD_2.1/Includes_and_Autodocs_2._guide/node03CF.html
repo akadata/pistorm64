@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/utility" NODE="Amiga2Date()" TITLE="utility.library/Amiga2Date" -->
+<head>
+<title>utility.library/Amiga2Date</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03CE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03D0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Amiga2Date -- Calculate the date from a timestamp.  (V36)
+
+SYNOPSIS
+    Amiga2Date( AmigaTime, Date )
+                D0         A0
+
+    void Amiga2Date( ULONG, struct <a href="../Includes_and_Autodocs_2._guide/node012C.html#line18">ClockData</a> * );
+
+FUNCTION
+    Fills in a <a href="../Includes_and_Autodocs_2._guide/node012C.html#line18">ClockData</a> structure with the date and time calculated
+    from a ULONG containing the number of seconds from 01-Jan-1978
+    to the date.
+
+INPUTS
+    AmigaTime       - the number of seconds from 01-Jan-1978.
+
+RESULTS
+    Date            - filled in with the date/time specified by
+                      AmigaTime.
+
+NOTES
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node03D1.html">CheckDate()</a>, <a href="../Includes_and_Autodocs_2._guide/node03D3.html">Date2Amiga()</a>
+
+BUGS
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

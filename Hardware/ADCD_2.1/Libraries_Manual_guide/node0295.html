@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_18" NODE="18-1-3" TITLE="18 / What is a Library? / Minimum Subset of Library Vectors" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>18 / What is a Library? / Minimum Subset of Library Vectors</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0294.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0296.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a name="line2">The first four code vectors of a library must be the following entries:</a>
+
+OPEN
+    is the entry point called by the function <a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a>.  In most
+    libraries, OPEN increments the library variable <a href="../Libraries_Manual_guide/node0292.html#line7">lib_OpenCnt</a>. This
+<a name="line7">    variable is also used by CLOSE and EXPUNGE.</a>
+
+CLOSE
+    is the entry point called by the function <a href="../Libraries_Manual_guide/node028E.html#line91">CloseLibrary()</a>. It
+    decrements the library variable <a href="../Libraries_Manual_guide/node0292.html#line7">lib_OpenCnt</a> and may do a delayed
+<a name="line12">    EXPUNGE.</a>
+
+EXPUNGE
+    prepares the library for removal from the system. This often includes
+    deallocating memory resources that were reserved during
+    initialization. EXPUNGE not only frees the memory allocated for data
+<a name="line18">    structures, but also the areas reserved for the library node itself.</a>
+
+RESERVED
+    is a fourth function vector reserved for future use. It must always
+    return zero.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

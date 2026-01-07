@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-6-8-1" TITLE="28 / / Other Items Influencing Bob Colors / ImageShadow" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Other Items Influencing Bob Colors / ImageShadow</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node039E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03A0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node0398.html#line5">ImageShadow</a> member is a pointer to the shadow mask of a Bob. A shadow
+mask is the logical or of all bitplanes of a Bob image. The system uses
+the shadow mask in conjunction with <a href="../Libraries_Manual_guide/node03A1.html">PlaneOnOff</a>, discussed below, for color
+selection. It also uses the shadow mask to &#034;cookie cut&#034; the bits that will
+be overwritten by this Bob, to save and later restore the background.
+
+The following figure shows the shadow mask of the image described above.
+
+
+    mem + 0    1111 1111 1111 1111    Shadow mask for line 1
+    mem + 1    0011 1100 0011 1100    Shadow mask for line 2
+    mem + 2    0000 1111 1111 0000    Shadow mask for line 3
+    mem + 3    0000 0011 1100 0000    Shadow mask for line 4
+    mem + 4    0000 0001 1000 0000    Shadow mask for line 5
+
+
+Space for the <a href="../Libraries_Manual_guide/node0398.html#line5">ImageShadow</a> must be provided and this pointer initialized to
+point to it.  The amount of memory needed is equivalent to one plane of
+the image:
+
+    shadow_size = myBob-&#062;BobVSprite-&#062;Height * myBob-&#062;BobVSprite-&#062;Width;
+
+The example image is 5 high and 1 word wide, so, 5 words must be made
+available.
+
+    Note:
+    -----
+    The <a href="../Libraries_Manual_guide/node0398.html#line5">ImageShadow</a> memory must be allocated from Chip memory
+    (<a href="../Libraries_Manual_guide/node02A8.html#line11">MEMF_CHIP</a>).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

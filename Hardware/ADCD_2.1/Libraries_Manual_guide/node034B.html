@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-1-1" TITLE="27 / / The RastPort Structure / Initializing a BitMap Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / The RastPort Structure / Initializing a BitMap Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node034A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node034C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Associated with the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> is another data structure called a <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>
+which contains a description of the organization of the data in the
+drawing area.  This tells the graphics library where in memory the drawing
+area is located and how it is arranged.  Before you can set up a RastPort
+for drawing you must first declare and initialize a BitMap structure,
+defining the characteristics of the drawing area, as shown in the
+following example. This was already shown in the &#034;<a href="../Libraries_Manual_guide/node032C.html">Forming a Basic Display</a>&#034;
+section, but it is repeated here because it relates to drawing as well as
+to display routines. (You need not necessarily use the same BitMap for
+both the drawing and the display, e.g., double-buffered displays.)
+
+    #define DEPTH 2       /* Two planes deep. */
+    #define WIDTH 320     /* Width in pixels. */
+    #define HEIGHT 200    /* Height in scanlines. */
+
+    struct BitMap bitMap;
+
+    /* Initialize the BitMap. */
+    InitBitMap(&#038;bitMap, DEPTH, WIDTH, HEIGHT);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

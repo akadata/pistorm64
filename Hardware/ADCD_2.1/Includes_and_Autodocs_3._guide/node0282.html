@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="gadtools" NODE="GT_RefreshWindow()" TITLE="gadtools.library/GT_RefreshWindow" -->
+<head>
+<title>gadtools.library/GT_RefreshWindow</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0281.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0283.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GT_RefreshWindow -- refresh all GadTools gadgets in a window. (V36)
+
+<b>   SYNOPSIS</b>
+	GT_RefreshWindow(win, req)
+	                 A0   A1
+
+	VOID GT_RefreshWindow(struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> *);
+
+<b>   FUNCTION</b>
+	Perform the initial refresh of all the GadTools gadgets you have
+	created.  After you have opened your window, you must call this
+	function.  Or, if you have opened your window without gadgets,
+	you add the gadgets with <a href="../Includes_and_Autodocs_3._guide/node0393.html">intuition.library/AddGList()</a>,
+	refresh them using <a href="../Includes_and_Autodocs_3._guide/node03DD.html">intuition.library/RefreshGList()</a>, then call
+	this function.
+	You should not need this function at other times.
+
+<b>   INPUTS</b>
+	win - pointer to the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> containing GadTools gadgets.
+	req - reserved for future use, should always be NULL
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node027C.html">GT_BeginRefresh()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

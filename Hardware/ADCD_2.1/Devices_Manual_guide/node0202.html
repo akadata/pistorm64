@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/modules/saveilbm.c" NODE="MAIN" TITLE="Devices/modules/saveilbm.c" -->
+<head>
+<title>Devices/modules/saveilbm.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0201.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0203.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* saveilbm.c 05/91  C. Scheppner CBM
+ *
+ * High-level ILBM save routines
+ */
+
+#include &#034;iffp/ilbm.h&#034;
+#include &#034;iffp/ilbmapp.h&#034;
+
+extern struct Library *GfxBase;
+
+/* screensave.c
+ *
+ * Given an ILBMInfo with a  currently available (not in use)
+ *   ParseInfo-&#062;iff IFFHandle, a screen pointer, filename, and
+ *   optional chunklist, will save screen as an ILBM
+ * The struct Chunk *chunklist1 and 2 are for chunks you wish written
+ * out other than BMHD, CMAP, and CAMG (they will be screened out
+ * because they are computed and written separately).
+ *
+ * Note -  screensave passes NULL for transparent color and mask
+ *
+ * Returns 0 for success or an IFFERR (libraries/iffparse.h)
+<a name="line23"> */</a>
+LONG screensave(struct ILBMInfo *ilbm,
+			struct Screen *scr,
+			struct Chunk *chunklist1, struct Chunk *chunklist2,
+			UBYTE *filename)
+{
+extern struct Library *GfxBase;
+UWORD *colortable, count;
+ULONG modeid;
+LONG error;
+int k;
+
+    if(GfxBase-&#062;lib_Version &#062;= 36)
+	modeid=GetVPModeID(&#038;scr-&#062;ViewPort);
+    else
+	modeid = scr-&#062;ViewPort.Modes &#038; OLDCAMGMASK;
+
+    count = scr-&#062;ViewPort.ColorMap-&#062;Count;
+    if(colortable = (UWORD *)AllocMem(count &#060;&#060; 1, MEMF_CLEAR))
+	{
+	for(k=0; k&#060;count; k++)	colortable[k]=GetRGB4(scr-&#062;ViewPort.ColorMap,k);
+
+    	error = saveilbm(ilbm, &#038;scr-&#062;BitMap, modeid,
+		scr-&#062;Width, scr-&#062;Height, scr-&#062;Width, scr-&#062;Height,
+		colortable, count, 4,
+		mskNone, 0,
+		chunklist1, chunklist2, filename);
+	FreeMem(colortable,count &#060;&#060; 1);
+	}
+    else error = IFFERR_NOMEM;
+    return(error);
+}
+
+
+/* saveilbm
+ *
+ * Given an ILBMInfo with a currently available (not-in-use)
+ *   ParseInfo-&#062;iff IFFHandle, a BitMap ptr,
+ *   modeid, widths/heights, colortable, ncolors, bitspergun,
+ *   masking, transparent color, optional chunklists, and filename,
+ *   will save the bitmap as an ILBM.
+ *
+ *  if bitspergun=4,  colortable is words, each with nibbles 0RGB
+ *  if bitspergun=8,  colortable is byte guns of RGBRGB etc. (like a CMAP)
+ *  if bitspergun=32, colortable is ULONG guns of RGBRGB etc.
+ *     Only the high eight bits of each gun will be written to CMAP.
+ *     Four bit guns n will be saved as nn
+ *
+ * The struct Chunk *chunklist is for chunks you wish written
+ * other than BMHD, CMAP, and CAMG (they will be screened out)
+ * because they are calculated and written separately
+ *
+ * Returns 0 for success, or an IFFERR
+ */
+LONG saveilbm(struct ILBMInfo *ilbm,
+		struct BitMap *bitmap, ULONG modeid,
+		WORD width, WORD height, WORD pagewidth, WORD pageheight,
+		APTR colortable, UWORD ncolors, UWORD bitspergun,
+		WORD masking, WORD transparentColor,
+		struct Chunk *chunklist1, struct Chunk *chunklist2,
+		UBYTE *filename)
+{
+struct IFFHandle *iff;
+struct Chunk *chunk;
+ULONG chunkID;
+UBYTE *bodybuf;
+LONG size, error = 0L;
+#define BODYBUFSZ	4096
+
+    iff = ilbm-&#062;ParseInfo.iff;
+
+    if(!(modeid &#038; 0xFFFF0000))	modeid &#038;= OLDCAMGMASK;
+
+    if(!(bodybuf = AllocMem(BODYBUFSZ,MEMF_PUBLIC)))
+	{
+	message(&#034;Not enough memory\n&#034;);
+	return(IFFERR_NOMEM);
+	}
+
+    if(!(error = openifile(ilbm, filename, IFFF_WRITE)))
+	{
+	D(bug(&#034;Opened %s for write\n&#034;,filename));
+
+	error = PushChunk(iff, ID_ILBM, ID_FORM, IFFSIZE_UNKNOWN);
+
+	D(bug(&#034;After PushChunk FORM ILBM - error = %ld\n&#034;, error));
+
+        initbmhd(&#038;ilbm-&#062;Bmhd, bitmap, masking, cmpByteRun1, transparentColor,
+            		width, height, pagewidth, pageheight, modeid);
+
+	D(bug(&#034;Error before putbmhd = %ld\n&#034;,error));
+
+	CkErr(putbmhd(iff,&#038;ilbm-&#062;Bmhd));
+
+	if(colortable)	CkErr(putcmap(iff,colortable,ncolors,bitspergun));
+
+	ilbm-&#062;camg = modeid;
+	D(bug(&#034;before putcamg - error = %ld\n&#034;,error));
+	CkErr(putcamg(iff,&#038;modeid));
+
+	D(bug(&#034;Past putBMHD, CMAP, CAMG - error = %ld\n&#034;,error));
+
+	/* Write out chunklists 1 &#038; 2 (if any), except for
+	 * any BMHD, CMAP, or CAMG (computed/written separately)
+	 */
+	for(chunk = chunklist1; chunk; chunk = chunk-&#062;ch_Next)
+	    {
+	    D(bug(&#034;chunklist1 - have a %.4s\n&#034;,&#038;chunk-&#062;ch_ID));
+	    chunkID = chunk-&#062;ch_ID;
+	    if((chunkID != ID_BMHD)&#038;&#038;(chunkID != ID_CMAP)&#038;&#038;(chunkID != ID_CAMG))
+		{
+		size = chunk-&#062;ch_Size==IFFSIZE_UNKNOWN ?
+			strlen(chunk-&#062;ch_Data) : chunk-&#062;ch_Size;
+		D(bug(&#034;Putting %.4s\n&#034;,&#038;chunk-&#062;ch_ID));
+		CkErr(PutCk(iff, chunkID, size, chunk-&#062;ch_Data));
+		}
+	    }
+
+	for(chunk = chunklist2; chunk; chunk = chunk-&#062;ch_Next)
+	    {
+	    chunkID = chunk-&#062;ch_ID;
+	    D(bug(&#034;chunklist2 - have a %.4s\n&#034;,&#038;chunk-&#062;ch_ID));
+	    if((chunkID != ID_BMHD)&#038;&#038;(chunkID != ID_CMAP)&#038;&#038;(chunkID != ID_CAMG))
+		{
+		size = chunk-&#062;ch_Size==IFFSIZE_UNKNOWN ?
+			strlen(chunk-&#062;ch_Data) : chunk-&#062;ch_Size;
+		D(bug(&#034;Putting %.4s\n&#034;,&#038;chunk-&#062;ch_ID));
+		CkErr(PutCk(iff, chunkID, size, chunk-&#062;ch_Data));
+		}
+	    }
+
+	/* Write out the BODY
+	 */
+	CkErr(putbody(iff, bitmap, NULL, &#038;ilbm-&#062;Bmhd, bodybuf, BODYBUFSZ));
+
+	D(bug(&#034;Past putbody - error = %ld\n&#034;,error));
+
+
+	CkErr(PopChunk(iff));	/* close out the FORM */
+	closeifile(ilbm);	/* and the file */
+	}
+
+    FreeMem(bodybuf,BODYBUFSZ);
+
+    return(error);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

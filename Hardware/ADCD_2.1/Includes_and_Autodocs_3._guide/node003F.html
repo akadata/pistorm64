@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="GetRexxVar()" TITLE="amiga.lib/GetRexxVar" -->
+<head>
+<title>amiga.lib/GetRexxVar</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node003E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0040.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetRexxVar - Gets the value of a variable from a running ARexx program
+
+<b>   SYNOPSIS</b>
+	error = GetRexxVar(message,varname,bufpointer)
+	D0,A1              A0      A1      (C-only)
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> GetRexxVar(struct <a href="../Includes_and_Autodocs_3._guide/node0633.html#line97">RexxMsg</a> *,char *,char **);
+
+<b>   FUNCTION</b>
+	This function will attempt to extract the value of the symbol
+	varname from the ARexx script that sent the message.  When called
+	from C, a pointer to the extracted value will be placed in the
+	pointer pointed to by bufpointer.  (*bufpointer will be the pointer
+	to the value)
+
+	When called from assembly, the pointer will be returned in A1.
+
+	The value string returned *MUST* *NOT* be modified.
+
+	While this function is new in the V37 amiga.lib, it is safe to
+	call it in all versions of the operating system.  It is also
+	PURE code, thus usable in resident/pure executables.
+
+<b>   NOTE</b>
+	This is a stub in amiga.lib.  It is only available via amiga.lib.
+	The stub has two labels.  One, _GetRexxVar, takes the arguments
+	from the stack.  The other, GetRexxVar, takes the arguments in
+	registers.
+
+	This routine does a <a href="../Includes_and_Autodocs_3._guide/node0026.html">CheckRexxMsg()</a> on the message.
+
+<b>   EXAMPLE</b>
+
+	char	*value;
+
+	/* <a href="../Includes_and_Autodocs_3._guide/node062E.html#line46">Message</a> is one from ARexx */
+	if (!GetRexxVar(rxmsg,&#034;TheVar&#034;,&#038;value))
+	{
+		/* The value was gotten and now is pointed to by value */
+		printf(&#034;Value of TheVar is %sn&#034;,value);
+	}
+
+<b>   INPUTS</b>
+	message		A message gotten from an ARexx script
+	varname		The name of the variable to extract
+	bufpointer	(For C only) A pointer to a string pointer.
+
+<b>   RESULTS</b>
+	error		0 for success, otherwise an error code.
+			(Other codes may exists, these are documented)
+			3  == Insufficient Storage
+			9  == String too long
+			10 == invalid message
+
+	A1		(Assembly only)  Pointer to the string.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node004B.html">SetRexxVar()</a>, <a href="../Includes_and_Autodocs_3._guide/node0026.html">CheckRexxMsg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

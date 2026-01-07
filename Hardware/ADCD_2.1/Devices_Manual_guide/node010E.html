@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_15" NODE="15-6" TITLE="15 Resources / Disk Resource" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>15 Resources / Disk Resource</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node010D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node010F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Disk resource obtains exclusive access to the floppy disk hardware
+There are four disk/MFM units available, units 0-3.
+
+<a name="line5">Six functions are available for dealing with the floppy disk hardware.</a>
+
+                      Disk Resource Functions
+                      -----------------------
+     <a href="../Includes_and_Autodocs_2._guide/node0546.html">AllocUnit()</a>      Allocate one of the units of the disk
+                      resource.
+
+     <a href="../Includes_and_Autodocs_2._guide/node0547.html">FreeUnit()</a>       Deallocate an allocated disk unit.
+
+     <a href="../Includes_and_Autodocs_2._guide/node0548.html">GetUnit()</a>        Allocate the disk for a driver.
+
+     <a href="../Includes_and_Autodocs_2._guide/node0549.html">GetUnitID()</a>      Return the drive ID of a specified drive
+                      unit.
+
+     <a href="../Includes_and_Autodocs_2._guide/node054A.html">GiveUnit()</a>       Free the disk.
+
+     <a href="../Includes_and_Autodocs_2._guide/node054B.html">ReadUnitID()</a>     Reread and return the drive ID of a
+<a name="line22">                      specified unit.</a>
+
+The disk resource provides both a gross and a fine unit allocation scheme.
+<a href="../Includes_and_Autodocs_2._guide/node0546.html">AllocUnit()</a> and <a href="../Includes_and_Autodocs_2._guide/node0547.html">FreeUnit()</a> are used to claim a unit for long term use, and
+<a href="../Includes_and_Autodocs_2._guide/node0548.html">GetUnit()</a> and <a href="../Includes_and_Autodocs_2._guide/node054A.html">GiveUnit()</a> are used to claim a unit and the disk hardware
+for shorter periods.
+
+The trackdisk device uses and abides by both allocation schemes.  Because
+a trackdisk unit is never closed for Amiga 3.5&#034; drives (the file system
+keeps them open) the associated resource units will always be allocated
+for these drives.  <a href="../Includes_and_Autodocs_2._guide/node0548.html">GetUnit()</a> and <a href="../Includes_and_Autodocs_2._guide/node054A.html">GiveUnit()</a> can still be used, however, by
+other applications that have not succeeded with <a href="../Includes_and_Autodocs_2._guide/node0546.html">AllocUnit()</a>.
+
+You must not change the state of of a disk that the trackdisk device is
+using unless you either
+
+   a) force its removal before giving it up, or
+
+   b) return it to the original track (with no changes to the track), or
+
+   c) CMD_STOP the unit before <a href="../Includes_and_Autodocs_2._guide/node0548.html">GetUnit()</a>, update the current track number
+      and CMD_START it after <a href="../Includes_and_Autodocs_2._guide/node054A.html">GiveUnit()</a>.  This option is only available
+      under V36 and higher versions of the operating system.
+
+<a href="../Includes_and_Autodocs_2._guide/node054B.html">ReadUnitID()</a> is provided to handle drives which use the unit number in a
+dynamic manner.  Subsequent <a href="../Includes_and_Autodocs_2._guide/node0548.html">GetUnit()</a> calls will return the value obtained
+by ReadUnitID().
+
+It is therefore possible to prevent the trackdisk device from using units
+that have not yet been mounted by successfully performing an <a href="../Includes_and_Autodocs_2._guide/node0546.html">AllocUnit()</a>
+for that unit.  It is also possible to starve trackdisk usage by
+performing a <a href="../Includes_and_Autodocs_2._guide/node0548.html">GetUnit()</a>. The appropriate companion routine (<a href="../Includes_and_Autodocs_2._guide/node0547.html">FreeUnit()</a> or
+<a href="../Includes_and_Autodocs_2._guide/node054A.html">GiveUnit()</a>) should be called to restore the resource at the end of its use.
+
+<a name="line56">     <a href="../Devices_Manual_guide/node01A3.html">Get_Disk_Unit_ID.c</a> </a>
+
+Additional programming information on the disk resource can be found in
+the include files and the Autodocs for the disk resource.
+
+                       Disk Resource Information
+                    --------------------------------
+                    INCLUDES        resources/<a href="../Includes_and_Autodocs_2._guide/node0119.html">disk.h</a>
+                                    resources/<a href="../Includes_and_Autodocs_2._guide/node011B.html">disk.i</a>
+
+                    AUTODOCS        <a href="../Includes_and_Autodocs_2._guide/node0545.html">disk.doc</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

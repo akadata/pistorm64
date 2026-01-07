@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-1-1-5" TITLE="12 / / Using Boopsi / Getting an Object's Attributes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / Using Boopsi / Getting an Object's Attributes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0205.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0207.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Intuition function <a href="../Includes_and_Autodocs_2._guide/node021B.html">GetAttr()</a> asks an object what the value of a
+specific attribute is:
+
+    ULONG GetAttr(ULONG attrID, APTR myobject, ULONG *mydata);
+
+where attrID is the attribute's ID number, myobject is the object to get
+the attribute from, and mydata points to a data area that will hold the
+attribute value.  This function returns a 0L if the object doesn't
+recognize the attribute, otherwise it returns some non-zero value, the
+meaning of which depends on the class.  In most cases, <a href="../Includes_and_Autodocs_2._guide/node021B.html">GetAttr()</a> returns a
+1 when it is successful.
+
+Not all object attributes are obtainable using the <a href="../Includes_and_Autodocs_2._guide/node021B.html">GetAttr()</a> function.
+Some classes are set up so that applications cannot query the state of
+certain attributes.  For example, using the <a href="../Libraries_Manual_guide/node0509.html">GA_Image</a> attribute, an
+application can give a Boopsi prop gadget (<a href="../Libraries_Manual_guide/node020A.html#line4">propgclass</a>) an <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structure
+which the gadget uses as the imagery for its knob. This attribute is not
+&#034;gettable&#034; as there is no need for an application to have to ask the
+gadget for the structure that the application passed it in the first
+place.  Whether or not a specific attribute is &#034;gettable&#034; is class
+dependent.  For more information about the attributes of specific classes,
+see the Boopsi Class Reference in the <a href="../Libraries_Manual_guide/node04B9.html">Appendix B</a> of this manual.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

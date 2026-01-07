@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="printer" NODE="--background--" TITLE="printer.device/--background--" -->
+<head>
+<title>printer.device/--background--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0502.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0504.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+The printer.device gots a lot of new features with V44:
+
+	- It is now possible to print hi- and true-color bitmaps
+	- Planar bitmaps are read faster
+	- Much more stable if wrong parameters for <a href="../Includes_and_Autodocs_3._guide/node050C.html">PRD_DUMPRPORT</a> are used
+	- A lot of new features for printer drivers are supported.
+
+	Creating a driver for printer.device now gets much easier: the driver
+	does not have to scale the bitmap anymore and can use its own
+	algorithms for nearly everything (color conversion, color correction,
+	all dither methods, anti aliasing). The driver is now run in a
+	DOS process instead of a exec task so loading preferences or saving
+	the output to a file is not longer a multithreading task.
+
+	The driver gives more information for the preferences user interface
+	(names of dither algorithms, names of shading algorithms, information
+	about density interpretation) and for the printing itself (left and
+	top border on paper, more page formats).
+
+	Drivers can have its own preferences which can be edited and
+	stored from every application. Driver can also have its own
+	preferences editor (like PrinterPS).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/workbench/workbench.h" NODE="MAIN" TITLE="Includes/workbench/workbench.h" -->
+<head>
+<title>Includes/workbench/workbench.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0134.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0136.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef WORKBENCH_WORKBENCH_H
+#define WORKBENCH_WORKBENCH_H
+/*
+**	$Filename: workbench/workbench.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.25 $
+**	$Date: 90/11/02 $
+**
+**	workbench.library general definitions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif
+<a name="line18"></a>
+#ifndef	EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+#endif
+<a name="line22"></a>
+#ifndef	EXEC_LISTS_H
+#include &#034;exec/lists.h&#034;
+#endif
+<a name="line26"></a>
+#ifndef EXEC_TASKS_H
+#include &#034;exec/tasks.h&#034;
+#endif
+<a name="line30"></a>
+#ifndef INTUITION_INTUITION_H
+#include &#034;intuition/intuition.h&#034;
+#endif
+<a name="line34"></a>
+<a name="line35">#define	WBDISK		1</a>
+<a name="line36">#define	WBDRAWER	2</a>
+<a name="line37">#define	WBTOOL		3</a>
+<a name="line38">#define	WBPROJECT	4</a>
+<a name="line39">#define	WBGARBAGE	5</a>
+<a name="line40">#define	WBDEVICE	6</a>
+<a name="line41">#define	WBKICK		7</a>
+#define WBAPPICON	8
+<a name="line43"></a>
+<a name="line44">struct OldDrawerData { /* pre V36 definition */</a>
+<a name="line45">    struct NewWindow	dd_NewWindow;	/* args to open window */</a>
+<a name="line46">    LONG		dd_CurrentX;	/* current x coordinate of origin */</a>
+    LONG		dd_CurrentY;	/* current y coordinate of origin */
+};
+<a name="line49">/* the amount of DrawerData actually written to disk */</a>
+#define OLDDRAWERDATAFILESIZE	(sizeof(struct OldDrawerData))
+<a name="line51"></a>
+<a name="line52">struct DrawerData {</a>
+<a name="line53">    struct NewWindow	dd_NewWindow;	/* args to open window */</a>
+<a name="line54">    LONG		dd_CurrentX;	/* current x coordinate of origin */</a>
+<a name="line55">    LONG		dd_CurrentY;	/* current y coordinate of origin */</a>
+<a name="line56">    ULONG		dd_Flags;	/* flags for drawer */</a>
+    UWORD		dd_ViewModes;	/* view mode for drawer */
+};
+<a name="line59">/* the amount of DrawerData actually written to disk */</a>
+#define DRAWERDATAFILESIZE	(sizeof(struct DrawerData))
+<a name="line61"></a>
+<a name="line62">struct DiskObject {</a>
+<a name="line63">    UWORD		do_Magic; /* a magic number at the start of the file */</a>
+<a name="line64">    UWORD		do_Version; /* a version number, so we can change it */</a>
+<a name="line65">    struct Gadget	do_Gadget;	/* a copy of in core gadget */</a>
+<a name="line66">    UBYTE		do_Type;</a>
+<a name="line67">    char *		do_DefaultTool;</a>
+<a name="line68">    char **		do_ToolTypes;</a>
+<a name="line69">    LONG		do_CurrentX;</a>
+<a name="line70">    LONG		do_CurrentY;</a>
+<a name="line71">    struct DrawerData *	do_DrawerData;</a>
+<a name="line72">    char *		do_ToolWindow;	/* only applies to tools */</a>
+    LONG		do_StackSize;	/* only applies to tools */
+
+};
+<a name="line76"></a>
+<a name="line77">#define WB_DISKMAGIC	0xe310	/* a magic number, not easily impersonated */</a>
+<a name="line78">#define WB_DISKVERSION	1	/* our current version number */</a>
+#define WB_DISKREVISION	1	/* our current revision number */
+<a name="line80">/* I only use the lower 8 bits of Gadget.UserData for the revision # */</a>
+#define WB_DISKREVISIONMASK	255
+<a name="line82"></a>
+<a name="line83">struct FreeList {</a>
+<a name="line84">    WORD		fl_NumFree;</a>
+    struct List		fl_MemList;
+};
+
+/* each message that comes into the WorkBenchPort must have a type field
+** in the preceeding short.  These are the defines for this type
+*/
+<a name="line91"></a>
+<a name="line92">#define MTYPE_PSTD		1	/* a &#034;standard Potion&#034; message */</a>
+<a name="line93">#define MTYPE_TOOLEXIT		2	/* exit message from our tools */</a>
+<a name="line94">#define MTYPE_DISKCHANGE	3	/* dos telling us of a disk change */</a>
+<a name="line95">#define MTYPE_TIMER		4	/* we got a timer tick */</a>
+<a name="line96">#define MTYPE_CLOSEDOWN		5	/* &#060;unimplemented&#062; */</a>
+<a name="line97">#define MTYPE_IOPROC		6	/* &#060;unimplemented&#062; */</a>
+<a name="line98">#define MTYPE_APPWINDOW		7	/* msg from an app window */</a>
+<a name="line99">#define MTYPE_APPICON		8	/* msg from an app icon */</a>
+<a name="line100">#define MTYPE_APPMENUITEM	9	/* msg from an app menuitem */</a>
+<a name="line101">#define MTYPE_COPYEXIT		10	/* exit msg from copy process */</a>
+#define MTYPE_ICONPUT		11	/* msg from PutDiskObject in icon.library */
+
+/* workbench does different complement modes for its gadgets.
+** It supports separate images, complement mode, and backfill mode.
+** The first two are identical to intuitions GADGIMAGE and GADGHCOMP.
+** backfill is similar to GADGHCOMP, but the region outside of the
+** image (which normally would be color three when complemented)
+** is flood-filled to color zero.
+<a name="line110">*/</a>
+#define GADGBACKFILL	0x0001
+
+/* if an icon does not really live anywhere, set its current position
+** to here
+<a name="line115">*/</a>
+#define NO_ICON_POSITION	(0x80000000)
+
+<a name="line118">/* workbench now is a library.	this is it's name */</a>
+#define WORKBENCH_NAME		&#034;workbench.library&#034;
+
+/* If you find am_Version &#062;= AM_VERSION, you know this structure has
+ * at least the fields defined in this version of the include file
+<a name="line123"> */</a>
+#define	AM_VERSION	1
+<a name="line125"></a>
+<a name="line126">struct AppMessage {</a>
+<a name="line127">    struct Message am_Message;	/* standard message structure */</a>
+<a name="line128">    UWORD am_Type;		/* message type */</a>
+<a name="line129">    ULONG am_UserData;		/* application specific */</a>
+<a name="line130">    ULONG am_ID;		/* application definable ID */</a>
+<a name="line131">    LONG am_NumArgs;		/* # of elements in arglist */</a>
+<a name="line132">    struct WBArg *am_ArgList;	/* the arguements themselves */</a>
+<a name="line133">    UWORD am_Version;		/* will be AM_VERSION */</a>
+<a name="line134">    UWORD am_Class;		/* message class */</a>
+<a name="line135">    WORD am_MouseX;		/* mouse x position of event */</a>
+<a name="line136">    WORD am_MouseY;		/* mouse y position of event */</a>
+<a name="line137">    ULONG am_Seconds;		/* current system clock time */</a>
+<a name="line138">    ULONG am_Micros;		/* current system clock time */</a>
+    ULONG am_Reserved[8];	/* avoid recompilation */
+};
+
+<a name="line142">/*</a>
+ * The following structures are private.  These are just stub
+ * structures for code compatibility...
+<a name="line145"> */</a>
+<a name="line146">struct	AppWindow	{ void *aw_PRIVATE;  };</a>
+<a name="line147">struct	AppIcon		{ void *ai_PRIVATE;  };</a>
+struct		AppMenuItem	{ void *ami_PRIVATE; };
+
+#endif	/* !WORKBENCH_WORKBENCH_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

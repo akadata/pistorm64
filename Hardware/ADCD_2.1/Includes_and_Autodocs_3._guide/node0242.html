@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="Supervisor()" TITLE="exec.library/Supervisor" -->
+<head>
+<title>exec.library/Supervisor</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0241.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0243.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	Supervisor -- trap to a short supervisor mode function
+
+<b>   SYNOPSIS</b>
+	result = Supervisor(userFunc)
+	Rx                   A5
+
+	ULONG Supervisor(void *);
+
+<b>   FUNCTION</b>
+	Allow a normal user-mode program to execute a short assembly language
+	function in the supervisor mode of the processor.  Supervisor() does
+	not modify or save registers; the user function has full access to the
+	register set.   All rules that apply to interrupt code must be
+	followed.  In addition, no system calls are permitted.  The function
+	must end with an RTE instruction.
+
+<b>   EXAMPLE</b>
+		;Obtain the Exception Vector base.  68010 or greater only!
+		MOVECtrap:	movec.l	VBR,d0	;$4e7a,$0801
+				rte
+
+<b>   INPUTS</b>
+	userFunc - A pointer to a short assembly language function ending
+		   in RTE.  The function has full access to the register set.
+
+<b>   RESULTS</b>
+	result   - Whatever values the userFunc left in the registers.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0241.html">SuperState()</a>,<a href="../Includes_and_Autodocs_3._guide/node0244.html">UserState()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

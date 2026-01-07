@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-2" TITLE="28 Sprites, Bobs and Animation / Using Simple (Hardware) Sprites" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 Sprites, Bobs and Animation / Using Simple (Hardware) Sprites</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0378.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node037A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Simple Sprites can be used to create animations, so even though are not
+really part of the GELs system, they are desribed here as a possible
+alternative to using VSprites.  For more information on the sprite
+hardware, including information on attached sprites, see the Amiga
+<a name="line6"><a href="../Hardware_Manual_guide/node00AE.html">Hardware</a> Reference Manual.</a>
+
+The SimpleSprite structure is found in &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">sprite.h</a>&#062;. It has fields
+that indicate the height and position of the Simple Sprite and a number
+that indicates which of the 8 hardware sprites to use.
+
+Simple Sprites are always 16 bits wide, which is why there is no width
+member in the <a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">SimpleSprite</a> structure.  Currently, sprites always appear as
+low-resolution pixels, and their position is specified in the same way.
+If the sprite is being moved across a high-resolution display in single
+pixel increments, it will appear to move two high-resolution pixels for
+each increment.  In low-resolution mode, a single Lores pixel movement
+will be seen.  Similarly, in an interlaced display, the y direction
+motions are in two-line increments. The same sprite image data is placed
+into both even and odd fields of the interlaced display, so the sprite
+<a name="line21">will appear to be the same size in any display mode.</a>
+
+The upper left corner of the <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a> area has coordinates (0,0). Unlike
+VSprites, the motion of a Simple Sprite can be relative to this position.
+(That is, if you create a Simple Sprite relative to your ViewPort and move
+the ViewPort around, the Simple Sprite can move as well, but its movement
+<a name="line27">is relative to the origin of the ViewPort.)</a>
+
+The Sprite pairs 0/1, 2/3, 4/5, and 6/7 share color registers.  See
+&#034;<a href="../Libraries_Manual_guide/node0391.html">VSprite Advanced Topics</a>&#034; later in this chapter, for precautions to take
+<a name="line31">if Simple Sprites and VSprites are used at the same time.</a>
+
+The following figure shows which color registers are used by Simple
+Sprites.
+
+                    00  Unused
+                    01  Unused
+                          &#183;
+                          &#183;
+                          &#183;     _
+                    16  Unused   |
+                    17  Color 1  |
+                    18  Color 2  |-- Sprites 0 and 1
+                    19  Color 3 _|
+                    20  Unused   |
+                    21  Color 1  |
+                    22  Color 2  |-- Sprites 2 and 3
+                    23  Color 3 _|
+                    24  Unused   |
+                    25  Color 1  |
+                    26  Color 2  |-- Sprites 4 and 5
+                    27  Color 3 _|
+                    28  Unused   |
+                    29  Color 1  |
+                    30  Color 2  |-- Sprites 6 and 7
+                    31  Color 3 _|
+
+
+                 Figure 28-2: Sprite Color Registers
+
+
+Sprites do not have exclusive use of the color registers. If the <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a>
+is 5 bitplanes deep, all 32 of the system color registers will still be
+used by the playfield display hardware.
+
+    Note:
+    -----
+    Color zero for all Sprites is always a &#034;transparent&#034; color, and the
+    colors in registers 16, 20, 24, and 28 are not used by sprites. These
+    colors will be seen only if they are rendered into a playfield. For
+<a name="line71">    further information, see the Amiga <a href="../Hardware_Manual_guide/node00B7.html">Hardware</a> Reference Manual.</a>
+
+If there are two <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a>s with different color sets on the same display,
+a sprite will switch colors when it is moved across their boundary.  For
+example, Sprite 0 and 1 will appear in colors 17-19 of whatever ViewPort
+they happen to be over.  This is because the system jams all the
+ViewPort's colors into the display hardware at the top of each ViewPort.
+
+ <a href="../Libraries_Manual_guide/node037A.html">Simple Sprite Functions</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

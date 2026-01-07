@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="ObtainPen()" TITLE="graphics.library/ObtainPen" -->
+<head>
+<title>graphics.library/ObtainPen</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0306.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0308.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ObtainPen -- Obtain a free palette entry for use by your program. (V39)
+
+
+<b>   SYNOPSIS</b>
+	n = ObtainPen( cm, n, r, g, b, flags)
+	d0	       a0 d0  d1 d2 d3  d4
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> ObtainPen(struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> *,ULONG,ULONG,ULONG,ULONG,ULONG);
+
+<b>   FUNCTION</b>
+	Attempt to allocate an entry in the colormap for use by the application.
+	If successful, you should <a href="../Includes_and_Autodocs_3._guide/node0314.html">ReleasePen()</a> this entry after you have finished
+	with it.
+
+	Applications needing exclusive use of a color register (say for color
+	cycling) will typically call this function with n=-1. Applications needing
+	only the shared use of a color will typically use <a href="../Includes_and_Autodocs_3._guide/node0306.html">ObtainBestPenA()</a> instead.
+	Other uses of this function are rare.
+
+<b>   INPUTS</b>
+	cm  =  A pointer to a color map created by <a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a>.
+	n   =  The index of the desired entry, or -1 if any one is acceptable
+	rgb =  The RGB values (32 bit left justified fractions) to set the new
+	       palette entry to.
+	flags= PEN_EXCLUSIVE - tells the system that you want exclusive
+	       (non-shared) use of this pen value. Default is shared access.
+
+	       PEN_NO_SETCOLOR - tells the system to not change the rgb values
+	       for the selected pen. Really only makes sense for exclusive pens.
+
+
+<b>   RESULTS</b>
+
+	n   =  The allocated pen. -1 will be returned if there is no pen available
+	       for you.
+
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+	When you allocate a palette entry in non-exclusive mode, you
+	should not change it (via SetRGB32), because other programs on the
+	same screen may be using it. With PEN_EXCLUSIVE mode, you can
+	change the returned entry at will.
+
+	To avoid visual artifacts, you should not free up a palette
+	entry until you are sure that your application is not displaying
+	any pixels in that color at the time you free it. Otherwise, another
+	task could allocate and set that color index, thus changing the colors
+	of your pixels.
+
+	Generally, for shared access, you should use <a href="../Includes_and_Autodocs_3._guide/node0306.html">ObtainBestPenA()</a>
+	instead, since it will not allocate a new color if there is one
+	&#034;close enough&#034; to the one you want already.
+	If there is no Palextra attached to the colormap, then this
+	routine will always fail.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a> <a href="../Includes_and_Autodocs_3._guide/node0314.html">ReleasePen()</a> <a href="../Includes_and_Autodocs_3._guide/node02AE.html">AttachPalExtra()</a> <a href="../Includes_and_Autodocs_3._guide/node0306.html">ObtainBestPenA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

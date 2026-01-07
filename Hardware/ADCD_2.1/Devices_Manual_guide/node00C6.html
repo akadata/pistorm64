@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_13" NODE="13-5" TITLE="13 Timer Device / Using the Time Arithmetic Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>13 Timer Device / Using the Time Arithmetic Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00C5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00C7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As indicated above, the time arithmetic functions are accessed in the
+timer device structure as if they were a routine library. To use them, you
+create an <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block and open the timer.  In the IORequest block is a
+pointer to the device's base address. This address is needed to access
+each routine as an offset - for example, _LVOAddTime, _LVOSubTime,
+_LVOCmpTime - from that base address.
+
+     <a href="../Devices_Manual_guide/node0199.html">Timer_Arithmetic.c</a> 
+
+ <a href="../Devices_Manual_guide/node00C7.html">Why Use Time Arithmetic?</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

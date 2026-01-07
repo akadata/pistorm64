@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="clipboard" NODE="CBD_CHANGEHOOK" TITLE="clipboard.device/CBD_CHANGEHOOK" -->
+<head>
+<title>clipboard.device/CBD_CHANGEHOOK</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00D3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00D5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CBD_CHANGEHOOK -- Add or remove a clip change hook
+
+<b>   FUNCTION</b>
+	CBD_CHANGEHOOK allows specification of a hook to be called
+	when the data on the clipboard has changed.
+
+<b>   IO REQUEST</b>
+	io_Message	mn_ReplyPort set up
+	io_Device	preset by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Unit		preset by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Command	CBD_CHANGEHOOK
+	io_Length -     0 to remove, 1 to install this hook
+	io_Data -       struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *, the clip change hook
+
+<b>   HOOK ENVIRONMENT</b>
+       hook message - a <a href="../Includes_and_Autodocs_3._guide/node05E9.html#line62">ClipHookMsg</a>, as defined in <a href="../Includes_and_Autodocs_3._guide/node05E9.html">devices/clipboard.h</a>
+           chm_Type - 0, indicating that the message has the
+               following fields:
+           chm_ClipID - the clip ID of the clip triggering the change
+       hook object - io_Unit
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

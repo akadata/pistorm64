@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-3-2" TITLE="27 / / Viewport Size Specifications / ViewPort Width" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Viewport Size Specifications / ViewPort Width</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0324.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0326.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">DWidth</a> variable in the <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> structure determines how wide, in
+pixels, the display segment will be.  To set your ViewPort to the maximum
+supported (displayable) NTSC high-resolution width, use the following
+fragment (this requires Release 2):
+
+    struct DimensionInfo querydims;
+    struct Rectangle *oscan;
+    struct ViewPort viewport;
+
+    /* Use PAL_MONITOR_ID instead of NTSC_MONITOR_ID to get PAL   */
+    /* dimensions                                                 */
+    if (GetDisplayInfoData( NULL,(UBYTE *)&#038;querydims, sizeof(querydims),
+        DTAG_DIMS, NTSC_MONITOR_ID|HIRES_KEY ))
+    {
+            /* Use StdOScan instead of MaxOScan to get standard   */
+            /* overscan dimensions as set by the user in Overscan */
+            /* Preferences                                        */
+            oscan = &#038;querydims.MaxOScan;
+            viewPort-&#062;DWidth = oscan-&#062;MaxX - oscan-&#062;MinX + 1;
+    }
+
+You may specify a smaller value of pixels per line to produce a narrower
+display segment or simply set <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort.DWidth</a> to the nominal value for
+<a name="line25">this resolution.</a>
+
+Although the system software allows you define low-resolution displays as
+wide as 362 pixels and high-resolution displays as wide as 724 pixels, you
+should use caution in exceeding the normal values of 320 or 640,
+respectively.  Because display overscan varies from one monitor to
+another, many video displays will not be able to show all of a wider
+display, and sprite display may also be affected.  However, if you use the
+standard overscan values (<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line91">DimensionInfo.StdOScan</a>) provided by the Release
+2 function <a href="../Libraries_Manual_guide/node033D.html">GetDisplayInfoData()</a> as shown above, the user's preference for
+<a name="line35">the size of the display will be satisfied.</a>
+
+If you are using hardware sprites or VSprites with your display, and you
+specify <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> widths exceeding 320 or 640 pixels (for low or
+high-resolution, respectively), it is likely that some hardware sprites
+will not be properly rendered on the screen. These sprites may not be
+rendered because playfield DMA (direct memory access) takes precedence
+over sprite DMA when an extra-wide display is produced.  See the Amiga
+<a href="../Hardware_Manual_guide/node012B.html">Hardware</a> Reference Manual for a more complete description of this
+phenomenon.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

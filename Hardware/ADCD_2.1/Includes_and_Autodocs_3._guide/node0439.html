@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="layout_gc" NODE="ActivateLayoutGadget()" TITLE="layout_gc/ActivateLayoutGadget" -->
+<head>
+<title>layout_gc/ActivateLayoutGadget</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0438.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node043A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+  NAME
+      ActivateLayoutGadget -- Activate a gadget within a layout window.
+
+  SYNOPSIS
+      Success = ActivateLayoutGadget( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, <a href="../Includes_and_Autodocs_3._guide/node03E5.html">Request</a>, <a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> )
+      d0                              a0      a1      a2       d0
+
+      <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> ActivateLayoutGadget( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+              struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> *, ULONG );
+
+  FUNCTION
+      The equivalent of intuition.library <a href="../Includes_and_Autodocs_3._guide/node038F.html">ActivateGadget()</a> for a
+      window controlled by layout.gadget. If successful, this means
+      that the user does not need to click in the gadget before
+      typing.
+
+      The gadget parameter MUST point to the root layout gadget in
+      the window, and the object parameter to the gagdet you wish
+      to activate. This works by calling the private
+      LAYOUT_ACTIVATEOBJECT method to search the layout hierarchy for
+      the specified gadget, and set the handleinput path to that
+      gadget, and finally calling <a href="../Includes_and_Autodocs_3._guide/node038F.html">ActivateGadget</a> for the root object.
+
+      The rules of calling <a href="../Includes_and_Autodocs_3._guide/node038F.html">ActivateGadget()</a> apply to
+      ActivateLayoutGadget() also.
+
+  INPUTS
+      <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> = pointer to the root layout obejct for the window.
+      <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to the window the gadget is in.
+      <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> = pointer to a requester (may be NULL)
+      <a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> = pointer to the BOOPSI object you wish to activate.
+
+  RESULT
+      If the conditions above (and those of <a href="../Includes_and_Autodocs_3._guide/node038F.html">ActivateGadget()</a>) are
+      met, the function will return TRUE, else FALSE.
+
+  NOTES
+      Not only string gadgets can be activated this way. Many
+      ReAction gadget classes, such as the button.gadget, also
+      support keyboard control, and thus may be activated this way.
+
+      An attempt to activate a gadget that is not currently visible
+      (as on a hidden page) will fail.
+
+  SEE ALSO
+      <a href="../Includes_and_Autodocs_3._guide/node038F.html">intuition.library/ActivateGadget()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

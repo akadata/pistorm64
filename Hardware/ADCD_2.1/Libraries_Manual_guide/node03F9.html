@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-2-1" TITLE="30 / Regions / Creating and Deleting Regions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / Regions / Creating and Deleting Regions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03F8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03FA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You allocate a <a href="../Includes_and_Autodocs_2._guide/node00B7.html#line28">Region</a> data structure with the <a href="../Includes_and_Autodocs_2._guide/node0460.html">NewRegion()</a> call.
+
+    struct Region *NewRegion( void );
+
+The <a href="../Includes_and_Autodocs_2._guide/node0460.html">NewRegion()</a> function allocates and initializes a <a href="../Includes_and_Autodocs_2._guide/node00B7.html#line28">Region</a> structure that
+<a name="line7">has no drawable areas defined in it.  If the application draws through a</a>
+new region, nothing will be drawn as the region is empty.  The application
+<a name="line9">must add rectangles to the region before any graphics will appear.</a>
+
+Use <a href="../Includes_and_Autodocs_2._guide/node0434.html">DisposeRegion()</a> to free the <a href="../Includes_and_Autodocs_2._guide/node00B7.html#line28">Region</a> structure when you are done with it.
+
+<a name="line13">    void DisposeRegion( struct Region *region );</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0434.html">DisposeRegion()</a> returns all memory associated with a region to the system
+<a name="line16">and deallocates all rectangles that have been linked to it.</a>
+
+    Don't Forget to Free Your Rectangles.
+    -------------------------------------
+    All of the functions that add rectangles to the region make copies
+    of the rectangles.  If the program allocates a rectangle, then adds
+    it to a region, it still must deallocate the rectangle.  The call to
+    <a href="../Includes_and_Autodocs_2._guide/node0434.html">DisposeRegion()</a> will not deallocate rectangles explicitly
+    allocated by the application.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_5" NODE="5-3-1" TITLE="5 / Gameport Events / Reading Gameport Events" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>5 / Gameport Events / Reading Gameport Events</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00B4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00B6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You read gameport events by passing an I/O request to the device with
+<a href="../Includes_and_Autodocs_2._guide/node04BC.html">GPD_READEVENT</a> set in io_Command, the address of the <a href="../Devices_Manual_guide/node00B4.html#line18">InputEvent</a> structure
+to store events set in io_Data and the size of the structure set in
+io_Length.
+
+   struct InputEvent  GameEV;
+   struct IOStdRequest *GameIO;  /* Must be initialized prior to using */
+
+   void send_read_request()
+   {
+   GameIO-&#062;io_Command = GPD_READEVENT;  /* Read events */
+   GameIO-&#062;io_Length = sizeof (struct InputEvent);
+   GameIO-&#062;io_Data = (APTR)&#038;GameEV;     /* put events in GameEV*/
+   SendIO(GameIO);                      /* Asynchronous */
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

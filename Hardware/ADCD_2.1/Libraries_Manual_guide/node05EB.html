@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/vertb.c" NODE="MAIN" TITLE="lib_examples/vertb.c" -->
+<head>
+<title>lib_examples/vertb.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05EA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05EC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* vertb.c - Execute me to compile me with SAS C 5.10
+LC -d0 -b1 -cfistq -v -y -j73 vertb.c
+Blink FROM LIB:c.o,vertb.o,vertbserver.o TO vertb LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit ; */
+/* vertb.c - Vertical blank interrupt server example.  Must be linked with vertbserver.o. */
+
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/interrupts.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;hardware/custom.h&#062;
+#include &#060;hardware/intbits.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)  { return(0); }  /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }  /* really */
+#endif
+
+extern void VertBServer();  /* proto for asm interrupt server */
+
+void main(void)
+{
+    struct Interrupt *vbint;
+    ULONG counter = 0;
+    ULONG endcount;
+                                                                         /* Allocate memory for  */
+    if (vbint = AllocMem(sizeof(struct Interrupt), MEMF_PUBLIC|MEMF_CLEAR))   /* interrupt node. */
+    {
+        vbint-&#062;is_Node.ln_Type = NT_INTERRUPT;         /* Initialize the node. */
+        vbint-&#062;is_Node.ln_Pri = -60;
+        vbint-&#062;is_Node.ln_Name = &#034;VertB-Example&#034;;
+        vbint-&#062;is_Data = (APTR)&#038;counter;
+        vbint-&#062;is_Code = VertBServer;
+
+
+        AddIntServer(INTB_VERTB, vbint); /* Kick this interrupt server to life. */
+
+        printf(&#034;VBlank server will increment a counter every frame.\n&#034;);
+        printf(&#034;counter started at zero, CTRL-C to remove server\n&#034;);
+
+        Wait(SIGBREAKF_CTRL_C);
+        endcount = counter;
+        printf(&#034;%ld vertical blanks occurred\nRemoving server\n&#034;, endcount);
+
+        RemIntServer(INTB_VERTB, vbint);
+        FreeMem(vbint, sizeof(struct Interrupt));
+    }
+    else printf(&#034;Can't allocate memory for interrupt node\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

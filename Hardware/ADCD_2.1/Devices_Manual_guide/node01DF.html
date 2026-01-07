@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-3-8" TITLE="Primitive Data Types / Data Properties (advanced topic) " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Primitive Data Types / Data Properties (advanced topic) </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01DE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01E0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Data properties specify attributes for following (non-property) <a href="../Devices_Manual_guide/node01DD.html">chunk</a>.  A
+data property essentially says &#034;identifier = value&#034;, for example &#034;XY =
+(10, 200)&#034;, telling something about following chunks.  Properties may only
+appear inside data sections (&#034;<a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>&#034; chunks, cf. Data Sections) and
+property sections (&#034;<a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>&#034; chunks, cf. Group PROP).
+
+The form of a data property is a type of <a href="../Devices_Manual_guide/node01C7.html">Chunk</a>.  The ckID is a property
+name as well as a property type.  The ckSize should be small since data
+properties are intended to be accumulated in RAM when reading a file.
+(256 bytes is a reasonable upper bound.)  Syntactically:
+
+	Property	::= Chunk
+
+When designing a data object, use properties to describe context
+information like the size of an image, even if they don't vary in your
+program.  Other programs will need this information.
+
+Think of property settings as assignments to variables in a programming
+language.  Multiple assignments are redundant and local assignments
+temporarily override global assignments.  The order of assignments doesn't
+matter as long as they precede the affected <a href="../Devices_Manual_guide/node01DD.html">chunk</a>.  (Cf. <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>s, CATs, and
+Shared Properties.)
+
+Each object type (<a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> type) is a local name space for property IDs.
+Think of a &#034;<a href="../Devices_Manual_guide/node01B0.html">CMAP</a>&#034; property in a &#034;FORM <a href="../Devices_Manual_guide/node01AC.html">ILBM</a>&#034; as the qualified ID
+&#034;ILBM.<a href="../Devices_Manual_guide/node01B0.html">CMAP</a>&#034;.  A &#034;CMAP&#034; inside some other type of <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> may not have the
+same meaning.  Property IDs specified when an object type is designed (and
+therefore known to all clients) are called &#034;standard&#034; while specialized
+ones added later are &#034;nonstandard&#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

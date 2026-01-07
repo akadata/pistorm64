@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="narrator" NODE="CloseDevice()" TITLE="narrator.device/CloseDevice" -->
+<head>
+<title>narrator.device/CloseDevice</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04D1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04D3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CloseDevice - terminates access to the narrator device
+
+
+<b>   SYNOPSIS</b>
+	CloseDevice(IORequest)
+		       A1
+
+<b>   FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0149.html">Close</a> invalidates the IO_UNIT and IO_DEVICE fields in the
+	<a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> block, preventing subsequent IO until another
+	<a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>.  CloseDevice also reduces the open count.  If
+	the count goes to 0 and the expunge bit is set, the device
+	is expunged.  If the open count goes to zero and the delayed
+	expunge bit is not set, CloseDevice sets the expunge bit.
+
+
+<b>   INPUTS</b>
+	A valid <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> block with its io_Message structure, and
+	io_Device and io_Unit fields properly initialized.  These
+	fields are initialized by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>.
+
+
+<b>   RESULTS</b>
+	CloseDevice invalidates the unit and device pointers in the
+	<a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> block.
+
+
+<b>   SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

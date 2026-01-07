@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="parallel" NODE="CMD_WRITE" TITLE="parallel.device/CMD_WRITE" -->
+<head>
+<title>parallel.device/CMD_WRITE</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04F2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04F4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a> -- send output to parallel port
+
+<b>   FUNCTION</b>
+	This command causes a stream of characters to be written to the
+	parallel output register. The number of characters is specified in
+	io_Length, unless -1 is used, in which case output is sent until
+	a zero byte occurs in the data. This is independent of, and may be
+	used simultaneously with setting the EOFMODE in io_ParFlags and using
+	the PTermArray to terminate the read or write.
+
+<b>   IO REQUEST</b>
+	io_Message      mn_ReplyPort initialized
+	io_Device       set by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Unit         set by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+	io_Command      CMD_WRITE (03)
+	io_Flags        If IOF_QUICK is set, driver will attempt Quick IO
+	io_Length       number of characters to transmit, or if set
+	                to -1 send until zero byte encountered
+	io_Data         pointer to block of data to transmit
+
+<b>   RESULTS</b>
+	io_Error -- If the <a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a> succeded, then io_Error will be null.
+	     If the <a href="../Includes_and_Autodocs_3._guide/node01D1.html">Write</a> failed, then io_Error will contain an error code.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node04F6.html">parallel.device/PDCMD_SETPARAMS</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

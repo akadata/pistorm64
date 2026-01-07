@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="III-29/dillo_lib.c" NODE="MAIN" TITLE="III-29/dillo_lib.c" -->
+<head>
+<title>III-29/dillo_lib.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0194.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0196.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+**  dillo_lib.c
+**
+**  Contains the __UserLibInit() and __UserLibCleanup() routines for
+**  the armadillo.library example shared library.
+**
+**  &#169; Copyright 1993-1999, Amiga, Inc. All Rights Reserved.
+**  Written by John Wiederhirn
+**
+*/
+
+#include    &#060;exec/types.h&#062;
+#include    &#060;clib/exec_protos.h&#062;
+#include    &#060;pragmas/exec_pragmas.h&#062;
+
+/* These prototypes are just to keep the compiler happy since we don't
+** want them in the distributable proto file.
+*/
+
+int __saveds __UserLibInit(void);
+void __saveds __UserLibCleanup(void);
+
+/* Following global item (UtilityBase) is created so our library can make
+** utility.library calls.  Technically putting it in the near section is a waste
+** of memory, but for this example, it serves its purpose.  Note also that we
+** don't actually MAKE any Utility calls, but we COULD.
+*/
+
+struct Library *UtilityBase = NULL;
+struct Library *SysBase = NULL;
+
+/*
+*/
+
+int __saveds
+__UserLibInit( void )
+{
+    int retval = 1;
+
+    SysBase = (*((void **)4));
+
+    /* Here we attempt to open Utility library.  Not a particularly good
+    ** example, but it gets the point across.  If exec.library could not
+    ** be opened (say for a second it couldn't), then __UserLibInit would
+    ** return 1 indicating failure (where a return of 0 means success).
+    */
+
+    if (UtilityBase = OpenLibrary( &#034;utility.library&#034;, 0L ))
+        retval = 0;
+
+    return( retval );
+}
+
+
+/* About as basic a routine as you can get, this routine cleans up the library
+** by providing a matching CloseLibrary of the Utility library base we opened
+** in the __UserLibInit() routine.
+*/
+
+void __saveds
+__UserLibCleanup( void )
+{
+    CloseLibrary( UtilityBase );
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

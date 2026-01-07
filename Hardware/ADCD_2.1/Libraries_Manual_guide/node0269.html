@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-8-10" TITLE="15 / / Kinds of GadTools / Text-Display and Numeric-Display Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / / Kinds of GadTools / Text-Display and Numeric-Display Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0268.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node026A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Text-display (TEXT_KIND) and numeric-display (NUMBER_KIND) gadgets are
+read-only displays of information.  They are useful for displaying
+information that is not editable or selectable, while allowing the
+application to use the GadTools formatting and visuals.  Conveniently, the
+visuals are automatically refreshed through normal GadTools gadget
+processing.  The values displayed may be modified by the program in the
+same way other GadTools gadgets may be updated.
+
+Text-display and number-display gadgets consist of a fixed label (the one
+supplied as the <a href="../Libraries_Manual_guide/node0259.html">NewGadget</a>'s <a href="../Libraries_Manual_guide/node0259.html#line27">ng_GadgetText</a>), as well as a changeable string
+or number (GTTX_Text or GTNM_Number respectively).  The fixed label is
+placed according to the PLACETEXT_ flag chosen in the NewGadget <a href="../Libraries_Manual_guide/node0259.html#line38">ng_Flags</a>
+field.  The variable part is aligned to the left-edge of the gadget.
+
+<a name="line16">Text-display gadgets recognize the following tags:</a>
+
+GTTX_Text (STRPTR)
+    Pointer to the string to be displayed or NULL for no string.  The
+<a name="line20">    default is NULL.  (Create and set.)</a>
+
+GTTX_Border (BOOL)
+    Set to TRUE to place a recessed border around the displayed string.
+<a name="line24">    The default is FALSE.  (Create only.)</a>
+
+GTTX_CopyText (BOOL)
+    This flag instructs the text-display gadget to copy the supplied
+    GTTX_Text string instead of using only a pointer to the string.  This
+    only works for the value of GTTX_Text set at <a href="../Libraries_Manual_guide/node025A.html">CreateGadget()</a> time.  If
+    GTTX_Text is changed, the new text will be referenced by pointer, not
+    copied.  Do not use this tag without a non-NULL GTTX_Text.  (Create
+    only.)
+
+
+<a name="line35">Number-display gadgets have the following tags:</a>
+
+GTNM_Number (LONG)
+<a name="line38">    The number to be displayed.  The default is zero.  (Create or set.)</a>
+
+GTNM_Border (BOOL)
+    Set to TRUE to place a recessed border around the displayed number.
+    The default is FALSE.  (Create only.)
+
+Since they are not selectable, text-display and numeric-display gadgets
+never cause <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>s to be sent to the application.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

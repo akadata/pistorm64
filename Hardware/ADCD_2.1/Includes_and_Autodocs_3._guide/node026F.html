@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="filesysres" NODE="--background--" TITLE="FileSystem.resource/--background--" -->
+<head>
+<title>FileSystem.resource/--background--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node026E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0270.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   PURPOSE</b>
+
+	The FileSystem.resource is where boot disk drivers rendezvous
+	to share file system code segments for partitions specified by
+	dos type.  Prior to V36, it was created by the first driver
+	that needed to use it.  For V36, its creation is ensured by the
+	rom boot process.
+
+<b>   CONTENTS</b>
+
+	The FileSystem.resource is described in the include file
+	<a href="../Includes_and_Autodocs_3._guide/node060C.html">resources/filesysres.h</a>.  The nodes on it describe how to
+	algorithmically convert the result of <a href="../Includes_and_Autodocs_3._guide/node0266.html">MakeDosNode</a> (from the
+	expansion.library) to a node appropriate for the dos type.
+
+	<a href="../Includes_and_Autodocs_3._guide/node060C.html#line30">FileSysEntry</a>
+	    fse_Node		on fsr_FileSysEntries list
+				ln_Name is of creator of this entry
+	    fse_DosType		DosType of this FileSys: e.g. 0x444f5301
+				for the fast file system.
+	    fse_Version		high word is the version, low word is
+				the revision.
+	    fse_PatchFlags	bits set for those of the following that
+				need to be substituted into a standard
+				device node for this file system: e.g.
+				$180 for substitute SegList &#038; GlobalVec
+	    fse_Type		device node type: zero
+	    fse_Task		standard dos &#034;task&#034; field
+	    fse_Lock		must be zero
+	    fse_Handler		for V36, if bit 31 is set, this is not
+				an AmigaDOS partition.
+	    fse_StackSize	stacksize to use when starting task
+	    fse_Priority	task priority when starting task
+	    fse_Startup		startup msg: <a href="../Includes_and_Autodocs_3._guide/node05FD.html#line80">FileSysStartupMsg</a> for disks
+	    fse_SegList		segment of code to run to start new task
+	    fse_GlobalVec	BCPL global vector when starting task
+
+	no more entries need exist than those implied by fse_PatchFlags,
+	so entries do not have a fixed size.  For V36, for example, the
+	entry for the fast file system (fse_DosType 0x444f5301)
+	contains a zero fse_PatchFlags, and thus no entries beyond that.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

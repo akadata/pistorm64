@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_16" NODE="16-4-1" TITLE="16 / Calling Functions / Parameters Passed to Custom Hook Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>16 / Calling Functions / Parameters Passed to Custom Hook Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0283.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0285.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A requester always passes three parameters to your custom hook function:
+
+    ULONG MyHookFunc(ULONG type, CPTR object, CPTR AslRequester)
+
+If MyHookFunc() is called from a file requester doing <a href="../Libraries_Manual_guide/node0283.html#line8">_DOWILDFUNC</a>, the
+three parameters are:
+
+
+    type = <a href="../Libraries_Manual_guide/node0283.html#line8">FILF_DOWILDFUNC</a>
+
+    object = pointer to an AnchorPath structure (from &#060;dos/<a href="../Includes_and_Autodocs_2._guide/node0070.html#line52">dosasl.h</a>&#062;)
+
+    AslRequester = pointer to the <a href="../Libraries_Manual_guide/node027B.html#line15">FileRequester</a> that called the hook
+                   function (Return a zero to display this file)
+
+
+The <a href="../Includes_and_Autodocs_2._guide/node0070.html#line52">AnchorPath</a> structure is a dos.library structure used in pattern
+matching.  Refer to the AmigaDOS Manual, 3rd Edition by Bantam Books for
+more information.
+
+If MyHookFunc() is called from a font requester doing <a href="../Libraries_Manual_guide/node0283.html#line8">_DOWILDFUNC</a>, the
+three parameters are:
+
+
+    type = <a href="../Libraries_Manual_guide/node0283.html#line8">FONF_DOWILDFUNC</a>
+
+    object = pointer to a <a href="../Libraries_Manual_guide/node03D6.html#line21">TextAttr</a> structure (from &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00A8.html#line65">text.h</a>&#062;)
+
+    AslRequester = pointer to the <a href="../Libraries_Manual_guide/node0281.html">FontRequester</a> that called the hook
+                   function (Return non-zero to display this particular
+                   font size)
+
+
+If MyHookFunc() is called from a file or font requester doing <a href="../Libraries_Manual_guide/node0283.html#line8">_DOMSGFUNC</a>,
+the three parameters are:
+
+
+    type = <a href="../Libraries_Manual_guide/node0283.html#line8">FILF_DOMSGFUNC</a> (file requester) or <a href="../Libraries_Manual_guide/node0283.html#line8">FONF_DOMSGFUNC</a> (font
+           requester)
+
+    object = pointer to the <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a> for the function to process
+
+    AslRequester = pointer to the <a href="../Libraries_Manual_guide/node027B.html#line15">FileRequester</a> or <a href="../Libraries_Manual_guide/node0281.html">FontRequester</a> that
+                   called the hook function (Return a pointer to the
+                   <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>)
+
+
+Notice that it is possible for a requester to use both <a href="../Libraries_Manual_guide/node0283.html#line8">_DOWILDFUNC</a> and
+<a href="../Libraries_Manual_guide/node0283.html#line8">_DOMSGFUNC</a> at the same time.  Your hook function has to differentiate
+between the two cases by testing the type passed to it.  It is not
+possible for a font and file requester to share a hook function for a
+_DOWILDFUNC, because FILF_DOWILDFUNC is defined to be the same value as
+FONF_DOWILDFUNC, so the hook function cannot tell if the object (from the
+prototype above) is a pointer to an <a href="../Includes_and_Autodocs_2._guide/node0070.html#line52">AnchorPath</a> structure or a pointer to a
+<a href="../Libraries_Manual_guide/node03D6.html#line21">TextAttr</a> structure.  It is possible for font and file requesters to share
+one hook function for _DOMSGFUNC (even though FILF_DOMSGFUNC and
+FONF_DOMSGFUNC are equal) because, in this case, font and file requesters
+both call your hook function in the same manner.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-2-1" TITLE="3 / Screen Data Structures / The Intuition Screen Data Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Screen Data Structures / The Intuition Screen Data Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00DC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00DE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node00DC.html#line7">structures</a> mentioned above are unified along with other information in
+Intuition's Screen data structure defined in the include file
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">screens.h</a>&#062;.  Notice that the Screen structure contains
+instances of a ViewPort, RastPort and BitMap.
+<a name="line6"></a>
+
+struct Screen
+    {
+    struct Screen *NextScreen;
+    struct Window *FirstWindow;
+    WORD LeftEdge, TopEdge, Width, Height;
+    WORD MouseY, MouseX;
+    UWORD Flags;
+    UBYTE *Title, *DefaultTitle;
+    BYTE BarHeight, BarVBorder, BarHBorder, MenuVBorder, MenuHBorder;
+    BYTE WBorTop, WBorLeft, WBorRight, WBorBottom;
+    struct TextAttr *Font;
+    struct ViewPort ViewPort;
+    struct RastPort RastPort;
+    struct BitMap BitMap;
+    struct Layer_Info LayerInfo;
+    struct Gadget *FirstGadget;
+    UBYTE DetailPen, BlockPen;
+    UWORD SaveColor0;
+    struct Layer *BarLayer;
+    UBYTE *ExtData, *UserData;
+    };
+
+
+In general, applications don't need to access the fields in the Screen
+structure directly; they use Intuition functions to manipulate the screen
+instead.  Likewise, applications do not set up the Screen themselves; they
+use one of the <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreen()</a> calls.  Here is a description of some of the
+more interesting members of the Screen structure (it is not meant to be a
+<a name="line36">complete description of all the fields).</a>
+
+LeftEdge, TopEdge
+    The LeftEdge and TopEdge variables give the position of the screen
+    relative to the upper left corner of the monitor's visible display
+    (as set by the user in the <a href="../Libraries_Manual_guide/node0314.html">Overscan</a> <a href="../Libraries_Manual_guide/node0228.html#line8">preferences editor</a>).  If it is
+    positioned down or to the right, the values are positive.  If the
+    screen is positioned up or to the left, the values are negative.  The
+    values are in screen resolution pixels.  In systems prior to <a href="../Libraries_Manual_guide/node0014.html">V36</a>,
+    LeftEdge positioning is ignored and negative TopEdge positions are
+<a name="line46">    illegal.</a>
+
+    The screen position may be set when the screen is opened or later by
+    calling the <a href="../Libraries_Manual_guide/node00FB.html">MoveScreen()</a> function. Note that the screen's actual
+    display position may not exactly equal the coordinates given in the
+    LeftEdge and TopEdge fields of the Screen structure.  This can cause
+    a window which is opened in the visible part of the screen to be
+    incorrectly positioned by a few pixels in each direction.  This
+    complication is due to hardware constraints that limit the fineness
+    of screen positioning.  For instance, <a href="../Libraries_Manual_guide/node00D8.html#line14">high resolution</a> screens can
+    only be positioned in <a href="../Libraries_Manual_guide/node00D8.html#line14">low resolution</a> pixel coordinates, yet the
+    values in the LeftEdge and TopEdge use high resolution pixel
+    coordinates.  So when the screen is displayed, its position is
+<a name="line59">    rounded to a position available for the monitor.</a>
+
+MouseX, MouseY
+    Position of the mouse with respect to the upper left corner of the
+<a name="line63">    screen.</a>
+
+ViewPort, RastPort, BitMap, LayerInfo
+    Actual instances of the graphics library <a href="../Libraries_Manual_guide/node00DC.html">data structures</a> associated
+    with this screen (not pointers to structures).  For normal use of
+<a name="line68">    <a href="../Libraries_Manual_guide/node00DF.html">custom screens</a>, these structures may be ignored.</a>
+
+BarLayer
+<a name="line71">    A pointer to the <a href="../Libraries_Manual_guide/node03E4.html">Layer</a> structure for the screen's <a href="../Libraries_Manual_guide/node00DB.html">title bar</a>.</a>
+
+WBorTop, WBorLeft, WBorRight, WBorBottom
+    Window border values, see the &#034;<a href="../Libraries_Manual_guide/node010A.html">Intuition Windows</a>&#034; chapter for
+    information on pre-calculating the size of window borders for windows
+<a name="line76">    that open in this screen.</a>
+
+Font
+    The default screen font, this can be used to pre-calculate the size
+<a name="line80">    of the <a href="../Libraries_Manual_guide/node0107.html#line14">window borders</a> for windows that open in this screen.</a>
+
+UserData
+<a name="line83">    Free for application use.</a>
+
+Other Screen structure members provide information on the title bar layer,
+and attributes of <a href="../Libraries_Manual_guide/node018B.html#line5">menus</a> and <a href="../Libraries_Manual_guide/node0107.html">windows</a> opened in the screen.  Of particular
+interest are the values that allow precalculation of window border size.
+These variables will be discussed in the chapter &#034;<a href="../Libraries_Manual_guide/node010A.html">Intuition Windows</a>&#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/exec/ports.h" NODE="MAIN" TITLE="include/exec/ports.h" -->
+<head>
+<title>include/exec/ports.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node062D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node062F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_PORTS_H
+#define	EXEC_PORTS_H
+/*
+**	$VER: ports.h 39.0 (15.10.1991)
+**	Includes Release 44.1
+**
+**	Message ports and Messages.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_NODES_H
+#include &#060;exec/nodes.h&#062;
+#endif /* EXEC_NODES_H */
+
+#ifndef EXEC_LISTS_H
+#include &#060;exec/lists.h&#062;
+#endif /* EXEC_LISTS_H */
+
+#ifndef EXEC_TASKS_H
+#include &#060;exec/tasks.h&#062;
+#endif /* EXEC_TASKS_H */
+
+
+/****** MsgPort *****************************************************/
+<a name="line27"></a>
+struct MsgPort {
+    struct  Node mp_Node;
+    UBYTE   mp_Flags;
+    UBYTE   mp_SigBit;		/* signal bit number	*/
+    void   *mp_SigTask;		/* object to be signalled */
+    struct  List mp_MsgList;	/* message linked list	*/
+};
+
+#define mp_SoftInt mp_SigTask	/* Alias */
+
+/* mp_Flags: Port arrival actions (PutMsg) */
+#define PF_ACTION	3	/* Mask */
+#define PA_SIGNAL	0	/* Signal task in mp_SigTask */
+#define PA_SOFTINT	1	/* Signal SoftInt in mp_SoftInt/mp_SigTask */
+#define PA_IGNORE	2	/* Ignore arrival */
+
+
+/****** Message *****************************************************/
+<a name="line46"></a>
+struct Message {
+    struct  Node mn_Node;
+    struct  MsgPort *mn_ReplyPort;  /* message reply port */
+    UWORD   mn_Length;		    /* total message length, in bytes */
+				    /* (include the size of the Message */
+				    /* structure in the length) */
+};
+
+#endif	/* EXEC_PORTS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

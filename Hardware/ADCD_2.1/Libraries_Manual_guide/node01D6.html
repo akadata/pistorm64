@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_9" NODE="9-5" TITLE="9 Intuition Input and Output Methods / Using the IDCMP" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>9 Intuition Input and Output Methods / Using the IDCMP</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01D5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01D7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The IDCMP allow the application to receive information directly from
+Intuition.  The program can use the IDCMP to learn about mouse, keyboard
+and other Intuition events.  Also, certain useful Intuition features, most
+notably the verification functions (described under &#034;<a href="../Libraries_Manual_guide/node01E2.html">IDCMP Flags</a>&#034; below),
+require that the IDCMP be opened, as this is the only mechanism available
+<a name="line7">for accessing these features.</a>
+
+The IDCMP consists of a pair of message ports, which may be allocated and
+initialized by Intuition at the request of the program.  Alternately, the
+application may choose to manage part of the allocation, such that one
+port is supplied by the application and one port is supplied by Intuition.
+These ports are standard Exec message ports, used to allow interprocess
+communications in the Amiga multitasking environment.  To learn more about
+message ports and message passing, see the &#034;<a href="../Libraries_Manual_guide/node02EA.html">Exec Messages and Ports</a>&#034;
+<a name="line16">chapter.</a>
+
+The IDCMP is always associated with a window, it is not possible to have
+an IDCMP without an open window.  The IDCMP is made up of several fields
+<a name="line20">in the <a href="../Libraries_Manual_guide/node0121.html">Window</a> structure:</a>
+
+  * IDCMPFlags stores the IDCMP flags currently set for this port. This
+    field should never be directly set by the application; use the
+<a name="line24">    function <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> or set them when the window is opened instead.</a>
+
+  * UserPort is a pointer to the standard Exec message port where the
+<a name="line27">    application receives input event messages from Intuition</a>
+
+  * WindowPort is a pointer to the reply message port used by Intuition.
+    The messages sent by Intuition are set up such that <a href="../Libraries_Manual_guide/node02F3.html">ReplyMsg()</a> will
+<a name="line31">    return them to this port.</a>
+
+To open these ports automatically, set at least one of the IDCMP flags in
+the <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> call.  To free these ports later in the program,
+call the function <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> with NULL for the IDCMP flags or simply
+<a name="line36">close the window.</a>
+
+    Don't Reply Any Messages After the IDCMP is Freed.
+    --------------------------------------------------
+    If an IDCMP is freed, either by calling <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> or by
+    closing the window, Intuition will reclaim and deallocate all
+    messages waiting at that port without waiting for a <a href="../Libraries_Manual_guide/node02F3.html">ReplyMsg()</a>.
+    If the program attempts to ReplyMsg() to an <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>s after
+    the IDCMP is closed, the system will probably crash.
+
+If the IDCMP flags are NULL when the window is opened, no ports will be
+allocated when the window is created.  To have Intuition allocate these
+ports later, call the function <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a> with any of the IDCMP flags
+set.  (Starting in V37, ModifyIDCMP() returns NULL if it was unable to
+create the necessary message ports.  Do not check the return code under
+V36 or earlier.)
+
+Once the IDCMP is opened, with the ports allocated, the program can
+receive many types of information directly from Intuition, based on the
+<a name="line55">IDCMP flags that are set.</a>
+
+The IDCMP allows the application to receive only the events that it
+considers important.  The program can, for instance, choose to learn about
+gadget events but may not want to learn about other mouse or keyboard
+events.  This is done by providing a &#034;filter&#034; or &#034;mask&#034; value for the
+IDCMP which tells Intuition which events it should send to this specific
+port.  Only messages with a type matching one of the flags set in the
+<a href="../Libraries_Manual_guide/node0121.html">Window</a> structure's IDCMPFlags field will be sent to this port.  These
+values may be set at creation time, or modified by calling the function
+<a name="line65"><a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP()</a>.</a>
+
+Messages sent to the IDCMP are instances of the structure <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>.
+This is an extended form of the Exec <a href="../Libraries_Manual_guide/node02EF.html">Message</a> structure which allows
+Intuition to send user interface specific information to the application.
+The IntuiMessage structure is discussed at length below.
+
+After the application opens an IDCMP, it must monitor the port for
+messages.  At a minimum, this involves removing all messages from the port
+and replying to them.  An event loop which processes messages arriving at
+the IDCMP is discussed <a href="../Libraries_Manual_guide/node01D7.html">below</a>.
+
+ <a href="../Libraries_Manual_guide/node01D7.html">Standard IntuiMessage Event Loop</a>    <a href="../Libraries_Manual_guide/node01D8.html">Setting Up A Custom User Port</a> 
+ <a href="../Libraries_Manual_guide/node058A.html">Event Loop Example</a>                  <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessages</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

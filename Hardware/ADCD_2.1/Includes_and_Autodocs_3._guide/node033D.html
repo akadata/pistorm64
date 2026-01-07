@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="WritePixel()" TITLE="graphics.library/WritePixel" -->
+<head>
+<title>graphics.library/WritePixel</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node033C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node033E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       WritePixel -- Change the pen num of one specific pixel in a
+                     specified <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+
+<b>   SYNOPSIS</b>
+       error = WritePixel(  rp, x,  y)
+         d0                 a1 D0  D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> WritePixel( struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line63">SHORT</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line63">SHORT</a> );
+
+<b>   FUNCTION</b>
+       Changes the pen number of the selected pixel in the specified
+       <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> to that currently specified by PenA, the primary
+       drawing pen. Obeys minterms in <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+
+<b>   INPUTS</b>
+       rp - a pointer to the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> structure
+       (x,y) - point within the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> at which the selected
+           pixel is located.
+
+<b>   RESULT</b>
+       error = 0 if pixel succesfully changed
+	      = -1 if (x,y) is outside the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node0310.html">ReadPixel()</a> <a href="../Includes_and_Autodocs_3._guide/node05D7.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

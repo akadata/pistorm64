@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/memory.h" NODE="MAIN" TITLE="Includes/exec/memory.h" -->
+<head>
+<title>Includes/exec/memory.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0088.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node008A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_MEMORY_H
+#define	EXEC_MEMORY_H
+/*
+**	$Filename: exec/memory.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.12 $
+**	$Date: 91/03/15 $
+**
+**	Definitions and structures used by the memory allocation system
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+#endif /* EXEC_NODES_H */
+
+<a name="line19"></a>
+/****** MemChunk ****************************************************/
+<a name="line21"></a>
+<a name="line22">struct	MemChunk {</a>
+<a name="line23">    struct  MemChunk *mc_Next;	/* pointer to next chunk */</a>
+    ULONG   mc_Bytes;		/* chunk byte size	*/
+};
+
+<a name="line27"></a>
+/****** MemHeader ***************************************************/
+<a name="line29"></a>
+<a name="line30">struct	MemHeader {</a>
+<a name="line31">    struct  Node mh_Node;</a>
+<a name="line32">    UWORD   mh_Attributes;	/* characteristics of this region */</a>
+<a name="line33">    struct  MemChunk *mh_First; /* first free region		*/</a>
+<a name="line34">    APTR    mh_Lower;		/* lower memory bound		*/</a>
+<a name="line35">    APTR    mh_Upper;		/* upper memory bound+1	*/</a>
+    ULONG   mh_Free;		/* total number of free bytes	*/
+};
+
+<a name="line39"></a>
+/****** MemEntry ****************************************************/
+<a name="line41"></a>
+struct	MemEntry {
+<a name="line43">union {</a>
+<a name="line44">    ULONG   meu_Reqs;		/* the AllocMem requirements */</a>
+<a name="line45">    APTR    meu_Addr;		/* the address of this memory region */</a>
+<a name="line46">    } me_Un;</a>
+    ULONG   me_Length;		/* the length of this memory region */
+};
+<a name="line49"></a>
+<a name="line50">#define me_un	    me_Un	/* compatibility - do not use*/</a>
+<a name="line51">#define me_Reqs     me_Un.meu_Reqs</a>
+#define me_Addr     me_Un.meu_Addr
+
+<a name="line54"></a>
+/****** MemList *****************************************************/
+
+<a name="line57">/* Note: sizeof(struct MemList) includes the size of the first MemEntry! */</a>
+<a name="line58">struct	MemList {</a>
+<a name="line59">    struct  Node ml_Node;</a>
+<a name="line60">    UWORD   ml_NumEntries;	/* number of entries in this struct */</a>
+    struct  MemEntry ml_ME[1];	/* the first entry	*/
+};
+<a name="line63"></a>
+#define ml_me	ml_ME		/* compatability - do not use */
+
+<a name="line66"></a>
+/*----- Memory Requirement Types ---------------------------*/
+/*----- See the AllocMem() documentation for details--------*/
+<a name="line69"></a>
+<a name="line70">#define MEMF_ANY    (0L)	/* Any type of memory will do */</a>
+<a name="line71">#define MEMF_PUBLIC (1L&#060;&#060;0)</a>
+<a name="line72">#define MEMF_CHIP   (1L&#060;&#060;1)</a>
+<a name="line73">#define MEMF_FAST   (1L&#060;&#060;2)</a>
+<a name="line74">#define MEMF_LOCAL  (1L&#060;&#060;8)	/* Memory that does not go away at RESET */</a>
+#define MEMF_24BITDMA (1L&#060;&#060;9)	/* DMAable memory within 24 bits of address */
+<a name="line76"></a>
+<a name="line77">#define MEMF_CLEAR   (1L&#060;&#060;16)	/* AllocMem: NULL out area before return */</a>
+<a name="line78">#define MEMF_LARGEST (1L&#060;&#060;17)	/* AvailMem: return the largest chunk size */</a>
+<a name="line79">#define MEMF_REVERSE (1L&#060;&#060;18)	/* AllocMem: allocate from the top down */</a>
+#define MEMF_TOTAL   (1L&#060;&#060;19)	/* AvailMem: return total size of memory */
+<a name="line81"></a>
+<a name="line82">/*----- Current alignment rules for memory blocks (may increase) -----*/</a>
+#define MEM_BLOCKSIZE	8L
+#define MEM_BLOCKMASK	(MEM_BLOCKSIZE-1)
+
+#endif	/* EXEC_MEMORY_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

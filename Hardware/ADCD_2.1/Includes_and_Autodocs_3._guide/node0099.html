@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="cardres" NODE="DeviceTuple()" TITLE="card.resource/DeviceTuple" -->
+<head>
+<title>card.resource/DeviceTuple</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0098.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node009A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	DeviceTuple -- Decode a device tuple
+
+<b>   SYNOPSIS</b>
+	return=DeviceTuple( tuple_data, storage)
+		   	    a0		a1
+
+	ULONG DeviceTuple( <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E2.html#line37">DeviceTData</a> *);
+
+<b>   FUNCTION</b>
+	Extracts SIZE, TYPE, and SPEED from a device tuple (generally
+	obtained with <a href="../Includes_and_Autodocs_3._guide/node0098.html">CopyTuple()</a>).
+
+<b>   INPUTS</b>
+	tuple_data - Pointer to a CISTPL_DEVICE tuple (generally obtained
+	with <a href="../Includes_and_Autodocs_3._guide/node0098.html">CopyTuple()</a>).
+
+	storage - Pointer to a <a href="../Includes_and_Autodocs_3._guide/node05E2.html#line37">DeviceTData</a> structure in which results
+	are to be stored.
+
+	struct	<a href="../Includes_and_Autodocs_3._guide/node05E2.html#line37">DeviceTData</a> {
+		ULONG	dtd_DTsize;		/* Size of card (bytes)	*/
+		ULONG	dtd_DTspeed;		/* Speed in nanoseconds	*/
+		<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a>	dtd_DTtype;		/* Type of card		*/
+		<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a>	dtd_DTflags;		/* Other flags		*/
+	};
+
+
+<b>   RETURN</b>
+	SIZE (same as dtd_DTsize) if the <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line23">Device</a> Tuple could be decoded.
+	FALSE (0) if the tuple is believed to be invalid.  The tuple is
+	considered to be invalid if:
+
+		The tuple link value is 0.
+
+		The device type/speed byte is $00, or $FF.
+
+		The device type is DTYPE_EXTEND, which is undefined
+		as of this writing.
+
+		The extended speed byte is a value which is
+		undefined as of this writing.
+
+		The extended speed byte is extended again which is
+		undefined as of this writing.
+
+		The device Size byte is $FF.
+
+<b>   NOTES</b>
+	Some cards may not have a size specified in the device
+	tuple.  An example would be an I/O card.  The size would be
+	returned as one (1) in this case.
+
+	You should not call this function with a partial CISTPL_DEVICE
+	tuple, or the return values may be junk.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0098.html">CopyTuple()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E2.html">resources/card.h</a>, resources/card.i
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="AIFF-7-2" TITLE=" AIFF / Local Chunk Types / Sound Data Chunk " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> AIFF / Local Chunk Types / Sound Data Chunk </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node021B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node021D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Sound Data Chunk contains the actual sample frames.
+
+    #define 	SoundDataID	'SSND'	/* ckID for Sound Data Chunk 	*/
+
+    typedef struct {
+	ID		ckID;
+	long		ckSize;
+
+	unsigned long	offset;
+	unsigned long	blockSize;
+	unsigned char	SoundData [];
+    }  SoundDataChunk;
+
+The ckID is always 'SSND'.  The ckSize is the size of the data portion of
+the chunk, in bytes.  It does not include the 8 bytes used by ckID and
+ckSize.
+
+The offset field determines where the first sample frame in the soundData
+starts.  The offset is in bytes.  Most applications won't use offset and
+should set it to zero.  Use for a non-zero offset is explained in the
+Block-Aligning Sound Data section below.
+
+The blockSize is used in conjunction with offset for block-aligning sound
+data.  It contains the size in bytes of the blocks that sound data is
+aligned to.  As with offset, most applications won't use blockSize and
+should set it to zero.  More information on blockSize is in the
+Block-Aligning Sound Data section below.
+
+The soundData field contains the sample frames that make up the sound.
+The number of sample frames in the soundData is determined by the
+numSampleFrames field in the Common Chunk.  Sample points and sample
+frames are explained in detail in the next section.
+
+The Sound Data Chunk is required unless the numSampleFrames field in the
+Common Chunk is zero.  A maximum of one Sound Data Chunk may appear in a
+FORM AIFF.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

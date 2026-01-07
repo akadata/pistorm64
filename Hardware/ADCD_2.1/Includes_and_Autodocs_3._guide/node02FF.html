@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="MakeVPort()" TITLE="graphics.library/MakeVPort" -->
+<head>
+<title>graphics.library/MakeVPort</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02FE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0300.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	MakeVPort -- generate display copper list for a viewport.
+
+<b>   SYNOPSIS</b>
+	error =  MakeVPort( view, viewport )
+	 d0                   a0     a1
+
+	ULONG MakeVPort( struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> * );
+
+<b>   FUNCTION</b>
+	Uses information in the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a>, <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>, ViewPort-&#062;RasInfo to
+	construct and intermediate copper list for this <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>.
+
+<b>   INPUTS</b>
+	view - pointer to a <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a> structure
+	viewport - pointer to a <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> structure
+		 The viewport must have valid pointer to a RasInfo.
+
+<b>   RESULTS</b>
+	constructs intermediate copper list and puts pointers in
+	viewport.DspIns
+	If the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> ptr in <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> is NULL then it uses colors
+	from the default color table.
+	If DUALPF in Modes then there must be a second RasInfo pointed
+	to by the first RasInfo
+
+	From V39, MakeVPort can return a ULONG error value (previous versions
+	returned void), to indicate that either not enough memory could be
+	allocated for MakeVPort's use, or that the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> mode
+	and bitplane alignments are incorrect for the bitplane's depth.
+
+	You should check for these error values - they are defined in
+	<a href="../Includes_and_Autodocs_3._guide/node05ED.html">&#060;graphics/view.h&#062;</a>.
+
+
+<b>   BUGS</b>
+	In V37 and earlier, narrow Viewports (whose righthand edge is
+	less than 3/4 of the way across the display) do not work properly.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02FA.html">InitVPort()</a> <a href="../Includes_and_Autodocs_3._guide/node0303.html">MrgCop()</a> <a href="../Includes_and_Autodocs_3._guide/node05ED.html">graphics/view.h</a> <a href="../Includes_and_Autodocs_3._guide/node03C4.html">intuition.library/MakeScreen()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node03E0.html">intuition.library/RemakeDisplay()</a> <a href="../Includes_and_Autodocs_3._guide/node03E7.html">intuition.library/RethinkDisplay()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

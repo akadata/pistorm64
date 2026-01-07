@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="II-65/RestoreShell.c" NODE="MAIN" TITLE="II-65/RestoreShell.c" -->
+<head>
+<title>II-65/RestoreShell.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0179.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node017B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* RestoreShell.c - Execute me to compile me with SAS/C 6.56
+; (c)  Copyright 1992-1999 Amiga, Inc.   All rights reserved.
+; The information contained herein is subject to change without notice,
+; and is provided &#034;as is&#034; without warranty of any kind, either expressed
+; or implied.  The entire risk as to the use of this information is
+; assumed by the user.
+;
+sc DATA=NEAR NMINC STRMERGE NOSTKCHK NODEBUG IGNORE=73 RestoreShell.c
+slink FROM lib:c.o RestoreShell.o TO RestoreShell LIBRARY lib:sc.lib lib:amiga.lib smallcode smalldata
+quit
+*/
+/* restore the BootShell as the UserShell.  Note that this
+   only switches back the BootShell, it does not unload the
+   current user shell (&#034;shell&#034; on the resident list) as it
+   is possible that some instance of it can still be running.
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;dos/dosextens.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }
+#endif
+
+UBYTE *vers = &#034;\0$VER: RestoreShell 1.0&#034;;
+
+void main(void)
+{
+    struct Segment
+        *bootshell_seg,
+        *shell_seg;
+
+    Forbid();
+    shell_seg = FindSegment(&#034;shell&#034;, NULL, CMD_SYSTEM);
+    bootshell_seg = FindSegment(&#034;bootshell&#034;, NULL, CMD_SYSTEM);
+    if (bootshell_seg)
+		shell_seg-&#062;seg_Seg = bootshell_seg-&#062;seg_Seg;
+    Permit();
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_9" NODE="9-6-1-3" TITLE="9 / / Event Message Classes and Flags / Menu Flags" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>9 / / Event Message Classes and Flags / Menu Flags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01DD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01DF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+IDCMP_MENUPICK
+    This flag indicates that the user has pressed the menu button.  If a
+<a name="line4">    menu item was selected, the menu number of the menu item can be found</a>
+    in the <a href="../Libraries_Manual_guide/node01D9.html#line33">Code</a> field of the <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>.  If no item was selected, the
+<a name="line6">    Code field will be equal to MENUNULL.</a>
+
+IDCMP_MENUVERIFY
+    This is a special verification mode which allows the program to
+    confirm that it is prepared to handle Intuition rendering, in this
+    case, allowing menus to be drawn in the screen.
+
+    This is a special kind of verification, in that any window in the
+    entire screen that has this flag set must respond before the menu
+    operations may proceed.  Also, the active window of the screen is
+    allowed to cancel the menu operation.  This is unique to
+    IDCMP_MENUVERIFY.  Refer to the &#034;Intuition Menus&#034; for a complete
+    description.
+
+    Also see the &#034;<a href="../Libraries_Manual_guide/node01E2.html">Verification Functions</a>&#034; section below for more
+<a name="line21">    information.</a>
+
+IDCMP_MENUHELP
+    This message is sent by Intuition when the user selects the Help key
+    while the menu system is activated.  If a menu item was selected, the
+    menu number of the menu item can be found in the <a href="../Libraries_Manual_guide/node01D9.html#line33">Code</a> field of the
+    <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>.  If no item was selected, the Code field will be equal
+<a name="line28">    to MENUNULL.</a>
+
+    These messages will only be sent if the <a href="../Libraries_Manual_guide/node0125.html#line142">WA_MenuHelp</a> attribute is set
+    for the window.
+
+    The menu number returned in IDCMP_MENUHELP may specify a position
+    that cannot be generated through normal menu activity.  For instance,
+    the menu number may indicate one of the menu headers with no item or
+    sub-item.  See the chapter on &#034;Intuition <a href="../Libraries_Manual_guide/node018A.html">Menus</a>&#034; for more information.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

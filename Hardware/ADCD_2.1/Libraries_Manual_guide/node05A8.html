@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/intuitext.c" NODE="MAIN" TITLE="Lib_examples/intuitext.c" -->
+<head>
+<title>Lib_examples/intuitext.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05A7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05A9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* intuitext.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 intuitext.c
+Blink FROM LIB:c.o,intuitext.o TO intuitext LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+
+** intuitext.c - program to show the use of an Intuition IntuiText object.
+*/
+#define INTUI_V36_NAMES_ONLY
+
+#include &#060;exec/types.h&#062;
+#include &#060;intuition/intuition.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+struct Library *IntuitionBase = NULL;
+
+#define MYTEXT_LEFT (0)
+#define MYTEXT_TOP  (0)
+
+/*
+** main routine. Open required library and window and draw the images.
+** This routine opens a very simple window with no IDCMP.  See the
+** chapters on &#034;Windows&#034; and &#034;Input and Output Methods&#034; for more info.
+** Free all resources when done.
+*/
+VOID main(int argc, char **argv)
+{
+struct Screen    *screen;
+struct DrawInfo  *drawinfo;
+struct Window    *win;
+struct IntuiText  myIText;
+struct TextAttr   myTextAttr;
+
+ULONG myTEXTPEN;
+ULONG myBACKGROUNDPEN;
+
+IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,37);
+if (IntuitionBase)
+    {
+    if (screen = LockPubScreen(NULL))
+        {
+        if (drawinfo = GetScreenDrawInfo(screen))
+            {
+            /* Get a copy of the correct pens for the screen.
+            ** This is very important in case the user or the
+            ** application has the pens set in a unusual way.
+            */
+            myTEXTPEN = drawinfo-&#062;dri_Pens[TEXTPEN];
+            myBACKGROUNDPEN  = drawinfo-&#062;dri_Pens[BACKGROUNDPEN];
+
+            /* create a TextAttr that matches the specified font. */
+            myTextAttr.ta_Name  = drawinfo-&#062;dri_Font-&#062;tf_Message.mn_Node.ln_Name;
+            myTextAttr.ta_YSize = drawinfo-&#062;dri_Font-&#062;tf_YSize;
+            myTextAttr.ta_Style = drawinfo-&#062;dri_Font-&#062;tf_Style;
+            myTextAttr.ta_Flags = drawinfo-&#062;dri_Font-&#062;tf_Flags;
+
+            /* open a simple window on the workbench screen for displaying
+            ** a text string.  An application would probably never use such a
+            ** window, but it is useful for demonstrating graphics...
+            */
+            if (win = OpenWindowTags(NULL,
+                                WA_PubScreen,    screen,
+                                WA_RMBTrap,      TRUE,
+                                TAG_END))
+                {
+                myIText.FrontPen    = myTEXTPEN;
+                myIText.BackPen     = myBACKGROUNDPEN;
+                myIText.DrawMode    = JAM2;
+                myIText.LeftEdge    = MYTEXT_LEFT;
+                myIText.TopEdge     = MYTEXT_TOP;
+                myIText.ITextFont   = &#038;myTextAttr;
+                myIText.IText       = &#034;Hello, World.  ;-)&#034;;
+                myIText.NextText    = NULL;
+
+                /* Draw the text string at 10,10 */
+                PrintIText(win-&#062;RPort,&#038;myIText,10,10);
+
+                /* Wait a bit, then quit.
+                ** In a real application, this would be an event loop,
+                ** like the one described in the Intuition Input and
+                ** Output Methods chapter.
+                */
+                Delay(200);
+
+                CloseWindow(win);
+                }
+            FreeScreenDrawInfo(screen,drawinfo);
+            }
+        UnlockPubScreen(NULL,screen);
+        }
+    CloseLibrary(IntuitionBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

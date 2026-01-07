@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/strings.i" NODE="MAIN" TITLE="Includes/exec/strings.i" -->
+<head>
+<title>Includes/exec/strings.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0089.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node008B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	EXEC_STRINGS_I
+EXEC_STRINGS_I	SET	1
+**
+**	$Filename: exec/strings.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.5 $
+**	$Date: 90/05/10 $
+**
+**	Macros for defining old style CR/LF terminated string constants
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+*------ Terminal Control:
+
+EOS	EQU 0
+BELL	EQU 7
+LF	EQU 10
+CR	EQU 13
+BS	EQU 8
+DEL	EQU $7F
+NL	EQU LF
+
+
+*----------------------------------------------------------------
+*
+*   String Support Macros
+*
+*----------------------------------------------------------------
+
+STRING	MACRO
+	dc.b	\1
+	dc.b	0
+	CNOP	0,2
+	ENDM
+
+
+STRINGL MACRO
+	dc.b	13,10
+	dc.b	\1
+	dc.b	0
+	CNOP	0,2
+	ENDM
+
+
+STRINGR MACRO
+	dc.b	\1
+	dc.b	13,10,0
+	CNOP	0,2
+	ENDM
+
+
+STRINGLR MACRO
+	dc.b	13,10
+	dc.b	\1
+	dc.b	13,10,0
+	CNOP	0,2
+	ENDM
+
+	ENDC	; EXEC_STRINGS_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

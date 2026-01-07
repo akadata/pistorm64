@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="InvertString()" TITLE="amiga.lib/InvertString" -->
+<head>
+<title>amiga.lib/InvertString</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0041.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0043.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	InvertString -- produce input events that would generate the
+			given string. (V36)
+
+<b>   SYNOPSIS</b>
+	events = InvertString(str,km)
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node061A.html#line256">InputEvent</a> *InvertString(STRPTR,struct <a href="../Includes_and_Autodocs_3._guide/node0623.html#line20">KeyMap</a> *);
+
+<b>   FUNCTION</b>
+	This function returns a linked list of input events which would
+	translate into the string using the supplied keymap (or the system
+	default keymap if 'km' is NULL).
+
+	'str' is null-terminated and may contain:
+	   - ANSI character codes
+	   - backslash escaped characters:
+		n   -   CR
+		r   -   CR
+		t   -   TAB
+		0   -   illegal, do not use!
+		\   -   backslash
+	   - a text description of an input event as used by <a href="../Includes_and_Autodocs_3._guide/node00F3.html">ParseIX()</a>,
+	     enclosed in angle brackets.
+
+	An example is:
+          abc&#060;alt f1&#062;nhi there.
+
+<b>   INPUTS</b>
+	str - null-terminated string to convert to input events
+	km - keymap to use for the conversion, or NULL to use the default
+	     keymap.
+
+<b>   RESULTS</b>
+	events - a chain of input events, or NULL if there was a problem. The
+		 most likely cause of failure is an illegal description
+		 enclosed in angled brackets.
+
+		 This chain should eventually be freed using <a href="../Includes_and_Autodocs_3._guide/node003E.html">FreeIEvents()</a>.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node00F3.html">commodities.library/ParseIX()</a>, <a href="../Includes_and_Autodocs_3._guide/node003E.html">FreeIEvents()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="AllocBitMap()" TITLE="graphics.library/AllocBitMap" -->
+<head>
+<title>graphics.library/AllocBitMap</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node029F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02A1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AllocBitMap -- <a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> a bitmap and attach bitplanes to it. (V39)
+
+
+<b>   SYNOPSIS</b>
+	bitmap=AllocBitMap(sizex,sizey,depth, flags, friend_bitmap)
+	                   d0    d1    d2     d3       a0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> *AllocBitMap(ULONG,ULONG,ULONG,ULONG, struct <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> *);
+
+<b>   FUNCTION</b>
+	Allocates and initializes a bitmap structure. Allocates and initializes
+	bitplane data, and sets the bitmap's planes to point to it.
+
+<b>   INPUTS</b>
+	sizex = the width (in pixels) desired for the bitmap data.
+
+	sizey = the height (in pixels) desired.
+
+	depth = the number of bitplanes deep for the allocation.
+		Pixels with AT LEAST this many bits will be allocated.
+
+	flags = BMF_CLEAR to specify that the allocated raster should be
+	        filled with color 0.
+
+	        BMF_DISPLAYABLE to specify that this bitmap data should
+	        be allocated in such a manner that it can be displayed.
+	        Displayable data has more severe alignment restrictions
+	        than non-displayable data in some systems.
+
+	        BMF_INTERLEAVED tells graphics that you would like your
+	        bitmap to be allocated with one large chunk of display
+	        memory for all bitplanes. This minimizes color flashing
+	        on deep displays. If there is not enough contiguous RAM
+		for an interleaved bitmap, graphics.library will fall
+		back to a non-interleaved one.
+
+	        BMF_MINPLANES causes graphics to only allocate enough space
+	        in the bitmap structure for &#034;depth&#034; plane pointers. This
+		is for system use and should not be used by applications use
+		as it is inefficient, and may waste memory.
+
+	friend_bitmap = pointer to another bitmap, or NULL. If this pointer
+	        is passed, then the bitmap data will be allocated in
+	        the most efficient form for blitting to friend_bitmap.
+
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+	When allocating using a friend bitmap, it is not safe to assume
+	anything about the structure of the bitmap data if that friend
+	<a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> might not be a standard amiga bitmap (for instance, if
+	the workbench is running on a non-amiga display device, its
+	Screen-&#062;RastPort-&#062;BitMap won't be in standard amiga format.
+	The only safe operations to perform on a non-standard <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> are:
+
+	        - blitting it to another bitmap, which must be either a standard
+	          Amiga bitmap, or a friend of this bitmap.
+
+	        - blitting from this bitmap to a friend bitmap or to a standard
+	          Amiga bitmap.
+
+	        - attaching it to a rastport and making rendering calls.
+
+	Good arguments to pass for the friend_bitmap are your window's
+	RPort-&#062;BitMap, and your screen's RastPort-&#062;BitMap.
+	Do NOT pass &#038;(screenptr-&#062;BitMap)!
+
+	BitMaps not allocated with BMF_DISPLAYABLE may not be used as
+	Intuition <a href="../Includes_and_Autodocs_3._guide/node05F6.html#line24">Custom</a> BitMaps or as RasInfo-&#062;BitMaps.  They may be blitted
+	to a BMF_DISPLAYABLE <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>, using one of the <a href="../Includes_and_Autodocs_3._guide/node02B2.html">BltBitMap()</a> family of
+	functions.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02D6.html">FreeBitMap()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

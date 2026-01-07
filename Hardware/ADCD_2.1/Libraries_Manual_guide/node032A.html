@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-5-3" TITLE="27 / / Viewport Display Modes / Interlaced vs. Non-interlaced Mode" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Viewport Display Modes / Interlaced vs. Non-interlaced Mode</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0329.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node032B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In interlaced mode, there are twice as many lines available as in
+non-interlaced mode, providing better vertical resolution in the same
+display area.
+
+
+  -----------------------------------------
+  -----------------------------------------
+  ------------                -------------
+  ----------- 200 lines define ------------  <a href="../Libraries_Manual_guide/node0327.html">ViewPort.Modes</a> = 0
+  -----------  a full screen   ------------
+  ------------                -------------
+  -----------------------------------------
+  -----------------------------------------
+
+
+  =========================================
+  =========================================
+  ============                =============
+  =========== 400 lines define ============  <a href="../Libraries_Manual_guide/node0327.html">ViewPort.Modes</a> = LACE
+  ===========  a full screen   ============
+  ============                =============
+  =========================================
+  =========================================
+
+            Figure 27-15: How LACE Affects Vertical Resolution
+<a name="line27"></a>
+
+If the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> structure does not specify <a href="../Libraries_Manual_guide/node0327.html#line36">LACE</a>, and the <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> specifies
+LACE, only the top half of the ViewPort data will be displayed. If the
+View structure specifies LACE and the ViewPort is non-interlaced, the same
+ViewPort data will be repeated in both fields.  The height of the ViewPort
+display is the height specified in the ViewPort structure. If both the
+View and the ViewPort are interlaced, the ViewPort will be built with
+double the normal vertical resolution.  That means it will need twice as
+much data space in memory as a non-interlaced picture to fill the display.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

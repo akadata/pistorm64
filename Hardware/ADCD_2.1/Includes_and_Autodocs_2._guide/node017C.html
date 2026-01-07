@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/asl" NODE="AllocAslRequest()" TITLE="asl.library/AllocAslRequest" -->
+<head>
+<title>asl.library/AllocAslRequest</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node017B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node017D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AllocAslRequest -- alloc an ASL requester, with <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> modifiers (V36)
+
+SYNOPSIS
+    request = AllocAslRequest( type, ptags )
+    D0                         D0    A0
+
+    APTR    request;
+    ulong   type;
+    struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a>       *ptags;
+
+FUNCTION
+    Allocates an ASL requester data structure of the specified type,
+    with optional <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> modifiers.
+
+INPUTS
+    type = type of requester to create.  Currently defined types
+        include ASL_FileRequest and ASL_FontRequest.
+    ptags = pointer to a tagitem array, which is defined for each
+        specified type.  See &#034;asl.h&#034; and example programs for usage
+        of various tag types.  See <a href="../Includes_and_Autodocs_2._guide/node017E.html">AslRequest()</a> for specifications
+        of currently defined tag values and their effects.
+
+    Note that tag values stay in effect for each use of the
+    requester until they are cleared or modified by passing the
+<a name="line28">    same tag with a new value.</a>
+
+    AllocAslRequestTags( type, tags... ) which accepts your tags
+    on the stack, is available in amiga.lib.
+
+    Example Usage: AllocAslRequestTags( ASL_FileRequest,
+                                        ASL_Hail, &#034;My Title Bar&#034;,
+                                        TAG_DONE );
+
+RESULT
+    Pointer to an initialized requester data structure, or NULL on
+    failure.  The data structure returned will match the requested
+    type; for type ASL_FileRequest, a struct <a href="../Includes_and_Autodocs_2._guide/node00EA.html#line65">FileRequester</a> *; for
+    ASL_FontRequest, a struct <a href="../Includes_and_Autodocs_2._guide/node00EA.html#line147">FontRequester</a> *.
+
+    The requester returned may then be passed to <a href="../Includes_and_Autodocs_2._guide/node017E.html">AslRequest()</a>, and
+    is freed by calling <a href="../Includes_and_Autodocs_2._guide/node017F.html">FreeAslRequest()</a>.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node017E.html">AslRequest()</a>, <a href="../Includes_and_Autodocs_2._guide/node017F.html">FreeAslRequest()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

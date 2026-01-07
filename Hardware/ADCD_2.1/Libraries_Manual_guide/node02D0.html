@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-8" TITLE="21 Exec Tasks / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 Exec Tasks / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02CF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02D1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following chart gives a brief description of the Exec functions that
+control tasks.  See the Amiga ROM Kernel Reference Manual: Includes and
+Autodocs for details about each call.
+<a name="line5"></a>
+
+     Table 21-3: Exec Task, Processor and Cache Control Functions
+  ___________________________________________________________________
+ |                                                                   |
+<a name="line10"> |      Exec Task                                                    |</a>
+ |      Function          Description                                |
+ |===================================================================|
+ |       <a href="../Includes_and_Autodocs_2._guide/node032D.html">AddTask()</a>  Add a task to the system.                        |
+ |     <a href="../Includes_and_Autodocs_2._guide/node0334.html">AllocTrap()</a>  Allocate a processor trap vector.                |
+ |       <a href="../Includes_and_Autodocs_2._guide/node034A.html">Disable()</a>  Disable interrupt processing.                    |
+ |        <a href="../Includes_and_Autodocs_2._guide/node034C.html">Enable()</a>  Enable interrupt processing.                     |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0352.html">FindTask()</a>  Find a specific task.                            |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0353.html">Forbid()</a>  Forbid task rescheduling.                        |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0357.html">FreeTrap()</a>  Release a process trap.                          |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0369.html">Permit()</a>  Permit task rescheduling.                        |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0380.html">SetTaskPri()</a>  Set the priority of a task.                      |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0378.html">RemTask()</a>  Remove a task from the system.                   |
+ |-------------------------------------------------------------------|
+ |   <a href="../Includes_and_Autodocs_2._guide/node0338.html">CacheClearE()</a>  Flush CPU instruction and/or data caches (V37).  |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0339.html">CacheClearU()</a>  Flush CPU instruction and data caches (V37).     |
+ |  <a href="../Includes_and_Autodocs_2._guide/node033A.html">CacheControl()</a>  Global cache control (V37).                      |
+ |  <a href="../Includes_and_Autodocs_2._guide/node033B.html">CachePostDMA()</a>  Perform actions prior to hardware DMA (V37).     |
+ |   <a href="../Includes_and_Autodocs_2._guide/node033C.html">CachePreDMA()</a>  Perform actions after hardware DMA (V37).        |
+ |         <a href="../Includes_and_Autodocs_2._guide/node0359.html">GetCC()</a>  Get processor <a href="../Libraries_Manual_guide/node02CC.html">condition codes</a>.                   |
+ |         <a href="../Includes_and_Autodocs_2._guide/node037F.html">SetSR()</a>  Get/set processor <a href="../Libraries_Manual_guide/node02CB.html">status register</a>.               |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0385.html">SuperState()</a>  Set <a href="../Libraries_Manual_guide/node02CA.html">supervisor mode</a> with user stack.             |
+<a name="line32"> |    <a href="../Includes_and_Autodocs_2._guide/node0386.html">Supervisor()</a>  Execute a short supervisor mode function.        |</a>
+ |     <a href="../Includes_and_Autodocs_2._guide/node0388.html">UserState()</a>  Return to user mode with user stack.             |
+ |-------------------------------------------------------------------|
+ |    <a href="../Includes_and_Autodocs_2._guide/node014A.html">CreateTask()</a>  Amiga.lib function to setup and add a new task.  |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0155.html">DeleteTask()</a>  Amiga.lib function to delete a task created with |
+ |                  CreateTask().                                    |
+ |___________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/layers" NODE="InstallLayerHook()" TITLE="layers.library/InstallLayerHook" -->
+<head>
+<title>layers.library/InstallLayerHook</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0399.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node039B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME                                                              (V36)
+    InstallLayerHook -- safely install a new Layer-&#062;BackFill hook.
+
+SYNOPSIS
+    oldhook = InstallLayerHook( layer, hook )
+    d0                          a0     a1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> *InstallLayerHook( struct <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line33">Layer</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> *);
+
+FUNCTION
+    Installs a new Layer-&#062;Backfill <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a>, waiting until it is safe to do
+    so. Locks the layer while substituting the new <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> and removing the
+    old one. If a new <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> is not provided, will install the default layer
+    BackFill <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a>.
+
+INPUTS
+    layer - pointer to the layer in which to install the Backfill <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a>.
+    hook -  pointer to layer callback <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> which will be called
+            with object == (struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *) result-&#062;RastPort
+            and message == [ (Layer *) layer, (struct Rectangle) bounds,
+                           (WORD) offsetx, (WORD) offsety ]
+
+            This hook should fill the <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line28">Rectangle</a> in the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>
+            with the BackFill pattern appropriate for offset x/y.
+
+            If this hook pointer is NULL, the function installs
+            the &#034;default&#034; Layers BackFill <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> into this <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line33">Layer</a>.
+
+RESULTS
+    oldhook - pointer to the Layer-&#062;BackFill <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> that was previously
+              active.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00A1.html">graphics/clip.h</a> <a href="../Includes_and_Autodocs_2._guide/node012D.html">utility/hooks.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="UnLoadSeg()" TITLE="dos.library/UnLoadSeg" -->
+<head>
+<title>dos.library/UnLoadSeg</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0305.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0307.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    UnLoadSeg -- Unload a seglist previously loaded by <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a>
+
+SYNOPSIS
+    success = UnLoadSeg( seglist )
+    D0                     D1
+
+    BOOL UnLoadSeg(BPTR)
+
+FUNCTION
+    Unload a seglist loaded by <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a>.  'seglist' may be zero.
+    Overlaid segments will have all needed cleanup done, including
+    closing files.
+
+INPUTS
+    seglist - BCPL pointer to a segment identifier
+
+RESULTS
+    success - returns 0 if a NULL seglist was passed or if it failed
+              to close an overlay file.  NOTE: this function returned
+              a random value before V36!
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a>, <a href="../Includes_and_Autodocs_2._guide/node02C0.html">InternalLoadSeg()</a>, <a href="../Includes_and_Autodocs_2._guide/node02C1.html">InternalUnLoadSeg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

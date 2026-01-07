@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-3-3" TITLE="28 / Using Virtual Sprites / Using VSprite Flags" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Virtual Sprites / Using VSprite Flags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0382.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0384.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line92">Flags</a> member of the <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure is both read and written by the
+system.  Some bits are used by the application to inform the system;
+others are used by the system to indicate things to the application.
+
+<a name="line6">The only <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line92">Flags</a> bits that are used by true VSprites are:</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line19">VSPRITE</a>
+    This may be set to indicate to the system that it should treat the
+    structure as a true VSprite, not part of a Bob.  This affects the
+    interpretation of the data layout and the use of various system
+<a name="line12">    variables.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line25">VSOVERFLOW</a>
+    The system sets this bit in the true VSprites that it is unable to
+    display.  This happens when there are too many in the same scan line,
+    and the system has run out of Simple Sprites to assign.  It indicates
+    that this VSprite has not been displayed.  If no sprites are
+    reserved, this means that more than eight sprites touch one scan
+    line.  This bit will not be set for Bobs and should not be changed by
+<a name="line21">    the application.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line25">GELGONE</a>
+    If the system has set GELGONE bit in the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line92">Flags</a> member, then the GEL
+    associated with this VSprite is not on the display at all, it is
+    entirely outside the GEL boundaries.  This area is defined by the
+    <a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a> members <a href="../Libraries_Manual_guide/node03B3.html">topmost, bottommost, leftmost and rightmost</a> (see
+    &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00AF.html#line39">rastport.h</a>&#062;). On the basis of that information, the
+    application may decide that the object need no longer be part of the
+    GEL list and may decide to remove it to speed up the consideration of
+    other objects. Use <a href="../Libraries_Manual_guide/node0389.html">RemVSprite()</a> (or <a href="../Libraries_Manual_guide/node03A6.html">RemBob()</a>, if it's a Bob) to do
+    this. This bit should not be changed by the application.
+
+The <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line92">VSprite.Flags</a> value should be initialized like this for a VSprite
+GEL:
+
+    myVSprite.Flags = VSPRITE;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

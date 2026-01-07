@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_29" NODE="29-9" TITLE="29 Graphics Library and Text / Composition of a Bitmap Font on Disk" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>29 Graphics Library and Text / Composition of a Bitmap Font on Disk</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03DF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03E1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For each Amiga bitmap font stored on disk (normally in the FONTS: assign
+directory), there is a corresponding &#034;.font&#034; file, a directory, and within
+that directory, a series of files bearing numeric names.  For example, for
+the font Sapphire, within FONTS:, there is a file called sapphire.font, a
+directory called Sapphire, and within the directory Sapphire are the files
+<a name="line7">14 and 19.</a>
+
+For a bitmap font (including color fonts), the &#034;.font&#034; file is a
+<a href="../Libraries_Manual_guide/node05F9.html#line51">FontContentsHeader</a> structure:
+
+    struct FontContentsHeader {
+        UWORD   fch_FileID;     /* FCH_ID */
+        UWORD   fch_NumEntries; /* the number of FontContents elements */
+        struct FontContents fch_FC[];
+                                /* or struct TFontContents fch_TFC[];  */
+    };
+
+<a name="line19">    #define MAXFONTPATH 256</a>
+
+Where the fch_FileID field can be be either:
+
+    FCH_ID    0x0f00    This FontContentsHeader uses FontContents
+                        structures to describe the available sizes of
+                        this font.
+
+
+    TFCH_ID   0x0f02    This FontContentsHeader uses TFontContents
+                        structures to describe the available sizes of
+                        this font.
+
+The fch_FileID can also be equal to 0x0f03, but that is only for scalable
+<a name="line33">outline fonts.</a>
+
+The <a href="../Libraries_Manual_guide/node05F9.html#line25">FontContents</a> structure:
+
+    struct FontContents {
+        char    fc_FileName[MAXFONTPATH];
+        UWORD   fc_YSize;
+        UBYTE   fc_Style;
+        UBYTE   fc_Flags;
+    };
+
+describes one of the sizes of this font that is available to the system as
+a designed font size.  For each FontContents structure, there should be a
+corresponding font descriptor file in this font's directory that contains
+data for this size font.  The FontContents fields correspond to the
+<a name="line48">similarly named field in the <a href="../Libraries_Manual_guide/node03DE.html">TextFont</a> structure.</a>
+
+The <a href="../Libraries_Manual_guide/node05F9.html#line32">TFontContents</a> structure is almost the same as the FontContents
+structure except that it allows the OS to store tag value pairs in the
+extra space not used by the file name.  Currently, this allows the OS to
+preserve the X and Y DPI (<a href="../Libraries_Manual_guide/node03DB.html#line65">TA_DeviceDPI</a>) values for a font.
+
+    struct TFontContents {
+        char    tfc_FileName[MAXFONTPATH-2];
+        UWORD   tfc_TagCount;       /* including the TAG_DONE tag */
+        /*
+         *  if tfc_TagCount is non-zero, tfc_FileName is overlaid with
+         *  Text Tags starting at:  (struct TagItem *)
+         *      &#038;tfc_FileName[MAXFONTPATH-(tfc_TagCount*sizeof
+         *                                 (struct TagItem))]
+         */
+        UWORD   tfc_YSize;
+        UBYTE   tfc_Style;
+        UBYTE   tfc_Flags;
+    };
+
+The fch_NumEntries contains the number of font sizes (and the number of
+FontContents or TFontContents structures) that this &#034;.font&#034; file
+describes.  The fch_FC[] is the array of FontContents or TFontContents
+structures that describe this font.
+
+For each font size described in a FontContents (or TFontContents)
+structure, there is a corresponding file in that font's directory whose
+name is its size.  For example, for the font size Sapphire-19, there is a
+file in the Sapphire directory called 19.  That file is basically a
+<a href="../Libraries_Manual_guide/node05F9.html#line61">DiskFontHeader</a> disguised as a loadable DOS hunk and is known as a font
+descriptor file.  This allows the diskfont.library to use the dos.library
+to load the module just like it was a hunk of relocatable 680x0
+instructions.  It even contains two instructions before the real
+DiskFontHeader structure that will cause the 680x0 to stop running the
+<a name="line83">DiskFontHeader if it does inadvertently get executed.</a>
+
+    #define  MAXFONTNAME    32      /* font name including &#034;.font&#034; */
+
+    struct DiskFontHeader {
+        /* the following 8 bytes are not actually considered a part of */
+        /* the DiskFontHeader, but immediately precede it. The         */
+        /* NextSegment is supplied by the linker/loader, and the       */
+        /* ReturnCode is the code at the beginning of the font in case */
+        /* someone runs it...                                          */
+        /*   ULONG dfh_NextSegment;               actually a BPTR      */
+        /*   ULONG dfh_ReturnCode;                MOVEQ #0,D0 : RTS    */
+        /* here then is the official start of the DiskFontHeader...    */
+        struct Node dfh_DF;            /* node to link disk fonts */
+        UWORD dfh_FileID;            /* DFH_ID */
+        UWORD dfh_Revision;          /* the font revision */
+        LONG  dfh_Segment;           /* the segment address when loaded */
+        char  dfh_Name[MAXFONTNAME]; /* the font name (null terminated) */
+        struct TextFont dfh_TF;        /* loaded TextFont structure */
+    };
+
+    /* unfortunately, this needs to be explicitly typed */
+    /* used only if dfh_TF.tf_Style FSB_TAGGED bit is set */
+    #define dfh_TagList     dfh_Segment     /* destroyed during loading */
+
+The dfh_DF field is an Exec <a href="../Libraries_Manual_guide/node02D9.html#line19">Node</a> structure that the diskfont library uses
+to link together the fonts it has loaded.  The dfh_FileID field contains
+the file type, which currently is DFH_ID (defined in
+&#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node0102.html#line60">diskfont.h</a>&#062;).  The dfh_Revision field contains a revision
+number for this font.  The dfh_Segment field will contain the segment
+address when the font is loaded.  The dfh_FontName field will contain the
+font's name after the font descriptor is <a href="../Includes_and_Autodocs_2._guide/node02C5.html">LoadSeg()</a>'ed.  The last field,
+dfh_TextFont is a <a href="../Libraries_Manual_guide/node03DE.html">TextFont</a> structure (or <a href="../Libraries_Manual_guide/node03DF.html">ColorTextFont</a> structure) as
+described in the previous section.  The following is a complete example of
+a proportional, bitmap font.
+
+     <a href="../Libraries_Manual_guide/node05BA.html">suites8.asm</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

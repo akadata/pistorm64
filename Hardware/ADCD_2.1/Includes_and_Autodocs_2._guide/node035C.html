@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="InitResident()" TITLE="exec.library/InitResident" -->
+<head>
+<title>exec.library/InitResident</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node035B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node035D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    InitResident - initialize resident module
+
+SYNOPSIS
+    object = InitResident(resident, segList)
+    D0                     A1        D1
+
+    APTR InitResident(struct <a href="../Includes_and_Autodocs_2._guide/node00A0.html#line19">Resident</a> *,ULONG);
+
+FUNCTION
+    Initialize a ROMTag.  ROMTags are used to link system modules
+    together.  Each disk based device or library must contain a
+    ROMTag structure in the first code hunk.
+
+    Once the validity of the ROMTag is verified, the RT_INIT pointer
+    is jumped to  with the following registers:
+            D0 = 0
+            A0 = segList
+            A6 = <a href="../Includes_and_Autodocs_2._guide/node009E.html#line35">ExecBase</a>
+
+INPUTS
+    resident - Pointer to a ROMTag
+    segList  - SegList of the loaded object, if loaded from disk.
+               Libraries &#038; Devices will cache this value for later
+               return at close or expunge time.  Pass NULL for ROM
+               modules.
+
+RESULTS
+    object  - Return value from the init code, usually the library
+              or device base.  NULL for failure.
+
+AUTOINIT FEATURE
+    An automatic method of library/device base and vector table
+    initialization is also provided by InitResident().  The initial code
+    hunk of the library or device should contain &#034;MOVEQ #-1,d0; RTS;&#034;.
+    Following that must be an initialized <a href="../Includes_and_Autodocs_2._guide/node00A0.html#line19">Resident</a> structure with
+    RTF_AUTOINIT set in rt_Flags, and an rt_Init pointer which points
+    to four longwords.  These four longwords will be used in a call
+    to MakeLibrary();
+
+        - The size of your library/device base structure including initial
+          <a href="../Includes_and_Autodocs_2._guide/node009C.html#line34">Library</a> or <a href="../Includes_and_Autodocs_2._guide/node0087.html#line25">Device</a> structure.
+
+        - A pointer to a longword table of standard, then library
+          specific function offsets, terminated with -1L.
+          (short format offsets are also acceptable)
+
+        - Pointer to data table in <a href="../Includes_and_Autodocs_2._guide/node035E.html">exec/InitStruct</a> format for
+          initialization of <a href="../Includes_and_Autodocs_2._guide/node009C.html#line34">Library</a> or <a href="../Includes_and_Autodocs_2._guide/node0087.html#line25">Device</a> structure.
+
+        - Pointer to library initialization function, or NULL.
+            Calling sequence:
+                    D0 = library base
+                    A0 = segList
+                    A6 = <a href="../Includes_and_Autodocs_2._guide/node009E.html#line35">ExecBase</a>
+          This function must return in D0 the library/device base to be
+          linked into the library/device list.  If the initialization
+          function fails, the device memory must be manually deallocated,
+          then NULL returned in D0.
+
+SEE ALSO
+    exec/resident.i, <a href="../Includes_and_Autodocs_2._guide/node0350.html">FindResident</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

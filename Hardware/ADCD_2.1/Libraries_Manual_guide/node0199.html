@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-3-1" TITLE="6 / Menu Data Structures / Menu Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Menu Data Structures / Menu Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0198.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node019A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here is the specification for a <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line61">Menu</a> structure:
+
+    struct Menu
+        {
+        struct Menu *NextMenu;
+        WORD LeftEdge, TopEdge;
+        WORD Width, Height;
+        UWORD Flags;
+        BYTE *MenuName;
+        struct MenuItem *FirstItem;
+        WORD JazzX, JazzY, BeatX, BeatY;
+<a name="line13">        };</a>
+
+<a name="line15">The variables in the Menu structure have the following meanings:</a>
+
+NextMenu
+    This variable points to the next Menu header in the list.  The last
+<a name="line19">    Menu in the list should have a NextMenu value of NULL.</a>
+
+LeftEdge, TopEdge, Width, Height
+    These fields describe the select box of the header.  Currently, any
+    values supplied for TopEdge and Height are ignored by Intuition,
+    which uses instead the top of the screen for the TopEdge and the
+    height of the screen's title bar for the Height.
+
+    LeftEdge is relative to the <a href="../Libraries_Manual_guide/node00DD.html#line36">LeftEdge</a> of the screen plus the screen's
+    left border width, so if LeftEdge is 0, Intuition puts this header at
+<a name="line29">    the leftmost allowable position.</a>
+
+Flags
+<a name="line32">    The flag space is shared by the program and Intuition.  The flags are:</a>
+
+    MENUENABLED
+        This flag is for Intuition's use and indicates whether or not
+        this Menu is currently enabled.  Set this flag before submitting
+        the menu strip to Intuition.  If this flag is not set, the menu
+        header and all menu items below it will be disabled, and the
+        user will be able to view, but not select any of the items.
+        After submitting the strip to Intuition, the disabled or enabled
+<a name="line41">        status may be changed by calling <a href="../Libraries_Manual_guide/node0192.html#line15">OnMenu()</a> or <a href="../Libraries_Manual_guide/node0192.html#line15">OffMenu()</a>.</a>
+
+    MIDRAWN
+        This flag indicates whether or not this menu's items are
+<a name="line45">        currently displayed to the user.</a>
+
+MenuName
+    This is a pointer to a NULL terminated character string that is
+    printed on the screen's title bar starting at the LeftEdge of this
+    menu's select box and at the TopEdge just below the screen title
+<a name="line51">    bar's top border.  The text is rendered in the screen's font.</a>
+
+FirstItem
+    This points to the first <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structure in the linked list of
+<a name="line55">    this menu's items.</a>
+
+JazzX, JazzY, BeatX, BeatY
+    For internal use only.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

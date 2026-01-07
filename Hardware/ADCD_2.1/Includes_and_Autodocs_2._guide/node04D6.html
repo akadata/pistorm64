@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/serial" NODE="SDCMD_QUERY" TITLE="serial.device/SDCMD_QUERY" -->
+<head>
+<title>serial.device/SDCMD_QUERY</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04D5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04D7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Query -- query serial port/line status
+
+FUNCTION
+    This command return the status of the serial port lines and
+    registers. The number of unread bytes in the serial device's
+    read buffer is shown in io_Actual.
+
+    The break send &#038; received flags are cleared by a query, and
+    whenever a read <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> is returned with a error
+    in io_Error.
+
+IO REQUEST
+    io_Message      mn_ReplyPort initialized
+    io_Device       preset by <a href="../Includes_and_Autodocs_2._guide/node04D4.html">OpenDevice</a>
+    io_Unit         preset by <a href="../Includes_and_Autodocs_2._guide/node04D4.html">OpenDevice</a>
+    io_Command      SDCMD_QUERY
+
+RESULTS
+    io_Status        BIT  ACTIVE  FUNCTION
+
+           LSB       0    ---    reserved
+                     1    ---    reserved
+                     2    high   parallel &#034;sel&#034; on the A1000
+                                 On the A500 &#038; A2000, &#034;sel&#034; is also
+                                 connected to the serial port's
+                                 &#034;Ring Indicator&#034;.  Be cautious when
+                                 making cables.
+                     3    low    Data Set Ready
+                     4    low    Clear To Send
+                     5    low    Carrier Detect
+                     6    low    Ready To Send
+                     7    low    Data Terminal Ready
+           MSB       8    high   hardware overrun
+                     9    high   break sent (most recent output)
+                    10    high   break received (as latest input)
+                    11    high   transmit x-OFFed
+                    12    high   receive x-OFFed
+                 13-15    ---    reserved
+
+    io_Actual       set to count of unread input characters
+
+    io_Error -- Query will always succeded.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

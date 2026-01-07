@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_3" NODE="3-2" TITLE="3 Clipboard Device / Device Interface" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>3 Clipboard Device / Device Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0066.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0068.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The clipboard device operates like the other Amiga devices.  To use it,
+you must first open the clipboard device, then send I/O requests to it,
+and then close it when finished. See &#034;<a href="../Devices_Manual_guide/node0006.html">Introduction to Amiga System Devices</a>&#034;
+<a name="line5">chapter for general information on device usage.</a>
+
+  struct IOClipReq
+  {
+      struct  Message io_Message;
+      struct  Device  *io_Device;     /* device node pointer  */
+      struct  Unit    *io_Unit;       /* unit (driver private)*/
+      UWORD   io_Command;             /* device command */
+      UBYTE   io_Flags;               /* including QUICK and SATISFY */
+      BYTE    io_Error;               /* error or warning num */
+      ULONG   io_Actual;              /* number of bytes transferred */
+      ULONG   io_Length;              /* number of bytes requested */
+      STRPTR  io_Data;                /* either clip stream or post port */
+      ULONG   io_Offset;              /* offset in clip stream */
+      LONG    io_ClipID;              /* ordinal clip identifier */
+<a name="line20">  };</a>
+
+See the include file devices/<a href="../Includes_and_Autodocs_2._guide/node0048.html">clipboard.h</a> for the complete
+<a name="line23">structure definition.</a>
+
+The clipboard device I/O request, IOClipReq, looks like a standard
+IORequest structure except for the addition of the io_ClipID field, which
+is used by the device to identify clips. It must be set to zero by the
+application for a post or an initial write or read, but preserved for
+subsequent writes or reads, as the clipboard device uses this field
+internally for bookkeeping purposes.
+
+ <a href="../Devices_Manual_guide/node0068.html">Opening The Clipboard Device</a>        <a href="../Devices_Manual_guide/node006C.html">Updating The Clipboard Device</a> 
+ <a href="../Devices_Manual_guide/node0069.html">Clipboard Data</a> 		     <a href="../Devices_Manual_guide/node006D.html">Clipboard Messages</a> 
+ <a href="../Devices_Manual_guide/node006A.html">Multiple Clips</a> 		     <a href="../Devices_Manual_guide/node006E.html">Reading From The Clipboard Device</a> 
+ <a href="../Devices_Manual_guide/node006B.html">Writing To The Clipboard Device</a>     <a href="../Devices_Manual_guide/node006F.html">Closing The Clipboard Device</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

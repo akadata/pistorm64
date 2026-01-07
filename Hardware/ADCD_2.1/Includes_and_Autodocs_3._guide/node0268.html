@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="expansion" NODE="ReadExpansionByte()" TITLE="expansion.library/ReadExpansionByte" -->
+<head>
+<title>expansion.library/ReadExpansionByte</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0267.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0269.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ReadExpansionByte - read a byte nybble by nybble.
+
+<b>   SYNOPSIS</b>
+	byte = ReadExpansionByte( board, offset )
+	D0                        A0     D0
+
+<b>   FUNCTION</b>
+	(Not typically called by user code)
+
+ 	ReadExpansionByte reads a byte from a new-style expansion
+	board.  These boards have their readable data organized
+	as a series of nybbles in memory.  This routine reads
+	two nybbles and returns the byte value.
+
+	In general, this routine will only be called by <a href="../Includes_and_Autodocs_3._guide/node0269.html">ReadExpansionRom</a>.
+
+	The offset is a byte offset, as if into a <a href="../Includes_and_Autodocs_3._guide/node05FE.html#line45">ExpansionRom</a> structure.
+	The actual memory address read will be four times larger.
+	The macros EROFFSET and ECOFFSET are provided to help get
+	these offsets from C.
+
+<b>   INPUTS</b>
+	board - a pointer to the base of a new style expansion board.
+	offset - a logical offset from the board base
+
+<b>   RESULTS</b>
+	byte - a byte of data from the expansion board.
+
+<b>   EXAMPLES</b>
+	byte = ReadExpansionByte( cd-&#062;BoardAddr, EROFFSET( er_Type ) );
+	ints = ReadExpansionByte( cd-&#062;BoardAddr, ECOFFSET( ec_Interrupt ) );
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node026D.html">WriteExpansionByte()</a>, <a href="../Includes_and_Autodocs_3._guide/node0269.html">ReadExpansionRom()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

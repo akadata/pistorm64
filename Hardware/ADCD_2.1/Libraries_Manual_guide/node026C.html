@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-9-1" TITLE="15 / / / GetVisualInfo() and FreeVisualInfo()" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / / / GetVisualInfo() and FreeVisualInfo()</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node026B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node026D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In order to ensure their best appearance, GadTools gadgets and menus need
+information about the screen on which they will appear.  Before creating
+any GadTools gadgets or menus, the program must get this information using
+the <a href="../Includes_and_Autodocs_2._guide/node03EE.html">GetVisualInfo()</a> call.
+
+    APTR GetVisualInfoA( struct Screen *screen, struct TagItem *taglist );
+    APTR GetVisualInfo( struct Screen *screen, Tag tag1, ... );
+
+Set the screen argument to a pointer to the screen you are using.  The tag
+arguments, tag1 or taglist, are reserved for future extensions.  Currently
+<a name="line12">none are recognized, so only TAG_END should be used.</a>
+
+The function returns an abstract handle called the VisualInfo.  For
+GadTools gadgets, the <a href="../Libraries_Manual_guide/node0259.html#line49">ng_VisualInfo</a> field of the <a href="../Libraries_Manual_guide/node0259.html">NewGadget</a> structure must
+be set to this handle before the gadget can be added to the window.
+GadTools menu layout and creation functions also require the VisualInfo
+handle as an argument.
+
+There are several ways to get the pointer to the screen on which the
+window will be opened.  If the application has its own custom screen, this
+pointer is known from the call to <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreen()</a> or <a href="../Libraries_Manual_guide/node00DF.html#line6">OpenScreenTags()</a>.  If
+the application already has its window opened on the Workbench or some
+other public screen, the screen pointer can be found in <a href="../Libraries_Manual_guide/node0121.html#line62">Window.WScreen</a>.
+Often the program will create its gadgets and menus before opening the
+window.  In this case, use <a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a> to get a pointer to the desired
+public screen, which also provides a lock on the screen to prevent it from
+closing.  See the chapters &#034;<a href="../Libraries_Manual_guide/node00E6.html">Intuition Screens</a>&#034; and &#034;<a href="../Libraries_Manual_guide/node0106.html">Intuition Windows</a>&#034; for
+more about public screens.
+
+The VisualInfo data must be freed after all the gadgets and menus have
+been freed but before releasing the screen.  Custom screens are released
+by calling <a href="../Libraries_Manual_guide/node00E4.html">CloseScreen()</a>, public screens are released by calling
+<a href="../Libraries_Manual_guide/node0105.html">CloseWindow()</a> or <a href="../Libraries_Manual_guide/node00E6.html#line34">UnlockPubScreen()</a>, depending on the technique used.  Use
+<a href="../Includes_and_Autodocs_2._guide/node03ED.html">FreeVisualInfo()</a> to free the visual info data.
+
+<a name="line37">    void FreeVisualInfo( APTR vi );</a>
+
+This function takes just one argument, the VisualInfo handle as returned
+by <a href="../Includes_and_Autodocs_2._guide/node03EE.html">GetVisualInfo()</a>.  The sequence of events for using the VisualInfo
+handle could look like this:
+
+    init()
+    {
+    myscreen = LockPubScreen(NULL);
+    if (!myscreen)
+        {
+        cleanup(&#034;Failed to lock default public screen&#034;);
+        }
+    vi = GetVisualInfo(myscreen);
+    if (!vi)
+        {
+        cleanup(&#034;Failed to GetVisualInfo&#034;);
+        }
+    /* Create gadgets here */
+    ng.ng_VisualInfo = vi;
+    ...
+    }
+
+    void cleanup(STRPTR errorstr)
+    {
+    /* These functions may be safely called with a NULL parameter: */
+    FreeGadgets(glist);
+    FreeVisualInfo(vi);
+
+    if (myscreen)
+        UnlockPubScreen(NULL, myscreen);
+
+    printf(errorstr);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

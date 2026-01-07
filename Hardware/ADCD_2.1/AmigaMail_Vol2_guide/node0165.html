@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="I-7/SimpleFR.c" NODE="MAIN" TITLE="I-7/SimpleFR.c" -->
+<head>
+<title>I-7/SimpleFR.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0164.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0166.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* simpleFR.c - Execute me to compile me with SAS/C 6.56
+sc DATA=NEAR NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 simpleFR.c
+slink FROM LIB:c.o,simpleFR.o TO simpleFR LIBRARY LIB:sc.lib,LIB:amiga.lib
+quit
+*/
+
+/*
+Copyright (c) 1991-1999 Amiga, Inc.
+
+This example is provided in electronic form by Amiga, Inc.
+for use with the Amiga Mail Volume II technical publication.
+Amiga Mail Volume II contains additional information on the correct
+usage of the techniques and operating system functions presented in
+these examples.  The source and executable code of these examples may
+only be distributed in free electronic form, via bulletin board or
+as part of a fully non-commercial and freely redistributable
+diskette.  Both the source and executable code (including comments)
+must be included, without modification, in any copy.  This example
+may not be published in printed form or distributed with any
+commercial product. However, the programming techniques and support
+routines set forth in these examples may be used in the development
+of original executable software products for Amiga
+computers.
+
+All other rights reserved.
+
+This example is provided &#034;as-is&#034; and is subject to change; no
+warranties are made.  All use is at your own risk. No liability or
+responsibility is assumed.
+*/
+
+#include &#060;clib/asl_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_stdio_protos.h&#062;
+#include &#060;dos/dosasl.h&#062;
+#include &#060;exec/libraries.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+UBYTE *vers = &#034;\0$VER: simpleFR 1.1&#034;;
+
+void main(void);
+
+#define MYLEFTEDGE 0
+#define MYTOPEDGE  0
+#define MYWIDTH    320
+#define MYHEIGHT   400
+
+struct Library *AslBase;
+
+struct TagItem frtags[] =
+{
+    ASL_Hail,       (ULONG)&#034;The RKM file requester&#034;,
+    ASL_Height,     MYHEIGHT,
+    ASL_Width,      MYWIDTH,
+    ASL_LeftEdge,   MYLEFTEDGE,
+    ASL_TopEdge,    MYTOPEDGE,
+    ASL_OKText,     (ULONG)&#034;O KAY&#034;,
+    ASL_CancelText, (ULONG)&#034;not OK&#034;,
+    ASL_File,       (ULONG)&#034;asl.library&#034;,
+    ASL_Dir,        (ULONG)&#034;libs:&#034;,
+    TAG_DONE
+};
+
+
+
+void main()
+{
+
+    struct FileRequester *fr;
+
+    if (AslBase = OpenLibrary(&#034;asl.library&#034;, 36L))
+    {
+        if (fr = (struct FileRequester *)
+            AllocAslRequest(ASL_FileRequest, frtags))
+        {
+            /* Application body, blah, blah,... */
+
+            /* Application need a requester */
+            if (AslRequest(fr, 0L))
+                printf(&#034;file choice = %s%s\n&#034;, fr-&#062;rf_Dir, fr-&#062;rf_File);
+            else
+                printf(&#034;User Cancelled\n&#034;);
+
+            /* More application body, blah, blah... */
+        }
+
+        /* Don't need any more requesters, better
+        ** give the requester structure back.
+        */
+        FreeAslRequest(fr);
+    }
+    CloseLibrary(AslBase);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

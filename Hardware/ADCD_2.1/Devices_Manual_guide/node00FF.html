@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_7" NODE="7-2-1" TITLE="7 / Device Interface / Opening The Keyboard Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>7 / Device Interface / Opening The Keyboard Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00FE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0100.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Three primary steps are required to open the keyboard device:
+
+   *  Create a message port using the <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a> function.
+
+   *  Create an extended I/O request structure using the <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>
+      function. CreateExtIO() will initialize the I/O request with your
+      reply port.
+
+   *  Open the keyboard device. Call <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>, passing the I/O request.
+
+
+struct MsgPort  *KeyMP;         /* Pointer for Message Port */
+struct IOStdReq *KeyIO;         /* Pointer for I/O request */
+
+if (KeyMP=CreatePort(NULL,NULL))
+  if (KeyIO=(struct IOStdReq *)CreateExtIO(KeyMP,sizeof(struct IOStdReq)))
+    if (OpenDevice( &#034;keyboard.device&#034;,NULL,(struct IORequest *)KeyIO,NULL))
+        printf(&#034;keyboard.device did not open\n&#034;);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

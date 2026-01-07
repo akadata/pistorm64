@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="datatypes" NODE="DrawDTObjectA()" TITLE="datatypes.library/DrawDTObjectA" -->
+<head>
+<title>datatypes.library/DrawDTObjectA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node010B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node010D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	DrawDTObjectA - <a href="../Includes_and_Autodocs_3._guide/node02CD.html">Draw</a> a DataTypes object.                (V44)
+
+<b>    SYNOPSIS</b>
+	retval = DrawDTObjectA (rp, o, x, y, w, h, th, tv, attrs);
+	d0			a0  a1 d0 d1 d2 d3 d4  d5  a2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> DrawDTObjectA (struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *rp, <a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> x, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> y,
+			    <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> w, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> h, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> th, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> tv,
+			    struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	retval = DrawDTObject (rp, o, x, y, w, h, th, tv, tag1, ...);
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> DrawDTObjectA (struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *rp, <a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> x, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> y,
+			    <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> w, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> h, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> th, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> tv, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...);
+
+<b>    FUNCTION</b>
+	This function is used to draw a DataTypes object into a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+
+	This function can be used for strip printing the object or
+	embedding it within a document.
+
+	You must successfully call <a href="../Includes_and_Autodocs_3._guide/node0113.html">ObtainDTDrawInfoA()</a> before using
+	this function.
+
+	This function invokes the object's DTM_DRAW method.
+
+	Clipping MUST be turned on within the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.  This means
+	that there must be a valid layer structure attached to the
+	<a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+
+<b>    INPUTS</b>
+	rp - Pointer to the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> to draw into.
+	o - Pointer to an object returned by <a href="../Includes_and_Autodocs_3._guide/node0111.html">NewDTObjectA()</a>.
+	x - Left-most point of area to draw into.
+	y - Top-most point of area to draw into.
+	w - Width of area to draw into.
+	h - Height of area to draw into.
+	th - Horizontal top in units.
+	tv - Vertical top in units.
+	attrs - Additional attributes.
+
+<b>    TAGS</b>
+	none defined at this time.
+
+<b>    RETURNS</b>
+	TRUE to indicate that it was able to render, FALSE on failure.
+
+<b>    SEE ALSO</b>
+	ObtainDTDrawInfo(), <a href="../Includes_and_Autodocs_3._guide/node0117.html">ReleaseDTDrawInfo()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

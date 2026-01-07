@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="iffparse" NODE="FindPropContext()" TITLE="iffparse.library/FindPropContext" -->
+<head>
+<title>iffparse.library/FindPropContext</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0364.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0366.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FindPropContext -- get the property context for the current state.
+	                   (V36)
+
+<b>   SYNOPSIS</b>
+	cn = FindPropContext(iff);
+	D0                   A0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line84">ContextNode</a> *FindPropContext(struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> *);
+
+<b>   FUNCTION</b>
+	Locates the context node which would be the scoping chunk for
+	properties in the current parsing state. (Huh?)  This is used for
+	locating the proper scoping context for property chunks i.e. the
+	scope from which a property would apply. This is usually the FORM
+	or LIST with the highest precedence in the context stack.
+
+	If you don't understand this, read the IFF spec a couple more times.
+
+<b>   INPUTS</b>
+	iff - pointer to <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> structure.
+
+<b>   RESULT</b>
+	cn - <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line84">ContextNode</a> of property scoping chunk.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node035F.html">CurrentChunk()</a>, <a href="../Includes_and_Autodocs_3._guide/node0371.html">ParentChunk()</a>, <a href="../Includes_and_Autodocs_3._guide/node037D.html">StoreItemInContext()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node05E8.html">&#060;libraries/iffparse.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_1" NODE="1-5" TITLE="1 Introduction to Amiga System Devices / I/O Request Completion" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>1 Introduction to Amiga System Devices / I/O Request Completion</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0009.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node000B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A device will set the io_Error field of the I/O request to indicate the
+success or failure of an operation.  The indication will be either zero
+for success or a non-zero error code for failure.  There are two types of
+error codes:  Exec I/O and device specific. Exec I/O errors are defined in
+the include file exec/<a href="../Includes_and_Autodocs_2._guide/node008F.html">errors.h</a>; device specific errors are defined in the
+include file for each device.  You should always check that the operation
+<a name="line8">you requested was successful.</a>
+
+The exact method for checking io_Error can depend on whether you use
+<a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> or <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>.   In both cases, io_Error will be set when the I/O
+request is returned, but in the case of <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>, the <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a> function itself
+returns the same value as io_Error.
+
+This gives you the option of checking the function return value:
+
+  SerialIO-&#062;IOSer.io_Length   = sizeof(ReadBuffer);
+  SerialIO-&#062;IOSer.io_Data  = ReadBuffer;
+  SerialIO-&#062;IOSer.io_Command  = CMD_READ;
+  if (DoIO((struct IORequest *)SerialIO);
+      printf(&#034;Read failed.  Error: %ld\n&#034;,SerialIO-&#062;IOSer.io_Error);
+
+Or you can check io_Error directly:
+
+  SerialIO-&#062;IOSer.io_Length   = sizeof(ReadBuffer);
+  SerialIO-&#062;IOSer.io_Data  = ReadBuffer;
+  SerialIO-&#062;IOSer.io_Command  = CMD_READ;
+  DoIO((struct IORequest *)SerialIO);
+
+  if (SerialIO-&#062;IOSer.io_Error)
+      printf(&#034;Read failed.  Error: %ld\n&#034;,SerialIO-&#062;IOSer.io_Error);
+
+Keep in mind that checking io_Error is the only way that I/O requests sent
+by <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> can be checked.
+
+Testing for a failed I/O request is a minimum step, what you do beyond
+that depends on your application.  In some instances, you may decide to
+resend the I/O request, and in others, you may decide to stop your
+application.   One thing you'll almost always want to do is to inform the
+user that an error has occurred.
+
+   Exiting The Correct Way.
+   ------------------------
+   If you decide that you must prematurely end your application, you
+   should deallocate, release, give back and let go of everything you
+   took to run the application.  In other words, you should exit
+   gracefully.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

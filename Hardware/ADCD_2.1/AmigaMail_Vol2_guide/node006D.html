@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="II-49/Scan.txt" NODE="MAIN" TITLE="II-49: Directory Scanning" TOC="AmigaMail_Vol2/II" -->
+<head>
+<title>II-49: Directory Scanning</title>
+</head>
+<body>
+<a href="../AmigaMail_Vol2_guide/node0002.html"><img src="../images/toc.gif" alt="[Contents]" border=0></a>
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node006C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node006E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+by Ewout Walraven
+
+
+Prior to release 2.0, examining the contents of directories using
+dos.library required the use of two functions: Examine() and ExNext().
+Although these routines perform the task for which they were intended,
+they have limitations.  One is that these functions require stepping
+through a directory one entry at a time.  For most applications that need
+to do directory scanning, it would more efficient to scan a directory in
+one pass rather than many.  This would significantly reduce the time spent
+scanning. Also, these functions don't know anything about the AmigaDOS
+wildcards, so any wildcard processing must be done by the application, not
+by the OS.
+
+ <a href="../AmigaMail_Vol2_guide/node006E.html">Atomic Directory Scanning</a> 
+ <a href="../AmigaMail_Vol2_guide/node006F.html">MultiDirectory Assigns</a> 
+ <a href="../AmigaMail_Vol2_guide/node0070.html">Filename Matching</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

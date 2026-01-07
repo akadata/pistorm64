@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="AllocDBufInfo()" TITLE="graphics.library/AllocDBufInfo" -->
+<head>
+<title>graphics.library/AllocDBufInfo</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02A0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02A2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       AllocDBufInfo -- <a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> structure for multi-buffered animation (V39)
+
+<b>   SYNOPSIS</b>
+       AllocDBufInfo(vp)
+		      a0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line278">DBufInfo</a> * AllocDBufInfo(struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> *)
+
+<b>   FUNCTION</b>
+	Allocates a structure which is used by the <a href="../Includes_and_Autodocs_3._guide/node02BD.html">ChangeVPBitMap()</a>
+	routine.
+
+<b>   INPUTS</b>
+       vp  =  A pointer to a <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a> structure.
+
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+	Returns 0 if there is no memory available or if the display mode
+	of the viewport does not support double-buffering.
+
+	The only fields of the <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line278">DBufInfo</a> structure which can be used by application
+	programs are the dbi_SafeMessage, dbi_DispMessage, dbi_UserData1 and
+	dbi_UserData2 fields.
+
+	dbi_SafeMessage and dbi_DispMessage are standard exec message structures
+	which may be used for synchronizing your animation with the screen update.
+
+	dbi_SafeMessage is a message which is replied to when it is safe to write to
+	the old <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> (the one which was installed when you called ChangeVPBitMap).
+
+	dbi_DispMessage is replied to when it is safe to call <a href="../Includes_and_Autodocs_3._guide/node02BD.html">ChangeVPBitMap</a> again
+	and be certain that the new frame has been seen at least once.
+
+	The dbi_UserData1 and dbi_UserData2 fields, which are stored after each
+	message, are for your application to stuff any data into that it may need
+	to examine when looking at the reply coming into the ReplyPort for either
+	of the embedded <a href="../Includes_and_Autodocs_3._guide/node062E.html#line46">Message</a> structures.
+
+	<a href="../Includes_and_Autodocs_3._guide/node05ED.html#line278">DBufInfo</a> structures MUST be allocated with this function. The size of
+	the structure will grow in future releases.
+
+	The following fragment shows proper double buffering synchronization:
+
+	int SafeToChange=TRUE, SafeToWrite=TRUE, CurBuffer=1;
+	struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *ports[2];    /* reply ports for DispMessage and SafeMessage
+*/
+	struct <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> *BmPtrs[2];
+	struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line278">DBufInfo</a> *myDBI;
+
+	... allocate bitmap pointers, <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line278">DBufInfo</a>, set up viewports, etc.
+
+	myDBI-&#062;dbi_SafeMessage.mn_ReplyPort=ports[0];
+	myDBI-&#062;dbi_DispMessage.mn_ReplyPort=ports[1];
+	while (! done)
+	{
+	    if (! SafeToWrite)
+		while(! GetMsg(ports[0])) Wait(1l&#060;&#060;(ports[0]-&#062;mp_SigBit));
+	    SafeToWrite=TRUE;
+
+	    ... render to bitmap # CurBuffer.
+
+	    if (! SafeToChange)
+		while(! GetMsg(ports[1])) Wait(1l&#060;&#060;(ports[1]-&#062;mp_SigBit));
+	    SafeToChange=TRUE;
+	    WaitBlit();         /* be sure rendering has finished */
+	    ChangeVPBitMap(vp,BmPtrs[CurBuffer],myDBI);
+	    SafeToChange=FALSE;
+	    SafeToWrite=FALSE;
+	    CurBuffer ^=1;	/* toggle current buffer */
+	}
+       if (! SafeToChange)	/* cleanup pending messages */
+	    while(! GetMsg(ports[1])) Wait(1l&#060;&#060;(ports[1]-&#062;mp_SigBit));
+       if (! SafeToWrite)	/* cleanup */
+	    while(! GetMsg(ports[0])) Wait(1l&#060;&#060;(ports[0]-&#062;mp_SigBit));
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02DA.html">FreeDBufInfo()</a> <a href="../Includes_and_Autodocs_3._guide/node02BD.html">ChangeVPBitMap()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

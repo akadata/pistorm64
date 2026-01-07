@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-10-13" TITLE="B / gadgetclass / Attributes:GA_IntuiText, GA_Text, GA_LabelImage (IS)" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / gadgetclass / Attributes:GA_IntuiText, GA_Text, GA_LabelImage (IS)</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04FE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0500.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+These attributes correspond to one field in the object's embedded <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>
+structure--the <a href="../Libraries_Manual_guide/node0149.html#line111">GadgetText</a> field.  Setting any of these attributes copies
+the attribute's value blindly into the GadgetText field.  In addition,
+setting GA_Text also sets the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line298">GFLG_LABELSTRING</a> flag in <a href="../Libraries_Manual_guide/node0149.html#line48">Gadget.Flags</a> and
+setting GA_LabelImage sets the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line298">GFLG_LABELIMAGE</a> flag in Gadget.Flags.  The
+GA_IntuiText attribute must be an <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> pointer, as with old-style
+gadgets.  GA_Text takes a pointer to a NULL- terminated string (UBYTE *).
+GA_LabelImage takes a pointer to a (Boopsi) image.  Note that most gadget
+classes do not support GA_Text and GA_LabelImage.  See the description of
+specific gadget classes for more details.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="ObtainQuickVector()" TITLE="exec.library/ObtainQuickVector" -->
+<head>
+<title>exec.library/ObtainQuickVector</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node021B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node021D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ObtainQuickVector -- obtain and install a Quick <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> vector (V39)
+
+<b>   SYNOPSIS</b>
+	vector=ObtainQuickVector(interruptCode)
+	d0                       a0
+
+	ULONG ObtainQuickVector(APTR);
+
+<b>   FUNCTION</b>
+	This function will install the code pointer into the quick interrupt
+	vector it allocates and returns to you the interrupt vector that
+	your Quick <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> system needs to use.
+
+	This function may also return 0 if no vectors are available.  Your
+	hardware should be able to then fall back to using the shared
+	interrupt server chain should this happen.
+
+	The interrupt code is a direct connect to the physical interrupt.
+	This means that it is the responsibility of your code to do all
+	of the context saving/restoring required by interrupt code.
+
+	Also, due to the performance of the interrupt controller, you may
+	need to also watch for &#034;false&#034; interrupts.  These are interrupts
+	that come in just after a DISABLE.  The reason this happens is
+	because the interrupt may have been posted before the DISABLE
+	hardware access is completed.  For example:
+
+	myInt:		move.l	d0,-(sp)	; Save d0...
+			move.w	_intenar,d0	; Get interrupt enable state
+			btst.l	#INTB_INTEN,d0	; Check if pending disable
+			bne.s	realInt		; If not, do real one...
+	exitInt:	move.l	(sp)+,d0	; Restore d0
+			rte			; Return from int...
+	;
+	realInt:	; Now do your int code...  d0 is already saved
+			; ALL other registers need to be saved if needed
+			; This includes a0/a1/d0/d1 as this is an interrupt
+			; and not a function call...
+			;
+			bra.s	exitInt		; <a href="../Includes_and_Autodocs_3._guide/node015F.html">Exit</a> interrupt...
+
+	If your interrupt will not play with system (OS) structures and your
+	own structures are safe to play with you do not need to check for
+	the disable.  It is only needed for when the system is in disable but
+	that &#034;one last interrupt&#034; still got through.
+
+<b>   NOTE</b>
+	This function was not implemented fully until V39.  Due to a mis-cue
+	it is not safe to call in V37 EXEC.  (Sorry)
+
+<b>   INPUTS</b>
+	A pointer to your interrupt code.  This code is not an EXEC interrupt
+	but is dirrectly connected to the hardware interrupt.  Thus, the
+	interrupt code must not modify any registers and must return via
+	an RTE.
+
+<b>   RESULTS</b>
+	The 8-bit vector number used for Zorro-III Quick Interrupts
+	If it returns 0, no quick interrupt was allocatable.  The device
+	should at this point switch to using the shared interrupt server
+	method.
+
+<b>   SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

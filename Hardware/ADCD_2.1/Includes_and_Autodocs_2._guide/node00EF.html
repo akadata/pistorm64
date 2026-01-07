@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/libraries/mathffp.h" NODE="MAIN" TITLE="Includes/libraries/mathffp.h" -->
+<head>
+<title>Includes/libraries/mathffp.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00EE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00F0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	LIBRARIES_MATHFFP_H
+#define	LIBRARIES_MATHFFP_H 1
+/*
+**	$Filename: libraries/mathffp.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.2 $
+**	$Date: 90/05/01 $
+**
+**	general floating point declarations
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+<a name="line15">#ifndef PI</a>
+#define PI	  ((float) 3.141592653589793)
+<a name="line17">#endif</a>
+<a name="line18">#define TWO_PI	  (((float) 2) * PI)</a>
+<a name="line19">#define PI2	  (PI / ((float) 2))</a>
+#define PI4	  (PI / ((float) 4))
+<a name="line21">#ifndef E</a>
+#define E	  ((float) 2.718281828459045)
+<a name="line23">#endif</a>
+#define LOG10	  ((float) 2.302585092994046)
+<a name="line25"></a>
+<a name="line26">#define FPTEN	  ((float) 10.0)</a>
+<a name="line27">#define FPONE	  ((float) 1.0)</a>
+<a name="line28">#define FPHALF	  ((float) 0.5)</a>
+#define FPZERO	  ((float) 0.0)
+<a name="line30"></a>
+<a name="line31">#define trunc(x)  ((int) (x))</a>
+<a name="line32">#define round(x)  ((int) ((x) + 0.5))</a>
+#define itof(i)   ((float) (i))
+<a name="line34"></a>
+<a name="line35">#define	fabs	SPAbs</a>
+<a name="line36">#define floor	SPFloor</a>
+#define	ceil	SPCeil
+<a name="line38"></a>
+<a name="line39">#define	tan	SPTan</a>
+<a name="line40">#define	atan	SPAtan</a>
+<a name="line41">#define cos	SPCos</a>
+<a name="line42">#define acos	SPAcos</a>
+<a name="line43">#define sin	SPSin</a>
+<a name="line44">#define asin	SPAsin</a>
+<a name="line45">#define exp	SPExp</a>
+<a name="line46">#define pow(a,b)	SPPow((b),(a))</a>
+<a name="line47">#define log	SPLog</a>
+<a name="line48">#define log10	SPLog10</a>
+#define sqrt	SPSqrt
+<a name="line50"></a>
+<a name="line51">#define	sinh	SPSinh</a>
+<a name="line52">#define cosh	SPCosh</a>
+#define tanh	SPTanh
+
+
+<a name="line56">int	 SPFix();			  /* Basic math functions */</a>
+float	 SPFlt();
+int	 SPCmp();
+<a name="line59">int	 SPTst();</a>
+<a name="line60">float	 SPAbs();</a>
+<a name="line61">float	 SPFloor();</a>
+float	 SPCeil();
+<a name="line63">#ifndef abs</a>
+float	 abs();
+<a name="line65">#endif</a>
+<a name="line66">float	 SPNeg();</a>
+<a name="line67">float	 SPAdd();</a>
+<a name="line68">float	 SPSub();</a>
+<a name="line69">float	 SPMul();</a>
+float	 SPDiv();
+<a name="line71"></a>
+<a name="line72">float	 SPAsin(),  SPAcos(),  SPAtan();  /* Transcendental math functions */</a>
+<a name="line73">float	 SPSin(),   SPCos(),   SPTan(),   SPSincos();</a>
+<a name="line74">float	 SPSinh(),  SPCosh(),  SPTanh();</a>
+<a name="line75">float	 SPExp(),   SPLog(),   SPLog10(), SPPow();</a>
+float	 SPSqrt(),  SPFieee();
+<a name="line77"></a>
+float	 afp(),    dbf();		  /* Math conversion functions */
+
+#endif	/* LIBRARIES_MATHFFP_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

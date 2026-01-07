@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_ILBM" NODE="16-3-2-4" TITLE=" Standard Properties / DEST " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Properties / DEST </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01B1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01B3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The optional property &#034;DEST&#034; is a way to say how to scatter zero or more
+source bitplanes into a deeper destination image.  Some readers may ignore
+DEST.
+
+The contents of a DEST chunk is DestMerge structure:
+
+
+typedef struct {
+  UBYTE depth;      /* # bitplanes in the original source               */
+  UBYTE pad1;       /* unused; for consistency put 0 here               */
+  UWORD planePick;  /* how to scatter source bitplanes into destination */
+  UWORD planeOnOff; /* default bitplane data for planePick              */
+  UWORD planeMask;  /* selects which bitplanes to store into            */
+  } DestMerge;
+
+
+The low order depth number of bits in planePick, planeOnOff, and planeMask
+correspond one-to-one with destination bitplanes.  Bit 0 with bitplane 0,
+etc. (Any higher order bits should be ignored.)  &#034;1&#034; bits in planePick
+mean &#034;put the next source bitplane into this bitplane&#034;, so the number of
+&#034;1&#034; bits should equal nPlanes.  &#034;0&#034; bits mean &#034;put the corresponding bit
+from planeOnOff into this bitplane&#034;.  Bits in planeMask gate writing to
+the destination bitplane: &#034;1&#034; bits mean &#034;write to this bitplane&#034; while &#034;0&#034;
+bits mean &#034;leave this bitplane alone&#034;.  The normal case (with no DEST
+property) is equivalent to planePick = planeMask = 2^(nPlanes) - 1.
+
+Remember that color numbers are formed by pixels in the destination bitmap
+(depth planes deep) not in the source bitmap (nPlanes planes deep).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

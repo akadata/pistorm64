@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="printer" NODE="PRead()" TITLE="printer.device/PRead" -->
+<head>
+<title>printer.device/PRead</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0515.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0517.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	PRead - internal read from printer port
+
+<b>   SYNOPSIS</b>
+	error = (*PrinterData-&#062;pd_PRead)(buffer, length, tv);
+	D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> PRead(UBYTE *, ULONG *, struct <a href="../Includes_and_Autodocs_3._guide/node0607.html#line29">timeval</a> *);
+
+<b>   FUNCTION</b>
+	PRead reads a buffer of data from the printer port. The variable
+	length points to is set to the actual number of read bytes.
+
+	tv points to a struct <a href="../Includes_and_Autodocs_3._guide/node0607.html#line29">timeval</a> or is NULL in which case the default
+	time is PrinterExtendedData.ped_TimeoutSecs. If the time of tv
+	ellapes before the <a href="../Includes_and_Autodocs_3._guide/node057F.html">CMD_READ</a> at the printer port is done two different
+	things may happen: If at least one char is read PRead() returns. If
+	no char is read but <a href="../Includes_and_Autodocs_3._guide/node0515.html">PQuery</a> returns a value larger 0 the read is
+	repeated with that length to read all outstanding data.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

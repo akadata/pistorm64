@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="StrToLong()" TITLE="dos.library/StrToLong" -->
+<head>
+<title>dos.library/StrToLong</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01C3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01C5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	StrToLong -- string to long value (decimal) (V36)
+
+<b>   SYNOPSIS</b>
+	characters = StrToLong(string,value)
+	D0                       D1    D2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> StrToLong(STRPTR, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> *)
+
+<b>   FUNCTION</b>
+	Converts decimal string into <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> value.  Returns number of characters
+	converted.  Skips over leading spaces &#038; tabs (included in count).  If
+	no decimal digits are found (after skipping leading spaces &#038; tabs),
+	StrToLong returns -1 for characters converted, and puts 0 into value.
+
+<b>   INPUTS</b>
+	string - <a href="../Includes_and_Autodocs_3._guide/node017F.html">Input</a> string.
+	value  - Pointer to long value.  Set to 0 if no digits are converted.
+
+<b>   RESULT</b>
+	result - Number of characters converted or -1.
+
+<b>   BUGS</b>
+	Before V39, if there were no convertible characters it returned the
+	number of leading white-space characters (space and tab in this case).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

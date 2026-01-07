@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="GetRGB4()" TITLE="graphics.library/GetRGB4" -->
+<head>
+<title>graphics.library/GetRGB4</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0447.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0449.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GetRGB4 -- Inquire value of entry in <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line113">ColorMap</a>.
+
+SYNOPSIS
+    value = GetRGB4( colormap, entry )
+      d0              a0       d0
+
+    ULONG GetRGB4(struct <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line113">ColorMap</a> *, LONG);
+
+FUNCTION
+    Read and format a value from the <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line113">ColorMap</a>.
+
+INPUTS
+    colormap - pointer to <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line113">ColorMap</a> structure
+    entry - index into colormap
+
+RESULT
+    returns -1 if no valid entry
+    return UWORD RGB value 4 bits per gun right justified
+
+NOTE
+    Intuition's <a href="../Includes_and_Autodocs_2._guide/node020C.html">DisplayBeep()</a> changes color 0. Reading Color 0 during a
+    <a href="../Includes_and_Autodocs_2._guide/node020C.html">DisplayBeep()</a> will lead to incorrect results.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node047C.html">SetRGB4()</a> <a href="../Includes_and_Autodocs_2._guide/node0458.html">LoadRGB4()</a> <a href="../Includes_and_Autodocs_2._guide/node0445.html">GetColorMap()</a> <a href="../Includes_and_Autodocs_2._guide/node043E.html">FreeColorMap()</a> <a href="../Includes_and_Autodocs_2._guide/node00B8.html">graphics/view.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

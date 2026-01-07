@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="SendPkt()" TITLE="dos.library/SendPkt" -->
+<head>
+<title>dos.library/SendPkt</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02EF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02F1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SendPkt -- Sends a packet to a handler (V36)
+
+SYNOPSIS
+    SendPkt(packet, port, replyport)
+             D1     D2      D3
+
+    void SendPkt(struct <a href="../Includes_and_Autodocs_2._guide/node0078.html#line109">DosPacket</a> *,struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *,struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *)
+
+FUNCTION
+    Sends a packet to a handler and does not wait.  All fields in the
+    packet must be initialized before calling this routine.  The packet
+    will be returned to replyport.  If you wish to use this with
+    <a href="../Includes_and_Autodocs_2._guide/node030F.html">WaitPkt()</a>, use the address or your pr_MsgPort for replyport.
+
+INPUTS
+    packet - packet to send, must be initialized and have a message.
+    port   - pr_MsgPort of handler process to send to.
+    replyport - <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> for the packet to come back to.
+
+NOTES
+    Callable from a task.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0296.html">DoPkt()</a>, <a href="../Includes_and_Autodocs_2._guide/node030F.html">WaitPkt()</a>, <a href="../Includes_and_Autodocs_2._guide/node027F.html">AllocDosObject()</a>, <a href="../Includes_and_Autodocs_2._guide/node02B2.html">FreeDosObject()</a>, <a href="../Includes_and_Autodocs_2._guide/node027A.html">AbortPkt()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

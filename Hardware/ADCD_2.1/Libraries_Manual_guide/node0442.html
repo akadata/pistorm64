@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-5-1-2" TITLE="33 / / Creating Chunks In a File / PopChunk()" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / / Creating Chunks In a File / PopChunk()</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0441.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0443.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When you are through writing data to a chunk, you complete the write by
+calling <a href="../Includes_and_Autodocs_2._guide/node01D2.html">PopChunk()</a>:
+
+    error = PopChunk (iff);
+
+If you wrote fewer bytes than you declared with <a href="../Libraries_Manual_guide/node0441.html">PushChunk()</a>, <a href="../Includes_and_Autodocs_2._guide/node01D2.html">PopChunk()</a>
+will return an error.  If you specified IFFSIZE_UNKNOWN, PopChunk() will
+seek backward on the stream and write the final size.  If you specified a
+chunk size that was odd, PopChunk() will write the pad byte automatically.
+
+<a href="../Libraries_Manual_guide/node0441.html">PushChunk()</a> and <a href="../Includes_and_Autodocs_2._guide/node01D2.html">PopChunk()</a> nest; every call to PushChunk() must have a
+corresponding call to PopChunk().
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

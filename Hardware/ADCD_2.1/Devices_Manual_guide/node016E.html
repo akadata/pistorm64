@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_FTXT" NODE="16-4-2-4" TITLE=" Standard Data and Property Chunks / Property Chunk FONS " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Data and Property Chunks / Property Chunk FONS </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node016D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node016F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The optional property &#034;FONS&#034; holds a FontSpecifier as defined in the C
+declaration below.  It assigns a font to a numbered &#034;font register&#034; so it
+can be referenced by number within subsequent <a href="../Devices_Manual_guide/node016D.html">CHRS</a> chunks.  (This function
+is not provided within the ISO and ANSI standards.)  The font specifier
+gives both a name and a description for the font so the recipient program
+can do font substitution. 
+
+By default, <a href="../Devices_Manual_guide/node016D.html">CHRS</a> text uses font 1 until it selects another font.  A
+minimal text reader always uses font 1.  If font 1 hasn't been specified,
+the reader may use the local system font as font 1.
+
+
+typedef struct {
+  UBYTE id;     /* 0 through 9 is a font id number referenced by an SGR
+                   control sequence selective parameter of 10 through 19.
+                   Other values are reserved for future standardization. */
+  UBYTE pad1;   /* reserved for future use; store 0 here                 */
+  UBYTE proportional; /* proportional font-- 0=unknown, 1=no, 2=yes      */
+  UBYTE serif;  /* serif font-- 0 = unknown, 1 = no, 2 = yes             */
+  char  name[]; /* A NUL-terminated string naming the preferred font.    */
+  } FontSpecifier;
+
+
+Fields are filed in the order shown.  The UBYTE fields are byte-packed (2
+per 16-bit word).  The field pad1 is reserved for future standardization.
+Programs should store 0 there for now.
+
+The field proportional indicates if the desired font is proportional width
+as opposed to fixed width.  The field serif indicates if the desired font
+is serif as opposed to sans serif. [Issue: Discuss font substitution!]
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

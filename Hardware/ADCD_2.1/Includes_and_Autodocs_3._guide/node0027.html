@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="CoerceMethod()" TITLE="amiga.lib/CoerceMethod" -->
+<head>
+<title>amiga.lib/CoerceMethod</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0026.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0028.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CoerceMethod -- Perform method on coerced object.
+
+<b>   SYNOPSIS</b>
+	result = CoerceMethod( cl, obj, MethodID, ... )
+
+	ULONG CoerceMethod( struct <a href="../Includes_and_Autodocs_3._guide/node05E6.html#line35">IClass</a> *, <a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> *, ULONG, ... );
+
+<b>   FUNCTION</b>
+	Boopsi support function that invokes the supplied message
+	on the specified object, as though it were the specified
+	class.  Equivalent to <a href="../Includes_and_Autodocs_3._guide/node0028.html">CoerceMethodA()</a>, but allows you to
+	build the message on the stack.
+
+<b>   INPUTS</b>
+	cl - pointer to boopsi class to receive the message
+	obj - pointer to boopsi object
+	... - method-specific message built on the stack
+
+<b>   RESULT</b>
+	result - class and message-specific result.
+
+<b>   NOTES</b>
+	This function first appears in the V37 release of amiga.lib.
+	While it intrinsically does not require any particular release
+	of the system software to operate, it is designed to work with
+	the boopsi subsystem of Intuition, which was only introduced
+	in V36.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0028.html">CoerceMethodA()</a>, <a href="../Includes_and_Autodocs_3._guide/node0039.html">DoMethodA()</a>, <a href="../Includes_and_Autodocs_3._guide/node003B.html">DoSuperMethodA()</a>, <a href="../Includes_and_Autodocs_3._guide/node0636.html">&#060;intuition/classusr.h&#062;</a>
+	ROM Kernel Manual boopsi section
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

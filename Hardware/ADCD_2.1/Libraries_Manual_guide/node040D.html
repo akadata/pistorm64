@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-12" TITLE="31 Commodities Exchange Library / Signal CxObjects" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / Signal CxObjects</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node040C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node040E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A commodity can use a <a href="../Libraries_Manual_guide/node0409.html">sender CxObject</a> to find out if a <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a> has
+&#034;visited&#034; a <a href="../Libraries_Manual_guide/node0407.html">CxObject</a>, but this method unnecessarily uses system resources.
+A commodity that is only interested in knowing if such a visitation took
+<a name="line5">place does not need to see a corresponding input event or a CxMessage ID.</a>
+Instead, Commodities Exchange has a CxObject that uses an Exec signal.
+
+    signalCxObj = CxObj  *CxSignal(struct Task *, LONG cx_signal);
+
+<a href="../Includes_and_Autodocs_2._guide/node014F.html">CxSignal()</a> sets up a signal <a href="../Libraries_Manual_guide/node0401.html">CxObject</a>.  When a signal CxObject receives a
+<a href="../Libraries_Manual_guide/node0403.html">CxMessage</a>, it signals a task.  The commodity is responsible for
+determining the proper task ID and allocating the signal.  Normally, a
+commodity wants to be signalled so it uses <a href="../Libraries_Manual_guide/node02D0.html#line5">FindTask</a>(NULL) to find it's own
+task address.  Note that cx_signal from the above prototype is the signal
+number as returned by <a href="../Libraries_Manual_guide/node02D3.html#line5">AllocSignal()</a>, not the signal mask made from that
+number.  For more information on signals, see the &#034;<a href="../Libraries_Manual_guide/node02D1.html">Exec Signals</a>&#034; chapter.
+
+The example <a href="../Libraries_Manual_guide/node0585.html">Divert.c</a> (shown a little later in this chapter) uses a signal
+<a href="../Libraries_Manual_guide/node0401.html">CxObject</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="II-87/ExRecLock1.c" NODE="MAIN" TITLE="II-87/ExRecLock1.c" -->
+<head>
+<title>II-87/ExRecLock1.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node017F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0181.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* ExRecLock1.c - Execute me to compile me with SAS/C 6.56
+sc DATA=NEAR NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 ExRecLock1.c
+slink FROM LIB:c.o,ExRecLock1.o TO ExRecLock1 LIBRARY LIB:sc.lib,LIB:amiga.lib
+quit ;*/
+
+/*
+(c)  Copyright 1992-1999 Amiga, Inc.   All rights reserved.
+The information contained herein is subject to change without notice,
+and is provided &#034;as is&#034; without warranty of any kind, either expressed
+or implied.  The entire risk as to the use of this information is
+assumed by the user.
+*/
+
+/* This is a simple example of using record locking to create an exclusive record    */
+/* lock on a file, and writing to that record.  The example ExRecLock2 is almost     */
+/* exactly the same as this example, except ExRecLock2 uses the record lock directly */
+/* after ExRecLock1's record.  If you try to run ExRecLock1 (or ExRecLock2) while    */
+/* another instance of ExRecLock1 (or ExRecLock2) is running, the second record lock */
+/* attempt will fail.                                                                */
+
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/alib_stdio_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }                    /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }
+#endif
+
+#define RECORDSIZE   12
+#define RECORDOFFSET 0
+
+extern struct Library *DOSBase;
+
+UBYTE *vers = &#034;\0$VER: ExRecLock1 37.2&#034;;
+UBYTE *string = &#034;ExRecLock1\n&#034;;                           /* This string will be the */
+                                                          /* contents of the record. */
+void main(void)
+{
+    BPTR fh;
+
+    if (DOSBase-&#062;lib_Version &#062;= 37)   /* Record locking was introduced in Release 2, */
+    {                                 /* but the standard startup code will open any */
+                                      /* version of dos.library, so we have to ex-   */
+                                      /* plicitly check the version number of DOS.   */
+
+        if (fh = Open(&#034;t:testRLock&#034;, MODE_READWRITE))     /* Open the file, creating */
+        {                                                 /*        it if necessary. */
+            if (DOSTRUE == LockRecord(fh,           /* Lock the record as exclusive, */
+                                      RECORDOFFSET, /* and do not wait if it is not  */
+                                      RECORDSIZE,   /* available immediately.        */
+                                      REC_EXCLUSIVE_IMMED, 0))
+            {
+                LONG error = RECORDOFFSET;
+
+                                     /* If the record is beyond the end of the file, */
+                if (Seek(fh, 0, OFFSET_END) &#060; RECORDOFFSET)    /* lengthen the file. */
+                    error = SetFileSize(fh, RECORDOFFSET, OFFSET_BEGINNING);
+
+                if (error == RECORDOFFSET)    /* If there was no error with the file */
+                {                             /*                file size, continue. */
+                    if (Seek(fh, RECORDOFFSET, OFFSET_BEGINNING) &#060; 0)
+                        PrintFault(IoErr(), &#034;Seek() error&#034;);
+
+                    if (Write(fh, string, RECORDSIZE) &#060; 0)
+                        PrintFault(IoErr(), &#034;Write() error&#034;);
+                    else
+                        PutStr(&#034;Write successful, &#034;);
+                }
+                PutStr(&#034;Waiting 10 seconds...\n&#034;);
+                TimeDelay(UNIT_VBLANK, 10, 0);       /* Amiga.lib function that puts */
+                          /* a task to sleep for a given amount of time.  This waits */
+                          /* 10 seconds before unlocking the record to give the user */
+                          /* a chance to start a second copy of this example.        */
+                UnLockRecord(fh, RECORDOFFSET, RECORDSIZE);
+            }
+            else PrintFault(IoErr(), &#034;Record Lock Failed&#034;);
+            Close(fh);
+        }
+        else PrintFault(IoErr(), &#034;Open Failed&#034;);
+    }
+    else PutStr(&#034;Need dos.library V37 or greater.\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_29" NODE="29-10" TITLE="29 Graphics Library and Text / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>29 Graphics Library and Text / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03E0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03E2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following are brief descriptions of the Graphics and Diskfont library
+functions that deal with text.  See the Amiga ROM Kernel Reference Manual:
+Includes and Autodocs for details on each function call.
+
+
+               Table 29-1: Graphics Library Text Functions
+  _______________________________________________________________________
+ |                                                                       |
+ |      Function                  Description                            |
+ |=======================================================================|
+ |          <a href="../Includes_and_Autodocs_2._guide/node0482.html">Text()</a>  Render a text string to a <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>.                  |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0479.html">SetFont()</a>  Set a RastPort's font.                               |
+ |       <a href="../Includes_and_Autodocs_2._guide/node041B.html">AskFont()</a>  Get the <a href="../Libraries_Manual_guide/node03D6.html#line21">TextAttr</a> for a RastPort's font.              |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0462.html">OpenFont()</a>  Open a font currently in the system font list.       |
+ |     <a href="../Includes_and_Autodocs_2._guide/node042E.html">CloseFont()</a>  Close a font.                                        |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0410.html">AddFont()</a>  Add a font to the system list.                       |
+ |       <a href="../Includes_and_Autodocs_2._guide/node046F.html">RemFont()</a>  Remove a font from the system list.                  |
+ |     <a href="../Includes_and_Autodocs_2._guide/node0480.html">StripFont()</a>  Remove the tf_Extension from a font (V36).           |
+ |  <a href="../Includes_and_Autodocs_2._guide/node048C.html">WeighTAMatch()</a>  Get a measure of how well two fonts match (V36).     |
+ |-----------------------------------------------------------------------|
+ |   <a href="../Includes_and_Autodocs_2._guide/node042C.html">ClearScreen()</a>  Clear <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> from the current position to the end  |
+ |                  of the RastPort.                                     |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0429.html">ClearEOL()</a>  Clear RastPort from the current position to the end  |
+ |                  of the line.                                         |
+ |  <a href="../Includes_and_Autodocs_2._guide/node041C.html">AskSoftStyle()</a>  Get the soft style bits of a RastPort's font.        |
+ |  <a href="../Includes_and_Autodocs_2._guide/node047E.html">SetSoftStyle()</a>  Set the soft style bits of a RastPort's font.        |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0485.html">TextLength()</a>  Determine the horizontal raster length of a text     |
+ |                  string using the current RastPort settings.          |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0483.html">TextExtent()</a>  Determine the raster extent (along the X and Y axes) |
+ |                  of a text string using the current RastPort settings |
+ |                  (V36).                                               |
+ |    <a href="../Includes_and_Autodocs_2._guide/node043D.html">FontExtent()</a>  Fill in a <a href="../Libraries_Manual_guide/node03DA.html#line37">TextExtent</a> structure with the bounding box |
+ |                  for the characters in the specified font (V36).      |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0484.html">TextFit()</a>  Count the number of characters in a given string     |
+ |                  that will fit into a given bounds, using the current |
+ |                  RastPort settings (V36).                             |
+ |_______________________________________________________________________|
+
+
+               Table 29-2: Diskfont Library Text Functions
+  _______________________________________________________________________
+ |                                                                       |
+ |           Function             Description                            |
+ |=======================================================================|
+ |           <a href="../Includes_and_Autodocs_2._guide/node01F3.html">AvailFonts()</a>  Inquire which fonts are available from disk   |
+ |                         and/or memory.                                |
+ |      <a href="../Includes_and_Autodocs_2._guide/node01F5.html">NewFontContents()</a>  Create a <a href="../Libraries_Manual_guide/node03E0.html#line33">FontContents</a> image for a font.       |
+ |  <a href="../Includes_and_Autodocs_2._guide/node01F4.html">DisposeFontContents()</a>  Free the result from NewFontContents().       |
+ |    <a href="../Includes_and_Autodocs_2._guide/node01F6.html">NewScaledDiskFont()</a>  Create a DiskFont scaled from another font    |
+ |                         (V36).                                        |
+ |         <a href="../Includes_and_Autodocs_2._guide/node01F7.html">OpenDiskFont()</a>  Open a font, loading it from disk if          |
+ |                         necessary.                                    |
+ |_______________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/conunit.h" NODE="MAIN" TITLE="Includes/devices/conunit.h" -->
+<head>
+<title>Includes/devices/conunit.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0057.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0059.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DEVICES_CONUNIT_H
+#define DEVICES_CONUNIT_H
+/*
+**	$Filename: devices/conunit.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.15 $
+**	$Date: 90/11/20 $
+**
+**	Console device unit definitions
+**
+**	(C) Copyright 1986-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef	EXEC_TYPES_H
+#include	&#034;exec/types.h&#034;
+#endif
+<a name="line18"></a>
+#ifndef EXEC_PORTS_H
+#include	&#034;exec/ports.h&#034;
+#endif
+<a name="line22"></a>
+#ifndef DEVICES_CONSOLE_H
+#include	&#034;devices/console.h&#034;
+#endif
+
+#ifndef DEVICES_KEYMAP_H
+#include	&#034;devices/keymap.h&#034;
+#endif
+
+#ifndef DEVICES_INPUTEVENT_H
+#include	&#034;devices/inputevent.h&#034;
+#endif
+
+<a name="line35">/* ----	console unit numbers for OpenDevice() */</a>
+<a name="line36">#define	CONU_LIBRARY	-1	/* no unit, just fill in IO_DEVICE field */</a>
+#define	CONU_STANDARD	0	/* standard unmapped console */
+
+/* ---- New unit numbers for OpenDevice() - (V36) */
+<a name="line40"></a>
+<a name="line41">#define	CONU_CHARMAP	1	/* bind character map to console */</a>
+#define	CONU_SNIPMAP	3	/* bind character map w/ snip to console */
+
+/* ---- New flag defines for OpenDevice() - (V37) */
+<a name="line45"></a>
+<a name="line46">#define CONFLAG_DEFAULT			0</a>
+#define CONFLAG_NODRAW_ON_NEWSIZE	1
+
+<a name="line49"></a>
+<a name="line50">#define	PMB_ASM		(M_LNM+1)	/* internal storage bit for AS flag */</a>
+<a name="line51">#define	PMB_AWM		(PMB_ASM+1)	/* internal storage bit for AW flag */</a>
+#define	MAXTABS		80
+
+<a name="line54"></a>
+<a name="line55">struct	ConUnit {</a>
+    struct  MsgPort cu_MP;
+<a name="line57">    /* ---- read only variables */</a>
+<a name="line58">    struct  Window *cu_Window;	/* intuition window bound to this unit */</a>
+<a name="line59">    WORD    cu_XCP;		/* character position */</a>
+<a name="line60">    WORD    cu_YCP;</a>
+<a name="line61">    WORD    cu_XMax;		/* max character position */</a>
+<a name="line62">    WORD    cu_YMax;</a>
+<a name="line63">    WORD    cu_XRSize;		/* character raster size */</a>
+<a name="line64">    WORD    cu_YRSize;</a>
+<a name="line65">    WORD    cu_XROrigin;	/* raster origin */</a>
+<a name="line66">    WORD    cu_YROrigin;</a>
+<a name="line67">    WORD    cu_XRExtant;	/* raster maxima */</a>
+<a name="line68">    WORD    cu_YRExtant;</a>
+<a name="line69">    WORD    cu_XMinShrink;	/* smallest area intact from resize process */</a>
+<a name="line70">    WORD    cu_YMinShrink;</a>
+<a name="line71">    WORD    cu_XCCP;		/* cursor position */</a>
+    WORD    cu_YCCP;
+
+    /* ---- read/write variables (writes must must be protected) */
+<a name="line75">    /* ---- storage for AskKeyMap and SetKeyMap */</a>
+    struct  KeyMap cu_KeyMapStruct;
+<a name="line77">    /* ---- tab stops */</a>
+    UWORD   cu_TabStops[MAXTABS]; /* 0 at start, 0xffff at end of list */
+
+<a name="line80">    /* ---- console rastport attributes */</a>
+<a name="line81">    BYTE    cu_Mask;</a>
+<a name="line82">    BYTE    cu_FgPen;</a>
+<a name="line83">    BYTE    cu_BgPen;</a>
+<a name="line84">    BYTE    cu_AOLPen;</a>
+<a name="line85">    BYTE    cu_DrawMode;</a>
+<a name="line86">    BYTE    cu_Obsolete1;	/* was cu_AreaPtSz -- not used in V36 */</a>
+<a name="line87">    APTR    cu_Obsolete2;	/* was cu_AreaPtrn -- not used in V36 */</a>
+<a name="line88">    UBYTE   cu_Minterms[8];	/* console minterms */</a>
+<a name="line89">    struct  TextFont *cu_Font;</a>
+<a name="line90">    UBYTE   cu_AlgoStyle;</a>
+<a name="line91">    UBYTE   cu_TxFlags;</a>
+<a name="line92">    UWORD   cu_TxHeight;</a>
+<a name="line93">    UWORD   cu_TxWidth;</a>
+<a name="line94">    UWORD   cu_TxBaseline;</a>
+    WORD    cu_TxSpacing;
+
+<a name="line97">    /* ---- console MODES and RAW EVENTS switches */</a>
+<a name="line98">    UBYTE   cu_Modes[(PMB_AWM+7)/8];	/* one bit per mode */</a>
+    UBYTE   cu_RawEvents[(IECLASS_MAX+8)/8];
+};
+
+#endif	/* DEVICES_CONUNIT_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

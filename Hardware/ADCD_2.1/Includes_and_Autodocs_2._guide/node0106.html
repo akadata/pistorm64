@@ -1,0 +1,329 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/libraries/gadtools.h" NODE="MAIN" TITLE="Includes/libraries/gadtools.h" -->
+<head>
+<title>Includes/libraries/gadtools.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0105.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0107.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef LIBRARIES_GADTOOLS_H
+#define LIBRARIES_GADTOOLS_H
+/*
+**	$Filename: libraries/gadtools.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.18 $
+**	$Date: 91/10/09 $
+**
+**	gadtools.library definitions
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	All Rights Reserved
+*/
+
+/*------------------------------------------------------------------------*/
+<a name="line16"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line20"></a>
+#ifndef UTILITY_TAGITEM_H
+#include &#060;utility/tagitem.h&#062;
+#endif
+<a name="line24"></a>
+#ifndef INTUITION_INTUITION_H
+#include &#060;intuition/intuition.h&#062;
+#endif
+
+/*------------------------------------------------------------------------*/
+
+/*  The kinds (almost classes) of gadgets in the toolkit.  Use these
+    identifiers when calling CreateGadgetA() */
+<a name="line33"></a>
+<a name="line34">#define GENERIC_KIND	0</a>
+<a name="line35">#define BUTTON_KIND	1</a>
+<a name="line36">#define CHECKBOX_KIND	2</a>
+<a name="line37">#define INTEGER_KIND	3</a>
+<a name="line38">#define LISTVIEW_KIND	4</a>
+<a name="line39">#define MX_KIND		5</a>
+<a name="line40">#define NUMBER_KIND	6</a>
+<a name="line41">#define CYCLE_KIND	7</a>
+<a name="line42">#define PALETTE_KIND	8</a>
+#define SCROLLER_KIND	9
+<a name="line44">/* Kind number 10 is reserved */</a>
+<a name="line45">#define SLIDER_KIND	11</a>
+<a name="line46">#define STRING_KIND	12</a>
+#define TEXT_KIND	13
+<a name="line48"></a>
+#define NUM_KINDS	14
+
+/*------------------------------------------------------------------------*/
+
+/*  These two definitions are obsolete, but are here for backwards
+<a name="line54">    compatibility.  You never need to worry about these: */</a>
+#define GADTOOLBIT	(0x8000)
+<a name="line56">/*  Use this mask to isolate the user part: */</a>
+#define GADTOOLMASK	(~GADTOOLBIT)
+
+/*------------------------------------------------------------------------*/
+<a name="line60"></a>
+/*  'Or' the appropriate set together for your Window IDCMPFlags: */
+
+<a name="line63">#define ARROWIDCMP	(IDCMP_GADGETUP | IDCMP_GADGETDOWN |\</a>
+	IDCMP_INTUITICKS | IDCMP_MOUSEBUTTONS)
+<a name="line65"></a>
+<a name="line66">#define BUTTONIDCMP	(IDCMP_GADGETUP)</a>
+<a name="line67">#define CHECKBOXIDCMP	(IDCMP_GADGETUP)</a>
+#define INTEGERIDCMP	(IDCMP_GADGETUP)
+<a name="line69">#define LISTVIEWIDCMP	(IDCMP_GADGETUP | IDCMP_GADGETDOWN |\</a>
+	IDCMP_MOUSEMOVE | ARROWIDCMP)
+<a name="line71"></a>
+<a name="line72">#define MXIDCMP		(IDCMP_GADGETDOWN)</a>
+<a name="line73">#define NUMBERIDCMP	(NULL)</a>
+<a name="line74">#define CYCLEIDCMP	(IDCMP_GADGETUP)</a>
+#define PALETTEIDCMP	(IDCMP_GADGETUP)
+
+<a name="line77">/*  Use ARROWIDCMP|SCROLLERIDCMP if your scrollers have arrows: */</a>
+<a name="line78">#define SCROLLERIDCMP	(IDCMP_GADGETUP | IDCMP_GADGETDOWN | IDCMP_MOUSEMOVE)</a>
+<a name="line79">#define SLIDERIDCMP	(IDCMP_GADGETUP | IDCMP_GADGETDOWN | IDCMP_MOUSEMOVE)</a>
+#define STRINGIDCMP	(IDCMP_GADGETUP)
+<a name="line81"></a>
+#define TEXTIDCMP	(NULL)
+
+/*------------------------------------------------------------------------*/
+
+<a name="line86">/*  Typical suggested spacing between &#034;elements&#034;: */</a>
+<a name="line87">#define INTERWIDTH	8</a>
+#define INTERHEIGHT	4
+
+/*------------------------------------------------------------------------*/
+
+/*  Generic NewGadget used by several of the gadget classes: */
+<a name="line93"></a>
+struct NewGadget
+<a name="line95">    {</a>
+<a name="line96">    WORD ng_LeftEdge, ng_TopEdge;	/*  gadget position */</a>
+<a name="line97">    WORD ng_Width, ng_Height;		/*  gadget size */</a>
+<a name="line98">    UBYTE *ng_GadgetText;		/*  gadget label */</a>
+<a name="line99">    struct TextAttr *ng_TextAttr;	/*  desired font for gadget label */</a>
+<a name="line100">    UWORD ng_GadgetID;			/*  gadget ID */</a>
+<a name="line101">    ULONG ng_Flags;			/*  see below */</a>
+<a name="line102">    APTR ng_VisualInfo;			/*  Set to retval of GetVisualInfo() */</a>
+    APTR ng_UserData;			/*  gadget UserData */
+    };
+
+
+/*  ng_Flags control certain aspects of the gadget.  The first five control
+    the placement of the descriptive text.  All larger groups supply a
+    default: */
+<a name="line110"></a>
+<a name="line111">#define PLACETEXT_LEFT	0x0001	/* Right-align text on left side */</a>
+<a name="line112">#define PLACETEXT_RIGHT	0x0002	/* Left-align text on right side */</a>
+<a name="line113">#define PLACETEXT_ABOVE	0x0004	/* Center text above */</a>
+<a name="line114">#define PLACETEXT_BELOW	0x0008	/* Center text below */</a>
+#define PLACETEXT_IN	0x0010	/* Center text on */
+<a name="line116"></a>
+#define NG_HIGHLABEL	0x0020	/* Highlight the label */
+
+/*------------------------------------------------------------------------*/
+
+/* Fill out an array of these and pass that to CreateMenus(): */
+<a name="line122"></a>
+struct NewMenu
+<a name="line124">    {</a>
+<a name="line125">    UBYTE nm_Type;		/*  See below */</a>
+<a name="line126">    /* Compiler inserts a PAD byte here */</a>
+<a name="line127">    STRPTR nm_Label;		/*  Menu's label */</a>
+<a name="line128">    STRPTR nm_CommKey;		/*  MenuItem Command Key Equiv */</a>
+<a name="line129">    UWORD nm_Flags;		/*  Menu or MenuItem flags (see note) */</a>
+    LONG nm_MutualExclude;	/*  MenuItem MutualExclude word */
+    APTR nm_UserData;		/*  For your own use, see note */
+    };
+<a name="line133"></a>
+<a name="line134">/*  Each nm_Type should be one of these: */</a>
+<a name="line135">#define NM_TITLE	1</a>
+<a name="line136">#define NM_ITEM		2</a>
+#define NM_SUB		3
+<a name="line138">#define NM_END		0</a>
+<a name="line139"></a>
+<a name="line140">#define MENU_IMAGE	128</a>
+
+/* For an image menu-item or sub-item, use one of these.  Set
+<a name="line143"> * nm_Label to point at the Image structure you wish to use.</a>
+ * NOTE: At present, you may only use conventional images.
+ * Custom images created from Intuition image-classes do not work.
+ */
+#define IM_ITEM		(NM_ITEM | MENU_IMAGE)
+#define IM_SUB		(NM_SUB | MENU_IMAGE)
+
+/*  If you set your label to NM_BARLABEL, you'll get a separator bar. */
+<a name="line151">#define NM_BARLABEL	((STRPTR)-1)</a>
+<a name="line152"></a>
+
+/*  The nm_Flags field is used to fill out either the Menu-&#062;Flags or
+    MenuItem-&#062;Flags field.  Note that the sense of the MENUENABLED or
+<a name="line156">    ITEMENABLED bit is inverted between this use and Intuition's use,</a>
+    in other words, NewMenus are enabled by default.  The following
+    labels are provided to disable them: */
+#define NM_MENUDISABLED	MENUENABLED
+#define NM_ITEMDISABLED	ITEMENABLED
+
+/*  The following are pre-cleared (COMMSEQ, ITEMTEXT, and HIGHxxx are set
+    later as appropriate): */
+#define NM_FLAGMASK	(~(COMMSEQ | ITEMTEXT | HIGHFLAGS))
+
+/*  You may choose among CHECKIT, MENUTOGGLE, and CHECKED.
+    Toggle-select menuitems are of type CHECKIT|MENUTOGGLE, along
+    with CHECKED if currently selected.  Mutually exclusive ones
+    are of type CHECKIT, and possibly CHECKED too.  The nm_MutualExclude
+    is a bit-wise representation of the items excluded by this one,
+<a name="line171">    so in the simplest case (choose 1 among n), these flags would be</a>
+<a name="line172">    ~1, ~2, ~4, ~8, ~16, etc.  See the Intuition Menus chapter. */</a>
+<a name="line173"></a>
+/*  A UserData pointer can be associated with each Menu and MenuItem structure.
+<a name="line175">    The CreateMenus() call allocates space for a UserData after each</a>
+    Menu or MenuItem (header, item or sub-item).  You should use the
+    GTMENU_USERDATA() or GTMENUITEM_USERDATA() macro to extract it. */
+
+<a name="line179">#define GTMENU_USERDATA(menu) (* ( (APTR *)(((struct Menu *)menu)+1) ) )</a>
+<a name="line180">#define GTMENUITEM_USERDATA(menuitem) (* ( (APTR *)(((struct MenuItem *)menuitem)+1) ) )</a>
+<a name="line181"></a>
+/*  Here is an old one for compatibility.  Do not use in new code! */
+#define MENU_USERDATA(menuitem) (* ( (APTR *)(menuitem+1) ) )
+
+/*  These return codes can be obtained through the GTMN_SecondaryError tag */
+#define GTMENU_TRIMMED	0x00000001	/* Too many menus, items, or subitems,
+<a name="line187">					   menu has been trimmed down */</a>
+#define GTMENU_INVALID	0x00000002	/* Invalid NewMenu array */
+<a name="line189">#define GTMENU_NOMEM	0x00000003	/* Out of memory */</a>
+<a name="line190"></a>
+/*------------------------------------------------------------------------*/
+<a name="line192"></a>
+/*  Tags for toolkit functions: */
+<a name="line194"></a>
+#define GT_TagBase	     TAG_USER + 0x80000
+<a name="line196"></a>
+<a name="line197">#define GTVI_NewWindow	     GT_TagBase+1  /* Unused */</a>
+#define GTVI_NWTags	     GT_TagBase+2  /* Unused */
+<a name="line199"></a>
+<a name="line200">#define GT_Private0	     GT_TagBase+3  /* (private) */</a>
+
+<a name="line202">#define GTCB_Checked	     GT_TagBase+4  /* State of checkbox */</a>
+<a name="line203"></a>
+#define GTLV_Top	     GT_TagBase+5  /* Top visible one in listview */
+<a name="line205">#define GTLV_Labels	     GT_TagBase+6  /* List to display in listview */</a>
+#define GTLV_ReadOnly	     GT_TagBase+7  /* TRUE if listview is to be
+<a name="line207">					      read-only */</a>
+#define GTLV_ScrollWidth     GT_TagBase+8  /* Width of scrollbar */
+<a name="line209"></a>
+#define GTMX_Labels	     GT_TagBase+9  /* NULL-terminated array of labels */
+<a name="line211">#define GTMX_Active	     GT_TagBase+10 /* Active one in mx gadget */</a>
+<a name="line212"></a>
+#define GTTX_Text	     GT_TagBase+11 /* Text to display */
+<a name="line214">#define GTTX_CopyText	     GT_TagBase+12 /* Copy text label instead of</a>
+<a name="line215">					      referencing it */</a>
+<a name="line216"></a>
+<a name="line217">#define GTNM_Number	     GT_TagBase+13 /* Number to display */</a>
+<a name="line218"></a>
+#define GTCY_Labels	     GT_TagBase+14 /* NULL-terminated array of labels */
+<a name="line220">#define GTCY_Active	     GT_TagBase+15 /* The active one in the cycle gad */</a>
+<a name="line221"></a>
+<a name="line222">#define GTPA_Depth	     GT_TagBase+16 /* Number of bitplanes in palette */</a>
+<a name="line223">#define GTPA_Color	     GT_TagBase+17 /* Palette color */</a>
+#define GTPA_ColorOffset     GT_TagBase+18 /* First color to use in palette */
+#define GTPA_IndicatorWidth  GT_TagBase+19 /* Width of current-color indicator */
+#define GTPA_IndicatorHeight GT_TagBase+20 /* Height of current-color indicator */
+<a name="line227"></a>
+<a name="line228">#define GTSC_Top	     GT_TagBase+21 /* Top visible in scroller */</a>
+<a name="line229">#define GTSC_Total	     GT_TagBase+22 /* Total in scroller area */</a>
+<a name="line230">#define GTSC_Visible	     GT_TagBase+23 /* Number visible in scroller */</a>
+<a name="line231">#define GTSC_Overlap	     GT_TagBase+24 /* Unused */</a>
+<a name="line232"></a>
+/*  GT_TagBase+25 through GT_TagBase+37 are reserved */
+<a name="line234"></a>
+#define GTSL_Min	     GT_TagBase+38 /* Slider min value */
+<a name="line236">#define GTSL_Max	     GT_TagBase+39 /* Slider max value */</a>
+<a name="line237">#define GTSL_Level	     GT_TagBase+40 /* Slider level */</a>
+#define GTSL_MaxLevelLen     GT_TagBase+41 /* Max length of printed level */
+<a name="line239">#define GTSL_LevelFormat     GT_TagBase+42 /* Format string for level */</a>
+<a name="line240">#define GTSL_LevelPlace      GT_TagBase+43 /* Where level should be placed */</a>
+#define GTSL_DispFunc	     GT_TagBase+44 /* Callback for number calculation
+<a name="line242">					      before display */</a>
+<a name="line243"></a>
+#define GTST_String	     GT_TagBase+45 /* String gadget's displayed string */
+<a name="line245">#define GTST_MaxChars	     GT_TagBase+46 /* Max length of string */</a>
+
+<a name="line247">#define GTIN_Number	     GT_TagBase+47 /* Number in integer gadget */</a>
+#define GTIN_MaxChars	     GT_TagBase+48 /* Max number of digits */
+
+#define GTMN_TextAttr	     GT_TagBase+49 /* MenuItem font TextAttr */
+<a name="line251">#define GTMN_FrontPen	     GT_TagBase+50 /* MenuItem text pen color */</a>
+
+<a name="line253">#define GTBB_Recessed	     GT_TagBase+51 /* Make BevelBox recessed */</a>
+<a name="line254"></a>
+<a name="line255">#define GT_VisualInfo	     GT_TagBase+52 /* result of VisualInfo call */</a>
+
+#define GTLV_ShowSelected    GT_TagBase+53 /* show selected entry beneath
+<a name="line258">		listview, set tag data = NULL for display-only, or pointer</a>
+		to a string gadget you've created */
+<a name="line260">#define GTLV_Selected	     GT_TagBase+54 /* Set ordinal number of selected</a>
+					      entry in the list */
+#define GT_Reserved1	     GT_TagBase+56 /* Reserved for future use */
+<a name="line263"></a>
+#define GTTX_Border	     GT_TagBase+57 /* Put a border around
+					      Text-display gadgets */
+<a name="line266">#define GTNM_Border	     GT_TagBase+58 /* Put a border around</a>
+					      Number-display gadgets */
+
+<a name="line269">#define GTSC_Arrows	     GT_TagBase+59 /* Specify size of arrows for</a>
+					      scroller */
+
+#define GTMN_Menu	     GT_TagBase+60 /* Pointer to Menu for use by
+<a name="line273">					      LayoutMenuItems() */</a>
+#define GTMX_Spacing	     GT_TagBase+61 /* Added to font height to
+<a name="line275">		figure spacing between mx choices.  Use this instead</a>
+		of LAYOUTA_SPACING for mx gadgets. */
+
+<a name="line278">/* New to V37 GadTools.  Ignored by GadTools V36 */</a>
+#define GTMN_FullMenu	     GT_TagBase+62 /* Asks CreateMenus() to
+		validate that this is a complete menu structure */
+#define GTMN_SecondaryError  GT_TagBase+63 /* ti_Data is a pointer
+		to a ULONG to receive error reports from CreateMenus() */
+#define GT_Underscore	     GT_TagBase+64 /* ti_Data points to the symbol
+		that preceeds the character you'd like to underline in a
+<a name="line285">		gadget label */</a>
+<a name="line286">#define GTST_EditHook	     GT_TagBase+55 /* String EditHook */</a>
+<a name="line287"></a>
+<a name="line288">/*  GT_TagBase+65 on up reserved for future use */</a>
+
+/* Old definition, now obsolete: */
+#define GT_Reserved0	     GTST_EditHook
+
+/*------------------------------------------------------------------------*/
+
+/*  &#034;NWay&#034; is an old synonym for cycle gadgets */
+#define NWAY_KIND	CYCLE_KIND
+#define NWAYIDCMP	CYCLEIDCMP
+#define GTNW_Labels	GTCY_Labels
+#define GTNW_Active	GTCY_Active
+
+/*------------------------------------------------------------------------*/
+
+#endif /* LIBRARIES_GADTOOLS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="XorRectRegion()" TITLE="graphics.library/XorRectRegion" -->
+<head>
+<title>graphics.library/XorRectRegion</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node048F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0491.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    XorRectRegion -- Perform 2d XOR operation of rectangle
+                     with region, leaving result in region
+
+SYNOPSIS
+    status = XorRectRegion(region,rectangle)
+    d0                     a0      a1
+
+    BOOL XorRectRegion( struct <a href="../Includes_and_Autodocs_2._guide/node00B7.html#line28">Region</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line28">Rectangle</a> * );
+
+FUNCTION
+    Add portions of rectangle to region if they are not in
+    the region.
+    Remove portions of rectangle from region if they are
+    in the region.
+
+INPUTS
+    region - pointer to <a href="../Includes_and_Autodocs_2._guide/node00B7.html#line28">Region</a> structure
+    rectangle - pointer to <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line28">Rectangle</a> structure
+
+RESULTS
+    status - return TRUE if successful operation
+             return FALSE if ran out of memory
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0465.html">OrRegionRegion()</a> <a href="../Includes_and_Autodocs_2._guide/node0414.html">AndRegionRegion()</a> <a href="../Includes_and_Autodocs_2._guide/node00B7.html">graphics/regions.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

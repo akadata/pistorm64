@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-1" TITLE="30 / Layers / The Layer Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / Layers / The Layer Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03E3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03E5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The internal representation of layers is essentially a set of clipping
+rectangles.  Each layer is represented by an instance of the Layer
+structure.  All the layers in a display are linked together through the
+<a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> structure.  Any display shared by multiple layers (such as an
+Intuition screen) requires one Layer_Info data structure to handle
+interactions between the various layers. Here is a partial listing of the
+Layer structure from &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00A1.html#line33">clip.h</a>&#062;.  (For a complete listing refer to
+the Amiga ROM Kernel Reference Manual: Includes and Autodocs.)
+
+<a name="line11">    struct Layer</a>
+    {
+        struct  Layer *front,*back;
+        struct  ClipRect   *ClipRect; /* read ROMs to find 1st cliprect */
+        struct  RastPort   *rp;
+        struct  Rectangle  bounds;
+          ...
+
+        UWORD   Flags;                /* obscured ?, Virtual BitMap? */
+        struct  BitMap  *SuperBitMap;
+<a name="line21">          ...</a>
+
+        struct  Region  *DamageList;  /* list of rectangles to refresh */
+                                      /* through */
+    };
+
+
+    The Layer Structure is Read-Only.
+    ---------------------------------
+    Applications should never directly modify any of the elements of the
+    Layer structure. In addition, applications should only read the
+    front, back, rp, bounds, Flags, SuperBitMap and DamageList elements
+    of the Layer structure. (Some of these elements are subject to
+    dynamic change by the system so proper layer locking procedures must
+    be followed when relying on what the application has read.)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

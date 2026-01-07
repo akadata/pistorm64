@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="ReadPixelArray8()" TITLE="graphics.library/ReadPixelArray8" -->
+<head>
+<title>graphics.library/ReadPixelArray8</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0310.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0312.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ReadPixelArray8 -- read the pen number value of a rectangular array
+	of pixels starting at a specified x,y location and continuing
+	through to another x,y location within a certain <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>. (V36)
+
+<b>   SYNOPSIS</b>
+	count = ReadPixelArray8(rp,xstart,ystart,xstop,ystop,array,temprp)
+	D0                      A0 D0:16  D1:16  D2:16 D3:16 A2    A1
+
+<b>     <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> ReadPixelArray8(struct  <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>,</b>
+	   <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *);
+
+<b>   FUNCTION</b>
+	For each pixel in a rectangular region, combine the bits from each
+	of the bit-planes used to describe a particular <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> into the pen
+	number selector which that bit combination normally forms for the
+	system hardware selection of pixel color.
+
+<b>   INPUTS</b>
+	rp    -  pointer to a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> structure
+	(xstart,ystart) - starting point in the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+	(xstop,ystop)   - stopping point in the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+	array - pointer to an array of UBYTEs from which to fetch the pixel data
+	        allocate at least ((((width+15)&#062;&#062;4)&#060;&#060;4)*(ystop-ystart+1)) bytes.
+	temprp - temporary rastport (copy of rp with <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> set == NULL,
+	         temporary memory allocated for
+	         temprp-&#062;BitMap with Rows set == 1,
+	         temprp-&#062;BytesPerRow == (((width+15)&#062;&#062;4)&#060;&#060;1),
+	         and temporary memory allocated for
+	         temprp-&#062;BitMap-&#062;Planes[])
+
+<b>   RESULT</b>
+	For each pixel in the array:
+	    Pen - (0..255) number at that position is returned
+	count   - the number of pixels read.
+
+<b>   NOTE</b>
+	xstop must be &#062;= xstart
+	ystop must be &#062;= ystart
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0310.html">ReadPixel()</a>  <a href="../Includes_and_Autodocs_3._guide/node0312.html">ReadPixelLine8()</a>  <a href="../Includes_and_Autodocs_3._guide/node05D7.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

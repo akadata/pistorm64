@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VII-1/DR2D.txt" NODE="VII-1-7" TITLE="CMAP (0x434D4150)       / Color map (Same as ILBM CMAP) /" -->
+<head>
+<title>CMAP (0x434D4150)       / Color map (Same as ILBM CMAP) /</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00E6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00E8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This chunk is identical to the ILBM CMAP chunk as described in the IFF
+ILBM documentation.
+
+    struct CMAPstruct {
+        ULONG       ID;
+        ULONG       Size;
+        UBYTE       ColorMap[Size];
+    };
+
+ColorMap is an array of 24-bit RGB color values.  The 24-bit value is
+spread across three bytes, the first of which contains the red
+intensity, the next contains the green intensity, and the third
+contains the blue intensity.  Because DR2D stores its colors with
+24-bit accuracy, DR2D readers must not make the mistake that some ILBM
+readers do in assuming the CMAP chunk colors correspond directly to
+Amiga color registers.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

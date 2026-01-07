@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-1-3" TITLE="5 / About Gadgets / Adding and Removing Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / About Gadgets / Adding and Removing Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0132.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0134.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Gadgets may be added to a window or requester when the window or requester
+is opened, or they may be added later.  To add the gadgets when a window
+is opened, use the <a href="../Libraries_Manual_guide/node0124.html#line52">WA_Gadgets</a> tag with the <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> call.  This
+technique is demonstrated in the example above.  For a requester, set the
+<a href="../Libraries_Manual_guide/node01AB.html#line72">ReqGadget</a> field in the <a href="../Libraries_Manual_guide/node01AB.html">Requester</a> structure to point to the first gadget in
+<a name="line7">the list.</a>
+
+To add or remove gadgets in a window or requester that is already open,
+use <a href="../Includes_and_Autodocs_2._guide/node01FD.html">AddGList()</a> or <a href="../Includes_and_Autodocs_2._guide/node0247.html">RemoveGList()</a>.  These functions operate on gadgets
+arranged in a list.  A gadget list is linked together by the <a href="../Libraries_Manual_guide/node0149.html#line21">NextGadget</a>
+field of the Gadget structure (see the description of the <a href="../Libraries_Manual_guide/node0149.html">Gadget structure</a>
+<a name="line13">later in this chapter).</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node01FD.html">AddGList()</a> adds a gadget list that you specify to the existing gadget list
+of a window or requester:
+
+    UWORD AddGList( struct Window *window, struct Gadget *agadget,
+                    unsigned long position, long numGad,
+                    struct Requester *requester );
+
+Up to numGad gadgets will be added from the gadget list you specify
+beginning with agadget.  The position argument determines where your
+gadgets will be placed in the existing list of gadgets for the window or
+requester.  Use (~0) to add your gadget list to the end of the window or
+requester's gadget list.  This function returns the actual position where
+<a name="line27">your gadgets are added in the existing list.</a>
+
+To remove gadgets from a window or requester use <a href="../Includes_and_Autodocs_2._guide/node0247.html">RemoveGList()</a>:
+
+    UWORD RemoveGList( struct Window *remPtr, struct Gadget *agadget,
+                       long numGad );
+
+This function removes up to numGad gadgets from a window or requester,
+beginning with the specified one.  Starting with V37, if one of the
+gadgets that is being removed is the active gadget, this routine will wait
+for the user to release the mouse button before deactivating and removing
+the gadget.  This function returns the former position of the removed
+<a name="line39">gadget or -1 if the specified gadget was not found.</a>
+
+The <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure should never be directly modified after it has been
+added to a window or requester.  To modify a gadget, first remove it with
+<a href="../Includes_and_Autodocs_2._guide/node0247.html">RemoveGList()</a>, modify the structure as needed, and then add the gadget
+back to the system with <a href="../Includes_and_Autodocs_2._guide/node01FD.html">AddGList()</a>.  Finally, refresh the gadget imagery
+with <a href="../Libraries_Manual_guide/node0146.html">RefreshGList()</a>. (See the section on &#034;<a href="../Libraries_Manual_guide/node0142.html">Gadget Refreshing</a>&#034; below for
+more information.)
+
+Some attributes of a gadget may be modified through special Intuition
+functions that perform the modification.  When using such functions it is
+not necessary to remove, add or refresh the gadget.  These functions, such
+as <a href="../Libraries_Manual_guide/node0163.html">NewModifyProp()</a>, <a href="../Libraries_Manual_guide/node0147.html#line10">OnGadget()</a> and <a href="../Libraries_Manual_guide/node0147.html#line10">OffGadget()</a>, are described later in
+this chapter.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

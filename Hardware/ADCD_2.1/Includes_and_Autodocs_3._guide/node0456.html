@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="locale" NODE="FormatDate()" TITLE="locale.library/FormatDate" -->
+<head>
+<title>locale.library/FormatDate</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0455.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0457.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FormatDate -- generate a date string based on a date formatting
+		      template. (V38)
+
+<b>   SYNOPSIS</b>
+	FormatDate(locale,fmtTemplate,date,putCharFunc);
+	           A0     A1          A2   A3
+
+	VOID FormatDate(struct <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> *,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>,struct <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line51">DateStamp</a> *,
+	                struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *);
+
+<b>   FUNCTION</b>
+	This function processes a formatting template and generates
+	a stream of bytes that's sent one character at a time to the
+	putCharFunc callback hook.
+
+<b>   INPUTS</b>
+	locale - the locale to use for the formatting
+	fmtTemplate - the NULL-terminated template describing the desired
+		      format for the date. This is constructed just like
+		      C-language <a href="../Includes_and_Autodocs_3._guide/node0048.html">printf()</a> statements, except that different
+		      formatting codes are used. Just like in C, formatting
+		      codes start with a % followed by the formatting command.
+		      The following commands are accepted by this function:
+
+	                %a - abbreviated weekday name
+	                %A - weekday name
+	                %b - abbreviated month name
+	                %B - month name
+	                %c - same as &#034;%a %b %d %H:%M:%S %Y&#034;
+	                %C - same as &#034;%a %b %e %T %Z %Y&#034;
+	                %d - day number with leading 0s
+	                %D - same as &#034;%m/%d/%y&#034;
+	                %e - day number with leading spaces
+	                %h - abbreviated month name
+	                %H - hour using 24-hour style with leading 0s
+	                %I - hour using 12-hour style with leading 0s
+	                %j - julian date
+	                %m - month number with leading 0s
+	                %M - the number of minutes with leading 0s
+	                %n - insert a linefeed
+	                %p - AM or PM strings
+	                %q - hour using 24-hour style
+	                %Q - hour using 12-hour style
+	                %r - same as &#034;%I:%M:%S %p&#034;
+	                %R - same as &#034;%H:%M&#034;
+	                %S - number of seconds with leadings 0s
+	                %t - insert a tab character
+	                %T - same as &#034;%H:%M:%S&#034;
+	                %U - week number, taking Sunday as first day of week
+	                %w - weekday number
+	                %W - week number, taking Monday as first day of week
+	                %x - same as &#034;%m/%d/%y&#034;
+	                %X - same as &#034;%H:%M:%S&#034;
+	                %y - year using two digits with leading 0s
+	                %Y - year using four digits with leading 0s
+
+	              If the template parameter is NULL, a single NULL byte
+		      is sent to putCharFunc.
+	date - the date to format into a string
+	putCharFunc - a callback hook invoked for every character generated,
+		      including for the terminating NULL character. The hook
+		      is called with:
+
+		 	A0 - address of <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> structure
+			A1 - character for hook to process (not a pointer!)
+	                A2 - locale pointer
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node045D.html">ParseDate()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E3.html">&#060;libraries/locale.h&#062;</a>, <a href="../Includes_and_Autodocs_3._guide/node05F8.html">&#060;dos/dos.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

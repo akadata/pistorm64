@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-1-7" TITLE="D / Errors / Crashes--Only on 68000 and 68010" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D / Errors / Crashes--Only on 68000 and 68010</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node053C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node053E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This can be caused by illegal instructions (80000000.00000004) such as new
+68020/30/40 instructions or inline 68881/882 code.  But this is usually
+caused by a word or longword access at an odd address.  This is legal on
+the 68020 and above, but will generate an Address Error
+(80000000.00000003) on a 68000 or 68010.  This can be caused by using
+uninitialized pointers, using freed memory, or using system structures
+improperly (for example, referencing into <a href="../Libraries_Manual_guide/node01D9.html#line73">IntuiMessage-&#062;IAddress</a> as a
+struct <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> *  on a non-Gadget message).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

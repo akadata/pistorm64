@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="SetIntVector()" TITLE="exec.library/SetIntVector" -->
+<head>
+<title>exec.library/SetIntVector</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0238.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node023A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetIntVector -- set a new handler for a system interrupt vector
+
+<b>   SYNOPSIS</b>
+	oldInterrupt = SetIntVector(intNumber, interrupt)
+	D0			    D0         A1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> *SetIntVector(ULONG, struct <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> *);
+
+<b>   FUNCTION</b>
+	This function provides a mechanism for setting the system interrupt
+	vectors.  These are non-sharable; setting a new interrupt handler
+	disconnects the old one.  Installed handlers are responsible for
+	processing, enabling and clearing the interrupt.  Note that interrupts
+	may have been left in any state by the previous code.
+
+	The IS_CODE and IS_DATA pointers of the <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> structure will
+	be copied into a private place by Exec.  A pointer to the previously
+	installed <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> structure is returned.
+
+	When the system calls the specified interrupt code, the registers are
+	setup as follows:
+
+	    D0 - scratch
+	    D1 - scratch (on entry: active
+			  interrupts -&#062; equals INTENA &#038; INTREQ)
+
+	    A0 - scratch (on entry: pointer to base of custom chips
+			  for fast indexing)
+	    A1 - scratch (on entry: Interrupt's IS_DATA pointer)
+
+	    A5 - jump vector register (scratch on call)
+	    A6 - Exec library base pointer (scratch on call)
+
+	    all other registers must be preserved
+
+<b>   INPUTS</b>
+	intNum - the Paula interrupt bit number (0..14).  Only non-chained
+		 interrupts should be set.  Use <a href="../Includes_and_Autodocs_3._guide/node01DA.html">AddIntServer()</a> for server
+		 chains.
+	interrupt - a pointer to an <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> structure containing the
+		 handler's entry point and data segment pointer.  A NULL
+		 interrupt pointer will remove the current interrupt and
+		 set illegal values for IS_CODE and IS_DATA.
+
+		 By convention, the LN_NAME of the interrupt structure must
+		 point a descriptive string so that other users may
+		 identify who currently has control of the interrupt.
+
+<b>   RESULT</b>
+	A pointer to the prior interrupt structure which had control
+	of this interrupt.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01DA.html">AddIntServer()</a>,exec/interrupts.i,hardware/intbits.i
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

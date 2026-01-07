@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_3" NODE="3-1" TITLE="3 Clipboard Device / Clipboard Device Commands and Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>3 Clipboard Device / Clipboard Device Commands and Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0065.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0067.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Command             Command Operation
+-------             -----------------
+<a href="../Devices_Manual_guide/node0070.html">CBD_CHANGEHOOK</a>      Specify a hook to be called when the data on the
+                    clipboard has changed (V36).
+
+<a href="../Devices_Manual_guide/node006D.html#line13">CBD_CURRENTREADID</a>   Return the Clip ID of the current clip to read.  This
+                    is used to determine if a clip posting is still the
+                    latest cut.
+
+<a href="../Devices_Manual_guide/node006D.html#line18">CBD_CURRENTWRITEID</a>  Return the Clip ID of the latest clip written.  This
+                    is used to determine if the clip posting data is
+                    obsolete.
+
+<a href="../Includes_and_Autodocs_2._guide/node04DC.html">CBD_POST</a>            Post the availability of clip data.
+
+<a href="../Devices_Manual_guide/node006E.html">CMD_READ</a>            Read data from the clipboard for a paste.  Data can be
+                    read from anywhere in the clipboard by specifying an
+                    offset &#062;0 in the I/O request.
+
+<a href="../Devices_Manual_guide/node006C.html">CMD_UPDATE</a>          Indicate that the data provided with a write command
+                    is complete and available for subsequent read/pastes.
+
+<a href="../Devices_Manual_guide/node006B.html">CMD_WRITE</a>           Write data to the clipboard as a cut.
+
+
+Exec Functions as Used in This Chapter
+--------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>       Relinquish use of the clipboard device.  All requests
+                    must be complete before closing.
+
+<a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>              Initiate a command and wait for completion
+                    (synchronous request).
+
+<a href="../Includes_and_Autodocs_2._guide/node035A.html">GetMsg()</a>            Get next message from a message port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>        Obtain use of the clipboard device.
+
+<a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>            Initiate a command and return immediately
+                    (asynchronous request).
+
+
+Exec Support Functions as Used in This Chapter
+----------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>       Create an I/O request structure of type IOClipReq.
+                    This structure will be used to communicate commands to
+                    the clipboard device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>        Create a signal message port for reply messages from
+                    the clipboard device.  Exec will signal a task when a
+                    message arrives at the port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>       Delete an I/O request structure created by
+                    CreateExtIO().
+
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>        Delete the message port created by CreatePort().
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

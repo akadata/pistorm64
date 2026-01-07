@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_3" NODE="3-3" TITLE="3 Clipboard Device / Monitoring Clipboard Changes" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>3 Clipboard Device / Monitoring Clipboard Changes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node006F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0071.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Some applications require notification of changes to data on the
+clipboard. Typically, these applications will need to do some processing
+when this occurs. You can set up such an environment through the
+<a href="../Includes_and_Autodocs_2._guide/node04D9.html">CBD_CHANGEHOOK</a> command. CBD_CHANGEHOOK allows you to specify a hook to be
+called when the data on the clipboard changes.
+
+For example, a show clipboard utility would need to know when the data on
+the clipboard is changed so that it can display the new data.  The hook it
+would specify would read the new clipboard data and display it for the
+<a name="line11">user.</a>
+
+You specify a hook for the clipboard device by initializing a Hook
+structure and then passing an IOClipReq to the device with <a href="../Includes_and_Autodocs_2._guide/node04D9.html">CBD_CHANGEHOOK</a>
+set in io_Command, 1 set in io_Length, and the address of the Hook
+structure set in io_Data.
+
+    ULONG HookEntry ();            /* Declare the hook assembly function */
+    struct IOClipReq *ClipIO;      /* Declare the IOClipReq */
+    struct Hook *ClipHook;         /* Declare the Hook */
+
+    /* Prepare the hook */
+    ClipHook-&#062;h_Entry = HookEntry; /* C intrfce in asmbly rout. HookEntry*/
+    ClipHook-&#062;h_SubEntry = HookFunc;/* Call function when Hook activated */
+    ClipHook-&#062;h_Data = FindTask(NULL);/* Set pointer to current task */
+
+    ClipIO-&#062;io_Data = (char *) ClipHook;/* Point to hook struct */
+    ClipIO-&#062;io_Length = 1;              /* Add hook to clipboard */
+    ClipIO-&#062;io_Command = CBD_CHANGEHOOK;
+    DoIO(clipIO);
+
+The above code fragment assumes that an assembly language routine
+HookEntry() has been coded:
+
+    ; entry interface for C code
+    _HookEntry:
+            move.l  a1,-(sp)            ; push message packet pointer
+            move.l  a2,-(sp)            ; push object pointer
+            move.l  a0,-(sp)            ; push hook pointer
+            move.l  h_SubEntry(a0),a0   ; fetch C entry point ...
+            jsr     (a0)                ; ... and call it
+            lea     12(sp),sp           ; fix stack
+            rts
+
+It also assumes that the function HookFunc() has been coded.  One of the
+example programs at the end of this chapter has hook processing in it.
+See the include file utility/<a href="../Includes_and_Autodocs_2._guide/node012D.html">hooks.h</a> and The Amiga ROM Kernel Reference
+Manual: <a href="../Libraries_Manual_guide/node04A2.html">Libraries</a> for further information on hooks.
+
+You remove a hook by passing an <a href="../Devices_Manual_guide/node0067.html#line5">IOClipReq</a> to the device with the address
+of the Hook structure set in io_Data, 0 set in io_Length and
+<a href="../Includes_and_Autodocs_2._guide/node04D9.html">CBD_CHANGEHOOK</a> set in io_Command.
+
+    ClipIO-&#062;io_Data = (char *) ClipHook;  /* point to hook struct */
+    ClipIO-&#062;io_Length = 0;                /* Remove hook from clipboard */
+    ClipIO-&#062;io_Command = CBD_CHANGEHOOK;
+    (DoIO (clipIO))
+
+You must remove the hook or it will continue indefinitely.
+
+ <a href="../Devices_Manual_guide/node0071.html">Caveats For CBD_CHANGEHOOK</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

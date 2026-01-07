@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="RemDevice()" TITLE="exec.library/RemDevice" -->
+<head>
+<title>exec.library/RemDevice</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0229.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node022B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	RemDevice -- remove a device from the system
+
+<b>   SYNOPSIS</b>
+	RemDevice(device)
+	          A1
+
+	void RemDevice(struct <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line23">Device</a> *);
+
+<b>   FUNCTION</b>
+	This function calls the device's EXPUNGE vector, which requests
+	that a device delete itself.  The device may refuse to do this if
+	it is busy or currently open. This is not typically called by user
+	code.
+
+	There are certain, limited circumstances where it may be
+	appropriate to attempt to specifically flush a certain device.
+	Example:
+
+	 /* Attempts to flush the named device out of memory. */
+	 #include <a href="../Includes_and_Autodocs_3._guide/node0654.html">&#060;exec/types.h&#062;</a>
+	 #include <a href="../Includes_and_Autodocs_3._guide/node0609.html">&#060;exec/execbase.h&#062;</a>
+
+	 void FlushDevice(name)
+	 <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> name;
+	 {
+	 struct <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line23">Device</a> *result;
+
+	    Forbid();
+	    if(result=(struct <a href="../Includes_and_Autodocs_3._guide/node05FB.html#line23">Device</a> *)FindName(&#038;SysBase-&#062;DeviceList,name))
+		RemDevice(result);
+	    Permit();
+	 }
+
+<b>   INPUTS</b>
+	device - pointer to a device node
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01DB.html">AddLibrary()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

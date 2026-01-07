@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="CINIT" TITLE="graphics.library/CINIT" -->
+<head>
+<title>graphics.library/CINIT</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02BD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02BF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CINIT -- Initialize user copperlist to accept intermediate
+		 user copper instructions.
+
+<b>   SYNOPSIS</b>
+ 	cl = CINIT( ucl , n )
+
+	cl = UCopperListInit( ucl , n )
+			      a0    d0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line61">CopList</a> *UCopperListInit( struct <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a> );
+
+<b>   FUNCTION</b>
+	Allocates and/or initialize copperlist structures/buffers
+	internal to a <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> structure.
+
+	This is a macro that calls UCopListInit. You must pass a
+	(non-initialized) <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> to CINIT (CINIT will NOT allocate
+	a new <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> if ucl==0 ). If (ucl != 0) it will initialize the
+	intermediate data buffers internal to a <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a>.
+
+	The maximum number of intermediate copper list instructions
+	that these internal <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line61">CopList</a> data buffers contain is specified
+	as the parameter n.
+
+<b>   INPUTS</b>
+	ucl - pointer to <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> structure
+	n - number of instructions buffer must be able to hold
+
+<b>   RESULTS</b>
+	cl- a pointer to a buffer which will accept n intermediate copper
+	    instructions.
+
+	NOTE: this is NOT a <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> pointer, rather a pointer to the
+	      UCopList's-&#062;FirstCopList sub-structure.
+
+<b>   BUGS</b>
+	CINIT will not actually allocate a new <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> if ucl==0.
+	Instead you must allocate a block MEMF_PUBLIC|MEMF_CLEAR, the
+	sizeof(struct UCopList) and pass it to this function.
+
+	The system's <a href="../Includes_and_Autodocs_3._guide/node02DF.html">FreeVPortCopLists</a> function will take care of
+	deallocating it if they are called.
+
+	Prior to release V36 the  CINIT macro had { } braces surrounding
+	the definition, preventing the proper return of the result value.
+	These braces have been removed for the V36 include definitions.
+
+<b>   SEE ALSO</b>
+ 	CINIT() CMOVE() CEND() <a href="../Includes_and_Autodocs_3._guide/node05F3.html">graphics/copper.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/diskfont" NODE="NewScaledDiskFont()" TITLE="diskfont.library/NewScaledDiskFont" -->
+<head>
+<title>diskfont.library/NewScaledDiskFont</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01F5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01F7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+     NewScaledDiskFont -- Create a DiskFont scaled from another. (V36)
+
+SYNOPSIS
+     header = NewScaledDiskFont(srcFont, destTextAttr)
+     D0                         A0       A1
+
+     struct <a href="../Includes_and_Autodocs_2._guide/node0102.html#line63">DiskFontHeader</a> *NewScaledDiskFont( struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line90">TextFont</a> *,
+             struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line73">TTextAttr</a> * );
+
+INPUTS
+     srcFont - the font from which the scaled font is to be
+         constructed.
+     destTextAttr - the desired attributes for the new scaled
+         font.  This may be a structure of type <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line66">TextAttr</a> or
+         <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line73">TTextAttr</a>.
+
+RESULT
+     header - a pointer to a <a href="../Includes_and_Autodocs_2._guide/node0102.html#line63">DiskFontHeader</a> structure.  This is not
+             being managed by the diskfont.library, however.
+
+NOTES
+     o   This function may use the blitter.
+     o   Fonts containing characters that render wholly outside
+         the character advance cell are currently not scalable.
+     o   The font, and memory allocated for the scaled font can
+         can be freed by calling <a href="../Includes_and_Autodocs_2._guide/node0480.html">StripFont()</a> on the font,
+         and then calling <a href="../Includes_and_Autodocs_2._guide/node0306.html">UnLoadSeg()</a> on the segment created
+         by this function.
+
+         Both the <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line90">TextFont</a> structure, and segment pointer are contained
+         within the <a href="../Includes_and_Autodocs_2._guide/node0102.html#line63">DiskFontHeader</a> struct.  The <a href="../Includes_and_Autodocs_2._guide/node0102.html#line63">DiskFontHeader</a> structure
+         will also be freed as part of the <a href="../Includes_and_Autodocs_2._guide/node0306.html">UnLoadSeg()</a> call.
+         <a href="../Includes_and_Autodocs_2._guide/node0480.html">StripFont()</a> is a new graphics.library call as of V36.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

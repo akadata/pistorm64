@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-9-3" TITLE="10 / Dumping a Rastport to a Printer / Strip Printing" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 / Dumping a Rastport to a Printer / Strip Printing</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0051.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0053.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Strip printing is a method which allows you to print a picture that
+normally requires a large print buffer when there is not much memory
+available. This would allow, for example, a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> to be printed at a
+higher resolution than it was drawn in. Strip printing is done by creating
+a temporary RastPort as wide as the source RastPort, but not as high. The
+source RastPort is then rendered, a strip at a time, into the temporary
+<a name="line8">RastPort which is dumped to the printer.</a>
+
+The height of the strip to dump must be an integer multiple of the
+<a name="line11">printer's NumRows if a non-aspect-ratio-corrected image is to be printed.</a>
+
+For an aspect-ratio-corrected image, the <a href="../Devices_Manual_guide/node0050.html#line15">SPECIAL_NOPRINT</a> flag will have
+to be used to find an io_DestRows that is an integer multiple of NumRows.
+This can be done by varying the source height and asking for a
+SPECIAL_NOPRINT dump until io_DestRows holds a number that is an integer
+<a name="line17">multiple of the printer's NumRows.</a>
+
+If smoothing is to work with strip printing, a raster line above and below
+the actual area should be added. The line above should be the last line
+from the previous strip, the line below should be the first line of the
+next strip. Of course, the first strip should not have a line added above
+<a name="line23">and the last strip should not have a line added below.</a>
+
+The following is a strip printing procedure for a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> which is 200
+lines high.
+
+First strip
+
+   * copy source line 0 through 50 (51 lines) to strip <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> lines 0
+     through 50 (51 lines).
+   * io_SrcY = 0, io_Height = 50.
+   * the printer device can see there is no line above the first line to
+     dump (since SrcY = 0) and that there is a line below the last line to
+     dump (since there is a 51 line RastPort and only 50 lines are dumped).
+
+Second strip
+
+   * copy source line 49 through 100 (52 lines) to strip <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> lines 0
+     through 51 (52 lines).
+   * io_SrcY = 1, io_Height = 50.
+   * the printer device can see there is a line above the first line to
+     dump (since SrcY = 1) and that there is a line below the last line to
+     dump (since there is a 52 line <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> and only 50 lines are dumped).
+
+Third strip
+
+   * copy source line 99 through 150 (52 lines) to strip <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> lines 0
+     through 51 (52 lines).
+   * io_SrcY = 1, io_Height = 50.
+   * the printer device can see there is a line above the first line to
+     dump (since SrcY = 1) and that there is a line below the last line to
+     dump (since there is a 52 line <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> and only 50 lines are dumped).
+
+Fourth strip
+
+   * copy source line 149 through 199 (51 lines) to strip <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> lines 0
+     through 50 (51 lines).
+   * io_SrcY = 1, io_Height = 50.
+   * the printer device can see there is a line above the first line to
+     dump (since SrcY = 1) and that there is no line below the last line to
+     dump (since there is a 51 line <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> and only 50 lines are dumped).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

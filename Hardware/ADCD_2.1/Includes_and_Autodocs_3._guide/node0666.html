@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/libraries/resource.h" NODE="MAIN" TITLE="include/libraries/resource.h" -->
+<head>
+<title>include/libraries/resource.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0665.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0667.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef LIBRARIES_RESOURCE_H
+#define LIBRARIES_RESOURCE_H
+/*
+**	$VER: resource.h 44.1 (19.10.1999)
+**	Includes Release 44.1
+**
+**	resource.library definitions
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line16"></a>
+typedef APTR RESOURCEFILE;
+typedef ULONG RESOURCEID;
+
+/* A gadget ID (Tag GA_ID) may contain the ID and the group ID
+   ored together. The following definitions must be used to extract
+   the original gadget ID (1024 different IDs are possible) and the
+   group id (63 different group IDs are possible).
+*/
+#define RL_GADGETMASK 0x03FF
+#define RL_GROUPMASK  0xFC00
+#define RL_GADGETID(x) ((x) &#038; RL_GADGETMASK)
+#define RL_GROUPID(x) (((x) &#038; RL_GROUPMASK) &#062;&#062; 10)
+
+#endif /* LIBRARIES_RESOURCE_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

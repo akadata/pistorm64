@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_10" NODE="10-1-2" TITLE="10 / The Mouse / Mouse Messages" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>10 / The Mouse / Mouse Messages</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01E8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01EA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Mouse events are broadcast to the application via the IDCMP or the console
+device.  See the &#034;<a href="../Libraries_Manual_guide/node01CE.html">Intuition Input and Output Methods</a>&#034; chapter in this book
+for information on the IDCMP.  See the &#034;<a href="../Devices_Manual_guide/node0080.html">Console Device</a>&#034; chapter in the
+Amiga ROM Kernel Reference Manual: Devices for more about the console
+<a name="line6">device.</a>
+
+Simple mouse button activity not associated with any Intuition function
+will be reported to the window as an <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a> with a <a href="../Libraries_Manual_guide/node01D9.html#line28">Class</a> of
+<a href="../Libraries_Manual_guide/node01DC.html">IDCMP_MOUSEBUTTONS</a>.  The IntuiMessage <a href="../Libraries_Manual_guide/node01D9.html#line33">Code</a> field will be set to
+SELECTDOWN, SELECTUP, MIDDLEDOWN, MIDDLEUP, MENUDOWN or MENUUP to specify
+<a name="line12">changes in the state of the left, middle and right buttons, respectively.</a>
+
+Direct select button events will not be received by the program if the
+select button is pressed while the pointer is positioned over a gadget or
+other object which uses the button event.  For example, select button
+activity over a gadget is reported with a <a href="../Libraries_Manual_guide/node01D9.html#line28">Class</a> of <a href="../Libraries_Manual_guide/node01DD.html">IDCMP_GADGETDOWN</a> or
+<a href="../Libraries_Manual_guide/node01DD.html#line6">IDCMP_GADGETUP</a>.  The gadget is said to have consumed the mouse events and
+<a name="line19">produced gadget events.</a>
+
+If the menu system is enabled, menu selections appear with a <a href="../Libraries_Manual_guide/node01D9.html#line28">Class</a> of
+<a href="../Libraries_Manual_guide/node01DE.html">IDCMP_MENUPICK</a>.  To directly receive menu button events, the application
+must set the flag <a href="../Libraries_Manual_guide/node0125.html#line95">WFLG_RMBTRAP</a> for the window either when the window is
+opened or by changing the flag in a single, atomic operation.  See the
+<a name="line25">chapter &#034;<a href="../Libraries_Manual_guide/node0125.html#line95">Intuition Windows</a>&#034; for more information on the flag WFLG_RMBTRAP.</a>
+
+The program receives mouse position changes in the event <a href="../Libraries_Manual_guide/node01D9.html#line28">Class</a>
+<a href="../Libraries_Manual_guide/node01DC.html#line23">IDCMP_MOUSEMOVE</a>.  The <a href="../Libraries_Manual_guide/node01D9.html#line53">MouseX</a> and <a href="../Libraries_Manual_guide/node01D9.html#line53">MouseY</a> position coordinates describe the
+position of the mouse relative to the upper left corner of the reference
+window.  These coordinates are always in the resolution of the screen
+being used, and may represent any pixel position on the screen, even
+though the hardware sprites can be positioned only on the even numbered
+pixels of a high resolution screen and on the even numbered rows of an
+interlaced screen.  Enabling IDCMP_MOUSEMOVE messages is discussed below
+<a name="line35">in the section on &#034;<a href="../Libraries_Manual_guide/node01EC.html">The Pointer</a>&#034;.</a>
+
+To get mouse movement reported as deltas (amount of change from the last
+position) instead of as absolute positions, set the IDCMP flag
+<a href="../Libraries_Manual_guide/node01DC.html#line57">IDCMP_DELTAMOVE</a>.  When IDCMP_DELTAMOVE is set, the <a href="../Libraries_Manual_guide/node01DC.html#line23">IDCMP_MOUSEMOVE</a>
+messages received by the program will have delta values rather than
+absolute values.  Note that IDCMP_DELTAMOVE is simply a flag used to
+modify the behavior of IDCMP_MOUSEMOVE, and that no messages of class
+<a name="line43">IDCMP_DELTAMOVE are ever sent.</a>
+
+Each window has a queue limit for the number of <a href="../Libraries_Manual_guide/node01DC.html#line23">IDCMP_MOUSEMOVE</a> messages
+waiting on its IDCMP at any given time.  If the number of mouse move
+messages waiting at the IDCMP is equal to the queue limit, then Intuition
+will discard additional IDCMP_MOUSEMOVE messages until the application
+replies to one of the queued mouse move messages.  The default queue limit
+<a name="line50">for mouse move messages is five.</a>
+
+Be aware that this may cause some data loss, especially when the
+application is using <a href="../Libraries_Manual_guide/node01DC.html#line57">IDCMP_DELTAMOVE</a>, as the information contained in the
+discarded messages is not repeated.  When using IDCMP_DELTAMOVE, this
+could cause the application to lose track of the actual pointer position.
+The application may wish to change the default mouse queue size if it is
+unable to reply to messages queued at the IDCMP for an extended period.
+The mouse queue can be set when the window is opened by using the
+<a href="../Libraries_Manual_guide/node0124.html#line154">WA_MouseQueue</a> tag, and may later be modified using the <a href="../Libraries_Manual_guide/node012B.html#line27">SetMouseQueue()</a>
+call.  Note that the actual mouse position is always available to the
+application through the <a href="../Libraries_Manual_guide/node0121.html">Window</a> structure <a href="../Libraries_Manual_guide/node0121.html#line48">MouseX</a> and <a href="../Libraries_Manual_guide/node0121.html#line48">MouseY</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

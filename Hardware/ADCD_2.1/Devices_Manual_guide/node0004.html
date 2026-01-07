@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_1" NODE="1-1" TITLE="1 Introduction to Amiga System Devices / What is a Device?" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>1 Introduction to Amiga System Devices / What is a Device?</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0003.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0005.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An Amiga device is a software module that accepts commands and data and
+performs I/O operations based on the commands it receives.  In most cases,
+a device interacts with either internal or external hardware. Generally,
+an Amiga device runs as a separate task which is capable of processing
+your commands while your application attends to other things.
+
+Device I/O is based on the Exec messaging system.  The philosophy behind
+the devices is that I/O operations should be consistent and uniform.  You
+print a file in the same manner as you play an audio sample, i.e., you
+send the device in question a WRITE command and the address of the buffer
+holding the data you wish to write.
+
+The result is that the interface presented to the programmer is
+essentially device independent and accessible from any computer language.
+This greatly expands the power the Amiga computer brings to the programmer
+<a name="line17">and, ultimately, to the user.</a>
+
+Devices support two types of commands: Exec standard commands like READ
+and WRITE, and device specific commands like the trackdisk device MOTOR
+command which controls the floppy drive motor.  The Exec standard commands
+are supported by most Amiga devices.  You should keep in mind, however,
+that supporting standard commands does not mean that all devices execute
+them in exactly the same manner.
+
+This manual contains a chapter about each of the Amiga devices.  The
+chapters cover how you use a device and the commands it supports.  In
+addition, the Amiga ROM Kernel Reference Manual: <a href="../Includes_and_Autodocs_2._guide/node0000.html">Includes and Autodocs</a>
+contains expanded explanations of the commands and the include files for
+each device, and the Amiga ROM Kernel Reference Manual: Libraries contains
+chapters on <a href="../Libraries_Manual_guide/node0003.html">Exec</a>.  The command explanations list the data, flags, and
+other information required by a device to execute a command.  The Exec
+chapters provide detailed discussions of its operation.  Both are very
+useful manuals to have on your desk when you are programming the devices.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-17" TITLE="31 Commodities Exchange Library / New Input Events" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / New Input Events</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0411.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0413.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Commodities Exchange also has functions used to introduce new input events
+to the input stream.
+
+    struct InputEvent *InvertString( UBYTE *string, ULONG *keymap );
+    void               FreeIEvents( struct InputEvent *ie );
+    void               AddIEvents( struct InputEvent *ie );
+
+<a href="../Includes_and_Autodocs_2._guide/node0160.html">InvertString()</a> is an amiga.lib function that accepts an ASCII string and
+creates a linked list of input events that translate into the string using
+the supplied keymap (or the system default if the key map is NULL).  The
+NULL terminated string may contain ANSI character codes, an input
+description enclosed in angle (&#060;&#062;) brackets, or one of the following
+backslash escape characters:
+
+    \r -- return
+    \t -- tab
+    \\ -- backslash
+
+For example:
+
+    abc&#060;alt f1&#062;\rhi there.
+
+<a href="../Includes_and_Autodocs_2._guide/node015C.html">FreeIEvents()</a> frees a list of input events allocated by <a href="../Includes_and_Autodocs_2._guide/node0160.html">InvertString()</a>.
+<a href="../Includes_and_Autodocs_2._guide/node019E.html">AddIEvents()</a> is a commodities.library function that adds a linked list of
+input events at the the top of the Commodities network.  Each input event
+in the list is made into an individual <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a>.  Note that if passed a
+linked list of input events created by InvertString(), the order the
+events appear in the string will be reversed.
+
+     <a href="../Libraries_Manual_guide/node0584.html">PopShell.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

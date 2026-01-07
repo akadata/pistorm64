@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-8-4" TITLE="33 / Advanced Topics / Freeing LCIs" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Advanced Topics / Freeing LCIs</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node045B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node045D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Ordinarily, the parser will automatically delete <a href="../Libraries_Manual_guide/node044A.html">LCI</a>s you have allocated
+and installed.  However, you may have a case where simply <a href="../Libraries_Manual_guide/node02A7.html#line11">FreeMem()</a>ing
+your LCI is not enough; you may need to free some ancillary memory, or
+decrement a counter, or send a signal, or something.  This is where
+<a href="../Includes_and_Autodocs_2._guide/node01D8.html">SetLocalItemPurge()</a> comes in.  It is called as follows:
+
+<a name="line8">    SetLocalItemPurge (lci, hookptr);</a>
+
+When the parser is ready to delete your <a href="../Libraries_Manual_guide/node044A.html">LCI</a>, your purge handler code will
+be called through the <a href="../Libraries_Manual_guide/node04A3.html">Hook</a> you supplied.  You can then perform all your
+necessary operations.  One of these operations should be to free the LCI
+itself.  This is done with <a href="../Includes_and_Autodocs_2._guide/node01C6.html">FreeLocalItem()</a>:
+
+    FreeLocalItem (lci);
+
+This deallocates the memory used to store the <a href="../Libraries_Manual_guide/node044A.html">LCI</a> and the client buffer
+allocated with it.  <a href="../Includes_and_Autodocs_2._guide/node01C6.html">FreeLocalItem()</a> is only called as part of a custom
+purge handler.
+
+As with custom chunk handlers, your purge handler executes in the same
+environment as the mainline code that called <a href="../Libraries_Manual_guide/node0432.html">ParseIFF()</a>.  It is
+recommended that you keep purge handlers short and to the point; super
+clever stuff should be reserved for custom chunk handlers, or for the
+client's mainline code.  Custom purge handlers must always work; failures
+will be ignored.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

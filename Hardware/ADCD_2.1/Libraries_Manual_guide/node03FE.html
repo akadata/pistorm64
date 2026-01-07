@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-3" TITLE="30 Layers Library / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 Layers Library / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03FD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03FF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following are brief descriptions of the layers library functions and
+related routines from the graphics library.  See the Amiga ROM Kernel
+Reference Manual: Includes and Autodocs for details on each function call.
+
+
+                  Table 30-5: Layers Library Functions
+  ______________________________________________________________________
+ |                                                                      |
+ |              Function                   Description                  |
+ |======================================================================|
+ |              <a href="../Includes_and_Autodocs_2._guide/node03A1.html">NewLayerInfo()</a>  Allocating a <a href="../Includes_and_Autodocs_2._guide/node00C4.html#line33">Layer_Info</a> structure.      |
+ |          <a href="../Includes_and_Autodocs_2._guide/node0395.html">DisposeLayerInfo()</a>  Deallocating a Layer_Info structure.    |
+ |----------------------------------------------------------------------|
+ |        <a href="../Includes_and_Autodocs_2._guide/node0393.html">CreateUpfrontLayer()</a>  Make a new layer in front of others.    |
+ |         <a href="../Includes_and_Autodocs_2._guide/node0391.html">CreateBehindLayer()</a>  Make a new layer behind others.         |
+ |               <a href="../Includes_and_Autodocs_2._guide/node0394.html">DeleteLayer()</a>  Remove and delete an existing layer.    |
+ |----------------------------------------------------------------------|
+ |                 <a href="../Includes_and_Autodocs_2._guide/node039E.html">MoveLayer()</a>  Change the position (not depth) of a    |
+ |                              layer.                                  |
+ |                 <a href="../Includes_and_Autodocs_2._guide/node03A3.html">SizeLayer()</a>  Change the size of a layer.             |
+ |               <a href="../Includes_and_Autodocs_2._guide/node03A2.html">ScrollLayer()</a>  Change the internal coordinates of a    |
+ |                              layer.                                  |
+ |----------------------------------------------------------------------|
+ |               <a href="../Includes_and_Autodocs_2._guide/node038F.html">BehindLayer()</a>  Depth arrange a layer behind others.    |
+ |              <a href="../Includes_and_Autodocs_2._guide/node03A9.html">UpfrontLayer()</a>  Depth arrange a layer in front of       |
+ |                              others.                                 |
+ |        <a href="../Includes_and_Autodocs_2._guide/node039F.html">MoveLayerInFrontOf()</a>  Depth arrange a layer to a specific     |
+ |                              position.                               |
+ |----------------------------------------------------------------------|
+ |                <a href="../Includes_and_Autodocs_2._guide/node03AA.html">WhichLayer()</a>  Find the frontmost layer at a position. |
+ |----------------------------------------------------------------------|
+ |  <a href="../Includes_and_Autodocs_2._guide/node03A4.html">SwapBitsRastPortClipRect()</a>  Fast, non-layered and non-damaging      |
+ |                              display operation.                      |
+ |----------------------------------------------------------------------|
+ |               <a href="../Includes_and_Autodocs_2._guide/node038E.html">BeginUpdate()</a>  Synchronize optimized refreshing for    |
+ |                              layer.                                  |
+ |                 <a href="../Includes_and_Autodocs_2._guide/node0396.html">EndUpdate()</a>  End optimized layer refresh.            |
+ |----------------------------------------------------------------------|
+ |                 <a href="../Includes_and_Autodocs_2._guide/node039B.html">LockLayer()</a>  Lock out rendering in a single layer.   |
+ |               <a href="../Includes_and_Autodocs_2._guide/node03A6.html">UnlockLayer()</a>  Release LockLayer() lock.               |
+ |                <a href="../Includes_and_Autodocs_2._guide/node039D.html">LockLayers()</a>  Lock out rendering in all layers of a   |
+ |                              display.                                |
+ |              <a href="../Includes_and_Autodocs_2._guide/node03A8.html">UnlockLayers()</a>  Release LockLayers() lock.              |
+ |             <a href="../Includes_and_Autodocs_2._guide/node039C.html">LockLayerInfo()</a>  Gain exclusive access to the display's  |
+ |                              layers.                                 |
+ |           <a href="../Includes_and_Autodocs_2._guide/node03A7.html">UnlockLayerInfo()</a>  Release LockLayerInfo() lock.           |
+ |----------------------------------------------------------------------|
+ |         <a href="../Includes_and_Autodocs_2._guide/node0399.html">InstallClipRegion()</a>  Add a clipping region to a layer.       |
+ |______________________________________________________________________|
+<a name="line51"></a>
+
+The following routines from graphics library are also required for certain
+layers library functions:
+
+  ______________________________________________________________________
+ |                                                                      |
+ |            Routine                        Description                |
+ |======================================================================|
+ |         <a href="../Includes_and_Autodocs_2._guide/node045A.html">LockLayerRom()</a>  Same as LockLayer(), from layers library.    |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0486.html">UnlockLayerRom()</a>  Release LockLayerRom() lock.                 |
+ |  <a href="../Includes_and_Autodocs_2._guide/node041D.html">AttemptLockLayerRom()</a>  Lock layer only if it is immediately         |
+ |                         available.                                   |
+ |----------------------------------------------------------------------|
+ |            <a href="../Includes_and_Autodocs_2._guide/node0460.html">NewRegion()</a>  Create a new, empty region.                  |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0434.html">DisposeRegion()</a>  Dispose of an existing region and its        |
+ |                         rectangles.                                  |
+ |----------------------------------------------------------------------|
+ |        <a href="../Includes_and_Autodocs_2._guide/node0413.html">AndRectRegion()</a>  AND a rectangle into a region.               |
+ |         <a href="../Includes_and_Autodocs_2._guide/node0464.html">OrRectRegion()</a>  OR a rectangle into a region.                |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0490.html">XorRectRegion()</a>  Exclusive-OR a rectangle into a region.      |
+ |      <a href="../Includes_and_Autodocs_2._guide/node042A.html">ClearRectRegion()</a>  Clear a region.                              |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0414.html">AndRegionRegion()</a>  AND two regions together.                    |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0465.html">OrRegionRegion()</a>  OR two regions together.                     |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0491.html">XorRegionRegion()</a>  Exclusive-OR two regions together.           |
+ |          <a href="../Includes_and_Autodocs_2._guide/node042B.html">ClearRegion()</a>  Clear a region.                              |
+ |______________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

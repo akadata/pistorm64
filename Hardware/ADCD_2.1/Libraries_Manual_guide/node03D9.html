@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_29" NODE="29-2-4" TITLE="29 / The Text Function / Setting the Font Style" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>29 / The Text Function / Setting the Font Style</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03D8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03DA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node03D6.html#line5">OpenFont()</a> and <a href="../Libraries_Manual_guide/node03D6.html#line5">OpenDiskFont()</a> functions both search through the fonts
+available to them, looking for the font that most closely matches the
+<a href="../Libraries_Manual_guide/node03D6.html#line21">TextAttr</a> structure.  If these functions can't find a font that matches
+exactly, they will open the one with the same name that most closely
+matches the TextAttr structure's <a href="../Libraries_Manual_guide/node03D6.html#line32">ta_YSize</a>, <a href="../Libraries_Manual_guide/node03D6.html#line47">ta_Style</a>, and <a href="../Libraries_Manual_guide/node03D6.html#line56">ta_Flags</a> fields
+<a name="line7">(in that order of preference).</a>
+
+If the font doesn't match your style choice exactly, it is possible to ask
+the system to alter how it renders the font so it matches the style you
+need.  The rastport contains some flags that tell the system's text
+rendering functions to algorithmically add styles to characters as they
+are rendered.  Currently, the system can add up to three styles to a font:
+italics, bold, and underline.  The system cannot alter the style of a font
+if the style is already intrinsic to the font.  For example, it is not
+possible to add (or remove) the bold styling to a font if the font was
+designed to be bolded.  There are two graphics.library functions that deal
+with software font style setting:
+
+    ULONG AskSoftStyle( struct RastPort *rp );
+    ULONG SetSoftStyle( struct RastPort *rp, ULONG newstyle,
+                        ULONG enable );
+
+The <a href="../Includes_and_Autodocs_2._guide/node041C.html">AskSoftStyle()</a> function returns a bitmask of the style bits available
+to the rastport's current font.  The style bits are the same ones used by
+the <a href="../Libraries_Manual_guide/node03D6.html#line21">TextAttr</a>'s <a href="../Libraries_Manual_guide/node03D6.html#line47">ta_Style</a> field (from &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00A8.html#line26">text.h</a>&#062;).  <a href="../Includes_and_Autodocs_2._guide/node047E.html">SetSoftStyle()</a>
+changes the rastport's current software style setting according to the
+style bits set in the newstyle field (from the function prototype above).
+
+<a href="../Includes_and_Autodocs_2._guide/node047E.html">SetSoftStyle()</a> pays attention only to the bits of newstyle that have the
+corresponding bit in the enable field set as well.  This function returns
+the style, which is the combined result of previous soft style selection,
+the effect of this function, and the style inherent in the set font.  The
+following code fragment turns on the algorithmic font attributes for the
+rastport (myrastport) based on those style attributes that were requested
+in the <a href="../Libraries_Manual_guide/node03D6.html#line5">OpenDiskFont()</a> call (mytextattr.<a href="../Libraries_Manual_guide/node03D6.html#line47">ta_Style</a>) and not inherent in the
+<a name="line37">font.</a>
+
+    /* Set the font and add software styling to the text if I asked for
+       a style in OpenFont() and didn't get it.  Because most Amiga fonts
+       do not have styling built into them (with the exception of the CG
+       outline fonts), if the user selected some kind of styling for the
+       text, it will have to be added algorithmically by calling
+       SetSoftStyle().
+    */
+    if (myfont = OpenDiskFont(mytextattr))
+    {
+            SetFont(myrastport, myfont);
+            SetSoftStyle(myrastport,
+                         mytextattr.ta_Style ^ myfont-&#062;tf_Style,
+                         (FSF_BOLD | FSF_UNDERLINED | FSF_ITALIC));
+    ...
+    ...
+            CloseFont(myfont);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

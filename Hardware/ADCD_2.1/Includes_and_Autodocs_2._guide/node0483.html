@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="TextExtent()" TITLE="graphics.library/TextExtent" -->
+<head>
+<title>graphics.library/TextExtent</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0482.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0484.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line165">TextExtent</a> -- Determine raster extent of text data. (V36)
+
+SYNOPSIS
+    TextExtent(rp, string, count, textExtent)
+               A1  A0      D0:16  A2
+
+    void TextExtent(struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *, STRPTR, WORD,
+         struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line165">TextExtent</a> *);
+
+FUNCTION
+    This function determines a more complete metric of the space
+    that a text string would render into than the <a href="../Includes_and_Autodocs_2._guide/node0485.html">TextLength()</a>
+    function.
+
+INPUTS
+    rp     - a pointer to the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> which describes where the
+             text attributes reside.
+    string - the address of the string to determine the length of.
+    count  - the number of characters in the string.
+            If zero, there are no characters in the string.
+    textExtent - a structure to hold the result.
+
+RESULTS
+    textExtent is filled in as follows:
+        te_Width  - same as <a href="../Includes_and_Autodocs_2._guide/node0485.html">TextLength()</a> result: the rp_cp_x
+                    advance that rendering this text would cause.
+        te_Height - same as tf_YSize.  The height of the
+                    font.
+        te_Extent.MinX - the offset to the left side of the
+                    rectangle this would render into.  Often zero.
+        te_Extent.MinY - same as -tf_Baseline.  The offset
+                    from the baseline to the top of the rectangle
+                    this would render into.
+        te_Extent.MaxX - the offset of the left side of the
+                    rectangle this would render into.  Often the
+                    same as te_Width-1.
+        te_Extent.MaxY - same as tf_YSize-tf_Baseline-1.
+                    The offset from the baseline to the bottom of
+                    the rectanangle this would render into.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0485.html">TextLength()</a>  <a href="../Includes_and_Autodocs_2._guide/node0482.html">Text()</a>  <a href="../Includes_and_Autodocs_2._guide/node0484.html">TextFit()</a>
+    <a href="../Includes_and_Autodocs_2._guide/node00A8.html">graphics/text.h</a>  <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-3-2" TITLE="33 / Stream Management / Termination" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Stream Management / Termination</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node042E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0430.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Termination is simple.  Just call <a href="../Includes_and_Autodocs_2._guide/node01BB.html">CloseIFF</a>(iff).  This may be called at
+any time, and terminates IFFParse's transaction with the stream.  The
+stream itself is not closed.  The <a href="../Libraries_Manual_guide/node042C.html">IFFHandle</a> may be reused; you may safely
+call <a href="../Libraries_Manual_guide/node042E.html#line55">OpenIFF()</a> on it again.  You are responsible for closing the streams
+you opened.  A stream used in an IFFHandle must generally remain open
+until you CloseIFF().
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

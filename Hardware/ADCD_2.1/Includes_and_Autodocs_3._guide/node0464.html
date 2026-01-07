@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="lowlevel" NODE="ElapsedTime()" TITLE="lowlevel.library/ElapsedTime" -->
+<head>
+<title>lowlevel.library/ElapsedTime</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0463.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0465.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ElapsedTime -- returns the time elapsed since it was last called. (V40)
+
+<b>   SYNOPSIS</b>
+	fractionalSeconds = ElapsedTime(context);
+	D0                              A0
+
+	ULONG ElapsedTime(struct <a href="../Includes_and_Autodocs_3._guide/node0607.html#line34">EClockVal</a> *);
+
+<b>   FUNCTION</b>
+	This function utilizes the <a href="../Includes_and_Autodocs_3._guide/node0578.html">timer.device/ReadEClock()</a> function to get
+	an accurate elapsed time value. Since the context needs to be
+	established the first call to this routine will return a nonsense
+	value.
+
+	The return value for this function only allows for sixteen bits
+	worth for the integer number of seconds and sixteen bits for the
+	factional number of seconds.
+
+	With sixteen bits worth of integer seconds this function can be
+	used to timer an interval up to about 16 hours. If the actual time
+	interval is larger this function will return this maximum value.
+
+	The sixteen bits for fractional seconds gives a resolution of
+	approximately 20 microseconds. However, it is not recomended
+	to expect this function to be accurate for a time interval of
+	less than 200 microseconds.
+
+<b>   INPUTS</b>
+	context - pointer to an <a href="../Includes_and_Autodocs_3._guide/node0607.html#line34">EClockVal</a> structure. The first time you
+		  call this function, you should initialize the structure
+		  to 0s. You should then reuse the same structure for
+		  subsequent calls to this function, as this is how the
+		  elapsed time is calculated.
+
+<b>   RESULT</b>
+	fractionalSeconds - The elapsed time as a fixed point 32-bit
+	                    number with the point fixed in the middle.
+	                    That is, the upper order sixteen bits represent
+	                    the number of seconds elapsed. The low order
+	                    sixteen bit represent the fractional number of
+	                    seconds elapsed. This value is limited to about
+	                    sixteen hours. Although this value is precise
+	                    to nearly 20 microseconds it is only accurate to
+	                    within 200 microseconds.
+
+<b>   WARNING</b>
+	The first call to this function will return a non-sense value. Only
+	rely on its result starting with the second call.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0578.html">timer.device/ReadEClock()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="NewModifyProp()" TITLE="intuition.library/NewModifyProp" -->
+<head>
+<title>intuition.library/NewModifyProp</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03C9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03CB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	NewModifyProp -- <a href="../Includes_and_Autodocs_3._guide/node03C6.html">ModifyProp()</a>, but with selective refresh.
+
+<b>    SYNOPSIS</b>
+	NewModifyProp( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a>, Flags,
+		       A0      A1      A2         D0
+		HorizPot, VertPot, HorizBody, VertBody, NumGad )
+		D1        D2       D3         D4        D5
+
+	VOID NewModifyProp( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+		struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>, WORD );
+
+<b>    FUNCTION</b>
+	Performs the function of <a href="../Includes_and_Autodocs_3._guide/node03C6.html">ModifyProp()</a>, but refreshes
+	gadgets in the list as specified by the NumGad parameter.
+	With NumGad = -1, this function is identical to <a href="../Includes_and_Autodocs_3._guide/node03C6.html">ModifyProp()</a>.
+
+	New for V36: When NumGad = 1, this function will now perform
+	an incremental update of the proportional gadget knob image,
+	rather than refreshing the entire gadget.  This means much
+	less flashing when programmatically scrolling a proportional
+	gadget.
+
+<b>    INPUTS</b>
+	PropGadget = pointer to a proportional gadget
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to the window containing the gadget or the window
+	    containing the requester containing the gadget.
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> = pointer to a requester (may be NULL if this isn't
+	    a requester gadget)
+	Flags = value to be stored in the Flags field of the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line537">PropInfo</a>
+	HorizPot = value to be stored in the HorizPot field of the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line537">PropInfo</a>
+	VertPot = value to be stored in the VertPot field of the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line537">PropInfo</a>
+	HorizBody = value to be stored in the HorizBody field of the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line537">PropInfo</a>
+	VertBody = value to be stored in the VertBody field of the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line537">PropInfo</a>
+	NumGad = number of gadgets to be refreshed after propgadget internals
+	    have been adjusted.  -1 means &#034;to end of list.&#034;
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO </b>
+	<a href="../Includes_and_Autodocs_3._guide/node03C6.html">ModifyProp()</a>
+	The Intuition Reference Manual contains more information on
+	Proportional Gadgets.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

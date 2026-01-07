@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="resource" NODE="RL_NewObjectA()" TITLE="resource.library/RL_NewObjectA" -->
+<head>
+<title>resource.library/RL_NewObjectA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0543.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0545.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	RL_NewObjectA - create a new object (V44)
+
+<b>   SYNOPSIS</b>
+	object = RL_NewObjectA(resource,id,taglist)
+	 D0                     A0      D0  A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> *RL_NewObjectA(RESOURCEFILE, RESOURCEID, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);;
+
+<b>   FUNCTION</b>
+	The routine creates a new object with a given numeric id.
+
+<b>   INPUTS</b>
+	resource -- a pointer to a resource
+	id -- a numeric id
+	taglist -- a pointer to an array of <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a>. The tags are moved
+	           forward to the call of NewObjectA, <a href="../Includes_and_Autodocs_3._guide/node0111.html">NewDTObjectA</a> or
+	           whatever is called to create the object
+
+<b>   RESULTS</b>
+	object -- a pointer to an <a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> or NULL.
+
+<b>   SEE ALSO</b>
+	intuition.library/NewObjectA
+	<a href="../Includes_and_Autodocs_3._guide/node0111.html">datatypes.library/NewDTObjectA</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0541.html">resource.library/RL_DisposeObject</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

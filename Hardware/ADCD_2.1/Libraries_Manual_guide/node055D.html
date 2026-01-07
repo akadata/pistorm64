@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-3" TITLE="D Troubleshooting Guide / A Final Word About Testing" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D Troubleshooting Guide / A Final Word About Testing</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node055C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node055E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Test your program with memory watchdog and invalidation tools on a wide
+variety of systems and configurations.  Programs with coding errors may
+appear to work properly on one or more configurations, but may fail or
+cause fatal problems on another.  Make sure that your code is tested on
+both a 68000 and a 68020/30, on machines with and without Fast RAM, and on
+machines with and without enhanced chips.  Test all of your program
+functions on every machine.
+
+Test all error and abort code.  A program with missing error checks or
+unsafe cleanup might work fine when all of the items it opens or allocates
+are available, but may fail fatally when an error or problem is
+encountered.  Try your code with missing files, filenames with spaces,
+incorrect filenames, cancelled requesters, Ctrl-C, missing libraries or
+<a name="line15">devices, low memory, missing hardware, etc.</a>
+
+Test all of your text input functions with high-ASCII characters (such as
+the character produced by pressing Alt-F then &#034;A&#034;).  Note that <a href="../Libraries_Manual_guide/node01E1.html#line19">RAWKEY</a>
+codes can be different keyboard characters on national keyboards (higher
+levels of keyboard input are automatically translated to the proper
+characters).  If your program will be distributed internationally, support
+and take advantage of the additional screen lines available on a PAL
+system.  Enhanced Agnus chip machines may be switched to be PAL or NTSC
+via motherboard jumper J102 in A2000s and jumper J200 in A3000s.  Note
+that a base PAL machine will have less memory free due to the larger
+display size.
+
+Write good code.  Test it.  Then make it great.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

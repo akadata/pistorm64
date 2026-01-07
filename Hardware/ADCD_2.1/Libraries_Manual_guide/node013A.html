@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-4" TITLE="5 Intuition Gadgets / Gadget Size and Position" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 Intuition Gadgets / Gadget Size and Position</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0139.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node013B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The position and dimensions of the gadget's select box are defined in the
+<a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure.  The <a href="../Libraries_Manual_guide/node0149.html#line33">LeftEdge</a>, <a href="../Libraries_Manual_guide/node0149.html#line33">TopEdge</a>, <a href="../Libraries_Manual_guide/node0149.html#line33">Width</a> and <a href="../Libraries_Manual_guide/node0149.html#line33">Height</a> values can be
+absolute numbers or values relative to the size of the window.  When using
+absolute numbers, the values are set once, when the gadget is created.
+When using relative numbers, the size and position of the select box are
+adjusted dynamically every time the window size changes.
+
+The gadget image is positioned relative to the select box so when the
+select box moves the whole gadget moves.  The size of the gadget image,
+however, is not usually affected by changes in the select box size
+(<a href="../Libraries_Manual_guide/node0153.html">proportional</a> gadgets are the exception).  To create a gadget image that
+changes size when the select box and window change size, you have to
+handle gadget rendering yourself or use a BOOPSI gadget.
+
+ <a href="../Libraries_Manual_guide/node013B.html">Select Box Position</a>     <a href="../Libraries_Manual_guide/node013D.html">Positioning Gadgets in Window Borders</a> 
+ <a href="../Libraries_Manual_guide/node013C.html">Select Box Dimension</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

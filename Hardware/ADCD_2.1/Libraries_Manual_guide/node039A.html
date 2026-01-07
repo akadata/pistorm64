@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-6-4" TITLE="28 / Using Bobs / Using Bob Flags" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Bobs / Using Bob Flags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0399.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node039B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following paragraphs describe how to set the <a href="../Libraries_Manual_guide/node0398.html#line5">Flags</a> field in the <a href="../Libraries_Manual_guide/node0398.html">Bob</a>
+structure (note that these flags do not apply to the Flags field of the
+<a name="line4"><a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure).</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line32">SAVEBOB</a>
+    To tell the system not to erase the old image of the Bob when the Bob
+    is moved, specify the SAVEBOB flag in the <a href="../Libraries_Manual_guide/node0398.html">Bob</a> structure <a href="../Libraries_Manual_guide/node0398.html#line5">Flags</a> field.
+    This makes the Bob behave like a paintbrush.  It has the opposite
+    effect of <a href="../Libraries_Manual_guide/node0397.html#line5">SAVEBACK</a>.
+
+    It's Faster To Draw A New Bob.
+    ------------------------------
+    It takes longer to preserve and restore the raster image than simply
+    to draw a new Bob image wherever required.
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line32">BOBISCOMP</a>
+    If this Bob is part of an <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a>, set the BOBISCOMP flag in the <a href="../Libraries_Manual_guide/node0398.html">Bob</a>
+    structure to 1.  If the flag is a 1, the pointer named <a href="../Libraries_Manual_guide/node0398.html#line10">BobComp</a> must
+    have been initialized.  Otherwise, the system ignores the pointer,
+    and it may be left alone (though it's good practice to initialize it
+    to NULL).  See &#034;<a href="../Libraries_Manual_guide/node03B9.html">Animation Data Structures</a>&#034; for a discussion
+    of AnimComps.
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line36">BWAITING</a>
+    This flag is used solely by the system, and should be left alone.
+    When a Bob is waiting to be drawn, the system sets the BWAITING flag
+    in the <a href="../Libraries_Manual_guide/node0398.html">Bob</a> structure to 1.  This occurs only if the system has found
+    a <a href="../Libraries_Manual_guide/node03A4.html">Before</a> pointer in this Bob's structure that points to another Bob.
+    Thus, the system flag BWAITING provides current draw-status to the
+    system.  Currently, the system clears this flag on return from each
+    call to <a href="../Libraries_Manual_guide/node038C.html">DrawGList()</a>.
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line36">BDRAWN</a>
+    This is a system status flag that indicates to the system whether or
+    not this Bob has already been drawn.  Therefore, in the process of
+    examining the various <a href="../Libraries_Manual_guide/node03A4.html">Before</a> and <a href="../Libraries_Manual_guide/node03A4.html">After</a> flags, the drawing routines
+    can determine the drawing sequence.  The system clears this flag on
+<a name="line39">    return from each call to <a href="../Libraries_Manual_guide/node038C.html">DrawGList()</a>.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line36">BOBSAWAY</a>
+    To initiate the removal of a Bob during the next call to <a href="../Libraries_Manual_guide/node038C.html">DrawGList()</a>,
+    set BOBSAWAY to 1.  Either the application or the system may set this
+    <a href="../Libraries_Manual_guide/node0398.html">Bob</a> structure system flag.  The system restores the background where
+    it has last drawn the Bob.  The system will unlink the Bob from the
+    system GEL list the next time DrawGList() is called, unless the
+    application is using double-buffering.  In that case, the Bob will
+    not be unlinked and completely removed until two calls to DrawGList()
+    have occurred and the Bob has been removed from both buffers.  The
+<a name="line50">    <a href="../Libraries_Manual_guide/node03A6.html">RemBob()</a> macro sets the BOBSAWAY flag.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line36">BOBNIX</a>
+    When a Bob has been completely removed, the system sets the BOBNIX
+    flag to 1 on return from <a href="../Libraries_Manual_guide/node038C.html">DrawGList()</a>.  In other words, when the
+    background area has been fully restored and the Bob has been removed
+    from the GEL list, this flag in is set to a 1.  BOBNIX is especially
+    significant when double-buffering because when an application asks
+    for a Bob to be removed, the system must remove it from both the
+    drawing buffer and from the display buffer.  Once BOBNIX has been
+    set, it means the Bob has been removed from both buffers and the
+    application is free to reuse or deallocate the Bob.
+
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line36">SAVEPRESERVE</a>
+    The SAVEPRESERVE flag is a double-buffer version of the <a href="../Libraries_Manual_guide/node0397.html#line5">SAVEBACK</a>
+    flag.  If using double-buffering and wishing to save and restore the
+    background, set SAVEBACK to 1.  SAVEPRESERVE is used by the system to
+    indicate whether the Bob in the &#034;other&#034; buffer has been restored; it
+    is for system use only.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/narrator" NODE="CMD_RESET" TITLE="narrator.device/CMD_RESET" -->
+<head>
+<title>narrator.device/CMD_RESET</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04C3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04C5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CMD_RESET - Reset the device to a known state
+
+SYNOPSIS
+    Standard device command.
+
+FUNCTION
+    Resets the device as though it has just be initialized.
+    Aborts all read/write requests whether active of enqueued.
+    Restarts device if it has been stopped.
+
+INPUTS
+    Valid <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block with the io_Command field set to CMD_RESET.
+    A valid <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block is one with its io_Message structure, and
+    io_Device and io_Unit fields properly initialized.  The easiest
+    way to insure proper initialization is to make a copy of the
+    <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block after a successful <a href="../Includes_and_Autodocs_2._guide/node04C8.html">OpenDevice</a> call.
+
+RESULTS
+
+SEE ALSO
+    Exec input/output documentation.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

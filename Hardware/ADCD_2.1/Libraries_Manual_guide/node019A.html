@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-3-2" TITLE="6 / Menu Data Structures / MenuItem Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Menu Data Structures / MenuItem Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0199.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node019B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line89">MenuItem</a> structure is used for both items and sub-items.  There is no
+internal difference between items and sub-items, other than how they are
+linked into the menu strip.  Items are linked directly to <a href="../Libraries_Manual_guide/node0199.html">Menu</a> structures
+through the <a href="../Libraries_Manual_guide/node0199.html#line51">FirstItem</a> field, sub-items are linked to MenuItem structures
+<a name="line6">through the SubItem field.</a>
+
+Here is the specification:
+
+    struct MenuItem
+        {
+        struct MenuItem *NextItem;
+        WORD LeftEdge, TopEdge;
+        WORD Width, Height;
+        UWORD Flags;
+        LONG MutualExclude;
+        APTR ItemFill;
+        APTR SelectFill;
+        BYTE Command;
+        struct MenuItem *SubItem;
+        UWORD NextSelect;
+        };
+
+<a name="line24">The fields have the following meanings:</a>
+
+NextItem
+    This field is a pointer to the next item in the list.  The last item
+<a name="line28">    in the list should have a NextItem value of NULL.</a>
+
+LeftEdge, TopEdge, Width, Height
+    These fields describe the select box of the MenuItem.  The LeftEdge
+    is relative to the <a href="../Libraries_Manual_guide/node0199.html#line19">LeftEdge</a> of the <a href="../Libraries_Manual_guide/node0199.html">Menu</a>. The TopEdge is relative to
+    the topmost position Intuition allows.  TopEdge is based on the way
+    the user has the system configured--which font, which resolution, and
+<a name="line35">    so on.  Use 0 for the topmost position.</a>
+
+Flags
+    The flag space is shared by the program and Intuition. See
+<a name="line39">    &#034;<a href="../Libraries_Manual_guide/node019B.html">MenuItem Flags</a>&#034; below for a description of the flag bits.</a>
+
+MutualExclude
+    Use these bits to describe which of the other items, if any, are
+    mutually excluded by this one.  This long word refers to the items in
+    the same menu as this one.  A maximum of 32 items may be described by
+    this variable, and they must be the first 32 items in the menu.  This
+    does not mean that there cannot be more than 32 items in any given
+<a name="line47">    menu, just that only the first 32 can be mutually excluded.</a>
+
+ItemFill
+    This points to the data used in rendering this MenuItem.  It can
+    point to either an instance of an <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structure with text for
+    this MenuItem or an instance of an <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structure with image data.
+    The program tells Intuition the type of data pointed to by this
+    variable by setting or clearing the MenuItem flag bit <a href="../Libraries_Manual_guide/node019B.html#line14">ITEMTEXT</a>.  (See
+<a name="line55">    &#034;<a href="../Libraries_Manual_guide/node019B.html">MenuItem Flags</a>&#034; below for more details about ITEMTEXT.)</a>
+
+    Note that the <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> or <a href="../Libraries_Manual_guide/node01BA.html">Image</a> data need not be simple imagery,
+    either of them may consist of multiple objects of the same type
+    chained together, described in &#034;<a href="../Libraries_Manual_guide/node01B6.html">Intuition Images,Line Drawing and Text</a>&#034;
+    chapter. By chaining multiple IntuiText structures, the application
+    may &#034;fine tune&#034; the positioning of text within each item. This is
+    especially important for proportional fonts, where the width of the
+    individual characters is not constant.  This also allows items to
+<a name="line64">    have part of the text left justified and part right justified.</a>
+
+SelectFill
+    If <a href="../Libraries_Manual_guide/node019B.html#line53">HIGHIMAGE</a> is set in the Flags variable as the MenuItem
+    highlighting mode, Intuition substitutes this alternate image or text
+    for the original rendering described by ItemFill.  The type of this
+    structure must be the same as ItemFill.  SelectFill can point to
+    either an <a href="../Libraries_Manual_guide/node01BA.html">Image</a> or an <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a>, where the type is determined by the
+<a name="line72">    setting of the <a href="../Libraries_Manual_guide/node019B.html#line14">ITEMTEXT</a> flag.</a>
+
+Command
+    This variable is storage for a single alphanumeric character to be
+    used as the command key substitute for this menu item.  The command
+    key sequence will be rendered in the menu display to the right of the
+    item's select area, with a fancy, reverse-video A, followed by the
+<a name="line79">    command character.  Case is ignored.</a>
+
+    If the flag <a href="../Libraries_Manual_guide/node019B.html#line20">COMMSEQ</a> is set, the user can hold down the right Amiga
+    key on the keyboard (to mimic using the right mouse menu button) and
+    press the indicated key as a shortcut for using the mouse to select
+<a name="line84">    this item.</a>
+
+SubItem
+    If this item has a sub-item list, this variable should point to the
+    MenuItem structure describing the first sub-item in the list.
+
+    There Is No Such Thing as a Sub-sub-item.
+    -----------------------------------------
+    A sub-item cannot have a sub-item attached to it.  If this
+<a name="line93">    MenuItem structure is not an item, this variable is ignored.</a>
+
+NextSelect
+    This field is filled in by Intuition when this MenuItem is selected
+    by the user.  After an item has been selected by the user, the
+    program should process the request and then check the NextSelect
+    field.  If the NextSelect field is equal to <a href="../Libraries_Manual_guide/node0188.html#line20">MENUNULL</a>, no other items
+    were selected;  otherwise, there is another item to process.  See
+    &#034;<a href="../Libraries_Manual_guide/node0188.html">Menu Numbers</a>&#034; and &#034;<a href="../Libraries_Manual_guide/node0186.html">Menu Selection Messages</a>&#034; above for more information
+    about user selections.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

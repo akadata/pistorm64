@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/libraries.h" NODE="MAIN" TITLE="Includes/exec/libraries.h" -->
+<head>
+<title>Includes/exec/libraries.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node009B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node009D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_LIBRARIES_H
+#define	EXEC_LIBRARIES_H
+/*
+**	$Filename: exec/libraries.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.10 $
+**	$Date: 90/05/10 $
+**
+**	Definitions for use when creating or using Exec libraries
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+#endif /* EXEC_NODES_H */
+
+<a name="line19"></a>
+<a name="line20">/*------ Special Constants ---------------------------------------*/</a>
+<a name="line21">#define LIB_VECTSIZE	6	/* Each library entry takes 6 bytes */</a>
+<a name="line22">#define LIB_RESERVED	4	/* Exec reserves the first 4 vectors */</a>
+<a name="line23">#define LIB_BASE	(-LIB_VECTSIZE)</a>
+#define LIB_USERDEF	(LIB_BASE-(LIB_RESERVED*LIB_VECTSIZE))
+#define LIB_NONSTD	(LIB_USERDEF)
+<a name="line26"></a>
+<a name="line27">/*------ Standard Functions --------------------------------------*/</a>
+<a name="line28">#define LIB_OPEN	(-6)</a>
+<a name="line29">#define LIB_CLOSE	(-12)</a>
+#define LIB_EXPUNGE	(-18)
+#define LIB_EXTFUNC	(-24)	/* for future expansion */
+<a name="line32"></a>
+<a name="line33">/*------ Library Base Structure ----------------------------------*/</a>
+<a name="line34">/* Also used for Devices and some Resources */</a>
+<a name="line35">struct Library {</a>
+<a name="line36">    struct  Node lib_Node;</a>
+<a name="line37">    UBYTE   lib_Flags;</a>
+<a name="line38">    UBYTE   lib_pad;</a>
+<a name="line39">    UWORD   lib_NegSize;	    /* number of bytes before library */</a>
+<a name="line40">    UWORD   lib_PosSize;	    /* number of bytes after library */</a>
+<a name="line41">    UWORD   lib_Version;	    /* major */</a>
+<a name="line42">    UWORD   lib_Revision;	    /* minor */</a>
+<a name="line43">    APTR    lib_IdString;	    /* ASCII identification */</a>
+    ULONG   lib_Sum;		    /* the checksum itself */
+    UWORD   lib_OpenCnt;	    /* number of current opens */
+};	/* Warning: size is not a longword multiple! */
+<a name="line47"></a>
+<a name="line48">/* lib_Flags bit definitions (all others are system reserved) */</a>
+<a name="line49">#define LIBF_SUMMING	(1&#060;&#060;0)	    /* we are currently checksumming */</a>
+<a name="line50">#define LIBF_CHANGED	(1&#060;&#060;1)	    /* we have just changed the lib */</a>
+#define LIBF_SUMUSED	(1&#060;&#060;2)	    /* set if we should bother to sum */
+#define LIBF_DELEXP	(1&#060;&#060;3)	    /* delayed expunge */
+<a name="line53"></a>
+<a name="line54"></a>
+<a name="line55">/* Temporary Compatibility */</a>
+<a name="line56">#define lh_Node	lib_Node</a>
+#define lh_Flags	lib_Flags
+<a name="line58">#define lh_pad		lib_pad</a>
+<a name="line59">#define lh_NegSize	lib_NegSize</a>
+<a name="line60">#define lh_PosSize	lib_PosSize</a>
+<a name="line61">#define lh_Version	lib_Version</a>
+<a name="line62">#define lh_Revision	lib_Revision</a>
+#define lh_IdString	lib_IdString
+#define lh_Sum		lib_Sum
+#define lh_OpenCnt	lib_OpenCnt
+
+#endif	/* EXEC_LIBRARIES_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_1" NODE="1-3" TITLE="1 Introduction to Libraries / General Amiga Development Guidelines" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>1 Introduction to Libraries / General Amiga Development Guidelines</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0019.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node001B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In the earlier sections of this chapter, the <a href="../Libraries_Manual_guide/node0009.html">basic environment</a> of the
+Amiga operating system was discussed.  This section presents specific
+guidelines that all Amiga programmers must follow.  Some of these
+guidelines are for advanced programmers or apply only to code written in
+assembly language.
+
+  * Check for <a href="../Libraries_Manual_guide/node0550.html">memory loss</a>.  Arrange your Workbench screen so that you
+    have a Shell available and can start your program without rearranging
+    any windows.  In the Shell window type Avail flush several times (the
+    flush option requires the <a href="../Libraries_Manual_guide/node0015.html">Release 2</a> version of the Avail command).
+    Note the total amount of free memory.  Run your program (do not
+    rearrange any windows other than those created by the program) and
+    then exit.  At the Shell, type Avail flush several times again.
+    Compare the total amount of free memory with the earlier figure.
+    They should be the same.  Any difference indicates that your
+    application is not freeing some memory it used or is not closing a
+    disk-loaded library, device or font it opened.  Note that under
+    Release 2, a small amount of memory loss is normal if your
+    application is the first to use the audio or narrator device.
+
+  * Use all of the program <a href="../Libraries_Manual_guide/node055C.html">debugging</a> and stress tools that are available
+    when writing and testing your code.  New debugging tools such as
+    Enforcer, MungWall, and Scratch can help find uninitialized pointers,
+    attempted use of freed memory and misuse of scratch registers or
+    condition codes (even in programs that appear to work perfectly).
+
+  * Always make sure you actually get any system resource that you ask
+    for.  This applies to memory, windows, screens, file handles,
+    libraries, devices, ports, etc.  Where an error value or return is
+    possible, ensure that there is a reasonable failure path.  Many
+    poorly written programs will appear to be reliable, until some <a href="../Libraries_Manual_guide/node0536.html">error</a>
+    condition (such as memory full or a disk problem) causes the program
+    to continue with an invalid or null pointer, or branch to untested
+    error handling code.
+
+  * Always clean up after yourself.  This applies for both normal program
+    exit and <a href="../Libraries_Manual_guide/node02C0.html">program termination</a> due to error conditions. Anything that
+    was opened must be closed, anything allocated must be deallocated.
+    It is generally correct to do closes and deallocations in reverse
+    order of the opens and allocations.  Be sure to check your
+    development language manual and startup code; some items may be
+    closed or deallocated automatically for you, especially in abort
+    conditions.  If you write in the C language, make sure your code
+    handles <a href="../Libraries_Manual_guide/node0019.html#line7">Ctrl-C</a> properly.
+
+  * Remember that memory, peripheral configurations, and ROMs differ
+    between models and between individual systems.  Do not make
+    assumptions about memory address ranges, storage device names, or the
+    locations of system structures or code.  Never call ROM routines
+    directly.  Beware of any example code you find that calls routines at
+    addresses in the $F0 0000 - $FF FFFF range.  These are ROM routines
+    and they will move with every OS release.  The only supported
+    interface to system ROM code is through the library, device, and
+    resource calls.
+
+  * Never assume library bases or structures will exist at any particular
+    memory location.  The only <a href="../Libraries_Manual_guide/node0013.html#line5">absolute address</a> in the system is $0000
+    0004, which contains a pointer to the Exec library base. Do not
+    modify or depend on the format of private system structures. This
+    includes the poking of <a href="../Libraries_Manual_guide/node031F.html">copper</a> lists, memory lists, and library bases.
+
+  * Never assume that programs can access hardware resources directly.
+    Most hardware is controlled by system software that will not respond
+    well to interference from other programs.  Shared hardware requires
+    programs to use the proper sharing protocols.  Use the defined
+    interface; it is the best way to ensure that your software will
+    continue to operate on future models of the Amiga.
+
+  * Never access shared data structures directly without the proper
+    mutual exclusion (<a href="../Libraries_Manual_guide/node02C4.html">locking</a>).  Remember that other tasks may be
+    accessing the same structures.
+
+  * The system does not monitor the size of a program's <a href="../Libraries_Manual_guide/node02BE.html#line12">stack</a>.  (Your
+    compiler may have an <a href="../Libraries_Manual_guide/node0019.html#line32">option</a> to do this for you.)  Take care that your
+    program does not cause stack overflow and provide extra stack space
+    for the possibility that some functions may use up additional stack
+    space in future versions of the OS.
+
+  * Never use a polling loop to test signal bits.  If your program waits
+    for external events like menu selection or keystrokes, do not bog
+    down the <a href="../Libraries_Manual_guide/node000A.html">multitasking</a> system by busy-waiting in a loop.  Instead, let
+    your task go to sleep by <a href="../Libraries_Manual_guide/node02D4.html">Wait()ing</a> on its signal bits.  For example:
+
+        signals = (ULONG)Wait(  (1&#060;&#060;windowPtr-&#062;UserPort-&#062;mp_SigBit) |
+                                    (1&#060;&#060;consoleMsgPortPtr-&#062;mp_SigBit)  );
+
+    This turns the signal bit number for each port into a mask, then
+    combines them as the argument for the Exec library <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a> function.
+    When your task wakes up, handle all of the messages at each port
+    where the mp_SigBit is set.  There may be more than one message per
+    port, or no messages at the port.  Make sure that you <a href="../Libraries_Manual_guide/node02F3.html">ReplyMsg()</a> to
+    all messages that are not replies themselves.  If you have no signal
+    bits to Wait() on, use <a href="../Includes_and_Autodocs_2._guide/node0292.html">Delay()</a> or <a href="../Libraries_Manual_guide/node0390.html">WaitTOF()</a> to provide a measured
+    delay.
+
+  * <a href="../Libraries_Manual_guide/node0287.html#line51">Tasks (and processes)</a> execute in 680x0 user mode.  <a href="../Libraries_Manual_guide/node02CA.html">Supervisor mode</a> is
+    reserved for interrupts, traps, and task dispatching.  Take extreme
+    care if your code executes in supervisor mode.  Exceptions while in
+    supervisor mode are deadly.
+
+  * Most system functions require a particular execution environment.
+    All DOS functions and any functions that might call DOS (such as the
+    opening of a disk-resident library, font, or device) can only be
+    executed from a <a href="../Libraries_Manual_guide/node0287.html#line51">process</a>.  A task is not sufficient.  Most other ROM
+    kernel functions may be executed from tasks.  Only a few may be
+    executed from interrupts.
+
+  * Never <a href="../Libraries_Manual_guide/node030E.html">disable interrupts</a> or multitasking for long periods.  If you
+    use <a href="../Libraries_Manual_guide/node02C2.html">Forbid()</a> or <a href="../Libraries_Manual_guide/node02C3.html">Disable()</a>, you should be aware that execution of any
+    system function that performs the <a href="../Libraries_Manual_guide/node02F1.html#line31">Wait()</a> function will temporarily
+    suspend the Forbid() or Disable() state, and allow multitasking and
+    interrupts to occur.  Such functions include almost all forms of DOS
+    and device I/O, including common stdio functions like <a href="../Includes_and_Autodocs_2._guide/node0162.html">printf()</a>.
+
+  * Never tie up system resources unless it is absolutely necessary. For
+    example, if your program does not require constant use of the
+    printer, open the printer device only when you need it.  This will
+    allow other tasks to use the printer while your program is running.
+    You must provide a reasonable error response if a resource is not
+<a name="line121">    available when you need it.</a>
+
+  * All data for the <a href="../Libraries_Manual_guide/node0016.html">custom chips</a> must reside in <a href="../Libraries_Manual_guide/node0018.html">Chip memory</a> (type
+    <a href="../Libraries_Manual_guide/node02A8.html#line11">MEMF_CHIP</a>).  This includes bitplanes, sound samples, trackdisk
+    buffers, and images for sprites, bobs, pointers, and gadgets.  The
+    <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a> call takes a flag for specifying the type of memory. A
+    program that specifies the wrong type of memory may appear to run
+    correctly because many Amigas have only Chip memory.  (On all models
+    of the Amiga, the first 512K of memory is Chip memory.  In later
+    models, Chip memory may occupy up to the first one or two megabytes).
+
+    However, once <a href="../Libraries_Manual_guide/node0018.html">expansion memory</a> has been added to an Amiga (type
+    <a href="../Libraries_Manual_guide/node02A8.html#line20">MEMF_FAST</a>), any memory allocations will be made in the expansion
+    memory area by default.  Hence, a program can run correctly on an
+    unexpanded Amiga which has only <a href="../Libraries_Manual_guide/node0018.html">Chip memory</a> while <a href="../Libraries_Manual_guide/node054A.html">crashing</a> on an
+    Amiga which has expanded memory.  A developer with only Chip memory
+    may fail to notice that memory was incorrectly specified.
+
+    Most compilers have <a href="../Libraries_Manual_guide/node0019.html#line62">options</a> to mark specific data structures or
+    object modules so that they will load into <a href="../Libraries_Manual_guide/node0018.html">Chip RAM</a>.  Some older
+    compilers provide the Atom utility for marking object modules.  If
+    this method is unacceptable, use the <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a> call to dynamically
+    allocate Chip memory, and copy your data there.
+
+    When making allocations that do not require <a href="../Libraries_Manual_guide/node0018.html">Chip memory</a>, do not
+    explicitly ask for <a href="../Libraries_Manual_guide/node0018.html">Fast memory</a>.  Instead ask for memory type
+    <a href="../Libraries_Manual_guide/node02A8.html#line31">MEMF_PUBLIC</a> or 0L as appropriate.  If Fast memory is available, you
+    will get it.
+
+  * Never use software delay loops!  Under the <a href="../Libraries_Manual_guide/node000A.html">multitasking</a> operating
+    system, the time spent in a loop can be better used by other tasks.
+    Even ignoring the effect it has on multitasking, timing loops are
+    inaccurate and will wait different amounts of time depending on the
+    specific model of Amiga computer.  The timer device provides
+    precision timing for use under the multitasking system and it works
+    the same on all models of the Amiga.  The AmigaDOS <a href="../Includes_and_Autodocs_2._guide/node0292.html">Delay()</a> function
+    or the graphics library <a href="../Libraries_Manual_guide/node0390.html">WaitTOF()</a> function provide a simple interface
+    for longer delays.  The <a href="../Hardware_Manual_guide/node012E.html">8520 I/O chips</a> provide timers for developers
+    who are bypassing the operating system (see the Amiga Hardware
+    Reference Manual for more information).
+
+  * Always obey structure conventions!
+
+      &#183; All non-byte fields must be word-aligned.  Longwords should be
+        longword-aligned for performance.
+
+      &#183; All address pointers should be 32 bits (not 24 bits).  Never use
+        the upper byte for data.
+
+      &#183; Fields that are not defined to contain particular initial values
+        must be initialized to zero.  This includes pointer fields.
+
+      &#183; All reserved or unused fields must be initialized to zero for
+        future compatibility.
+
+      &#183; Data structures to be accessed by the <a href="../Libraries_Manual_guide/node0016.html">custom chips</a>, public data
+        structures (such as a task control block), and structures which
+        must be longword aligned must not be allocated on a program's
+        stack.
+
+      &#183; Dynamic allocation of structures with <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a> provides
+        longword aligned memory of a specified type with optional
+        initialization to zero, which is useful in the allocation of
+        structures.
+
+ <a href="../Libraries_Manual_guide/node001B.html">For 68010/68020/68030/68040 Compatibility</a> 
+ <a href="../Libraries_Manual_guide/node001C.html">Hardware Programming Guidelines</a> 
+ <a href="../Libraries_Manual_guide/node001D.html">Additional Assembler Development Guidelines</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

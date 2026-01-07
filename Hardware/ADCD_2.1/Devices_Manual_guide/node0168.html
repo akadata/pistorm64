@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_FTXT" NODE="16-4-1" TITLE=" FTXT IFF Formatted Text / Introduction " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> FTXT IFF Formatted Text / Introduction </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0167.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0169.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This memo is the IFF supplement for FORM FTXT.  An FTXT is an IFF &#034;data
+section&#034; or &#034;<a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a> type&#034; - which can be an IFF file or a part of one -
+containing a stream of text plus optional formatting information.
+<a href="../Devices_Manual_guide/node01C5.html">EA IFF 85</a> is Electronic Arts' standard for interchange format files.
+(See the IFF reference.)
+
+An FTXT is an archival and interchange representation designed for three
+uses. The simplest use is for a &#034;console device&#034; or &#034;glass teletype&#034; (the
+minimal 2-D text layout means): a stream of &#034;graphic&#034; (&#034;printable&#034;)
+characters plus positioning characters &#034;space&#034; (&#034;SP&#034;) and line terminator
+(&#034;LF&#034;).  This is not intended for cursor movements on a screen although it
+does not conflict with standard cursor-moving characters.  The second use
+is text that has explicit formatting information (or &#034;looks&#034;) such as font
+family and size, typeface, etc.  The third use is as the lowest layer of a
+structured document that also has &#034;inherited&#034; styles to implicitly control
+character looks.  For that use, FORMs FTXT would be embedded within a
+future document <a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a> type.  The beauty of FTXT is that these three uses
+are interchangeable, that is, a program written for one purpose can read
+and write the others' files.  So a word processor does not have to write a
+separate plain text file to communicate with other programs.
+
+Text is stored in one or more &#034;<a href="../Devices_Manual_guide/node016D.html">CHRS</a>&#034; chunks inside an FTXT.  Each CHRS
+contains a stream of 8-bit text compatible with ISO and ANSI data
+interchange standards.  FTXT uses just the central character set from the
+ISO/ANSI standards.  (These two standards are henceforth called &#034;ISO/ANSI&#034;
+as in &#034;see the ISO/ANSI reference&#034;.)
+
+Since it's possible to extract just the text portions from future document
+<a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a> types, programs can exchange data without having to save both plain
+text and formatted text representations.
+
+Character looks are stored as embedded control sequences within <a href="../Devices_Manual_guide/node016D.html">CHRS</a>
+chunks. This document specifies which class of control sequences to use:
+the CSI group.  This document does not yet specify their meanings, e.g.,
+which one means &#034;turn on italic face&#034;.  Consult ISO/ANSI.
+
+Section 2 defines the chunk types character stream &#034;<a href="../Devices_Manual_guide/node016D.html">CHRS</a>&#034; and font
+specifier &#034;<a href="../Devices_Manual_guide/node016E.html">FONS</a>&#034;.  These are the &#034;standard&#034; chunks.  Specialized chunks
+for private or future needs can be added later.  Section 3 outlines an
+FTXT reader program that strips a document down to plain unformatted text.
+<a href="../Devices_Manual_guide/node0172.html">Appendix A</a> is a code table for the 8-bit ISO/ANSI character set used here.
+<a href="../Devices_Manual_guide/node0173.html">Appendix B</a> is an example FTXT shown as a box diagram.  <a href="../Devices_Manual_guide/node0174.html">Appendix C</a> is a
+racetrack diagram of the syntax of ISO/ANSI control sequences.
+
+ <a href="../Devices_Manual_guide/node0169.html">Reference</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

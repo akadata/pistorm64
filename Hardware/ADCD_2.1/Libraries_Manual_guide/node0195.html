@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-17-2" TITLE="6 / / Intercepting Normal Menu Operations / Menu Verify" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / / Intercepting Normal Menu Operations / Menu Verify</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0194.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0196.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Menu verify is one of the Intuition verification capabilities that allow
+an application to ensure that it is prepared for some action taken by
+Intuition before that action takes place.  Through menu verify, Intuition
+allows all windows in a screen to verify that they are prepared for menu
+operations before the operations begin.  In general, use menu verify if
+the program is doing something special to the display of a custom screen,
+<a name="line8">and needs to be sure the operation has completed before menus are rendered.</a>
+
+Any window can access the menu verify feature by setting the
+<a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> flag with the <a href="../Libraries_Manual_guide/node0124.html#line35">WA_IDCMP</a> tag when opening the window.  When
+menus are activated in a screen which contains at least one window with
+IDCMP_MENUVERFIY set, menu operations will not proceed until all windows
+with the menu verify flag set reply to the notification or until the last
+<a name="line15">message times out.  The specific menu verify protocol is described below.</a>
+
+In any case, it is vital that the application know when menu operations
+terminate, for only then does it have control of the screen again.  For
+the active window, this is typically detected by watching for an
+<a href="../Libraries_Manual_guide/node01DE.html">IDCMP_MENUPICK</a> message.  If the program cancels the menu operations
+(MENUCANCEL), then it will instead receive an <a href="../Libraries_Manual_guide/node01DC.html">IDCMP_MOUSEBUTTONS</a> message
+with code equal to MENUUP.  Inactive windows will always receive
+<a name="line23">IDCMP_MOUSEBUTTONS message with code equal to MENUUP.</a>
+
+The active window is given special menu verify treatment.  It receives the
+menu verify message before any other window and has the option of
+canceling menu operations altogether.  This could be used, for instance,
+to examine where the user has positioned the mouse when the right button
+was pressed.  For example, the application may choose to allow normal menu
+operations to proceed only when the pointer is in the menu bar area.  When
+the pointer is below the menu bar, then the application can choose to
+interpret the menu verify message as a right button event for some
+<a name="line33">non-menu purpose.</a>
+
+The program can tell if it is the active window for the verify event by
+examining the <a href="../Libraries_Manual_guide/node01D9.html#line33">Code</a> field of the <a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> message.  If the Code
+field is equal to MENUWAITING, this window is not active and Intuition is
+simply waiting for verification that menu operations may continue.
+However, if the Code field is equal to MENUHOT, this window is active and
+<a name="line40">it determines if menu operations should proceed.</a>
+
+If it wishes menu operations to proceed, the active window should reply to
+the <a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> message without changing any values.  To cancel the
+menu operation, change the code field of the message to MENUCANCEL before
+replying to the message.
+
+When the active window cancels the menu operation it will be sent an
+<a href="../Libraries_Manual_guide/node01DC.html">IDCMP_MOUSEBUTTONS</a> message with code equal to MENUUP.  In general, the
+window will not then receive an <a href="../Libraries_Manual_guide/node01DE.html">IDCMP_MENUPICK</a> event as it cancelled the
+operation.  However, the system should be prepared to handle an
+IDCMP_MENUPICK message with code equal to <a href="../Libraries_Manual_guide/node0188.html#line20">MENUNULL</a> as one may be sent if
+the user releases the mouse button before the window replies to the
+message.
+
+The system takes no action on screen until the active window either
+replies to the menu verify event or the event times out.  If the active
+window replies to the event in time and does not cancel the menu
+operation, Intuition will then move the screen title bar layer to the
+front, display the menu strip and notify all inactive menu verify windows
+of the operation.  Layers will not be locked and the actual menus will not
+be swapped in until all these inactive windows reply to the message or
+<a name="line62">time out.  The inactive windows may not cancel the menu operation.</a>
+
+If the user releases the menu button before the active window replies to
+the menu verify message, the menu operation will be cancelled and the
+active window will be sent an <a href="../Libraries_Manual_guide/node01DC.html">IDCMP_MOUSEBUTTONS</a> message with code equal
+to MENUUP.  When the active window finally replies to the message, it will
+receive an <a href="../Libraries_Manual_guide/node01DE.html">IDCMP_MENUPICK</a> message with code equal to <a href="../Libraries_Manual_guide/node0188.html#line20">MENUNULL</a>.
+
+If the event times out before the active window replies to the message, it
+will immediately be sent an <a href="../Libraries_Manual_guide/node01DE.html">IDCMP_MENUPICK</a> message with code equal to
+<a href="../Libraries_Manual_guide/node0188.html#line20">MENUNULL</a>.  Then, when the user releases the menu button, the program will
+receive an <a href="../Libraries_Manual_guide/node01DC.html">IDCMP_MOUSEBUTTONS</a> message with code equal to MENUUP.
+
+If an inactive window receives an <a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> message, it will always
+receive an <a href="../Libraries_Manual_guide/node01DC.html">IDCMP_MOUSEBUTTONS</a> message with code equal to MENUUP when the
+menu operations are completed.
+
+    About Double-Menu Requesters.
+    -----------------------------
+    The processing described above becomes more complicated when
+    double-menu requester processing is introduced.  If an application
+    chooses to use a double-menu requester in a window with
+    <a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> set, it should be aware that odd message
+    combinations are possible.  For instance, it is possible to receive
+    only an IDCMP_MENUVERIFY event with no following <a href="../Libraries_Manual_guide/node01DC.html">IDCMP_MOUSEBUTTONS</a>
+    event or <a href="../Libraries_Manual_guide/node01DE.html">IDCMP_MENUPICK</a> event.  Applications should avoid using
+    double menu requesters if possible.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

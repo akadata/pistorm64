@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/iffparse" NODE="ParentChunk()" TITLE="iffparse.library/ParentChunk" -->
+<head>
+<title>iffparse.library/ParentChunk</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01CF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01D1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ParentChunk -- Get the nesting context node for the given chunk.
+
+SYNOPSIS
+    parent = ParentChunk (cn)
+      d0                  a0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node010B.html#line68">ContextNode</a> *parent, *cn;
+
+FUNCTION
+    Returns a context node for the chunk containing the chunk for the
+    given context node.  This function effectively moves down the context
+    stack into previously pushed contexts.  For example, to get a
+    <a href="../Includes_and_Autodocs_2._guide/node010B.html#line68">ContextNode</a> pointer for the enclosing FORM chunk while reading a data
+    chunk, use: ParentChunk (CurrentChunk (iff)) to find this pointer.
+    The <a href="../Includes_and_Autodocs_2._guide/node010B.html#line68">ContextNode</a> structure contains information on the type of chunk
+    and its size.
+
+INPUTS
+    cn      - pointer to a context node.
+
+RESULT
+    parent  - pointer to the enclosing context node or NULL if none.
+
+EXAMPLE
+
+NOTES
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01BE.html">CurrentChunk()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/hardware/cia.h" NODE="MAIN" TITLE="Includes/hardware/cia.h" -->
+<head>
+<title>Includes/hardware/cia.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00C6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00C8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	HARDWARE_CIA_H
+#define	HARDWARE_CIA_H
+/*
+**	$Filename: hardware/cia.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.3 $
+**	$Date: 90/11/05 $
+**
+**	registers and bits in the Complex Interface Adapter (CIA) chip
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+<a name="line15"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif /* EXEC_TYPES_H */
+
+
+
+/*
+ * ciaa is on an ODD address (e.g. the low byte) -- $bfe001
+ * ciab is on an EVEN address (e.g. the high byte) -- $bfd000
+ *
+ * do this to get the definitions:
+ *    extern struct CIA ciaa, ciab;
+ */
+
+<a name="line30"></a>
+<a name="line31">struct CIA {</a>
+<a name="line32">    UBYTE   ciapra;</a>
+<a name="line33">    UBYTE   pad0[0xff];</a>
+<a name="line34">    UBYTE   ciaprb;</a>
+<a name="line35">    UBYTE   pad1[0xff];</a>
+<a name="line36">    UBYTE   ciaddra;</a>
+<a name="line37">    UBYTE   pad2[0xff];</a>
+<a name="line38">    UBYTE   ciaddrb;</a>
+<a name="line39">    UBYTE   pad3[0xff];</a>
+<a name="line40">    UBYTE   ciatalo;</a>
+<a name="line41">    UBYTE   pad4[0xff];</a>
+<a name="line42">    UBYTE   ciatahi;</a>
+<a name="line43">    UBYTE   pad5[0xff];</a>
+<a name="line44">    UBYTE   ciatblo;</a>
+<a name="line45">    UBYTE   pad6[0xff];</a>
+<a name="line46">    UBYTE   ciatbhi;</a>
+<a name="line47">    UBYTE   pad7[0xff];</a>
+<a name="line48">    UBYTE   ciatodlow;</a>
+<a name="line49">    UBYTE   pad8[0xff];</a>
+<a name="line50">    UBYTE   ciatodmid;</a>
+<a name="line51">    UBYTE   pad9[0xff];</a>
+<a name="line52">    UBYTE   ciatodhi;</a>
+<a name="line53">    UBYTE   pad10[0xff];</a>
+<a name="line54">    UBYTE   unusedreg;</a>
+<a name="line55">    UBYTE   pad11[0xff];</a>
+<a name="line56">    UBYTE   ciasdr;</a>
+<a name="line57">    UBYTE   pad12[0xff];</a>
+<a name="line58">    UBYTE   ciaicr;</a>
+<a name="line59">    UBYTE   pad13[0xff];</a>
+<a name="line60">    UBYTE   ciacra;</a>
+<a name="line61">    UBYTE   pad14[0xff];</a>
+    UBYTE   ciacrb;
+};
+
+
+<a name="line66">/* interrupt control register bit numbers */</a>
+<a name="line67">#define CIAICRB_TA	0</a>
+<a name="line68">#define CIAICRB_TB	1</a>
+<a name="line69">#define CIAICRB_ALRM	2</a>
+<a name="line70">#define CIAICRB_SP	3</a>
+<a name="line71">#define CIAICRB_FLG	4</a>
+<a name="line72">#define CIAICRB_IR	7</a>
+#define CIAICRB_SETCLR	7
+
+<a name="line75">/* control register A bit numbers */</a>
+<a name="line76">#define CIACRAB_START	0</a>
+<a name="line77">#define CIACRAB_PBON	1</a>
+<a name="line78">#define CIACRAB_OUTMODE 2</a>
+<a name="line79">#define CIACRAB_RUNMODE 3</a>
+<a name="line80">#define CIACRAB_LOAD	4</a>
+<a name="line81">#define CIACRAB_INMODE	5</a>
+<a name="line82">#define CIACRAB_SPMODE	6</a>
+#define CIACRAB_TODIN	7
+
+<a name="line85">/* control register B bit numbers */</a>
+<a name="line86">#define CIACRBB_START	0</a>
+<a name="line87">#define CIACRBB_PBON	1</a>
+<a name="line88">#define CIACRBB_OUTMODE 2</a>
+<a name="line89">#define CIACRBB_RUNMODE 3</a>
+<a name="line90">#define CIACRBB_LOAD	4</a>
+<a name="line91">#define CIACRBB_INMODE0 5</a>
+<a name="line92">#define CIACRBB_INMODE1 6</a>
+#define CIACRBB_ALARM	7
+
+<a name="line95">/* interrupt control register masks */</a>
+<a name="line96">#define CIAICRF_TA	(1&#060;&#060;CIAICRB_TA)</a>
+<a name="line97">#define CIAICRF_TB	(1&#060;&#060;CIAICRB_TB)</a>
+<a name="line98">#define CIAICRF_ALRM	(1&#060;&#060;CIAICRB_ALRM)</a>
+<a name="line99">#define CIAICRF_SP	(1&#060;&#060;CIAICRB_SP)</a>
+<a name="line100">#define CIAICRF_FLG	(1&#060;&#060;CIAICRB_FLG)</a>
+<a name="line101">#define CIAICRF_IR	(1&#060;&#060;CIAICRB_IR)</a>
+#define CIAICRF_SETCLR	(1&#060;&#060;CIAICRB_SETCLR)
+
+<a name="line104">/* control register A register masks */</a>
+<a name="line105">#define CIACRAF_START	(1&#060;&#060;CIACRAB_START)</a>
+<a name="line106">#define CIACRAF_PBON	(1&#060;&#060;CIACRAB_PBON)</a>
+<a name="line107">#define CIACRAF_OUTMODE (1&#060;&#060;CIACRAB_OUTMODE)</a>
+<a name="line108">#define CIACRAF_RUNMODE (1&#060;&#060;CIACRAB_RUNMODE)</a>
+<a name="line109">#define CIACRAF_LOAD	(1&#060;&#060;CIACRAB_LOAD)</a>
+<a name="line110">#define CIACRAF_INMODE	(1&#060;&#060;CIACRAB_INMODE)</a>
+<a name="line111">#define CIACRAF_SPMODE	(1&#060;&#060;CIACRAB_SPMODE)</a>
+#define CIACRAF_TODIN	(1&#060;&#060;CIACRAB_TODIN)
+
+<a name="line114">/* control register B register masks */</a>
+<a name="line115">#define CIACRBF_START	(1&#060;&#060;CIACRBB_START)</a>
+<a name="line116">#define CIACRBF_PBON	(1&#060;&#060;CIACRBB_PBON)</a>
+<a name="line117">#define CIACRBF_OUTMODE (1&#060;&#060;CIACRBB_OUTMODE)</a>
+<a name="line118">#define CIACRBF_RUNMODE (1&#060;&#060;CIACRBB_RUNMODE)</a>
+<a name="line119">#define CIACRBF_LOAD	(1&#060;&#060;CIACRBB_LOAD)</a>
+<a name="line120">#define CIACRBF_INMODE0 (1&#060;&#060;CIACRBB_INMODE0)</a>
+<a name="line121">#define CIACRBF_INMODE1 (1&#060;&#060;CIACRBB_INMODE1)</a>
+#define CIACRBF_ALARM	(1&#060;&#060;CIACRBB_ALARM)
+
+<a name="line124">/* control register B INMODE masks */</a>
+<a name="line125">#define CIACRBF_IN_PHI2 0</a>
+<a name="line126">#define CIACRBF_IN_CNT	(CIACRBF_INMODE0)</a>
+<a name="line127">#define CIACRBF_IN_TA	(CIACRBF_INMODE1)</a>
+#define CIACRBF_IN_CNT_TA  (CIACRBF_INMODE0|CIACRBF_INMODE1)
+
+/*
+ * Port definitions -- what each bit in a cia peripheral register is tied to
+ */
+
+<a name="line134">/* ciaa port A (0xbfe001) */</a>
+<a name="line135">#define CIAB_GAMEPORT1	(7)   /* gameport 1, pin 6 (fire button*) */</a>
+<a name="line136">#define CIAB_GAMEPORT0	(6)   /* gameport 0, pin 6 (fire button*) */</a>
+<a name="line137">#define CIAB_DSKRDY	(5)   /* disk ready* */</a>
+<a name="line138">#define CIAB_DSKTRACK0	(4)   /* disk on track 00* */</a>
+<a name="line139">#define CIAB_DSKPROT	(3)   /* disk write protect* */</a>
+<a name="line140">#define CIAB_DSKCHANGE	(2)   /* disk change* */</a>
+<a name="line141">#define CIAB_LED	(1)   /* led light control (0==&#062;bright) */</a>
+#define CIAB_OVERLAY	(0)   /* memory overlay bit */
+
+/* ciaa port B (0xbfe101) -- parallel port */
+
+<a name="line146">/* ciab port A (0xbfd000) -- serial and printer control */</a>
+<a name="line147">#define CIAB_COMDTR	(7)   /* serial Data Terminal Ready* */</a>
+<a name="line148">#define CIAB_COMRTS	(6)   /* serial Request to Send* */</a>
+<a name="line149">#define CIAB_COMCD	(5)   /* serial Carrier Detect* */</a>
+<a name="line150">#define CIAB_COMCTS	(4)   /* serial Clear to Send* */</a>
+<a name="line151">#define CIAB_COMDSR	(3)   /* serial Data Set Ready* */</a>
+<a name="line152">#define CIAB_PRTRSEL	(2)   /* printer SELECT */</a>
+<a name="line153">#define CIAB_PRTRPOUT	(1)   /* printer paper out */</a>
+#define CIAB_PRTRBUSY	(0)   /* printer busy */
+
+<a name="line156">/* ciab port B (0xbfd100) -- disk control */</a>
+<a name="line157">#define CIAB_DSKMOTOR	(7)   /* disk motorr* */</a>
+<a name="line158">#define CIAB_DSKSEL3	(6)   /* disk select unit 3* */</a>
+<a name="line159">#define CIAB_DSKSEL2	(5)   /* disk select unit 2* */</a>
+<a name="line160">#define CIAB_DSKSEL1	(4)   /* disk select unit 1* */</a>
+<a name="line161">#define CIAB_DSKSEL0	(3)   /* disk select unit 0* */</a>
+<a name="line162">#define CIAB_DSKSIDE	(2)   /* disk side select* */</a>
+<a name="line163">#define CIAB_DSKDIREC	(1)   /* disk direction of seek* */</a>
+#define CIAB_DSKSTEP	(0)   /* disk step heads* */
+
+<a name="line166">/* ciaa port A (0xbfe001) */</a>
+<a name="line167">#define CIAF_GAMEPORT1	(1&#060;&#060;7)</a>
+<a name="line168">#define CIAF_GAMEPORT0	(1&#060;&#060;6)</a>
+<a name="line169">#define CIAF_DSKRDY	(1&#060;&#060;5)</a>
+<a name="line170">#define CIAF_DSKTRACK0	(1&#060;&#060;4)</a>
+<a name="line171">#define CIAF_DSKPROT	(1&#060;&#060;3)</a>
+<a name="line172">#define CIAF_DSKCHANGE	(1&#060;&#060;2)</a>
+<a name="line173">#define CIAF_LED	(1&#060;&#060;1)</a>
+#define CIAF_OVERLAY	(1&#060;&#060;0)
+
+/* ciaa port B (0xbfe101) -- parallel port */
+
+<a name="line178">/* ciab port A (0xbfd000) -- serial and printer control */</a>
+<a name="line179">#define CIAF_COMDTR	(1&#060;&#060;7)</a>
+<a name="line180">#define CIAF_COMRTS	(1&#060;&#060;6)</a>
+<a name="line181">#define CIAF_COMCD	(1&#060;&#060;5)</a>
+<a name="line182">#define CIAF_COMCTS	(1&#060;&#060;4)</a>
+<a name="line183">#define CIAF_COMDSR	(1&#060;&#060;3)</a>
+<a name="line184">#define CIAF_PRTRSEL	(1&#060;&#060;2)</a>
+<a name="line185">#define CIAF_PRTRPOUT	(1&#060;&#060;1)</a>
+#define CIAF_PRTRBUSY	(1&#060;&#060;0)
+
+<a name="line188">/* ciab port B (0xbfd100) -- disk control */</a>
+<a name="line189">#define CIAF_DSKMOTOR	(1&#060;&#060;7)</a>
+<a name="line190">#define CIAF_DSKSEL3	(1&#060;&#060;6)</a>
+<a name="line191">#define CIAF_DSKSEL2	(1&#060;&#060;5)</a>
+<a name="line192">#define CIAF_DSKSEL1	(1&#060;&#060;4)</a>
+<a name="line193">#define CIAF_DSKSEL0	(1&#060;&#060;3)</a>
+<a name="line194">#define CIAF_DSKSIDE	(1&#060;&#060;2)</a>
+<a name="line195">#define CIAF_DSKDIREC	(1&#060;&#060;1)</a>
+#define CIAF_DSKSTEP	(1&#060;&#060;0)
+
+#endif	/* HARDWARE_CIA_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

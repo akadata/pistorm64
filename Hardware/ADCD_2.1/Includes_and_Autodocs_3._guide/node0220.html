@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="OldOpenLibrary()" TITLE="exec.library/OldOpenLibrary" -->
+<head>
+<title>exec.library/OldOpenLibrary</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node021F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0221.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	OldOpenLibrary -- obsolete <a href="../Includes_and_Autodocs_3._guide/node0222.html">OpenLibrary</a>
+
+<b>   SYNOPSIS</b>
+	library = OldOpenLibrary(libName)
+	D0			 A1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node0626.html#line33">Library</a> *OldOpenLibrary(APTR);
+
+<b>   FUNCTION</b>
+	The 1.0 release of the Amiga system had an incorrect version of
+	<a href="../Includes_and_Autodocs_3._guide/node0222.html">OpenLibrary</a> that did not check the version number during the
+	library open.  This obsolete function is provided so that object
+	code compiled using a 1.0 system will still run.
+
+	This exactly the same as &#034;OpenLibrary(libName,0L);&#034;
+
+<b>   INPUTS</b>
+	libName - the name of the library to open
+
+<b>   RESULTS</b>
+	library - a library pointer for a successful open, else zero
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01F7.html">CloseLibrary()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

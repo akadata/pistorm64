@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/clip.h" NODE="MAIN" TITLE="Includes/graphics/clip.h" -->
+<head>
+<title>Includes/graphics/clip.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00A0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00A2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_CLIP_H
+#define	GRAPHICS_CLIP_H
+/*
+**	$Filename: graphics/clip.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.2 $
+**	$Date: 91/10/24 $
+**
+**
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+#ifndef GRAPHICS_GFX_H
+#include &#060;graphics/gfx.h&#062;
+<a name="line21">#endif</a>
+#ifndef EXEC_SEMAPHORES_H
+#include &#060;exec/semaphores.h&#062;
+#endif
+#ifndef UTILITY_HOOKS_H
+#include &#060;utility/hooks.h&#062;
+#endif
+
+/* structures used by and constructed by windowlib.a */
+/* understood by rom software */
+<a name="line31"></a>
+#define NEWLOCKS
+<a name="line33"></a>
+struct Layer
+<a name="line35">{</a>
+<a name="line36">    struct  Layer *front,*back;</a>
+<a name="line37">    struct  ClipRect	*ClipRect;  /* read by roms to find first cliprect */</a>
+<a name="line38">    struct  RastPort	*rp;</a>
+<a name="line39">    struct  Rectangle	bounds;</a>
+<a name="line40">    UBYTE   reserved[4];</a>
+<a name="line41">    UWORD   priority;		    /* system use only */</a>
+<a name="line42">    UWORD   Flags;		    /* obscured ?, Virtual BitMap? */</a>
+<a name="line43">    struct  BitMap *SuperBitMap;</a>
+    struct  ClipRect *SuperClipRect; /* super bitmap cliprects if VBitMap != 0*/
+<a name="line45">				  /* else damage cliprect list for refresh */</a>
+<a name="line46">    APTR    Window;		  /* reserved for user interface use */</a>
+<a name="line47">    WORD   Scroll_X,Scroll_Y;</a>
+<a name="line48">    struct  ClipRect *cr,*cr2,*crnew;	/* used by dedice */</a>
+<a name="line49">    struct  ClipRect *SuperSaveClipRects; /* preallocated cr's */</a>
+<a name="line50">    struct  ClipRect *_cliprects;	/* system use during refresh */</a>
+<a name="line51">    struct  Layer_Info	*LayerInfo;	/* points to head of the list */</a>
+<a name="line52">    struct  SignalSemaphore Lock;</a>
+<a name="line53">    struct  Hook *BackFill;</a>
+<a name="line54">    ULONG   reserved1;</a>
+<a name="line55">    struct  Region *ClipRegion;</a>
+<a name="line56">    struct  Region *saveClipRects;	/* used to back out when in trouble*/</a>
+<a name="line57">    WORD    Width,Height;		/* system use */</a>
+    UBYTE   reserved2[18];
+<a name="line59">    /* this must stay here */</a>
+    struct  Region  *DamageList;    /* list of rectangles to refresh
+				       through */
+};
+<a name="line63"></a>
+struct ClipRect
+<a name="line65">{</a>
+<a name="line66">    struct  ClipRect *Next;	    /* roms used to find next ClipRect */</a>
+<a name="line67">    struct  ClipRect *prev;	    /* Temp use in layers (private) */</a>
+<a name="line68">    struct  Layer   *lobs;	    /* Private use for layers */</a>
+<a name="line69">    struct  BitMap  *BitMap;	    /* Bitmap for layers private use */</a>
+<a name="line70">    struct  Rectangle	bounds;     /* bounds of cliprect */</a>
+<a name="line71">    void    *_p1;		    /* Layers private use!!! */</a>
+    void    *_p2;		    /* Layers private use!!! */
+    LONG    reserved;		    /* system use (Layers private) */
+#ifdef NEWCLIPRECTS_1_1
+    LONG    Flags;		    /* Layers private field for cliprects */
+				    /* that layers allocates... */
+#endif				    /* MUST be multiple of 8 bytes to buffer */
+<a name="line78">};</a>
+<a name="line79"></a>
+/* internal cliprect flags */
+#define CR_NEEDS_NO_CONCEALED_RASTERS  1
+<a name="line82">#define CR_NEEDS_NO_LAYERBLIT_DAMAGE   2</a>
+<a name="line83"></a>
+<a name="line84">/* defines for code values for getcode */</a>
+<a name="line85">#define ISLESSX 1</a>
+#define ISLESSY 2
+#define ISGRTRX 4
+#define ISGRTRY 8
+
+#endif	/* GRAPHICS_CLIP_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-9-10" TITLE="27 / / Monitors, Modes and Display Database / Accessing MonitorSpec" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Monitors, Modes and Display Database / Accessing MonitorSpec</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node033E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0340.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node0463.html">OpenMonitor()</a> function will locate and open the requested <a href="../Includes_and_Autodocs_2._guide/node00A7.html#line26">MonitorSpec</a>.
+It is called with either the name of the monitor or a ModeID.
+
+    mspc = struct MonitorSpec *OpenMonitor(STRPTR name, ULONG modeID)
+
+If the name argument is non-NULL, the <a href="../Includes_and_Autodocs_2._guide/node00A7.html#line26">MonitorSpec</a> is chosen by name.  If
+the name argument is NULL, the MonitorSpec is chosen by ModeID.  If both
+the name and ModeID arguments are NULL, a pointer to the MonitorSpec for
+the default monitor is returned.  <a href="../Includes_and_Autodocs_2._guide/node0463.html">OpenMonitor()</a> returns either a pointer
+to a MonitorSpec structure, or NULL if the requested MonitorSpec could not
+be opened.  The <a href="../Includes_and_Autodocs_2._guide/node042F.html">CloseMonitor()</a> function relinquishes access to a
+<a name="line13">MonitorSpec previously acquired with OpenMonitor().</a>
+
+To set up a <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> in Release 2, a <a href="../Libraries_Manual_guide/node032C.html#line16">ViewExtra</a> structure must also be created
+and attached to it.  The ViewExtra.Monitor field must be initialized to
+the address of a valid <a href="../Includes_and_Autodocs_2._guide/node00A7.html#line26">MonitorSpec</a> structure before the View is displayed.
+Use <a href="../Includes_and_Autodocs_2._guide/node0463.html">OpenMonitor()</a> to initialize the Monitor field.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

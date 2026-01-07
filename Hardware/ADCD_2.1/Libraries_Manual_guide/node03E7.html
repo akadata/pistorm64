@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-3-1" TITLE="30 / / Types of Layers / Simple Refresh Layer" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / / Types of Layers / Simple Refresh Layer</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03E6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03E8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When an application draws into the layer, any portion of the layer that is
+visible (not obscured) will be rendered into the common <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> of the
+viewing area.  All graphics rendering routines are &#034;clipped&#034;, so that only
+exposed sections of the layer are drawn into.  No back-up of obscured
+<a name="line6">areas is provided.</a>
+
+If another layer operation is performed that causes an obscured part of a
+simple refresh layer to be exposed, the application must determine if the
+section need be refreshed, re-drawing the newly exposed part of the layer
+as required.
+
+The basic advantage of simple refresh is that it does not require back-up
+area to save drawing sections that cannot be seen, saving memory. However,
+the application needs to monitor the layer to see if it needs refreshing.
+This is typically performed with statements like:
+
+    if (layer-&#062;Flags &#038; LAYERREFRESH)
+        refresh(layer);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="I-19/SWCompat.txt" NODE="I-19-20" TITLE="CLI / Shell" -->
+<head>
+<title>CLI / Shell</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node002E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0030.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+* Many more commands are now built-in (no longer in C:).  This can break
+  installation scripts that copy C:commandname, and programs that try to
+  Lock() or Open() C:commandname to check for the command's existence.
+
+* The limit of 20 CLI processes is gone and the DOSBase CLI table has
+  changed to accomodate this.  Under V36 and higher, you should use new
+  2.0 functions rather than accessing the CLI table directly.
+
+* Shell windows now have Close Gadgets.  The EOF character is passed for
+  the Close Gadget of a Shell.  This is -1L with CON: getchar(), and the
+  Close Gadget raw event ESC seq with RAW:.
+
+* Shells now use the simple-refresh character-mapped console (see
+  Console notes).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

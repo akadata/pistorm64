@@ -1,0 +1,569 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="OpenScreen()" TITLE="intuition.library/OpenScreen" -->
+<head>
+<title>intuition.library/OpenScreen</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03D2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03D4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	OpenScreen -- <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open</a> an Intuition screen.
+
+<b>    SYNOPSIS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> = OpenScreen( <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> )
+	D0		     A0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *OpenScreen( struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> * );
+
+	or
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *OpenScreen( struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line512">ExtNewScreen</a> * );
+
+<b>    FUNCTION</b>
+	Opens an Intuition screen according to the specified parameters
+	found in the <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> structure.
+
+	Does all the allocations, sets up the screen structure and all
+	substructures completely, and links this screen's viewport into
+	Intuition's <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a> structure.
+
+	Before you call OpenScreen(), you must initialize an instance of
+	a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> structure.  <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> is a structure that contains
+	all of the arguments needed to open a screen.  The <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a>
+	structure may be discarded immediately after OpenScreen() returns.
+
+	The SHOWTITLE flag is set to TRUE by default when a screen is opened.
+	To change this, you must call the routine <a href="../Includes_and_Autodocs_3._guide/node03F9.html">ShowTitle()</a>.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> = pointer to an instance of a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> structure.
+
+	New for V36:
+	In addition to the information contained in the <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> structure,
+	Intuition now recognizes extended data passed in the form
+	of an array of <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> structures (from <a href="../Includes_and_Autodocs_3._guide/node064C.html">&#060;utility/tagitem.h&#062;</a>),
+	commonly called a &#034;tag list.&#034;
+
+	There are two ways to provide this array.  The first is to
+	use the new Intuition entry point <a href="../Includes_and_Autodocs_3._guide/node03D4.html">OpenScreenTagList()</a> and
+	pass the tag list as a parameter.  This is the recommended
+	method, and has a convenient format variation for C programs
+	using a variable number of arguments.
+
+	An older way used for some V36 development uses the OpenScreen()
+	entry point, and an extension of the <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> structure named
+	<a href="../Includes_and_Autodocs_3._guide/node0602.html#line512">ExtNewScreen</a>.  See the documentation of the flag NS_EXTENDED,
+	below.
+
+	While we recommend that you use <a href="../Includes_and_Autodocs_3._guide/node03D4.html">OpenScreenTagList()</a> rather than
+	OpenScreen() when using the extension tag list, we document
+	the tag ID values here, so that all parameters for opening
+	a screen can be found in one place.
+
+	<a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> is initialized with the following information:
+	-------------------------------------------------------------
+	Left = initial x-position of your screen (should be zero for
+	releases prior to V36)
+
+	Top = initial y-position of the opening screen
+	(Note: Left and Top are specified relative to the Intuition's view,
+	in same resolution as the screen pixels.)
+
+	Width = the width for this screen's <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+
+	Height = the height for this screen's <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, or the constant
+		STDSCREENHEIGHT to get the current default height (at
+		this time guaranteed to be at least 200 rows).  The normal
+		width and height for a particular system is stored by
+		the graphics.library in GfxBase-&#062;NormalDisplayRows and
+		GfxBase-&#062;NormalDisplayColumns.  These values will be different
+		depending on factors such as PAL video and overscan.
+
+		For V36, a new constant STDSCREENWIDTH is introduced.  It
+		serves the similar function for screen width.  Both
+		STDSCREENWIDTH and STDSCREENHEIGHT indicate that your
+		screen <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> is to be the same dimensions as your
+		DisplayClip rectangle.  If you do not specify either a
+		standard or custom DisplayClip, the OSCAN_TEXT region
+		will be used, which corresponds to the standard dimensions
+		of V35 and earlier.
+
+		Furthermore, if you are using <a href="../Includes_and_Autodocs_3._guide/node03D4.html">OpenScreenTagList()</a>, and you
+		specify STDSCREENWIDTH, and you DO NOT provide a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a>
+		pointer, and you DO NOT provide sA_Left, then Intuition
+		will automatically set the LeftEdge of the screen to
+		be the left edge of the screen's DisplayClip region.
+		Likewise for STDSCREENHEIGHT and the screen's TopEdge.
+
+	Depth = number of bitplanes
+
+	DetailPen = pen number for details (like gadgets or text in title bar)
+	    The common value for this pen is 0.
+
+	BlockPen = pen number for block fills (like title bar)
+	    The common value for this pen is 1.
+
+	Type = screen type values
+	    Set these flags as desired from the set:
+	    CUSTOMSCREEN -- this is your own screen, not a system screen.
+	    CUSTOMBITMAP -- this custom screen has bit maps supplied
+		in the bitmap field of the <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> structure.  Intuition is
+		not to allocate any raster bitmaps.
+	    SCREENBEHIND -- your screen will be created behind all other open
+		screens.  This allows a program to prepare imagery in the
+		screen, change its colors, and so on, bringing it to the
+		front when it is presentable.
+	    SCREENQUIET -- Intuition will not render system screen gadgets or
+		screen title.  In concert with the WFLG_RMBTRAP flag on all
+		your screen's windows, this flag will prevent Intuition from
+		rendering into your screen's bitplanes.  Without WFLG_RMBTRAP
+		(or using the IDCMP_MENUVERIFY facility to cancel menu
+		operations), this flag will prevent Intuition from clearing
+		your menu bar, which is probably unacceptable.  The menu bar
+		layer may still overwrite  a portion of your screen bitmap
+		when the screen is opened.  (V36: it won't clobber your bits
+		any more.)
+	    NS_EXTENDED for this screen to use extended attributes pointed
+		to by the 'Extended' field, below.
+
+	ViewModes = the appropriate argument for the data type ViewPort.Modes.
+           These include:
+           HIRES for this screen to be HIRES width.
+           LACE for the display to switch to interlace.
+           SPRITES for this screen to use sprites (the pointer
+		sprite is always displayed)
+           DUALPF for dual-playfield mode (not supported yet)
+	    [For V36: The ViewModes field is superseded by a <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> with
+	    tag value SA_DisplayID.]
+
+	Font = pointer to the default <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> structure for text in this
+	    screen and all windows that open in this screen.  <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text</a> that uses
+	    this <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> includes title bars of both screen and windows,
+	    string gadgets, and menu titles.  Of course, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line655">IntuiText</a> that
+	    specifies a NULL <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> field will use the screen/window default
+	    fonts.  NOTE: Intuition will *NOT* call <a href="../Includes_and_Autodocs_3._guide/node0137.html">OpenDiskFont()</a>, so
+	    the <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> you supply must be in memory.  The ways to ensure
+	    that are to either use a ROM font (Topaz 8 or 9) or first
+	    call <a href="../Includes_and_Autodocs_3._guide/node0137.html">OpenDiskFont()</a> to load the font, and don't close it
+	    until after your screen is successfully opened.
+	    [For V36: this is superseded by SA_Font and SA_SysFont.]
+
+	DefaultTitle = pointer to a line of text that will be displayed along
+	    the screen's title bar.  Null terminated, or just a NULL pointer
+           to get no text
+	    [For V36: superseded by SA_Title.]
+
+	Gadgets = This field should be set to NULL, since no user gadgets may
+	    be attached to a screen with the current versions of Intuition.
+
+	CustomBitMap = if you're not supplying a custom bitmap, this value is
+           ignored.  However, if you have your own display memory that you
+           want used for this screen, the CustomBitMap field should point to
+	    the <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> structure that describes your display memory.  See the
+           &#034;Screens&#034; chapter and the &#034;Amiga ROM Kernel Manual&#034; for more
+           information about bitmaps.
+	    [For V36: this is superseded by SA_BitMap.]
+
+	[ All <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> extensions below are new for V36.]
+	Extension = if NS_EXTENDED is set in NewScreen.Type, this pointer
+	    should point to an array (or chain of arrays) of TagItems,
+	    as defined in the include file <a href="../Includes_and_Autodocs_3._guide/node064C.html">&#060;utility/tagitem.h&#062;</a>.   This
+	    field is only defined in the structure <a href="../Includes_and_Autodocs_3._guide/node0602.html#line512">ExtNewScreen</a>.
+	    The values to use for TagItem.ti_Tag are defined below.  We
+	    recommend that V36-specific applications use the new Intuition
+	    entry point <a href="../Includes_and_Autodocs_3._guide/node03D4.html">OpenScreenTagList()</a>, rather than using this field.
+	    The <a href="../Includes_and_Autodocs_3._guide/node0602.html#line512">ExtNewScreen</a> structure is a convenient way to give V36
+	    Intuition some information that V34 and earlier Intuition will
+	    ignore.
+
+	    Each <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> is an optional tagged data structure which identifies
+	    an additional parameter to OpenScreen().  The applicable tag ID
+	    values for TagItem.ti_Tag and their corresponding data follow.
+
+	    Several of the tag items are alternative (and overriding) versions
+	    to familiar fields in <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a>.  (Defaults only apply if
+	    <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> == NULL).  They are:
+
+	SA_Left
+	SA_Top
+	SA_Width
+	SA_Height
+	    The defaults for the SA_Left, SA_Top, SA_Width, and
+	    SA_Height tags end up being a bit complex.  If none of
+	    these tags are specified, and no <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> structure is
+	    used, then the left/top/width/height correctly match the
+	    display clip of your screen (see SA_DClip and
+	    SA_Overscan).
+
+	    The difficulty comes with overscanned screens, because the
+	    normal value of SA_Left or SA_Top for such a screen may be
+	    non-zero.  If a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> structure is supplied, then the
+	    left/top/width/height come originally from there.  If no
+	    <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> structure is supplied, but a non-default
+	    SA_Width (SA_Height) is specified, then SA_Left (SA_Top)
+	    defaults to zero instead.  In these cases, the left and
+	    top edge may not be what you want.
+
+	    If you need to specify explicit width or height, or supply
+	    a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a>, you must supply correct values for SA_Left
+	    and SA_Top.  The correct normal values are the display
+	    clip rectangle's MinX and MinY values respectively.  If
+	    you are using the SA_DClip tag, then you already have a
+	    rectangle to consult for these values.  If you are using
+	    SA_Overscan to get one of the standard overscan types, you
+	    may use <a href="../Includes_and_Autodocs_3._guide/node03DB.html">QueryOverscan()</a> to get a rectangle for that
+	    overscan type.
+
+	SA_Depth (defaults to 1)
+	SA_DetailPen (defaults to 0)
+	SA_BlockPen (defaults to 1)
+	SA_Title (defaults to NULL)
+	SA_Font (defaults to NULL, meaning user's preferred monospace font)
+	SA_BitMap (whose existence also implies CUSTOMBITMAP).
+
+	    Several tags are Booleans, which means that depending on whether
+	    their corresponding ti_Data field is zero (FALSE) or non-zero
+	    (TRUE), they specify Boolean attributes.  The ones corresponding
+	    to Boolean flags in the NewScreen.Type field are:
+
+	SA_ShowTitle (defaults to TRUE)
+	SA_Behind (equiv. to SCREENBEHIND) (defaults to FALSE)
+	SA_Quiet (equiv. to SCREENQUIET) (defaults to FALSE)
+
+	    The following tags provide extended information to Intuition
+	    when creating a screen:
+
+	SA_Type: ti_Data corresponds to the SCREENTYPE bits of the
+	    NewScreen.Type field.  This should be one of PUBLICSCREEN or
+	    CUSTOMSCREEN.  The other bits of the NewScreen.Type field
+	    must be set with the appropriate tags (SA_Behind, SA_Quiet,
+	    etc.)
+
+	SA_DisplayID: ti_Data is a 32-bit extended display mode ID, as
+	  defined in the <a href="../Includes_and_Autodocs_3._guide/node0661.html">&#060;graphics/modeid.h&#062;</a> include file (V39 and up)
+	  or in <a href="../Includes_and_Autodocs_3._guide/node05FF.html">&#060;graphics/displayinfo.h&#062;</a> (V37 and V38).
+
+	SA_Overscan: ti_Data contains a defined constant specifying
+	    one of the system standard overscan dimensions appropriate for
+	    the display mode of the screen.  Used with the Width and
+	    Height dimensions STDSCREENWIDTH and STDSCREEN, this makes
+	    it trivial to open an overscanned or standard dimension
+	    screen.  You may also hand-pick your various dimensions
+	    for overscanned or other screens, by specifying screen position
+	    and dimensions explicitly, and by using SA_DClip to explicitly
+	    specify an overscanned DisplayClip region.
+
+	    The values for ti_Data of this tag are as follows:
+
+	    OSCAN_TEXT - <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text</a> Overscan region.  A region which is completely
+	    on screen and readable (&#034;text safe&#034;).  A preferences data
+	    setting, this is backward equivalent with the old MoreRows,
+	    and specifies the DisplayClip and default dimensions of the
+	    Workbench screen.  This is the default.
+
+	    OSCAN_STANDARD - Also a preferences setting, this specifies
+	    a rectangle whose edges are &#034;just out of view.&#034;  This yields
+	    the most efficient position and dimensions of on-monitor
+	    presentations, such as games and artwork.
+
+	    OSCAN_MAX - This is the largest rectangular region that the
+	    graphics library can handle &#034;comfortably&#034; for a given mode.
+	    Screens can smoothly scroll (hardware pan) within this region,
+	    and any DisplayClip or <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> region within this rectangle
+	    is also legal.  It is not a preferences item, but reflects
+	    the limits of the graphics hardware and software.
+
+	    OSCAN_VIDEO - This is the largest region that the graphics
+	    library can display, comfortable or not.  There is no guarantee
+	    that all smaller rectangles are valid.  This region is
+	    typically out of sight on any monitor or TV, but provides our
+	    best shot at &#034;edge-to-edge&#034; video generation.
+
+	    <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1429">Remember</a>, using overscan drastically effects memory use and
+	    chip memory bandwidth.  Always use the smallest (standard)
+	    overscan region that works for your application.
+
+	SA_DClip: ti_Data is a pointer to a rectangle which explicitly
+	    defines a DisplayClip region for this screen.  See <a href="../Includes_and_Autodocs_3._guide/node03DB.html">QueryOverscan()</a>
+	    for the role of the DisplayClip region.
+
+	    Except for overscan display screens, this parameter is
+	    unnecessary, and specifying a standard value using SA_Overscan
+	    is normally an easier way to get overscan.
+
+	SA_AutoScroll: this is a Boolean tag item, which specifies that
+	    this screens is to scroll automatically when the mouse pointer
+	    reaches the edge of the screen.  The operation of this requires
+	    that the screen dimensions be larger than its DisplayClip
+	    region.
+
+	SA_PubName: If this field is present (and ti_Data is non-NULL),
+	    it means that the screen is a public screen, and that
+	    the public screen name string is pointed to by ti_Data.
+	    Public screens are opened in &#034;PRIVATE&#034; mode and must
+	    be made public using PubScreenStatus( screen, 0 ).
+
+	SA_Pens: The ti_Data field (if non-NULL) points to a <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>
+	    array of pen specification, as defined for struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line65">DrawInfo</a>.
+	    This array will be used to initialize the screen's
+	    DrawInfo.dri_Pens array.
+
+	    SA_Pens is also used to decide that a screen is ready
+	    to support the full-blown &#034;new look&#034; graphics.  If you
+	    want the 3D embossed look, you must provide this tag,
+	    and the ti_Data value cannot be NULL.  If it points
+	    to a &#034;minimal&#034; array, containing just the terminator ~0,
+	    you can specify &#034;new look&#034; without providing any values
+	    for the pen array.
+
+	    The way the <a href="../Includes_and_Autodocs_3._guide/node0602.html#line65">DrawInfo</a> pens are determined is Intuition
+	    picks a default pen-array.  Then, any pens you supply with
+	    SA_Pens override the defaults, up until the ~0 in your
+	    array.
+
+	    If the screen is monochrome or old-look, the default will
+	    be the standard two-color pens.
+
+	    If the screen is two or more planes deep, the default will
+	    be the standard four-color pens, which now include the
+	    new-look menu colors.
+
+	    If the screen has the SA_LikeWorkbench property, the
+	    default will be the user's preferred pen-array, changeable
+	    through preferences.
+
+	The following two tag items specify the task and signal to be issued
+	to notify when the last &#034;visitor&#034; window closes on a public screen.
+	This support is to assist envisioned public screen manager programs.
+
+	SA_PubTask:  <a href="../Includes_and_Autodocs_3._guide/node064B.html#line23">Task</a> to be signalled.  If absent (and SA_PubSig is
+	    valid), use the task which called OpenScreen() or
+	    <a href="../Includes_and_Autodocs_3._guide/node03D4.html">OpenScreenTagList()</a>).
+
+	SA_PubSig:  Data is a <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> signal number (not flag) used to notify
+	    a task when the last visitor window closes on a public screen.
+
+	SA_Colors: ti_Data points to an array of <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line1445">ColorSpec</a> structures
+	    (terminated with ColorIndex = -1) which specify initial
+	    values of the screen's color palette.
+
+	SA_FullPalette: this is a Boolean attribute.  Prior to V36, there
+	    were just 7 RGB color values that Intuition maintained
+	    in its user preferences (playfield colors 0-3, and colors
+	    17-19 for the sprite).  When opening a screen, the color
+	    map for the screens viewport is first initialized by
+	    graphics <a href="../Includes_and_Autodocs_3._guide/node02E3.html">(graphics.library/GetColorMap()</a>) then these
+	    seven values are overridden to take the preferences values.
+
+	    In V36, Intuition maintains a full set of 32 preferences colors.
+	    If you specify TRUE for SA_FullPalette, Intuition will
+	    override ALL color map entries with its full suite of
+	    preferred colors.  (Defaults to FALSE).
+
+	SA_ErrorCode: ti_Data points to a ULONG in which Intuition will
+	    stick an extended error code if OpenScreen[TagList]() fails.
+	    Values are of this include 0, for success, and:
+	    OSERR_NOMONITOR	- monitor for display mode not available.
+	    OSERR_NOCHIPS	- you need newer custom chips for display mode.
+	    OSERR_NOMEM		- couldn't get normal memory
+	    OSERR_NOCHIPMEM	- couldn't get chip memory
+	    OSERR_PUBNOTUNIQUE	- public screen name already used
+	    OSERR_UNKNOWNMODE	- don't recognize display mode requested
+	    OSERR_TOODEEP	- screen too deep to be displayed on
+				  this hardware (V39)
+	    OSERR_ATTACHFAIL	- An illegal attachment of screens was
+				  requested (V39)
+
+	    NOTE: These values are not the same as some similar return
+	    values defined in <a href="../Includes_and_Autodocs_3._guide/node0300.html">graphics.library/ModeNotAvailable()</a>.
+
+	SA_SysFont: ti_Data selects one of the system standard fonts
+	    specified in preferences.  This tag item overrides the
+	    NewScreen.Font field and the SA_Font tag item.
+
+	    Values recognized in ti_Data at present are:
+		0 - old DefaultFont, fixed-width, the default.
+		1 - Workbench screen preferred font.  You have to
+		    be very font sensitive to handle a proportional or
+		    larger than traditional screen font.
+
+	    NOTE WELL: if you select sysfont 1, windows opened on
+	    your screen will not inherit the screen font, but rather
+	    the window <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> will be initialized to the old-style
+	    DefaultFont (sysfont 0).
+
+	Attached screen tags:  V39 supports attached screens, where
+	    one or more child screens can be associated with a parent
+	    screen.  Attached screens depth-arrange as a group, and
+	    always remain adjacent depth-wise.  Independent
+	    depth-arrangement of child screens is possible through
+	    the V39 <a href="../Includes_and_Autodocs_3._guide/node03E8.html">ScreenDepth()</a> call.  If a child screen is
+	    made non-draggable through {SA_Draggable, FALSE}, then
+	    it will drag exclusively with the parent.  Normal child
+	    screens drag independently of the parent, but are pulled
+	    down when the parent is.  Use the SA_Parent, SA_FrontChild,
+	    and SA_BackChild tags to attach screens.
+
+	SA_Parent:  If you wish to attach this screen to an
+	    already-open parent screen, use this tag and set
+	    ti_Data to point to the parent screen.  See also
+	    SA_FrontChild and SA_BackChild.  (V39).
+
+	SA_FrontChild:  If you wish to attach an already-open child
+	    screen to this screen, set ti_Data to point to the child
+	    screen.  The child screen will come to the front of the
+	    family defined by the parent screen you are opening.  See
+	    also SA_Parent and SA_BackChild.  (V39)
+
+	SA_BackChild:  If you wish to attach an already-open child
+	    screen to this screen, set ti_Data to point to the child
+	    screen.  The child screen will go to the back of the family
+	    defined by the parent screen you are opening.  See also
+	    SA_Parent and SA_FrontChild.  (V39)
+
+	SA_BackFill:  ti_Data is a pointer to a backfill hook for
+	    the screen's <a href="../Includes_and_Autodocs_3._guide/node0625.html#line30">Layer_Info</a>.
+	    (see layers.library/InstallLayerInfoHook()).  (V39).
+
+	SA_Draggable:  ti_Data is a boolean.  Set to FALSE if you
+	    wish your screen to be non-draggable.  This tag should be
+	    used very sparingly!.  Defaults to TRUE.  For child screens
+	    (see SA_Parent, SA_FrontChild, and SA_BackChild) this tag
+	    has a slightly different meaning:  non-draggable child
+	    screens are non-draggable with respect to their parent,
+	    meaning they always drag exactly with the parent, as
+	    opposed to having relative freedom.  Also see
+	    <a href="../Includes_and_Autodocs_3._guide/node03E9.html">ScreenPosition()</a>.  (V39)
+
+	SA_Exclusive:  ti_Data is a boolean.  Set to TRUE if you
+	    never want your screen to share the display with another
+	    screen.  This means that your screen can't be pulled down,
+	    and will not appear behind other screens that are pulled
+	    down.  Your screen may still be depth arranged, though.  Use
+	    this tag sparingly!  Defaults to FALSE.  Starting with V40,
+	    attached screens may be SA_Exclusive.  Setting SA_Exclusive
+	    for each screen will produce an exclusive family.  (V39).
+
+	SA_SharePens:  For those pens in the screen's
+	    DrawInfo-&#062;dri_Pens, Intuition obtains them in shared mode
+	    (see graphics.library/ObtainPen()).  For compatibility,
+	    Intuition obtains the other pens of a public screen as
+	    PENF_EXCLUSIVE.  Screens that wish to manage the pens
+	    themselves should generally set this tag to TRUE.  This
+	    instructs Intuition to leave the other pens unallocated.
+	    Defaults to FALSE.  (V39).
+
+	SA_Colors32:  <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a> to set the screen's initial palette colors
+	    at 32 bits-per-gun.  ti_Data is a pointer to a table to be
+	    passed to the <a href="../Includes_and_Autodocs_3._guide/node02FB.html">graphics.library/LoadRGB32()</a> function.  This
+	    format supports both runs of color registers and sparse
+	    registers.  See the autodoc for that function for full
+	    details.  Any color set here has precedence over the same
+	    register set by SA_Colors.  (V39).
+
+	SA_Interleaved:  ti_Data is a boolean.  Set to TRUE to
+	    request an interleaved bitmap for your screen.  Defaults to
+	    FALSE.  If the system cannot allocate an interleaved bitmap for
+	    you, it will attempt to allocate a non-interleaved one (V39).
+
+	SA_VideoControl:  ti_Data points to a taglist that will be
+	    passed to <a href="../Includes_and_Autodocs_3._guide/node0338.html">VideoControl()</a> after your screen is open.  You
+	    might use this to turn on border-sprites, for example.
+	    (V39).
+
+	SA_ColorMapEntries:  ti_Data is the number of entries that
+	    you wish Intuition to allocate for this screen's <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a>.
+	    While Intuition allocates a suitable number for ordinary
+	    use, certain graphics.library features require a
+	    <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> which is larger than default.  (The default value is
+	    1&#060;&#060;depth, but not less than 32).  (V39)
+
+	SA_LikeWorkbench:  ti_Data is boolean.  Set to TRUE to get
+	    a screen just like the Workbench screen.  This is the
+	    best way to inherit all the characteristics of the
+	    Workbench, including depth, colors, pen-array, screen mode,
+	    etc.  Individual attributes can be overridden through the
+	    use of tags.  (SA_LikeWorkbench itself overrides things
+	    specified in the <a href="../Includes_and_Autodocs_3._guide/node0602.html#line476">NewScreen</a> structure).  Attention
+	    should be paid to hidden assumptions when doing this.  For
+	    example, setting the depth to two makes assumptions about
+	    the pen values in the <a href="../Includes_and_Autodocs_3._guide/node0602.html#line65">DrawInfo</a> pens.  Note that this
+	    tag requests that Intuition ATTEMPT to open the screen
+	    to match the Workbench.  There are fallbacks in case
+	    that fails, so it is not correct to make enquiries about
+	    the Workbench screen then make strong assumptions about
+	    what you're going to get.  (Defaults to FALSE).  (V39)
+
+ 	SA_MinimizeISG:  ti_Data is boolean.  For compatibility,
+	    Intuition always ensures that the inter-screen gap is at
+	    least three non-interlaced lines.  If your application
+	    would look best with the smallest possible inter-screen
+	    gap, set ti_Data to TRUE.  If you use the new graphics
+	    <a href="../Includes_and_Autodocs_3._guide/node0338.html">VideoControl()</a> VC_NoColorPaletteLoad tag for your screen's
+	    <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>, you should also set this tag.  (V40)
+
+
+<b>    RESULT</b>
+	If all is well, returns the pointer to your new screen
+	If anything goes wrong, returns NULL, with further error
+	specification in the variable pointed to by the SA_ErrorCode
+	data field (V36 and later).
+
+<b>    NOTES</b>
+	By default, AmigaDOS requesters related to your process are put on
+	the Workbench screen (these are messages like &#034;Disk Full&#034;).  If
+	you wish them to show up on custom screens, DOS must be told.
+	This fragment shows the procedure.  More information is available
+	in the AmigaDOS manuals.  Sample code fragment:
+
+	#include &#034;libraries/dosextens.h&#034;
+		...
+	struct <a href="../Includes_and_Autodocs_3._guide/node05D9.html#line36">Process</a>	*process;
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>	*window;
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a>		temp;
+		...
+		process = (struct <a href="../Includes_and_Autodocs_3._guide/node05D9.html#line36">Process</a> *) FindTask(NULL);
+		temp = process-&#062;pr_WindowPtr;	(save old value)
+		process-&#062;pr_WindowPtr = (APTR) window;
+		( use a pointer to any open window on your screen )
+			...
+		your code goes here
+			...
+		process-&#062;pr_WindowPtr = temp;
+		( restore value BEFORE <a href="../Includes_and_Autodocs_3._guide/node03A0.html">CloseWindow()</a> )
+		CloseWindow(window);
+
+	A VERY IMPORTANT NOTE about the Screen-&#062;BitMap.  In the future,
+	bitmaps will need to grow.  The embedded instance of a bitmap
+	in the screen will no longer be large enough to hold the whole
+	description of the bitmap.
+
+	YOU ARE STRONGLY URGED to use Screen-&#062;RastPort.BitMap in place of
+	&#038;Screen-&#062;BitMap whenever and whereever possible.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03D4.html">OpenScreenTagList()</a>, <a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a>, <a href="../Includes_and_Autodocs_3._guide/node03D9.html">PrintIText()</a>, <a href="../Includes_and_Autodocs_3._guide/node039F.html">CloseScreen()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node03DB.html">QueryOverscan()</a> <a href="../Includes_and_Autodocs_3._guide/node03DA.html">PubScreenStatus()</a>, The Intuition Reference Manual,
+	<a href="../Includes_and_Autodocs_3._guide/node064C.html">utility/tagitem.h</a>, <a href="../Includes_and_Autodocs_3._guide/node0300.html">graphics.library/ModeNotAvailable()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node0137.html">diskfont.library/OpenDiskFont()</a>, <a href="../Includes_and_Autodocs_3._guide/node02E3.html">graphics.library/GetColorMap()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

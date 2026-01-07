@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_37" NODE="37-2-1" TITLE="37 / Callback Hooks / Callback Hook Structure and Function" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>37 / Callback Hooks / Callback Hook Structure and Function</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04A2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04A4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An application passes a custom function in the form of a callback Hook
+(from &#060;utility/<a href="../Includes_and_Autodocs_2._guide/node012D.html#line22">hooks.h</a>&#062;):
+
+    struct Hook
+    {
+        struct MinNode h_MinNode;
+        ULONG (*h_Entry)();     /* stub function entry point */
+        ULONG (*h_SubEntry)();  /* the custom function entry point */
+        VOID *h_Data;           /* owner specific */
+    };
+
+h_MinNode
+<a name="line14">    This field is reserved for use by the module that will call the Hook.</a>
+
+h_Entry
+    This is the address of the Hook stub.  When the OS calls a callback
+    function, it puts parameters for the callback function in CPU
+    registers A0, A1, and A2.  This makes it tough for higher level
+    language programmers to use a callback function because most higher
+    level languages don't have a way to manipulate CPU registers
+    directly.  The solution is a stub function which first copies the
+    parameters from the CPU registers to a place where a high level
+    language function can get to them.   The stub function then calls the
+    callback function.  Typically, the stub pushes the registers onto the
+    stack in a specific order and the callback function pops them off the
+<a name="line27">    stack.</a>
+
+h_SubEntry
+    This is the address of the actual callback function that the
+    application has defined.  The stub calls this function.
+
+h_Data
+    This field is for the application to use.  It could point to a global
+<a name="line35">    storage structure that the callback function utilizes.</a>
+
+There is only one function defined in utility library that relates to
+callback hooks:
+
+    ULONG CallHookPkt(struct Hook *hook, VOID *object, VOID *paramPkt);
+
+This function calls a standard callback Hook function.
+
+ <a href="../Libraries_Manual_guide/node04A4.html">Simple Callback Hook Usage</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

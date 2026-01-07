@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/prefs/serial.h" NODE="MAIN" TITLE="include/prefs/serial.h" -->
+<head>
+<title>include/prefs/serial.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0647.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0649.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef PREFS_SERIAL_H
+#define PREFS_SERIAL_H
+/*
+**	$VER: serial.h 38.2 (10.7.1991)
+**	Includes Release 44.1
+**
+**	File format for serial preferences
+**
+**	(C) Copyright 1991-1999 Amiga, Inc.
+**	All Rights Reserved
+*/
+
+/*****************************************************************************/
+
+
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+
+#ifndef LIBRARIES_IFFPARSE_H
+#include &#060;libraries/iffparse.h&#062;
+#endif
+
+
+/*****************************************************************************/
+
+
+#define ID_SERL MAKE_ID('S','E','R','L')
+
+<a name="line30"></a>
+struct SerialPrefs
+{
+    LONG  sp_Reserved[3];		/* System reserved		    */
+    ULONG sp_Unit0Map;			/* What unit 0 really refers to     */
+    ULONG sp_BaudRate;			/* Baud rate			    */
+
+    ULONG sp_InputBuffer;		/* Input buffer: 0 - 65536	    */
+    ULONG sp_OutputBuffer;		/* Future: Output: 0 - 65536	    */
+
+    UBYTE sp_InputHandshake;		/* Input handshaking		    */
+    UBYTE sp_OutputHandshake;		/* Future: Output handshaking	    */
+
+    UBYTE sp_Parity;			/* Parity			    */
+    UBYTE sp_BitsPerChar;		/* I/O bits per character	    */
+    UBYTE sp_StopBits;			/* Stop bits			    */
+};
+
+/* constants for SerialPrefs.sp_Parity */
+#define PARITY_NONE	0
+#define PARITY_EVEN	1
+#define PARITY_ODD	2
+#define PARITY_MARK	3		/* Future enhancement */
+#define PARITY_SPACE	4		/* Future enhancement */
+
+/* constants for SerialPrefs.sp_Input/OutputHandshaking */
+#define HSHAKE_XON	0
+#define HSHAKE_RTS	1
+#define HSHAKE_NONE	2
+
+
+/*****************************************************************************/
+
+
+#endif /* PREFS_SERIAL_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

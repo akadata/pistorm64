@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="DupLock()" TITLE="dos.library/DupLock" -->
+<head>
+<title>dos.library/DupLock</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0155.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0157.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	DupLock -- Duplicate a lock
+
+<b>    SYNOPSIS</b>
+	lock = DupLock( lock )
+	D0		D1
+
+	<a href="../Includes_and_Autodocs_3._guide/node05F8.html#line129">BPTR</a> DupLock(BPTR)
+
+<b>    FUNCTION</b>
+	DupLock() is passed a shared filing system lock.  This is the ONLY
+	way to obtain a duplicate of a lock... simply copying is not
+	allowed.
+
+	Another lock to the same object is then returned.  It is not
+	possible to create a copy of a exclusive lock.
+
+	A zero return indicates failure.
+
+<b>    INPUTS</b>
+	lock - BCPL pointer to a lock
+
+<b>    RESULTS</b>
+	newLock - BCPL pointer to a lock
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock()</a>, <a href="../Includes_and_Autodocs_3._guide/node01C8.html">UnLock()</a>, <a href="../Includes_and_Autodocs_3._guide/node0157.html">DupLockFromFH()</a>, <a href="../Includes_and_Autodocs_3._guide/node019A.html">ParentOfFH()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

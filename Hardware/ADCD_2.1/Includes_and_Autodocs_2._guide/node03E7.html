@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/gadtools" NODE="CreateContext()" TITLE="gadtools.library/CreateContext" -->
+<head>
+<title>gadtools.library/CreateContext</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03E6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03E8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CreateContext -- Create a place for GadTools context data. (V36)
+
+SYNOPSIS
+    gad = CreateContext(glistpointer);
+    D0                  A0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> *CreateContext(struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> **);
+
+FUNCTION
+    Creates a place for GadTools to store any context data it might
+    need for your window.  In reality, an unselectable invisible
+    gadget is created, with room for the context data.
+    This function also establishes the linkage from a glist type
+    pointer to the individual gadget pointers.  Call this function
+    before any of the other gadget creation calls.
+
+INPUTS
+    glistptr - Address of a pointer to a <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a>, which was previously
+        set to NULL.  When all the gadget creation is done, you may
+        use that pointer as your NewWindow.FirstGadget, or
+        in <a href="../Includes_and_Autodocs_2._guide/node01FD.html">intuition.library/AddGList()</a>, <a href="../Includes_and_Autodocs_2._guide/node0241.html">intuition.library/RefreshGList()</a>,
+        <a href="../Includes_and_Autodocs_2._guide/node03EB.html">FreeGadgets()</a>, etc.
+
+RESULT
+    gad - Pointer to context gadget, or NULL if failure.
+
+EXAMPLE
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> *gad;
+    struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> *glist = NULL;
+    gad = CreateContext(&#038;glist);
+    /*  Other creation calls go here */
+    if (gad)
+    {
+        myNewWindow.FirstGadget = glist;
+        if ( myWindow = OpenWindow(&#038;myNewWindow) )
+        {
+            GT_RefreshWindow(win);
+            /* other stuff */
+            CloseWindow(myWindow);
+        }
+    }
+    FreeGadgets(glist);
+
+NOTES
+
+BUGS
+
+SEE ALSO
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

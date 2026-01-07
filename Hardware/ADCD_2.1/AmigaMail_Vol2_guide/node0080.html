@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="III-1/SetFunc.txt" NODE="III-1-1" TITLE="Exec Library Structure" -->
+<head>
+<title>Exec Library Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node007F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0081.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When a library is opened for the first time, a library node structure, a
+jump table, and a data area are created in RAM.
+
+   <a href="../AmigaMail_Vol2_guide/node0189.html">Fig. 1 - An Exec Library Base in RAM</a> 
+
+The library node structure address is the base address of the library.
+OpenLibrary() returns this base address.  The library's jump table, which
+directly precedes the library node in RAM, consists of six byte long
+entries containing a jump instruction (JMP) to a corresponding library
+function.  The jump table is initialized when Exec opens the library.
+Each function's entry in the jump table (also known as a vector) is always
+a constant (negative) offset from the library base. These fixed negative
+offsets are known as Library Vector Offsets (LVO). Note that the first
+four function vectors are reserved for use by Exec. They point to standard
+library functions for opening, closing, and expunging the library, plus
+there is space reserved for a fourth function vector.  The base address of
+a library is determined dynamically when the library is loaded into RAM.
+See the Exec introduction chapter in the ROM Kernel Manual: Libraries and
+Devices for more information on libraries.
+
+The SetFunction() routine replaces an LVO address with a new address
+which points to the wedge routine.  SetFunction() returns the old vector
+address, which the wedge routine can use to call the original library
+function from within the wedge.  Note that if another task
+SetFunction()s the same library function, SetFunction() returns the
+address of your debugging routine (to the second task)  as the old
+vector.  At that point your task can no longer exit since that would
+mean that that other task has an invalid pointer to your function and
+will most likely crash the system when it tries to use your function.
+
+   <a href="../AmigaMail_Vol2_guide/node018A.html">Fig. 2 - Calling a Library Function</a> 
+
+There is a way around this problem.  Instead of SetFunction()ing a library
+function with the address of your wedge code, build your own jump table
+and use the addresses of its entries as arguments to SetFunction() calls.
+This method allows you to unload your code when you want to because if
+another task SetFunction()s your routine, that task will get a pointer to
+a jump table entry, not your routine.
+
+   <a href="../AmigaMail_Vol2_guide/node018B.html">Fig. 3 - Using SetFunction() with a Jump Table</a> 
+
+   <a href="../AmigaMail_Vol2_guide/node018C.html">Fig. 4 - Another Debugger SetFunction()s an Entry in the Jump Table</a> 
+
+Now when you want to exit, all you need to do is replace the entries in
+your jump table which point to your functions with the original function
+vectors which were returned by SetFunction().  By not freeing the memory
+allocated for the jump table your task can exit any time, regardless of
+other tasks which SetFunction()ed the same library routines.  The other
+task(s) will never know what happened.
+
+   <a href="../AmigaMail_Vol2_guide/node018D.html">Fig. 5 - Original Debugger Removes its Debugging Routine</a> 
+
+The next time the debugger is executed, it looks for the jump table it
+left behind and replaces the entries in it with pointers to its own
+functions.  Incidentally, this is an easy way to provide a mechanism to
+determine if your debugging program has already been installed.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

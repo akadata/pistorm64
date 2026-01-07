@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/prefnotify.c" NODE="MAIN" TITLE="Lib_examples/prefnotify.c" -->
+<head>
+<title>Lib_examples/prefnotify.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0588.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node058A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* prefnotify.c.  - Execute me to compile me with SAS/C 5.10
+lc -cfistq -v -y -j73 prefnotify.c
+blink from LIB:c.o,prefnotify.o to prefnotify lib LIB:LC.lib LIB:amiga.lib
+quit
+
+** prefnotify.c - notified if serial prefs change
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;dos/notify.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+#define PREFSFILENAME &#034;ENV:sys/serial.prefs&#034;
+
+static UBYTE   *VersTag = &#034;\0$VER: prefnot 37.1 (09.07.91)&#034;;
+
+extern struct Library *DOSBase;
+
+
+void main(int argc, char **argv)
+{
+BOOL done=FALSE;
+struct NotifyRequest *notifyrequest;
+UBYTE          *filename;
+LONG           signum;
+ULONG          signals;
+
+/* We need at least V37 for notification */
+if (DOSBase-&#062;lib_Version &#062;= 37)
+    {
+    /* Allocate a NotifyRequest structure */
+    if (notifyrequest = AllocMem(sizeof(struct NotifyRequest), MEMF_CLEAR))
+        {
+        /* And allocate a signalsbit */
+        if ((signum = AllocSignal(-1L)) != -1)
+            {
+            /* Initialize notification request */
+            filename = PREFSFILENAME;
+            notifyrequest-&#062;nr_Name = filename;
+            notifyrequest-&#062;nr_Flags = NRF_SEND_SIGNAL;
+            /* Signal this task */
+            notifyrequest-&#062;nr_stuff.nr_Signal.nr_Task = (struct Task *) FindTask(NULL);
+            /* with this signals bit */
+            notifyrequest-&#062;nr_stuff.nr_Signal.nr_SignalNum = signum;
+
+            if ((StartNotify(notifyrequest)) == DOSTRUE)
+                {
+                printf(&#034;Select Serial Prefs SAVE or USE to notify this program\n&#034;);
+                printf(&#034;CTRL-C to exit\n\n&#034;);
+                /* Loop until Ctrl-C to exit */
+                while(!done)
+                    {
+                    signals = Wait(  (1L &#060;&#060; signum) | SIGBREAKF_CTRL_C  );
+                    if (signals &#038; (1L &#060;&#060; signum))
+                        printf(&#034;Notification signal received.\n&#034;);
+                    if (signals &#038; SIGBREAKF_CTRL_C)
+                        {
+                        EndNotify(notifyrequest);
+                        done=TRUE;
+                        }
+                    }
+                }
+            else printf(&#034;Can't start notification\n&#034;);
+            FreeSignal(signum);
+            }
+        else printf(&#034;No signals available\n&#034;);
+        FreeMem(notifyrequest, sizeof(struct NotifyRequest));
+        }
+    else printf(&#034;Not enough memory for NotifyRequest.\n&#034;);
+    }
+else printf(&#034;Requires at least V37 dos.library\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

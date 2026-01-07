@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="expansion" NODE="WriteExpansionByte()" TITLE="expansion.library/WriteExpansionByte" -->
+<head>
+<title>expansion.library/WriteExpansionByte</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node026C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node026E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	WriteExpansionByte - write a byte nybble by nybble.
+
+<b>   SYNOPSIS</b>
+	WriteExpansionByte( board, offset, byte )
+			    A0     D0      D1
+
+<b>   FUNCTION</b>
+	(Not typically called by user code)
+
+	WriteExpansionByte writes a byte to a new-style expansion
+	board.  These boards have their writeable data organized
+	as a series of nybbles in memory.  This routine writes
+	two nybbles in a very careful manner to work with all
+	types of new expansion boards.
+
+	To make certain types of board less expensive, an expansion
+	board's write registers may be organized as either a
+	byte-wide or nybble-wide register.  If it is nybble-wide
+	then it must latch the less significant nybble until the
+	more significant nybble is written.  This allows the
+	following algorithm to work with either type of board:
+
+		write the low order nybble to bits D15-D12 of
+			byte (offset*4)+2
+
+		write the entire byte to bits D15-D8 of
+			byte (offset*4)
+
+	The offset is a byte offset into a <a href="../Includes_and_Autodocs_3._guide/node05FE.html#line45">ExpansionRom</a> structure.
+	The actual memory address read will be four times larger.
+	The macros EROFFSET and ECOFFSET are provided to help get
+	these offsets from C.
+
+<b>   INPUTS</b>
+	board - a pointer to the base of a new style expansion board.
+	offset - a logical offset from the configdev base
+	byte - the byte of data to be written to the expansion board.
+
+<b>   EXAMPLES</b>
+	WriteExpansionByte( cd-&#062;BoardAddr, ECOFFSET( ec_Shutup ),  0 );
+	WriteExpansionByte( cd-&#062;BoardAddr, ECOFFSET( ec_Interrupt ), 1 );
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0268.html">ReadExpansionByte()</a>, <a href="../Includes_and_Autodocs_3._guide/node0269.html">ReadExpansionRom()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-5-3" TITLE=" LISTs, CATs, and Shared Properties (Advanced topics) / Group PROP " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> LISTs, CATs, and Shared Properties (Advanced topics) / Group PROP </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01EC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01EE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a> <a href="../Devices_Manual_guide/node01DD.html">chunk</a>s may appear in <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a>s (not in <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>s or CATs).  They supply
+shared properties for the FORMs in that LIST.  This ability to elevate
+some property settings to shared status for a list of forms is useful for
+both indirection and compaction.  E.g., a list of images with the same
+size and colors can share one &#034;size&#034; property and one &#034;color map&#034;
+property.  Individual FORMs can override the shared settings.
+
+The contents of a <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a> is like a FORM with no data <a href="../Devices_Manual_guide/node01DD.html">chunk</a>s:
+
+	PROP	::= &#034;PROP&#034; #{ FormType Property* }
+
+It means, &#034;Here are the shared properties for <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> type &#060;FormType&#062;&#034;.
+
+A <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a> may have at most one <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a> of a <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> type, and all the <a href="../Devices_Manual_guide/node01CA.html#line49">PROP</a>s must
+appear before any of the FORMs or nested LISTs and <a href="../Devices_Manual_guide/node01CA.html#line2">CAT</a> s.  You can have
+subsequences of FORMs sharing properties by making each subsequence a LIST.
+
+Scoping: Think of property settings as variable bindings in nested blocks
+of a programming language.  In C this would look like:
+
+    #define Roman           0
+    #define Helvetica       1
+
+    void main()
+            {
+            int font=Roman; /* The global default */
+                    {
+                    printf(&#034;The font number is %d\n&#034;,font);
+                    }
+                    {
+                    int font=Helvetica;     /* local setting */
+                    printf(&#034;The font number is %d\n&#034;,font);
+                    }
+                    {
+                    printf(&#034;The font number is %d\n&#034;,font);
+                    }
+            }
+
+
+    /*
+    * Sample output:       The font number is 0
+    *                      The font number is 1
+    *                      The font number is 0
+    */
+
+
+
+
+    An IFF file could contain:
+
+    LIST {
+            PROP TEXT {
+                    FONT {TimesRoman}       /* shared setting       */
+                    }
+
+            FORM TEXT {
+                    FONT {Helvetica}        /* local setting        */
+                    CHRS {Hello }           /* uses font Helvetica  */
+                    }
+
+            FORM TEXT {
+                    CHRS {there.}           /* uses font TimesRoman */
+                    }
+            }
+
+The shared property assignments selectively override the reader's global
+defaults, but only for <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>s within the group.  A FORM's own property
+assignments selectively override the global and group-supplied values.  So
+when reading an IFF file, keep property settings on a stack.  They are
+designed to be small enough to hold in main memory.
+
+Shared properties are semantically equivalent to copying those properties
+into each of the nested <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>s right after their FORM type IDs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

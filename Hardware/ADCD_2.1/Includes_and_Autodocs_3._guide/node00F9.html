@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="commodities" NODE="SetTranslate()" TITLE="commodities.library/SetTranslate" -->
+<head>
+<title>commodities.library/SetTranslate</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00F8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00FA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	SetTranslate -- replace a translator object's translation list. (V36)
+
+<b>   SYNOPSIS</b>
+	SetTranslate(translator,events);
+		     A0         A1
+
+	VOID SetTranslate(CxObj *,struct <a href="../Includes_and_Autodocs_3._guide/node061A.html#line256">InputEvent</a> *);
+
+<b>   FUNCTION</b>
+	This function replaces the translation list of a commodity
+	translator object with the linked list starting at 'events'.
+
+	A NULL value for 'events' indicates that the object 'translator'
+	should swallow all commodity messages that are sent its way.
+
+	Note that the input events are not copied into commodities' private
+	memory, but the value of 'events' is used -- asynchronously to the
+	application program -- to find a chain of InputEvents in the
+	application's data space. At the time of translation, each input event
+	is copied into its own new commodity message.
+
+	The above means that no other commodities' user, nor
+	commodities.library itself will be modifying your list of InputEvents.
+	On the other hand, your program must not corrupt the input event
+	chain that has been presented to a translator.
+
+<b>   INPUTS</b>
+	translator - the translator object to affect (may be NULL)
+	events - the new input event translation list
+
+<b>   BUGS</b>
+	The list of input events manipulated by a translator object is
+	inserted in reverse order in the commodities network, and come out
+	of the network in reverse order as well. The <a href="../Includes_and_Autodocs_3._guide/node0042.html">cx_lib/InvertString()</a>
+	function creates lists of input events that are in reverse order so
+	they can be used directly with translator objects.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node061A.html">&#060;devices/inputevent.h&#062;</a>, <a href="../Includes_and_Autodocs_3._guide/node0032.html">cx_lib/CxTranslate()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

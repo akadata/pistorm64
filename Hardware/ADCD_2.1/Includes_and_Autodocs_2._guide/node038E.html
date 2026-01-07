@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/layers" NODE="BeginUpdate()" TITLE="layers.library/BeginUpdate" -->
+<head>
+<title>layers.library/BeginUpdate</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node038D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node038F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    BeginUpdate -- Prepare to repair damaged layer.
+
+SYNOPSIS
+    result = BeginUpdate( l )
+    d0                    a0
+
+    LONG BeginUpdate( struct <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line33">Layer</a> *);
+
+FUNCTION
+    Convert damage list to <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line63">ClipRect</a> list and swap in for
+    programmer to redraw through. This routine simulates
+    the ROM library environment. The idea is to only render in the
+    &#034;damaged&#034; areas, saving time over redrawing all of the layer.
+    The layer is locked against changes made by the layer library.
+
+INPUTS
+    l - pointer to a layer
+
+RESULTS
+    result - TRUE if damage list converted to <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line63">ClipRect</a> list sucessfully.
+             FALSE if list conversion aborted. (probably out of memory)
+
+BUGS
+    If BeginUpdate returns FALSE, programmer must abort the attempt to
+    refresh this layer and instead call EndUpdate( l, FALSE ) to restore
+    original <a href="../Includes_and_Autodocs_2._guide/node00A1.html#line63">ClipRect</a> and damage list.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0396.html">EndUpdate</a>, <a href="../Includes_and_Autodocs_2._guide/node00C4.html">graphics/layers.h</a>, <a href="../Includes_and_Autodocs_2._guide/node00A1.html">graphics/clip.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

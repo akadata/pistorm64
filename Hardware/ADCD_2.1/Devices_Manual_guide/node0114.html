@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_8" NODE="8-1" TITLE="8 Narrator Device / Narrator Device Commands and Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>8 Narrator Device / Narrator Device Commands and Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0113.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0115.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Command         Operation
+-------         ---------
+<a href="../Includes_and_Autodocs_2._guide/node04C2.html">CMD_FLUSH</a>       Purge all active and queued requests for the narrator
+                device.
+
+<a href="../Devices_Manual_guide/node011A.html">CMD_READ</a>        Read mouth shapes associated with an active write from the
+                narrator device.
+
+<a href="../Includes_and_Autodocs_2._guide/node04C4.html">CMD_RESET</a>       Reset the narrator port to its initialized state. All
+                active and queued I/O requests will be aborted.  Restarts
+                the device if it has been stopped.
+
+<a href="../Includes_and_Autodocs_2._guide/node04C5.html">CMD_START</a>       Restart the currently active speech (if any) and resume
+                queued I/O requests.
+
+<a href="../Includes_and_Autodocs_2._guide/node04C6.html">CMD_STOP</a>        Stop any currently active speech and prevent queued I/O
+                requests from starting.
+
+<a href="../Devices_Manual_guide/node0119.html">CMD_WRITE</a>       Write a stream of characters to the narrator device and
+                generate mouth movement data for reads.
+
+
+Exec Functions as Used in This Chapter
+--------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node04C0.html">AbortIO()</a>       Abort a command to the narrator device. If the command is
+                in progress, it is stopped immediately.  If it is queued,
+                it is removed from the queue.
+
+<a href="../Includes_and_Autodocs_2._guide/node0141.html">BeginIO()</a>       Initiate a command and return immediately (asynchronous
+                request).  This is used to minimize the amount of system
+                overhead.
+
+<a href="../Includes_and_Autodocs_2._guide/node04C1.html">CloseDevice()</a>   Relinquish use of the narrator device.  All requests must
+                be complete.
+
+<a href="../Includes_and_Autodocs_2._guide/node033E.html">CheckIO()</a>       Return the status of an I/O request.
+
+<a href="../Includes_and_Autodocs_2._guide/node0340.html">CloseLibrary()</a>  Relinquish use of a previously opened library.
+
+<a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>          Initiate a command and wait for completion (synchronous
+                request). Should be used with care because it will not
+                return control if the request does not complete.
+
+<a href="../Includes_and_Autodocs_2._guide/node04C8.html">OpenDevice()</a>    Obtain use of the narrator device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0367.html">OpenLibrary()</a>   Obtain use of a library.
+
+<a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>        Initiate a command and return immediately (asynchronous
+                request).
+
+<a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a>        Wait for the completion of an asynchronous request. When
+                the request is complete the message will be removed from
+                reply port.
+
+
+Exec Support Functions as Used in This Chapter
+----------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>   Create an extended I/O request structure of type
+                narrator_rb.  This structure will be used to communicate
+                commands to the narrator device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>    Create a signal message port for reply messages from the
+                narrator device.  Exec will signal a task when a message
+                arrives at the port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>   Delete an extended I/O request structure created by
+                <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>.
+
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>    Delete the message port created by <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

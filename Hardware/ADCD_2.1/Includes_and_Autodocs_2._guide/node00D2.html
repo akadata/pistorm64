@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/cghooks.h" NODE="MAIN" TITLE="Includes/intuition/cghooks.h" -->
+<head>
+<title>Includes/intuition/cghooks.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00D1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00D3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef INTUITION_CGHOOKS_H
+#define INTUITION_CGHOOKS_H 1
+/*
+**  $Filename: intuition/cghooks.h $
+**  $Release: 2.04 Includes, V37.4 $
+**  $Revision: 36.2 $
+**  $Date: 91/11/08 $
+**
+**  Custom Gadget processing
+**
+**  (C) Copyright 1988-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+#ifndef INTUITION_INTUITION_H
+#include &#060;intuition/intuition.h&#062;
+#endif
+<a name="line22"></a>
+<a name="line23">/*</a>
+ * Package of information passed to custom and 'boopsi'
+ * gadget &#034;hook&#034; functions.  This structure is READ ONLY.
+<a name="line26"> */</a>
+struct GadgetInfo {
+<a name="line28"></a>
+<a name="line29">    struct Screen		*gi_Screen;</a>
+<a name="line30">    struct Window		*gi_Window;	/* null for screen gadgets */</a>
+    struct Requester		*gi_Requester;	/* null if not GTYP_REQGADGET */
+
+    /* rendering information:
+     * don't use these without cloning/locking.
+     * Official way is to call ObtainRPort()
+<a name="line36">     */</a>
+<a name="line37">    struct RastPort		*gi_RastPort;</a>
+    struct Layer		*gi_Layer;
+
+    /* copy of dimensions of screen/window/g00/req(/group)
+     * that gadget resides in.	Left/Top of this box is
+     * offset from window mouse coordinates to gadget coordinates
+     *		screen gadgets:			0,0 (from screen coords)
+     *	window gadgets (no g00):	0,0
+     *	GTYP_GZZGADGETs (borderlayer):		0,0
+     *	GZZ innerlayer gadget:		borderleft, bordertop
+     *	Requester gadgets:		reqleft, reqtop
+<a name="line48">     */</a>
+    struct IBox			gi_Domain;
+
+    /* these are the pens for the window or screen	*/
+<a name="line52">    struct {</a>
+<a name="line53">	UBYTE	DetailPen;</a>
+<a name="line54">	UBYTE	BlockPen;</a>
+    }				gi_Pens;
+
+    /* the Detail and Block pens in gi_DrInfo-&#062;dri_Pens[] are
+     * for the screen.	Use the above for window-sensitive
+     * colors.
+<a name="line60">     */</a>
+    struct DrawInfo		*gi_DrInfo;
+
+    /* reserved space: this structure is extensible
+     * anyway, but using these saves some recompilation
+<a name="line65">     */</a>
+    ULONG			gi_Reserved[6];
+};
+
+/*** system private data structure for now ***/
+<a name="line70">/* prop gadget extra info	*/</a>
+<a name="line71">struct PGX	{</a>
+<a name="line72">    struct IBox	pgx_Container;</a>
+    struct IBox	pgx_NewKnob;
+};
+
+/* this casts MutualExclude for easy assignment of a hook
+ * pointer to the unused MutualExclude field of a custom gadget
+<a name="line78"> */</a>
+#define CUSTOM_HOOK( gadget ) ( (struct Hook *) (gadget)-&#062;MutualExclude)
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

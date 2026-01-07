@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/wb" NODE="AddAppIconA()" TITLE="workbench.library/AddAppIconA" -->
+<head>
+<title>workbench.library/AddAppIconA</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0406.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0408.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AddAppIcon - add an icon to workbench's list of appicons.        (V36)
+
+SYNOPSIS
+    AppIcon = AddAppIconA(id, userdata, text, msgport,
+       D0                 D0     D1      A0     A1
+
+                                    lock, diskobj, taglist)
+                                     A2      A3      A4
+
+    struct AppIcon *AddAppIconA(ULONG, ULONG, char *,
+            struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node0078.html#line453">FileLock</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node0135.html#line61">DiskObject</a> *,
+            struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *);
+
+    Alternate, varargs version:
+    struct AppIcon *AddAppIcon(ULONG, ULONG, char *,
+                    struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node0078.html#line453">FileLock</a> *,
+                    struct <a href="../Includes_and_Autodocs_2._guide/node0135.html#line61">DiskObject</a> *,
+                    tag1, data1,
+                    tag2, data2,
+                    ...
+                    TAG_END );
+
+FUNCTION
+    Attempt to add an icon to workbench's list of appicons.  If
+    successful, the icon is displayed on the workbench (the same
+    place disk icons are displayed).
+    This call is provided to allow applications to be notified when
+    a graphical object (non neccessarely associated with a file)
+    gets 'manipulated'. (explained later).
+    The notification consists of an <a href="../Includes_and_Autodocs_2._guide/node0135.html#line125">AppMessage</a> (found in workbench.h/i)
+    of type 'MTYPE_APPICON' arriving at the message port you specified.
+    The types of 'manipulation' that can occur are:
+    1. Double-clicking on the icon.  am_NumArgs will be zero and
+       am_ArgList will be NULL.
+    2. Dropping an icon or icons on your appicon.  am_NumArgs will
+      be the number of icons droppped on your app icon plus one.
+      am_ArgList will be an array of ptrs to <a href="../Includes_and_Autodocs_2._guide/node0134.html#line35">WBArg</a> structures.
+      Refer to the 'WBStartup Message' section of the RKM for more info.
+    3. Dropping your appicon on another icon.  NOT SUPPORTED.
+
+INPUTS
+    id       - this variable is strictly for your own use and is ignored
+               by workbench.  Typical uses in C are in switch and case
+               statements, and in assembly language table lookup.
+    userdata - this variable is strictly for your own use and is ignored
+               by workbench.
+    text     - name of icon (char *)
+    lock     - NULL    (Currently unused)
+    msgport  - pointer to message port workbench will use to send you an
+               <a href="../Includes_and_Autodocs_2._guide/node0135.html#line125">AppMessage</a> message of type 'MTYPE_APPICON' when your icon
+               gets 'manipulted' (explained above).
+    diskobj  - pointer to a <a href="../Includes_and_Autodocs_2._guide/node0135.html#line61">DiskObject</a> structure filled in as follows:
+        do_Magic - NULL
+        do_Version - NULL
+        do_Gadget - a gadget structure filled in as follows:
+            NextGadget - NULL
+            LeftEdge - NULL
+            TopEdge - NULL
+            Width - width of icon hit-box
+            Height - height of icon hit-box
+            Flags - NULL or GADGHIMAGE
+            Activation - NULL
+            GadgetType - NULL
+            GadgetRender - pointer to <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line621">Image</a> structure filled in as follows:
+                LeftEdge - NULL
+                TopEdge - NULL
+                Width - width of image (must be &#060;= Width of hit box)
+                Height - height of image (must be &#060;= Height of hit box)
+                Depth - # of bit-planes in image
+                ImageData - pointer to actual word aligned bits (CHIP MEM)
+                PlanePick - Plane mask ((1 &#060;&#060; depth) - 1)
+                PlaneOnOff - 0
+                NextImage - NULL
+            SelectRender - pointer to alternate <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line621">Image</a> struct or NULL
+            GadgetText - NULL
+            MutualExclude - NULL
+            SpecialInfo - NULL
+            GadgetID - NULL
+            UserData - NULL
+        do_Type - NULL
+        do_DefaultTool - NULL
+        do_ToolTypes - NULL
+        do_CurrentX - NO_ICON_POSITION (recommended)
+        do_CurrentY - NO_ICON_POSITION (recommended)
+        do_DrawerData - NULL
+        do_ToolWindow - NULL
+        do_StackSize - NULL
+
+    (an easy way to create one of these (a DiskObject) is to create an icon
+    with the V2.0 icon editor and save it out.  Your application can then
+    call <a href="../Includes_and_Autodocs_2._guide/node018A.html">GetDiskObject</a> on it and pass that to AddAppIcon.)
+
+    taglist  - ptr to a list of tag items.  Must be NULL for V2.0.
+
+RESULTS
+    AppIcon  - a pointer to an appicon structure which you pass to
+               <a href="../Includes_and_Autodocs_2._guide/node040A.html">RemoveAppIcon</a> when you want to remove the icon
+               from workbench's list of appicons.  NULL
+               if workbench was unable to add your icon; typically
+               happens when workbench is not running or under low
+               memory conditions.
+
+EXAMPLE
+    You could design a print-spooler icon and add it to the workbench.
+    Any file dropped on the print spooler would be printed.  If the
+    user double-clicked (opended) your printer-spooler icon, you could
+    open a window showing the status of the print spool, allow changes
+    to print priorities, allow deletions, etc.  If you registered this
+    window as an 'appwindow' (explained in workbench.library AddAppWindow)
+    files could also be dropped in the window and added to the spool.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node040A.html">RemoveAppIcon()</a>
+
+BUGS
+    Currently <a href="../Includes_and_Autodocs_2._guide/node02BD.html">Info</a> cannot be obtained on appicons.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

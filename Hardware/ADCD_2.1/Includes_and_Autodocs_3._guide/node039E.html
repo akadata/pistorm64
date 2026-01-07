@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="ClearPointer()" TITLE="intuition.library/ClearPointer" -->
+<head>
+<title>intuition.library/ClearPointer</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node039D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node039F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ClearPointer -- Clear the mouse pointer definition from a window.
+
+<b>    SYNOPSIS</b>
+	ClearPointer( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> )
+		      A0
+
+	VOID ClearPointer( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> * );
+
+<b>    FUNCTION</b>
+	Clears the window of its own definition of the Intuition mouse pointer.
+	After calling ClearPointer(), every time this window is the active
+	one the default Intuition pointer will be the pointer displayed
+	to the user.  If your window is the active one when this routine
+	is called, the change will take place immediately.
+
+	<a href="../Includes_and_Autodocs_3._guide/node05F6.html#line24">Custom</a> definitions of the mouse pointer which this function clears
+	are installed by a call to <a href="../Includes_and_Autodocs_3._guide/node03F4.html">SetPointer()</a>.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to the window to be cleared of its pointer definition
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03F7.html">SetWindowPointerA()</a>, <a href="../Includes_and_Autodocs_3._guide/node03F4.html">SetPointer()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-2-10" TITLE="B / rootclass / New Methods: OM_NOTIFY" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / rootclass / New Methods: OM_NOTIFY</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04C4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04C6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This method tells an object to broadcast an attribute change to a set of
+target objects using <a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a> messages.  The return value for this method
+is not explicitly defined.
+
+The OM_NOTIFY method uses the same message structure as <a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a>.
+
+Most dispatchers do not handle the OM_NOTIFY message directly.  Normally
+they inherit this method from a superclass, so they pass the OM_NOTIFY
+message on to the superclass dispatcher.
+
+Although most dispatchers don't have to process OM_NOTIFY messages, most
+do have to send them.  Whenever an object receives an <a href="../Libraries_Manual_guide/node04C3.html">OM_SET</a> or <a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a>
+about one of its attributes, it may need to notify other objects of the
+change.  For example, when a prop gadget's <a href="../Libraries_Manual_guide/node050F.html">PGA_Top</a> value changes, its
+target object(s) need to hear about it.
+
+If an object needs to notify other objects about a change to one or more
+of its attributes, it sends itself an OM_NOTIFY message.  The OM_NOTIFY
+message will eventually end up in the hands of a superclass that
+understands OM_NOTIFY and it will send <a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a> messages to the target
+objects.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

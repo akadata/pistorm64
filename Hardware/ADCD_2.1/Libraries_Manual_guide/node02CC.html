@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_21" NODE="21-7-3" TITLE="21 / Processor and Cache Control / Condition Code Register" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>21 / Processor and Cache Control / Condition Code Register</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02CB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02CD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+On the MC68000 a copy of the processor condition codes can be obtained
+with the MOVE SR,&#060;ea&#062; instruction.  On MC68010 processors and up however,
+the instruction MOVE CCR,&#060;ea&#062; must be used.  Using the specific MC68000
+instruction on later processors will cause a 680x0 exception since it is a
+privileged instruction on those processors.  The <a href="../Includes_and_Autodocs_2._guide/node0359.html">GetCC()</a> function provides
+a processor independent way of obtaining a copy of the condition codes.
+For all processors there are 5 bits which can indicate the result of an
+integer or a system control instruction:
+
+    X - extend    N - negative    Z - zero    V - overflow    C - carry
+
+The X bit is used for multiprecision calculations. If used, it is copy of
+the carry bit.  The other bits state the result of a processor operation.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

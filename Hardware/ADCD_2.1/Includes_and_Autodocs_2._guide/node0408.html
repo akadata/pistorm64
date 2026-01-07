@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/wb" NODE="AddAppMenuItemA()" TITLE="workbench.library/AddAppMenuItemA" -->
+<head>
+<title>workbench.library/AddAppMenuItemA</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0407.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0409.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AddAppMenuItem - add a menuitem to workbench's list              (V36)
+                    of appmenuitems.
+
+SYNOPSIS
+    <a href="../Includes_and_Autodocs_2._guide/node0135.html#line147">AppMenuItem</a> = AddAppMenuItemA(id, userdata, text, msgport, taglist)
+    D0                            D0     D1      A0     A1       A2
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node0135.html#line147">AppMenuItem</a> *AddAppMenuItemA(ULONG, ULONG, char *,
+                                            struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *,
+                                            struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *);
+
+    Alternate, varargs version:
+    struct <a href="../Includes_and_Autodocs_2._guide/node0135.html#line147">AppMenuItem</a> *AddAppMenuItem(ULONG, ULONG, char *,
+                                    struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *,
+                                    tag1, data1,
+                                    tag2, data2,
+                                    ...
+                                    TAG_END );
+
+FUNCTION
+    Attempt to add the text as a menuitem to workbench's list
+    of appmenuitems (the 'Tools' menu strip).
+
+INPUTS
+    id       - this variable is strictly for your own use and is ignored
+               by workbench.  Typical uses in C are in switch and case
+               statements, and in assembly language table lookup.
+    userdata - this variable is strictly for your own use and is ignored
+               by workbench.
+    text     - text for the menuitem (char *)
+    msgport  - pointer to message port workbench will use to send you an
+               <a href="../Includes_and_Autodocs_2._guide/node0135.html#line125">AppMessage</a> message of type 'MTYPE_APPMENUITEM' when your
+               menuitem gets selected.
+    taglist  - ptr to a list of tag items.  Must be NULL for V2.0.
+
+RESULTS
+    <a href="../Includes_and_Autodocs_2._guide/node0135.html#line147">AppMenuItem</a> - a pointer to an appmenuitem structure which you pass to
+                  <a href="../Includes_and_Autodocs_2._guide/node040B.html">RemoveAppMenuItem</a> when you want to remove the menuitem
+                  from workbench's list of appmenuitems.  NULL if
+                  workbench was unable to add your menuitem; typically
+                  happens when workbench is not running or under low
+                  memory conditions.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node040B.html">RemoveAppMenuItem()</a>
+
+BUGS
+    Currently does not limit the system to 63 menu items...
+    Any menu items after the 63rd will not be selectable.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

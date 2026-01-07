@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="AIFF-15-2" TITLE="AIFF / The Comments Chunk / Comments Chunk Format " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>AIFF / The Comments Chunk / Comments Chunk Format </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0229.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node022B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+    #define 	CommentID	'COMT'	/* ckID for Comments Chunk  */
+
+    typedef struct {
+	ID		ckID;
+	long		ckSize;
+
+	unsigned short  numComments;
+	Comment		comments[];
+    }CommentsChunk;
+
+The ckID is always 'COMT'.  The ckSize is the size of the data portion of
+the chunk, in bytes.  It does not include the 8 bytes used by ckID and
+ckSize.
+
+The numComments field contains the number of comments in the Comments
+Chunk. This is followed by the comments themselves.  Comments are always
+even numbers of bytes in length, so there is no padding between comments
+in the Comments Chunk.
+
+The Comments Chunk is optional.  No more than one Comments Chunk may
+appear in a single FORM AIFF.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

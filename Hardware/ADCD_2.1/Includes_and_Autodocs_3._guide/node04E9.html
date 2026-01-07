@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="palette_gc" NODE="--datasheet--" TITLE="palette_gc/--datasheet--" -->
+<head>
+<title>palette_gc/--datasheet--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04E8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04EA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>     NAME</b>
+        palette_gc -- A colour selection gadget.
+
+<b>     SUPERCLASS</b>
+        gadgetclass
+
+<b>     REQUIRES</b>
+        bevel.image
+
+<b>     DESCRIPTION</b>
+        This gadget is equivalent to the GadTools PALETTE_KIND gadget, but
+        implemented as a BOOPSI gadget class.  It displays a palette of
+        colours, allowing the user to select one.
+
+        Advantages that this class provides:
+
+         &#062; Right mouse button cancels gadget action.
+
+         &#062; Supports window relativity.
+
+         &#062; Supports gadget interconnections.
+
+         &#062; Supports OS 3.0 BOOPSI <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> HelpTest.
+
+<b>     METHODS</b>
+        OM_NEW -- Create the palette gadget, calls OM_SET.  Passed to
+            superclass.
+
+        OM_SET -- Set object attributes.  Passed to superclass first.
+
+        OM_GET -- Get object attributes.  Passed to superclass first.
+
+        OM_NOTIFY -- Notify connections of attribute changes.
+
+        OM_DISPOSE -- Frees resources and calls superclass.
+
+        OM_UPDATE -- Calls OM_SET.
+
+        GM_DOMAIN -- Return the maximum and minimum size of the gadget.
+
+        GM_RENDER -- Renders the gadget imagry.  Overrides the superclass.
+
+        GM_KEYACTIVE -- Handles keyboard activation.
+
+        GM_KEYINACTIVE -- Handles keyboard de-activation.
+
+        GM_GOACTIVE -- Activate the gadget on mouse click only.  Overrides
+            the superclass.
+
+        GM_HANDLEINPUT -- Handles input events once active.  Overrides the
+            superclass.
+
+        GM_GOINACTIVE -- Deactivates the gadget.  Passed to the superclass.
+
+        All other methods are passed to the superclass.
+
+<b>     ATTRIBUTES</b>
+        GA_Disabled (BOOL)
+            Set to TRUE to disable gadget, FALSE otherwise
+
+            Defaults to FALSE.
+
+            Applicability is (OM_NEW, OM_SET, OM_GET)
+
+        PALETTE_Colour (UBYTE)
+	        Initially selected color of the palette. This number is a pen
+	        number, and not the ordinal color number within the palette
+	        gadget itself.  The exception is when PALETTE_ColourTable is
+	        used, in which case you will get an index into your table.
+
+            Defaults to 0.
+
+            Applicability is (OM_NEW, OM_SET, OM_GET)
+
+        PALETTE_ColourOffset (UBYTE)
+            First color to use in screen palette.
+
+	        Defaults to 0.
+
+            Applicability is (OM_NEW, OM_SET, OM_GET)
+
+        PALETTE_ColourTable (UBYTE *)
+            Pointer to a table of pen numbers indicating  which colors
+            should be used and edited by the palette gadget. This array
+            must contain as many entries as there are colors displayed in
+            the palette gadget PLUS the colour offset.  The array provided
+            with this tag must remain valid for the life of the gadget or
+            until a new table is provided.
+
+            Default is NULL, which causes a 1-to-1 mapping of pen numbers.
+
+            Applicability is (OM_NEW, OM_SET, OM_GET)
+
+        PALETTE_NumColours (UWORD)
+            Number of colors to display in the palette gadget.  Currently
+            this MUST be a power of
+
+	        Defaults to 2.
+
+            Applicability is (OM_NEW, OM_SET, OM_GET)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

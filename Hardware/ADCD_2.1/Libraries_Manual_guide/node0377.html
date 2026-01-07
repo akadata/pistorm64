@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-1-2" TITLE="28 / About the GELs System / The GELs System" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / About the GELs System / The GELs System</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0376.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0378.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Before you can use the GELs system, you must set up a playfield.  The GELs
+system requires access to a <a href="../Libraries_Manual_guide/node00F1.html#line4">View</a>, <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a>, and <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> structure.  These
+structures may be set up through the grapics library or Intuition.  For
+most examples in this chapter, the Intuition library is used for this
+<a name="line6">purpose.</a>
+
+All GELs have a <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure at their core.  The system keeps track
+of all the GELs that it will display (the active GELs) by using a standard
+Exec list structure to link the VSprites.  This list is accessed via the
+GelsInfo data structure, which in turn is associated with the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>.
+The GelsInfo structure is defined in the file &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00AF.html#line39">rastport.h</a>&#062;. When
+a new GEL is introduced to the system, the new GEL is added immediately
+ahead of the first existing GEL whose x, y value is greater than or equal
+to that of the new GEL, always trying to keep the list sorted.
+
+As GELs are moved about the screen, their x, y values are constantly
+changing.  <a href="../Libraries_Manual_guide/node038B.html#line7">SortGList()</a> re-sorts this list by the x, y values. (Although
+this is a list of <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structures, bear in mind that some or all may
+really be Bobs or AnimComps.)
+
+The basic set up of the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line39">GelsInfo</a> structure requires three important
+fields:  <a href="../Libraries_Manual_guide/node0392.html">sprRsrvd</a>,  gelHead and gelTail.  The sprRsrvd field tells the
+system which hardware sprites not to use when managing true VSprites.  For
+instance, Intuition uses sprite 0 for the mouse pointer so this hardware
+sprite is not available for assignment to a VSprite.  The gelHead and
+gelTail are <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structures that are used to manage the list of GELs.
+They are never displayed.  To activate or deactivate a GEL, a system call
+is made to add it to or delete it from this list.
+
+Other fields must be set up to provide for collision detection, color
+optimization, and other features.  A complete example for setting up the
+<a href="../Includes_and_Autodocs_2._guide/node00AF.html#line39">GelsInfo</a> structure is shown in the <a href="../Libraries_Manual_guide/node059C.html#line22">animtools.c</a> lisitng at the end of this
+chapter.
+
+ <a href="../Libraries_Manual_guide/node0378.html">Initializing the GEL System</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

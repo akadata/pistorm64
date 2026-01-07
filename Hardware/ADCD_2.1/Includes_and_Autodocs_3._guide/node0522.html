@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="reaction_lib" NODE="--datasheet--" TITLE="reaction.lib/--datasheet--" -->
+<head>
+<title>reaction.lib/--datasheet--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0521.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0523.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       reaction.lib -- ReAction support functions link library
+
+<b>   DESCRIPTION</b>
+       This library contains the autoinitialization code for the shared
+       library versions of the ReAction BOOPSI classes, thus sparing the
+       programmer from having to <a href="../Includes_and_Autodocs_3._guide/node0222.html">OpenLibrary()</a> the classes manually. It
+       also contains stub functions for the node taglist allocation
+       functions of certain classes. These can be used by the DICE
+       compiler, which does not support #pragma tagcall.
+
+       Autoinitialization works just like normal SAS/C library autoinit.
+       By declaring the class base extern in all source files (easiest
+       done by #including the &#034;proto&#034; header, such as proto/layout.h),
+       the SAS/C linker will take the class base, together with the code
+       to open the class on program startup (and to close it on exit)
+       from this library. The same autoinitialisation code should also
+       work for DICE.
+
+       The version number to use for <a href="../Includes_and_Autodocs_3._guide/node0222.html">OpenLibrary()</a> is contained in the
+       variable long __reactionversion. If you do not set this global
+       variable in your source code, it will be linked from this library,
+       With the release of V41 or greater classes in Release 2.0, it has
+       been considered prudent to requier them, so you should set this
+       value to 41. Note however, that classes NOT part of the ReAction
+       package are not effected by __reactionversion and will open with
+       any version available.
+
+       If the opening of a class fails, the autoinit code will cause the
+       program to exit with an error message of &#034;Can't open version Y of
+       X&#034;. If you wish to continue without using a certain class, you
+       will have to open it manually.
+
+<b>   SUPPORTED CLASSES</b>
+       Version 1 of reaction.lib supports the following ReAction classes.
+       The version variable of each class is listed after the shared class
+       name.
+
+       images/bevel.image
+       images/bitmap.image
+       gadgets/button.gadget
+       gadgets/checkbox.gadget
+       gadgets/chooser.gadget
+       gadgets/datebrowser.gadget
+       images/drawlist.image
+       gadgets/fuelgauge.gadget
+       gadgets/getfile.gadget
+       gadgets/getfont.gadget
+       gadgets/getscreenmode.gadget
+       images/glyph.image
+       gadgets/integer.gadget
+       images/label.image
+       gadgets/layout.gadget
+       gadgets/listbrowser.gadget
+       gadgets/radiobutton.gadget
+       gadgets/scroller.gadget
+       gadgets/slider.gadget
+       gadgets/space.gadget
+       gadgets/speedbar.gadget
+       gadgets/string.gadget
+
+       Additionally, to help programmers, reaction.lib contains
+       autoinitialization for the following shared classes NOT part of
+       the ReAction package. Please remember that these gadgets do not
+       necessarily contain a CLASS_GetClass() type function for getting
+       the base class. Some of them have registered class names, some
+       have a function with another name. Some don't have functions at
+       all, in which case special care must be taken to make sure the
+       autoinit code is loaded (reference the class base variable, for
+       example TapeDeckBase, somewhere within the source). Refer to the
+       documentation of these classes to find out more.
+
+       gadgets/calendar.gadget
+       <a href="../Includes_and_Autodocs_3._guide/node00DC.html">gadgets/colorwheel.gadget</a>
+       <a href="../Includes_and_Autodocs_3._guide/node029A.html">gadgets/gradientslider.gadget</a>
+       images/led.image
+       gadgets/statusbar.gadget
+       gadgets/tabs.gadget
+       gadgets/tapedeck.gadget
+       gadgets/textfield.gadget
+
+<b>   EXAMPLE</b>
+       The following program will print out the class base of
+       layout.gadget and the base address of <a href="../Includes_and_Autodocs_3._guide/node029A.html">gradientslider.gadget</a> (which
+       doesn't have functions or a proto header) when compiled and linked
+       with reaction.lib:
+
+       #include &#060;proto/layout.h&#062;
+       #include &#060;proto/dos.h&#062;
+
+       extern void *GradientSliderBase;
+       long __reactionversion = 37;
+
+       main()
+       {
+           Printf( &#034;layout.gadget minimum version %ld class base is %lxn&#034;,
+                   __layoutversion, <a href="../Includes_and_Autodocs_3._guide/node043B.html">LAYOUT_GetClass()</a> );
+           Printf( &#034;explicit reference to GradientSliderBase will force &#034;
+                   &#034;initialization:n base address is %lxn&#034;,
+                   GradientSliderBase );
+       }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

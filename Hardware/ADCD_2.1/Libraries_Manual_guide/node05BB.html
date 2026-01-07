@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/pseudotext.c" NODE="MAIN" TITLE="Lib_examples/pseudotext.c" -->
+<head>
+<title>Lib_examples/pseudotext.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05BA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05BC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* pseudotext.c */
+
+void main(void, void)
+{
+    struct TextAttr myta = {
+        &#034;topaz.font&#034;
+        11,
+        FSF_ITALIC | FSF_BOLD,
+        NULL
+    };
+
+    struct TextFont *myfont, *oldfont;
+    struct RastPort *myrp;
+    struct Window   *mywin;
+
+    . . .
+
+    /* open the graphics and diskfont libraries and whatever else you may need */
+    . . .
+
+    if (myfont = OpenDiskFont(&#038;myta))
+    {
+        /* you would probably set the font of the rastport you are going to use */
+        myrp    = mywin-&#062;RPort
+        oldfont = myrp-&#062;Font;
+        SetFont(myrp, myfont);
+
+        . . .
+
+        /* perform whatever drawing you need to do */
+
+        . . .
+
+        /* time to clean up.  If the rastport is not exclusively yours,
+           you may need to restore the original font or other Rasport values */
+        SetFont(myrp, oldfont);
+        CloseFont(myfont);
+    }
+
+    /* close whatever libraries and other resources you allocated */
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

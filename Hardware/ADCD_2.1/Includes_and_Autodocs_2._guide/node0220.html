@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="GetScreenDrawInfo()" TITLE="intuition.library/GetScreenDrawInfo" -->
+<head>
+<title>intuition.library/GetScreenDrawInfo</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node021F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0221.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GetScreenDrawInfo -- Get pointer to rendering information. (V36)
+
+SYNOPSIS
+    DrInfo = GetScreenDrawInfo( <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> )
+    D0                          A0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> *GetScreenDrawInfo( struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> * );
+
+FUNCTION
+    Returns a pointer to a <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> structure derived from the
+    screen passed.  This data structure is READ ONLY.  The field
+    dri_Version identifies which version of struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> you
+    are given a pointer to.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a>        - pointer to a valid, open screen.
+
+RESULT
+    DrInfo - pointer to a system-allocated <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> structure,
+    as defined in <a href="../Includes_and_Autodocs_2._guide/node00DD.html">intuition/screens.h</a>.
+
+NOTES
+    Some information in the <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> structure may in the future
+    be calculated the first time this function is called for a
+    particular screen.
+
+    You must call <a href="../Includes_and_Autodocs_2._guide/node0218.html">FreeScreenDrawInfo()</a> when you are done using the
+    returned pointer.
+
+    This function does not prevent a screen from closing.  Apply it
+    only to the screens you opened yourself, or apply a protocol
+    such as <a href="../Includes_and_Autodocs_2._guide/node0225.html">LockPubScreen()</a>.
+
+    WARNING: Until further notice, the pointer returned does not
+    remain valid after the screen is closed.
+
+    This function and <a href="../Includes_and_Autodocs_2._guide/node0218.html">FreeScreenDrawInfo()</a> don't really do much now,
+    but they provide an upward compatibility path.  That means that
+    if you misuse them today, they probably won't cause a problem,
+    although they may someday later.  So, please be very careful
+    only to use the <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line60">DrawInfo</a> structure between calls to
+    GetScreenDrawInfo() and <a href="../Includes_and_Autodocs_2._guide/node0218.html">FreeScreenDrawInfo()</a>, and be sure
+    that you don't forget <a href="../Includes_and_Autodocs_2._guide/node0218.html">FreeScreenDrawInfo()</a>.
+
+BUGS
+    Does not reflect to changes in screen modes, depth, or pens.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0218.html">FreeScreenDrawInfo()</a>, <a href="../Includes_and_Autodocs_2._guide/node0225.html">LockPubScreen()</a>, <a href="../Includes_and_Autodocs_2._guide/node00DD.html">intuition/screens.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

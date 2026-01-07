@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="OpenMonitor()" TITLE="graphics.library/OpenMonitor" -->
+<head>
+<title>graphics.library/OpenMonitor</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0308.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node030A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       OpenMonitor -- open a named <a href="../Includes_and_Autodocs_3._guide/node05D3.html#line24">MonitorSpec</a> (V36)
+
+<b>   SYNOPSIS</b>
+       mspc = OpenMonitor( monitor_name , display_id)
+       d0                  a1		   d0
+
+       struct <a href="../Includes_and_Autodocs_3._guide/node05D3.html#line24">MonitorSpec</a> *OpenMonitor( char *, ULONG );
+
+<b>   FUNCTION</b>
+       Locate and open a named <a href="../Includes_and_Autodocs_3._guide/node05D3.html#line24">MonitorSpec</a>.
+
+<b>   INPUTS</b>
+       monitor_name - a pointer to a null terminated string.
+       display_id - an optional 32 bit monitor/mode identifier
+
+<b>   RESULTS</b>
+       mspc - a pointer to an open <a href="../Includes_and_Autodocs_3._guide/node05D3.html#line24">MonitorSpec</a> structure.
+              NULL if <a href="../Includes_and_Autodocs_3._guide/node05D3.html#line24">MonitorSpec</a> could not  be opened.
+
+<b>   NOTE</b>
+	if monitor_name is non-NULL, the monitor will be opened by name.
+	if monitor_name is NULL the monitor will be opened by optional ID.
+	if both monitor_name and display_id are NULL returns default monitor.
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node02C5.html">CloseMonitor()</a> <a href="../Includes_and_Autodocs_3._guide/node05D3.html">graphics/monitor.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

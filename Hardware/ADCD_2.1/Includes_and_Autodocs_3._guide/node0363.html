@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="iffparse" NODE="FindLocalItem()" TITLE="iffparse.library/FindLocalItem" -->
+<head>
+<title>iffparse.library/FindLocalItem</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0362.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0364.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FindLocalItem -- return a local context item from the context stack.
+	                 (V36)
+
+<b>   SYNOPSIS</b>
+	lci = FindLocalItem(iff, type, id, ident);
+	D0                  A0   D0    D1  D2
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line103">LocalContextItem</a>	*FindLocalItem(struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a>	*,
+	                                       <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, LONG);
+
+<b>   FUNCTION</b>
+	Searches the context stack of the given <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> structure for a
+	local context item which matches the given ident, type and id. This
+	function searches the context stack from the most current context
+	backwards, so that the item found (if any) will be the one with
+	greatest precedence in the context stack.
+
+<b>   INPUTS</b>
+	iff - pointer to <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> structure.
+	type - type code to search for.
+	id - ID code to search for.
+	ident - ident code for the class of context item to search for
+		(ex. &#034;exhd&#034; -- exit handler).
+
+<b>   RESULT</b>
+	lci - pointer to local context item, or NULL if nothing matched.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node037E.html">StoreLocalItem()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E8.html">&#060;libraries/iffparse.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

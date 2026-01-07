@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-4-3" TITLE="4 / Window Types / GimmeZeroZero Window Type" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Window Types / GimmeZeroZero Window Type</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0115.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0117.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+GimmeZeroZero windows provide a window border layer separate from the main
+(inner) window layer.  This allows the application to freely render into
+<a name="line4">the window without worrying about the window border and its contents.</a>
+
+System gadgets and the window title are placed in the border layer.
+Application gadgets go into the inner window by default, but may be placed
+in the border.  To position application gadgets in the border layer, the
+<a href="../Libraries_Manual_guide/node0149.html#line81">GTYP_GZZGADGET</a> flag and the appropriate <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> border flag must be set in
+<a name="line10">the <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field of the Gadget.</a>
+
+The top left coordinates of the inner window are always (0,0), regardless
+of the size or contents of the border, thus the name &#034;GimmeZeroZero.&#034;  The
+application need not take the border size into account when rendering.
+The inner window always begins at (0,0) and extends to
+(GZZWidth,GZZHeight).  The GZZWidth and GZZHeight variables are available
+<a name="line17">in the <a href="../Libraries_Manual_guide/node0102.html#line8">Window</a> structure.</a>
+
+The <a href="../Libraries_Manual_guide/node0121.html#line48">GZZMouseX and GZZMouseY</a> variables provide the position of the mouse
+relative to the inner window.  Note that the mouse positions in
+<a href="../Libraries_Manual_guide/node01DC.html#line23">IDCMP_MOUSEMOVE</a> events are always relative to the total window, even for
+<a name="line22">GimmeZeroZero windows.</a>
+
+Requesters in a GimmeZeroZero window are also positioned relative to the
+inner window.  See the chapter entitled &#034;<a href="../Libraries_Manual_guide/node01A6.html">Intuition Requesters and Alerts</a>,&#034;
+<a name="line26">for more information about requester location.</a>
+
+To specify a GimmeZeroZero window, set the WFLG_GIMMEZEROZERO flag or the
+<a name="line29"><a href="../Libraries_Manual_guide/node0125.html#line81">WA_GimmeZeroZero</a> tag in the <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> call.</a>
+
+    WARNING!
+    --------
+    The GimmeZeroZero window uses more system resources than other window
+    types because the window creates a separate layer for the border
+    display.  Using multiple GimmeZeroZero windows will quickly degrade
+<a name="line36">    performance in the positioning and sizing of windows.</a>
+
+    Applications should consider using regions as an alternative to
+    GimmeZeroZero windows.  See the &#034;<a href="../Libraries_Manual_guide/node03F8.html">Layers Library</a>&#034; chapter,
+    especially the <a href="../Libraries_Manual_guide/node03FA.html">InstallClipRegion()</a> function, for information on
+    setting up regions to limit graphics display in the window.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

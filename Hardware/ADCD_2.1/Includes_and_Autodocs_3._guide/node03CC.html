@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="NextObject()" TITLE="intuition.library/NextObject" -->
+<head>
+<title>intuition.library/NextObject</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03CB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03CD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	NextObject -- iterate through the object on an Exec list. (V36)
+
+<b>    SYNOPSIS</b>
+	object = NextObject( objectPtrPtr )
+	D0                   A0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> NextObject( <a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> );
+
+<b>    FUNCTION</b>
+	This function is for boopsi class implementors only.
+
+	When you collect a set of boopsi objects on an Exec <a href="../Includes_and_Autodocs_3._guide/node0628.html#line19">List</a>
+	structure by invoking their OM_ADDMEMBER method, you
+	can (only) retrieve them by iterations of this function.
+
+	Works even if you remove and dispose the returned list
+	members in turn.
+
+<b>    INPUTS</b>
+	Initially, you set a pointer variable to equal the
+	lh_Head field of the list (or mlh_Head field of a MinList).
+	You pass the *address* of that pointer repeatedly
+	to NextObject() until it returns NULL.
+
+<b>    EXAMPLE</b>
+
+	/* here is the OM_DISPOSE case of some class's dispatcher */
+	case OM_DISPOSE:
+	    /* dispose members	*/
+	    object_state = mydata-&#062;md_CollectionList.lh_Head;
+	    while ( member_object = NextObject( &#038;object_state ) )
+	    {
+		DoMethod( member_object, OM_REMOVE ); /* remove from list */
+		DoMethodA( member, msg );	/* and pass along dispose	*/
+	    }
+
+<b>    RESULT</b>
+	Returns pointers to each object in the list in turn, and NULL
+	when there are no more.
+
+<b>    NOTES</b>
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03A5.html">DisposeObject()</a>, SetAttrs(), <a href="../Includes_and_Autodocs_3._guide/node03B5.html">GetAttr()</a>, <a href="../Includes_and_Autodocs_3._guide/node03C3.html">MakeClass()</a>,
+	Document &#034;Basic Object-Oriented Programming System for Intuition&#034;
+	and the &#034;boopsi Class Reference&#034; document.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

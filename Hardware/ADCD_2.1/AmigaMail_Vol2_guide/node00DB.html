@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="V-23/Bullet.txt" NODE="V-23-12" TITLE="Other Level 0 Tags" -->
+<head>
+<title>Other Level 0 Tags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00DA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00DC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are several other Level 0 tags:
+
+OT_DotSize
+----------
+This tag specifies the X and Y size of the target device's dots.  The
+X and Y DPI imply a dot size.  For example, at 300 X and 300 Y DPI,
+the resolution implied dot size is 1/300 inches by 1/300 inches.  For
+some devices (like some dot matrix printers), the size of the output
+dot does not match its resolution implied size.  To a degree, the
+IntelliFont engine can account for this.  The dot size is represented
+as a percentage of the dot's resolution implied size.  The X
+percentage is in the tag value's upper word, and the Y percentage is
+in the tag value's lower word.
+
+OT_SetFactor
+------------
+This tag distorts the width of a typeface by changing the width of
+the em square.  The scaling engine changes the em width to this tag's
+value.  The value is a fixed point binary fraction.
+
+OT_EmboldenX/OT_EmboldenY
+-------------------------
+These tags specify the algorithmic emboldening factor in the X and Y
+direction, respectively.  The tag values are fixed point two's
+complement binary numbers.  The units are measured in ems.
+Emboldening values above zero embolden the typeface.  Emboldening
+values below zero lighten the typeface.  By default, both values are
+zero.
+
+OT_GlyphWidth
+-------------
+This tag's value specifies a width for the current typeface.  It is a
+fraction of an em represented as a fixed point binary number.  If
+this value is set to something besides 0.0, all glyphs will have this
+width.  To turn off the constant width, set OT_GlyphMap back to 0.0
+(its default value).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

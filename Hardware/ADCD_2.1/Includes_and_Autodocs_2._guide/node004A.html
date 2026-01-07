@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/parallel.h" NODE="MAIN" TITLE="Includes/devices/parallel.h" -->
+<head>
+<title>Includes/devices/parallel.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0049.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node004B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DEVICES_PARALLEL_H
+#define DEVICES_PARALLEL_H
+/*
+**	$Filename: devices/parallel.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.1 $
+**	$Date: 90/05/10 $
+**
+**	parallel.device I/O request structure information
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All rights reserved.
+*/
+<a name="line14"></a>
+#ifndef   EXEC_IO_H
+#include &#034;exec/io.h&#034;
+#endif	 /* !EXEC_IO_H */
+<a name="line18"></a>
+<a name="line19"> struct  IOPArray {</a>
+<a name="line20">	ULONG PTermArray0;</a>
+	ULONG PTermArray1;
+};
+
+/******************************************************************/
+/* CAUTION !!  IF YOU ACCESS the parallel.device, you MUST (!!!!) use
+   an IOExtPar-sized structure or you may overlay innocent memory !! */
+/******************************************************************/
+<a name="line28"></a>
+<a name="line29"> struct   IOExtPar {</a>
+	struct	 IOStdReq IOPar;
+
+/*     STRUCT	MsgNode
+*   0	APTR	 Succ
+*   4	APTR	 Pred
+*   8	UBYTE	 Type
+*   9	UBYTE	 Pri
+*   A	APTR	 Name
+*   E	APTR	 ReplyPort
+*  12	UWORD	 MNLength
+*     STRUCT   IOExt
+*  14	APTR	 io_Device
+*  18	APTR	 io_Unit
+*  1C	UWORD	 io_Command
+*  1E	UBYTE	 io_Flags
+*  1F	UBYTE	 io_Error
+*     STRUCT   IOStdExt
+*  20	ULONG	 io_Actual
+*  24	ULONG	 io_Length
+*  28	APTR	 io_Data
+*  2C	ULONG	 io_Offset
+<a name="line51">*  30 */</a>
+<a name="line52">	ULONG	io_PExtFlags;	 /* (not used) flag extension area */</a>
+<a name="line53">	UBYTE	io_Status;	 /* status of parallel port and registers */</a>
+<a name="line54">	UBYTE	io_ParFlags;	 /* see PARFLAGS bit definitions below */</a>
+	struct	IOPArray io_PTermArray; /* termination character array */
+};
+<a name="line57"></a>
+<a name="line58">#define	PARB_SHARED	5	   /* ParFlags non-exclusive access bit */</a>
+<a name="line59">#define	PARF_SHARED	(1&#060;&#060;5)	   /*	 &#034;     non-exclusive access mask */</a>
+<a name="line60">#define PARB_SLOWMODE	4	   /*	 &#034;     slow printer bit */</a>
+<a name="line61">#define PARF_SLOWMODE	(1&#060;&#060;4)	   /*	 &#034;     slow printer mask */</a>
+<a name="line62">#define PARB_FASTMODE	3	   /*	 &#034;     fast I/O mode selected bit */</a>
+<a name="line63">#define PARF_FASTMODE	(1&#060;&#060;3)	   /*	 &#034;     fast I/O mode selected mask */</a>
+<a name="line64">#define PARB_RAD_BOOGIE	3	   /*	 &#034;     for backward compatibility */</a>
+#define PARF_RAD_BOOGIE	(1&#060;&#060;3)	   /*	 &#034;     for backward compatibility */
+<a name="line66"></a>
+<a name="line67">#define PARB_ACKMODE	2	   /*	 &#034;     ACK interrupt handshake bit */</a>
+#define PARF_ACKMODE	(1&#060;&#060;2)	   /*	 &#034;     ACK interrupt handshake mask */
+<a name="line69"></a>
+<a name="line70">#define PARB_EOFMODE	1	   /*	 &#034;     EOF mode enabled bit */</a>
+#define PARF_EOFMODE	(1&#060;&#060;1)	   /*	 &#034;     EOF mode enabled mask */
+<a name="line72"></a>
+<a name="line73">#define IOPARB_QUEUED	6	   /* IO_FLAGS rqst-queued bit */</a>
+<a name="line74">#define IOPARF_QUEUED	(1&#060;&#060;6)	   /*	 &#034;     rqst-queued mask */</a>
+<a name="line75">#define	IOPARB_ABORT	5	   /*	 &#034;     rqst-aborted bit */</a>
+<a name="line76">#define	IOPARF_ABORT	(1&#060;&#060;5)	   /*	 &#034;     rqst-aborted mask */</a>
+<a name="line77">#define	IOPARB_ACTIVE	4	   /*	 &#034;     rqst-qued-or-current bit */</a>
+<a name="line78">#define	IOPARF_ACTIVE	(1&#060;&#060;4)	   /*	 &#034;     rqst-qued-or-current mask */</a>
+<a name="line79">#define	IOPTB_RWDIR	3	   /* IO_STATUS read=0,write=1 bit */</a>
+<a name="line80">#define	IOPTF_RWDIR	(1&#060;&#060;3)	   /*	 &#034;     read=0,write=1 mask */</a>
+#define	IOPTB_PARSEL	2	   /*	 &#034;     printer selected on the A1000 */
+#define	IOPTF_PARSEL	(1&#060;&#060;2)	   /* printer selected &#038; serial &#034;Ring Indicator&#034;
+<a name="line83">				      on the A500 &#038; A2000.  Be careful when</a>
+<a name="line84">				      making cables */</a>
+<a name="line85">#define	IOPTB_PAPEROUT 1	   /*	 &#034;     paper out bit */</a>
+<a name="line86">#define	IOPTF_PAPEROUT (1&#060;&#060;1)	   /*	 &#034;     paper out mask */</a>
+<a name="line87">#define	IOPTB_PARBUSY  0	   /*	 &#034;     printer in busy toggle bit */</a>
+#define	IOPTF_PARBUSY  (1&#060;&#060;0)	   /*	 &#034;     printer in busy toggle mask */
+/* Note: previous versions of this include files had bits 0 and 2 swapped */
+<a name="line90"></a>
+#define PARALLELNAME		&#034;parallel.device&#034;
+<a name="line92"></a>
+<a name="line93">#define PDCMD_QUERY		(CMD_NONSTD)</a>
+#define PDCMD_SETPARAMS	(CMD_NONSTD+1)
+<a name="line95"></a>
+<a name="line96">#define ParErr_DevBusy			1</a>
+<a name="line97">#define ParErr_BufTooBig	2</a>
+<a name="line98">#define ParErr_InvParam	3</a>
+<a name="line99">#define ParErr_LineErr		4</a>
+<a name="line100">#define ParErr_NotOpen		5</a>
+<a name="line101">#define ParErr_PortReset	6</a>
+#define ParErr_InitErr			7
+
+#endif	/* DEVICES_PARALLEL_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

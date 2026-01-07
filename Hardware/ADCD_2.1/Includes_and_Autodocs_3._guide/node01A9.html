@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="ReplyPkt()" TITLE="dos.library/ReplyPkt" -->
+<head>
+<title>dos.library/ReplyPkt</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01A8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01AA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ReplyPkt -- replies a packet to the person who sent it to you (V36)
+
+<b>   SYNOPSIS</b>
+	ReplyPkt(packet, result1, result2)
+		   D1      D2       D3
+
+	void ReplyPkt(struct <a href="../Includes_and_Autodocs_3._guide/node05D9.html#line107">DosPacket</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, LONG)
+
+<b>   FUNCTION</b>
+	This returns a packet to the process which sent it to you.  In
+	addition, puts your pr_MsgPort address in dp_Port, so using ReplyPkt()
+	again will send the message to you.  (This is used in &#034;ping-ponging&#034;
+	packets between two processes).  It uses result 1 &#038; 2 to set the
+	dp_Res1 and dp_Res2 fields of the packet.
+
+<b>   INPUTS</b>
+	packet  - packet to reply, assumed to set up correctly.
+	result1 - first result
+	result2 - secondary result
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0155.html">DoPkt()</a>, <a href="../Includes_and_Autodocs_3._guide/node01B0.html">SendPkt()</a>, <a href="../Includes_and_Autodocs_3._guide/node01D0.html">WaitPkt()</a>, <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

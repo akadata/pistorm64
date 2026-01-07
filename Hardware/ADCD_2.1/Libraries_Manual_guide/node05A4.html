@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/displayalert.c" NODE="MAIN" TITLE="Lib_examples/displayalert.c" -->
+<head>
+<title>Lib_examples/displayalert.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05A3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05A5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* displayalert.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 displayalert.c
+Blink FROM LIB:c.o,displayalert.o TO displayalert LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+**
+** This program demonstrates an alert.  An explanation of the positioning
+** values for the alert strings is in the comment that precedes the
+** alertMsg string.
+**
+** displayalert.c -  This program implements a recoverable alert
+*/
+#define INTUI_V36_NAMES_ONLY
+
+#include &#060;exec/types.h&#062;
+#include &#060;intuition/intuition.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+
+/* Each string requires its own positioning information, as explained
+** in the manual.  Hex notation has been used to specify the positions of
+** the text. Hex numbers start with a backslash, an &#034;x&#034; and the characters
+** that make up the number.
+**
+** Each line needs 2 bytes of X position, and 1 byte of Y position.
+**   In our 1st line: x = \x00\xF0 (2 bytes) and y = \x14 (1 byte)
+**   In our 2nd line: x = \x00\xA0 (2 bytes) and y = \x24 (1 byte)
+** Each line is null terminated plus a continuation character (0=done).
+** This example assumes that the complier will concatenate adjacent
+** strings into a single string with no extra NULLs.  The compiler does
+** add the terminating NULL at the end of the entire string...The entire
+** alert must end in TWO NULLs, one for the end of the string, and one
+** for the NULL continuation character.
+*/
+
+UBYTE *alertMsg =
+    &#034;\x00\xF0\x14&#034; &#034;OH NO, NOT AGAIN!&#034; &#034;\x00\x01&#034;
+    &#034;\x00\x80\x24&#034; &#034;PRESS MOUSEBUTTON:   LEFT=TRUE   RIGHT=FALSE&#034; &#034;\x00&#034;;
+
+struct Library *IntuitionBase;
+
+VOID main(int argc, char **argv)
+{
+if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,33))
+    {
+    if (DisplayAlert(RECOVERY_ALERT, alertMsg, 52))
+        printf(&#034;Alert returned TRUE\n&#034;);
+    else
+        printf(&#034;Alert returned FALSE\n&#034;);
+
+    CloseLibrary(IntuitionBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

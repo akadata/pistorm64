@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/iffparse" NODE="WriteChunkBytes()" TITLE="iffparse.library/WriteChunkBytes" -->
+<head>
+<title>iffparse.library/WriteChunkBytes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01DD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01DF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    WriteChunkBytes -- Write data from a buffer into the current chunk.
+
+SYNOPSIS
+    error = WriteChunkBytes (iff, buf, size)
+     d0                      a0   a1    d0
+
+    LONG             error;
+    struct <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a> *iff;
+    UBYTE            *buf;
+    LONG             size;
+
+FUNCTION
+    Writes &#034;size&#034; bytes from the specified buffer into the current chunk.
+    If the current chunk was pushed with IFFSIZE_UNKNOWN, the size of the
+    chunk gets increased by the size of the buffer written.  If the size
+    was specified for this chunk, attempts to write past the end of the
+    chunk will be truncated.
+
+INPUTS
+    iff     - pointer to <a href="../Includes_and_Autodocs_2._guide/node010B.html#line34">IFFHandle</a> struct.
+    buf     - pointer to buffer area with bytes to be written.
+    size    - number of bytes to write.
+
+RESULT
+    error   - (positive) number of bytes written if successful or a
+              (negative) IFFERR_#? error code if not successful.
+
+EXAMPLE
+
+NOTES
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01D5.html">PushChunk()</a>, <a href="../Includes_and_Autodocs_2._guide/node01D2.html">PopChunk()</a>, <a href="../Includes_and_Autodocs_2._guide/node01DF.html">WriteChunkRecords()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

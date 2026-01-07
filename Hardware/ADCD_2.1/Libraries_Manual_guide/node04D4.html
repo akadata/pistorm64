@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-5-3" TITLE="B / imageclass / New Methods: IM_ERASE" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / imageclass / New Methods: IM_ERASE</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04D3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04D5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The IM_ERASE method tells an image to erase itself.  Applications should
+not call this method directly, instead they should call the Intuition
+function <a href="../Includes_and_Autodocs_2._guide/node0215.html">EraseImage()</a>.  The return value for this method is not explicitly
+defined.
+
+The IM_ERASE method uses a custom message structure:
+
+    struct impErase
+    {
+        ULONG           MethodID;   /* IM_ERASE */
+        struct RastPort *imp_RPort; /* The image's RastPort */
+        struct
+        {
+            WORD X;                 /* X and Y offset relative */
+            WORD Y;                 /* to the image's IA_Left  */
+        } imp_Offset;               /* and IA_Top attributes.  */
+    };
+
+The <a href="../Libraries_Manual_guide/node04D1.html">imageclass</a> dispatcher calls the graphics.library function <a href="../Includes_and_Autodocs_2._guide/node0439.html">EraseRect()</a>
+to erase the image.  The imageclass dispatcher gets the position of the
+image using the offsets from the IM_ERASE message and the dimensions it
+finds in the object's <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structure.  The imageclass dispatcher does not
+do any bounds checking before calling EraseRect().
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="FreeVPortCopLists()" TITLE="graphics.library/FreeVPortCopLists" -->
+<head>
+<title>graphics.library/FreeVPortCopLists</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0443.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0445.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    FreeVPortCopLists -- deallocate all intermediate copper lists and
+                         their headers from a viewport
+
+SYNOPSIS
+    FreeVPortCopLists(vp)
+                     a0
+
+    void FreeVPortCopLists(struct <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a> *);
+
+FUNCTION
+    Search display, color, sprite, and user copper
+    lists and call <a href="../Includes_and_Autodocs_2._guide/node0355.html">FreeMem()</a> to deallocate them from memory
+
+INPUTS
+    vp - pointer to <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a> structure
+
+RESULTS
+    The memory allocated to the various copper lists will be returned
+    to the system's free memory pool, and the following fields in
+    the viewport structure will be set to NULL:
+
+            DspIns, Sprins, ClrIns, UCopIns
+
+BUGS
+    none known
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00B8.html">graphics/view.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

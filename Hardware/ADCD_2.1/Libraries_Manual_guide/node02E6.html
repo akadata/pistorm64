@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_23" NODE="23-2-9" TITLE="23 / List Functions / Empty Lists" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>23 / List Functions / Empty Lists</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02E5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02E7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+It is often important to determine if a list is empty.  This can be done
+in many ways, but only two are worth mentioning.  If either the
+<a href="../Libraries_Manual_guide/node02DB.html#line20">lh_TailPred</a> field is pointing to the list header or the <a href="../Libraries_Manual_guide/node02D9.html#line13">ln_Succ</a> field of
+the <a href="../Libraries_Manual_guide/node02DB.html#line14">lh_Head</a> is NULL, then the list is empty.
+
+In C, for example, these methods would be written as follows:
+
+    /* You can use this method...   */
+    if (list-&#062;lh_TailPred == (struct Node *)list)
+        printf(&#034;list is empty\n&#034;);
+
+    /* Or you can use this method   */
+    if (NULL == list-&#062;lh_Head-&#062;ln_Succ)
+        printf(&#034;list is empty\n&#034;);
+
+In assembly code, if A0 points to the list header, these methods would be
+written as follows:
+
+    ; Use this method...
+    CMP.L   LH_TAILPRED(A0),A0
+    BEQ     list_is_empty
+
+    ; Or use this method
+    MOVE.L  LH_HEAD(A0),A1
+    TST.L   LN_SUCC(A1)
+    BEQ     list_is_empty
+
+Because LH_HEAD and LN_SUCC are both zero offsets, the second case may be
+simplified or optimized by your assembler.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

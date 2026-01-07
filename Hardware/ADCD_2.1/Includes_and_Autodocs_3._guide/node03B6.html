@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="GetDefaultPubScreen()" TITLE="intuition.library/GetDefaultPubScreen" -->
+<head>
+<title>intuition.library/GetDefaultPubScreen</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03B5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03B7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	GetDefaultPubScreen -- Get name of default public screen. (V36)
+
+<b>    SYNOPSIS</b>
+	GetDefaultPubScreen( Namebuff )
+			     A0
+
+	VOID GetDefaultPubScreen( <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> * );
+
+<b>    FUNCTION</b>
+	Provides the name of the current default public screen.
+	Only anticipated use is for Public <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> Manager utilities,
+	since it is easy to open a visitor window on the default
+	public screen without specifying the name.
+
+<b>    INPUTS</b>
+	Namebuff = a buffer of MAXPUBSCREENNAME.  This can be NULL.
+
+<b>    RESULT</b>
+	None.  Will provide the string &#034;Workbench&#034; in Namebuff if there
+	is no current default public screen.
+
+<b>    NOTES</b>
+	This function actually &#034;returns&#034; in register D0 a pointer
+	to the public screen.  Unfortunately, the lifespan of
+	this pointer is not ensured; the screen could be closed
+	at any time.  The *ONLY* legitimate use we can see for
+	this return value is to compare for identity with the pointer
+	to a public screen you either have a window open in, or
+	a lock on using <a href="../Includes_and_Autodocs_3._guide/node03C1.html">LockPubScreen()</a>, to determine if that
+	screen is in fact the default screen.
+
+	Also note that if there no default public screen has been set,
+	the return value of this function will be zero, and not a pointer
+	to the Workbench screen.
+
+<b>    BUGS</b>
+	The function prototype does not reflect the return value.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03EE.html">SetDefaultPubScreen()</a>, <a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

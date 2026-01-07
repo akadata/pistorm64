@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-6-5" TITLE="28 / Using Bobs / Specifying the Size of a Bob" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Bobs / Specifying the Size of a Bob</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node039A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node039C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Bobs do not have the 16-pixel width limit that applies to VSprites.  To
+specify the overall size of a Bob, use the <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line102">Height and Width</a> members of the
+root <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure.  Specify the Width as the number of 16-bit words
+it takes to fully contain the object.  The number of lines is still
+specified with the Height member in the VSprite data structure.
+
+As an example, suppose the Bob is 24 pixels wide and 20 lines tall.  Use
+statements like the following to specify the size:
+
+    myVSprite.Height = 20;  /* 20 lines tall. */
+    myVSprite.Width  = 2;   /* 24 bits fit into two words. */
+
+Because Bobs are drawn into the background playfield, the pixels of the
+Bob are the same size as the background pixels, and share the color
+palette of the <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

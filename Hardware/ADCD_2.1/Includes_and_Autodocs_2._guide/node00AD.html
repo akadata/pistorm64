@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/copper.h" NODE="MAIN" TITLE="Includes/graphics/copper.h" -->
+<head>
+<title>Includes/graphics/copper.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00AC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00AE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef GRAPHICS_COPPER_H
+#define GRAPHICS_COPPER_H
+/*
+**	$Filename: graphics/copper.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**	graphics copper list intstruction definintions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+<a name="line19">#define COPPER_MOVE 0	    /* pseude opcode for move #XXXX,dir */</a>
+<a name="line20">#define COPPER_WAIT 1	    /* pseudo opcode for wait y,x */</a>
+<a name="line21">#define CPRNXTBUF   2	    /* continue processing with next buffer */</a>
+<a name="line22">#define CPR_NT_LOF  0x8000  /* copper instruction only for short frames */</a>
+<a name="line23">#define CPR_NT_SHT  0x4000  /* copper instruction only for long frames */</a>
+#define CPR_NT_SYS  0x2000  /* copper user instruction only */
+<a name="line25"></a>
+struct CopIns
+<a name="line27">{</a>
+    WORD   OpCode; /* 0 = move, 1 = wait */
+    union
+<a name="line30">    {</a>
+    struct CopList *nxtlist;
+    struct
+    {
+   union
+<a name="line35">   {</a>
+<a name="line36">   WORD   VWaitPos;	   /* vertical beam wait */</a>
+<a name="line37">   WORD   DestAddr;	   /* destination address of copper move */</a>
+   } u1;
+   union
+<a name="line40">   {</a>
+<a name="line41">   WORD   HWaitPos;	   /* horizontal beam wait position */</a>
+<a name="line42">   WORD   DestData;	   /* destination immediate data to send */</a>
+<a name="line43">   } u2;</a>
+<a name="line44">    } u4;</a>
+    } u3;
+};
+<a name="line47">/* shorthand for above */</a>
+<a name="line48">#define NXTLIST     u3.nxtlist</a>
+<a name="line49">#define VWAITPOS    u3.u4.u1.VWaitPos</a>
+<a name="line50">#define DESTADDR    u3.u4.u1.DestAddr</a>
+<a name="line51">#define HWAITPOS    u3.u4.u2.HWaitPos</a>
+#define DESTDATA    u3.u4.u2.DestData
+
+
+<a name="line55">/* structure of cprlist that points to list that hardware actually executes */</a>
+struct cprlist
+<a name="line57">{</a>
+<a name="line58">    struct cprlist *Next;</a>
+<a name="line59">    UWORD   *start;	    /* start of copper list */</a>
+    WORD   MaxCount;	   /* number of long instructions */
+};
+<a name="line62"></a>
+struct CopList
+<a name="line64">{</a>
+<a name="line65">    struct  CopList *Next;  /* next block for this copper list */</a>
+<a name="line66">    struct  CopList *_CopList;	/* system use */</a>
+<a name="line67">    struct  ViewPort *_ViewPort;    /* system use */</a>
+<a name="line68">    struct  CopIns *CopIns; /* start of this block */</a>
+<a name="line69">    struct  CopIns *CopPtr; /* intermediate ptr */</a>
+<a name="line70">    UWORD   *CopLStart;     /* mrgcop fills this in for Long Frame*/</a>
+<a name="line71">    UWORD   *CopSStart;     /* mrgcop fills this in for Short Frame*/</a>
+<a name="line72">    WORD   Count;	   /* intermediate counter */</a>
+<a name="line73">    WORD   MaxCount;	   /* max # of copins for this block */</a>
+    WORD   DyOffset;	   /* offset this copper list vertical waits */
+#ifdef V1_3
+    UWORD   *Cop2Start;
+    UWORD   *Cop3Start;
+    UWORD   *Cop4Start;
+    UWORD   *Cop5Start;
+#endif
+};
+<a name="line82"></a>
+struct UCopList
+<a name="line84">{</a>
+<a name="line85">    struct UCopList *Next;</a>
+<a name="line86">    struct CopList  *FirstCopList; /* head node of this copper list */</a>
+    struct CopList  *CopList;	   /* node in use */
+};
+
+/* private graphics data structure */
+<a name="line91"></a>
+struct copinit
+<a name="line93">{</a>
+<a name="line94">    UWORD vsync_hblank[2];</a>
+<a name="line95">    UWORD diwstart[4];</a>
+<a name="line96">    UWORD diagstrt[4];	    /* copper list for first bitplane */</a>
+<a name="line97">    UWORD sprstrtup[(2*8*2)];</a>
+<a name="line98">    UWORD wait14[2];</a>
+<a name="line99">    UWORD norm_hblank[2];</a>
+<a name="line100">    UWORD genloc[4];</a>
+<a name="line101">    UWORD jump[(2*2)];</a>
+<a name="line102">    UWORD wait_forever[2];</a>
+    UWORD   sprstop[4];
+};
+
+#endif	/* GRAPHICS_COPPER_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

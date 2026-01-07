@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-77/Optim.txt" NODE="IV-77-7" TITLE="BeginRefresh() and EndRefresh()" -->
+<head>
+<title>BeginRefresh() and EndRefresh()</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00C2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00C4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To improve the performance of repairing damage to simple and smart
+refresh windows, Intuition can put a window into a special refresh
+state using Intuition's BeginRefresh() function:
+
+    VOID BeginRefresh(struct Window *window)
+
+While a window is in this state, the system restricts attempts to
+render into the window to the window's damaged regions.  Because the
+system ignores rendering operations outside the window's damage
+regions, an application only refreshes the parts of a window that
+need refreshing.  This can significant decrease the amount of time
+necessary to refresh the window.  This also reduces the possibility
+of visual flicker that can happen if an application has to redraw the
+entire contents of a window.
+
+To end a window's special refresh state, use EndRefresh():
+
+    VOID EndRefresh(struct Window *window, BOOL Complete)
+
+Compared to BeginRefresh(), EndRefresh() has an extra parameter, a
+boolean value.  If this value is TRUE, Intuition assumes that all of
+the refreshing for this window is finished and removes all of the
+window layer's damaged regions.  In most cases, this value should be
+TRUE.  See the Autodoc for BeginRefresh() and EndRefresh() for more
+information.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="locale" NODE="OpenCatalog()" TITLE="locale.library/OpenCatalog" -->
+<head>
+<title>locale.library/OpenCatalog</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node045A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node045C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	OpenCatalogA -- open a message catalog. (V38)
+	OpenCatalog -- varargs stub for OpenCatalogA(). (V38)
+
+<b>   SYNOPSIS</b>
+	catalog = OpenCatalogA(locale,name,tagList);
+	D0                     A0     A1   A2
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line245">Catalog</a> *OpenCatalogA(struct <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> *,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>,struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	catalog = OpenCatalog(locale,name,firstTag, ...);
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line245">Catalog</a> *OpenCatalog(struct <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line117">Locale</a> *,<a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>,<a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...);
+
+<b>   FUNCTION</b>
+	This function opens a message catalog. Catalogs contain all the
+	text strings that an application uses. These strings can easily
+	be replaced by strings in a different language, which causes the
+	application to magically start operating in that new language.
+
+	Catalogs originally come from disk files. This function searches for
+	them in the following places:
+
+		PROGDIR:Catalogs/languageName/name
+		LOCALE:Catalogs/languageName/name
+
+	where languageName is the name of the language associated with the
+	locale parameter. So assuming an application called WizPaint:
+
+		catalog = OpenCatalog(NULL,
+				      &#034;WizPaint.catalog&#034;,
+				      OC_BuiltInLanguage,&#034;english&#034;,
+				      TAG_DONE);
+
+	Passing NULL as first parameter to OpenCatalog() indicates you
+	wish to use the system's default locale. Assuming the default locale
+	specifies &#034;deutsch&#034; as language, OpenCatalog() tries to open the
+	catalog as:
+
+		PROGDIR:Catalogs/deutsch/WizPaint.catalog
+
+	and if that file is not found, then OpenCatalog() tries to open it
+	as:
+
+		LOCALE:Catalogs/deutsch/WizPaint.catalog
+
+	PROGDIR: is not always checked before LOCALE: is. If the volume which
+	PROGDIR: is assigned to is NOT currently mounted, and if the one
+	which LOCALE: is assigned to IS mounted, then LOCALE: is checked
+	first, followed by PROGDIR: if needed. This is done in order to
+	minimize the number of disk swaps on floppy systems.
+
+	The OC_BuiltInLanguage tag specifies the language of the strings
+	that are built into the application. If the language of the
+	built-in strings matches that of the locale, then no catalog
+	need be loaded from disk and the built-in strings can be used
+	directly.
+
+	locale.library caches text catalogs in order to minimize disk
+	access. As such, OpenCatalog() may or may not cause disk access.
+	This fact should be taken into consideration. Unused catalogs are
+	automatically flushed from the system when there is not enough
+	memory. When there is disk access, it is possible a DOS requester
+	may be opened asking for a volume to be inserted. You can avoid this
+	requester opening by setting your process' pr_WindowPtr field to -1.
+
+<b>   INPUTS</b>
+	locale - the locale for which the catalog should be opened, or NULL.
+		 When NULL, then the system's default locale is used. This
+		 should generally be NULL
+	name - the NULL-terminated name of the catalog to open, typically
+	       the application name with a &#034;.catalog&#034; extension
+	tagList - pointer to an array of tags providing optional extra
+		  parameters, or NULL
+
+<b>   TAGS</b>
+	OC_BuiltInLanguage (STRPTR) - language of built-in strings of the
+				      application. That is, this tag identifies
+				      the language used for the &#034;defaultString&#034;
+				      parameter used in the <a href="../Includes_and_Autodocs_3._guide/node0458.html">GetCatalogStr()</a>
+				      function. Default is &#034;english&#034;. Providing
+				      this tag and setting its value to NULL
+				      indicates that there are no built-in
+				      strings.
+
+	OC_BuiltInCodeSet (ULONG) - code set of built-in strings. Default is 0.
+				    THIS TAG SHOULD ALWAYS BE SET TO 0 FOR NOW.
+
+	OC_Language (STRPTR) - language explicitly requested for the catalog.
+			       A catalog of this language will be returned if
+			       possible, otherwise a catalog in one of the
+			       user's preferred languages. This tag should
+			       normally not be provided as it overrides the
+			       user's preferences.
+
+	OC_Version (UWORD) - catalog version number required. Default is 0
+			     which means to accept any version of the catalog
+			     that is found. Note that if a version is
+			     specified, the catalog's version much match it
+			     exactly. This is different from version numbers
+			     used by <a href="../Includes_and_Autodocs_3._guide/node0222.html">OpenLibrary()</a>.
+
+<b>   RESULT</b>
+	catalog - a message catalog to use with <a href="../Includes_and_Autodocs_3._guide/node0458.html">GetCatalogStr()</a> or NULL.
+		  A NULL result does not necessarily indicate an error.
+		  If OpenCatalog() determines that the built-in strings of
+		  the application can be used instead of an external catalog
+		  from disk, then NULL is returned. To determine whether
+		  a NULL result actually indicates an error, look at the
+		  return value of <a href="../Includes_and_Autodocs_3._guide/node0182.html">dos.library/IoErr()</a>. 0 means no error.
+
+		  <a href="../Includes_and_Autodocs_3._guide/node0458.html">GetCatalogStr()</a> interprets a NULL catalog as meaning to use
+		  the built-in strings.
+
+<b>   NOTE</b>
+	In most cases, failing to open a catalog should not be considered a
+	fatal error, and the application should continue operating and
+	simply use the built-in set of strings instead of the disk-based
+	catalog. Note that <a href="../Includes_and_Autodocs_3._guide/node0458.html">GetCatalogStr()</a> accepts a NULL catalog pointer for
+	this very reason.
+
+	Also note that displaying an error message when a catalog fails to
+	open can be a meaningless endeavor as the message is likely in a
+	language the user does not understand.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0452.html">CloseCatalog()</a>, <a href="../Includes_and_Autodocs_3._guide/node0458.html">GetCatalogStr()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

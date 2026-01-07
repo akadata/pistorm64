@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/gadtoolsmenu.c" NODE="MAIN" TITLE="Lib_examples/gadtoolsmenu.c" -->
+<head>
+<title>Lib_examples/gadtoolsmenu.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0599.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node059B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* The functions used to set up and control GadTools menus are discussed
+ * in the next section.  Before looking at these functions in detail, it
+ * may be helpful to look at a brief example.
+ */
+
+/* gadtoolsmenu.c
+** Example showing the basic usage of the menu system with a window.
+** Menu layout is done with GadTools, as is recommended for applications.
+**
+** Compiled with SAS C v5.10a
+** lc -b1 -cfistq -v -y gadtoolsmenu
+** blink FROM LIB:c.o gadtoolsmenu.o TO gadtoolsmenu LIB LIB:lc.lib LIB:amiga.lib
+*/
+
+#define INTUI_V36_NAMES_ONLY
+
+#include &#060;exec/types.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/intuitionbase.h&#062;
+#include &#060;libraries/gadtools.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/gadtools_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+struct Library *GadToolsBase;
+struct IntuitionBase *IntuitionBase;
+
+struct NewMenu mynewmenu[] =
+    {
+        { NM_TITLE, &#034;Project&#034;,    0 , 0, 0, 0,},
+        {  NM_ITEM, &#034;Open...&#034;,   &#034;O&#034;, 0, 0, 0,},
+        {  NM_ITEM, &#034;Save&#034;,      &#034;S&#034;, 0, 0, 0,},
+        {  NM_ITEM, NM_BARLABEL,  0 , 0, 0, 0,},
+        {  NM_ITEM, &#034;Print&#034;,      0 , 0, 0, 0,},
+        {   NM_SUB, &#034;Draft&#034;,      0 , 0, 0, 0,},
+        {   NM_SUB, &#034;NLQ&#034;,        0 , 0, 0, 0,},
+        {  NM_ITEM, NM_BARLABEL,  0 , 0, 0, 0,},
+        {  NM_ITEM, &#034;Quit...&#034;,   &#034;Q&#034;, 0, 0, 0,},
+
+        { NM_TITLE, &#034;Edit&#034;,       0 , 0, 0, 0,},
+        {  NM_ITEM, &#034;Cut&#034;,       &#034;X&#034;, 0, 0, 0,},
+        {  NM_ITEM, &#034;Copy&#034;,      &#034;C&#034;, 0, 0, 0,},
+        {  NM_ITEM, &#034;Paste&#034;,     &#034;V&#034;, 0, 0, 0,},
+        {  NM_ITEM, NM_BARLABEL,  0 , 0, 0, 0,},
+        {  NM_ITEM, &#034;Undo&#034;,      &#034;Z&#034;, 0, 0, 0,},
+
+        {   NM_END, NULL,         0 , 0, 0, 0,},
+    };
+
+
+/*
+** Watch the menus and wait for the user to select the close gadget
+** or quit from the menus.
+*/
+VOID handle_window_events(struct Window *win, struct Menu *menuStrip)
+{
+struct IntuiMessage *msg;
+SHORT done;
+UWORD menuNumber;
+UWORD menuNum;
+UWORD itemNum;
+UWORD subNum;
+struct MenuItem *item;
+
+done = FALSE;
+while (FALSE == done)
+    {
+    /* we only have one signal bit, so we do not have to check which
+    ** bit broke the Wait().
+    */
+    Wait(1L &#060;&#060; win-&#062;UserPort-&#062;mp_SigBit);
+
+    while ( (FALSE == done) &#038;&#038;
+            (NULL != (msg = (struct IntuiMessage *)GetMsg(win-&#062;UserPort))))
+        {
+        switch (msg-&#062;Class)
+            {
+            case IDCMP_CLOSEWINDOW:
+                done = TRUE;
+                break;
+            case IDCMP_MENUPICK:
+                menuNumber = msg-&#062;Code;
+                while ((menuNumber != MENUNULL) &#038;&#038; (!done))
+                    {
+                    item = ItemAddress(menuStrip, menuNumber);
+
+                    /* process the item here! */
+                    menuNum = MENUNUM(menuNumber);
+                    itemNum = ITEMNUM(menuNumber);
+                    subNum  = SUBNUM(menuNumber);
+
+                    /* stop if quit is selected. */
+                    if ((menuNum == 0) &#038;&#038; (itemNum == 5))
+                        done = TRUE;
+
+                    menuNumber = item-&#062;NextSelect;
+                    }
+                break;
+            }
+        ReplyMsg((struct Message *)msg);
+        }
+    }
+}
+
+
+/*
+** Open all of the required libraries and set-up the menus.
+*/
+VOID main(int argc, char *argv[])
+{
+struct Window *win;
+APTR *my_VisualInfo;
+struct Menu *menuStrip;
+
+/* Open the Intuition Library */
+IntuitionBase = (struct IntuitionBase *)OpenLibrary(&#034;intuition.library&#034;, 37);
+if (IntuitionBase != NULL)
+    {
+    /* Open the gadtools Library */
+    GadToolsBase = OpenLibrary(&#034;gadtools.library&#034;, 37);
+    if (GadToolsBase != NULL)
+        {
+        if (NULL != (win = OpenWindowTags(NULL,
+                            WA_Width,  400,       WA_Activate,    TRUE,
+                            WA_Height, 100,       WA_CloseGadget, TRUE,
+                            WA_Title,  &#034;Menu Test Window&#034;,
+                            WA_IDCMP,  IDCMP_CLOSEWINDOW | IDCMP_MENUPICK,
+                            TAG_END)))
+            {
+            if (NULL != (my_VisualInfo = GetVisualInfo(win-&#062;WScreen, TAG_END)))
+                {
+                if (NULL != (menuStrip = CreateMenus(mynewmenu, TAG_END)))
+                    {
+                    if (LayoutMenus(menuStrip, my_VisualInfo, TAG_END))
+                        {
+                        if (SetMenuStrip(win, menuStrip))
+                            {
+                            handle_window_events(win,menuStrip);
+
+                            ClearMenuStrip(win);
+                            }
+                        FreeMenus(menuStrip);
+                        }
+                    }
+                FreeVisualInfo(my_VisualInfo);
+                }
+            CloseWindow(win);
+            }
+        CloseLibrary((struct Library *)GadToolsBase);
+        }
+    CloseLibrary((struct Library *)IntuitionBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

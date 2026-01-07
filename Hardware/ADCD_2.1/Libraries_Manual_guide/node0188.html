@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-7" TITLE="6 / Setting Up Menus / Menu Numbers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Setting Up Menus / Menu Numbers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0187.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0189.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The menu numbers Intuition provides in the <a href="../Libraries_Manual_guide/node01DE.html">IDCMP_MENUPICK</a> messages,
+describe the ordinal position of the menu in the linked list of menus, the
+ordinal position of the menu item beneath that menu, and (if applicable)
+the ordinal position of the sub-item beneath that menu item.  Ordinal
+means the successive number of the linked items, in this case, starting
+<a name="line7">from 0.</a>
+
+To determine which menus and menu items (sub-items are special cases of
+menu items) were selected, use the following macros:
+<a name="line11"></a>
+
+            Table 6-1: Macros Used with Intuition Menus
+  _______________________________________________________________
+ |                                                               |
+ |  MENUNUM(num)  Extracts the ordinal menu number from num.     |
+ |  ITEMNUM(num)  Extracts the ordinal item number from num.     |
+ |   SUBNUM(num)  Extracts the ordinal sub-item number from num. |
+ |_______________________________________________________________|
+<a name="line20"></a>
+
+MENUNULL is the constant describing &#034;no menu selection made.&#034;  Likewise,
+NOMENU, NOITEM, and NOSUB describe the conditions &#034;no menu chosen,&#034; &#034;no
+item chosen&#034; and &#034;no sub-item chosen.&#034;
+
+<a name="line26">For example:</a>
+
+    if (menuNumber == MENUNULL)
+        /* no menu selection was made */ ;
+    else
+        {
+        /* if there were no sub-items attached to that item,
+        ** SubNumber will equal NOSUB.
+        */
+        menuNum = MENUNUM(menuNumber);
+        itemNum = ITEMNUM(menuNumber);
+        subNum  = SUBNUM(menuNumber);
+        }
+
+The menu number received by the program is always set to either MENUNULL
+or a valid menu selection.  If the menu number represents a valid
+selection, it will always have at least a menu number and a menu item
+number.  Users can never select the menu text itself, but they always
+select at least an item within a menu.  Therefore, the program always gets
+at least the menu selected and the menu item selected.  If the menu item
+selected has a sub-item, a sub-item number will also be received.
+
+Just as it is not possible to select an entry in the menu bar, it is not
+possible to select a menu item that has attached sub-items.  The user must
+select one of the options in the sub-item list before the program hears
+<a name="line51">about the action as a valid menu selection.</a>
+
+    Help Is Available.
+    ------------------
+    The restrictions on what can be selected do not apply to
+    <a href="../Libraries_Manual_guide/node01DE.html#line21">IDCMP_MENUHELP</a> messages.  Using menu help, a user can select any
+    component of a menu, including the menu header itself.
+
+ <a href="../Libraries_Manual_guide/node0189.html">How Menu Numbers Really Work</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

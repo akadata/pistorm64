@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/modules/screendump.c" NODE="MAIN" TITLE="Devices/modules/screendump.c" -->
+<head>
+<title>Devices/modules/screendump.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0305.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0307.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * screendump.c    - routine to dump rastport (iffparse not required)
+ *
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;devices/printer.h&#062;
+
+#ifndef NO_PROTOS
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#endif
+
+
+/* screendump
+ *
+ * Passed a screen pointer, source x, source y, width, height,
+ *   destcols and io_Special flags, will print part or all of a screen.
+ *
+ * If 0 is passed for BOTH destcols and special, screendump()
+ *   assumes you want IT to compute suitable values.
+ * In this case:
+ *   1. If srcx and srcy are 0, and srcw and srch are same as
+ *      screen width and height, screendump will set destcols=0,
+ *      and special = SPECIAL_FULLCOLS|SPECIAL_ASPECT
+ *	for a full width aspected dump.
+ *
+ *   2. If srcx or srcy are nonzero, or srcw or srch are different
+ *      from screen width or height, screendump will print a
+ *      fractional size dump relative to the size whole screendump
+ *      would have been.
+ *
+ * Returns 0 for success or printer io_Error (devices/printer.h)
+ */
+
+int screendump(struct Screen *scr,
+		UWORD srcx, UWORD srcy, UWORD srcw, UWORD srch,
+		LONG destcols, UWORD iospecial)
+    {
+    struct IODRPReq *iodrp;
+    struct MsgPort  *printerPort;
+    struct ViewPort *vp;
+    ULONG tmpl;
+    int error = PDERR_BADDIMENSION;
+
+    if(!scr)	return(error);
+
+    if((!destcols)&#038;&#038;(!iospecial))
+	{
+	/* Then we compute what they should be */
+	if((!srcx)&#038;&#038;(!srcy)&#038;&#038;(srcw==scr-&#062;Width)&#038;&#038;(srch==scr-&#062;Height))
+	    {
+	    iospecial = SPECIAL_FULLCOLS|SPECIAL_ASPECT;
+	    }
+	else
+	    {
+	    iospecial = SPECIAL_FRACCOLS|SPECIAL_ASPECT;
+	    tmpl = srcw;
+	    tmpl = tmpl &#060;&#060; 16;
+	    destcols = (tmpl / scr-&#062;Width) &#060;&#060; 16;
+	    }
+	}
+
+    if(printerPort = CreatePort(0,0))
+	{
+	if(iodrp=
+	   (struct IODRPReq *)CreateExtIO(printerPort,sizeof(struct IODRPReq)))
+	    {
+	    if(!(error=OpenDevice(&#034;printer.device&#034;,0,iodrp,0)))
+		{
+            	vp = &#038;scr-&#062;ViewPort;
+            	iodrp-&#062;io_Command = PRD_DUMPRPORT;
+            	iodrp-&#062;io_RastPort = &#038;scr-&#062;RastPort;
+            	iodrp-&#062;io_ColorMap = vp-&#062;ColorMap;
+            	iodrp-&#062;io_Modes = (ULONG)vp-&#062;Modes;
+ 	    	iodrp-&#062;io_SrcX = srcx;
+	    	iodrp-&#062;io_SrcY = srcy;
+            	iodrp-&#062;io_SrcWidth = srcw;
+            	iodrp-&#062;io_SrcHeight = srch;
+	    	iodrp-&#062;io_DestCols = destcols;
+	/*  	iodrp-&#062;io_DestRows = 0; cleared by allocation */
+            	iodrp-&#062;io_Special = iospecial;
+
+            	error = DoIO(iodrp);
+
+            	CloseDevice(iodrp);
+            	}
+	    DeleteExtIO(iodrp);
+  	    }
+      	DeletePort(printerPort);
+      	}
+    return(error);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

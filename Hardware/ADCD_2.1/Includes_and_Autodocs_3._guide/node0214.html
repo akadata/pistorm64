@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="GetMsg()" TITLE="exec.library/GetMsg" -->
+<head>
+<title>exec.library/GetMsg</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0213.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0215.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetMsg -- get next message from a message port
+
+<b>   SYNOPSIS</b>
+	message = GetMsg(port)
+	D0		 A0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line46">Message</a> *GetMsg(struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *);
+
+<b>   FUNCTION</b>
+	This function receives a message from a given message port. It
+	provides a fast, non-copying message receiving mechanism. The
+	received message is removed from the message port.
+
+	This function will not wait.  If a message is not present this
+	function will return zero.  If a program must wait for a message,
+	it can <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait()</a> on the signal specified for the port or use the
+	<a href="../Includes_and_Autodocs_3._guide/node0248.html">WaitPort()</a> function.  There can only be one task waiting for any
+	given port.
+
+	Getting a message does not imply to the sender that the message is
+	free to be reused by the sender.  When the receiver is finished
+	with the message, it may <a href="../Includes_and_Autodocs_3._guide/node0235.html">ReplyMsg()</a> it back to the sender.
+
+
+	Getting a signal does NOT always imply a message is ready.  More
+	than one message may arrive per signal, and signals may show up
+	without messages.  Typically you must loop to GetMsg() until it
+	returns zero, then <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait()</a> or <a href="../Includes_and_Autodocs_3._guide/node0248.html">WaitPort()</a>.
+
+<b>   INPUT</b>
+	port - a pointer to the receiver message port
+
+<b>   RESULT</b>
+	message - a pointer to the first message available.  If
+		  there are no messages, return zero.
+		  Callers must be prepared for zero at any time.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0226.html">PutMsg()</a>, <a href="../Includes_and_Autodocs_3._guide/node0235.html">ReplyMsg()</a>, <a href="../Includes_and_Autodocs_3._guide/node0248.html">WaitPort()</a>, <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait()</a>, <a href="../Includes_and_Autodocs_3._guide/node062E.html">exec/ports.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

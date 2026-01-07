@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/serial" NODE="CMD_READ" TITLE="serial.device/CMD_READ" -->
+<head>
+<title>serial.device/CMD_READ</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04CE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04D0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Read -- read input from serial port
+
+FUNCTION
+    This command causes a stream of characters to be read in from
+    the serial port buffer.  The number of characters is specified
+    in io_Length.
+
+    The Query function can be used to check how many characters
+    are currently waiting in the serial port buffer.  If more characters
+    are requested than are currently available, the ioRequest
+    will be queued until it can be satisfied.
+
+
+    The best way to handle reads is to first Query to get the number
+    of characters currently in the buffer.  Then post a read request
+    for that number of characters (or the maximum size of your buffer).
+
+    If zero characters are in the buffer, post a request
+    for 1 character.  When at least one is ready, the device will return
+    it.  Now start over with another Query.
+
+    Before the program exits, it must be sure to <a href="../Includes_and_Autodocs_2._guide/node04CA.html">AbortIO()</a> then <a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a>
+    any outstanding ioRequests.
+
+IO REQUEST
+    io_Message      A mn_ReplyPort is required
+    io_Device       set by <a href="../Includes_and_Autodocs_2._guide/node04D4.html">OpenDevice</a>
+    io_Unit         set by <a href="../Includes_and_Autodocs_2._guide/node04D4.html">OpenDevice</a>
+    io_Command      CMD_READ
+    io_Flags        If the IOB_QUICK bit is set, read will try
+                     to complete the IO quickly
+    io_Length       number of characters to receive.
+    io_Data         pointer to buffer
+
+RESULTS
+    Error -- if the Read succeded, then io_Error will be null.
+             If the Read failed, then io_Error will be non-zero.
+             io_Error will indicate problems such as parity mismatch,
+             break, and buffer overrun.
+
+SEE ALSO
+     <a href="../Includes_and_Autodocs_2._guide/node04D6.html">serial.device/SDCMD_QUERY</a>
+     <a href="../Includes_and_Autodocs_2._guide/node04D7.html">serial.device/SDCMD_SETPARAMS</a>
+
+BUGS
+     Having multiple outstanding read IORequests at any one time will
+     probably fail.
+
+     Old documentation mentioned a mode where io_Length was set to -1.
+     If you want a NULL terminated read, use the io_TermArray instead.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

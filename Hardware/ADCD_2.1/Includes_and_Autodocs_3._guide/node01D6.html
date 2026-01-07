@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="Main" TITLE="exec.doc" TOC="Includes_and_Autodocs_3.5/Main" -->
+<head>
+<title>exec.doc</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<a href="../Includes_and_Autodocs_3._guide/node0000.html"><img src="../images/toc.gif" alt="[Contents]" border=0></a>
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01D5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01D7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+     <a href="../Includes_and_Autodocs_3._guide/node01D7.html">AbortIO()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01D8.html">AddDevice()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01D9.html">AddHead()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01DA.html">AddIntServer()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01DB.html">AddLibrary()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01DC.html">AddMemHandler()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01DD.html">AddMemList()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01DE.html">AddPort()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01DF.html">AddResource()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01E0.html">AddSemaphore()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01E1.html">AddTail()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01E2.html">AddTask()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01E3.html">Alert()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01E4.html">AllocAbs()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01E6.html">AllocEntry()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01E7.html">AllocMem()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01E8.html">AllocPooled()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01E9.html">AllocSignal()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01EA.html">AllocTrap()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01EB.html">AllocVec()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01EC.html">AttemptSemaphore()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01ED.html">AttemptSemaphoreShared()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01EE.html">AvailMem()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01EF.html">CacheClearE()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01F0.html">CacheClearU()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01F1.html">CacheControl()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01F2.html">CachePostDMA()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01F3.html">CachePreDMA()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01F4.html">Cause()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01F5.html">CheckIO()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01F6.html">CloseDevice()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01F7.html">CloseLibrary()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01F8.html">ColdReboot()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01F9.html">CopyMem()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01FA.html">CopyMemQuick()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01FB.html">CreateIORequest()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01FC.html">CreateMsgPort()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01FD.html">CreatePool()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01FE.html">Deallocate()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node01FF.html">Debug()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0200.html">DeleteIORequest()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0201.html">DeleteMsgPort()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0202.html">DeletePool()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0203.html">Disable()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0204.html">DoIO()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0205.html">Enable()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0206.html">Enqueue()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0207.html">FindName()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0208.html">FindPort()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0209.html">FindResident()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node020A.html">FindSemaphore()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node020B.html">FindTask()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node020C.html">Forbid()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node020D.html">FreeEntry()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node020E.html">FreeMem()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node020F.html">FreePooled()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0210.html">FreeSignal()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0211.html">FreeTrap()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0212.html">FreeVec()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0213.html">GetCC()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0214.html">GetMsg()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0215.html">InitCode()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0216.html">InitResident()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0217.html">InitSemaphore()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0218.html">InitStruct()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0219.html">Insert()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node021A.html">MakeFunctions()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node021B.html">MakeLibrary()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node021C.html">ObtainQuickVector()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node021E.html">ObtainSemaphoreList()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node021F.html">ObtainSemaphoreShared()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0220.html">OldOpenLibrary()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0221.html">OpenDevice()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0222.html">OpenLibrary()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0223.html">OpenResource()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0224.html">Permit()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0225.html">Procure()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0226.html">PutMsg()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0227.html">RawDoFmt()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0228.html">ReleaseSemaphore()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0229.html">ReleaseSemaphoreList()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node022A.html">RemDevice()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node022B.html">RemHead()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node022C.html">RemIntServer()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node022D.html">RemLibrary()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node022E.html">RemMemHandler()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node022F.html">Remove()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0230.html">RemPort()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0231.html">RemResource()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0232.html">RemSemaphore()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0233.html">RemTail()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0234.html">RemTask()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0235.html">ReplyMsg()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0236.html">SendIO()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0237.html">SetExcept()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0238.html">SetFunction()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0239.html">SetIntVector()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node023A.html">SetSignal()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node023B.html">SetSR()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node023C.html">SetTaskPri()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node023D.html">Signal()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node023E.html">StackSwap()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node023F.html">SumKickData()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0240.html">SumLibrary()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0241.html">SuperState()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0242.html">Supervisor()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0243.html">TypeOfMem()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0244.html">UserState()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0245.html">Vacate()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0247.html">WaitIO()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0248.html">WaitPort()</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0249.html">--Overview--</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node024A.html">ALLOCATE_MEMORY</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node024B.html">CALL_ADDRESS</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node024C.html">FREE_MEMORY</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node024D.html">GET_CONTEXT_FRAME</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node024E.html">NOP</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node024F.html">READ_ARRAY</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0250.html">READ_BYTE</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0251.html">READ_LONG</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0252.html">READ_WORD</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0253.html">RESET</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0254.html">RETURN_TO_SYSTEM</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0255.html">TURN_OFF_SINGLE</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0256.html">TURN_ON_SINGLE</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0257.html">WRITE_ARRAY</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0258.html">WRITE_BYTE</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node0259.html">WRITE_LONG</a> 
+     <a href="../Includes_and_Autodocs_3._guide/node025A.html">WRITE_WORD</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-6-8-2" TITLE="28 / / Other Items Influencing Bob Colors / PlanePick" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Other Items Influencing Bob Colors / PlanePick</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node039F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03A1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Because the <a href="../Libraries_Manual_guide/node039D.html#line10">Depth</a> of the Bob can be less than the background, the
+<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line123">PlanePick</a> member is provided so that the application can indicate which
+background bitplanes are to have image data put into them.  The system
+starts with the least significant plane of the Bob, and scans PlanePick
+starting at the least significant bit, looking for a plane of the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>
+to put it in.
+
+For example, if <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line123">PlanePick</a> has a binary value of: 0 0 0 0   0 0 1 1 (0x03)
+then the system draws the first plane of the Bob's image into background
+plane 0 and the second plane into background plane 1.
+
+Alternatively, a <a href="../Includes_and_Autodocs_2._guide/node00C3.html#line123">PlanePick</a> value of:  0 0 0 1   0 0 1 0 (0x12) directs the
+system to put the first Bob plane into plane 1, and the second Bob plane
+into plane 4.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

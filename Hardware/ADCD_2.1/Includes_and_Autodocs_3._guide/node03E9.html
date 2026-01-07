@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="ScreenPosition()" TITLE="intuition.library/ScreenPosition" -->
+<head>
+<title>intuition.library/ScreenPosition</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03E8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03EA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ScreenPosition -- <a href="../Includes_and_Autodocs_3._guide/node0301.html">Move</a> screens with greater control. (V39)
+
+<b>    SYNOPSIS</b>
+	ScreenPosition( <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a>, flags, x1, y1, x2, y2 )
+	                A0      D0     D1  D2  D3  D4
+
+	VOID ScreenPosition( struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *, ULONG, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> );
+
+<b>    FUNCTION</b>
+	Moves the screen to the specified position or by the specified
+	increment, in screen pixel resolution coordinates.
+
+	If the x1 and y1 variables you specify would move the screen in
+	a way that violates any restrictions, the screen will be moved
+	as far as possible.  You may examine the LeftEdge and TopEdge
+	fields of the <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> structure after this function returns to
+	see where the screen really ended up.
+
+	Note that negative values for screen LeftEdge and TopEdge are
+	valid for screens bigger than their display clip.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> = pointer to a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> structure
+	flags = Set to one of SPOS_RELATIVE, SPOS_ABSOLUTE, or
+		SPOS_MAKEVISIBLE.   You may additionally set SPOS_FORCEDRAG
+		if you need.  Use SPOS_RELATIVE (zero) for normal use
+		(move screen a relative amount expressed by x1,y1).  Set
+		the SPOS_ABSOLUTE flag if you wish x1 and y1 to be absolute
+		coordinates to move the screen to.  Set SPOS_MAKEVISIBLE to
+		position an oversized scrolling screen so that the rectangle
+		described by (x1,y1)-(x2,y2) is on the visible part of
+		the display. (A word-processor may wish to support
+		autoscrolling as the user types.  In that case, it could
+		call ScreenPosition() with the SPOS_MAKEVISIBLE flag and
+		a rectangle that encompasses the cursor with some space
+		around it.
+
+		In addition to any one of the above choices, you can
+		additionally set SPOS_FORCEDRAG if you wish to reposition
+		a screen that was opened with the {SA_Draggable,FALSE}
+		attribute.
+
+	x1,y1 = Absolute position or change in position you wish to apply
+		to the screen, when using SPOS_ABSOLUTE or SPOS_RELATIVE.
+		When using SPOS_MAKEVISIBLE, these variables describe
+		the upper-left corner of the rectangle you would like to
+		ensure is on the visible part of a scrolling screen.
+	x2,y2 = Ignored when using SPOS_ABSOLUTE or SPOS_RELATIVE.
+		When using SPOS_MAKEVISIBLE, these variables describe
+		the lower-right corner of the rectangle you would like to
+		ensure is on the visible part of a scrolling screen.
+
+		Note that these coordinates are in the same resolution
+		as the screen (such as HIRES or INTERLACE)
+
+<b>    RESULT</b>
+	None
+
+<b>    NOTES</b>
+	ONLY the owner of the screen should use SPOS_FORCEDRAG.
+	It is incorrect style (and against the intentions of the
+	screen opener) for programs such as commodities or
+	mouse-helpers to move non-draggable screens.
+
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03C7.html">MoveScreen()</a>, <a href="../Includes_and_Autodocs_3._guide/node03E7.html">RethinkDisplay()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

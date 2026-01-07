@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-9" TITLE="10 Printer Device / Dumping a Rastport to a Printer" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 Printer Device / Dumping a Rastport to a Printer</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node004E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0050.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You dump a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> (drawing area) to a graphics capable printer by
+passing an <a href="../Includes_and_Autodocs_2._guide/node0052.html#line155">IODRPReq</a> to the device with <a href="../Includes_and_Autodocs_2._guide/node0519.html">PRD_DUMPRPORT</a> set in io_Command
+along with several parameters that define how the dump is to be rendered.
+
+    union printerIO *PrintIO
+    struct RastPort *rastPort;
+    struct ColorMap *colorMap;
+    ULONG modeid;
+    UWORD sx, sy, sw, sh;
+    LONG dc, dr;
+    UWORD s;
+
+    PrintIO-&#062;iodrp.io_RastPort = rastPort; /* pointer to RastPort */
+    PrintIO-&#062;iodrp.io_ColorMap = colorMap; /* pointer to color map */
+    PrintIO-&#062;iodrp.io_Modes = modeid;      /* ModeID of ViewPort */
+    PrintIO-&#062;iodrp.io_SrcX = sx;           /* RastPort X offset */
+    PrintIO-&#062;iodrp.io_SrcY = sy;           /* RastPort Y offset */
+    PrintIO-&#062;iodrp.io_SrcWidth = sw;       /* print width from X offset */
+    PrintIO-&#062;iodrp.io_SrcHeight = sh;      /* print height from Y offset */
+    PrintIO-&#062;iodrp.io_DestCols = dc;       /* pixel width */
+    PrintIO-&#062;iodrp.io_DestRows = dr;       /* pixel height */
+    PrintIO-&#062;iodrp.io_Special = s;         /* flags */
+    PrintIO-&#062;iodrp.io_Command = PRD_DUMPRPORT;
+    SendIO((struct IORequest *)request);
+
+The asynchronous <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a> routine is used in this example instead of the
+synchronous <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>.  A call to DoIO() does not return until the I/O
+request is finished. A call to SendIO() returns immediately.  This allows
+your task to do other processing such as checking if the user wants to
+abort the I/O request.  It should also be used when writing a lot of text
+<a name="line32">or raw data with <a href="../Includes_and_Autodocs_2._guide/node0518.html">CMD_WRITE</a> and <a href="../Includes_and_Autodocs_2._guide/node051C.html">PRD_RAWWRITE</a>.</a>
+
+Here is an overview of the possible arguments for the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> dump.
+
+   io_RastPort     A pointer to a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>. The RastPort's <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">bitmap</a> could be
+                   in Fast memory.
+
+   io_ColorMap     A pointer to a <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line113">ColorMap</a>. This could be a custom one.
+   io_Modes        The viewmode flags or the ModeID returned from
+                   GetVPModeID() (V36).
+
+   io_SrcX         X offset in the RastPort to start printing from.
+   io_SrcY         Y offset in the RastPort to start printing from.
+   io_SrcWidth     Width of the RastPort to print from io_SrcX.
+   io_SrcHeight    Height of the RastPort to print from io_SrcY.
+   io_DestCols     Width of the dump in printer pixels.
+   io_DestRows     Height of the dump in printer pixels.
+   io_Special      Flag bits (described below).
+
+Looking at these arguments you can see the enormous flexibility the
+printer device offers for dumping a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>. The RastPort pointed to
+could be totally custom defined. This flexibility means it is possible to
+build a <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line47">BitMap</a> with the resolution of the printer. This would result in
+having one pixel of the BitMap correspond to one pixel of the printer. In
+other words, only the resolution of the output device would limit the
+final result. With 12 bit planes and a custom <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line113">ColorMap</a>, you could dump
+4096 colors - without the HAM limitation - to a suitable printer. The
+offset, width and height parameters allow dumps of any desired part of the
+picture. Finally the <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a> mode, io_DestCols, io_DestRows parameters,
+together with the io_Special flags define how the dump will appear on
+paper and aid in getting the correct aspect ratio.
+
+ <a href="../Devices_Manual_guide/node0050.html">Printer Special Flags</a> 
+ <a href="../Devices_Manual_guide/node0051.html">Printing With Corrected Aspect Ratio</a> 
+ <a href="../Devices_Manual_guide/node0052.html">Strip Printing</a> 
+ <a href="../Devices_Manual_guide/node0053.html">Additional Notes About Graphic Dumps</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

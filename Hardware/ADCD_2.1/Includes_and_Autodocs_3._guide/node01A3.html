@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="ReadLink()" TITLE="dos.library/ReadLink" -->
+<head>
+<title>dos.library/ReadLink</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01A2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01A4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ReadLink -- Reads the path for a soft filesystem link (V36)
+
+<b>   SYNOPSIS</b>
+	success = ReadLink( port, lock, path, buffer, size)
+	D0		     D1    D2    D3     D4     D5
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> ReadLink( struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *, <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line129">BPTR</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, ULONG)
+
+<b>   FUNCTION</b>
+	ReadLink() takes a lock/name pair (usually from a failed attempt
+	to use them to access an object with packets), and asks the
+	filesystem to find the softlink and fill buffer with the modified
+	path string.  You then start the resolution process again by
+	calling <a href="../Includes_and_Autodocs_3._guide/node0177.html">GetDeviceProc()</a> with the new string from ReadLink().
+
+	Soft-links are resolved at access time by a combination of the
+	filesystem (by returning ERROR_IS_SOFT_LINK to dos), and by
+	Dos (using ReadLink() to resolve any links that are hit).
+
+<b>   INPUTS</b>
+	port - msgport of the filesystem
+	lock - lock this path is relative to on the filesystem
+	path - path that caused the ERROR_IS_SOFT_LINK
+	buffer - pointer to buffer for new path from handler.
+	size - size of buffer.
+
+<b>   RESULT</b>
+	Success - boolean
+
+<b>   BUGS</b>
+	In V36, soft-links didn't work in the ROM filesystem.  This was
+	fixed for V37.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node018B.html">MakeLink()</a>, <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open()</a>, <a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock()</a>, <a href="../Includes_and_Autodocs_3._guide/node0177.html">GetDeviceProc()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

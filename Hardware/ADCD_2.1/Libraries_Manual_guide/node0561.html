@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_E" NODE="E-2-1" TITLE="E / Release 2 Changes That Can Affect Compatibility / Exec" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>E / Release 2 Changes That Can Affect Compatibility / Exec</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0560.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0562.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+  * Do not jump to location $FC0002 -- the start of the ROM under
+    1.3 -- as part of performing a system RESET.  The 2.04 Kickstart
+    ROM has a temporary compatibility hack called &#034;Kickety-Split&#034; which
+    is a redirecting jump at $FC0002.  This hack does not appear on the
+    A3000 ROM and due to space considerations will not appear on future
+    machines.
+
+  * Everything has moved.
+
+  * The Supervisor stack is not in the same place as it was under 1.3.
+    This has caused problems for some games that completely take over the
+    Amiga.  If your program goes into <a href="../Libraries_Manual_guide/node02CA.html">Supervisor mode</a>, you must either
+    respect allocated memory or provide your own Supervisor stack when
+    taking over the machine.
+
+  * <a href="../Includes_and_Autodocs_2._guide/node009E.html#line31">ExecBase</a> is moved to expansion memory if possible.  Before, ExecBase
+    would only end up in one of two fixed locations.  Now, ColdCapture
+    may be called after expansion memory has been configured.
+
+  * Exception/Interrupt vectors may move.  This means the 68010 and above
+    Vector Base Register (VBR) may contain a non-zero value.  Poking
+    assumed low memory vector addresses may have no effect.  You must
+    read the VBR on 68010 and above to find the base.
+
+  * No longer tolerant of wild <a href="../Libraries_Manual_guide/node02C2.html#line9">Forbid()</a> counts.  Under 1.3, sometimes
+    this bug could go unnoticed.  Make sure that all Forbid()s are
+    matched with one and only one <a href="../Libraries_Manual_guide/node02C2.html#line9">Permit()</a> (and vice versa).
+
+  * When an Exec device gets an <a href="../Libraries_Manual_guide/node029D.html">IORequest</a>, it must validate <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">io_Command</a>.
+    If the io_Command is 0 or out of range, the device must return
+    <a href="../Includes_and_Autodocs_2._guide/node008F.html#line14">IOERR_NOCMD</a> and take no other action.  The filesystem now sends new
+    commands and expects older devices to properly ignore them.
+
+  * A fix to task-switching in Release 2 allows a busy task to properly
+    regain the processor after an interrupt until either its quantum (4
+    vertical blanks) is up or a higher priority task preempts it.  This
+    can dramatically change the behavior of multitask programs where one
+    task busyloops while another same-priority task <a href="../Libraries_Manual_guide/node02D4.html">Wait()</a>s.  See
+    &#034;<a href="../Libraries_Manual_guide/node0574.html">Task Switching</a>&#034; in the &#034;Additional Information&#034; section below.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

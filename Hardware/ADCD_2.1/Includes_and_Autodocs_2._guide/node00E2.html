@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/classusr.h" NODE="MAIN" TITLE="Includes/intuition/classusr.h" -->
+<head>
+<title>Includes/intuition/classusr.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00E1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00E3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	INTUITION_CLASSUSR_H
+#define INTUITION_CLASSUSR_H	1
+/*
+**  $Filename: intuition/classusr.h $
+**  $Release: 2.04 Includes, V37.4 $
+**  $Revision: 36.2 $
+**  $Date: 91/11/08 $
+**
+**  For application users of Intuition object classes
+**
+**  (C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+<a name="line15"></a>
+#ifndef UTILITY_HOOKS_H
+#include &#060;utility/hooks.h&#062;
+#endif
+<a name="line19"></a>
+<a name="line20">/*** User visible handles on objects, classes, messages ***/</a>
+typedef ULONG	Object;		/* abstract handle */
+<a name="line22"></a>
+typedef	UBYTE	*ClassID;
+<a name="line24"></a>
+/* you can use this type to point to a &#034;generic&#034; message,
+ * in the object-oriented programming parlance.  Based on
+ * the value of 'MethodID', you dispatch to processing
+ * for the various message types.  The meaningful parameter
+ * packet structure definitions are defined below.
+<a name="line30"> */</a>
+<a name="line31">typedef struct {</a>
+    ULONG MethodID;
+<a name="line33">    /* method-specific data follows, some examples below */</a>
+}		*Msg;
+
+/*
+ * Class id strings for Intuition classes.
+ * There's no real reason to use the uppercase constants
+ * over the lowercase strings, but this makes a good place
+ * to list the names of the built-in classes.
+<a name="line41"> */</a>
+<a name="line42">#define ROOTCLASS	&#034;rootclass&#034;		/* classusr.h	*/</a>
+<a name="line43">#define IMAGECLASS	&#034;imageclass&#034;		/* imageclass.h	*/</a>
+<a name="line44">#define FRAMEICLASS	&#034;frameiclass&#034;</a>
+<a name="line45">#define SYSICLASS	&#034;sysiclass&#034;</a>
+<a name="line46">#define FILLRECTCLASS	&#034;fillrectclass&#034;</a>
+<a name="line47">#define GADGETCLASS	&#034;gadgetclass&#034;		/* gadgetclass.h */</a>
+<a name="line48">#define PROPGCLASS	&#034;propgclass&#034;</a>
+<a name="line49">#define STRGCLASS	&#034;strgclass&#034;</a>
+<a name="line50">#define BUTTONGCLASS	&#034;buttongclass&#034;</a>
+<a name="line51">#define FRBUTTONCLASS	&#034;frbuttonclass&#034;</a>
+<a name="line52">#define GROUPGCLASS	&#034;groupgclass&#034;</a>
+<a name="line53">#define ICCLASS		&#034;icclass&#034;		/* icclass.h	*/</a>
+#define MODELCLASS	&#034;modelclass&#034;
+
+
+/* Dispatched method ID's
+ * NOTE: Applications should use Intuition entry points, not direct
+ * DoMethod() calls, for NewObject, DisposeObject, SetAttrs,
+ * SetGadgetAttrs, and GetAttr.
+ */
+<a name="line62"></a>
+<a name="line63">#define OM_Dummy	(0x100)</a>
+<a name="line64">#define OM_NEW		(0x101)	/* 'object' parameter is &#034;true class&#034;	*/</a>
+<a name="line65">#define OM_DISPOSE	(0x102)	/* delete self (no parameters)		*/</a>
+<a name="line66">#define OM_SET		(0x103)	/* set attributes (in tag list)		*/</a>
+<a name="line67">#define OM_GET		(0x104)	/* return single attribute value	*/</a>
+<a name="line68">#define OM_ADDTAIL	(0x105)	/* add self to a List (let root do it)	*/</a>
+<a name="line69">#define OM_REMOVE	(0x106)	/* remove self from list		*/</a>
+<a name="line70">#define OM_NOTIFY	(0x107)	/* send to self: notify dependents	*/</a>
+<a name="line71">#define OM_UPDATE	(0x108)	/* notification message from somebody	*/</a>
+<a name="line72">#define OM_ADDMEMBER	(0x109)	/* used by various classes with lists	*/</a>
+#define OM_REMMEMBER	(0x10A)	/* used by various classes with lists	*/
+
+/* Parameter &#034;Messages&#034; passed to methods	*/
+<a name="line76"></a>
+<a name="line77">/* OM_NEW and OM_SET	*/</a>
+<a name="line78">struct opSet {</a>
+<a name="line79">    ULONG		MethodID;</a>
+<a name="line80">    struct TagItem	*ops_AttrList;	/* new attributes	*/</a>
+    struct GadgetInfo	*ops_GInfo;	/* always there for gadgets,
+					 * when SetGadgetAttrs() is used,
+					 * but will be NULL for OM_NEW
+					 */
+};
+
+<a name="line87">/* OM_NOTIFY, and OM_UPDATE	*/</a>
+<a name="line88">struct opUpdate {</a>
+<a name="line89">    ULONG		MethodID;</a>
+<a name="line90">    struct TagItem	*opu_AttrList;	/* new attributes	*/</a>
+    struct GadgetInfo	*opu_GInfo;	/* non-NULL when SetGadgetAttrs or
+					 * notification resulting from gadget
+					 * input occurs.
+<a name="line94">					 */</a>
+    ULONG		opu_Flags;	/* defined below	*/
+};
+
+/* this flag means that the update message is being issued from
+ * something like an active gadget, a la GACT_FOLLOWMOUSE.  When
+ * the gadget goes inactive, it will issue a final update
+ * message with this bit cleared.  Examples of use are for
+ * GACT_FOLLOWMOUSE equivalents for propgadclass, and repeat strobes
+ * for buttons.
+<a name="line104"> */</a>
+#define OPUF_INTERIM	(1&#060;&#060;0)
+<a name="line106"></a>
+<a name="line107">/* OM_GET	*/</a>
+<a name="line108">struct opGet {</a>
+<a name="line109">    ULONG		MethodID;</a>
+<a name="line110">    ULONG		opg_AttrID;</a>
+    ULONG		*opg_Storage;	/* may be other types, but &#034;int&#034;
+					 * types are all ULONG
+					 */
+};
+<a name="line115"></a>
+<a name="line116">/* OM_ADDTAIL	*/</a>
+<a name="line117">struct opAddTail {</a>
+<a name="line118">    ULONG		MethodID;</a>
+    struct List		*opat_List;
+};
+<a name="line121"></a>
+<a name="line122">/* OM_ADDMEMBER, OM_REMMEMBER	*/</a>
+<a name="line123">#define  opAddMember opMember</a>
+<a name="line124">struct opMember {</a>
+<a name="line125">    ULONG		MethodID;</a>
+    Object		*opam_Object;
+};
+
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

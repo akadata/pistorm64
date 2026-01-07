@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/ramdev-mountlist" NODE="MAIN" TITLE="Devices/ramdev-mountlist" -->
+<head>
+<title>Devices/ramdev-mountlist</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01FD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01FF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Mountlist for manually mounting the sample ramdisk driver.
+ *
+ * F0: and F1: are set up for the V1.3 fast file system (FFS).
+ * S2: and S3: are setup for the old file system (OFS).
+ *
+ * After mounting, the drives must be formatted.  Be sure to
+ * use the FFS flag when formatting the Fast File System
+ * ramdrives:
+ *
+ *	;make sure &#034;ramdev.device&#034; is in DEVS:
+ *
+ *	mount f0: from mydev-mountlist
+ *	format drive f0: name &#034;Zippy&#034; FFS
+ */
+F0:	   Device = ramdev.device
+	   Unit   = 0
+	   LowCyl = 0 ; HighCyl = 14
+	   Surfaces  = 1
+	   Buffers = 1
+	   BlocksPerTrack = 10
+	   Flags  = 0
+	   Reserved = 2
+	   GlobVec = -1
+	   BufMemType = 0
+	   DosType = 0x444F5301
+	   StackSize = 4000
+	   FileSystem = l:fastfilesystem
+#
+F1:	   Device = ramdev.device
+	   Unit   = 1
+	   LowCyl = 0 ; HighCyl = 14
+	   Surfaces  = 1
+	   Buffers = 1
+	   BlocksPerTrack = 10
+	   Flags  = 0
+	   Reserved = 2
+	   GlobVec = -1
+	   BufMemType = 0
+	   DosType = 0x444F5301
+	   StackSize = 4000
+	   FileSystem = l:fastfilesystem
+#
+S2:	   Device = ramdev.device
+	   Unit   = 2
+	   Flags  = 0
+	   Surfaces  = 1
+	   BlocksPerTrack = 10
+	   Reserved = 1
+	   Interleave = 0
+	   LowCyl = 0  ;  HighCyl = 14
+	   Buffers = 1
+	   BufMemType = 0
+#
+S3:	   Device = ramdev.device
+	   Unit   = 3
+	   Flags  = 0
+	   Surfaces  = 1
+	   BlocksPerTrack = 10
+	   Reserved = 1
+	   Interleave = 0
+	   LowCyl = 0  ;  HighCyl = 14
+	   Buffers = 1
+	   BufMemType = 0
+#
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

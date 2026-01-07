@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/other/clipftxt.c" NODE="MAIN" TITLE="Devices/other/clipftxt.c" -->
+<head>
+<title>Devices/other/clipftxt.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02FA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02FC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* clipftxt.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -j73 clipftxt.c
+Blink FROM LIB:c.o,clipftxt.o TO clipftxt LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+
+*
+* clipftxt.c:	Writes ASCII text to clipboard unit as FTXT
+*		(All clipboard data must be IFF)
+*
+* Usage: clipftxt unitnumber
+*
+* To convert to an example of reading only, comment out #define WRITEREAD
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;libraries/dos.h&#062;
+#include &#060;libraries/iffparse.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/iffparse_protos.h&#062;
+#include &#060;stdlib.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;string.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+/* Causes example to write FTXT first, then read it back
+ * Comment out to create a reader only
+ */
+#define WRITEREAD
+
+
+#define MINARGS 2
+
+/* 2.0 Version string for c:Version to find */
+UBYTE vers[] = &#034;\0$VER: clipftxt 37.2&#034;;
+
+UBYTE usage[] = &#034;Usage: clipftxt unitnumber (use zero for primary unit)&#034;;
+
+/*
+ * Text error messages for possible IFFERR_#? returns from various
+ * IFF routines.  To get the index into this array, take your IFFERR code,
+ * negate it, and subtract one.
+ *  idx = -error - 1;
+ */
+char	*errormsgs[] = {
+	&#034;End of file (not an error).&#034;,
+	&#034;End of context (not an error).&#034;,
+	&#034;No lexical scope.&#034;,
+	&#034;Insufficient memory.&#034;,
+	&#034;Stream read error.&#034;,
+	&#034;Stream write error.&#034;,
+	&#034;Stream seek error.&#034;,
+	&#034;File is corrupt.&#034;,
+	&#034;IFF syntax error.&#034;,
+	&#034;Not an IFF file.&#034;,
+	&#034;Required call-back hook missing.&#034;,
+	&#034;Return to client.  You should never see this.&#034;
+};
+
+#define RBUFSZ 512
+
+#define  ID_FTXT	MAKE_ID('F','T','X','T')
+#define  ID_CHRS	MAKE_ID('C','H','R','S')
+
+struct Library *IFFParseBase;
+
+UBYTE mytext[]=&#034;This FTXT written to clipboard by clipftxt example.\n&#034;;
+
+void main(int argc, char **argv)
+{
+    struct IFFHandle	*iff = NULL;
+    struct ContextNode  *cn;
+    long		error=0, unitnumber=0, rlen;
+    int textlen;
+    UBYTE readbuf[RBUFSZ];
+
+    	/* if not enough args or '?', print usage */
+    	if(((argc)&#038;&#038;(argc&#060;MINARGS))||(argv[argc-1][0]=='?'))
+		{
+	    	printf(&#034;%s\n&#034;,usage);
+	    	exit(RETURN_WARN);
+	    	}
+
+	unitnumber = atoi(argv[1]);
+
+	if (!(IFFParseBase = OpenLibrary (&#034;iffparse.library&#034;, 0L)))
+		{
+		puts(&#034;Can't open iff parsing library.&#034;);
+		goto bye;
+		}
+
+	/*
+	 * Allocate IFF_File structure.
+	 */
+	if (!(iff = AllocIFF ()))
+		{
+		puts (&#034;AllocIFF() failed.&#034;);
+		goto bye;
+		}
+
+	/*
+	 * Set up IFF_File for Clipboard I/O.
+	 */
+	if (!(iff-&#062;iff_Stream = (ULONG) OpenClipboard (unitnumber)))
+		{
+		puts (&#034;Clipboard open failed.&#034;);
+		goto bye;
+		}
+	else printf(&#034;Opened clipboard unit %ld\n&#034;,unitnumber);
+
+	InitIFFasClip (iff);
+
+#ifdef WRITEREAD
+
+	/*
+	 * Start the IFF transaction.
+	 */
+	if (error = OpenIFF (iff, IFFF_WRITE))
+		{
+		puts (&#034;OpenIFF for write failed.&#034;);
+		goto bye;
+		}
+
+	/*
+	 * Write our text to the clipboard as CHRS chunk in FORM FTXT
+	 *
+	 * First, write the FORM ID (FTXT)
+	 */
+    	if(!(error=PushChunk(iff, ID_FTXT, ID_FORM, IFFSIZE_UNKNOWN)))
+		{
+		/* Now the CHRS chunk ID followed by the chunk data
+		 * We'll just write one CHRS chunk.
+		 * You could write more chunks.
+		 */
+    		if(!(error=PushChunk(iff, 0, ID_CHRS, IFFSIZE_UNKNOWN)))
+			{
+			/* Now the actual data (the text) */
+			textlen = strlen(mytext);
+			if(WriteChunkBytes(iff, mytext, textlen) != textlen)
+				{
+				puts(&#034;Error writing CHRS data.&#034;);
+				error = IFFERR_WRITE;
+				}
+			}
+		if(!error) error = PopChunk(iff);
+		}
+	if(!error) error = PopChunk(iff);
+
+
+	if(error)
+		{
+		printf (&#034;IFF write failed, error %ld: %s\n&#034;,
+			error, errormsgs[-error - 1]);
+		goto bye;
+		}
+	else printf(&#034;Wrote text to clipboard as FTXT\n&#034;);
+
+	/*
+	 * Now let's close it, then read it back
+	 * First close the write handle, then close the clipboard
+	 */
+	CloseIFF(iff);
+	if (iff-&#062;iff_Stream) CloseClipboard ((struct ClipboardHandle *)
+						iff-&#062;iff_Stream);
+
+	if (!(iff-&#062;iff_Stream = (ULONG) OpenClipboard (unitnumber)))
+		{
+		puts (&#034;Reopen of Clipboard failed.&#034;);
+		goto bye;
+		}
+	else printf(&#034;Reopened clipboard unit %ld\n&#034;,unitnumber);
+
+#endif /* WRITEREAD */
+
+	if (error = OpenIFF (iff, IFFF_READ))
+		{
+		puts (&#034;OpenIFF for read failed.&#034;);
+		goto bye;
+		}
+
+	/* Tell iffparse we want to stop on FTXT CHRS chunks */
+	if (error = StopChunk(iff, ID_FTXT, ID_CHRS))
+		{
+		puts (&#034;StopChunk failed.&#034;);
+		goto bye;
+		}
+
+	/* Find all of the FTXT CHRS chunks */
+	while(1)
+		{
+		error = ParseIFF(iff,IFFPARSE_SCAN);
+		if(error == IFFERR_EOC) continue;	/* enter next context */
+		else if(error) break;
+
+		/* We only asked to stop at FTXT CHRS chunks
+		 * If no error we've hit a stop chunk
+		 * Read the CHRS chunk data
+		 */
+		cn = CurrentChunk(iff);
+
+		if((cn)&#038;&#038;(cn-&#062;cn_Type == ID_FTXT)&#038;&#038;(cn-&#062;cn_ID == ID_CHRS))
+			{
+			printf(&#034;CHRS chunk contains:\n&#034;);
+			while((rlen = ReadChunkBytes(iff,readbuf,RBUFSZ)) &#062; 0)
+				{
+				Write(Output(),readbuf,rlen);
+				}
+			if(rlen &#060; 0)	error = rlen;
+			}
+		}
+
+	if((error)&#038;&#038;(error != IFFERR_EOF))
+		{
+		printf (&#034;IFF read failed, error %ld: %s\n&#034;,
+			error, errormsgs[-error - 1]);
+		}
+
+bye:
+	if (iff) {
+		/*
+		 * Terminate the IFF transaction with the stream.  Free
+		 * all associated structures.
+		 */
+		CloseIFF (iff);
+
+		/*
+		 * Close the clipboard stream
+		 */
+		if (iff-&#062;iff_Stream)
+				CloseClipboard ((struct ClipboardHandle *)
+						iff-&#062;iff_Stream);
+		/*
+		 * Free the IFF_File structure itself.
+		 */
+		FreeIFF (iff);
+		}
+	if (IFFParseBase)	CloseLibrary (IFFParseBase);
+
+	exit (RETURN_OK);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

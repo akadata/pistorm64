@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-101/dt.c" NODE="MAIN" TITLE="IV-101/dt.c" -->
+<head>
+<title>IV-101/dt.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01BB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01BD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+; /* Compiled with SAS/C 6.56.  Run from CLI only.
+sc DATA=NEAR NMINC STRMERGE NOSTKCHK IGNORE=73 dt.c
+slink from lib:c.o dt.o TO dt LIBRARY lib:sc.lib lib:amiga.lib
+quit ; */
+
+#include &#060;exec/types.h&#062;
+#include &#060;datatypes/datatypesclass.h&#062;  /* This includes other files we need */
+#include &#060;stdio.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;          /* Prototypes for system functions */
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/datatypes_protos.h&#062;
+
+#ifdef LATTICE                         /* Disable SAS/C CTRL-C handling */
+int CXBRK(void)    { return(0); }
+int chkabort(void) { return(0); }
+#endif
+
+
+
+
+struct Library *IntuitionBase=NULL;    /* System library bases */
+struct Library *DataTypesBase=NULL;
+
+VOID main(int argc, char **argv)
+{
+APTR dtobject=NULL;        /* Pointer to a datatypes object */
+struct dtTrigger mydtt;    /* A trigger structure for the DTM_TRIGGER method */
+ULONG dores;               /* Variable for return values    */
+
+if (IntuitionBase=OpenLibrary(&#034;intuition.library&#034;,39L))
+   {
+   if(DataTypesBase=OpenLibrary(&#034;datatypes.library&#034;,39L) )
+      {
+      if(argc &#062; 1 ) /* CLI only, at least one argument please. */
+         {
+         /* Attempt to make an 8svx sound object from the file name the user */
+         /* specified in the command line.  For a list of possible error     */
+         /* returns, see the Autodocs for NewDTObjectA().  The group ID tag  */
+         /* will allow only sound datatype files to be accepted for the call.*/
+         if (dtobject = NewDTObject(argv[1], DTA_GroupID, GID_SOUND,
+                                             TAG_END) )
+            {
+            mydtt.MethodID     = DTM_TRIGGER; /* Fill in the dtTrigger struct */
+            mydtt.dtt_GInfo    = NULL;
+            mydtt.dtt_Function = STM_PLAY;
+            mydtt.dtt_Data     = NULL;
+
+            /* The return value of the DTM_TRIGGER method used with the 8svx */
+            /* sound datatype is undefined in V39.  This is likely to change */
+            /* in future versions of the Amiga operating system.             */
+            dores = DoDTMethodA(dtobject, NULL, NULL, &#038;mydtt);
+
+            /* Let the 8svx sound finish playing.  Currently (V39) there is  */
+            /* no programmatic way to find out when it is finished playing.  */
+            Wait(SIGBREAKF_CTRL_C);
+
+            DisposeDTObject(dtobject);
+            }
+         else printf(&#034;Couldn't create new object or not a sound data file\n&#034;);
+
+         }
+      else printf(&#034;Give a file name too.\n&#034;);
+
+      CloseLibrary(DataTypesBase);
+      }
+   else printf(&#034;Can't open datatypes library\n&#034;);
+
+   CloseLibrary(IntuitionBase);
+   }
+else printf(&#034;Can't open V39 Intuition\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

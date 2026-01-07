@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_10" NODE="10-2" TITLE="10 Printer Device / Printer Device Access" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>10 Printer Device / Printer Device Access</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node003F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0041.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The printer device is totally transparent to an application. It uses
+information set up by the Workbench Preferences Printer and PrinterGfx
+tools to identify the type of printer connection (serial or parallel),
+type of dithering, etc.  It also offers the flexibility to send raw
+information to the printer for special non-standard or unsupported
+features. Raw data transfer is not recommended for conventional text and
+graphics since it will result in applications that will only work with
+certain printers. By using the standard printer device interface, an
+application can perform device independent output to a printer.
+
+   Don't Hog The Device.
+   ---------------------
+   The printer device is currently an exclusive access device.  Do not
+<a name="line15">   tie it up needlessly.</a>
+
+<a name="line17">There are two ways of doing output to the printer device:</a>
+
+*  PRT:-the AmigaDOS printer device
+   PRT: may be opened just like any other AmigaDOS file. You may send
+   standard escape sequences to PRT: to specify the options you want as
+   shown in the command table below. The escape sequences are
+   interpreted by the printer driver, translated into printer-specific
+   escape sequences and forwarded to the printer. When using PRT: the
+   escape sequences and data must be sent as a character stream. Using
+<a name="line26">   PRT: is by far the easiest way of doing text output to a printer.</a>
+
+*  printer.device - to directly access the printer device itself
+   By opening the printer device directly, you have full control over
+   the printer.  You can either send standard escape sequences as shown
+   in the command table below or send raw characters directly to the
+   printer with no processing at all. Doing this would be similar to
+   sending raw characters to SER: or PAR: from AmigaDOS. (Since this
+   interferes with device-independence it is strongly discouraged).
+   Direct access to the printer device also allows you to transmit
+   device I/O commands, such as reset and flush, and do a raster dump on
+   a graphics-capable printer.
+
+   Use A Stream to Escape.
+   -----------------------
+   All &#034;raw escape sequences&#034; transmitted to the printer through the
+   printer device must take the form of a character stream.
+
+ <a href="../Devices_Manual_guide/node0041.html">Opening Prt:</a>        <a href="../Devices_Manual_guide/node0042.html">Writing To Prt:</a>        <a href="../Devices_Manual_guide/node0043.html">Closing Prt:</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

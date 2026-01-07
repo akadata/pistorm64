@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-3-3" TITLE="14 / Advanced Commands / Controlling The Drive Motor" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 / Advanced Commands / Controlling The Drive Motor</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00E6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00E8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+ETD_MOTOR and <a href="../Includes_and_Autodocs_2._guide/node052B.html">TD_MOTOR</a> give you control of the motor. When the trackdisk
+device executes this command, the old state of the motor is returned in
+io_Actual. If io_Actual is zero, then the motor was off.  Any other value
+implies that the motor was on.  If the motor is just being turned on, the
+device will delay the proper amount of time to allow the drive to come up
+to speed. Normally, turning the drive on is not necessary - the device
+does this automatically if it receives a request when the motor is off.
+
+However, turning the motor off is the programmer's responsibility. In
+addition, the standard instructions to the user are that it is safe to
+remove a disk if, and only if, the motor is off (that is, if the disk
+light is off).
+
+You control the drive motor by passing an <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> to the device with
+TD_MOTOR or ETD_MOTOR set in io_Command and the state you want to put the
+motor in set in io_Length.  If io_Length is set to 1, the trackdisk device
+will turn on the motor; a 0 will turn it off. For ETD_MOTOR, you must also
+set iotd_Count to the current diskchange number.
+
+   DiskIO-&#062;iotd_Req.io_Length = 1;          /* Turn on the drive motor */
+   DiskIO-&#062;iotd_Req.io_Command = TD_MOTOR;
+   DoIO((struct IORequest *)DiskIO);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="QBSBlit()" TITLE="graphics.library/QBSBlit" -->
+<head>
+<title>graphics.library/QBSBlit</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node030E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0310.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+
+	QBSBlit -- Synchronize the blitter request with the video beam.
+
+<b>   SYNOPSIS</b>
+
+	QBSBlit( bsp )
+		 a1
+
+	void QBSBlit( struct <a href="../Includes_and_Autodocs_3._guide/node05DF.html#line87">bltnode</a> * );
+
+<b>   FUNCTION</b>
+	Call a user routine for use of the blitter, enqueued separately from
+       the <a href="../Includes_and_Autodocs_3._guide/node030E.html">QBlit</a> queue.  Calls the user routine contained in the blit
+       structure when the video beam is located at a specified position
+       onscreen.   Useful when you are trying to blit into a visible part
+       of the screen and wish to perform the data move while the beam is
+       not trying to display that same area.  (prevents showing part of
+       an old display and part of a new display simultaneously).  Blitter
+       requests on the QBSBlit queue take precedence over those on the
+       regular blitter queue. The beam position is specified in the blitnode.
+
+<b>   INPUTS</b>
+	bsp - pointer to a blit structure.  See description in the
+             Graphics Support section of the manual for more info.
+
+<b>   RESULT</b>
+       User routine is called when the QBSBlit queue reaches this
+       request AND the video beam is in the specified position.
+       If there are lots of blits going on and the video beam
+       has wrapped around back to the top it will call all the
+       remaining bltnodes as fast as it can to try and catch up.
+
+<b>   NOTES</b>
+       <a href="../Includes_and_Autodocs_3._guide/node030E.html">QBlit()</a>, and QBSBlit() have been rewritten for V39.  Queued
+       blits are now handled in FIFO order.  Tasks trying to
+       <a href="../Includes_and_Autodocs_3._guide/node030C.html">OwnBlitter()</a> are now given a fair share of the total
+       blitter time available.  QBSBlit() is no longer queued
+       separately from nodes added by <a href="../Includes_and_Autodocs_3._guide/node030E.html">QBlit()</a>.  This fixes the
+       ordering dependencies listed under BUGS in prior autodoc
+       notes.
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node030E.html">QBlit()</a> <a href="../Includes_and_Autodocs_3._guide/node05DF.html">hardware/blit.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/visiblewindow.c" NODE="MAIN" TITLE="Lib_examples/visiblewindow.c" -->
+<head>
+<title>Lib_examples/visiblewindow.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05BE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05C0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* visiblewindow.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 visiblewindow.c
+Blink FROM LIB:c.o,visiblewindow.o TO visiblewindow LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+**
+** open a window on the visible part of a screen, with the window as large
+** as the visible part of the screen.  It is assumed that the visible part
+** of the screen is OSCAN_TEXT, which how the user has set their preferences.
+*/
+#define INTUI_V36_NAMES_ONLY
+
+#include &#060;exec/types.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/intuitionbase.h&#062;
+#include &#060;graphics/displayinfo.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+/* Minimum window width and height:
+** These values should really be calculated dynamically given the size
+** of the font and the window borders.  Here, to keep the example simple
+** they are hard-coded values.
+*/
+#define MIN_WINDOW_WIDTH  (100)
+#define MIN_WINDOW_HEIGHT (50)
+
+/* minimum and maximum calculations...Note that each argument is
+** evaluated twice (don't use max(a++,foo(c))).
+*/
+#define max(a,b) ((a)&#062;(b)?(a):(b))
+#define min(a,b) ((a)&#060;=(b)?(a):(b))
+
+struct Library *IntuitionBase;
+struct Library *GfxBase;
+
+/* our function prototypes */
+VOID handle_window_events(struct Window *win);
+VOID fullScreen(VOID);
+
+/*
+** open all the libraries and run the code.  Cleanup when done.
+*/
+VOID main(int argc, char **argv)
+{
+/* these calls are only valid if we have Intuition version 37 or greater */
+if (GfxBase = OpenLibrary(&#034;graphics.library&#034;,37))
+    {
+    if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,37))
+        {
+        fullScreen();
+
+        CloseLibrary(IntuitionBase);
+        }
+    CloseLibrary(GfxBase);
+    }
+}
+
+
+/*
+** Open a window on the default public screen, then leave it open until the
+** user selects the close gadget. The window is full-sized, positioned in the
+** currently visible OSCAN_TEXT area.
+*/
+VOID fullScreen(VOID)
+{
+struct Window *test_window;
+struct Screen *pub_screen;
+struct Rectangle rect;
+ULONG screen_modeID;
+LONG width, height, left, top;
+
+left  = 0;   /* set some reasonable defaults for left, top, width and height. */
+top   = 0;   /* we'll pick up the real values with the call to QueryOverscan(). */
+width = 640;
+height= 200;
+
+/* get a lock on the default public screen */
+if (NULL != (pub_screen = LockPubScreen(NULL)))
+    {
+    /* this technique returns the text overscan rectangle of the screen that we
+    ** are opening on.  If you really need the actual value set into the display
+    ** clip of the screen, use the VideoControl() command of the graphics library
+    ** to return a copy of the ViewPortExtra structure.  See the Graphics
+    ** library chapter and Autodocs for more details.
+    **
+    ** GetVPModeID() is a graphics call...
+    */
+
+    screen_modeID = GetVPModeID(&#038;pub_screen-&#062;ViewPort);
+    if(screen_modeID != INVALID_ID)
+        {
+        if (QueryOverscan(screen_modeID, &#038;rect, OSCAN_TEXT))
+            {
+            /* make sure window coordinates are positive or zero */
+            left = max(0, -pub_screen-&#062;LeftEdge);
+            top  = max(0, -pub_screen-&#062;TopEdge);
+
+            /* get width and height from size of display clip */
+            width  = rect.MaxX - rect.MinX + 1;
+            height = rect.MaxY - rect.MinY + 1;
+
+            /* adjust height for pulled-down screen (only show visible part) */
+            if (pub_screen-&#062;TopEdge &#062; 0)
+                height -= pub_screen-&#062;TopEdge;
+
+            /* insure that window fits on screen */
+            height = min(height, pub_screen-&#062;Height);
+            width  = min(width,  pub_screen-&#062;Width);
+
+            /* make sure window is at least minimum size */
+            width  = max(width,  MIN_WINDOW_WIDTH);
+            height = max(height, MIN_WINDOW_HEIGHT);
+            }
+        }
+
+    /* open the window on the public screen */
+    test_window = OpenWindowTags(NULL,
+            WA_Left, left,            WA_Width,  width,
+            WA_Top,  top,             WA_Height, height,
+            WA_CloseGadget, TRUE,
+            WA_IDCMP,       IDCMP_CLOSEWINDOW,
+            WA_PubScreen,   pub_screen,
+            TAG_END);
+
+    /* unlock the screen.  The window now acts as a lock on the screen,
+    ** and we do not need the screen after the window has been closed.
+    */
+    UnlockPubScreen(NULL, pub_screen);
+
+    /* if we have a valid window open, run the rest of the
+    ** program, then clean up when done.
+    */
+    if (test_window)
+        {
+        handle_window_events(test_window);
+        CloseWindow(test_window);
+        }
+    }
+}
+
+
+/*
+** Wait for the user to select the close gadget.
+*/
+VOID handle_window_events(struct Window *win)
+{
+struct IntuiMessage *msg;
+BOOL done = FALSE;
+
+while (! done)
+    {
+    /* we only have one signal bit, so we do not have to check which
+    ** bit(s) broke the Wait() (i.e. the return value of Wait)
+    */
+    Wait(1L &#060;&#060; win-&#062;UserPort-&#062;mp_SigBit);
+
+    while ( (! done) &#038;&#038;
+            (msg = (struct IntuiMessage *)GetMsg(win-&#062;UserPort)))
+        {
+        /* use a switch statement if looking for multiple event types */
+        if (msg-&#062;Class == IDCMP_CLOSEWINDOW)
+            done = TRUE;
+
+        ReplyMsg((struct Message *)msg);
+        }
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

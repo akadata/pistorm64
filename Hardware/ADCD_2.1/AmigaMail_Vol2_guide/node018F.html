@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="III-1/Ispy_stubs.asm" NODE="MAIN" TITLE="III-1/Ispy_stubs.asm" -->
+<head>
+<title>III-1/Ispy_stubs.asm</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node018E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0190.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+**
+**      ISpy stubs
+**
+**
+** Copyright (c) 1991-1999 Amiga, Inc.
+**
+** This example is provided in electronic form by Amiga,
+** Inc. for use with the Amiga Mail Volume II technical publication.
+** Amiga Mail Volume II contains additional information on the correct
+** usage of the techniques and operating system functions presented in
+** these examples.  The source and executable code of these examples may
+** only be distributed in free electronic form, via bulletin board or
+** as part of a fully non-commercial and freely redistributable
+** diskette.  Both the source and executable code (including comments)
+** must be included, without modification, in any copy.  This example
+** may not be published in printed form or distributed with any
+** commercial product. However, the programming techniques and support
+** routines set forth in these examples may be used in the development
+** of original executable software products for Amiga
+** computers.
+**
+** All other rights reserved.
+**
+** This example is provided &#034;as-is&#034; and is subject to change; no
+** warranties are made.  All use is at your own risk. No liability or
+** responsibility is assumed.
+**
+**
+	INCLUDE &#034;exec/types.i&#034;
+
+	SECTION CODE
+
+	XREF	_SysBase
+
+	XREF    _LVOForbid
+	XREF    _LVOPermit
+
+	XREF	_newOpenScreen
+	XREF	_newOpenWindowTagList
+	XREF	_newFreeMem
+	XREF	_newSetFont
+
+	XDEF	_OpenScreenStub
+	XDEF	_OpenWindowTagListStub
+	XDEF	_FreeMemStub
+	XDEF	_SetFontStub
+
+
+_OpenScreenStub:
+	movem.l	a4,-(sp)
+	lea		4(sp),a4
+	jsr		_newOpenScreen
+	movem.l	(sp)+,a4
+	rts
+
+_OpenWindowTagListStub:
+	movem.l	a4,-(sp)
+	lea		4(sp),a4
+	jsr		_newOpenWindowTagList
+	movem.l	(sp)+,a4
+	rts
+
+_FreeMemStub:
+	movem.l	a4,-(sp)
+	lea		4(sp),a4
+	jsr		_newFreeMem
+	movem.l	(sp)+,a4
+	rts
+
+_SetFontStub:
+	movem.l	a4,-(sp)
+	lea		4(sp),a4
+	jsr		_newSetFont
+	movem.l	(sp)+,a4
+	rts
+
+	END
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

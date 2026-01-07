@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_24" NODE="24-1-2" TITLE="24 / Message Ports / Deleting a Message Port" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>24 / Message Ports / Deleting a Message Port</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02EC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02EE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Before a message port is deleted, all outstanding messages from other
+tasks must be returned.  This is done by getting and replying to all
+messages at the port until message queue is empty.  Of course, there is no
+need to reply to messages owned by the current task (the task performing
+the port deletion).  Public ports attached to the system with <a href="../Libraries_Manual_guide/node02EC.html">AddPort()</a>
+must be removed from the system with <a href="../Includes_and_Autodocs_2._guide/node0374.html">RemPort()</a> before deallocation.  This
+amiga.lib functions <a href="../Libraries_Manual_guide/node02EC.html">CreatePort()</a> and <a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a> handle this
+automatically.
+
+The following example of port deletion is equivalent to the <a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>
+function as supplied in amiga.lib.  Note that DeletePort() must only be
+used on ports created with <a href="../Libraries_Manual_guide/node02EC.html">CreatePort()</a>.
+
+    void DeletePort(mp)
+    struct MsgPort *mp;
+    {
+        if ( mp-&#062;mp_Node.ln_Name ) RemPort(mp);  /* if it was public... */
+
+        mp-&#062;mp_SigTask         = (struct Task *) -1;
+                                /* Make it difficult to re-use the port */
+        mp-&#062;mp_MsgList.lh_Head = (struct Node *) -1;
+
+        FreeSignal( mp-&#062;mp_SigBit );
+        FreeMem( mp, (ULONG)sizeof(struct MsgPort) );
+<a name="line26">    }</a>
+
+To delete ports created with <a href="../Libraries_Manual_guide/node02EC.html#line39">CreateMsgPort()</a>, <a href="../Includes_and_Autodocs_2._guide/node0349.html">DeleteMsgPort()</a> must be
+used.  Note that these functions are only available in V36 and higher.  If
+the port was made public with <a href="../Libraries_Manual_guide/node02EC.html">AddPort()</a>, <a href="../Includes_and_Autodocs_2._guide/node0374.html">RemPort()</a> must be used first, to
+remove the port from the system.  Again, make sure all outstanding
+messages are replied to, so that the message queue is empty.
+
+    struct MsgPort *newmp;
+
+    if (newmp)
+    {
+        if ( newmp-&#062;mp_Node.ln_Name ) RemPort(newmp);
+                                /* if it was public... */
+        DeleteMsgPort(newmp);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

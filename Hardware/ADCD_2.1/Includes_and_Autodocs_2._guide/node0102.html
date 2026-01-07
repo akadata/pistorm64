@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/libraries/diskfont.h" NODE="MAIN" TITLE="Includes/libraries/diskfont.h" -->
+<head>
+<title>Includes/libraries/diskfont.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0101.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0103.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	LIBRARIES_DISKFONT_H
+#define	LIBRARIES_DISKFONT_H
+/*
+**	$Filename: libraries/diskfont.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.6 $
+**	$Date: 90/11/26 $
+**
+**	diskfont library definitions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef     EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+<a name="line17">#endif</a>
+#ifndef     EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+<a name="line20">#endif</a>
+#ifndef     EXEC_LISTS_H
+#include &#034;exec/lists.h&#034;
+<a name="line23">#endif</a>
+#ifndef     GRAPHICS_TEXT_H
+#include &#034;graphics/text.h&#034;
+#endif
+<a name="line27"></a>
+#define     MAXFONTPATH 256   /* including null terminator */
+<a name="line29"></a>
+<a name="line30">struct FontContents {</a>
+<a name="line31">    char    fc_FileName[MAXFONTPATH];</a>
+<a name="line32">    UWORD   fc_YSize;</a>
+<a name="line33">    UBYTE   fc_Style;</a>
+    UBYTE   fc_Flags;
+};
+<a name="line36"></a>
+<a name="line37">struct TFontContents {</a>
+<a name="line38">    char    tfc_FileName[MAXFONTPATH-2];</a>
+    UWORD   tfc_TagCount;	/* including the TAG_DONE tag */
+    /*
+     *	if tfc_TagCount is non-zero, tfc_FileName is overlayed with
+     *	Text Tags starting at:	(struct TagItem *)
+     *	    &#038;tfc_FileName[MAXFONTPATH-(tfc_TagCount*sizeof(struct TagItem))]
+<a name="line44">     */</a>
+<a name="line45">    UWORD   tfc_YSize;</a>
+<a name="line46">    UBYTE   tfc_Style;</a>
+    UBYTE   tfc_Flags;
+};
+
+<a name="line50"></a>
+<a name="line51">#define  FCH_ID		0x0f00	/* FontContentsHeader, then FontContents */</a>
+#define  TFCH_ID	0x0f02	/* FontContentsHeader, then TFontContents */
+<a name="line53"></a>
+<a name="line54">struct FontContentsHeader {</a>
+<a name="line55">    UWORD   fch_FileID;		/* FCH_ID */</a>
+    UWORD   fch_NumEntries;	/* the number of FontContents elements */
+    /* struct FontContents fch_FC[], or struct TFontContents fch_TFC[]; */
+};
+
+<a name="line60"></a>
+<a name="line61">#define  DFH_ID		0x0f80</a>
+#define  MAXFONTNAME	32	/* font name including &#034;.font\0&#034; */
+<a name="line63"></a>
+struct DiskFontHeader {
+    /* the following 8 bytes are not actually considered a part of the	*/
+    /* DiskFontHeader, but immediately preceed it. The NextSegment is	*/
+    /* supplied by the linker/loader, and the ReturnCode is the code	*/
+    /* at the beginning of the font in case someone runs it...		*/
+    /*	 ULONG dfh_NextSegment;			\* actually a BPTR	*/
+    /*	 ULONG dfh_ReturnCode;			\* MOVEQ #0,D0 : RTS	*/
+<a name="line71">    /* here then is the official start of the DiskFontHeader...		*/</a>
+<a name="line72">    struct Node dfh_DF;		/* node to link disk fonts */</a>
+<a name="line73">    UWORD   dfh_FileID;		/* DFH_ID */</a>
+<a name="line74">    UWORD   dfh_Revision;	/* the font revision */</a>
+<a name="line75">    LONG    dfh_Segment;	/* the segment address when loaded */</a>
+<a name="line76">    char    dfh_Name[MAXFONTNAME]; /* the font name (null terminated) */</a>
+    struct TextFont dfh_TF;	/* loaded TextFont structure */
+};
+
+/* unfortunately, this needs to be explicitly typed */
+<a name="line81">/* used only if dfh_TF.tf_Style FSB_TAGGED bit is set */</a>
+#define	dfh_TagList	dfh_Segment	/* destroyed during loading */
+
+<a name="line84"></a>
+<a name="line85">#define     AFB_MEMORY	0</a>
+<a name="line86">#define     AFF_MEMORY	0x0001</a>
+<a name="line87">#define     AFB_DISK	1</a>
+<a name="line88">#define     AFF_DISK	0x0002</a>
+<a name="line89">#define     AFB_SCALED	2</a>
+#define     AFF_SCALED	0x0004
+<a name="line91"></a>
+<a name="line92">#define     AFB_TAGGED	16	/* return TAvailFonts */</a>
+#define     AFF_TAGGED	0x10000L
+<a name="line94"></a>
+<a name="line95">struct AvailFonts {</a>
+<a name="line96">    UWORD   af_Type;		/* MEMORY, DISK, or SCALED */</a>
+    struct TextAttr af_Attr;	/* text attributes for font */
+};
+<a name="line99"></a>
+<a name="line100">struct TAvailFonts {</a>
+<a name="line101">    UWORD   taf_Type;		/* MEMORY, DISK, or SCALED */</a>
+    struct TTextAttr taf_Attr;	/* text attributes for font */
+};
+<a name="line104"></a>
+<a name="line105">struct AvailFontsHeader {</a>
+    UWORD   afh_NumEntries;	 /* number of AvailFonts elements */
+    /* struct AvailFonts afh_AF[], or struct TAvailFonts afh_TAF[]; */
+};
+
+#endif	/* LIBRARIES_DISKFONT_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

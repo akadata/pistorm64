@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/execbase.h" NODE="MAIN" TITLE="Includes/exec/execbase.h" -->
+<head>
+<title>Includes/exec/execbase.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node009D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node009F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef EXEC_EXECBASE_H
+#define EXEC_EXECBASE_H
+/*
+**	$Filename: exec/execbase.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.18 $
+**	$Date: 91/10/10 $
+**
+**	Definition of the exec.library base structure.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_LISTS_H
+#include &#034;exec/lists.h&#034;
+#endif /* EXEC_LISTS_H */
+<a name="line18"></a>
+#ifndef EXEC_INTERRUPTS_H
+#include &#034;exec/interrupts.h&#034;
+#endif /* EXEC_INTERRUPTS_H */
+<a name="line22"></a>
+#ifndef EXEC_LIBRARIES_H
+#include &#034;exec/libraries.h&#034;
+#endif /* EXEC_LIBRARIES_H */
+<a name="line26"></a>
+#ifndef EXEC_TASKS_H
+#include &#034;exec/tasks.h&#034;
+#endif /* EXEC_TASKS_H */
+
+<a name="line31"></a>
+/* Definition of the Exec library base structure (pointed to by location 4).
+** Most fields are not to be viewed or modified by user programs.  Use
+** extreme caution.
+<a name="line35">*/</a>
+<a name="line36">struct ExecBase {</a>
+	struct Library LibNode; /* Standard library node */
+
+/******** Static System Variables ********/
+<a name="line40"></a>
+<a name="line41">	UWORD	SoftVer;	/* kickstart release number (obs.) */</a>
+<a name="line42">	WORD	LowMemChkSum;	/* checksum of 68000 trap vectors */</a>
+<a name="line43">	ULONG	ChkBase;	/* system base pointer complement */</a>
+<a name="line44">	APTR	ColdCapture;	/* coldstart soft capture vector */</a>
+<a name="line45">	APTR	CoolCapture;	/* coolstart soft capture vector */</a>
+<a name="line46">	APTR	WarmCapture;	/* warmstart soft capture vector */</a>
+<a name="line47">	APTR	SysStkUpper;	/* system stack base   (upper bound) */</a>
+<a name="line48">	APTR	SysStkLower;	/* top of system stack (lower bound) */</a>
+<a name="line49">	ULONG	MaxLocMem;	/* top of chip memory */</a>
+<a name="line50">	APTR	DebugEntry;	/* global debugger entry point */</a>
+<a name="line51">	APTR	DebugData;	/* global debugger data segment */</a>
+<a name="line52">	APTR	AlertData;	/* alert data segment */</a>
+	APTR	MaxExtMem;	/* top of extended mem, or null if none */
+<a name="line54"></a>
+	UWORD	ChkSum;	/* for all of the above (minus 2) */
+
+/****** Interrupt Related ***************************************/
+<a name="line58"></a>
+	struct	IntVector IntVects[16];
+
+/****** Dynamic System Variables *************************************/
+<a name="line62"></a>
+	struct	Task *ThisTask; /* pointer to current task (readable) */
+<a name="line64"></a>
+<a name="line65">	ULONG	IdleCount;	/* idle counter */</a>
+<a name="line66">	ULONG	DispCount;	/* dispatch counter */</a>
+<a name="line67">	UWORD	Quantum;	/* time slice quantum */</a>
+<a name="line68">	UWORD	Elapsed;	/* current quantum ticks */</a>
+<a name="line69">	UWORD	SysFlags;	/* misc internal system flags */</a>
+<a name="line70">	BYTE	IDNestCnt;	/* interrupt disable nesting count */</a>
+	BYTE	TDNestCnt;	/* task disable nesting count */
+<a name="line72"></a>
+	UWORD	AttnFlags;	/* special attention flags (readable) */
+<a name="line74"></a>
+<a name="line75">	UWORD	AttnResched;	/* rescheduling attention */</a>
+<a name="line76">	APTR	ResModules;	/* resident module array pointer */</a>
+<a name="line77">	APTR	TaskTrapCode;</a>
+<a name="line78">	APTR	TaskExceptCode;</a>
+<a name="line79">	APTR	TaskExitCode;</a>
+<a name="line80">	ULONG	TaskSigAlloc;</a>
+	UWORD	TaskTrapAlloc;
+
+<a name="line83"></a>
+/****** System Lists (private!) ********************************/
+<a name="line85"></a>
+<a name="line86">	struct	List MemList;</a>
+<a name="line87">	struct	List ResourceList;</a>
+<a name="line88">	struct	List DeviceList;</a>
+<a name="line89">	struct	List IntrList;</a>
+<a name="line90">	struct	List LibList;</a>
+<a name="line91">	struct	List PortList;</a>
+<a name="line92">	struct	List TaskReady;</a>
+	struct	List TaskWait;
+<a name="line94"></a>
+	struct	SoftIntList SoftInts[5];
+
+/****** Other Globals *******************************************/
+<a name="line98"></a>
+	LONG	LastAlert[4];
+
+	/* these next two variables are provided to allow
+	** system developers to have a rough idea of the
+	** period of two externally controlled signals --
+	** the time between vertical blank interrupts and the
+	** external line rate (which is counted by CIA A's
+	** &#034;time of day&#034; clock).  In general these values
+	** will be 50 or 60, and may or may not track each
+	** other.  These values replace the obsolete AFB_PAL
+	** and AFB_50HZ flags.
+<a name="line110">	*/</a>
+<a name="line111">	UBYTE	VBlankFrequency;	/* (readable) */</a>
+	UBYTE	PowerSupplyFrequency;	/* (readable) */
+<a name="line113"></a>
+	struct	List SemaphoreList;
+
+	/* these next two are to be able to kickstart into user ram.
+	** KickMemPtr holds a singly linked list of MemLists which
+	** will be removed from the memory list via AllocAbs.  If
+	** all the AllocAbs's succeeded, then the KickTagPtr will
+	** be added to the rom tag list.
+<a name="line121">	*/</a>
+<a name="line122">	APTR	KickMemPtr;	/* ptr to queue of mem lists */</a>
+<a name="line123">	APTR	KickTagPtr;	/* ptr to rom tag queue */</a>
+	APTR	KickCheckSum;	/* checksum for mem and tags */
+
+/****** V36 Exec additions start here **************************************/
+<a name="line127"></a>
+<a name="line128">	UWORD	ex_Pad0;</a>
+<a name="line129">	ULONG	ex_LaunchPoint;		/* Private to Launch/Switch */</a>
+	APTR	ex_RamLibPrivate;
+	/* The next ULONG contains the system &#034;E&#034; clock frequency,
+	** expressed in Hertz.	The E clock is used as a timebase for
+	** the Amiga's 8520 I/O chips. (E is connected to &#034;02&#034;).
+	** Typical values are 715909 for NTSC, or 709379 for PAL.
+<a name="line135">	*/</a>
+<a name="line136">	ULONG	ex_EClockFrequency;	/* (readable) */</a>
+<a name="line137">	ULONG	ex_CacheControl;	/* Private to CacheControl calls */</a>
+	ULONG	ex_TaskID;		/* Next available task ID */
+<a name="line139"></a>
+<a name="line140">	ULONG	ex_PuddleSize;</a>
+<a name="line141">	ULONG	ex_PoolThreshold;</a>
+	struct	MinList ex_PublicPool;
+<a name="line143"></a>
+	APTR	ex_MMULock;		/* private */
+<a name="line145"></a>
+	UBYTE	ex_Reserved[12];
+};
+
+
+/****** Bit defines for AttnFlags (see above) ******************************/
+
+<a name="line152">/*  Processors and Co-processors: */</a>
+<a name="line153">#define AFB_68010	0	/* also set for 68020 */</a>
+<a name="line154">#define AFB_68020	1	/* also set for 68030 */</a>
+<a name="line155">#define AFB_68030	2	/* also set for 68040 */</a>
+<a name="line156">#define AFB_68040	3</a>
+<a name="line157">#define AFB_68881	4	/* also set for 68882 */</a>
+#define AFB_68882	5
+<a name="line159">#define	AFB_FPU40	6	/* Set if 68040 FPU */</a>
+<a name="line160">/*</a>
+<a name="line161"> * The AFB_FPU40 bit is set when a working 68040 FPU</a>
+<a name="line162"> * is in the system.  If this bit is set and both the</a>
+<a name="line163"> * AFB_68881 and AFB_68882 bits are not set, then the 68040</a>
+<a name="line164"> * math emulation code has not been loaded and only 68040</a>
+ * FPU instructions are available.  This bit is valid *ONLY*
+ * if the AFB_68040 bit is set.
+ */
+
+#define AFB_PRIVATE	15	/* Just what it says */
+
+#define AFF_68010	(1L&#060;&#060;0)
+<a name="line172">#define AFF_68020	(1L&#060;&#060;1)</a>
+<a name="line173">#define AFF_68030	(1L&#060;&#060;2)</a>
+<a name="line174">#define AFF_68040	(1L&#060;&#060;3)</a>
+<a name="line175">#define AFF_68881	(1L&#060;&#060;4)</a>
+<a name="line176">#define AFF_68882	(1L&#060;&#060;5)</a>
+<a name="line177">#define	AFF_FPU40	(1L&#060;&#060;6)</a>
+<a name="line178"></a>
+<a name="line179">#define AFF_PRIVATE	(1L&#060;&#060;15)</a>
+
+<a name="line181">/* #define AFB_RESERVED8   8 */</a>
+<a name="line182">/* #define AFB_RESERVED9   9 */</a>
+
+
+/****** Selected flag definitions for Cache manipulation calls **********/
+
+#define CACRF_EnableI	    (1L&#060;&#060;0)  /* Enable instruction cache */
+#define CACRF_FreezeI	    (1L&#060;&#060;1)  /* Freeze instruction cache */
+#define CACRF_ClearI	    (1L&#060;&#060;3)  /* Clear instruction cache  */
+#define CACRF_IBE	    (1L&#060;&#060;4)  /* Instruction burst enable */
+#define CACRF_EnableD	    (1L&#060;&#060;8)  /* 68030 Enable data cache  */
+#define CACRF_FreezeD	    (1L&#060;&#060;9)  /* 68030 Freeze data cache  */
+#define CACRF_ClearD	    (1L&#060;&#060;11) /* 68030 Clear data cache	 */
+#define CACRF_DBE	    (1L&#060;&#060;12) /* 68030 Data burst enable */
+#define CACRF_WriteAllocate (1L&#060;&#060;13) /* 68030 Write-Allocate mode
+					(must always be set!)	 */
+#define CACRF_CopyBack	    (1L&#060;&#060;31) /* Master enable for copyback caches */
+
+#define DMA_Continue	    (1L&#060;&#060;1)  /* Continuation flag for CachePreDMA */
+#define DMA_NoModify	    (1L&#060;&#060;2)  /* Set if DMA does not update memory */
+
+
+#endif	/* EXEC_EXECBASE_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

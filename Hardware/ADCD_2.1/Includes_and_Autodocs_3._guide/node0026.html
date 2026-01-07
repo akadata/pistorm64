@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="CheckRexxMsg()" TITLE="amiga.lib/CheckRexxMsg" -->
+<head>
+<title>amiga.lib/CheckRexxMsg</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0025.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0027.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CheckRexxMsg - Check if a <a href="../Includes_and_Autodocs_3._guide/node0633.html#line97">RexxMsg</a> is from ARexx
+
+<b>   SYNOPSIS</b>
+	result = CheckRexxMsg(message)
+	D0                    A0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> CheckRexxMsg(struct <a href="../Includes_and_Autodocs_3._guide/node0633.html#line97">RexxMsg</a> *);
+
+<b>   FUNCTION</b>
+	This function checks to make sure that the message is from ARexx
+	directly.  It is required when using the Rexx Variable Interface
+	routines (RVI) that the message be from ARexx.
+
+	While this function is new in the V37 amiga.lib, it is safe to
+	call it in all versions of the operating system.  It is also
+	PURE code, thus usable in resident/pure executables.
+
+<b>   NOTE</b>
+	This is a stub in amiga.lib.  It is only available via amiga.lib.
+	The stub has two labels.  One, _CheckRexxMsg, takes the arguments
+	from the stack.  The other, CheckRexxMsg, takes the arguments in
+	registers.
+
+<b>   EXAMPLE</b>
+	if (CheckRexxMsg(rxmsg))
+	{
+		/* <a href="../Includes_and_Autodocs_3._guide/node062E.html#line46">Message</a> is one from ARexx */
+	}
+
+<b>   INPUTS</b>
+	message		A pointer to the <a href="../Includes_and_Autodocs_3._guide/node0633.html#line97">RexxMsg</a> in question
+
+<b>   RESULTS</b>
+	result		A boolean - TRUE if message is from ARexx.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node003F.html">GetRexxVar()</a>, <a href="../Includes_and_Autodocs_3._guide/node004B.html">SetRexxVar()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

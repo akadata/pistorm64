@@ -1,0 +1,1390 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/intuition.h" NODE="MAIN" TITLE="Includes/intuition/intuition.h" -->
+<head>
+<title>Includes/intuition/intuition.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00D3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00D5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef INTUITION_INTUITION_H
+#define INTUITION_INTUITION_H TRUE
+/*
+**  $Filename: intuition/intuition.h $
+**  $Release: 2.04 Includes, V37.4 $
+**  $Revision: 36.51 $
+**  $Date: 91/03/28 $
+**
+**  Interface definitions for Intuition applications.
+**
+**  (C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+
+#ifndef GRAPHICS_GFX_H
+#include &#060;graphics/gfx.h&#062;
+#endif
+
+#ifndef GRAPHICS_CLIP_H
+#include &#060;graphics/clip.h&#062;
+#endif
+
+#ifndef GRAPHICS_VIEW_H
+#include &#060;graphics/view.h&#062;
+#endif
+
+#ifndef GRAPHICS_RASTPORT_H
+#include &#060;graphics/rastport.h&#062;
+#endif
+
+#ifndef GRAPHICS_LAYERS_H
+#include &#060;graphics/layers.h&#062;
+#endif
+
+#ifndef GRAPHICS_TEXT_H
+#include &#060;graphics/text.h&#062;
+#endif
+<a name="line42"></a>
+#ifndef EXEC_PORTS_H
+#include &#060;exec/ports.h&#062;
+#endif
+<a name="line46"></a>
+#ifndef DEVICES_INPUTEVENT_H
+#include &#060;devices/inputevent.h&#062;
+#endif
+<a name="line50"></a>
+#ifndef UTILITY_TAGITEM_H
+#include &#060;utility/tagitem.h&#062;
+#endif
+
+/*
+ * NOTE:  intuition/iobsolete.h is included at the END of this file!
+ */
+
+/* ======================================================================== */
+/* === Menu =============================================================== */
+<a name="line61">/* ======================================================================== */</a>
+struct Menu
+<a name="line63">{</a>
+<a name="line64">    struct Menu *NextMenu;	/* same level */</a>
+<a name="line65">    WORD LeftEdge, TopEdge;	/* position of the select box */</a>
+<a name="line66">    WORD Width, Height;	/* dimensions of the select box */</a>
+<a name="line67">    UWORD Flags;		/* see flag definitions below */</a>
+<a name="line68">    BYTE *MenuName;		/* text for this Menu Header */</a>
+    struct MenuItem *FirstItem; /* pointer to first in chain */
+
+<a name="line71">    /* these mysteriously-named variables are for internal use only */</a>
+    WORD JazzX, JazzY, BeatX, BeatY;
+};
+
+
+<a name="line76">/* FLAGS SET BY BOTH THE APPLIPROG AND INTUITION */</a>
+#define MENUENABLED 0x0001	/* whether or not this menu is enabled */
+
+<a name="line79">/* FLAGS SET BY INTUITION */</a>
+#define MIDRAWN 0x0100		/* this menu's items are currently drawn */
+
+
+
+
+
+
+/* ======================================================================== */
+/* === MenuItem =========================================================== */
+<a name="line89">/* ======================================================================== */</a>
+struct MenuItem
+<a name="line91">{</a>
+<a name="line92">    struct MenuItem *NextItem;	/* pointer to next in chained list */</a>
+<a name="line93">    WORD LeftEdge, TopEdge;	/* position of the select box */</a>
+<a name="line94">    WORD Width, Height;		/* dimensions of the select box */</a>
+    UWORD Flags;		/* see the defines below */
+<a name="line96"></a>
+    LONG MutualExclude;		/* set bits mean this item excludes that */
+<a name="line98"></a>
+    APTR ItemFill;		/* points to Image, IntuiText, or NULL */
+
+    /* when this item is pointed to by the cursor and the items highlight
+     *	mode HIGHIMAGE is selected, this alternate image will be displayed
+<a name="line103">     */</a>
+    APTR SelectFill;		/* points to Image, IntuiText, or NULL */
+<a name="line105"></a>
+    BYTE Command;		/* only if appliprog sets the COMMSEQ flag */
+<a name="line107"></a>
+    struct MenuItem *SubItem;	/* if non-zero, points to MenuItem for submenu */
+
+    /* The NextSelect field represents the menu number of next selected
+     *	item (when user has drag-selected several items)
+<a name="line112">     */</a>
+    UWORD NextSelect;
+};
+
+
+<a name="line117">/* FLAGS SET BY THE APPLIPROG */</a>
+<a name="line118">#define CHECKIT		0x0001	/* set to indicate checkmarkable item */</a>
+<a name="line119">#define ITEMTEXT	0x0002	/* set if textual, clear if graphical item */</a>
+<a name="line120">#define COMMSEQ		0x0004	/* set if there's an command sequence */</a>
+<a name="line121">#define MENUTOGGLE	0x0008	/* set for toggling checks (else mut. exclude) */</a>
+#define ITEMENABLED	0x0010	/* set if this item is enabled */
+
+<a name="line124">/* these are the SPECIAL HIGHLIGHT FLAG state meanings */</a>
+<a name="line125">#define HIGHFLAGS	0x00C0	/* see definitions below for these bits */</a>
+<a name="line126">#define HIGHIMAGE	0x0000	/* use the user's &#034;select image&#034; */</a>
+<a name="line127">#define HIGHCOMP	0x0040	/* highlight by complementing the selectbox */</a>
+<a name="line128">#define HIGHBOX		0x0080	/* highlight by &#034;boxing&#034; the selectbox */</a>
+#define HIGHNONE	0x00C0	/* don't highlight */
+
+<a name="line131">/* FLAGS SET BY BOTH APPLIPROG AND INTUITION */</a>
+#define CHECKED	0x0100	/* state of the checkmark */
+
+<a name="line134">/* FLAGS SET BY INTUITION */</a>
+<a name="line135">#define ISDRAWN		0x1000	/* this item's subs are currently drawn */</a>
+<a name="line136">#define HIGHITEM	0x2000	/* this item is currently highlighted */</a>
+#define MENUTOGGLED	0x4000	/* this item was already toggled */
+
+
+
+
+
+/* ======================================================================== */
+/* === Requester ========================================================== */
+<a name="line145">/* ======================================================================== */</a>
+struct Requester
+<a name="line147">{</a>
+<a name="line148">    struct Requester *OlderRequest;</a>
+<a name="line149">    WORD LeftEdge, TopEdge;		/* dimensions of the entire box */</a>
+<a name="line150">    WORD Width, Height;			/* dimensions of the entire box */</a>
+    WORD RelLeft, RelTop;		/* for Pointer relativity offsets */
+<a name="line152"></a>
+<a name="line153">    struct Gadget *ReqGadget;		/* pointer to a list of Gadgets */</a>
+<a name="line154">    struct Border *ReqBorder;		/* the box's border */</a>
+<a name="line155">    struct IntuiText *ReqText;		/* the box's text */</a>
+    UWORD Flags;			/* see definitions below */
+
+<a name="line158">    /* pen number for back-plane fill before draws */</a>
+    UBYTE BackFill;
+<a name="line160">    /* Layer in place of clip rect	*/</a>
+    struct Layer *ReqLayer;
+<a name="line162"></a>
+    UBYTE ReqPad1[32];
+
+    /* If the BitMap plane pointers are non-zero, this tells the system
+     * that the image comes pre-drawn (if the appliprog wants to define
+     * its own box, in any shape or size it wants!);  this is OK by
+     * Intuition as long as there's a good correspondence between
+     * the image and the specified Gadgets
+<a name="line170">     */</a>
+<a name="line171">    struct BitMap *ImageBMap;	/* points to the BitMap of PREDRAWN imagery */</a>
+    struct Window *RWindow;	/* added.  points back to Window */
+<a name="line173"></a>
+    struct Image  *ReqImage;	/* new for V36: drawn if USEREQIMAGE set */
+<a name="line175"></a>
+    UBYTE ReqPad2[32];
+};
+
+
+<a name="line180">/* FLAGS SET BY THE APPLIPROG */</a>
+#define POINTREL	0x0001
+			  /* if POINTREL set, TopLeft is relative to pointer
+			   * for DMRequester, relative to window center
+			   * for Request().
+<a name="line185">			   */</a>
+#define PREDRAWN	0x0002
+<a name="line187">	/* set if Requester.ImageBMap points to predrawn Requester imagery */</a>
+#define NOISYREQ	0x0004
+<a name="line189">	/* if you don't want requester to filter input	   */</a>
+#define SIMPLEREQ	0x0010
+	/* to use SIMPLEREFRESH layer (recommended)	*/
+
+<a name="line193">/* New for V36		*/</a>
+#define USEREQIMAGE	0x0020
+	/*  render linked list ReqImage after BackFill
+	 * but before gadgets and text
+<a name="line197">	 */</a>
+#define NOREQBACKFILL	0x0040
+	/* don't bother filling requester with Requester.BackFill pen	*/
+
+
+<a name="line202">/* FLAGS SET BY INTUITION */</a>
+<a name="line203">#define REQOFFWINDOW	0x1000	/* part of one of the Gadgets was offwindow */</a>
+<a name="line204">#define REQACTIVE	0x2000	/* this requester is active */</a>
+<a name="line205">#define SYSREQUEST	0x4000	/* (unused) this requester caused by system */</a>
+#define DEFERREFRESH	0x8000	/* this Requester stops a Refresh broadcast */
+
+
+
+
+
+<a name="line212"></a>
+/* ======================================================================== */
+/* === Gadget ============================================================= */
+<a name="line215">/* ======================================================================== */</a>
+struct Gadget
+<a name="line217">{</a>
+    struct Gadget *NextGadget;	/* next gadget in the list */
+<a name="line219"></a>
+<a name="line220">    WORD LeftEdge, TopEdge;	/* &#034;hit box&#034; of gadget */</a>
+    WORD Width, Height;		/* &#034;hit box&#034; of gadget */
+<a name="line222"></a>
+    UWORD Flags;		/* see below for list of defines */
+<a name="line224"></a>
+    UWORD Activation;		/* see below for list of defines */
+<a name="line226"></a>
+    UWORD GadgetType;		/* see below for defines */
+
+    /* appliprog can specify that the Gadget be rendered as either as Border
+     * or an Image.  This variable points to which (or equals NULL if there's
+     * nothing to be rendered about this Gadget)
+<a name="line232">     */</a>
+    APTR GadgetRender;
+
+    /* appliprog can specify &#034;highlighted&#034; imagery rather than algorithmic
+     * this can point to either Border or Image data
+<a name="line237">     */</a>
+    APTR SelectRender;
+<a name="line239"></a>
+    struct IntuiText *GadgetText;   /* text for this gadget */
+
+    /* MutualExclude, never implemented, is now declared obsolete.
+     * There are published examples of implementing a more general
+     * and practical exclusion in your applications.
+     *
+     * Starting with V36, this field is used to point to a hook
+     * for a custom gadget.
+     *
+     * Programs using this field for their own processing will
+     * continue to work, as long as they don't try the
+     * trick with custom gadgets.
+<a name="line252">     */</a>
+    LONG MutualExclude;  /* obsolete */
+
+    /* pointer to a structure of special data required by Proportional,
+     * String and Integer Gadgets
+<a name="line257">     */</a>
+    APTR SpecialInfo;
+<a name="line259"></a>
+<a name="line260">    UWORD GadgetID;	/* user-definable ID field */</a>
+    APTR UserData;	/* ptr to general purpose User data (ignored by In) */
+};
+
+<a name="line264"></a>
+/* --- Gadget.Flags values	--- */
+<a name="line266">/* combinations in these bits describe the highlight technique to be used */</a>
+<a name="line267">#define GFLG_GADGHIGHBITS 0x0003</a>
+<a name="line268">#define GFLG_GADGHCOMP	  0x0000  /* Complement the select box */</a>
+<a name="line269">#define GFLG_GADGHBOX	  0x0001  /* Draw a box around the image */</a>
+<a name="line270">#define GFLG_GADGHIMAGE	  0x0002  /* Blast in this alternate image */</a>
+#define GFLG_GADGHNONE	  0x0003  /* don't highlight */
+
+#define GFLG_GADGIMAGE		  0x0004  /* set if GadgetRender and SelectRender
+				   * point to an Image structure, clear
+<a name="line275">				   * if they point to Border structures</a>
+				   */
+
+/* combinations in these next two bits specify to which corner the gadget's
+ *  Left &#038; Top coordinates are relative.  If relative to Top/Left,
+ *  these are &#034;normal&#034; coordinates (everything is relative to something in
+ *  this universe).
+ *
+ * Gadget positions and dimensions are relative to the window or
+ * requester which contains the gadget
+<a name="line285"> */</a>
+<a name="line286">#define GFLG_RELBOTTOM	  0x0008  /* vert. pos. is relative to bottom edge */</a>
+<a name="line287">#define GFLG_RELRIGHT	  0x0010  /* horiz. pos. is relative to right edge */</a>
+<a name="line288">#define GFLG_RELWIDTH	  0x0020  /* width is relative to req/window	*/</a>
+#define GFLG_RELHEIGHT	  0x0040  /* height is relative to req/window	*/
+<a name="line290"></a>
+#define GFLG_SELECTED	  0x0080  /* you may initialize and look at this	*/
+
+/* the GFLG_DISABLED flag is initialized by you and later set by Intuition
+ * according to your calls to On/OffGadget().  It specifies whether or not
+ * this Gadget is currently disabled from being selected
+<a name="line296"> */</a>
+#define GFLG_DISABLED	  0x0100
+<a name="line298"></a>
+/* These flags specify the type of text field that Gadget.GadgetText
+ * points to.  In all normal (pre-V36) gadgets which you initialize
+ * this field should always be zero.  Some types of gadget objects
+ * created from classes will use these fields to keep track of
+ * types of labels/contents that different from IntuiText, but are
+ * stashed in GadgetText.
+ */
+<a name="line306"></a>
+<a name="line307">#define GFLG_LABELMASK	  0x3000</a>
+<a name="line308">#define GFLG_LABELITEXT	  0x0000  /* GadgetText points to IntuiText	*/</a>
+<a name="line309">#define	GFLG_LABELSTRING  0x1000  /* GadgetText points to (UBYTE *)	*/</a>
+#define GFLG_LABELIMAGE	  0x2000  /* GadgetText points to Image (object)	*/
+
+/* New for V37: GFLG_TABCYCLE */
+#define GFLG_TABCYCLE	  0x0200  /* (string or custom) gadget participates in
+<a name="line314">				   * cycling activation with Tab or Shift-Tab</a>
+				   */
+/* New for V37: GFLG_STRINGEXTEND.  We discovered that V34 doesn't properly
+ * ignore the value we had chosen for the Gadget-&#062;Activation flag
+ * GACT_STRINGEXTEND.  NEVER SET THAT FLAG WHEN RUNNING UNDER V34.
+ * The Gadget-&#062;Flags bit GFLG_STRINGEXTEND is provided as a synonym which is
+ * safe under V34, and equivalent to GACT_STRINGEXTEND under V37.
+ * (Note that the two flags are not numerically equal)
+<a name="line322"> */</a>
+#define GFLG_STRINGEXTEND 0x0400  /* this String Gadget has StringExtend	*/
+
+/* ---	Gadget.Activation flag values	--- */
+/* Set GACT_RELVERIFY if you want to verify that the pointer was still over
+ * the gadget when the select button was released.  Will cause
+ * an IDCMP_GADGETUP message to be sent if so.
+<a name="line329"> */</a>
+#define GACT_RELVERIFY	  0x0001
+
+/* the flag GACT_IMMEDIATE, when set, informs the caller that the gadget
+ *  was activated when it was activated.  This flag works in conjunction with
+ *  the GACT_RELVERIFY flag
+<a name="line335"> */</a>
+#define GACT_IMMEDIATE	  0x0002
+
+/* the flag GACT_ENDGADGET, when set, tells the system that this gadget,
+ * when selected, causes the Requester to be ended.  Requesters
+ * that are ended are erased and unlinked from the system.
+<a name="line341"> */</a>
+#define GACT_ENDGADGET	  0x0004
+
+/* the GACT_FOLLOWMOUSE flag, when set, specifies that you want to receive
+ * reports on mouse movements while this gadget is active.
+ * You probably want to set the GACT_IMMEDIATE flag when using
+ * GACT_FOLLOWMOUSE, since that's the only reasonable way you have of
+ * learning why Intuition is suddenly sending you a stream of mouse
+ * movement events.  If you don't set GACT_RELVERIFY, you'll get at
+ * least one Mouse Position event.
+<a name="line351"> * Note: boolean FOLLOWMOUSE gadgets require GACT_RELVERIFY to get</a>
+ * _any_ mouse movement events (this unusual behavior is a compatibility
+ * hold-over from the old days).
+ */
+#define GACT_FOLLOWMOUSE  0x0008
+
+<a name="line357">/* if any of the BORDER flags are set in a Gadget that's included in the</a>
+<a name="line358"> * Gadget list when a Window is opened, the corresponding Border will</a>
+<a name="line359"> * be adjusted to make room for the Gadget</a>
+<a name="line360"> */</a>
+<a name="line361">#define GACT_RIGHTBORDER  0x0010</a>
+#define GACT_LEFTBORDER	  0x0020
+<a name="line363">#define GACT_TOPBORDER	  0x0040</a>
+<a name="line364">#define GACT_BOTTOMBORDER 0x0080</a>
+#define GACT_BORDERSNIFF  0x8000  /* neither set nor rely on this bit	*/
+
+<a name="line367">#define GACT_TOGGLESELECT 0x0100  /* this bit for toggle-select mode */</a>
+<a name="line368">#define GACT_BOOLEXTEND	  0x2000  /* this Boolean Gadget has a BoolInfo	*/</a>
+<a name="line369"></a>
+<a name="line370">/* should properly be in StringInfo, but aren't	*/</a>
+<a name="line371">#define GACT_STRINGLEFT	  0x0000  /* NOTE WELL: that this has value zero	*/</a>
+<a name="line372">#define GACT_STRINGCENTER 0x0200</a>
+#define GACT_STRINGRIGHT  0x0400
+#define GACT_LONGINT	  0x0800  /* this String Gadget is for Long Ints	*/
+#define GACT_ALTKEYMAP	  0x1000  /* this String has an alternate keymap	*/
+#define GACT_STRINGEXTEND 0x2000  /* this String Gadget has StringExtend	*/
+				  /* NOTE: NEVER SET GACT_STRINGEXTEND IF YOU
+				   * ARE RUNNING ON LESS THAN V36!  SEE
+				   * GFLG_STRINGEXTEND (ABOVE) INSTEAD
+				   */
+
+#define GACT_ACTIVEGADGET 0x4000  /* this gadget is &#034;active&#034;.  This flag
+				   * is maintained by Intuition, and you
+<a name="line384">				   * cannot count on its value persisting</a>
+				   * while you do something on your program's
+				   * task.  It can only be trusted by
+				   * people implementing custom gadgets
+				   */
+
+/* note 0x8000 is used above (GACT_BORDERSNIFF);
+ * all Activation flags defined */
+<a name="line392"></a>
+/* --- GADGET TYPES ------------------------------------------------------- */
+<a name="line394">/* These are the Gadget Type definitions for the variable GadgetType</a>
+<a name="line395"> * gadget number type MUST start from one.  NO TYPES OF ZERO ALLOWED.</a>
+<a name="line396"> * first comes the mask for Gadget flags reserved for Gadget typing</a>
+<a name="line397"> */</a>
+<a name="line398">#define GTYP_GADGETTYPE	0xFC00	/* all Gadget Global Type flags (padded) */</a>
+#define GTYP_SYSGADGET	0x8000	/* 1 = Allocated by the system, 0 = by app. */
+<a name="line400">#define GTYP_SCRGADGET	0x4000	/* 1 = ScreenGadget, 0 = WindowGadget */</a>
+<a name="line401">#define GTYP_GZZGADGET	0x2000	/* 1 = for WFLG_GIMMEZEROZERO borders */</a>
+<a name="line402">#define GTYP_REQGADGET	0x1000	/* 1 = this is a Requester Gadget */</a>
+<a name="line403">/* system gadgets */</a>
+<a name="line404">#define GTYP_SIZING	0x0010</a>
+<a name="line405">#define GTYP_WDRAGGING	0x0020</a>
+<a name="line406">#define GTYP_SDRAGGING	0x0030</a>
+<a name="line407">#define GTYP_WUPFRONT	0x0040</a>
+#define GTYP_SUPFRONT	0x0050
+<a name="line409">#define GTYP_WDOWNBACK	0x0060</a>
+<a name="line410">#define GTYP_SDOWNBACK	0x0070</a>
+<a name="line411">#define GTYP_CLOSE	0x0080</a>
+<a name="line412">/* application gadgets */</a>
+<a name="line413">#define GTYP_BOOLGADGET	0x0001</a>
+<a name="line414">#define GTYP_GADGET0002	0x0002</a>
+#define GTYP_PROPGADGET	0x0003
+#define GTYP_STRGADGET	0x0004
+#define GTYP_CUSTOMGADGET	0x0005
+#define GTYP_GTYPEMASK	0x0007	/* masks out to gadget class	*/
+
+/* This bit in GadgetType is reserved for undocumented internal use
+ * by the Gadget Toolkit, and cannot be used nor relied on by
+ * applications:	0x0100
+ */
+
+/* ======================================================================== */
+/* === BoolInfo======================================================= */
+<a name="line427">/* ======================================================================== */</a>
+/* This is the special data needed by an Extended Boolean Gadget
+<a name="line429"> * Typically this structure will be pointed to by the Gadget field SpecialInfo</a>
+<a name="line430"> */</a>
+struct BoolInfo
+{
+    UWORD  Flags;	/* defined below */
+    UWORD  *Mask;	/* bit mask for highlighting and selecting
+			 * mask must follow the same rules as an Image
+<a name="line436">			 * plane.  Its width and height are determined</a>
+			 * by the width and height of the gadget's
+			 * select box. (i.e. Gadget.Width and .Height).
+			 */
+    ULONG  Reserved;	/* set to 0	*/
+};
+
+<a name="line443">/* set BoolInfo.Flags to this flag bit.</a>
+ * in the future, additional bits might mean more stuff hanging
+ * off of BoolInfo.Reserved.
+ */
+#define BOOLMASK	0x0001	/* extension is for masked gadget */
+<a name="line448"></a>
+/* ======================================================================== */
+/* === PropInfo =========================================================== */
+<a name="line451">/* ======================================================================== */</a>
+/* this is the special data required by the proportional Gadget
+<a name="line453"> * typically, this data will be pointed to by the Gadget variable SpecialInfo</a>
+<a name="line454"> */</a>
+struct PropInfo
+{
+    UWORD Flags;	/* general purpose flag bits (see defines below) */
+
+    /* You initialize the Pot variables before the Gadget is added to
+     * the system.  Then you can look here for the current settings
+     * any time, even while User is playing with this Gadget.  To
+     * adjust these after the Gadget is added to the System, use
+<a name="line463">     * ModifyProp();  The Pots are the actual proportional settings,</a>
+<a name="line464">     * where a value of zero means zero and a value of MAXPOT means</a>
+     * that the Gadget is set to its maximum setting.
+     */
+    UWORD HorizPot;	/* 16-bit FixedPoint horizontal quantity percentage */
+    UWORD VertPot;	/* 16-bit FixedPoint vertical quantity percentage */
+
+    /* the 16-bit FixedPoint Body variables describe what percentage of
+     * the entire body of stuff referred to by this Gadget is actually
+     * shown at one time.  This is used with the AUTOKNOB routines,
+     * to adjust the size of the AUTOKNOB according to how much of
+     * the data can be seen.  This is also used to decide how far
+     * to advance the Pots when User hits the Container of the Gadget.
+     * For instance, if you were controlling the display of a 5-line
+     * Window of text with this Gadget, and there was a total of 15
+     * lines that could be displayed, you would set the VertBody value to
+     *	   (MAXBODY / (TotalLines / DisplayLines)) = MAXBODY / 3.
+     * Therefore, the AUTOKNOB would fill 1/3 of the container, and
+     * if User hits the Cotainer outside of the knob, the pot would
+     * advance 1/3 (plus or minus) If there's no body to show, or
+<a name="line483">     * the total amount of displayable info is less than the display area,</a>
+<a name="line484">     * set the Body variables to the MAX.  To adjust these after the</a>
+     * Gadget is added to the System, use ModifyProp();
+     */
+<a name="line487">    UWORD HorizBody;		/* horizontal Body */</a>
+<a name="line488">    UWORD VertBody;		/* vertical Body */</a>
+<a name="line489"></a>
+<a name="line490">    /* these are the variables that Intuition sets and maintains */</a>
+<a name="line491">    UWORD CWidth;	/* Container width (with any relativity absoluted) */</a>
+    UWORD CHeight;	/* Container height (with any relativity absoluted) */
+    UWORD HPotRes, VPotRes;	/* pot increments */
+    UWORD LeftBorder;		/* Container borders */
+    UWORD TopBorder;		/* Container borders */
+<a name="line496">};</a>
+
+<a name="line498"></a>
+/* --- FLAG BITS ---------------------------------------------------------- */
+#define AUTOKNOB	0x0001	/* this flag sez:  gimme that old auto-knob */
+/* NOTE: if you do not use an AUTOKNOB for a proportional gadget,
+ * you are currently limited to using a single Image of your own
+<a name="line503"> * design: Intuition won't handle a linked list of images as</a>
+<a name="line504"> * a proportional gadget knob.</a>
+<a name="line505"> */</a>
+<a name="line506"></a>
+#define FREEHORIZ	0x0002	/* if set, the knob can move horizontally */
+#define FREEVERT	0x0004	/* if set, the knob can move vertically */
+<a name="line509">#define PROPBORDERLESS	0x0008	/* if set, no border will be rendered */</a>
+#define KNOBHIT		0x0100	/* set when this Knob is hit */
+<a name="line511">#define PROPNEWLOOK	0x0010	/* set this if you want to get the new</a>
+<a name="line512">				 * V36 look</a>
+<a name="line513">				 */</a>
+<a name="line514"></a>
+#define KNOBHMIN	6	/* minimum horizontal size of the Knob */
+#define KNOBVMIN	4	/* minimum vertical size of the Knob */
+#define MAXBODY		0xFFFF	/* maximum body value */
+#define MAXPOT			0xFFFF	/* maximum pot value */
+
+
+/* ======================================================================== */
+/* === StringInfo ========================================================= */
+<a name="line523">/* ======================================================================== */</a>
+<a name="line524">/* this is the special data required by the string Gadget</a>
+ * typically, this data will be pointed to by the Gadget variable SpecialInfo
+<a name="line526"> */</a>
+<a name="line527">struct StringInfo</a>
+<a name="line528">{</a>
+<a name="line529">    /* you initialize these variables, and then Intuition maintains them */</a>
+<a name="line530">    UBYTE *Buffer;	/* the buffer containing the start and final string */</a>
+    UBYTE *UndoBuffer;	/* optional buffer for undoing current entry */
+    WORD BufferPos;	/* character position in Buffer */
+<a name="line533">    WORD MaxChars;	/* max number of chars in Buffer (including NULL) */</a>
+<a name="line534">    WORD DispPos;	/* Buffer position of first displayed character */</a>
+<a name="line535"></a>
+<a name="line536">    /* Intuition initializes and maintains these variables for you */</a>
+    WORD UndoPos;	/* character position in the undo buffer */
+    WORD NumChars;	/* number of characters currently in Buffer */
+    WORD DispCount;	/* number of whole characters visible in Container */
+    WORD CLeft, CTop;	/* topleft offset of the container */
+
+    /* This unused field is changed to allow extended specification
+     * of string gadget parameters.  It is ignored unless the flag
+     * GACT_STRINGEXTEND is set in the Gadget's Activation field
+<a name="line545">     * or the GFLG_STRINGEXTEND flag is set in the Gadget Flags field.</a>
+     * (See GFLG_STRINGEXTEND for an important note)
+     */
+    /* struct Layer *LayerPtr;	--- obsolete --- */
+    struct StringExtend *Extension;
+
+    /* you can initialize this variable before the gadget is submitted to
+<a name="line552">     * Intuition, and then examine it later to discover what integer</a>
+     * the user has entered (if the user never plays with the gadget,
+     * the value will be unchanged from your initial setting)
+     */
+    LONG LongInt;
+
+    /* If you want this Gadget to use your own Console keymapping, you
+<a name="line559">     * set the GACT_ALTKEYMAP bit in the Activation flags of the Gadget,</a>
+     * and then set this variable to point to your keymap.  If you don't
+     * set the GACT_ALTKEYMAP, you'll get the standard ASCII keymapping.
+     */
+    struct KeyMap *AltKeyMap;
+};
+
+/* ======================================================================== */
+/* === IntuiText ========================================================== */
+<a name="line568">/* ======================================================================== */</a>
+/* IntuiText is a series of strings that start with a location
+ *  (always relative to the upper-left corner of something) and then the
+<a name="line571"> *  text of the string.  The text is null-terminated.</a>
+<a name="line572"> */</a>
+<a name="line573">struct IntuiText</a>
+<a name="line574">{</a>
+<a name="line575">    UBYTE FrontPen, BackPen;	/* the pen numbers for the rendering */</a>
+<a name="line576">    UBYTE DrawMode;		/* the mode for rendering the text */</a>
+<a name="line577">    WORD LeftEdge;		/* relative start location for the text */</a>
+    WORD TopEdge;		/* relative start location for the text */
+    struct TextAttr *ITextFont;	/* if NULL, you accept the default */
+    UBYTE *IText;		/* pointer to null-terminated text */
+    struct IntuiText *NextText; /* pointer to another IntuiText to render */
+};
+
+
+
+
+
+
+/* ======================================================================== */
+/* === Border ============================================================= */
+<a name="line591">/* ======================================================================== */</a>
+/* Data type Border, used for drawing a series of lines which is intended for
+ *  use as a border drawing, but which may, in fact, be used to render any
+ *  arbitrary vector shape.
+ *  The routine DrawBorder sets up the RastPort with the appropriate
+ *  variables, then does a Move to the first coordinate, then does Draws
+ *  to the subsequent coordinates.
+ *  After all the Draws are done, if NextBorder is non-zero we call DrawBorder
+<a name="line599"> *  on NextBorder</a>
+<a name="line600"> */</a>
+<a name="line601">struct Border</a>
+<a name="line602">{</a>
+<a name="line603">    WORD LeftEdge, TopEdge;	/* initial offsets from the origin */</a>
+<a name="line604">    UBYTE FrontPen, BackPen;	/* pens numbers for rendering */</a>
+    UBYTE DrawMode;		/* mode for rendering */
+    BYTE Count;			/* number of XY pairs */
+    WORD *XY;			/* vector coordinate pairs rel to LeftTop */
+    struct Border *NextBorder;	/* pointer to any other Border too */
+};
+
+
+
+
+
+
+/* ======================================================================== */
+/* === Image ============================================================== */
+<a name="line618">/* ======================================================================== */</a>
+/* This is a brief image structure for very simple transfers of
+<a name="line620"> * image data to a RastPort</a>
+<a name="line621"> */</a>
+<a name="line622">struct Image</a>
+<a name="line623">{</a>
+<a name="line624">    WORD LeftEdge;		/* starting offset relative to some origin */</a>
+<a name="line625">    WORD TopEdge;		/* starting offsets relative to some origin */</a>
+    WORD Width;			/* pixel size (though data is word-aligned) */
+    WORD Height;
+    WORD Depth;			/* &#062;= 0, for images you create		*/
+    UWORD *ImageData;		/* pointer to the actual word-aligned bits */
+
+    /* the PlanePick and PlaneOnOff variables work much the same way as the
+     * equivalent GELS Bob variables.  It's a space-saving
+     * mechanism for image data.  Rather than defining the image data
+     * for every plane of the RastPort, you need define data only
+     * for the planes that are not entirely zero or one.  As you
+     * define your Imagery, you will often find that most of the planes
+     * ARE just as color selectors.  For instance, if you're designing
+     * a two-color Gadget to use colors one and three, and the Gadget
+     * will reside in a five-plane display, bit plane zero of your
+     * imagery would be all ones, bit plane one would have data that
+     * describes the imagery, and bit planes two through four would be
+     * all zeroes.  Using these flags avoids wasting all
+     * that memory in this way:  first, you specify which planes you
+     * want your data to appear in using the PlanePick variable.  For
+     * each bit set in the variable, the next &#034;plane&#034; of your image
+     * data is blitted to the display.	For each bit clear in this
+     * variable, the corresponding bit in PlaneOnOff is examined.
+     * If that bit is clear, a &#034;plane&#034; of zeroes will be used.
+     * If the bit is set, ones will go out instead.  So, for our example:
+     *	 Gadget.PlanePick = 0x02;
+     *	 Gadget.PlaneOnOff = 0x01;
+     * Note that this also allows for generic Gadgets, like the
+     * System Gadgets, which will work in any number of bit planes.
+     * Note also that if you want an Image that is only a filled
+     * rectangle, you can get this by setting PlanePick to zero
+     * (pick no planes of data) and set PlaneOnOff to describe the pen
+     * color of the rectangle.
+     *
+<a name="line659">     * NOTE:  Intuition relies on PlanePick to know how many planes</a>
+     * of data are found in ImageData.	There should be no more
+     * '1'-bits in PlanePick than there are planes in ImageData.
+     */
+    UBYTE PlanePick, PlaneOnOff;
+
+<a name="line665">    /* if the NextImage variable is not NULL, Intuition presumes that</a>
+     * it points to another Image structure with another Image to be
+     * rendered
+     */
+    struct Image *NextImage;
+};
+
+
+
+
+
+<a name="line676"></a>
+/* ======================================================================== */
+<a name="line678">/* === IntuiMessage ======================================================= */</a>
+<a name="line679">/* ======================================================================== */</a>
+struct IntuiMessage
+{
+    struct Message ExecMessage;
+<a name="line683"></a>
+    /* the Class bits correspond directly with the IDCMP Flags, except for the
+     * special bit IDCMP_LONELYMESSAGE (defined below)
+<a name="line686">     */</a>
+    ULONG Class;
+
+<a name="line689">    /* the Code field is for special values like MENU number */</a>
+    UWORD Code;
+
+    /* the Qualifier field is a copy of the current InputEvent's Qualifier */
+    UWORD Qualifier;
+<a name="line694"></a>
+    /* IAddress contains particular addresses for Intuition functions, like
+     * the pointer to the Gadget or the Screen
+     */
+    APTR IAddress;
+
+    /* when getting mouse movement reports, any event you get will have the
+     * the mouse coordinates in these variables.  the coordinates are relative
+<a name="line702">     * to the upper-left corner of your Window (WFLG_GIMMEZEROZERO</a>
+     * notwithstanding).  If IDCMP_DELTAMOVE is set, these values will
+     * be deltas from the last reported position.
+     */
+    WORD MouseX, MouseY;
+<a name="line707"></a>
+    /* the time values are copies of the current system clock time.  Micros
+     * are in units of microseconds, Seconds in seconds.
+     */
+    ULONG Seconds, Micros;
+<a name="line712"></a>
+    /* the IDCMPWindow variable will always have the address of the Window of
+     * this IDCMP
+<a name="line715">     */</a>
+    struct Window *IDCMPWindow;
+
+    /* system-use variable */
+    struct IntuiMessage *SpecialLink;
+};
+
+<a name="line722"></a>
+<a name="line723">/* --- IDCMP Classes ------------------------------------------------------ */</a>
+<a name="line724">/* Please refer to the Autodoc for OpenWindow() and to the Rom Kernel</a>
+<a name="line725"> * Manual for full details on the IDCMP classes.</a>
+<a name="line726"> */</a>
+<a name="line727">#define IDCMP_SIZEVERIFY	0x00000001</a>
+<a name="line728">#define IDCMP_NEWSIZE		0x00000002</a>
+<a name="line729">#define IDCMP_REFRESHWINDOW	0x00000004</a>
+<a name="line730">#define IDCMP_MOUSEBUTTONS	0x00000008</a>
+<a name="line731">#define IDCMP_MOUSEMOVE		0x00000010</a>
+<a name="line732">#define IDCMP_GADGETDOWN	0x00000020</a>
+<a name="line733">#define IDCMP_GADGETUP		0x00000040</a>
+<a name="line734">#define IDCMP_REQSET		0x00000080</a>
+<a name="line735">#define IDCMP_MENUPICK		0x00000100</a>
+<a name="line736">#define IDCMP_CLOSEWINDOW	0x00000200</a>
+<a name="line737">#define IDCMP_RAWKEY		0x00000400</a>
+<a name="line738">#define IDCMP_REQVERIFY		0x00000800</a>
+<a name="line739">#define IDCMP_REQCLEAR		0x00001000</a>
+<a name="line740">#define IDCMP_MENUVERIFY	0x00002000</a>
+<a name="line741">#define IDCMP_NEWPREFS		0x00004000</a>
+<a name="line742">#define IDCMP_DISKINSERTED	0x00008000</a>
+<a name="line743">#define IDCMP_DISKREMOVED	0x00010000</a>
+<a name="line744">#define IDCMP_WBENCHMESSAGE	0x00020000  /*	System use only		*/</a>
+<a name="line745">#define IDCMP_ACTIVEWINDOW	0x00040000</a>
+#define IDCMP_INACTIVEWINDOW	0x00080000
+<a name="line747">#define IDCMP_DELTAMOVE		0x00100000</a>
+#define IDCMP_VANILLAKEY	0x00200000
+<a name="line749">#define IDCMP_INTUITICKS	0x00400000</a>
+/*  for notifications from &#034;boopsi&#034; gadgets	*/
+<a name="line751">#define IDCMP_IDCMPUPDATE	0x00800000  /* new for V36	*/</a>
+/* for getting help key report during menu session	*/
+#define IDCMP_MENUHELP		0x01000000  /* new for V36	*/
+/* for notification of any move/size/zoom/change window		*/
+#define IDCMP_CHANGEWINDOW	0x02000000  /* new for V36	*/
+
+/* NOTEZ-BIEN:				0x80000000 is reserved for internal use   */
+
+/* the IDCMP Flags do not use this special bit, which is cleared when
+<a name="line760"> * Intuition sends its special message to the Task, and set when Intuition</a>
+ * gets its Message back from the Task.  Therefore, I can check here to
+ * find out fast whether or not this Message is available for me to send
+ */
+#define IDCMP_LONELYMESSAGE	0x80000000
+<a name="line765"></a>
+<a name="line766"></a>
+<a name="line767">/* --- IDCMP Codes -------------------------------------------------------- */</a>
+/* This group of codes is for the IDCMP_MENUVERIFY function */
+#define MENUHOT		0x0001	/* IntuiWants verification or MENUCANCEL    */
+#define MENUCANCEL	0x0002	/* HOT Reply of this cancels Menu operation */
+#define MENUWAITING	0x0003	/* Intuition simply wants a ReplyMsg() ASAP */
+<a name="line772"></a>
+<a name="line773">/* These are internal tokens to represent state of verification attempts</a>
+<a name="line774"> * shown here as a clue.</a>
+ */
+#define OKOK		MENUHOT	/* guy didn't care			*/
+<a name="line777">#define OKABORT		0x0004	/* window rendered question moot	*/</a>
+<a name="line778">#define OKCANCEL	MENUCANCEL /* window sent cancel reply		*/</a>
+
+/* This group of codes is for the IDCMP_WBENCHMESSAGE messages */
+#define WBENCHOPEN	0x0001
+<a name="line782">#define WBENCHCLOSE	0x0002</a>
+<a name="line783"></a>
+<a name="line784"></a>
+<a name="line785">/* A data structure common in V36 Intuition processing	*/</a>
+<a name="line786">struct IBox {</a>
+    WORD Left;
+    WORD Top;
+    WORD Width;
+    WORD Height;
+    };
+
+
+
+/* ======================================================================== */
+<a name="line796">/* === Window ============================================================= */</a>
+<a name="line797">/* ======================================================================== */</a>
+<a name="line798">struct Window</a>
+<a name="line799">{</a>
+    struct Window *NextWindow;		/* for the linked list in a screen */
+<a name="line801"></a>
+    WORD LeftEdge, TopEdge;		/* screen dimensions of window */
+<a name="line803">    WORD Width, Height;			/* screen dimensions of window */</a>
+<a name="line804"></a>
+    WORD MouseY, MouseX;		/* relative to upper-left of window */
+<a name="line806"></a>
+    WORD MinWidth, MinHeight;		/* minimum sizes */
+<a name="line808">    UWORD MaxWidth, MaxHeight;		/* maximum sizes */</a>
+
+<a name="line810">    ULONG Flags;			/* see below for defines */</a>
+
+<a name="line812">    struct Menu *MenuStrip;		/* the strip of Menu headers */</a>
+
+<a name="line814">    UBYTE *Title;			/* the title text for this window */</a>
+
+<a name="line816">    struct Requester *FirstRequest;	/* all active Requesters */</a>
+
+<a name="line818">    struct Requester *DMRequest;	/* double-click Requester */</a>
+<a name="line819"></a>
+    WORD ReqCount;			/* count of reqs blocking Window */
+
+    struct Screen *WScreen;		/* this Window's Screen */
+    struct RastPort *RPort;		/* this Window's very own RastPort */
+
+    /* the border variables describe the window border.  If you specify
+     * WFLG_GIMMEZEROZERO when you open the window, then the upper-left of
+     * the ClipRect for this window will be upper-left of the BitMap (with
+     * correct offsets when in SuperBitMap mode; you MUST select
+     * WFLG_GIMMEZEROZERO when using SuperBitMap).  If you don't specify
+     * ZeroZero, then you save memory (no allocation of RastPort, Layer,
+<a name="line831">     * ClipRect and associated Bitmaps), but you also must offset all your</a>
+<a name="line832">     * writes by BorderTop, BorderLeft and do your own mini-clipping to</a>
+     * prevent writing over the system gadgets
+     */
+    BYTE BorderLeft, BorderTop, BorderRight, BorderBottom;
+    struct RastPort *BorderRPort;
+
+
+    /* You supply a linked-list of Gadgets for your Window.
+<a name="line840">     * This list DOES NOT include system gadgets.  You get the standard</a>
+     * window system gadgets by setting flag-bits in the variable Flags (see
+     * the bit definitions below)
+<a name="line843">     */</a>
+    struct Gadget *FirstGadget;
+
+    /* these are for opening/closing the windows */
+    struct Window *Parent, *Descendant;
+<a name="line848"></a>
+<a name="line849">    /* sprite data information for your own Pointer</a>
+<a name="line850">     * set these AFTER you Open the Window by calling SetPointer()</a>
+<a name="line851">     */</a>
+    UWORD *Pointer;	/* sprite data */
+    BYTE PtrHeight;	/* sprite height (not including sprite padding) */
+<a name="line854">    BYTE PtrWidth;	/* sprite width (must be less than or equal to 16) */</a>
+<a name="line855">    BYTE XOffset, YOffset;	/* sprite offsets */</a>
+<a name="line856"></a>
+    /* the IDCMP Flags and User's and Intuition's Message Ports */
+<a name="line858">    ULONG IDCMPFlags;	/* User-selected flags */</a>
+    struct MsgPort *UserPort, *WindowPort;
+    struct IntuiMessage *MessageKey;
+
+    UBYTE DetailPen, BlockPen;	/* for bar/border/gadget rendering */
+
+<a name="line864">    /* the CheckMark is a pointer to the imagery that will be used when</a>
+     * rendering MenuItems of this Window that want to be checkmarked
+<a name="line866">     * if this is equal to NULL, you'll get the default imagery</a>
+     */
+    struct Image *CheckMark;
+
+    UBYTE *ScreenTitle;	/* if non-null, Screen title when Window is active */
+
+    /* These variables have the mouse coordinates relative to the
+     * inner-Window of WFLG_GIMMEZEROZERO Windows.  This is compared with the
+<a name="line874">     * MouseX and MouseY variables, which contain the mouse coordinates</a>
+<a name="line875">     * relative to the upper-left corner of the Window, WFLG_GIMMEZEROZERO</a>
+     * notwithstanding
+     */
+    WORD GZZMouseX;
+<a name="line879">    WORD GZZMouseY;</a>
+<a name="line880">    /* these variables contain the width and height of the inner-Window of</a>
+     * WFLG_GIMMEZEROZERO Windows
+<a name="line882">     */</a>
+    WORD GZZWidth;
+<a name="line884">    WORD GZZHeight;</a>
+
+    UBYTE *ExtData;
+
+    BYTE *UserData;	/* general-purpose pointer to User data extension */
+<a name="line889"></a>
+    /** 11/18/85: this pointer keeps a duplicate of what
+     * Window.RPort-&#062;Layer is _supposed_ to be pointing at
+     */
+    struct Layer *WLayer;
+<a name="line894"></a>
+    /* NEW 1.2: need to keep track of the font that
+     * OpenWindow opened, in case user SetFont's into RastPort
+     */
+    struct TextFont *IFont;
+
+<a name="line900">    /* (V36) another flag word (the Flags field is used up).</a>
+     * At present, all flag values are system private.
+     * Until further notice, you may not change nor use this field.
+     */
+    ULONG	MoreFlags;
+
+    /**** Data beyond this point are Intuition Private.  DO NOT USE ****/
+<a name="line907">};</a>
+<a name="line908"></a>
+<a name="line909"></a>
+<a name="line910">/* --- Flags requested at OpenWindow() time by the application --------- */</a>
+#define WFLG_SIZEGADGET	    0x00000001	/* include sizing system-gadget? */
+<a name="line912">#define WFLG_DRAGBAR	    0x00000002	/* include dragging system-gadget? */</a>
+<a name="line913">#define WFLG_DEPTHGADGET    0x00000004	/* include depth arrangement gadget? */</a>
+#define WFLG_CLOSEGADGET    0x00000008	/* include close-box system-gadget? */
+
+#define WFLG_SIZEBRIGHT	    0x00000010	/* size gadget uses right border */
+<a name="line917">#define WFLG_SIZEBBOTTOM    0x00000020	/* size gadget uses bottom border */</a>
+<a name="line918"></a>
+<a name="line919">/* --- refresh modes ------------------------------------------------------ */</a>
+<a name="line920">/* combinations of the WFLG_REFRESHBITS select the refresh type */</a>
+<a name="line921">#define WFLG_REFRESHBITS    0x000000C0</a>
+#define WFLG_SMART_REFRESH  0x00000000
+<a name="line923">#define WFLG_SIMPLE_REFRESH 0x00000040</a>
+#define WFLG_SUPER_BITMAP   0x00000080
+<a name="line925">#define WFLG_OTHER_REFRESH  0x000000C0</a>
+
+<a name="line927">#define WFLG_BACKDROP	    0x00000100	/* this is a backdrop window */</a>
+
+<a name="line929">#define WFLG_REPORTMOUSE    0x00000200	/* to hear about every mouse move */</a>
+
+<a name="line931">#define WFLG_GIMMEZEROZERO  0x00000400	/* a GimmeZeroZero window	*/</a>
+
+#define WFLG_BORDERLESS	    0x00000800	/* to get a Window sans border */
+
+<a name="line935">#define WFLG_ACTIVATE	    0x00001000	/* when Window opens, it's Active */</a>
+<a name="line936"></a>
+<a name="line937"></a>
+/* FLAGS SET BY INTUITION */
+#define WFLG_WINDOWACTIVE   0x00002000	/* this window is the active one */
+<a name="line940">#define WFLG_INREQUEST	    0x00004000	/* this window is in request mode */</a>
+<a name="line941">#define WFLG_MENUSTATE	    0x00008000	/* Window is active with Menus on */</a>
+
+/* --- Other User Flags --------------------------------------------------- */
+<a name="line944">#define WFLG_RMBTRAP	    0x00010000	/* Catch RMB events for your own */</a>
+<a name="line945">#define WFLG_NOCAREREFRESH  0x00020000	/* not to be bothered with REFRESH */</a>
+<a name="line946"></a>
+/* --- Other Intuition Flags ---------------------------------------------- */
+#define WFLG_WINDOWREFRESH  0x01000000	/* Window is currently refreshing */
+#define WFLG_WBENCHWINDOW   0x02000000	/* WorkBench tool ONLY Window */
+<a name="line950">#define WFLG_WINDOWTICKED   0x04000000	/* only one timer tick at a time */</a>
+
+
+/* - V36 new Flags which the programmer may specify in NewWindow.Flags	*/
+<a name="line954">#define WFLG_NW_EXTENDED    0x00040000	/* extension data provided	*/</a>
+<a name="line955">					/* see struct ExtNewWindow	*/</a>
+<a name="line956"></a>
+/* --- V36 Flags to be set only by Intuition -------------------------	*/
+#define WFLG_VISITOR	    0x08000000	/* visitor window		*/
+<a name="line959">#define WFLG_ZOOMED	    0x10000000	/* identifies &#034;zoom state&#034;	*/</a>
+#define WFLG_HASZOOM	    0x20000000	/* windowhas a zoom gadget	*/
+
+/* --- Other Window Values ---------------------------------------------- */
+#define DEFAULTMOUSEQUEUE	(5)	/* no more mouse messages	*/
+
+/* --- see struct IntuiMessage for the IDCMP Flag definitions ------------- */
+
+
+
+
+/* ======================================================================== */
+/* === NewWindow ========================================================== */
+/* ======================================================================== */
+<a name="line973">/*</a>
+ * Note that the new extension fields have been removed.  Use ExtNewWindow
+<a name="line975"> * structure below to make use of these fields</a>
+<a name="line976"> */</a>
+struct NewWindow
+<a name="line978">{</a>
+    WORD LeftEdge, TopEdge;		/* screen dimensions of window */
+<a name="line980">    WORD Width, Height;			/* screen dimensions of window */</a>
+
+<a name="line982">    UBYTE DetailPen, BlockPen;		/* for bar/border/gadget rendering */</a>
+
+    ULONG IDCMPFlags;			/* User-selected IDCMP flags */
+
+    ULONG Flags;			/* see Window struct for defines */
+
+    /* You supply a linked-list of Gadgets for your Window.
+<a name="line989">     *	This list DOES NOT include system Gadgets.  You get the standard</a>
+     *	system Window Gadgets by setting flag-bits in the variable Flags (see
+     *	the bit definitions under the Window structure definition)
+     */
+    struct Gadget *FirstGadget;
+
+<a name="line995">    /* the CheckMark is a pointer to the imagery that will be used when</a>
+     * rendering MenuItems of this Window that want to be checkmarked
+<a name="line997">     * if this is equal to NULL, you'll get the default imagery</a>
+     */
+    struct Image *CheckMark;
+
+    UBYTE *Title;			  /* the title text for this window */
+
+    /* the Screen pointer is used only if you've defined a CUSTOMSCREEN and
+<a name="line1004">     * want this Window to open in it.	If so, you pass the address of the</a>
+     * Custom Screen structure in this variable.  Otherwise, this variable
+     * is ignored and doesn't have to be initialized.
+     */
+    struct Screen *Screen;
+
+<a name="line1010">    /* WFLG_SUPER_BITMAP Window?  If so, put the address of your BitMap</a>
+     * structure in this variable.  If not, this variable is ignored and
+     * doesn't have to be initialized
+     */
+    struct BitMap *BitMap;
+
+    /* the values describe the minimum and maximum sizes of your Windows.
+     * these matter only if you've chosen the WFLG_SIZEGADGET option,
+     * which means that you want to let the User to change the size of
+     * this Window.  You describe the minimum and maximum sizes that the
+     * Window can grow by setting these variables.  You can initialize
+     * any one these to zero, which will mean that you want to duplicate
+     * the setting for that dimension (if MinWidth == 0, MinWidth will be
+     * set to the opening Width of the Window).
+<a name="line1024">     * You can change these settings later using SetWindowLimits().</a>
+<a name="line1025">     * If you haven't asked for a SIZING Gadget, you don't have to</a>
+     * initialize any of these variables.
+     */
+    WORD MinWidth, MinHeight;	    /* minimums */
+    UWORD MaxWidth, MaxHeight;	     /* maximums */
+
+    /* the type variable describes the Screen in which you want this Window to
+<a name="line1032">     * open.  The type value can either be CUSTOMSCREEN or one of the</a>
+     * system standard Screen Types such as WBENCHSCREEN.  See the
+     * type definitions under the Screen structure.
+     */
+    UWORD Type;
+
+};
+<a name="line1039"></a>
+/* The following structure is the future NewWindow.  Compatibility
+ * issues require that the size of NewWindow not change.
+ * Data in the common part (NewWindow) indicates the the extension
+<a name="line1043"> * fields are being used.</a>
+ * NOTE WELL: This structure may be subject to future extension.
+<a name="line1045"> * Writing code depending on its size is not allowed.</a>
+<a name="line1046"> */</a>
+struct ExtNewWindow
+<a name="line1048">{</a>
+<a name="line1049">    WORD LeftEdge, TopEdge;</a>
+<a name="line1050">    WORD Width, Height;</a>
+<a name="line1051"></a>
+    UBYTE DetailPen, BlockPen;
+<a name="line1053">    ULONG IDCMPFlags;</a>
+    ULONG Flags;
+<a name="line1055">    struct Gadget *FirstGadget;</a>
+<a name="line1056"></a>
+<a name="line1057">    struct Image *CheckMark;</a>
+
+<a name="line1059">    UBYTE *Title;</a>
+<a name="line1060">    struct Screen *Screen;</a>
+    struct BitMap *BitMap;
+
+    WORD MinWidth, MinHeight;
+    UWORD MaxWidth, MaxHeight;
+
+    /* the type variable describes the Screen in which you want this Window to
+     * open.  The type value can either be CUSTOMSCREEN or one of the
+     * system standard Screen Types such as WBENCHSCREEN.  See the
+     * type definitions under the Screen structure.
+<a name="line1070">     * A new possible value for this field is PUBLICSCREEN, which</a>
+     * defines the window as a 'visitor' window.  See below for
+     * additional information provided.
+     */
+    UWORD Type;
+
+    /* ------------------------------------------------------- *
+     * extensions for V36
+     * if the NewWindow Flag value WFLG_NW_EXTENDED is set, then
+     * this field is assumed to point to an array ( or chain of arrays)
+     * of TagItem structures.  See also ExtNewScreen for another
+<a name="line1081">     * use of TagItems to pass optional data.</a>
+     *
+     * see below for tag values and the corresponding data.
+     */
+    struct TagItem	*Extension;
+};
+
+/*
+ * The TagItem ID's (ti_Tag values) for OpenWindowTagList() follow.
+ * They are values in a TagItem array passed as extension/replacement
+<a name="line1091"> * values for the data in NewWindow.  OpenWindowTagList() can actually</a>
+ * work well with a NULL NewWindow pointer.
+ */
+<a name="line1094"></a>
+<a name="line1095">#define WA_Dummy	(TAG_USER + 99)	/* 0x80000063	*/</a>
+<a name="line1096"></a>
+<a name="line1097">/* these tags simply override NewWindow parameters */</a>
+<a name="line1098">#define WA_Left			(WA_Dummy + 0x01)</a>
+<a name="line1099">#define WA_Top			(WA_Dummy + 0x02)</a>
+<a name="line1100">#define WA_Width		(WA_Dummy + 0x03)</a>
+#define WA_Height		(WA_Dummy + 0x04)
+<a name="line1102">#define WA_DetailPen		(WA_Dummy + 0x05)</a>
+<a name="line1103">#define WA_BlockPen		(WA_Dummy + 0x06)</a>
+<a name="line1104">#define WA_IDCMP		(WA_Dummy + 0x07)</a>
+<a name="line1105">			/* &#034;bulk&#034; initialization of NewWindow.Flags */</a>
+#define WA_Flags		(WA_Dummy + 0x08)
+#define WA_Gadgets		(WA_Dummy + 0x09)
+#define WA_Checkmark		(WA_Dummy + 0x0A)
+<a name="line1109">#define WA_Title		(WA_Dummy + 0x0B)</a>
+<a name="line1110">			/* means you don't have to call SetWindowTitles</a>
+<a name="line1111">			 * after you open your window</a>
+			 */
+<a name="line1113">#define WA_ScreenTitle		(WA_Dummy + 0x0C)</a>
+<a name="line1114">#define WA_CustomScreen		(WA_Dummy + 0x0D)</a>
+<a name="line1115">#define WA_SuperBitMap		(WA_Dummy + 0x0E)</a>
+<a name="line1116">			/* also implies WFLG_SUPER_BITMAP property	*/</a>
+#define WA_MinWidth		(WA_Dummy + 0x0F)
+#define WA_MinHeight		(WA_Dummy + 0x10)
+#define WA_MaxWidth		(WA_Dummy + 0x11)
+<a name="line1120">#define WA_MaxHeight		(WA_Dummy + 0x12)</a>
+<a name="line1121"></a>
+/* The following are specifications for new features	*/
+
+#define WA_InnerWidth		(WA_Dummy + 0x13)
+#define WA_InnerHeight		(WA_Dummy + 0x14)
+			/* You can specify the dimensions of the interior
+			 * region of your window, independent of what
+			 * the border widths will be.  You probably want
+			 * to also specify WA_AutoAdjust to allow
+<a name="line1130">			 * Intuition to move your window or even</a>
+			 * shrink it so that it is completely on screen.
+			 */
+
+#define WA_PubScreenName	(WA_Dummy + 0x15)
+<a name="line1135">			/* declares that you want the window to open as</a>
+			 * a visitor on the public screen whose name is
+			 * pointed to by (UBYTE *) ti_Data
+			 */
+#define WA_PubScreen		(WA_Dummy + 0x16)
+			/* open as a visitor window on the public screen
+			 * whose address is in (struct Screen *) ti_Data.
+<a name="line1142">			 * To ensure that this screen remains open, you</a>
+			 * should either be the screen's owner, have a
+			 * window open on the screen, or use LockPubScreen().
+			 */
+#define WA_PubScreenFallBack	(WA_Dummy + 0x17)
+			/* A Boolean, specifies whether a visitor window
+<a name="line1148">			 * should &#034;fall back&#034; to the default public screen</a>
+			 * (or Workbench) if the named public screen isn't
+<a name="line1150">			 * available</a>
+			 */
+#define WA_WindowName		(WA_Dummy + 0x18)
+			/* not implemented	*/
+#define WA_Colors		(WA_Dummy + 0x19)
+			/* a ColorSpec array for colors to be set
+			 * when this window is active.	This is not
+			 * implemented, and may not be, since the default
+<a name="line1158">			 * values to restore would be hard to track.</a>
+			 * We'd like to at least support per-window colors
+			 * for the mouse pointer sprite.
+			 */
+#define WA_Zoom		(WA_Dummy + 0x1A)
+			/* ti_Data points to an array of four WORD's,
+			 * the initial Left/Top/Width/Height values of
+			 * the &#034;alternate&#034; zoom position/dimensions.
+<a name="line1166">			 * It also specifies that you want a Zoom gadget</a>
+			 * for your window, whether or not you have a
+			 * sizing gadget.
+			 */
+<a name="line1170">#define WA_MouseQueue		(WA_Dummy + 0x1B)</a>
+			/* ti_Data contains initial value for the mouse
+			 * message backlog limit for this window.
+			 */
+<a name="line1174">#define WA_BackFill		(WA_Dummy + 0x1C)</a>
+			/* unimplemented at present: provides a &#034;backfill
+			 * hook&#034; for your window's layer.
+			 */
+#define WA_RptQueue		(WA_Dummy + 0x1D)
+			/* initial value of repeat key backlog limit	*/
+<a name="line1180"></a>
+<a name="line1181">    /* These Boolean tag items are alternatives to the NewWindow.Flags</a>
+<a name="line1182">     * boolean flags with similar names.</a>
+<a name="line1183">     */</a>
+<a name="line1184">#define WA_SizeGadget		(WA_Dummy + 0x1E)</a>
+<a name="line1185">#define WA_DragBar		(WA_Dummy + 0x1F)</a>
+<a name="line1186">#define WA_DepthGadget		(WA_Dummy + 0x20)</a>
+<a name="line1187">#define WA_CloseGadget		(WA_Dummy + 0x21)</a>
+<a name="line1188">#define WA_Backdrop		(WA_Dummy + 0x22)</a>
+<a name="line1189">#define WA_ReportMouse		(WA_Dummy + 0x23)</a>
+<a name="line1190">#define WA_NoCareRefresh	(WA_Dummy + 0x24)</a>
+<a name="line1191">#define WA_Borderless		(WA_Dummy + 0x25)</a>
+#define WA_Activate		(WA_Dummy + 0x26)
+<a name="line1193">#define WA_RMBTrap		(WA_Dummy + 0x27)</a>
+#define WA_WBenchWindow		(WA_Dummy + 0x28)	/* PRIVATE!! */
+<a name="line1195">#define WA_SimpleRefresh	(WA_Dummy + 0x29)</a>
+<a name="line1196">			/* only specify if TRUE	*/</a>
+#define WA_SmartRefresh		(WA_Dummy + 0x2A)
+			/* only specify if TRUE	*/
+<a name="line1199">#define WA_SizeBRight		(WA_Dummy + 0x2B)</a>
+#define WA_SizeBBottom		(WA_Dummy + 0x2C)
+
+    /* New Boolean properties	*/
+#define WA_AutoAdjust		(WA_Dummy + 0x2D)
+<a name="line1204">			/* shift or squeeze the window's position and</a>
+			 * dimensions to fit it on screen.
+			 */
+
+<a name="line1208">#define WA_GimmeZeroZero	(WA_Dummy + 0x2E)</a>
+			/* equiv. to NewWindow.Flags WFLG_GIMMEZEROZERO	*/
+
+/* New for V37: WA_MenuHelp (ignored by V36) */
+#define WA_MenuHelp		(WA_Dummy + 0x2F)
+			/* Enables IDCMP_MENUHELP:  Pressing HELP during menus
+			 * will return IDCMP_MENUHELP message.
+			 */
+
+
+
+#ifndef INTUITION_SCREENS_H
+#include &#060;intuition/screens.h&#062;
+#endif
+
+#ifndef INTUITION_PREFERENCES_H
+#include &#060;intuition/preferences.h&#062;
+#endif
+
+/* ======================================================================== */
+/* === Remember =========================================================== */
+<a name="line1229">/* ======================================================================== */</a>
+<a name="line1230">/* this structure is used for remembering what memory has been allocated to</a>
+ * date by a given routine, so that a premature abort or systematic exit
+<a name="line1232"> * can deallocate memory cleanly, easily, and completely</a>
+<a name="line1233"> */</a>
+<a name="line1234">struct Remember</a>
+{
+    struct Remember *NextRemember;
+    ULONG RememberSize;
+    UBYTE *Memory;
+};
+<a name="line1240"></a>
+<a name="line1241"></a>
+<a name="line1242">/* === Color Spec ====================================================== */</a>
+<a name="line1243">/* How to tell Intuition about RGB values for a color table entry. */</a>
+<a name="line1244">struct ColorSpec {</a>
+    WORD	ColorIndex;	/* -1 terminates an array of ColorSpec	*/
+    UWORD	Red;		/* only 6 bits recognized in V36	*/
+    UWORD	Green;		/* only 6 bits recognized in V36	*/
+    UWORD	Blue;		/* only 6 bits recognized in V36	*/
+};
+<a name="line1250"></a>
+<a name="line1251">/* === Easy Requester Specification ======================================= */</a>
+<a name="line1252">/* see also autodocs for EasyRequest and BuildEasyRequest	*/</a>
+<a name="line1253">/* NOTE: This structure may grow in size in the future		*/</a>
+<a name="line1254">struct EasyStruct {</a>
+<a name="line1255">    ULONG	es_StructSize;	/* should be sizeof (struct EasyStruct )*/</a>
+    ULONG	es_Flags;	/* should be 0 for now			*/
+    UBYTE	*es_Title;	/* title of requester window		*/
+    UBYTE	*es_TextFormat;	/* 'printf' style formatting string	*/
+    UBYTE	*es_GadgetFormat; /* 'printf' style formatting string	*/
+};
+
+
+
+/* ======================================================================== */
+<a name="line1265">/* === Miscellaneous ====================================================== */</a>
+<a name="line1266">/* ======================================================================== */</a>
+<a name="line1267"></a>
+/* = MACROS ============================================================== */
+<a name="line1269">#define MENUNUM(n) (n &#038; 0x1F)</a>
+<a name="line1270">#define ITEMNUM(n) ((n &#062;&#062; 5) &#038; 0x003F)</a>
+<a name="line1271">#define SUBNUM(n) ((n &#062;&#062; 11) &#038; 0x001F)</a>
+
+#define SHIFTMENU(n) (n &#038; 0x1F)
+<a name="line1274">#define SHIFTITEM(n) ((n &#038; 0x3F) &#060;&#060; 5)</a>
+#define SHIFTSUB(n) ((n &#038; 0x1F) &#060;&#060; 11)
+<a name="line1276"></a>
+<a name="line1277">#define FULLMENUNUM( menu, item, sub )	\</a>
+<a name="line1278">	( SHIFTSUB(sub) | SHIFTITEM(item) | SHIFTMENU(menu) )</a>
+<a name="line1279"></a>
+<a name="line1280">#define SRBNUM(n)    (0x08 - (n &#062;&#062; 4))	/* SerRWBits -&#062; read bits per char */</a>
+#define SWBNUM(n)    (0x08 - (n &#038; 0x0F))/* SerRWBits -&#062; write bits per chr */
+#define SSBNUM(n)    (0x01 + (n &#062;&#062; 4))	/* SerStopBuf -&#062; stop bits per chr */
+#define SPARNUM(n)   (n &#062;&#062; 4)		/* SerParShk -&#062; parity setting	  */
+<a name="line1284">#define SHAKNUM(n)   (n &#038; 0x0F)	/* SerParShk -&#062; handshake mode	  */</a>
+<a name="line1285"></a>
+<a name="line1286"></a>
+<a name="line1287">/* = MENU STUFF =========================================================== */</a>
+#define NOMENU 0x001F
+#define NOITEM 0x003F
+#define NOSUB  0x001F
+<a name="line1291">#define MENUNULL 0xFFFF</a>
+<a name="line1292"></a>
+<a name="line1293"></a>
+/* = =RJ='s peculiarities ================================================= */
+#define FOREVER for(;;)
+#define SIGN(x) ( ((x) &#062; 0) - ((x) &#060; 0) )
+#define NOT !
+
+<a name="line1299">/* these defines are for the COMMSEQ and CHECKIT menu stuff.  If CHECKIT,</a>
+<a name="line1300"> * I'll use a generic Width (for all resolutions) for the CheckMark.</a>
+<a name="line1301"> * If COMMSEQ, likewise I'll use this generic stuff</a>
+<a name="line1302"> */</a>
+#define CHECKWIDTH	19
+#define COMMWIDTH	27
+#define LOWCHECKWIDTH	13
+#define LOWCOMMWIDTH	16
+
+<a name="line1308"></a>
+<a name="line1309">/* these are the AlertNumber defines.  if you are calling DisplayAlert()</a>
+<a name="line1310"> * the AlertNumber you supply must have the ALERT_TYPE bits set to one</a>
+<a name="line1311"> * of these patterns</a>
+ */
+#define ALERT_TYPE	0x80000000
+#define RECOVERY_ALERT	0x00000000	/* the system can recover from this */
+#define DEADEND_ALERT	0x80000000	/* no recovery possible, this is it */
+
+
+/* When you're defining IntuiText for the Positive and Negative Gadgets
+<a name="line1319"> * created by a call to AutoRequest(), these defines will get you</a>
+<a name="line1320"> * reasonable-looking text.  The only field without a define is the IText</a>
+<a name="line1321"> * field; you decide what text goes with the Gadget</a>
+<a name="line1322"> */</a>
+<a name="line1323">#define AUTOFRONTPEN	0</a>
+<a name="line1324">#define AUTOBACKPEN	1</a>
+<a name="line1325">#define AUTODRAWMODE	JAM2</a>
+#define AUTOLEFTEDGE	6
+#define AUTOTOPEDGE	3
+#define AUTOITEXTFONT	NULL
+<a name="line1329">#define AUTONEXTTEXT	NULL</a>
+<a name="line1330"></a>
+<a name="line1331"></a>
+<a name="line1332">/* --- RAWMOUSE Codes and Qualifiers (Console OR IDCMP) ------------------- */</a>
+<a name="line1333">#define SELECTUP	(IECODE_LBUTTON | IECODE_UP_PREFIX)</a>
+<a name="line1334">#define SELECTDOWN	(IECODE_LBUTTON)</a>
+<a name="line1335">#define MENUUP		(IECODE_RBUTTON | IECODE_UP_PREFIX)</a>
+<a name="line1336">#define MENUDOWN	(IECODE_RBUTTON)</a>
+<a name="line1337">#define MIDDLEDOWN	(IECODE_MBUTTON)</a>
+<a name="line1338">#define MIDDLEUP	(IECODE_MBUTTON | IECODE_UP_PREFIX)</a>
+<a name="line1339">#define ALTLEFT		(IEQUALIFIER_LALT)</a>
+#define ALTRIGHT	(IEQUALIFIER_RALT)
+<a name="line1341">#define AMIGALEFT	(IEQUALIFIER_LCOMMAND)</a>
+<a name="line1342">#define AMIGARIGHT	(IEQUALIFIER_RCOMMAND)</a>
+<a name="line1343">#define AMIGAKEYS	(AMIGALEFT | AMIGARIGHT)</a>
+<a name="line1344"></a>
+<a name="line1345">#define CURSORUP	0x4C</a>
+<a name="line1346">#define CURSORLEFT	0x4F</a>
+<a name="line1347">#define CURSORRIGHT	0x4E</a>
+<a name="line1348">#define CURSORDOWN	0x4D</a>
+<a name="line1349">#define KEYCODE_Q	0x10</a>
+<a name="line1350">#define KEYCODE_Z	0x31</a>
+<a name="line1351">#define KEYCODE_X	0x32</a>
+<a name="line1352">#define KEYCODE_V	0x34</a>
+<a name="line1353">#define KEYCODE_B	0x35</a>
+#define KEYCODE_N	0x36
+#define KEYCODE_M	0x37
+<a name="line1356">#define KEYCODE_LESS	0x38</a>
+#define KEYCODE_GREATER 0x39
+
+/* Include obsolete identifiers: */
+#ifndef INTUITION_IOBSOLETE_H
+#include &#060;intuition/iobsolete.h&#062;
+#endif
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

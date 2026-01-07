@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_25" NODE="25-1-1" TITLE="25 / Semaphore Functions / The Signal Semaphore" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>25 / Semaphore Functions / The Signal Semaphore</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02F6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02F8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Exec semaphores are signal based. Using signal semaphores is the easiest
+way to protect shared, single-access resources in the Amiga.  Your task
+will sleep until the semaphore is available for use.  The <a href="../Includes_and_Autodocs_2._guide/node0082.html#line39">SignalSemaphore</a>
+structure is as follows:
+
+    struct SignalSemaphore {
+        struct  Node ss_Link;
+        SHORT   ss_NestCount;
+        struct  MinList ss_WaitQueue;
+        struct  SemaphoreRequest ss_MultipleLink;
+        struct  Task *ss_Owner;
+        SHORT   ss_QueueCount;
+    };
+
+ss_Link
+    is the node structure used to link semaphores together.  The <a href="../Libraries_Manual_guide/node02D9.html#line34">ln_Pri</a>
+    and <a href="../Libraries_Manual_guide/node02D9.html#line38">ln_Name</a> fields are used to set the priority of the semaphore in a
+    list and to name the semaphore for <a href="../Libraries_Manual_guide/node02F9.html">public</a> access.  If a semaphore is
+    not public the ln_Name and ln_Pri fields may be left NULL.
+
+ss_NestCount
+    is the count of number of locks the current owner has on the
+    semaphore.
+
+ss_WaitQueue
+    is the <a href="../Libraries_Manual_guide/node02DB.html#line23">List</a> header for the list of other tasks waiting for this
+<a name="line28">    semaphore.</a>
+
+ss_MultipleLink
+    is the <a href="../Includes_and_Autodocs_2._guide/node0082.html#line33">SemaphoreRequest</a> used by <a href="../Libraries_Manual_guide/node02FF.html">ObtainSemaphoreList()</a>.
+
+ss_Owner
+    is the pointer to the current owning task.
+
+ss_QueueCount
+<a name="line37">    is the number of other tasks waiting for the semaphore.</a>
+
+A practical application of a SignalSemaphore would be to use it as the
+base of a shared data structure.  For example:
+
+    struct SharedList {
+        struct SignalSemaphore sl_Semaphore;
+        struct MinList         sl_List;
+    };
+
+ <a href="../Libraries_Manual_guide/node02F8.html">Creating a SignalSemaphore Structure</a> 
+ <a href="../Libraries_Manual_guide/node02F9.html">Making a SignalSemaphore Available to the Public</a> 
+ <a href="../Libraries_Manual_guide/node02FA.html">Obtaining a SignalSemaphore Exclusively</a> 
+ <a href="../Libraries_Manual_guide/node02FB.html">Obtaining a Shared SignalSemaphore</a> 
+ <a href="../Libraries_Manual_guide/node02FC.html">Checking a SignalSemaphore</a> 
+ <a href="../Libraries_Manual_guide/node02FD.html">Releasing a SignalSemaphore</a> 
+ <a href="../Libraries_Manual_guide/node02FE.html">Removing a SignalSemaphore Structure</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="NameFromFH()" TITLE="dos.library/NameFromFH" -->
+<head>
+<title>dos.library/NameFromFH</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0191.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0193.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	NameFromFH -- Get the name of an open filehandle (V36)
+
+<b>   SYNOPSIS</b>
+	success = NameFromFH(fh, buffer, len)
+	D0                   D1    D2    D3
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> NameFromFH(BPTR, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, LONG)
+
+<b>   FUNCTION</b>
+	Returns a fully qualified path for the filehandle.  This routine is
+	guaranteed not to write more than len characters into the buffer.  The
+	name will be null-terminated.  See <a href="../Includes_and_Autodocs_3._guide/node0193.html">NameFromLock()</a> for more information.
+
+	Note: Older filesystems that don't support <a href="../Includes_and_Autodocs_3._guide/node015D.html">ExamineFH()</a> will cause
+	NameFromFH() to fail with ERROR_ACTION_NOT_SUPPORTED.
+
+<b>   INPUTS</b>
+	fh     - <a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock</a> of object to be examined.
+	buffer - Buffer to store name.
+	len    - Length of buffer.
+
+<b>   RESULT</b>
+	success - Success/failure indicator.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0193.html">NameFromLock()</a>, <a href="../Includes_and_Autodocs_3._guide/node015D.html">ExamineFH()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

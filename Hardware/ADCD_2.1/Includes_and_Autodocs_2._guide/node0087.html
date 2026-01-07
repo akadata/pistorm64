@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/devices.h" NODE="MAIN" TITLE="Includes/exec/devices.h" -->
+<head>
+<title>Includes/exec/devices.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0086.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0088.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_DEVICES_H
+#define	EXEC_DEVICES_H
+/*
+**	$Filename: exec/devices.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.5 $
+**	$Date: 90/05/10 $
+**
+**	Include file for use by Exec device drivers
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_LIBRARIES_H
+#include &#034;exec/libraries.h&#034;
+#endif /* EXEC_LIBRARIES_H */
+
+#ifndef EXEC_PORTS_H
+#include &#034;exec/ports.h&#034;
+#endif /* EXEC_PORTS_H */
+
+
+/****** Device ******************************************************/
+<a name="line25"></a>
+<a name="line26">struct Device {</a>
+    struct  Library dd_Library;
+};
+
+
+/****** Unit ********************************************************/
+<a name="line32"></a>
+<a name="line33">struct Unit {</a>
+    struct  MsgPort unit_MsgPort;	/* queue for unprocessed messages */
+<a name="line35">					/* instance of msgport is recommended */</a>
+<a name="line36">    UBYTE   unit_flags;</a>
+<a name="line37">    UBYTE   unit_pad;</a>
+    UWORD   unit_OpenCnt;		/* number of active opens */
+};
+
+<a name="line41"></a>
+<a name="line42">#define UNITF_ACTIVE	(1&#060;&#060;0)</a>
+#define UNITF_INTASK	(1&#060;&#060;1)
+
+#endif	/* EXEC_DEVICES_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

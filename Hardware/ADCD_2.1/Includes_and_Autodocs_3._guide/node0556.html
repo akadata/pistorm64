@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="serial" NODE="AbortIO()" TITLE="serial.device/AbortIO" -->
+<head>
+<title>serial.device/AbortIO</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0555.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0557.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       AbortIO(ioRequest) -- abort an I/O request
+               A1
+
+<b>   FUNCTION</b>
+      This is an exec.library call.
+
+      This function attempts to aborts a specified read or write request.
+      If the request is active, it is stopped immediately. If the request is
+      queued, it is painlessly removed.  The request will be returned
+      in the same way any completed request it.
+
+      After AbortIO(), you must generally do a <a href="../Includes_and_Autodocs_3._guide/node0247.html">WaitIO()</a>.
+
+<b>   INPUTS</b>
+      iORequest  -- pointer to the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> Block that is to be aborted.
+
+<b>   RESULTS</b>
+       io_Error -- if the Abort succeded, then io_Error will be #IOERR_ABORTED
+
+           (-2) and the request will be flagged as aborted (bit 5 of
+           io_Flags is set).  If the Abort failed, then the Error will be zero.
+
+<b>   BUGS</b>
+       Previous to version 34, the serial.device would often hang when
+       aborting CTS/RTS handshake requests.  This was the cause of the
+       incorrect assumption that AbortIO() does not need to be followed
+       by a wait for a reply (or a WaitIO()).
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

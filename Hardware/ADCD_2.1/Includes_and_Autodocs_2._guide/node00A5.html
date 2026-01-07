@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/clip.i" NODE="MAIN" TITLE="Includes/graphics/clip.i" -->
+<head>
+<title>Includes/graphics/clip.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00A4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00A6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	GRAPHICS_CLIP_I
+GRAPHICS_CLIP_I	SET	1
+**
+**	$Filename: graphics/clip.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.1 $
+**	$Date: 91/01/28 $
+**
+**
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+    IFND    EXEC_TYPES_I
+    include 'exec/types.i'
+    ENDC
+
+    IFND    GRAPHICS_GFX_I
+    include &#034;graphics/gfx.i&#034;
+    ENDC
+
+    IFND    EXEC_SEMAPHORES_I
+    include &#034;exec/semaphores.i&#034;
+    ENDC
+
+NEWLOCKS	equ	1
+
+ STRUCTURE  Layer,0
+    LONG    lr_front
+    LONG    lr_back
+    LONG    lr_ClipRect
+    LONG    lr_rp
+    WORD    lr_MinX
+    WORD    lr_MinY
+    WORD    lr_MaxX
+    WORD    lr_MaxY
+	STRUCT	lr_reserved,4
+	WORD	lr_priority
+    WORD    lr_Flags
+    LONG    lr_SuperBitMap
+    LONG    lr_SuperClipRect
+    APTR    lr_Window
+    WORD    lr_Scroll_X
+    WORD    lr_Scroll_Y
+    APTR    lr_cr
+    APTR    lr_cr2
+    APTR    lr_crnew
+    APTR    lr_SuperSaverClipRects
+    APTR    lr__cliprects
+    APTR    lr_LayerInfo
+*			just by lucky coincidence
+*			this is not confused with simplesprites
+	STRUCT	lr_Lock,SS_SIZE
+	APTR	lr_BackFill
+	ULONG	lr_reserved1
+	APTR	lr_ClipRegion
+	APTR	lr_saveClipRects
+	STRUCT	lr_reserved2,22
+    APTR    lr_DamageList
+    LABEL   lr_SIZEOF
+
+ STRUCTURE  ClipRect,0
+    LONG    cr_Next
+    LONG    cr_prev
+    LONG    cr_lobs
+    LONG    cr_BitMap
+    WORD    cr_MinX
+    WORD    cr_MinY
+    WORD    cr_MaxX
+    WORD    cr_MaxY
+    APTR    cr__p1
+    APTR    cr__p2
+    LONG    cr_reserved
+    LONG    cr_Flags
+ LABEL	    cr_SIZEOF
+
+* internal cliprect flags
+CR_NEEDS_NO_CONCEALED_RASTERS	equ	1
+CR_NEEDS_NO_LAYERBLIT_DAMAGE	equ	2
+
+* defines for clipping
+ISLESSX equ 1
+ISLESSY equ 2
+ISGRTRX equ 4
+ISGRTRY equ 8
+
+* for ancient history reasons
+	IFND	lr_Front
+lr_Front	equ lr_front
+lr_Back	equ lr_back
+lr_RastPort	equ	lr_rp
+cr_Prev	equ cr_prev
+cr_LObs	equ	cr_lobs
+	ENDC
+
+	ENDC	; GRAPHICS_CLIP_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

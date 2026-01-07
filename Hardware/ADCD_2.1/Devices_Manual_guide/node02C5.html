@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_SMUS" NODE="16-5-5-2" TITLE=" Appendix A. Quick Reference / SMUS Regular Expression " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Appendix A. Quick Reference / SMUS Regular Expression </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02C4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02C6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here's a regular expression summary of the FORM <a href="../Devices_Manual_guide/node02AB.html">SMUS</a> syntax.  This could
+be an IFF file or part of one.
+
+    SMUS      ::= &#034;FORM&#034; #{ &#034;SMUS&#034; SHDR [NAME] [Copyright] [AUTH] [IRev]
+                            ANNO* INS1*  TRAK*  InstrForm* }
+
+    SHDR      ::= &#034;SHDR&#034; #{ SScoreHeader    }
+    NAME      ::= &#034;NAME&#034; #{ CHAR*   } [0]
+    Copyright ::= &#034;(c) &#034; #{ CHAR*   } [0]
+    AUTH      ::= &#034;AUTH&#034; #{ CHAR*   } [0]
+    IRev      ::= &#034;IRev&#034; #{ ...     }
+
+    ANNO      ::= &#034;ANNO&#034; #{ CHAR*   } [0]
+    INS1      ::= &#034;INS1&#034; #{ RefInstrument   } [0]
+
+    TRAK      ::= &#034;TRAK&#034; #{ SEvent* }
+    InstrForm ::= &#034;FORM&#034; #{ ...     }
+
+The token &#034;#&#034; represents a ckSize LONG count of the following {braced}
+data bytes.  Literal items are shown in &#034;quotes&#034;, [square bracket items]
+are optional, and &#034;*&#034; means 0 or more replications.  A sometimes-needed
+pad byte is shown as &#034;[0]&#034;.
+
+Actually, the order of chunks in a FORM <a href="../Devices_Manual_guide/node02AB.html">SMUS</a> is not as strict as this
+regular expression indicates.  The <a href="../Devices_Manual_guide/node02B3.html">SHDR</a>, <a href="../Devices_Manual_guide/node02B4.html">NAME</a>, <a href="../Devices_Manual_guide/node02B4.html">Copyright</a>, <a href="../Devices_Manual_guide/node02B4.html">AUTH</a>, <a href="../Devices_Manual_guide/node02B4.html">IRev</a>,
+<a href="../Devices_Manual_guide/node02B4.html">ANNO</a>, and <a href="../Devices_Manual_guide/node02B5.html">INS1</a> chunks may appear in any order, as long as they precede the
+<a href="../Devices_Manual_guide/node02B7.html">TRAK</a> chunks.
+
+The chunk &#034;InstrForm&#034; represents any kind of instrument data <a href="../Devices_Manual_guide/node01C7.html#line51">FORM</a> embedded
+in the FORM <a href="../Devices_Manual_guide/node02AB.html">SMUS</a>.  For example, see the document &#034;8SVX&#034; IFF 8-Bit Sampled
+Voice. Of course, a recipient program will ignore an instrument FORM if it
+doesn't recognize that FORM type.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

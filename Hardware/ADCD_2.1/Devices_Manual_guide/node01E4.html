@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-4-2" TITLE=" Data Sections / Composite FORMs " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Data Sections / Composite FORMs </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01E3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01E5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> <a href="../Devices_Manual_guide/node01DD.html">chunk</a> inside a FORM is a full-fledged data section.  This means you
+can build a composite object such as a multi-frame animation sequence by
+nesting available picture FORMs and sound effect FORMs.  You can insert
+additional <a href="../Devices_Manual_guide/node01DD.html">chunk</a>s with information like frame rate and frame count.
+
+Using composite <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>s, you leverage on existing programs that create and
+edit the component FORMs.  Those editors may even look into your composite
+object to copy out its type of component.  Such editors are not allowed to
+replace their component objects within your composite object.  That's
+because the IFF standard lets you specify consistency requirements for the
+composite FORM such as maintaining a count or a directory of the
+components.  Only programs that are written to uphold the rules of your
+FORM type may create or modify such FORMs.
+
+Therefore, in designing a program that creates composite objects, you are
+strongly requested to provide a facility for your users to import and
+export the nested <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>s.  Import and export could move the data through a
+clipboard or a file.
+
+Here are several existing <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> types and rules for defining new ones:
+
+ <a href="../Devices_Manual_guide/node01E5.html">FTXT</a>      <a href="../Devices_Manual_guide/node01E6.html">ILBM</a>      <a href="../Devices_Manual_guide/node01E7.html">PICs</a>      <a href="../Devices_Manual_guide/node01E8.html">Other Macintosh Resource Types</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

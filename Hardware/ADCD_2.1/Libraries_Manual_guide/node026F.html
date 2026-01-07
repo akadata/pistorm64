@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-11" TITLE="15 / GadTools Gadgets / Gadget Refresh Functions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / GadTools Gadgets / Gadget Refresh Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node026E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0270.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Normally, GadTools gadgets are created and then attached to a window when
+the window is opened, either through the <a href="../Libraries_Manual_guide/node0124.html#line52">WA_Gadget</a> tag or the
+<a href="../Libraries_Manual_guide/node0124.html#line52">NewWindow.FirstGadget</a> field.  Alternately, they may be added to a window
+<a name="line5">after it is open by using the functions <a href="../Libraries_Manual_guide/node0133.html#line7">AddGList()</a> and <a href="../Libraries_Manual_guide/node0146.html">RefreshGList()</a>.</a>
+
+Regardless of which way gadgets are attached to a window, the program must
+then call the <a href="../Includes_and_Autodocs_2._guide/node03F4.html">GT_RefreshWindow()</a> function to complete the rendering of
+GadTools gadgets.  This function takes two arguments.
+
+    void GT_RefreshWindow( struct Window *win, struct Requester *req );
+
+This win argument is a pointer to the window that contains the GadTools
+gadgets.  The req argument is currently unused and should be set to NULL.
+This function should only be called immediately after adding GadTools
+gadgets to a window.  Subsequent changes to GadTools gadget imagery made
+through calls to <a href="../Libraries_Manual_guide/node025E.html">GT_SetGadgetAttrs()</a> will be automatically performed by
+GadTools when the changes are made.  (There is no need to call
+<a name="line19"><a href="../Includes_and_Autodocs_2._guide/node03F4.html">GT_RefreshWindow()</a> in that case.)</a>
+
+As mentioned earlier, applications must always ask for notification of
+window refresh events for any window that uses GadTools gadgets.  When the
+application receives an <a href="../Libraries_Manual_guide/node01E0.html#line7">IDCMP_REFRESHWINDOW</a> message for a window,
+Intuition has already refreshed its gadgets.  Normally, a program would
+then call Intuition's <a href="../Libraries_Manual_guide/node011E.html">BeginRefresh()</a>, perform its own custom rendering
+operations, and finally call <a href="../Libraries_Manual_guide/node011E.html#line25">EndRefresh()</a>.  But for a window that uses
+GadTools gadgets, the application must call <a href="../Includes_and_Autodocs_2._guide/node03EF.html">GT_BeginRefresh()</a> and
+<a href="../Includes_and_Autodocs_2._guide/node03F0.html">GT_EndRefresh()</a> in place of BeginRefresh() and EndRefresh().  This allows
+the the GadTools gadgets to be fully refreshed.
+
+    void GT_BeginRefresh( struct Window *win );
+    void GT_EndRefresh ( struct Window *win, long complete );
+
+For both functions, the win argument is a pointer to the window to be
+refreshed.  For <a href="../Includes_and_Autodocs_2._guide/node03F0.html">GT_EndRefresh()</a>, set the complete argument to TRUE if
+refreshing is complete, set it to FALSE otherwise.  See the discussion of
+<a href="../Libraries_Manual_guide/node011E.html">BeginRefresh()</a> and <a href="../Libraries_Manual_guide/node011E.html#line25">EndRefresh()</a> in the &#034;Intuition Windows&#034; chapter for
+<a name="line38">more about window refreshing.</a>
+
+When using GadTools gadgets, the program may not set the window's
+<a href="../Libraries_Manual_guide/node0125.html#line62">WFLG_NOCAREREFRESH</a> flag.  Even if there is no custom rendering to be
+performed, GadTools gadgets requires this minimum code to handle
+<a href="../Libraries_Manual_guide/node01E0.html#line7">IDCMP_REFRESHWINDOW</a> messages:
+
+    case IDCMP_REFRESHWINDOW:
+        GT_BeginRefresh(win);
+        /* custom rendering, if any, goes here */
+        GT_EndRefresh(win, TRUE);
+        break;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

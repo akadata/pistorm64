@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_8" NODE="8-2-2" TITLE="8 / Device Interface / Opening The Narrator Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>8 / Device Interface / Opening The Narrator Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0116.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0118.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Three primary steps are required to open the narrator device:
+
+   *  Create a message port using <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>. Reply messages from the
+      device must be directed to a message port.
+
+   *  Create an extended I/O request structure of type <a href="../Devices_Manual_guide/node0115.html#line17">narrator_rb</a>.  The
+      <a href="../Devices_Manual_guide/node0115.html#line17">narrator_rb</a> structure is created by the <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a> function.
+
+   *  Open the narrator device.  Call <a href="../Includes_and_Autodocs_2._guide/node04C8.html">OpenDevice()</a> passing the I/O request.
+
+
+    struct MsgPort *VoiceMP;
+    struct narrator_rb *VoiceIO;
+
+    if (VoiceMP = CreatePort(&#034;speech_write&#034;,0))
+        if (VoiceIO = (struct narrator_rb *)
+                        CreateExtIO(VoiceMP,sizeof(struct narrator_rb));
+            if (OpenDevice(&#034;narrator.device&#034;, 0, VoiceIO, 0))
+<a name="line20">                    printf(&#034;narrator.device did not open\n&#034;);</a>
+
+When the narrator device is first opened, it initializes certain fields in
+the user's <a href="../Devices_Manual_guide/node0115.html#line17">narrator_rb</a> I/O request structure.  In order to maintain
+backwards compatibility with older versions of the narrator device, a
+mechanism was needed for the device to ascertain whether it was being
+opened with a V37 or pre-V37 style I/O request structure. The pad field in
+the pre-V37 <a href="../Devices_Manual_guide/node0115.html#line17">narrator_rb</a> I/O request structure (which no one should have
+ever touched!) has been replaced by the flags field in the V37 <a href="../Devices_Manual_guide/node0115.html#line17">narrator_rb</a>
+structure, and is our path to upward compatibility.  The device checks to
+see if a bit is set in this flags field.  This bit must be set before
+opening the device if V37 or later features of the narrator device are to
+be used.  There are two defined constants in the include file, NDB_NEWIORB
+and NDF_NEWIORB. NDB_NEWIORB specifies the bit which must be set in the
+flags field, NDF_NEWIORB is the field definition of the bit (1 &#060;&#060;
+NDB_NEWIORB).
+<a name="line36"></a>
+Once the device is opened, the <a href="../Devices_Manual_guide/node0115.html#line47">mouth_rb</a> (read) I/O request structure can
+be set up.  Each <a href="../Includes_and_Autodocs_2._guide/node04C3.html">CMD_READ</a> request must be matched with an associated
+<a href="../Includes_and_Autodocs_2._guide/node04C7.html">CMD_WRITE</a> request.  This is necessary for the device to match the various
+sync events with a particular utterance.  The read I/O request structure
+is easily set up as follows:
+
+   *  Create a read message port using the <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a> function.
+
+   *  Allocate memory for the <a href="../Devices_Manual_guide/node0115.html#line47">mouth_rb</a> extended I/O request structure using
+      <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a>.
+
+   *  Copy the <a href="../Devices_Manual_guide/node0115.html#line17">narrator_rb</a> I/O request structure used to open the device
+      into the voice field of the <a href="../Devices_Manual_guide/node0115.html#line47">mouth_rb</a> I/O request structure. This will
+      set the fields necessary for the device to make the correct
+      correspondence between read and write requests.
+
+   *  Copy the pointer to the read message port returned from <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>
+      into the voice.message.io_Message.mn_ReplyPort field of the <a href="../Devices_Manual_guide/node0115.html#line47">mouth_rb</a>
+      structure.
+
+The following code fragment, in conjunction with the <a href="../Includes_and_Autodocs_2._guide/node04C8.html">OpenDevice()</a> code
+fragment above, shows how to set up the <a href="../Devices_Manual_guide/node0115.html#line47">mouth_rb</a> structure:
+
+    struct  MsgPort   *MouthMP;
+    struct  mouth_rb  *MouthIO;
+
+    if (MouthMP = CreatePort(&#034;narrator_read&#034;, 0))
+      if (!(MouthIO = (struct mouth_rb *)
+                 AllocMem(sizeof(struct mouth_rb),MEMF_PUBLIC|MEMF_CLEAR)))
+          {
+          /* Copy I/O request used in OpenDevice */
+          MouthIO-&#062;voice = *VoiceIO;
+          /* Set port */
+          MouthIO-&#062;voice.message.io_Message.mn_ReplyPort=MouthMP;
+          }
+      else
+          printf(&#034;AllocMem failed\n&#034;);
+    else
+        printf(&#034;CreatePort failed\n&#034;);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

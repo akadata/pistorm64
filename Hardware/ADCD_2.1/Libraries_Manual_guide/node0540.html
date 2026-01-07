@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-1-10" TITLE="D / Errors / Crashes--Window Related" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D / Errors / Crashes--Window Related</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node053F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0541.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Be careful not to <a href="../Libraries_Manual_guide/node0105.html">CloseWindow()</a> a window during a while(msg=GetMsg(...))
+loop on that window's port (next <a href="../Libraries_Manual_guide/node02F2.html">GetMsg()</a> would be on freed pointer).
+Also, use <a href="../Libraries_Manual_guide/node01E3.html#line5">ModifyIDCMP</a>(NULL) with care, especially if using one port with
+multiple windows.  Be sure to <a href="../Libraries_Manual_guide/node0181.html#line11">ClearMenuStrip()</a> any menus before closing a
+window, and do not free items such as dynamically allocated gadgets and
+menus while they are attached to a window.  Do not reference an
+<a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a>'s <a href="../Libraries_Manual_guide/node01D9.html#line73">IAddress</a> field as a structure pointer of any kind before
+determining it is a structure pointer (this depends on the <a href="../Libraries_Manual_guide/node01D9.html#line28">Class</a> of the
+IntuiMessage).  If a crash or problem only occurs when opening a window
+after extended use of your program, check to make sure that your program
+is properly freeing up signals allocated indirectly by <a href="../Libraries_Manual_guide/node02EC.html">CreatePort()</a>,
+<a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a> or ModifyIDCMP().
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

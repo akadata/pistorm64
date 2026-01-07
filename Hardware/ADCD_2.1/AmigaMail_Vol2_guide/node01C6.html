@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="V-11/getaspect.c" NODE="MAIN" TITLE="V-11/getaspect.c" -->
+<head>
+<title>V-11/getaspect.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01C5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01C7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* getaspect.c - Execute me to compile me with SAS/C 6.56
+sc DATA=NEAR NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 getaspect.c
+slink FROM LIB:c.o,getaspect.o TO getaspect LIBRARY LIB:sc.lib,LIB:amiga.lib
+quit
+
+Gets X/Y pixel aspect of a screen's ViewPort
+*/
+/*
+Copyright (c) 1991-1999 Amiga, Inc.
+
+This example is provided in electronic form by Amiga, Inc.
+for use with the Amiga Mail Volume II technical publication.
+Amiga Mail Volume II contains additional information on the correct
+usage of the techniques and operating system functions presented in
+these examples.  The source and executable code of these examples may
+only be distributed in free electronic form, via bulletin board or
+as part of a fully non-commercial and freely redistributable
+diskette.  Both the source and executable code (including comments)
+must be included, without modification, in any copy.  This example
+may not be published in printed form or distributed with any
+commercial product. However, the programming techniques and support
+routines set forth in these examples may be used in the development
+of original executable software products for Amiga
+computers.
+
+All other rights reserved.
+
+This example is provided &#034;as-is&#034; and is subject to change; no
+warranties are made.  All use is at your own risk. No liability or
+responsibility is assumed.
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;libraries/dos.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/intuitionbase.h&#062;
+#include &#060;graphics/displayinfo.h&#062;
+#include &#060;graphics/gfxbase.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;stdlib.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;string.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+
+#define MINARGS 1
+
+UBYTE *vers = &#034;\0$VER: getaspect 37.1&#034;;
+UBYTE *Copyright =
+  &#034;getaspect v37.1\nCopyright (c) 1990-1999 Amiga, Inc.  All Rights Reserved&#034;;
+UBYTE *usage = &#034;Usage: getaspect&#034;;
+
+void bye(UBYTE *s, int e);
+void cleanup(void);
+
+struct Library *IntuitionBase;
+struct Library *GfxBase;
+
+void main(int argc, char **argv)
+    {
+    struct Screen *first;
+    struct ViewPort *vp;
+    struct DisplayInfo DI;
+    ULONG  modeid;
+    UBYTE  xAspect, yAspect;
+
+    if(((argc)&#038;&#038;(argc&#060;MINARGS))||(argv[argc-1][0]=='?'))
+    {
+    printf(&#034;%s\n%s\n&#034;,Copyright,usage);
+    bye(&#034;&#034;,RETURN_OK);
+    }
+
+    /* We will check later to see if we can call V36 functions */
+    IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,34);
+    GfxBase = OpenLibrary(&#034;graphics.library&#034;,34);
+    if((!IntuitionBase)||(!GfxBase))
+    bye(&#034;Can't open intuition or graphics library&#034;,RETURN_FAIL);
+
+    printf(&#034;Using front screen's ViewPort (for example purposes only):\n&#034;);
+
+    first = ((struct IntuitionBase *)IntuitionBase)-&#062;FirstScreen;
+    vp = &#038;first-&#062;ViewPort;
+
+    xAspect = 0;    /* So we can tell when we've got it */
+
+    if(GfxBase-&#062;lib_Version &#062;= 36)
+    {
+        modeid = GetVPModeID(vp);
+
+        if(GetDisplayInfoData(NULL, (UBYTE *)&#038;DI, sizeof(struct DisplayInfo),
+        DTAG_DISP, modeid))
+        {
+        printf(&#034;Running 2.0,  ViewPort modeid is $%08lx\n&#034;,modeid);
+        xAspect = DI.Resolution.x;
+        yAspect = DI.Resolution.y;
+        printf(&#034;Pixel  xAspect=%ld  yAspect=%ld\n&#034;,xAspect, yAspect);
+        printf(&#034;PaletteRange is %ld\n&#034;,DI.PaletteRange);
+        }
+    }
+
+    if(!xAspect)  /* pre-2.0 or GetDisplayInfoData failed */
+    {
+    modeid = vp-&#062;Modes;
+    printf(&#034;Not running 2.0, ViewPort mode is $%04lx\n&#034;,modeid);
+        /* default lores pixel ratio */
+        xAspect = 44;
+        yAspect = ((struct GfxBase *)GfxBase)-&#062;DisplayFlags &#038; PAL  ? 44 : 52;
+        if(modeid &#038; HIRES)      xAspect = xAspect &#062;&#062; 1;
+        if(modeid &#038; LACE)       yAspect = yAspect &#062;&#062; 1;
+    printf(&#034;Pixel  xAspect=%ld  yAspect=%ld\n&#034;,xAspect, yAspect);
+        }
+
+    bye(&#034;&#034;,RETURN_OK);
+    }
+
+
+void bye(UBYTE *s, int e)
+    {
+    cleanup();
+    exit(e);
+    }
+
+void cleanup()
+    {
+    if(GfxBase) CloseLibrary(GfxBase);
+    if(IntuitionBase)   CloseLibrary(IntuitionBase);
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

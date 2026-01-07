@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/timer" NODE="AddTime()" TITLE="timer.device/AddTime" -->
+<head>
+<title>timer.device/AddTime</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04F7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04F9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AddTime -- Add one time request to another.
+
+SYNOPSIS
+    AddTime( Dest, Source )
+             A0    A1
+
+    void AddTime( struct <a href="../Includes_and_Autodocs_2._guide/node0053.html#line26">timeval</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node0053.html#line26">timeval</a> *);
+
+FUNCTION
+    This routine adds one <a href="../Includes_and_Autodocs_2._guide/node0053.html#line26">timeval</a> structure to another.  The
+    results are stored in the destination (Dest + Source -&#062; Dest)
+
+    A0 and A1 will be left unchanged
+
+INPUTS
+    Dest, Source -- pointers to <a href="../Includes_and_Autodocs_2._guide/node0053.html#line26">timeval</a> structures.
+
+NOTES
+    This function may be called from interrupts.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node04F9.html">timer.device/CmpTime()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node04FC.html">timer.device/SubTime()</a>
+
+BUGS
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-3-3" TITLE="27 / Advanced Topics / Extra-Half-Brite Mode" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / Advanced Topics / Extra-Half-Brite Mode</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0346.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0348.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In the Extra-Half-Brite mode you can create a single-playfield,
+low-resolution display with up to 64 colors, double the normal maximum of
+32.  This requires your <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> to be defined with six bitplanes.  Under
+1.3, you specify EHB mode by setting the <a href="../Libraries_Manual_guide/node0327.html#line54">EXTRA_HALFBRITE</a> bit in the
+<a href="../Libraries_Manual_guide/node0327.html">ViewPort.Modes</a> field.  Under Release 2, you specify EHB by selecting any
+ModeID which includes EXTRAHALFBRITE in its name as defined in the include
+file &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00BD.html#line152">displayinfo.h</a>&#062;.
+
+When setting up the color palette for an EHB display, you only specify
+values for registers 0 to 31.  If you draw using color numbers 0 through
+31, the pixel you draw will be the color specified in that particular
+system color register.  If you draw using a color number from 32 to 63,
+then the color displayed will be half the intensity value of the
+corresponding color register from 0 to 31.  For example, if color register
+0 is set to 0xFFF (white), then color number 32 would be half this value
+or 0x777 (grey).
+
+EHB mode uses all six bitplanes.  The color register (0 through 31) is
+obtained from the bit combinations from planes 5 to 1, in that order of
+significance.  Plane 6 is used to determine whether the full intensity
+(bit value 0) color or half-intensity (bit value 1) color is to be
+displayed.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

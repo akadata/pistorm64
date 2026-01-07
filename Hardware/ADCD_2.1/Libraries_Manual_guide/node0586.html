@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/broker.c" NODE="MAIN" TITLE="Lib_examples/broker.c" -->
+<head>
+<title>Lib_examples/broker.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0585.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0587.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* The example below, Broker.c, receives input from one source, the
+ * controller program.  The controller program sends a CxMessage each
+ * time the user clicks its Enable, Disable, or Kill gadgets.  Using the
+ * CxMsgID() function, the commodity finds out what the command is and
+ * executes it.
+ *
+ * broker.c - Simple skeletal example of opening a broker
+ *
+ * compiled with SASC 5.10
+ * LC -b0 -cfist -v broker.c
+ * Blink FROM LIB:c.o,broker.o TO broker LIBRARY LIB:LC.lib,LIB:Amiga.lib
+ */
+#include &#060;exec/libraries.h&#062;
+#include &#060;libraries/commodities.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/alib_stdio_protos.h&#062;
+#include &#060;clib/commodities_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }
+#endif
+
+void main(void);
+void ProcessMsg(void);
+
+struct Library *CxBase;
+
+CxObj *broker;
+struct MsgPort *broker_mp;
+ULONG cxsigflag;
+
+struct NewBroker newbroker = {
+    NB_VERSION,   /* nb_Version - Version of the NewBroker structure */
+    &#034;RKM broker&#034;, /* nb_Name - Name Commodities uses to identify this commodity */
+    &#034;Broker&#034;,     /* nb_Title - Title of commodity that appears in CXExchange */
+    &#034;A simple example of a broker&#034;,  /* nb_Descr - Description of the commodity */
+    0,            /* nb_Unique - Tells CX not to launch another commodity with same name */
+    0,            /* nb_Flags - Tells CX if this commodity has a window */
+    0,            /* nb_Pri - This commodity's priority */
+    0,            /* nb_Port - MsgPort CX talks to */
+    0             /* nb_ReservedChannel - reserved for later use */
+};
+
+
+void main(void)
+{
+    CxMsg *msg;
+
+    /* Before bothering with anything else, open the library */
+    if (CxBase = OpenLibrary(&#034;commodities.library&#034;, 37L))
+    {
+        /* Commodities talks to a Commodities application through */
+        /* an Exec Message port, which the application provides   */
+        if (broker_mp = CreateMsgPort())
+        {
+            newbroker.nb_Port = broker_mp;
+
+            /* The commodities.library function CxBroker() adds a borker to the
+             * master list.  It takes two arguments, a pointer to a NewBroker
+             * structure and a pointer to a LONG.  The NewBroker structure contains
+             * information to set up the broker.  If the second argument is not
+             * NULL, CxBroker will fill it in with an error code.
+             */
+            if (broker = CxBroker(&#038;newbroker, NULL))
+            {
+                cxsigflag = 1L &#060;&#060; broker_mp-&#062;mp_SigBit;
+
+                /* After it's set up correctly, the broker has to be activated */
+                ActivateCxObj(broker, 1L);
+
+                /* the main processing loop */
+                ProcessMsg();
+
+                /* It's time to clean up.  Start by removing the broker from the
+                 * Commodities master list.  The DeleteCxObjAll() function will
+                 * take care of removing a CxObject and all those connected
+                 * to it from the Commodities network
+                 */
+                DeleteCxObj(broker);
+
+                /* Empty the port of CxMsgs */
+                while(msg = (CxMsg *)GetMsg(broker_mp))
+                	ReplyMsg((struct Message *)msg);
+            }
+            DeletePort(broker_mp);
+        }
+        CloseLibrary(CxBase);
+    }
+}
+
+
+void ProcessMsg(void)
+{
+    CxMsg *msg;
+
+    ULONG sigrcvd, msgid, msgtype;
+    LONG returnvalue = 1L;
+
+    while (returnvalue)
+    {
+        /* wait for something to happen */
+        sigrcvd = Wait(SIGBREAKF_CTRL_C | cxsigflag);
+
+        /* process any messages */
+        while(msg = (CxMsg *)GetMsg(broker_mp))
+        {
+            /* Extract necessary information from the CxMessage and return it */
+            msgid = CxMsgID(msg);
+            msgtype = CxMsgType(msg);
+            ReplyMsg((struct Message *)msg);
+
+            switch(msgtype)
+            {
+                case CXM_IEVENT:
+                    /* Shouldn't get any of these in this example */
+                    break;
+                case CXM_COMMAND:
+                    /* Commodities has sent a command */
+                    printf(&#034;A command: &#034;);
+                    switch(msgid)
+                    {
+                        case CXCMD_DISABLE:
+                            printf(&#034;CXCMD_DISABLE\n&#034;);
+                            /* The user clicked Commodities Exchange disable
+                             * gadget better disable
+                             */
+                            ActivateCxObj(broker, 0L);
+                            break;
+                        case CXCMD_ENABLE:
+                            /* user clicked enable gadget */
+                            printf(&#034;CXCMD_ENABLE\n&#034;);
+                            ActivateCxObj(broker, 1L);
+                            break;
+                        case CXCMD_KILL:
+                            /* user clicked kill gadget, better quit */
+                            printf(&#034;CXCMD_KILL\n&#034;);
+                            returnvalue = 0L;
+                            break;
+                    }
+                    break;
+                default:
+                    printf(&#034;Unknown msgtype\n&#034;);
+                    break;
+            }
+        }
+        /* Test to see if user tried to break */
+        if (sigrcvd &#038; SIGBREAKF_CTRL_C)
+        {
+            returnvalue = 0L;
+            printf(&#034;CTRL C signal break\n&#034;);
+        }
+    }
+}
+
+
+/* Notice that Broker.c uses Ctrl-C as a break key.  The break key for
+** any commodity should be Ctrl-C.
+*/
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

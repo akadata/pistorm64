@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/layers.i" NODE="MAIN" TITLE="Includes/graphics/layers.i" -->
+<head>
+<title>Includes/graphics/layers.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00A2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00A4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	GRAPHICS_LAYERS_I
+GRAPHICS_LAYERS_I	SET	1
+**
+**	$Filename: graphics/layers.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+    IFND    EXEC_SEMAPHORES_I
+       include &#034;exec/semaphores.i&#034;
+    ENDC
+
+    IFND  EXEC_LISTS_I
+       include	&#034;exec/lists.i&#034;
+    ENDC
+
+* these should be clip.i/h but you know backwards compatibility etc.
+LAYERSIMPLE		equ   1
+LAYERSMART		equ   2
+LAYERSUPER		equ   4
+LAYERUPDATING		equ   $10
+LAYERBACKDROP		equ   $40
+LAYERREFRESH		equ   $80
+LAYER_CLIPRECTS_LOST	equ   $100
+
+LMN_REGION  equ -1
+
+    STRUCTURE  Layer_Info,0
+    APTR       li_top_layer
+    APTR       li_check_lp
+    APTR       li_obs
+    STRUCT     li_FreeClipRects,MLH_SIZE
+    STRUCT     li_Lock,SS_SIZE
+	STRUCT	   li_gs_Head,LH_SIZE
+	LONG		li_long_reserved
+	WORD	   li_Flags
+    BYTE       li_fatten_count
+	BYTE	   li_LockLayersCount
+    WORD       li_LayerInfo_extra_size
+	APTR		li_blitbuff
+    APTR       li_LayerInfo_extra
+    LABEL      li_SIZEOF
+
+NEWLAYERINFO_CALLED	equ 1
+ALERTLAYERSNOMEM	equ $83010000
+
+	ENDC	; GRAPHICS_LAYERS_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

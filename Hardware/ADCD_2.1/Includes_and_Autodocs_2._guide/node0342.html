@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="CopyMem()" TITLE="exec.library/CopyMem" -->
+<head>
+<title>exec.library/CopyMem</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0341.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0343.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CopyMem - general purpose memory copy function
+
+SYNOPSIS
+    CopyMem( source, dest, size )
+             A0      A1    D0
+
+    void CopyMem(APTR,APTR,ULONG);
+
+FUNCTION
+    CopyMem is a general purpose, fast memory copy function.  It can
+    deal with arbitrary lengths, with its pointers on arbitrary
+    alignments.  It attempts to optimize larger copies with more
+    efficient copies, it uses byte copies for small moves, parts of
+    larger copies, or the entire copy if the source and destination are
+    misaligned with respect to each other.
+
+    Arbitrary overlapping copies are not supported.
+
+    The internal implementation of this function will change from
+    system to system, and may be implemented via hardware DMA.
+
+INPUTS
+    source - a pointer to the source data region
+    dest  - a pointer to the destination data region
+    size  - the size (in bytes) of the memory area.  Zero copies
+            zero bytes
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0343.html">CopyMemQuick</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

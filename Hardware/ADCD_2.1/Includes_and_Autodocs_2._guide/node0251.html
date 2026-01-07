@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="SetEditHook()" TITLE="intuition.library/SetEditHook" -->
+<head>
+<title>intuition.library/SetEditHook</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0250.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0252.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SetEditHook -- Set global processing for string gadgets. (V36)
+
+SYNOPSIS
+    OldHook = SetEditHook( <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> )
+    D0                     A0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> *SetEditHook( struct <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> * );
+
+FUNCTION
+    Sets new global editing hook for string gadgets.
+
+    WARNING: This function is wholly untested.  Do *NOT* use
+    this in a commercial product until further notice.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> -- A pointer to a struct <a href="../Includes_and_Autodocs_2._guide/node012D.html#line23">Hook</a> which determines a function
+      in your code to be called every time the user types a key.
+      This is done before control is passed to the gadget custom
+      editing hook, so effects ALL string gadgets.
+
+RESULT
+    Returns previous global edit hook structure.
+
+BUGS
+    Unknown, risky.
+
+SEE ALSO
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

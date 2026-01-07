@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/narrator.h" NODE="MAIN" TITLE="Includes/devices/narrator.h" -->
+<head>
+<title>Includes/devices/narrator.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0041.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0043.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DEVICES_NARRATOR_H
+#define DEVICES_NARRATOR_H
+/*
+**	$Filename: devices/narrator.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 1.7 $
+**	$Date: 91/03/12 $
+**
+**	V37 Narrator device C language include file
+**
+**	Copyright 1990, 1991 Joseph Katz/Mark Barton.
+**	All rights reserved.
+**
+**	This include file (narrator.h) may be freely distributed
+**	as long as the above copyright notice remains intact.
+<a name="line16">**</a>
+*/
+
+
+#ifndef EXEC_IO_H
+#include &#034;exec/io.h&#034;
+#endif
+<a name="line23"></a>
+<a name="line24"></a>
+<a name="line25">		/*	    Device Options	*/</a>
+
+#define NDB_NEWIORB	0	/* Use new extended IORB		*/
+<a name="line28">#define NDB_WORDSYNC	1	/* Generate word sync messages		*/</a>
+<a name="line29">#define NDB_SYLSYNC	2	/* Generate syllable sync messages	*/</a>
+<a name="line30"></a>
+
+#define NDF_NEWIORB	(1 &#060;&#060; NDB_NEWIORB)
+#define NDF_WORDSYNC	(1 &#060;&#060; NDB_WORDSYNC)
+#define NDF_SYLSYNC	(1 &#060;&#060; NDB_SYLSYNC)
+
+<a name="line36"></a>
+<a name="line37"></a>
+<a name="line38">		/*	    Error Codes		*/</a>
+<a name="line39"></a>
+<a name="line40">#define ND_NoMem	-2	/* Can't allocate memory		*/</a>
+<a name="line41">#define ND_NoAudLib	-3	/* Can't open audio device		*/</a>
+<a name="line42">#define ND_MakeBad	-4	/* Error in MakeLibrary call		*/</a>
+<a name="line43">#define ND_UnitErr	-5	/* Unit other than 0			*/</a>
+<a name="line44">#define ND_CantAlloc	-6	/* Can't allocate audio channel(s)	*/</a>
+<a name="line45">#define ND_Unimpl	-7	/* Unimplemented command		*/</a>
+<a name="line46">#define ND_NoWrite	-8	/* Read for mouth without write first	*/</a>
+<a name="line47">#define ND_Expunged	-9	/* Can't open, deferred expunge bit set	*/</a>
+<a name="line48">#define ND_PhonErr     -20	/* Phoneme code spelling error			*/</a>
+<a name="line49">#define ND_RateErr     -21	/* Rate out of bounds			*/</a>
+<a name="line50">#define ND_PitchErr    -22	/* Pitch out of bounds				*/</a>
+<a name="line51">#define ND_SexErr      -23	/* Sex not valid			*/</a>
+<a name="line52">#define ND_ModeErr     -24	/* Mode not valid			*/</a>
+#define ND_FreqErr     -25	/* Sampling frequency out of bounds	*/
+#define ND_VolErr      -26	/* Volume out of bounds		*/
+#define ND_DCentErr    -27	/* Degree of centralization out of bounds */
+#define ND_CentPhonErr -28	/* Invalid central phon			*/
+
+<a name="line58"></a>
+<a name="line59"></a>
+<a name="line60">		/* Input parameters and defaults */</a>
+<a name="line61"></a>
+<a name="line62">#define DEFPITCH    110		/* Default pitch			*/</a>
+<a name="line63">#define DEFRATE     150		/* Default speaking rate (wpm)			*/</a>
+<a name="line64">#define DEFVOL	    64		/* Default volume (full)		*/</a>
+<a name="line65">#define DEFFREQ     22200	/* Default sampling frequency (Hz)	*/</a>
+<a name="line66">#define MALE	    0		/* Male vocal tract			*/</a>
+<a name="line67">#define FEMALE	    1		/* Female vocal tract			*/</a>
+<a name="line68">#define NATURALF0   0		/* Natural pitch contours		*/</a>
+<a name="line69">#define ROBOTICF0   1		/* Monotone pitch			*/</a>
+<a name="line70">#define MANUALF0    2		/* Manual setting of pitch contours	*/</a>
+<a name="line71">#define DEFSEX	    MALE	/* Default sex					*/</a>
+<a name="line72">#define DEFMODE     NATURALF0	/* Default mode			*/</a>
+<a name="line73">#define	DEFARTIC    100		/* 100% articulation (normal)		*/</a>
+#define DEFCENTRAL  0		/* No centralization			*/
+#define DEFF0PERT   0		/* No F0 Perturbation			*/
+#define DEFF0ENTHUS 32		/* Default F0 enthusiasm (in 32nds)	*/
+#define DEFPRIORITY 100		/* Default speaking priority		*/
+<a name="line78"></a>
+<a name="line79"></a>
+<a name="line80">			/*	Parameter bounds	*/</a>
+<a name="line81"></a>
+<a name="line82">#define MINRATE     40		/* Minimum speaking rate		*/</a>
+<a name="line83">#define MAXRATE     400		/* Maximum speaking rate		*/</a>
+<a name="line84">#define MINPITCH    65		/* Minimum pitch			*/</a>
+<a name="line85">#define MAXPITCH    320		/* Maximum pitch			*/</a>
+<a name="line86">#define MINFREQ     5000	/* Minimum sampling frequency		*/</a>
+<a name="line87">#define MAXFREQ     28000	/* Maximum sampling frequency		*/</a>
+#define MINVOL	    0		/* Minimum volume			*/
+#define MAXVOL	    64		/* Maximum volume			*/
+#define MINCENT      0		/* Minimum degree of centralization	*/
+#define MAXCENT    100		/* Maximum degree of centralization	*/
+<a name="line92"></a>
+<a name="line93"></a>
+<a name="line94">		/*    Standard Write request	*/</a>
+<a name="line95"></a>
+<a name="line96">struct narrator_rb {</a>
+<a name="line97">	struct IOStdReq  message;	/* Standard IORB		*/</a>
+<a name="line98">	UWORD	rate;			/* Speaking rate (words/minute) */</a>
+<a name="line99">	UWORD	pitch;			/* Baseline pitch in Hertz		*/</a>
+<a name="line100">	UWORD	mode;			/* Pitch mode			*/</a>
+<a name="line101">	UWORD	sex;			/* Sex of voice			*/</a>
+<a name="line102">	UBYTE	*ch_masks;		/* Pointer to audio alloc maps	*/</a>
+<a name="line103">	UWORD	nm_masks;		/* Number of audio alloc maps	*/</a>
+<a name="line104">	UWORD	volume;			/* Volume. 0 (off) thru 64	*/</a>
+<a name="line105">	UWORD	sampfreq;		/* Audio sampling freq			*/</a>
+<a name="line106">	UBYTE	mouths;			/* If non-zero, generate mouths */</a>
+<a name="line107">	UBYTE	chanmask;		/* Which ch mask used (internal)*/</a>
+<a name="line108">	UBYTE	numchan;		/* Num ch masks used (internal) */</a>
+<a name="line109">	UBYTE	flags;			/* New feature flags		*/</a>
+<a name="line110">	UBYTE	F0enthusiasm;		/* F0 excursion factor		*/</a>
+<a name="line111">	UBYTE	F0perturb;		/* Amount of F0 perturbation	*/</a>
+<a name="line112">	BYTE	F1adj;			/* F1 adjustment in &#177;5% steps	*/</a>
+<a name="line113">	BYTE	F2adj;				/* F2 adjustment in &#177;5% steps	*/</a>
+<a name="line114">	BYTE	F3adj;			/* F3 adjustment in &#177;5% steps	*/</a>
+<a name="line115">	BYTE	A1adj;			/* A1 adjustment in decibels	*/</a>
+<a name="line116">	BYTE	A2adj;			/* A2 adjustment in decibels	*/</a>
+<a name="line117">	BYTE	A3adj;			/* A3 adjustment in decibels	*/</a>
+<a name="line118">	UBYTE	articulate;		/* Transition time multiplier	*/</a>
+<a name="line119">	UBYTE	centralize;		/* Degree of vowel centralization */</a>
+<a name="line120">	char	*centphon;		/* Pointer to central ASCII phon  */</a>
+	BYTE	AVbias;			/* AV bias			*/
+	BYTE	AFbias;			/* AF bias			*/
+	BYTE	priority;		/* Priority while speaking	*/
+	BYTE	pad1;			/* For alignment		*/
+    };
+
+<a name="line127"></a>
+<a name="line128"></a>
+<a name="line129">		/*    Standard Read request	*/</a>
+<a name="line130"></a>
+<a name="line131">struct mouth_rb {</a>
+<a name="line132">	struct	narrator_rb voice;	/* Speech IORB			*/</a>
+	UBYTE	width;			/* Width (returned value)	*/
+	UBYTE	height;			/* Height (returned value)	*/
+	UBYTE	shape;			/* Internal use, do not modify	*/
+	UBYTE	sync;			/* Returned sync events		*/
+	};
+
+
+
+#endif	/* DEVICES_NARRATOR_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

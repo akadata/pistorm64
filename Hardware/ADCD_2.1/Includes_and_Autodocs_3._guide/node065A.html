@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/dos/stdio.h" NODE="MAIN" TITLE="include/dos/stdio.h" -->
+<head>
+<title>include/dos/stdio.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0659.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node065B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_STDIO_H
+#define DOS_STDIO_H
+/*
+**
+**	$VER: stdio.h 36.6 (1.11.1991)
+**	Includes Release 44.1
+**
+**	ANSI-like stdio defines for dos buffered I/O
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+
+#define ReadChar()		FGetC(Input())
+#define WriteChar(c)		FPutC(Output(),(c))
+#define UnReadChar(c)		UnGetC(Input(),(c))
+/* next one is inefficient */
+#define ReadChars(buf,num)	FRead(Input(),(buf),1,(num))
+#define ReadLn(buf,len)		FGets(Input(),(buf),(len))
+#define WriteStr(s)		FPuts(Output(),(s))
+#define VWritef(format,argv)	VFWritef(Output(),(format),(argv))
+
+/* types for SetVBuf */
+#define BUF_LINE	0	/* flush on \n, etc */
+#define BUF_FULL	1	/* never flush except when needed */
+#define BUF_NONE	2	/* no buffering */
+
+/* EOF return value */
+#define ENDSTREAMCH	-1
+
+#endif	/* DOS_STDIO_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/macros.i" NODE="MAIN" TITLE="Devices/Dev_examples/macros.i" -->
+<head>
+<title>Devices/Dev_examples/macros.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0175.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0177.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+**********************************************************************
+*
+*       printer device macro definitions
+*
+**********************************************************************
+
+*------ external definition macros -----------------------------------
+
+XREF_EXE        MACRO
+        XREF            _LVO\1
+                ENDM
+
+XREF_DOS        MACRO
+        XREF            _LVO\1
+                ENDM
+
+XREF_GFX        MACRO
+        XREF            _LVO\1
+                ENDM
+
+XREF_ITU        MACRO
+        XREF            _LVO\1
+                ENDM
+
+*------ library dispatch macros --------------------------------------
+
+CALLEXE         MACRO
+                CALLLIB _LVO\1
+                ENDM
+
+LINKEXE         MACRO
+                LINKLIB _LVO\1,_SysBase
+                ENDM
+
+LINKDOS         MACRO
+                LINKLIB _LVO\1,_DOSBase
+                ENDM
+
+LINKGFX         MACRO
+                LINKLIB _LVO\1,_GfxBase
+                ENDM
+
+LINKITU         MACRO
+                LINKLIB _LVO\1,_IntuitionBase
+                ENDM
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

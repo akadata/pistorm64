@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/gadtools" NODE="GT_PostFilterIMsg()" TITLE="gadtools.library/GT_PostFilterIMsg" -->
+<head>
+<title>gadtools.library/GT_PostFilterIMsg</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03F2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03F4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GT_PostFilterIMsg -- Return the unfiltered message after
+        <a href="../Includes_and_Autodocs_2._guide/node03F1.html">GT_FilterIMsg()</a> was called, and clean up. (V36)
+
+SYNOPSIS
+    imsg = GT_PostFilterIMsg(modimsg)
+    D0                       A1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a> *GT_PostFilterIMsg(struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a> *);
+
+FUNCTION
+    NOTE WELL:  Extremely few programs will actually need this function.
+    You almost certainly should be using <a href="../Includes_and_Autodocs_2._guide/node03F2.html">GT_GetIMsg()</a> and <a href="../Includes_and_Autodocs_2._guide/node03F5.html">GT_ReplyIMsg()</a>
+    only, and not <a href="../Includes_and_Autodocs_2._guide/node03F1.html">GT_FilterIMsg()</a> and GT_PostFilterIMsg().
+
+    Performs any clean-up necessitated by a previous call to
+    <a href="../Includes_and_Autodocs_2._guide/node03F1.html">GT_FilterIMsg()</a>.  The original <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a> is now yours to handle.
+    Do not interpret the fields of the original <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a>, but
+    rather use only the one you got from <a href="../Includes_and_Autodocs_2._guide/node03F1.html">GT_FilterIMsg()</a>.  You
+    may only do message related things at this point, such as queueing
+    it up or replying it.  Since you got the message with
+    <a href="../Includes_and_Autodocs_2._guide/node035A.html">exec.library/GetMsg()</a>, your responsibilities do include replying
+    it with <a href="../Includes_and_Autodocs_2._guide/node0379.html">exec.library/ReplyMsg()</a>. This function may be safely
+    called with a NULL parameter.
+
+INPUTS
+    modimsg - A modified <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a> obtained with <a href="../Includes_and_Autodocs_2._guide/node03F1.html">GT_FilterIMsg()</a>.
+
+RESULT
+    imsg - A pointer to the original <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a>, if <a href="../Includes_and_Autodocs_2._guide/node03F1.html">GT_FilterIMsg()</a>
+        returned non-NULL.
+
+EXAMPLE
+
+NOTES
+    Be sure to use <a href="../Includes_and_Autodocs_2._guide/node0379.html">exec.library/ReplyMsg()</a> on the original <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line679">IntuiMessage</a>
+    you obtained with <a href="../Includes_and_Autodocs_2._guide/node035A.html">GetMsg()</a>, (which is the what you passed to
+    <a href="../Includes_and_Autodocs_2._guide/node03F1.html">GT_FilterIMsg()</a>), and not on the parameter of this function.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node03F1.html">GT_FilterIMsg()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

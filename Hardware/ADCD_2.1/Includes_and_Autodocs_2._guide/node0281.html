@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="AssignLate()" TITLE="dos.library/AssignLate" -->
+<head>
+<title>dos.library/AssignLate</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0280.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0282.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AssignLate -- Creates an assignment to a specified path later (V36)
+
+SYNOPSIS
+    success = AssignLate(name,path)
+    D0                    D1   D2
+
+    BOOL AssignLate(STRPTR,STRPTR)
+
+FUNCTION
+    Sets up a assignment that is expanded upon the FIRST reference to the
+    name.  The path (a string) would be attached to the node.  When
+    the name is referenced (Open(&#034;FOO:xyzzy&#034;...), the string will be used
+    to determine where to set the assign to, and if the directory can be
+    locked, the assign will act from that point on as if it had been
+    created by <a href="../Includes_and_Autodocs_2._guide/node0282.html">AssignLock()</a>.
+
+    A major advantage is assigning things to unmounted volumes, which
+    will be requested upon access (useful in startup sequences).
+
+INPUTS
+    name - Name of device to be assigned (without trailing ':')
+    path - Name of late assignment to be resolved on the first reference.
+
+RESULT
+    success - Success/failure indicator of the operation
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02C6.html">Lock()</a>, <a href="../Includes_and_Autodocs_2._guide/node0280.html">AssignAdd()</a>, <a href="../Includes_and_Autodocs_2._guide/node0283.html">AssignPath()</a>, <a href="../Includes_and_Autodocs_2._guide/node0282.html">AssignLock()</a>,
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

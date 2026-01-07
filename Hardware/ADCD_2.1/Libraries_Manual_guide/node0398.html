@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-6-3" TITLE="28 / Using Bobs / The Bob Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Bobs / The Bob Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0397.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0399.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Bob structure is defined in the include file &#060;graphics/<a href="../Includes_and_Autodocs_2._guide/node00C3.html#line140">gels.h</a>&#062; as
+follows:
+
+<a name="line5">struct Bob</a>
+  {
+  WORD               Flags;     /* general purpose flags                 */
+<a name="line8">  WORD              *SaveBuffer;/* buffer for background save            */</a>
+  WORD              *ImageShadow; /* shadow mask of image                */
+<a name="line10">  struct Bob        *Before;   /* draw this Bob before Bobs on this list */</a>
+  struct Bob        *After;     /* draw this Bob after Bobs on this list */
+  struct VSprite    *BobVSprite;/* this Bob's VSprite definition         */
+  struct AnimComp   *BobComp;   /* pointer to this Bob's AnimComp def    */
+  struct DBufPacket *DBuffer;   /* pointer to this Bob's dBuf packet     */
+  BUserStuff         BUserExt;  /* Bob user extension                    */
+  };
+
+The Bob structure itself does not need to be in Chip memory. The (global)
+static declaration of a Bob structure could be done like so:
+
+    struct Bob myBob =
+        {
+        0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0
+        };
+
+However, since most of the Bob structure members are pointers, it is more
+common to allocate and set the Bob up dynamically. Refer to the <a href="../Libraries_Manual_guide/node059C.html#line129">makeBob()</a>
+and <a href="../Libraries_Manual_guide/node059C.html#line302">freeBob()</a> functions in the &#034;<a href="../Libraries_Manual_guide/node059C.html">animtools.c</a>&#034; example at the end of the
+chapter for an example of allocating, initializing and freeing a Bob
+structure.
+
+ <a href="../Libraries_Manual_guide/node0399.html">Linking Bob and VSprite Structures</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

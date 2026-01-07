@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_8SVX" NODE="16-6-3-1" TITLE=" Appendix A. Quick Reference / Type Definitions " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Appendix A. Quick Reference / Type Definitions </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02D2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02D4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+#define ID_8SVX MakeID('8', 'S', 'V', 'X')
+#define ID_VHDR MakeID('V', 'H', 'D', 'R')
+
+typedef LONG Fixed;    /* A fixed-point value, 16 bits to the left of  *
+                          the point and 16 to the right. A Fixed is a  *
+                          number of 2^16ths, i.e., 65536ths.           */
+#define Unity 0x10000L /* Unity = Fixed 1.0 = maximum volume           */
+
+
+/* sCompression: Choice of compression algorithm.                    */
+#define sCmpNone       0    /* not compressed                        */
+#define sCmpFibDelta   1    /* Fibonacci-delta encoding (Appendix C) */
+                            /* Can be more kinds in the future.      */
+
+typedef struct {
+    ULONG oneShotHiSamples, /* # samples in the high octave 1-shot part */
+          repeatHiSamples,  /* # samples in the high octave repeat part */
+          samplesPerHiCycle;/* # samples/cycle in high octave, else 0   */
+    UWORD samplesPerSec;    /* data sampling rate                       */
+    UBYTE ctOctave,         /* # octaves of waveforms                   */
+          sCompression;     /* data compression technique used          */
+    Fixed volume;           /* playback volume from 0 to Unity (full    *
+                             * volume). Map this value into the output  *
+                             * hardware's dynamic range.                */
+    } Voice8Header;
+
+#define ID_NAME MakeID('N', 'A', 'M', 'E')
+/* NAME chunk contains a CHAR[], the voice's name.                     */
+
+#define ID_Copyright MakeID('(', 'c', ')', ' ')
+/* &#034;(c) &#034; chunk contains a CHAR[], the FORM's copyright notice.        */
+
+#define ID_AUTH MakeID('A', 'U', 'T', 'H')
+/* AUTH chunk contains a CHAR[], the author's name.                    */
+
+#define ID_ANNO MakeID('A', 'N', 'N', 'O')
+/* ANNO chunk contains a CHAR[], author's text annotations.            */
+
+#define ID_ATAK MakeID('A', 'T', 'A', 'K')
+#define ID_RLSE MakeID('R', 'L', 'S', 'E')
+
+typedef struct {
+    UWORD duration; /* segment duration in milliseconds, &#062; 0           */
+    Fixed dest;     /* destination volume factor                       */
+    } EGPoint;
+
+
+/* ATAK and RLSE chunks contain an EGPoint[],piecewise-linear envelope. */
+/* The envelope defines a function of time returning Fixed values. It's *
+ * used to scale the nominal volume specified in the Voice8Header.      */
+
+#define ID_BODY MakeID('B', 'O', 'D', 'Y')
+typedef character BYTE;     /* 8 bit signed number, -128 through 127.   */
+/* BODY chunk contains a BYTE[], array of audio data samples.           */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

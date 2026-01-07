@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="AddPort()" TITLE="exec.library/AddPort" -->
+<head>
+<title>exec.library/AddPort</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0328.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node032A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AddPort -- add a public message port to the system
+
+SYNOPSIS
+    AddPort(port)
+            A1
+
+    void AddPort(struct <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> *);
+
+FUNCTION
+    This function attaches a message port structure to the system's
+    public message port list, where it can be found by the <a href="../Includes_and_Autodocs_2._guide/node034F.html">FindPort()</a>
+    function.  The name and priority fields of the port structure must
+    be initialized prior to calling this function.  If the user does
+    not require the priority field, it should be initialized to zero.
+
+    Only ports that will be searched for with <a href="../Includes_and_Autodocs_2._guide/node034F.html">FindPort()</a> need to
+    be added to the system list.  In addition, adding ports is often
+    useful during debugging.  If the port will be searched for,
+    the priority field should be at least 1 (to avoid the large number
+    of inactive ports at priority zero).  If the port will be searched
+    for often, set the proritiry in the 50-100 range (so it will be
+    before other less used ports).
+
+    Once a port has been added to the naming list, you must be careful
+    to remove the port from the list (via RemPort) before deallocating
+    its memory.
+
+NOTE
+    A point of confusion is that clearing a <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a> structure to all
+    zeros is not enough to prepare it for use.  As mentioned in the
+    Exec chapter of the ROM Kernel Manual, the <a href="../Includes_and_Autodocs_2._guide/node007D.html#line21">List</a> for the <a href="../Includes_and_Autodocs_2._guide/node0099.html#line29">MsgPort</a>
+    must be initialized.  This is automatically handled by AddPort(),
+    and <a href="../Includes_and_Autodocs_2._guide/node0148.html">amiga.lib/CreatePort</a>.  This initialization can be done manually
+    with <a href="../Includes_and_Autodocs_2._guide/node0161.html">amiga.lib/NewList</a> or the assembly NEWLIST macro.
+
+    Do not AddPort an active port.
+
+INPUTS
+    port - pointer to a message port
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0374.html">RemPort</a>, <a href="../Includes_and_Autodocs_2._guide/node034F.html">FindPort</a>, <a href="../Includes_and_Autodocs_2._guide/node0148.html">amiga.lib/CreatePort</a>, <a href="../Includes_and_Autodocs_2._guide/node0161.html">amiga.lib/NewList</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

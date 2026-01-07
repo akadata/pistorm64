@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_12" NODE="12-8" TITLE="12 Serial Device / Error Codes from the Serial Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>12 Serial Device / Error Codes from the Serial Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00A9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00AB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The serial device returns error codes whenever an operation is attempted.
+
+   SerialIO-&#062;IOSer.io_Command  = SDCMD_SETPARAMS; /* Set parameters */
+   if (DoIO((struct IORequest *)SerialIO))
+       printf(&#034;Set Params failed. Error: %ld &#034;,SerialIO-&#062;IOSer.io_Error);
+
+The error is returned in the io_Error field of the <a href="../Devices_Manual_guide/node009C.html#line7">IOExtSer</a> structure.
+
+                    SERIAL DEVICE ERROR CODES
+
+    Error                   Value    Explanation
+    -----                   -----    ----------
+    SerErr_DevBusy          1        Device in use
+    SerErr_BaudMismatch     2        Baud rate not supported by hardware
+    SerErr_BufErr           4        Failed to allocate new read buffer
+    SerErr_InvParam         5        Bad parameter
+    SerErr_LineErr          6        Hardware data overrun
+    SerErr_ParityErr        9        Parity error
+    SerErr_TimerErr         11       Timeout (if using 7-wire handshaking)
+    SerErr_BufOverflow      12       Read buffer overflowed
+    SerErr_NoDSR            13       No Data Set Ready
+    SerErr_DetectedBreak    15       Break detected
+    SerErr_UnitBusy         16       Selected unit already in use
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="FontExtent()" TITLE="graphics.library/FontExtent" -->
+<head>
+<title>graphics.library/FontExtent</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02D4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02D6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FontExtent -- get the font attributes of the current font (V36)
+
+<b>   SYNOPSIS</b>
+	FontExtent(font, fontExtent)
+	           A0    A1
+
+	void FontExtent(struct <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line88">TextFont</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line163">TextExtent</a> *);
+
+<b>   FUNCTION</b>
+	This function fills the text extent structure with a bounding
+	(i.e. maximum) extent for the characters in the specified font.
+
+<b>   INPUTS</b>
+	font       - the <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line88">TextFont</a> from which the font metrics are extracted.
+	fontExtent - the <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line163">TextExtent</a> structure to be filled.
+
+<b>   RESULT</b>
+	fontExtent is filled.
+
+<b>   NOTES</b>
+	The <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line88">TextFont</a>, not the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, is specified -- unlike
+	<a href="../Includes_and_Autodocs_3._guide/node0333.html">TextExtent()</a>, effect of algorithmic enhancements is not
+	included, nor does te_Width include any effect of
+	rp_TxSpacing.  The returned te_Width will be negative only
+	when FPF_REVPATH is set in the tf_Flags of the font -- the
+	effect of left-moving characters is ignored for the width of
+	a normal font, and the effect of right-moving characters is
+	ignored if a REVPATH font.  These characters will, however,
+	be reflected in the bounding extent.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0333.html">TextExtent()</a>  <a href="../Includes_and_Autodocs_3._guide/node05EC.html">graphics/text.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Absolute_joystick.c" NODE="MAIN" TITLE="Devices/Dev_examples/Absolute_joystick.c" -->
+<head>
+<title>Devices/Dev_examples/Absolute_joystick.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0194.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0196.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Absolute_Joystick.c
+ *
+ * Gameport device absolute joystick example
+ *
+ * Compile with SAS 5.10  lc -b1 -cfistq -v -y -L
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/io.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;exec/exec.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;devices/gameport.h&#062;
+#include &#060;devices/inputevent.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }     /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+#define JOY_X_DELTA (1)
+#define JOY_Y_DELTA (1)
+#define TIMEOUT_SECONDS (10)
+
+extern struct ExecBase *SysBase;
+
+/*-----------------------------------------------------------------------
+** Routine to print out some information for the user.
+*/
+VOID printInstructions(VOID)
+{
+printf(&#034;\n &#062;&#062;&#062; gameport.device Absolute Joystick Demo &#060;&#060;&#060;\n\n&#034;);
+
+if (SysBase-&#062;VBlankFrequency==60)
+    printf(&#034; Running on NTSC system (60 Hz).\n&#034;);
+else if (SysBase-&#062;VBlankFrequency==50)
+    printf(&#034; Running on PAL system (50 Hz).\n&#034;);
+
+printf(&#034; Attach joystick to rear connector (A3000) and (A1000).\n&#034;
+       &#034; Attach joystick to right connector (A2000).\n&#034;
+       &#034; Attach joystick to left connector (A500).\n&#034;
+       &#034; Then move joystick and click its button(s).\n\n&#034;
+       &#034; To exit program press and release fire button 3 times in a row.\n&#034;
+       &#034; The program also exits if no activity occurs for 1 minute.\n\n&#034;);
+}
+
+/*-----------------------------------------------------------------------
+** print out information on the event received.
+*/
+BOOL check_move(struct InputEvent *game_event)
+{
+WORD xmove, ymove;
+BOOL timeout=FALSE;
+
+xmove = game_event-&#062;ie_X;
+ymove = game_event-&#062;ie_Y;
+
+if (xmove == 1)
+    {
+    if (ymove == 1) printf(&#034;RIGHT DOWN\n&#034;);
+    else if (ymove == 0) printf(&#034;RIGHT\n&#034;);
+    else if (ymove ==-1) printf(&#034;RIGHT UP\n&#034;);
+    else printf(&#034;UNKNOWN Y\n&#034;);
+    }
+else if (xmove ==-1)
+    {
+    if (ymove == 1) printf(&#034;LEFT DOWN\n&#034;);
+    else if (ymove == 0) printf(&#034;LEFT\n&#034;);
+    else if (ymove ==-1) printf(&#034;LEFT UP\n&#034;);
+    else printf(&#034;UNKNOWN Y\n&#034;);
+    }
+else if (xmove == 0)
+    {
+    if (ymove == 1) printf(&#034;DOWN\n&#034;);
+    /* note that 0,0 can be a timeout, or a direction release. */
+    else if (ymove == 0)
+        {
+        if (game_event-&#062;ie_TimeStamp.tv_secs &#062;=
+                        (UWORD)(SysBase-&#062;VBlankFrequency)*TIMEOUT_SECONDS)
+            {
+            printf(&#034;TIMEOUT\n&#034;);
+            timeout=TRUE;
+            }
+        else printf(&#034;RELEASE\n&#034;);
+        }
+    else if (ymove ==-1) printf(&#034;UP\n&#034;);
+    else printf(&#034;UNKNOWN Y\n&#034;);
+    }
+else
+    {
+    printf(&#034;UNKNOWN X &#034;);
+    if (ymove == 1) printf(&#034;unknown action\n&#034;);
+    else if (ymove == 0) printf(&#034;unknown action\n&#034;);
+    else if (ymove ==-1) printf(&#034;unknown action\n&#034;);
+    else printf(&#034;UNKNOWN Y\n&#034;);
+    }
+
+return(timeout);
+
+}
+
+/*-----------------------------------------------------------------------
+** send a request to the gameport to read an event.
+*/
+VOID send_read_request( struct InputEvent *game_event,
+                        struct IOStdReq *game_io_msg)
+{
+game_io_msg-&#062;io_Command = GPD_READEVENT;
+game_io_msg-&#062;io_Flags   = 0;
+game_io_msg-&#062;io_Data    = (APTR)game_event;
+game_io_msg-&#062;io_Length  = sizeof(struct InputEvent);
+SendIO(game_io_msg);  /* Asynchronous - message will return later */
+}
+
+/*-----------------------------------------------------------------------
+** simple loop to process gameport events.
+*/
+VOID processEvents( struct IOStdReq *game_io_msg,
+                    struct MsgPort  *game_msg_port)
+{
+BOOL timeout;
+SHORT timeouts;
+SHORT button_count;
+BOOL  not_finished;
+struct InputEvent game_event;   /* where input event will be stored */
+
+/* From now on, just read input events into the event buffer,
+** one at a time.  READEVENT waits for the preset conditions.
+*/
+timeouts = 0;
+button_count = 0;
+not_finished = TRUE;
+
+while ((timeouts &#060; 6) &#038;&#038; (not_finished))
+    {
+    /* Send the read request */
+    send_read_request(&#038;game_event,game_io_msg);
+
+    /* Wait for joystick action */
+    Wait(1L &#060;&#060; game_msg_port-&#062;mp_SigBit);
+    while (NULL != GetMsg(game_msg_port))
+        {
+        timeout=FALSE;
+        switch(game_event.ie_Code)
+            {
+            case IECODE_LBUTTON:
+                printf(&#034; FIRE BUTTON PRESSED \n&#034;);
+                break;
+
+            case (IECODE_LBUTTON | IECODE_UP_PREFIX):
+                printf(&#034; FIRE BUTTON RELEASED \n&#034;);
+                if (3 == ++button_count)
+                    not_finished = FALSE;
+                break;
+
+            case IECODE_RBUTTON:
+                printf(&#034; ALT BUTTON PRESSED \n&#034;);
+                button_count = 0;
+                break;
+
+            case (IECODE_RBUTTON | IECODE_UP_PREFIX):
+                printf(&#034; ALT BUTTON RELEASED \n&#034;);
+                button_count = 0;
+                break;
+
+            case IECODE_NOBUTTON:
+                /* Check for change in position */
+                timeout = check_move(&#038;game_event);
+                button_count = 0;
+                break;
+
+            default:
+                break;
+            }
+
+        if (timeout)
+            timeouts++;
+        else
+            timeouts=0;
+        }
+    }
+}
+
+/*-----------------------------------------------------------------------
+** allocate the controller if it is available.
+** you allocate the controller by setting its type to something
+** other than GPCT_NOCONTROLLER.  Before you allocate the thing
+** you need to check if anyone else is using it (it is free if
+** it is set to GPCT_NOCONTROLLER).
+*/
+BOOL set_controller_type(BYTE type, struct IOStdReq *game_io_msg)
+{
+BOOL success = FALSE;
+BYTE controller_type = 0;
+
+/* begin critical section
+** we need to be sure that between the time we check that the controller
+** is available and the time we allocate it, no one else steals it.
+*/
+Forbid();
+
+game_io_msg-&#062;io_Command = GPD_ASKCTYPE;    /* inquire current status */
+game_io_msg-&#062;io_Flags   = IOF_QUICK;
+game_io_msg-&#062;io_Data    = (APTR)&#038;controller_type; /* put answer in here */
+game_io_msg-&#062;io_Length  = 1;
+DoIO(game_io_msg);
+
+/* No one is using this device unit, let's claim it */
+if (controller_type == GPCT_NOCONTROLLER)
+    {
+    game_io_msg-&#062;io_Command = GPD_SETCTYPE;
+    game_io_msg-&#062;io_Flags   = IOF_QUICK;
+    game_io_msg-&#062;io_Data    = (APTR)&#038;type;
+    game_io_msg-&#062;io_Length  = 1;
+    DoIO( game_io_msg);
+    success = TRUE;
+    }
+
+Permit(); /* critical section end */
+return(success);
+}
+
+/*-----------------------------------------------------------------------
+** tell the gameport when to trigger.
+*/
+VOID set_trigger_conditions(struct GamePortTrigger *gpt,
+                            struct IOStdReq *game_io_msg)
+{
+/* trigger on all joystick key transitions */
+gpt-&#062;gpt_Keys   = GPTF_UPKEYS | GPTF_DOWNKEYS;
+gpt-&#062;gpt_XDelta = JOY_X_DELTA;
+gpt-&#062;gpt_YDelta = JOY_Y_DELTA;
+/* timeout trigger every TIMEOUT_SECONDS second(s) */
+gpt-&#062;gpt_Timeout = (UWORD)(SysBase-&#062;VBlankFrequency) * TIMEOUT_SECONDS;
+
+game_io_msg-&#062;io_Command = GPD_SETTRIGGER;
+game_io_msg-&#062;io_Flags   = IOF_QUICK;
+game_io_msg-&#062;io_Data    = (APTR)gpt;
+game_io_msg-&#062;io_Length  = (LONG)sizeof(struct GamePortTrigger);
+DoIO(game_io_msg);
+}
+
+/*-----------------------------------------------------------------------
+** clear the buffer.  do this before you begin to be sure you
+** start in a known state.
+*/
+VOID flush_buffer(struct IOStdReq *game_io_msg)
+{
+game_io_msg-&#062;io_Command = CMD_CLEAR;
+game_io_msg-&#062;io_Flags   = IOF_QUICK;
+game_io_msg-&#062;io_Data    = NULL;
+game_io_msg-&#062;io_Length  = 0;
+DoIO(game_io_msg);
+}
+
+/*-----------------------------------------------------------------------
+** free the unit by setting its type back to GPCT_NOCONTROLLER.
+*/
+VOID free_gp_unit(struct IOStdReq *game_io_msg)
+{
+BYTE type = GPCT_NOCONTROLLER;
+
+game_io_msg-&#062;io_Command = GPD_SETCTYPE;
+game_io_msg-&#062;io_Flags   = IOF_QUICK;
+game_io_msg-&#062;io_Data    = (APTR)&#038;type;
+game_io_msg-&#062;io_Length  = 1;
+DoIO(game_io_msg);
+}
+
+/*-----------------------------------------------------------------------
+** allocate everything and go.  On failure, free any resources that
+** have been allocated.  this program fails quietly-no error messages.
+*/
+VOID main(int argc,char **argv)
+{
+struct GamePortTrigger   joytrigger;
+struct IOStdReq         *game_io_msg;
+struct MsgPort          *game_msg_port;
+
+/* Create port for gameport device communications */
+if (game_msg_port = CreatePort(&#034;RKM_game_port&#034;,0))
+    {
+    /* Create message block for device IO */
+    if (game_io_msg = (struct IOStdReq *)
+                      CreateExtIO(game_msg_port,sizeof(*game_io_msg)))
+        {
+        game_io_msg-&#062;io_Message.mn_Node.ln_Type = NT_UNKNOWN;
+
+        /* Open the right/back (unit 1, number 2) gameport.device unit */
+        if (!OpenDevice(&#034;gameport.device&#034;,1,game_io_msg,0))
+            {
+            /* Set controller type to joystick */
+            if (set_controller_type(GPCT_ABSJOYSTICK,game_io_msg))
+                {
+                /* Specify the trigger conditions */
+                set_trigger_conditions(&#038;joytrigger,game_io_msg);
+
+                printInstructions();
+
+                /* Clear device buffer to start from a known state.
+                ** There might still be events left
+                */
+                flush_buffer(game_io_msg);
+
+                processEvents(game_io_msg,game_msg_port);
+
+                /* Free gameport unit so other applications can use it ! */
+                free_gp_unit(game_io_msg);
+                }
+            CloseDevice(game_io_msg);
+            }
+        DeleteExtIO(game_io_msg);
+        }
+    DeletePort(game_msg_port);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_13" NODE="13-2-2" TITLE="13 / Preferences in Release 2 / The ENV: Directory and Notification" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>13 / Preferences in Release 2 / The ENV: Directory and Notification</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0228.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node022A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+One advantage of the new Preferences system in Release 2 is file
+notification.  File notification is a form of interprocess communication
+available in Release 2 that allows an application to be automatically
+notified if a change is made to a specific file or directory.  This makes
+it easy for the application to react to changes the user makes to
+Preferences files.
+
+File notification is also used by the system itself.  The Release 2
+Preferences control program, IPrefs, sets up notification on most of the
+Preferences files in ENV:sys.  If the user alters a Preferences item
+(normally this is done with a Preferences editor), the system will notify
+IPrefs about the change and IPrefs will attempt to alter the user's
+environment to reflect the change.
+
+For example, if the user opens the ScreenMode Preferences editor and
+changes the Workbench screen mode to high-resolution, the new settings are
+saved in <a href="../Libraries_Manual_guide/node0228.html#line11">Screenmode.prefs</a> in the ENV:sys directory.  IPrefs sets up
+notification on this file at boot time, so the file system will notify
+IPrefs of the change.  IPrefs will read in the Screenmode.prefs file and
+reset the Workbench screen to high resolution mode.
+
+Here's a short example showing how to set up notification on the
+serial.prefs file in ENV:sys.  The program displays a message in a window
+whenever this file is changed (e.g., when the user selects the &#034;Use&#034; or
+&#034;Save&#034; gadget in the Serial Preferences editor).
+
+     <a href="../Libraries_Manual_guide/node0589.html">prefnotify.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

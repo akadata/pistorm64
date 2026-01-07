@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_24" NODE="24-2-3" TITLE="24 / Messages / Getting a Message" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>24 / Messages / Getting a Message</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Messages are usually removed from ports with the <a href="../Includes_and_Autodocs_2._guide/node035A.html">GetMsg()</a> function.  This
+function removes the next message at the head of the port queue and
+returns a pointer to it.  If there are no messages in a port, this
+<a name="line5">function returns a zero.</a>
+
+The example below illustrates the use of <a href="../Includes_and_Autodocs_2._guide/node035A.html">GetMsg()</a> to print the contents of
+all messages in a port:
+
+    while (xymsg = GetMsg(xyport)) printf(&#034;x=%ld y=%ld\n&#034;, xymsg-&#062;xy_X,
+                                           xymsg-&#062;xy_Y);
+
+Certain messages may be more important than others.  Because ports impose
+FIFO ordering, these important messages may get queued behind other
+messages regardless of their priority.  If it is necessary to recognize
+more important messages, it is easiest to create another port for these
+special messages.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

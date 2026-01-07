@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/workbench/startup.h" NODE="MAIN" TITLE="include/workbench/startup.h" -->
+<head>
+<title>include/workbench/startup.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node064F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0651.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef WORKBENCH_STARTUP_H
+#define WORKBENCH_STARTUP_H
+/*
+**	$VER: startup.h 36.3 (11.7.1990)
+**	Includes Release 44.1
+**
+**	workbench startup definitions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	All Rights Reserved
+*/
+
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+
+#ifndef EXEC_PORTS_H
+#include &#060;exec/ports.h&#062;
+#endif
+
+#ifndef DOS_DOS_H
+#include &#060;dos/dos.h&#062;
+#endif
+<a name="line24"></a>
+struct WBStartup {
+    struct Message	sm_Message;	/* a standard message structure */
+    struct MsgPort *	sm_Process;	/* the process descriptor for you */
+    BPTR		sm_Segment;	/* a descriptor for your code */
+    LONG		sm_NumArgs;	/* the number of elements in ArgList */
+    char *		sm_ToolWindow;	/* description of window */
+    struct WBArg *	sm_ArgList;	/* the arguments themselves */
+};
+<a name="line33"></a>
+struct WBArg {
+    BPTR		wa_Lock;	/* a lock descriptor */
+    BYTE *		wa_Name;	/* a string relative to that lock */
+};
+
+#endif	/* !WORKBENCH_STARTUP_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

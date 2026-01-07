@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="printer" NODE="PRD_WRITEPREFS" TITLE="printer.device/PRD_WRITEPREFS" -->
+<head>
+<title>printer.device/PRD_WRITEPREFS</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0513.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0515.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	PRD_WRITEPREFS - write the current driver prefs from a buffer (V44)
+
+<b>   FUNCTION</b>
+	This is a non standard write command that writes the driver
+	preferences.
+
+<b>   IO REQUEST</b>
+	io_Message	mn_ReplyPort set if quick I/O is not possible
+	io_Command	PRD_WRITEPREFS
+	io_Flags	IOB_QUICK set if quick I/O is possible
+	io_Length	the length of the buffer
+	io_Data		a buffer
+	io_Actual	the number of bytes copied to the driver prefs.
+
+	The printer driver checks the buffer before copying it to its
+	preferences. So you don't have to worry about changing the printer
+	driver between <a href="../Includes_and_Autodocs_3._guide/node0512.html">PRD_READPREFS</a> and PRD_WRITEPREFS.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

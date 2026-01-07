@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="II-77/ASyncIO.h" NODE="MAIN" TITLE="II-77/ASyncIO.h" -->
+<head>
+<title>II-77/ASyncIO.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node017D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node017F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* ASyncIO.h - Header File for ASyncIO.c */
+
+#ifndef ASYNCIO_H
+#define ASYNCIO_H
+
+
+/*****************************************************************************/
+
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/ports.h&#062;
+#include &#060;dos/dos.h&#062;
+
+
+/*****************************************************************************/
+
+
+struct AsyncFile
+{
+    BPTR                  af_File;
+    struct MsgPort       *af_Handler;
+    APTR                  af_Offset;
+    LONG                  af_BytesLeft;
+    ULONG                 af_BufferSize;
+    APTR                  af_Buffers[2];
+    struct StandardPacket af_Packet;
+    struct MsgPort        af_PacketPort;
+    ULONG                 af_CurrentBuf;
+    UBYTE                 af_PacketPending;
+    UBYTE                 af_ReadMode;
+};
+
+
+/*****************************************************************************/
+
+
+#define MODE_READ   0  /* read an existing file                             */
+#define MODE_WRITE  1  /* create a new file, delete existing file if needed */
+#define MODE_APPEND 2  /* append to end of existing file, or create new     */
+
+
+/*****************************************************************************/
+
+
+struct AsyncFile *OpenAsync(STRPTR fileName, UBYTE mode, LONG bufferSize);
+LONG CloseAsync(struct AsyncFile *file);
+LONG ReadAsync(struct AsyncFile *file, APTR buf, LONG numBytes);
+LONG ReadCharAsync(struct AsyncFile *file);
+LONG WriteAsync(struct AsyncFile *file, APTR buf, LONG numBytes);
+LONG WriteCharAsync(struct AsyncFile *file, char ch);
+
+
+/*****************************************************************************/
+
+
+#endif /* ASYNCIO_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

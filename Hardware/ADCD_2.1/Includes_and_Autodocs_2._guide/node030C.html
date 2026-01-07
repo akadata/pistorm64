@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="VFWritef()" TITLE="dos.library/VFWritef" -->
+<head>
+<title>dos.library/VFWritef</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node030B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node030D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    VFWritef - write a BCPL formatted string to a file (buffered) (V36)
+
+SYNOPSIS
+    count = VFWritef(fh, fmt, argv)
+    D0               D1  D2    D3
+
+    LONG VFWritef(BPTR, STRPTR, LONG *)
+
+    count = FWritef(fh, fmt, ...)
+
+    LONG FWritef(BPTR, STRPTR, ...)
+
+FUNCTION
+    Writes the formatted string and values to the default output.  This
+    routine is assumed to handle all internal buffering so that the
+    formatting string and resultant formatted values can be arbitrarily
+    long.  The formats are in BCPL form.  This routine is buffered.
+
+    Supported formats are:  (Note x is in base 36!)
+            %S  - string (CSTR)
+            %Tx - writes a left-justified string in a field at least
+                  x bytes long.
+            %C  - writes a single character
+            %Ox - writes a number in octal, maximum x characters wide
+            %Xx - writes a number in hex, maximum x characters wide
+            %Ix - writes a number in decimal, maximum x characters wide
+            %N  - writes a number in decimal, any length
+            %Ux - writes an unsigned number, maximum x characters wide
+            %$  - ignore parameter
+
+    Note: 'x' above is actually the character value - '0'.
+
+INPUTS
+    fmt   - BCPL style formatting string
+    argv  - Pointer to array of formatting values
+
+RESULT
+    count - Number of bytes written or -1 for error
+
+BUGS
+    As of V37, VFWritef() does NOT return a valid return value.  In
+    order to reduce possible errors, the prototypes supplied for the
+    system as of V37 have it typed as VOID.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node030B.html">VFPrintf()</a>, <a href="../Includes_and_Autodocs_2._guide/node030B.html">VFPrintf()</a>, <a href="../Includes_and_Autodocs_2._guide/node02AC.html">FPutC()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

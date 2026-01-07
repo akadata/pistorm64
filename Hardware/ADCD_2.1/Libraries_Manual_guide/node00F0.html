@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-6-1" TITLE="3 / Overscan and the Display Clip / Preset Overscan Values" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Overscan and the Display Clip / Preset Overscan Values</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00EF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00F1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Four preset overscan dimensions are provided.  Applications that support
+overscan should use these preset values where possible since they will be
+tailored to each individual system.  Avoid using custom values that happen
+to look good on a specific system.  However, be aware that the size and
+positioning of overscan screens can be different on every system depending
+on how the user has set Overscan Preferences.  These preset values are
+also dependent on the underlying display mode so keep in mind that both
+offset and size parameters will change under different screen modes.
+Overscan presets can be used, among other things, with the <a href="../Libraries_Manual_guide/node00E5.html#line247">SA_Overscan</a> tag
+to set the size of the screen's display clip or passed as an argument to
+<a name="line12"><a href="../Includes_and_Autodocs_2._guide/node023F.html">QueryOverscan()</a> to find their current overscan settings.</a>
+
+OSCAN_TEXT
+    This overscan region is based on user preference settings and
+    indicates a display that is completely within the visible bounds of
+    the monitor. The <a href="../Libraries_Manual_guide/node00F1.html#line4">View</a> origin is set to the upper left corner of the
+    text overscan rectangle which is the highest leftmost point known to
+    be visible on the physical display.  This position is set by the user
+    through the Overscan Preferences editor.  All screen positions and
+<a name="line21">    display clips are relative to this origin.</a>
+
+OSCAN_STANDARD
+    The edges of OSCAN_STANDARD display are also based on user
+    preferences and are set to be just outside the visible bounds of the
+    monitor.  OSCAN_STANDARD provides the smallest possible display that
+    will fill the entire screen with no border around it.  Parts of the
+<a name="line28">    display created with OSCAN_STANDARD may not be visible to the user.</a>
+
+OSCAN_MAX
+    Create the largest display fully supported by Intuition and the
+    graphics library.  This is the largest size for which all enclosed
+    sizes and positions are legal.  Parts of the display created with
+<a name="line34">    OSCAN_MAX may not be visible to the user.</a>
+
+OSCAN_VIDEO
+    Create the largest display, restricted by the hardware.  This is the
+    only legal size and position that is possibly (but not necessarily)
+    larger than OSCAN_MAX.  You must use the exact size and position
+    specified.  OSCAN_VIDEO does not support variable left edge, top edge
+    positioning.  Parts of the display created with OSCAN_VIDEO may not
+<a name="line42">    be visible to the user.</a>
+
+If custom clipping is required, a display clip may be explicitly specified
+using the <a href="../Libraries_Manual_guide/node00E5.html#line257">SA_DClip</a> tag and a <a href="../Libraries_Manual_guide/node03DA.html#line49">Rectangle</a> structure specification.  This
+custom rectangle must fit within the OSCAN_MAX rectangle, offset included.
+It is not permitted to specify custom rectangles whose values are in
+between OSCAN_MAX and OSCAN_VIDEO, nor is it permitted to specify
+rectangles larger than OSCAN_VIDEO.  For an example of how to open a
+centered overscan screen based on user preferences, see the
+module/<a href="../Libraries_Manual_guide/node05D2.html">screen.c</a> listing in the IFF Appendix of the Amiga ROM Kernel
+<a name="line52">Reference Manual: Devices.</a>
+
+Use the Graphics library call VideoControl() to find the true display clip
+of a screen.  See the Graphics <a href="../Includes_and_Autodocs_2._guide/node0488.html">Autodocs</a> and the chapter
+&#034;<a href="../Libraries_Manual_guide/node0339.html#line15">Graphics Primitives</a>&#034; for more information on VideoControl().  The
+<a name="line57"><a href="../Includes_and_Autodocs_2._guide/node00B8.html#line78">ViewPortExtra</a> structure contains the display clip information.</a>
+
+If any dimension of a screen is not equal to the equivalent display clip
+dimension, then the screen may be scrolled. If the screen's dimensions are
+smaller than the display clip, then the screen may be positioned within
+the display clip. If the screen is larger than the display clip, then it
+<a name="line63">may be positioned such that any part of the screen is visible.</a>
+
+AutoScroll may be activated by setting the tag <a href="../Libraries_Manual_guide/node00E5.html#line220">SA_AutoScroll</a>. Screens will
+only scroll when they are the active screen. Activate a window in the
+<a name="line67">screen to make the screen active.</a>
+
+    About the Default Display Clip.
+    -------------------------------
+    The default display clip for a screen is the entire screen, that
+    is, the rectangle starting from the upper left corner of the screen
+    and ending at the lower right corner of the screen.  This display
+    clip is only used if the application does not specify <a href="../Libraries_Manual_guide/node00E5.html#line247">SA_Overscan</a> or
+    <a href="../Libraries_Manual_guide/node00E5.html#line257">SA_DClip</a>.  When using this default display clip the screen will not
+<a name="line76">    scroll as the screen exactly fits into the clipping region.</a>
+
+When opening a window in an overscanned screen, it is often useful to open
+it relative to the visible part of the screen rather than relative to the
+entire screen.  Use <a href="../Includes_and_Autodocs_2._guide/node023F.html">QueryOverscan()</a> to find the overscan region and where
+the screen is positioned relative to it.
+
+    LONG QueryOverscan(ULONG displayID,
+                       struct Rectangle *rect, WORD overscanType )
+
+This example was taken from the chapter &#034;Intuition Windows&#034; in the section
+&#034;<a href="../Libraries_Manual_guide/node0109.html">A Display Sized Window Example</a>&#034;. The <a href="../Libraries_Manual_guide/node05BF.html">complete example</a> is reproduced
+there.
+
+
+/* this technique returns the text overscan rectangle of the screen that
+** we are opening on.  If you really need the actual value set into the
+** display clip of the screen, use the VideoControl() command of the
+** graphics library to return a copy of the ViewPortExtra structure.  See
+** the Graphics library chapter and Autodocs for more details.
+**
+** GetVPModeID() is a graphics call...
+*/
+
+screen_modeID = GetVPModeID(&#038;(pub_screen-&#062;ViewPort))))
+if (screen_modeID != INVALID_ID)
+    {
+    if ( QueryOverscan(screen_modeID, &#038;rect, OSCAN_TEXT) )
+        {
+        /* if this screen's origin is up or to the left of the */
+        /* view origin then move the window down and to the right */
+        left = max(0, -pub_screen-&#062;LeftEdge);
+        top  = max(0, -pub_screen-&#062;TopEdge);
+
+        /* get width and height from size of display clip */
+        width  = rect.MaxX - rect.MinX + 1;
+        height = rect.MaxY - rect.MinY + 1;
+
+        /* adjust height for pulled-down screen (only show visible part) */
+        if (pub_screen-&#062;TopEdge &#062; 0)
+            height -= pub_screen-&#062;TopEdge;
+
+        /* ensure that window fits on screen */
+        height = min(height, pub_screen-&#062;Height);
+        width  = min(width,  pub_screen-&#062;Width);
+
+        /* make sure window is at least minimum size */
+        width  = max(width,  MIN_WINDOW_WIDTH);
+        height = max(height, MIN_WINDOW_HEIGHT);
+        }
+    }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_10" NODE="10-3-5" TITLE="10 / The Keyboard / Amiga Qualifiers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>10 / The Keyboard / Amiga Qualifiers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01F2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01F4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Amiga keyboard has several special qualifiers which are listed in the
+next table.  Most of these qualifiers are associated with special keys on
+the keyboard such as the Shift or Ctrl key.  These keys are used to modify
+the meaning of other keys.  Other qualifiers are associated with mouse
+button status.  For a complete list of all the qualifiers, see the include
+<a name="line7">file &#060;devices/<a href="../Includes_and_Autodocs_2._guide/node0051.html#line161">inputevent.h</a>&#062;.</a>
+
+The <a href="../Libraries_Manual_guide/node01D9.html#line45">Qualifier</a> field of each <a href="../Libraries_Manual_guide/node01D9.html">IntuiMessage</a> contains the status of all the
+qualifiers.  An individual application should never attempt to track the
+state of any of the qualifier keys or mouse buttons even though key-down
+and key-up information may be available.  Instead use the information
+available in the Qualifier field of the IntuiMessage structure.
+<a name="line14"></a>
+
+<a name="line16">                 Table 10-3: Keyboard Qualifiers</a>
+
+    Qualifier
+      Type          Key Label  Explanation
+    ---------       ---------  -----------
+    Control         Ctrl       The IEQUALIFIER_CONTROL bit indicates
+<a name="line22">                               that the Control key is depressed.</a>
+
+    Amiga           Fancy A    There are two Amiga keys, one on each
+                               side of the space bar.  The left Amiga
+                               key is recognized by the <a href="../Libraries_Manual_guide/node01D9.html#line45">Qualifier</a> bit
+                               IEQUALIFIER_LCOMMAND, and the right
+<a name="line28">                               Amiga key by IEQUALIFIER_RCOMMAND.</a>
+
+    Alternate       Alt        There are two separate Alt keys, one on
+                               each side of the space bar, next to the
+                               Amiga keys.  These can be treated
+                               separately, if desired.  The left Alt
+                               key sets the IEQUALIFIER_LALT bit and
+                               the right Alt key sets the
+<a name="line36">                               IEQUALIFIER_RALT bit.</a>
+
+    Shift           Up Arrow   There are two separate Shift keys, one
+                               above each Alt key.  These can be
+                               treated distinctly, if desired.  The
+                               left Shift key sets the
+                               IEQUALIFIER_LSHIFT bit and the right
+                               Shift key sets the IEQUALIFIER_RSHIFT
+<a name="line44">                               bit.</a>
+
+    Caps Lock       Caps Lock  The IEQUALIFIER_CAPSLOCK bit is set as
+                               long as the Caps Lock light is
+<a name="line48">                               illuminated.</a>
+
+    Numeric Pad                The IEQUALIFIER_NUMERICPAD bit is set
+<a name="line51">                               for keys on the numeric keypad.</a>
+
+    Repeat                     Repeat key events are sent with the
+<a name="line54">                               IEQUALIFIER_REPEAT bit set.</a>
+
+    Mouse Buttons              If mouse buttons are down when the
+                               event occurs, one or more of the three
+                               bits IEQUALIFIER_LEFTBUTTON,
+                               IEQUALIFIER_MIDBUTTON or
+                               IEQUALIFIER_RBUTTON will be set.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

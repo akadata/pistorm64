@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_7" NODE="7-2-1" TITLE="7 / True Requesters / Creating Application Requesters" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>7 / True Requesters / Creating Application Requesters</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01A1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01A3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To create a requester, the application first allocates memory for or
+declares an instance of the <a href="../Libraries_Manual_guide/node01AB.html">Requester</a> structure as defined in
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">intuition.h</a>&#062;.  Once the Requester structure is set up, it is
+initialized with the <a href="../Includes_and_Autodocs_2._guide/node0221.html">InitRequester()</a> function.
+
+    void InitRequester( struct Requester *requester)
+
+This function simply clears the <a href="../Libraries_Manual_guide/node01AB.html">Requester</a> structure.  The application
+should do further initialization depending on its needs.  See the section
+on the &#034;<a href="../Libraries_Manual_guide/node01AB.html#line34">Requester Structure</a>&#034; below for an explanation of all the Requester
+<a name="line12">fields and how to set them.</a>
+
+A <a href="../Libraries_Manual_guide/node01A1.html">true</a> (modal) requester is attached to its parent window and displayed
+with the <a href="../Includes_and_Autodocs_2._guide/node0249.html">Request()</a> function.
+
+    BOOL Request(struct Requester *requester, struct Window *window)
+
+This function returns TRUE if the requester opens successfully or FALSE if
+the requester cannot be opened.  If the requester opens successfully, menu
+and gadget input in the parent window is blocked as long as the requester
+is displayed.  The application should process input events from the
+requester, which are sent to the parent window's <a href="../Libraries_Manual_guide/node01D6.html#line16">Window.UserPort</a>, until
+<a name="line24">the requester is satisfied.</a>
+
+To remove a requester from its parent window and update the display, use
+<a href="../Includes_and_Autodocs_2._guide/node0214.html">EndRequest()</a>.
+
+    void EndRequest( struct Requester *requester, struct Window *window );
+
+This removes only the one requester specified.  It is possible to set up a
+requester with a special gadget that, if selected, will automatically
+close the requester.  In that case, <a href="../Includes_and_Autodocs_2._guide/node0214.html">EndRequest()</a> need not be called.  If
+the program needs to cancel the request early, or cancel it only after
+<a name="line35">some specific manipulation of the gadgets, EndRequest() should be used.</a>
+
+The application should always provide a safe way for the user to back out
+of a requester without taking any action that affects the user's work.
+Providing an escape hatch is important, for instance, a requester with the
+message &#034;Overwrite File?&#034; should allow the user to cancel the operation
+without losing the old data.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

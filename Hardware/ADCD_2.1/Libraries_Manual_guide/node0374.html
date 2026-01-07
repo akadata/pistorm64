@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-1-1-3" TITLE="28 / / Types Of GELs / Bobs and AnimComps" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / Types Of GELs / Bobs and AnimComps</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0373.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0375.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Like VSprites, Bobs and AnimComps are graphics objects that make animation
+easier.  They are rendered using the blitter.  The blitter is a special
+Amiga hardware component used to move data quickly and efficiently,
+optionally performing logical operations as it does.  It can be used to
+move any kind of data but is especially well suited to moving rectangular
+blocks of display data.
+
+It is important to keep in mind that Bobs and AnimComps are based on the
+blitter hardware while VSprites use the sprite hardware. However all three
+GEL types use the <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure as their root data structure.  The
+system uses pointers to link the VSprite, <a href="../Libraries_Manual_guide/node0398.html">Bob</a> and <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a> structures,
+&#034;extending&#034; the VSprite structure to include all GEL types.
+
+Since Bobs and AnimComps are rendered with the blitter they actually
+change the underlying playfield <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a>.  The BitMap area where the GEL is
+rendered can be saved.  By moving the GEL to new locations in small
+increments while also saving and restoring the Bitmap as you proceed, you
+can create an animation effect.  Bobs and AnimComps use the same
+coordinates as the playfield and can be any size.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

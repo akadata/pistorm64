@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="Vacate()" TITLE="exec.library/Vacate" -->
+<head>
+<title>exec.library/Vacate</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0244.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0246.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	Vacate -- release a bitMessage from <a href="../Includes_and_Autodocs_3._guide/node0225.html">Procure()</a>                    (V39)
+
+<b>   SYNOPSIS</b>
+	Vacate(semaphore, bidMessage)
+	       A0         A1
+
+	void Vacate(struct <a href="../Includes_and_Autodocs_3._guide/node0647.html#line39">SignalSemaphore</a> *,struct <a href="../Includes_and_Autodocs_3._guide/node0647.html#line50">SemaphoreMessage</a> *);
+
+<b>   FUNCTION</b>
+	This function can be used to release a semaphore obtained via
+	<a href="../Includes_and_Autodocs_3._guide/node0225.html">Procure()</a>.  However, the main purpose for this call is to be
+	able to remove a bid for a semaphore that has not yet responded.
+	This is required when a <a href="../Includes_and_Autodocs_3._guide/node0225.html">Procure()</a> was issued and the program
+	no longer needs to get the semaphore and wishes to cancel the
+	<a href="../Includes_and_Autodocs_3._guide/node0225.html">Procure()</a> request.  The canceled request will be replied with
+	the ssm_Semaphore field set to NULL.  If you own the semaphore,
+	the message was already replied and only the ssm_Semaphore field
+	will be cleared.
+
+	NOTE:  Pre-V39, <a href="../Includes_and_Autodocs_3._guide/node0225.html">Procure()</a> and Vacate() did not work correctly.
+	They also did not operate on <a href="../Includes_and_Autodocs_3._guide/node0647.html#line39">SignalSemaphore</a> semaphores.
+	Old (and broken) MessageSemaphore use as of V39 will no longer work.
+
+<b>   INPUT</b>
+	semaphore - The <a href="../Includes_and_Autodocs_3._guide/node0647.html#line39">SignalSemaphore</a> that you wish to Vacate()
+	bidMessage- The <a href="../Includes_and_Autodocs_3._guide/node0647.html#line50">SemaphoreMessage</a> that you wish to abort.
+		The message's ssm_Semaphore field will be cleared.
+		The message will be replied if it is still on the waiting
+		list.  If it is not on the waiting list, it is assumed
+		that the semaphore is owned and it will be released.
+
+<b>   BUGS</b>
+	Before V39, <a href="../Includes_and_Autodocs_3._guide/node0225.html">Procure()</a> and Vacate() used a different semaphore
+	system that was very broken.  This new system is only available
+	as of V39 even though the LVOs are the same.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node021F.html">ObtainSemaphoreShared()</a>, <a href="../Includes_and_Autodocs_3._guide/node0217.html">InitSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node0228.html">ReleaseSemaphore()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node01EC.html">AttemptSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node021E.html">ObtainSemaphoreList()</a>, <a href="../Includes_and_Autodocs_3._guide/node0225.html">Procure()</a>, <a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

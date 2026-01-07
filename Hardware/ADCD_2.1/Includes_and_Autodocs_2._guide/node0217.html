@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="FreeRemember()" TITLE="intuition.library/FreeRemember" -->
+<head>
+<title>intuition.library/FreeRemember</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0216.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0218.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    FreeRemember -- Free memory allocated by calls to <a href="../Includes_and_Autodocs_2._guide/node01FE.html">AllocRemember()</a>.
+
+SYNOPSIS
+    FreeRemember( RememberKey, ReallyForget )
+                  A0           D0
+
+    VOID FreeRemember( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line1233">Remember</a> **, BOOL );
+
+FUNCTION
+    This function frees up memory allocated by the <a href="../Includes_and_Autodocs_2._guide/node01FE.html">AllocRemember()</a>
+    function.  It will either free up just the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line1233">Remember</a> structures, which
+    supply the link nodes that tie your allocations together, or it will
+    deallocate both the link nodes AND your memory buffers too.
+
+    If you want to deallocate just the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line1233">Remember</a> structure link nodes,
+    you should set the ReallyForget argument to FALSE.  However, if you
+    want FreeRemember to really deallocate all the memory, including
+    both the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line1233">Remember</a> structure link nodes and the buffers you requested
+    via earlier calls to <a href="../Includes_and_Autodocs_2._guide/node01FE.html">AllocRemember()</a>, then you should set the
+    ReallyForget argument to TRUE.
+
+    NOTE WELL: Once you call this function passing it FALSE, the
+    linkages between all the memory chunks are lost, and you
+    cannot subsequently use FreeRemember() to free them.
+
+INPUTS
+    RememberKey = the address of a pointer to struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line1233">Remember</a>.  This
+       pointer should either be NULL or set to some value (possibly
+       NULL) by a call to <a href="../Includes_and_Autodocs_2._guide/node01FE.html">AllocRemember()</a>.
+    ReallyForget = a BOOL FALSE or TRUE describing, respectively,
+       whether you want to free up only the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line1233">Remember</a> nodes or
+       if you want this procedure to really forget about all of
+       the memory, including both the nodes and the memory buffers
+       referenced by the nodes.
+
+EXAMPLE
+    struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line1233">Remember</a> *RememberKey;
+    RememberKey = NULL;
+    AllocRemember(&#038;RememberKey, BUFSIZE, MEMF_CHIP);
+    FreeRemember(&#038;RememberKey, TRUE);
+
+RESULT
+    None
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node01FE.html">AllocRemember()</a>, <a href="../Includes_and_Autodocs_2._guide/node0355.html">exec.library/FreeMem()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

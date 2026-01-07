@@ -1,0 +1,325 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/other/ilbmscan.c" NODE="MAIN" TITLE="Devices/other/ilbmscan.c" -->
+<head>
+<title>Devices/other/ilbmscan.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0301.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0303.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* ilbmscan.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -j73 ilbmscan.c
+Blink FROM LIB:c.o,ilbmscan.o TO ilbmscan LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+
+*
+* ilbmscan.c:	Prints the size, aspect, mode, etc. of ILBM's
+*		Scans through an IFF file for all ILBM's
+*
+* Usage: ilbmscan -c		; For clipboard scanning
+*    or  ilbmscan &#060;file&#062;	; For DOS file scanning
+*
+* Based on sift.c by by Stuart Ferguson and Leo Schwab
+*/
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;libraries/dos.h&#062;
+#include &#060;libraries/iffparse.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/iffparse_protos.h&#062;
+#include &#060;stdlib.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;string.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+/*  The structure of a FORM ILBM 'BMHD' and 'CAMG' chunks
+ *  Such structures are defined in the spec for a FORM
+ *  and may also be provided in include files
+ */
+/*  Bitmap header (BMHD) structure  */
+typedef struct {
+        UWORD   w, h;           /*  Width, height in pixels */
+        WORD    x, y;           /*  x, y position for this bitmap  */
+        UBYTE   nplanes;        /*  # of planes  */
+        UBYTE   Masking;
+        UBYTE   Compression;
+        UBYTE   pad1;
+        UWORD   TransparentColor;
+        UBYTE   XAspect, YAspect;
+        WORD    PageWidth, PageHeight;
+} BitMapHeader;
+
+/* Commodore Amiga (CAMG) Viewmodes structure */
+typedef struct {
+   ULONG ViewModes;
+   } CamgChunk;
+
+#define ID_ILBM         MAKE_ID('I','L','B','M')
+#define ID_BMHD         MAKE_ID('B','M','H','D')
+#define ID_CMAP         MAKE_ID('C','M','A','P')
+#define ID_CAMG         MAKE_ID('C','A','M','G')
+#define ID_BODY         MAKE_ID('B','O','D','Y')
+
+void PrintILBMInfo(struct IFFHandle *);
+
+#define MINARGS 2
+
+/* 2.0 Version string for c:Version to find */
+UBYTE vers[] = &#034;\0$VER: ilbmscan 37.3&#034;;
+
+UBYTE usage[] = &#034;Usage: ilbmscan IFFfilename (or -c for clipboard)&#034;;
+
+/*
+ * Text error messages for possible IFFERR_#? returns from various
+ * IFF routines.  To get the index into this array, take your IFFERR code,
+ * negate it, and subtract one.
+ *  idx = -error - 1;
+ */
+char	*errormsgs[] = {
+	&#034;End of file (not an error).&#034;,
+	&#034;End of context (not an error).&#034;,
+	&#034;No lexical scope.&#034;,
+	&#034;Insufficient memory.&#034;,
+	&#034;Stream read error.&#034;,
+	&#034;Stream write error.&#034;,
+	&#034;Stream seek error.&#034;,
+	&#034;File is corrupt.&#034;,
+	&#034;IFF syntax error.&#034;,
+	&#034;Not an IFF file.&#034;,
+	&#034;Required call-back hook missing.&#034;,
+	&#034;Return to client.  You should never see this.&#034;
+};
+
+struct Library *IFFParseBase;
+
+
+void main(int argc, char **argv)
+{
+    struct IFFHandle	*iff = NULL;
+    long		error;
+    short		cbio;
+
+    	/* if not enough args or '?', print usage */
+    	if(((argc)&#038;&#038;(argc&#060;MINARGS))||(argv[argc-1][0]=='?'))
+		{
+	    	printf(&#034;%s\n&#034;,usage);
+	    	exit(RETURN_OK);
+	    	}
+
+	/*
+	 * Check to see if we are doing I/O to the Clipboard.
+	 */
+	cbio = (argv[1][0] == '-'  &#038;&#038;  argv[1][1] == 'c');
+
+	if (!(IFFParseBase = OpenLibrary (&#034;iffparse.library&#034;, 0L)))
+		{
+		printf(&#034;Can't open iff parsing library.&#034;);
+		goto bye;
+		}
+
+	/*
+	 * Allocate IFF_File structure.
+	 */
+	if (!(iff = AllocIFF ()))
+		{
+		printf (&#034;AllocIFF() failed.&#034;);
+		goto bye;
+		}
+
+	/*
+	 * Internal support is provided for both AmigaDOS files, and the
+	 * clipboard.device.  This bizarre 'if' statement performs the
+	 * appropriate machinations for each case.
+	 */
+	if (cbio)
+		{
+		/*
+		 * Set up IFF_File for Clipboard I/O.
+		 */
+		if (!(iff-&#062;iff_Stream =
+				(ULONG) OpenClipboard (PRIMARY_CLIP)))
+			{
+			printf(&#034;Clipboard open failed.&#034;);
+			goto bye;
+			}
+		InitIFFasClip (iff);
+		}
+	else
+		{
+		/*
+		 * Set up IFF_File for AmigaDOS I/O.
+		 */
+		if (!(iff-&#062;iff_Stream = Open (argv[1], MODE_OLDFILE)))
+			{
+			printf(&#034;File open failed.&#034;);
+			goto bye;
+			}
+		InitIFFasDOS (iff);
+		}
+
+	/*
+	 * Start the IFF transaction.
+	 */
+	if (error = OpenIFF (iff, IFFF_READ))
+		{
+		printf(&#034;OpenIFF failed.&#034;);
+		goto bye;
+		}
+
+	/* We want to collect BMHD and CAMG */
+	PropChunk(iff, ID_ILBM, ID_BMHD);
+	PropChunk(iff, ID_ILBM, ID_CAMG);
+	PropChunk(iff, ID_ILBM, ID_CMAP);
+
+	/* Stop at the BODY */
+	StopChunk(iff, ID_ILBM, ID_BODY);
+
+	/* And let us know (IFFERR_EOC) when leaving a FORM ILBM */
+	StopOnExit(iff,ID_ILBM, ID_FORM);
+
+	/* Do the scan.
+	 * The while(1) will let us delve into more complex formats
+	 * to find FORM ILBM's
+	 */
+	while (1)
+		{
+		error = ParseIFF(iff, IFFPARSE_SCAN);
+		/*
+		 * Since we're only interested in when we enter a context,
+		 * we &#034;discard&#034; end-of-context (_EOC) events.
+		 */
+		if (error == IFFERR_EOC)
+			{
+			printf(&#034;Exiting FORM ILBM\n\n&#034;);
+			continue;
+			}
+		else if (error)
+			/*
+			 * Leave the loop if there is any other error.
+			 */
+			break;
+
+		/*
+		 * If we get here, error was zero
+		 * Since we did IFFPARSE_SCAN, zero error should mean
+		 * we are at our Stop Chunk (BODY)
+		 */
+		PrintILBMInfo(iff);
+		}
+
+	/*
+	 * If error was IFFERR_EOF, then the parser encountered the end of
+	 * the file without problems.  Otherwise, we print a diagnostic.
+	 */
+	if (error == IFFERR_EOF)
+		printf(&#034;File scan complete.\n&#034;);
+	else
+		printf(&#034;File scan aborted, error %ld: %s\n&#034;,
+			error, errormsgs[-error - 1]);
+
+bye:
+	if (iff) {
+		/*
+		 * Terminate the IFF transaction with the stream.  Free
+		 * all associated structures.
+		 */
+		CloseIFF (iff);
+
+		/*
+		 * Close the stream itself.
+		 */
+		if (iff-&#062;iff_Stream)
+			if (cbio)
+				CloseClipboard ((struct ClipboardHandle *)
+						iff-&#062;iff_Stream);
+			else
+				Close (iff-&#062;iff_Stream);
+
+		/*
+		 * Free the IFF_File structure itself.
+		 */
+		FreeIFF (iff);
+		}
+	if (IFFParseBase)	CloseLibrary (IFFParseBase);
+
+	exit (RETURN_OK);
+}
+
+
+void
+PrintILBMInfo(iff)
+struct IFFHandle *iff;
+{
+	struct StoredProperty	*sp;
+	BitMapHeader 	*bmhd;
+	CamgChunk	*camg;
+
+	/*
+	 * Get a pointer to the stored propery BMHD
+	 */
+	if (!(sp = FindProp(iff, ID_ILBM, ID_BMHD)))
+		printf(&#034;No BMHD found\n&#034;);
+	else
+		{
+		/* If property is BMHD, sp-&#062;sp_Data is ptr to data in BMHD */
+		bmhd = (BitMapHeader *)sp-&#062;sp_Data;
+		printf(&#034;BMHD: Width      = %ld\n&#034;,bmhd-&#062;w);
+		printf(&#034;      Height     = %ld\n&#034;,bmhd-&#062;h);
+		printf(&#034;      PageWidth  = %ld\n&#034;,bmhd-&#062;PageWidth);
+		printf(&#034;      PageHeight = %ld\n&#034;,bmhd-&#062;PageHeight);
+		printf(&#034;      nplanes    = %ld\n&#034;,bmhd-&#062;nplanes);
+       		printf(&#034;      Masking    = %ld\n&#034;,bmhd-&#062;Masking);
+                printf(&#034;      Compression= %ld\n&#034;,bmhd-&#062;Compression);
+		printf(&#034;      TransColor = %ld\n&#034;,bmhd-&#062;TransparentColor);
+		printf(&#034;      X/Y Aspect = %ld/%ld\n&#034;,bmhd-&#062;XAspect,bmhd-&#062;YAspect);
+		}
+
+	/*
+	 * Get a pointer to the stored propery CMAP
+	 */
+	if (!(sp = FindProp(iff, ID_ILBM, ID_CMAP)))
+		printf(&#034;No CMAP found\n&#034;);
+	else
+		{
+		/* If property is CMAP, sp-&#062;sp_Data is ptr to data in CMAP */
+		printf(&#034;CMAP: contains RGB values for %ld registers\n&#034;,
+				sp-&#062;sp_Size / 3);
+		}
+
+	/*
+	 * Get a pointer to the stored propery CAMG
+	 */
+	if (!(sp = FindProp(iff, ID_ILBM, ID_CAMG)))
+		printf(&#034;No CAMG found\n&#034;);
+	else
+		{
+		/* If property is CAMG, sp-&#062;sp_Data is ptr to data in CAMG */
+		camg = (CamgChunk *)sp-&#062;sp_Data;
+		printf(&#034;CAMG: ModeID     = $%08lx\n\n&#034;,camg-&#062;ViewModes);
+		}
+
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

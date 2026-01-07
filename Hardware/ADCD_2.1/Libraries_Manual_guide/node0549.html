@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-1-19" TITLE="D / Errors / Fails only on Chip-RAM-Only Machines" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D / Errors / Fails only on Chip-RAM-Only Machines</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0548.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node054A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Caused by specifically asking for or requiring <a href="../Libraries_Manual_guide/node02A8.html#line20">MEMF_FAST</a> memory.  If you
+don't need Chip RAM, ask for memory type 0L, or <a href="../Libraries_Manual_guide/node02A8.html#line37">MEMF_CLEAR</a>, or
+<a href="../Libraries_Manual_guide/node02A8.html#line31">MEMF_PUBLIC</a>|MEMF_CLEAR as applicable.  If there is Fast memory available,
+you will be given Fast memory.  If not, you will get Chip RAM.  May also
+be caused by trackdisk-level loading of code or data over important system
+memory or structures which might reside in low Chip memory on a
+Chip-RAM-Only machine.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

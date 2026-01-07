@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_13" NODE="13-2-1" TITLE="13 / Device Interface / Timer Device Units" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>13 / Device Interface / Timer Device Units</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00BF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00C1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are five units in the timer device.
+
+                           TIMER DEVICE UNITS
+
+                   Unit                        Use
+                ------------            ---------------
+                UNIT_MICROHZ            Interval Timing
+                UNIT_VBLANK             Interval Timing
+                UNIT_ECLOCK             Interval Timing
+                UNIT_WAITUNTIL          Time Event Occurrence
+                UNIT_WAITECLOCK         Time Event Occurrence
+<a name="line13"></a>
+
+   *  The VBLANK timer unit is very stable and has a granularity comparable
+      to the vertical blanking time.  When you make a timing request, such
+      as &#034;signal me in 21 seconds,&#034; the reply will come at the next
+      vertical blank after 21 seconds have elapsed.  This timer has very
+      low overhead and may be more accurate then the MICROHZ and ECLOCK
+      units for long time periods. Keep in mind that the vertical blanking
+<a name="line21">      time varies depending on the display mode.</a>
+
+   *  The MICROHZ timer unit uses the built-in precision hardware timers to
+      create the timing interval you request. It accepts the same type of
+      command - &#034;signal me in so many seconds and microseconds.&#034; The
+      microhertz timer has the advantage of greater resolution than the
+      vertical blank timer, but it may have less accuracy over long periods
+      of time.  The microhertz timer also has much more system overhead,
+<a name="line29">      which means accuracy is reduced as the system load increases. It is</a>
+      primarily useful for short-burst timing for which critical accuracy
+<a name="line31">      is not required.</a>
+
+   *  The ECLOCK timer unit uses the Amiga E-Clock to measure the time
+<a name="line34">      interval you request.  This is the most precise time measure</a>
+<a name="line35">      available through the timer device.</a>
+
+   *  The WAITUNTIL timer unit acts as an alarm clock for time requests.
+      It will signal the task when systime is greater than or equal to a
+<a name="line39">      specified time value.  It has the same granularity as the VBLANK</a>
+<a name="line40">      timer unit.</a>
+
+   *  The WAITECLOCK timer unit acts as an alarm clock for time requests.
+      It will signal the task when the E-Clock value is greater than or
+      equal to a specified time value.  It has the same granularity as the
+      ECLOCK timer unit.
+
+   Granularity vs. Accuracy.
+   -------------------------
+   Granularity is the sampling frequency used to check the timers.
+   Accuracy is the precision of a measured time interval with respect to
+   the same time interval in real-time.  We speak only of granularity
+   because the sampling frequency directly affects how accurate the
+   timers appear to be.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-3-11" TITLE="28 / Using Virtual Sprites / Getting the VSprite List In Order" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Virtual Sprites / Getting the VSprite List In Order</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node038A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node038C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When the system has displayed the last line of a VSprite, it is able to
+reassign the hardware sprite to another VSprite located at a lower
+position on the screen.  The system allocates hardware sprites in the
+order in which it encounters the VSprites in the list.  Therefore, the
+list of VSprites must be sorted before the system can assign the use of
+<a name="line7">the hardware Sprites correctly.</a>
+
+The function <a href="../Includes_and_Autodocs_2._guide/node047F.html">SortGList()</a> must be used to get the GELs in the correct order
+before the system is asked to display them.  This sorting step is
+essential!  It should be done before calling <a href="../Libraries_Manual_guide/node038C.html">DrawGList()</a>, whenever a GEL
+has changed position.  This function is called as follows:
+
+    struct RastPort myRastPort = {0};
+
+    SortGList(&#038;myRastPort);
+
+The only argument is a pointer to the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> structure containing the
+<a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

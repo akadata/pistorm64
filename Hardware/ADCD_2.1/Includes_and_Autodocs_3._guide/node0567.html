@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="speedbar_gc" NODE="--datasheet--" TITLE="speedbar_gc/--datasheet--" -->
+<head>
+<title>speedbar_gc/--datasheet--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0566.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0568.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        speedbar_gc -- create speedbar BOOPSI objects
+
+<b>    SUPERCLASS</b>
+        gadgetclass
+
+<b>    REQUIRES</b>
+        bevel.image
+
+<b>    DESCRIPTION</b>
+        This classes provides a simple way to create and manage
+        &#034;Speed Bars&#034;, also commonly called Button Bars, <a href="../Includes_and_Autodocs_3._guide/node05F7.html#line144">Tool</a> Docs, etc.
+
+        A speed bar is a horizontal row or vertical column of button
+        gadgets, usually with an image face denoting some program function.
+        The speedbar gadget could be placed in the main programs window
+        or perhaps its own window to form a floating speedbar/tooldoc.
+
+        An advantages that this class provides:
+
+         &#062; Speedbar button strip created &#038; removed as a single gadget.
+
+         &#062; Help strings for each button can be provided, and displayed
+           in a window title bar while a button is depressed.
+
+         &#062; Supports Right Mouse Button abort.
+
+         &#062; Supports window relativity.
+
+         &#062; <a href="../Includes_and_Autodocs_3._guide/node05F6.html#line24">Custom</a> centered images.
+
+         &#062; Ability to change background color of the speed bar strip
+           or use fill hook pattern.
+
+         &#062; Horizontal or Vertical speed bar orientation.
+
+         &#062; Supports hiding and exposing speed buttons in the bar.
+
+         &#062; Supports scrolling additional speed buttons in to view
+           via holding down the SHIFT key while clicking and
+           dragging the mouse left/right or up/down depending on
+           the SPEEDBAR_Orientation setting.
+
+         &#062; Supports OM_NOTIFY and may be attached to either
+           button.gadget, scroller.gadget and/or propgclass to scroll
+           the speed buttons if more buttons exist that are visible
+           within its bounds. However, this as a slight unresolvable bug.
+
+<b>    METHODS</b>
+        OM_NEW -- Passed to superclass, defaults set, then OM_SET.
+
+        OM_SET -- Passed to superclass, options tags set then rendered.
+
+        OM_GET -- <a href="../Includes_and_Autodocs_3._guide/node05F6.html#line24">Custom</a> tag returned or passed to superclass.
+
+        OM_UPDATE -- Passed to superclass, options set then rendered.
+
+        OM_NOTIFY -- Passed to superclass, options set then rendered.
+
+        OM_DISPOSE -- Passed to superclass.
+
+        GM_RENDER -- Passed to superclass, then speedbar is rendered.
+
+        GM_HITTEST -- Overrides supperclass, returns GMR_HITTEST.
+
+        GM_GOACTIVE -- Passed to superclass, speedbar activated.
+
+        GM_HANDLEINPUT -- Overrides supperclass, all input processed.
+
+        GM_GOINACTIVE -- Passed to superclass, speedbar deactivated.
+
+        GM_DOMAIN -- Returns GDOMAIN_MINIMUM and GDOMAIN_MAXIMUM dimensions.
+
+<b>    ATTRIBUTES</b>
+        SPEEDBAR_Buttons (struct <a href="../Includes_and_Autodocs_3._guide/node0628.html#line19">List</a> *)
+            An Exec list.  Nodes in this list must be allocated with
+            <a href="../Includes_and_Autodocs_3._guide/node0569.html">AllocSpeedButtonNodeA()</a>.
+
+            See the included SpeedBarTest.c example for additional information.
+            Passing a NULL list will remove all buttons from the speedbar and
+            detatch the buttons.  Passing ~0 will detach all buttons but not
+            erase the display, useful when working on the list data, or while
+            changing button lists.
+
+            Applicability is (OM_NEW,OM_SET,OM_GET)
+
+        SPEEDBAR_Orientation (WORD)
+            Define orientation of the speedbar's button strip.
+
+            Accepted values as defined in <a href="../Includes_and_Autodocs_3._guide/node0669.html">&#060;gadgets/speedbar.h&#062;</a> are:
+
+               SBORIENT_HORIZ
+               SBORIENT_VERT
+
+            Defaults to SBORIENT_HORIZ
+
+
+            Applicability is (OM_NEW,OM_SET,OM_GET)
+
+        SPEEDBAR_Background (WORD)
+            Background colour to appear behind gadget.
+
+            Defaults to 0.
+
+            Applicability is (OM_NEW,OM_SET,OM_GET)
+
+        SPEEDBAR_Window (struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *)
+            This Window's TitleBar will changed to the selected button's
+            help text while the button remains selected.
+
+            Defaults to NULL.
+
+            Applicability is (OM_NEW,OM_SET,OM_GET)
+
+            NOTE: SPEEDBAR_Screen is *NOT* implemented.
+
+        SPEEDBAR_StrumBar (BOOL)
+            <a href="../Includes_and_Autodocs_3._guide/node0205.html">Enable</a> &#034;strumming&#034; mode, where by you can drag the mouse
+            over the button bar to view the help titles and release
+            mouse button select the speed button under the mouse.
+
+            Defaults to FALSE.
+
+            Applicability is (OM_NEW,OM_SET)
+
+            NOTE: SPEEDBAR_StrumBar has been disabled to support other
+                  features available now, and in the future.
+
+        SPEEDBAR_OffButton (SHORT)
+            Disconnect a specified button ID from the speedbar display,
+            but does not remove or deallocate button from the list.
+
+            Applicability is (OM_SET, OM_UPDATE)
+
+        SPEEDBAR_OnButton (SHORT)
+            Reconnect specified button ID to the speedbar.
+
+            Applicability is (OM_SET, OM_UPDATE)
+
+        SPEEDBAR_ScrollLeft (BOOL)
+            Scrolls the speedbuttons to the Left or Up depending on
+            gadget orientation.
+
+            Applicability is (OM_SET, OM_UPDATE)
+
+        SPEEDBAR_ScrollRight (BOOL)
+            Scrolls the speedbuttons to the Right or Down depending on
+            gadget orientation.
+
+            Applicability is (OM_SET, OM_UPDATE)
+
+        SPEEDBAR_Top (WORD)
+            Set or retrieve the SpeedButton ID of the Top (read First
+            Visible) gadget in the button list.
+
+            Applicability is (OM_SET, OM_UPDATE, OM_GET, OM_NOTIFY)
+
+        SPEEDBAR_Visible (WORD)
+            Retrieve the number of speed buttons visible within
+            the gadget's container bounds.
+
+            Applicability is (OM_GET, OM_NOTIFY)
+
+        SPEEDBAR_Total (WORD)
+            Retrieve the total number of speed buttons in the button list.
+            SPEEDBAR_Total, SPEEDBAR_Visible and SPEEDBAR_Top could be
+            mapped to a scroller's matching PGA tags to scroll the button
+            list if so desired.
+
+            Applicability is (OM_GET, OM_NOTIFY)
+
+        SPEEDBAR_BevelStyle (WORD)
+            Set bevel box style around the speed bar. In some cases
+            complex speedbars might be built via a series of speedbars
+            in a layout object group and it would be desirable to
+            select other bevel styles such as BVS_NONE, which under any
+            bevel style preferences in use, it will not render a bevel.
+
+            Defaults to BVS_BUTTON.
+
+            Applicability is (ON_NEW, OM_SET, OM_GET)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

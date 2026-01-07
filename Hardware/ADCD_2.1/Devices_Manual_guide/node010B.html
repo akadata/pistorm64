@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_15" NODE="15-3" TITLE="15 Resources / BattClock Resource" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>15 Resources / BattClock Resource</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node010A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node010C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The battery-backed clock (BattClock) keeps Amiga time while the system is
+powered off.  The time from the BattClock is loaded into the Amiga system
+<a name="line4">clock as part of the boot sequence.</a>
+
+The battclock resource provides access to the BattClock.  Three functions
+allow you to read the BattClock value, reset it and set it to a value you
+desire.
+
+                           BattClock Resource Functions
+                           ----------------------------
+     <a href="../Includes_and_Autodocs_2._guide/node0532.html">ReadBattClock()</a>       Read the time from the BattClock and
+                           returns it as the number of seconds since
+                           12:00 AM, January 1, 1978.
+
+     <a href="../Includes_and_Autodocs_2._guide/node0533.html">ResetBattClock()</a>      Reset the BattClock to 12:00 AM, January 1,
+                           1978.
+
+     <a href="../Includes_and_Autodocs_2._guide/node0534.html">WriteBattClock()</a>      Set the BattClock to the number of seconds
+                           you pass it relative to 12:00 AM, January
+<a name="line21">                           1, 1978.</a>
+
+The utility.library contains time functions which convert the number of
+seconds since 12:00 AM, January 1, 1978 to a date and time we can
+understand, and vice versa.  You will find these functions useful when
+dealing with the BattClock.  The example program below uses the
+<a href="../Includes_and_Autodocs_2._guide/node03CF.html">Amiga2Date()</a> utility function to convert  the value returned by
+<a href="../Includes_and_Autodocs_2._guide/node0532.html">ReadBattClock()</a>.  See the &#034;<a href="../Libraries_Manual_guide/node0495.html">Utility Library</a>&#034; chapter of the Amiga ROM
+Kernel Reference Manual: Libraries for a discussion of the utility.library
+and the Amiga ROM Kernel Reference Manual: <a href="../Includes_and_Autodocs_2._guide/node03CD.html">Includes and Autodocs</a> for a
+listing of its functions.
+
+   So, You Want to Be A Time Lord?
+   -------------------------------
+   This resource will allow you to set the BattClock to any value you
+   desire. Keep in mind that this time will endure a reboot and could
+   adversely affect your system.
+
+<a name="line39">     <a href="../Devices_Manual_guide/node01A1.html">Read_BattClock.c</a> </a>
+
+Additional programming information on the battclock resource can be found
+in the include files and the Autodocs for the battclock resource and the
+utility library.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

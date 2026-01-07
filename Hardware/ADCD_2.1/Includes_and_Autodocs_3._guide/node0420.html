@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="layers" NODE="DoHookClipRects()" TITLE="layers.library/DoHookClipRects" -->
+<head>
+<title>layers.library/DoHookClipRects</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node041F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0421.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	DoHookClipRects - Do the given hook for each of the ClipRects    (V39)
+
+<b>    SYNOPSIS</b>
+	DoHookClipRects(hook,rport,rect)
+	                a0   a1    a2
+
+	void DoHookClipRects(struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *,struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *,struct <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line26">Rectangle</a> *);
+
+<b>    FUNCTION</b>
+	This function will call the given hook for each cliprect in the
+	layer that can be rendered into.  This is how the backfill hook
+	in Layers is implemented.  This means that hidden simple-refresh
+	cliprects will be ignored.  It will call the SuperBitMap cliprects,
+	smart refresh off-screen cliprects, and all on screen cliprects.
+	If the rect parameter is not NULL, the cliprects are bounded to
+	the rectangle given.
+
+<b>    INPUTS</b>
+	hook - pointer to layer callback <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> which will be called
+	       with object == (struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *) result-&#062;RastPort
+	       and message == [ (Layer *) layer, (struct Rectangle) bounds,
+	                        (LONG) offsetx, (LONG) offsety ]
+
+	       This hook should fill the <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line26">Rectangle</a> in the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+	       with the BackFill pattern appropriate for offset x/y.
+
+	       If hook is LAYERS_BACKFILL, the default backfill is
+	       used for the layer.
+
+	       If hook is LAYERS_NOBACKFILL, the layer will not be
+	       backfilled (NO-OP).
+
+	rport- A pointer to the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> that is to be operated on.
+	       This function will lock the layer if the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> is
+	       layered...
+	       If the rport is non-layered your hook will be called with
+	       the rectangle as passed, the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, and a NULL layer...
+
+	rect - The bounding rectangle that should be used on the layer.
+	       This rectangle &#034;clips&#034; the cliprects to the bound given.
+	       If this is NULL, no bounding will take place.
+	       *MUST* not be NULL if the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> is non-layered!
+
+<b>    NOTES</b>
+	The <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> you are passed back is the same one passed to the
+	function.  You should *not* use &#034;layered&#034; rendering functions
+	on this <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.  Generally, you will wish to do <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> operations
+	such as <a href="../Includes_and_Autodocs_3._guide/node02B2.html">BltBitMap()</a>.  The callback is a raw, low-level rendering
+	call-back.  If you need to call a rendering operation with a
+	<a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, make sure you use a copy of the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> and NULL the
+	<a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> pointer.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a> <a href="../Includes_and_Autodocs_3._guide/node0617.html">utility/hooks.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

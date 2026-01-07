@@ -1,0 +1,290 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/alerts.h" NODE="MAIN" TITLE="Includes/exec/alerts.h" -->
+<head>
+<title>Includes/exec/alerts.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node007E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0080.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef EXEC_ALERTS_H
+#define EXEC_ALERTS_H
+/*
+**	$Filename: exec/alerts.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.18 $
+**	$Date: 91/01/12 $
+**
+**	Alert numbers, as displayed by system crashes.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+/*********************************************************************
+*
+*  Format of the alert error number:
+*
+*    +-+-------------+----------------+--------------------------------+
+*    |D|  SubSysId   |	General Error |    SubSystem Specific Error    |
+*    +-+-------------+----------------+--------------------------------+
+*     1    7 bits	   8 bits		   16 bits
+*
+*		     D:  DeadEnd alert
+*	      SubSysId:  indicates ROM subsystem number.
+*	 General Error:  roughly indicates what the error was
+*	Specific Error:  indicates more detail
+**********************************************************************/
+
+/*********************************************************************
+*
+*  General Alerts
+*
+*  For example: timer.device cannot open math.library would be 0x05038015
+*
+*	Alert(AN_TimerDev|AG_OpenLib|AO_MathLib);
+*
+*********************************************************************/
+
+<a name="line40">/*------ alert types */</a>
+<a name="line41">#define AT_DeadEnd	0x80000000</a>
+#define AT_Recovery	0x00000000
+
+
+<a name="line45">/*------ general purpose alert codes */</a>
+<a name="line46">#define AG_NoMemory	0x00010000</a>
+<a name="line47">#define AG_MakeLib	0x00020000</a>
+<a name="line48">#define AG_OpenLib	0x00030000</a>
+<a name="line49">#define AG_OpenDev	0x00040000</a>
+<a name="line50">#define AG_OpenRes	0x00050000</a>
+<a name="line51">#define AG_IOError	0x00060000</a>
+<a name="line52">#define AG_NoSignal	0x00070000</a>
+<a name="line53">#define AG_BadParm	0x00080000</a>
+<a name="line54">#define AG_CloseLib	0x00090000	/* usually too many closes */</a>
+<a name="line55">#define AG_CloseDev	0x000A0000	/* or a mismatched close */</a>
+#define AG_ProcCreate	0x000B0000	/* Process creation failed */
+
+
+<a name="line59">/*------ alert objects: */</a>
+<a name="line60">#define AO_ExecLib	0x00008001</a>
+<a name="line61">#define AO_GraphicsLib	0x00008002</a>
+<a name="line62">#define AO_LayersLib	0x00008003</a>
+<a name="line63">#define AO_Intuition	0x00008004</a>
+<a name="line64">#define AO_MathLib	0x00008005</a>
+<a name="line65">#define AO_DOSLib	0x00008007</a>
+<a name="line66">#define AO_RAMLib	0x00008008</a>
+<a name="line67">#define AO_IconLib	0x00008009</a>
+<a name="line68">#define AO_ExpansionLib 0x0000800A</a>
+<a name="line69">#define AO_DiskfontLib	0x0000800B</a>
+#define AO_UtilityLib	0x0000800C
+<a name="line71"></a>
+<a name="line72">#define AO_AudioDev	0x00008010</a>
+<a name="line73">#define AO_ConsoleDev	0x00008011</a>
+<a name="line74">#define AO_GamePortDev	0x00008012</a>
+<a name="line75">#define AO_KeyboardDev	0x00008013</a>
+<a name="line76">#define AO_TrackDiskDev 0x00008014</a>
+#define AO_TimerDev	0x00008015
+<a name="line78"></a>
+<a name="line79">#define AO_CIARsrc	0x00008020</a>
+<a name="line80">#define AO_DiskRsrc	0x00008021</a>
+#define AO_MiscRsrc	0x00008022
+<a name="line82"></a>
+<a name="line83">#define AO_BootStrap	0x00008030</a>
+<a name="line84">#define AO_Workbench	0x00008031</a>
+<a name="line85">#define AO_DiskCopy	0x00008032</a>
+<a name="line86">#define AO_GadTools	0x00008033</a>
+#define AO_Unknown	0x00008035
+
+
+<a name="line90"></a>
+/*********************************************************************
+*
+*   Specific Alerts:
+*
+*********************************************************************/
+
+<a name="line97">/*------ exec.library */</a>
+<a name="line98">#define AN_ExecLib	0x01000000</a>
+<a name="line99">#define AN_ExcptVect	0x01000001 /* 68000 exception vector checksum (obs.) */</a>
+<a name="line100">#define AN_BaseChkSum	0x01000002 /* Execbase checksum (obs.) */</a>
+#define AN_LibChkSum	0x01000003 /* Library checksum failure */
+<a name="line102"></a>
+<a name="line103">#define AN_MemCorrupt	0x81000005 /* Corrupt memory list detected in FreeMem */</a>
+<a name="line104">#define AN_IntrMem	0x81000006 /* No memory for interrupt servers */</a>
+#define AN_InitAPtr	0x01000007 /* InitStruct() of an APTR source (obs.) */
+<a name="line106">#define AN_SemCorrupt	0x01000008 /* A semaphore is in an illegal state</a>
+<a name="line107">				      at ReleaseSempahore() */</a>
+<a name="line108">#define AN_FreeTwice	0x01000009 /* Freeing memory already freed */</a>
+<a name="line109">#define AN_BogusExcpt	0x8100000A /* illegal 68k exception taken (obs.) */</a>
+#define AN_IOUsedTwice	0x0100000B /* Attempt to reuse active IORequest */
+<a name="line111">#define AN_MemoryInsane 0x0100000C /* Sanity check on memory list failed</a>
+<a name="line112">				      during AvailMem(MEMF_LARGEST) */</a>
+<a name="line113">#define AN_IOAfterClose 0x0100000D /* IO attempted on closed IORequest */</a>
+#define AN_StackProbe	0x0100000E /* Stack appears to extend out of range */
+<a name="line115">#define AN_BadFreeAddr	0x0100000F /* Memory header not located. [ Usually an</a>
+				      invalid address passed to FreeMem() ] */
+
+<a name="line118">/*------ graphics.library */</a>
+<a name="line119">#define AN_GraphicsLib	0x02000000</a>
+<a name="line120">#define AN_GfxNoMem	0x82010000	/* graphics out of memory */</a>
+<a name="line121">#define AN_GfxNoMemMspc 0x82010001	/* MonitorSpec alloc, no memory */</a>
+<a name="line122">#define AN_LongFrame	0x82010006	/* long frame, no memory */</a>
+<a name="line123">#define AN_ShortFrame	0x82010007	/* short frame, no memory */</a>
+<a name="line124">#define AN_TextTmpRas	0x02010009	/* text, no memory for TmpRas */</a>
+<a name="line125">#define AN_BltBitMap	0x8201000A	/* BltBitMap, no memory */</a>
+<a name="line126">#define AN_RegionMemory 0x8201000B	/* regions, memory not available */</a>
+<a name="line127">#define AN_MakeVPort	0x82010030	/* MakeVPort, no memory */</a>
+<a name="line128">#define AN_GfxNewError	0x0200000C</a>
+#define AN_GfxFreeError 0x0200000D
+<a name="line130"></a>
+#define AN_GfxNoLCM	0x82011234	/* emergency memory not available */
+<a name="line132"></a>
+#define AN_ObsoleteFont 0x02000401	/* unsupported font description used */
+
+<a name="line135">/*------ layers.library */</a>
+<a name="line136">#define AN_LayersLib	0x03000000</a>
+#define AN_LayersNoMem	0x83010000	/* layers out of memory */
+
+<a name="line139">/*------ intuition.library */</a>
+<a name="line140">#define AN_Intuition	0x04000000</a>
+<a name="line141">#define AN_GadgetType	0x84000001	/* unknown gadget type */</a>
+<a name="line142">#define AN_BadGadget	0x04000001	/* Recovery form of AN_GadgetType */</a>
+<a name="line143">#define AN_CreatePort	0x84010002	/* create port, no memory */</a>
+<a name="line144">#define AN_ItemAlloc	0x04010003	/* item plane alloc, no memory */</a>
+<a name="line145">#define AN_SubAlloc	0x04010004	/* sub alloc, no memory */</a>
+<a name="line146">#define AN_PlaneAlloc	0x84010005	/* plane alloc, no memory */</a>
+<a name="line147">#define AN_ItemBoxTop	0x84000006	/* item box top &#060; RelZero */</a>
+<a name="line148">#define AN_OpenScreen	0x84010007	/* open screen, no memory */</a>
+<a name="line149">#define AN_OpenScrnRast 0x84010008	/* open screen, raster alloc, no memory */</a>
+<a name="line150">#define AN_SysScrnType	0x84000009	/* open sys screen, unknown type */</a>
+<a name="line151">#define AN_AddSWGadget	0x8401000A	/* add SW gadgets, no memory */</a>
+<a name="line152">#define AN_OpenWindow	0x8401000B	/* open window, no memory */</a>
+<a name="line153">#define AN_BadState	0x8400000C	/* Bad State Return entering Intuition */</a>
+<a name="line154">#define AN_BadMessage	0x8400000D	/* Bad Message received by IDCMP */</a>
+<a name="line155">#define AN_WeirdEcho	0x8400000E	/* Weird echo causing incomprehension */</a>
+#define AN_NoConsole	0x8400000F	/* couldn't open the Console Device */
+
+<a name="line158">/*------ math.library */</a>
+#define AN_MathLib	0x05000000
+
+<a name="line161">/*------ dos.library */</a>
+<a name="line162">#define AN_DOSLib	0x07000000</a>
+<a name="line163">#define AN_StartMem	0x07010001 /* no memory at startup */</a>
+<a name="line164">#define AN_EndTask	0x07000002 /* EndTask didn't */</a>
+<a name="line165">#define AN_QPktFail	0x07000003 /* Qpkt failure */</a>
+<a name="line166">#define AN_AsyncPkt	0x07000004 /* Unexpected packet received */</a>
+<a name="line167">#define AN_FreeVec	0x07000005 /* Freevec failed */</a>
+<a name="line168">#define AN_DiskBlkSeq	0x07000006 /* Disk block sequence error */</a>
+<a name="line169">#define AN_BitMap	0x07000007 /* Bitmap corrupt */</a>
+<a name="line170">#define AN_KeyFree	0x07000008 /* Key already free */</a>
+<a name="line171">#define AN_BadChkSum	0x07000009 /* Invalid checksum */</a>
+<a name="line172">#define AN_DiskError	0x0700000A /* Disk Error */</a>
+<a name="line173">#define AN_KeyRange	0x0700000B /* Key out of range */</a>
+<a name="line174">#define AN_BadOverlay	0x0700000C /* Bad overlay */</a>
+<a name="line175">#define AN_BadInitFunc	0x0700000D /* Invalid init packet for cli/shell */</a>
+#define AN_FileReclosed 0x0700000E /* A filehandle was closed more than once */
+
+<a name="line178">/*------ ramlib.library */</a>
+<a name="line179">#define AN_RAMLib	0x08000000</a>
+#define AN_BadSegList	0x08000001	/* no overlays in library seglists */
+
+<a name="line182">/*------ icon.library */</a>
+#define AN_IconLib	0x09000000
+
+<a name="line185">/*------ expansion.library */</a>
+<a name="line186">#define AN_ExpansionLib 0x0A000000</a>
+#define AN_BadExpansionFree	0x0A000001 /* freeed free region */
+
+<a name="line189">/*------ diskfont.library */</a>
+#define AN_DiskfontLib	0x0B000000
+
+<a name="line192">/*------ audio.device */</a>
+#define AN_AudioDev	0x10000000
+
+<a name="line195">/*------ console.device */</a>
+<a name="line196">#define AN_ConsoleDev	0x11000000</a>
+#define AN_NoWindow	0x11000001	/* Console can't open initial window */
+
+<a name="line199">/*------ gameport.device */</a>
+#define AN_GamePortDev	0x12000000
+
+<a name="line202">/*------ keyboard.device */</a>
+#define AN_KeyboardDev	0x13000000
+
+<a name="line205">/*------ trackdisk.device */</a>
+<a name="line206">#define AN_TrackDiskDev 0x14000000</a>
+<a name="line207">#define AN_TDCalibSeek	0x14000001	/* calibrate: seek error */</a>
+#define AN_TDDelay	0x14000002	/* delay: error on timer wait */
+
+<a name="line210">/*------ timer.device */</a>
+<a name="line211">#define AN_TimerDev	0x15000000</a>
+<a name="line212">#define AN_TMBadReq	0x15000001 /* bad request */</a>
+#define AN_TMBadSupply	0x15000002 /* power supply -- no 50/60Hz ticks */
+
+<a name="line215">/*------ cia.resource */</a>
+#define AN_CIARsrc	0x20000000
+
+<a name="line218">/*------ disk.resource */</a>
+<a name="line219">#define AN_DiskRsrc	0x21000000</a>
+<a name="line220">#define AN_DRHasDisk	0x21000001	/* get unit: already has disk */</a>
+#define AN_DRIntNoAct	0x21000002	/* interrupt: no active unit */
+
+<a name="line223">/*------ misc.resource */</a>
+#define AN_MiscRsrc	0x22000000
+
+<a name="line226">/*------ bootstrap */</a>
+<a name="line227">#define AN_BootStrap	0x30000000</a>
+#define AN_BootError	0x30000001	/* boot code returned an error */
+
+<a name="line230">/*------ Workbench */</a>
+<a name="line231">#define AN_Workbench			0x31000000</a>
+<a name="line232">#define AN_NoFonts			0xB1000001</a>
+<a name="line233">#define AN_WBBadStartupMsg1		0x31000001</a>
+<a name="line234">#define AN_WBBadStartupMsg2		0x31000002</a>
+#define AN_WBBadIOMsg			0x31000003
+<a name="line236"></a>
+<a name="line237">#define AN_WBInitPotionAllocDrawer	0xB1010004</a>
+<a name="line238">#define AN_WBCreateWBMenusCreateMenus1	0xB1010005</a>
+<a name="line239">#define AN_WBCreateWBMenusCreateMenus2	0xB1010006</a>
+<a name="line240">#define AN_WBLayoutWBMenusLayoutMenus	0xB1010007</a>
+<a name="line241">#define AN_WBAddToolMenuItem		0xB1010008</a>
+<a name="line242">#define AN_WBReLayoutToolMenu		0xB1010009</a>
+<a name="line243">#define AN_WBinitTimer			0xB101000A</a>
+<a name="line244">#define AN_WBInitLayerDemon		0xB101000B</a>
+<a name="line245">#define AN_WBinitWbGels			0xB101000C</a>
+<a name="line246">#define AN_WBInitScreenAndWindows1	0xB101000D</a>
+<a name="line247">#define AN_WBInitScreenAndWindows2	0xB101000E</a>
+<a name="line248">#define AN_WBInitScreenAndWindows3	0xB101000F</a>
+#define AN_WBMAlloc			0xB1010010
+
+<a name="line251">/*------ DiskCopy */</a>
+#define AN_DiskCopy	0x32000000
+
+<a name="line254">/*------ toolkit for Intuition */</a>
+#define AN_GadTools	0x33000000
+
+<a name="line257">/*------ System utility library */</a>
+#define AN_UtilityLib	0x34000000
+
+<a name="line260">/*------ For use by any application that needs it */</a>
+#define AN_Unknown	0x35000000
+
+
+#endif /* EXEC_ALERTS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

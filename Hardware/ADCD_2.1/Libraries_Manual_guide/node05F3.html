@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/ssprite.c" NODE="MAIN" TITLE="lib_examples/ssprite.c" -->
+<head>
+<title>lib_examples/ssprite.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05F2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05F4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* The following example demonstrates how to set up, move and free a
+** Simple Sprite.  The animtools.h file included is listed at the end of
+** the chapter.
+**
+** ssprite.c - Simple Sprite example
+**
+** SAS/C V5.10a
+** lc -b1 -cfist -v -y ssprite.c
+** blink FROM LIB:c.o ssprite.o LIB LIB:lc.lib LIB:amiga.lib TO ssprite
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;graphics/gfx.h&#062;
+#include &#060;graphics/gfxbase.h&#062;
+#include &#060;graphics/gfxmacros.h&#062;
+#include &#060;graphics/sprite.h&#062;
+#include &#060;intuition/intuitionbase.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;hardware/custom.h&#062;
+#include &#060;hardware/dmabits.h&#062;
+#include &#060;libraries/dos.h&#062;
+
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/alib_stdio_protos.h&#062;
+
+#include &#060;stdlib.h&#062;
+
+struct GfxBase *GfxBase = NULL;
+struct IntuitionBase *IntuitionBase = NULL;
+extern struct Custom far custom ;
+
+/* real boring sprite data */
+UWORD chip sprite_data[ ] = {
+    0, 0,           /* position control           */
+    0xffff, 0x0000, /* image data line 1, color 1 */
+    0xffff, 0x0000, /* image data line 2, color 1 */
+    0x0000, 0xffff, /* image data line 3, color 2 */
+    0x0000, 0xffff, /* image data line 4, color 2 */
+    0x0000, 0x0000, /* image data line 5, transparent */
+    0x0000, 0xffff, /* image data line 6, color 2 */
+    0x0000, 0xffff, /* image data line 7, color 2 */
+    0xffff, 0xffff, /* image data line 8, color 3 */
+    0xffff, 0xffff, /* image data line 9, color 3 */
+    0, 0            /* reserved, must init to 0 0 */
+    };
+
+VOID main(int argc, char **argv)
+{
+struct SimpleSprite    sprite = {0};
+struct ViewPort        *viewport;
+
+WORD sprite_num;
+SHORT delta_move, ktr1, ktr2, color_reg;
+struct Screen *screen;
+int return_code;
+
+return_code = RETURN_OK;
+
+if (NULL == (GfxBase = (struct GfxBase *) OpenLibrary(&#034;graphics.library&#034;,37L)))
+    return_code = RETURN_FAIL;
+else
+    {
+    if (NULL == (IntuitionBase = (struct IntuitionBase *)OpenLibrary(&#034;intuition.library&#034;,37L)))
+        return_code = RETURN_FAIL;
+    else
+        {
+        /* opened library, need a viewport to render a sprite over. */
+        if (NULL == (screen = OpenScreenTagList(NULL, NULL)))
+            return_code = RETURN_FAIL;
+        else
+            {
+            viewport = &#038;screen-&#062;ViewPort;
+            if (-1 == (sprite_num = GetSprite(&#038;sprite, 2)))
+                return_code = RETURN_WARN;
+            else
+                {
+                /* Calculate the correct base color register number, */
+                /* set up the color registers.                       */
+                color_reg = 16 + ((sprite_num &#038; 0x06) &#060;&#060; 1);
+                printf(&#034;color_reg=%d\n&#034;, color_reg);
+                SetRGB4(viewport, color_reg + 1, 12,  3,  8);
+                SetRGB4(viewport, color_reg + 2, 13, 13, 13);
+                SetRGB4(viewport, color_reg + 3,  4,  4, 15);
+
+                sprite.x = 0;       /* initialize position and size info    */
+                sprite.y = 0;       /* to match that shown in sprite_data   */
+                sprite.height = 9;  /* so system knows layout of data later */
+
+                /* install sprite data and move sprite to start position. */
+                ChangeSprite(NULL, &#038;sprite, (APTR)sprite_data);
+                MoveSprite(NULL, &#038;sprite, 30, 0);
+
+                /* move the sprite back and forth. */
+                for ( ktr1 = 0, delta_move = 1;
+                      ktr1 &#060; 6; ktr1++, delta_move = -delta_move)
+                    {
+                    for ( ktr2 = 0; ktr2 &#060; 100; ktr2++)
+                        {
+                        MoveSprite( NULL, &#038;sprite, (LONG)(sprite.x + delta_move),
+                                    (LONG)(sprite.y + delta_move) );
+                        WaitTOF(); /* one move per video frame */
+
+                        /* Show the effect of turning off sprite DMA. */
+                        if (ktr2 == 40) OFF_SPRITE ;
+                        if (ktr2 == 60) ON_SPRITE ;
+                        }
+                    }
+                /* NOTE:  if you turn off the sprite at the wrong time (when it
+                ** is being displayed), the sprite will appear as a vertical bar
+                ** on the screen.  To really get rid of the sprite, you must
+                ** OFF_SPRITE while it is not displayed.  This is hard in a
+                ** multi-tasking system (the solution is not addressed in
+                ** this program).
+                */
+                ON_SPRITE ; /* just to be sure */
+                FreeSprite((WORD)sprite_num);
+                }
+            (VOID) CloseScreen(screen);
+            }
+        CloseLibrary((struct Library *)IntuitionBase);
+        }
+    CloseLibrary((struct Library *)GfxBase);
+    }
+exit(return_code);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

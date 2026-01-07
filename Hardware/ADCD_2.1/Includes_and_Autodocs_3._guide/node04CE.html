@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="misc" NODE="AllocMiscResource()" TITLE="misc.resource/AllocMiscResource" -->
+<head>
+<title>misc.resource/AllocMiscResource</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04CD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04CF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	AllocMiscResource - allocate one of the miscelaneous resources
+
+<b>   SYNOPSIS</b>
+	CurrentUser = AllocMiscResource( unitNum, name )
+	D0				 D0	  A1
+
+	char * AllocMiscResource(ULONG,char *);
+
+<b>   FUNCTION</b>
+	This routine attempts to allocate one of the miscellaneous resources
+	If the resource had already been allocated, an error is returned. If
+	you do get it, your name is associated with the resource (so a user
+	can see who has it allocated).
+
+	This function may not be called from interrupt code
+
+<b>   DESCRIPTION</b>
+	There are certain parts of the hardware that a multitasking- friendly
+	program may need to take over.	The serial port is a good example. By
+	grabbing the misc.resource for the serial port, the caller would
+	&#034;own&#034; the hardware registers associated with that function.  Nobody
+	else, including the system serial driver, is allowed to interfere.
+
+	Resources are called in exactly the same manner as libraries.
+	From assembly language, A6 must equal the resource base.  The
+	offsets for the function are listed in the resources/misc.i
+	include file (MR_ALLOCMISCRESOURCE for this function).
+
+<b>   INPUTS</b>
+	unitNum - the number of the resource you want to allocate
+		  (eg.  MR_SERIALBITS).
+	name - a mnenonic name that will help the user figure out
+		what piece of software is hogging a resource.
+		(havoc breaks out if a name of null is passed in...)
+
+<b>   RESULTS</b>
+	CurrentUser - if the resource is busy, then the name of
+		the current user is returned.  If the resource is
+		free, then null is returned.
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	resources/misc.i, <a href="../Includes_and_Autodocs_3._guide/node04CF.html">FreeMiscResource()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

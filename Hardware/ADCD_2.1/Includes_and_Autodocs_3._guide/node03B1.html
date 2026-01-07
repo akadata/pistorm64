@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="FreeScreenBuffer()" TITLE="intuition.library/FreeScreenBuffer" -->
+<head>
+<title>intuition.library/FreeScreenBuffer</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03B0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03B2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	FreeScreenBuffer -- Free a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> structure. (V39)
+
+<b>    SYNOPSIS</b>
+	FreeScreenBuffer( <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a>, <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> )
+	                  A0      A1
+
+	VOID FreeScreenBuffer( struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> * );
+
+<b>    FUNCTION</b>
+	Frees a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> structure you got from <a href="../Includes_and_Autodocs_3._guide/node0395.html">AllocScreenBuffer()</a>,
+	and releases associated resources.  You must call FreeScreenBuffer()
+	before you close your screen.
+
+<b>    INPUTS</b>
+	Screen: pointer to the screen this <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> is associated with.
+	ScreenBuffer: pointer to a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> structure obtained from
+	    <a href="../Includes_and_Autodocs_3._guide/node0395.html">AllocScreenBuffer()</a>.  It is safe to call this function with
+	    a NULL argument.  It will have no effect.
+
+<b>    RESULT</b>
+	None.
+
+<b>    NOTES</b>
+	Originally, FreeScreenBuffer() did not <a href="../Includes_and_Autodocs_3._guide/node0339.html">WaitBlit()</a> before freeing
+	a <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.  The intent was that the application should do this.
+	However, as this sort of thing is easily forgotten, <a href="../Includes_and_Autodocs_3._guide/node0339.html">WaitBlit()</a>
+	was added in V40.  Application writers should ensure that freeing
+	the buffer is safe by calling <a href="../Includes_and_Autodocs_3._guide/node0339.html">WaitBlit()</a> themselves.
+
+	The SB_SCREEN_BITMAP flag instructs <a href="../Includes_and_Autodocs_3._guide/node0395.html">AllocScreenBuffer()</a> to provide
+	a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> referring to the screen's actual bitmap.  When
+	you are done changing screen buffers, you must FreeScreenBuffer()
+	the currently-installed <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a> before you close the screen.
+	Intuition will recognize when FreeScreenBuffer() is called for
+	the currently-installed <a href="../Includes_and_Autodocs_3._guide/node0602.html#line644">ScreenBuffer</a>, and will know to free the
+	supporting structures but not the <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.  <a href="../Includes_and_Autodocs_3._guide/node039F.html">CloseScreen()</a> will
+	take care of that.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0395.html">AllocScreenBuffer()</a>, <a href="../Includes_and_Autodocs_3._guide/node039A.html">ChangeScreenBuffer()</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node02BD.html">graphics.library/ChangeVPBitMap()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

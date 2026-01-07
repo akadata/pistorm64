@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-7-1" TITLE="6 / / Menu Numbers / How Menu Numbers Really Work" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / / Menu Numbers / How Menu Numbers Really Work</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0188.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node018A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following is a description of how menu numbers really work.  It should
+clarify why there are some restrictions on the number of menu components
+Intuition allows.  Programs should not rely on the information given here
+to access menu number information directly though.  Always use the
+<a name="line6">Intuition menu macros to handle menu numbers.</a>
+
+For convenience you should use the menus supplied.  For example, to
+extract the item number from the menu number, call the macro
+<a href="../Libraries_Manual_guide/node0188.html#line7">ITEMNUM</a>(menu_number); to construct a menu number, call the macro
+<a href="../Libraries_Manual_guide/node019D.html#line15">FULLMENUNUM</a>(menu, item, sub).  See the section at the end of this chapter
+<a name="line12">for a more complete description of the <a href="../Libraries_Manual_guide/node019D.html">menu number macros</a>.</a>
+
+Menu numbers are 16-bit numbers with 5 bits used for the menu number, 6
+bits used for the menu item number, and 5 bits used for the sub-item
+number.  The three numbers only have meaning when used together to
+determine the position of the item or sub-item selected.
+
+
+bit 15 (MSB)                                                 bit 0 (LSB)
+    _______________________________________________________________
+   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+   |                   |                       |                   |
+   |These bits are for |   These bits are for  |  These bits are   |
+   |the Sub-items with-|     the Menu Items    |   for the Menu    |
+   |in the Menu Items  |     within the Menu   |       number      |
+   |                   |                       |                   |
+   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|
+<a name="line29"></a>
+
+The value &#034;all bits on&#034; means that no selection of this particular
+component was made.  <a href="../Libraries_Manual_guide/node0188.html#line20">MENUNULL</a> actually equals &#034;no selection of any of the
+components was made&#034; so MENUNULL always equals &#034;all bits of all components
+on.&#034;
+
+For example, suppose that the program gets back the menu number (in
+hexadecimal) 0x0CA0.  In binary that equals:
+
+
+
+bit 15 (MSB)                                                 bit 0 (LSB)
+    _______________________________________________________________
+   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+   |                   |                       |                   |
+   |                   |                       |                   |
+   | 0   0   0   0   1 | 1   0   0   1   0   1 | 0   0   0   0   0 |
+   |                   |                       |                   |
+   |                   |                       |                   |
+   |___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|___|
+
+     Sub_Item number=1    Menu Item number=37      Menu number=0
+
+
+Again, the application should not examine these numbers directly. Use the
+macros described above to ensure proper menu handling.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

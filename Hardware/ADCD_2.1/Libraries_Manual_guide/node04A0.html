@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_37" NODE="37-1-4-7" TITLE="37 / / Advanced Tag Usage / Obtaining Boolean Values" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>37 / / Advanced Tag Usage / Obtaining Boolean Values</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node049F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04A1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Often times data is best represented as simple boolean (TRUE or FALSE)
+values.  The <a href="../Includes_and_Autodocs_2._guide/node03DB.html">PackBoolTags()</a> function provides an easy method for
+converting a tag list to bit fields.
+
+    /* These are the attributes that we understand, with the
+     * corresponding flag value. */
+    struct TagItem activation_bools[] =
+    {
+        /* Attribute            Flags */
+        {GA_ENDGADGET,          ENDGADGET},
+        {GA_IMMEDIATE,          GADGIMMEDIATE},
+        {GA_RELVERIFY,          RELVERIFY},
+        {GA_FOLLOWMOUSE,        FOLLOWMOUSE},
+        {GA_RIGHTBORDER,        RIGHTBORDER},
+        {GA_LEFTBORDER,         LEFTBORDER},
+        {GA_TOPBORDER,          TOPBORDER},
+        {GA_BOTTOMBORDER,       BOTTOMBORDER},
+        {GA_TOGGLESELECT,       TOGGLESELECT},
+
+        /* Terminate the array */
+        {TAG_END}
+    };
+
+    /* Set the activation field, based on the attributes passed */
+    g-&#062;Activation = PackBoolTags(g-&#062;Activation, tags, activation_bools);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

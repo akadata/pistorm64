@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_SMUS" NODE="16-5-3-9" TITLE=" Standard Data and Property Chunks / Key Signature SEvent " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Data and Property Chunks / Key Signature SEvent </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02BA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02BC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a> SID_KeySig sets the key signature for the track.  Its data field
+is a UBYTE number encoding a major key:
+
+	data	key	music notation	data	key	music notation
+
+	&#160;0	 C maj
+	&#160;1	 G    	  #		 &#160;8	 F	  b
+	&#160;2	 D    	  ##		 &#160;9	 Bb	  bb
+	&#160;3	 A    	  ###		 10	 Eb	  bbb
+	&#160;4	 E    	  ####		 11	 Ab	  bbbb
+	&#160;5	 B    	  #####		 12	 Db	  bbbbb
+	&#160;6	 F#   	  ######	 13	 Gb	  bbbbbb
+	&#160;7	 C#    	  #######	 14	 Cb	  bbbbbbb
+
+A SID_KeySig <a href="../Devices_Manual_guide/node02B7.html#line29">SEvent</a> changes the key for the following notes in that track.
+C major is the default key in every track before the first SID_KeySig
+SEvent.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

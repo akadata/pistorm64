@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="TextLength()" TITLE="graphics.library/TextLength" -->
+<head>
+<title>graphics.library/TextLength</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0334.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0336.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	TextLength -- Determine raster length of text data.
+
+<b>   SYNOPSIS</b>
+	length = TextLength(rp, string, count)
+	D0                  A1  A0      D0:16
+
+	WORD TextLength(struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, WORD);
+
+<b>   FUNCTION</b>
+	This graphics function determines the length that text data
+	would occupy if output to the specified <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> with the
+	current attributes.  The length is specified as the number of
+	raster dots: to determine what the current position would be
+	after a <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text()</a> using this string, add the length to cp_x
+	(cp_y is unchanged by <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text()</a>).  Use the newer <a href="../Includes_and_Autodocs_3._guide/node0333.html">TextExtent()</a> to
+	get more information.
+
+<b>   INPUTS</b>
+	rp     - a pointer to the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> which describes where the
+	         text attributes reside.
+	string - the address of string to determine the length of
+	count  - the string length.  If zero, there are no characters
+	         in the string.
+
+<b>   RESULTS</b>
+	length - the number of pixels in x this text would occupy, not
+	         including any negative kerning that may take place at
+	         the beginning of the text string, nor taking into
+	         account the effects of any clipping that may take
+	         place.
+
+<b>   NOTES</b>
+	Prior to V36, the result length occupied only the low word of
+	d0 and was not sign extended into the high word.
+
+<b>   BUGS</b>
+	A length that would overflow single word arithmetic is not
+	calculated correctly.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0333.html">TextExtent()</a>  <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text()</a>  <a href="../Includes_and_Autodocs_3._guide/node0334.html">TextFit()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05EC.html">graphics/text.h</a>  <a href="../Includes_and_Autodocs_3._guide/node05D7.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

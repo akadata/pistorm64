@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="WeighTAMatch()" TITLE="graphics.library/WeighTAMatch" -->
+<head>
+<title>graphics.library/WeighTAMatch</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node048B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node048D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    WeighTAMatch -- Get a measure of how well two fonts match. (V36)
+
+SYNOPSIS
+    weight = WeighTAMatch(reqTextAttr, targetTextAttr, targetTags)
+    D0                    A0           A1              A2
+
+    WORD WeighTAMatch(struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line73">TTextAttr</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line66">TextAttr</a> *,
+         struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *);
+
+FUNCTION
+    This function provides a metric to describe how well two fonts
+    match.  This metric ranges from MAXFONTMATCHWEIGHT (perfect match)
+    through lower positive numbers to zero (unsuitable match).
+
+INPUTS
+    reqTextAttr    - the text attributes requested.
+    targetTextAttr - the text attributes of a potential match.
+    targetTags     - tags describing the extended target attributes, or
+                     zero if not available.
+
+    The [t]ta_Name fields of the [T]TextAttr structures are not used.
+
+    The tags affect the weight only when both a) the reqTextAttr
+    has the FSF_TAGGED bit set in ta_Style, and b) targetTags is
+    not zero.  To fairly compare two different weights, the inclusion
+    or exclusion of tags in the weighing must be the same for both.
+
+RESULTS
+    weight -- a positive weight describes suitable matches, in
+          increasing desirability.  MAXFONTMATCHWEIGHT is a perfect
+          match.  A zero weight is an unsuitable match.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0462.html">OpenFont()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-4" TITLE="27 / Display Routines and Structures / Viewport Color Selection" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / Display Routines and Structures / Viewport Color Selection</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0325.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0327.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The maximum number of colors that a <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> can display is determined by
+the depth of the <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> that the ViewPort displays. The depth is specified
+when the BitMap is initialized. See the section below called
+<a name="line5">&#034;<a href="../Libraries_Manual_guide/node032E.html">Preparing the BitMap Structure</a>.&#034;</a>
+
+Depth determines the number of bitplanes used to define the colors of the
+rectangular image you are trying to build (the raster image) and the
+number of different colors that can be displayed at the same time within a
+<a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>. For any single pixel, the system can display any one of 4,096
+possible colors.
+
+The following table shows depth values and the corresponding number of
+possible colors for each value.
+
+
+    Table 27-1: Depth Values and Number of Colors in the ViewPort
+
+
+          Colors    Depth Value
+          ------    -----------
+              2          1
+              4          2
+              8          3         (Note 1)
+             16          4         (Notes 1,2)
+             32          5         (Notes 1,2,3)
+             16          6         (Notes 1,4)
+             64          6         (Notes 1,2,3,5)
+          4,096          6         (Notes 1,2,3,6)
+
+        Notes:
+        1. Not available for <a href="../Libraries_Manual_guide/node0327.html#line29">SUPERHIRES</a>.
+        2. Single-playfield mode only - <a href="../Libraries_Manual_guide/node0327.html#line14">DUALPF</a> not one of the
+           <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>'s attributes.
+        3. Low-resolution mode only - neither <a href="../Libraries_Manual_guide/node0327.html#line25">HIRES</a> nor
+           <a href="../Libraries_Manual_guide/node0327.html#line29">SUPERHIRES</a> one of the ViewPort attributes.
+        4. Dual Playfield mode - <a href="../Libraries_Manual_guide/node0327.html#line14">DUALPF</a> is an attribute of this
+           ViewPort.  Up to eight colors (in three planes) for
+           each playfield.
+        5. Extra-Half-Brite mode - <a href="../Libraries_Manual_guide/node0327.html#line54">EXTRA_HALFBRITE</a> is an
+           attribute of this ViewPort.
+        6. Hold-And-Modify mode only - <a href="../Libraries_Manual_guide/node0327.html#line43">HAM</a> is an attribute of
+           this ViewPort.
+
+
+The color palette used by a <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> is specified in a <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a>. See the
+<a name="line47">section called &#034;<a href="../Libraries_Manual_guide/node0331.html">Preparing the ColorMap</a>&#034; for more information.</a>
+
+Depending on whether single- or dual-playfield mode is used, the system
+will use different color register groupings for interpreting the on-screen
+colors. The table below details how the depth and the different <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>
+modes affect the registers the system uses.
+
+
+      Table 27-2: Color Registers Used in Single-playfield Mode
+
+
+                        Color
+           Depth   Registers Used
+           -----   --------------
+             1          0,1
+             2          0-3
+             3          0-7
+             4          0-15
+             5          0-31
+             6          0-31       (if <a href="../Libraries_Manual_guide/node0327.html#line54">EXTRA_HALFBRITE</a> is an
+                                    attribute of this <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.)
+
+             6          0-15       (if <a href="../Libraries_Manual_guide/node0327.html#line43">HAM</a> is an attribute of
+                                    this <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.)
+<a name="line71"></a>
+
+The following table shows the five possible combinations when <a href="../Libraries_Manual_guide/node0327.html#line14">DUALPF</a> is an
+attribute of the <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.
+
+
+        Table 27-3: Color Register Used in Dual-playfield Mode
+
+
+	   Depth       Color	   Depth       Color
+           (PF-1)    Registers     (PF-2)    Registers
+           ------    ---------     ------    ---------
+             1          0,1          1          8,9
+             2          0-3          1          8,9
+             2          0-3          2          8-11
+             3          0-7          2          8-11
+             3          0-7          3          8-15
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_29" NODE="29-6" TITLE="29 Graphics Library and Text / What Fonts Are Available?" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>29 Graphics Library and Text / What Fonts Are Available?</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03DC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03DE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The diskfont.library function <a href="../Includes_and_Autodocs_2._guide/node01F3.html">AvailFonts()</a> fills in a memory area
+designated by you with a list of all of the fonts available to the system.
+AvailFonts() searches the AmigaDOS directory path currently assigned to
+FONTS: and locates all available fonts.  If you haven't issued a DOS
+Assign command to change the FONTS: directory path, it defaults to the
+sys:fonts directory.
+
+    LONG AvailFonts( struct AvailFontsHeader *mybuffer, LONG bufBytes,
+<a name="line10">                     LONG flags );</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node01F3.html">AvailFonts()</a> fills in a memory area, mybuffer, which is bufBytes bytes
+long, with an <a href="../Libraries_Manual_guide/node05F9.html#line104">AvailFontsHeader</a> structure:
+
+    struct AvailFontsHeader {
+        UWORD   afh_NumEntries;      /* number of AvailFonts elements */
+        /* struct AvailFonts afh_AF[], or struct TAvailFonts afh_TAF[]; */
+<a name="line18">    };</a>
+
+This structure is followed by an array of <a href="../Libraries_Manual_guide/node05F9.html#line94">AvailFonts</a> structures with the
+number of entries in the array equal to afh_NumEntries:
+
+    struct AvailFonts {
+        UWORD   af_Type;            /* MEMORY, DISK, or SCALED */
+        struct TextAttr af_Attr;    /* text attributes for font */
+<a name="line26">    };</a>
+
+Each <a href="../Libraries_Manual_guide/node05F9.html#line94">AvailFonts</a> structure describes a font available to the OS.  The flags
+field lets <a href="../Includes_and_Autodocs_2._guide/node01F3.html">AvailFonts()</a> know which fonts you want to hear about.  At
+<a name="line30">present, there are four possible flags:</a>
+
+AFF_MEMORY  Create AvailFonts structures for all <a href="../Libraries_Manual_guide/node03DE.html">TextFont</a>'s currently in
+<a name="line33">            the system list.</a>
+
+AFF_DISK    Create AvailFonts structures for all <a href="../Libraries_Manual_guide/node03DE.html">TextFont</a>'s that are
+<a name="line36">            currently available from disk.</a>
+
+AFF_SCALED  Create AvailFonts structures for <a href="../Libraries_Manual_guide/node03DE.html">TextFont</a>'s that do not have
+            their <a href="../Libraries_Manual_guide/node03D6.html#line70">FPF_DESIGNED</a> flag set.  If the AFF_SCALED flag is not
+            present, <a href="../Includes_and_Autodocs_2._guide/node01F3.html">AvailFonts()</a> will not create AvailFonts structures
+            for fonts that have been scaled, which do not have the
+<a name="line42">            FPF_DESIGNED flag set.</a>
+
+AFF_TAGGED  These AvailFonts structures are really <a href="../Libraries_Manual_guide/node05F9.html#line99">TAvailFonts</a> structures.
+            These structures were created for Release 2 to allow
+            <a href="../Includes_and_Autodocs_2._guide/node01F3.html">AvailFonts()</a> to list tag values:
+
+            struct TAvailFonts {
+                UWORD   taf_Type;           /* MEMORY, DISK, or SCALED */
+                struct TTextAttr taf_Attr;  /* text attributes for font */
+            };
+
+Notice that AFF_MEMORY and AFF_DISK are not mutually exclusive; a font
+that is currently in memory may also be available for loading from disk.
+In this case, the font will appear twice in the array of <a href="../Libraries_Manual_guide/node05F9.html#line94">AvailFonts</a> (or
+TAvailFonts) structures.
+
+If <a href="../Includes_and_Autodocs_2._guide/node01F3.html">AvailFonts()</a> fails without any major system problems, it will be
+because the buffer for the <a href="../Libraries_Manual_guide/node05F9.html#line104">AvailFontsHeader</a> structure was not big enough
+to contain all of the AvailFonts or TAvailFonts structures.  In this case,
+AvailFonts() returns the number of additional bytes that mybuffer needed
+to contain all of the TAvailFonts or AvailFonts structures.  You can then
+use that return value to figure out how big the buffer needs to be,
+<a name="line64">allocate that memory, and try AvailFonts() again:</a>
+
+int afShortage, afSize;
+struct AvailFontsHeader *afh;
+ . . .
+
+    afSize = AvailFonts(afh, 0L, AFF_MEMORY|AFF_DISK|AFF_SCALED|
+                                                     AFF_TAGGED);
+    do
+    {
+        afh = (struct AvailFontsHeader *) AllocMem(afSize, 0);
+        if (afh)
+        {
+            afShortage = AvailFonts(afh, afSize, AFF_MEMORY|AFF_DISK|
+                                                 AFF_SCALED|AFF_TAGGED);
+            if (afShortage)
+            {
+                FreeMem(afh, afSize);
+                afSize += afShortage;
+            }
+        }
+        else
+        {
+            fail(&#034;AllocMem of AvailFonts buffer afh failed\n&#034;);
+            break;
+        }
+    } while (afShortage); /* if (afh) non-zero here, then:             */
+                          /* 1. it points to a valid AvailFontsHeader, */
+                          /* 2. it must have FreeMem(afh, afSize)      */
+                          /* called for it after use. */
+
+The following code, AvailFonts.c, uses <a href="../Includes_and_Autodocs_2._guide/node01F3.html">AvailFonts()</a> to find out what fonts
+are available to the system.  It uses this information to open every
+available font (one at a time), print some information about the font
+(including the <a href="../Libraries_Manual_guide/node03DB.html#line65">TA_DeviceDPI</a> tag values if they are present), and renders a
+sample of the font into a clipping region.
+
+     <a href="../Libraries_Manual_guide/node05B7.html">AvailFonts.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

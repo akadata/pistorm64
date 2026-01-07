@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="CompareDates()" TITLE="dos.library/CompareDates" -->
+<head>
+<title>dos.library/CompareDates</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node028A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node028C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CompareDates -- Compares two datestamps (V36)
+
+SYNOPSIS
+    result = CompareDates(date1,date2)
+    D0                     D1     D2
+
+    LONG CompareDates(struct <a href="../Includes_and_Autodocs_2._guide/node0068.html#line53">DateStamp</a> *,struct <a href="../Includes_and_Autodocs_2._guide/node0068.html#line53">DateStamp</a> *)
+
+FUNCTION
+    Compares two times for relative magnitide.  &#060;0 is returned if date1 is
+    later than date2, 0 if they are equal, or &#062;0 if date2 is later than
+    date1.  NOTE: this is NOT the same ordering as strcmp!
+
+INPUTS
+    date1, date2 - DateStamps to compare
+
+RESULT
+    result -  &#060;0, 0, or &#062;0 based on comparison of two date stamps
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0290.html">DateStamp()</a>, <a href="../Includes_and_Autodocs_2._guide/node0291.html">DateToStr()</a>, <a href="../Includes_and_Autodocs_2._guide/node0302.html">StrToDate()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

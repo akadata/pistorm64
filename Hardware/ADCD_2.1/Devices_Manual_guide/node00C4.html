@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_13" NODE="13-4" TITLE="13 Timer Device / Adding a Time Request" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>13 Timer Device / Adding a Time Request</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00C3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00C5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Time delays and time alarms are done by opening the timer device with the
+proper unit and submitting a <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> to the device with <a href="../Includes_and_Autodocs_2._guide/node04FD.html">TR_ADDREQUEST</a>
+set in io_Command and the appropriate values set in tv_secs and tv_micro.
+
+Time delays are used with the <a href="../Devices_Manual_guide/node00C0.html#line21">UNIT_MICROHZ</a>, <a href="../Devices_Manual_guide/node00C0.html#line13">UNIT_VBLANK</a>, and
+<a href="../Devices_Manual_guide/node00C0.html#line31">UNIT_ECLOCK</a> units. The time specified in a time delay <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> is a
+relative measure from the time the request is posted.  This means that the
+<a name="line9">tv_secs and tv_micro fields should be set to the amount of delay required.</a>
+
+When the specified amount of time has elapsed, the driver will send the
+<a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> back via <a href="../Includes_and_Autodocs_2._guide/node0379.html">ReplyMsg()</a>.  You must fill in the ReplyPort pointer
+of the <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> structure if you wish to be signaled. Also, the number
+of microseconds must be normalized; it should be a value less than one
+million.
+
+For a minute and a half delay, set 60 in tv_secs and 500,000 in tv_micro.
+
+    TimerIO-&#062;tr_node.io_Command = TR_ADDREQUEST;
+    TimerIO-&#062;tr_time.tv_secs  = 60;        /* Delay a minute */
+    TimerIO-&#062;tr_time.tv_micro = 500000;    /* and a half     */
+    DoIO(TimerIO);
+
+Time alarms are used with the <a href="../Devices_Manual_guide/node00C0.html#line35">UNIT_WAITUNTIL</a> and <a href="../Devices_Manual_guide/node00C0.html#line40">UNIT_WAITECLOCK</a> units.
+The tv_secs and tv_micro fields should be set to the absolute time value
+of the alarm.  For an alarm at 10:30 tonight, the number of seconds from
+midnight, January 1, 1978 till 10:30 tonight should be set in tv_secs.
+The timer device will not return until the time is greater than or equal
+to the absolute time value.
+
+For our purposes, we will set an alarm for three hours from now by getting
+the current system time and adding three hours of seconds to it.
+
+   #define SECSPERHOUR (60*60)
+   struct timeval *systime;
+
+   GetSysTime(systime);   /* Get current system time */
+
+   TimerIO-&#062;tr_node.io_Command = TR_ADDREQUEST;
+   TimerIO-&#062;tr_time.tv_secs  = systime.tv_secs+(SECSPERHOUR*3);
+   TimerIO-&#062;tr_time.tv_micro = systime.tv_micro;
+   DoIO(TimerIO);
+
+   Time requests with the E-Clock Units.
+   -------------------------------------
+   Time requests with the E-Clock units - <a href="../Devices_Manual_guide/node00C0.html#line31">UNIT_ECLOCK</a> and
+   <a href="../Devices_Manual_guide/node00C0.html#line39">UNIT_WAITECLOCK</a> - work the same as the other units except that the
+   values specified in their I/O requests are compared against the value
+   of the E-Clock.  See &#034;<a href="../Devices_Manual_guide/node00C8.html">E-Clock Time and Its Relationship to Actual Time</a>&#034;
+   below.
+
+Remember, you must never reuse a <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> until the timer device has
+replied to it.  When you submit a timer request, the driver destroys the
+values you have provided in the  <a href="../Devices_Manual_guide/node00BF.html#line25">timeval</a> structure. This means that you
+must reinitialize the time specification before reposting a <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a>.
+
+Keep in mind that the timer device provides a general time-delay
+capability. It can signal you when at least a certain amount of time has
+passed. The timer device is very accurate under normal system loads, but
+because the Amiga is a multitasking system, the timer device cannot
+guarantee that exactly the specified amount of time has
+elapsed - processing overhead increases as more tasks are run.
+High-performance applications (such as MIDI time-stamping) may want to
+take over the 16-bit counters of the CIA B timer resource instead of using
+the timer device.
+
+   Problems with small time requests in V1.3 and earlier versions.
+   ---------------------------------------------------------------
+   You must also take care  to avoid posting a <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> of less than
+   2 microseconds with the <a href="../Devices_Manual_guide/node00C0.html#line21">UNIT_MICROHZ</a> timer device if you are using
+   V1.3 or earlier versions of the system software.  In V1.3 and earlier
+   versions of the Amiga system software, sending a <a href="../Devices_Manual_guide/node00BF.html#line16">timerequest</a> for 0 or
+   1 microseconds can cause a system crash.  Make sure all your timer
+   requests are for 2 microseconds or more when you use the <a href="../Devices_Manual_guide/node00C0.html#line21">UNIT_MICROHZ</a>
+   timer with those versions.
+
+ <a href="../Devices_Manual_guide/node00C5.html">Multiple Timer Requests</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

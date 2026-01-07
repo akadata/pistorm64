@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_32" NODE="32-3-3-2" TITLE="32 / / ROM Based and Autoboot Drivers / Events At ROMTAG INIT Time" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>32 / / ROM Based and Autoboot Drivers / Events At ROMTAG INIT Time</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node041C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node041E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Next, most resident system modules (for example graphics) are initialized.
+As part of the system initialization procedure a search is made of the
+expansion.library's private list of boards (which contains a <a href="../Libraries_Manual_guide/node0416.html#line6">ConfigDev</a>
+structure for each of the AUTOCONFIG hardware boards). If the <a href="../Libraries_Manual_guide/node0416.html#line15">cd_Flags</a>
+specify CONFIGME and the <a href="../Libraries_Manual_guide/node0416.html#line52">er_Type</a> specifies <a href="../Libraries_Manual_guide/node041C.html#line6">DIAGVALID</a>, the system
+initialization will do three things:
+
+First, it will set the current <a href="../Libraries_Manual_guide/node0416.html#line6">ConfigDev</a> as the current binding (see the
+expansion.library <a href="../Includes_and_Autodocs_2._guide/node03BE.html">SetCurrentBinding()</a> function).  Second, it will check
+the <a href="../Libraries_Manual_guide/node041C.html#line29">DiagArea</a>'s da_Config flag to make sure that the <a href="../Libraries_Manual_guide/node041C.html#line55">CONFIGTIME</a> bit is set.
+Third, it will search the ROM &#034;image&#034; associated with this hardware board
+for a valid <a href="../Libraries_Manual_guide/node0298.html">Resident</a> structure (&#060;exec/<a href="../Includes_and_Autodocs_2._guide/node00A0.html#line19">resident.h</a>&#062;); and, if one is
+located, will call <a href="../Libraries_Manual_guide/node0419.html#line28">InitResident()</a> on it, passing a NULL segment list
+pointer as part of the call.
+
+Next, the board's device driver is initialized.  The <a href="../Libraries_Manual_guide/node0298.html">Resident</a> structure
+associated with this board's device driver (which has now been patched by
+the ROM/diagnostic routine) should follow standard system conventions in
+initializing the device driver provided in the boot ROMs.  This driver
+should obtain the address of its associated <a href="../Libraries_Manual_guide/node0416.html#line6">ConfigDev</a> structure via
+<a name="line22"><a href="../Libraries_Manual_guide/node0419.html#line28">GetCurrentBinding()</a>.</a>
+
+Once the driver is initialized, it is responsible for some further steps.
+It must clear the CONFIGME bit in the cd_Flags of its <a href="../Libraries_Manual_guide/node0416.html#line6">ConfigDev</a> structure,
+so that the system knows not to configure this device again if binddrivers
+is run after bootstrap.  Also, though it is not currently mandatory, the
+driver should place a pointer to its Exec node in the cd_Driver field of
+the ConfigDev structure.  This will generally be a device (NT_DEVICE)
+node.  And for this device to be bootable, the driver must create a
+<a href="../Includes_and_Autodocs_2._guide/node00FA.html#line31">BootNode</a> structure, and link this BootNode onto the expansion.library's
+<a href="../Includes_and_Autodocs_2._guide/node00FA.html#line45">eb_MountList</a>.
+
+The BootNode structure (see &#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node00FA.html#line31">expansionbase.h</a>&#062;) contains a Node
+of the new type NT_BOOTNODE (see &#060;exec/<a href="../Includes_and_Autodocs_2._guide/node0091.html#line60">nodes.h</a>&#062;).  The driver must
+initialize the ln_Name field to point to the <a href="../Libraries_Manual_guide/node0416.html#line6">ConfigDev</a> structure which it
+has obtained via the <a href="../Libraries_Manual_guide/node0419.html#line28">GetCurrentBinding()</a> call.  The bn_Flags subfield is
+currently unused and should be initialized to NULL.  The bn_DeviceNode
+must be initialized to point to the DosNode for the device.
+
+When the DOS is initialized later, it will attempt to boot from the first
+<a href="../Includes_and_Autodocs_2._guide/node00FA.html#line31">BootNode</a> on the <a href="../Includes_and_Autodocs_2._guide/node00FA.html#line45">eb_MountList</a>.  The eb_MountList is a priority sorted List,
+with nodes of the highest priority at the head of the List.  For this
+reason, the device driver must enqueue a BootNode onto the list using the
+Exec library function <a href="../Libraries_Manual_guide/node02E2.html">Enqueue()</a>.
+
+In the case of an <a href="../Libraries_Manual_guide/node041B.html">autoboot</a> of AmigaDOS, the <a href="../Includes_and_Autodocs_2._guide/node00FA.html#line31">BootNode</a> must be linked to a
+DeviceNode of the AmigaDOS type (see &#060;libraries/<a href="../Includes_and_Autodocs_2._guide/node0100.html">filehandler.h</a>&#062;), which the
+driver can create via the expansion library <a href="../Libraries_Manual_guide/node041A.html">MakeDosNode()</a> function call.
+When the DOS &#034;wakes up&#034;, it will attempt to boot from this DeviceNode.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

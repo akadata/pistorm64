@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="XI-21/LoadKeyMap.c" NODE="MAIN" TITLE="XI-21/LoadKeyMap.c" -->
+<head>
+<title>XI-21/LoadKeyMap.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0203.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0205.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/libraries.h&#062;
+#include &#060;devices/keymap.h&#062;
+#include &#060;dos/dos.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/utility_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+
+#include &#060;pragmas/exec_pragmas.h&#062;
+#include &#060;pragmas/utility_pragmas.h&#062;
+#include &#060;pragmas/dos_pragmas.h&#062;
+
+#include &#034;loadkeymap.h&#034;
+
+
+/*****************************************************************************/
+
+
+extern struct Library *SysBase;
+extern struct Library *UtilityBase;
+extern struct Library *DOSBase;
+
+
+/*****************************************************************************/
+
+
+/* Case-insensitive version of FindName() */
+static struct Node *FindNameNC(struct List *list, STRPTR name)
+{
+struct Node *node;
+WORD         result;
+
+    node = list-&#062;lh_Head;
+    while (node-&#062;ln_Succ)
+    {
+        result = Stricmp(name,node-&#062;ln_Name);
+        if (result == 0)
+            return(node);
+
+        node = node-&#062;ln_Succ;
+    }
+
+    return(NULL);
+}
+
+
+/*****************************************************************************/
+
+
+struct KeyMap *LoadKeyMap(STRPTR name)
+{
+BPTR                   segment;
+struct KeyMapResource *kr;
+struct KeyMapNode     *kn;
+STRPTR                 base;
+
+    kn      = NULL;
+    segment = NULL;
+
+    /* open the keymap resource, in order to gain access to the keymap list */
+    if (kr = (struct KeyMapResource *)OpenResource(&#034;keymap.resource&#034;))
+    {
+        segment = NULL;
+        base = FilePart(name);
+
+        /* must access the list under Forbid() */
+        Forbid();
+
+        /* is the keymap we want already on the keymap list? */
+        if (!(kn = (struct KeyMapNode *)FindNameNC(&#038;kr-&#062;kr_List,base)))
+        {
+            /* if not on the keymap list, try loading it */
+            if (segment = LoadSeg(name))
+            {
+                /* see if someone added it to the keymap list while we were
+                 * doing a LoadSeg() (which broke Forbid() )
+                 */
+                if (!(kn = (struct KeyMapNode *)FindNameNC(&#038;kr-&#062;kr_List,base)))
+                {
+                    kn = (struct KeyMapNode *)((segment &#060;&#060; 2) + sizeof(BPTR));
+
+                    /* we've loaded a keymap file. Do a few sanity checks
+                     * to make sure it is a keymap, and not some bogus
+                     * load file
+                     */
+                    if (TypeOfMem(kn-&#062;kn_Node.ln_Name)
+                    &#038;&#038;  Stricmp(name,kn-&#062;kn_Node.ln_Name))
+                    {
+                        /* add to the system's keymap list */
+                        AddHead(&#038;(kr-&#062;kr_List),(struct Node *)kn);
+                    }
+                    else
+                    {
+                        /* bogus load file! Get rid of it and fail */
+                        UnLoadSeg(segment);
+                        kn = NULL;
+                    }
+                }
+                else
+                {
+                    /* the keymap was added to the list behind our back!
+                     * Free what was loaded and return happily
+                     */
+                    UnLoadSeg(segment);
+                }
+            }
+        }
+
+        /* get out of forbidden state */
+        Permit();
+    }
+
+    if (kn)
+        return(&#038;kn-&#062;kn_KeyMap);
+
+    return(NULL);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

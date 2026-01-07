@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="FANT-8" TITLE="FANT.doc / Fantavision frame info " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>FANT.doc / Fantavision frame info </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node026C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node026E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+**     Each frame has this structure defined.
+*/
+typedef struct FrameFormat
+{
+   int OpCode;           /* Frame opcode */
+   long Parm;            /* contains frame number for opNEXT, opREPEAT */
+   char Rep1, Rep2;      /* Rep1 is repeat counter, Rep2 is not used */
+   int TweenRate;        /* number of tweens per frame */
+
+   int ChannelIndex[2];  /* -3 stop sound is this channel
+                         ** -2 modify current sound
+                         ** -1 no sound for this channel
+                         ** (all others) is an index into the sound
+                         ** list.  Which sound to use.
+                         */
+
+   int NumberOfPolys;    /* number of polygons in this frame */
+   int ColorPalette[32]; /* xRGB - format 4 bits per register */
+   int Pan, Tilt;        /* 0 is centered, (+-) amounts are in pixels */
+   int Modes;            /* Frame modes */
+   int pad;              /* expansion */
+};
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

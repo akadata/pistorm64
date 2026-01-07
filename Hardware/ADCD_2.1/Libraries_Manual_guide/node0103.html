@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-2-1" TITLE="4 / Basic Window Structures and Functions / Opening a Window" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Basic Window Structures and Functions / Opening a Window</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0102.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0104.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A window is opened and displayed by a call to one of the OpenWindow()
+functions:  <a href="../Includes_and_Autodocs_2._guide/node0239.html">OpenWindow()</a>, <a href="../Includes_and_Autodocs_2._guide/node023A.html">OpenWindowTagList()</a> or <a href="../Includes_and_Autodocs_2._guide/node023A.html">OpenWindowTags()</a>.
+
+    struct Window *OpenWindowTagList( struct NewWindow *newWindow,
+                                     struct TagItem *tagList );
+    struct Window *OpenWindowTags( struct NewWindow *newWindow,
+                                  unsigned long tag1Type, ... );
+    struct Window *OpenWindow( struct NewWindow *newWindow );
+
+The type of window and its attributes are specified in <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a> or
+<a href="../Libraries_Manual_guide/node0102.html#line8">TagItem</a> structures depending on which function is used.  These functions
+all return a pointer to a new <a href="../Libraries_Manual_guide/node0102.html#line8">Window</a> structure if they succeed.  A NULL
+return indicates failure.
+
+<a href="../Includes_and_Autodocs_2._guide/node023A.html">OpenWindowTagList()</a> and <a href="../Includes_and_Autodocs_2._guide/node023A.html">OpenWindowTags()</a> are available only in Release 2
+(V36) and later versions of the OS.  For these functions, window
+attributes are specified in <a href="../Libraries_Manual_guide/node0102.html#line8">TagItem</a> structures which are paired data items
+specifying an attribute and its setting.  (See the `<a href="../Libraries_Manual_guide/node0496.html">Utility Library</a>'
+<a name="line20">chapter for more information on TagItems.)</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0239.html">OpenWindow()</a> is available in all versions of the OS.  Window attributes
+can be specified using a <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a> structure but only a limited set of
+window attributes are available this way.  To support both the new window
+features of Release 2 and compatibility with older versions of the OS, use
+OpenWindow() with an extended version of the <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a> structure named
+<a href="../Libraries_Manual_guide/node0102.html#line8">ExtNewWindow</a>.  See the <a href="../Libraries_Manual_guide/node0123.html">WFLG_NW_EXTENDED</a> flag description in the &#034;Window
+Attributes&#034; section below for more information on using OpenWindow() with
+the extended NewWindow structure.
+
+Further references to OpenWindow() in this chapter will apply to all three
+functions.  These calls are the only proper method for allocating a <a href="../Libraries_Manual_guide/node0102.html#line8">Window</a>
+structure.  The tag based versions are recommended for V36 and later
+versions of the OS.  Use the <a href="../Libraries_Manual_guide/node0102.html#line8">ExtNewWindow</a> structure with OpenWindow() to
+provide backward compatibility.
+
+ <a href="../Libraries_Manual_guide/node05BC.html">OpenWindowTagList() Example</a>    <a href="../Libraries_Manual_guide/node0104.html">Setting Window Attributes</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

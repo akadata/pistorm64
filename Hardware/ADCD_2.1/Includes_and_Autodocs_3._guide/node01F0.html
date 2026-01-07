@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="CacheClearU()" TITLE="exec.library/CacheClearU" -->
+<head>
+<title>exec.library/CacheClearU</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01EF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01F1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CacheClearU - User callable simple cache clearing (V37)
+
+<b>   SYNOPSIS</b>
+	CacheClearU()
+
+	void CacheClearU(void);
+
+<b>   FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node016A.html">Flush</a> out the contents of any CPU instruction and data caches.
+	If dirty data cache lines are present, push them to memory first.
+
+	Caches must be cleared after *any* operation that could cause
+	invalid or stale data.  The most common cases are DMA and modifying
+	instructions using the processor.  See the <a href="../Includes_and_Autodocs_3._guide/node01EF.html">CacheClearE()</a> autodoc
+	for a more complete description.
+
+	Some examples of when the cache needs clearing:
+			Self modifying code
+			Building Jump tables
+			Run-time code patches
+			Relocating code for use at different addresses.
+			Loading code from disk
+
+<b>   SEE ALSO</b>
+	exec/execbase.i, <a href="../Includes_and_Autodocs_3._guide/node01F1.html">CacheControl()</a>, <a href="../Includes_and_Autodocs_3._guide/node01EF.html">CacheClearE()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

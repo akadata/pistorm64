@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/icon" NODE="MatchToolValue()" TITLE="icon.library/MatchToolValue" -->
+<head>
+<title>icon.library/MatchToolValue</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node018B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node018D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    MatchToolValue - check a tool type variable for a particular value.
+
+SYNOPSIS
+    result = MatchToolValue(typeString, value)
+      D0                        A0        A1
+
+    BOOL MatchToolValue(char *, char *);
+
+FUNCTION
+    MatchToolValue is useful for parsing a tool type value for
+    a known value.  It knows how to parse the syntax for a tool
+    type value (in particular, it knows that '|' separates
+    alternate values).  Note that the parsing is case insensitve.
+
+INPUTS
+    typeString - a ToolType value (as returned by FindToolType)
+    value - you are interested if value appears in typeString
+
+RESULTS
+    result - TRUE if the value was in typeString else FALSE.
+
+EXAMPLE
+    Assume there are two type strings:
+        type1 = &#034;text&#034;
+        type2 = &#034;a|b|c&#034;
+
+    MatchToolValue( type1, &#034;text&#034; ) returns TRUE
+    MatchToolValue( type1, &#034;TEXT&#034; ) returns TRUE
+    MatchToolValue( type1, &#034;data&#034; ) returns FALSE
+    MatchToolValue( type2, &#034;a&#034; ) returns TRUE
+    MatchToolValue( type2, &#034;b&#034; ) returns TRUE
+    MatchToolValue( type2, &#034;d&#034; ) returns FALSE
+    MatchToolValue( type2, &#034;a|b&#034; ) returns FALSE
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0186.html">FindToolType()</a>
+
+BUGS
+    None
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

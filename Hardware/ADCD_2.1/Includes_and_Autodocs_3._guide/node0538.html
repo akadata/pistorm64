@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="realtime" NODE="LockRealTime()" TITLE="realtime.library/LockRealTime" -->
+<head>
+<title>realtime.library/LockRealTime</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0537.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0539.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	LockRealTime -- prevent other tasks from changing internal structures.
+			(V37)
+
+<b>   SYNOPSIS</b>
+	lockHandle = LockRealTime(lockType);
+	D0                        D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> LockRealTime(ULONG);
+
+<b>   FUNCTION</b>
+	This routine will lock the internal sempahores in the RealTime library.
+	If they are already locked by another task, this routine will wait
+	until they are free.
+
+<b>   INPUTS</b>
+	lockType - the internal list to lock. Only RT_CONDUCTORS is
+		   currently defined.
+
+<b>   RESULT</b>
+	handle - if lockType is valid, returns a value that must be passed
+		 later to <a href="../Includes_and_Autodocs_3._guide/node053C.html">UnlockRealTime()</a> to unlock the list. Returns NULL
+		 if passed an invalid lock type.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node053C.html">UnlockRealTime()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

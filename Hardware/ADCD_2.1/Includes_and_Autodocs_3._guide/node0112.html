@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="datatypes" NODE="ObtainDataTypeA()" TITLE="datatypes.library/ObtainDataTypeA" -->
+<head>
+<title>datatypes.library/ObtainDataTypeA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0111.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0113.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ObtainDataTypeA - Examines a handle and return its <a href="../Includes_and_Autodocs_3._guide/node05F7.html#line174">DataType</a>.
+                                                               (V39)
+<b>   SYNOPSIS</b>
+	dtn = ObtainDataTypeA (type, handle, attrs);
+	d0			d0    a0      a1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05F7.html#line174">DataType</a> *ObtainDataTypeA (ULONG, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a>, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+	dtn = ObtainDataType (type, handle, tag1, ...);
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05F7.html#line174">DataType</a> *ObtainDataType (ULONG, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a>, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a> tag1, ...);
+
+<b>   FUNCTION</b>
+	This function examines the data that the handle points to,
+	and returns a <a href="../Includes_and_Autodocs_3._guide/node05F7.html#line174">DataType</a> record that describes the data.
+
+<b>   INPUTS</b>
+	type - Type of handle.
+
+	handle - Handle to examine.
+	    For DTST_FILE, handle must be <a href="../Includes_and_Autodocs_3._guide/node05F8.html#line129">BPTR</a> lock.
+	    For DTST_CLIPBOARD, handle must be struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line43">IFFHandle</a> *.
+	    For DTST_MEMORY, handle will be ignored (you need
+	    to specify the additional information required by this
+	    source type through the attrs list).
+
+	attrs - Additional attributes (see TAGS).
+
+<b>   TAGS</b>
+	DTA_SourceAddress (APTR) -- For DTST_MEMORY source data, this
+	    specifies the memory address at which the source data is
+	    located. This must be non-NULL. This attribute is required
+	    for DTST_MEMORY source data (V44).
+
+	DTA_SourceSize (ULONG) -- For DTST_MEMORY source data, this
+	    specifies the size of the source data (in bytes). This must
+	    be greater than 0. This attribute is required for DTST_MEMORY
+	    source data (V44).
+
+<b>   NOTES</b>
+	The datatypes.library maintains a sorted list of all the
+	<a href="../Includes_and_Autodocs_3._guide/node05F7.html#line174">DataType</a> descriptors.  The descriptor can consist of a
+	function, a data mask for the first 64 bytes of the data,
+	and a name pattern.
+
+	The sort order for the list is:
+
+	    Descriptors with a function and no mask or name pattern.
+	    Descriptors with a function and a mask or name pattern.
+	    Descriptors with no function and a mask or name pattern.
+
+	Within each group, they are also sorted in descending priority
+	and descending mask length.
+
+	The DTST_MEMORY source type introduced in V44 makes in-memory
+	data available to subclasses as if the data were stored in a
+	file. Thus, subclasses will see the data as DTST_FILE. Since
+	the data does not correspond to an on-disk file, subclasses
+	and examine hook code must not assume that they will be able
+	to reopen the &#034;file&#034; whose data has been provided to them.
+
+<b>   RETURNS</b>
+	Success returns a pointer to a <a href="../Includes_and_Autodocs_3._guide/node05F7.html#line174">DataType</a>.  You must call
+	FreeDataType() when you are done with the handle.
+
+	A NULL return indicates failure.  Use <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a> to get error value.
+	Following is a summary of the error number used and there meaning
+	as it relates to DataTypes.
+
+	ERROR_NO_FREE_STORE - Not enough memory.
+	ERROR_OBJECT_NOT_FOUND - Unable to open the data object.
+	ERROR_NOT_IMPLEMENTED - Unknown handle type.
+
+<b>   SEE ALSO</b>
+	FreeDataType()
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

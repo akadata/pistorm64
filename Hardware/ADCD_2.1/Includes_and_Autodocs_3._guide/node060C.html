@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/resources/filesysres.h" NODE="MAIN" TITLE="include/resources/filesysres.h" -->
+<head>
+<title>include/resources/filesysres.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node060B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node060D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	RESOURCES_FILESYSRES_H
+#define	RESOURCES_FILESYSRES_H
+/*
+**	$VER: filesysres.h 36.4 (3.5.1990)
+**	Includes Release 44.1
+**
+**	FileSystem.resource description
+**
+**	(C) Copyright 1988-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef	EXEC_NODES_H
+#include	&#060;exec/nodes.h&#062;
+#endif
+#ifndef	EXEC_LISTS_H
+#include	&#060;exec/lists.h&#062;
+#endif
+#ifndef	DOS_DOS_H
+#include	&#060;dos/dos.h&#062;
+#endif
+
+#define	FSRNAME	&#034;FileSystem.resource&#034;
+<a name="line24"></a>
+struct FileSysResource {
+    struct Node fsr_Node;		/* on resource list */
+    char   *fsr_Creator;		/* name of creator of this resource */
+    struct List fsr_FileSysEntries;	/* list of FileSysEntry structs */
+};
+<a name="line30"></a>
+struct FileSysEntry {
+    struct Node fse_Node;	/* on fsr_FileSysEntries list */
+				/* ln_Name is of creator of this entry */
+    ULONG   fse_DosType;	/* DosType of this FileSys */
+    ULONG   fse_Version;	/* Version of this FileSys */
+    ULONG   fse_PatchFlags;	/* bits set for those of the following that */
+				/*   need to be substituted into a standard */
+				/*   device node for this file system: e.g. */
+				/*   0x180 for substitute SegList &#038; GlobalVec */
+    ULONG   fse_Type;		/* device node type: zero */
+    CPTR    fse_Task;		/* standard dos &#034;task&#034; field */
+    BPTR    fse_Lock;		/* not used for devices: zero */
+    BSTR    fse_Handler;	/* filename to loadseg (if SegList is null) */
+    ULONG   fse_StackSize;	/* stacksize to use when starting task */
+    LONG    fse_Priority;	/* task priority when starting task */
+    BPTR    fse_Startup;	/* startup msg: FileSysStartupMsg for disks */
+    BPTR    fse_SegList;	/* code to run to start new task */
+    BPTR    fse_GlobalVec;	/* BCPL global vector when starting task */
+    /* no more entries need exist than those implied by fse_PatchFlags */
+};
+
+#endif	/* RESOURCES_FILESYSRES_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

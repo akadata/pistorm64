@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_6" NODE="6-9" TITLE="6 Input Device / Input Device and Intuition" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>6 Input Device / Input Device and Intuition</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00D9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00DB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are several ways to receive information from the various devices
+that are part of the input device. The first way is to communicate
+directly with the device. This method is not recommended while the input
+device task is running - which is most of the time. The second way is to
+become a handler for the stream of events which the input device produces.
+That method is shown above.
+<a name="line8"></a>
+The third method of getting input from the input device is to retrieve the
+data from the console device or from the IDCMP (Intuition Direct
+Communications Message Port).   These are the preferred methods for
+applications in a multitasking environment because each application can
+receive juts its own input (i.e., only the input which occurs when one of
+its window is active).  See the &#034;<a href="../Libraries_Manual_guide/node0002.html">Intuition</a>&#034; chapters of Amiga ROM Kernel
+Reference Manual: Libraries for more information on IDCMP messages. See
+the <a href="../Devices_Manual_guide/node0080.html">Console Device</a> chapter of this manual for more information on
+console device I/O.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

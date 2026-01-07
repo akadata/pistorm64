@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-59/AppWorkbench.txt" NODE="IV-59-3" TITLE="AppWindows" -->
+<head>
+<title>AppWindows</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00B4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00B6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The workbench.library's AddAppWindow() call makes an application's
+Intuition window into an AppWindow.  It has one parameter that is
+different from the other AddApp calls, a window pointer.  The mywindow
+field (from the prototype above) must point to an open Intuition window
+that is on the Workbench screen.
+
+The C source code example <a href="../AmigaMail_Vol2_guide/node01B2.html">AppWindow.c</a> at the end of this article is a
+simple example of how to create an AppWindow.
+
+There are two interesting things to note about the AppWindow.  First,
+because an AppWindow is still an Intuition window, an application can use
+a Workbench AppWindow for any purpose it would need a normal Workbench
+based window for. An application can render graphics and text in it,
+process its IntuiMessages, or create menus for it.  Also, because
+Workbench tells where on an AppWindow icons were dropped, an application
+can use a small region of a window as a drop box rather than the entire
+AppWindow.  A program can even have several drop boxes on the same window.
+Using simple rendering routines, an application can draw the boxes so the
+user can see where to drop icons.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

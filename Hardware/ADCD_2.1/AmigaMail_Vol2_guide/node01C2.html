@@ -1,0 +1,412 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-111/relative.c" NODE="MAIN" TITLE="IV-111/relative.c" -->
+<head>
+<title>IV-111/relative.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01C1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01C3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/*
+sc DATA=NEAR NMINC STRMERGE NOSTKCHK SAVEDS IGNORE=73 relative
+slink FROM LIB:c.o relative.o TO relative LIB LIB:sc.lib LIB:amiga.lib
+quit
+*/
+
+/* (c)  Copyright 1993-1999 Amiga, Inc.   All rights reserved. */
+/* The information contained herein is subject to change without    */
+/* notice, and is provided &#034;as is&#034; without warranty of any kind,    */
+/* either expressed or implied.  The entire risk as to the use of   */
+/* this information is assumed by the user.                         */
+
+/*
+ * relative.c - shows custom gadget relativity
+ *
+ * custom gadget relativity allows a gadget to arbitrarily resize
+ * itself whenever the window changes size.  This is a complete superset
+ * of the functionality of the old GRELWIDTH, GRELRIGHT, etc., features.
+ * This example shows a subclass of gadgetclass whose imagery comes
+ * from frameiclass.  This gadget's property is that it is always half
+ * the size of its domain, and centered within it.  That is, it's always
+ * half as wide and half as tall as the inner area of its window, and
+ * centered within that area.
+ */
+
+
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/gadgetclass.h&#062;
+#include &#060;intuition/imageclass.h&#062;
+#include &#060;intuition/cghooks.h&#062;
+#include &#060;intuition/classes.h&#062;
+#include &#060;intuition/classusr.h&#062;
+
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/alib_stdio_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+struct Library *GfxBase = NULL;
+struct Library *IntuitionBase = NULL;
+struct Window *win = NULL;
+struct Gadget *gad = NULL;
+Class *customrelclass = NULL;
+
+Class *initCustomRelClass(void);
+ULONG __saveds __asm dispatchCustomRel( register __a0 Class *cl,
+                                         register __a2 Object *o,
+                                         register __a1 Msg msg );
+void                 renderCustomRel( struct Gadget *gad,
+                                       struct RastPort *rp,
+                                       struct GadgetInfo *gi );
+void                 layoutCustomRel( struct Gadget *gad,
+                                       struct GadgetInfo *gi,
+                                       ULONG initial );
+LONG                 handleCustomRel( struct Gadget *gad,
+                                       struct gpInput *msg );
+
+void main(void)
+{
+  if ( GfxBase = OpenLibrary(&#034;graphics.library&#034;,39) )
+  {
+    if ( IntuitionBase = OpenLibrary(&#034;intuition.library&#034;,39) )
+    {
+      if ( customrelclass = initCustomRelClass() )
+      {
+        if ( gad = NewObject( customrelclass, NULL,
+            GA_Left, 20,
+            GA_Top, 20,
+            GA_Width, 20,
+            GA_Height, 20,
+            GA_RelVerify, TRUE,
+            GA_Immediate, TRUE,
+            TAG_DONE ) )
+        {
+          if ( win = OpenWindowTags( NULL,
+              WA_Title, &#034;Custom Relativity Demo&#034;,
+              WA_CloseGadget, TRUE,
+              WA_DepthGadget, TRUE,
+              WA_DragBar, TRUE,
+              WA_SizeGadget, TRUE,
+              WA_Gadgets, gad,
+              WA_Activate, TRUE,
+              WA_IDCMP, IDCMP_GADGETHELP | IDCMP_RAWKEY | IDCMP_CLOSEWINDOW |
+                        IDCMP_GADGETDOWN | IDCMP_GADGETUP,
+              WA_Width, 150,
+              WA_Height, 150,
+              WA_MinWidth, 50,
+              WA_MinHeight, 50,
+              WA_MaxWidth, ~0,
+              WA_MaxHeight, ~0,
+              WA_NoCareRefresh, TRUE,
+              TAG_DONE ) )
+          {
+            BOOL terminated = FALSE;
+            struct IntuiMessage *imsg;
+
+            /* Turn on Gadget Help */
+            HelpControl( win, HC_GADGETHELP );
+
+            while (!terminated)
+            {
+              Wait (1 &#060;&#060; win-&#062;UserPort-&#062;mp_SigBit);
+              while (imsg = (struct IntuiMessage *) GetMsg(win-&#062;UserPort))
+              {
+                switch ( imsg-&#062;Class )
+                {
+                case IDCMP_CLOSEWINDOW:
+                  terminated = TRUE;
+                  break;
+
+                case IDCMP_RAWKEY:
+                  printf(&#034;RAWKEY %lx\n&#034;, imsg-&#062;Code);
+                  break;
+
+                case IDCMP_GADGETUP:
+                  printf(&#034;Gadget Up\n&#034;);
+                  break;
+
+                case IDCMP_GADGETDOWN:
+                  printf(&#034;Gadget Down\n&#034;);
+                  break;
+
+                case IDCMP_GADGETHELP:
+                  if ( imsg-&#062;IAddress == NULL )
+                  {
+                    printf(&#034;Gadget Help: Mouse not over window\n&#034;);
+                  }
+                  else if ( imsg-&#062;IAddress == (APTR) win )
+                  {
+                    printf(&#034;Gadget Help: Mouse in window, not over a gadget\n&#034;);
+                  }
+                  else
+                  {
+                    /* Detect system gadgets.  Figure out by looking at
+                     * system-gadget-type bits in GadgetType field:
+                     */
+                    LONG sysgtype =
+                      ((struct Gadget *)imsg-&#062;IAddress)-&#062;GadgetType &#038; GTYP_SYSTYPEMASK;
+                    switch ( sysgtype )
+                    {
+                    case GTYP_SIZING:
+                      printf(&#034;Gadget Help for window sizing gadget\n&#034;);
+                      break;
+
+                    case GTYP_WDRAGGING:
+                      printf(&#034;Gadget Help for window drag-bar\n&#034;);
+                      break;
+
+                    case GTYP_WUPFRONT:
+                      printf(&#034;Gadget Help for window depth gadget\n&#034;);
+                      break;
+
+                    case GTYP_WDOWNBACK:
+                      printf(&#034;Gadget Help for window zoom gadget\n&#034;);
+                      break;
+
+                    case GTYP_CLOSE:
+                      printf(&#034;Gadget Help for window close gadget\n&#034;);
+                      break;
+
+                    case 0:
+                      /* In this example, we only have one gadget,
+                       * so we know which one it is.  Normally, you'd
+                       * have to figure that out here, using the
+                       * usual techniques you already use for other
+                       * gadget messages.
+                       */
+                      printf(&#034;Gadget Help for gadget, code 0x%x\n&#034;,
+                          imsg-&#062;Code);
+                      break;
+
+                    default:
+                      printf(&#034;Gadget Help on some other system gadget\n&#034;);
+                      break;
+                    }
+                  }
+                }
+                ReplyMsg((struct Message *)imsg);
+              }
+            }
+            CloseWindow( win );
+          }
+          DisposeObject( gad );
+        }
+        FreeClass( customrelclass );
+      }
+      CloseLibrary( IntuitionBase );
+    }
+    CloseLibrary( GfxBase );
+  }
+}
+
+
+/* initCustomRelClass()
+ *
+ * Initialize a simple private subclass of gadgetclass that
+ * knows about GM_LAYOUT.
+ *
+ */
+
+Class *initCustomRelClass( void )
+{
+  Class *cl;
+
+  /* Create a private class: */
+  if ( cl = MakeClass( NULL, &#034;gadgetclass&#034;, NULL, 0, 0 ) )
+  {
+    cl-&#062;cl_Dispatcher.h_SubEntry = NULL;
+    cl-&#062;cl_Dispatcher.h_Entry = dispatchCustomRel;
+    cl-&#062;cl_Dispatcher.h_Data = NULL;
+  }
+  return ( cl );
+}
+
+/* dispatchCustomRel()
+ *
+ * boopsi dispatcher for the custom relativity class.
+ *
+ */
+
+ULONG __saveds __asm
+dispatchCustomRel( register __a0 Class *cl,
+                    register __a2 Object *o,
+                    register __a1 Msg msg )
+{
+  ULONG retval = 1;
+  Object *newobj;
+
+  switch ( msg-&#062;MethodID )
+  {
+  case OM_NEW:
+    if ( retval = (ULONG)(newobj = (Object *) DoSuperMethodA( cl, o, msg )) )
+    {
+      /* Set custom relativity */
+      ((struct Gadget *)newobj)-&#062;Flags |= GFLG_RELSPECIAL;
+
+      /* Tell Intuition this gadget supports gadget help */
+      SetAttrs(newobj, GA_GadgetHelp, TRUE, TAG_DONE, NULL);
+
+      /* Attempt to allocate a frame.  If I can't, then
+       * delete myself and fail.
+       */
+      if ( ! ( ((struct Gadget *)newobj)-&#062;GadgetRender =
+          NewObject( NULL, &#034;frameiclass&#034;,
+                     IA_FrameType, FRAME_BUTTON,
+                     TAG_DONE ) ) )
+      {
+        CoerceMethod( cl, o, OM_DISPOSE );
+        retval = NULL;
+      }
+    }
+    break;
+
+  case GM_LAYOUT:
+    layoutCustomRel( (struct Gadget *)o, ((struct gpLayout *)msg)-&#062;gpl_GInfo,
+        ((struct gpLayout *)msg)-&#062;gpl_Initial );
+    break;
+
+  case GM_RENDER:
+    renderCustomRel( (struct Gadget *)o, ((struct gpRender *) msg)-&#062;gpr_RPort,
+        ((struct gpRender *) msg)-&#062;gpr_GInfo );
+    break;
+
+  case GM_GOACTIVE:
+    return( GMR_MEACTIVE );
+    break;
+
+  case GM_HELPTEST:
+    return(GMR_HELPCODE | 0x0000C0DE);
+    break;
+
+  case GM_HANDLEINPUT:
+    retval = handleCustomRel( (struct Gadget *)o, (struct gpInput *)msg );
+    break;
+
+  case OM_DISPOSE:
+    DisposeObject( ((struct Gadget *)o)-&#062;GadgetRender );
+    /* fall through to default */
+  default:
+    retval = (ULONG) DoSuperMethodA( cl, o, msg );
+  }
+  return( retval );
+}
+
+
+/* renderCustomRel()
+ *
+ * Simple routine to draw my imagery based on my selected state.
+ *
+ */
+void
+renderCustomRel( struct Gadget *gad, struct RastPort *rp, struct GadgetInfo *gi )
+{
+  DrawImageState( rp, gad-&#062;GadgetRender, gad-&#062;LeftEdge, gad-&#062;TopEdge,
+      (gad-&#062;Flags &#038; GFLG_SELECTED) ? IDS_SELECTED : IDS_NORMAL,
+      gi ? gi-&#062;gi_DrInfo : NULL );
+}
+
+
+/* layoutCustomRel()
+ *
+ * Lay myself out based on my domain dimensions.  Refigure my own size,
+ * then inform my image of the size change.
+ *
+ */
+void
+layoutCustomRel( struct Gadget *gad, struct GadgetInfo *gi, ULONG initial )
+{
+  if ( gi-&#062;gi_Requester )
+  {
+    /* Center it within the requester */
+    gad-&#062;Width = gi-&#062;gi_Domain.Width / 2;
+    gad-&#062;Height = gi-&#062;gi_Domain.Height / 2;
+    gad-&#062;LeftEdge = gad-&#062;Width / 2;
+    gad-&#062;TopEdge = gad-&#062;Height / 2;
+  }
+  else
+  {
+    /* Center it within the window, after accounting for
+     * the window borders
+     */
+    gad-&#062;Width = ( gi-&#062;gi_Domain.Width -
+        gi-&#062;gi_Window-&#062;BorderLeft - gi-&#062;gi_Window-&#062;BorderRight ) / 2;
+    gad-&#062;Height = ( gi-&#062;gi_Domain.Height -
+        gi-&#062;gi_Window-&#062;BorderTop - gi-&#062;gi_Window-&#062;BorderBottom ) / 2;
+    gad-&#062;LeftEdge = ( gad-&#062;Width / 2 ) + gi-&#062;gi_Window-&#062;BorderLeft;
+    gad-&#062;TopEdge = ( gad-&#062;Height / 2 ) + gi-&#062;gi_Window-&#062;BorderTop;
+  }
+  SetAttrs( gad-&#062;GadgetRender,
+    IA_Width, gad-&#062;Width,
+    IA_Height, gad-&#062;Height,
+    TAG_DONE );
+}
+
+
+/* handleCustomRel()
+ *
+ * Routine to handle input to the gadget.  Behaves like a basic
+ * hit-select gadget.
+ *
+ */
+LONG
+handleCustomRel( struct Gadget *gad, struct gpInput *msg )
+{
+  WORD selected = 0;
+  struct RastPort *rp;
+  LONG retval = GMR_MEACTIVE;
+
+  /* Could send IM_HITTEST to image instead */
+  if ( ( msg-&#062;gpi_Mouse.X &#062;= 0 ) &#038;&#038;
+      ( msg-&#062;gpi_Mouse.X &#060; gad-&#062;Width ) &#038;&#038;
+      ( msg-&#062;gpi_Mouse.Y &#062;= 0 ) &#038;&#038;
+      ( msg-&#062;gpi_Mouse.Y &#060; gad-&#062;Height ) )
+  {
+    selected = GFLG_SELECTED;
+  }
+
+  if ((msg-&#062;gpi_IEvent-&#062;ie_Class == IECLASS_RAWMOUSE) &#038;&#038;
+      (msg-&#062;gpi_IEvent-&#062;ie_Code == SELECTUP))
+  {
+    /* gadgetup, time to go */
+    if ( selected )
+    {
+      retval = GMR_NOREUSE | GMR_VERIFY;
+    }
+    else
+    {
+      retval = GMR_NOREUSE;
+    }
+    /* and unselect the gadget on our way out... */
+    selected = 0;
+  }
+
+  if ( ( gad-&#062;Flags &#038; GFLG_SELECTED ) != selected )
+  {
+    gad-&#062;Flags ^= GFLG_SELECTED;
+    if ( rp = ObtainGIRPort( msg-&#062;gpi_GInfo ) )
+    {
+      DoMethod( (Object *)gad, GM_RENDER, msg-&#062;gpi_GInfo, rp, GREDRAW_UPDATE );
+      ReleaseGIRPort( rp );
+    }
+  }
+
+  return( retval );
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="ReleasePen()" TITLE="graphics.library/ReleasePen" -->
+<head>
+<title>graphics.library/ReleasePen</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0313.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0315.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ReleasePen -- Release an allocated palette entry to the free pool. (V39)
+
+
+<b>   SYNOPSIS</b>
+	ReleasePen( cm, n)
+	            a0 d0
+
+	void ReleasePen( Struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> *, ULONG);
+
+<b>   FUNCTION</b>
+	Return the palette entry for use by other applications.
+	If the reference count for this palette entry goes to zero,
+	then it may be reset to another RGB value.
+
+<b>   INPUTS</b>
+       cm  =  A pointer to a color map created by <a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a>.
+
+	n   =  A palette index obtained via any of the palette allocation
+	       functions. Passing a -1 will result in this call doing
+	       nothing.
+
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+	This function works for both shared and exclusive palette entries.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02E3.html">GetColorMap()</a> <a href="../Includes_and_Autodocs_3._guide/node0307.html">ObtainPen()</a> <a href="../Includes_and_Autodocs_3._guide/node0306.html">ObtainBestPenA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

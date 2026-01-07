@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="AreaDraw()" TITLE="graphics.library/AreaDraw" -->
+<head>
+<title>graphics.library/AreaDraw</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0416.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0418.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AreaDraw -- Add a point to a list of end points for areafill.
+
+
+SYNOPSIS
+    error = AreaDraw( rp,  x,     y)
+      d0              A1 D0:16 D1:16
+
+    ULONG AreaDraw( struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *, SHORT, SHORT);
+
+FUNCTION
+    Add point to the vector buffer.
+
+
+INPUTS
+    rp      - points to a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> structure.
+    x,y     - are coordinates of a point in the raster.
+
+RESULT
+    error   - zero for success, else -1 if no there was no space
+              left in the vector list.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node041A.html">AreaMove()</a> <a href="../Includes_and_Autodocs_2._guide/node044F.html">InitArea()</a> <a href="../Includes_and_Autodocs_2._guide/node0419.html">AreaEnd()</a> <a href="../Includes_and_Autodocs_2._guide/node00AF.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

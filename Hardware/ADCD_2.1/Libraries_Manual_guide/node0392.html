@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-5-1" TITLE="28 / VSprite Advanced Topics / Reserving Hardware Sprites" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / VSprite Advanced Topics / Reserving Hardware Sprites</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0391.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0393.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To prevent the VSprite system from using specific hardware sprites, set
+the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line39">sprRsrvd</a> member of the <a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a> structure. The pointer to the GelsInfo
+structure is contained in the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> structure. If all of the bits of
+this 8-bit value are ones (0xFF), then all of the hardware sprites may be
+used by the VSprite system. If any of the bits is a 0, the sprite
+<a name="line7">corresponding to that bit will not be utilized by VSprites.</a>
+
+    Reserving Can Cause Problems.
+    -----------------------------
+    Reserving sprites increases the likelihood of the system not being
+    able to display a VSprite (<a href="../Libraries_Manual_guide/node0383.html#line12">VSOVERFLOW</a>). See the next section,
+    &#034;<a href="../Libraries_Manual_guide/node0393.html">How VSprites are Assigned</a>,&#034; for further details on this topic.
+
+You reserve a sprite by setting its corresponding bit in sprRsrvd.  For
+instance, to reserve sprite zero only, set sprRsrvd to 0x01.  To reserve
+sprite three only, set sprRsrvd to 0x08.
+
+If a hardware sprite is reserved, the system will not consider it when it
+makes VSprite assignments.  Remember, hardware sprite pairs share color
+register sets.  If a hardware sprite is reserved, its mate should probably
+be reserved too, otherwise the reserved sprite's colors will change as the
+unreserved mate is assigned different VSprites.  For example, it is common
+practice to reserve Sprites 0 and 1, so that the Intuition pointer (Sprite
+0) is left alone.  This could be accomplished with the following
+statements:
+
+    struct RastPort myRastPort = {0};  /* the View structure is defined */
+
+<a name="line30">    myRastPort.GelsInfo-&#062;sprRsrvd = 0x03;  /* reserve 0 and 1 */</a>
+
+The <a href="../Includes_and_Autodocs_2._guide/node00AE.html#line24">GfxBase</a> structure may be examined to find which sprites are already in
+use.  This may, at your option, impact what sprites you reserve.  If
+Intuition is running, sprite 0 will already be in use as its pointer.
+
+The reserved sprite status is accessible as
+
+    currentreserved = GfxBase-&#062;SpriteReserved;
+
+The <a href="../Libraries_Manual_guide/node0393.html">next section</a> presents a few trouble-shooting techniques for VSprite
+assignment.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

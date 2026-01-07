@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-2-7-6" TITLE="27 / / Forming a Basic Display / Creating the Display Instructions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Forming a Basic Display / Creating the Display Instructions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0331.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0333.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Now that you have initialized the system data structures, you can request
+that the system prepare a set of display instructions for the Copper using
+these structures as input data. During the one or more blank vertical
+lines that precede each <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>, the Copper is busy changing the
+characteristics of the display hardware to match the characteristics you
+expect for this ViewPort. This may include a change in display resolution,
+a change in the colors to be used, or other user-defined modifications to
+<a name="line9">system registers.</a>
+
+Here is the code that creates the display instructions:
+
+    /*  Construct preliminary Copper instruction list.  */
+    MakeVPort( &#038;view, &#038;viewPort );
+
+In this line of code, &#038;view is the address of the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> structure and
+&#038;viewPort is the address of the first <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> structure. Using these
+structures, the system has enough information to build the instruction
+<a name="line19">stream that defines your display.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node045B.html">MakeVPort()</a> creates a special set of instructions that controls the
+appearance of the display. If you are using animation, the graphics
+animation routines create a special set of instructions to control the
+hardware sprites and the system color registers. In addition, the advanced
+user can create special instructions (called user Copper instructions) to
+change system operations based on the position of the video beam on the
+<a name="line27">screen.</a>
+
+All of these special instructions must be merged together before the
+system can use them to produce the display you have designed. This is done
+by the system routine <a href="../Includes_and_Autodocs_2._guide/node045F.html">MrgCop()</a> (which stands for &#034;Merge Coprocessor
+Instructions&#034;).  Here is a typical call:
+
+    /* Merge preliminary lists into a real Copper list in the view
+       structure.                                                  */
+    MrgCop( &#038;view );
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

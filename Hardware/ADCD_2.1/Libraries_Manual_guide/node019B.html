@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-3-3" TITLE="6 / Menu Data Structures / MenuItem Flags" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Menu Data Structures / MenuItem Flags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node019A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node019C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here are the flags that can be set by the application in the <a href="../Libraries_Manual_guide/node019A.html#line35">Flags</a> field
+<a name="line3">of the <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structure:</a>
+
+CHECKIT
+    Set this flag to inform Intuition that this item is a checkmark item
+<a name="line7">    and should be preceded by a checkmark if the flag CHECKED is set.</a>
+
+CHECKED
+    For an item with the CHECKIT flag set, set this bit to specify that
+    the checkmark is displayed.  After the menu strip is submitted to
+    Intuition, it will maintain the CHECKED bit based on effects from
+    other items' mutual exclusions, or, for MENUTOGGLE items, from user
+<a name="line14">    accesses to this item.</a>
+
+ITEMTEXT
+    Set this flag if the representation of the item pointed to by the
+    <a href="../Libraries_Manual_guide/node019A.html#line47">ItemFill</a> field and, possibly, by <a href="../Libraries_Manual_guide/node019A.html#line64">SelectFill</a> is text and points to an
+    <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structure.  Clear this bit if the item is graphic and
+<a name="line20">    points to an <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structure.</a>
+
+COMMSEQ
+    If this flag is set, this item has an equivalent command key sequence
+<a name="line24">    set in the <a href="../Libraries_Manual_guide/node019A.html#line72">Command</a> field of the <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structure.</a>
+
+MENUTOGGLE
+    This flag is used in conjunction with the CHECKIT flag.  If
+    MENUTOGGLE is set, a checkmark that is turned on may be turned off by
+    selecting the item.  This allows the user to toggle between the
+<a name="line30">    checked and non-checked states by repeatedly selecting the item.</a>
+
+ITEMENABLED
+    This flag describes whether or not this item is currently enabled.
+    If an item is not enabled, its image will be ghosted and the user
+    will not be able to select it.  If this item has sub-items, all of
+<a name="line36">    the sub-items are disabled when the item is disabled.</a>
+
+    Set this flag before submitting the menu strip to Intuition.  Once
+    the menu strip has been submitted to Intuition, enable or disable
+<a name="line40">    items by calling <a href="../Libraries_Manual_guide/node0192.html#line15">OnMenu()</a> or <a href="../Libraries_Manual_guide/node0192.html#line15">OffMenu()</a>.</a>
+
+HIGHFLAGS
+    An item can be highlighted when the user positions the pointer over
+    the item.  These bits describe what type of highlighting will be
+    used, if any.  One of the following bits must be set, according to
+<a name="line46">    the type of highlighting desired:</a>
+
+    HIGHCOMP
+        This complements all of the bits contained by this item's select
+<a name="line50">        box.</a>
+
+    HIGHBOX
+<a name="line53">        This draws a box outside this item's select box.</a>
+
+    HIGHIMAGE
+        This displays alternate imagery referenced in SelectFill.  For
+        alternate text, make sure that ITEMTEXT is set, and that the
+        <a href="../Libraries_Manual_guide/node019A.html#line64">SelectFill</a> field points to an <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> structure.  For
+        alternate image, ITEMTEXT must be cleared, and the SelectFill
+<a name="line60">        field must point to an <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structure.</a>
+
+    HIGHNONE
+        This specifies no highlighting.
+
+
+<a name="line66">The following two flags are used by Intuition:</a>
+
+ISDRAWN
+    Intuition sets this flag when this item's sub-items are currently
+<a name="line70">    displayed to the user and clears it when they are not.</a>
+
+HIGHITEM
+    Intuition sets this flag when this item is highlighted and clears it
+    when the item is not highlighted.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

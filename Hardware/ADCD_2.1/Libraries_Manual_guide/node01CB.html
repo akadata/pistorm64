@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-4-6" TITLE="8 / Creating Text / Fonts" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Text / Fonts</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01CA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01CC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The application may choose to specify the font used in rendering the
+<a name="line3"><a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a>, or it may choose to use the default font for the system.</a>
+
+To use the default font, set the <a href="../Libraries_Manual_guide/node01C7.html#line59">ITextFont</a> field to NULL.  Some care must
+be taken when using the default font.  When an <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> object is
+rendered and no font is specified, the text will be rendered in the font
+set in the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>.
+
+If the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> font is NULL, the text will be rendered using
+<a href="../Includes_and_Autodocs_2._guide/node00AE.html#line24">GfxBase-&#062;DefaultFont</a>.  Also, <a href="../Libraries_Manual_guide/node01C9.html">IntuiTextLength()</a> always uses
+GfxBase-&#062;DefaultFont when <a href="../Libraries_Manual_guide/node01C7.html#line59">ITextFont</a> is NULL.  The application must have
+open the graphics library in order to check the default font in GfxBase.
+<a name="line14">(See the <a href="../Libraries_Manual_guide/node03D2.html">graphics library</a> chapter for more information.)</a>
+
+To use a specific font for this text, place a pointer to an initialized
+<a href="../Libraries_Manual_guide/node03D6.html#line21">TextAttr</a> structure in the <a href="../Libraries_Manual_guide/node01C7.html#line59">ITextFont</a> field.  Intuition will only use the
+specified font if it is available through a call to the <a href="../Libraries_Manual_guide/node03D6.html#line5">OpenFont()</a>
+routine.  To use a font from disk, the application must first open the
+font using the <a href="../Libraries_Manual_guide/node03D6.html#line5">OpenDiskFont()</a> function.  For more information about using
+fonts, see the &#034;<a href="../Libraries_Manual_guide/node03D6.html">Graphics Library and Text</a>&#034; chapter in this manual.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

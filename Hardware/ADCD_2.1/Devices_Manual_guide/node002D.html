@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_2" NODE="2-6-1-3" TITLE="2 / ADCMD_ALLOCATE / ADCMD_ALLOCATE Examples" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>2 / ADCMD_ALLOCATE / ADCMD_ALLOCATE Examples</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node002C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node002E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following are more examples of how to tell <a href="../Includes_and_Autodocs_2._guide/node04A6.html">ADCMD_ALLOCATE</a> your channel
+preferences. If you want any channel, but want a right channel first, use
+an array containing 1, 8, 2, and 4:
+
+  0001
+  1000
+  0010
+  0100
+
+If you only want a right channel, use 1 and 8 (channels 0 and 3):
+
+  0001
+  1000
+
+If you want only a left channel, use 2 and 4  (channels 1 and 2):
+
+  0010
+  0100
+
+If you want to allocate a channel and keep it for a sound that can be
+interrupted and restarted, allocate it at a certain precedence. If it is
+stolen, allocate it again with the ADIOF_NOWAIT flag set to 0. When the
+channel is relinquished, you will get it again.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

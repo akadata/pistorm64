@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="CMOVE" TITLE="graphics.library/CMOVE" -->
+<head>
+<title>graphics.library/CMOVE</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node042F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0431.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CMOVE -- append copper move instruction to user copper list.
+
+SYNOPSIS
+    CMOVE( c , a , v )
+
+    CMove( c , a , v )
+          a1  d0  d1
+    CBump( c )
+          a1
+
+    void CMove( struct <a href="../Includes_and_Autodocs_2._guide/node00AD.html#line82">UCopList</a> *, void *, WORD );
+
+FUNCTION
+    Add instruction to move value v to hardware register a.
+
+INPUTS
+    c - pointer to <a href="../Includes_and_Autodocs_2._guide/node00AD.html#line82">UCopList</a> structure
+    a - hardware register
+    v - 16 bit value to be written
+
+RESULTS
+    This is actually a macro that calls CMove(c,&#038;a,v)
+    and then calls CBump(c) to bump the local pointer
+    to the next instruction. Watch out for macro side affects.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0428.html">CINIT</a> <a href="../Includes_and_Autodocs_2._guide/node0432.html">CWAIT</a> <a href="../Includes_and_Autodocs_2._guide/node0426.html">CEND</a> <a href="../Includes_and_Autodocs_2._guide/node00AD.html">graphics/copper.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

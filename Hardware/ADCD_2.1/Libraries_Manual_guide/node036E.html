@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-7" TITLE="27 Graphics Primitives / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 Graphics Primitives / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node036D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node036F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following are brief descriptions of the Amiga's graphics primitives.
+See the Amiga ROM Kernel Reference Manual: Includes and Autodocs for
+details on each function call.
+<a name="line5"></a>
+
+                Table 27-9: Graphics Primitives Functions
+  ________________________________________________________________________
+ |                                                                        |
+ |         Display                                                        |
+ |     Set-up Functions              Description                          |
+ |========================================================================|
+ |           <a href="../Includes_and_Autodocs_2._guide/node0456.html">InitView()</a>  Initializes the <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> structure.                  |
+ |         <a href="../Includes_and_Autodocs_2._guide/node0450.html">InitBitMap()</a>  Initializes the <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> structure.                |
+ |            <a href="../Includes_and_Autodocs_2._guide/node00A6.html#line57">RASSIZE()</a>  Calculates the size of a <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>'s BitMap.      |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0412.html">AllocRaster()</a>  Allocates the bitplanes needed for a BitMap.     |
+ |         <a href="../Includes_and_Autodocs_2._guide/node0442.html">FreeRaster()</a>  Frees the bitplanes created with AllocRaster().  |
+ |          <a href="../Includes_and_Autodocs_2._guide/node0457.html">InitVPort()</a>  Initializes the ViewPort structure.              |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0445.html">GetColorMap()</a>  Returns the <a href="../Libraries_Manual_guide/node00F1.html#line4">ColorMap</a> structure used by           |
+ |                       ViewPorts.                                       |
+ |       <a href="../Includes_and_Autodocs_2._guide/node043E.html">FreeColorMap()</a>  Frees the ColorMap created by GetColorMap().     |
+ |           <a href="../Includes_and_Autodocs_2._guide/node0458.html">LoadRGB4()</a>  Loads the color registers for a given <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a>.  |
+ |          <a href="../Includes_and_Autodocs_2._guide/node047D.html">SetRGB4CM()</a>  Loads an individual color register for a given   |
+ |                       ViewPort.                                        |
+ |          <a href="../Includes_and_Autodocs_2._guide/node045B.html">MakeVPort()</a>  Creates the intermediate Copper list program for |
+ |                       a ViewPort.                                      |
+ |             <a href="../Includes_and_Autodocs_2._guide/node045F.html">MrgCop()</a>  Merges the intermediate Copper lists.            |
+ |           <a href="../Includes_and_Autodocs_2._guide/node0459.html">LoadView()</a>  Displays a given <a href="../Libraries_Manual_guide/node032B.html#line51">View</a>.                           |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0440.html">FreeCprList()</a>  Frees the Copper list created with MrgCop()      |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0444.html">FreeVPortCopLists()</a>  Frees the intermediate Copper lists created with |
+ |                       MakeVPort().                                     |
+ |        <a href="../Includes_and_Autodocs_2._guide/node00B6.html#line22">OFF_DISPLAY()</a>  Turns the video display DMA off                  |
+ |         <a href="../Includes_and_Autodocs_2._guide/node00B6.html#line22">ON_DISPLAY()</a>  Turns the video display DMA back on again.       |
+<a name="line34"> |________________________________________________________________________|</a>
+
+  ________________________________________________________________________
+ |                                                                        |
+ |    Release 2 Display                                                   |
+ |    Set-up Functions               Description                          |
+ |========================================================================|
+ |     <a href="../Includes_and_Autodocs_2._guide/node043B.html">FindDisplayInfo()</a>  Returns the display database handle for a given |
+ |                        ModeID (V36).                                   |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0446.html">GetDisplayInfoData()</a>  Looks up a display attribute in the display     |
+ |                        database (V36).                                 |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0488.html">VideoControl()</a>  Sets, clears and gets the attributes of an      |
+ |                        existing display (V36).                         |
+ |              <a href="../Includes_and_Autodocs_2._guide/node044E.html">GfxNew()</a>  Creates <a href="../Libraries_Manual_guide/node032C.html#line16">ViewExtra</a> or <a href="../Libraries_Manual_guide/node032C.html#line16">ViewPortExtra</a> used in      |
+ |                        Release 2 displays (V36).                       |
+ |        <a href="../Includes_and_Autodocs_2._guide/node044B.html">GfxAssociate()</a>  Attaches a ViewExtra to a <a href="../Libraries_Manual_guide/node032B.html#line51">View</a> (V36).           |
+ |             <a href="../Includes_and_Autodocs_2._guide/node044C.html">GfxFree()</a>  Frees the ViewExtra or ViewPortExtra created by |
+ |                        GfxNew() (V36).                                 |
+ |         <a href="../Includes_and_Autodocs_2._guide/node0463.html">OpenMonitor()</a>  Returns the <a href="../Includes_and_Autodocs_2._guide/node00A7.html#line26">MonitorSpec</a> structure used in       |
+ |                        Release 2 Views (V36).                          |
+ |        <a href="../Includes_and_Autodocs_2._guide/node042F.html">CloseMonitor()</a>  Frees the MonitorSpec structure created by      |
+ |                        OpenMonitor() (V36).                            |
+ |         <a href="../Includes_and_Autodocs_2._guide/node044A.html">GetVPModeID()</a>  Returns the Release 2 ModeID of an existing     |
+ |                        <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> (V36).                                 |
+ |    <a href="../Includes_and_Autodocs_2._guide/node045C.html">ModeNotAvailable()</a>  Determines if a display mode is available from  |
+ |                        a given ModeID (V36).                           |
+<a name="line60"> |________________________________________________________________________|</a>
+
+  ________________________________________________________________________
+ |                                                                        |
+ |      Drawing                                                           |
+ |     Functions                     Description                          |
+ |========================================================================|
+ |  <a href="../Includes_and_Autodocs_2._guide/node0454.html">InitRastPort()</a>  Initialize a <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> structure.                      |
+ |      <a href="../Includes_and_Autodocs_2._guide/node044F.html">InitArea()</a>  Initialize the <a href="../Libraries_Manual_guide/node034D.html">AreaInfo</a> structure used with a         |
+ |                  RastPort.                                             |
+ |     <a href="../Includes_and_Autodocs_2._guide/node00B6.html#line30">SetWrMask()</a>  Set the <a href="../Libraries_Manual_guide/node034F.html">RastPort.Mask</a>.                                |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0475.html">SetAPen()</a>  Set the <a href="../Libraries_Manual_guide/node0350.html#line3">RastPort.FgPen</a> foreground pen color.          |
+ |       SetBPen()  Set the <a href="../Libraries_Manual_guide/node0350.html#line6">RastPort.BgPen</a> background pen color.          |
+ |       <a href="../Includes_and_Autodocs_2._guide/node047A.html">SetOPen()</a>  Set the <a href="../Libraries_Manual_guide/node0350.html#line9">RastPort.AOlPen</a> area fill outline pen color.  |
+ |     <a href="../Includes_and_Autodocs_2._guide/node00B6.html#line30">SetDrMode()</a>  Set the <a href="../Libraries_Manual_guide/node0351.html">RastPort.DrawMode</a> drawing mode.               |
+ |       SetDrPt()  Set the RastPort.LinePtrn line drawing pattern.       |
+ |       <a href="../Includes_and_Autodocs_2._guide/node00B6.html#line30">SetAfPt()</a>  Set the RastPort area fill pattern and size.          |
+ |------------------------------------------------------------------------|
+ |    <a href="../Includes_and_Autodocs_2._guide/node048D.html">WritePixel()</a>  Draw a single pixel in the foreground color at a      |
+ |                  given coordinate.                                     |
+ |     <a href="../Includes_and_Autodocs_2._guide/node046A.html">ReadPixel()</a>  Find the color of the pixel at a given coordinate.    |
+ |    <a href="../Includes_and_Autodocs_2._guide/node00B6.html#line42">DrawCircle()</a>  Draw a circle with a given radius and center point.   |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0437.html">DrawEllipse()</a>  Draw an ellipse with the given radii and center       |
+ |                  point.                                                |
+ |          <a href="../Includes_and_Autodocs_2._guide/node045D.html">Move()</a>  Move the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> drawing pen to a given coordinate.  |
+ |          <a href="../Includes_and_Autodocs_2._guide/node0436.html">Draw()</a>  Draw a line from the current pen location to a given  |
+ |                  coordinate.                                           |
+ |------------------------------------------------------------------------|
+ |      <a href="../Includes_and_Autodocs_2._guide/node0467.html">PolyDraw()</a>  Draw a polygon with a given set of vertices.          |
+ |      <a href="../Includes_and_Autodocs_2._guide/node041A.html">AreaMove()</a>  Set the anchor point for a filled polygon.            |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0417.html">AreaDraw()</a>  Add a new vertice to an area-fill polygon.            |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0419.html">AreaEnd()</a>  Close and area-fill polygon, draw it and fill it.     |
+ |      <a href="../Includes_and_Autodocs_2._guide/node00B6.html#line35">BNDRYOFF()</a>  Turn off area-outline pen usage activated with        |
+ |                  SetOPen().                                            |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0416.html">AreaCircle()</a>  Draw a filled circle with a given radius and center   |
+ |                  point.                                                |
+ |   <a href="../Includes_and_Autodocs_2._guide/node0418.html">AreaEllipse()</a>  Draw a filled ellipse with the given radii and center |
+ |                  point.                                                |
+ |         <a href="../Includes_and_Autodocs_2._guide/node043C.html">Flood()</a>  Flood fill a region starting at a given coordinate.   |
+ |      <a href="../Includes_and_Autodocs_2._guide/node046D.html">RectFill()</a>  Flood fill a rectangular area at a given location and |
+ |                  size.                                                 |
+<a name="line101"> |________________________________________________________________________|</a>
+
+  ________________________________________________________________________
+ |                                                                        |
+ |         Data Movement                                                  |
+ |           Functions               Description                          |
+ |========================================================================|
+ |               <a href="../Includes_and_Autodocs_2._guide/node0421.html">BltClear()</a>  Use the hardware blitter to clear a block of |
+ |                           memory.                                      |
+ |                <a href="../Includes_and_Autodocs_2._guide/node047B.html">SetRast()</a>  Fill the RastPort.BitMap with a given color. |
+ |           <a href="../Includes_and_Autodocs_2._guide/node0473.html">ScrollRaster()</a>  Move a portion of a RastPort.BitMap.         |
+ |             <a href="../Includes_and_Autodocs_2._guide/node0423.html">BltPattern()</a>  Draw a rectangular pattern of pixels into a  |
+ |                           RastPort.BitMap.  The x-dimension of the     |
+ |                           rectangle must be word-aligned and           |
+ |                           word-sized.                                  |
+ |            <a href="../Includes_and_Autodocs_2._guide/node0424.html">BltTemplate()</a>  Draw a rectangular pattern of pixels into a  |
+ |                           RastPort.BitMap.  The x-dimension of the     |
+ |                           rectangle can be arbitrarily bit-aligned and |
+ |                           sized.                                       |
+ |              <a href="../Includes_and_Autodocs_2._guide/node041F.html">BltBitMap()</a>  Copy a rectangular area from one <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a> to a |
+ |                           given coordinate in another BitMap.          |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0420.html">BltBitMapRastPort()</a>  Copy a rectangular area from a BitMap to a   |
+ |                           given coordinate in a RastPort.BitMap.       |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0422.html">BltMaskBitMapRastPort()</a>  Copy a rectangular area from a BitMap to a   |
+ |                           RastPort.BitMap through a mask bitplane.     |
+ |               <a href="../Includes_and_Autodocs_2._guide/node042D.html">ClipBlit()</a>  Copy a rectangular area from one <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> to |
+ |                           another with respect to their <a href="../Libraries_Manual_guide/node03E4.html">Layer</a>s.        |
+ |            <a href="../Includes_and_Autodocs_2._guide/node041E.html">BitMapScale()</a>  Scale a rectangular area within a BitMap to  |
+ |                           new dimensions (V36).                        |
+<a name="line130"> |________________________________________________________________________|</a>
+
+  ________________________________________________________________________
+ |                                                                        |
+ |  Hardware Programming                                                  |
+ |       Functions                   Description                          |
+ |========================================================================|
+ |     <a href="../Includes_and_Autodocs_2._guide/node0466.html">OwnBlitter()</a>  Obtain exclusive access to the Amiga's hardware      |
+ |                   blitter.                                             |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0433.html">DisownBlitter()</a>  Relinquish exclusive access to the blitter.          |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0489.html">WaitBlit()</a>  Suspend until the current blitter operation has      |
+ |                   completed.                                           |
+ |          <a href="../Includes_and_Autodocs_2._guide/node0468.html">QBlit()</a>  Place a bltnode-style asynchronous blitter request   |
+ |                   in the system queue                                  |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0469.html">QBSBlit()</a>  Place a bltnode-style asynchronous blitter request   |
+ |                   in the beam synchronized queue.                      |
+ |------------------------------------------------------------------------|
+ |          <a href="../Includes_and_Autodocs_2._guide/node0428.html">CINIT()</a>  Initialize the user Copper list buffer.              |
+ |          <a href="../Includes_and_Autodocs_2._guide/node0432.html">CWAIT()</a>  Instructs the Copper to wait for the video beam to   |
+ |                   reach a given position.                              |
+ |          <a href="../Includes_and_Autodocs_2._guide/node0430.html">CMOVE()</a>  Instructs the Copper to place a value into a given   |
+ |                   hardware register.                                   |
+ |          <a href="../Includes_and_Autodocs_2._guide/node0425.html">CBump()</a>  Instructs the Copper to increment its Copper list    |
+ |                   pointer.                                             |
+ |           <a href="../Includes_and_Autodocs_2._guide/node0426.html">CEND()</a>  Terminate the user Copper list.                      |
+ |________________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

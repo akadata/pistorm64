@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_23" NODE="23-1-2" TITLE="23 / List Structure / Node Initialization" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>23 / List Structure / Node Initialization</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02D9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02DB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Before linking a node into a list, certain fields may need initialization.
+Initialization consists of setting the <a href="../Libraries_Manual_guide/node02D9.html#line31">ln_Type</a>, <a href="../Libraries_Manual_guide/node02D9.html#line34">ln_Pri</a>, and <a href="../Libraries_Manual_guide/node02D9.html#line38">ln_Name</a> fields
+to their appropriate values (A <a href="../Libraries_Manual_guide/node02D9.html#line7">MinNode</a> structure does not have these
+fields).  The successor and predecessor fields do not require
+<a name="line6">initialization.</a>
+
+The <a href="../Libraries_Manual_guide/node02D9.html#line31">ln_Type</a> field contains the data type of the node.  This indicates to
+Exec (and other subsystems) the type, and hence the structure, of the
+content portion of the node (the extra data after the <a href="../Libraries_Manual_guide/node02D9.html#line19">Node</a> structure).
+The standard system types are defined in the &#060;exec/<a href="../Includes_and_Autodocs_2._guide/node0091.html#line43">nodes.h</a>&#062; include file.
+Some examples of standard system types are NT_TASK, NT_INTERRUPT,
+<a name="line13">NT_DEVICE, and NT_MSGPORT.</a>
+
+The <a href="../Libraries_Manual_guide/node02D9.html#line34">ln_Pri</a> field uses a signed numerical value ranging from +127 to -128
+to indicate the priority of the node.  Higher-priority nodes have greater
+values; for example, 127 is the highest priority, zero is nominal
+priority, and -128 is the lowest priority.  Some Exec lists are kept
+sorted by priority order.  In such lists, the highest-priority node is at
+the head of the list, and the lowest-priority node is at the tail of the
+list.  Most Exec node types do not use a priority.  In such cases,
+<a name="line22">initialize the priority field to zero.</a>
+
+The <a href="../Libraries_Manual_guide/node02D9.html#line38">ln_Name</a> field is a pointer to a NULL-terminated string of characters.
+Node names are used to find and identify list-bound objects (like public
+message ports and libraries), and to bind symbolic names to actual nodes.
+Names are also useful for debugging purposes, so it is a good idea to
+provide every node with a name.  Take care to provide a valid name
+pointer; Exec does not copy name strings.
+
+This fragment initializes a <a href="../Libraries_Manual_guide/node02D9.html#line19">Node</a> called myInt, an instance of the
+<a href="../Libraries_Manual_guide/node02D9.html#line47">Interrupt</a> data structure introduced above.
+
+    struct Interrupt interrupt;
+
+    interrupt.is_Node.ln_Type = NT_INTERRUPT;
+    interrupt.is_Node.ln_Pri  = -10;
+    interrupt.is_Node.ln_Name = &#034;sample.interrupt&#034;;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

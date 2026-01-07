@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-2-2" TITLE="30 / Regions / Installing Regions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / Regions / Installing Regions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03F9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03FB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Use the function <a href="../Includes_and_Autodocs_2._guide/node0399.html">InstallClipRegion()</a> to install the region.
+
+    struct Region *InstallClipRegion( struct Layer *layer,
+                                      struct Region *region );
+
+This installs a transparent clipping region to a layer.  All subsequent
+graphics calls will be clipped to this region.  The region must be removed
+with a second call to <a href="../Includes_and_Autodocs_2._guide/node0399.html">InstallClipRegion()</a> before removing the layer.
+
+    /*
+    ** Sample installation and removal of a clipping region
+    */
+    register struct Region     *new_region ;
+    register struct Region     *old_region ;
+
+    /* If the application owns the layer and has not installed a region,
+    ** old_region will return NULL here.
+    */
+    old_region = InstallClipRegion(win-&#062;WLayer, new_region);
+
+    /* draw into the layer or window */
+
+    if (NULL != (old_region = InstallClipRegion(win-&#062;WLayer, old_region)))
+        {
+        /* throw the used region away.  This region could be saved and
+        ** used again later, if desired by the application.
+        */
+        DisposeRegion(new_region) ;
+        }
+<a name="line31"></a>
+
+    A Warning About InstallClipRegion().
+    ------------------------------------
+    The program must not call <a href="../Includes_and_Autodocs_2._guide/node0399.html">InstallClipRegion()</a> inside of a
+    <a href="../Libraries_Manual_guide/node011E.html">Begin</a>/<a href="../Libraries_Manual_guide/node011E.html#line25">EndRefresh()</a> or <a href="../Libraries_Manual_guide/node03EF.html#line32">Begin/EndUpdate()</a> pair.  The following code
+    segment shows how to modify the user clipping region when using these
+    calls.  See the Autodoc for <a href="../Includes_and_Autodocs_2._guide/node0200.html">BeginRefresh()</a> for more details.
+
+
+    register struct Region     *new_region ;
+    register struct Region     *old_region ;
+
+    /* you have to have already setup the new_region and old_region */
+
+    BeginRefresh(window);
+    /* draw through the damage list */
+    /* into the layer or window */
+    EndRefresh(window, FALSE);              /* keep the damage list */
+
+    old_region = InstallClipRegion(win-&#062;WLayer, new_region);
+
+    BeginRefresh(window);
+    /* draw through the damage list and the new_region */
+    /* into the layer or window */
+    EndRefresh(window, FALSE);              /* keep the damage list */
+
+    /* put back the old region */
+    new_region = InstallClipRegion(win-&#062;WLayer, old_region);
+
+    BeginRefresh(window);
+    EndRefresh(window, TRUE);               /* remove the damage list */
+
+    old_region = InstallClipRegion(win-&#062;WLayer, new_region);
+
+    BeginRefresh(window);
+    /* draw through the new_region only into the layer or window */
+    EndRefresh(window, FALSE);
+
+    /* finally get rid of the new region, old_region still installed */
+    if (NULL != (new_region = InstallClipRegion(win-&#062;WLayer, old_region)))
+        DisposeRegion(new_region) ;
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

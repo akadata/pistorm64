@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/commodities" NODE="InvertKeyMap()" TITLE="commodities.library/InvertKeyMap" -->
+<head>
+<title>commodities.library/InvertKeyMap</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01AD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01AF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    InvertKeyMap -- generate an input event from an ANSI code. (V36)
+
+SYNOPSIS
+    success = InvertKeyMap(ansicode,event,km)
+                           D0       A0    A1
+
+    BOOL InvertKeyMap(ULONG,struct <a href="../Includes_and_Autodocs_2._guide/node0051.html#line198">InputEvent</a> *,struct <a href="../Includes_and_Autodocs_2._guide/node003A.html#line22">KeyMap</a> *);
+
+FUNCTION
+    This function uses the system call <a href="../Includes_and_Autodocs_2._guide/node0314.html">MapANSI()</a> to figure out what
+    <a href="../Includes_and_Autodocs_2._guide/node0051.html#line198">InputEvent</a> translates to an ANSI character code 'ansicode'. The
+    <a href="../Includes_and_Autodocs_2._guide/node0051.html#line198">InputEvent</a> pointed to by 'event' is filled in with that information.
+    The <a href="../Includes_and_Autodocs_2._guide/node003A.html#line22">KeyMap</a> 'km' is used for the translation, unless it is NULL, in
+    which case the system default keymap (as defined when
+    commodities.library is initialized) is used.
+
+INPUTS
+    ansicode - the ANSI code to convert to an input event
+    event - the <a href="../Includes_and_Autodocs_2._guide/node0051.html#line198">InputEvent</a> to fill-in
+    km - the keymap to use for the translation, or NULL to use the
+         system default keymap.
+
+RESULTS
+    success - TRUE if the translation worked, FALSE otherwise.
+
+BUGS
+    This function currently handles one-deep dead keys (such as
+    &#060;alt f&#062;o). It does not look up the high key map (keystrokes
+    with scan codes greater than 0x40), and misses system changes to
+    the default key map.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0160.html">cx_lib/InvertString()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

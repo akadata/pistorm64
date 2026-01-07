@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="SetMaxPen()" TITLE="graphics.library/SetMaxPen" -->
+<head>
+<title>graphics.library/SetMaxPen</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0323.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0325.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       SetMaxPen -- set maximum pen value for a rastport (V39).
+
+
+<b>   SYNOPSIS</b>
+       SetMaxPen ( rp, maxpen)
+   		    a0   d0
+
+	void SetMaxPen(struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *,ULONG)
+
+<b>   FUNCTION</b>
+	This will instruct the graphics library that the owner of the rastport
+	will not be rendering in any colors whose index is &#062;maxpen. If there
+	are any speed optimizations which the graphics device can make based
+	on this fact (for instance, setting the pixel write mask), they will
+	be done.
+
+	Basically this call sets the rastport mask, if this would improve
+	speed. On devices where masking would slow things down (like with
+	chunky pixels), it will be a no-op.
+
+<b>   INPUTS</b>
+       rp  =  a pointer to a valid <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> structure.
+	maxpen =  a longword pen value.
+
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+	The maximum pen value passed must take into account not only which
+	colors you intend to render in the future, but what colors you will
+	be rendering on top of.
+	SetMaxPen(rp,0) doesn't make much sense.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node032E.html">SetWriteMask()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_19" NODE="19-6" TITLE="19 Exec Device I/O / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>19 Exec Device I/O / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02A4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02A6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following chart gives a brief description of the Exec functions that
+control device I/O.  See the Amiga ROM Kernel Reference Manual: Includes
+and Autodocs for details about each call.
+
+
+                  Table 19-4: Exec Device I/O Functions
+  ______________________________________________________________________
+ |                                                                      |
+ |     Exec Device                                                      |
+ |     I/O Function                  Description                        |
+ |======================================================================|
+ |  <a href="../Includes_and_Autodocs_2._guide/node0344.html">CreateIORequest()</a>  Create an <a href="../Libraries_Manual_guide/node029D.html">IORequest</a> structure (V36).             |
+ |  <a href="../Includes_and_Autodocs_2._guide/node0348.html">DeleteIORequest()</a>  Delete an IORequest created by CreateIORequest() |
+ |                     (V36).                                           |
+ |       <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>  Gain access to an Exec device.                   |
+ |      <a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>  Close Exec device opened with OpenDevice().      |
+ |             <a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>  Perform a device I/O command and wait for        |
+ |                     completion.                                      |
+ |           <a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>  Initiate an I/O command.  Do not wait for it to  |
+ |                     complete.                                        |
+ |          <a href="../Includes_and_Autodocs_2._guide/node033E.html">CheckIO()</a>  Get the status of an IORequest.                  |
+ |           <a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a>  Wait for completion of an I/O request.           |
+ |          <a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a>  Attempt to abort an I/O request that is in       |
+ |                     progress.                                        |
+ |______________________________________________________________________|
+
+
+             Table 19-5: Exec Support Functions in amiga.lib
+  ______________________________________________________________________
+ |                                                                      |
+ |        Function                   Description                        |
+ |======================================================================|
+ |          <a href="../Includes_and_Autodocs_2._guide/node0141.html">BeginIO()</a>  Initiate an asynchronous device I/O request.     |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>  Create an <a href="../Libraries_Manual_guide/node029D.html">IORequest</a> data structure.              |
+ |      <a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>  Free an IORequest structure allocated by         |
+ |                     CreateExtIO().                                   |
+ |______________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

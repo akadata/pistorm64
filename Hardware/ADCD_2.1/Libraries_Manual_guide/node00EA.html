@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-4-4" TITLE="3 / Public Screen Functions / Searching the Public Screen List" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Public Screen Functions / Searching the Public Screen List</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00E9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00EB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To access an existing <a href="../Libraries_Manual_guide/node00E6.html">public screen</a> the application may take one of three
+approaches.  To get a lock on the default public screen, either
+<a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen</a>(NULL) or {<a href="../Libraries_Manual_guide/node0124.html#line129">WA_PubScreenName</a> , NULL} may be used.
+
+If the name of the screen is known, the application may use
+<a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a> to gain a lock on the screen as shown in the
+<a href="../Libraries_Manual_guide/node05B5.html#line28">example above</a> (or use <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> with the <a href="../Libraries_Manual_guide/node0124.html#line129">WA_PubScreenName</a> tag as
+described in the  &#034;<a href="../Libraries_Manual_guide/node0106.html#line13">Intuition Windows</a>&#034; chapter).  Failure to lock the
+screen or open the window probably indicates that the screen does not
+exist.
+
+A third approach is to search the <a href="../Libraries_Manual_guide/node00E6.html">public screen</a> list for a screen that
+meets the requirements of the application.  These requirements may be
+related to the name or attributes of the screen.  Here are the functions
+to use with the public screen list maintained by Intuition.
+<a name="line17"></a>
+
+                Table 3-7: Public Screen List Functions
+  _____________________________________________________________________
+ |                                                                     |
+ |    <a href="../Includes_and_Autodocs_2._guide/node0226.html">LockPubScreenList()</a>  Lock the public screen list maintained by   |
+ |                         Intuition so that it may be quickly copied. |
+ |                                                                     |
+ |  <a href="../Includes_and_Autodocs_2._guide/node025E.html">UnlockPubScreenList()</a>  Release the lock on the public screen list. |
+ |                                                                     |
+ |        <a href="../Includes_and_Autodocs_2._guide/node0231.html">NextPubScreen()</a>  Find the next screen in the public screen   |
+ |                         list.                                       |
+ |_____________________________________________________________________|
+<a name="line30"></a>
+
+The main function used to access the <a href="../Libraries_Manual_guide/node00E6.html">public screen</a> list is
+<a href="../Includes_and_Autodocs_2._guide/node0226.html">LockPubScreenList()</a>.  This function, intended for use by the public screen
+manager utility, locks the list to allow data from it to be quickly
+copied.  The list is stored in an Exec List structure, with each node in
+the list being a <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line381">PubScreenNode</a> structure.  See &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DD.html">screens</a>&#062; for
+<a name="line37">details.</a>
+
+Do not interpret the list while in a locked state, instead, copy any
+values required to local variables and release the lock.  All required
+data must be copied, including the name of the screen which is not part of
+the structure.  Pointers that reference the list or structures attached to
+the list are not valid after releasing the lock.  Once the lock is
+released, the screen pointers in the list (<a href="../Includes_and_Autodocs_2._guide/node00DD.html#line381">psn_Screen</a>) may be tested for
+equality against other screen pointers, but referencing any part of the
+screen structure from this pointer is strictly illegal.  After the lock is
+released with <a href="../Includes_and_Autodocs_2._guide/node025E.html">UnlockPubScreenList()</a>, the application may access the data
+in the screen structure by obtaining a lock on the screen using
+<a name="line49"><a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a> with the name of the screen.</a>
+
+The application should only require accessing three fields in the
+<a href="../Includes_and_Autodocs_2._guide/node00DD.html#line381">PubScreenNode</a>, these are ln_Name, psn_Screen and psn_Flags.  The name of
+the <a href="../Libraries_Manual_guide/node00E6.html">public screen</a> is maintained in the ln_Name field of the Node
+(psn_Node) structure.  Access to other information on the screen may be
+done by getting a lock on this name and reading the data from the <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a>
+structure.  The screen pointer (psn_Screen) may only be used for testing
+against other screen pointers, never reference the screen structure from
+this value.  Finally, the public screen flags are maintained in psn_Flags.
+Currently, only PSNF_PRIVATE is defined for this field.  PSNF_PRIVATE
+indicates that the screen is not currently public.
+
+Remember that all information in the <a href="../Libraries_Manual_guide/node00E6.html">public screen</a> list is transitory,
+that is, it may change at any time.  Do not rely on the values in the
+list.  The only way to ensure the existence or mode of a screen is to lock
+it, either directly with <a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a> or by opening a window on the
+screen.  To update the copy of the list, lock it and copy the data again.
+<a name="line67">Don't forget to release the lock when finished.</a>
+
+As an alternative to dealing with the <a href="../Libraries_Manual_guide/node00E6.html">public screen</a> list, <a href="../Includes_and_Autodocs_2._guide/node0231.html">NextPubScreen()</a>
+can be used.  This call takes the name of a public screen as its argument
+and returns the name of the next screen in the public screen list.  This
+helps an application move a window through the entire rotation of public
+screens.  Repeated calls to NextPubScreen() could be used to get the names
+of all public screens one at a time.  Keep in mind though that the list of
+public screens is subject to sudden change; the task that owns a public
+screen might close it after you obtain the name, but before you access the
+screen.
+
+Always use <a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a> to access screen information after scanning the
+<a href="../Libraries_Manual_guide/node00E6.html">public screen</a> list.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

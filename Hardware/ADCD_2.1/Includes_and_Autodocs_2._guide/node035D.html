@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="InitSemaphore()" TITLE="exec.library/InitSemaphore" -->
+<head>
+<title>exec.library/InitSemaphore</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node035C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node035E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    InitSemaphore -- initialize a signal semaphore
+
+SYNOPSIS
+    InitSemaphore(signalSemaphore)
+                  A0
+
+    void InitSemaphore(struct <a href="../Includes_and_Autodocs_2._guide/node0082.html#line40">SignalSemaphore</a> *);
+
+FUNCTION
+    This function initializes a signal semaphore and prepares it for
+    use.  It does not allocate anything, but does initialize list
+    pointers and the semaphore counters.
+
+    Semaphores are often used to protect critical data structures
+    or hardware that can only be accessed by one task at a time.
+    After initialization, the address of the <a href="../Includes_and_Autodocs_2._guide/node0082.html#line40">SignalSemaphore</a> may be
+    made available to any number of tasks.  Typically a task will
+    try to <a href="../Includes_and_Autodocs_2._guide/node0362.html">ObtainSemaphore()</a>, passing this address in.  If no other
+    task owns the semaphore, then the call will lock and return
+    quickly.  If more tasks try to <a href="../Includes_and_Autodocs_2._guide/node0362.html">ObtainSemaphore()</a>, they will
+    be put to sleep.  When the owner of the semaphore releases
+    it, the next waiter in turn will be woken up.
+
+    Semaphores are often preferable to the old-style <a href="../Includes_and_Autodocs_2._guide/node0369.html">Forbid()/Permit()</a>
+    type arbitration.  With <a href="../Includes_and_Autodocs_2._guide/node0369.html">Forbid()/Permit()</a> *all* other tasks are
+    prevented from running.  With semaphores, only those tasks that
+    need access to whatever the semaphore protects are subject
+    to waiting.
+
+INPUT
+    signalSemaphore -- a signal semaphore structure (with all fields
+                       set to zero before the call)
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0362.html">ObtainSemaphore()</a>, <a href="../Includes_and_Autodocs_2._guide/node0364.html">ObtainSemaphoreShared()</a>, <a href="../Includes_and_Autodocs_2._guide/node0336.html">AttemptSemaphore()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node036D.html">ReleaseSemaphore()</a>, <a href="../Includes_and_Autodocs_2._guide/node0082.html">exec/semaphores.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

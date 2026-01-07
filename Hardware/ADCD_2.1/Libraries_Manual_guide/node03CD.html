@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-8-8" TITLE="28 / Animation with GELs / Your Own Animation Routine Calls" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Animation with GELs / Your Own Animation Routine Calls</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03CC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03CE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a> and <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a> structures can include pointers for your own
+routines that you want the system to call.  These pointers are stored in
+the AnimOb's AnimORoutine field and in the AnimComp's AnimCRoutine field,
+respectively.
+
+When <a href="../Libraries_Manual_guide/node03CC.html">Animate()</a> is called, the system performs the following steps for
+every <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a> in the AnimKey list:
+
+    * Updates the <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a>'s location and velocities.
+
+    * Calls the <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a>.AnimORoutine routine if one is supplied.
+
+    * The for each <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a> of the <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a>:
+
+         &#183; If this sequence times out, switches to the new <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a>.
+
+         &#183; Calls the <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a>.AnimCRoutine if one is supplied.
+
+         &#183; Sets the underlying <a href="../Libraries_Manual_guide/node0381.html">VSprite</a>'s x,y coordinates.
+
+If you want a routine to be called, you put the address of the routine in
+either <a href="../Libraries_Manual_guide/node03B9.html#line3">AnimComp</a>.AnimCRoutine or <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a>.AnimORoutine member as needed.  If
+no routine is to be called, you must set these fields to NULL.  Your
+routines will be passed one parameter, a pointer to the AnimOb or AnimComp
+it was related to.  You can use the user structure extensions discussed
+earlier to hold the variables you need for your own routines.
+
+For example, if you provide a routine such as this:
+
+    VOID MyOCode(struct AnimOb *anOb)
+    {
+    /* whatever needs to be done */
+    }
+
+Then, if you put the address of the routine in an <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a> structure:
+
+    myAnimOb.AnimORoutine = MyOCode;
+
+MyOCode() will be called with the address of this <a href="../Libraries_Manual_guide/node03B9.html#line34">AnimOb</a> when <a href="../Libraries_Manual_guide/node03CC.html">Animate()</a>
+processes this AnimOb.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

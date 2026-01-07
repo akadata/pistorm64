@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="serial" NODE="CMD_STOP" TITLE="serial.device/CMD_STOP" -->
+<head>
+<title>serial.device/CMD_STOP</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node055D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node055F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       Stop -- pause all current I/O over the serial port
+
+<b>   FUNCTION</b>
+       This command halts all current I/O on the serial port by
+       sending an xOFF to the &#034;other side&#034;, and submitting a &#034;logical
+       xOFF&#034; to &#034;our side&#034;, if/when appropriate to current activity.
+
+<b>   IO REQUEST</b>
+       io_Message      mn_ReplyPort initialized
+       io_Device       set by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+       io_Unit         set by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+       io_Command      CMD_STOP
+
+<b>   RESULTS</b>
+
+<b>   SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node055D.html">serial.device/CMD_START</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="TextFit()" TITLE="graphics.library/TextFit" -->
+<head>
+<title>graphics.library/TextFit</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0333.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0335.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	TextFit - count characters that will fit in a given extent (V36)
+
+<b>   SYNOPSIS</b>
+	chars = TextFit(rastport, string, strLen, textExtent,
+	D0              A1        A0      D0      A2
+	        constrainingExtent, strDirection,
+	        A3                  D1
+	        constrainingBitWidth, constrainingBitHeight)
+	        D2                    D3
+
+	ULONG TextFit(struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>,
+	    struct <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line163">TextExtent</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line163">TextExtent</a> *, WORD, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line43">UWORD</a>, UWORD);
+
+<b>   FUNCTION</b>
+	This function determines how many of the characters of the
+	provided string will fit into the space described by the
+	constraining parameters.  It also returns the extent of
+	that number of characters.
+
+<b>   INPUTS</b>
+	rp     - a pointer to the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> which describes where the
+	         text attributes reside.
+	string - the address of string to determine the constraint of
+	strLen - The number of characters in the string.
+	         If zero, there are no characters in the string.
+	textExtent - a structure to hold the extent result.
+	constrainingExtent - the extent that the text must fit in.
+	    This can be NULL, indicating only the constrainingBit
+	    dimensions will describe the constraint.
+	strDirection - the offset to add to the string pointer to
+	    get to the next character in the string.  Usually 1.
+	    Set to -1 and the string to the end of the string to
+	    perform a TextFit() anchored at the end.  No other value
+	    is valid.
+	constrainingBitWidth - an alternative way to specify the
+	    rendering box constraint width that is independent of
+	    the rendering origin.  Range 0..32767.
+	constrainingBitHeight - an alternative way to specify the
+	    rendering box constraint height that is independent of
+	    the rendering origin.  Range 0..32767.
+
+<b>   RESULTS</b>
+	chars - the number of characters from the origin of the
+	        given string that will fit in both the constraining
+	        extent (which specifies a CP bound and a rendering
+	        box relative to the origin) and in the rendering width
+	        and height specified.
+
+<b>   NOTES</b>
+	The result is zero chars and an empty textExtent when the fit
+	cannot be performed.  This occurs not only when no text will
+	fit in the provided constraints, but also when:
+	-   the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> rp's rp_TxSpacing sign and magnitude is so
+	    great it reverses the path of the text.
+	-   the constrainingExtent does not include x = 0.
+
+
+<b>   BUGS</b>
+	Under V37, TextFit() would return one too few characters if the
+	font was proportional. This can be worked around by passing
+	(constrainingBitWidth + 1) for proportional fonts. This is fixed
+	for V39.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0333.html">TextExtent()</a>  <a href="../Includes_and_Autodocs_3._guide/node0335.html">TextLength()</a>  <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05EC.html">graphics/text.h</a>  <a href="../Includes_and_Autodocs_3._guide/node05D7.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

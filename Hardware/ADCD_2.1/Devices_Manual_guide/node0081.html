@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_4" NODE="4-1" TITLE="4 Console Device / Console Device Commands and Functions" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>4 Console Device / Console Device Commands and Functions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0080.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0082.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Command              Operation
+-------              ---------
+<a href="../Devices_Manual_guide/node0096.html#line5">CD_ASKDEFAULTKEYMAP</a>  Get the current default keymap.
+
+<a href="../Includes_and_Autodocs_2._guide/node0502.html">CD_ASKKEYMAP</a>         Get the current key map structure for this console.
+
+<a href="../Devices_Manual_guide/node0096.html#line5">CD_SETDEFAULTKEYMAP</a>  Set the current default keymap.
+
+<a href="../Includes_and_Autodocs_2._guide/node0504.html">CD_SETKEYMAP</a>         Set the current key map structure for this console.
+
+<a href="../Includes_and_Autodocs_2._guide/node0506.html">CMD_CLEAR</a>            Remove any reports waiting to satisfy read requests
+                     from the console input buffer.
+
+<a href="../Devices_Manual_guide/node008F.html">CMD_READ</a>             Read the next input, generally from the keyboard.
+                     The form of this input is as an ANSI byte stream.
+
+<a href="../Devices_Manual_guide/node008A.html">CMD_WRITE</a>            Write a text record to the display interpreting
+                     any ANSI control characters in the record.
+
+
+Console Device Function
+-----------------------
+<a href="../Includes_and_Autodocs_2._guide/node0505.html">CDInputHandler()</a>     Handle an input event for the console device.
+
+<a href="../Includes_and_Autodocs_2._guide/node050A.html">RawKeyConvert()</a>      Decode raw input classes and convert input events of
+                     type IECLASS_RAWKEY to ANSI bytes based on the keymap
+                     in use.
+
+
+Exec Functions as Used in This Chapter
+--------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0323.html">AbortIO()</a>            Abort an I/O request to the console device.
+
+<a href="../Includes_and_Autodocs_2._guide/node033E.html">CheckIO()</a>            Return the status of an I/O request.
+
+<a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a>        Relinquish use of the console device.  All requests
+                     must be complete before closing.
+
+<a href="../Includes_and_Autodocs_2._guide/node034B.html">DoIO()</a>               Initiate a command and wait for completion
+                     (synchronous request).
+
+<a href="../Includes_and_Autodocs_2._guide/node035A.html">GetMsg()</a>             Get the next message from the reply port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0509.html">OpenDevice()</a>         Obtain use of the console device.  You specify the
+                     type of unit and its characteristics in the call to
+                     OpenDevice().
+
+<a href="../Includes_and_Autodocs_2._guide/node0367.html">OpenLibrary()</a>        Gain access to a library.
+
+<a href="../Includes_and_Autodocs_2._guide/node0239.html">OpenWindow()</a>         Open an intuition window.
+
+<a href="../Includes_and_Autodocs_2._guide/node037A.html">SendIO()</a>             Initiate a command and return immediately
+                     (asynchronous request).
+
+<a href="../Includes_and_Autodocs_2._guide/node038A.html">Wait()</a>               Wait for one or more signals.
+
+<a href="../Includes_and_Autodocs_2._guide/node038B.html">WaitIO()</a>             Wait for completion of an I/O request and remove it
+                     from the reply port.
+
+<a href="../Includes_and_Autodocs_2._guide/node038C.html">WaitPort()</a>           Wait for the reply port to be non-empty. Does not
+                     remove the message from port.
+
+
+Exec Support Functions as Used in This Chapter
+----------------------------------------------
+<a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>        Create an extended I/O request structure for use in
+                     communicating with the console device.
+
+<a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>         Create a message port for reply messages from the
+                     console device.  Exec will signal a task when a
+                     message arrives at the port.
+
+<a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a>        Delete the extended I/O request structure created by
+                     <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>.
+
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>         Delete the message port created by <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

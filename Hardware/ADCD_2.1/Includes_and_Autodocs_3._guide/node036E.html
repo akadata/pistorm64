@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="iffparse" NODE="LocalItemData()" TITLE="iffparse.library/LocalItemData" -->
+<head>
+<title>iffparse.library/LocalItemData</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node036D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node036F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	LocalItemData -- get pointer to user data for local context item. (V36)
+
+<b>   SYNOPSIS</b>
+	data = LocalItemData(localItem);
+	D0                   A0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line37">APTR</a> LocalItemData(struct <a href="../Includes_and_Autodocs_3._guide/node05E8.html#line103">LocalContextItem</a> *);
+
+<b>   FUNCTION</b>
+	Returns pointer to the user data associated with the given local
+	context item. The size of the data area depends on the &#034;dataSize&#034;
+	argument used when allocating this item. If the pointer to the item
+	given (localItem) is NULL, this function returns NULL.
+
+<b>   INPUTS</b>
+	localItem - pointer to local context item or NULL.
+
+<b>   RESULT</b>
+	data - pointer to user data area or NULL if localItem is NULL.
+
+<b>   BUGS</b>
+	Currently, there is no way to determine the size of the user data
+	area; you have to 'know'.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node035A.html">AllocLocalItem()</a>, <a href="../Includes_and_Autodocs_3._guide/node0367.html">FreeLocalItem()</a>, <a href="../Includes_and_Autodocs_3._guide/node05E8.html">&#060;libraries/iffparse.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

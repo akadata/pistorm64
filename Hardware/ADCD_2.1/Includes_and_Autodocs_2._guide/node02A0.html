@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="ExNext()" TITLE="dos.library/ExNext" -->
+<head>
+<title>dos.library/ExNext</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node029F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02A1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ExNext -- Examine the next entry in a directory
+
+SYNOPSIS
+    success = ExNext( lock, <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a> )
+    D0                 D1        D2
+
+    BOOL ExNext(BPTR, struct <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a> *)
+
+FUNCTION
+    This routine is passed a directory lock and a <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a> that
+    have been initialized by a previous call to <a href="../Includes_and_Autodocs_2._guide/node029C.html">Examine()</a>, or updated
+    by a previous call to ExNext().  ExNext() gives a return code of zero
+    on failure.  The most common cause of failure is reaching the end
+    of the list of files in the owning directory.  In this case, <a href="../Includes_and_Autodocs_2._guide/node02C2.html">IoErr</a>
+    will return ERROR_NO_MORE_ENTRIES and a good exit is appropriate.
+
+    So, follow these steps to examine a directory:
+    1) Pass a Lock and a <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a> to <a href="../Includes_and_Autodocs_2._guide/node029C.html">Examine()</a>.  The lock must
+       be on the directory you wish to examine.
+    2) Pass ExNext() the same lock and <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a>.
+    3) Do something with the information returned in the <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a>.
+       Note that the fib_DirEntryType field is positive for directories,
+       negative for files.
+    4) Keep calling ExNext() until it returns FALSE.  Check <a href="../Includes_and_Autodocs_2._guide/node02C2.html">IoErr()</a>
+       to ensure that the reason for failure was ERROR_NO_MORE_ENTRIES.
+
+    Note: if you wish to recursively scan the file tree and you find
+    another directory while ExNext()ing you must Lock that directory and
+    <a href="../Includes_and_Autodocs_2._guide/node029C.html">Examine()</a> it using a new <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a>.  Use of the same
+    <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a> to enter a directory would lose important state
+    information such that it will be impossible to continue scanning
+    the parent directory.  While it is permissible to <a href="../Includes_and_Autodocs_2._guide/node0307.html">UnLock()</a> and <a href="../Includes_and_Autodocs_2._guide/node02C6.html">Lock()</a>
+    the parent directory between ExNext() calls, this is NOT recommended.
+    Important state information is associated with the parent lock, so
+    if it is freed between ExNext() calls this information has to be
+    rebuilt on each new ExNext() call, and will significantly slow down
+    directory scanning.
+
+    It is NOT legal to <a href="../Includes_and_Autodocs_2._guide/node029C.html">Examine()</a> a file, and then to ExNext() from that
+    <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a>.       You may make a local copy of the <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a>, as
+    long as it is never passed back to the operating system.
+
+INPUTS
+    lock - BCPL pointer to a lock originally used for the <a href="../Includes_and_Autodocs_2._guide/node029C.html">Examine()</a> call
+    infoBlock - pointer to a <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a> used on the previous <a href="../Includes_and_Autodocs_2._guide/node029C.html">Examine()</a>
+                or ExNext() call.
+
+RESULTS
+    success - boolean
+
+SPECIAL NOTE
+    <a href="../Includes_and_Autodocs_2._guide/node0068.html#line62">FileInfoBlock</a> must be longword-aligned.  <a href="../Includes_and_Autodocs_2._guide/node027F.html">AllocDosObject()</a> will
+    allocate them correctly for you.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node029C.html">Examine()</a>, <a href="../Includes_and_Autodocs_2._guide/node02C6.html">Lock()</a>, <a href="../Includes_and_Autodocs_2._guide/node0307.html">UnLock()</a>, <a href="../Includes_and_Autodocs_2._guide/node02C2.html">IoErr()</a>, <a href="../Includes_and_Autodocs_2._guide/node029D.html">ExamineFH()</a>, <a href="../Includes_and_Autodocs_2._guide/node027F.html">AllocDosObject()</a>,
+    <a href="../Includes_and_Autodocs_2._guide/node029B.html">ExAll()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

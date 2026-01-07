@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/libraries/mathieeedp.h" NODE="MAIN" TITLE="Includes/libraries/mathieeedp.h" -->
+<head>
+<title>Includes/libraries/mathieeedp.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	LIBRARIES_MATHIEEEDP_H
+#define	LIBRARIES_MATHIEEEDP_H
+/*
+**	$Filename: libraries/mathieeedp.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 1.1 $
+**	$Date: 90/07/13 $
+**	Include file to use for &#060;math.h&#062;
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line13"></a>
+#ifndef PI
+#define PI	((double)	3.141592653589793))
+#endif
+<a name="line17"></a>
+<a name="line18">#define TWO_PI	(((double)	2)	* PI)</a>
+<a name="line19">#define PI2	(PI/((double)2))</a>
+#define PI4	(PI/((double)4))
+<a name="line21"></a>
+#ifndef	E
+#define	E	((double)	2.718281828459045)
+#endif
+<a name="line25"></a>
+<a name="line26">#define LOG10	((double)	2.302585092994046)</a>
+<a name="line27">#define FPTEN	((double)	10.0)</a>
+<a name="line28">#define	FPONE	((double)	1.0)</a>
+<a name="line29">#define FPHALF	((double)	0.5)</a>
+<a name="line30">#define FPZERO	((double)	0.0)</a>
+<a name="line31">#define trunc(x)	((int)	(x))</a>
+<a name="line32">#define round(x)	((int)	((x) + 0.5))</a>
+#define itof(i)		((double) (i))
+<a name="line34"></a>
+<a name="line35">#define	fabs	IEEEDPAbs</a>
+<a name="line36">#define floor	IEEEDPFloor</a>
+#define	ceil	IEEEDPCeil
+<a name="line38"></a>
+<a name="line39">#define	tan	IEEEDPTan</a>
+<a name="line40">#define	atan	IEEEDPAtan</a>
+<a name="line41">#define cos	IEEEDPCos</a>
+<a name="line42">#define acos	IEEEDPAcos</a>
+<a name="line43">#define sin	IEEEDPSin</a>
+<a name="line44">#define asin	IEEEDPAsin</a>
+<a name="line45">#define exp	IEEEDPExp</a>
+<a name="line46">#define pow(a,b)	IEEEDPPow((b),(a))</a>
+<a name="line47">#define log	IEEEDPLog</a>
+<a name="line48">#define log10	IEEEDPLog10</a>
+#define sqrt	IEEEDPSqrt
+<a name="line50"></a>
+<a name="line51">#define	sinh	IEEEDPSinh</a>
+<a name="line52">#define cosh	IEEEDPCosh</a>
+#define tanh	IEEEDPTanh
+
+<a name="line55"></a>
+<a name="line56">double	IEEEDPTan(),IEEEDPAtan();</a>
+<a name="line57">double	IEEEDPCos(),IEEEDPACos();</a>
+<a name="line58">double	IEEEDPSin(),IEEEDPASin();</a>
+<a name="line59">double	IEEEDPExp(),IEEEDPLog();</a>
+<a name="line60">double	IEEEDPSqrt();</a>
+<a name="line61">double	IEEEDPLog10(),IEEEDPPow();</a>
+<a name="line62">double	IEEEDPSincos();</a>
+<a name="line63">double	IEEEDPSinh(),IEEEDPCosh(),IEEEDPTanh();</a>
+<a name="line64">float	IEEEDPTieee();</a>
+double	IEEEDPFieee();
+
+int	IEEEDPFix();
+<a name="line68">int	IEEEDPCmp(),IEEEDPTst();</a>
+<a name="line69">double	IEEEDPFlt();</a>
+<a name="line70">double	IEEEDPAbs();</a>
+<a name="line71">double	IEEEDPNeg();</a>
+<a name="line72">double	IEEEDPAdd();</a>
+<a name="line73">double	IEEEDPSub();</a>
+<a name="line74">double	IEEEDPMul();</a>
+<a name="line75">double	IEEEDPDiv();</a>
+<a name="line76">double	IEEEDPFloor();</a>
+double	IEEEDPCeil();
+
+#endif	/* LIBRARIES_MATHIEEEDP_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

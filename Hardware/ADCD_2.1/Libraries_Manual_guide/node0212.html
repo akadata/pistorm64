@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-2-2-1" TITLE="12 / / Writing The Dispatcher / OM_NEW" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / Writing The Dispatcher / OM_NEW</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0211.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0213.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a> method returns a pointer to a newly created Boopsi object, or
+NULL if it failed to create the object.  This method receives the
+<a name="line4">following message structure (defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00E2.html#line76">classusr.h</a>&#062;):</a>
+
+    /* The OM_NEW method uses the same structure as OM_SET */
+
+    struct opSet {
+        ULONG             MethodID;
+        struct TagItem    *ops_AttrList;
+        struct GadgetInfo *ops_GInfo;
+    };
+
+The ops_AttrList field contains a pointer to a <a href="../Libraries_Manual_guide/node0497.html">TagItem</a> array of
+attribute/value pairs.  These contain the initial values of the new
+object's attributes.  The ops_GInfo field is always NULL for the <a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a>
+method.
+
+Unlike other methods, when a dispatcher gets an <a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a> message, the object
+pointer (recvobject from the <a href="../Libraries_Manual_guide/node0211.html">dispatchRKMModel()</a> prototype above) does not
+point to an object.  It doesn't make sense for recvobject to point to an
+object because the idea is to create a new object, not act on an existing
+one.
+
+The pointer normally used to pass a Boopsi object is instead used to pass
+the address of the object's &#034;true class&#034;.  An object's true class is the
+<a name="line27">class of which the object is an instance.</a>
+
+The first thing the dispatcher does when it processes an <a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a> message is
+pass the OM_NEW message on to its superclass's dispatcher. It does this
+using the amiga.lib function <a href="../Includes_and_Autodocs_2._guide/node0159.html">DoSuperMethodA()</a>:
+
+    ULONG DoSuperMethodA(Class *cl, Object *trueclass, Msg msg);
+
+Each dispatcher passes control to its superclass.  Eventually the message
+will arrive at the <a href="../Libraries_Manual_guide/node0200.html#line50">rootclass</a> dispatcher.  The <a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a> method in the
+rootclass dispatcher looks at the object's true class (trueclass from the
+prototype) to find out which class dispatcher is trying to create a new
+object.  Note that trueclass is not necessarily the same as the current
+dispatcher's class (cl from the <a href="../Libraries_Manual_guide/node0211.html">dispatchRKMModel()</a> prototype above),
+although this would be the case if the object's true class is a subclass
+<a name="line42">of the current dispatcher's class.</a>
+
+The <a href="../Libraries_Manual_guide/node0200.html#line50">rootclass</a> dispatcher uses the true class to find out how much memory
+to allocate for the object's instance data.  Each class keeps a record of
+how much memory its local instance data requires.  The rootclass
+dispatcher also looks at each class between the true class and rootclass
+to find out much memory the local instance data for those classes require.
+The rootclass dispatcher totals the amount of local instance data memory
+needed by the true class and each of its superclasses and allocates that
+much memory.
+
+If all goes well, the <a href="../Libraries_Manual_guide/node0200.html#line50">rootclass</a> dispatcher increments a private field in
+the true class that keeps track of how many instances of the true class
+there currently are.  It then returns a pointer to the newly created
+object and passes control back to the subclass dispatcher that called it,
+which is <a href="../Libraries_Manual_guide/node0200.html#line55">icclass</a> in the case of <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a>.  If there was a problem,
+the rootclass dispatcher does not increment the object count and passes
+back a NULL.
+
+When the <a href="../Libraries_Manual_guide/node0200.html#line50">rootclass</a> dispatcher returns, the <a href="../Libraries_Manual_guide/node0200.html#line55">icclass</a> dispatcher regains
+control from <a href="../Includes_and_Autodocs_2._guide/node0159.html">DoSuperMethodA()</a>.  DoSuperMethodA() will return either a
+pointer to the new object or else it returns NULL if there was an error.
+Although the rootclass dispatcher allocated all the memory the object
+needs, it only initialized the instance data local to rootclass. Now it's
+the icclass dispatcher's turn to do some work.  It has to initialize the
+<a name="line67">instance data that is local to icclass.</a>
+
+A dispatcher finds its local instance data by using the INST_DATA() macro
+(defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DA.html#line46">classes.h</a>&#062;):
+
+   void *INST_DATA(Class *localclass, Object *object);
+
+INST_DATA() takes two arguments, a pointer to a class and a pointer to the
+object.  The INST_DATA() macro returns a pointer to the instance data
+local to localclass.  When the <a href="../Libraries_Manual_guide/node0200.html#line55">icclass</a> dispatcher was called, it received
+three arguments, one of which was a pointer to the local class (icclass).
+The icclass dispatcher passes this pointer and the new object pointer it
+got from <a href="../Includes_and_Autodocs_2._guide/node0159.html">DoSuperMethodA()</a> to INST_DATA() to get a pointer to the instance
+data local to icclass.
+
+After initializing its local instance data, the <a href="../Libraries_Manual_guide/node0200.html#line55">icclass</a> dispatcher passes
+control back to the <a href="../Libraries_Manual_guide/node020D.html#line13">modelclass</a> dispatcher, which in turn, initializes the
+instance data local to modelclass.  Finally, the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> dispatcher
+regains control and now has to take care of its local instance data.
+
+To find its local instance data, the <a href="../Libraries_Manual_guide/node020F.html">rkmmodelclass</a> dispatcher needs a
+pointer to its Class and a pointer to the new object.  The dispatcher
+function gets its Class pointer as its first argument (cl from the
+<a href="../Libraries_Manual_guide/node0211.html">dispatchRKMModel()</a> prototype above).  It gets the new object pointer as
+the return value from <a href="../Includes_and_Autodocs_2._guide/node0159.html">DoSuperMethodA()</a>.  In this case, INST_DATA() returns
+a pointer to an <a href="../Libraries_Manual_guide/node0210.html#line18">RKMModData</a> structure.
+
+Now the dispatcher has to initialize its local instance data.  It has to
+scan through the tag list passed in the <a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a> message looking for initial
+values for the <a href="../Libraries_Manual_guide/node020F.html">RKMMOD_CurrVal</a> and <a href="../Libraries_Manual_guide/node0210.html">RKMMOD_Limit</a> attributes. As an
+alternative, the dispatcher's OM_NEW method can use its <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a> method to
+handle initializing these &#034;settable&#034; attributes.
+
+Finally, the dispatcher can return.  When the dispatcher returns from an
+<a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a> method, it returns a pointer to the new object.
+
+If the <a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a> method fails, it should tell the partially initialized
+object it got from its superclass's dispatcher to dispose of itself (using
+<a href="../Libraries_Manual_guide/node0211.html#line24">OM_DISPOSE</a>) and return NULL.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

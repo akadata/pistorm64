@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_7" NODE="7-6-2" TITLE="7 / Alerts / Creating Alerts" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>7 / Alerts / Creating Alerts</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01B2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01B4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The function <a href="../Includes_and_Autodocs_2._guide/node020B.html">DisplayAlert()</a> creates and displays an alert message.  The
+message will almost always be displayed regardless of the state of the
+machine (with the exception of catastrophic hardware failures).  If the
+user presses one of the mouse buttons, the display is restored to its
+original state, if possible.  If a recoverable alert cannot be displayed
+(because memory is low), DisplayAlert() will return FALSE, as if the user
+had selected cancel.  DisplayAlert() is also used by the system to display
+the Amiga system alert messages.
+
+    BOOL DisplayAlert( unsigned long alertNumber, UBYTE *string,
+<a name="line12">                       unsigned long height );</a>
+
+The alertNumber argument is a LONG value, specifying whether this is a
+<a href="../Libraries_Manual_guide/node01B2.html#line2">RECOVERY_ALERT</a> or a <a href="../Libraries_Manual_guide/node01B2.html#line12">DEADEND_ALERT</a> (see the &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D4.html#line1308">intuition.h</a>&#062; include
+file).
+
+The string argument points to a string that is made up of one or more
+substrings.  Each substring contains the following:
+
+  * The first component is a 16 bit x-coordinate and an 8 bit
+    y-coordinate describing where to position the substring within the
+    alert display.  The units are in pixels.  The y-coordinate describes
+    the location of the text baseline.
+
+  * The second component is the text itself.  The substring must be NULL
+    terminated (it ends with a zero byte).
+
+  * The last component is the continuation byte.  If this byte is zero,
+    this is the last substring in the message.  If this byte is non-zero,
+    there is another substring in this alert message.
+
+The complete string must be terminated by two NULL characters; one as the
+end of the last substring, and one as a NULL continuation byte, indicating
+that this was the last substring. The height argument is the number of
+display lines required for the alert.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="ReleaseSemaphore()" TITLE="exec.library/ReleaseSemaphore" -->
+<head>
+<title>exec.library/ReleaseSemaphore</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0227.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0229.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ReleaseSemaphore -- make signal semaphore available to others
+
+<b>   SYNOPSIS</b>
+	ReleaseSemaphore(signalSemaphore)
+			 A0
+
+	void ReleaseSemaphore(struct <a href="../Includes_and_Autodocs_3._guide/node0647.html#line39">SignalSemaphore</a> *);
+
+<b>   FUNCTION</b>
+	ReleaseSemaphore() is the inverse of <a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a>. It makes
+	the semaphore lockable to other users.	If tasks are waiting for
+	the semaphore and this this task is done with the semaphore then
+	the next waiting task is signalled.
+
+	Each <a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a> call must be balanced by exactly one
+	ReleaseSemaphore() call.  This is because there is a nesting count
+	maintained in the semaphore of the number of times that the current
+	task has locked the semaphore. The semaphore is not released to
+	other tasks until the number of releases matches the number of
+	obtains.
+
+	Needless to say, havoc breaks out if the task releases more times
+	than it has obtained.
+
+<b>   INPUT</b>
+       signalSemaphore -- an initialized signal semaphore structure
+
+<b>   NOTE</b>
+	This call is guaranteed to preserve all registers.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0217.html">InitSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node021D.html">ObtainSemaphore()</a>, <a href="../Includes_and_Autodocs_3._guide/node021F.html">ObtainSemaphoreShared()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

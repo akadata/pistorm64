@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="GfxAssociate()" TITLE="graphics.library/GfxAssociate" -->
+<head>
+<title>graphics.library/GfxAssociate</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node044A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node044C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    GfxAssociate -- associate a graphics extended node with a given pointer
+                    (V36)
+
+SYNOPSIS
+   GfxAssociate(pointer, node);
+                A0       A1
+
+    void GfxAssociate(VOID *, struct <a href="../Includes_and_Autodocs_2._guide/node00BA.html#line18">ExtendedNode</a> *);
+
+FUNCTION
+    Associate a special graphics extended data structure (each of which
+    begins with an <a href="../Includes_and_Autodocs_2._guide/node00BA.html#line18">ExtendedNode</a> structure)  with another structure via
+    the other structure's pointer. Later, when you call GfxLookUp()
+    with the other structure's pointer you may retrieve a pointer
+    to this special graphics extended data structure, if it is
+    available.
+
+INPUTS
+    pointer = a pointer to a data structure.
+    node = an <a href="../Includes_and_Autodocs_2._guide/node00BA.html#line18">ExtendedNode</a> structure to associate with the pointer
+
+RESULT
+    an association is created between the pointer and the node such
+    that given the pointer the node can be retrieved via GfxLookUp().
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00BA.html">graphics/gfxnodes.h</a> <a href="../Includes_and_Autodocs_2._guide/node044E.html">GfxNew()</a> <a href="../Includes_and_Autodocs_2._guide/node044C.html">GfxFree()</a> GfxLookUp()
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

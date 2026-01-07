@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="OpenScreenTagList()" TITLE="intuition.library/OpenScreenTagList" -->
+<head>
+<title>intuition.library/OpenScreenTagList</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0237.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0239.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    OpenScreenTagList -- <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a> with <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> extension array. (V36)
+    OpenScreenTags -- Varargs stub for OpenScreenTagList. (V36)
+
+SYNOPSIS
+    <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> = OpenScreenTagList( <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">NewScreen</a>, TagItems )
+    D0                          A0         A1
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> *OpenScreenTagList( struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">NewScreen</a> *,
+            struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> * );
+
+    <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> = OpenScreenTags( <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">NewScreen</a>, Tag1, ... )
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> *OpenScreenTags( struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">NewScreen</a> *,
+            ULONG, ... );
+
+FUNCTION
+    Provides an extension to the parameters passed to <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a>.
+    This extensions is in the form of (a pointer to) an array of
+    <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> structures, which have to fields: ti_Tag, an ID identifying
+    the meaning of the other field, ti_Data.  See <a href="../Includes_and_Autodocs_2._guide/node012E.html">&#060;utility/tagitem.h&#062;</a>.
+
+    The tag items can supplement or override the values in <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">NewScreen</a>.
+    In fact, you can pass a NULL value of the <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">NewScreen</a> pointer.
+    For that matter, if you pass NULL in both arguments, you'll get
+    a screen with defaults in all fields, including display mode,
+    depth, colors, dimension, title, and so on.  We ask that
+    you at least supply a title when you open a screen.
+
+    See <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a> documentation for parameter specifications.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">NewScreen</a>     - (optional) pointer to a <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">NewScreen</a> structure.
+    TagItems      - (optional) pointer to (an array of) <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a>
+                    structures, terminated by the value TAG_END.
+
+RESULT
+    <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a>     - an open Intuition screen.  See <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a> for
+            extended error codes when <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> is returned NULL.
+
+EXAMPLE
+    The version using a variable number of arguments must be
+    created for each particular compiler, and may not have
+    an analogue in all versions.  For vanilla, 32-bit C
+    parameter passing conventions, this works (and will
+    appear in amiga.lib):
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a>      *
+    OpenScreenTags( ns, tag1 )
+    struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line309">NewScreen</a>  *ns;
+    ULONG                   tag1;
+    {
+        struct <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a>  *OpenScreenTagList();
+
+        return ( OpenScreenTagList( ns, (struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *) &#038;tag1 ) );
+    }
+
+NOTES
+    We recommend this extension to <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a> over using the
+    field ExtNewScreen.Extension.  However, the ExtNewScreen.Extension
+    is a convenient way to supply a few tags to V36 Intuition which
+    will be ignored by V34 Intuition.  See <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a> documentation
+    for lots of details.
+
+BUGS
+
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

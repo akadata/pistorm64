@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="PointInImage()" TITLE="intuition.library/PointInImage" -->
+<head>
+<title>intuition.library/PointInImage</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03D7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03D9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME	</b>
+	PointInImage -- Tests whether an image &#034;contains&#034; a point. (V36)
+
+<b>   SYNOPSIS</b>
+	DoesContain = PointInImage( Point, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> )
+	D0	  		    D0     A0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> PointInImage( struct Point, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> * );
+
+<b>   FUNCTION</b>
+	Tests whether a point is properly contained in an image.
+	The intention of this is to provide custom gadgets a means
+	to delegate &#034;image mask&#034; processing to the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a>, where
+	it belongs (superseding things like BOOLMASK).  After all,
+	a rounded rect image with a drop shadow knows more about
+	what points are inside it than anybody else should.
+
+	For traditional Intuition Images, this routine checks if
+	the point is in the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> box (LeftEdge/RightEdge/Width/Height).
+
+<b>   INPUTS</b>
+ 	Point	- Two words, X/Y packed into a <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, with high word
+		containing 'X'.  This is what you get if you pass
+		a Point structure (not a pointer!) using common
+		C language parameter conventions.
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> - a pointer to a standard or custom <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> data object.
+	    NOTE: If 'Image' is NULL, this function returns TRUE.
+
+<b>   RESULT</b>
+ 	DoesContain - Boolean result of the test.
+
+<b>   EXAMPLE</b>
+
+
+<b>   NOTES</b>
+
+
+<b>   BUGS</b>
+	Only applies to the first image, does not follow NextImage
+	linked list.  This might be preferred.
+
+<b>   SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

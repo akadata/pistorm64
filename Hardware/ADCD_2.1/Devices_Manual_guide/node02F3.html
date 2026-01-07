@@ -1,0 +1,847 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/apps/Play8SVX/Play8SVX.c" NODE="MAIN" TITLE="Devices/apps/Play8SVX/Play8SVX.c" -->
+<head>
+<title>Devices/apps/Play8SVX/Play8SVX.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02F2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02F4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/** Play8SVX.c **************************************************************
+ *
+ * Read and play sound sample from an IFF file.  21Jan85
+ *
+ * By Steve Hayes, Electronic Arts.
+ * This software is in the public domain.
+ *
+ * Modified 05/91 for use with iffparse &#038; to play notes - CAS_CBM
+ * requires linkage with several IFF modules - see Makefile
+ ****************************************************************************/
+
+#include &#034;iffp/8svxapp.h&#034;
+
+#include &#060;exec/execbase.h&#062;
+#include &#060;graphics/gfxbase.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+/* prototypes for our functions */
+void cleanup(void);
+void bye(UBYTE *s,int error);
+void DUnpack(BYTE source[], LONG n, BYTE dest[]);
+BYTE D1Unpack(BYTE source[], LONG n, BYTE dest[], BYTE x);
+LONG LoadSample(struct EightSVXInfo *esvx, UBYTE *filename);
+void UnloadSample(struct EightSVXInfo *esvx);
+LONG LoadSBody(struct EightSVXInfo *esvx);
+void UnloadSBody(struct EightSVXInfo *esvx);
+
+LONG ShowSample(struct EightSVXInfo *esvx);
+
+LONG OpenAudio(void);
+void CloseAudio(void);
+LONG PlaySample(struct EightSVXInfo *esvx,
+		LONG octave, LONG note, UWORD volume, ULONG delay);
+
+struct IOAudio *playbigsample(struct IOAudio *aio0, struct IOAudio *aio1,
+		BYTE *samptr, LONG ssize, ULONG period, UWORD volume);
+
+#define MINARGS 2
+char *vers = &#034;\0$VER: Play8SVX 37.5&#034;;
+char *Copyright = &#034;Play8SVX v37.5 (Freely Redistributable)&#034;;
+char *usage = &#034;Usage: Play8SVX 8SVXname&#034;;
+
+
+/* globals */
+struct Library *IFFParseBase   = NULL;
+struct Library *GfxBase = NULL;
+
+BOOL   FromWb;
+
+/* 8SVX Property chunks to be grabbed
+ */
+LONG	esvxprops[] = {
+		ID_8SVX, ID_VHDR,
+		ID_8SVX, ID_NAME,
+		ID_8SVX, ID_ATAK,
+		ID_8SVX, ID_RLSE,
+		ID_8SVX, ID_AUTH,
+		ID_8SVX, ID_Copyright,
+		TAG_DONE
+		};
+
+/* 8SVX Collection chunks (more than one in file) to be gathered */
+LONG	esvxcollects[] = {
+		ID_8SVX, ID_ANNO,
+		TAG_DONE
+		};
+
+/* 8SVX Chunk to stop on */
+LONG	esvxstops[] = {
+		ID_8SVX, ID_BODY,
+		TAG_DONE
+		};
+
+
+UBYTE nomem[]  = &#034;Not enough memory\n&#034;;
+UBYTE noiffh[] = &#034;Can't alloc iff\n&#034;;
+
+
+
+/* For our allocated EightSVXInfo */
+struct EightSVXInfo  *esvx = NULL;
+
+
+/*
+ * MAIN
+ */
+void main(int argc, char **argv)
+   {
+   UBYTE *esvxname=NULL;
+   ULONG oct;
+   LONG error=0L;
+
+   FromWb = argc ? FALSE : TRUE;
+
+   if((argc&#060;MINARGS)||(argv[argc-1][0]=='?'))
+	{
+	printf(&#034;%s\n%s\n&#034;,Copyright,usage);
+        bye(&#034;&#034;,RETURN_OK);
+	}
+
+   esvxname = argv[1];
+
+/* Open Libraries */
+   if(!(IFFParseBase = OpenLibrary(&#034;iffparse.library&#034;,0)))
+      bye(&#034;Can't open iffparse library.\n&#034;,RETURN_WARN);
+
+
+/*
+ * Alloc one EightSVXInfo struct
+ */
+    if(!(esvx = (struct EightSVXInfo *)
+	AllocMem(sizeof(struct EightSVXInfo),MEMF_PUBLIC|MEMF_CLEAR)))
+		bye(nomem,RETURN_FAIL);
+
+/*
+ * Here we set up our EightSVXInfo fields for our
+ * application.
+ * Above we have defined the propery and collection chunks
+ * we are interested in (some required like VHDR).
+ * We want to stop on BODY.
+ */
+    esvx-&#062;ParseInfo.propchks	= esvxprops;
+    esvx-&#062;ParseInfo.collectchks	= esvxcollects;
+    esvx-&#062;ParseInfo.stopchks	= esvxstops;
+/*
+ * Alloc the IFF handle for the frame
+ */
+    if(!(esvx-&#062;ParseInfo.iff = AllocIFF())) bye(noiffh,RETURN_FAIL);
+
+
+    if(!(error = LoadSample(esvx, esvxname)))
+	{
+	ShowSample(esvx);
+
+	if(!(error = OpenAudio()))
+	    {
+	    /* If we think this is a sound effect, play it as such (note=-1) */
+	    if((esvx-&#062;Vhdr.ctOctave==1)&#038;&#038;(esvx-&#062;Vhdr.samplesPerSec)
+		&#038;&#038;(esvx-&#062;Vhdr.oneShotHiSamples)&#038;&#038;(!esvx-&#062;Vhdr.repeatHiSamples))
+		{
+		PlaySample(esvx,0,-1,64,0);
+		}
+	    /* Else play it like an instrument */
+	    else
+		{
+	    	for(oct=0; oct &#060; esvx-&#062;Vhdr.ctOctave; oct++)
+		    {
+	    	    PlaySample(esvx,oct,0,64,50);
+	    	    PlaySample(esvx,oct,4,64,50);
+	    	    PlaySample(esvx,oct,7,64,50);
+		    }
+		}
+	    CloseAudio();
+	    }
+        else printf(&#034;error opening audio device\n&#034;);
+	}
+    else
+    	printf(&#034;%s\n&#034;,IFFerr(error));
+
+    cleanup();
+    exit(RETURN_OK);
+    }
+
+
+void bye(UBYTE *s,int error)
+   {
+   if((*s)&#038;&#038;(!FromWb)) printf(&#034;%s\n&#034;,s);
+   cleanup();
+   exit(error);
+   }
+
+
+void cleanup()
+   {
+   if(esvx)
+	{
+	DD(bug(&#034;About to UnloadSample\n&#034;));
+	UnloadSample(esvx);
+
+	DD(bug(&#034;About to FreeIFF\n&#034;));
+	if(esvx-&#062;ParseInfo.iff) 	FreeIFF(esvx-&#062;ParseInfo.iff);
+
+	DD(bug(&#034;About to free EightSVXInfo\n&#034;));
+        FreeMem(esvx,sizeof(struct EightSVXInfo));
+	}
+
+   if(IFFParseBase)  	CloseLibrary(IFFParseBase);
+   }
+
+
+/** ShowSample() **********************************************
+ *
+ * Show sample information after calling LoadSample()
+ *
+ *************************************************************************/
+LONG ShowSample(struct EightSVXInfo *esvx)
+    {
+    LONG error = 0L;
+    BYTE *buf;
+    Voice8Header *vhdr;
+
+    if(!esvx)			return(CLIENT_ERROR);
+    if(!(buf = esvx-&#062;sample))	return(CLIENT_ERROR);
+
+    /* LoadSample copied VHDR and NAME (if any) to our esvx frame */
+    vhdr = &#038;esvx-&#062;Vhdr;
+    if(esvx-&#062;name[0]) printf(&#034;\nNAME: %s&#034;,esvx-&#062;name);
+
+    printf(&#034;\n\nVHDR Info:&#034;);
+    printf(&#034;\noneShotHiSamples=%ld&#034;, vhdr-&#062;oneShotHiSamples);
+    printf(&#034;\nrepeatHiSamples=%ld&#034;, vhdr-&#062;repeatHiSamples);
+    printf(&#034;\nsamplesPerHiCycle=%ld&#034;, vhdr-&#062;samplesPerHiCycle);
+    printf(&#034;\nsamplesPerSec=%ld&#034;, vhdr-&#062;samplesPerSec);
+    printf(&#034;\nctOctave=%ld&#034;, vhdr-&#062;ctOctave);
+    printf(&#034;\nsCompression=%ld&#034;, vhdr-&#062;sCompression);
+    printf(&#034;\nvolume=0x%lx&#034;, vhdr-&#062;volume);
+    printf(&#034;\nData = %3ld %3ld %3ld %3ld %3ld %3ld %3ld %3ld&#034;,
+           buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7]);
+    printf(&#034;\n       %3ld %3ld %3ld %3ld %3ld %3ld %3ld %3ld ...\n&#034;,
+           buf[8+0],buf[8+1],buf[8+2],buf[8+3],buf[8+4],buf[8+5],
+           buf[8+6],buf[8+ 7]);
+
+    return(error);
+    }
+
+
+/* OpenAudio
+ *
+ * Opens audio device for one audio channel, 2 IO requests
+ * Returns 0 for success
+ *
+ * Based on code by Dan Baker
+ */
+
+UBYTE           whichannel[] = { 1,2,4,8 };
+
+/* periods for scale starting at   65.40Hz (C) with 128 samples per cycle
+ *                            or  130.81Hz (C) with  64 samples per cycle
+ *                            or  261.63Hz (C) with  32 samples per cycle
+ *                            or  523.25Hz (C) with  16 samples per cycle
+ *                            or 1046.50Hz (C) with   8 samples per cycle
+ *                            or 2093.00Hz (C) with   4 samples per cycle
+ */
+
+UWORD   per_ntsc[12]= { 428, 404, 380, 360,
+			340, 320, 302, 286,
+			270, 254, 240, 226 };
+
+/* periods adjusted for system clock frequency */
+UWORD   per[12];
+
+/* Note - these values 3579545 NTSC, 3546895 PAL */
+#define NTSC_CLOCK 3579545L
+#define PAL_CLOCK  3546895L
+
+#define AIOCNT 4
+struct 	IOAudio *aio[AIOCNT] = {NULL}; 	  /* Ptrs to IO blocks for commands  */
+
+struct 	MsgPort *port;   	/* Pointer to a port so the device can reply */
+BOOL	devopened;
+ULONG	clock = NTSC_CLOCK;     /* Will check for PAL and change if necessary */
+
+
+LONG OpenAudio()
+{
+extern	struct ExecBase *SysBase;
+LONG 	error=0L;
+ULONG   period;
+int	k;
+
+if(devopened)	return(-1);
+
+/*-------------------------------------------------------------------------*/
+/* Ask the system if we are PAL or NTSC and set clock constant accordingly */
+/*-------------------------------------------------------------------------*/
+if(GfxBase=OpenLibrary(&#034;graphics.library&#034;,0L))
+    {
+    if(((struct GfxBase *)GfxBase)-&#062;DisplayFlags &#038; PAL)
+		clock = PAL_CLOCK;
+    else
+		clock = NTSC_CLOCK;
+    CloseLibrary((struct Library *) GfxBase);
+    }
+
+printf(&#034;OpenAudio: For period calculations, clock=%ld\n&#034;, clock);
+
+/* calculate period values for one octave based on system clock */
+for(k=0; k&#060;12; k++)
+    {
+    period = ((per_ntsc[k] * clock) + (NTSC_CLOCK &#062;&#062; 1)) / NTSC_CLOCK;
+    per[k] = period;
+    D(bug(&#034;per[%ld]=%ld &#034;,k,per[k]));
+    }
+D(bug(&#034;\n&#034;));
+
+/*-------------------------------------------------------------------*/
+/* Create a reply port so the audio device can reply to our commands */
+/*-------------------------------------------------------------------*/
+if(!(port=CreatePort(0,0)))
+	{ error = 1; goto bailout; }
+
+/*--------------------------------------------------------------------------*/
+/*  Create audio I/O blocks so we can send commands to the audio device     */
+/*--------------------------------------------------------------------------*/
+for(k=0; k&#060;AIOCNT; k++)
+    {
+    if(!(aio[k]=(struct IOAudio *)CreateExtIO(port,sizeof(struct IOAudio))))
+	{ error = k+2; goto bailout; }
+    }
+
+/*----------------------------------------------------------------------*/
+/* Set up the audio I/O block for channel allocation:                   */
+/* ioa_Request.io_Message.mn_ReplyPort is the address of a reply port.  */
+/* ioa_Request.io_Message.mn_Node.ln_Pri sets the precedence (priority) */
+/*   of our use of the audio device. Any tasks asking to use the audio  */
+/*   device that have a higher precedence will steal the channel from us.*/
+/* ioa_Request.io_Command is the command field for IO.                  */
+/* ioa_Request.io_Flags is used for the IO flags.                       */
+/* ioa_AllocKey will be filled in by the audio device if the allocation */
+/*   succeeds. We must use the key it gives for all other commands sent.*/
+/* ioa_Data is a pointer to the array listing the channels we want.     */
+/* ioa_Length tells how long our list of channels is.                   */
+/*----------------------------------------------------------------------*/
+aio[0]-&#062;ioa_Request.io_Command               = ADCMD_ALLOCATE;
+aio[0]-&#062;ioa_Request.io_Flags                 = ADIOF_NOWAIT;
+aio[0]-&#062;ioa_AllocKey                         = 0;
+aio[0]-&#062;ioa_Data                             = whichannel;
+aio[0]-&#062;ioa_Length                           = sizeof(whichannel);
+
+/*-----------------------------------------------*/
+/* Open the audio device and allocate a channel  */
+/*-----------------------------------------------*/
+if(!(OpenDevice(&#034;audio.device&#034;,0L, (struct IORequest *) aio[0] ,0L)))
+	devopened = TRUE;
+else { error = 5; goto bailout; }
+
+/* Clone the flags, channel allocation, etc. into other IOAudio requests */
+for(k=1; k&#060;AIOCNT; k++)	*aio[k] = *aio[0];
+
+bailout:
+if(error)
+    {
+    printf(&#034;OpenAudio errored out at step %ld\n&#034;,error);
+    CloseAudio();
+    }
+return(error);
+}
+
+
+/* CloseAudio
+ *
+ * Close audio device as opened by OpenAudio, null out pointers
+ */
+void CloseAudio()
+{
+int k;
+
+D(bug(&#034;Closing audio device...\n&#034;));
+
+/* Note - we know we have no outstanding audio requests */
+if(devopened)
+    {
+    CloseDevice((struct IORequest *) aio[0]);
+    devopened = FALSE;
+    }
+
+for(k=0; k&#060;AIOCNT; k++)
+    {
+    if(aio[k]) 	DeleteExtIO(aio[k]), aio[k] = NULL;
+    }
+
+if(port)   	DeletePort(port),  port = NULL;
+}
+
+
+/** PlaySample() **********************************************
+ *
+ * Play a note in octave for delay/50ths of a second
+ * OR Play a sound effect (set octave and note to 0, -1)
+ *
+ * Requires successful OpenAudio() called previously
+ *
+ * When playing notes:
+ * Expects note values between 0 (C) and 11 (B#)
+ * Uses largest octave sample in 8SVX as octave 0, next smallest
+ *   as octave 1, etc.
+ *
+ * Notes - this simple example routine does not do ATAK and RLSE)
+ *       - use of Delay for timing is simplistic, synchronous, and does
+ *		not take into account that the oneshot itself may be
+ *		longer than the delay.
+ *         Use timer.device for more accurate asynchronous delays
+ *
+ *************************************************************************/
+/* Max playable sample in one IO request is 128K */
+#define MAXSAMPLE 131072
+
+LONG	PlaySample(struct EightSVXInfo *esvx,
+			LONG octave, LONG note, UWORD volume, ULONG delay)
+{
+/* pointers to outstanding requests */
+struct		IOAudio	*aout0=NULL, *aout1=NULL;
+ULONG		period;
+LONG		osize, rsize;
+BYTE		*oneshot, *repeat;
+
+if(!devopened)	return(-1);
+
+if(note &#062; 11) note=0;
+
+if( note == -1 ) period = clock / esvx-&#062;Vhdr.samplesPerSec;
+else 		 period = per[note]; /* table set up by OpenAudio */
+
+if(octave &#062; esvx-&#062;Vhdr.ctOctave) octave = 0;
+if(volume &#062; 64)	volume = 64;
+
+oneshot = esvx-&#062;osamps[octave];
+osize   = esvx-&#062;osizes[octave];
+repeat  = esvx-&#062;rsamps[octave];
+rsize   = esvx-&#062;rsizes[octave];
+
+D(bug(&#034;oneshot $%lx size %ld, repeat $%lx size %ld\n&#034;,
+	oneshot, osize, repeat, rsize));
+
+/*------------------------------------------------------------*/
+/* Set up audio I/O blocks to play a sample using CMD_WRITE.  */
+/* Set up one request for the oneshot and one for repeat      */
+/* (all ready for simple case, but we may not need both)      */
+/* The io_Flags are set to ADIOF_PERVOL so we can set the     */
+/*    period (speed) and volume with the our sample;          */
+/* ioa_Data points to the sample; ioa_Length gives the length */
+/* ioa_Cycles tells how many times to repeat the sample       */
+/* If you want to play the sample at a given sampling rate,   */
+/* set ioa_Period = clock/(given sampling rate)               */
+/*------------------------------------------------------------*/
+aio[0]-&#062;ioa_Request.io_Command             =CMD_WRITE;
+aio[0]-&#062;ioa_Request.io_Flags               =ADIOF_PERVOL;
+aio[0]-&#062;ioa_Data                           =oneshot;
+aio[0]-&#062;ioa_Length                         =osize;
+aio[0]-&#062;ioa_Period                         =period;
+aio[0]-&#062;ioa_Volume                         =volume;
+aio[0]-&#062;ioa_Cycles                         =1;
+
+aio[2]-&#062;ioa_Request.io_Command             =CMD_WRITE;
+aio[2]-&#062;ioa_Request.io_Flags               =ADIOF_PERVOL;
+aio[2]-&#062;ioa_Data                           =repeat;
+aio[2]-&#062;ioa_Length                         =rsize;
+aio[2]-&#062;ioa_Period                         =period;
+aio[2]-&#062;ioa_Volume                         =volume;
+aio[2]-&#062;ioa_Cycles                         =0;	/* repeat until stopped */
+
+/*---------------------------------------------------*/
+/* Send the command to start a sound using BeginIO() */
+/* Go to sleep and wait for the sound to finish with */
+/* WaitIO() to wait and get the get the ReplyMsg     */
+/*---------------------------------------------------*/
+printf(&#034;Starting tone O len %ld for %0ld cyc, R len %ld for %0ld cyc, per=%ld...&#034;,
+		osize, aio[0]-&#062;ioa_Cycles, rsize, aio[1]-&#062;ioa_Cycles, period);
+
+if(osize)
+    {
+    /* Simple case for oneshot sample &#060;= 128K (ie. most samples) */
+    if(osize &#060;= MAXSAMPLE)	BeginIO((struct IORequest *)(aout0=aio[0]));
+
+    /* Note - this else case code is for samples &#062;128K */
+    else
+	{
+	*aio[1] = *aio[0];
+	aout0 = playbigsample(aio[0],aio[1],oneshot,osize,period,volume);
+	}
+     }
+
+if(rsize)
+    {
+    /* Simple case for oneshot sample &#060;= 128K (ie. most samples) */
+    if(rsize &#060;= MAXSAMPLE)	BeginIO((struct IORequest *)(aout1=aio[2]));
+
+    /* Note - this else case code is for samples &#062;128K */
+    else
+	{
+	*aio[3] = *aio[2];
+	aout1 = playbigsample(aio[2],aio[3],repeat,rsize,period,volume);
+	}
+     }
+
+if(delay)	Delay(delay);	/* crude timing for notes */
+
+/* Wait for any requests we still have out */
+if(aout0) WaitIO(aout0);
+
+if(aout1)
+   {
+   if(note &#062;= 0) AbortIO(aout1);	/* if a note, stop it now */
+   WaitIO(aout1);
+   }
+
+printf(&#034;Done\n&#034;);
+}
+
+
+/** playbigsample() ********************************************************
+ *
+ *  called by playsample to deal with samples &#062; 128K
+ *
+ *  wants pointers to two ready-to-use IOAudio iorequest blocks
+ *
+ *  returns pointer to the IOAudio request that is still out
+ *   or NULL if none (error)
+ *************************************************************************/
+
+struct IOAudio *playbigsample(struct IOAudio *aio0, struct IOAudio* aio1,
+			BYTE *samptr, LONG ssize, ULONG period, UWORD volume)
+{
+struct IOAudio *aio[2];
+LONG   size;
+int    req=0, reqn=1;	/* current and next IOAudio request indexes */
+
+if((!aio0)||(!aio1)||(ssize &#060; MAXSAMPLE))	return(NULL);
+
+aio[req]  = aio0;
+aio[reqn] = aio1;
+
+/* start the first 128 K playing */
+aio[req]-&#062;ioa_Request.io_Command             =CMD_WRITE;
+aio[req]-&#062;ioa_Request.io_Flags               =ADIOF_PERVOL;
+aio[req]-&#062;ioa_Data                           =samptr;
+aio[req]-&#062;ioa_Length			     =MAXSAMPLE;
+aio[req]-&#062;ioa_Period                         =period;
+aio[req]-&#062;ioa_Volume                         =volume;
+aio[req]-&#062;ioa_Cycles                         =1;
+BeginIO((struct IORequest*)aio[req]);
+
+for(samptr=samptr + MAXSAMPLE, size = ssize - MAXSAMPLE;
+	size &#062; 0;
+		samptr += MAXSAMPLE)
+    {
+    /* queue the next piece of sample */
+    reqn = req ^ 1;	/* alternate IO blocks 0 and 1 */
+    aio[reqn]-&#062;ioa_Request.io_Command             =CMD_WRITE;
+    aio[reqn]-&#062;ioa_Request.io_Flags               =ADIOF_PERVOL;
+    aio[reqn]-&#062;ioa_Data                           =samptr;
+    aio[reqn]-&#062;ioa_Length = (size &#062; MAXSAMPLE) ? MAXSAMPLE : size;
+    aio[reqn]-&#062;ioa_Period                         =period;
+    aio[reqn]-&#062;ioa_Volume                         =volume;
+    aio[reqn]-&#062;ioa_Cycles                         =1;
+    BeginIO((struct IORequest*)aio[reqn]);
+
+    /* Wait for previous request to finish */
+    WaitIO(aio[req]);
+    /* decrement size */
+    size = (size &#062; MAXSAMPLE) ? size-MAXSAMPLE : 0;
+    req = reqn;		/* switch between aio[0] and aio[1] */
+    }
+return(aio[reqn]);
+}
+
+/** LoadSample() **********************************************************
+ *
+ * Read 8SVX, given an initialized EightSVXInfo with not-in-use IFFHandle,
+ *   and filename.  Leaves the IFFHandle open so you can FindProp()
+ *   additional chunks or copychunks().  You must UnloadSample()
+ *   when done.  UnloadSample will closeifile if the file is still
+ *   open.
+ *
+ * Fills in esvx-&#062;Vhdr and Name, and allocates/loads esvx-&#062;sample,
+ *   setting esvx-&#062;samplebytes to size for deallocation.
+ *
+ * Returns 0 for success of an IFFERR (libraries/iffparse.h)
+ *************************************************************************/
+LONG LoadSample(struct EightSVXInfo *esvx, UBYTE *filename)
+    {
+    struct IFFHandle *iff;
+    struct StoredProperty *sp;
+    Voice8Header *vhdr;
+    BYTE *oneshot, *repeat;
+    ULONG osize, rsize, spcyc;
+    int oct;
+    LONG error = 0L;
+
+    D(bug(&#034;LoadSample:\n&#034;));
+
+    if(!esvx)				return(CLIENT_ERROR);
+    if(!(iff=esvx-&#062;ParseInfo.iff))	return(CLIENT_ERROR);
+
+    if(!(error = openifile((struct ParseInfo *)esvx, filename, IFFF_READ)))
+	{
+	printf(&#034;Reading '%s'...\n&#034;,filename);
+	error = parseifile((struct ParseInfo *)esvx,
+			ID_FORM, ID_8SVX,
+			esvx-&#062;ParseInfo.propchks,
+			esvx-&#062;ParseInfo.collectchks,
+			esvx-&#062;ParseInfo.stopchks);
+
+	D(bug(&#034;LoadSample: after parseifile - error = %ld\n&#034;,error));
+
+	if((!error)||(error == IFFERR_EOC)||(error == IFFERR_EOF))
+	    {
+	    if(contextis(iff,ID_8SVX,ID_FORM))
+		{
+		D(bug(&#034;LoadSample: context is 8SVX\n&#034;));
+		if(!(sp = FindProp(iff,ID_8SVX,ID_VHDR)))
+		    {
+		    message(&#034;No 8SVX.VHDR!&#034;);
+		    error = IFFERR_SYNTAX;
+		    }
+		else
+		    {
+		    D(bug(&#034;LoadSample: Have VHDR\n&#034;));
+		    /* copy Voice8Header into frame */
+		    vhdr = (Voice8Header *)(sp-&#062;sp_Data);
+		    *(&#038;esvx-&#062;Vhdr) = *vhdr;
+		    /* copy name if any */
+		    esvx-&#062;name[0]='\0';
+		    if(sp = FindProp(iff,ID_8SVX,ID_NAME))
+			{
+			strncpy(esvx-&#062;name,sp-&#062;sp_Data,sp-&#062;sp_Size);
+			esvx-&#062;name[MIN(sp-&#062;sp_Size,79)] = '\0';
+			}
+	    	    error = LoadSBody(esvx);
+		    D(bug(&#034;LoadSample: After LoadSBody - error = %ld\n&#034;,error));
+		    if(!error)
+			{
+			osize   = esvx-&#062;Vhdr.oneShotHiSamples;
+			rsize   = esvx-&#062;Vhdr.repeatHiSamples;
+			spcyc	= esvx-&#062;Vhdr.samplesPerHiCycle;
+			if(!spcyc) spcyc = esvx-&#062;Vhdr.repeatHiSamples;
+			if(!spcyc) spcyc = 8;
+
+			oneshot = esvx-&#062;sample;
+
+			for(oct = esvx-&#062;Vhdr.ctOctave-1; oct &#062;= 0;
+				 oct--, oneshot+=(osize+rsize),
+					osize &#060;&#060;= 1, rsize &#060;&#060;=1, spcyc &#060;&#060;=1)
+    			    {
+    			    repeat  = oneshot + osize;
+			    esvx-&#062;osizes[oct] = osize;
+			    if(osize) esvx-&#062;osamps[oct] = oneshot;
+			    else      esvx-&#062;osamps[oct] = 0;
+			    esvx-&#062;rsizes[oct] = rsize;
+			    if(rsize) esvx-&#062;rsamps[oct] = repeat;
+			    else      esvx-&#062;rsamps[oct] = 0;
+			    esvx-&#062;spcycs[oct] = spcyc;
+
+ 			D(bug(&#034;oneshot $%lx size %ld, repeat $%lx size %ld\n&#034;,
+				oneshot, osize, repeat, rsize));
+
+			    }
+		        }
+		    }
+		}
+	    else
+		{
+		message(&#034;Not an 8SVX\n&#034;);
+		error = NOFILE;
+		}
+	    }
+	}
+
+    if(error)
+	{
+	closeifile((struct ParseInfo *)esvx);
+	UnloadSample(esvx);
+	}
+    return(error);
+    }
+
+
+/** UnloadSample() *******************************************************
+ *
+ * Frees and closes everything opened/alloc'd by LoadSample()
+ *
+ *************************************************************************/
+void UnloadSample(struct EightSVXInfo *esvx)
+    {
+    if(esvx)
+	{
+	UnloadSBody(esvx);
+	closeifile((struct ParseInfo *)esvx);
+	}
+    }
+
+
+/** LoadSBody() ***********************************************************
+ *
+ * Read a 8SVX Sample BODY into RAM.
+ *
+ *************************************************************************/
+LONG LoadSBody(struct EightSVXInfo *esvx)
+    {
+    struct IFFHandle *iff;
+    LONG sbytes, rlen, error = 0L;
+    ULONG memtype;
+    Voice8Header *vhdr = &#038;esvx-&#062;Vhdr;
+    BYTE *t;
+
+    D(bug(&#034;LoadSBody:\n&#034;));
+
+    if(!(iff=esvx-&#062;ParseInfo.iff))	return(CLIENT_ERROR);
+    if(!esvx)				return(CLIENT_ERROR);
+
+    if(!(currentchunkis(iff,ID_8SVX,ID_BODY)))
+	{
+	message(&#034;LoadSBody: not at BODY!&#034;);
+	return(IFFERR_READ);
+	}
+
+    sbytes  = ChunkMoreBytes(CurrentChunk(iff));
+
+    /* if we have to decompress, let's just load it into public mem */
+    memtype = vhdr-&#062;sCompression ? MEMF_PUBLIC : MEMF_CHIP;
+
+    D(bug(&#034;LoadSBody: samplebytes=%ld, compression=%ld\n&#034;,
+			sbytes,vhdr-&#062;sCompression));
+
+    if(!(esvx-&#062;sample = (BYTE *)AllocMem(sbytes, memtype)))
+	{
+        error = CLIENT_ERROR;
+	}
+    else
+	{
+	D(bug(&#034;LoadSBody: have load buffer\n&#034;));
+	esvx-&#062;samplebytes = sbytes;
+        if(rlen=ReadChunkBytes(iff,esvx-&#062;sample,sbytes) != sbytes)
+	    error = IFFERR_READ;
+
+	if(error)
+	    {
+	    D(bug(&#034;LoadSBody: ReadChunkBytes error = %ld, read %ld bytes\n&#034;,
+			error));
+	    UnloadSample(esvx);
+	    }
+	else if (vhdr-&#062;sCompression) /* Decompress, if needed. */
+	    {
+            if(t = (BYTE *)AllocMem(sbytes&#060;&#060;1, MEMF_CHIP))
+		{
+		D(bug(&#034;LoadSBody: have decompression buffer\n&#034;));
+            	DUnpack(esvx-&#062;sample, sbytes, t);
+            	FreeMem(esvx-&#062;sample, sbytes);
+            	esvx-&#062;sample = t;
+            	esvx-&#062;samplebytes = sbytes &#060;&#060; 1;
+		}
+	    else
+		{
+		UnloadSample(esvx);
+		error = IFFERR_NOMEM;
+		}
+	    }
+	}
+    return(error);
+    }
+
+
+/** UnloadSBody() ********************************************************
+ *
+ * Deallocates esvx-&#062;smaple
+ *
+ *************************************************************************/
+void UnloadSBody(struct EightSVXInfo *esvx)
+    {
+    if(esvx)
+	{
+	if(esvx-&#062;sample)
+	    {
+	    DD(bug(&#034;About to free SBody\n&#034;));
+	    FreeMem(esvx-&#062;sample,esvx-&#062;samplebytes);
+	    esvx-&#062;sample = NULL;
+	    }
+	esvx-&#062;samplebytes = NULL;
+	}
+    }
+
+
+/* DUnpack.c --- Fibonacci Delta decompression by Steve Hayes */
+
+/* Fibonacci delta encoding for sound data */
+BYTE codeToDelta[16] = {-34,-21,-13,-8,-5,-3,-2,-1,0,1,2,3,5,8,13,21};
+
+/* Unpack Fibonacci-delta encoded data from n byte source
+ * buffer into 2*n byte dest buffer, given initial data
+ * value x.  It returns the lats data value x so you can
+ * call it several times to incrementally decompress the data.
+ */
+
+BYTE D1Unpack(BYTE source[], LONG n, BYTE dest[], BYTE x)
+   {
+   BYTE d;
+   LONG i, lim;
+
+   lim = n &#060;&#060; 1;
+   for (i=0; i &#060; lim; ++i)
+      {
+      /* Decode a data nibble, high nibble then low nibble */
+      d = source[i &#062;&#062; 1];    /* get a pair of nibbles */
+      if (i &#038; 1)             /* select low or high nibble */
+         d &#038;= 0xf;           /* mask to get the low nibble */
+      else
+         d &#062;&#062;= 4;            /* shift to get the high nibble */
+      x += codeToDelta[d];   /* add in the decoded delta */
+      dest[i] = x;           /* store a 1 byte sample */
+      }
+   return(x);
+   }
+
+/* Unpack Fibonacci-delta encoded data from n byte
+ * source buffer into 2*(n-2) byte dest buffer.
+ * Source buffer has a pad byte, an 8-bit initial
+ * value, followed by n-2 bytes comprising 2*(n-2)
+ * 4-bit encoded samples.
+ */
+
+void DUnpack(source, n, dest)
+BYTE source[], dest[];
+LONG n;
+   {
+   D1Unpack(source+2, n-2, dest, source[1]);
+   }
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

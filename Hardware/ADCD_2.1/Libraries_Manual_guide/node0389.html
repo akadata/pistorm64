@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-3-9" TITLE="28 / Using Virtual Sprites / Adding and Removing VSprites" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Virtual Sprites / Adding and Removing VSprites</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0388.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node038A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Once a true VSprite has been set up and initialized, the obvious next step
+is to give it to the system by adding it to the GEL list. The VSprite may
+then be manipulated as needed.  Before the program ends, the VSprite
+should be removed from the GELs list by calling <a href="../Includes_and_Autodocs_2._guide/node0471.html">RemVSprite()</a>. A typical
+<a name="line6">calling sequence could be performed like so:</a>
+
+    struct VSprite  myVSprite = {0};
+    struct RastPort myRastPort = {0};
+
+    AddVSprite(&#038;myVSprite, &#038;myRastPort);
+
+    /* Manipulate the VSprite as needed here */
+
+    RemVSprite(&#038;myVSprite);
+
+The &#038;myVSprite argument is a fully initialized <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure and
+&#038;myRastPort is the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> with which this VSprite is to be associated.
+Note that you will probably not like the results if you try to
+<a href="../Includes_and_Autodocs_2._guide/node0471.html">RemVSprite()</a> a VSprite that has not been added to the system with
+<a href="../Includes_and_Autodocs_2._guide/node0411.html">AddVSprite()</a>.  See the Amiga ROM Kernel Reference Manual: Includes and
+Autodocs for additional information on these functions.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

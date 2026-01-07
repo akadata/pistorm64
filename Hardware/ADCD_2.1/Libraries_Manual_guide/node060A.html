@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/sample_lvos.asm" NODE="MAIN" TITLE="lib_examples/sample_lvos.asm" -->
+<head>
+<title>lib_examples/sample_lvos.asm</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0609.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node060B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+***************************************************************************
+* sample_lvos.asm   _LVO definitions
+*
+*  This is the .fd file for our sample library:
+*
+* Note - the slash in (D0/D1) means that a stub-maker can use MOVEM.L to
+* load these registers from the stack, rather than using a separate MOVE
+* instruction for each register. Alternately, something like  (A0,D2) would
+* show that a separate MOVE instruction is needed for each load.
+*
+*       ##base _SampleBase
+*       ##bias 30
+*       ##public
+*       Double(n1)(D0)
+*       AddThese(n1,n2)(D0/D1)
+*       ##end
+*
+* After assembling,
+*   JOIN sample_stubs.o sample_lvos.o AS sample.lib
+*
+* Apps LINK with LIBRARY sample.lib when calling sample.library functions
+***************************************************************************
+
+   INCLUDE  &#034;exec/types.i&#034;
+   INCLUDE  &#034;exec/libraries.i&#034;
+
+          SECTION data
+
+*----- LIBINIT initializes an LVO value to -30 to skip the first four
+*----- 6-byte required library vectors (Open, Expunge, etc)
+
+             LIBINIT
+
+*----- LIBDEF assigns the current LVO value to a label, and then
+*----- bumps the LVO value by -6 in preparation for next LVO label
+
+*----- This assigns the value -30 to our first _LVO label
+
+             LIBDEF      _LVODouble     ;-30
+             XDEF        _LVODouble
+
+*----- The value -30-6 is asigned to our second _LVO label
+
+             LIBDEF      _LVOAddThese   ;-36
+             XDEF        _LVOAddThese
+
+             END
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

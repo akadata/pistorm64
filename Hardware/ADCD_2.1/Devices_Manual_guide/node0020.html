@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_2" NODE="2-3-2" TITLE="2 / Device Interface / Audio Device Command Types" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>2 / Device Interface / Audio Device Command Types</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node001F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0021.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Commands for audio use can be divided into two categories:
+allocation/arbitration commands and hardware control commands.
+
+There are four allocation/arbitration commands.  These do not actually
+produce any sound.  Instead they manage and arbitrate the audio resources
+for the many tasks that may be using audio in the Amiga's multitasking
+<a name="line8">environment.</a>
+<a name="line9"></a>
+<a name="line10">    <a href="../Devices_Manual_guide/node002A.html">ADCMD_ALLOCATE</a>   - Reserves an audio channel for your program to use.</a>
+<a name="line11">    <a href="../Devices_Manual_guide/node002F.html">ADCMD_FREE</a>       - Frees an audio channel.</a>
+    <a href="../Devices_Manual_guide/node0030.html">ADCMD_SETPREC</a>    - Changes the precedence of a sound in progress.
+    <a href="../Devices_Manual_guide/node0031.html">ADCMD_LOCK</a>       - Tells if a channel has been stolen from you.
+
+The hardware control commands are used to set up, start, and stop sounds
+<a name="line16">on the audio device:</a>
+
+    <a href="../Devices_Manual_guide/node0033.html">CMD_WRITE</a>        - The main command.  Starts a sound playing.
+    <a href="../Devices_Manual_guide/node0034.html">ADCMD_FINISH</a>     - Aborts a sound in progress.
+    <a href="../Devices_Manual_guide/node0035.html">ADCMD_PERVOL</a>     - Changes the period (speed) and volume of a sound
+                        in progress.
+    <a href="../Devices_Manual_guide/node0036.html">CMD_FLUSH</a>        - Clears the audio channels.
+    <a href="../Devices_Manual_guide/node0037.html">CMD_RESET</a>        - Resets and initializes the audio device.
+    <a href="../Devices_Manual_guide/node0038.html">ADCMD_WAITCYCLE</a>  - Signals you when a cycle finishes.
+    <a href="../Devices_Manual_guide/node0039.html">CMD_STOP</a>         - Temporarily stops a channel from playing.
+    <a href="../Devices_Manual_guide/node003A.html">CMD_START</a>        - Restarts an audio channel that was stopped.
+    <a href="../Devices_Manual_guide/node003B.html">CMD_READ</a>         - Returns a pointer to the current IOAudio request.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

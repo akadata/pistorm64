@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_3" NODE="3-2-1" TITLE="3 / Device Interface / Opening The Clipboard Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>3 / Device Interface / Opening The Clipboard Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0067.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0069.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Three primary steps are required to open the clipboard device:
+
+    *  Create a message port using <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>. Reply messages from the
+       device must be directed to a message port.
+
+    *  Create an extended I/O request structure of type <a href="../Devices_Manual_guide/node0067.html#line5">IOClipReq</a> using
+       <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a>.
+
+    *  Open the clipboard device. Call <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a>, passing the IOClipReq.
+
+
+    struct MsgPort  *ClipMP;          /* pointer to message port*/
+    struct IOClipReq *ClipIO;         /* pointer to IORequest */
+
+    if (ClipMP=CreatePort(0L,0L) )
+        {
+        if (ClipIO=(struct IOClipReq *)
+                    CreateExtIO(ClipMP,sizeof(struct IOClipReq)))
+            {
+            if (OpenDevice(&#034;clipboard.device&#034;,0L,ClipIO,0))
+                printf(&#034;clipboard.device did not open\n&#034;);
+            else
+                {
+                 ... do device processing
+                }
+            {
+        else
+            printf(&#034;Error: Could not create IORequest\n&#034;);
+        }
+    else
+        printf(&#034;Error: Could not create message port\n&#034;);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

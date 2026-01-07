@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/mathtrans.c" NODE="MAIN" TITLE="lib_examples/mathtrans.c" -->
+<head>
+<title>lib_examples/mathtrans.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05FC.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05FE.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#include &#060;exec/types.h&#062;
+#include &#060;libraries/mathffp.h&#062;
+
+#include &#060;clib/mathffp_protos.h&#062;
+#include &#060;clib/mathtrans_protos.h&#062;
+
+struct Library *MathTransBase;
+
+VOID main()
+{
+FLOAT f1, f2, f3;
+FLOAT i1;
+
+if (MathTransBase = OpenLibrary(&#034;mathtrans.library&#034;,33))
+    {
+    f1 = SPAsin(f2);        /* Call SPAsin entry */
+    f1 = SPAcos(f2);        /* Call SPAcos entry */
+    f1 = SPAtan(f2);        /* Call SPAtan entry */
+
+    f1 = SPSin(f2);         /* Call SPSin entry */
+    f1 = SPCos(f2);         /* Call SPCos entry */
+    f1 = SPTan(f2);         /* Call SPTan entry */
+    f1 = SPSincos(&#038;f3, f2); /* Call SPSincos entry */
+
+    f1 = SPSinh(f2);        /* Call SPSinh entry */
+    f1 = SPCosh(f2);        /* Call SPCosh entry */
+    f1 = SPTanh(f2);        /* Call SPTanh entry */
+
+    f1 = SPExp(f2);         /* Call SPExp entry */
+    f1 = SPLog(f2);         /* Call SPLog entry */
+    f1 = SPLog10(f2);       /* Call SPLog10 entry */
+    f1 = SPPow(f2);         /* Call SPPow entry */
+    f1 = SPSqrt(f2);        /* Call SPSqrt entry */
+
+    i1 = SPTieee(f2);       /* Call SPTieee entry */
+    f1 = SPFieee(i1);       /* Call SPFieee entry */
+
+    CloseLibrary(MathTransBase);
+    }
+else
+    printf(&#034;Can't open mathtrans.library\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

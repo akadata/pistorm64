@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_2" NODE="2-5" TITLE="2 Audio Device / Audio Allocation and Arbitration" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>2 Audio Device / Audio Allocation and Arbitration</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0027.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0029.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The first command you send to the audio device should always be
+<a href="../Devices_Manual_guide/node002A.html">ADCMD_ALLOCATE</a>.  You can do this when you open the device, or at a later
+time.  You specify the channels you want in the ioa_Data field of the
+<a href="../Devices_Manual_guide/node001E.html#line8">IOAudio</a> block. If the allocation succeeds, the audio device will return
+the channels that you now own in the lower four bits of the
+ioa_Request.io_Unit field of your <a href="../Devices_Manual_guide/node001E.html#line9">IOAudio</a> block. For instance, if the
+io_Unit field equals 5 (binary 0101) then you own channels 2 and 0.  If
+the io_Unit field equals 15 (binary 1111) then you own all the channels.
+
+When you send the <a href="../Devices_Manual_guide/node002A.html">ADCMD_ALLOCATE</a> command, the audio device will also
+return a unique allocation key in the ioa_AllocKey of the <a href="../Devices_Manual_guide/node001E.html#line9">IOAudio</a> block.
+You must use this allocation key for all subsequent commands that you send
+to the audio device.  The audio device uses this unique key to identify
+which task issued the command.  If you do not use the correct allocation
+key assigned to you by the audio device when you send a command, your
+<a name="line17">command will be ignored.</a>
+
+When you request a channel with <a href="../Devices_Manual_guide/node002A.html">ADCMD_ALLOCATE</a>, you specify a precedence
+number from -128 to 127 in the ioa_Request.io_Message.mn_Node.ln_Pri field
+<a name="line21">of the IOAudio block. If a channel you want is being used and you have</a>
+specified a higher precedence than the current user, ADCMD_ALLOCATE will
+&#034;steal&#034; the channel from the other user. Later on, if your precedence is
+lower than that of another user who is performing an allocation, the
+<a name="line25">channel may be stolen from you.</a>
+
+If you set the precedence to 127 when you open the device or raise the
+precedence to 127 with the <a href="../Devices_Manual_guide/node0030.html">ADCMD_SETPREC</a> command, no other tasks can steal
+a channel from you. When you have finished with a channel, you must
+relinquish it with the <a href="../Devices_Manual_guide/node002F.html">ADCMD_FREE</a> command to make it available for other
+<a name="line31">users.</a>
+
+The following table shows suggested precedence values.
+
+                SUGGESTED PRECEDENCES FOR CHANNEL ALLOCATION
+
+   Predecence                   Type of Sound
+   ----------                   -------------
+     127          Unstoppable. Sounds first allocated at lower precedence,
+                  then set to this to the highest level.
+
+     90 - 100     Emergencies.  Alert, urgent situation
+                  that requires immediate action.
+
+     80 - 90      Annunciators.  Attention, bell (CTRL-G).
+
+     75           Speech. Synthesized or recorded speech (narrator.device).
+
+     50 - 70      Sonic cues.  Sounds thatprovide information that is not
+                  provided by graphics. Only the beginning of each sound
+                  (enough to recognize it) should be at this level;the rest
+                  should be set to sound effects level.
+
+    -50 - 50      Music program.  Musical notes in music-oriented program.
+                  The higher levels should be used for the attack portions
+                  of each note.
+
+    -70 - -50     Sound effects.  Sounds used in conjunction with graphics.
+                  More important sounds should use higher levels.
+
+    -100 - -80    Background. Theme music and restartable background
+                  sounds.
+
+    -128          Silence. Lowest level (freeing the channel completely
+                  is preferred).
+
+If you attempt to perform a command on a channel that has been stolen from
+you by a higher priority task, an AUDIO_NOALLOCATION error is returned and
+the bit in the ioa_Request.io_Unit field corresponding to the stolen
+<a name="line70">channel is cleared so you know which channel was stolen.</a>
+
+If you want to be warned before a channel is stolen so that you have a
+chance to stop your sound gracefully, then you should use the <a href="../Devices_Manual_guide/node0031.html">ADCMD_LOCK</a>
+command after you open the device.  This command is also useful for
+programs which write directly to the audio hardware.  For more on
+<a href="../Devices_Manual_guide/node0031.html">ADCMD_LOCK</a>, see the section below.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

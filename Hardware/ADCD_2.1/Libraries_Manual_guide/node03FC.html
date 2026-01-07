@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-2-3-1" TITLE="30 / / Changing a Region / Rectangles and Regions" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / / Changing a Region / Rectangles and Regions</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03FB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03FD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+There are four functions for changing a region through logical operations
+with a rectangle.
+
+    BOOL OrRectRegion   ( struct Region *region,
+                          struct Rectangle *rectangle );
+    void AndRectRegion  ( struct Region *region,
+                          struct Rectangle *rectangle );
+    BOOL XorRectRegion  ( struct Region *region,
+                          struct Rectangle *rectangle );
+    BOOL ClearRectRegion( struct Region *region,
+<a name="line12">                          struct Rectangle *rectangle );</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0464.html">OrRectRegion()</a> modifies a region structure by or'ing a clipping rectangle
+into the region.  When the application draws through this region (assuming
+that the region was originally empty), only the pixels within the clipping
+rectangle will be affected. If the region already has drawable areas, they
+<a name="line18">will still exist, this rectangle is added to the drawable area.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0413.html">AndRectRegion()</a> modifies the region structure by and'ing a clipping
+rectangle into the region.  Only those pixels that were already drawable
+and within the rectangle will remain drawable, any that are outside of it
+<a name="line23">will be clipped in future.</a>
+
+<a href="../Includes_and_Autodocs_2._guide/node0490.html">XorRectRegion()</a> applies the rectangle to the region in an exclusive-or
+mode.  Within the given rectangle, any areas that were drawable become
+clipped, any areas that were clipped become drawable.  Areas outside of
+the rectangle are not affected.
+
+<a href="../Includes_and_Autodocs_2._guide/node042A.html">ClearRectRegion()</a> clears the rectangle from the region.  Within the given
+rectangle, any areas that were drawable become clipped.  Areas outside of
+the rectangle are not affected.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

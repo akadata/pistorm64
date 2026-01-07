@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-17-3" TITLE="6 / / Intercepting Menu Operations / Shortcuts and IDCMP_MENUVERIFY" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / / Intercepting Menu Operations / Shortcuts and IDCMP_MENUVERIFY</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0195.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0197.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The idea behind <a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> is to synchronize the program with
+Intuition's menu handling sessions.  The motive was to allow a program to
+arbitrate access to a custom screen's bitmap, so that Intuition would not
+<a name="line5">render menus before the application was prepared for them.</a>
+
+Some programs use <a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a> to permit them to intercept the right
+mouse button for their own purposes.  Other programs use it to delay menu
+operations while they recover from unusual events such as illegible colors
+<a name="line10">of the screen or double buffering and related <a href="../Libraries_Manual_guide/node00F1.html#line4">ViewPort</a> operations.</a>
+
+Menu shortcut keystrokes, for compatibility, also respect
+<a href="../Libraries_Manual_guide/node01DE.html#line6">IDCMP_MENUVERIFY</a>.  They are always paired with an <a href="../Libraries_Manual_guide/node01DE.html">IDCMP_MENUPICK</a> message
+so that the program knows the menu operation is over.  This is true even
+if the menu event is cancelled.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

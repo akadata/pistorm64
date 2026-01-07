@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="AbortIO()" TITLE="exec.library/AbortIO" -->
+<head>
+<title>exec.library/AbortIO</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01D6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01D8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AbortIO - attempt to abort an in-progress I/O request
+
+<b>   SYNOPSIS</b>
+	AbortIO(iORequest)
+	        A1
+
+	VOID AbortIO(struct <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> *);
+
+<b>   FUNCTION</b>
+	Ask a device to abort a previously started <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a>.  This is done
+	by calling the device's ABORTIO vector, with your given <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a>.
+
+
+	AbortIO is a command the device that may or may not grant.  If
+	successful, the device will stop processing the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a>, and
+	reply to it earlier than it would otherwise have done.
+
+<b>   NOTE</b>
+	AbortIO() does NOT <a href="../Includes_and_Autodocs_3._guide/node022F.html">Remove()</a> the <a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a> from your ReplyPort, OR
+	wait for it to complete.  After an AbortIO() you must wait normally
+	for the reply message before actually reusing the request.
+
+	If a request has already completed when AbortIO() is called, no
+	action is taken.
+
+<b>   EXAMPLE</b>
+	    AbortIO(timer_request);
+	    WaitIO(timer_request);
+	    /* <a href="../Includes_and_Autodocs_3._guide/node062E.html#line46">Message</a> is free to be reused */
+
+<b>   INPUTS</b>
+	iORequest - pointer to an I/O request block (must have been used
+		at least once.  May be active or finished).
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0247.html">WaitIO()</a>, <a href="../Includes_and_Autodocs_3._guide/node0204.html">DoIO()</a>, <a href="../Includes_and_Autodocs_3._guide/node0236.html">SendIO()</a>, <a href="../Includes_and_Autodocs_3._guide/node01F5.html">CheckIO()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

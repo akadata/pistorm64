@@ -1,0 +1,219 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/modules/getdisplay.c" NODE="MAIN" TITLE="Devices/modules/getdisplay.c" -->
+<head>
+<title>Devices/modules/getdisplay.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02F8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02FA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*----------------------------------------------------------------------*
+ * GETDISPLAY.C  Support routines for reading/displaying ILBM files.
+ * (IFF is Interchange Format File.)
+ *
+ * Based on code by Jerry Morrison and Steve Shaw, Electronic Arts.
+ * This software is in the public domain.
+ * Modified for iffparse.library by CBM 04/90
+ * This version for the Amiga computer.
+ *----------------------------------------------------------------------*/
+
+#include &#034;iffp/ilbm.h&#034;
+#include &#034;iffp/packer.h&#034;
+#include &#034;iffp/ilbmapp.h&#034;
+
+extern struct Library *GfxBase;
+
+/* showilbm
+ *
+ * Passed an ILBMInfo initilized with with a not-in-use ParseInfo.iff
+ *   IFFHandle and desired propchks, collectchks, stopchks, and a filename,
+ *   will load and display an ILBM, initializing ilbm-&#062;Bmhd, ilbm-&#062;camg,
+ *   ilbm-&#062;scr, ilbm-&#062;win, ilbm-&#062;vp, ilbm-&#062;srp, ilbm-&#062;wrp,
+ *   ilbm-&#062;colortable, and ilbm-&#062;ncolors.
+ *
+ *   Note that ncolors may be more colors than you can LoadRGB4.
+ *   Use MIN(ilbm-&#062;ncolors,MAXAMCOLORREG) for color count if you change
+ *   the colors yourself using 1.3/2.0 functions.
+ *
+ * Returns 0 for success or an IFFERR (libraries/iffparse.h)
+ */
+
+LONG showilbm(struct ILBMInfo *ilbm, UBYTE *filename)
+{
+LONG error = 0L;
+
+    if(!(ilbm-&#062;ParseInfo.iff))	return(CLIENT_ERROR);
+
+    if(!(error = openifile((struct ParseInfo *)ilbm, filename, IFFF_READ)))
+	{
+	D(bug(&#034;showilbm: openifile successful\n&#034;));
+
+	error = parseifile((struct ParseInfo *)ilbm,
+				ID_FORM, ID_ILBM,
+				ilbm-&#062;ParseInfo.propchks,
+				ilbm-&#062;ParseInfo.collectchks,
+				ilbm-&#062;ParseInfo.stopchks);
+
+	if((!error)||(error == IFFERR_EOC)||(error == IFFERR_EOF))
+	    {
+	    D(bug(&#034;showilbm: parseifile successful\n&#034;));
+
+	    if(contextis(ilbm-&#062;ParseInfo.iff,ID_ILBM,ID_FORM))
+		{
+	    	if(error = createdisplay(ilbm))	deletedisplay(ilbm);
+		}
+	    else
+		{
+		closeifile((struct ParseInfo *)ilbm);
+		message(&#034;Not an ILBM\n&#034;);
+		error = NOFILE;
+		}
+	    }
+	}
+    return(error);
+}
+
+
+/* unshowilbm
+ *
+ * frees and closes everything alloc'd/opened by showilbm
+ */
+void unshowilbm(struct ILBMInfo *ilbm)
+{
+	deletedisplay(ilbm);
+	closeifile((struct ParseInfo *)ilbm);
+}
+
+
+
+/* createdisplay
+ *
+ * Passed a initialized ILBMInfo with parsed IFFHandle (chunks parsed,
+ * stopped at BODY),
+ * opens/allocs the display and colortable, and displays the ILBM.
+ *
+ * If successful, sets up ilbm-&#062;Bmhd, ilbm-&#062;camg, ilbm-&#062;scr, ilbm-&#062;win,
+ *   ilbm-&#062;vp,  ilbm-&#062;wrp, ilbm-&#062;srp and also ilbm-&#062;colortable and
+ *   ilbm-&#062;ncolors.
+ *
+ * Note that ncolors may be more colors than you can LoadRGB4.
+ * Use MIN(ilbm-&#062;ncolors,MAXAMCOLORREG) for color count if you change
+ *   the colors yourself using 1.3/2.0 functions.
+ *
+ * Returns 0 for success or an IFFERR (libraries/iffparse.h)
+ */
+
+LONG createdisplay(struct ILBMInfo *ilbm)
+	{
+	int error;
+
+	D(bug(&#034;createdisplay:\n&#034;));
+
+	error 			= getdisplay(ilbm);
+
+	D(bug(&#034;createdisplay: after getdisplay, error = %ld\n&#034;, error));
+
+	if(!error) 	error 	= loadbody(ilbm-&#062;ParseInfo.iff,
+						&#038;ilbm-&#062;scr-&#062;BitMap,&#038;ilbm-&#062;Bmhd);
+
+	D(bug(&#034;createdisplay: after loadbody, error = %ld\n&#034;, error));
+
+	if(!error)
+		{
+		if(!(getcolors(ilbm)))
+		   LoadRGB4(ilbm-&#062;vp, ilbm-&#062;colortable,
+				MIN(ilbm-&#062;ncolors,MAXAMCOLORREG));
+		}
+	if(error)  deletedisplay(ilbm);
+	return(error);
+	}
+
+
+/* deletedisplay
+ *
+ * closes and deallocates created display and colors
+ */
+void deletedisplay(struct ILBMInfo *ilbm)
+	{
+	freedisplay(ilbm);
+	freecolors(ilbm);
+	}
+
+
+
+/* getdisplay
+ *
+ * Passed an initialized ILBMInfo with a parsed IFFHandle (chunks parsed,
+ * stopped at BODY),
+ * gets the dimensions and mode for the display and calls the external
+ * routine opendisplay().  Our opendisplay() is in the screen.c
+ * module.  It opens a 2.0 or 1.3, ECS or non-ECS screen and window.
+ * It also does 2.0 overscan centering based on the closest user prefs.
+ *
+ * If successful, sets up ilbm-&#062;Bmhd, ilbm-&#062;camg, ilbm-&#062;scr, ilbm-&#062;win,
+ *   ilbm-&#062;vp, ilbm-&#062;wrp, ilbm-&#062;srp
+ *
+ * Returns 0 for success or an IFFERR (libraries/iffparse.h)
+ */
+LONG getdisplay(struct ILBMInfo *ilbm)
+	{
+	struct IFFHandle *iff;
+	BitMapHeader *bmhd;
+	ULONG				modeid;
+	UWORD				wide, high, deep;
+
+
+	if(!(iff=ilbm-&#062;ParseInfo.iff))	return(CLIENT_ERROR);
+
+	if(!(bmhd = (BitMapHeader *)findpropdata(iff, ID_ILBM, ID_BMHD)))
+		{
+		message (&#034;No ILBM.BMHD chunk\n&#034;);
+		return(IFFERR_SYNTAX);
+		}
+
+	*(&#038;ilbm-&#062;Bmhd)	= *bmhd;
+
+        wide = (RowBytes(bmhd-&#062;w)) &#062;= (RowBytes(bmhd-&#062;pageWidth)) ?
+                bmhd-&#062;w : bmhd-&#062;pageWidth;
+        high = MAX(bmhd-&#062;h, bmhd-&#062;pageHeight);
+        deep = MIN(bmhd-&#062;nPlanes,MAXAMDEPTH);
+
+	ilbm-&#062;camg = modeid = getcamg(ilbm);
+
+	/*
+	 * Open the display
+	 */
+	if(!(opendisplay(ilbm,wide,high,deep,modeid)))
+		{
+		message(&#034;Failed to open display.\n&#034;);
+		return(1);
+		}
+	return(0);
+	}
+
+
+/* freedisplay
+ *
+ * closes and deallocates display from getdisplay (not colors)
+ */
+void freedisplay(struct ILBMInfo *ilbm)
+	{
+	closedisplay(ilbm);
+	}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

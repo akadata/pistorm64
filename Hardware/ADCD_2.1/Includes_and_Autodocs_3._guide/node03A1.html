@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="CloseWorkBench()" TITLE="intuition.library/CloseWorkBench" -->
+<head>
+<title>intuition.library/CloseWorkBench</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03A0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03A2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME </b>
+	CloseWorkBench -- Closes the Workbench screen.
+
+<b>    SYNOPSIS </b>
+	Success = CloseWorkBench()
+	D0
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> CloseWorkBench( VOID );
+
+<b>    FUNCTION </b>
+	This routine attempts to close the Workbench screen:
+       -   Test whether or not any applications have opened windows on the
+           Workbench, and return FALSE if so.  Otherwise ...
+       -   Clean up all special buffers
+       -   <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close</a> the Workbench screen
+       -   Make the Workbench program mostly inactive (it will still
+           monitor disk activity)
+       -   Return TRUE
+
+<b>    INPUTS </b>
+	None
+
+<b>    RESULT </b>
+	TRUE if the Workbench screen closed successfully
+	FALSE if the Workbench was not open, or if it has windows
+	    open which are not Workbench drawers.
+
+<b>   NOTES</b>
+	This routine has been drastically rewritten for V36.
+	It is much more solid, although we haven't eliminated
+	all the problem cases yet.
+
+<b>    BUGS </b>
+	The name of this function is improperly spelled.  It ought
+	to have been CloseWorkbench().
+
+	It might be more convenient to have it return TRUE if the
+	Workbench wasn't opened when called.  The idea as it is now
+	is probably this: if you want to free up the memory of the
+	Workbench screen when your program begins, you can call
+	CloseWorkBench().  The return value of that call indicates
+	whether you should call <a href="../Includes_and_Autodocs_3._guide/node03D7.html">OpenWorkBench()</a> when your program
+	exits: if FALSE, that means either the the Workbench existed
+	but you could not close it, or that it wasn't around to
+	begin with, and you should not try to re-open it.
+
+	We would prefer that you provide a user selection to attempt
+	to open or close the Workbench screen from within your application,
+	rather than your making assumptions like these.
+
+<b>    SEE ALSO </b>
+	<a href="../Includes_and_Autodocs_3._guide/node03D7.html">OpenWorkBench()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="ShowTitle()" TITLE="intuition.library/ShowTitle" -->
+<head>
+<title>intuition.library/ShowTitle</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03F8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03FA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	ShowTitle -- Set the screen title bar display mode.
+
+<b>    SYNOPSIS</b>
+	ShowTitle( <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a>, ShowIt )
+		   A0      D0
+
+	VOID ShowTitle( struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> );
+
+<b>    FUNCTION</b>
+	This routine sets the SHOWTITLE flag of the specified screen, and
+	then coordinates the redisplay of the screen and its windows.
+
+	The screen title bar can appear either in front of or behind
+	WFLG_BACKDROP windows.  This is contrasted with the fact that
+	non-WFLG_BACKDROP windows always appear in front of the screen title
+	bar.  You specify whether you want the screen title bar to be in front
+	of or behind the screen's WFLG_BACKDROP windows by calling this
+	routine.
+
+	The ShowIt argument should be set to either TRUE or FALSE.  If TRUE,
+       the screen's title bar will be shown in front of WFLG_BACKDROP windows
+.
+       If FALSE, the title bar will be rendered behind all windows.
+
+       When a screen is first opened, the default setting of the SHOWTITLE
+       flag is TRUE.
+
+<b>    INPUTS</b>
+       <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> = pointer to a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> structure
+       ShowIt = Boolean TRUE or FALSE describing whether to show or hide the
+           screen title bar
+
+<b>    RESULT</b>
+       None
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IX-1/4Play.txt" NODE="IX-1-3" TITLE="Supporting the Interface in Software" -->
+<head>
+<title>Supporting the Interface in Software</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node012C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node012E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Because this &#034;+2&#034; joystick adapter attaches to the parallel port,
+supporting it in software is simply a matter of reading the correct
+lines on the parallel port.
+
+Many Amiga game programmers make the decision to throw away the OS and
+directly manipulate the hardware.  These programmers will no doubt come
+up with their own personal scheme for reading the appropriate
+information from the port.  Other, more forward thinking developers,
+may want to write their software in such a way as to be compatible with
+the OS.
+
+The following pair of code samples work in tandem to demonstrate one
+method of reading the necessary information from the parallel port in
+an OS friendly manner.  The C program <a href="../AmigaMail_Vol2_guide/node01FE.html">4play.c</a> is a simple example that
+demonstrates how to access the assembly functions.  The assembly
+language program <a href="../AmigaMail_Vol2_guide/node01FF.html">read34.asm</a> properly allocates the parallel port and any
+necessary signal lines, warning the OS not to let any other applications
+use them.  Other assembly routines do the actual hardware level reading
+and place the joystick values into C variables.  A cleanup routine
+releases the port and signal lines.  The example does not mask out the
+directional or fire button bits, it only prints the raw joystick data.
+I'll leave it as an exercise for the reader to interpret the meaning of
+the raw data.
+
+   <a href="../AmigaMail_Vol2_guide/node0200.html">lmkfile</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

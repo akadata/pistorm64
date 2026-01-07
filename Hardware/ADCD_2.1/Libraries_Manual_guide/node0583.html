@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/CloseWindowSafely.c" NODE="MAIN" TITLE="Lib_examples/CloseWindowSafely.c" -->
+<head>
+<title>Lib_examples/CloseWindowSafely.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0582.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0584.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* This example shows the CloseWindowSafely() function.  Use this
+** function to close any windows that share an IDCMP port with another
+** window.
+**
+** CloseWindowSafely.c
+**
+** these functions close an Intuition window that shares a port with other
+** Intuition windows.
+**
+** We are careful to set the UserPort to NULL before closing, and to free
+** any messages that it might have been sent.
+*/
+#include &#034;exec/types.h&#034;
+#include &#034;exec/nodes.h&#034;
+#include &#034;exec/lists.h&#034;
+#include &#034;exec/ports.h&#034;
+#include &#034;intuition/intuition.h&#034;
+
+/*
+** function to remove and reply all IntuiMessages on a port that have been
+** sent to a particular window (note that we don't rely on the ln_Succ
+** pointer of a message after we have replied it)
+*/
+VOID StripIntuiMessages(struct MsgPort *mp, struct Window *win)
+{
+struct IntuiMessage *msg;
+struct Node *succ;
+
+msg = (struct IntuiMessage *)mp-&#062;mp_MsgList.lh_Head;
+
+while (succ = msg-&#062;ExecMessage.mn_Node.ln_Succ)
+	{
+	if (msg-&#062;IDCMPWindow == win)
+		{
+		/* Intuition is about to free this message.
+		** Make sure that we have politely sent it back.
+		*/
+		Remove(msg);
+
+		ReplyMsg(msg);
+		}
+	msg = (struct IntuiMessage *)succ;
+	}
+}
+
+<a name="line46">/*</a>
+** Entry point to CloseWindowSafely()
+** Strip all IntuiMessages from an IDCMP which are waiting for a specific
+** window.  When the messages are gone, set the UserPort of the window to
+** NULL and call ModifyIDCMP(win,0).  This will free the Intuition arts of
+** the IDMCMP and trun off message to this port without changing the
+** original UserPort (which may be in use by other windows).
+*/
+VOID CloseWindowSafely(struct Window *win)
+{
+/* we forbid here to keep out of race conditions with Intuition */
+Forbid();
+
+/* send back any messages for this window  that have not yet been
+** processed
+*/
+StripIntuiMessages(win-&#062;UserPort, win);
+
+/* clear UserPort so Intuition will not free it */
+win-&#062;UserPort = NULL;
+
+/* tell Intuition to stop sending more messages */
+ModifyIDCMP(win, 0L);
+
+/* turn multitasking back on */
+Permit();
+
+/* Now it's safe to really close the window */
+CloseWindow(win);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

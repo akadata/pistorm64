@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/utility" NODE="MapTags()" TITLE="utility.library/MapTags" -->
+<head>
+<title>utility.library/MapTags</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03D8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03DA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    MapTags -- Convert ti_Tag values in a list via map pairing. (V36)
+
+SYNOPSIS
+    MapTags(tagList, mapList, includeMiss)
+            A0       A1       D0
+
+    void MapTags(struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *tagList, struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> mapList,
+                 LONG includeMiss);
+
+FUNCTION
+    Apply a &#034;mapping list&#034; mapList to tagList:
+
+    If the ti_Tag field of an item in tagList appears as ti_Tag in some
+    item in mapList, overwrite ti_Tag with the corresponding ti_Data
+    from the map list.
+
+    If a tag in tagList does not appear in the mapList, you can choose
+    to have it removed by changing it to TAG_IGNORE. Do this by setting
+    includeMiss to FALSE.
+
+    If you want to have items which do not appear in the mapList
+    survive the mapping as-is, set includeMiss to 1.
+
+    This is central to gadget interconnections where you want
+    to convert the tag values from one space (the sender) to
+    another (the receiver).
+
+INPUTS
+    tagList         - Input list of tag items which is to be mapped
+                      to Tag values as specified in mapList.
+    mapList         - a &#034;mapping list&#034; tagItem list which pairs Tag
+                      values expected to appear in tagList with new
+                      values to be substituted in the ti_Tag fields of
+                      tagList.  May be NULL, which means that all items
+                      in tagList will be eliminated.
+    includeMiss     - 0 to remove tags from tagList not in mapList,
+                      1 to remove
+
+RESULT
+    None.
+
+EXAMPLE
+    /* Consider this source list: */
+        struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> list[] = {
+            { MY_SIZE,      71 },
+            { MY_WEIGHT,    200 },
+            { TAG_END,      } };
+
+    /* And the mapping list: */
+        struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> map[] = {
+            { MY_SIZE,      HIS_TALL },
+            { TAG_END,      } };
+
+    /* Then after MapTags( list, map, 0 ), 'list' will become: */
+            { HIS_TALL, 71 },
+            { TAG_IGNORE, },
+            { TAG_END, }
+
+    /* Then after MapTags( list, map, 1 ), 'list' will become: */
+            { HIS_TALL, 71 },
+            { MY_WEIGHT, 200 },
+            { TAG_END, }
+
+NOTES
+    The procedure will change the values of the input tag list
+    tagList (but not mapList).
+
+    You can &#034;filter&#034; a list by passing includeMiss as 0, and having the
+    data items in the map list equal the corresponding tags.
+
+    You can perform the inverse filter (&#034;everything but&#034;) by passing
+    includeMiss equal to 1, and creating a map item for every tag you
+    want to filter out, pairing it with a mapped data value of
+    TAG_IGNORE.
+
+    For safety and &#034;order independence&#034; of tag item arrays, if you
+    attempt to map some tag to the value TAG_END, the value TAG_IGNORE
+    will be substituted instead.
+
+BUGS
+
+SEE ALSO
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

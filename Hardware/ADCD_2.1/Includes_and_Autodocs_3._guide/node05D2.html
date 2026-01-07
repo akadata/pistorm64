@@ -1,0 +1,265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/libraries/amigaguide.h" NODE="MAIN" TITLE="include/libraries/amigaguide.h" -->
+<head>
+<title>include/libraries/amigaguide.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05D1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05D3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef LIBRARIES_AMIGAGUIDE_H
+#define LIBRARIES_AMIGAGUIDE_H
+/*
+**	$VER: amigaguide.h 44.1 (14.3.1999)
+**	Includes Release 44.1
+**
+**	Interface definitions for AmigaGuide(tm) hypertext system
+**
+**	(C) Copyright 1990-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif /* EXEC_TYPES_H */
+
+#ifndef EXEC_LISTS_H
+#include &#060;exec/lists.h&#062;
+#endif /* EXEC_LISTS_H */
+
+#ifndef EXEC_NODES_H
+#include &#060;exec/nodes.h&#062;
+#endif /* EXEC_NODES_H */
+
+#ifndef EXEC_SEMAPHORES_H
+#include &#060;exec/semaphores.h&#062;
+#endif
+
+#ifndef INTUITION_INTUITION_H
+#include &#060;intuition/intuition.h&#062;
+#endif
+
+#ifndef INTUITION_SCREENS_H
+#include &#060;intuition/screens.h&#062;
+#endif
+
+#ifndef INTUITION_CLASSUSR_H
+#include &#060;intuition/classusr.h&#062;
+#endif
+
+#ifndef DOS_DOS_H
+#include &#060;dos/dos.h&#062;
+#endif
+
+#ifndef UTILITY_TAGITEM_H
+#include &#060;utility/tagitem.h&#062;
+#endif
+
+#ifndef APSH_TOOL_ID
+#define	APSH_TOOL_ID 11000L
+#define	StartupMsgID		(APSH_TOOL_ID+1L)	/* Startup message */
+#define	LoginToolID		(APSH_TOOL_ID+2L)	/* Login a tool SIPC port */
+#define	LogoutToolID		(APSH_TOOL_ID+3L)	/* Logout a tool SIPC port */
+#define	ShutdownMsgID		(APSH_TOOL_ID+4L)	/* Shutdown message */
+#define	ActivateToolID		(APSH_TOOL_ID+5L)	/* Activate tool */
+#define	DeactivateToolID	(APSH_TOOL_ID+6L)	/* Deactivate tool */
+#define	ActiveToolID		(APSH_TOOL_ID+7L)	/* Tool Active */
+#define	InactiveToolID		(APSH_TOOL_ID+8L)	/* Tool Inactive */
+#define	ToolStatusID		(APSH_TOOL_ID+9L)	/* Status message */
+#define	ToolCmdID		(APSH_TOOL_ID+10L)	/* Tool command message */
+#define	ToolCmdReplyID		(APSH_TOOL_ID+11L)	/* Reply to tool command */
+#define	ShutdownToolID		(APSH_TOOL_ID+12L)	/* Shutdown tool */
+#endif
+
+/* Attributes accepted by GetAmigaGuideAttr() */
+#define	AGA_Dummy		(TAG_USER)
+#define	AGA_Path		(AGA_Dummy+1)
+#define	AGA_XRefList		(AGA_Dummy+2)
+#define	AGA_Activate		(AGA_Dummy+3)
+#define	AGA_Context		(AGA_Dummy+4)
+
+#define	AGA_HelpGroup		(AGA_Dummy+5)
+    /* (ULONG) Unique identifier */
+
+#define	AGA_Reserved1		(AGA_Dummy+6)
+#define	AGA_Reserved2		(AGA_Dummy+7)
+#define	AGA_Reserved3		(AGA_Dummy+8)
+
+#define	AGA_ARexxPort		(AGA_Dummy+9)
+    /* (struct MsgPort *) Pointer to the ARexx message port (V40) */
+
+#define	AGA_ARexxPortName	(AGA_Dummy+10)
+   /* (STRPTR) Used to specify the ARexx port name (V40) (not copied) */
+
+#define AGA_Secure		(AGA_Dummy+11)
+   /* (BOOL) Disable &#034;ONOPEN&#034;, &#034;ONCLOSE&#034; and &#034;LINK RX&#034;, &#034;LINK RXS&#034;, &#034;LINK SYSTEM&#034; commands (V41) */
+<a name="line86"></a>
+typedef void *AMIGAGUIDECONTEXT;
+<a name="line88"></a>
+struct AmigaGuideMsg
+{
+    struct Message	 agm_Msg;			/* Embedded Exec message structure */
+    ULONG		 agm_Type;			/* Type of message */
+    APTR		 agm_Data;			/* Pointer to message data */
+    ULONG		 agm_DSize;			/* Size of message data */
+    ULONG		 agm_DType;			/* Type of message data */
+    ULONG		 agm_Pri_Ret;			/* Primary return value */
+    ULONG		 agm_Sec_Ret;			/* Secondary return value */
+    APTR		 agm_System1;
+    APTR		 agm_System2;
+};
+
+<a name="line102">/* Allocation description structure */</a>
+struct NewAmigaGuide
+{
+    BPTR		 nag_Lock;			/* Lock on the document directory */
+    STRPTR		 nag_Name;			/* Name of document file */
+    struct Screen	*nag_Screen;			/* Screen to place windows within */
+    STRPTR		 nag_PubScreen;			/* Public screen name to open on */
+    STRPTR		 nag_HostPort;			/* Application's ARexx port name */
+    STRPTR		 nag_ClientPort;		/* Name to assign to the clients ARexx port */
+    STRPTR		 nag_BaseName;			/* Base name of the application */
+    ULONG		 nag_Flags;			/* Flags */
+    STRPTR		*nag_Context;			/* NULL terminated context table */
+    STRPTR		 nag_Node;			/* Node to align on first (defaults to Main) */
+    LONG		 nag_Line;			/* Line to align on */
+    struct TagItem	*nag_Extens;			/* Tag array extension */
+    VOID		*nag_Client;			/* Private! MUST be NULL */
+};
+
+/* public Client flags */
+#define	HTF_LOAD_INDEX		(1L&#060;&#060;0)			/* Force load the index at init time */
+#define	HTF_LOAD_ALL		(1L&#060;&#060;1)			/* Force load the entire database at init */
+#define	HTF_CACHE_NODE		(1L&#060;&#060;2)			/* Cache each node as visited */
+#define	HTF_CACHE_DB		(1L&#060;&#060;3)			/* Keep the buffers around until expunge */
+#define	HTF_UNIQUE		(1L&#060;&#060;15)		/* Unique ARexx port name */
+#define	HTF_NOACTIVATE		(1L&#060;&#060;16)		/* Don't activate window */
+
+#define	HTFC_SYSGADS		0x80000000
+
+/* Callback function ID's */
+#define	HTH_OPEN		0
+#define	HTH_CLOSE		1
+
+#define	HTERR_NOT_ENOUGH_MEMORY		100L
+#define	HTERR_CANT_OPEN_DATABASE	101L
+#define	HTERR_CANT_FIND_NODE		102L
+#define	HTERR_CANT_OPEN_NODE		103L
+#define	HTERR_CANT_OPEN_WINDOW		104L
+#define	HTERR_INVALID_COMMAND		105L
+#define	HTERR_CANT_COMPLETE		106L
+#define	HTERR_PORT_CLOSED		107L
+#define	HTERR_CANT_CREATE_PORT		108L
+#define	HTERR_KEYWORD_NOT_FOUND		113L
+<a name="line144"></a>
+typedef struct AmigaGuideHost *AMIGAGUIDEHOST;
+
+<a name="line147">/* Cross reference node */</a>
+struct XRef
+{
+    struct Node		 xr_Node;			/* Embedded node */
+    UWORD		 xr_Pad;			/* Padding */
+    struct DocFile	*xr_DF;				/* Document defined in */
+    STRPTR		 xr_File;			/* Name of document file */
+    STRPTR		 xr_Name;			/* Name of item */
+    LONG		 xr_Line;			/* Line defined at */
+    ULONG                xr_Reserved[2];		/* Don't touch! (V44) */
+};
+
+#define	XRSIZE	(sizeof (struct XRef))
+
+/* Types of cross reference nodes */
+#define	XR_GENERIC	0
+#define	XR_FUNCTION	1
+#define	XR_COMMAND	2
+#define	XR_INCLUDE	3
+#define	XR_MACRO	4
+#define	XR_STRUCT	5
+#define	XR_FIELD	6
+#define	XR_TYPEDEF	7
+#define	XR_DEFINE	8
+
+/* Callback handle */
+struct AmigaGuideHost
+{
+    struct Hook		 agh_Dispatcher;		/* Dispatcher */
+    ULONG		 agh_Reserved;			/* Must be 0 */
+    ULONG		 agh_Flags;
+    ULONG		 agh_UseCnt;			/* Number of open nodes */
+    APTR		 agh_SystemData;		/* Reserved for system use */
+    APTR		 agh_UserData;			/* Anything you want... */
+};
+
+/* Methods */
+#define	HM_FINDNODE	1
+#define	HM_OPENNODE	2
+#define	HM_CLOSENODE	3
+#define	HM_EXPUNGE	10		/* Expunge DataBase */
+
+<a name="line189">/* HM_FINDNODE */</a>
+struct opFindHost
+{
+    ULONG MethodID;
+    struct TagItem *ofh_Attrs;		/*  R: Additional attributes */
+    STRPTR ofh_Node;			/*  R: Name of node */
+    STRPTR ofh_TOC;			/*  W: Table of Contents */
+    STRPTR ofh_Title;			/*  W: Title to give to the node */
+    STRPTR ofh_Next;			/*  W: Next node to browse to */
+    STRPTR ofh_Prev;			/*  W: Previous node to browse to */
+};
+
+<a name="line201">/* HM_OPENNODE, HM_CLOSENODE */</a>
+struct opNodeIO
+{
+    ULONG MethodID;
+    struct TagItem *onm_Attrs;		/*  R: Additional attributes */
+    STRPTR onm_Node;			/*  R: Node name and arguments */
+    STRPTR onm_FileName;		/*  W: File name buffer */
+    STRPTR onm_DocBuffer;		/*  W: Node buffer */
+    ULONG onm_BuffLen;			/*  W: Size of buffer */
+    ULONG onm_Flags;			/* RW: Control flags */
+};
+
+/* onm_Flags */
+#define	HTNF_KEEP	(1L&#060;&#060;0)	/* Don't flush this node until database is
+				 * closed. */
+#define	HTNF_RESERVED1	(1L&#060;&#060;1)	/* Reserved for system use */
+#define	HTNF_RESERVED2	(1L&#060;&#060;2)	/* Reserved for system use */
+#define	HTNF_ASCII	(1L&#060;&#060;3)	/* Node is straight ASCII */
+#define	HTNF_RESERVED3	(1L&#060;&#060;4)	/* Reserved for system use */
+#define	HTNF_CLEAN	(1L&#060;&#060;5)	/* Remove the node from the database */
+#define	HTNF_DONE	(1L&#060;&#060;6)	/* Done with node */
+
+/* onm_Attrs */
+#define	HTNA_Dummy	(TAG_USER)
+#define	HTNA_Screen	(HTNA_Dummy+1)	/* (struct Screen *) Screen that window resides in */
+#define	HTNA_Pens	(HTNA_Dummy+2)	/* Pen array (from DrawInfo) */
+#define	HTNA_Rectangle	(HTNA_Dummy+3)	/* Window box */
+
+#define	HTNA_HelpGroup	(HTNA_Dummy+5)	/* (ULONG) unique identifier */
+
+
+<a name="line232">/* HM_EXPUNGE */</a>
+struct opExpungeNode
+{
+    ULONG MethodID;
+    struct TagItem *oen_Attrs;		/*  R: Additional attributes */
+};
+
+#endif /* LIBRARIES_AMIGAGUIDE_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

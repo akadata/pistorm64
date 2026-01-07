@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_8" NODE="8-2-2" TITLE="8 / Creating Images / Directly Drawing the Image" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>8 / Creating Images / Directly Drawing the Image</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01BA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01BC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As noted above, you use the <a href="../Includes_and_Autodocs_2._guide/node0210.html">DrawImage()</a> call to directly draw an image
+into a screen or window <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>.
+
+    void DrawImage( struct RastPort *rp, struct Image *image,
+                    long leftOffset, long topOffset );
+
+The rp argument is a pointer to the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> into which the image should
+be drawn.  This RastPort may come from a Window or Screen structure.
+
+The image argument is a pointer to the list of <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structures that are
+to be rendered.  The list may contain a single Image structure.
+
+The leftOffset and topOffset arguments are the external component, or the
+base position, for this list of images.  The <a href="../Libraries_Manual_guide/node01BA.html#line17">LeftEdge</a> and <a href="../Libraries_Manual_guide/node01BA.html#line17">TopEdge</a> values
+of each <a href="../Libraries_Manual_guide/node01BA.html">Image</a> structure are added to these values to determine the final
+position of each image.
+
+Images may also be indirectly drawn by attaching them to gadgets, menus or
+requesters when they are initialized.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

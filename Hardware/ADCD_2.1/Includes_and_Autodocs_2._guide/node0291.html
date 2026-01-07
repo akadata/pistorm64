@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="DateToStr()" TITLE="dos.library/DateToStr" -->
+<head>
+<title>dos.library/DateToStr</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0290.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0292.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    DateToStr -- Converts a <a href="../Includes_and_Autodocs_2._guide/node0068.html#line53">DateStamp</a> to a string (V36)
+
+SYNOPSIS
+    success = DateToStr( datetime )
+    D0                      D1
+
+    BOOL DateToStr(struct <a href="../Includes_and_Autodocs_2._guide/node0060.html#line26">DateTime</a> *)
+
+FUNCTION
+    StamptoStr converts an AmigaDOS <a href="../Includes_and_Autodocs_2._guide/node0068.html#line53">DateStamp</a> to a human
+    readable ASCII string as requested by your settings in the
+    <a href="../Includes_and_Autodocs_2._guide/node0060.html#line26">DateTime</a> structure.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node0060.html#line26">DateTime</a> - a pointer to an initialized <a href="../Includes_and_Autodocs_2._guide/node0060.html#line26">DateTime</a> structure.
+
+    The <a href="../Includes_and_Autodocs_2._guide/node0060.html#line26">DateTime</a> structure should be initialized as follows:
+
+    dat_Stamp - a copy of the datestamp you wish to convert to
+              ascii.
+
+    dat_Format - a format   byte which specifies the format of the
+              dat_StrDate.  This can be any of the following
+              (note: If value used is something other than those
+              below, the default of FORMAT_DOS is used):
+
+              FORMAT_DOS:     AmigaDOS format (dd-mmm-yy).
+
+              FORMAT_INT:     International format (yy-mmm-dd).
+
+              FORMAT_USA:     American format (mm-dd-yy).
+
+              FORMAT_CDN:     Canadian format (dd-mm-yy).
+
+              FORMAT_DEF:     default format for locale.
+
+    dat_Flags - a   flags byte.  The only flag which affects this
+              function is:
+
+              DTF_SUBST:      If set, a string such as Today,
+                              Monday, etc., will be used instead
+                              of the dat_Format specification if
+                              possible.
+              DTF_FUTURE:     Ignored by this function.
+
+    dat_StrDay - pointer to a buffer to receive the day of the
+              week string.  (Monday, Tuesday, etc.). If null, this
+              string will not be generated.
+
+    dat_StrDate -   pointer to a buffer to receive the date
+              string, in the format requested by dat_Format,
+              subject to possible modifications by DTF_SUBST.  If
+              null, this string will not be generated.
+
+    dat_StrTime -   pointer to a buffer to receive the time of day
+              string. If NULL, this will not be generated.
+
+RESULT
+    success - a zero return indicates that the <a href="../Includes_and_Autodocs_2._guide/node0068.html#line53">DateStamp</a> was
+              invalid, and could not be converted.  Non-zero
+              indicates that the call succeeded.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0290.html">DateStamp()</a>, StrtoDate(), <a href="../Includes_and_Autodocs_2._guide/node0060.html">&#060;dos/datetime.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

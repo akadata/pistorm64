@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="listbrowser_gc" NODE="LBM_ADDNODE" TITLE="listbrowser_gc/LBM_ADDNODE" -->
+<head>
+<title>listbrowser_gc/LBM_ADDNODE</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0440.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0442.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        LBM_ADDNODE -- Adds a node to the attached list.
+
+<b>    FUNCTION</b>
+        Allocates a new node and adds it to the list currently attached to
+        the listbrowser (if there is one attached).  If rendering
+        information is available, then any necessary refreshing will take
+        place.  You do not need to detach your list first.
+
+        This method takes the following message structure:
+
+          struct <a href="../Includes_and_Autodocs_3._guide/node05EF.html#line31">lbAddNode</a>
+          {
+              ULONG MethodID;                 /* LBM_ADDNODE */
+              struct <a href="../Includes_and_Autodocs_3._guide/node060E.html#line24">GadgetInfo</a> *lba_GInfo;   /* to provide rendering info */
+              struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *lba_Node;          /* <a href="../Includes_and_Autodocs_3._guide/node0219.html">Insert()</a> after this node */
+              struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *lba_NodeAttrs;  /* <a href="../Includes_and_Autodocs_3._guide/node0444.html">AllocListBrowserNodeA()</a>
+                                                 taglist */
+          };
+
+<b>    RESULT</b>
+        Returns a pointer to the allocated node, or NULL on failure.
+
+<b>    SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node0442.html">LBM_EDITNODE</a>, <a href="../Includes_and_Autodocs_3._guide/node0443.html">LBM_REMNODE</a>, reaction.lib/LBAddNode
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

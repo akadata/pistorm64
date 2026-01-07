@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="NameFromLock()" TITLE="dos.library/NameFromLock" -->
+<head>
+<title>dos.library/NameFromLock</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02D2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02D4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    NameFromLock -- Returns the name of a locked object (V36)
+
+SYNOPSIS
+    success = NameFromLock(lock, buffer, len)
+    D0                      D1     D2    D3
+
+    BOOL NameFromLock(BPTR, STRPTR, LONG)
+
+FUNCTION
+    Returns a fully qualified path for the lock.  This routine is
+    guaranteed not to write more than len characters into the buffer.  The
+    name will be null-terminated.  NOTE: if the volume is not mounted,
+    the system will request it (unless of course you set pr_WindowPtr to
+    -1).  If the volume is not mounted or inserted, it will return an
+    error.  If the lock passed in is NULL, &#034;SYS:&#034; will be returned. If
+    the buffer is too short, an error will be returned, and <a href="../Includes_and_Autodocs_2._guide/node02C2.html">IoErr()</a> will
+    return ERROR_LINE_TOO_LONG.
+
+INPUTS
+    lock   - Lock of object to be examined.
+    buffer - Buffer to store name.
+    len    - Length of buffer.
+
+RESULT
+    success - Success/failure indicator.
+
+BUGS
+    Should return the name of the boot volume instead of SYS: for a NULL
+    lock.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02D2.html">NameFromFH()</a>, <a href="../Includes_and_Autodocs_2._guide/node02C6.html">Lock()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

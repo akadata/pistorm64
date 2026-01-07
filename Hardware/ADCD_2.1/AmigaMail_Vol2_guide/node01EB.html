@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VIII-51/sana2device.doc" NODE="VIII-51-11" TITLE="sana2.device/CMD_WRITE" -->
+<head>
+<title>sana2.device/CMD_WRITE</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01EA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01EC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+NAME
+    Write -- Send packet to the network.
+
+FUNCTION
+    This command causes the packet to be sent to the specified network
+    interface. Normally, appropriate packet header and trailer information
+    will be added to the packet data when it is sent.  If bit SANA2IOB_RAW
+    is set in io_Flags, then the ios2_Data is assumed to contain an entire
+    physical frame and will be sent (copied to the wire via
+    CopyFromBuffer() unmodified.
+
+    Note that the device should not check to see if the destination
+    address is on the local hardware.  Network protocols should realize
+    that the packet has a local destination long before it gets to a
+    SANA-II driver.
+
+IO REQUEST
+    ios2_Command    - CMD_WRITE.
+    ios2_Flags      - Supported flags are:
+                        SANA2IOB_RAW
+                        SANA2IOB_QUICK
+    ios2_PacketType - Packet type to send.
+    ios2_DstAddr    - Destination interface address for this packet.
+    ios2_DataLength - Length of the Data to be sent.
+    ios2_Data       - Abstract data structure which packet data is
+                      contained in.
+
+RESULTS
+    ios2_Error      - Zero if successful; non-zero otherwise.
+    ios2_WireError  - More specific error number.
+
+NOTES
+    The driver may not directly examine or modify anything pointed to by
+    ios2_Data.  It *must* use the requester-provided functions to access
+    this data.
+
+SEE ALSO
+    CMD_READ, S2_BROADCAST, S2_MULTICAST, any_protocol/CopyFromBuffer
+
+BUGS
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

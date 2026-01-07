@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/narrator" NODE="CMD_READ" TITLE="narrator.device/CMD_Read" -->
+<head>
+<title>narrator.device/CMD_Read</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04C2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04C4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CMD_READ - Query the narrator device for mouth shape or other
+               synchronization events.
+
+SYNOPSIS
+    Standard device command.
+
+FUNCTION
+    Currently, there are three events which the user can inquire
+    about from the narrator device.  These are: mouth shape changes,
+    start of word, and start of syllable.  Each read request returns
+    information about any or all of these events as determined by
+    the bits set in the sync field of the read <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block.  In
+    the case of mouth shape changes, each shape returned is guaranteed
+    to be different from the previously returned shape to allow
+    updating to be done only when necessary.  Each read request is
+    associated with a write request by information contained in the
+    <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block used to open the device.  Since the first field
+    in the read <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block is a write <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> structure, this
+    association is easily made by copying the write <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block
+    (after the <a href="../Includes_and_Autodocs_2._guide/node04C8.html">OpenDevice</a> call) into the voice field of the read
+    <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block.  If there is no write in progress or in the
+    device input queue with the same pseudo unit number as the read
+    request, the read will be returned to the user with an error.  This
+    is also how the user knows that the write request has finished and
+    that s/he should not issue any more reads.  Note that in this case
+    the mouth shapes may not be different from previously returned values.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node0042.html#line130">mouth_rb</a> <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block with the voice field (a <a href="../Includes_and_Autodocs_2._guide/node0042.html#line95">narrator_rb</a>
+    structure) copied from the associated write request with the
+    following fields modified:
+
+       io_Message - Pointer to message port for read request
+       io_Command - CMD_READ
+       io_Error   - Clear before issuing first read
+       width      - 0
+       height     - 0
+
+RESULTS
+    As long as the speech is in progress, each read returns the
+    following information in the <a href="../Includes_and_Autodocs_2._guide/node0042.html#line130">mouth_rb</a> <a href="../Includes_and_Autodocs_2._guide/node0094.html#line19">IORequest</a> block.
+
+    If mouth shape changes are requested the following fields are
+    modified:
+       width  - Contains mouth width value in arbitrary units
+       height - Contains mouth height value in arbitrary units
+       shape  - Compressed form of mouth shapes (internal use only)
+
+    ******  NEW FOR V37 NARRATOR
+
+    If word synchronization is requested:
+       sync   - Bit NDB_WORDSYNC is set
+
+    If syllable synchronization is requested:
+       sync   - Bit NDB_SYLSYNC is set
+
+    Note that any or all of the above fields can be set and it is
+    the user's responsibility to check for all possibilities.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node04C7.html">CMD_WRITE</a>
+    Exec input/output documentation.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

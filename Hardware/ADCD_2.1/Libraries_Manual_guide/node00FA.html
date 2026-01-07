@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-9-1" TITLE="3 / Other Screen Functions / Screen Depth Arrangement" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Other Screen Functions / Screen Depth Arrangement</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00F9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00FB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Includes_and_Autodocs_2._guide/node024D.html">ScreenToFront()</a> and <a href="../Includes_and_Autodocs_2._guide/node024C.html">ScreenToBack()</a> make a screen either the frontmost or
+the backmost screen.  If an application needs to render into a screen
+before the screen becomes visible to the user, the screen may be opened
+behind all other screens and later moved to the front when ready with
+ScreenToFront().
+
+    VOID ScreenToFront( struct Screen * )
+<a name="line9">    VOID ScreenToBack ( struct Screen * )</a>
+
+Depth control of screens is also available through the depth arrangement
+gadget in the screen's title bar or through keyboard shortcuts.  The N key
+with the Left-Amiga qualifier moves the Workbench screen to front.  The M
+key with the Left-Amiga qualifier moves the frontmost screen to back.
+Repeated selection of Left-Amiga-M will cycle through available screens.
+These keys are processed through the keymap and will retain their value
+even if the key location changes.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

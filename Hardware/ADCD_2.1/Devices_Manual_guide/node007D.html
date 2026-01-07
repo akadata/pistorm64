@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_11" NODE="11-5-1" TITLE="11 / Amiga BootStrap / Bootblock Booting" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>11 / Amiga BootStrap / Bootblock Booting</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node007C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node007E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In BootBlock booting the sequence of events is as follows:
+
+   1. The disk device must contain valid boot blocks:
+
+       a) the device and unit from dn_Startup opens successfully,
+
+       b) memory is available for the &#060;de_BootBlocks&#062; * &#060;de_SizeBlock&#062; * 4
+          bytes of boot block code,
+
+       c) the device commands CMD_CLEAR, <a href="../Includes_and_Autodocs_2._guide/node0524.html">TD_CHANGENUM</a>, and CMD_READ of the
+          boot blocks execute without error,
+
+       d) the boot blocks start with the three characters &#034;DOS&#034; and pass
+          the longword checksum (with carry wraparound), and
+
+       e) memory is available to construct a boot node on the eb_MountList
+          to describe the floppy.  If a device error is reported in 1.c.,
+          or if memory is not available for 1.b. or 1.e., a recoverable
+          alert is presented before continuing.
+
+   2. The boot code in the boot blocks is invoked as follows:
+
+       a) The address of the entry point for the boot code is offset
+          BB_ENTRY into the boot blocks in memory.
+
+       b) The boot code is invoked with the I/O request used to issue the
+          device commands in 1.c. above in register A1, with the io_Offset
+          pointing to the beginning of the partition (the origin of the
+          boot blocks) and SysBase in A6.
+
+   3. The boot code returns with results in both D0 and A0.
+
+       a) Non-zero D0 indicates boot failure.  The recoverable alert
+          AN_BootError is presented before continuing.
+
+       b) Zero D0 indicates A0 contains a pointer to the function to
+          complete the boot.  This completion function is chained to with
+          SysBase in A6 after the strap module frees all its resources.
+          It is usually the dos.library initialization function, from the
+          dos.library resident tag.  Return from this function is
+          identical to return from the strap module itself.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/prtgfx.h" NODE="MAIN" TITLE="Includes/devices/prtgfx.h" -->
+<head>
+<title>Includes/devices/prtgfx.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node003A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node003C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DEVICES_PRTGFX_H
+#define DEVICES_PRTGFX_H
+/*
+**	$Filename: devices/prtgfx.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 1.12 $
+**	$Date: 90/07/26 $
+**
+**	printer.device structure definitions
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef  EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif
+<a name="line18"></a>
+<a name="line19">#define	PCMYELLOW	0		/* byte index for yellow */</a>
+<a name="line20">#define	PCMMAGENTA	1		/* byte index for magenta */</a>
+<a name="line21">#define	PCMCYAN		2		/* byte index for cyan */</a>
+<a name="line22">#define	PCMBLACK	3		/* byte index for black */</a>
+<a name="line23">#define PCMBLUE		PCMYELLOW	/* byte index for blue */</a>
+<a name="line24">#define PCMGREEN	PCMMAGENTA	/* byte index for green */</a>
+<a name="line25">#define PCMRED		PCMCYAN		/* byte index for red */</a>
+#define PCMWHITE	PCMBLACK	/* byte index for white */
+<a name="line27"></a>
+<a name="line28">union colorEntry {</a>
+<a name="line29">	ULONG colorLong;	/* quick access to all of YMCB */</a>
+<a name="line30">	UBYTE colorByte[4];	/* 1 entry for each of YMCB */</a>
+	BYTE colorSByte[4];	/* ditto (except signed) */
+};
+<a name="line33"></a>
+<a name="line34">struct PrtInfo { /* printer info */</a>
+<a name="line35">	int (*pi_render)();		/* PRIVATE - DO NOT USE! */</a>
+<a name="line36">	struct RastPort *pi_rp;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line37">	struct RastPort *pi_temprp;	/* PRIVATE - DO NOT USE! */</a>
+<a name="line38">	UWORD *pi_RowBuf;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line39">	UWORD *pi_HamBuf;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line40">	union colorEntry *pi_ColorMap;	/* PRIVATE - DO NOT USE! */</a>
+<a name="line41">	union colorEntry *pi_ColorInt;	/* color intensities for entire row */</a>
+<a name="line42">	union colorEntry *pi_HamInt;	/* PRIVATE - DO NOT USE! */</a>
+<a name="line43">	union colorEntry *pi_Dest1Int;	/* PRIVATE - DO NOT USE! */</a>
+<a name="line44">	union colorEntry *pi_Dest2Int;	/* PRIVATE - DO NOT USE! */</a>
+<a name="line45">	UWORD *pi_ScaleX;		/* array of scale values for X */</a>
+<a name="line46">	UWORD *pi_ScaleXAlt;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line47">	UBYTE *pi_dmatrix;		/* pointer to dither matrix */</a>
+<a name="line48">	UWORD *pi_TopBuf;		/* PRIVATE - DO NOT USE! */</a>
+	UWORD *pi_BotBuf;		/* PRIVATE - DO NOT USE! */
+<a name="line50"></a>
+<a name="line51">	UWORD pi_RowBufSize;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line52">	UWORD pi_HamBufSize;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line53">	UWORD pi_ColorMapSize;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line54">	UWORD pi_ColorIntSize;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line55">	UWORD pi_HamIntSize;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line56">	UWORD pi_Dest1IntSize;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line57">	UWORD pi_Dest2IntSize;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line58">	UWORD pi_ScaleXSize;		/* PRIVATE - DO NOT USE! */</a>
+	UWORD pi_ScaleXAltSize;		/* PRIVATE - DO NOT USE! */
+<a name="line60"></a>
+<a name="line61">	UWORD pi_PrefsFlags;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line62">	ULONG pi_special;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line63">	UWORD pi_xstart;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line64">	UWORD pi_ystart;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line65">	UWORD pi_width;			/* source width (in pixels) */</a>
+<a name="line66">	UWORD pi_height;		/* PRIVATE - DO NOT USE! */</a>
+<a name="line67">	ULONG pi_pc;			/* PRIVATE - DO NOT USE! */</a>
+<a name="line68">	ULONG pi_pr;			/* PRIVATE - DO NOT USE! */</a>
+<a name="line69">	UWORD pi_ymult;			/* PRIVATE - DO NOT USE! */</a>
+<a name="line70">	UWORD pi_ymod;			/* PRIVATE - DO NOT USE! */</a>
+<a name="line71">	WORD pi_ety;			/* PRIVATE - DO NOT USE! */</a>
+<a name="line72">	UWORD pi_xpos;			/* offset to start printing picture */</a>
+<a name="line73">	UWORD pi_threshold;		/* threshold value (from prefs) */</a>
+<a name="line74">	UWORD pi_tempwidth;		/* PRIVATE - DO NOT USE! */</a>
+	UWORD pi_flags;			/* PRIVATE - DO NOT USE! */
+};
+
+#endif	/* DEVICES_PRTGFX_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

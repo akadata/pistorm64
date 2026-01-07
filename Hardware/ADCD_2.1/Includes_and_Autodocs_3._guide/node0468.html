@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="lowlevel" NODE="ReadJoyPort()" TITLE="lowlevel.library/ReadJoyPort" -->
+<head>
+<title>lowlevel.library/ReadJoyPort</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0467.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0469.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ReadJoyPort -- return the state of the selected joy/mouse port. (V40)
+
+<b>   SYNOPSIS</b>
+	portState = ReadJoyPort(portNumber);
+	D0                      D0
+
+	ULONG ReadJoyPort(ULONG);
+
+<b>   FUNCTION</b>
+	This function is used to determine what device is attached to the
+	joy port and the current position/button state. The user may attach
+	a mouse, game controller, or joystick to the port and this function
+	will dynamically detect which device is attached and return the
+	appropriatly formatted portState.
+
+	To determine the type of controller that is attached, this function
+	clocks the game controller and/or interprets changes in the joy
+	port data. Valid clocked data from the game controller is immediately
+	detected. However, to accuratly determine if a mouse or joystick is
+	attached, several calls to this function are required along with some
+	movement at the joy port by the user.
+
+	This function always executes immediatly.
+
+	This is a low level single threaded function that does not fit the
+	normal Amiga multitasking model. Only one task can be executing
+	this routine at any time. All others will return immediately with
+	JP_TYPE_NOTAVAIL.
+
+	The nature of this routine is not meant to encourage non-multitasking
+	friendly programming practices like polling loops. If your task
+	is waiting for a transition to be returned use a <a href="../Includes_and_Autodocs_3._guide/node033B.html">WaitTOF()</a> between
+	calls to minimize the total system impact.
+
+	When called the first time, for each port, this function attempts to
+	acquire certain system resources. In order to aquire these resources
+	this function MUST be called from a task, or a DOS process. If this
+	function fails to aquire the necessary resources, it will
+	return with JP_TYPE_NOTAVAIL. Once the resources are aquired (return
+	value other than JP_TYPE_NOTAVAIL) this function may be used in
+	interrupts.
+
+<b>   INPUTS</b>
+	portNumber - port to read, in the range 0 to 3.
+
+<b>   RESULT</b>
+	portState - bit map that identifies the device and the current
+	            state of that device. The format of the bit map is
+	            dependant on the type of device attached.
+
+	            The following constants from <a href="../Includes_and_Autodocs_3._guide/node0624.html">&#060;libraries/lowlevel.h&#062;</a>
+	            are used to determine which device is attached and
+	            the state of that device.
+
+	            The type of device can be determined by applying
+	            the mask JP_TYPE_MASK to the return value and comparing
+	            the resultant value with the following:
+
+	                JP_TYPE_NOTAVAIL        port data unavailable
+	                JP_TYPE_GAMECTLR        game controller
+	                JP_TYPE_MOUSE           mouse
+	                JP_TYPE_JOYSTK          joystick
+	                JP_TYPE_UNKNOWN         unknown device
+
+	            If type = JP_TYPE_GAMECTLR the bit map of portState is:
+	                JPF_BUTTON_BLUE         Blue - Stop
+	                JPF_BUTTON_RED          Red - Select
+	                JPF_BUTTON_YELLOW       Yellow - Repeat
+	                JPF_BUTTON_GREEN        Green - Shuffle
+	                JPF_BUTTON_FORWARD      Charcoal - Forward
+	                JPF_BUTTON_REVERSE      Charcoal - Reverse
+	                JPF_BUTTON_PLAY         Grey - Play/Pause
+	                JPF_JOY_UP              Up
+	                JPF_JOY_DOWN            Down
+	                JPF_JOY_LEFT            Left
+	                JPF_JOY_RIGHT           Right
+
+	            If type = JP_TYPE_JOYSTK the bit map of portState is:
+	                JPF_BUTTON_BLUE         Right
+	                JPF_BUTTON_RED          Fire
+	                JPF_JOY_UP              Up
+	                JPF_JOY_DOWN            Down
+	                JPF_JOY_LEFT            Left
+	                JPF_JOY_RIGHT           Right
+
+	            If type = JP_TYPE_MOUSE the bit map of portState is:
+	                JPF_BUTTON_BLUE         Right mouse
+	                JPF_BUTTON_RED          Left mouse
+	                JPF_BUTTON_PLAY         Middle mouse
+	                JP_MVERT_MASK           Mask for vertical counter
+	                JP_MHORZ_MASK           Mask for horizontal counter
+
+<b>   SEE ALSO</b>
+	SetJoyPortAttrs()
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

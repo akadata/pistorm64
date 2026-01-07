@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="ANIM-2-2-2" TITLE="Chunk Formats / DLTA Chunk / Format for method 4 " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Chunk Formats / DLTA Chunk / Format for method 4 </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0247.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0249.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The DLTA chunk is modified slightly to have 16 long pointers at the start.
+The first 8 are as before - pointers to the start of the data for each of
+the bitplanes (up to a theoretical max of 8 planes).  The next 8 are
+pointers to the start of the offset/numbers data list.  If there is only
+one list of offset/numbers for all planes, then the pointer to that list
+is repeated in all positions so the playback code need not even be aware
+of it.  In fact, one could get fancy and have some bitplanes share lists
+while others have different lists, or no lists (the problems in these
+schemes lie in the generation, not in the playback).
+
+The best way to show the use of this format is in a sample playback
+routine.
+
+   SetDLTAshort(bm,deltaword)
+   struct BitMap *bm;
+   WORD *deltaword;
+   {
+      int i;
+      LONG *deltadata;
+      WORD *ptr,*planeptr;
+      register int s,size,nw;
+      register WORD *data,*dest;
+
+      deltadata = (LONG *)deltaword;
+      nw = bm-&#062;BytesPerRow &#062;&#062;1;
+
+      for (i=0;i&#060;bm-&#062;Depth;i++) {
+         planeptr = (WORD *)(bm-&#062;Planes[i]);
+         data = deltaword + deltadata[i];
+         ptr  = deltaword + deltadata[i+8];
+         while (*ptr != 0xFFFF) {
+            dest = planeptr + *ptr++;
+            size = *ptr++;
+            if (size &#060; 0) {
+               for (s=size;s&#060;0;s++) {
+                  *dest = *data;
+                  dest += nw;
+               }
+               data++;
+            }
+            else {
+               for (s=0;s&#060;size;s++) {
+                  *dest = *data++;
+                  dest += nw;
+               }
+            }
+         }
+      }
+      return(0);
+   }
+
+The above routine is for short word vertical compression with run length
+compression.  The most efficient way to support the various options is to
+replicate this routine and make alterations for, say, long word or XOR.
+The variable nw indicates the number of words to skip to go down the
+vertical column.  This one routine could easily handle horizontal
+compression by simply setting nw=1.  For ultimate playback speed, the
+core, at least, of this routine should be coded in assembly language.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

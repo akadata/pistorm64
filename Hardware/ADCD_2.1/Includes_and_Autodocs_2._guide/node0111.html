@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/resources/misc.i" NODE="MAIN" TITLE="Includes/resources/misc.i" -->
+<head>
+<title>Includes/resources/misc.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0110.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0112.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	RESOURCES_MISC_I
+RESOURCES_MISC_I	SET	1
+**
+**	$Filename: resources/misc.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.12 $
+**	$Date: 90/05/06 $
+**
+**	Unit number definitions for &#034;misc.resource&#034;
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+	IFND	EXEC_TYPES_I
+	INCLUDE &#034;exec/types.i&#034;
+	ENDC	!EXEC_TYPES_I
+
+	IFND	EXEC_LIBRARIES_I
+	INCLUDE &#034;exec/libraries.i&#034;
+	ENDC	!EXEC_LIBRARIES_I
+
+*
+* Unit number definitions.  Ownership of a resource grants low-level
+* bit access to the hardware registers.  You are still obligated to follow
+* the rules for shared access of the interrupt system.	(see
+* exec.library/SetIntVector or cia.resource as appropriate).
+*
+MR_SERIALPORT	EQU 0	;Amiga custom chip serial port registers &#038; interrupts
+			;(SERDAT,SERDATR,SERPER,ADKCON, and interrupts)
+MR_SERIALBITS	EQU 1	;Serial control bits (DTR,CTS, etc.)
+MR_PARALLELPORT	EQU 2	;The 8 bit parallel data port
+			;(CIAAPRA &#038; CIAADDRA only!)
+MR_PARALLELBITS	EQU 3	;All other parallel bits &#038; interrupts (BUSY,ACK,etc.)
+
+*
+* Library vector offset definitions
+*
+	LIBINIT LIB_BASE
+	LIBDEF	MR_ALLOCMISCRESOURCE	;-6
+	LIBDEF	MR_FREEMISCRESOURCE	;-12
+
+*
+* Name of misc.resource
+*
+MISCNAME	MACRO
+		DC.B	'misc.resource',0
+		CNOP	0,2
+		ENDM
+
+	ENDC	;RESOURCE_MISC_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

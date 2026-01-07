@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-2-10" TITLE="27 / / Using the Graphics Drawing Routines / Rectangle-fill Operations" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Using the Graphics Drawing Routines / Rectangle-fill Operations</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node035E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0360.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The final fill function, <a href="../Includes_and_Autodocs_2._guide/node046D.html">RectFill()</a>, is for filling rectangular areas.
+The form of this function follows:
+
+    RectFill(&#038;rastPort, xmin, ymin, xmax, ymax);
+
+As usual, the rastPort argument specifies the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> you want to draw
+into.  The xmin and ymin arguments specify the upper left corner of the
+rectangle to be filled. The xmax and ymax arguments specify the lower
+right corner of the rectangle to be filled.  Note that the variable xmax
+must be equal to or greater than xmin, and ymax must be equal to or
+<a name="line12">greater than ymin.</a>
+
+Rectangle-fill uses <a href="../Libraries_Manual_guide/node0350.html#line3">FgPen</a>, <a href="../Libraries_Manual_guide/node0350.html#line6">BgPen</a>, <a href="../Libraries_Manual_guide/node0350.html#line9">AOlPen</a>, <a href="../Libraries_Manual_guide/node0351.html">DrawMode</a>, <a href="../Libraries_Manual_guide/node034A.html#line9">AreaPtrn</a> and <a href="../Libraries_Manual_guide/node034F.html">Mask</a> to
+fill the area you specify. Remember that the fill can be multicolored as
+well as single- or two-colored.  When the DrawMode is <a href="../Libraries_Manual_guide/node0351.html#line17">COMPLEMENT</a>, it
+complements all bit planes, rather than only those planes in which the
+foreground is non-zero.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

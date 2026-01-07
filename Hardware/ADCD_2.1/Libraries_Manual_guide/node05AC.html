@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/simpleimage.c" NODE="MAIN" TITLE="Lib_examples/simpleimage.c" -->
+<head>
+<title>Lib_examples/simpleimage.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node05AB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node05AD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* simpleimage.c - program to show the use of a simple Intuition Image.
+**
+** compiled with:
+** lc -b1 -cfist -v -y simpleimage.c
+** blink FROM LIB:c.o+&#034;simpleimage.o&#034; TO &#034;simpleimage&#034; LIB LIB:lc.lib LIB:amiga.lib
+*/
+#define INTUI_V36_NAMES_ONLY
+
+#include &#060;exec/types.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/intuitionbase.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+struct IntuitionBase *IntuitionBase = NULL;
+
+#define MYIMAGE_LEFT    (0)
+#define MYIMAGE_TOP     (0)
+#define MYIMAGE_WIDTH   (24)
+#define MYIMAGE_HEIGHT  (10)
+#define MYIMAGE_DEPTH   (1)
+
+/* This is the image data.  It is a one bit-plane open rectangle which is 24
+** pixels wide and 10 high.  Make sure that it is in CHIP memory, or allocate
+** a block of chip memory with a call like this: AllocMem(data_size,MEMF_CHIP),
+** and then copy the data to that block.  See the Exec chapter on Memory
+** Allocation for more information on AllocMem().
+*/
+UWORD __chip myImageData[] =
+    {
+    0xFFFF, 0xFF00,
+    0xC000, 0x0300,
+    0xC000, 0x0300,
+    0xC000, 0x0300,
+    0xC000, 0x0300,
+    0xC000, 0x0300,
+    0xC000, 0x0300,
+    0xC000, 0x0300,
+    0xC000, 0x0300,
+    0xFFFF, 0xFF00,
+    };
+
+/*
+** main routine. Open required library and window and draw the images.
+** This routine opens a very simple window with no IDCMP.  See the
+** chapters on &#034;Windows&#034; and &#034;Input and Output Methods&#034; for more info.
+** Free all resources when done.
+*/
+VOID main(int argc, char *argv[])
+{
+struct Window *win;
+struct Image myImage;
+
+IntuitionBase = (struct IntuitionBase *)OpenLibrary(&#034;intuition.library&#034;,37);
+if (IntuitionBase != NULL)
+    {
+    if (NULL != (win = OpenWindowTags(NULL,
+                        WA_Width,       200,
+                        WA_Height,      100,
+                        WA_RMBTrap,     TRUE,
+                        TAG_END)))
+        {
+        myImage.LeftEdge    = MYIMAGE_LEFT;
+        myImage.TopEdge     = MYIMAGE_TOP;
+        myImage.Width       = MYIMAGE_WIDTH;
+        myImage.Height      = MYIMAGE_HEIGHT;
+        myImage.Depth       = MYIMAGE_DEPTH;
+        myImage.ImageData   = myImageData;
+        myImage.PlanePick   = 0x1;              /* use first bit-plane     */
+        myImage.PlaneOnOff  = 0x0;              /* clear all unused planes */
+        myImage.NextImage   = NULL;
+
+        /* Draw the 1 bit-plane image into the first bit-plane (color 1) */
+        DrawImage(win-&#062;RPort,&#038;myImage,10,10);
+
+        /* Draw the same image at a new location */
+        DrawImage(win-&#062;RPort,&#038;myImage,100,10);
+
+        /* Wait a bit, then quit.
+        ** In a real application, this would be an event loop, like the
+        ** one described in the Intuition Input and Output Methods chapter.
+        */
+        Delay(200);
+
+        CloseWindow(win);
+        }
+    CloseLibrary((struct Library *)IntuitionBase);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

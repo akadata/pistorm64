@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="BltTemplate()" TITLE="graphics.library/BltTemplate" -->
+<head>
+<title>graphics.library/BltTemplate</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02B6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02B8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	BltTemplate -- Cookie cut a shape in a rectangle to the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+
+<b>   SYNOPSIS</b>
+	BltTemplate(SrcTemplate, SrcX, SrcMod, rp,
+	            A0           D0:16  D1:16  A1
+	    DstX,  DstY, SizeX, SizeY)
+	    D2:16  D3:16 D4:16  D5:16
+
+	void BltTemplate(UWORD *, WORD, WORD, struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *,
+	     WORD, WORD, WORD, WORD);
+
+<b>   FUNCTION</b>
+	This function draws the image in the template into the
+	<a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> in the current color and drawing mode at the
+	specified position.  The template is assumed not to overlap
+	the destination.
+	If the template falls outside the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> boundary, it is
+	truncated to that boundary.
+
+	Note: the SrcTemplate pointer should point to the &#034;nearest&#034; word
+	   (rounded down) of the template mask. Fine alignment of the mask
+	   is achieved by setting the SrcX bit offseet within the range
+	   of 0 to 15 decimal.
+
+<b>   INPUTS</b>
+	SrcTemplate  - pointer to the first (nearest) word of the template mask.
+	SrcX         - x bit offset into the template mask (range 0..15).
+	SrcMod       - number of bytes per row in template mask.
+	rp           - pointer to destination <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.
+	DstX, DstY   - x and y coordinates of the upper left
+	               corner of the destination for the blit.
+	SizeX, SizeY - size of the rectangle to be used as the
+	               template.
+
+<b>   NOTES</b>
+	o   This function may use the blitter.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02B2.html">BltBitMap()</a>  <a href="../Includes_and_Autodocs_3._guide/node05D7.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

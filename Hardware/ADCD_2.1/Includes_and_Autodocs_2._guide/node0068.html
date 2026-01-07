@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/dos.h" NODE="MAIN" TITLE="Includes/dos/dos.h" -->
+<head>
+<title>Includes/dos/dos.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0067.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0069.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_DOS_H
+#define DOS_DOS_H
+/*
+**	$Filename: dos/dos.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.24 $
+**	$Date: 91/10/29 $
+**
+**	Standard C header for AmigaDOS
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif
+
+<a name="line19"></a>
+#define	 DOSNAME  &#034;dos.library&#034;
+
+/* Predefined Amiga DOS global constants */
+<a name="line23"></a>
+<a name="line24">#define DOSTRUE (-1L)</a>
+#define DOSFALSE (0L)
+
+/* Mode parameter to Open() */
+<a name="line28">#define MODE_OLDFILE	     1005   /* Open existing file read/write</a>
+				     * positioned at beginning of file. */
+<a name="line30">#define MODE_NEWFILE	     1006   /* Open freshly created file (delete</a>
+				     * old file) read/write, exclusive lock. */
+<a name="line32">#define MODE_READWRITE	     1004   /* Open old file w/shared lock,</a>
+				     * creates file if doesn't exist. */
+
+<a name="line35">/* Relative position to Seek() */</a>
+<a name="line36">#define OFFSET_BEGINNING    -1	    /* relative to Begining Of File */</a>
+<a name="line37">#define OFFSET_CURRENT	     0	    /* relative to Current file position */</a>
+#define OFFSET_END	     1	    /* relative to End Of File	  */
+<a name="line39"></a>
+#define OFFSET_BEGINING	    OFFSET_BEGINNING  /* ancient compatibility */
+<a name="line41"></a>
+<a name="line42">#define BITSPERBYTE	     8</a>
+<a name="line43">#define BYTESPERLONG	     4</a>
+<a name="line44">#define BITSPERLONG	     32</a>
+<a name="line45">#define MAXINT		     0x7FFFFFFF</a>
+#define MININT		     0x80000000
+
+<a name="line48">/* Passed as type to Lock() */</a>
+<a name="line49">#define SHARED_LOCK	     -2	    /* File is readable by others */</a>
+<a name="line50">#define ACCESS_READ	     -2	    /* Synonym */</a>
+<a name="line51">#define EXCLUSIVE_LOCK	     -1	    /* No other access allowed	  */</a>
+#define ACCESS_WRITE	     -1	    /* Synonym */
+<a name="line53"></a>
+<a name="line54">struct DateStamp {</a>
+<a name="line55">   LONG	 ds_Days;	      /* Number of days since Jan. 1, 1978 */</a>
+<a name="line56">   LONG	 ds_Minute;	      /* Number of minutes past midnight */</a>
+   LONG	 ds_Tick;	      /* Number of ticks past minute */
+}; /* DateStamp */
+<a name="line59"></a>
+#define TICKS_PER_SECOND      50   /* Number of ticks in one second */
+
+<a name="line62">/* Returned by Examine() and ExNext(), must be on a 4 byte boundary */</a>
+<a name="line63">struct FileInfoBlock {</a>
+<a name="line64">   LONG	  fib_DiskKey;</a>
+   LONG	  fib_DirEntryType;  /* Type of Directory. If &#060; 0, then a plain file.
+<a name="line66">			      * If &#062; 0 a directory */</a>
+<a name="line67">   char	  fib_FileName[108]; /* Null terminated. Max 30 chars used for now */</a>
+<a name="line68">   LONG	  fib_Protection;    /* bit mask of protection, rwxd are 3-0.	   */</a>
+<a name="line69">   LONG	  fib_EntryType;</a>
+<a name="line70">   LONG	  fib_Size;	     /* Number of bytes in file */</a>
+<a name="line71">   LONG	  fib_NumBlocks;     /* Number of blocks in file */</a>
+<a name="line72">   struct DateStamp fib_Date;/* Date file last changed */</a>
+<a name="line73">   char	  fib_Comment[80];  /* Null terminated comment associated with file */</a>
+   char	  fib_Reserved[36];
+}; /* FileInfoBlock */
+
+/* FIB stands for FileInfoBlock */
+
+<a name="line79">/* FIBB are bit definitions, FIBF are field definitions */</a>
+<a name="line80">#define FIBB_SCRIPT    6	/* program is a script (execute) file */</a>
+<a name="line81">#define FIBB_PURE      5	/* program is reentrant and rexecutable */</a>
+<a name="line82">#define FIBB_ARCHIVE   4	/* cleared whenever file is changed */</a>
+<a name="line83">#define FIBB_READ      3	/* ignored by old filesystem */</a>
+<a name="line84">#define FIBB_WRITE     2	/* ignored by old filesystem */</a>
+<a name="line85">#define FIBB_EXECUTE   1	/* ignored by system, used by Shell */</a>
+<a name="line86">#define FIBB_DELETE    0	/* prevent file from being deleted */</a>
+<a name="line87">#define FIBF_SCRIPT    (1&#060;&#060;FIBB_SCRIPT)</a>
+<a name="line88">#define FIBF_PURE      (1&#060;&#060;FIBB_PURE)</a>
+<a name="line89">#define FIBF_ARCHIVE   (1&#060;&#060;FIBB_ARCHIVE)</a>
+<a name="line90">#define FIBF_READ      (1&#060;&#060;FIBB_READ)</a>
+<a name="line91">#define FIBF_WRITE     (1&#060;&#060;FIBB_WRITE)</a>
+<a name="line92">#define FIBF_EXECUTE   (1&#060;&#060;FIBB_EXECUTE)</a>
+#define FIBF_DELETE    (1&#060;&#060;FIBB_DELETE)
+
+/* Standard maximum length for an error string from fault.  However, most */
+/* error strings should be kept under 60 characters if possible.  Don't   */
+<a name="line97">/* forget space for the header you pass in. */</a>
+#define FAULT_MAX	82
+
+/* All BCPL data must be long word aligned.  BCPL pointers are the long word
+<a name="line101"> *  address (i.e byte address divided by 4 (&#062;&#062;2)) */</a>
+<a name="line102">typedef long  BPTR;		    /* Long word pointer */</a>
+typedef long  BSTR;		    /* Long word pointer to BCPL string	 */
+
+/* Convert BPTR to typical C pointer */
+#ifdef OBSOLETE_LIBRARIES_DOS_H
+#define BADDR( bptr )	(((ULONG)bptr) &#060;&#060; 2)
+#else
+<a name="line109">/* This one has no problems with CASTing */</a>
+#define BADDR(x)	((APTR)((ULONG)(x) &#060;&#060; 2))
+#endif
+<a name="line112">/* Convert address into a BPTR */</a>
+#define MKBADDR(x)	(((LONG)(x)) &#062;&#062; 2)
+
+/* BCPL strings have a length in the first byte and then the characters.
+ * For example:	 s[0]=3 s[1]=S s[2]=Y s[3]=S				 */
+
+<a name="line118">/* returned by Info(), must be on a 4 byte boundary */</a>
+<a name="line119">struct InfoData {</a>
+<a name="line120">   LONG	  id_NumSoftErrors;	/* number of soft errors on disk */</a>
+<a name="line121">   LONG	  id_UnitNumber;	/* Which unit disk is (was) mounted on */</a>
+<a name="line122">   LONG	  id_DiskState;		/* See defines below */</a>
+<a name="line123">   LONG	  id_NumBlocks;		/* Number of blocks on disk */</a>
+<a name="line124">   LONG	  id_NumBlocksUsed;	/* Number of block in use */</a>
+<a name="line125">   LONG	  id_BytesPerBlock;</a>
+<a name="line126">   LONG	  id_DiskType;		/* Disk Type code */</a>
+<a name="line127">   BPTR	  id_VolumeNode;	/* BCPL pointer to volume node */</a>
+   LONG	  id_InUse;		/* Flag, zero if not in use */
+}; /* InfoData */
+
+/* ID stands for InfoData */
+<a name="line132">	/* Disk states */</a>
+<a name="line133">#define ID_WRITE_PROTECTED 80	 /* Disk is write protected */</a>
+<a name="line134">#define ID_VALIDATING	   81	 /* Disk is currently being validated */</a>
+#define ID_VALIDATED	   82	 /* Disk is consistent and writeable */
+
+<a name="line137">	/* Disk types */</a>
+<a name="line138">/* ID_INTER_* use international case comparison routines for hashing */</a>
+<a name="line139">#define ID_NO_DISK_PRESENT	(-1)</a>
+<a name="line140">#define ID_UNREADABLE_DISK	(0x42414400L)	/* 'BAD\0' */</a>
+<a name="line141">#define ID_DOS_DISK		(0x444F5300L)	/* 'DOS\0' */</a>
+<a name="line142">#define ID_FFS_DISK		(0x444F5301L)	/* 'DOS\1' */</a>
+<a name="line143">#define ID_INTER_DOS_DISK	(0x444F5302L)	/* 'DOS\2' */</a>
+#define ID_INTER_FFS_DISK	(0x444F5303L)	/* 'DOS\3' */
+#define ID_NOT_REALLY_DOS	(0x4E444F53L)	/* 'NDOS'  */
+<a name="line146">#define ID_KICKSTART_DISK	(0x4B49434BL)	/* 'KICK'  */</a>
+<a name="line147">#define ID_MSDOS_DISK		(0x4d534400L)	/* 'MSD\0' */</a>
+<a name="line148"></a>
+<a name="line149">/* Errors from IoErr(), etc. */</a>
+<a name="line150">#define ERROR_NO_FREE_STORE		  103</a>
+<a name="line151">#define ERROR_TASK_TABLE_FULL		  105</a>
+<a name="line152">#define ERROR_BAD_TEMPLATE		  114</a>
+<a name="line153">#define ERROR_BAD_NUMBER		  115</a>
+<a name="line154">#define ERROR_REQUIRED_ARG_MISSING	  116</a>
+<a name="line155">#define ERROR_KEY_NEEDS_ARG		  117</a>
+<a name="line156">#define ERROR_TOO_MANY_ARGS		  118</a>
+<a name="line157">#define ERROR_UNMATCHED_QUOTES		  119</a>
+<a name="line158">#define ERROR_LINE_TOO_LONG		  120</a>
+<a name="line159">#define ERROR_FILE_NOT_OBJECT		  121</a>
+<a name="line160">#define ERROR_INVALID_RESIDENT_LIBRARY	  122</a>
+<a name="line161">#define ERROR_NO_DEFAULT_DIR		  201</a>
+<a name="line162">#define ERROR_OBJECT_IN_USE		  202</a>
+<a name="line163">#define ERROR_OBJECT_EXISTS		  203</a>
+<a name="line164">#define ERROR_DIR_NOT_FOUND		  204</a>
+<a name="line165">#define ERROR_OBJECT_NOT_FOUND		  205</a>
+<a name="line166">#define ERROR_BAD_STREAM_NAME		  206</a>
+<a name="line167">#define ERROR_OBJECT_TOO_LARGE		  207</a>
+<a name="line168">#define ERROR_ACTION_NOT_KNOWN		  209</a>
+<a name="line169">#define ERROR_INVALID_COMPONENT_NAME	  210</a>
+<a name="line170">#define ERROR_INVALID_LOCK		  211</a>
+<a name="line171">#define ERROR_OBJECT_WRONG_TYPE		  212</a>
+<a name="line172">#define ERROR_DISK_NOT_VALIDATED	  213</a>
+<a name="line173">#define ERROR_DISK_WRITE_PROTECTED	  214</a>
+<a name="line174">#define ERROR_RENAME_ACROSS_DEVICES	  215</a>
+<a name="line175">#define ERROR_DIRECTORY_NOT_EMPTY	  216</a>
+<a name="line176">#define ERROR_TOO_MANY_LEVELS		  217</a>
+<a name="line177">#define ERROR_DEVICE_NOT_MOUNTED	  218</a>
+<a name="line178">#define ERROR_SEEK_ERROR		  219</a>
+<a name="line179">#define ERROR_COMMENT_TOO_BIG		  220</a>
+<a name="line180">#define ERROR_DISK_FULL			  221</a>
+<a name="line181">#define ERROR_DELETE_PROTECTED		  222</a>
+<a name="line182">#define ERROR_WRITE_PROTECTED		  223</a>
+#define ERROR_READ_PROTECTED		  224
+<a name="line184">#define ERROR_NOT_A_DOS_DISK		  225</a>
+<a name="line185">#define ERROR_NO_DISK			  226</a>
+<a name="line186">#define ERROR_NO_MORE_ENTRIES		  232</a>
+<a name="line187">/* added for 1.4 */</a>
+<a name="line188">#define ERROR_IS_SOFT_LINK		  233</a>
+<a name="line189">#define ERROR_OBJECT_LINKED		  234</a>
+<a name="line190">#define ERROR_BAD_HUNK			  235</a>
+<a name="line191">#define ERROR_NOT_IMPLEMENTED		  236</a>
+#define ERROR_RECORD_NOT_LOCKED		  240
+#define ERROR_LOCK_COLLISION		  241
+#define ERROR_LOCK_TIMEOUT		  242
+#define ERROR_UNLOCK_ERROR		  243
+
+<a name="line197">/* error codes 303-305 are defined in dosasl.h */</a>
+<a name="line198"></a>
+<a name="line199">/* These are the return codes used by convention by AmigaDOS commands */</a>
+<a name="line200">/* See FAILAT and IF for relvance to EXECUTE files		      */</a>
+#define RETURN_OK			    0  /* No problems, success */
+#define RETURN_WARN			    5  /* A warning only */
+<a name="line203">#define RETURN_ERROR			   10  /* Something wrong */</a>
+<a name="line204">#define RETURN_FAIL			   20  /* Complete or severe failure*/</a>
+<a name="line205"></a>
+<a name="line206">/* Bit numbers that signal you that a user has issued a break */</a>
+#define SIGBREAKB_CTRL_C   12
+#define SIGBREAKB_CTRL_D   13
+#define SIGBREAKB_CTRL_E   14
+<a name="line210">#define SIGBREAKB_CTRL_F   15</a>
+<a name="line211"></a>
+<a name="line212">/* Bit fields that signal you that a user has issued a break */</a>
+<a name="line213">/* for example:	 if (SetSignal(0,0) &#038; SIGBREAKF_CTRL_C) cleanup_and_exit(); */</a>
+#define SIGBREAKF_CTRL_C   (1&#060;&#060;SIGBREAKB_CTRL_C)
+#define SIGBREAKF_CTRL_D   (1&#060;&#060;SIGBREAKB_CTRL_D)
+<a name="line216">#define SIGBREAKF_CTRL_E   (1&#060;&#060;SIGBREAKB_CTRL_E)</a>
+<a name="line217">#define SIGBREAKF_CTRL_F   ((long)1&#060;&#060;SIGBREAKB_CTRL_F)</a>
+<a name="line218"></a>
+/* Values returned by SameLock() */
+#define LOCK_DIFFERENT		-1
+<a name="line221">#define LOCK_SAME		0</a>
+<a name="line222">#define LOCK_SAME_VOLUME	1	/* locks are on same volume */</a>
+#define LOCK_SAME_HANDLER	LOCK_SAME_VOLUME
+/* LOCK_SAME_HANDLER was a misleading name, def kept for src compatibility */
+<a name="line225"></a>
+<a name="line226">/* types for ChangeMode() */</a>
+#define CHANGE_LOCK	0
+#define CHANGE_FH	1
+<a name="line229"></a>
+<a name="line230">/* Values for MakeLink() */</a>
+<a name="line231">#define LINK_HARD	0</a>
+<a name="line232">#define LINK_SOFT	1	/* softlinks are not fully supported yet */</a>
+<a name="line233"></a>
+/* values returned by ReadItem */
+#define	ITEM_EQUAL	-2		/* &#034;=&#034; Symbol */
+<a name="line236">#define ITEM_ERROR	-1		/* error */</a>
+<a name="line237">#define ITEM_NOTHING	0		/* *N, ;, endstreamch */</a>
+<a name="line238">#define ITEM_UNQUOTED	1		/* unquoted item */</a>
+<a name="line239">#define ITEM_QUOTED	2		/* quoted item */</a>
+<a name="line240"></a>
+<a name="line241">/* types for AllocDosObject/FreeDosObject */</a>
+#define DOS_FILEHANDLE		0	/* few people should use this */
+#define DOS_EXALLCONTROL	1	/* Must be used to allocate this! */
+#define	DOS_FIB			2	/* useful */
+#define DOS_STDPKT		3	/* for doing packet-level I/O */
+#define DOS_CLI			4	/* for shell-writers, etc */
+#define DOS_RDARGS		5	/* for ReadArgs if you pass it in */
+
+#endif	/* DOS_DOS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

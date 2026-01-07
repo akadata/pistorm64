@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-2-6" TITLE="27 / / / Drawing Multiple Lines with a Single Command" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / / Drawing Multiple Lines with a Single Command</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node035A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node035C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+You can use multiple <a href="../Includes_and_Autodocs_2._guide/node0436.html">Draw()</a> statements to draw connected line figures. If
+the shapes are all definable as interconnected, continuous lines, you can
+use a simpler function, called <a href="../Includes_and_Autodocs_2._guide/node0467.html">PolyDraw()</a>. PolyDraw() takes a set of line
+endpoints and draws a shape using these points. You call PolyDraw() with
+the statement:
+
+    PolyDraw(&#038;rastPort, count, arraypointer);
+
+<a href="../Includes_and_Autodocs_2._guide/node0467.html">PolyDraw()</a> reads the array of points and draws a line from the first pair
+of coordinates to the second, then a connecting line to each succeeding
+pair in the array until count points have been connected. This function
+uses the current drawing mode, pens, line pattern, and write mask
+specified in the target <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>; for example, this fragment draws a
+rectangle, using the five defined pairs of x,y coordinates.
+
+    SHORT linearray[] =
+        {
+         3, 3,
+        15, 3,
+        15,15,
+         3,15,
+         3, 3
+        };
+
+    PolyDraw(&#038;rastPort, 5, linearray);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

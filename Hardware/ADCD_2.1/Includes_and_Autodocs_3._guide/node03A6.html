@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="DoGadgetMethodA()" TITLE="intuition.library/DoGadgetMethodA" -->
+<head>
+<title>intuition.library/DoGadgetMethodA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03A5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03A7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	DoGadgetMethodA -- Invoke method on a boopsi gadget. (V39)
+	DoGadgetMethod -- Varargs stub for DoGadgetMethodA(). (V39)
+
+<b>    SYNOPSIS</b>
+	result = DoGadgetMethodA( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a>, <a href="../Includes_and_Autodocs_3._guide/node062E.html#line46">Message</a> )
+	D0		          A0      A1      A2         A3
+
+	ULONG DoGadgetMethodA( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+		struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> *, <a href="../Includes_and_Autodocs_3._guide/node0636.html#line28">Msg</a> );
+
+	result = DoGadgetMethod( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a>, MethodID, ...)
+
+	ULONG DoGadgetMethod( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *,
+		struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> *, ULONG, ... );
+
+<b>    FUNCTION</b>
+	Same as the <a href="../Includes_and_Autodocs_3._guide/node0038.html">DoMethod()</a> function of amiga.lib, but provides context
+	information and arbitration for classes which implement custom
+	Intuition gadgets.
+
+	You should use this function for boopsi gadget objects,
+	or for &#034;models&#034; which propagate information to gadgets.
+
+	Unlike <a href="../Includes_and_Autodocs_3._guide/node0038.html">DoMethod()</a>, this function provides a <a href="../Includes_and_Autodocs_3._guide/node060E.html#line24">GadgetInfo</a> pointer
+	(if possible) when invoking the method.  Some classes may
+	require or benefit from this.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line213">Gadget</a> = abstract pointer to a boopsi gadget
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = window gadget has been added to using <a href="../Includes_and_Autodocs_3._guide/node0393.html">AddGList()</a> or <a href="../Includes_and_Autodocs_3._guide/node0392.html">AddGadget()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line143">Requester</a> = for REQGADGETs, requester containing the gadget
+	<a href="../Includes_and_Autodocs_3._guide/node0636.html#line28">Msg</a> = the boopsi message to send
+
+<b>    RESULT</b>
+	The object does whatever it wants with the message you sent,
+	which might include updating its gadget visuals.
+
+	The return value is defined per-method.
+
+<b>    NOTES</b>
+	This function invokes the specified method with a <a href="../Includes_and_Autodocs_3._guide/node060E.html#line24">GadgetInfo</a>
+	derived from the 'Window' and 'Requester' pointers.  The <a href="../Includes_and_Autodocs_3._guide/node060E.html#line24">GadgetInfo</a>
+	is passed as the second parameter of the message, except for
+	OM_NEW, OM_SET, OM_NOTIFY, and OM_UPDATE, where the <a href="../Includes_and_Autodocs_3._guide/node060E.html#line24">GadgetInfo</a>
+	is passed as the third parameter.
+
+	Implementers of new gadget methods should ensure that the
+	<a href="../Includes_and_Autodocs_3._guide/node060E.html#line24">GadgetInfo</a> is the second long-word of their message!
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03CB.html">NewObject()</a>, <a href="../Includes_and_Autodocs_3._guide/node03A5.html">DisposeObject()</a>, <a href="../Includes_and_Autodocs_3._guide/node03B5.html">GetAttr()</a>, <a href="../Includes_and_Autodocs_3._guide/node03C3.html">MakeClass()</a>,
+	Document &#034;Basic Object-Oriented Programming System for Intuition&#034;
+	and the &#034;boopsi Class Reference&#034; document.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

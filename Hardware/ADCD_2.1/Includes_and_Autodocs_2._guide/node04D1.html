@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/serial" NODE="CMD_START" TITLE="serial.device/CMD_START" -->
+<head>
+<title>serial.device/CMD_START</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node04D0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node04D2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    Start -- restart paused I/O over the serial port
+
+FUNCTION
+    This function restarts all current I/O on the serial port by
+    sending an xON to the &#034;other side&#034;, and submitting a &#034;logical
+    xON&#034; to &#034;our side&#034;, if/when appropriate to current activity.
+
+IO REQUEST
+    io_Message      mn_ReplyPort initialized
+    io_Device       set by <a href="../Includes_and_Autodocs_2._guide/node04D4.html">OpenDevice</a>
+    io_Unit         set by <a href="../Includes_and_Autodocs_2._guide/node04D4.html">OpenDevice</a>
+    io_Command      CMD_START
+
+RESULTS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node04D2.html">serial.device/CMD_STOP</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

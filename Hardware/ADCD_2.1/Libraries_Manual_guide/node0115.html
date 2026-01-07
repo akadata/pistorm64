@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-4-2" TITLE="4 / Window Types / Borderless Window Type" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Window Types / Borderless Window Type</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0114.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0116.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The borderless window type has no borders rendered by Intuition.  Such a
+window will have no visual delineation from the rest of the display.  Be
+aware that a Borderless window which does not cover the entire display may
+cause visual confusion for the user.  When using a borderless window that
+does not cover the entire display, the application should provide some
+form of graphics to replace the borders provided by Intuition.
+
+In general, none of the system gadgets or the window title should be
+specified for a borderless window, as they may cause at least part of the
+<a name="line11">border to be rendered.</a>
+
+A typical application of a borderless window is to simulate graphics drawn
+directly into the screen, while remaining compatible with windows and
+menus. In this case, the application will often create a full sized,
+<a name="line16">borderless, backdrop window.</a>
+
+Use the WFLG_BORDERLESS flag or the <a href="../Libraries_Manual_guide/node0125.html#line68">WA_Borderless</a> tag to get this window
+type.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

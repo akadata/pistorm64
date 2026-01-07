@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/printer.h" NODE="MAIN" TITLE="Includes/devices/printer.h" -->
+<head>
+<title>Includes/devices/printer.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0051.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0053.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef     DEVICES_PRINTER_H
+#define     DEVICES_PRINTER_H
+/*
+**	$Filename: devices/printer.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 1.7 $
+**	$Date: 90/07/26 $
+**
+**	printer.device structure definitions
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef  EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+#endif
+<a name="line18"></a>
+#ifndef  EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+#endif
+<a name="line22"></a>
+#ifndef  EXEC_LISTS_H
+#include &#034;exec/lists.h&#034;
+#endif
+<a name="line26"></a>
+#ifndef  EXEC_PORTS_H
+#include &#034;exec/ports.h&#034;
+#endif
+<a name="line30"></a>
+<a name="line31">#define  PRD_RAWWRITE	   (CMD_NONSTD+0)</a>
+<a name="line32">#define  PRD_PRTCOMMAND    (CMD_NONSTD+1)</a>
+<a name="line33">#define  PRD_DUMPRPORT	   (CMD_NONSTD+2)</a>
+#define  PRD_QUERY	   (CMD_NONSTD+3)
+
+/* printer command definitions */
+<a name="line37"></a>
+<a name="line38">#define aRIS	 0  /* ESCc  reset		      ISO */</a>
+<a name="line39">#define aRIN	 1  /* ESC#1 initialize	      +++ */</a>
+<a name="line40">#define aIND	 2  /* ESCD  lf		      ISO */</a>
+<a name="line41">#define aNEL	 3  /* ESCE  return,lf		      ISO */</a>
+#define aRI	 4  /* ESCM  reverse lf	      ISO */
+<a name="line43"></a>
+<a name="line44">#define aSGR0	 5  /* ESC[0m normal char set	      ISO */</a>
+<a name="line45">#define aSGR3	 6  /* ESC[3m italics on	      ISO */</a>
+<a name="line46">#define aSGR23	 7  /* ESC[23m italics off	      ISO */</a>
+<a name="line47">#define aSGR4	 8  /* ESC[4m underline on	      ISO */</a>
+<a name="line48">#define aSGR24	 9  /* ESC[24m underline off	      ISO */</a>
+<a name="line49">#define aSGR1	10  /* ESC[1m boldface on	      ISO */</a>
+<a name="line50">#define aSGR22	11  /* ESC[22m boldface off	      ISO */</a>
+<a name="line51">#define aSFC	12  /* SGR30-39  set foreground color ISO */</a>
+#define aSBC	13  /* SGR40-49  set background color ISO */
+<a name="line53"></a>
+<a name="line54">#define aSHORP0 14  /* ESC[0w normal pitch	      DEC */</a>
+<a name="line55">#define aSHORP2 15  /* ESC[2w elite on		      DEC */</a>
+<a name="line56">#define aSHORP1 16  /* ESC[1w elite off	      DEC */</a>
+<a name="line57">#define aSHORP4 17  /* ESC[4w condensed fine on       DEC */</a>
+<a name="line58">#define aSHORP3 18  /* ESC[3w condensed off	      DEC */</a>
+<a name="line59">#define aSHORP6 19  /* ESC[6w enlarged on	      DEC */</a>
+#define aSHORP5 20  /* ESC[5w enlarged off	      DEC */
+<a name="line61"></a>
+<a name="line62">#define aDEN6	21  /* ESC[6&#034;z shadow print on	      DEC (sort of) */</a>
+<a name="line63">#define aDEN5	22  /* ESC[5&#034;z shadow print off       DEC */</a>
+<a name="line64">#define aDEN4	23  /* ESC[4&#034;z doublestrike on	      DEC */</a>
+<a name="line65">#define aDEN3	24  /* ESC[3&#034;z doublestrike off       DEC */</a>
+<a name="line66">#define aDEN2	25  /* ESC[2&#034;z	NLQ on		      DEC */</a>
+#define aDEN1	26  /* ESC[1&#034;z	NLQ off	      DEC */
+<a name="line68"></a>
+<a name="line69">#define aSUS2	27  /* ESC[2v superscript on	      +++ */</a>
+<a name="line70">#define aSUS1	28  /* ESC[1v superscript off	      +++ */</a>
+<a name="line71">#define aSUS4	29  /* ESC[4v subscript on	      +++ */</a>
+<a name="line72">#define aSUS3	30  /* ESC[3v subscript off	      +++ */</a>
+<a name="line73">#define aSUS0	31  /* ESC[0v normalize the line      +++ */</a>
+<a name="line74">#define aPLU	32  /* ESCL  partial line up	      ISO */</a>
+#define aPLD	33  /* ESCK  partial line down	      ISO */
+<a name="line76"></a>
+<a name="line77">#define aFNT0	34  /* ESC(B US char set	or Typeface  0 (default) */</a>
+<a name="line78">#define aFNT1	35  /* ESC(R French char set	or Typeface  1 */</a>
+<a name="line79">#define aFNT2	36  /* ESC(K German char set	or Typeface  2 */</a>
+<a name="line80">#define aFNT3	37  /* ESC(A UK char set	or Typeface  3 */</a>
+<a name="line81">#define aFNT4	38  /* ESC(E Danish I char set	or Typeface  4 */</a>
+<a name="line82">#define aFNT5	39  /* ESC(H Sweden char set	or Typeface  5 */</a>
+<a name="line83">#define aFNT6	40  /* ESC(Y Italian char set	or Typeface  6 */</a>
+<a name="line84">#define aFNT7	41  /* ESC(Z Spanish char set	or Typeface  7 */</a>
+<a name="line85">#define aFNT8	42  /* ESC(J Japanese char set	or Typeface  8 */</a>
+<a name="line86">#define aFNT9	43  /* ESC(6 Norweign char set	or Typeface  9 */</a>
+#define aFNT10	44  /* ESC(C Danish II char set or Typeface 10 */
+
+/*
+	Suggested typefaces are:
+
+	 0 - default typeface.
+	 1 - Line Printer or equiv.
+	 2 - Pica or equiv.
+	 3 - Elite or equiv.
+	 4 - Helvetica or equiv.
+	 5 - Times Roman or equiv.
+	 6 - Gothic or equiv.
+	 7 - Script or equiv.
+	 8 - Prestige or equiv.
+	 9 - Caslon or equiv.
+	10 - Orator or equiv.
+*/
+<a name="line104"></a>
+<a name="line105">#define aPROP2	45  /* ESC[2p  proportional on	      +++ */</a>
+<a name="line106">#define aPROP1	46  /* ESC[1p  proportional off       +++ */</a>
+<a name="line107">#define aPROP0	47  /* ESC[0p  proportional clear     +++ */</a>
+<a name="line108">#define aTSS	48  /* ESC[n E set proportional offset ISO */</a>
+<a name="line109">#define aJFY5	49  /* ESC[5 F auto left justify      ISO */</a>
+<a name="line110">#define aJFY7	50  /* ESC[7 F auto right justify     ISO */</a>
+<a name="line111">#define aJFY6	51  /* ESC[6 F auto full justify      ISO */</a>
+<a name="line112">#define aJFY0	52  /* ESC[0 F auto justify off       ISO */</a>
+<a name="line113">#define aJFY3	53  /* ESC[3 F letter space (justify) ISO (special) */</a>
+#define aJFY1	54  /* ESC[1 F word fill(auto center) ISO (special) */
+<a name="line115"></a>
+<a name="line116">#define aVERP0	55  /* ESC[0z  1/8&#034; line spacing      +++ */</a>
+<a name="line117">#define aVERP1	56  /* ESC[1z  1/6&#034; line spacing      +++ */</a>
+<a name="line118">#define aSLPP	57  /* ESC[nt  set form length n      DEC */</a>
+<a name="line119">#define aPERF	58  /* ESC[nq  perf skip n (n&#062;0)      +++ */</a>
+#define aPERF0	59  /* ESC[0q  perf skip off	      +++ */
+<a name="line121"></a>
+<a name="line122">#define aLMS	60  /* ESC#9   Left margin set	      +++ */</a>
+<a name="line123">#define aRMS	61  /* ESC#0   Right margin set       +++ */</a>
+<a name="line124">#define aTMS	62  /* ESC#8   Top margin set	      +++ */</a>
+<a name="line125">#define aBMS	63  /* ESC#2   Bottom marg set	      +++ */</a>
+<a name="line126">#define aSTBM	64  /* ESC[Pn1;Pn2r  T&#038;B margins      DEC */</a>
+<a name="line127">#define aSLRM	65  /* ESC[Pn1;Pn2s  L&#038;R margin       DEC */</a>
+#define aCAM	66  /* ESC#3   Clear margins	      +++ */
+<a name="line129"></a>
+<a name="line130">#define aHTS	67  /* ESCH    Set horiz tab	      ISO */</a>
+<a name="line131">#define aVTS	68  /* ESCJ    Set vertical tabs      ISO */</a>
+<a name="line132">#define aTBC0	69  /* ESC[0g  Clr horiz tab	      ISO */</a>
+<a name="line133">#define aTBC3	70  /* ESC[3g  Clear all h tab	      ISO */</a>
+<a name="line134">#define aTBC1	71  /* ESC[1g  Clr vertical tabs      ISO */</a>
+<a name="line135">#define aTBC4	72  /* ESC[4g  Clr all v tabs	      ISO */</a>
+<a name="line136">#define aTBCALL 73  /* ESC#4   Clr all h &#038; v tabs     +++ */</a>
+<a name="line137">#define aTBSALL 74  /* ESC#5   Set default tabs       +++ */</a>
+#define aEXTEND 75  /* ESC[Pn&#034;x extended commands     +++ */
+<a name="line139"></a>
+#define aRAW	76	/* ESC[Pn&#034;r	Next 'Pn' chars are raw +++ */
+<a name="line141"></a>
+<a name="line142">struct IOPrtCmdReq {</a>
+<a name="line143">    struct  Message io_Message;</a>
+<a name="line144">    struct  Device  *io_Device;     /* device node pointer  */</a>
+<a name="line145">    struct  Unit    *io_Unit;	    /* unit (driver private)*/</a>
+<a name="line146">    UWORD   io_Command;	    /* device command */</a>
+<a name="line147">    UBYTE   io_Flags;</a>
+<a name="line148">    BYTE    io_Error;		    /* error or warning num */</a>
+<a name="line149">    UWORD   io_PrtCommand;	    /* printer command */</a>
+<a name="line150">    UBYTE   io_Parm0;		    /* first command parameter */</a>
+<a name="line151">    UBYTE   io_Parm1;		    /* second command parameter */</a>
+<a name="line152">    UBYTE   io_Parm2;		    /* third command parameter */</a>
+    UBYTE   io_Parm3;		    /* fourth command parameter */
+};
+<a name="line155"></a>
+<a name="line156">struct IODRPReq {</a>
+<a name="line157">    struct  Message io_Message;</a>
+<a name="line158">    struct  Device  *io_Device;     /* device node pointer  */</a>
+<a name="line159">    struct  Unit    *io_Unit;	    /* unit (driver private)*/</a>
+<a name="line160">    UWORD   io_Command;	    /* device command */</a>
+<a name="line161">    UBYTE   io_Flags;</a>
+<a name="line162">    BYTE    io_Error;		    /* error or warning num */</a>
+<a name="line163">    struct  RastPort *io_RastPort;  /* raster port */</a>
+<a name="line164">    struct  ColorMap *io_ColorMap;  /* color map */</a>
+<a name="line165">    ULONG   io_Modes;		    /* graphics viewport modes */</a>
+<a name="line166">    UWORD   io_SrcX;		    /* source x origin */</a>
+<a name="line167">    UWORD   io_SrcY;		    /* source y origin */</a>
+<a name="line168">    UWORD   io_SrcWidth;	    /* source x width */</a>
+<a name="line169">    UWORD   io_SrcHeight;	    /* source x height */</a>
+<a name="line170">    LONG    io_DestCols;	    /* destination x width */</a>
+<a name="line171">    LONG    io_DestRows;	    /* destination y height */</a>
+    UWORD   io_Special;	    /* option flags */
+};
+<a name="line174"></a>
+<a name="line175">#define SPECIAL_MILCOLS		0x0001	/* DestCols specified in 1/1000&#034; */</a>
+<a name="line176">#define SPECIAL_MILROWS		0x0002	/* DestRows specified in 1/1000&#034; */</a>
+<a name="line177">#define SPECIAL_FULLCOLS	0x0004	/* make DestCols maximum possible */</a>
+<a name="line178">#define SPECIAL_FULLROWS	0x0008	/* make DestRows maximum possible */</a>
+<a name="line179">#define SPECIAL_FRACCOLS	0x0010	/* DestCols is fraction of FULLCOLS */</a>
+<a name="line180">#define SPECIAL_FRACROWS	0x0020	/* DestRows is fraction of FULLROWS */</a>
+<a name="line181">#define SPECIAL_CENTER		0x0040	/* center image on paper */</a>
+<a name="line182">#define SPECIAL_ASPECT		0x0080	/* ensure correct aspect ratio */</a>
+<a name="line183">#define SPECIAL_DENSITY1	0x0100	/* lowest resolution (dpi) */</a>
+<a name="line184">#define SPECIAL_DENSITY2	0x0200	/* next res */</a>
+<a name="line185">#define SPECIAL_DENSITY3	0x0300	/* next res */</a>
+<a name="line186">#define SPECIAL_DENSITY4	0x0400	/* next res */</a>
+<a name="line187">#define SPECIAL_DENSITY5	0x0500	/* next res */</a>
+<a name="line188">#define SPECIAL_DENSITY6	0x0600	/* next res */</a>
+<a name="line189">#define SPECIAL_DENSITY7	0x0700	/* highest res */</a>
+<a name="line190">#define SPECIAL_NOFORMFEED	0x0800	/* don't eject paper on gfx prints */</a>
+#define SPECIAL_TRUSTME		0x1000	/* don't reset on gfx prints */
+/*
+	Compute print size, set 'io_DestCols' and 'io_DestRows' in the calling
+	program's 'IODRPReq' structure and exit, DON'T PRINT.  This allows the
+	calling program to see what the final print size would be in printer
+	pixels.  Note that it modifies the 'io_DestCols' and 'io_DestRows'
+	fields of your 'IODRPReq' structure.  Also, set the print density and
+	update the 'MaxXDots', 'MaxYDots', 'XDotsInch', and 'YDotsInch' fields
+	of the 'PrinterExtendedData' structure.
+<a name="line200">*/</a>
+#define SPECIAL_NOPRINT		0x2000	/* see above */
+<a name="line202"></a>
+<a name="line203">#define PDERR_NOERR		0	/* clean exit, no errors */</a>
+<a name="line204">#define PDERR_CANCEL		1	/* user cancelled print */</a>
+<a name="line205">#define PDERR_NOTGRAPHICS	2	/* printer cannot output graphics */</a>
+<a name="line206">#define PDERR_INVERTHAM		3	/* OBSOLETE */</a>
+<a name="line207">#define PDERR_BADDIMENSION	4	/* print dimensions illegal */</a>
+<a name="line208">#define PDERR_DIMENSIONOVFLOW	5	/* OBSOLETE */</a>
+<a name="line209">#define PDERR_INTERNALMEMORY	6	/* no memory for internal variables */</a>
+#define PDERR_BUFFERMEMORY	7	/* no memory for print buffer */
+/*
+	Note : this is an internal error that can be returned from the render
+	function to the printer device.  It is NEVER returned to the user.
+	If the printer device sees this error it converts it 'PDERR_NOERR'
+	and exits gracefully.  Refer to the document on
+	'How to Write a Graphics Printer Driver' for more info.
+<a name="line217">*/</a>
+#define PDERR_TOOKCONTROL	8	/* Took control in case 0 of render */
+
+<a name="line220">/* internal use */</a>
+#define SPECIAL_DENSITYMASK	0x0700	/* masks out density values */
+#define SPECIAL_DIMENSIONSMASK \
+<a name="line223">	(SPECIAL_MILCOLS|SPECIAL_MILROWS|SPECIAL_FULLCOLS|SPECIAL_FULLROWS\</a>
+	|SPECIAL_FRACCOLS|SPECIAL_FRACROWS|SPECIAL_ASPECT)
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

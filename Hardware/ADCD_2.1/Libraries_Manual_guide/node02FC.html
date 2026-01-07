@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_25" NODE="25-1-1-5" TITLE="25 / / The Signal Semaphore / Checking a SignalSemaphore" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>25 / / The Signal Semaphore / Checking a SignalSemaphore</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02FB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02FD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When you attempt to obtain a semaphore with <a href="../Libraries_Manual_guide/node02FA.html">ObtainSemaphore()</a>, your task
+will be put to sleep if the semaphore is not currently available. If you
+do not want to wait, you can call <a href="../Includes_and_Autodocs_2._guide/node0336.html">AttemptSemaphore()</a> instead. If the
+semaphore is available for <a href="../Libraries_Manual_guide/node02FA.html">exclusive locking</a>, AttemptSemaphore() obtains
+it for you and returns TRUE.  If it is not available, the function returns
+FALSE immediately instead of waiting for the semaphore to be released.
+
+To attempt to obtain a semaphore, use the following:
+
+    struct SignalSemaphore *semaphore;
+    AttemptSemaphore(semaphore);
+
+To make an attempt to obtain a <a href="../Libraries_Manual_guide/node02F9.html">public</a> semaphore, the following code should
+be used:
+
+    UBYTE *name;
+    struct SignalSemaphore *semaphore;
+
+    Forbid();
+    if (semaphore = FindSemaphore(name)) AttemptSemaphore(semaphore);
+    Permit();
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

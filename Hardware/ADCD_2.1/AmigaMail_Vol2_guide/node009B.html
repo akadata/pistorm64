@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-23/BoopsiIntro.txt" NODE="IV-23-2" TITLE="Imageclass Subclasses" -->
+<head>
+<title>Imageclass Subclasses</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node009A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node009C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An imageclass object contains an Image structure that Intuition uses to
+render objects such as gadgets.  Boopsi imageclass objects are organized
+so that when NewObject() returns a pointer to an imageclass object, it
+points to the actual Image structure.
+
+Normally, an application does not create an imageclass object.  Instead,
+it will use a subclass of imageclass.  Currently, there are four
+subclasses:  frameiclass, sysiclass, fillrectclass, and itexticlass.
+
+frameiclass - An embossed or recessed rectangular frame, rendered in the
+  proper DrawInfo pens, with enough intelligence to bound or center its
+  contents.
+
+sysiclass - The class of system images.  The class includes all the
+  images for the system gadgets, and the Gadtools check mark and button
+  glyphs.
+
+fillrectclass - Rectangle with frame and pattern support.
+
+itexticlass - A specialized image class used for rendering text.  Note
+  that you have to calculate itexticlass object's width and height
+  yourself.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="layers" NODE="CreateUpfrontLayer()" TITLE="layers.library/CreateUpfrontLayer" -->
+<head>
+<title>layers.library/CreateUpfrontLayer</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node041C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node041E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	CreateUpfrontLayer -- Create a new layer on top of existing layers.
+
+<b>    SYNOPSIS</b>
+	result = CreateUpfrontLayer(li,bm,x0,y0,x1,y1,flags [,bm2])
+	d0                          a0 a1 d0 d1 d2 d3   d4  [ a2 ]
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> *CreateUpfrontLayer(struct <a href="../Includes_and_Autodocs_3._guide/node0625.html#line30">Layer_Info</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> *,
+	    <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a>, ... );
+
+<b>    FUNCTION</b>
+	Create a new <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> of position and size (x0,y0)-&#062;(x1,y1)
+	and place it on top of all other layers.
+	Make this layer of type found in flags
+	if SuperBitMap, use bm2 as pointer to real SuperBitMap.
+	and copy contents of Superbitmap into display layer.
+
+	Note: when using SUPERBITMAP, you should also set LAYERSMART flag.
+
+<b>    INPUTS</b>
+	li - pointer to LayerInfo structure
+	bm - pointer to common <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> used by all Layers
+	x0,y0 - upper left hand corner of layer
+	x1,y1 - lower right hand corner of layer
+	flags - various types of layers supported as bit sets.
+	bm2 - pointer to optional Super <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>
+
+<b>    RESULTS</b>
+	result - pointer to <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> structure if successful
+	         NULL if not successful
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node041E.html">DeleteLayer()</a>, <a href="../Includes_and_Autodocs_3._guide/node0625.html">graphics/layers.h</a>, <a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a>, <a href="../Includes_and_Autodocs_3._guide/node05DC.html">graphics/gfx.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

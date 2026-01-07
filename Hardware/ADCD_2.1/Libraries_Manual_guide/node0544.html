@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-1-14" TITLE="D / Errors / DOS-related Problems" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D / Errors / DOS-related Problems</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0543.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0545.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In general, any dos.library function which fills in a structure for you
+(for example, <a href="../Includes_and_Autodocs_2._guide/node029C.html">Examine()</a>), requires that the structure be longword aligned.
+In most cases, the only way to insure longword alignment in C is to
+dynamically allocate the structure.  Unless documented otherwise,
+dos.library functions may only be called from a process, not from a task.
+Also note that a process's <a href="../Includes_and_Autodocs_2._guide/node0078.html#line38">pr_MsgPort</a> is intended for the exclusive use of
+dos.library.  (The port may be used to receive a <a href="../Libraries_Manual_guide/node023E.html#line5">WBStartup</a> message as long
+as the message is <a href="../Libraries_Manual_guide/node02F2.html">GetMsg()</a>'d from the port before DOS is used.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

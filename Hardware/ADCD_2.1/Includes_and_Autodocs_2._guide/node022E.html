@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="NewModifyProp()" TITLE="intuition.library/NewModifyProp" -->
+<head>
+<title>intuition.library/NewModifyProp</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node022D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node022F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    NewModifyProp -- <a href="../Includes_and_Autodocs_2._guide/node022A.html">ModifyProp()</a>, but with selective refresh.
+
+SYNOPSIS
+    NewModifyProp( <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a>, Flags,
+                   A0      A1      A2         D0
+            HorizPot, VertPot, HorizBody, VertBody, NumGad )
+            D1        D2       D3         D4        D5
+
+    VOID NewModifyProp( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> *,
+            struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> *, UWORD, UWORD, UWORD, UWORD, UWORD, WORD );
+
+FUNCTION
+    Performs the function of <a href="../Includes_and_Autodocs_2._guide/node022A.html">ModifyProp()</a>, but refreshes
+    gadgets in the list as specified by the NumGad parameter.
+    With NumGad = -1, this function is identical to <a href="../Includes_and_Autodocs_2._guide/node022A.html">ModifyProp()</a>.
+
+    New for V36: When NumGad = 1, this function will now perform
+    an incremental update of the proportional gadget knob image,
+    rather than refreshing the entire gadget.  This means much
+    less flashing when programmatically scrolling a proportional
+    gadget.
+
+INPUTS
+    PropGadget = pointer to a proportional gadget
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> = pointer to the window containing the gadget or the window
+        containing the requester containing the gadget.
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> = pointer to a requester (may be NULL if this isn't
+        a requester gadget)
+    Flags = value to be stored in the Flags field of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line454">PropInfo</a>
+    HorizPot = value to be stored in the HorizPot field of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line454">PropInfo</a>
+    VertPot = value to be stored in the VertPot field of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line454">PropInfo</a>
+    HorizBody = value to be stored in the HorizBody field of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line454">PropInfo</a>
+    VertBody = value to be stored in the VertBody field of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line454">PropInfo</a>
+    NumGad = number of gadgets to be refreshed after propgadget internals
+        have been adjusted.  -1 means &#034;to end of list.&#034;
+
+RESULT
+    None
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node022A.html">ModifyProp()</a>
+    The Intuition Reference Manual contains more information on
+    Proportional Gadgets.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

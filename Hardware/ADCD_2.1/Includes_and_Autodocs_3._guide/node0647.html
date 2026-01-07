@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/exec/semaphores.h" NODE="MAIN" TITLE="include/exec/semaphores.h" -->
+<head>
+<title>include/exec/semaphores.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0646.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0648.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_SEMAPHORES_H
+#define	EXEC_SEMAPHORES_H
+/*
+**	$VER: semaphores.h 39.1 (7.2.1992)
+**	Includes Release 44.1
+**
+**	Definitions for locking functions.
+**
+**	(C) Copyright 1986-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_NODES_H
+#include &#060;exec/nodes.h&#062;
+#endif /* EXEC_NODES_H */
+
+#ifndef EXEC_LISTS_H
+#include &#060;exec/lists.h&#062;
+#endif /* EXEC_LISTS_H */
+
+#ifndef EXEC_PORTS_H
+#include &#060;exec/ports.h&#062;
+#endif /* EXEC_PORTS_H */
+
+#ifndef EXEC_TASKS_H
+#include &#060;exec/tasks.h&#062;
+#endif /* EXEC_TASKS_H */
+
+
+/****** SignalSemaphore *********************************************/
+
+<a name="line32">/* Private structure used by ObtainSemaphore() */</a>
+struct SemaphoreRequest
+{
+	struct MinNode	sr_Link;
+	struct Task	*sr_Waiter;
+};
+
+<a name="line39">/* Signal Semaphore data structure */</a>
+struct SignalSemaphore
+{
+	struct Node		ss_Link;
+	WORD			ss_NestCount;
+	struct MinList		ss_WaitQueue;
+	struct SemaphoreRequest	ss_MultipleLink;
+	struct Task		*ss_Owner;
+	WORD			ss_QueueCount;
+};
+
+<a name="line50">/****** Semaphore procure message (for use in V39 Procure/Vacate) ****/</a>
+struct SemaphoreMessage
+{
+	struct Message		ssm_Message;
+	struct SignalSemaphore	*ssm_Semaphore;
+};
+
+#define	SM_SHARED	(1L)
+#define	SM_EXCLUSIVE	(0L)
+
+/****** Semaphore (Old Procure/Vacate type, not reliable) ***********/
+
+struct Semaphore	/* Do not use these semaphores! */
+{
+	struct MsgPort	sm_MsgPort;
+	WORD		sm_Bids;
+};
+
+#define sm_LockMsg mp_SigTask
+
+#endif	/* EXEC_SEMAPHORES_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-41/imageclass.txt" NODE="IV-41-13" TITLE="IM_DRAWFRAME" -->
+<head>
+<title>IM_DRAWFRAME</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node00AA.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node00AC.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The IM_DRAWFRAME method instructs the image to render itself within the
+confines of the given rectangle.  It receives the following parameters:
+
+    struct impDraw
+    {
+        ULONG MethodID;
+        struct RastPort *imp_RPort;
+        struct
+        {
+            WORD X;
+            WORD Y;
+        } imp_Offset;
+
+        ULONG imp_State;
+        struct DrawInfo *imp_DrInfo;
+
+        struct
+        {
+            WORD Width;
+            WORD Height;
+        } imp_Dimensions;
+    };
+
+The Width and Height fields provide the object's rectangular bounds. How
+the image object deals with the frame is implementation specific.
+Typically, a scaleable image will scale itself as best it can to fit into
+the rectangle.  The <a href="../AmigaMail_Vol2_guide/node01AF.html">mytextlabelclass.c</a> example does not actually implement
+this method, instead mytextlabelclass treats IM_DRAWFRAME like the IM_DRAW
+method.
+
+In general, applications that use this method to draw an object should use
+the IM_ERASEFRAME method (see below) to erase it.  This will ensure that
+the image was erased at the proper scale.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

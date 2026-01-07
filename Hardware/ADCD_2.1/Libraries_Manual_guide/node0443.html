@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-5-2" TITLE="33 / Writing IFF Files / Writing Chunk Data" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / Writing IFF Files / Writing Chunk Data</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0442.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0444.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Writing the <a href="../Libraries_Manual_guide/node0428.html">IFF</a> chunk data is done with either the <a href="../Includes_and_Autodocs_2._guide/node01DE.html">WriteChunkBytes()</a> or
+<a href="../Includes_and_Autodocs_2._guide/node01DF.html">WriteChunkRecords()</a> functions.
+
+    error = WriteChunkBytes (iff, buf, size);
+    error = WriteChunkRecords (iff, buf, recsize, numrec);
+
+If you specified a valid chunk size when you called <a href="../Libraries_Manual_guide/node0441.html">PushChunk()</a>,
+<a href="../Includes_and_Autodocs_2._guide/node01DE.html">WriteChunkBytes()</a> and <a href="../Includes_and_Autodocs_2._guide/node01DF.html">WriteChunkRecords()</a> will truncate attempts to write
+past the end of the chunk.
+
+Code to write an <a href="../Libraries_Manual_guide/node045D.html#line8">ILBM</a> file might take the following form:
+
+    iff = AllocIFF ();
+    iff-&#062;iff_Stream = Open (&#034;foo&#034;, MODE_NEWFILE);
+    InitIFFasDOS (iff);
+    OpenIFF (iff, IFFF_WRITE);
+
+    PushChunk (iff, ID_ILBM, ID_FORM, IFFSIZE_UNKNOWN);
+
+    PushChunk (iff, ID_ILBM, ID_BMHD, sizeof (struct BitMapHeader));
+    WriteChunkBytes (iff, &#038;bmhd, sizeof (bmhd));
+    PopChunk (iff);
+
+    PushChunk (iff, ID_ILBM, ID_CMAP, cmapsize);
+    WriteChunkBytes (iff, cmapdata, cmapsize);
+    PopChunk (iff);
+
+    PushChunk (iff, ID_ILBM, ID_BODY, IFFSIZE_UNKNOWN);
+    packwritebody (iff);
+    PopChunk (iff);
+
+    PopChunk (iff);
+
+    CloseIFF (iff);
+    Close (iff-&#062;iff_Stream);
+    FreeIFF (iff);
+
+Again, error checking is not present for clarity. See the example code
+<a href="../Libraries_Manual_guide/node059F.html">ClipFTXT.c</a> which writes a simple <a href="../Libraries_Manual_guide/node045D.html#line8">FTXT</a> clip to the clipboard.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

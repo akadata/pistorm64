@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="datatypes" NODE="DoAsyncLayout()" TITLE="datatypes.library/DoAsyncLayout" -->
+<head>
+<title>datatypes.library/DoAsyncLayout</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0109.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node010B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	DoAsyncLayout - Call the DTM_ASYNCLAYOUT method on a separate process.
+                                                               (V39)
+
+<b>    SYNOPSIS</b>
+	retval = DoAsyncLayout (object, gpl);
+	d0			a0	a1
+
+	ULONG DoAsyncLayout (Object *, struct <a href="../Includes_and_Autodocs_3._guide/node0615.html#line459">gpLayout</a> *);
+
+<b>    FUNCTION</b>
+	This function is used to asyncronously perform the object's
+	DTM_ASYNCLAYOUT method.  This is used to offload the layout method
+	from input.device.
+
+	The DTM_ASYNCLAYOUT method must exit when SIGBREAKF_CTRL_C signal
+	is set.   This indicates that the data has become obsolete and
+	the DTM_ASYNCLAYOUT method will be called again.
+
+<b>    INPUTS</b>
+	object - Pointer to the data types object.
+	gpl - Pointer to a <a href="../Includes_and_Autodocs_3._guide/node0615.html#line459">gpLayout</a> message.
+
+<b>    RETURNS</b>
+
+<b>    SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

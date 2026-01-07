@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-9" TITLE="31 Commodities Exchange Library / Translate CxObjects" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / Translate CxObjects</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0409.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node040B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Normally, after a commodity processes a hot key input event, it needs to
+eliminate that input event.  Other commodities may need to replace an
+<a name="line4">input event with a different one.  The translate <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> can be used for</a>
+these purposes.
+
+    translateCxObj = CxObj  *CxTranslate(struct InputEvent *newinputevent);
+
+The macro <a href="../Includes_and_Autodocs_2._guide/node0150.html">CxTranslate()</a> creates a new translate <a href="../Libraries_Manual_guide/node0401.html">CxObject</a>.  CxTranslate()'s
+only argument is a pointer to a chain of one or more <a href="../Libraries_Manual_guide/node01D0.html">InputEvent</a> structures.
+
+When a translate <a href="../Libraries_Manual_guide/node0401.html">CxObject</a> receives a <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a>, it eliminates the
+CxMessage and its corresponding input event from the system.  The
+translator introduces a new input event, which Commodities Exchange copies
+from the <a href="../Libraries_Manual_guide/node01D0.html">InputEvent</a> structure passed to <a href="../Includes_and_Autodocs_2._guide/node0150.html">CxTranslate()</a> (newinputevent from
+the function prototype above), in place of the deleted input event.
+
+A translator is normally attached to some kind of <a href="../Libraries_Manual_guide/node0407.html">filtering CxObject</a>.  If
+it wasn't, it would translate all input events into the same exact input
+<a name="line20">event.  Like the <a href="../Libraries_Manual_guide/node0409.html">sender CxObject</a>, a translator does not divert <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a></a>
+down its personal list, so it doesn't serve any purpose to add any to it.
+
+    void SetTranslate( CxObj *translator, struct InputEvent *ie );
+
+It is possible to change the <a href="../Libraries_Manual_guide/node01D0.html">InputEvent</a> structure that a translator looks
+at when it creates and introduces new input events into the input stream.
+The function <a href="../Includes_and_Autodocs_2._guide/node01B5.html">SetTranslate()</a> accepts a pointer to the new InputEvent
+structure, which the translator will duplicate and introduce when it
+receives a <a href="../Libraries_Manual_guide/node0403.html">CxMessage</a>.
+
+HotKey utilizes a special kind of translator.  Instead of supplying a new
+input event, HotKey passes a NULL to <a href="../Includes_and_Autodocs_2._guide/node0150.html">CxTranslate()</a>.  If a translator has a
+NULL new input event pointer, it does not introduce a new input event, but
+still eliminates any <a href="../Libraries_Manual_guide/node0403.html">CxMessages</a> and corresponding input events it receives.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

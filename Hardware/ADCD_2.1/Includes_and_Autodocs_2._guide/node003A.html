@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/keymap.h" NODE="MAIN" TITLE="Includes/devices/keymap.h" -->
+<head>
+<title>Includes/devices/keymap.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0039.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node003B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	DEVICES_KEYMAP_H
+#define	DEVICES_KEYMAP_H
+/*
+**	$Filename: devices/keymap.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.3 $
+**	$Date: 90/04/13 $
+**
+**	key map definitions for keymap.resource, keymap.library, and
+**	console.device
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line15"></a>
+#ifndef EXEC_NODES_H
+#include	&#034;exec/nodes.h&#034;
+<a name="line18">#endif</a>
+#ifndef EXEC_LISTS_H
+#include	&#034;exec/lists.h&#034;
+#endif
+<a name="line22"></a>
+<a name="line23">struct	 KeyMap {</a>
+<a name="line24">    UBYTE   *km_LoKeyMapTypes;</a>
+<a name="line25">    ULONG   *km_LoKeyMap;</a>
+<a name="line26">    UBYTE   *km_LoCapsable;</a>
+<a name="line27">    UBYTE   *km_LoRepeatable;</a>
+<a name="line28">    UBYTE   *km_HiKeyMapTypes;</a>
+<a name="line29">    ULONG   *km_HiKeyMap;</a>
+<a name="line30">    UBYTE   *km_HiCapsable;</a>
+    UBYTE   *km_HiRepeatable;
+};
+<a name="line33"></a>
+<a name="line34">struct	KeyMapNode {</a>
+<a name="line35">    struct Node kn_Node;	/* including name of keymap */</a>
+    struct KeyMap kn_KeyMap;
+};
+
+<a name="line39">/* the structure of keymap.resource */</a>
+<a name="line40">struct	KeyMapResource {</a>
+<a name="line41">    struct Node kr_Node;</a>
+    struct List kr_List;	/* a list of KeyMapNodes */
+};
+<a name="line44"></a>
+<a name="line45">/* Key Map Types */</a>
+<a name="line46">#define  KC_NOQUAL   0</a>
+<a name="line47">#define  KC_VANILLA  7		/* note that SHIFT+ALT+CTRL is VANILLA */</a>
+<a name="line48">#define  KCB_SHIFT   0</a>
+<a name="line49">#define  KCF_SHIFT   0x01</a>
+<a name="line50">#define  KCB_ALT     1</a>
+<a name="line51">#define  KCF_ALT     0x02</a>
+<a name="line52">#define  KCB_CONTROL 2</a>
+<a name="line53">#define  KCF_CONTROL 0x04</a>
+<a name="line54">#define  KCB_DOWNUP  3</a>
+#define  KCF_DOWNUP  0x08
+<a name="line56"></a>
+<a name="line57">#define  KCB_DEAD    5		/* may be dead or modified by dead key: */</a>
+#define  KCF_DEAD    0x20	/*   use dead prefix bytes		*/
+<a name="line59"></a>
+<a name="line60">#define  KCB_STRING  6</a>
+#define  KCF_STRING  0x40
+<a name="line62"></a>
+<a name="line63">#define  KCB_NOP     7</a>
+#define  KCF_NOP     0x80
+
+<a name="line66"></a>
+<a name="line67">/* Dead Prefix Bytes */</a>
+<a name="line68">#define DPB_MOD	0</a>
+<a name="line69">#define DPF_MOD	0x01</a>
+<a name="line70">#define DPB_DEAD	3</a>
+#define DPF_DEAD	0x08
+<a name="line72"></a>
+<a name="line73">#define DP_2DINDEXMASK	0x0f	/* mask for index for 1st of two dead keys */</a>
+#define DP_2DFACSHIFT	4	/* shift for factor for 1st of two dead keys */
+
+#endif	/* DEVICES_KEYMAP_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-1-8" TITLE="27 / / RastPort Structure / RastPort Line and Area Drawing Patterns" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / RastPort Structure / RastPort Line and Area Drawing Patterns</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0351.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0353.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> data structure provides two different pattern variables that
+it uses during the various drawing functions: a line pattern and an area
+pattern. The line pattern is 16 bits wide and is applied to all lines.
+When you initialize a RastPort, this line pattern value is set to all 1s
+(hex FFFF), so that solid lines are drawn. You can also set this pattern
+to other values to draw dotted lines if you wish. For example, you can
+establish a dotted line pattern with the graphics macro <a href="../Includes_and_Autodocs_2._guide/node00B6.html#line30">SetDrPt()</a>:
+
+<a name="line10">    SetDrPt(&#038;rastPort, 0xCCCC);</a>
+
+The second argument is a bit-pattern, 1100110011001100, to be applied to
+all lines drawn. If you draw multiple, connected lines, the pattern
+<a name="line14">cleanly connects all the points.</a>
+
+The area pattern is also 16 bits wide and its height is some power of two.
+This means that you can define patterns in heights of 1, 2, 4, 8, 16, and
+so on.  To tell the system how large a pattern you are providing, use the
+graphics macro <a href="../Includes_and_Autodocs_2._guide/node00B6.html#line30">SetAfPt()</a>:
+
+    SetAfPt(&#038;rastPort, &#038;areaPattern, power_of_two);
+
+The &#038;areaPattern argument is the address of the first word of the area
+pattern and power_of_two specifies how many words are in the pattern. For
+example:
+
+    USHORT ditherData[] =
+    {
+        0x5555, 0xAAAA
+    };
+
+    SetAfPt(&#038;rastPort, ditherData, 1);
+
+This example produces a small cross-hatch pattern, useful for shading.
+Because power_of_two is set to 1, the pattern height is 2 to the 1st, or 2
+rows high.
+
+To clear the area fill pattern, use:
+
+    SetAfPt(&#038;rastPort, NULL, 0);
+
+
+    Pattern Positioning.
+    --------------------
+    The pattern is always positioned with respect to the upper left
+    corner of the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> drawing area (the 0,0 coordinate).  If you
+    draw two rectangles whose edges are adjacent, the pattern will be
+    continuous across the rectangle boundaries.
+
+The last example given produces a two-color pattern with one color where
+there are 1s and the other color where there are 0s in the pattern.  A
+special mode allows you to develop a pattern having up to 256 colors.  To
+create this effect, specify power_of_two as a negative value instead of a
+positive value.  For instance, the following initialization establishes an
+8-color checkerboard pattern where each square in the checkerboard has a
+different color.
+
+    USHORT areaPattern[3][8] =
+    {
+    /* plane 0 pattern */
+        {
+               0x0000, 0x0000,
+               0xffff, 0xffff,
+               0x0000, 0x0000,
+               0xffff, 0xffff
+        },
+    /* plane 1 pattern */
+        {
+               0x0000, 0x0000,
+               0x0000, 0x0000,
+               0xffff, 0xffff,
+               0xffff, 0xffff
+        },
+    /* plane 2 pattern */
+        {
+               0xff00, 0xff00,
+               0xff00, 0xff00,
+               0xff00, 0xff00,
+               0xff00, 0xff00
+        }
+    };
+
+    SetAfPt(&#038;rastPort, &#038;areaPattern, -3);
+
+    /* when doing this, it is best to set */
+    /* three other parameters as follows: */
+    SetAPen(&#038;rastPort, -1);
+    SetBPen(&#038;rastPort, 0);
+    SetDrMd(&#038;rastPort, JAM2);
+
+If you use this multicolored pattern mode, you must provide as many planes
+of pattern data as there are planes in your <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

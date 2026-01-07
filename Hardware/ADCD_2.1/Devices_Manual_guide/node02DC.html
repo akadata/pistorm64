@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Addl" NODE="ADDL-5" TITLE="Additional Info / How Amiga HAM mode works " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Additional Info / How Amiga HAM mode works </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02DB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02DD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Amiga HAM (Hold and Modify) mode lets the Amiga display all 4096 RGB
+values. In HAM mode, the bits in the two last planes describe an R G or B
+modification to the color of the previous pixel on the line to create the
+color of the current pixel.  So a 6-plane HAM picture has 4 planes for
+specifying absolute color pixels giving up to 16 absolute colors which
+would be specified in the ILBM CMAP chunk.  The bits in the last two
+planes are color modification bits which cause the Amiga, in HAM mode, to
+take the RGB value of the previous pixel (Hold and), substitute the 4 bits
+in planes 0-3 for the previous color's R G or B component (Modify) and
+display the result for the current pixel.  If the first pixel of a scan
+line is a modification pixel, it modifies the RGB value of the border
+color (register 0).  The color modification bits in the last two planes
+(planes 4 and 5) are interpreted as follows:
+
+   00 - no modification.  Use planes 0-3 as normal color register index
+   10 - hold previous, replacing Blue component with bits from planes 0-3
+   01 - hold previous, replacing Red component with bits from planes 0-3
+   11 - hold previous. replacing Green component with bits from planes 0-3
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

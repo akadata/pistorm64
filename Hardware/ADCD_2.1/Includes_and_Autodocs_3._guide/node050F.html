@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="printer" NODE="PRD_PRTCOMMAND" TITLE="printer.device/PRD_PRTCOMMAND" -->
+<head>
+<title>printer.device/PRD_PRTCOMMAND</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node050E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0510.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       PRD_PRTCOMMAND -- send a command to the printer
+
+<b>   FUNCTION</b>
+      This function sends a command to either the parallel or serial
+      device.  The printer device maps this command to the control
+      code set of the current printer.  The commands supported can
+      be found with the <a href="../Includes_and_Autodocs_3._guide/node01D1.html">printer.device/Write</a> command.  All printers
+      may not support all functions.
+
+<b>   IO REQUEST IOPrtCmdReq</b>
+       io_Message      mn_ReplyPort set
+       io_Device       preset by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+       io_Unit         preset by <a href="../Includes_and_Autodocs_3._guide/node0560.html">OpenDevice</a>
+       io_Command      PRD_PRTCOMMAND
+       io_PrtCommand   the actual command number
+       io_Parm0        parameter for the command
+       io_Parm1        parameter for the command
+       io_Parm2        parameter for the command
+       io_Parm3        parameter for the command
+
+<b>   RESULTS</b>
+       Errors: if the PRD_PRTCOMMAND succeeded, then io_Error will be zero.
+       Otherwise io_Error will be non-zero.  An error of -1 indicates that
+       the command is not supported by the current printer driver.  This
+       could be used to check if the connected printer supports a particular
+       command (italics for example).
+
+<b>   SEE ALSO</b>
+       <a href="../Includes_and_Autodocs_3._guide/node0517.html">printer.device/PWrite()</a> printer.h, parallel.device, <a href="../Includes_and_Autodocs_3._guide/node063B.html#line57">Preferences</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

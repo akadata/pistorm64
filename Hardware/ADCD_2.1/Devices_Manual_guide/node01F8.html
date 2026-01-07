@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-8-2" TITLE=" Appendix A. Reference / Syntax Definitions " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Appendix A. Reference / Syntax Definitions </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01F7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01F9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here's a collection of the syntax definitions in this document.
+
+    Chunk        ::= ID #{ UBYTE* } [0]
+
+    Property     ::= Chunk
+
+    FORM         ::= 'FORM' #{ FormType (LocalChunk | FORM | LIST | CAT)* }
+    FormType     ::= ID
+    LocalChunk   ::= Property | Chunk
+
+    CAT          ::= 'CAT ' #{ ContentsType (FORM | LIST | CAT)* }
+    ContentsType ::= ID     - a hint or an &#034;abstract data type&#034; ID
+
+    LIST         ::= 'LIST' #{ ContentsType PROP* (FORM | LIST | CAT)* }
+    PROP         ::= 'PROP' #{ FormType Property* }
+
+In this extended regular expression notation, the token '#' represents a
+count of the following {braced} data bytes.  Literal items are shown in
+&#034;quotes&#034;, [square bracketed items] are optional, and &#034;*&#034; means 0 or more
+instances.  A sometimes-needed pad byte is shown as &#034;[0]&#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

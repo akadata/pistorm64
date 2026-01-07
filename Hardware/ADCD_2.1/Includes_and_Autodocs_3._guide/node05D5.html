@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/classes/arexx.h" NODE="MAIN" TITLE="include/classes/arexx.h" -->
+<head>
+<title>include/classes/arexx.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05D4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05D6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef CLASSES_AREXX_H
+#define CLASSES_AREXX_H
+/*
+**	$VER: arexx.h 44.1 (19.10.1999)
+**	Includes Release 44.1
+**
+**	arexx.class definitions
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_MEMORY_H
+#include &#060;exec/memory.h&#062;
+#endif
+
+#ifndef DOS_DOS_H
+#include &#060;dos/dos.h&#062;
+#endif
+
+#ifndef DOS_RDARGS_H
+#include &#060;dos/rdargs.h&#062;
+#endif
+
+#ifndef REXX_STORAGE_H
+#include &#060;rexx/storage.h&#062;
+#endif
+
+#ifndef REXX_RXSLIB_H
+#include &#060;rexx/rxslib.h&#062;
+#endif
+
+#ifndef REXX_ERRORS_H
+#include &#060;rexx/errors.h&#062;
+#endif
+
+#ifndef INTUITION_CLASSES_H
+#include &#060;intuition/classes.h&#062;
+#endif
+
+#ifndef INTUITION_CLASSUSR_H
+#include &#060;intuition/classusr.h&#062;
+#endif
+
+#ifndef UTILITY_HOOKS_H
+#include &#060;utility/hooks.h&#062;
+#endif
+
+/*****************************************************************************/
+
+/* Tags supported by the arexx class
+ */
+#define AREXX_Dummy				(REACTION_Dummy+0x30000)
+
+#define AREXX_HostName			(AREXX_Dummy+1)
+	/* (STRPTR) */
+#define AREXX_DefExtension		(AREXX_Dummy+2)
+	/* (STRPTR) */
+#define AREXX_Commands			(AREXX_Dummy+3)
+	/* (struct ARexxCmd *) */
+#define AREXX_ErrorCode			(AREXX_Dummy+4)
+	/* (ULONG *) */
+#define AREXX_SigMask			(AREXX_Dummy+5)
+	/* (ULONG) */
+#define AREXX_NoSlot			(AREXX_Dummy+6)
+	/* (BOOL) */
+#define AREXX_ReplyHook			(AREXX_Dummy+7)
+	/* (struct Hook *) */
+#define AREXX_MsgPort			(AREXX_Dummy+8)
+	/* (struct MsgPort *) */
+
+/* Possible error result codes
+ */
+#define RXERR_NO_COMMAND_LIST     (1L)
+#define RXERR_NO_PORT_NAME        (2L)
+#define RXERR_PORT_ALREADY_EXISTS (3L)
+#define RXERR_OUT_OF_MEMORY       (4L)
+
+/* I can't spell, don't use this.
+ */
+#define AREXX_DefExtention	AREXX_DefExtension
+
+/*****************************************************************************/
+
+/* Methods Supported by the ARexx Class.
+ */
+#define AM_HANDLEEVENT                (0x590001)
+	/* ARexx class event-handler. */
+
+#define AM_EXECUTE                    (0x590002)
+	/* Execute a host command. */
+
+#define AM_FLUSH                      (0x590003)
+	/* Flush rexx port. */
+
+/* AM_EXECUTE message.
+<a name="line97"> */</a>
+struct apExecute
+{
+	ULONG MethodID;				/* AM_EXECUTE */
+	STRPTR ape_CommandString;	/* Command string to execute */
+	STRPTR ape_PortName;		/* Port to send to (usually RXSDIR) */
+	LONG *ape_RC;				/* RC pointer */
+	LONG *ape_RC2;				/* RC2 pointer */
+	STRPTR *ape_Result;			/* Result pointer */
+	BPTR ape_IO;				/* I/O handle */
+};
+
+
+/*****************************************************************************/
+
+/* An array of these structures must be passed at object-create time.
+<a name="line113"> */</a>
+struct ARexxCmd
+{
+	STRPTR ac_Name;			/* Command name */
+	UWORD ac_ID;			/* Unique ID */
+
+	/* NOTE: The function pointed to by ac_Func() will be called
+	 *       with parameters in CPU registers. Register usage
+	 *       is as follows:
+	 *
+	 *       VOID ac_Func(struct ARexxCmd * cmd, struct RexxMsg * rm)
+	 *                                       A0                   A1
+	 */
+	VOID (*ac_Func)();
+
+	STRPTR ac_ArgTemplate;	/* DOS-style argument template */
+	ULONG ac_Flags;			/* Unused, make NULL */
+	ULONG *ac_ArgList;		/* Result of ReadArgs() */
+	LONG ac_RC;				/* Primary result */
+	LONG ac_RC2;			/* Secondary result */
+	STRPTR ac_Result;		/* RESULT variable */
+};
+
+#endif /* CLASSES_AREXX_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

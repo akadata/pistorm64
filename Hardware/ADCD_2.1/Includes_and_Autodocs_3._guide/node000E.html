@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amigaguide" NODE="OpenAmigaGuideA()" TITLE="amigaguide.library/OpenAmigaGuideA" -->
+<head>
+<title>amigaguide.library/OpenAmigaGuideA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node000D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node000F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        OpenAmigaGuideA - <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open</a> a synchronous AmigaGuide database.
+
+<b>    SYNOPSIS</b>
+        handle = OpenAmigaGuideA (nag, attrs);
+        d0                         a0   a1
+
+        <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line86">AMIGAGUIDECONTEXT</a> OpenAmigaGuideA (struct <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line102">NewAmigaGuide</a> *,
+                                           struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+        handle = OpenAmigaGuide (nag, tag1, ...);
+
+        <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line86">AMIGAGUIDECONTEXT</a> OpenAmigaGuide (struct <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line102">NewAmigaGuide</a> *,
+                                          <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a> tag1, ...);
+
+<b>    FUNCTION</b>
+        Opens a AmigaGuide database, complete with the first viewing
+        window, for synchronous activity.
+
+        Before you call OpenAmigaGuide(), you must initialize a <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line102">NewAmigaGuide</a>
+        structure.  <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line102">NewAmigaGuide</a> is a structure that contains all the
+        information needed to open a database.  The <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line102">NewAmigaGuide</a> structure
+        must be retained until the call returns.
+
+        The function will not return until the user closes all the
+        windows.
+
+<b>    INPUTS</b>
+        nag - Pointer to an instance of a <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line102">NewAmigaGuide</a> structure.  That
+            structure is initialized with the following data.
+
+                  nag_Lock
+                  <a href="../Includes_and_Autodocs_3._guide/node0186.html">Lock</a> on the directory that the database is located in.
+                  Not needed if nag_Name contains the complete path name.
+
+                  nag_Name
+                  Name of the AmigaGuide database.
+
+                  nag_Screen
+                  <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> to open the viewing windows on, NULL for the
+                  Workbench screen.
+
+                  nag_PubScreen
+                  Pointer to the name of the public screen to open on.
+                  Must already be opened.
+
+                  nag_HostPort
+                  Name of the applications' ARexx port (currently not used).
+
+                  nag_ClientPort
+                  Base name to use for the databases' ARexx port.
+
+                  nag_Flags
+                  Used to specify the requirements of this database.  The
+                  flags are defined in <a href="../Includes_and_Autodocs_3._guide/node05D2.html">&#060;libraries/amigaguide.h&#062;</a>.
+
+                  nag_Context
+                  NULL terminated array of context nodes, in the form of:
+
+                        /* context array */
+                        <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> context[] =
+                        {
+                            &#034;MAIN&#034;,
+                            &#034;INTRO&#034;,
+                            &#034;GADGETS&#034;,
+                            NULL
+                        };
+
+                  The context array is not copied, but referenced,
+                  therefore must remain static throughout the useage of
+                  the AmigaGuide system.  This array is only referenced
+                  when using the SetAmigaGuideContext() function.
+
+                  nag_Node
+                  <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> to start at (does not work with OpenAmigaGuideAsync())
+.
+
+                  nag_Line
+                  <a href="../Includes_and_Autodocs_3._guide/node0627.html#line42">Line</a> to start at (does not work with OpenAmigaGuideAsync())
+.
+
+                  nag_Extens
+                  Used by V37 and beyond to pass additional arguments.
+
+                  nag_Client
+                  This is a private pointer, MUST be initialized to NULL.
+
+        attrs - Additional attributes.
+
+<b>    TAGS</b>
+        AGA_HelpGroup (ULONG) -- Unique identifier used to identify the
+            AmigaGuide help windows.  See <a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a> and <a href="../Includes_and_Autodocs_3._guide/node05A4.html">GetUniqueID()</a>.
+
+            Default for this tag is NULL.  Applicability is (I). (V39)
+
+<b>    EXAMPLE</b>
+
+        /* Short example showing synchronous AmigaGuide access */
+        <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> ShowAmigaGuideFile (STRPTR name, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> node, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> line)
+        {
+            struct <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line102">NewAmigaGuide</a> nag = {NULL};
+            <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line86">AMIGAGUIDECONTEXT</a> handle;
+            <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> retval = 0L;
+
+            /* Fill in the <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line102">NewAmigaGuide</a> structure */
+            nag.nag_Name = name;
+            nag.nag_Node = node;
+            nag.nag_Line = line;
+
+            /* <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open</a> the AmigaGuide client */
+            if ( handle = OpenAmigaGuide(&#038;nag, NULL))
+            {
+                /* <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close</a> the AmigaGuide client */
+                CloseAmigaGuide(handle);
+            }
+            else
+            {
+                /* Get the reason for failure */
+                retval = IoErr();
+            }
+
+            return (retval);
+        }
+
+<b>    RETURNS</b>
+        handle - Handle to a AmigaGuide system.
+
+<b>    SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node000F.html">OpenAmigaGuideAsyncA()</a>, <a href="../Includes_and_Autodocs_3._guide/node0009.html">CloseAmigaGuide()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

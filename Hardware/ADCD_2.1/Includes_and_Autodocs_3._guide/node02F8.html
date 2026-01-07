@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="InitTmpRas()" TITLE="graphics.library/InitTmpRas" -->
+<head>
+<title>graphics.library/InitTmpRas</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02F7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02F9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	InitTmpRas -- Initialize area of local memory for usage by
+			areafill, floodfill, text.
+
+<b>   SYNOPSIS</b>
+<b>   	InitTmpRas(tmpras, buffer, size)</b>
+              	    a0	     a1     d0
+
+	void InitTmpRas( struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line31">TmpRas</a> *, void *, ULONG );
+
+<b>   FUNCTION</b>
+	The area of memory pointed to by buffer is set up to be used
+	by <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> routines that may need to get some memory for
+	intermediate operations in preparation to putting the graphics
+	into the final <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a>.
+	Tmpras is used to control the usage of buffer.
+
+<b>   INPUTS</b>
+	tmpras - pointer to a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line31">TmpRas</a> structure to be linked into
+		a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+	buffer - pointer to a contiguous piece of chip memory.
+	size - size in bytes of buffer
+
+<b>   RESULT</b>
+	makes buffer available for users of <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+
+<b>   BUGS</b>
+	Would be nice if RastPorts could share one <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line31">TmpRas</a>.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02AA.html">AreaEnd()</a> <a href="../Includes_and_Autodocs_3._guide/node02D4.html">Flood()</a> <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text()</a> <a href="../Includes_and_Autodocs_3._guide/node05D7.html">graphics/rastport.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

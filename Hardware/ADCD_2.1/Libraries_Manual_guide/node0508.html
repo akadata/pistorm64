@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-11-1" TITLE="B / propgclass / Changed Methods: GM_HANDLEINPUT" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / propgclass / Changed Methods: GM_HANDLEINPUT</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0507.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0509.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+If the knob position changes sufficiently to change a <a href="../Libraries_Manual_guide/node0507.html">propgclass</a> object's
+<a href="../Libraries_Manual_guide/node050F.html">PGA_Top</a> attribute, the gadget will send an <a href="../Libraries_Manual_guide/node04F9.html">OM_NOTIFY</a> message to itself,
+which the propgclass dispatcher passes on to the <a href="../Libraries_Manual_guide/node04F2.html">gadgetclass</a> dispatcher
+for processing (see the <a href="../Libraries_Manual_guide/node04BB.html">rootclass</a> description of <a href="../Libraries_Manual_guide/node04C5.html">OM_NOTIFY</a> and <a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a>
+for more information).
+
+The <a href="../Libraries_Manual_guide/node04C5.html">OM_NOTIFY</a> message will contain two attribute/value pairs, <a href="../Libraries_Manual_guide/node050F.html">PGA_Top</a> and
+GA_ID.  While the prop gadget's PGA_Top is in a transitory state (while it
+is active and the user is moving the prop gadget's knob), the gadget sends
+interim <a href="../Libraries_Manual_guide/node04F9.html">OM_NOTIFY</a> messages.  The interim OM_NOTIFY messages have the
+OPUF_INTERIM flag of the <a href="../Libraries_Manual_guide/node04C4.html#line26">opUpdate.opu_Flags</a> field set.  When the user
+finishes manipulating the gadget (by letting go of the knob), the gadget
+sends a final OM_NOTIFY message, which has a cleared OPUF_INTERIM flag.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

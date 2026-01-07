@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/commodities" NODE="CxMsgID()" TITLE="commodities.library/CxMsgID" -->
+<head>
+<title>commodities.library/CxMsgID</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node01A3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node01A5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    CxMsgID -- obtain the ID of a commodity message. (V36)
+
+SYNOPSIS
+    id = CxMsgID(cxm);
+                 A0
+
+    LONG CxMsgID(struct CxMsg *);
+
+FUNCTION
+    This function returns the value associated with the cause or source
+    of the commodity message 'cxm'. Values are provided by the application
+    when a sender or custom object is created.
+
+INPUTS
+    cxm - the commodity message to inquire about
+
+RESULTS
+    id - if not specified by the application, the ID value of a
+        commodity message will be 0. It is suggested that using
+         non-zero values in your program as a rule may identify some
+         possible errors.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node014E.html">cx_lib/CxSender()</a>, <a href="../Includes_and_Autodocs_2._guide/node014B.html">cx_lib/CxCustom()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

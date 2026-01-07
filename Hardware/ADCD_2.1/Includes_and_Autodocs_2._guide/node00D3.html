@@ -1,0 +1,274 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/intuition/gadgetclass.h" NODE="MAIN" TITLE="Includes/intuition/gadgetclass.h" -->
+<head>
+<title>Includes/intuition/gadgetclass.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00D2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00D4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef INTUITION_GADGETCLASS_H
+#define INTUITION_GADGETCLASS_H 1
+/*
+**  $Filename: intuition/gadgetclass.h $
+**  $Release: 2.04 Includes, V37.4 $
+**  $Revision: 36.6 $
+**  $Date: 91/11/08 $
+**
+**  Custom and 'boopsi' gadget class interface
+**
+**  (C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+#ifndef INTUITION_INTUITION_H
+#include &#060;intuition/intuition.h&#062;
+#endif
+<a name="line22"></a>
+#ifndef UTILITY_TAGITEM_H
+#include &#060;utility/tagitem.h&#062;
+#endif
+
+/*
+ * NOTE:  &#060;intuition/iobsolete.h&#062; is included at the END of this file!
+ */
+<a name="line30"></a>
+/* Gadget Class attributes	*/
+<a name="line32"></a>
+<a name="line33">#define	   GA_Dummy		(TAG_USER +0x30000)</a>
+<a name="line34">#define    GA_Left		(GA_Dummy + 0x0001)</a>
+<a name="line35">#define    GA_RelRight		(GA_Dummy + 0x0002)</a>
+<a name="line36">#define    GA_Top		(GA_Dummy + 0x0003)</a>
+<a name="line37">#define    GA_RelBottom		(GA_Dummy + 0x0004)</a>
+<a name="line38">#define    GA_Width		(GA_Dummy + 0x0005)</a>
+<a name="line39">#define    GA_RelWidth		(GA_Dummy + 0x0006)</a>
+<a name="line40">#define    GA_Height		(GA_Dummy + 0x0007)</a>
+<a name="line41">#define    GA_RelHeight		(GA_Dummy + 0x0008)</a>
+<a name="line42">#define    GA_Text		(GA_Dummy + 0x0009) /* ti_Data is (UBYTE *) */</a>
+<a name="line43">#define    GA_Image		(GA_Dummy + 0x000A)</a>
+<a name="line44">#define    GA_Border		(GA_Dummy + 0x000B)</a>
+<a name="line45">#define    GA_SelectRender	(GA_Dummy + 0x000C)</a>
+<a name="line46">#define    GA_Highlight		(GA_Dummy + 0x000D)</a>
+<a name="line47">#define    GA_Disabled		(GA_Dummy + 0x000E)</a>
+<a name="line48">#define    GA_GZZGadget		(GA_Dummy + 0x000F)</a>
+<a name="line49">#define    GA_ID		(GA_Dummy + 0x0010)</a>
+<a name="line50">#define    GA_UserData		(GA_Dummy + 0x0011)</a>
+<a name="line51">#define    GA_SpecialInfo	(GA_Dummy + 0x0012)</a>
+<a name="line52">#define    GA_Selected		(GA_Dummy + 0x0013)</a>
+<a name="line53">#define    GA_EndGadget		(GA_Dummy + 0x0014)</a>
+<a name="line54">#define    GA_Immediate		(GA_Dummy + 0x0015)</a>
+<a name="line55">#define    GA_RelVerify		(GA_Dummy + 0x0016)</a>
+<a name="line56">#define    GA_FollowMouse	(GA_Dummy + 0x0017)</a>
+<a name="line57">#define    GA_RightBorder	(GA_Dummy + 0x0018)</a>
+<a name="line58">#define    GA_LeftBorder	(GA_Dummy + 0x0019)</a>
+<a name="line59">#define    GA_TopBorder		(GA_Dummy + 0x001A)</a>
+<a name="line60">#define    GA_BottomBorder	(GA_Dummy + 0x001B)</a>
+#define    GA_ToggleSelect	(GA_Dummy + 0x001C)
+
+<a name="line63">    /* internal use only, until further notice, please */</a>
+#define    GA_SysGadget		(GA_Dummy + 0x001D)
+<a name="line65">	/* bool, sets GTYP_SYSGADGET field in type	*/</a>
+#define    GA_SysGType		(GA_Dummy + 0x001E)
+	/* e.g., GTYP_WUPFRONT, ...	*/
+<a name="line68"></a>
+#define    GA_Previous		(GA_Dummy + 0x001F)
+	/* previous gadget (or (struct Gadget **)) in linked list
+	 * NOTE: This attribute CANNOT be used to link new gadgets
+	 * into the gadget list of an open window or requester.
+	 * You must use AddGList().
+	 */
+<a name="line75"></a>
+#define    GA_Next		(GA_Dummy + 0x0020)
+	 /* not implemented */
+<a name="line78"></a>
+#define    GA_DrawInfo		(GA_Dummy + 0x0021)
+	/* some fancy gadgets need to see a DrawInfo
+	 * when created or for layout
+	 */
+
+<a name="line84">/* You should use at most ONE of GA_Text, GA_IntuiText, and GA_LabelImage */</a>
+#define GA_IntuiText		(GA_Dummy + 0x0022)
+	/* ti_Data is (struct IntuiText	*) */
+<a name="line87"></a>
+#define GA_LabelImage		(GA_Dummy + 0x0023)
+	/* ti_Data is an image (object), used in place of
+	 * GadgetText
+	 */
+<a name="line92"></a>
+#define GA_TabCycle		(GA_Dummy + 0x0024)
+	/* New for V37:
+	 * Boolean indicates that this gadget is to participate in
+	 * cycling activation with Tab or Shift-Tab.
+	 */
+
+/* PROPGCLASS attributes */
+<a name="line100"></a>
+<a name="line101">#define PGA_Dummy	(TAG_USER + 0x31000)</a>
+#define PGA_Freedom	(PGA_Dummy + 0x0001)
+<a name="line103">	/* only one of FREEVERT or FREEHORIZ */</a>
+<a name="line104">#define PGA_Borderless	(PGA_Dummy + 0x0002)</a>
+<a name="line105">#define PGA_HorizPot	(PGA_Dummy + 0x0003)</a>
+<a name="line106">#define PGA_HorizBody	(PGA_Dummy + 0x0004)</a>
+<a name="line107">#define PGA_VertPot	(PGA_Dummy + 0x0005)</a>
+<a name="line108">#define PGA_VertBody	(PGA_Dummy + 0x0006)</a>
+<a name="line109">#define PGA_Total	(PGA_Dummy + 0x0007)</a>
+<a name="line110">#define PGA_Visible	(PGA_Dummy + 0x0008)</a>
+#define PGA_Top		(PGA_Dummy + 0x0009)
+<a name="line112">/* New for V37: */</a>
+#define PGA_NewLook	(PGA_Dummy + 0x000A)
+
+/* STRGCLASS attributes	*/
+<a name="line116"></a>
+<a name="line117">#define STRINGA_Dummy			(TAG_USER      +0x32000)</a>
+<a name="line118">#define STRINGA_MaxChars	(STRINGA_Dummy + 0x0001)</a>
+<a name="line119">#define STRINGA_Buffer		(STRINGA_Dummy + 0x0002)</a>
+<a name="line120">#define STRINGA_UndoBuffer	(STRINGA_Dummy + 0x0003)</a>
+<a name="line121">#define STRINGA_WorkBuffer	(STRINGA_Dummy + 0x0004)</a>
+<a name="line122">#define STRINGA_BufferPos	(STRINGA_Dummy + 0x0005)</a>
+<a name="line123">#define STRINGA_DispPos		(STRINGA_Dummy + 0x0006)</a>
+<a name="line124">#define STRINGA_AltKeyMap	(STRINGA_Dummy + 0x0007)</a>
+<a name="line125">#define STRINGA_Font		(STRINGA_Dummy + 0x0008)</a>
+<a name="line126">#define STRINGA_Pens		(STRINGA_Dummy + 0x0009)</a>
+<a name="line127">#define STRINGA_ActivePens	(STRINGA_Dummy + 0x000A)</a>
+<a name="line128">#define STRINGA_EditHook	(STRINGA_Dummy + 0x000B)</a>
+#define STRINGA_EditModes	(STRINGA_Dummy + 0x000C)
+
+<a name="line131">/* booleans */</a>
+<a name="line132">#define STRINGA_ReplaceMode	(STRINGA_Dummy + 0x000D)</a>
+<a name="line133">#define STRINGA_FixedFieldMode	(STRINGA_Dummy + 0x000E)</a>
+#define STRINGA_NoFilterMode	(STRINGA_Dummy + 0x000F)
+<a name="line135"></a>
+#define STRINGA_Justification	(STRINGA_Dummy + 0x0010)
+<a name="line137">	/* GACT_STRINGCENTER, GACT_STRINGLEFT, GACT_STRINGRIGHT */</a>
+<a name="line138">#define STRINGA_LongVal		(STRINGA_Dummy + 0x0011)</a>
+#define STRINGA_TextVal		(STRINGA_Dummy + 0x0012)
+<a name="line140"></a>
+#define STRINGA_ExitHelp	(STRINGA_Dummy + 0x0013)
+	/* STRINGA_ExitHelp is new for V37, and ignored by V36.
+	 * Set this if you want the gadget to exit when Help is
+	 * pressed.  Look for a code of 0x5F, the rawkey code for Help
+	 */
+<a name="line146"></a>
+#define SG_DEFAULTMAXCHARS	(128)
+
+/* Gadget Layout related attributes	*/
+<a name="line150"></a>
+<a name="line151">#define	LAYOUTA_Dummy		(TAG_USER  + 0x38000)</a>
+<a name="line152">#define LAYOUTA_LayoutObj	(LAYOUTA_Dummy + 0x0001)</a>
+<a name="line153">#define LAYOUTA_Spacing		(LAYOUTA_Dummy + 0x0002)</a>
+#define LAYOUTA_Orientation	(LAYOUTA_Dummy + 0x0003)
+
+<a name="line156">/* orientation values	*/</a>
+<a name="line157">#define LORIENT_NONE	0</a>
+<a name="line158">#define LORIENT_HORIZ	1</a>
+#define LORIENT_VERT	2
+
+<a name="line161"></a>
+/* Gadget Method ID's	*/
+<a name="line163"></a>
+#define GM_Dummy	(-1)	/* not used for anything		*/
+#define GM_HITTEST	(0)	/* return GMR_GADGETHIT if you are clicked on
+<a name="line166">				 * (whether or not you are disabled).</a>
+<a name="line167">				 */</a>
+<a name="line168">#define GM_RENDER	(1)	/* draw yourself, in the appropriate state */</a>
+<a name="line169">#define GM_GOACTIVE	(2)	/* you are now going to be fed input	*/</a>
+<a name="line170">#define GM_HANDLEINPUT	(3)	/* handle that input			*/</a>
+#define GM_GOINACTIVE	(4)	/* whether or not by choice, you are done  */
+
+/* Parameter &#034;Messages&#034; passed to gadget class methods	*/
+<a name="line174"></a>
+<a name="line175">/* GM_HITTEST	*/</a>
+<a name="line176">struct gpHitTest {</a>
+<a name="line177">    ULONG		MethodID;</a>
+    struct GadgetInfo	*gpht_GInfo;
+<a name="line179">    struct {</a>
+<a name="line180">	WORD	X;</a>
+<a name="line181">	WORD	Y;</a>
+    }			gpht_Mouse;
+<a name="line183">};</a>
+<a name="line184">/* GM_HITTEST return value */</a>
+#define GMR_GADGETHIT	(0x00000004)	/* if no hit, return 0 */
+<a name="line186"></a>
+<a name="line187">/* GM_RENDER	*/</a>
+<a name="line188">struct gpRender {</a>
+<a name="line189">    ULONG		MethodID;</a>
+<a name="line190">    struct GadgetInfo	*gpr_GInfo;	/* gadget context		*/</a>
+<a name="line191">    struct RastPort	*gpr_RPort;	/* all ready for use		*/</a>
+    LONG		gpr_Redraw;	/* might be a &#034;highlight pass&#034;	*/
+};
+
+<a name="line195">/* values of gpr_Redraw	*/</a>
+<a name="line196">#define GREDRAW_UPDATE	(2)	/* incremental update, e.g. prop slider	*/</a>
+<a name="line197">#define GREDRAW_REDRAW	(1)	/* redraw gadget	*/</a>
+#define GREDRAW_TOGGLE	(0)	/* toggle highlight, if applicable	*/
+<a name="line199"></a>
+<a name="line200">/* GM_GOACTIVE, GM_HANDLEINPUT	*/</a>
+<a name="line201">struct gpInput {</a>
+<a name="line202">    ULONG		MethodID;</a>
+<a name="line203">    struct GadgetInfo	*gpi_GInfo;</a>
+<a name="line204">    struct InputEvent	*gpi_IEvent;</a>
+    LONG		*gpi_Termination;
+<a name="line206">    struct {</a>
+<a name="line207">	WORD	X;</a>
+<a name="line208">	WORD	Y;</a>
+    }			gpi_Mouse;
+};
+<a name="line211"></a>
+/* GM_HANDLEINPUT and GM_GOACTIVE  return code flags	*/
+/* return GMR_MEACTIVE (0) alone if you want more input.
+ * Otherwise, return ONE of GMR_NOREUSE and GMR_REUSE, and optionally
+ * GMR_VERIFY.
+<a name="line216"> */</a>
+<a name="line217">#define GMR_MEACTIVE	(0)</a>
+<a name="line218">#define GMR_NOREUSE	(1 &#060;&#060; 1)</a>
+<a name="line219">#define GMR_REUSE	(1 &#060;&#060; 2)</a>
+#define GMR_VERIFY	(1 &#060;&#060; 3)	/* you MUST set cgp_Termination */
+
+/* New for V37:
+ * You can end activation with one of GMR_NEXTACTIVE and GMR_PREVACTIVE,
+ * which instructs Intuition to activate the next or previous gadget
+ * that has GFLG_TABCYCLE set.
+<a name="line226"> */</a>
+<a name="line227">#define GMR_NEXTACTIVE	(1 &#060;&#060; 4)</a>
+#define GMR_PREVACTIVE	(1 &#060;&#060; 5)
+<a name="line229"></a>
+<a name="line230">/* GM_GOINACTIVE */</a>
+<a name="line231">struct gpGoInactive {</a>
+<a name="line232">    ULONG		MethodID;</a>
+    struct GadgetInfo	*gpgi_GInfo;
+
+<a name="line235">    /* V37 field only!	DO NOT attempt to read under V36! */</a>
+    ULONG		gpgi_Abort;	/* gpgi_Abort=1 if gadget was aborted
+					 * by Intuition and 0 if gadget went
+					 * inactive at its own request
+					 */
+};
+
+
+<a name="line243">/* Include obsolete identifiers: */</a>
+#ifndef INTUITION_IOBSOLETE_H
+#include &#060;intuition/iobsolete.h&#062;
+#endif
+
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

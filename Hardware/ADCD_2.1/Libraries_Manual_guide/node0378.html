@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-1-2-1" TITLE="28 / / The GELs System / Initializing the GEL System" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / / The GELs System / Initializing the GEL System</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0377.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0379.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To initialize the animation system, call the system function <a href="../Includes_and_Autodocs_2._guide/node0451.html">InitGels()</a>.
+It takes the form:
+
+    struct VSprite  *vsHead;
+    struct VSprite  *vsTail;
+    struct GelsInfo *gInfo;
+
+    InitGels(vsHead, vsTail, gInfo);
+
+The vsHead argument is a pointer to the <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> structure to be used as
+the GEL list head.  (You must allocate an actual VSprite structure for
+vsHead to point to.)  The vsTail argument is a pointer to the VSprite
+structure to be used as the GEL list tail.  (You must allocate an actual
+VSprite structure for vsTail to point to.)  The gInfo argument is a
+pointer to the <a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a> structure to be initialized.
+
+<a href="../Includes_and_Autodocs_2._guide/node0451.html">InitGels()</a> forms these structures into a linked list of GELs that is empty
+except for these two dummy elements (the head and tail).  It gives the
+head <a href="../Libraries_Manual_guide/node0381.html">VSprite</a> the maximum negative x and y positions and the tail VSprite
+the maximum positive x and y positions.  This is to aid the system in
+keeping the list sorted by x, y values, so GELs that are closer to the top
+and left of the display are nearer the head of the list.  The memory space
+that the VSprites and <a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a> structures take up must already have been
+allocated.  This can be done either by declaring them statically or
+explicitly allocating memory for them.
+
+Once the <a href="../Libraries_Manual_guide/node0377.html#line6">GelsInfo</a> structure has been allocated and initialized, GELs can
+be added to the system.  Refer to the <a href="../Libraries_Manual_guide/node059C.html#line28">setupGelSys()</a> and <a href="../Libraries_Manual_guide/node059C.html#line73">cleanupGelSys()</a>
+functions in the <a href="../Libraries_Manual_guide/node059C.html">animtools.c</a> lisitng at the end of the chapter for
+examples of allocating, initializing and freeing a GelsInfo structure.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

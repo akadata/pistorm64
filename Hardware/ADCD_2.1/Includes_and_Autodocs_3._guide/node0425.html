@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="layers" NODE="InstallLayerHook()" TITLE="layers.library/InstallLayerHook" -->
+<head>
+<title>layers.library/InstallLayerHook</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0424.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0426.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	InstallLayerHook -- safely install a new Layer-&#062;BackFill hook.    (V36)
+
+<b>    SYNOPSIS</b>
+	oldhook = InstallLayerHook( layer, hook )
+	d0                          a0     a1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *InstallLayerHook( struct <a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *);
+
+<b>    FUNCTION</b>
+	Installs a new Layer-&#062;Backfill <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a>, waiting until it is safe to do
+	so. Locks the layer while substituting the new <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> and removing the
+	old one. If a new <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> is not provided, will install the default layer
+	BackFill <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a>.
+
+<b>    INPUTS</b>
+	layer - pointer to the layer in which to install the Backfill <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a>.
+	hook -  pointer to layer callback <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> which will be called
+	        with object == (struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *) result-&#062;RastPort
+	        and message == [ (Layer *) layer, (struct Rectangle) bounds,
+	                         (LONG) offsetx, (LONG) offsety ]
+
+	        This hook should fill the <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line26">Rectangle</a> in the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>
+	        with the BackFill pattern appropriate for offset x/y.
+
+	        If hook is LAYERS_BACKFILL, the default backfill is
+	        used for the layer.  (Same as pre-2.0)
+
+	        As of V39:
+		If hook is LAYERS_NOBACKFILL, the layer will not be
+	        backfilled (NO-OP).
+
+<b>    RESULTS</b>
+	oldhook - pointer to the Layer-&#062;BackFill <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> that was previously
+	          active.  Returns NULL if it was the default hook.
+		  In V39, it could return 1 if there was no hook.
+
+<b>    EXAMPLE</b>
+	The following hook is a very simple example that does rather little
+	but gives the basis idea of what is going on.
+
+	*
+	* This is the code called by the layer hook...
+	* Note that some other setup is required for this to work, including
+	* the definition of the PrivateData structure (pd_...) and the
+	* definition of the BitMapPattern structure (bmp_...)
+	*
+	CoolHook:	xdef	CoolHook
+			movem.l	d2-d7/a3-a6,-(sp)	; Save these...
+			move.l	h_SubEntry(a0),a4	; (my private data #1 here)
+			move.l	h_Data(a0),a5		; Put data into address reg
+	*
+	* Now, we do the rendering...
+	* Note that the layer may not be important...  But it is here...
+	*
+			move.l	(a1)+,a0		; Get the layer...
+	*
+	* a1 now points at the rectangle...
+	*
+			move.l	pd_GfxBase(a4),a6	; Point at <a href="../Includes_and_Autodocs_3._guide/node0612.html#line25">GfxBase</a>
+			move.l	bmp_Pattern(a5),d0	; Get PatternBitMap
+			beq	SimpleCase		; None?  Simple (0) case
+	*
+	* Now do the complex case of a pattern...
+	*
+			move.l	a1,a3			; Pointer to rectangle
+			addq.l	#8,a1			; Get past rectangle
+			move.l	(a1)+,d2		; X Offset (For pattern)
+			move.l	(a1)+,d3		; Y Offset
+		;
+		; Whatever complex blitting you would do in the complex case
+		; goes here
+		;
+	*
+	* No bitmap, so just do the simple (0) minterm case...
+	*
+	SimpleCase:	moveq.l	#0,d2			; Clear d2
+			move.w	ra_MinX(a1),d2		; Get X pos
+	*
+			moveq.l	#0,d3
+			move.w	ra_MinY(a1),d3		; Get Y pos
+	*
+			moveq.l	#0,d4
+			move.w	ra_MaxX(a1),d4
+			sub.l	d2,d4
+			addq.l	#1,d4			; Get X size
+	*
+			moveq.l	#0,d5
+			move.w	ra_MaxY(a1),d5
+			sub.l	d3,d5
+			addq.l	#1,d5			; Get Y size
+	*
+			move.l	d2,d0			; X Source
+			move.l	d3,d1			; Y Source
+			moveq.l	#0,d6			; NULL minterm
+			moveq.l	#-1,d7			; FF mask
+	*
+			move.l	rp_BitMap(a2),a1	; Get bitmap
+			move.l	a1,a0
+			CALLSYS	<a href="../Includes_and_Autodocs_3._guide/node02B2.html">BltBitMap</a>		; Do the backfill-0
+	*
+	HookDone:	movem.l	(sp)+,d2-d7/a3-a6	; Restore
+			rts
+
+<b>    NOTES</b>
+	The <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> you are passed back is the same one passed to the
+	function.  You should *not* use &#034;layered&#034; rendering functions
+	on this <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>.  Generally, you will wish to do <a href="../Includes_and_Autodocs_3._guide/node05DC.html#line45">BitMap</a> operations
+	such as <a href="../Includes_and_Autodocs_3._guide/node02B2.html">BltBitMap()</a>.  The callback is a raw, low-level rendering
+	call-back.  If you need to call a rendering operation with a
+	<a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a>, make sure you use a copy of the <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> and NULL the
+	<a href="../Includes_and_Autodocs_3._guide/node05EA.html#line26">Layer</a> pointer.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05EA.html">graphics/clip.h</a> <a href="../Includes_and_Autodocs_3._guide/node0617.html">utility/hooks.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

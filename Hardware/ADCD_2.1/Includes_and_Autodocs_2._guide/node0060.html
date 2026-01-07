@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/datetime.h" NODE="MAIN" TITLE="Includes/dos/datetime.h" -->
+<head>
+<title>Includes/dos/datetime.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node005F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0061.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef DOS_DATETIME_H
+#define DOS_DATETIME_H
+
+/*
+**	$Filename: dos/datetime.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.7 $
+**	$Date: 90/07/12 $
+**
+**	Date and time C header for AmigaDOS
+**
+**	(C) Copyright 1989-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+*/
+<a name="line16"></a>
+#ifndef DOS_DOS_H
+#include &#034;dos/dos.h&#034;
+#endif
+
+/*
+ *	Data structures and equates used by the V1.4 DOS functions
+ * StrtoDate() and DatetoStr()
+ */
+
+<a name="line26">/*--------- String/Date structures etc */</a>
+<a name="line27">struct DateTime {</a>
+<a name="line28">	struct DateStamp dat_Stamp;	/* DOS DateStamp */</a>
+<a name="line29">	UBYTE	dat_Format;		/* controls appearance of dat_StrDate */</a>
+<a name="line30">	UBYTE	dat_Flags;		/* see BITDEF's below */</a>
+<a name="line31">	UBYTE	*dat_StrDay;		/* day of the week string */</a>
+<a name="line32">	UBYTE	*dat_StrDate;		/* date string */</a>
+	UBYTE	*dat_StrTime;		/* time string */
+};
+
+<a name="line36">/* You need this much room for each of the DateTime strings: */</a>
+#define	LEN_DATSTRING	16
+
+/*	flags for dat_Flags */
+<a name="line40"></a>
+<a name="line41">#define DTB_SUBST	0		/* substitute Today, Tomorrow, etc. */</a>
+<a name="line42">#define DTF_SUBST	1</a>
+<a name="line43">#define DTB_FUTURE	1		/* day of the week is in future */</a>
+#define DTF_FUTURE	2
+
+/*
+ *	date format values
+ */
+<a name="line49"></a>
+<a name="line50">#define FORMAT_DOS	0		/* dd-mmm-yy */</a>
+<a name="line51">#define FORMAT_INT	1		/* yy-mm-dd  */</a>
+<a name="line52">#define FORMAT_USA	2		/* mm-dd-yy  */</a>
+<a name="line53">#define FORMAT_CDN	3		/* dd-mm-yy  */</a>
+#define FORMAT_MAX	FORMAT_CDN
+
+#endif /* DOS_DATETIME_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

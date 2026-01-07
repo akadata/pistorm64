@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-10" TITLE="B Boopsi Class Reference / gadgetclass" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B Boopsi Class Reference / gadgetclass</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04F1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04F3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Class:                  gadgetclass
+Superclass:             <a href="../Libraries_Manual_guide/node04BB.html">rootclass</a>
+Include File:           &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D3.html">gadgetclass.h</a>&#062;
+
+This is a base class for Intuition compatible gadget objects.  The
+dispatcher for this class takes care of creating an Intuition <a href="../Libraries_Manual_guide/node0149.html">Gadget</a>
+structure as part of its local instance data.  All of the standard Boopsi
+gadget classes build on this class.  Normally there are no direct
+instances of this class, only instances of subclasses of gadgetclass.
+
+The behavior of a Boopsi gadget depends on how it handles the five Boopsi
+gadget methods: GM_HITTEST, GM_RENDER, GM_GOACTIVE, GM_HANDLEINPUT, and
+GM_GOINACTIVE.  Intuition controls a Boopsi gadget by sending it these
+types of messages.  The structures that these methods use for their
+messages begin with the method's ID followed by a pointer to a <a href="../Libraries_Manual_guide/node0219.html#line23">GadgetInfo</a>
+structure (defined in &#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D2.html#line23">cghooks.h</a>&#062;).  The GadgetInfo structure is
+a read-only structure that contains information about the gadget's
+rendering environment.  The gadget uses this to find things like its
+window, screen, or pen array.  Although this structure does contain a
+pointer to a <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> for the gadget, the gadget must not use this
+RastPort for rendering.  The gadget can obtain a RastPort for rendering by
+calling the Intuition function <a href="../Includes_and_Autodocs_2._guide/node0232.html">ObtainGIRPort()</a> using the GadgetInfo
+structure.  See the intuition.library Autodocs for more details on this
+function.
+
+These methods are not defined directly by gadgetclass.  It is up to
+subclasses of gadgetclass to implement them.
+
+Like all Boopsi methods, these methods run on the context of the task that
+called the method.  Normally, Intuition is the only entity that calls
+these methods, so these normally operate in the input.device's task.
+Because a gadget may have to process a large number of input events, poor
+implementations of gadget methods (especially the GM_HANDLEINPUT method)
+can degrade system performance.
+
+New Methods:
+------------
+ <a href="../Libraries_Manual_guide/node04F3.html">GM_HITTEST</a>    <a href="../Libraries_Manual_guide/node04F5.html">GM_GOACTIVE</a>       <a href="../Libraries_Manual_guide/node04F7.html">GM_GOINACTIVE</a> 
+ <a href="../Libraries_Manual_guide/node04F4.html">GM_RENDER</a>     <a href="../Libraries_Manual_guide/node04F6.html">GM_HANDLEINPUT</a> 
+
+Changed Methods:
+----------------
+ <a href="../Libraries_Manual_guide/node04F8.html">OM_NEW</a>    <a href="../Libraries_Manual_guide/node04F9.html">OM_NOTIFY</a> 
+
+Attributes:
+-----------
+ <a href="../Libraries_Manual_guide/node04FA.html">GA_Previous (I)</a> 
+ <a href="../Libraries_Manual_guide/node04FB.html">ICA_TARGET (IS)</a> 
+ <a href="../Libraries_Manual_guide/node04FC.html">ICA_MAP (IS)</a> 
+ <a href="../Libraries_Manual_guide/node04FD.html">GA_Left, GA_Top, GA_Width, GA_Height (IS)</a> 
+ <a href="../Libraries_Manual_guide/node04FE.html">GA_RelRight, GA_RelBottom, GA_RelWidth, GA_RelHeight (IS)</a> 
+
+The remaining attributes defined by gadgetclass are used to set the fields
+in the <a href="../Libraries_Manual_guide/node0149.html">Gadget</a> structure of the Boopsi gadget.  Some Boopsi gadgets do not
+pay attention to many of the fields in its Gadget structure, so most
+applications will not have to worry about the majority of these
+attributes.  Some gadget classes assign special meanings to these
+attributes.  See the documentation of the specific gadget classes for more
+details.
+
+ <a href="../Libraries_Manual_guide/node04FF.html">GA_IntuiText, GA_Text, GA_LabelImage (IS)</a> 
+ <a href="../Libraries_Manual_guide/node0500.html">GA_Image (IS)</a> 
+ <a href="../Libraries_Manual_guide/node0501.html">GA_Border, GA_SelectRender, GA_ID, GA_UserData, GA_SpecialInfo (IS)</a> 
+ <a href="../Libraries_Manual_guide/node0502.html">GA_GZZGadget, GA_SysGadget (IS)</a> 
+ <a href="../Libraries_Manual_guide/node0503.html">GA_Disabled, GA_Selected (IS)</a> 
+ <a href="../Libraries_Manual_guide/node0504.html">GA_EndGadget, GA_Immediate, GA_RelVerify, GA_FollowMouse, (IS)</a>     
+ <a href="../Libraries_Manual_guide/node0504.html">GA_RightBorder, GA_LeftBorder, GA_TopBorder, GA_BottomBorder, (IS)</a> 
+ <a href="../Libraries_Manual_guide/node0504.html">GA_ToggleSelect, GA_TabCycle (IS)</a>                                  
+ <a href="../Libraries_Manual_guide/node0505.html">GA_Highlight (IS)</a> 
+ <a href="../Libraries_Manual_guide/node0506.html">GA_SysGType (IS)</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

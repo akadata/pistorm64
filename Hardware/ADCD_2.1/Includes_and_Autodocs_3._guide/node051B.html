@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="radiobutton_gc" NODE="--datasheet--" TITLE="radiobutton_gc/--datasheet--" -->
+<head>
+<title>radiobutton_gc/--datasheet--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node051A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node051C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        radiobutton_gc -- create radiobutton BOOPSI objects
+
+<b>    SUPERCLASS</b>
+        gadgetclass
+
+<b>     REQUIRES</b>
+        bevel.image, glyph.image
+
+<b>    DESCRIPTION</b>
+        The radiobutton gadget class is used to create a mutually exclusive
+        (MX) selection button group. Selection of an associated option is
+        denoted by the depressed/filled button. Unlike GadTools, GA_Width and
+        GA_Height to not specify the size of a single radio button. Instead
+        it marks the entire domain of the gadget which allows for easier
+        group layout. When used outside of a layout group you must be
+        sure to provide enough space for the gadget to completly render
+        all radio buttons and labels. However, within a layout group such
+        as ReAction's own layout.gadget this is automatic and of no
+        concern to the application programmer.
+
+        Advantages that this class provides over the standard gadtools
+        radiobutton (MX_KIND) are:
+
+         &#062; Strumming of the radio buttons with the mouse.
+
+         &#062; Aspect correct scaled buttons with any screen resolution or font.
+
+         &#062; Works under OS 2.0 or greater.
+
+<b>    METHODS</b>
+        OM_NEW -- Passed to superclass first, defaults set, then OM_SET.
+
+        OM_SET -- Passed to superclass first, then custom tags set.
+
+        OM_GET -- Returns requested setting or passed to superclass
+
+        OM_DISPOSE -- Passed to superclass.
+
+        GM_GOACTIVE -- Passed to superclass first, then radio activated
+
+        GM_GOINACTIVE -- Passed to superclass first, then radio deactivated
+
+        GM_HANDLEINPUT -- Handles button selection/strum. Overrides superclass.
+
+        GM_HITTEST -- Overrides superclass, returns GMR_HITTEST.
+
+        GM_RENDER -- Renders radio button(s).
+
+        GM_DOMAIN -- Returns GDOMAIN_MINIMUM and GDOMAIN_MAXIMUM dimensions.
+
+        GM_KEYACTIVE -- Activates button via keyboard. Advances selection
+            to the next item (down), if SHIFT is pressed, it selects
+            the previous item (up). Invoked by window.class only.
+
+        GM_KEYINACTIVE -- Deactivates gadget. Invoked by window.class only.
+
+        All other methods are passed to the superclass.
+
+
+<b>    ATTRIBUTES</b>
+        GA_ID (WORD)
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE, OM_NOTIFY)
+
+        GA_TextAttr (struct <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> *)
+            Used to set the text font to render the radiobutton labels.
+
+            Defaults to RPort-&#062;Font, which is often the screen or
+            window font.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+        RADIOBUTTON_Labels (struct <a href="../Includes_and_Autodocs_3._guide/node0628.html#line19">List</a> *)
+            Used to set the text labels for the radiobutton group.
+
+            Defaults to NULL.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+
+        RADIOBUTTON_Spacing (WORD)
+            Spacing between the radio buttons.
+
+            Defaults to 1.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE, OM_NOTIFY)
+
+        RADIOBUTTON_Selected (WORD)
+            Currently selected radio button number.
+
+            Defaults to 0.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+        RADIOBUTTON_LabelPlace (WORD)
+            Location of radiobutton text labels. Supports:
+
+                PLACETEXT_RIGHT
+
+            Defaults to PLACETEXT_RIGHT.
+
+            Applicability is (OM_NEW, OM_SET, OM_UPDATE)
+
+<b>    NOTES</b>
+        GA_Height and GA_Width DO NOT specify the actual button size, but
+        rather the entire &#034;hit box&#034; area which includes the text label.
+        When being used with layout.gadget it will domain to a proper
+        size to hold the number of buttons and largest text labels.
+        Take care when designing interfaces with out layout to set
+        a proper height and width to hold the radiobutton imagery.
+        This may be done via sending a BOOPSI GM_DOMAIN GDOMAIN_MINIMUM
+        method message to the object with DoGadgetMethod(), or computing
+        a minimum size based on font height and length. In otherwords,
+        use layout, its alot easier! :)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

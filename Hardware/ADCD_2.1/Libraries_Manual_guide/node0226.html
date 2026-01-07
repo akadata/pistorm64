@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_13" NODE="13-1-4" TITLE="13 / Preferences in 1.3 and Older Versions / Alternatives to SetPrefs" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>13 / Preferences in 1.3 and Older Versions / Alternatives to SetPrefs</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0225.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0227.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Since the Amiga is a multitasking system, it is rarely correct for a
+single Amiga application to modify the user's system-wide Preferences.
+Instead, use methods such as the following to modify only your own
+application's appearance or behavior.
+
+  * Custom screen applications can control their own display mode,
+    resolution, palette, and fonts. Use functions such a <a href="../Libraries_Manual_guide/node0331.html">LoadRGB4()</a> to
+    change your own screen's palette, and <a href="../Libraries_Manual_guide/node03D6.html">SetFont()</a> to change your own
+    screen and window fonts. Workbench applications should never change
+    the attributes of the user's Workbench.
+
+  * The mouse pointer for a window may be changed with <a href="../Libraries_Manual_guide/node01ED.html#line4">SetPointer()</a>.
+
+  * Serial device settings can be changed with the command
+<a name="line16">    SDCMD_SETPARAMS.</a>
+
+  * Printer device settings may be changed by altering the printer's copy
+    of the Preferences structure when you have the printer open. Note
+    that Amiga applications should only keep the printer open while they
+    are printing.  This allows other applications to print, and also
+    allows user changes to Printer Preferences to take effect.
+
+See the <a href="../Libraries_Manual_guide/node0002.html">Inutition</a> and <a href="../Libraries_Manual_guide/node0004.html">graphics</a> chapters of this manual, and the
+&#034;<a href="../Devices_Manual_guide/node003E.html">Printer Device</a>&#034; and &#034;<a href="../Devices_Manual_guide/node009A.html">Serial Device</a>&#034; chapters of the Amiga ROM Kernel
+Reference Manual: Devices for more information.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

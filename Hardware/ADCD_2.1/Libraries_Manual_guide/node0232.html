@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_13" NODE="13-2-9" TITLE="13 / Preferences in Release 2 / PTXT" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>13 / Preferences in Release 2 / PTXT</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0231.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0233.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+    struct PrinterTxtPrefs
+    {
+        LONG  pt_Reserved[4];            /* System reserved            */
+        UBYTE pt_Driver[DRIVERNAMESIZE]; /* printer driver filename    */
+        UBYTE pt_Port;                   /* printer port connection    */
+
+        UWORD pt_PaperType;              /* Fanfold or single */
+        UWORD pt_PaperSize;              /* Standard, Legal, A4, A3 etc. */
+        UWORD pt_PaperLength;            /* Paper length in # of lines */
+
+        UWORD pt_Pitch;                  /* Pica or Elite */
+        UWORD pt_Spacing;                /* 6 or 8 LPI */
+        UWORD pt_LeftMargin;             /* Left margin */
+        UWORD pt_RightMargin;            /* Right margin */
+        UWORD pt_Quality;                /* Draft or Letter */
+    };
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

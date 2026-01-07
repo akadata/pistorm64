@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_22" NODE="22-1" TITLE="22 Exec Signals / The Signal System" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>22 Exec Signals / The Signal System</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02D1.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02D3.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The signal system is designed to support independent simultaneous events,
+so several signals can occur at the same time.  Each task has 32
+independent signals, 16 of which are pre-allocated for use by the
+operating system.  The signals in use by a particular task are represented
+as bits in a 32-bit field in its <a href="../Libraries_Manual_guide/node02BB.html">Task</a> structure (&#060;exec/<a href="../Includes_and_Autodocs_2._guide/node008E.html#line23">tasks.h</a>&#062;).  Two
+other 32-bit fields in the Task structure indicate which signals the task
+is waiting for, and which signals have been received.
+
+Signals are task relative.  A task can only allocate its own signals, and
+may only wait on its own signals.  In addition, a task may assign its own
+significance to a particular signal.  Signals are not broadcast to all
+tasks; they are directed only to individual tasks. A signal has meaning to
+the task that defined it and to those tasks that have been informed of its
+meaning.
+
+For example, signal bit 12 may indicate a timeout event to one task, but
+to another task it may indicate a message arrival event. You can never
+wait on a signal that you did not directly or indirectly allocate
+yourself, and any other task that wishes to signal you must use a signal
+that you allocated.
+
+ <a href="../Libraries_Manual_guide/node02D3.html">Signal Allocation</a>    <a href="../Libraries_Manual_guide/node02D4.html">Waiting for a Signal</a>    <a href="../Libraries_Manual_guide/node02D5.html">Generating a Signal</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

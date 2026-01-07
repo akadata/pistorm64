@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="SAMP-11" TITLE="SAMP.doc / Converting Midi Sample Dump to SAMP " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>SAMP.doc / Converting Midi Sample Dump to SAMP </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0298.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node029A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+SEMANTICS: When MIDI literature talks about a sample, usually it means a
+collection of many sample points that make up what we call &#034;a wave&#034;.
+Therefore, a Midi Sample Dump sends all the sample data that makes up ONE
+wave. A SAMP file is designed to hold up to 255 of these waves (midi
+dumps).
+
+The Midi Sample Dump specifies playback rate only in terms of a sample
+PERIOD in nanoseconds. SAMP also expresses playback in terms of samples
+per second (frequency). The Amiga needs to see its period rounded to the
+nearest microsecond. If you take the sample period field of a Midi sample
+Dump (the 8th, 9th, and 10th bytes of the Dump Header LSB first) which we
+will call MidiSamplePer, and the Rate of a SAMP file, here is the
+relationship:
+
+   Rate = (1/MidiSamplePer) x 10E9
+
+Also the number of samples (wave's length) in a Midi Sample Dump (the
+11th, 12th, and 13th bytes of the Dump header) is expressed in WORDS.
+SAMP's WaveSize is expressed in the number of BYTES. (For the incredibly
+stupid), the relationship is:
+
+   WaveSize = MidiSampleLength x 2
+
+A Midi sample dump's LoopStart point and LoopEnd point are also in WORDS
+as versus the SAMP equivalents expressed in BYTES.
+
+A Midi sample dump's sample number can be 0 to 65535. A SAMP file can hold
+up to 255 waves, and their numbers in the playmap must be 1 to 255. (A
+single, Midi Sample Dump only sends info on one wave.) When recieving a
+Midi Sample Dump, just store the sample number (5th and 6th bytes of the
+Dump Header LSB first) in SAMP's MidiSampNum field. Then forget about this
+number until you need to send the wave back to the Midi instrument from
+whence it came.
+
+A Midi Dump's loop type can be forward, or forward/backward. Amiga
+hardware supports forward only. You should store the Midi Dump's LoopType
+byte here, but ignore it otherwise until/unless Amiga hardware supports
+&#034;reading audio data&#034; in various ways. If so, then the looptype is as
+follows:
+
+    forward = 0, backward/forward = 1
+
+A Midi Dump's sample format byte is the same as SAMP's.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

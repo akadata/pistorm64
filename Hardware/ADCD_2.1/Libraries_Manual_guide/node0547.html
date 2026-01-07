@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_D" NODE="D-1-17" TITLE="D / Errors / Fails only on Older ROMs or Older WB" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>D / Errors / Fails only on Older ROMs or Older WB</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0546.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0548.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+This can be caused by asking for a library version higher than you need
+(Do not use the #define LIBRARY_VERSION when compiling!).  Can also be
+caused by calling functions or using structures which do not exist in the
+older version of the operating system.  Ask for the lowest version which
+provides the functions you need (usually 33), and exit gracefully and
+informatively if an <a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a> fails (returns NULL).  Or code
+conditionally to only use new functions and structures if the available
+Library's <a href="../Libraries_Manual_guide/node0292.html#line6">lib_Version</a> supports them.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

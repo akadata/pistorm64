@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-2-2-4" TITLE="12 / / Writing The Dispatcher / Making the New Class" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / Writing The Dispatcher / Making the New Class</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0214.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0216.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Intuition function <a href="../Includes_and_Autodocs_2._guide/node0227.html">MakeClass()</a> creates a new Boopsi class:
+
+    Class *MakeClass(UBYTE *newclassID, UBYTE *pubsuperclassID,
+                     Class *privsuperclass, UWORD instancesize,
+                     ULONG flags);
+
+If the new class is going to be public, newclassID is a string naming the
+new class.  If the new class is private, this field is NULL.  The next two
+fields tell <a href="../Includes_and_Autodocs_2._guide/node0227.html">MakeClass()</a> where to find the new class's superclass.  If the
+superclass is public, pubsuperclassID points to a string naming that
+public superclass and the privsuperclass pointer is NULL.  If the
+superclass is private, privsuperclass points to that superclass's Class
+structure and pubsuperclassID is NULL. The size of the new class's local
+instance data is instancesize.  The last parameter, flags, is for future
+enhancement.  For now, make this zero.
+
+If it is successful, <a href="../Includes_and_Autodocs_2._guide/node0227.html">MakeClass()</a> returns a pointer to the new class,
+otherwise it returns NULL.  When MakeClass() is successful, it also takes
+measures to make sure no one can &#034;close&#034; the new class's superclass (using
+<a href="../Includes_and_Autodocs_2._guide/node0216.html">FreeClass()</a>).  It does this by incrementing a private field of the
+superclass that keeps track of how many subclasses the superclass
+<a name="line23">currently has.</a>
+
+After successfully creating a class, an application has to tell the class
+where its dispatcher is. The Class pointer (defined in
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00DA.html">classes.h</a>&#062;) returned by <a href="../Includes_and_Autodocs_2._guide/node0227.html">MakeClass()</a> contains a Hook structure
+called cl_Dispatcher, which is used to call the dispatcher.  The
+application has to initialize this hook:
+
+    myclass-&#062;cl_Dispatcher.h_Entry = HookEntry;
+    /* HookEntry() is defined in amiga.lib */
+
+<a name="line34">    myclass-&#062;cl_Dispatcher.h_SubEntry = dispatchRKMModel;</a>
+
+The h_Entry field points to a function in amiga.lib that copies the
+function arguments to where the dispatcher expects them. See the
+&#034;<a href="../Libraries_Manual_guide/node04A3.html">Callback Hooks</a>&#034; section of the &#034;Utility Library&#034; chapter of this manual for
+<a name="line39">more details.</a>
+
+To make a class public instead of private, an application has to call
+AddClass() in addition to giving the class a name in <a href="../Includes_and_Autodocs_2._guide/node0227.html">MakeClass()</a>.
+AddClass() takes one argument, a pointer to a valid Class structure that
+has been initialized as a public class by MakeClass().  To remove a public
+class added to the system with AddClass(), pass the public class pointer
+to RemoveClass().  See the Intuition Autodocs for more details on
+<a href="../Includes_and_Autodocs_2._guide/node01FB.html">AddClass()</a> and <a href="../Includes_and_Autodocs_2._guide/node0245.html">RemoveClass()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

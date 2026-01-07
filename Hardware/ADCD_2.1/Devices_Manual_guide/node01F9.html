@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-8-3" TITLE=" Appendix A. Reference / Example Diagrams " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Appendix A. Reference / Example Diagrams </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01F8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01FA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Here's a box diagram for an example IFF file, a raster image FORM <a href="../Devices_Manual_guide/node01AC.html">ILBM</a>.
+This <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a> contains a bitmap header property <a href="../Devices_Manual_guide/node01DD.html">chunk</a> <a href="../Devices_Manual_guide/node01AF.html">BMHD</a>, a color map
+property chunk <a href="../Devices_Manual_guide/node01B0.html">CMAP</a>, and a raster data chunk <a href="../Devices_Manual_guide/node01B7.html">BODY</a>.  This particular raster
+is 320 x 200 pixels x 3 bit planes uncompressed.  The &#034;0&#034; after the CMAP
+chunk represents a zero pad byte; included since the CMAP chunk has an odd
+length.  The text to the right of the diagram shows the outline that would
+be printed by the IFFCheck utility program for this particular file.
+
+
+	          +----------------------------+
+	          |                            |
+	          |  &#034;FORM&#034;            24070   |  FORM 24070 ILBM
+	          |                            |
+	       -  +----------------------------+
+	       |  |                            |
+	       |  |    &#034;ILBM&#034;                  |
+	       |  |                            |
+	       |  |  +----------------------+  |
+	       |  |  |  &#034;BMHD&#034;         20   |  |  .BMHD 20
+	       |  |  |----------------------|  |
+	       |  |  |  320, 200, 0, 0, 3,  |  |
+	       |  |  |  0, 0, 0, ....       |  |
+	       |  |  +----------------------+  |
+	       |  |                            |
+	24070 &#060;   |  +----------------------+  |
+	 bytes |  |  |  &#034;CMAP&#034;         21   |  |  .CMAP 21
+	       |  |  |----------------------|  |
+	       |  |  |  0, 0, 0; 32, 0, 0;  |  |
+	       |  |  |  64, 0, 0 ...        |  |
+	       |  |  +----------------------+  |
+	       |  |     0                      |
+	       |  |  +----------------------+  |
+	       |  |  |  &#034;BODY&#034;      24000   |  |
+	       |  |  |----------------------|  |  .BODY 24000
+	       |  |  |  0, 0, 0....         |  |
+	       |  |  +----------------------+  |
+	       |  |                            |
+	       -- +----------------------------+
+
+
+This second diagram shows a <a href="../Devices_Manual_guide/node01CA.html#line49">LIST</a> of two FORMs ILBM sharing a common <a href="../Devices_Manual_guide/node01AF.html">BMHD</a>
+property and a common <a href="../Devices_Manual_guide/node01B0.html">CMAP</a> property.  Again, the text on the right is an
+outline &#225; la IFFCheck.
+
+
+	        +------------------------------+
+	        | &#034;LIST&#034;              48114    |
+	        +------------------------------+
+	        |                              |
+	        |   &#034;ILBM&#034;                     |
+	        |                              |
+	        |  +------------------------+  |
+	        |  |  &#034;PROP&#034;        62      |  | .PROP 62 ILBM
+	        |  +------------------------+  |
+	        |  |                        |  |
+	        |  |  &#034;ILBM&#034;                |  |
+	        |  | +--------------------+ |  |
+	        |  | |  &#034;BMHD&#034;       20   | |  | ..BMHD 20
+	        |  | |--------------------| |  |
+	        |  | |  320, 200, 0, 0, 3,| |  |
+	        |  | |  0, 0, 0, ....     | |  |
+	        |  | +--------------------+ |  |
+	        |  |                        |  |
+	        |  | +--------------------+ |  |
+	        |  | |  &#034;CMAP&#034;       21   | |  | ..CMAP 21
+	        |  | |--------------------| |  |
+	        |  | |  0, 0, 0; 32, 0, 0;| |  |
+	        |  | |  64, 0, 0 ....     | |  |
+	        |  | +--------------------+ |  |
+	        |  |   0                    |  |
+	        |  +------------------------+  |
+	        |                              |
+	        |                              |
+	        |  +------------------------+  |
+	        |  |  &#034;FORM&#034;        24012   |  | .FORM 24012 ILBM
+	        |  +------------------------+  |
+	        |  |                        |  |
+	        |  |  &#034;ILBM&#034;                |  |
+	        |  | +--------------------+ |  |
+	        |  | |  &#034;BODY&#034;    24000   | |  | ..BODY 24000
+	        |  | |--------------------| |  |
+	        |  | |  0, 0, 0....       | |  |
+	        |  | +--------------------+ |  |
+	        |  +------------------------+  |
+	        |                              |
+	        |                              |
+	        |  +------------------------+  |
+	        |  |  &#034;FORM&#034;        24012   |  | .FORM 24012 ILBM
+	        |  +------------------------+  |
+	        |  |                        |  |
+	        |  |  &#034;ILBM&#034;                |  |
+	        |  | +--------------------+ |  |
+	        |  | |  &#034;BODY&#034;    24000   | |  | ..BODY 24000
+	        |  | |--------------------| |  |
+	        |  | |  0, 0, 0....       | |  |
+	        |  | +--------------------+ |  |
+	        |  +------------------------+  |
+	        |                              |
+	        |                              |
+	        +------------------------------+
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

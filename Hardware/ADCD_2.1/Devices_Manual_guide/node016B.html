@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_FTXT" NODE="16-4-2-1" TITLE=" Standard Data and Property Chunks / Character Set " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Data and Property Chunks / Character Set </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node016A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node016C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a href="../Devices_Manual_guide/node0168.html">FORM FTXT</a> uses the core of the 8-bit character set defined by the ISO/ANSI
+standards cited at the start of this document.  (See <a href="../Devices_Manual_guide/node0172.html">Appendix A</a> for a
+character code table.)  This character set is divided into two &#034;graphic&#034;
+groups plus two &#034;control&#034; groups.  Eight of the control characters begin
+ISO/ANSI standard control sequences.  (See &#034;<a href="../Devices_Manual_guide/node016C.html">Control Sequences</a>&#034;, below.)
+Most control sequences and control characters are reserved for future use
+and for compatibility with ISO/ANSI.  Current reader programs should skip
+them.
+
+* C0 is the group of control characters in the range NUL (hex 0) through
+  hex 1F.  Of these, only LF (hex 0A) and ESC (hex 1B) are significant.
+  ESC begins a control sequence.  LF is the line terminator, meaning &#034;go
+  to the first horizontal position of the next line&#034;.  All other C0
+  characters are not used.  In particular, CR (hex 0D) is not recognized
+  as a line terminator.
+
+* G0 is the group of graphic characters in the range hex 20 through hex
+  7F.  SP (hex 20) is the space character.  DEL (hex 7F) is the delete
+  character which is not used.  The rest are the standard ASCII printable
+  characters &#034;!&#034; (hex 21) through &#034;~&#034; (hex 7E).
+
+* C1 is the group of extended control characters in the range hex 80
+  through hex 9F.  Some of these begin control sequences.  The control
+  sequence starting with CSI (hex 9B) is used for <a href="../Devices_Manual_guide/node0168.html">FTXT</a> formatting.  All
+  other control sequences and C1 control characters are unused.
+
+* G1 is the group of extended graphic characters in the range NBSP (hex
+  A0) through &#034;&#255;&#034; (hex FF).  It is one of the alternate graphic groups
+  proposed for ISO/ANSI standardization.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

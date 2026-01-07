@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="serial" NODE="BeginIO()" TITLE="serial.device/BeginIO" -->
+<head>
+<title>serial.device/BeginIO</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0556.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0558.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       BeginIO(ioRequest),deviceNode -- start up an I/O process
+                A1        A6
+<b>   FUNCTION</b>
+       This is a direct function call to the device.  It is intended for
+       more advanced programmers.  See exec's <a href="../Includes_and_Autodocs_3._guide/node0204.html">DoIO()</a> and <a href="../Includes_and_Autodocs_3._guide/node0236.html">SendIO()</a> for
+       the normal method of calling devices.
+
+       This function initiates a I/O request made to the serial
+       device. Other than read or write, the functions are performed
+       synchronously, and do not depend on any interrupt handling
+       logic (or it's associated discontinuities), and hence should
+       be performed as IO_QUICK.
+       With some exceptions, reads and writes are merely initiated by
+       BeginIO, and thusly return to the caller as begun, not completed.
+       Completion is signalled via the standard <a href="../Includes_and_Autodocs_3._guide/node0235.html">ReplyMsg</a> routine.
+       Multiple requests are handled via FIFO queueing.
+       One exception to this non-QUICK handling of reads and writes
+       is for READS when:
+         - IO_QUICK bit is set
+         - There are no pending read requests
+         - There is already enough data in the input buffer to satisfy
+           this I/O <a href="../Includes_and_Autodocs_3._guide/node03E5.html">Request</a> immediately.
+       In this case, the IO_QUICK flag is not cleared, and the request
+       is completed by the time it returns to the caller. There is no
+       <a href="../Includes_and_Autodocs_3._guide/node0235.html">ReplyMsg</a> or signal bit activity in this case.
+
+<b>   INPUTS</b>
+       ioRequest  -- pointer to an I/O <a href="../Includes_and_Autodocs_3._guide/node03E5.html">Request</a> Block of size
+           io_ExtSerSize (see serial.i for size/definition),
+           containing a valid command in io_Command to process,
+           as well as the command's other required parameters.
+       deviceNode -- pointer to the &#034;serial.device&#034;, as found in
+           the IO_DEVICE of the ioRequest.
+
+<b>   RESULTS</b>
+       io_Error -- if the BeginIO succeded, then Error will be null.
+           If the BeginIO failed, then the Error will be non-zero.
+           I/O errors won't be reported until the io completes.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0668.html">devices/serial.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="chooser_gc" NODE="SetChooserNodeAttrsA()" TITLE="chooser_gc/SetChooserNodeAttrsA" -->
+<head>
+<title>chooser_gc/SetChooserNodeAttrsA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00C5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00C7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        SetChooserNodeAttrsA -- Set attributes of a Chooser node.
+
+<b>    SYNOPSIS</b>
+        VOID SetChooserNodeAttrs(struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *, <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a>, ...)
+        SetChooserNodeAttrs(node, firsttag, ...)
+
+        VOID SetChooserNodeAttrsA(struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *)
+        SetChooserNodeAttrsA(node, taglist)
+
+<b>    FUNCTION</b>
+        Changes attributes for a Chooser node.  Since the Chooser
+        class uses a private node structure, this is the only way to change
+        node attributes.
+
+        You may NOT change node attributes when the node is in a list
+        attached to a Chooser gadget.  You must first detach the list
+        with CHOOSER_Labels, ~0 before you can change attributes, and
+        then re-attach the list.
+
+<b>    TAGS</b>
+        CNA_Text (STRPTR)
+        <a href="../Includes_and_Autodocs_3._guide/node0332.html">Text</a> string to appear as a line in the Chooser menu. This tag
+        must be supplied for the node.
+
+        CNA_Image (struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> *)
+        <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> to be placed to the left of the CNA_Text in the Chooser menu.
+
+        CNA_SelImage (struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> *)
+        Selected state <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line704">Image</a> to be placed to the left of the CNA_Text in
+        the Chooser menu.
+
+        CNA_ReadOnly (BOOL) (V41.4)
+        Item will not be highlight rendered when selected.
+
+        CNA_Disabled (BOOL) (V41.5)
+        Item can not be selected. No GADGETUP message is generated.
+
+        CNA_Separator (BOOL) (V41.7)
+        Separator (~~~~) Bar Item can not be selected. Simular to the
+        separator bars in Intuition menus. No GADGETUP message is generated.
+
+<b>    INPUTS</b>
+        node - <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> whose attributes you are changing.
+        taglist - <a href="../Includes_and_Autodocs_3._guide/node064C.html#line29">Tag</a> list of attributes to change.
+
+<b>    SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node00C5.html">GetChooserNodeAttrsA()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

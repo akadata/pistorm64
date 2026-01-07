@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="ChangeSprite()" TITLE="graphics.library/ChangeSprite" -->
+<head>
+<title>graphics.library/ChangeSprite</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0426.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0428.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ChangeSprite -- Change the sprite image pointer.
+
+SYNOPSIS
+    ChangeSprite( vp, s, newdata)
+                 a0  a1   a2
+
+    void ChangeSprite(struct <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">SimpleSprite</a> *, void * )
+
+FUNCTION
+    The sprite image is changed to use the data starting at newdata
+
+INPUTS
+    vp - pointer to <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line40">ViewPort</a> structure that this sprite is
+              relative to,  or 0 if relative only top of <a href="../Includes_and_Autodocs_2._guide/node00B8.html#line57">View</a>
+    s - pointer to <a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">SimpleSprite</a> structure
+    newdata - pointer to data structure of the following form.
+            struct spriteimage
+            {
+                UWORD    posctl[2]; /* used by simple sprite machine*/
+                UWORD    data[height][2];   /* actual sprite image */
+                UWORD    reserved[2];       /* initialized to */
+                                                 /*  0x0,0x0 */
+            };
+    The programmer must initialize reserved[2].  Spriteimage must be
+    in CHIP memory. The height subfield of the <a href="../Includes_and_Autodocs_2._guide/node00C5.html#line20">SimpleSprite</a> structure
+    must be set to reflect the height of the new spriteimage BEFORE
+    calling ChangeSprite(). The programmer may allocate two sprites to
+    handle a single attached sprite.  After <a href="../Includes_and_Autodocs_2._guide/node0449.html">GetSprite()</a>, ChangeSprite(),
+    the programmer can set the SPRITE_ATTACHED bit in posctl[1] of the
+    odd numbered sprite.
+    If you need more than 8 sprites, look up VSprites in the
+    graphics documentation.
+
+RESULTS
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0443.html">FreeSprite()</a> ChangeSprite() <a href="../Includes_and_Autodocs_2._guide/node045E.html">MoveSprite()</a> <a href="../Includes_and_Autodocs_2._guide/node0411.html">AddVSprite()</a> <a href="../Includes_and_Autodocs_2._guide/node00C5.html">graphics/sprite.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

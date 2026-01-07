@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Epsonx_transfer.c" NODE="MAIN" TITLE="Devices/Dev_examples/Epsonx_transfer.c" -->
+<head>
+<title>Devices/Dev_examples/Epsonx_transfer.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0174.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0176.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+        C-language Transfer routine for EpsonX driver.
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;devices/printer.h&#062;
+#include &#060;devices/prtbase.h&#062;
+#include &#060;devices/prtgfx.h&#062;
+
+Transfer(PInfo, y, ptr, colors, BufOffset)
+struct PrtInfo *PInfo;
+UWORD y;                /* row # */
+UBYTE *ptr;             /* ptr to buffer */
+UWORD *colors;          /* indexes to color buffers */
+ULONG BufOffset;        /* used for interleaved printing */
+{
+        extern struct PrinterData *PD;
+        extern struct PrinterExtendedData *PED;
+
+        static UWORD bit_table[8] = {128, 64, 32, 16, 8, 4, 2, 1};
+        union colorEntry *ColorInt;
+        UBYTE *bptr, *yptr, *mptr, *cptr, Black, Yellow, Magenta, Cyan;
+        UBYTE *dmatrix, dvalue, threshold;
+        UWORD x, width, sx, *sxptr, color, bit, x3;
+
+        /* printer non-specific, MUST DO FOR EVERY PRINTER */
+        x = PInfo-&#062;pi_xpos;
+        ColorInt = PInfo-&#062;pi_ColorInt;
+        sxptr = PInfo-&#062;pi_ScaleX;
+        width = PInfo-&#062;pi_width;
+
+        /* printer specific */
+        if (PED-&#062;ped_YDotsInch == 216)
+        {
+                BufOffset *= y % 3;
+                y /= 3;
+        }
+        else if (PED-&#062;ped_YDotsInch == 144)
+        {
+                BufOffset *= y &#038; 1;
+                y /= 2;
+        }
+        else
+        {
+                BufOffset = 0;
+        }
+        bit = bit_table[y &#038; 7];
+        bptr = ptr + colors[0] + BufOffset;
+        yptr = ptr + colors[1] + BufOffset;
+        mptr = ptr + colors[2] + BufOffset;
+        cptr = ptr + colors[3] + BufOffset;
+
+        /* pre-compute threshold; are we thresholding? */
+        if (threshold = PInfo-&#062;pi_threshold)
+        { /* thresholding */
+                dvalue = threshold ^ 15;
+                bptr += x;
+                do { /* for all source pixels */
+                        /* pre-compute intensity values for Black component */
+                        Black = ColorInt-&#062;colorByte[PCMBLACK];
+                        ColorInt++;
+
+                        sx = *sxptr++;
+
+                        do { /* use this pixel 'sx' times */
+                                if (Black &#062; dvalue)
+                                {
+                                        *bptr |= bit;
+                                }
+                                bptr++; /* done 1 more printer pixel */
+                        } while (--sx);
+                } while (--width);
+        }
+
+        else
+        { /* not thresholding, pre-compute ptr to dither matrix */
+                dmatrix = PInfo-&#062;pi_dmatrix + ((y &#038; 3) &#060;&#060; 2);
+                if (PD-&#062;pd_Preferences.PrintShade == SHADE_GREYSCALE)
+                {
+                        do { /* for all source pixels */
+                                /* pre-compute intensity values for Black */
+                                Black = ColorInt-&#062;colorByte[PCMBLACK];
+                                ColorInt++;
+
+                                sx = *sxptr++;
+
+                                do { /* use this pixel 'sx' times */
+                                        if (Black &#062; dmatrix[x &#038; 3])
+                                        {
+                                                *(bptr + x) |= bit;
+                                        }
+                                        x++; /* done 1 more printer pixel */
+                                } while (--sx);
+                        } while (--width);
+                }
+                else
+                { /* color */
+                        do { /* for all source pixels */
+                                /* compute intensity values for each color */
+                                Black = ColorInt-&#062;colorByte[PCMBLACK];
+                                Yellow = ColorInt-&#062;colorByte[PCMYELLOW];
+                                Magenta = ColorInt-&#062;colorByte[PCMMAGENTA];
+                                Cyan = ColorInt-&#062;colorByte[PCMCYAN];
+                                ColorInt++;
+
+                                sx = *sxptr++;
+
+                                do { /* use this pixel 'sx' times */
+                                        x3 = x &#062;&#062; 3;
+                                        dvalue = dmatrix[x &#038; 3];
+                                        if (Black &#062; dvalue)
+                                        {
+                                                *(bptr + x) |= bit;
+                                        }
+                                        else
+                                        { /* black not rendered */
+                                                if (Yellow &#062; dvalue)
+                                                {
+                                                        *(yptr + x) |= bit;
+                                                }
+                                                if (Magenta &#062; dvalue)
+                                                {
+                                                        *(mptr + x) |= bit;
+                                                }
+                                                if (Cyan &#062; dvalue)
+                                                {
+                                                        *(cptr + x) |= bit;
+                                                }
+                                        }
+                                        ++x; /* done 1 more printer pixel */
+                                } while (--sx);
+                        } while (--width);
+                }
+        }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

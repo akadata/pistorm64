@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/gfxbase.h" NODE="MAIN" TITLE="Includes/graphics/gfxbase.h" -->
+<head>
+<title>Includes/graphics/gfxbase.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00AD.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00AF.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef GRAPHICS_GFXBASE_H
+#define GRAPHICS_GFXBASE_H
+/*
+**	$Filename: graphics/gfxbase.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.3 $
+**	$Date: 91/04/15 $
+**
+**	graphics base definitions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_LISTS_H
+#include &#060;exec/lists.h&#062;
+<a name="line17">#endif</a>
+#ifndef EXEC_LIBRARIES_H
+#include &#060;exec/libraries.h&#062;
+<a name="line20">#endif</a>
+#ifndef EXEC_INTERRUPTS_H
+#include &#060;exec/interrupts.h&#062;
+#endif
+<a name="line24"></a>
+struct GfxBase
+<a name="line26">{</a>
+<a name="line27">    struct Library  LibNode;</a>
+<a name="line28">    struct View *ActiView;</a>
+<a name="line29">    struct copinit *copinit;	/* ptr to copper start up list */</a>
+<a name="line30">    long    *cia;		/* for 8520 resource use */</a>
+<a name="line31">    long    *blitter;		/* for future blitter resource use */</a>
+<a name="line32">    UWORD   *LOFlist;</a>
+<a name="line33">    UWORD   *SHFlist;</a>
+<a name="line34">    struct bltnode *blthd,*blttl;</a>
+<a name="line35">    struct bltnode *bsblthd,*bsblttl;</a>
+<a name="line36">    struct Interrupt vbsrv,timsrv,bltsrv;</a>
+<a name="line37">    struct List     TextFonts;</a>
+<a name="line38">    struct  TextFont *DefaultFont;</a>
+<a name="line39">    UWORD  Modes;			/* copy of current first bplcon0 */</a>
+<a name="line40">    BYTE VBlank;</a>
+<a name="line41">    BYTE Debug;</a>
+<a name="line42">    WORD BeamSync;</a>
+<a name="line43">    WORD system_bplcon0;	/* it is ored into each bplcon0 for display */</a>
+<a name="line44">    UBYTE   SpriteReserved;</a>
+<a name="line45">    UBYTE   bytereserved;</a>
+<a name="line46">    UWORD   Flags;</a>
+<a name="line47">    WORD   BlitLock;</a>
+	WORD	BlitNest;
+<a name="line49"></a>
+<a name="line50">	struct	List	BlitWaitQ;</a>
+<a name="line51">	struct	Task	*BlitOwner;</a>
+<a name="line52">	struct	List	TOF_WaitQ;</a>
+	UWORD	DisplayFlags;		/* NTSC PAL GENLOC etc*/
+<a name="line54">					/* flags initialized at power on */</a>
+<a name="line55">	struct SimpleSprite **SimpleSprites;</a>
+<a name="line56">	UWORD	MaxDisplayRow;		/* hardware stuff, do not use */</a>
+<a name="line57">	UWORD	MaxDisplayColumn;	/* hardware stuff, do not use */</a>
+<a name="line58">	UWORD	NormalDisplayRows;</a>
+	UWORD	NormalDisplayColumns;
+<a name="line60">	/* the following are for standard non interlace, 1/2 wb width */</a>
+<a name="line61">	UWORD	NormalDPMX;		/* Dots per meter on display */</a>
+<a name="line62">	UWORD	NormalDPMY;		/* Dots per meter on display */</a>
+<a name="line63">	struct	SignalSemaphore *LastChanceMemory;</a>
+<a name="line64">	UWORD	*LCMptr;</a>
+<a name="line65">	UWORD	MicrosPerLine;		/* 256 time usec/line */</a>
+<a name="line66">	UWORD	MinDisplayColumn;</a>
+<a name="line67">	UBYTE	ChipRevBits0;</a>
+<a name="line68">	UBYTE	crb_reserved[5];</a>
+<a name="line69">	UWORD	monitor_id;		/* normally null */</a>
+<a name="line70">	ULONG	hedley[8];</a>
+<a name="line71">	ULONG	hedley_sprites[8] ;	/* sprite ptrs for intuition mouse */</a>
+<a name="line72">	ULONG	hedley_sprites1[8] ;		/* sprite ptrs for intuition mouse */</a>
+<a name="line73">	WORD	hedley_count;</a>
+<a name="line74">	UWORD	hedley_flags;</a>
+<a name="line75">	WORD	hedley_tmp;</a>
+<a name="line76">	LONG	*hash_table;</a>
+<a name="line77">	UWORD	current_tot_rows;</a>
+<a name="line78">	UWORD	current_tot_cclks;</a>
+<a name="line79">	UBYTE	hedley_hint;</a>
+<a name="line80">	UBYTE	hedley_hint2;</a>
+<a name="line81">	ULONG	nreserved[4];</a>
+<a name="line82">	LONG	*a2024_sync_raster;</a>
+<a name="line83">	WORD   control_delta_pal;</a>
+<a name="line84">	WORD   control_delta_ntsc;</a>
+<a name="line85">	struct	MonitorSpec *current_monitor;</a>
+<a name="line86">	struct	List MonitorList;</a>
+<a name="line87">	struct	MonitorSpec *default_monitor;</a>
+<a name="line88">	struct	SignalSemaphore *MonitorListSemaphore;</a>
+<a name="line89">	VOID	*DisplayInfoDataBase;</a>
+<a name="line90">	WORD	lapad;			/* alignment */</a>
+<a name="line91">	struct	SignalSemaphore *ActiViewCprSemaphore;</a>
+	ULONG	*UtilityBase;		/* for hook and tag utilities	*/
+	ULONG	*ExecBase;		/* to link with rom.lib	*/
+<a name="line94">	};</a>
+<a name="line95"></a>
+<a name="line96">#define NTSC		1</a>
+<a name="line97">#define GENLOC		2</a>
+#define PAL		4
+<a name="line99">#define TODA_SAFE	8</a>
+
+#define BLITMSG_FAULT	4
+<a name="line102"></a>
+<a name="line103">/* bits defs for ChipRevBits */</a>
+<a name="line104">#define	GFXB_BIG_BLITS	0</a>
+#define	GFXB_HR_AGNUS	0
+<a name="line106">#define GFXB_HR_DENISE	1</a>
+<a name="line107"></a>
+<a name="line108">#define GFXF_BIG_BLITS	1</a>
+#define	GFXF_HR_AGNUS	1
+<a name="line110">#define GFXF_HR_DENISE	2</a>
+
+#define GRAPHICSNAME	&#034;graphics.library&#034;
+
+#endif	/* GRAPHICS_GFXBASE_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

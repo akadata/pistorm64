@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="wb" NODE="RemoveAppWindowDropZone()" TITLE="workbench.library/RemoveAppWindowDropZoneench.library/RemoveAppWindowDropZone" -->
+<head>
+<title>workbench.library/RemoveAppWindowDropZoneench.library/RemoveAppWindowDropZone</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node05C4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05C6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	RemoveAppWindowDropZone -- <a href="../Includes_and_Autodocs_3._guide/node022F.html">Remove</a> a drop zone from an <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a>.
+
+<b>   SYNOPSIS</b>
+	success = RemoveAppWindowDropZone(appWindow,dropZone)
+	  D0                                 A0        A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> RemoveAppWindowDropZone(struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> *,
+	                             struct AppWindowDropZone *);
+
+<b>   FUNCTION</b>
+	Attempt to remove a drop zone from an <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a>.
+
+<b>   INPUTS</b>
+	appWindow -- pointer to an <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a> structure returned by
+	    <a href="../Includes_and_Autodocs_3._guide/node05BC.html">workbench.library/AddAppWindowA</a>. A value of NULL will be
+	    ignored.
+	dropZone -- pointer to an AppWindowDropZone returned by
+	    <a href="../Includes_and_Autodocs_3._guide/node05BD.html">workbench.library/AddAppWindowDropZoneA</a>. A value of NULL will
+	    be ignored.
+
+<b>   RESULTS</b>
+	success - TRUE if the drop zone could be removed, FALSE otherwise.
+	    The reason for the failure can be obtained using
+	    <a href="../Includes_and_Autodocs_3._guide/node0182.html">dos.library/IoErr</a>. This routine may fail if the specified drop
+	    zone is not registered with the <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line160">AppWindow</a>.
+
+<b>   NOTES</b>
+	Due to the asynchronous nature of Workbench/user interaction, you
+	may receive <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line162">AppIcon</a> drop zone messages for zones that you have
+	just removed. These messages may arrive in the time between your
+	code calling RemoveAppWindowDropZone() and Workbench responding
+	to the drop zone removal request. Be prepared to handle this. Once
+	a drop zone is removed, it will generate no new AppMessages.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05BD.html">workbench.library/AddAppWindowDropZoneA</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

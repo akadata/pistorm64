@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="SetWindowTitles()" TITLE="intuition.library/SetWindowTitles" -->
+<head>
+<title>intuition.library/SetWindowTitles</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03F7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03F9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	SetWindowTitles -- Set the window's titles for both window and screen.
+
+<b>    SYNOPSIS</b>
+	SetWindowTitles( <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a>, WindowTitle, ScreenTitle )
+			 A0      A1           A2
+
+	VOID SetWindowTitles( struct <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> * );
+
+<b>    FUNCTION</b>
+	Allows you to set the text which appears in the <a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> and/or <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a>
+	title bars.
+
+	The window title appears at all times along the window title bar.
+	The window's screen title appears at the screen title bar whenever
+	this window is the active one.
+
+	When this routine is called, your window title will be changed
+	immediately.  If your window is the active one when this routine is
+	called, the screen title will be changed immediately.
+
+	You can specify a value of -1 (i.e. (UBYTE *) ~0) for either of
+	the title pointers.  This designates that you want Intuition to leave
+	the current setting of that particular title alone, and modify
+	only the other one.  Of course, you could set both to -1.
+
+	Furthermore, you can set a value of 0 (zero) for either of the
+	title pointers.  Doing so specifies that you want no title to
+	appear (the title bar will be blank).
+
+	Both of the titles are rendered in the default font of the window's
+	screen, as set using <a href="../Includes_and_Autodocs_3._guide/node03D3.html">OpenScreen()</a>.
+
+	In setting the window's title, Intuition may do some other rendering
+	in the top border of your window.  If your own rendering sometimes
+	appears in your window border areas, you may want to restore the entire
+	window border frame.  The function SetWindowTitles() does not do this
+	in the newer versions.  The function <a href="../Includes_and_Autodocs_3._guide/node03DE.html">RefreshWindowFrame()</a> is provided
+	to do this kind of thing for you.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html#line908">Window</a> = pointer to your window structure
+	WindowTitle = pointer to a null-terminated text string, or set to
+           either the value of -1 (negative one) or 0 (zero)
+	ScreenTitle = pointer to a null-terminated text string, or set to
+           either the value of -1 (negative one) or 0 (zero)
+
+<b>    RESULT</b>
+	None
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03D5.html">OpenWindow()</a>, <a href="../Includes_and_Autodocs_3._guide/node03DE.html">RefreshWindowFrame()</a>, <a href="../Includes_and_Autodocs_3._guide/node03D3.html">OpenScreen()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

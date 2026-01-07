@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_35" NODE="35-4" TITLE="35 Math Libraries / FFP Transcendental Mathematics Library" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>35 Math Libraries / FFP Transcendental Mathematics Library</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node047F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0481.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The FFP transcendental math library contains entries for the
+transcendental math functions sine, cosine, and square root. It resides on
+disk and is opened by calling <a href="../Libraries_Manual_guide/node028E.html#line15">OpenLibrary()</a> with &#034;mathtrans.library&#034; as
+the argument.
+
+    #include &#060;exec/types.h&#062;
+    #include &#060;libraries/mathffp.h&#062;
+
+    #include &#060;clib/mathffp_protos.h&#062;
+    #include &#060;clib/mathtrans_protos.h&#062;
+
+    struct Library *MathTransBase;
+
+    VOID main()
+    {
+    if (MathTransBase = OpenLibrary(&#034;mathtrans.library&#034;,0))
+        {
+                .
+                .
+                .
+        CloseLibrary(MathTransBase);
+        }
+    else
+        printf(&#034;Can't open mathtrans.library\n&#034;);
+    }
+
+The global variable MathTransBase is used internally for all future
+library references.  Note that the transcendental math library is
+dependent upon the basic math library, which it will open if it is not
+open already.  If you want to use the basic math functions in conjunction
+with the transcendental math functions however, you have to specifically
+open the basic math library yourself.
+
+ <a href="../Libraries_Manual_guide/node0481.html">FFP Transcendental Functions</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

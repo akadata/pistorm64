@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="V-23/BulletMain.c" NODE="MAIN" TITLE="V-23/BulletMain.c" -->
+<head>
+<title>V-23/BulletMain.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01CB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01CD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* BulletMain.c - Execute me to compile me with SAS/C 6.56
+sc NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 BulletMain.c
+quit ;*/
+
+/* (c)  Copyright 1992-1999 Amiga, Inc.   All rights reserved.       */
+/* The information contained herein is subject to change without notice,  */
+/* and is provided &#034;as is&#034; without warranty of any kind, either expressed */
+/* or implied.  The entire risk as to the use of this information is      */
+/* assumed by the user.                                                   */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;dos/rdargs.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;dos/var.h&#062;
+#include &#060;diskfont/diskfonttag.h&#062;
+#include &#060;diskfont/diskfont.h&#062;
+#include &#060;diskfont/glyph.h&#062;
+#include &#060;diskfont/oterrors.h&#062;
+#include &#060;utility/tagitem.h&#062;
+#include &#060;string.h&#062;
+#include &#060;graphics/displayinfo.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/screens.h&#062;
+
+#include &#060;clib/dos_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/utility_protos.h&#062;
+#include &#060;clib/bullet_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+#define OTAG_ID 0x0f03
+
+#ifdef LATTICE
+int CXBRK(void) { return (0);} /* Disable Lattice CTRL/C handling */
+int chkabort(void) { return (0);}
+#endif
+
+UBYTE   *readargsstring = &#034;FontName,Size/N,XDPI/N,YDPI/N,CharCode/N,CharCode2/N\n&#034;;
+UBYTE   *librarystring = &#034;.library&#034;;
+UBYTE   *fontstring     = &#034;fonts:cgtimes.font&#034;;
+UBYTE   *dpivarname = &#034;XYDPI&#034;;  /* Name of an X/Y DPI environment variable. */
+                                /* If this ENV: variable exists, this code  */
+                                /* will use the X and Y DPI stored there.   */
+                                /* This code will also save the X and Y DPI */
+                                /* in XYDPI if the user supplies a DPI.     */
+                                /* XYDPI encodes the DPI just like the      */
+                                /* OT_DeviceDPI tag.                        */
+extern struct TagItem *AllocOtag(STRPTR);
+extern void     FreeOtag(void *);
+extern struct Library *OpenScalingLibrary(struct TagItem *);
+extern void     CloseScalingLibrary(struct Library *);
+extern struct GlyphEngine *GetGlyphEngine(struct TagItem *, STRPTR);
+extern void     ReleaseGlyphEngine(struct GlyphEngine *);
+extern void
+BulletExample(struct GlyphEngine *,
+              struct Window *,
+              struct RastPort *, ULONG, ULONG, ULONG, ULONG, ULONG);
+
+#define BUFSIZE     256
+
+#define NUM_ARGS    6    /* Arguments for ReadArgs(). */
+#define FONT_NAME   0
+#define SIZE        1
+#define XDPI        2
+#define YDPI        3
+#define CODE        4
+#define CODE2       5
+LONG            args[NUM_ARGS];
+struct RDargs  *myrda;
+
+struct Library *BulletBase, *UtilityBase, *GfxBase, *IntuitionBase;
+
+UBYTE           buf[BUFSIZE];
+BPTR            fontfile, dpifile;
+UBYTE          *otagname;
+UWORD           fchid;
+
+struct GlyphEngine *ge;
+
+struct DrawInfo *drawinfo;
+struct RastPort rp;
+
+void            main(int argc, char **argv)
+{
+  struct TagItem *ti;
+  struct GlyphEngine *ge;
+  struct Window  *w;
+
+  UBYTE           xydpi[5];
+
+  ULONG           defpointheight = 36;   /* Default values for ReadArgs() */
+  ULONG           defxdpi = 68;          /* variables.                    */
+  ULONG           defydpi = 27;
+  ULONG           defcode = (ULONG) 'A';
+  ULONG           defcode2 = 0;
+
+  if (GfxBase = OpenLibrary(&#034;graphics.library&#034;, 37L))
+  {
+    if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 37L))
+    {
+      if (myrda = ReadArgs(readargsstring, args, NULL))
+      {
+        if (args[XDPI] &#038;&#038; args[YDPI]) /* If the user sets the DPI from the command  */
+        {            /* line, make sure the environment variable also gets changed. */
+          *(ULONG *)xydpi = ( (*(LONG *) args[XDPI]) &#060;&#060; 16 | (*(ULONG *) args[YDPI]) );
+          SetVar(dpivarname, xydpi, 5,
+              GVF_GLOBAL_ONLY | GVF_BINARY_VAR | GVF_DONT_NULL_TERM);
+        }
+        else                            /* If the user did NOT set the X OR Y DPI...*/
+        {
+          args[XDPI] = (LONG) &#038;defxdpi; /* ...set to default values and look for    */
+          args[YDPI] = (LONG) &#038;defydpi; /* an environment variable called &#034;XYDPI&#034;.  */
+                                                  /* Read the environment variable, */
+          if ((GetVar(dpivarname, xydpi, 5,        /* XYDPI, if it exists.          */
+              GVF_GLOBAL_ONLY | GVF_BINARY_VAR | GVF_DONT_NULL_TERM)) != -1)
+
+     /* BUG!: In the original publication of this code, the line above erroneously  */
+     /* tested for the wrong return value.  It caused unexpected results when using */
+     /* the default X and Y DPI values.  This bug was also present in BulletMain.c. */
+
+          {
+            if ( (*(ULONG *)xydpi &#038; 0xFFFF0000) &#038;&#038; (*(ULONG *)xydpi &#038; 0x0000FFFF) )
+            {     /* Make sure the environment variable is OK to use by making sure */
+                  /* that neither X or YDPI is zero. If XYDPI is OK, use it as the  */
+              defxdpi = ((*(ULONG *)xydpi) &#038; 0xFFFF0000) &#062;&#062; 16;        /* default.  */
+              defydpi = (*(ULONG *)xydpi) &#038; 0x0000FFFF;
+            }
+          }
+        }
+        if (!(args[SIZE]))
+          args[SIZE] = (LONG) &#038;defpointheight;
+        if (!(args[CODE]))
+          args[CODE] = (LONG) &#038;defcode;
+        if (!(args[CODE2]))
+          args[CODE2] = (LONG) &#038;defcode2;
+        if (!(args[FONT_NAME]))
+          args[FONT_NAME] = (LONG) fontstring;
+                                           /* Open the &#034;.font&#034; file which contains  */
+                                           /* the FontContentsHeader for this font. */
+        if (fontfile = Open((STRPTR) args[FONT_NAME], MODE_OLDFILE))
+        {
+          if (Read(fontfile, &#038;fchid, sizeof(UWORD)))
+          {
+            if (fchid == OTAG_ID)             /* Does this font have an .otag file? */
+            {
+              strcpy(buf, (STRPTR) args[FONT_NAME]); /* Put together the otag file  */
+              if (otagname = &#038;(buf[strlen(buf) - 4]))/* name from the .font file.   */
+              {
+                strcpy(otagname, &#034;otag&#034;);
+                if (UtilityBase = OpenLibrary(&#034;utility.library&#034;, 37L))
+                {
+                  if (ti = AllocOtag(buf))      /* open the otag file and copy its  */
+                  {                             /* tags into memory.                */
+                    if (BulletBase = OpenScalingLibrary(ti)) /* Pass the function   */
+                    {                                  /* the OTAG tag list which it*/
+                                                       /* needs to open the scaling */
+                      if (ge = GetGlyphEngine(ti, buf))/* library.  Open the        */
+                      {                                /* library's scaling engine. */
+                        if (w = OpenWindowTags(NULL,
+                                               WA_Width,         640,
+                                               WA_Height,        200,
+                                               WA_SmartRefresh,  TRUE,
+                                               WA_SizeGadget,    FALSE,
+                                               WA_CloseGadget,   TRUE,
+                                               WA_IDCMP,         NULL,
+                                               WA_DragBar,       TRUE,
+                                               WA_DepthGadget,   TRUE,
+                                               WA_Title,         (ULONG)argv[0],
+                                               TAG_END))
+                        {
+                          rp = *(w-&#062;RPort); /* Clone window's RastPort.  The second */
+                                            /* Rastport is for rendering with the   */
+                                            /* background color.                    */
+
+                          if (drawinfo = GetScreenDrawInfo(w-&#062;WScreen)) /* Get the  */
+                          {             /* Screen's DrawInfo to get its pen colors. */
+                            SetAPen(w-&#062;RPort, drawinfo-&#062;dri_Pens[TEXTPEN]);
+                            SetAPen(&#038;rp, drawinfo-&#062;dri_Pens[BACKGROUNDPEN]);
+                            FreeScreenDrawInfo(w-&#062;WScreen, drawinfo);
+
+                            BulletExample(ge, w, &#038;rp, *(ULONG *) args[SIZE],
+                                          *(ULONG *) args[XDPI],
+                                          *(ULONG *) args[YDPI],
+                                          *(ULONG *) args[CODE],
+                                          *(ULONG *) args[CODE2]);
+                          }
+                          CloseWindow(w);
+                        }
+                        ReleaseGlyphEngine(ge);
+                      }
+                      CloseScalingLibrary(BulletBase);
+                    }
+                    FreeOtag(ti);
+                  }
+                  CloseLibrary(UtilityBase);
+                }
+              }
+            }
+          }
+          Close(fontfile);
+        }
+        FreeArgs(myrda);
+      }
+      CloseLibrary(IntuitionBase);
+    }
+    CloseLibrary(GfxBase);
+  }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

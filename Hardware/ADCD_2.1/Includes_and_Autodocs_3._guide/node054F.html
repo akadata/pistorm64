@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="rexxsyslib" NODE="LengthArgstring()" TITLE="rexxsyslib.library/LengthArgstring" -->
+<head>
+<title>rexxsyslib.library/LengthArgstring</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node054E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0550.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	LengthArgstring - Returns the length value stored in the argstring
+
+<b>    SYNOPSIS</b>
+	length = LengthArgstring(argstring)
+	D0                       A0
+
+	ULONG LengthArgstring(UBYTE *);
+
+<b>    FUNCTION</b>
+	This function returns the length value stored in the argstring.
+	This is *NOT* the same as doing a strlen() type call on the
+	argstring.  (Note that argstrings may contain NULLs)
+
+<b>    INPUTS</b>
+	argstring - A pointer to an argstring that was created by ARexx
+
+<b>    RESULTS</b>
+	length - The length of the argstring.
+
+<b>    EXAMPLE</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0549.html">CreateArgstring()</a>
+
+<b>    BUGS</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amiga_lib" NODE="ACrypt()" TITLE="amiga.lib/ACrypt" -->
+<head>
+<title>amiga.lib/ACrypt</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node001A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node001C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	ACrypt -- Encrypt a password
+
+<b>   SYNOPSIS</b>
+	newpass = ACrypt( buffer, password, username )
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *ACrypt( <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *) ;
+
+<b>   FUNCTION</b>
+	This function takes a buffer of at least 12 characters in length,
+	an unencrypted password and the user's name (as known to the host
+	system) and returns an encrypted password in the passed buffer.
+	This is a one-way encryption. Normally, the user's encrypted
+	password is stored in a file for future password comparison.
+
+<b>   INPUTS</b>
+	buffer     - a pointer to a buffer at least 12 bytes in length.
+	password   - a pointer to an unencrypted password string.
+	username   - a pointer to the user's name.
+
+<b>   RESULT</b>
+	newpass    - a pointer to the passed buffer if successful, NULL
+	             upon failure. The encrypted password placed in the
+	             buffer will be be eleven (11) characters in length
+	             and will be NULL-terminated.
+
+<b>   EXAMPLE</b>
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *pw, *getpassword() ;
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *user = &#034;alf&#034;
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *newpass ;
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> buffer[16] ;         /* size &#062;= 12 */
+
+	pw = getpassword() ;   /* your own function */
+
+	if((newpass = ACrypt(buffer, pw, user)) != NULL)
+	{
+		printf(&#034;pw = %sn&#034;, newpass) ; /* newpass = &#038;buffer[0] */
+	}
+	else
+	{
+		printf(&#034;ACrypt failedn&#034;) ;
+	}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/semaphore.c" NODE="MAIN" TITLE="Lib_examples/semaphore.c" -->
+<head>
+<title>Lib_examples/semaphore.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node058C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node058E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* A simple &#034;do nothing&#034; example of Exec signal semaphore use is shown   */
+/* below. When the semaphore is owned by a task, attempted access by     */
+/* other tasks will block.  A nesting count is maintained, so the        */
+/* current task can safely call ObtainSemaphore() on the same semaphore. */
+/*
+/* semaphore.c - Exec semaphore example - compile with lc -L semaphore.c */
+#include &#060;exec/types.h&#062;
+#include &#060;exec/semaphores.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void)  { return(0); }  /* Disable Lattice CTRL/C handling */
+void chkabort(void) { return; }  /* really */
+#endif
+
+struct SignalSemaphore LockSemaphore = {0};
+
+VOID main(int argc,char *argv[])
+{
+    InitSemaphore(&#038;LockSemaphore);
+    ObtainSemaphore(&#038;LockSemaphore);  /* Task now owns the semaphore. */
+         ...
+    ReleaseSemaphore(&#038;LockSemaphore); /* Task has released the semaphore. */
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

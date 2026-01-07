@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="icon" NODE="GetDefDiskObject()" TITLE="icon.library/GetDefDiskObject" -->
+<head>
+<title>icon.library/GetDefDiskObject</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node034B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node034D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetDefDiskObject - read default wb disk object from disk.       (V36)
+
+<b>   SYNOPSIS</b>
+	diskobj = GetDefDiskObject(def_type)
+	  D0                          D0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line64">DiskObject</a> *GetDefDiskObject(LONG);
+
+<b>   FUNCTION</b>
+	This routine reads in a default Workbench disk object from disk.
+	The valid def_types can be found in <a href="../Includes_and_Autodocs_3._guide/node05D6.html">workbench/workbench.h</a> and
+	currently include WBDISK thru WBKICK. If the call fails,
+	it will return NULL. The reason for the failure may be obtained
+	via <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>.
+
+	Using this routine protects you from any future changes to
+	the way default icons are stored within the system.
+
+<b>   INPUTS</b>
+	def_type -- default icon type (WBDISK thru WBKICK).
+
+<b>   RESULTS</b>
+	diskobj -- the default Workbench disk object in question
+
+<b>   NOTES</b>
+	icon.library V36 through V40 did not support the WBDEVICE default
+	icon type.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0182.html">dos.library/IoErr</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0355.html">icon.library/PutDefDiskObject</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0357.html">icon.library/PutIconTagList</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

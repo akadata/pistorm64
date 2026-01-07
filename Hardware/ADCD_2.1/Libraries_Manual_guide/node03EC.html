@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-5" TITLE="30 / Layers / Working With Existing Layers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / Layers / Working With Existing Layers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03EB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03ED.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A common operation performed by applications is to render text or graphics
+into an existing layer such as an Intuition window.  To prevent Intuition
+from changing the layer (for instance when the user resizes or moves the
+window) during a series of graphic operations, the layers library provides
+<a name="line6">locking functions for obtaining exclusive access to a layer.</a>
+
+These locking functions are also useful for applications that create their
+own layers if the application has more than one task operating on the
+layers asynchronously.  These calls coordinate multiple access to layers.
+<a name="line11"></a>
+
+  Table 30-1: Functions for Intertask Control of Layers (Layers Library)
+   ____________________________________________________________________
+  |                                                                    |
+  |        <a href="../Libraries_Manual_guide/node03ED.html#line27">LockLayer()</a>  Lock out rendering in a single layer.          |
+  |      <a href="../Libraries_Manual_guide/node03ED.html#line40">UnlockLayer()</a>  Release LockLayer() lock.                      |
+  |       <a href="../Libraries_Manual_guide/node03ED.html#line49">LockLayers()</a>  Lock out rendering in all layers of a display. |
+  |     <a href="../Libraries_Manual_guide/node03ED.html#line49">UnlockLayers()</a>  Release LockLayers() lock.                     |
+  |    <a href="../Libraries_Manual_guide/node03ED.html#line6">LockLayerInfo()</a>  Gain exclusive access to the display's layers. |
+  |  <a href="../Libraries_Manual_guide/node03ED.html#line19">UnlockLayerInfo()</a>  Release LockLayerInfo() lock.                  |
+  |____________________________________________________________________|
+
+
+The following routines from the graphics library also allow multitasking
+access to layer structures:
+
+
+ Table 30-2: Functions for Intertask Control of Layers (Graphics Library)
+   ____________________________________________________________________
+  |                                                                    |
+  |         <a href="../Includes_and_Autodocs_2._guide/node045A.html">LockLayerRom()</a>  Same as <a href="../Libraries_Manual_guide/node03ED.html#line27">LockLayer()</a>, from layers library.  |
+  |       <a href="../Includes_and_Autodocs_2._guide/node0486.html">UnlockLayerRom()</a>  Release LockLayerRom() lock.               |
+  |  <a href="../Includes_and_Autodocs_2._guide/node041D.html">AttemptLockLayerRom()</a>  Lock layer only if it is immediately       |
+  |                         available.                                 |
+  |____________________________________________________________________|
+
+
+These functions are similar to the layers <a href="../Libraries_Manual_guide/node03ED.html#line27">LockLayer()</a> and <a href="../Libraries_Manual_guide/node03ED.html#line40">UnlockLayer()</a>
+functions, but do not require the layers library to be open.  See the
+Amiga ROM Kernel Reference Manual: Includes and Autodocs for details.
+
+ <a href="../Libraries_Manual_guide/node03ED.html">Intertask Operations</a>    <a href="../Libraries_Manual_guide/node03EE.html">Determining Layer Position</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

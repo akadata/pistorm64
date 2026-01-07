@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_14" NODE="14-2-5" TITLE="14 / Device Interface / Closing The Trackdisk Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>14 / Device Interface / Closing The Trackdisk Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node00E2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node00E4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As with all devices, you must close the trackdisk device when you have
+finished using it. To release the device, a <a href="../Includes_and_Autodocs_2._guide/node033F.html">CloseDevice()</a> call is executed
+with the same <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> used when the device was opened. This only closes
+the device and makes it available to the rest of the system. It does not
+deallocate the <a href="../Devices_Manual_guide/node00DE.html#line12">IOExtTD</a> structure.
+
+    CloseDevice((struct IORequest *)DiskIO);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

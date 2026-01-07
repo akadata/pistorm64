@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/prtbase.h" NODE="MAIN" TITLE="Includes/devices/prtbase.h" -->
+<head>
+<title>Includes/devices/prtbase.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0059.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node005B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef  DEVICES_PRTBASE_H
+#define  DEVICES_PRTBASE_H
+/*
+**	$Filename: devices/prtbase.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 1.10 $
+**	$Date: 90/11/02 $
+**
+**	printer.device base structure definitions
+**
+**	(C) Copyright 1987-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef  EXEC_TYPES_H
+#include &#034;exec/types.h&#034;
+<a name="line17">#endif</a>
+#ifndef  EXEC_NODES_H
+#include &#034;exec/nodes.h&#034;
+<a name="line20">#endif</a>
+#ifndef  EXEC_LISTS_H
+#include &#034;exec/lists.h&#034;
+<a name="line23">#endif</a>
+#ifndef  EXEC_PORTS_H
+#include &#034;exec/ports.h&#034;
+<a name="line26">#endif</a>
+#ifndef  EXEC_LIBRARIES_H
+#include &#034;exec/libraries.h&#034;
+<a name="line29">#endif</a>
+#ifndef  EXEC_TASKS_H
+#include &#034;exec/tasks.h&#034;
+#endif
+<a name="line33"></a>
+#ifndef  DEVICES_PARALLEL_H
+#include &#034;devices/parallel.h&#034;
+#endif
+#ifndef  DEVICES_SERIAL_H
+#include &#034;devices/serial.h&#034;
+<a name="line39">#endif</a>
+#ifndef  DEVICES_TIMER_H
+#include &#034;devices/timer.h&#034;
+#endif
+#ifndef  LIBRARIES_DOSEXTENS_H
+#include &#034;libraries/dosextens.h&#034;
+#endif
+#ifndef  INTUITION_INTUITION_H
+#include &#034;intuition/intuition.h&#034;
+#endif
+
+<a name="line50"></a>
+<a name="line51">struct DeviceData {</a>
+<a name="line52">    struct Library dd_Device; /* standard library node */</a>
+<a name="line53">    APTR dd_Segment;	      /* A0 when initialized */</a>
+<a name="line54">    APTR dd_ExecBase;	      /* A6 for exec */</a>
+<a name="line55">    APTR dd_CmdVectors;       /* command table for device commands */</a>
+<a name="line56">    APTR dd_CmdBytes;	      /* bytes describing which command queue */</a>
+    UWORD   dd_NumCommands;   /* the number of commands supported */
+};
+<a name="line59"></a>
+<a name="line60">#define P_OLDSTKSIZE	0x0800	/* stack size for child task (OBSOLETE) */</a>
+<a name="line61">#define P_STKSIZE	0x1000	/* stack size for child task */</a>
+<a name="line62">#define P_BUFSIZE	256	/* size of internal buffers for text i/o */</a>
+#define P_SAFESIZE	128	/* safety margin for text output buffer */
+<a name="line64"></a>
+<a name="line65">struct	 PrinterData {</a>
+<a name="line66">	struct DeviceData pd_Device;</a>
+<a name="line67">	struct MsgPort pd_Unit;	/* the one and only unit */</a>
+<a name="line68">	BPTR pd_PrinterSegment;	/* the printer specific segment */</a>
+	UWORD pd_PrinterType;	/* the segment printer type */
+<a name="line70">				/* the segment data structure */</a>
+<a name="line71">	struct PrinterSegment *pd_SegmentData;</a>
+<a name="line72">	UBYTE *pd_PrintBuf;	/* the raster print buffer */</a>
+<a name="line73">	int (*pd_PWrite)();	/* the write function */</a>
+	int (*pd_PBothReady)();	/* write function's done */
+<a name="line75">	union {			/* port I/O request 0 */</a>
+<a name="line76">		struct IOExtPar pd_p0;</a>
+<a name="line77">		struct IOExtSer pd_s0;</a>
+	} pd_ior0;
+<a name="line79"></a>
+<a name="line80">#define  pd_PIOR0 pd_ior0.pd_p0</a>
+#define  pd_SIOR0 pd_ior0.pd_s0
+
+<a name="line83">	union {			/*   and 1 for double buffering */</a>
+<a name="line84">		struct IOExtPar pd_p1;</a>
+<a name="line85">		struct IOExtSer pd_s1;</a>
+	} pd_ior1;
+<a name="line87"></a>
+<a name="line88">#define  pd_PIOR1 pd_ior1.pd_p1</a>
+#define  pd_SIOR1 pd_ior1.pd_s1
+<a name="line90"></a>
+<a name="line91">	struct timerequest pd_TIOR;	/* timer I/O request */</a>
+<a name="line92">	struct MsgPort pd_IORPort;	/* and message reply port */</a>
+<a name="line93">	struct Task pd_TC;		/* write task */</a>
+<a name="line94">	UBYTE pd_OldStk[P_OLDSTKSIZE];	/* and stack space (OBSOLETE) */</a>
+<a name="line95">	UBYTE pd_Flags;			/* device flags */</a>
+<a name="line96">	UBYTE pd_pad;			/* padding */</a>
+<a name="line97">	struct Preferences pd_Preferences;	/* the latest preferences */</a>
+	UBYTE pd_PWaitEnabled;		/* wait function switch */
+<a name="line99">	/* new fields for V2.0 */</a>
+<a name="line100">	UBYTE pd_Flags1;		/* padding */</a>
+	UBYTE pd_Stk[P_STKSIZE];	/* stack space */
+};
+
+<a name="line104">/* Printer Class */</a>
+<a name="line105">#define PPCB_GFX	0	/* graphics (bit position) */</a>
+<a name="line106">#define PPCF_GFX	0x1	/* graphics (and/or flag) */</a>
+<a name="line107">#define PPCB_COLOR	1	/* color (bit position) */</a>
+#define PPCF_COLOR	0x2	/* color (and/or flag) */
+<a name="line109"></a>
+<a name="line110">#define PPC_BWALPHA	0x00	/* black&#038;white alphanumerics */</a>
+<a name="line111">#define PPC_BWGFX	0x01	/* black&#038;white graphics */</a>
+<a name="line112">#define PPC_COLORALPHA	0x02	/* color alphanumerics */</a>
+#define PPC_COLORGFX	0x03	/* color graphics */
+
+<a name="line115">/* Color Class */</a>
+<a name="line116">#define	PCC_BW		0x01	/* black&#038;white only */</a>
+<a name="line117">#define	PCC_YMC		0x02	/* yellow/magenta/cyan only */</a>
+<a name="line118">#define	PCC_YMC_BW	0x03	/* yellow/magenta/cyan or black&#038;white */</a>
+<a name="line119">#define	PCC_YMCB	0x04	/* yellow/magenta/cyan/black */</a>
+<a name="line120">#define	PCC_4COLOR	0x04	/* a flag for YMCB and BGRW */</a>
+<a name="line121">#define	PCC_ADDITIVE	0x08	/* not ymcb but blue/green/red/white */</a>
+<a name="line122">#define	PCC_WB		0x09	/* black&#038;white only, 0 == BLACK */</a>
+<a name="line123">#define	PCC_BGR		0x0A	/* blue/green/red */</a>
+<a name="line124">#define	PCC_BGR_WB	0x0B	/* blue/green/red or black&#038;white */</a>
+#define	PCC_BGRW	0x0C	/* blue/green/red/white */
+/*
+	The picture must be scanned once for each color component, as the
+	printer can only define one color at a time.  ie. If 'PCC_YMC' then
+	first pass sends all 'Y' info to printer, second pass sends all 'M'
+	info, and third pass sends all C info to printer.  The CalComp
+	PlotMaster is an example of this type of printer.
+<a name="line132">*/</a>
+#define PCC_MULTI_PASS	0x10	/* see explanation above */
+<a name="line134"></a>
+<a name="line135">struct PrinterExtendedData {</a>
+<a name="line136">	char	*ped_PrinterName;    /* printer name, null terminated */</a>
+<a name="line137">	VOID	(*ped_Init)();	     /* called after LoadSeg */</a>
+<a name="line138">	VOID	(*ped_Expunge)();    /* called before UnLoadSeg */</a>
+<a name="line139">	int	(*ped_Open)();	     /* called at OpenDevice */</a>
+<a name="line140">	VOID	(*ped_Close)();      /* called at CloseDevice */</a>
+<a name="line141">	UBYTE	ped_PrinterClass;    /* printer class */</a>
+<a name="line142">	UBYTE	ped_ColorClass;      /* color class */</a>
+<a name="line143">	UBYTE	ped_MaxColumns;      /* number of print columns available */</a>
+<a name="line144">	UBYTE	ped_NumCharSets;     /* number of character sets */</a>
+<a name="line145">	UWORD	ped_NumRows;	     /* number of 'pins' in print head */</a>
+<a name="line146">	ULONG	ped_MaxXDots;	     /* number of dots max in a raster dump */</a>
+<a name="line147">	ULONG	ped_MaxYDots;	     /* number of dots max in a raster dump */</a>
+<a name="line148">	UWORD	ped_XDotsInch;	     /* horizontal dot density */</a>
+<a name="line149">	UWORD	ped_YDotsInch;	     /* vertical dot density */</a>
+<a name="line150">	char	***ped_Commands;     /* printer text command table */</a>
+<a name="line151">	int	(*ped_DoSpecial)();  /* special command handler */</a>
+<a name="line152">	int	(*ped_Render)();     /* raster render function */</a>
+	LONG	ped_TimeoutSecs;     /* good write timeout */
+<a name="line154">	/* the following only exists if the segment version is &#062;= 33 */</a>
+<a name="line155">	char	**ped_8BitChars;     /* conv. strings for the extended font */</a>
+	LONG	ped_PrintMode;	     /* set if text printed, otherwise 0 */
+	/* the following only exists if the segment version is &#062;= 34 */
+<a name="line158">	/* ptr to conversion function for all chars */</a>
+	int	(*ped_ConvFunc)();
+};
+<a name="line161"></a>
+<a name="line162">struct PrinterSegment {</a>
+<a name="line163">    ULONG   ps_NextSegment;	 /* (actually a BPTR) */</a>
+<a name="line164">    ULONG   ps_runAlert;	 /* MOVEQ #0,D0 : RTS */</a>
+<a name="line165">    UWORD   ps_Version;	 /* segment version */</a>
+<a name="line166">    UWORD   ps_Revision;	 /* segment revision */</a>
+    struct  PrinterExtendedData ps_PED;   /* printer extended data */
+};
+#endif
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

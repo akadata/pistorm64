@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="resource" NODE="RL_OpenResource()" TITLE="resource.library/RL_OpenResource" -->
+<head>
+<title>resource.library/RL_OpenResource</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0544.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0546.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	RL_OpenResource - open a resource (V44)
+
+<b>   SYNOPSIS</b>
+	resource = RL_OpenResource(resobject, screen, catalog)
+	 D0                         A0         A1      A2
+
+	<a href="../Includes_and_Autodocs_3._guide/node0666.html#line16">RESOURCEFILE</a> RL_OpenResource(APTR, struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line245">Catalog</a> *);
+
+<b>   FUNCTION</b>
+	This routine opens a resource object.
+
+	If you give a NULL for the parameter screen do not call <a href="../Includes_and_Autodocs_3._guide/node0544.html">RL_NewObjectA</a>
+	or <a href="../Includes_and_Autodocs_3._guide/node0543.html">RL_NewGroupA</a>. You must first set a screen with
+	<a href="../Includes_and_Autodocs_3._guide/node0546.html">RL_SetResourceScreen</a>.
+
+<b>   INPUTS</b>
+	resobject -- a pointer to a resource object
+	screen -- a pointer to a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a>. This may be NULL
+	catalog -- a pointer to a <a href="../Includes_and_Autodocs_3._guide/node05E3.html#line245">Catalog</a>. This may be NULL
+
+<b>   RESULTS</b>
+	resource -- a pointer to a resource or NULL
+
+<b>   EXAMPLE</b>
+
+	extern char RCTResource[];
+	struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *screen;
+
+	screen = LockPubScreen(NULL);
+	<a href="../Includes_and_Autodocs_3._guide/node0666.html#line16">RESOURCEFILE</a> resource = RL_OpenResource(RCTResource, screen, NULL);
+	if (resource)
+	{
+		/* create your objects here */
+	}
+	RL_CloseResource(resource);
+	UnlockPubScreen(NULL,screen);
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03C1.html">intuition.library/LockPubScreen</a>
+	<a href="../Includes_and_Autodocs_3._guide/node03D4.html">intuition.library/OpenScreenTagList</a>
+	locale.library/OpenCatalogA
+	<a href="../Includes_and_Autodocs_3._guide/node053F.html">resource.library/RL_CloseResource</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0546.html">resource.library/RL_SetResourceScreen</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

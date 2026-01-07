@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="timer" NODE="GetSysTime()" TITLE="timer.device/GetSysTime" -->
+<head>
+<title>timer.device/GetSysTime</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0576.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0578.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetSysTime -- Get the system time. (V36)
+
+<b>   SYNOPSIS</b>
+	GetSysTime( Dest )
+	            A0
+
+	void GetSysTime( struct <a href="../Includes_and_Autodocs_3._guide/node0607.html#line29">timeval</a> * );
+
+<b>   FUNCTION</b>
+	Ask the system what time it is.  The system time starts off at
+	zero at power on, but may be initialized via the <a href="../Includes_and_Autodocs_3._guide/node057C.html">TR_SETSYSTIME</a>
+	timer.device command.
+
+	System time is monotonocally increasing and guarenteed to be
+	unique (except when the system time is set back).
+
+	A0 will be left unchanged.
+
+	This function is less expensive to use than the <a href="../Includes_and_Autodocs_3._guide/node057B.html">TR_GETSYSTIME</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0621.html#line17">IORequest</a>.
+
+<b>   INPUTS</b>
+	Dest -- pointer to a <a href="../Includes_and_Autodocs_3._guide/node0607.html#line29">timeval</a> structure to hold the system time.
+
+<b>   RESULTS</b>
+	Dest -- the <a href="../Includes_and_Autodocs_3._guide/node0607.html#line29">timeval</a> structure will contain the system time.
+
+<b>   NOTES</b>
+	This function may be called from interrupts.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node057B.html">timer.device/TR_GETSYSTIME</a>,
+	<a href="../Includes_and_Autodocs_3._guide/node057C.html">timer.device/TR_SETSYSTIME</a>,
+
+<b>   BUGS</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="8SVX-2" TITLE="8SVX.CHAN.PAN.doc / Optional Data Chunk PAN " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>8SVX.CHAN.PAN.doc / Optional Data Chunk PAN </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0208.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node020A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The optional data chunk PAN provides the neccessary information to create
+a stereo sound using a single array of data. It is neccessary to replay
+the sample simultaneously on two channels, at different volumes.
+
+    #define ID_PAN MakeID('P','A','N',' ')
+
+    typedef sposition Fixed; /* 0 &#060;= sposition &#060;= Unity */
+
+    /* Unity is elsewhere #defined as 10000L, and
+     * refers to the maximum possible volume.
+     * /
+
+    /* Please note that &#034;Fixed&#034; (elsewhere #defined as LONG) is used to
+     * allow for compatabilty between audio hardware of different
+     * resolutions.
+     * /
+
+The &#034;sposition&#034; variable describes a position in the stereo field. The
+numbers of discrete stereo positions available is equal to 1/2 the number
+of discrete volumes for a single channel.
+
+The sample must be played on both the right and left channels. The overall
+volume of the sample is determined by the &#034;volume&#034; field in the
+Voice8Header structure in the VHDR chunk.
+
+The left channel volume = overall volume / (Unity / sposition).
+ &#034;  right   &#034;       &#034;   = overall volume - left channel volume.
+
+For example:
+	If sposition = Unity, the sample is panned all the way to the left.
+	If sposition = 0, the sample is panned all the way to the right.
+	If sposition = Unity/2, the sample is centered in the stereo field.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

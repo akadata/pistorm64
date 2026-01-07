@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="CacheClearE()" TITLE="exec.library/CacheClearE" -->
+<head>
+<title>exec.library/CacheClearE</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01EE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01F0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	CacheClearE - Cache clearing with extended control (V37)
+
+<b>   SYNOPSIS</b>
+	CacheClearE(address,length,caches)
+	            a0      d0     d1
+
+	void CacheClearE(APTR,ULONG,ULONG);
+
+<b>   FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node016A.html">Flush</a> out the contents of the CPU instruction and/or data caches.
+	If dirty data cache lines are present, push them to memory first.
+
+	Motorola CPUs have separate instruction and data caches.  A data
+	write does not update the instruction cache.  If an instruction is
+	written to memory or modified, the old instruction may still exist
+	in the cache.  Before attempting to execute the code, a flush of
+	the instruction cache is required.
+
+	For most systems, the data cache is not updated by Direct Memory
+	Access (DMA), or if some external factor changes shared memory.
+
+	Caches must be cleared after *any* operation that could cause
+	invalid or stale data.  The most common cases are DMA and modifying
+	instructions using the processor.
+
+	Some examples:
+			Self modifying code
+			Building Jump tables
+			Run-time code patches
+			Relocating code for use at different addresses.
+			Loading code from disk
+
+<b>   INPUTS</b>
+	address - Address to start the operation.  This may be rounded
+		  due to hardware granularity.
+	length	- Length of area to be cleared, or $FFFFFFFF to indicate all
+		  addresses should be cleared.
+	caches  - Bit flags to indicate what caches to affect.  The current
+		  supported flags are:
+			CACRF_ClearI	;Clear instruction cache
+			CACRF_ClearD	;Clear data cache
+		  All other bits are reserved for future definition.
+
+<b>   NOTES</b>
+	On systems with a copyback mode cache, any dirty data is pushed
+	to memory as a part of this operation.
+
+	Regardless of the length given, the function will determine the most
+	efficient way to implement the operation.  For some cache systems,
+	including the 68030, the overhead partially clearing a cache is often
+	too great.  The entire cache may be cleared.
+
+	For all current Amiga models, Chip memory is set with Instruction
+	caching enabled, data caching disabled.  This prevents coherency
+	conflicts with the blitter or other custom chip DMA.  <a href="../Includes_and_Autodocs_3._guide/node05F6.html#line24">Custom</a> chip
+	registers are marked as non-cacheable by the hardware.
+
+	The system takes care of appropriately flushing the caches for normal
+	operations.  The instruction cache is cleared by all calls that
+	modify instructions, including <a href="../Includes_and_Autodocs_3._guide/node0185.html">LoadSeg()</a>, <a href="../Includes_and_Autodocs_3._guide/node021B.html">MakeLibrary()</a> and
+	<a href="../Includes_and_Autodocs_3._guide/node0238.html">SetFunction()</a>.
+
+<b>   SEE ALSO</b>
+	exec/execbase.i, <a href="../Includes_and_Autodocs_3._guide/node01F1.html">CacheControl()</a>, <a href="../Includes_and_Autodocs_3._guide/node01F0.html">CacheClearU()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

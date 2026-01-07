@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/types.h" NODE="MAIN" TITLE="Includes/exec/types.h" -->
+<head>
+<title>Includes/exec/types.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0095.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0097.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_TYPES_H
+#define	EXEC_TYPES_H
+/*
+**	$Filename: exec/types.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.14 $
+**	$Date: 91/11/08 $
+**
+**	Data typing.  Must be included before any other Amiga include.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+
+<a name="line16">#define INCLUDE_VERSION	36 /* Version of the include files in use. (Do not</a>
+			      use this label for OpenLibrary() calls!) */
+
+<a name="line19"></a>
+<a name="line20">#define GLOBAL	extern	    /* the declaratory use of an external */</a>
+<a name="line21">#define IMPORT	extern	    /* reference to an external */</a>
+<a name="line22">#define STATIC	static	    /* a local static variable */</a>
+#define REGISTER register   /* a (hopefully) register variable */
+
+
+<a name="line26">#ifndef VOID</a>
+#define VOID		void
+#endif
+
+
+  /*  WARNING: APTR was redefined for the V36 Includes!  APTR is a   */
+ /*  32-Bit Absolute Memory Pointer.  C pointer math will not	    */
+/*  operate on APTR --	use &#034;ULONG *&#034; instead.			   */
+<a name="line34">#ifndef APTR_TYPEDEF</a>
+<a name="line35">#define APTR_TYPEDEF</a>
+typedef void	       *APTR;	    /* 32-bit untyped pointer */
+<a name="line37">#endif</a>
+<a name="line38">typedef long		LONG;	    /* signed 32-bit quantity */</a>
+<a name="line39">typedef unsigned long	ULONG;	    /* unsigned 32-bit quantity */</a>
+<a name="line40">typedef unsigned long	LONGBITS;   /* 32 bits manipulated individually */</a>
+<a name="line41">typedef short		WORD;	    /* signed 16-bit quantity */</a>
+<a name="line42">typedef unsigned short	UWORD;	    /* unsigned 16-bit quantity */</a>
+<a name="line43">typedef unsigned short	WORDBITS;   /* 16 bits manipulated individually */</a>
+<a name="line44">#if __STDC__</a>
+typedef signed char	BYTE;	    /* signed 8-bit quantity */
+#else
+typedef char		BYTE;	    /* signed 8-bit quantity */
+<a name="line48">#endif</a>
+<a name="line49">typedef unsigned char	UBYTE;	    /* unsigned 8-bit quantity */</a>
+<a name="line50">typedef unsigned char	BYTEBITS;   /* 8 bits manipulated individually */</a>
+<a name="line51">typedef unsigned short	RPTR;	    /* signed relative pointer */</a>
+typedef unsigned char  *STRPTR;     /* string pointer (NULL terminated) */
+
+
+<a name="line55">/* For compatibility only: (don't use in new code) */</a>
+<a name="line56">typedef short		SHORT;	    /* signed 16-bit quantity (use WORD) */</a>
+<a name="line57">typedef unsigned short	USHORT;     /* unsigned 16-bit quantity (use UWORD) */</a>
+<a name="line58">typedef short		COUNT;</a>
+<a name="line59">typedef unsigned short	UCOUNT;</a>
+typedef ULONG		CPTR;
+
+
+<a name="line63">/* Types with specific semantics */</a>
+<a name="line64">typedef float		FLOAT;</a>
+<a name="line65">typedef double		DOUBLE;</a>
+<a name="line66">typedef short		BOOL;</a>
+typedef unsigned char	TEXT;
+
+<a name="line69">#ifndef TRUE</a>
+#define TRUE		1
+#endif
+<a name="line72">#ifndef FALSE</a>
+#define FALSE		0
+#endif
+<a name="line75">#ifndef NULL</a>
+#define NULL		0L
+#endif
+
+<a name="line79"></a>
+#define BYTEMASK	0xFF
+
+
+ /* #define LIBRARY_VERSION is now obsolete.  Please use LIBRARY_MINIMUM */
+<a name="line84">/* or code the specific minimum library version you require.		*/</a>
+#define LIBRARY_MINIMUM	33 /* Lowest version supported by Amiga, Inc. */
+
+
+#endif	/* EXEC_TYPES_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

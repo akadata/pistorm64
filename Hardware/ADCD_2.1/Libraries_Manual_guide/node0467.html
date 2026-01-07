@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-11" TITLE="33 IFFParse Library / Function Reference" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 IFFParse Library / Function Reference</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0466.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0468.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The following are brief descriptions of the IFFParse functions discussed
+in this chapter.  IFFParse library functions are avialable in Release 2 of
+the Amiga OS and are backward compatible with older versions of the
+system.  Further information about these and other IFFParse functions can
+be found in the 3rd edition of the Amiga ROM Kernel Reference Manual:
+Includes and Autodocs, also from Addison-Wesley.
+<a name="line8"></a>
+
+                  Table 33-2: IFFParse Library Functions
+  _______________________________________________________________________
+ |                                                                       |
+ |            Function              Description                          |
+ |=======================================================================|
+ |            <a href="../Includes_and_Autodocs_2._guide/node01B8.html">AllocIFF()</a>  Creates an <a href="../Libraries_Manual_guide/node042C.html">IFFHandle</a> structure.                |
+ |             <a href="../Includes_and_Autodocs_2._guide/node01C5.html">FreeIFF()</a>  Frees the IFFHandle structure created with     |
+ |                        AllocIFF().                                    |
+ |             <a href="../Includes_and_Autodocs_2._guide/node01CF.html">OpenIFF()</a>  Initialize an IFFHandle structure to read or   |
+ |                        write an <a href="../Libraries_Manual_guide/node0428.html">IFF</a> stream.                           |
+ |            <a href="../Includes_and_Autodocs_2._guide/node01BB.html">CloseIFF()</a>  Closes an IFF context.                         |
+ |-----------------------------------------------------------------------|
+ |             <a href="../Includes_and_Autodocs_2._guide/node01CA.html">InitIFF()</a>  Initialize an <a href="../Libraries_Manual_guide/node042C.html">IFFHandle</a> as a user-defined      |
+ |                        stream.                                        |
+ |        <a href="../Includes_and_Autodocs_2._guide/node01CC.html">InitIFFasDOS()</a>  Initialize an IFFHandle as an AmigaDOS stream. |
+ |       <a href="../Includes_and_Autodocs_2._guide/node01CB.html">InitIFFasClip()</a>  Initialize an IFFHandle as a clipboard stream. |
+ |-----------------------------------------------------------------------|
+ |       <a href="../Includes_and_Autodocs_2._guide/node01CE.html">OpenClipboard()</a>  Create a handle on a clipboard unit for        |
+ |                        InitIFFasClip().                               |
+ |            <a href="../Includes_and_Autodocs_2._guide/node01D1.html">ParseIFF()</a>  Parse an <a href="../Libraries_Manual_guide/node0428.html">IFF</a> file from an <a href="../Libraries_Manual_guide/node042C.html">IFFHandle</a> stream.    |
+ |      <a href="../Includes_and_Autodocs_2._guide/node01D6.html">ReadChunkBytes()</a>  Read bytes from current chunk into a buffer.   |
+ |    <a href="../Includes_and_Autodocs_2._guide/node01D7.html">ReadChunkRecords()</a>  Read record elements from the current chunk    |
+ |                        into a buffer.                                 |
+ |           <a href="../Includes_and_Autodocs_2._guide/node01D9.html">StopChunk()</a>  Declare a chunk that should cause ParseIFF()   |
+ |                        to return.                                     |
+ |        <a href="../Includes_and_Autodocs_2._guide/node01BE.html">CurrentChunk()</a>  Get the context node for the current chunk.    |
+ |           <a href="../Includes_and_Autodocs_2._guide/node01D3.html">PropChunk()</a>  Specify a property chunk to store.             |
+ |            <a href="../Includes_and_Autodocs_2._guide/node01C3.html">FindProp()</a>  Search for a stored property in a given        |
+ |                        context.                                       |
+ |     <a href="../Includes_and_Autodocs_2._guide/node01BC.html">CollectionChunk()</a>  Declare a chunk type for collection.           |
+ |      <a href="../Includes_and_Autodocs_2._guide/node01C1.html">FindCollection()</a>  Get a pointer to the current list of           |
+ |                        collection items.                              |
+ |          <a href="../Includes_and_Autodocs_2._guide/node01DB.html">StopOnExit()</a>  Declare a stop condition for exiting a chunk.  |
+ |        <a href="../Includes_and_Autodocs_2._guide/node01BF.html">EntryHandler()</a>  Add an entry handler to the IFFHandle context. |
+ |         <a href="../Includes_and_Autodocs_2._guide/node01C0.html">ExitHandler()</a>  Add an exit handler to the IFFHandle context.  |
+ |-----------------------------------------------------------------------|
+ |           <a href="../Includes_and_Autodocs_2._guide/node01D5.html">PushChunk()</a>  Push a given context node onto the top of the  |
+ |                        context stack.                                 |
+ |            <a href="../Includes_and_Autodocs_2._guide/node01D2.html">PopChunk()</a>  Pop the top context node off of the context    |
+ |                        stack.                                         |
+ |        <a href="../Includes_and_Autodocs_2._guide/node01BE.html">CurrentChunk()</a>  Get the top context node for the current chunk.|
+ |         <a href="../Includes_and_Autodocs_2._guide/node01D0.html">ParentChunk()</a>  Get the nesting context node for a given chunk.|
+ |-----------------------------------------------------------------------|
+ |      <a href="../Includes_and_Autodocs_2._guide/node01B9.html">AllocLocalItem()</a>  Create a <a href="../Libraries_Manual_guide/node044A.html">LocalContextItem</a> (LCI) structure.     |
+ |       <a href="../Includes_and_Autodocs_2._guide/node01CD.html">LocalItemData()</a>  Returns a pointer to the user data of a        |
+ |                        LocalContextItem (LCI).                        |
+ |      <a href="../Includes_and_Autodocs_2._guide/node01DD.html">StoreLocalItem()</a>  Insert a LocalContextItem (LCI).               |
+ |  <a href="../Includes_and_Autodocs_2._guide/node01DC.html">StoreItemInContext()</a>  Store a LocalContextItem in a given context    |
+ |                        node.                                          |
+ |     <a href="../Includes_and_Autodocs_2._guide/node01C4.html">FindPropContext()</a>  Find the property context for the current      |
+ |                        state.                                         |
+ |       <a href="../Includes_and_Autodocs_2._guide/node01C2.html">FindLocalItem()</a>  Return a LocalContextItem from the context     |
+ |                        stack.                                         |
+ |       <a href="../Includes_and_Autodocs_2._guide/node01C6.html">FreeLocalItem()</a>  Free a LocalContextItem (LCI) created with     |
+ |                        AllocLocalItem().                              |
+ |   <a href="../Includes_and_Autodocs_2._guide/node01D8.html">SetLocalItemPurge()</a>  Set purge vector for a local context item.     |
+ |_______________________________________________________________________|
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

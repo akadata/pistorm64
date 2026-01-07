@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="RemFont()" TITLE="graphics.library/RemFont" -->
+<head>
+<title>graphics.library/RemFont</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node046E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0470.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    RemFont -- Remove a font from the system list.
+
+SYNOPSIS
+    RemFont(textFont)
+            A1
+
+    void RemFont(struct <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line90">TextFont</a> *);
+
+FUNCTION
+    This function removes a font from the system, ensuring that
+    access to it is restricted to those applications that
+    currently have an active pointer to it: i.e. no new <a href="../Includes_and_Autodocs_2._guide/node0479.html">SetFont</a>
+    requests to this font are satisfied.
+
+INPUTS
+    textFont - the <a href="../Includes_and_Autodocs_2._guide/node00A8.html#line90">TextFont</a> structure to remove.
+
+RESULT
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0479.html">SetFont()</a>  <a href="../Includes_and_Autodocs_2._guide/node0410.html">AddFont()</a>  <a href="../Includes_and_Autodocs_2._guide/node00A8.html">graphics/text.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

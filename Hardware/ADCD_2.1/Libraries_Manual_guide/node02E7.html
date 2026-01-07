@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_23" NODE="23-2-10" TITLE="23 / List Functions / Scanning a List" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>23 / List Functions / Scanning a List</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02E6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02E8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Occasionally a program may need to scan a list to locate a particular
+node, find a node that has a field with a particular value, or just print
+the list.  Because lists are linked in both the forward and backward
+directions, the list can be scanned from either the head or tail.
+
+Here is a code fragment that uses a for loop to print the names of all
+nodes in a list:
+
+    struct List *list;
+    struct Node *node;
+
+    for (node = list-&#062;lh_Head ; node-&#062;ln_Succ ; node = node-&#062;ln_Succ)
+        printf(&#034;%lx -&#062; %s\n&#034;,node,node-&#062;ln_Name);
+
+A common mistake is to process the head or tail nodes.  Valid data nodes
+have non-NULL successor and predecessor pointers.  The above loop exits
+when <a href="../Libraries_Manual_guide/node02D9.html#line13">node-&#062;ln_Succ</a> is NULL.  Another common mistake is to free a node from
+within a loop, then reference the free memory to obtain the next node
+pointer.  An extra temporary pointer solves this second problem.
+
+In assembly code, it is more efficient to use a look-ahead cache pointer
+when scanning a list.  In this example the list is scanned until the first
+zero-priority node is reached:
+
+            MOVE.L  (A1),D1         ; first node
+    scan:   MOVE.L  D1,A1
+            MOVE.L  (A1),D1         ; lookahead to next
+            BEQ.S   not_found       ; end of list...
+            TST.B   LN_PRI(A1)
+            BNE.S   scan
+            ...                     ; found one
+
+    not_found:
+
+     <a href="../Libraries_Manual_guide/node058B.html">Exec List Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

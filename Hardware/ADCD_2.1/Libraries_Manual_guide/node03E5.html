@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_30" NODE="30-1-2" TITLE="30 / Layers / The Layer's RastPort" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>30 / Layers / The Layer's RastPort</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03E4.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03E6.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+When a layer is created, a <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> is automatically to go along with it.
+The pointer to the RastPort is contained in the layer data structure.
+Using this RastPort, the application may draw anywhere into the layer's
+bounds rectangle.  If the application tries to draw outside of this
+<a name="line6">rectangle, the graphics routines will clip the graphics.</a>
+
+Here is sample code showing how to access the layer's <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>:
+
+    struct RastPort *myRPort;
+        /* allocate a RastPort pointer for each layer */
+
+    myRPort = layer-&#062;rp;
+
+    /* The layer's RastPort may be used with any of the graphics library
+    ** calls that require this structure.  For instance, to fill layer
+    ** with color:
+    */
+    SetRast(layer-&#062;rp, color);
+
+    /* set up for writing text into layer */
+    SetDrMd(layer-&#062;rp,JAM1);
+    SetAPen(layer-&#062;rp,0);
+    Move(layer-&#062;rp, 5, 7);
+
+    /* write into layer */
+    Text(layer-&#062;rp, string, strlen(string));
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

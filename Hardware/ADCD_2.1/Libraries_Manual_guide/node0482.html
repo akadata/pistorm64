@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_35" NODE="35-5" TITLE="35 Math Libraries / FFP Mathematics Conversion Library" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>35 Math Libraries / FFP Mathematics Conversion Library</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0481.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0483.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The FFP mathematics conversion library provides functions to convert ASCII
+strings to their FFP equivalents and vice versa.
+
+It is accessed by linking code into the executable file being created. The
+name of the file to include in the library description of the link command
+line is amiga.lib.  When this is included, direct calls are made to the
+conversion functions.  Only a C interface exists for the conversion
+functions; there is no assembly language interface.  The basic math
+library is required in order to access these functions.
+
+    #include &#060;exec/types.h&#062;
+    #include &#060;libraries/mathffp.h&#062;
+
+    #include &#060;clib/mathffp_protos.h&#062;
+
+    struct Library *MathBase;
+
+    VOID main()
+    {
+    if (MathBase = OpenLibrary(&#034;mathffp.library&#034;, 33))
+        {
+               . . .
+
+        CloseLibrary(MathBase);
+        }
+    else
+        printf(&#034;Can't open mathffp.library\n&#034;);
+    }
+
+ <a href="../Libraries_Manual_guide/node0483.html">Math Support Functions</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

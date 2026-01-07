@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-1-6" TITLE="27 / / The RastPort Structure / RastPort Drawing Pens" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / The RastPort Structure / RastPort Drawing Pens</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node034F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0351.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Amiga has three different drawing &#034;pens&#034; associated with the graphics
+<a name="line3">drawing routines.  These are:</a>
+
+  * <a href="../Libraries_Manual_guide/node034A.html#line14">FgPen</a>--the foreground or primary drawing pen. For historical
+<a name="line6">    reasons, it is also called the A-Pen.</a>
+
+  * <a href="../Libraries_Manual_guide/node034A.html#line14">BgPen</a>--the background or secondary drawing pen. For historical
+<a name="line9">    reasons, it is also called the B-Pen.</a>
+
+  * <a href="../Libraries_Manual_guide/node034A.html#line14">AOlPen</a>--the area outline pen. For historical reasons, it is also
+    called the O-Pen.
+
+A drawing pen variable in the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> contains the current value (range
+0-255) for a particular color choice.  This value represents a color
+register number whose contents are to be used in rendering a particular
+type of image.  The effect of the pen value is dependent upon the drawing
+mode and can be influenced by the pattern variables and the write mask as
+described below. Always use the system calls (e.g. <a href="../Includes_and_Autodocs_2._guide/node0475.html">SetAPen()</a>) to set the
+different pens, never store values directly into the pen fields of the
+RastPort.
+
+    Colors Repeat Beyond 31.
+    ------------------------
+    The Amiga 500/2000/3000 (with original chips or ECS) contains only
+    32 color registers.  Any range beyond that repeats the colors in
+    0-31. For example, pen numbers 32-63 refer to the colors in registers
+    0-31 (except when you are using Extra-Half-Brite mode).
+
+The graphics library drawing routines support <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>s up to eight planes
+<a name="line31">deep allowing for future expansion of the Amiga hardware.</a>
+
+The color in FgPen is used as the primary drawing color for rendering
+lines and areas. This pen is used when the drawing mode is <a href="../Libraries_Manual_guide/node0351.html#line2">JAM1</a> (see the
+<a href="../Libraries_Manual_guide/node0351.html">next section</a> for drawing modes). JAM1 specifies that only one color is to
+<a name="line36">be &#034;jammed&#034; into the drawing area.</a>
+
+You establish the color for FgPen using the statement:
+
+<a name="line40">    SetAPen(&#038;rastPort, newcolor);</a>
+
+The color in BgPen is used as the secondary drawing color for rendering
+lines and areas.  If you specify that the drawing mode is <a href="../Libraries_Manual_guide/node0351.html#line8">JAM2</a> (jamming
+two colors) and a pattern is being drawn, the primary drawing color
+(FgPen) is used where there are 1s in the pattern. The secondary drawing
+<a name="line46">color (BgPen) is used where there are 0s in the pattern.</a>
+
+You establish the drawing color for BgPen using the statement:
+
+<a name="line50">    SetBPen(&#038;rastPort, newcolor);</a>
+
+The area outline pen AOlPen is used in two applications: area fill and
+flood fill. (See &#034;<a href="../Libraries_Manual_guide/node035C.html">Area Fill Operations</a>&#034; below.)  In area fill, you can
+specify that an area, once filled, can be outlined in this AOlPen color.
+In flood fill (in one of its operating modes) you can fill until the
+<a name="line56">flood-filler hits a pixel of the color specified in this pen variable.</a>
+
+You establish the drawing color for AOlPen using the statement:
+
+    SetOPen(&#038;rastPort, newcolor);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

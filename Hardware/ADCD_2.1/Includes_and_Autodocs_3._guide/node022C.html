@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="RemIntServer()" TITLE="exec.library/RemIntServer" -->
+<head>
+<title>exec.library/RemIntServer</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node022B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node022D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	RemIntServer -- remove an interrupt server from a server chain
+
+<b>   SYNOPSIS</b>
+	RemIntServer(intNum, interrupt)
+		     D0      A1
+
+	void RemIntServer(ULONG,struct <a href="../Includes_and_Autodocs_3._guide/node061D.html#line21">Interrupt</a> *);
+
+<b>   FUNCTION</b>
+	This function removes an interrupt server node from the given
+	server chain.
+
+	If this server was the last one on this chain, interrupts for this
+	chain are disabled.
+
+<b>   INPUTS</b>
+	intNum - the Paula interrupt bit (0..14)
+	interrupt - pointer to an interrupt server node
+
+<b>   BUGS</b>
+	Before V36 Kickstart, the feature that disables the interrupt
+	would not function.  For most server chains this does not
+	cause a problem.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01DA.html">AddIntServer()</a>, <a href="../Includes_and_Autodocs_3._guide/node065C.html">hardware/intbits.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

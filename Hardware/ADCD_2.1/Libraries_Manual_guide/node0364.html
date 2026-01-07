@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-4-3-4" TITLE="27 / / Performing Data Move Operations / Drawing through a Stencil" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 / / Performing Data Move Operations / Drawing through a Stencil</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0363.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0365.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The routine <a href="../Includes_and_Autodocs_2._guide/node0423.html">BltPattern()</a> allows you to change only a very selective
+portion of a drawing area. Basically, this routine lets you define a
+rectangular region to be affected by a drawing operation and a mask of the
+same size that further defines which pixels within the rectangle will be
+affected.
+
+The figure below shows an example of what you can do with <a href="../Includes_and_Autodocs_2._guide/node0423.html">BltPattern()</a>.
+
+
+                   &#183; = 0 bits    o &#038; # = 1 bits
+
+
+         Mask contains                   Drawing area contains:
+
+         &#183; &#183; o &#183; o &#183; &#183;                       &#183; &#183; &#183; &#183; &#183; &#183; &#183;
+         &#183; &#183; o &#183; o &#183; &#183;                       &#183; # # # # # &#183;
+         &#183; &#183; o &#183; o &#183; &#183;                       # &#183; &#183; &#183; &#183; &#183; &#183;
+         &#183; &#183; o &#183; o &#183; &#183;                       &#183; # # # # # &#183;
+         &#183; &#183; o &#183; o &#183; &#183;                       &#183; &#183; &#183; &#183; &#183; &#183; #
+         &#183; &#183; o &#183; o &#183; &#183;                       &#183; # # # # # &#183;
+         &#183; &#183; o &#183; o &#183; &#183;                       &#183; &#183; &#183; &#183; &#183; &#183; &#183;
+
+                       \                   /
+                        \                 /
+                         \               /
+
+                           &#183; &#183; o &#183; o &#183; &#183;
+                           &#183; # o # o # &#183;
+                           # &#183; o &#183; o &#183; &#183;
+                           &#183; # o # o # &#183;
+                           &#183; &#183; o &#183; o &#183; #
+                           &#183; # o # o # &#183;
+                           &#183; &#183; o &#183; o &#183; &#183;
+
+                      Result of BitPattern():
+
+
+         Figure 27-17: Example of Drawing Through a Stencil
+<a name="line40"></a>
+
+In the resulting drawing, the lighter squares show where the target
+drawing area has been affected.  Exactly what goes into the drawing area
+when the mask has 1's is determined by your <a href="../Libraries_Manual_guide/node034A.html">RastPort</a>'s <a href="../Libraries_Manual_guide/node0350.html#line3">FgPen</a>, <a href="../Libraries_Manual_guide/node0350.html#line6">BgPen</a>,
+<a href="../Libraries_Manual_guide/node0351.html">DrawMode</a> and <a href="../Libraries_Manual_guide/node034A.html#line9">AreaPtrn</a> fields.
+
+You call <a href="../Includes_and_Autodocs_2._guide/node0423.html">BltPattern()</a> with:
+
+    BltPattern(&#038;rastport, mask, xl, yl, maxx, maxy, bytecnt)
+
+The &#038;rastport argument specifies the <a href="../Libraries_Manual_guide/node034A.html">RastPort</a> to use.  The operation will
+be confined to a rectangular area within the RastPort specified by xl and
+yl (upper right corner of the rectangle) and maxx and maxy (lower right
+corner of the rectangle).
+
+The mask is a pointer to the mask to use.  This can be NULL, in which case
+a simple rectangular region is modified.  Or it can be set to the address
+of a byte pattern which allows any arbitrary shape within the rectangle to
+be defined.  The bytecount is the number of bytes per row for the mask (it
+must be an even number of bytes).
+
+The mask parameter is a rectangularly organized, contiguously stored
+pattern.  This means that the pattern is stored in sequential memory
+locations stored as (maxy - yl + 1) rows of bytecnt bytes per row.  These
+patterns must obey the same rules as <a href="../Libraries_Manual_guide/node032B.html#line74">BitMap</a>s.  This means that they must
+consist of an even number of bytes per row and must be stored in memory
+beginning at a legal word address. (The mask for <a href="../Includes_and_Autodocs_2._guide/node0423.html">BltPattern()</a> does not
+have to be in Chip RAM, though.)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

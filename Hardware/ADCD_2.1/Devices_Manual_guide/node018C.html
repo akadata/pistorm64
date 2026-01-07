@@ -1,0 +1,507 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Clipdemo.c" NODE="MAIN" TITLE="Devices/Dev_examples/Clipdemo.c" -->
+<head>
+<title>Devices/Dev_examples/Clipdemo.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node018B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node018D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Clipdemo.c
+ *
+ * Demonstrate use of clipboard I/O.  Uses general functions
+ * provided in cbio.c
+ *
+ * Compile with SAS C 5.10: LC -b1 -cfistq -v -y -L+cbio.o
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/ports.h&#062;
+#include &#060;exec/io.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;devices/clipboard.h&#062;
+#include &#060;libraries/dosextens.h&#062;
+#include &#060;libraries/dos.h&#062;
+
+#include &#034;cb.h&#034;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#include &#060;stdlib.h&#062;
+#include &#060;stdio.h&#062;
+#include &#060;string.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+#define FORGETIT 0
+#define READIT   1
+#define WRITEIT  2
+#define POSTIT   3
+
+/* prototypes */
+
+int ReadClip( void );           /* Demonstrate reading clipboard data    */
+int WriteClip( char * );        /* Demonstrate write to clipboard        */
+int PostClip( char * );         /* Demonstrate posting data to clipboard */
+
+void main( USHORT, char **);
+
+char message[] = &#034;\
+\nPossible switches are:\n\n\
+-r            Read, and output contents of clipboard.\n\
+-w [string]   Write string to clipboard.\n\n\
+-p [string]   Write string to clipboard using the clipboard POST mechanism.\n\n\
+              The Post can be satisfied by reading data from\n\
+              the clipboard.  Note that the message may never\n\
+              be received if some other application posts, or\n\
+              performs an immediate write to the clipboard.\n\n\
+              To run this test you must run two copies of this example.\n\
+              Use the -p switch with one to post data, and the -r switch\n\
+              with another to read the data.\n\n\
+              The process can be stopped by using the BREAK command,\n\
+              in which case this example checks the CLIP write ID\n\
+              to determine if it should write to the clipboard before\n\
+              exiting.\n\n&#034;;
+
+
+void main(argc,argv)
+USHORT argc;
+char **argv;
+{
+
+int todo;
+char *string;
+
+todo = FORGETIT;
+
+if (argc)     /* from CLI ? */
+    {
+
+    /* Very simple code to parse for arguments - will suffice for
+     * the sake of this example
+     */
+
+    if (argc &#062; 1)
+       {
+       if (!(strcmp(argv[1],&#034;-r&#034;)))
+           todo = READIT;
+       if (!(strcmp(argv[1],&#034;-w&#034;)))
+           todo = WRITEIT;
+       if (!(strcmp(argv[1],&#034;-p&#034;)))
+           todo = POSTIT;
+
+       string = NULL;
+
+       if (argc &#062; 2)
+           string=argv[2];
+
+       }
+
+    switch (todo)
+            {
+
+            case READIT:
+
+                 ReadClip();
+                 break;
+
+            case POSTIT:
+
+                 PostClip(string);
+                 break;
+
+            case WRITEIT:
+
+                 WriteClip(string);
+                 break;
+
+            default:
+
+                 printf(&#034;%s&#034;,message);
+                 break;
+
+            }
+    }
+}
+
+/*
+ * Read, and output FTXT in the clipboard.
+ *
+ */
+
+ReadClip()
+{
+struct IOClipReq *ior;
+struct cbbuf *buf;
+
+
+/* Open clipboard.device unit 0 */
+
+if (ior=CBOpen(0L))
+    {
+
+    /* Look for FTXT in clipboard */
+
+    if (CBQueryFTXT(ior))
+        {
+
+        /* Obtain a copy of the contents of each CHRS chunk */
+
+        while (buf=CBReadCHRS(ior))
+              {
+              /* Process data */
+
+              printf(&#034;%s\n&#034;,buf-&#062;mem);
+
+              /* Free buffer allocated by CBReadCHRS() */
+
+              CBFreeBuf(buf);
+              }
+
+        /* The next call is not really needed if you are sure */
+        /* you read to the end of the clip.                   */
+
+        CBReadDone(ior);
+        }
+    else
+        {
+        puts(&#034;No FTXT in clipboard&#034;);
+        }
+
+    CBClose(ior);
+    }
+
+else
+    {
+    puts(&#034;Error opening clipboard unit 0&#034;);
+    }
+
+return(0L);
+}
+
+/*
+ * Write a string to the clipboard
+ *
+ */
+
+WriteClip(string)
+char *string;
+{
+
+struct IOClipReq *ior;
+
+if (string == NULL)
+    {
+    puts(&#034;No string argument given&#034;);
+    return(0L);
+    }
+
+/* Open clipboard.device unit 0 */
+
+if (ior = CBOpen(0L))
+    {
+    if (!(CBWriteFTXT(ior,string)))
+        {
+        printf(&#034;Error writing to clipboard: io_Error = %ld\n&#034;,ior-&#062;io_Error);
+        }
+    CBClose(ior);
+    }
+else
+    {
+    puts(&#034;Error opening clipboard.device&#034;);
+    }
+
+return(0);
+}
+
+
+/*
+ * Write a string to the clipboard using the POST mechanism
+ *
+ * The POST mechanism can be used by applications which want to
+ * defer writing text to the clipboard until another application
+ * needs it (by attempting to read it via CMD_READ).  However
+ * note that you still need to keep a copy of the data until you
+ * receive a SatisfyMsg from the clipboard.device, or your program
+ * exits.
+ *
+ * In most cases it is easier to write the data immediately.
+ *
+ * If your program receives the SatisfyMsg from the clipboard.device,
+ * you MUST write some data.  This is also how you reply to the message.
+ *
+ * If your program wants to exit before it has received the SatisfyMsg,
+ * you must check the io_ClipID field at the time of the post against
+ * the current post ID which is obtained by sending the CBD_CURRENTWRITEID
+ * command.
+ *
+ * If the value in io_ClipID (returned by CBD_CURRENTWRITEID) is greater
+ * than your post ID, it means that some other application has performed
+ * a post, or immediate write after your post, and that you're application
+ * will never receive the SatisfyMsg.
+ *
+ * If the value in io_ClipID (returned by CBD_CURRENTWRITEID) is equal
+ * to your post ID, then you must write your data, and send CMD_UPDATE
+ * before exiting.
+ *
+ */
+
+PostClip(string)
+char *string;
+{
+
+struct MsgPort *satisfy;
+struct SatisfyMsg *sm;
+struct IOClipReq *ior;
+int mustwrite;
+ULONG postID;
+
+if (string == NULL)
+    {
+    puts(&#034;No string argument given&#034;);
+    return(0L);
+    }
+
+if (satisfy = CreatePort(0L,0L))
+    {
+
+    /* Open clipboard.device unit 0 */
+
+    if (ior = CBOpen(0L))
+        {
+        mustwrite = FALSE;
+
+        /* Notify clipboard we have data */
+
+        ior-&#062;io_Data    = (STRPTR)satisfy;
+        ior-&#062;io_ClipID  = 0L;
+        ior-&#062;io_Command = CBD_POST;
+        DoIO( (struct IORequest *) ior);
+
+        postID = ior-&#062;io_ClipID;
+
+        printf(&#034;\nClipID = %ld\n&#034;,postID);
+
+        /* Wait for CTRL-C break, or message from clipboard */
+        Wait(SIGBREAKF_CTRL_C|(1L &#060;&#060; satisfy-&#062;mp_SigBit));
+
+        /* see if we got a message, or a break */
+        puts(&#034;Woke up&#034;);
+
+
+        if (sm = (struct SatisfyMsg *)GetMsg(satisfy))
+            {
+            puts(&#034;Got a message from the clipboard\n&#034;);
+
+            /* We got a message - we MUST write some data */
+            mustwrite = TRUE;
+            }
+        else
+            {
+            /* Determine if we must write before exiting by
+             * checking to see if our POST is still valid
+             */
+
+            ior-&#062;io_Command = CBD_CURRENTWRITEID;
+            DoIO( (struct IORequest *) ior);
+
+            printf(&#034;CURRENTWRITEID = %ld\n&#034;,ior-&#062;io_ClipID);
+
+            if (postID &#062;= ior-&#062;io_ClipID)
+                mustwrite = TRUE;
+
+            }
+
+        /* Write the string of text */
+
+        if (mustwrite)
+            {
+            if (!(CBWriteFTXT(ior,string)))
+                puts(&#034;Error writing to clipboard&#034;);
+            }
+        else
+            {
+            puts(&#034;No need to write to clipboard&#034;);
+            }
+
+        CBClose(ior);
+        }
+    else
+        {
+        puts(&#034;Error opening clipboard.device&#034;);
+        }
+
+    DeletePort(satisfy);
+    }
+else
+    {
+    puts(&#034;Error creating message port&#034;);
+    }
+
+return(0);
+}
+
+
+/*
+<a name="line344"> * Changehook_Test.c</a>
+ *
+ * Demonstrate the use of CBD_CHANGEHOOK command.
+ * The program will set a hook and wait for the clipboard data to change.
+ * You must put something in the clipboard in order for it to return.
+ *
+ * Compile with SAS C 5.10: LC -cfist -v -y -L+Hookface.o+cbio.o
+ *
+ * Requires Kickstart 36 or greater.
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/ports.h&#062;
+#include &#060;exec/tasks.h&#062;
+#include &#060;exec/io.h&#062;
+#include &#060;devices/clipboard.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;utility/hooks.h&#062;
+#include &#034;cb.h&#034;
+
+#include &#060;clib/macros.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+#include &#060;string.h&#062;
+
+
+LONG version = 1L;
+
+extern ULONG SysBase, DOSBase;
+
+/* Data to pass around with the clipHook */
+struct CHData
+{
+    struct Task *ch_Task;
+    LONG ch_ClipID;
+};
+
+struct MsgPort *clip_port;
+struct Hook hook;
+struct CHData ch;
+
+ULONG clipHook (struct Hook * h, VOID * o, struct ClipHookMsg * msg)
+{
+struct CHData *ch = (struct CHData *) h-&#062;h_Data;
+
+if (ch)
+   {
+   /* Remember the ID of clip */
+   ch-&#062;ch_ClipID = msg-&#062;chm_ClipID;
+
+   /* Signal the task that started the hook */
+   Signal (ch-&#062;ch_Task, SIGBREAKF_CTRL_E);
+   }
+
+return (0);
+}
+
+struct IOClipReq *OpenCB (LONG unit)
+{
+struct IOClipReq *clipIO;
+
+/* Open clipboard unit 0 */
+
+if (clipIO = CBOpen( 0L ))
+    {
+    ULONG hookEntry ();
+
+    /* Fill out the IORequest */
+    clipIO-&#062;io_Data = (char *) &#038;hook;
+    clipIO-&#062;io_Length = 1;
+    clipIO-&#062;io_Command = CBD_CHANGEHOOK;
+
+    /* Set up the hook data */
+    ch.ch_Task = FindTask (NULL);
+
+    /* Prepare the hook */
+    hook.h_Entry = hookEntry;
+    hook.h_SubEntry = clipHook;
+    hook.h_Data = &#038;ch;
+
+    /* Start the hook */
+    if (DoIO (clipIO))
+        printf (&#034;unable to set hook\n&#034;);
+    else
+        printf (&#034;hook set\n&#034;);
+
+    /* Return success */
+    return ( clipIO );
+    }
+
+/* return failure */
+return (NULL);
+}
+
+void CloseCB (struct IOClipReq *clipIO)
+{
+
+/* Fill out the IO request */
+clipIO-&#062;io_Data = (char *) &#038;hook;
+clipIO-&#062;io_Length = 0;
+clipIO-&#062;io_Command = CBD_CHANGEHOOK;
+
+    /* Stop the hook */
+if (DoIO (clipIO))
+    printf (&#034;unable to stop hook\n&#034;);
+else
+    /* Indicate success */
+    printf (&#034;hook is stopped\n&#034;);
+
+CBClose(clipIO);
+}
+
+main (int argc, char **argv)
+{
+struct IOClipReq *clipIO;
+
+ULONG sig_rcvd;
+
+printf (&#034;Test v%ld\n&#034;, version);
+
+if (clipIO=OpenCB (0L))
+    {
+    sig_rcvd = Wait ((SIGBREAKF_CTRL_C | SIGBREAKF_CTRL_E));
+
+    if (sig_rcvd &#038; SIGBREAKF_CTRL_C)
+        printf (&#034;^C received\n&#034;);
+
+    if (sig_rcvd &#038; SIGBREAKF_CTRL_E)
+        printf (&#034;clipboard change, current ID is %ld\n&#034;, ch.ch_ClipID);
+
+    CloseCB(clipIO);
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

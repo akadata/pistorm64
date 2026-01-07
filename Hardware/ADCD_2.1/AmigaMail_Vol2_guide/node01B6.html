@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-69/jumpy.c" NODE="MAIN" TITLE="IV-69/jumpy.c" -->
+<head>
+<title>IV-69/jumpy.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01B5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01B7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* Jumpy.c - Execute me to compile me with SAS/C 6.56
+sc DATA=NEAR NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 Jumpy.c
+slink FROM LIB:c.o,Jumpy.o TO Jumpy LIBRARY LIB:sc.lib,LIB:amiga.lib
+quit
+*/
+/*
+Copyright (c) 1991-1999 Amiga, Inc.
+
+This example is provided in electronic form by Amiga, Inc.
+for use with the Amiga Mail Volume II technical publication.
+Amiga Mail Volume II contains additional information on the correct
+usage of the techniques and operating system functions presented in
+these examples.  The source and executable code of these examples may
+only be distributed in free electronic form, via bulletin board or
+as part of a fully non-commercial and freely redistributable
+diskette.  Both the source and executable code (including comments)
+must be included, without modification, in any copy.  This example
+may not be published in printed form or distributed with any
+commercial product. However, the programming techniques and support
+routines set forth in these examples may be used in the development
+of original executable software products for Amiga
+computers.
+
+All other rights reserved.
+
+This example is provided &#034;as-is&#034; and is subject to change; no
+warranties are made.  All use is at your own risk. No liability or
+responsibility is assumed.
+*/
+
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;graphics/text.h&#062;
+#include &#060;libraries/gadtools.h&#062;
+
+#ifdef LATTICE
+#include &#060;string.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/gadtools_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+/* disable SAS/C CTRL-C handing */
+int             CXBRK(void)
+{
+    return (0);
+}
+int             chkabort(void)
+{
+    return (0);
+}
+
+#endif
+
+struct IntuitionBase *IntuitionBase;
+struct GfxBase *GfxBase;
+struct Library *GadToolsBase;
+struct Library *IconBase;
+struct Library *CxBase;
+
+LONG            main(LONG, UBYTE **);
+
+LONG
+main(LONG argc, UBYTE ** argv)
+{
+    struct Window       *window;
+    struct IntuiMessage *imsg;
+    struct Gadget       *gadgetcontext;
+    struct Gadget       *gadget, *nextscreengadget;
+    struct NewGadget     ng;
+    struct TextExtent    textextent;
+    UWORD                left, top;
+    void                *visualinfo;
+    UBYTE               *startupname;
+    UBYTE                namebuffer[MAXPUBSCREENNAME];
+    UBYTE              **tooltypes;
+    BOOL                 ABORT = FALSE;
+
+    if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 37))
+    {
+        /* Open GfxBase to use TextExtent() so we can handle proportional fonts */
+        if (GfxBase = OpenLibrary(&#034;graphics.library&#034;, 37))
+        {
+            if (GadToolsBase = OpenLibrary(&#034;gadtools.library&#034;, 37))
+            {
+
+                /*
+                 * Open commodities &#038; icon.library so we can use ArgArray
+                 * functions
+                 */
+                if (CxBase = OpenLibrary(&#034;commodities.library&#034;, 37))
+                {
+                    if (IconBase = OpenLibrary(&#034;icon.library&#034;, 37))
+                    {
+                        left = 50;
+                        top = 50;                /* Initial offset */
+                        /* Note that these are functions in amiga.lib */
+                        if (tooltypes = ArgArrayInit(argc, argv))
+                        {
+                            startupname =
+                                ArgString(tooltypes, &#034;PUBSCREEN&#034;, &#034;Workbench&#034;);
+                            strcpy(namebuffer, startupname);
+                            ArgArrayDone();
+                        }
+                        else
+                            strcpy(namebuffer, &#034;Workbench&#034;);
+                        do
+                        {
+                            /* open a window with tags */
+                            /* no NewWindow structure, tags only */
+                            if (window = OpenWindowTags(NULL,
+                                        /* Open at far left corner */
+                                        WA_Left,  left,
+                                        WA_Top,   top,
+                                        WA_Width, 150,
+                                        WA_Height, 80,
+                                        WA_Title, (LONG) &#034;jumpy&#034;,
+                                        WA_PubScreenName, (LONG) namebuffer,
+                                        /* if no pubscreen with this name exists... */
+                                        WA_PubScreenFallBack, TRUE,
+                                        /* ...fall back on default pubscreen */
+                                        WA_Flags, WFLG_DRAGBAR | WFLG_DEPTHGADGET |
+                                            WFLG_CLOSEGADGET | WFLG_ACTIVATE |
+                                            WFLG_SMART_REFRESH | WFLG_NOCAREREFRESH,
+                                        WA_IDCMP, IDCMP_CLOSEWINDOW | IDCMP_GADGETUP,
+                                        TAG_DONE))
+                            {
+
+                                /*
+                                 * Get the visual info gadtools needs for the
+                                 * screen we opened on
+                                 */
+                                if (visualinfo = GetVisualInfoA(window-&#062;WScreen, NULL))
+                                {
+
+                                    /*
+                                     * Create a simple gadtools button and sort
+                                     * of lay it out. Note this doesn't do any
+                                     * checking for legal (window) dimensions.
+                                     */
+                                    if (gadget = CreateContext(&#038;gadgetcontext))
+                                    {
+
+                                        /*
+                                         * Use TextExtent to handle
+                                         * proportional fonts
+                                         */
+                                        TextExtent(&#038;(window-&#062;WScreen-&#062;RastPort),
+                                                   &#034;Jump&#034;, 4, &#038;textextent);
+                                        ng.ng_Width = textextent.te_Width + 8;
+                                        ng.ng_LeftEdge = (window-&#062;Width / 2) -
+                                                          (ng.ng_Width / 2);
+                                        ng.ng_Height = textextent.te_Height + 4;
+                                        ng.ng_TopEdge = (
+                                            (window-&#062;Height - window-&#062;BorderTop -
+                                                window-&#062;BorderBottom) / 2) +
+                                            (ng.ng_Height / 2);
+                                        ng.ng_TextAttr = window-&#062;WScreen-&#062;Font;
+                                        ng.ng_GadgetText = &#034;Jump&#034;;
+                                        ng.ng_VisualInfo = visualinfo;
+                                        ng.ng_GadgetID = 1;
+                                        ng.ng_Flags = PLACETEXT_IN;
+                                        nextscreengadget = gadget =
+                                            CreateGadget(BUTTON_KIND, gadget, &#038;ng,
+                                                         TAG_END);
+                                        AddGList(window, gadget, -1, -1, NULL);
+                                        RefreshGList(gadget, window, NULL, -1);
+                                        GT_RefreshWindow(window, NULL);
+
+                                        WaitPort(window-&#062;UserPort);
+                                        while (imsg = (struct IntuiMessage *)
+                                            GetMsg(window-&#062;UserPort))
+                                        {
+                                            if (imsg-&#062;Class == IDCMP_CLOSEWINDOW)
+                                                ABORT = TRUE;
+                                            else if (imsg-&#062;Class = IDCMP_GADGETUP)
+                                                NextPubScreen(window-&#062;WScreen,
+                                                              namebuffer);
+                                            ReplyMsg((struct Message *) imsg);
+                                        }
+                                        RemoveGadget(window, nextscreengadget);
+                                        FreeGadgets(gadgetcontext);
+                                    }
+                                    FreeVisualInfo(visualinfo);
+                                }
+                                left = window-&#062;LeftEdge;
+                                top = window-&#062;TopEdge;
+                                CloseWindow(window);
+                            }
+                        } while (ABORT == FALSE);
+
+                        CloseLibrary(IconBase);
+                    }
+                    CloseLibrary(CxBase);
+                }
+                CloseLibrary(GadToolsBase);
+            }
+            CloseLibrary(GfxBase);
+        }
+        CloseLibrary(IntuitionBase);
+    }
+    return (0);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

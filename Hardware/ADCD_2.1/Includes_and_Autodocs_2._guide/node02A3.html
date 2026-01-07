@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="FGets()" TITLE="dos.library/FGets" -->
+<head>
+<title>dos.library/FGets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node02A2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node02A4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    FGets -- Reads a line from the specified input (buffered) (V36)
+
+SYNOPSIS
+    buffer = FGets(fh, buf, len)
+    D0             D1  D2   D3
+
+    STRPTR FGets(BPTR, STRPTR, ULONG)
+
+FUNCTION
+    This routine reads in a single line from the specified input stopping
+    at a NEWLINE character or EOF.  In either event, UP TO the number of
+    len specified bytes minus 1 will be copied into the buffer.  Hence if
+    a length of 50 is passed and the input line is longer than 49 bytes,
+    it will return 49 characters.  It returns the buffer pointer normally,
+    or NULL if EOF is the first thing read.
+
+    If terminated by a newline, the newline WILL be the last character in
+    the buffer.  This is a buffered read routine.  The string read in IS
+    null-terminated.
+
+INPUTS
+    fh  - filehandle to use for buffered I/O
+    buf - Area to read bytes into.
+    len - Number of bytes to read, must be &#062; 0.
+
+RESULT
+    buffer - Pointer to buffer passed in, or NULL for immediate EOF or for
+             an error.  If NULL is returnd for an EOF, <a href="../Includes_and_Autodocs_2._guide/node02C2.html">IoErr()</a> will return
+             0.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02AE.html">FRead()</a>, <a href="../Includes_and_Autodocs_2._guide/node02AD.html">FPuts()</a>, <a href="../Includes_and_Autodocs_2._guide/node02A2.html">FGetC()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

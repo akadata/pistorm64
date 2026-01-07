@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_12" NODE="12-1-1-6" TITLE="12 / / Using Boopsi / What About the Boopsi Messages and Methods?" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>12 / / Using Boopsi / What About the Boopsi Messages and Methods?</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0206.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0208.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+According to the &#034;<a href="../Libraries_Manual_guide/node0200.html#line100">OOP Overview</a>&#034; section, for an object to perform a
+method, something has to pass it a Boopsi message.  The previous section
+discussed using Intuition functions to ask an object to do things like set
+and get attributes.  The functions in the previous section seem to
+completely ignore all that material about methods and messages.  What
+<a name="line7">happened to the methods and messages?</a>
+
+Nothing--these functions don't ignore the OOP constructs, they just shield
+the programmer from them.  Each of these functions corresponds to a Boopsi
+method:
+
+    <a href="../Libraries_Manual_guide/node0203.html#line25">NewObject()</a>                  <a href="../Libraries_Manual_guide/node0211.html#line20">OM_NEW</a>
+    <a href="../Libraries_Manual_guide/node0204.html">DisposeObject()</a>              <a href="../Libraries_Manual_guide/node0211.html#line24">OM_DISPOSE</a>
+    <a href="../Libraries_Manual_guide/node0205.html">SetAttrs()/SetGadgetAttrs()</a>  <a href="../Libraries_Manual_guide/node0211.html#line28">OM_SET</a>
+    <a href="../Libraries_Manual_guide/node0206.html">GetAttr()</a>                    <a href="../Libraries_Manual_guide/node0211.html#line36">OM_GET</a>
+
+These methods are defined on the <a href="../Libraries_Manual_guide/node0200.html#line50">rootclass</a> level, so all Boopsi classes
+inherit them.  The Intuition functions that correspond to these methods
+take care of constructing and sending a Boopsi message with the
+appropriate method ID and parameters.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

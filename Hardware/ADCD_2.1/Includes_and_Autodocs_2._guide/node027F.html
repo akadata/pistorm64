@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/dos" NODE="AllocDosObject()" TITLE="dos.library/AllocDosObject" -->
+<head>
+<title>dos.library/AllocDosObject</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node027E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0280.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    AllocDosObject -- Creates a dos object (V36)
+
+SYNOPSIS
+    ptr = AllocDosObject(type, tags)
+    D0                    D1    D2
+
+    void *AllocDosObject(ULONG, struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *)
+
+    ptr = AllocDosObjectTagList(type, tags)
+    D0                           D1    D2
+
+    void *AllocDosObjectTagList(ULONG, struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> *)
+
+    ptr = AllocDosObjectTags(type, Tag1, ...)
+
+    void *AllocDosObjectTags(ULONG, ULONG, ...)
+
+FUNCTION
+    Create one of several dos objects, initializes it, and returns it
+    to you.  Note the DOS_STDPKT returns a pointer to the sp_Pkt of the
+    structure.
+
+INPUTS
+    type - type of object requested
+    tags - pointer to taglist with additional information
+
+RESULT
+    packet - pointer to the object or NULL
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node02B2.html">FreeDosObject()</a>, <a href="../Includes_and_Autodocs_2._guide/node006D.html">&#060;dos/dostags.h&#062;</a>, <a href="../Includes_and_Autodocs_2._guide/node0068.html">&#060;dos/dos.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

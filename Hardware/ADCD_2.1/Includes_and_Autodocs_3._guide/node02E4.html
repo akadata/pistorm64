@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="GetDisplayInfoData()" TITLE="graphics.library/GetDisplayInfoData" -->
+<head>
+<title>graphics.library/GetDisplayInfoData</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02E3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02E5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	GetDisplayInfoData -- query <a href="../Includes_and_Autodocs_3._guide/node05FF.html#line52">DisplayInfo</a> Record parameters (V36)
+
+<b>   SYNOPSIS</b>
+	result = GetDisplayInfoData(handle, buf, size, tagID, [ID])
+	D0                          A0      A1   D0    D1     [D2]
+
+	ULONG GetDisplayInfoData(DisplayInfoHandle, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> *, ULONG, ULONG, ULONG);
+
+<b>   FUNCTION</b>
+	GetDisplayInfoData() fills a buffer with data meaningful to the
+	DisplayInfoRecord pointed at by your valid handle. The data type
+	that you are interested in is indicated by a tagID for that chunk.
+	The types of tagged information that may be available include:
+
+	DTAG_DISP: (DisplayInfo)   - properties and availability information.
+	DTAG_DIMS: (DimensionInfo) - default dimensions and overscan info.
+	DTAG_MNTR: (MonitorInfo)   - type, position, scanrate, and compatibility
+	DTAG_NAME: (NameInfo)      - a user friendly way to refer to this mode.
+
+<b>   INPUTS</b>
+	handle - displayinfo handle
+	buf    - pointer to destination buffer
+	size   - buffer size in bytes
+	tagID  - data chunk type
+	ID     - displayinfo identifier, optionally used if handle is NULL
+
+<b>   RESULT</b>
+	result - if positive, number of bytes actually transferred
+	         if zero, no information for ID was available
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02D3.html">FindDisplayInfo()</a>, <a href="../Includes_and_Autodocs_3._guide/node0305.html">NextDisplayInfo()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05FF.html">graphics/displayinfo.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

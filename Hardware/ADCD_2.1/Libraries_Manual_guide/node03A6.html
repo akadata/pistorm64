@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_28" NODE="28-6-11" TITLE="28 / Using Bobs / Removing a Bob" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>28 / Using Bobs / Removing a Bob</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node03A5.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node03A7.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Two methods may be used to remove a Bob.  The first method uses the
+<a href="../Includes_and_Autodocs_2._guide/node046E.html">RemBob()</a> macro.  RemBob() causes the system to remove the Bob during the
+next call to <a href="../Libraries_Manual_guide/node038C.html">DrawGList()</a> (or two calls to DrawGList() if the system is
+double-buffered).  RemBob() asks the system to remove the Bob at the next
+convenient time.  See the description of the <a href="../Libraries_Manual_guide/node039A.html#line39">BOBSAWAY</a> and <a href="../Libraries_Manual_guide/node039A.html#line50">BOBNIX</a> flags
+above. It is called as follows:
+
+    struct Bob myBob = {0};
+
+<a name="line11">    RemBob(&#038;myBob);</a>
+
+The second method uses the <a href="../Includes_and_Autodocs_2._guide/node0470.html">RemIBob()</a> routine.  RemIBob() tells the system
+to remove this Bob immediately.  For example:
+
+    struct Bob      myBob = {0};
+    struct RastPort rastport = {0};
+    struct ViewPort viewport = {0};
+
+    RemIBob(&#038;myBob, &#038;rastport, &#038;viewport);
+
+This causes the system to erase the Bob from the drawing area and causes
+the immediate erasure of any other Bob that had been drawn subsequent to
+(and on top of) this one.  The system then unlinks the Bob from the system
+GEL list.  To redraw the Bobs that were drawn on top of the one just
+removed, another call to <a href="../Libraries_Manual_guide/node038C.html">DrawGList()</a> must be made.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

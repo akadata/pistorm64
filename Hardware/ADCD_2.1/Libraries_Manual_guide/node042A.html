@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_33" NODE="33-1-2" TITLE="33 / The Structure of IFF Files / Composite Data Types" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>33 / The Structure of IFF Files / Composite Data Types</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0429.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node042B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Standard <a href="../Libraries_Manual_guide/node0428.html">IFF</a> files generally contain a variable number of <a href="../Libraries_Manual_guide/node0429.html">chunks</a> within
+one of the standard IFF composite data types (which may be thought of as
+chunks which contain other chunks).  The IFF specification defines three
+basic composite data types, `FORM', `CAT ', and `LIST'.  A special
+composite data type, the `PROP', is found only inside a LIST.
+<a name="line7"></a>
+
+              Table 33-1: Usage of Composite <a href="../Libraries_Manual_guide/node0428.html">IFF</a> Types
+
+        <a href="../Libraries_Manual_guide/node045D.html">FORM</a>  A grouping of <a href="../Libraries_Manual_guide/node0429.html">chunks</a> which describe one set of data
+        LIST  A grouping of the same type of FORMs with shared
+              properties in a PROP
+        PROP  May appear in a LIST to define chunks shared by
+              several FORMs
+        CAT   A concatenation of related FORMs or LISTs
+
+
+The special <a href="../Libraries_Manual_guide/node0428.html">IFF</a> composite data types, like simple <a href="../Libraries_Manual_guide/node0429.html">chunks,</a> start with a
+4-character identifier (such as `FORM'), followed by a 32-bit length.  But
+their data begins with a second 4-character identifier that tells you what
+type of data is in the composite.  For example, a <a href="../Libraries_Manual_guide/node045D.html#line8">FORM ILBM</a> contains
+chunks describing a bitmap image, and a <a href="../Libraries_Manual_guide/node045D.html#line8">FORM FTXT</a> contains chunks
+describing formatted text.
+
+It may help to think of each composite data type as a box containing
+<a href="../Libraries_Manual_guide/node0429.html">chunks</a>, the <a href="../Libraries_Manual_guide/node0428.html">IFF</a> building blocks.  Figure 33-2 shows a diagram of a
+<a name="line28">typical composite.</a>
+
+
+        Figure 33-2: The FORM - The Most Common IFF File Type
+                        ____________________
+                       |                    |
+                       | `FORM' Size `NAME' |
+                       |  ________________  |
+                       | |                | |
+                       | | `CKID' Size    | |
+                       | | data data data | |
+                       | | data data ...  | |
+                       | |________________| |
+                       |  ________________  |
+                       | |                | |
+                       | | `CKID' Size    | |
+                       | | data data data | |
+                       | | data data ...  | |
+                       | |________________| |
+                       |  ________________  |
+                       | |                | |
+                       | | `CKID' Size    | |
+                       | | data data data | |
+                       | | data data ...  | |
+                       | |________________| |
+                       |____________________|
+
+
+The example FORM in figure 33-2 is outlined below showing the size of
+<a href="../Libraries_Manual_guide/node0429.html">chunks</a> within the FORM.  Notice that the size of a composite includes its
+second 4-character identifier (shown below as `NAME').
+
+
+ .FORM 72 NAME  (72 is the size of the FORM starting with the &#034;N&#034; of NAME)
+ ..CKID 22     (then 22 bytes of data, so chunk header + chunk size is 30)
+ ..CKID 10     (then 10 bytes of data, so chunk header + chunk size is 18)
+ ..CKID 12     (then 12 bytes of data, so chunk header + chunk size is 20)
+
+
+    Note
+    ----
+    In the example above, indentation represents the nesting of the
+    <a href="../Libraries_Manual_guide/node0429.html">chunks</a> within the FORM.  Real FORMs and chunks would have different
+    four-character identifiers rather than `NAME' and `CKID':
+
+Any odd-length <a href="../Libraries_Manual_guide/node0429.html">chunks</a> must have a pad byte of zero at the end of the
+chunk.  As shown below, this pad byte is not counted in the size of the
+chunk but is counted in the size of any composite types (such as FORM)
+that contain an odd-length chunk.  Warning: some <a href="../Libraries_Manual_guide/node0428.html">IFF</a> readers and writers
+do not deal with this properly.
+
+
+ .FORM 72 NAME  (72 is the size of the FORM starting with the &#034;N&#034; of NAME)
+ ..CKID 21     (then 21 bytes of data, so chunk header + chunk size is 29)
+ ..0           (pad byte of zero, size 1)
+ ..CKID 10     (then 10 bytes of data, so chunk header + chunk size is 18)
+ ..CKID 12     (then 12 bytes of data, so chunk header + chunk size is 20)
+
+
+Most <a href="../Libraries_Manual_guide/node0428.html">IFF</a> files are of the composite type FORM.  Generally, a FORM is a
+simple grouping of <a href="../Libraries_Manual_guide/node0429.html">chunks</a> that provide information about some data, and
+the data itself.  Although some standard chunks have common usage within
+different FORMS, the identity and format of most chunks within a FORM are
+relative to the definition and specification of the FORM.  For example, a
+CRNG chunk in a <a href="../Libraries_Manual_guide/node045D.html#line8">FORM ILBM</a> may have a totally different format and contents
+than a chunk named CRNG in a different type of FORM.
+
+One of the most popular IFF FORMs that has been defined is the <a href="../Libraries_Manual_guide/node045D.html#line8">ILBM</a>
+standard.  This is how most Amiga bitmap imagery is stored.  Since this is
+<a name="line97">the most common <a href="../Libraries_Manual_guide/node0428.html">IFF</a> file, it is used frequently as an example.</a>
+
+Here is the output of a program called Sift.c that displays a text
+description of the contents of an <a href="../Libraries_Manual_guide/node0428.html">IFF</a> file (<a href="../Libraries_Manual_guide/node05A0.html">Sift.c</a> is listed at the end of
+this chapter).  The file shown below is a fairly simple <a href="../Libraries_Manual_guide/node045D.html#line8">ILBM</a>.
+
+
+                .FORM 11068 ILBM
+                ..BMHD 20
+                ..CAMG 4
+                ..CMAP 12
+                ..BODY 10995
+<a name="line109"></a>
+
+    Computing the Size of a FORM.
+    -----------------------------
+    The size of the FORM (11068 bytes) is equal to the sum of the sizes
+    stated in each <a href="../Libraries_Manual_guide/node0429.html">chunk</a> contained within the FORM, plus 8 bytes for the
+    overhead of each chunk header (4 bytes for the 4-character chunk ID,
+    and 4 bytes for the 32-bit chunk size), plus 4 bytes for the FORM's
+    own 4-character ID (`ILBM'), plus 1 byte more for each pad byte that
+    follow any odd-length chunks.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

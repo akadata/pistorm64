@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_EA_IFF_85" NODE="16-2-3-5" TITLE="Primitive Data Types / Type IDs " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>Primitive Data Types / Type IDs </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01DB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01DD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A &#034;type ID&#034;, &#034;property name&#034;, &#034;FORM type&#034;, or any other IFF identifier is
+a 32-bit value: the concatenation of four ASCII characters in the range
+&#034; &#034; (SP, hex 20) through '~' (hex 7E).  Spaces (hex 20) should not precede
+printing characters; trailing spaces are OK.  Control characters are
+forbidden.
+
+	typedef CHAR ID[4];
+
+IDs are compared using a simple 32-bit case-dependent equality test.  <a href="../Devices_Manual_guide/node01C7.html#line52">FORM</a>
+type IDs are restricted.  Since they may be stored in filename extensions
+lower case letters and punctuation marks are forbidden.  Trailing spaces
+are OK.
+
+Carefully choose those four characters when you pick a new ID.  Make them
+mnemonic so programmers can look at an interchange format file and figure
+out what kind of data it contains.  The name space makes it possible for
+developers scattered around the globe to generate ID values with minimal
+collisions so long as they choose specific names like &#034;MUS4&#034; instead of
+general ones like &#034;TYPE&#034; and &#034;FILE&#034;.
+
+Commodore Applications and Technical Support has undertaken the task of
+maintaining the registry of FORM type IDs and format descriptions.  See
+the <a href="../Devices_Manual_guide/node01FD.html">IFF Registry</a> document for more information.
+
+Sometimes it's necessary to make data format changes that aren't backward
+compatible.  As much as we work for compatibility, unintended interactions
+can develop.  Since IDs are used to denote data formats in IFF, new IDs
+are chosen to denote revised formats.  Since programs won't read chunks
+whose IDs they don't recognize (see <a href="../Devices_Manual_guide/node01C7.html">Chunks</a>, below), the new IDs keep old
+programs from stumbling over new data.  The conventional way to chose a
+&#034;revision&#034; ID is to increment the last character if it's a digit or else
+change the last character to a digit.  E.g., first and second revisions of
+the ID &#034;XY&#034; would be &#034;XY1&#034; and &#034;XY2&#034;.  Revisions of &#034;<a href="../Devices_Manual_guide/node01B0.html">CMAP</a>&#034; would be &#034;CMA1&#034;
+and &#034;CMA2&#034;.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

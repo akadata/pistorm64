@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-9" TITLE="6 / Setting Up Menus / Menu Layout" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Setting Up Menus / Menu Layout</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node018A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node018C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Amiga allows great flexibility in the specification of fonts for the
+display.  Default fonts are chosen by the user to suit their particular
+requirements and display resolution.  The application should, where
+<a name="line5">possible, use one of the preferred fonts.</a>
+
+If the application did not open its own screen and completely specify the
+font for that screen, it must perform dynamic menu layout.  This is
+because the <a href="../Libraries_Manual_guide/node0199.html">Menu</a> structure does not specify font.  The menu header always
+uses the screen font and the program should update the size and position
+<a name="line11">of these items at runtime to reflect the font.</a>
+
+The font for menu items may be specified in the <a href="../Libraries_Manual_guide/node019A.html">MenuItem</a> structure,
+allowing the programmer to hard code values for the font, size and
+position of these items.  This is not recommended.  A specific font, while
+ideal on one system, may be less than ideal on another display type.  Use
+the preferred font wherever possible.
+
+If the application does its own menu layout, it must use great care to
+handle the font in the menu strip and the font in each item or sub-item.
+<a name="line21">The code should also keep items from running off the edges of the screen.</a>
+
+See the description of <a href="../Libraries_Manual_guide/node019A.html#line47">ItemFill</a> in the section &#034;<a href="../Libraries_Manual_guide/node019A.html">MenuItem Structure</a>&#034; below
+for information on the positioning of multiple <a href="../Libraries_Manual_guide/node01C7.html">IntuiText</a> or <a href="../Libraries_Manual_guide/node01BA.html">Image</a>
+<a name="line25">structures within the menu item.</a>
+
+Applications should use the GadTools library menu layout routines whenever
+possible, rather than performing their own layout.  See the chapter on the
+&#034;<a href="../Libraries_Manual_guide/node024E.html">GadTools Library</a>&#034; for more details.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

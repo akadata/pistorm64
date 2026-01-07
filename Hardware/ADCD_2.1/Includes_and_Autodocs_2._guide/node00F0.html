@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/libraries/commodities.h" NODE="MAIN" TITLE="Includes/libraries/commodities.h" -->
+<head>
+<title>Includes/libraries/commodities.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00EF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00F1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef LIBRARIES_COMMODITIES_H
+#define LIBRARIES_COMMODITIES_H
+
+/*
+**   $Filename: libraries/commodities.h $
+**   $Release: 2.04 Includes, V37.4 $
+**   $Revision: 37.1 $
+**   $Date: 91/04/15 $
+**
+**   Commodities definitions.
+**
+**   (C) Copyright 1988-1999 Amiga, Inc.
+**	All Rights Reserved
+*/
+<a name="line15"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line19"></a>
+/*************************
+ * object creation macros
+<a name="line22"> *************************/</a>
+<a name="line23">#define CxFilter(d)	    CreateCxObj((LONG)CX_FILTER, (LONG) d, 0)</a>
+<a name="line24">#define CxTypeFilter(type)  CreateCxObj((LONG)CX_TYPEFILTER, (LONG) type, 0)</a>
+<a name="line25">#define CxSender(port,id)   CreateCxObj((LONG)CX_SEND, (LONG) port, (LONG) id)</a>
+<a name="line26">#define CxSignal(task,sig)  CreateCxObj((LONG)CX_SIGNAL,(LONG) task, (LONG) sig)</a>
+<a name="line27">#define CxTranslate(ie)     CreateCxObj((LONG)CX_TRANSLATE, (LONG) ie, 0)</a>
+<a name="line28">#define CxDebug(id)	    CreateCxObj((LONG)CX_DEBUG, (LONG) id, 0)</a>
+#define CxCustom(action,id) CreateCxObj((LONG)CX_CUSTOM,(LONG)action,(LONG)id)
+
+/***************
+ * Broker stuff
+ ***************/
+
+<a name="line35">/* buffer sizes   */</a>
+<a name="line36">#define CBD_NAMELEN	24</a>
+<a name="line37">#define CBD_TITLELEN	40</a>
+#define CBD_DESCRLEN	40
+<a name="line39"></a>
+<a name="line40">/* CxBroker errors   */</a>
+<a name="line41">#define CBERR_OK	0	 /* No error			     */</a>
+<a name="line42">#define CBERR_SYSERR	1	 /* System error , no memory, etc    */</a>
+<a name="line43">#define CBERR_DUP	2	 /* uniqueness violation	     */</a>
+#define CBERR_VERSION	3	 /* didn't understand nb_VERSION     */
+<a name="line45"></a>
+#define NB_VERSION	5	 /* Version of NewBroker structure   */
+<a name="line47"></a>
+<a name="line48">struct NewBroker {</a>
+<a name="line49">   BYTE     nb_Version;	 /* set to NB_VERSION		     */</a>
+<a name="line50">   BYTE     *nb_Name;</a>
+<a name="line51">   BYTE     *nb_Title;</a>
+<a name="line52">   BYTE     *nb_Descr;</a>
+<a name="line53">   SHORT    nb_Unique;</a>
+<a name="line54">   SHORT    nb_Flags;</a>
+   BYTE     nb_Pri;
+<a name="line56">   struct MsgPort   *nb_Port;</a>
+<a name="line57">   WORD     nb_ReservedChannel;  /* plans for later port sharing     */</a>
+};
+<a name="line59"></a>
+/* Flags for nb_Unique */
+<a name="line61">#define NBU_DUPLICATE	0</a>
+<a name="line62">#define NBU_UNIQUE	1	 /* will not allow duplicates	     */</a>
+<a name="line63">#define NBU_NOTIFY	2	 /* sends CXM_UNIQUE to existing broker */</a>
+<a name="line64"></a>
+/* Flags for nb_Flags */
+<a name="line66">#define   COF_SHOW_HIDE 4</a>
+
+/********
+ * cxusr
+ ********/
+<a name="line71"></a>
+/** Fake data types for system private objects	 */
+#ifndef CX_H
+<a name="line74">typedef LONG   CxObj;</a>
+<a name="line75">typedef LONG   CxMsg;</a>
+#endif
+
+/* Pointer to Function returning Long	*/
+<a name="line79">typedef LONG   (*PFL)();</a>
+
+/********************************/
+/** Commodities Object Types   **/
+/********************************/
+<a name="line84">#define CX_INVALID	0     /* not a valid object (probably null)  */</a>
+<a name="line85">#define CX_FILTER	1     /* input event messages only	     */</a>
+<a name="line86">#define CX_TYPEFILTER	2     /* filter on message type	     */</a>
+<a name="line87">#define CX_SEND	3     /* sends a message		     */</a>
+<a name="line88">#define CX_SIGNAL	4     /* sends a signal		     */</a>
+<a name="line89">#define CX_TRANSLATE	5     /* translates IE into chain	     */</a>
+<a name="line90">#define CX_BROKER	6     /* application representative	     */</a>
+<a name="line91">#define CX_DEBUG	7     /* dumps kprintf to serial port	     */</a>
+<a name="line92">#define CX_CUSTOM	8     /* application provids function	     */</a>
+<a name="line93">#define CX_ZERO	9     /* system terminator node	     */</a>
+
+/*****************/
+/** CxMsg types **/
+/*****************/
+<a name="line98">#define CXM_UNIQUE   (1 &#060;&#060; 4) /* sent down broker by CxBroker()      */</a>
+/* Obsolete: subsumed by CXM_COMMAND (below)   */
+<a name="line100"></a>
+/* Messages of this type rattle around the Commodities input network.
+ * They will be sent to you by a Sender object, and passed to you
+ * as a synchronous function call by a Custom object.
+ *
+ * The message port or function entry point is stored in the object,
+ * and the ID field of the message will be set to what you arrange
+ * issuing object.
+ *
+ * The Data field will point to the input event triggering the
+ * message.
+ */
+<a name="line112">#define CXM_IEVENT   (1 &#060;&#060; 5)</a>
+<a name="line113"></a>
+/* These messages are sent to a port attached to your Broker.
+ * They are sent to you when the controller program wants your
+ * program to do something.  The ID field identifies the command.
+ *
+ * The Data field will be used later.
+ */
+<a name="line120">#define CXM_COMMAND   (1 &#060;&#060; 6)</a>
+<a name="line121"></a>
+/* ID values   */
+<a name="line123">#define CXCMD_DISABLE	(15)  /* please disable yourself       */</a>
+<a name="line124">#define CXCMD_ENABLE	(17)  /* please enable yourself        */</a>
+<a name="line125">#define CXCMD_APPEAR	(19)  /* open your window, if you can  */</a>
+<a name="line126">#define CXCMD_DISAPPEAR (21)  /* go dormant		       */</a>
+<a name="line127">#define CXCMD_KILL	(23)  /* go away for good	       */</a>
+#define CXCMD_UNIQUE	(25)  /* someone tried to create a broker
+			       * with your name.  Suggest you Appear.
+<a name="line130">			       */</a>
+<a name="line131">#define CXCMD_LIST_CHG	(27)  /* Used by Exchange program. Someone */</a>
+			      /* has changed the broker list	   */
+
+/* return values for BrokerCommand(): */
+<a name="line135">#define CMDE_OK	(0)</a>
+<a name="line136">#define CMDE_NOBROKER	(-1)</a>
+<a name="line137">#define CMDE_NOPORT	(-2)</a>
+<a name="line138">#define CMDE_NOMEM	(-3)</a>
+
+/* IMPORTANT NOTE:
+ * Only CXM_IEVENT messages are passed through the input network.
+ *
+ * Other types of messages are sent to an optional port in your broker.
+ *
+ * This means that you must test the message type in your message handling,
+ * if input messages and command messages come to the same port.
+ *
+ * Older programs have no broker port, so processing loops which
+ * make assumptions about type won't encounter the new message types.
+ *
+ * The TypeFilter CxObject is hereby obsolete.
+ *
+ * It is less convenient for the application, but eliminates testing
+ * for type of input messages.
+ */
+<a name="line156"></a>
+/**********************************************************/
+/** CxObj Error Flags (return values from CxObjError())  **/
+/**********************************************************/
+<a name="line160">#define COERR_ISNULL	   1  /* you called CxError(NULL)	     */</a>
+<a name="line161">#define COERR_NULLATTACH   2  /* someone attached NULL to my list    */</a>
+<a name="line162">#define COERR_BADFILTER    4  /* a bad filter description was given  */</a>
+<a name="line163">#define COERR_BADTYPE	   8  /* unmatched type-specific operation   */</a>
+
+<a name="line165"></a>
+/*****
+ * ix
+ *****/
+
+<a name="line170">#define IX_VERSION   2</a>
+<a name="line171"></a>
+<a name="line172">struct InputXpression {</a>
+<a name="line173">   UBYTE   ix_Version;	   /* must be set to IX_VERSION  */</a>
+<a name="line174">   UBYTE   ix_Class;	   /* class must match exactly	 */</a>
+
+<a name="line176">   UWORD   ix_Code;</a>
+   UWORD   ix_CodeMask;    /* normally used for UPCODE	 */
+<a name="line178"></a>
+   UWORD   ix_Qualifier;
+   UWORD   ix_QualMask;
+   UWORD   ix_QualSame;    /* synonyms in qualifier	 */
+<a name="line182">   };</a>
+typedef struct InputXpression IX;
+<a name="line184"></a>
+/* QualSame identifiers */
+#define IXSYM_SHIFT  1	   /* left- and right- shift are equivalent	*/
+#define IXSYM_CAPS   2	   /* either shift or caps lock are equivalent	*/
+<a name="line188">#define IXSYM_ALT    4	   /* left- and right- alt are equivalent	*/</a>
+
+/* corresponding QualSame masks */
+<a name="line191">#define IXSYM_SHIFTMASK (IEQUALIFIER_LSHIFT | IEQUALIFIER_RSHIFT)</a>
+#define IXSYM_CAPSMASK	(IXSYM_SHIFTMASK    | IEQUALIFIER_CAPSLOCK)
+#define IXSYM_ALTMASK	(IEQUALIFIER_LALT   | IEQUALIFIER_RALT)
+<a name="line194"></a>
+<a name="line195">#define IX_NORMALQUALS	0x7FFF;/* for QualMask field: avoid RELATIVEMOUSE */</a>
+<a name="line196"></a>
+/* matches nothing   */
+#define NULL_IX(I)   ((I)-&#062;ix_Class == IECLASS_NULL)
+<a name="line199"></a>
+<a name="line200">#endif</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="LockPubScreenList()" TITLE="intuition.library/LockPubScreenList" -->
+<head>
+<title>intuition.library/LockPubScreenList</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0225.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0227.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    LockPubScreenList -- Prevent changes to the system list. (V36)
+
+SYNOPSIS
+    <a href="../Includes_and_Autodocs_2._guide/node007D.html#line21">List</a> = LockPubScreenList()
+    D0
+
+    struct <a href="../Includes_and_Autodocs_2._guide/node007D.html#line21">List</a> *LockPubScreenList( VOID );
+
+FUNCTION
+    Arbitrates access to public screen list while you quickly
+    make a copy of it for display to the user.
+
+    Note that this is intended only for the Public <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line97">Screen</a> Manager
+    program.
+
+NOTES
+    The nodes on the list are <a href="../Includes_and_Autodocs_2._guide/node00DD.html#line381">PubScreenNode</a> structures.
+    Act quickly while holding this lock.  The restrictions
+    on <a href="../Includes_and_Autodocs_2._guide/node0224.html">LockIBase()</a> apply here as well.
+
+INPUTS
+    None.
+
+RESULT
+    A pointer to the public screen list.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0237.html">OpenScreen()</a>, Intuition V36 update documentation
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

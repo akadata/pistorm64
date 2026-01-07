@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-10-1" TITLE="5 / Boolean Gadget Type / Masked Boolean Gadgets" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / Boolean Gadget Type / Masked Boolean Gadgets</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node014C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node014E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Imagery for <a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadgets is rectangular by default, but non-rectangular
+boolean gadgets are possible, with some restrictions. An auxiliary bit
+plane, called a mask, may be associated with a boolean gadget. When the
+user clicks within the select box of the gadget, a further test is made to
+see if the chosen point is contained within the mask. Only if it is, does
+the interaction count as a gadget hit.
+
+With masked <a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadgets, if the gadget has highlight type
+<a href="../Libraries_Manual_guide/node014A.html#line8">GFLG_GADGHCOMP</a> then the complement rendering is restricted to the mask.
+This allows for non-rectangular shapes, such as an oval gadget which
+highlights only within the oval.
+
+There are some shortcomings to non-rectangular <a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadgets.  For
+instance, the gadget image is not rendered through the mask.  Images are
+rectangular blocks, with all bits rendered.  In the case of an oval mask,
+the image will be rendered in the corner areas even though they are
+outside of the oval.  Also, it is not possible to mask out the select box,
+thus non-rectangular masked gadgets cannot overlap in the masked area.
+Therefore, such gadgets can't be crowded together without care.  Likewise,
+the ghosting of a disabled gadget does not respect the mask, so ghosting
+of the corners around an oval may be visible, depending on the colors
+<a name="line23">involved.</a>
+
+To use a masked <a href="../Libraries_Manual_guide/node014C.html">boolean</a> gadget, fill out an instance of the <a href="../Libraries_Manual_guide/node014E.html">BoolInfo</a>
+structure.  This structure contains a pointer to the mask plane data.  The
+application must also set the <a href="../Libraries_Manual_guide/node014B.html#line102">GACT_BOOLEXTEND</a> flag in the gadget's
+<a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/resources/filesysres.i" NODE="MAIN" TITLE="Includes/resources/filesysres.i" -->
+<head>
+<title>Includes/resources/filesysres.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node011E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0120.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	RESOURCES_FILESYSRES_I
+RESOURCES_FILESYSRES_I	SET	1
+**
+**	$Filename: resources/filesysres.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.4 $
+**	$Date: 90/05/03 $
+**
+**	FileSystem.resource description
+**
+**	(C) Copyright 1988-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+	IFND	EXEC_NODES_I
+	INCLUDE	&#034;exec/nodes.i&#034;
+	ENDC
+	IFND	EXEC_LISTS_I
+	INCLUDE	&#034;exec/lists.i&#034;
+	ENDC
+	IFND	DOS_DOS_I
+	INCLUDE	&#034;dos/dos.i&#034;
+	ENDC
+
+FSRNAME	MACRO
+		dc.b	'FileSystem.resource',0
+	ENDM
+
+ STRUCTURE  FileSysResource,LN_SIZE	; on resource list
+    CPTR    fsr_Creator			; name of creator of this resource
+    STRUCT  fsr_FileSysEntries,LH_SIZE	; list of FileSysEntry structs
+    LABEL   FileSysResource_SIZEOF
+
+ STRUCTURE  FileSysEntry,LN_SIZE	; on fsr_FileSysEntries list
+					; LN_NAME is of creator of this entry
+    ULONG   fse_DosType		; DosType of this FileSys
+    ULONG   fse_Version		; Version of this FileSys
+    ULONG   fse_PatchFlags	; bits set for those of the following that need
+				;   to be substituted into a standard device
+				;   node for this file system: e.g. $180
+				;   for substitute SegList &#038; GlobalVec
+    ULONG   fse_Type		; device node type: zero
+    CPTR    fse_Task		; standard dos &#034;task&#034; field
+    BPTR    fse_Lock		; not used for devices: zero
+    BSTR    fse_Handler		; filename to loadseg (if SegList is null)
+    ULONG   fse_StackSize	; stacksize to use when starting task
+    LONG    fse_Priority	; task priority when starting task
+    BPTR    fse_Startup		; startup msg: FileSysStartupMsg for disks
+    BPTR    fse_SegList		; code to run to start new task
+    BPTR    fse_GlobalVec	; BCPL global vector when starting task
+    ; no more entries need exist than those implied by fse_PatchFlags
+
+	ENDC	; RESOURCES_FILESYSRES_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

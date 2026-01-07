@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/exec/initializers.h" NODE="MAIN" TITLE="Includes/exec/initializers.h" -->
+<head>
+<title>Includes/exec/initializers.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0083.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0085.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	EXEC_INITIALIZERS_H
+#define	EXEC_INITIALIZERS_H
+/*
+**	$Filename: exec/initializers.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.5 $
+**	$Date: 90/05/10 $
+**
+**	Macros for use with the InitStruct() function.
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+<a name="line15">#define	OFFSET(structName, structEntry) \</a>
+<a name="line16">				(&#038;(((struct structName *) 0)-&#062;structEntry))</a>
+<a name="line17">#define	INITBYTE(offset,value)	0xe000,(UWORD) (offset),(UWORD) ((value)&#060;&#060;8)</a>
+#define	INITWORD(offset,value)	0xd000,(UWORD) (offset),(UWORD) (value)
+#define	INITLONG(offset,value)	0xc000,(UWORD) (offset), \
+<a name="line20">				(UWORD) ((value)&#062;&#062;16), \</a>
+				(UWORD) ((value) &#038; 0xffff)
+#define	INITSTRUCT(size,offset,value,count) \
+				(UWORD) (0xc000|(size&#060;&#060;12)|(count&#060;&#060;8)| \
+<a name="line24">				((UWORD) ((offset)&#062;&#062;16)), \</a>
+				((UWORD) (offset)) &#038; 0xffff)
+#endif /* EXEC_INITIALIZERS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

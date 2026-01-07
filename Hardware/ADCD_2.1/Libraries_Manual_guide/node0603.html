@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="lib_examples/makefile" NODE="MAIN" TITLE="lib_examples/makefile" -->
+<head>
+<title>lib_examples/makefile</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0602.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0604.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+# MAKEFILE for sample.library, sample.lib, and asm library test program
+# define linker command
+LINKER = Blink
+
+all: sample.library sample.lib alibtest
+
+sample.library: sample.library.o
+	$(LINKER) from sample.library.o to sample.library LIB lib:amiga.lib
+
+sample.lib: sample_stubs.o sample_lvos.o
+	JOIN sample_stubs.o sample_lvos.o AS sample.lib
+
+alibtest: alibtest.o
+  $(LINKER) from astartup.obj,alibtest.o to alibtest LIB lib:amiga.lib,sample.lib
+
+# assembler command line for Adapt assembler
+.asm.o:
+	HX68 -A $*.asm -iINCLUDE: -o$*.o
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-2-3" TITLE="4 / Basic Window Structures and Functions / Windows and Screens" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Basic Window Structures and Functions / Windows and Screens</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0105.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0107.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Windows may be opened on one of three screen types:  a custom screen, a
+public screen or the Workbench screen.  A custom screen is one created and
+controlled by your application.  Once you have set up a custom screen, you
+may open a window on it directly by calling one of the three open window
+<a name="line6">functions.</a>
+
+To open a window on a custom screen, call <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> (or
+<a href="../Libraries_Manual_guide/node0103.html">OpenWindowTags()</a>) with the <a href="../Libraries_Manual_guide/node0124.html#line91">WA_CustomScreen</a> tag along with a pointer to the
+custom screen.  This must be a pointer to a screen created by your
+application.  For systems prior to Release 2, use the <a href="../Libraries_Manual_guide/node0103.html">OpenWindow()</a> call
+with <a href="../Libraries_Manual_guide/node0102.html#line8">NewWindow</a>.Type set to CUSTOMSCREEN and NewWindow.Screen set to a
+<a name="line13">pointer to your custom screen.</a>
+
+You may choose to open a window on an existing public (shareable) screen
+instead of setting up your own custom screen.  Such windows are often
+referred to as visitor windows because they &#034;visit&#034; a screen managed by
+<a name="line18">the system or another application.</a>
+
+For Workbench or other public screens that are not created and managed
+directly by your application, you must lock the screen before opening the
+window.  This ensures that the screen remains open while your call to open
+the window is processed.  One way to obtain a lock on a public screen is
+by calling the <a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a> function (see the &#034;<a href="../Libraries_Manual_guide/node00E7.html">Intuition Screens</a>&#034;
+<a name="line25">chapter).</a>
+
+Use <a href="../Libraries_Manual_guide/node0124.html#line129">WA_PubScreenName</a> with NULL to open a visitor window on the default
+public screen (normally the Workbench screen).  If a name is provided and
+the named screen exists, the visitor window will open on that named
+screen.  In this case the system locks the named screen for you so there
+is no need to call <a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a> directly.  The open window call will
+fail if it cannot obtain a lock on the screen.  If the
+<a href="../Libraries_Manual_guide/node0124.html#line137">WA_PubScreenFallBack</a> tag is TRUE, the window will open on the default
+<a name="line34">public screen when WA_PubScreenName can't be found.</a>
+
+Another method to open a visitor window on a public screen is to use the
+<a href="../Libraries_Manual_guide/node0124.html#line121">WA_PubScreen</a> tag along with a pointer to the <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a> structure of the
+<a name="line38">public screen obtained via <a href="../Libraries_Manual_guide/node00E6.html#line34">LockPubScreen()</a>.</a>
+
+The application may also request the name of the &#034;next&#034; public screen,
+which allows windows to &#034;jump&#034; between public screens.  This is done by
+closing the application window on the first screen and opening a new
+window on the next screen.  (See the &#034;<a href="../Libraries_Manual_guide/node00DA.html">Intuition Screens</a>&#034; chapter for more
+<a name="line44">information on public and custom screens.)</a>
+
+If no action is taken by the programmer to open the window on a specific
+screen, the window will open on the default public screen (normally the
+<a name="line48">Workbench).  This behavior is shown in the above <a href="../Libraries_Manual_guide/node05BC.html">example</a> using</a>
+<a name="line49"><a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a>.</a>
+
+There are two global modes which come into play when a visitor window is
+opened on a public screen.  If the global mode SHANGHAI is set, Workbench
+application windows will be opened on the default public screen.  A second
+global mode, POPPUBSCREEN, forces a public screen to be moved to the front
+when a visitor window opens on it.  These modes can be changed using
+<a href="../Libraries_Manual_guide/node00E6.html#line34">SetPubScreenModes()</a>, however, these should only be set according to the
+preferences of the user.
+
+ <a href="../Libraries_Manual_guide/node05BE.html">Simple Window on a Public Screen Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

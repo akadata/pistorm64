@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="I-43/Hooks.txt" NODE="I-43-1" TITLE="Callback Hook Functions and Structures" -->
+<head>
+<title>Callback Hook Functions and Structures</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node0050.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node0052.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+An application passes a custom function in the form of a callback Hook
+(from &#060;utility/hooks.h&#062;):
+
+
+    /* Standard hook structure */
+    struct Hook
+    {
+        struct MinNode h_MinNode;
+        ULONG (*h_Entry)();     /* stub function entry point */
+        ULONG (*h_SubEntry)();  /* the custom function entry point */
+        VOID *h_Data;           /* owner specific */
+    };
+
+
+
+    h_MinNode - This field is reserved for use by the module that will
+    call the Hook.
+
+    h_Entry - This is the address of the Hook stub.  When the OS calls
+    a callback function, it puts parameters for the callback function
+    in CPU registers A0, A1, and A2.  This makes it tough for higher
+    level language programmers to use a callback function because most
+    higher level languages don't have a way to manipulate CPU registers
+    directly.  The solution is a stub function which first copies the
+    parameters from the CPU registers to a place where a high level
+    language function can get to them.   The stub function then calls
+    the callback function.  Typically, the stub pushes the registers
+    onto the stack in a specific order and the high level language
+    callback function pops them off the stack.
+
+    h_SubEntry - This is the address of the actual callback function
+    that the application has defined.  The stub calls this function.
+
+    h_Data - This field is for the application to use.  It could point
+    to a global storage structure that the callback function utilizes.
+
+There is only one function defined in utility.library for callback
+functions.
+
+    ULONG CallHookPkt(struct Hook *hook, VOID *object, VOID *paramPkt);
+                               A0          A2            A1
+
+This function invokes a standard callback Hook function.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_B" NODE="B-11-8" TITLE="B / propgclass / PGA_Top (ISGNU), PGA_Visible, PGA_Total (ISU)" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>B / propgclass / PGA_Top (ISGNU), PGA_Visible, PGA_Total (ISU)</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node050E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0510.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+These attributes replace the <a href="../Libraries_Manual_guide/node015B.html">Pot</a> and <a href="../Libraries_Manual_guide/node015C.html">Body</a> variables of the Release 1.3
+prop gadget. They are based on the use of proportional gadgets to control
+scrolling text.  When scrolling 100 lines of text in a 25 line visible
+window, you would set PGA_Total to 100, PGA_Visible to 25, and watch
+PGA_Top run from 0 to 75 (the top line of the last page).
+
+If the user clicks in the prop gadget but not on the knob, the entire knob
+jumps one &#034;page&#034; (the size of the visible area minus one, PGA_Visible-1).
+The page jump will leave an overlap of one line, unless the value
+PGA_Visible is 1, in which case the prop gadget acts as an integer numeric
+slider, sliding from 0 to PGA_Total - 1.
+
+Note that when PGA_Top changes, the gadget sends itself an <a href="../Libraries_Manual_guide/node04F9.html">OM_NOTIFY</a>
+message about this attribute change (see the <a href="../Libraries_Manual_guide/node0507.html">propgclass</a> description of
+<a href="../Libraries_Manual_guide/node0508.html">GM_HANDLEINPUT</a> for more information).  All three of these attributes have
+<a href="../Libraries_Manual_guide/node04C4.html">OM_UPDATE</a> access, so they can be controlled from other objects.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

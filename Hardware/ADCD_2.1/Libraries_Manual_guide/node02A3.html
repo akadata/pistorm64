@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_19" NODE="19-3-2-2" TITLE="19 / / I/O Request Completion / Ending Device Access" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>19 / / I/O Request Completion / Ending Device Access</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02A2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02A4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+After the device is closed, you must deallocate the I/O request memory.
+The exact method you use depends on how you allocated the memory in the
+first place.  For <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a> you call <a href="../Libraries_Manual_guide/node02A7.html#line11">FreeMem()</a>, for <a href="../Libraries_Manual_guide/node04B0.html#line6">CreateExtIO()</a> you
+call <a href="../Libraries_Manual_guide/node04B0.html#line6">DeleteExtIO()</a>, and for <a href="../Includes_and_Autodocs_2._guide/node0344.html">CreateIORequest()</a> you call <a href="../Includes_and_Autodocs_2._guide/node0348.html">DeleteIORequest()</a>.
+If you allocated the I/O request memory at compile time, you naturally
+have nothing to free.
+
+Finally, you must delete the message port you created.  You delete the
+message port by calling <a href="../Libraries_Manual_guide/node02ED.html#line26">DeleteMsgPort()</a> if you used <a href="../Libraries_Manual_guide/node02EC.html#line39">CreateMsgPort()</a>, or
+<a name="line11"><a href="../Libraries_Manual_guide/node02ED.html">DeletePort()</a> if you used <a href="../Libraries_Manual_guide/node02EC.html">CreatePort()</a>.</a>
+
+Here is the checklist for gracefully exiting:
+
+  * Abort any outstanding I/O requests with <a href="../Libraries_Manual_guide/node02A2.html#line30">AbortIO()</a>.
+
+  * Wait for the completion of any outstanding or aborted I/O
+    requests with <a href="../Libraries_Manual_guide/node02A0.html#line48">WaitIO()</a>.
+
+  * Close the device with <a href="../Libraries_Manual_guide/node02A2.html#line9">CloseDevice()</a>.
+
+  * Release the I/O request memory with either <a href="../Includes_and_Autodocs_2._guide/node0348.html">DeleteIORequest()</a>,
+    <a href="../Libraries_Manual_guide/node04B0.html#line6">DeleteExtIO()</a> or <a href="../Libraries_Manual_guide/node02A7.html#line11">FreeMem()</a> (as appropriate).
+
+  * Delete the message port with <a href="../Libraries_Manual_guide/node02ED.html#line26">DeleteMsgPort()</a> or <a href="../Libraries_Manual_guide/node02ED.html">DeletePort()</a>.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

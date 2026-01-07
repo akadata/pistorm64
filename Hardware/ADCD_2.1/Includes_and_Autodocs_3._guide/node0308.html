@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="OpenFont()" TITLE="graphics.library/OpenFont" -->
+<head>
+<title>graphics.library/OpenFont</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0307.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0309.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	OpenFont -- Get a pointer to a system font.
+
+<b>   SYNOPSIS</b>
+	font = OpenFont(textAttr)
+	D0              A0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line88">TextFont</a> *OpenFont(struct <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> *);
+
+<b>   FUNCTION</b>
+	This function searches the system font space for the graphics
+	text font that best matches the attributes specified.  The
+	pointer to the font returned can be used in subsequent
+	<a href="../Includes_and_Autodocs_3._guide/node0323.html">SetFont</a> and <a href="../Includes_and_Autodocs_3._guide/node02C4.html">CloseFont</a> calls.  It is important to match this
+	call with a corresponding <a href="../Includes_and_Autodocs_3._guide/node02C4.html">CloseFont</a> call for effective
+	management of ram fonts.
+
+<b>   INPUTS</b>
+	textAttr - a <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> or <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line71">TTextAttr</a> structure that describes the
+	           text font attributes desired.
+
+<b>   RESULT</b>
+	font is zero if the desired font cannot be found.  If the named
+	font is found, but the size and style specified are not
+	available, a font with the nearest attributes is returned.
+
+<b>   BUGS</b>
+	Prior to V39 this function would return a <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line88">TextFont</a> pointer
+	for any font which matched exactly in Y size, regardless of
+	differences in DPI, or DotSize.
+
+	As part of fixing this bug it is REQUIRED that you use pass the
+	same <a href="../Includes_and_Autodocs_3._guide/node05EC.html#line64">TextAttr</a> (or TTextAttr) to this function that was used when
+	<a href="../Includes_and_Autodocs_3._guide/node0137.html">OpenDiskFont()</a> was called.
+
+	OpenFont(), and <a href="../Includes_and_Autodocs_3._guide/node0137.html">OpenDiskFont()</a> use WeighTAMatch() to measure
+	how well two fonts match.  WeightTAMatch() was a public function
+	in graphics.library V36-V37; it is now a system PRIVATE function
+	as of V39.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node02C4.html">CloseFont()</a>  <a href="../Includes_and_Autodocs_3._guide/node0323.html">SetFont()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0137.html">diskfont.library/OpenDiskFont</a>  <a href="../Includes_and_Autodocs_3._guide/node05EC.html">graphics/text.h</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05E0.html">intuition/intuition.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

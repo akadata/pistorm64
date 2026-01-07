@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_34" NODE="34-1-5" TITLE="34 / Keymap Functions / Mapping ANSI Strings To Key Codes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>34 / Keymap Functions / Mapping ANSI Strings To Key Codes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node046D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node046F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node0314.html">MapANSI()</a> function translates ANSI strings into raw key codes,
+complete with qualifiers and (double) dead keys, based on a default or
+supplied keymap.
+
+    LONG MapANSI(UBYTE *string, LONG stringlength, UBYTE *buffer,
+                 LONG bufferlength, struct KeyMap *keymap);
+
+The string argument is a pointer to an ANSI string, of length
+stringlength. The buffer argument is a pointer to the memory block where
+the translated key codes will be placed.  The length of this buffer must
+be indicated in WORDs since each translation will occupy one byte for the
+key code and one for the qualifier. Since one ANSI character can be
+translated to two dead keys and one key, the buffer must be at least 3
+WORDs per character in the string to be translated. The keymap argument
+can be set to NULL if the default keymap is to be used, or can be a
+pointer to a <a href="../Libraries_Manual_guide/node046F.html">KeyMap</a> structure.  Upon return, the function will indicate
+how many key code/qualifier combinations are placed in the buffer or a
+negative number in case an error occurred. If zero is returned, the
+character could not be translated.
+
+The following example shows the usage of <a href="../Includes_and_Autodocs_2._guide/node0314.html">MapANSI()</a> and demonstrates how
+returned key codes can be processed.
+
+     <a href="../Libraries_Manual_guide/node05AE.html">mapansi.c</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

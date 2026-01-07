@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="arexx_cl" NODE="--datasheet--" TITLE="arexx_cl/--datasheet--" -->
+<head>
+<title>arexx_cl/--datasheet--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0052.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0054.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        arexx_cl -- ARexx interface class.
+
+<b>    SUPERCLASS</b>
+        rootclass
+
+<b>    DESCRIPTION</b>
+        This class provides you with a very easy way to implement an ARexx
+        interface.  It will setup a unique ARexx port, start ARexx macros,
+        parse commands and dispatch command handler functions.
+
+        All ARexx class methods and the callbacks you provide it are run in
+        the context of the task you call ARexx class from. Thus if your
+        application is a process, DOS is safe to use.
+
+<b>    METHODS</b>
+        OM_NEW -- Passed to superclass first.  Sets up the port.
+
+        OM_GET -- Returns requested attributes.  Passed onto superclass.
+
+        OM_DISPOSE -- Closes the port and frees all resources.  Passed onto
+            superclass
+
+        <a href="../Includes_and_Autodocs_3._guide/node0054.html">AM_EXECUTE</a> -- Executes an ARexx command or macro.
+
+        <a href="../Includes_and_Autodocs_3._guide/node0055.html">AM_HANDLEINPUT</a> -- Handles ARexx messages.
+
+<b>    ATTRIBUTES</b>
+        AREXX_HostName (STRPTR)
+            The name of the host.  The ARexx portname is derived from this.
+            In pretty much all cases, this should the same as your app's
+            basename.  You should refrain from using names like &#034;MYPROG_RX&#034;
+            or others with unnecessary suffixes.
+
+            To create the portname, the hostname will be uppercased, and,
+            unless AREXX_NoSlot is specified, a slot number will be
+            appended.
+
+            Applicability is (OM_NEW, OM_GET)
+
+        AREXX_NoSlot (BOOL)
+            Specifies that no slot number should be appended to the port
+            name when it is being created.  This greatly increases the
+            chances that your requested portname is in use, so your code
+            must be sure to handle this situation.
+
+            Defaults to FALSE.
+
+            Applicability is (OM_NEW)
+
+        AREXX_DefExtension (STRPTR)
+            Default filename extension for macros started by your app.  Do
+            not include the &#034;.&#034;, just the extension text.   In pretty much
+            all cases, this should be the same as your app's basename.  You
+            should refrain from using extensions like &#034;myrx&#034;.
+
+            Defaults to &#034;rexx&#034;.
+
+            Applicability is (OM_NEW)
+
+        AREXX_Commands (struct <a href="../Includes_and_Autodocs_3._guide/node05D5.html#line113">ARexxCmd</a> *)
+            The table of the commands supported by your ARexx interface.
+            This will be a pointer to an array of struct <a href="../Includes_and_Autodocs_3._guide/node05D5.html#line113">ARexxCmd</a>.  If this
+            array is not passed then your host will not be able to process
+            any ARexx commands.
+
+            The following fields must be setup initially by the app before
+            OM_NEW:
+
+                ac_Name (STRPTR)
+                The name of the command.  By convention this is usually all
+                uppercase, though a case-insensitive comparisons will be
+                done.
+
+                ac_ID (WORD)
+                A unique number identifying this command.
+
+                ac_Func (*()(struct <a href="../Includes_and_Autodocs_3._guide/node05D5.html#line113">ARexxCmd</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node0633.html#line97">RexxMsg</a> *))
+                A pointer to the function that will be called when this
+                command is received by your programme.  The function will
+                get past a pointer to its <a href="../Includes_and_Autodocs_3._guide/node05D5.html#line113">ARexxCmd</a> entry and the <a href="../Includes_and_Autodocs_3._guide/node0633.html#line97">RexxMsg</a>
+                structure received for the command.  You may use this
+                for setting ARexx variables, but please note that is may
+                be NULL
+
+                ac_ArgTemplate (STRPTR)
+                DOS ReadArgs()-style argument template for this command.
+
+                ac_Flags (ULONG)
+                Command flags.  Currently unused, but in order to remain
+                compatable, you must ensure that this is NULL.
+
+            These fields are ignored in OM_NEW and are set by the class
+            when calling the ac_Func command callback.
+
+                ac_ArgList (ULONG *)
+                Result of <a href="../Includes_and_Autodocs_3._guide/node01A1.html">ReadArgs()</a> using the arguments received with the
+                command and ac_ArgTemplate as the template.
+
+                ac_RC (LONG)
+                Primary result, the RC variable.  Also causes the RC2
+                variable to return, and will cause RESULT to NOT be set.
+
+                ac_RC2 (LONG)
+                Secundary result, the RC2 variable.  This will not be set
+                unless RC is non-zero.
+
+                ac_Result (STRPTR)
+                RESULT variable, this should be a string.  If you want to
+                return a number, you will have to convert it to a string
+                first.  This string will not be set if RC is non-zero.
+
+            The array must be terminated with a NULL ac_Name field.
+
+            Applicability is (OM_NEW)
+
+        AREXX_ErrorCode (ULONG *)
+            A pointer to storage space for OM_NEW to store an error code
+            when it fails trying to create the object.  Possible values
+            are:
+
+            RXERR_NO_COMMAND_LIST - No command list was provided.
+            RXERR_NO_PORT_NAME - No host base name was provided.
+            RXERR_PORT_ALREADY_EXISTS - The  class  was unable to create a
+                unique name of the base name you provided.
+            RXERR_OUT_OF_MEMORY - Not enough free memory.
+
+            No error code will be returned if you provide a NULL pointer.
+
+            Defaults NULL.
+
+            Applicability is (OM_NEW)
+
+        AREXX_SigMask (ULONG)
+            The signal mask for the object's message port.  This is the
+            signal you will want to <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait()</a> on so you know when there is
+            activity at the ARexx port.
+
+            Applicability is (OM_GET)
+
+        AREXX_ReplyHook (struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *)
+            This is a function hook that will get called whenever your host
+            replies to an ARexx message.  This generally happens after your
+            host has sent a message (eg. via AM_EXECUTE) and the task
+            receiving the message has completed its processing with the
+            message.  This is most useful for checking return codes from
+            commands sent via <a href="../Includes_and_Autodocs_3._guide/node0054.html">AM_EXECUTE</a>.
+
+            The object parameter in the hook function will point to the
+            <a href="../Includes_and_Autodocs_3._guide/node0636.html#line18">Object</a> * that is yur host, and the message parameter will be
+            the ARexx message that is being replied to (from which you
+            could extract result codes).
+
+            Defaults to NULL.
+
+            Applicability is (OM_NEW, OM_GET)
+
+<b>    BUGS</b>
+        AREXX_HostName MUST be all uppercase in V40 otherwise the checks for
+        an already existing port won't work right.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="DR2D-1-1-6" TITLE="The Global Drawing Attribute Chunks / AROW " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>The Global Drawing Attribute Chunks / AROW </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0251.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0253.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+AROW (0x41524F57)   	/* An arrow-head pattern */
+
+The AROW chunk describes an arrowhead pattern.  DR2D open polygons (OPLY)
+can have arrowheads attached to their endpoints.  See the description of
+the OPLY chunk later in this article for more information on the OPLY
+chunk.
+
+    #define ARROW_FIRST  0x01 /* Draw an arrow on the OPLY's first point */
+    #define ARROW_LAST   0x02 /* Draw an arrow on the OPLY's last point */
+
+    struct AROWstruct {
+        ULONG       ID;
+        ULONG       Size;
+        UBYTE       Flags;          /* Flags, from ARROW_*, above */
+        UBYTE       Pad0;           /* Should always 0 */
+        USHORT      ArrowID;        /* Name of the arrow head */
+        USHORT      NumPoints;
+        IEEE        ArrowPoints[NumPoints*2];
+    };
+
+The Flags field specifies which end(s) of an OPLY to place an arrowhead
+based on the #defines above.  ArrowID is the number by which an OPLY will
+reference this arrowhead pattern.
+
+The coordinates in the array ArrowPoints[] define the arrowhead's shape.
+These points form a closed polygon.  See the section on the OPLY/CPLY
+object chunks for a descriptionof how DR2D defines shapes. The arrowhead
+is drawn in the same coordinate system relative to the endpoint of the
+OPLY the arrowhead is attached to.  The arrowhead's origin (0,0) coincides
+with the OPLY's endpoint.  DR2D assumes that the arrowhead represented in
+the AROW chunk is pointing to the right so the proper rotation can be
+applied to the arrowhead.  The arrow is filled according to the current
+fill pattern set in the ATTR object attribute chunk.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

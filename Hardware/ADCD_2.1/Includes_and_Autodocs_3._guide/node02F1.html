@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="GfxNew()" TITLE="graphics.library/GfxNew" -->
+<head>
+<title>graphics.library/GfxNew</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02F0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02F2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       GfxNew -- allocate a graphics extended data structure (V36)
+
+<b>   SYNOPSIS</b>
+ 	result = GfxNew( node_type );
+	d0		 d0
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node060A.html#line16">ExtendedNode</a> *GfxNew( ULONG);
+
+<b>   FUNCTION</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01E5.html">Allocate</a> a special graphics extended data structure (each of which
+	begins with an <a href="../Includes_and_Autodocs_3._guide/node060A.html#line16">ExtendedNode</a> structure).  The type of structure to
+	be allocated is specified by the node_type identifier.
+
+<b>   INPUTS</b>
+	node_type = which type of graphics extended data structure to allocate.
+		    (see gfxnodes.h for identifier definitions.)
+
+<b>   RESULT</b>
+	result = a pointer to the allocated graphics node or NULL if the
+		 allocation failed.
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node060A.html">graphics/gfxnodes.h</a> <a href="../Includes_and_Autodocs_3._guide/node02EF.html">GfxFree()</a> <a href="../Includes_and_Autodocs_3._guide/node02EE.html">GfxAssociate()</a> GfxLookUp()
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

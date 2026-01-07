@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_23" NODE="23-2-7" TITLE="23 / List Functions / More on the Use of Named Lists" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>23 / List Functions / More on the Use of Named Lists</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node02E3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node02E5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To find multiple occurrences of nodes with identical names, the <a href="../Libraries_Manual_guide/node02E3.html#line5">FindName()</a>
+function is called multiple times.  For example, if you want to find all
+the nodes with the name pointed to by name:
+
+    VOID DisplayName(struct List *list,UBYTE *name)
+    {
+    struct Node *node;
+
+        if (node = FindName(list,name))
+            while (node)
+            {
+                printf(&#034;Found %s at location %lx\n&#034;,node-&#062;ln_Name,node);
+                node = FindName((struct List *)node,name);
+            }
+        else printf(&#034;No node with name %s found.\n&#034;,name);
+    }
+
+Notice that the second search uses the node found by the first search. The
+<a href="../Libraries_Manual_guide/node02E3.html#line5">FindName()</a> function never compares the specified name with that of the
+starting node.  It always begins the search with the successor of the
+starting point.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

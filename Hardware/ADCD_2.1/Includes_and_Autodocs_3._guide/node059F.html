@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="utility" NODE="FindNamedObject()" TITLE="utility.library/FindNamedObject" -->
+<head>
+<title>utility.library/FindNamedObject</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node059E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node05A0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FindNamedObject -- find the next object of a given name. (V39)
+
+<b>   SYNOPSIS</b>
+	object = FindNamedObject(nameSpace, name, lastObject);
+	D0                       A0         A1    A2
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node0631.html#line24">NamedObject</a> *FindNamedObject(struct <a href="../Includes_and_Autodocs_3._guide/node0631.html#line24">NamedObject</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>,
+					    struct <a href="../Includes_and_Autodocs_3._guide/node0631.html#line24">NamedObject</a> *);
+
+<b>   FUNCTION</b>
+	Finds an object and adds to the open count of the object. The
+	object is guaranteed not to be freed until <a href="../Includes_and_Autodocs_3._guide/node05AB.html">ReleaseNamedObject()</a> is
+	called. The name comparison is caseless, using the current
+	locale string comparison routines.
+
+	If name is NULL, then all objects will be matched.
+
+	If lastObject is non-NULL, it must be an object from the same
+	NameSpace found on a previous call to FindNamedObject(). It
+	will not be freed by this call. The search will start at the
+	node after lastobject, if non-NULL.
+
+	nameSpace is the name space from the named object given
+	or the root name space if NULL is given.
+
+<b>   INPUTS</b>
+	nameSpace - the name space to search
+	name - the name of the object to search for
+	lastObject - the starting point for the search or NULL
+
+<b>   RESULT</b>
+	object - the first match found, or NULL for no match
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node05AB.html">ReleaseNamedObject()</a>, <a href="../Includes_and_Autodocs_3._guide/node0631.html">&#060;utility/name.h&#062;</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

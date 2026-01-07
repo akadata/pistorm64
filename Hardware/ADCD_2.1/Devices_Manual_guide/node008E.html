@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_4" NODE="4-4-3" TITLE="4 / Writing to the Console Device / Example Console Control Sequences" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>4 / Writing to the Console Device / Example Console Control Sequences</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node008D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node008F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+                                     Character String       Numeric (hex)
+                                        Equivalent           Equivalent
+                                     ----------------       -------------
+    Move cursor right by 1:              &#060;CSI&#062;C or           9B 43
+                                         &#060;CSI&#062;1C             9B 31 43
+
+    Move cursor right by 20:             &#060;CSI&#062;20C            9B 32 30 43
+
+    Move cursor to upper-left corner
+    (Home Position)                      &#060;CSI&#062;H  or          9B 48
+                                         &#060;CSI&#062;1;1H or        9B 31 3B 31 48
+                                         &#060;CSI&#062;;1H or         9B 3B 31 48
+                                         &#060;CSI&#062;1;H            9B 31 3B 48
+    Move cursor to the fourth column
+    of the first line of the window:     &#060;CSI&#062;1;4H or        9B 31 3B 34 48
+                                         &#060;CSI&#062;;4H            9B 3B 34 48
+
+    Clear the window:                    &#060;FF&#062; or             0C
+                                         CTRL-L or
+    (home and clear to end of window)    &#060;CSI&#062;H&#060;CSI&#062;J        9B 48 9B 4A
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

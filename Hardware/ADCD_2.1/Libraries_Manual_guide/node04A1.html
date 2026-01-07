@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_37" NODE="37-1-4-8" TITLE="37 / / Advanced Tag Usage / Mapping Tag Attributes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>37 / / Advanced Tag Usage / Mapping Tag Attributes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node04A0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node04A2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+To translate all occurrences of an attribute to another attribute, the
+<a href="../Includes_and_Autodocs_2._guide/node03D9.html">MapTags()</a> function is used.
+
+For Release 2, the third parameter of this function is always TRUE (tags
+remain in the array even if they can't be mapped).
+
+    struct TagItem map_list[] =
+    {
+        /* Original     New */
+        {MGA_LeftEdge,  GA_LeftEdge},
+        {MGA_TopEdge,   GA_TopEdge},
+        {MGA_Width,     GA_Width},
+        {MGA_Height,    GA_Height},
+
+        /* Terminate the array */
+        {TAG_END},
+    }
+
+    /* Map the tags to the new attributes, keeping all attributes that
+     * aren't included in the mapping array */
+    MapTags(tags, map_list, TRUE);
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

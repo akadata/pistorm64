@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="DisplayBeep()" TITLE="intuition.library/DisplayBeep" -->
+<head>
+<title>intuition.library/DisplayBeep</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03A3.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03A5.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	DisplayBeep -- Flash the video display.
+
+<b>    SYNOPSIS</b>
+	DisplayBeep( <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> )
+		     A0
+
+	VOID DisplayBeep( struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> * );
+
+<b>    FUNCTION</b>
+	&#034;Beeps&#034; the video display by flashing the background color of the
+	specified screen.  If the screen argument is NULL, every screen
+	in the display will be beeped.  Flashing everyone's screen is not
+	a polite thing to do, so this should be reserved for dire
+	circumstances.
+
+	The reason such a routine is supported is because the Amiga has
+	no internal bell or speaker.  When the user needs to know of
+	an event that is not serious enough to require the use of a requester,
+	the DisplayBeep() function may be called.
+
+	New for V36:  Intuition now calls DisplayBeep through the
+	external library vector.  This means that if you call <a href="../Includes_and_Autodocs_3._guide/node0238.html">SetFunction()</a>
+	to replace DisplayBeep with an audible beep, for example, then
+	your change will affect even Intuition's calls to DisplayBeep.
+
+<b>    INPUTS</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> = pointer to a screen.  If NULL, every screen in the display
+           will be flashed
+
+<b>    RESULT</b>
+	None
+
+<b>    NOTES</b>
+	Since this function changes color zero of the affected screen(s),
+	surprising results could occur if the screen's owner reading
+	colors or perhaps cycling them.
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

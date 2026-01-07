@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/modules/loadilbm.c" NODE="MAIN" TITLE="Devices/modules/loadilbm.c" -->
+<head>
+<title>Devices/modules/loadilbm.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0304.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0306.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* loadilbm.c 05/91  C. Scheppner CBM
+ *
+ * High-level ILBM load routines
+ */
+
+#include &#034;iffp/ilbm.h&#034;
+#include &#034;iffp/ilbmapp.h&#034;
+
+extern struct Library *GfxBase;
+
+/* loadbrush
+ *
+ * Passed an initialized ILBMInfo with a not-in-use ParseInfo.iff
+ *   IFFHandle and desired propchks, collectchks, and stopchks, and filename,
+ *   will load an ILBM as a brush, setting up ilbm-&#062;Bmhd, ilbm-&#062;camg,
+ *   ilbm-&#062;brbitmap, ilbm-&#062;colortable, and ilbm-&#062;ncolors
+ *
+ *   Note that ncolors may be more colors than you can LoadRGB4.
+ *   Use MIN(ilbm-&#062;ncolors,MAXAMCOLORREG) for color count if you change
+ *   the colors yourself using 1.3/2.0 functions.
+ *
+ * Returns 0 for success or an IFFERR (libraries/iffparse.h)
+ */
+
+LONG loadbrush(struct ILBMInfo *ilbm, UBYTE *filename)
+{
+LONG error = 0L;
+
+    if(!(ilbm-&#062;ParseInfo.iff))	return(CLIENT_ERROR);
+
+    if(!(error = openifile((struct ParseInfo *)ilbm, filename, IFFF_READ)))
+	{
+	error = parseifile((struct ParseInfo *)ilbm,
+				ID_FORM, ID_ILBM,
+				ilbm-&#062;ParseInfo.propchks,
+				ilbm-&#062;ParseInfo.collectchks,
+				ilbm-&#062;ParseInfo.stopchks);
+	if((!error)||(error == IFFERR_EOC)||(error == IFFERR_EOF))
+	    {
+	    if(contextis(ilbm-&#062;ParseInfo.iff,ID_ILBM,ID_FORM))
+		{
+	    	if(error = createbrush(ilbm))   deletebrush(ilbm);
+		}
+	    else
+		{
+		closeifile((struct ParseInfo *)ilbm);
+		message(&#034;Not an ILBM\n&#034;);
+		error = NOFILE;
+		}
+	    }
+	}
+    return(error);
+}
+
+
+/* unloadbrush
+ *
+ * frees and close everything alloc'd/opened by loadbrush
+ */
+void unloadbrush(struct ILBMInfo *ilbm)
+{
+    closeifile((struct ParseInfo *)ilbm);
+    deletebrush(ilbm);
+}
+
+
+/* queryilbm
+ *
+ * Passed an initilized ILBMInfo with a not-in-use IFFHandle,
+ *   and a filename,
+ *   will open an ILBM, fill in ilbm-&#062;camg and ilbm-&#062;bmhd,
+ *   and close the ILBM.
+ *
+ * This allows you to determine if the ILBM is a size and
+ *   type you want to deal with.
+ *
+ * Returns 0 for success or an IFFERR (libraries/iffparse.h)
+ */
+
+/* query just wants these chunks */
+LONG queryprops[] = { ID_ILBM, ID_BMHD,
+		      ID_ILBM, ID_CAMG,
+                      TAG_DONE };
+
+/* scan can stop when a CMAP or BODY is reached */
+LONG querystops[] = { ID_ILBM, ID_CMAP,
+		      ID_ILBM, ID_BODY,
+		      TAG_DONE };
+
+LONG queryilbm(struct ILBMInfo *ilbm, UBYTE *filename)
+{
+LONG error = 0L;
+BitMapHeader *bmhd;
+
+    if(!(ilbm-&#062;ParseInfo.iff))	return(CLIENT_ERROR);
+
+    if(!(error = openifile((struct ParseInfo *)ilbm, filename, IFFF_READ)))
+	{
+	D(bug(&#034;queryilbm: openifile successful\n&#034;));
+
+	error = parseifile((struct ParseInfo *)ilbm,
+			ID_FORM, ID_ILBM,
+			queryprops, NULL, querystops);
+
+	D(bug(&#034;queryilbm: after parseifile, error = %ld\n&#034;,error));
+
+	if((!error)||(error == IFFERR_EOC)||(error == IFFERR_EOF))
+	    {
+	    if(contextis(ilbm-&#062;ParseInfo.iff,ID_ILBM,ID_FORM))
+		{
+		if(bmhd = (BitMapHeader*)
+			findpropdata(ilbm-&#062;ParseInfo.iff,ID_ILBM,ID_BMHD))
+		    {
+		    *(&#038;ilbm-&#062;Bmhd) = *bmhd;
+		    ilbm-&#062;camg = getcamg(ilbm);
+		    }
+		else error = NOFILE;
+		}
+	    else
+		{
+		message(&#034;Not an ILBM\n&#034;);
+		error = NOFILE;
+		}
+	    }
+	closeifile(ilbm);
+	}
+    return(error);
+}
+
+
+/* loadilbm
+ *
+ * Passed a not-in-use IFFHandle, an initialized ILBMInfo, and filename,
+ *   will load an ILBM into your already opened ilbm-&#062;scr, setting up
+ *   ilbm-&#062;Bmhd, ilbm-&#062;camg, ilbm-&#062;colortable, and ilbm-&#062;ncolors
+ *   and loading the colors into the screen's viewport
+ *
+ *   Note that ncolors may be more colors than you can LoadRGB4.
+ *   Use MIN(ilbm-&#062;ncolors,MAXAMCOLORREG) for color count if you change
+ *   the colors yourself using 1.3/2.0 functions.
+ *
+ * Returns 0 for success or an IFFERR (libraries/iffparse.h)
+ *
+ * NOTE - loadilbm() keeps the IFFHandle open so you can copy
+ *   or examine other chunks.  You must call closeifile(iff,ilbm)
+ *   to close the file and deallocate the parsed context
+ *
+ */
+
+LONG loadilbm(struct ILBMInfo *ilbm, UBYTE *filename)
+{
+LONG error = 0L;
+
+
+    D(bug(&#034;loadilbm:\n&#034;));
+
+    if(!(ilbm-&#062;ParseInfo.iff))	return(CLIENT_ERROR);
+    if(!ilbm-&#062;scr)		return(CLIENT_ERROR);
+
+    if(!(error = openifile((struct ParseInfo *)ilbm, filename, IFFF_READ)))
+	{
+	D(bug(&#034;loadilbm: openifile successful\n&#034;));
+
+	error = parseifile((struct ParseInfo *)ilbm,
+			ID_FORM, ID_ILBM,
+			ilbm-&#062;ParseInfo.propchks,
+			ilbm-&#062;ParseInfo.collectchks,
+			ilbm-&#062;ParseInfo.stopchks);
+
+	D(bug(&#034;loadilbm: after parseifile, error = %ld\n&#034;,error));
+
+	if((!error)||(error == IFFERR_EOC)||(error == IFFERR_EOF))
+	    {
+	    if(contextis(ilbm-&#062;ParseInfo.iff,ID_ILBM,ID_FORM))
+		{
+	    	error = loadbody(ilbm-&#062;ParseInfo.iff,
+					&#038;ilbm-&#062;scr-&#062;BitMap, &#038;ilbm-&#062;Bmhd);
+
+		D(bug(&#034;loadilbm: after loadbody, error = %ld\n&#034;,error));
+
+		if(!error)
+		    {
+		    if(!(getcolors(ilbm)))
+				LoadRGB4(&#038;ilbm-&#062;scr-&#062;ViewPort,ilbm-&#062;colortable,
+					MIN(ilbm-&#062;ncolors,MAXAMCOLORREG));
+		    }
+		}
+	    else
+		{
+		closeifile((struct ParseInfo *)ilbm);
+		message(&#034;Not an ILBM\n&#034;);
+		error = NOFILE;
+		}
+	    }
+	}
+    return(error);
+}
+
+
+/* unloadilbm
+ *
+ * frees and closes everything allocated by loadilbm
+ */
+void unloadilbm(struct ILBMInfo *ilbm)
+{
+    closeifile((struct ParseInfo *)ilbm);
+    freecolors(ilbm);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="CBump()" TITLE="graphics.library/CBump" -->
+<head>
+<title>graphics.library/CBump</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node02B8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node02BA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<b>   NAME</b>
+	CBump -  increment user copper list pointer (bump to next position in list).
+
+<b>   SYNOPSIS</b>
+	CBump( c )
+	      a1
+
+	void CBump( struct <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> * );
+
+<b>   FUNCTION</b>
+	Increment pointer to space for next instruction in user copper list.
+
+<b>   INPUTS</b>
+	c - pointer to <a href="../Includes_and_Autodocs_3._guide/node05F3.html#line88">UCopList</a> structure
+
+<b>   RESULTS</b>
+	User copper list pointer is incremented to next position.
+	Pointer is repositioned to next user copperlist instruction block
+	if the current block is full.
+
+	    Note: CBump is usually invoked for the programmer as part of the
+	          macro definitions <a href="../Includes_and_Autodocs_3._guide/node02C9.html">CWAIT</a> or <a href="../Includes_and_Autodocs_3._guide/node02C6.html">CMOVE</a>.
+
+<b>   BUGS</b>
+
+<b>   SEE ALSO</b>
+	CINIT() CWAIT() CMOVE() CEND() <a href="../Includes_and_Autodocs_3._guide/node05F3.html">graphics/copper.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

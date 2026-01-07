@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VIII-51/sana2device.doc" NODE="VIII-51-17" TITLE="sana2.device/S2_DEVICEQUERY" -->
+<head>
+<title>sana2.device/S2_DEVICEQUERY</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01F0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01F2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+NAME
+    DeviceQuery -- Return parameters for this network interface.
+
+FUNCTION
+    This command causes the device driver to report information about the
+    device. Up to SizeAvailable bytes of the information is copied
+    into a buffer pointed to by ios2_StatData. The format of the data is
+    as follows:
+
+        struct Sana2DeviceQuery
+        {
+        /*
+        ** Standard information
+        */
+            ULONG SizeAvailble; /* bytes available */
+            ULONG SizeSupplied; /* bytes supplied */
+            LONG  DevQueryFormat;   /* this is type 0 */
+            LONG  DeviceLevel;      /* this document is level 0 */
+
+        /*
+        ** Common information
+        */
+            UWORD AddrFieldSize;    /* address size in bits */
+            ULONG MTU;              /* maximum packet data size */
+            LONG  bps;              /* line rate (bits/sec) */
+            LONG  HardwareType;     /* what the wire is */
+
+        /*
+        ** Format specific information
+        */
+        };
+
+    The SizeAvailable specifies the number of bytes that the caller
+    is prepared to accomodate, including the standard information fields.
+
+    SizeSupplied is the number of bytes actually supplied,
+    including the standard information fields, which will not exceed
+    SizeAvailable.
+
+    &#060;devices/sana2.h&#062; includes constants for these values.  If your
+    hardware does not have a number assigned to it, you must contact
+    CATS to get a hardware number.
+
+IO REQUEST
+    ios2_Command    - S2_DEVICEQUERY.
+    ios2_StatData   - Pointer to Sana2DeviceQuery structure to fill in.
+
+RESULTS
+    ios2_Error      - Zero if successful; non-zero otherwise.
+    ios2_WireError  - More specific error number.
+
+NOTES
+
+SEE ALSO
+
+BUGS
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

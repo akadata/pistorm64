@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_3" NODE="3-7-2" TITLE="3 / Intuition Screens and the Graphics Library / Direct Screen Access" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>3 / Intuition Screens and the Graphics Library / Direct Screen Access</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node00F2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node00F4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Sometimes an application may want direct access to the custom screen's
+bitmap to use with low-level graphics library calls.  This may be useful
+if the application needs to do custom manipulation of the display but also
+needs Intuition functionality.  For instance, an application may want to
+use the graphics library primitives to perform double buffering then, when
+detecting user input, switch to Intuition control of the screen so that
+windows, gadgets and menus may be used to process the user input.  If an
+application chooses to combine these techniques, it must take special care
+to avoid conflicts with Intuition rendered graphics.  An example of how to
+<a name="line11">do this is listed in the next section, &#034;<a href="../Libraries_Manual_guide/node00F7.html">Advanced Screen Programming</a>&#034;.</a>
+
+Application programs that open <a href="../Libraries_Manual_guide/node00DF.html">custom screens</a> may use the screen's display
+memory in any way they choose.  However, this memory is also used by
+Intuition for windows and other high level display components on the
+screen.  Writing directly to the screen memory, whether through direct
+access or through graphics library calls that access the screen's
+<a href="../Libraries_Manual_guide/node00F1.html#line4">RastPort</a>, is not compatible with many Intuition constructs such as windows
+and menus.
+
+Techniques such as this require great care and understanding of the Amiga.
+If possible, the application should avoid these techniques and only use
+standard Intuition display and input processing.  Directly accessing the
+screen's bitmap, while possible, is not recommended.  A better way to
+access the screen display is through windows.  Windows provide access to
+the screen through layers which perform clipping and arbitration between
+<a name="line27">multiple drawing areas.</a>
+
+Alternatives to writing directly to a screen, such as using a backdrop
+window, greatly limit the number of cases where an application must access
+screen memory.  The <a href="../Libraries_Manual_guide/node00FC.html#line10">ShowTitle()</a> function allows the screen's title bar
+layer to be positioned in front of or behind any backdrop windows that are
+opened on the screen.  Hence, a backdrop window may be created that uses
+the entire visible area of the monitor. Application programs that use
+existing <a href="../Libraries_Manual_guide/node00E6.html">public screens</a> do not have the same freedom to access the
+screen's display memory as they do with <a href="../Libraries_Manual_guide/node00DF.html">custom screens</a>.  In general,
+public screens must be shared through the use of windows and menus rather
+than directly accessing the screen's display memory.
+
+    Use Direct Access Only On Screens You Own.
+    ------------------------------------------
+    An application may not steal the bitmap of a screen that it does not
+    own.  Stealing the Workbench screen's bitmap, or that of any other
+    <a href="../Libraries_Manual_guide/node00E6.html">public screen</a>, is strictly illegal.  Accessing the underlying
+    graphics structures of a screen may only be done on <a href="../Libraries_Manual_guide/node00DF.html">custom screens</a>
+<a name="line46">    opened by the application itself.</a>
+
+    Do Not Perform Layers Operations Directly.
+    ------------------------------------------
+    While <a href="../Libraries_Manual_guide/node03E2.html">layers</a> are not part of the graphics library, it is appropriate
+    to mention them here.  Certain types of layers operations are not
+    allowed with Intuition.  You may not, for example, call <a href="../Libraries_Manual_guide/node03EF.html#line17">SizeLayer()</a>
+    on a window (use <a href="../Libraries_Manual_guide/node0129.html">SizeWindow()</a> instead). To access layers library
+<a name="line54">    features with screens, use Intuition windows!</a>
+
+A <a href="../Libraries_Manual_guide/node00DF.html">custom screen</a> may be created to allow for modification of the screen's
+Copper list.  The Copper is the display synchronized co-processor that
+handles the actual video display by directly affecting the hardware
+registers.  See the Amiga <a href="../Hardware_Manual_guide/node0047.html">Hardware</a> Reference Manual or the <a href="../Libraries_Manual_guide/node0004.html">graphics</a>
+library chapters for more information on programming the Copper.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

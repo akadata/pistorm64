@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_26" NODE="26-2-3" TITLE="26 / Servicing Interrupts / Interrupt Handlers" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>26 / Servicing Interrupts / Interrupt Handlers</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0308.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node030A.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+As <a href="../Libraries_Manual_guide/node0306.html">described above</a>, an interrupt handler is a system routine that
+exclusively handles all processing related to a particular 4703 interrupt.
+There can only be one handler per 4703 interrupt.  Every interrupt handler
+consists of an <a href="../Libraries_Manual_guide/node0307.html">Interrupt</a> structure (as defined above) and a single
+assembly code routine.  Optionally, a data structure pointer may also be
+<a name="line7">provided.  This is particularly useful for ROM-resident interrupt code.</a>
+
+An interrupt handler is passed control as if it were a subroutine of Exec.
+Once the handler has finished its business, it must return to Exec by
+executing an RTS (return from subroutine) instruction rather than an RTE
+(return from exception) instruction. Interrupt handlers should be kept
+very short to minimize service-time overhead and thus minimize the
+possibilities of interrupt overruns. As <a href="../Libraries_Manual_guide/node0308.html">described above</a>, an interrupt
+handler has the normal scratch registers at its disposal.  In addition, A5
+and A6 are free for use.  These registers are saved by Exec as part of the
+<a name="line17">interrupt initiation cycle.</a>
+
+For the sake of efficiency, Exec passes certain register parameters to the
+handler (see the <a href="../Libraries_Manual_guide/node030A.html">list below</a>).  These register values may be utilized to
+trim a few microseconds off the execution time of a handler.  All of the
+following registers (D0/D1/A0/A1/A5/A6) may be used as scratch registers
+by an interrupt handler, and need not be restored prior to returning.
+
+    Don't Make Assumptions About Registers.
+    ---------------------------------------
+    Interrupt servers have different register usage rules (see the
+    &#034;<a href="../Libraries_Manual_guide/node030B.html">Interrupt Servers</a>&#034; section).
+
+ <a href="../Libraries_Manual_guide/node030A.html">Interrupt Handler Register Usage</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-6" TITLE="4 Intuition Windows / The Window Structure" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 Intuition Windows / The Window Structure</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0120.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0122.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> structure is the main Intuition data structure used to
+represent a window.  For the most part, applications treat this structure
+only as a handle.  Window operations are performed by calling system
+functions that take Window as an argument instead of directly manipulating
+fields within the structure.  However, there are some useful variables in
+<a name="line7">a Window structure which are discussed in this section.</a>
+
+   struct Window
+       {
+       struct Window *NextWindow;
+       WORD LeftEdge, TopEdge, Width, Height;
+       WORD MouseY, MouseX;
+       WORD MinWidth, MinHeight;
+       UWORD MaxWidth, MaxHeight;
+       ULONG Flags;
+       struct Menu *MenuStrip;
+       UBYTE *Title;
+       struct Requester *FirstRequest, *DMRequest;
+       WORD ReqCount;
+       struct Screen *WScreen;
+       struct RastPort *RPort;
+       BYTE BorderLeft, BorderTop, BorderRight, BorderBottom;
+       struct RastPort *BorderRPort;
+       struct Gadget *FirstGadget;
+       struct Window *Parent, *Descendant;
+       UWORD *Pointer;
+       BYTE PtrHeight, PtrWidth;
+<a name="line29">       BYTE XOffset, YOffset;</a>
+       ULONG IDCMPFlags;
+       struct MsgPort *UserPort, *WindowPort;
+<a name="line32">       struct IntuiMessage *MessageKey;</a>
+       UBYTE DetailPen, BlockPen;
+       struct Image *CheckMark;
+       UBYTE *ScreenTitle;
+       WORD GZZMouseX, GZZMouseY, GZZWidth, GZZHeight;
+       UBYTE *ExtData;
+       BYTE *UserData;
+       struct Layer *WLayer;
+       struct TextFont *IFont;
+       ULONG MoreFlags;
+<a name="line42">       };</a>
+
+LeftEdge, TopEdge, Width and Height
+    These variables reflect current position and size of the window.  If
+    the user sizes or positions the window, then these values will
+    change. The position of the window is relative to the upper left
+<a name="line48">    corner of the screen.</a>
+
+MouseX, MouseY, GZZMouseX, GZZMouseY
+    The current position of the Intuition pointer with respect to the
+    window, whether or not this window is currently the active one.  For
+    <a href="../Libraries_Manual_guide/node0116.html">GimmeZeroZero</a> windows, the GZZ variables reflect the position
+    relative to the inner layer (see &#034;Window Types&#034; below).  For normal
+    windows, the GZZ variables reflect the position relative to the
+<a name="line56">    window origin after taking the borders into account.</a>
+
+ReqCount
+    Contains a count of the number of requesters currently displayed in
+    the window.  Do not rely on the value in this field, instead use
+    <a href="../Libraries_Manual_guide/node01DF.html">IDCMP_REQSET</a> and <a href="../Libraries_Manual_guide/node01DF.html#line4">IDCMP_REQCLEAR</a> to indirectly determine the number of
+<a name="line62">    open requesters in the window.</a>
+
+WScreen
+    A pointer to the <a href="../Libraries_Manual_guide/node00DE.html#line6">Screen</a> structure of the screen on which this window
+<a name="line66">    was opened.</a>
+
+RPort
+    A pointer to this window's <a href="../Libraries_Manual_guide/node0102.html#line8">RastPort</a> structure.  Use this RastPort
+    pointer to render into your window with Intuition or graphics library
+<a name="line71">    rendering functions.</a>
+
+BorderLeft, BorderTop, BorderRight, BorderBottom
+    These variables describe the actual size of the window borders. The
+<a name="line75">    border size is not changed after the window is opened.</a>
+
+BorderRPort
+    With <a href="../Libraries_Manual_guide/node0116.html">GimmeZeroZero</a> windows, this variable points to the <a href="../Libraries_Manual_guide/node0102.html#line8">RastPort</a> for
+<a name="line79">    the outer layer, in which the border gadgets are kept.</a>
+
+UserData
+    This pointer is available for application use.  The program can
+    attach a data block to this window by setting this variable to point
+    to the data.
+
+For a commented listing of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> structure see
+&#060;intuition/<a href="../Includes_and_Autodocs_2._guide/node00D4.html">intuition.h</a>&#062; in the Amiga ROM Kernel Reference Manual: Includes
+and Autodocs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

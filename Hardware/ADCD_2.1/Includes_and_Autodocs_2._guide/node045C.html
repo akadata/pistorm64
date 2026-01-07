@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/graphics" NODE="ModeNotAvailable()" TITLE="graphics.library/ModeNotAvailable" -->
+<head>
+<title>graphics.library/ModeNotAvailable</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node045B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node045D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    ModeNotAvailable -- check to see if a DisplayID isn't available. (V36)
+
+SYNOPSIS
+    error =  ModeNotAvailable( modeID )
+    d0                         d0
+
+    ULONG   ModeNotAvailable( ULONG);
+
+FUNCTION
+    returns an error code, indicating why this modeID is not available,
+    or NULL if there is no reason known why this mode should not be there.
+
+INPUTS
+    modeID -- a 32 bit DisplayInfoRecord identifier.
+
+RESULT
+    error -- a general indication of why this modeID is not available,
+             or NULL if there is no reason why it shouldn't be available.
+
+NOTE
+    ULONG return values from this function are a proper superset of the
+    DisplayInfo.NotAvailable field (defined in <a href="../Includes_and_Autodocs_2._guide/node00BD.html">graphics/displayinfo.h)</a>.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node00BD.html">graphics/displayinfo.h</a>, <a href="../Includes_and_Autodocs_2._guide/node044A.html">GetVPModeID()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

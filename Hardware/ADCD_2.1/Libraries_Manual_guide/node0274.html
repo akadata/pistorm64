@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_15" NODE="15-3-13-1" TITLE="15 / / Keyboard Equivalents / Denoting a Gadget's Keyboard Equivalent" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>15 / / Keyboard Equivalents / Denoting a Gadget's Keyboard Equivalent</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0273.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0275.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+In order to denote the key equivalent, the application may add a
+marker-symbol to the gadget label.  This is done by placing the
+marker-symbol immediately before the character to be underscored.  This
+symbol can be any character that is not used in the label.  The underscore
+character, `_' is the recommended marker-symbol.  So, for example, to mark
+the letter &#034;F&#034; as the keyboard equivalent for a button labelled &#034;Select
+Font...&#034;, create the gadget text:
+
+<a name="line10">    ng.ng_GadgetText = &#034;Select _Font...&#034;;</a>
+
+To inform GadTools of the underscore in the label, pass the GA_Underscore
+tag to <a href="../Libraries_Manual_guide/node025A.html">CreateGadget()</a> or <a href="../Libraries_Manual_guide/node025A.html">CreateGadgetA()</a>.  The data-value associated with
+this tag is a character, not a string, which is the marker-symbol used in
+the gadget label:
+
+    GA_Underscore, '_',/* Note '_', not &#034;_&#034; !!! */
+
+GadTools will create a gadget label which consists of the text supplied
+with the marker-symbol removed and the character following the
+marker-symbol underscored.
+
+The gadget's label would look something like:
+
+    Select Font...
+           -
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

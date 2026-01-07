@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="intuition" NODE="RemakeDisplay()" TITLE="intuition.library/RemakeDisplay" -->
+<head>
+<title>intuition.library/RemakeDisplay</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node03DF.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node03E1.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	RemakeDisplay -- Remake the entire Intuition display.
+
+<b>    SYNOPSIS</b>
+	failure = RemakeDisplay()
+	D0 (V39)
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> RemakeDisplay( VOID );
+	/* Returns <a href="../Includes_and_Autodocs_3._guide/node0654.html#line39">LONG</a> in V39 and greater */
+
+<b>    FUNCTION</b>
+	This is the big one.
+
+	This procedure remakes the entire <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line63">View</a> structure for the
+	Intuition display.  It does the equivalent of <a href="../Includes_and_Autodocs_3._guide/node03C4.html">MakeScreen()</a> for
+	every screen in the system, and then it calls the internal
+	equivalent of <a href="../Includes_and_Autodocs_3._guide/node03E7.html">RethinkDisplay()</a>.
+
+	WARNING:  This routine can take many milliseconds to run, so
+	do not use it lightly.
+
+	Calling <a href="../Includes_and_Autodocs_3._guide/node03C4.html">MakeScreen()</a> followed by <a href="../Includes_and_Autodocs_3._guide/node03E7.html">RethinkDisplay()</a> is typically
+	a more efficient method for affecting changes to a single
+	screen's <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line46">ViewPort</a>.
+
+<b>    INPUTS</b>
+	None
+
+<b>    RESULT</b>
+	Starting with V39, returns zero for success, non-zero for failure.
+	Probable cause of failure is failure of <a href="../Includes_and_Autodocs_3._guide/node02FF.html">graphics.library/MakeVPort()</a>
+	or of <a href="../Includes_and_Autodocs_3._guide/node0303.html">graphics.library/MrgCop()</a>.
+	Prior to V39, the return code is invalid.  Do not interpret it when
+	running on pre-V39 systems!
+
+<b>    BUGS</b>
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node03C4.html">MakeScreen()</a>, <a href="../Includes_and_Autodocs_3._guide/node03E7.html">RethinkDisplay()</a>, <a href="../Includes_and_Autodocs_3._guide/node02FF.html">graphics.library/MakeVPort()</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0303.html">graphics.library/MrgCop()</a>, <a href="../Includes_and_Autodocs_3._guide/node02FD.html">graphics.library/LoadView()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/utility" NODE="TagInArray()" TITLE="utility.library/TagInArray" -->
+<head>
+<title>utility.library/TagInArray</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03E0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03E2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    TagInArray  -- Check if a Tag value appears in a Tag array. (V36)
+
+SYNOPSIS
+    BOOL TagInArray( tag, tagArray )
+    D0               D0   A0
+
+    BOOL TagInArray( Tag tag, Tag *tagArray);
+
+FUNCTION
+    Perform a quick scan to see if a tag value appears in
+    an array terminated with TAG_END.  Returns TRUE if
+    the value is found.
+
+    The 'tagArray' must be terminated by TAG_END.  It should
+    NOT contain other system tag values, such as TAG_MORE
+    or TAG_IGNORE.  Note that this is an array of Tag values, NOT
+    an array of TagItems.
+
+    This is sort of a &#034;one shot&#034; version of <a href="../Includes_and_Autodocs_2._guide/node03D5.html">FilterTagItems()</a>.
+
+INPUTS
+    tag             - Tag value to search array for.
+    tagArray        - a simple array terminated by TAG_END.
+
+RESULT
+    Boolean success of search.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node03D5.html">FilterTagItems()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

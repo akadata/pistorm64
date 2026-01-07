@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Speak_Narrator.c" NODE="MAIN" TITLE="Devices/Dev_examples/Speak_Narrator.c" -->
+<head>
+<title>Devices/Dev_examples/Speak_Narrator.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node01A9.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node01AB.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Speak_Narrator.c
+ *
+ * This example program sends a string of phonetic text to the narrator
+ * device twice, changing some of the characteristics the second time.
+ *
+ * Compile with SAS C 5.10  lc -b1 -cfistq -v -y -L
+ *
+ * Requires Kickstart V37 or greater.
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/exec.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;devices/narrator.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/dos_protos.h&#062;
+
+#include &#060;string.h&#062;
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }     /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+void main(void)
+{
+struct  MsgPort     *VoiceMP;
+struct  narrator_rb *VoiceIO;
+UBYTE   *PhoneticText    = &#034;DHIHS IHZ AHMIY5GAH SPIY5KIHNX.&#034;;
+BYTE    audio_chan[4]   = {3, 5, 10, 12};
+
+if (VoiceMP=CreateMsgPort())  /* Create the message port */
+  {                           /* Create the I/O request */
+  if (VoiceIO = CreateIORequest(VoiceMP,sizeof(struct narrator_rb)))
+    {
+    /*Set the NEWIORB bit in the flags field to use the new fields*/
+    VoiceIO-&#062;flags = NDF_NEWIORB;
+
+    /* Open the narrator device */
+    if (OpenDevice(&#034;narrator.device&#034;,0,(struct IORequest *)VoiceIO,0L))
+        /* Inform user that it could not be opened */
+        printf(&#034;Error: narrator.device did not open\n&#034;);
+    else
+        {
+         /* Speak the string using the default parameters */
+         VoiceIO-&#062;ch_masks = &#038;audio_chan[0];
+         VoiceIO-&#062;nm_masks = sizeof(audio_chan);
+         VoiceIO-&#062;message.io_Command = CMD_WRITE;
+         VoiceIO-&#062;message.io_Data = PhoneticText;
+         VoiceIO-&#062;message.io_Length = strlen(PhoneticText);
+         DoIO(VoiceIO);
+
+         /* Now change some of the characteristics:
+          *    Raise the first formant, lower the third formant,
+          *    and move 50% of the way towards AO.
+          * and speak it again.
+          */
+
+        VoiceIO-&#062;A1adj = -32;          /* Shut off first formant  */
+        VoiceIO-&#062;A3adj =  11;          /* Raise the third formant */
+        VoiceIO-&#062;centralize = 50;      /* Move 50% of the way     */
+        VoiceIO-&#062;centphon = &#034;AO&#034;;      /* towards AO              */
+        DoIO(VoiceIO);
+
+        /* Close the narrator device */
+        CloseDevice((struct IORequest *)VoiceIO);
+        }
+    /* Delete the IORequest */
+    DeleteIORequest(VoiceIO);
+    }
+  else
+    /* Inform user that the I/O request could be created */
+    printf(&#034;Error: Could not create I/O request\n&#034;);
+
+  /* Delete the message port */
+  DeleteMsgPort(VoiceMP);
+  }
+else
+  /* Inform user that the message port could not be created */
+  printf(&#034;Error: Could not create message port\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="SetDMRequest()" TITLE="intuition.library/SetDMRequest" -->
+<head>
+<title>intuition.library/SetDMRequest</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node024F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0251.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SetDMRequest -- Set the DMRequest of a window.
+
+SYNOPSIS
+    success = SetDMRequest( <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a>, DMRequest )
+    D0                      A0      A1
+
+    BOOL SetDMRequest( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> * );
+
+FUNCTION
+    Attempts to set the DMRequest into the specified window.
+    The DMRequest is the special requester that you attach to
+    the double-click of the menu button which the user can then
+    bring up on demand.  This routine WILL NOT change the DMRequest
+    if it's already set and is currently active (in use by the user).
+    After having called SetDMRequest(), if you want to change the
+    DMRequest, the correct way to start is by calling <a href="../Includes_and_Autodocs_2._guide/node0204.html">ClearDMRequest()</a>
+    until it returns a value of TRUE; then you can call SetDMRequest()
+    with the new DMRequest.
+
+    If the POINTREL flag is set in the DMRequest, the DMR will open as
+    close to the pointer as possible.  The RelLeft/Top fields are
+    for fine-tuning the position.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> = pointer to the window from which the DMRequest is to be set
+    DMRequest = a pointer to a requester
+
+RESULT
+    If the current DMRequest was not in use, sets the DMRequest
+        pointer into the window and returns TRUE.
+    If the DMRequest was currently in use, doesn't change the pointer
+        and returns FALSE
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0204.html">ClearDMRequest()</a>, <a href="../Includes_and_Autodocs_2._guide/node0249.html">Request()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

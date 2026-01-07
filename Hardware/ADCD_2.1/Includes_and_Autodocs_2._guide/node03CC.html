@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/mathffp" NODE="SPTst()" TITLE="mathffp.library/SPTst" -->
+<head>
+<title>mathffp.library/SPTst</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node03CB.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node03CD.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SPTst - Compares a float against zero (0.0).
+
+SYNOPSIS
+    result = SPTst(fnum)
+    D0             D1
+
+    int SPTst(float fnum);
+
+FUNCTION
+    Accepts a floating point number and returns the condition
+    codes set to indicate the result of a comparison against
+    the value of zero (0.0).  Additionally, the integer functional
+    result is returned.
+
+INPUTS
+    fnum    - floating point number.
+
+RESULT
+    Condition codes set to reflect the following branches:
+
+            EQ - fnum =  0.0
+            NE - fnum != 0.0
+            PL - fnum &#062;= 0.0
+            MI - fnum &#060;  0.0
+
+    Integer functional result as:
+
+            +1 =&#062; fnum &#062; 0.0
+            -1 =&#062; fnum &#060; 0.0
+             0 =&#062; fnum = 0.0
+
+BUGS
+    None.
+
+SEE ALSO
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

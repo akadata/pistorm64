@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_4" NODE="4-5-1" TITLE="4 / Reading from the Console Device / Information About The Input Stream" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>4 / Reading from the Console Device / Information About The Input Stream</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node008F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0091.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For the most part, keys whose keycaps are labeled with ANSI-standard
+characters will ordinarily be translated into their ASCII-equivalent
+character by the console device through the use of its keymap. Keymap
+information can be found in the &#034;<a href="../Libraries_Manual_guide/node0468.html">Keymap Library</a>&#034; chapter of the Amiga
+ROM Kernel Reference Manual: Libraries.
+
+For keys other than those with normal ASCII equivalents, an escape
+sequence is generated and inserted into your input stream.  For example,
+in the default state (no raw input events selected)  the function, arrow
+and special keys (reserved for 101 key keyboards) will cause the sequences
+shown in the next table to be inserted in the input stream.
+
+                      SPECIAL KEY REPORT SEQUENCES
+
+     Key        Unshifted Sends     Shifted Sends
+     ---        ---------------     -------------
+     F1            &#060;CSI&#062;0~            &#060;CSI&#062;10~
+     F2            &#060;CSI&#062;1~            &#060;CSI&#062;11~
+     F3            &#060;CSI&#062;2~            &#060;CSI&#062;12~
+     F4            &#060;CSI&#062;3~            &#060;CSI&#062;13~
+     F5            &#060;CSI&#062;4~            &#060;CSI&#062;14~
+     F6            &#060;CSI&#062;5~            &#060;CSI&#062;15~
+     F7            &#060;CSI&#062;6~            &#060;CSI&#062;16~
+     F8            &#060;CSI&#062;7~            &#060;CSI&#062;17~
+     F9            &#060;CSI&#062;8~            &#060;CSI&#062;18~
+     F10           &#060;CSI&#062;9~            &#060;CSI&#062;19~
+     F11           &#060;CSI&#062;20~           &#060;CSI&#062;30~ (101 key keyboard)
+     F12           &#060;CSI&#062;21~           &#060;CSI&#062;31~ (101 key keyboard)
+     HELP          &#060;CSI&#062;?~            &#060;CSI&#062;?~  (same sequence for both)
+     Insert        &#060;CSI&#062;40~           &#060;CSI&#062;50~ (101 key keyboard)
+     Page Up       &#060;CSI&#062;41~           &#060;CSI&#062;51~ (101 key keyboard)
+     Page Down     &#060;CSI&#062;42~           &#060;CSI&#062;52~ (101 key keyboard)
+     Pause/Break   &#060;CSI&#062;43~           &#060;CSI&#062;53~ (101 key keyboard)
+     Home          &#060;CSI&#062;44~           &#060;CSI&#062;54~ (101 key keyboard)
+     End           &#060;CSI&#062;45~           &#060;CSI&#062;55~ (101 key keyboard)
+
+     Arrow keys:
+     Up            &#060;CSI&#062;A             &#060;CSI&#062;T
+     Down          &#060;CSI&#062;B             &#060;CSI&#062;S
+     Left          &#060;CSI&#062;D             &#060;CSI&#062;A   (notice the space
+     Right         &#060;CSI&#062;C             &#060;CSI&#062;@    after &#060;CSI&#062;)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

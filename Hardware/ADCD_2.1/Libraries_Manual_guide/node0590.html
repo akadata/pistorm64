@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Lib_examples/tasklist.c" NODE="MAIN" TITLE="Lib_examples/tasklist.c" -->
+<head>
+<title>Lib_examples/tasklist.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node058F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0591.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* tasklist.c - Execute me to compile me with SAS C 5.10
+LC -b1 -cfistq -v -y -j73 tasklist.c
+Blink FROM LIB:c.o,tasklist.o TO tasklist LIBRARY LIB:LC.lib,LIB:Amiga.lib
+quit
+
+tasklist.c - Snapshots and prints the ExecBase task list
+*/
+#include &#060;exec/types.h&#062;
+#include &#060;exec/lists.h&#062;
+#include &#060;exec/nodes.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/execbase.h&#062;
+
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+#include &#060;string.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }   /* disable SAS/C CTRL-C handing */
+int chkabort(void) {return(0); }
+#endif
+
+static UBYTE *VersTag = &#034;$VER: tasklist 37.2 (31.3.92)&#034;;
+extern struct ExecBase *SysBase;
+
+/* Use extended structure to hold task information */
+struct TaskNode {
+    struct Node tn_Node;
+    ULONG tn_TaskAddress;
+    ULONG tn_SigAlloc;
+    ULONG tn_SigWait;
+    UBYTE tn_Name[32];
+};
+
+
+
+
+void main(int argc, char **argv)
+{
+    struct List *ourtasklist;
+    struct List *exectasklist;
+    struct Task *task;
+    struct TaskNode *node, *tnode, *rnode = NULL;
+    struct Node *execnode;
+
+    /* Allocate memory for our list */
+    if (ourtasklist = AllocMem(sizeof(struct List), MEMF_CLEAR)) {
+        /* Initialize list structure (ala NewList()) */
+        ourtasklist-&#062;lh_Head = (struct Node *)&#038;ourtasklist-&#062;lh_Tail;
+        ourtasklist-&#062;lh_Tail = 0;
+        ourtasklist-&#062;lh_TailPred = (struct Node *)&#038;ourtasklist-&#062;lh_Head;
+
+        /* Make sure tasks won't switch lists or go away */
+        Disable();
+
+        /* Snapshot task WAIT list */
+        exectasklist = &#038;(SysBase-&#062;TaskWait);
+        for (execnode = exectasklist-&#062;lh_Head;
+                 execnode-&#062;ln_Succ; execnode = execnode-&#062;ln_Succ)
+        {
+            if (tnode = AllocMem(sizeof(struct TaskNode), MEMF_CLEAR))
+            {
+                /* Save task information we want to print */
+                strncpy(tnode-&#062;tn_Name, execnode-&#062;ln_Name, 32);
+                tnode-&#062;tn_Node.ln_Pri = execnode-&#062;ln_Pri;
+                tnode-&#062;tn_TaskAddress = (ULONG)execnode;
+                tnode-&#062;tn_SigAlloc = ((struct Task *)execnode)-&#062;tc_SigAlloc;
+                tnode-&#062;tn_SigWait = ((struct Task*)execnode)-&#062;tc_SigWait;
+                AddTail(ourtasklist, (struct Node *)tnode);
+            }
+            else break;
+        }
+
+        /* Snapshot task READY list */
+        exectasklist = &#038;(SysBase-&#062;TaskReady);
+        for (execnode = exectasklist-&#062;lh_Head;
+                 execnode-&#062;ln_Succ; execnode = execnode-&#062;ln_Succ)
+        {
+            if (tnode = AllocMem(sizeof(struct TaskNode), MEMF_CLEAR))
+            {
+                /* Save task information we want to print */
+                strncpy(tnode-&#062;tn_Name, execnode-&#062;ln_Name, 32);
+                tnode-&#062;tn_Node.ln_Pri = execnode-&#062;ln_Pri;
+                tnode-&#062;tn_TaskAddress = (ULONG)execnode;
+                tnode-&#062;tn_SigAlloc = ((struct Task *)execnode)-&#062;tc_SigAlloc;
+                tnode-&#062;tn_SigWait = ((struct Task*)execnode)-&#062;tc_SigWait;
+                AddTail(ourtasklist, (struct Node *)tnode);
+                if(!rnode)  rnode = tnode;  /* first READY task */
+            }
+            else
+                break;
+        }
+
+        /* Re-enable interrupts and taskswitching */
+        Enable();
+
+        /* Print now (printing above would have defeated a Forbid or Disable) */
+        printf(&#034;Pri Address     SigAlloc    SigWait    Taskname\n&#034;);
+
+        node = (struct TaskNode *)(ourtasklist-&#062;lh_Head);
+        printf(&#034;\nWAITING:\n&#034;);
+        while (tnode = (struct TaskNode *)node-&#062;tn_Node.ln_Succ)
+        {
+            if(tnode == rnode)
+                printf(&#034;\nREADY:\n&#034;);  /* we set rnode above */
+            printf(&#034;%02d  0x%08lx  0x%08lx  0x%08lx %s\n&#034;,
+                    node-&#062;tn_Node.ln_Pri, node-&#062;tn_TaskAddress, node-&#062;tn_SigAlloc,
+                    node-&#062;tn_SigWait, node-&#062;tn_Name);
+
+            /* Free the memory, no need to remove the node, referenced once only */
+            FreeMem(node,sizeof(struct TaskNode));
+            node = tnode;
+        }
+        FreeMem(ourtasklist, sizeof(struct List));
+
+        /* Say who we are */
+        printf(&#034;\nTHIS TASK:\n&#034;);
+        task = FindTask(NULL);
+        printf(&#034;%02d  0x%08lx  0x%08lx  0x%08lx %s\n&#034;,
+                task-&#062;tc_Node.ln_Pri, task, task-&#062;tc_SigAlloc,
+                task-&#062;tc_SigWait, task-&#062;tc_Node.ln_Name);
+
+    }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/exec" NODE="Cause()" TITLE="exec.library/Cause" -->
+<head>
+<title>exec.library/Cause</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node033C.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node033E.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+   Cause -- cause a software interrupt
+
+SYNOPSIS
+   Cause(interrupt)
+         A1
+
+   void Cause(struct <a href="../Includes_and_Autodocs_2._guide/node008C.html#line23">Interrupt</a> *);
+
+FUNCTION
+    This function causes a software interrupt to occur.  If it is
+    called from user mode (and processor level 0), the software
+    interrupt will preempt the current task.  This call is often used
+    by high-level hardware interrupts to defer medium-length processing
+    down to a lower interrupt level.  Note that a software interrupt is
+    still a real interrupt, and must obey the same restrictions on what
+    system function it may call.
+
+    Currently only 5 software interrupt priorities are implemented:
+    -32, -16, 0, +16, and +32.  Priorities in between are truncated,
+    values outside the -32/+32 range are not allowed.
+
+NOTE
+    When setting up the <a href="../Includes_and_Autodocs_2._guide/node008C.html#line23">Interrupt</a> structure, set the node type to
+    NT_INTERRUPT, or NT_UNKOWN.
+
+IMPLEMENTATION
+    1&#062; Checks if the node type is NT_SOFTINT.  If so does nothing since
+       the softint is already pending.  No nest count is maintained.
+    2&#062; Sets the node type to NT_SOFTINT.
+    3&#062; Links into one of the 5 priority queues.
+    4&#062; Pokes the hardware interrupt bit used for softints.
+
+    The node type returns to NT_INTERRUPT after removal from the list.
+
+INPUTS
+    interrupt - pointer to a properly initialized interrupt node
+
+BUGS
+    Unlike other Interrupts, SoftInts must preserve the value of A6.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

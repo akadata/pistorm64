@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="RGBN-1" TITLE="RGBN-RGB8.doc / RGBN BODY Chunk " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>RGBN-RGB8.doc / RGBN BODY Chunk </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node028A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node028C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+For each RGB value, a WORD (16-bits) is written: with the 12 RGB bits in
+the MSB (most significant bit) positions; the &#034;genlock&#034; bit next; and then
+a 3 bit repeat count. If the repeat count is greater than 7, the 3-bit
+count is zero, and a BYTE repeat count follows.  If the repeat count is
+greater than 255, the BYTE count is zero, and a WORD repeat count follows.
+Repeat counts greater than 65536 are not supported.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

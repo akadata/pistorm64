@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_31" NODE="31-10" TITLE="31 Commodities Exchange Library / CxObject Errors" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>31 Commodities Exchange Library / CxObject Errors</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node040A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node040C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A Commodities Exchange function that acts on a <a href="../Libraries_Manual_guide/node0407.html">CxObject</a> records errors in
+the CxObject's accumulated error field.  The function <a href="../Includes_and_Autodocs_2._guide/node01A6.html">CxObjError()</a> returns
+a CxObject's error field.
+
+    co_errorfield = LONG CxObjError( CxObj *co );
+
+Each bit in the error field corresponds to a specific type of error.  The
+following is a list of the currently defined <a href="../Includes_and_Autodocs_2._guide/node00F0.html#line156">CxObject errors</a> and their
+corresponding bit mask constants.
+<a name="line11"></a>
+
+    Error Constant    Meaning
+    --------------    -------
+    COERR_ISNULL      <a href="../Includes_and_Autodocs_2._guide/node01A6.html">CxObjError()</a> was passed a NULL.
+    COERR_NULLATTACH  Someone tried to attach a NULL <a href="../Libraries_Manual_guide/node0407.html">CxObject</a> to this
+                      CxObject.
+    COERR_BADFILTER   This <a href="../Libraries_Manual_guide/node0407.html">filter CxObject</a> currently has an invalid
+                      filter description.
+    COERR_BADTYPE     Someone tried to perform a type specific function
+                      on the wrong type of <a href="../Libraries_Manual_guide/node0407.html">CxObject</a> (for example calling
+                      <a href="../Libraries_Manual_guide/node0410.html#line66">SetFilter()</a> on a <a href="../Libraries_Manual_guide/node0409.html">sender CxObject</a>).
+
+
+The remaining bits are reserved for future use.  <a href="../Libraries_Manual_guide/node0587.html">HotKey.c</a>
+checks the error field of its <a href="../Libraries_Manual_guide/node0407.html">filter CxObject</a> to make sure the filter is
+valid.  HotKey.c does not need to check the other objects with
+<a href="../Includes_and_Autodocs_2._guide/node01A6.html">CxObjError()</a> because it already makes sure that these other objects are
+not NULL, which is the only other kind of error the other objects can
+<a name="line30">cause in this situation.</a>
+
+Commodities Exchange has a function that clears a <a href="../Libraries_Manual_guide/node0407.html">CxObject</a>'s accumulated
+error field, <a href="../Includes_and_Autodocs_2._guide/node01A0.html">ClearCxObjError()</a>.
+
+    void ClearCxObjError( CxObj *co );
+
+A commodity should be careful about using this, especially on a <a href="../Libraries_Manual_guide/node0403.html">filter</a>.
+If a commodity clears a filter's error field and the COERR_BADFILTER bit
+is set, Commodities Exchange will think that the filter is OK and start
+sending messages through it.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

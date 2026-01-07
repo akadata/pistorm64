@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="SetGadgetAttrsA()" TITLE="intuition.library/SetGadgetAttrsA" -->
+<head>
+<title>intuition.library/SetGadgetAttrsA</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0251.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0253.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SetGadgetAttrsA -- Specify attribute values for a boopsi gadget. (V36)
+    SetGadgetAttrs -- Varargs stub for SetGadgetAttrsA(). (V36)
+
+SYNOPSIS
+    result = SetGadgetAttrsA( <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a>, TagList )
+    D0                        A0      A1      A2         A3
+
+    ULONG SetGadgetAttrsA( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> *,
+            struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> * );
+
+    result = SetGadgetAttrs( <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a>, Tag1, ...)
+
+    ULONG SetGadgetAttrs( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> *,
+            struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> *, ULONG, ... );
+
+FUNCTION
+    Same as SetAttrs(), but provides context information and
+    arbitration for classes which implement custom Intuition gadgets.
+
+    You should use this function for boopsi gadget objects which have
+    already been added to a requester or a window, or for &#034;models&#034; which
+    propagate information to gadget already added.
+
+    Typically, the gadgets will refresh their visuals to reflect
+    changes to visible attributes, such as the value of a slider,
+    the text in a string-type gadget, the selected state of a button.
+
+    You can use this as a replacement for SetAttrs(), too, if you
+    specify NULL for the 'Window' and 'Requester' parameters.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line215">Gadget</a> = abstract pointer to a boopsi gadget
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> = window gadget has been added to using <a href="../Includes_and_Autodocs_2._guide/node01FD.html">AddGList()</a> or
+             <a href="../Includes_and_Autodocs_2._guide/node01FC.html">AddGadget()</a>
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line145">Requester</a> = for REQGADGETs, requester containing the gadget
+    TagList = array of <a href="../Includes_and_Autodocs_2._guide/node012E.html#line31">TagItem</a> structures with attribute/value pairs.
+
+RESULT
+    The object does whatever it wants with the attributes you provide,
+    which might include updating its gadget visuals.
+
+    The return value tends to be non-zero if the changes would require
+    refreshing gadget imagery, if the object is a gadget.
+
+NOTES
+    This function invokes the OM_SET method with a <a href="../Includes_and_Autodocs_2._guide/node00D2.html#line26">GadgetInfo</a>
+    derived from the 'Window' and 'Requester' pointers.
+
+BUGS
+    There should be more arbitration between this function and
+    the calls that Intuition's input task will make to the
+    gadgets.  In the meantime, this function, input processing,
+    and refreshing must be mutually re-entrant.
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node022F.html">NewObject()</a>, <a href="../Includes_and_Autodocs_2._guide/node020D.html">DisposeObject()</a>, <a href="../Includes_and_Autodocs_2._guide/node021B.html">GetAttr()</a>, <a href="../Includes_and_Autodocs_2._guide/node0227.html">MakeClass()</a>,
+    Document &#034;Basic Object-Oriented Programming System for Intuition&#034;
+    and the &#034;boopsi Class Reference&#034; document.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

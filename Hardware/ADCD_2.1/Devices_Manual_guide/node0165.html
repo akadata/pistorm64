@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Demo_Dump.c" NODE="MAIN" TITLE="Devices/Dev_examples/Demo_Dump.c" -->
+<head>
+<title>Devices/Dev_examples/Demo_Dump.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0164.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0166.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/* Demo_Dump.c
+ *
+ * Simple example of dumping a rastport to the printer, changing
+ * printer preferences programmatically and handling error codes.
+ *
+ * Compile with SAS C 5.10a. lc -cfist -v -L Demo_Dump
+ *
+ * Requires Kickstart V37
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/ports.h&#062;
+#include &#060;devices/printer.h&#062;
+#include &#060;devices/prtbase.h&#062;
+#include &#060;dos/dos.h&#062;
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;graphics/displayinfo.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/alib_stdio_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+
+struct IntuitionBase *IntuitionBase;
+struct GfxBase *GfxBase;
+
+union printerIO
+{
+    struct IOStdReq    ios;
+    struct IODRPReq    iodrp;
+    struct IOPrtCmdReq iopc;
+};
+
+struct EasyStruct reqES =
+{
+    sizeof(struct EasyStruct), 0, &#034;DemoDump&#034;,
+    &#034;%s&#034;,
+    NULL,
+};
+
+/* Possible printer.device and I/O errors */
+static UBYTE *ErrorText[] =
+{
+    &#034;PDERR_NOERR&#034;,
+    &#034;PDERR_CANCEL&#034;,
+    &#034;PDERR_NOTGRAPHICS&#034;,
+    &#034;INVERTHAM&#034;,                /* OBSOLETE */
+    &#034;BADDIMENSION&#034;,
+    &#034;DIMENSIONOVFLOW&#034;,  /* OBSOLETE */
+    &#034;INTERNALMEMORY&#034;,
+    &#034;BUFFERMEMORY&#034;,
+    /* IO_ERRs */
+    &#034;IOERR_OPENFAIL&#034;,
+    &#034;IOERR_ABORTED&#034;,
+    &#034;IOERR_NOCMD&#034;,
+    &#034;IOERR_BADLENGTH&#034;
+};
+
+/* Requester Action text */
+static UBYTE *ActionText[] =
+{
+    &#034;OK|CANCEL&#034;,
+    &#034;Continue&#034;,
+    &#034;Abort&#034;,
+};
+
+#define OKCANCELTEXT 0
+#define CONTINUETEXT 1
+#define ABORTTEXT    2
+
+VOID main(VOID);
+
+VOID main(VOID)
+{
+struct MsgPort  *PrinterMP;
+union printerIO *PIO;
+struct PrinterData *PD;
+struct PrinterExtendedData *PED;
+struct Screen *pubscreen;
+struct ViewPort *vp;
+STRPTR textbuffer;
+LONG modeID, i,j;
+ULONG dcol[5], drow[5];
+ULONG signal;
+
+/* Fails silently if not V37 or greater. Nice thing to do would be to put up
+ * a V33 requester of course.
+ */
+
+/* Set up once */
+reqES.es_GadgetFormat = ActionText[CONTINUETEXT];
+
+if (IntuitionBase = (struct IntuitionBase *)OpenLibrary(&#034;intuition.library&#034;, 37))
+  {
+  /* Using graphics.library to get the displaymodeID of the public screen,
+   * which we'll pass to the printer.device.
+   */
+  if (GfxBase = (struct GfxBase *)OpenLibrary(&#034;graphics.library&#034;, 37))
+    {
+    if (textbuffer = (STRPTR)AllocMem(256, MEMF_CLEAR))
+      {
+      /* Create non-public messageport. Since we depend on V37 already, we'll
+       * use the new Exec function.
+       */
+      if (PrinterMP = CreateMsgPort())
+        {
+        /* Allocate printerIO union */
+        if (PIO = (union printerIO *)CreateExtIO(PrinterMP, sizeof(union printerIO)))
+          {
+          /* Open the printer.device */
+          if (!(OpenDevice(&#034;printer.device&#034;,0,(struct IORequest *)PIO,0)))
+            {
+            /* Yahoo, we've got it.
+             * We'll use the PrinterData structure to get to the the printer
+             * preferences later on. The PrinterExtendedData structure will
+             * reflect the changes we'll make to the preferences.
+             */
+
+            PD = (struct PrinterData *)PIO-&#062;iodrp.io_Device;
+            PED = (struct PrinterExtendedData *)&#038;PD-&#062;pd_SegmentData-&#062;ps_PED;
+
+            /* We're all set. We'll grab the default public screen (normally
+             * Workbench) and see what happens when we dump it with different
+             * densities.
+             * Next we'll put up a nice requester for the user and ask if
+             * (s)he wants to actually do the dump.
+             */
+
+            if (pubscreen = LockPubScreen(NULL))
+              {
+              vp = &#038;(pubscreen-&#062;ViewPort);
+              /* Use graphics.library/GetVPModeID() to get the ModeID of the screen. */
+              if ((modeID = GetVPModeID(vp)) != INVALID_ID)
+                {
+                /* Seems we got a valid ModeID for the default public screen (surprise).
+                 * Do some fake screen dumps with densities 1, 3, 5 and 7. Depending on
+                 * the driver, one or more may be the same.
+                 */
+
+                /* Fill in those parts of the IODRPRequest which won't change */
+                PIO-&#062;iodrp.io_Command = PRD_DUMPRPORT;
+                PIO-&#062;iodrp.io_RastPort = &#038;(pubscreen-&#062;RastPort);
+                PIO-&#062;iodrp.io_ColorMap = vp-&#062;ColorMap;
+                PIO-&#062;iodrp.io_Modes = modeID;
+                PIO-&#062;iodrp.io_SrcX = pubscreen-&#062;LeftEdge;
+                PIO-&#062;iodrp.io_SrcY = pubscreen-&#062;TopEdge;
+                PIO-&#062;iodrp.io_SrcWidth = pubscreen-&#062;Width;
+                PIO-&#062;iodrp.io_SrcHeight = pubscreen-&#062;Height;
+
+                for (i = 1,j=0; i &#060; 8; i+=2,j++)
+                  {
+                  /* On return these will contain the actual dump dimension */
+                  PIO-&#062;iodrp.io_DestCols = 0;
+                  PIO-&#062;iodrp.io_DestRows = 0;
+                  /* We'll simply change our local copy of the
+                   * Preferences structure. Likewise we could change
+                   * all printer-related preferences.
+                   */
+                  PD-&#062;pd_Preferences.PrintDensity = i;
+                  PIO-&#062;iodrp.io_Special = SPECIAL_NOPRINT|SPECIAL_ASPECT;
+
+                  /* No need to do asynchronous I/O here */
+                  DoIO((struct IORequest *)PIO);
+
+                  if (PIO-&#062;iodrp.io_Error == 0)
+                    {
+                    dcol[j] = PIO-&#062;iodrp.io_DestCols;
+                    drow[j] = PIO-&#062;iodrp.io_DestRows;
+                    }
+                  else
+                    {
+                    j = PIO-&#062;iodrp.io_Error;
+                    if (j &#060; 0)
+                      j = j * -1 + 7;
+
+                    sprintf(textbuffer, &#034;Error: %s\n&#034;, ErrorText[j]);
+                    reqES.es_GadgetFormat = ActionText[CONTINUETEXT];
+                    EasyRequest(NULL, &#038;reqES, NULL, textbuffer);
+                    break;
+                    }
+                  }
+                /* Simple, lazy way to check if we encountered any problems */
+                if (i == 9)
+                  {
+                  /* Build an 'intelligent' requester */
+                  sprintf(textbuffer,
+                    &#034;%s: %5ld x %5ld\n%s: %5ld x %5ld\n%s: %5ld x%5ld\n%s: %5ld x %5ld\n\n%s&#034;,
+                    &#034;Density 1&#034;, dcol[0], drow[0],
+                    &#034;Density 3&#034;, dcol[1], drow[1],
+                    &#034;Density 5&#034;, dcol[2], drow[2],
+                    &#034;Density 7&#034;, dcol[3], drow[3],
+                    &#034;Print screen at highest density?&#034;);
+                  reqES.es_GadgetFormat = ActionText[OKCANCELTEXT];
+
+                  /* Obviously the choice presented to the user here is a very
+                   * simple one. To print or not to print. In a real life
+                   * application, a requester could be presented, inviting
+                   * the user to select density, aspect, dithering etc.
+                   * The fun part is, of course, that the user can, to a certain
+                   * degree, be informed about the effects of her/his selections.
+                   */
+                  if (EasyRequest(NULL, &#038;reqES, NULL, textbuffer))
+                    {
+                    /* We've still got the density preference set to the highest
+                     * density, so no need to change that.
+                     * All we do here is re-initialize io_DestCols/Rows and remove
+                     * the SPECIAL_NOPRINT flag from io_Special.
+                     */
+                    PIO-&#062;iodrp.io_DestCols = 0;
+                    PIO-&#062;iodrp.io_DestRows = 0;
+                    PIO-&#062;iodrp.io_Special &#038;= ~SPECIAL_NOPRINT;
+
+                    /* Always give the user a change to abort.
+                     * So we'll use SendIO(), instead of DoIO(), to be asynch and
+                     * catch a possible user request to abort printing. Normally,
+                     * the user would be presented with a nice, fat, ABORT requester.
+                     * However, since this example doesn't even open a window, and is
+                     * basically a 'GraphicDumpDefaultPubscreen' equivalent, we'll use
+                     * CTRL-C as the user-abort. Besides that, got to keep it short.
+                     */
+                    SendIO((struct IORequest *)PIO);
+
+                    /* Now Wait() for either a user signal (CTRL-C) or a signal from
+                     * the printer.device
+                     */
+                    signal = Wait(1 &#060;&#060; PrinterMP-&#062;mp_SigBit | SIGBREAKF_CTRL_C);
+
+                    if (signal &#038; SIGBREAKF_CTRL_C)
+                      {
+                      /* User wants to abort */
+                      AbortIO((struct IORequest *)PIO);
+                      WaitIO((struct IORequest *)PIO);
+                      }
+
+                    if (signal &#038; (1 &#060;&#060; PrinterMP-&#062;mp_SigBit))
+                      {
+                      /* printer is either ready or an error has occurred */
+                      /* Remove any messages */
+                      while(GetMsg(PrinterMP));
+                      }
+                    /* Check for errors (in this case we count user-abort as an error) */
+                    if (PIO-&#062;iodrp.io_Error != 0)
+                      {
+                      j = PIO-&#062;iodrp.io_Error;
+                      if (j &#060; 0)
+                        j = j * -1 + 7;
+                      sprintf(textbuffer, &#034;Error: %s\n&#034;, ErrorText[j]);
+                      reqES.es_GadgetFormat = ActionText[CONTINUETEXT];
+                      EasyRequest(NULL, &#038;reqES, NULL, textbuffer);
+                      }
+
+                    } /* else user doesn't want to print */
+                  }
+                }
+              else
+                /* Say what? */
+                EasyRequest(NULL, &#038;reqES, NULL, &#034;Invalid ModeID\n&#034;);
+              UnlockPubScreen(NULL, pubscreen);
+              }
+            else
+              EasyRequest(NULL, &#038;reqES, NULL, &#034;Can't lock Public Screen\n&#034;);
+
+            CloseDevice((struct IORequest *)PIO);
+            }
+          else
+            EasyRequest(NULL, &#038;reqES, NULL, &#034;Can't open printer.device\n&#034;);
+
+          DeleteExtIO((struct IORequest *)PIO);
+          }
+        else
+          EasyRequest(NULL, &#038;reqES, NULL, &#034;Can't create Extented I/O Request\n&#034;);
+        DeleteMsgPort(PrinterMP);
+        }
+      else
+        EasyRequest(NULL, &#038;reqES, NULL, &#034;Can't create Message port\n&#034;);
+      /* else Out of memory? 256 BYTES? */
+      FreeMem(textbuffer,256);
+      }
+    CloseLibrary(GfxBase);
+    } /* else MAJOR confusion */
+  CloseLibrary(IntuitionBase);
+  }
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

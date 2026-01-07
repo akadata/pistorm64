@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_examples/Terminate_Serial.c" NODE="MAIN" TITLE="Devices/Dev_examples/Terminate_Serial.c" -->
+<head>
+<title>Devices/Dev_examples/Terminate_Serial.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0193.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0195.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+/*
+ * Terminate_Serial.c
+ *
+ * This is an example of using a termination array for reads from the serial
+ * device. A termination array is set up for the characters Q, E, etx (CTRL-D)
+ * and eot (CTRL-C).  The EOFMODE flag is set in io_SerFlags to indicate that
+ * we want to use a termination array by sending the SDCMD_SETPARAMS command to
+ * the device.  Then, a CMD_READ command is sent to the device with
+ * io_Length set to 25.
+ *
+ * The read will terminate whenever one of the four characters in the termination
+ * array is received or when 25 characters have been received.
+ *
+ * Compile with SAS C 5.10  lc -b1 -cfistq -v -y -L
+ *
+ * Run from CLI only
+ */
+
+#include &#060;exec/types.h&#062;
+#include &#060;exec/memory.h&#062;
+#include &#060;exec/io.h&#062;
+#include &#060;devices/serial.h&#062;
+
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/alib_protos.h&#062;
+
+#include &#060;stdio.h&#062;
+
+#ifdef LATTICE
+int CXBRK(void) { return(0); }  /* Disable SAS CTRL/C handling */
+int chkabort(void) { return(0); }  /* really */
+#endif
+
+
+
+void main(void)
+{
+struct MsgPort  *SerialMP;          /* Define storage for one pointer */
+struct IOExtSer *SerialIO;         /* Define storage for one pointer */
+
+struct IOTArray Terminators =
+{
+0x51450403,   /* Q E etx eot */
+0x03030303    /* fill to end with lowest value */
+};
+
+#define READ_BUFFER_SIZE 25
+UBYTE ReadBuff[READ_BUFFER_SIZE];
+UWORD ctr;
+
+if (SerialMP=CreatePort(0,0) )
+    {
+    if (SerialIO=(struct IOExtSer *) CreateExtIO(SerialMP,sizeof(struct IOExtSer)))
+        {
+        if (OpenDevice(SERIALNAME,0L,(struct IORequest *)SerialIO,0) )
+            printf(&#034;%s did not open\n&#034;,SERIALNAME);
+        else
+            {
+             /* Tell user what we are doing */
+             printf(&#034;\fLooking for Q, E, EOT or ETX\n&#034;);
+
+             /* Set EOF mode flag
+              * Set the termination array
+              * Send SDCMD_SETPARAMS to the serial device
+              */
+             SerialIO-&#062;io_SerFlags |= SERF_EOFMODE;
+             SerialIO-&#062;io_TermArray = Terminators;
+             SerialIO-&#062;IOSer.io_Command  = SDCMD_SETPARAMS;
+             if (DoIO((struct IORequest *)SerialIO))
+                 printf(&#034;Set Params failed &#034;);   /* Inform user of error */
+             else
+                 {
+                 SerialIO-&#062;IOSer.io_Length   = READ_BUFFER_SIZE;
+                 SerialIO-&#062;IOSer.io_Data     = (APTR)&#038;ReadBuff[0];
+                 SerialIO-&#062;IOSer.io_Command  = CMD_READ;
+                 if (DoIO((struct IORequest *)SerialIO))     /* Execute Read */
+                     printf(&#034;Error: Read failed\n&#034;);
+                 else
+                     {
+                      /* Display all characters received */
+                      printf(&#034;\nThese characters were read:\n\t\t\tASCII\tHEX\n&#034;);
+                      for (ctr=0;ctr&#060;SerialIO-&#062;IOSer.io_Actual;ctr++)
+                           printf(&#034;\t\t\t  %c\t%x\n&#034;,ReadBuff[ctr],ReadBuff[ctr]);
+                      printf(&#034;\nThe actual number of characters read: %d\n&#034;,
+                                  SerialIO-&#062;IOSer.io_Actual);
+                      }
+                 }
+            CloseDevice((struct IORequest *)SerialIO);
+            }
+
+        DeleteExtIO((struct IORequest *)SerialIO);
+        }
+    else
+        printf(&#034;Error: Could not create IORequest\n&#034;);
+
+    DeletePort(SerialMP);
+    }
+else
+    printf(&#034;Error: Could not create message port\n&#034;);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

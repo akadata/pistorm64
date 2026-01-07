@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="VIII-51/sana2device.doc" NODE="VIII-51-9" TITLE="sana2.device/CMD_STOP" -->
+<head>
+<title>sana2.device/CMD_STOP</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01E8.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01EA.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+NAME
+    Stop -- Pause device operation.
+
+FUNCTION
+    There is no way for the driver to keep queuing requests without
+    servicing them, so CMD_STOP does not apply to this class of device.
+    S2_OFFLINE and S2_ONLINE do perform a similar function to CMD_STOP
+    and CMD_START
+
+IO REQUEST
+    ios2_Command    - CMD_STOP.
+
+RESULTS
+    ios2_Error      - IOERR_NOCMD.
+
+NOTES
+
+SEE ALSO
+    S2_ONLINE, S2_OFFLINE
+
+BUGS
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

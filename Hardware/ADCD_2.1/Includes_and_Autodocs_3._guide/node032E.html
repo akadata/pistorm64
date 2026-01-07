@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="graphics" NODE="SetWriteMask()" TITLE="graphics.library/SetWriteMask" -->
+<head>
+<title>graphics.library/SetWriteMask</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node032D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node032F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+       SetWriteMask -- Set the pixel write mask value for a <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> (V39).
+
+
+<b>   SYNOPSIS</b>
+       success=SetWriteMask ( rp, msk )
+	  d0	               a0   d0
+
+	ULONG SetWriteMask(struct <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> *,ULONG)
+
+<b>   FUNCTION</b>
+	Set the current value of the bit write mask for the rastport.
+	bits of the pixel with zeros in their mask will not be modified by
+	subsequent drawing operations.
+
+<b>   INPUTS</b>
+       rp  =  a pointer to a valid <a href="../Includes_and_Autodocs_3._guide/node05D7.html#line53">RastPort</a> structure.
+	msk =  a longword mask value.
+
+	Graphics devices which do not support per-bit masking will
+	return 0 (failure).
+<b>   BUGS</b>
+
+<b>   NOTES</b>
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0660.html">graphics/gfxmacros.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

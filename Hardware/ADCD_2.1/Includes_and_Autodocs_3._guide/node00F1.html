@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="commodities" NODE="InvertKeyMap()" TITLE="commodities.library/InvertKeyMap" -->
+<head>
+<title>commodities.library/InvertKeyMap</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node00F0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node00F2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	InvertKeyMap -- generate an input event from an ANSI code. (V36)
+
+<b>   SYNOPSIS</b>
+	success = InvertKeyMap(ansiCode,event,km)
+	D0	 	       D0       A0    A1
+
+	<a href="../Includes_and_Autodocs_3._guide/node0654.html#line73">BOOL</a> InvertKeyMap(ULONG,struct <a href="../Includes_and_Autodocs_3._guide/node061A.html#line256">InputEvent</a> *,struct <a href="../Includes_and_Autodocs_3._guide/node0623.html#line20">KeyMap</a> *);
+
+<b>   FUNCTION</b>
+	This function uses the system call <a href="../Includes_and_Autodocs_3._guide/node0411.html">MapANSI()</a> to figure out what
+	<a href="../Includes_and_Autodocs_3._guide/node061A.html#line256">InputEvent</a> translates to an ANSI character code 'ansiCode'. The
+	<a href="../Includes_and_Autodocs_3._guide/node061A.html#line256">InputEvent</a> pointed to by 'event' is filled in with that information.
+	The <a href="../Includes_and_Autodocs_3._guide/node0623.html#line20">KeyMap</a> 'km' is used for the translation, unless it is NULL, in
+	which case the current system default keymap is used.
+
+<b>   INPUTS</b>
+	ansiCode - the ANSI code to convert to an input event
+	event - the <a href="../Includes_and_Autodocs_3._guide/node061A.html#line256">InputEvent</a> to fill-in
+	km - the keymap to use for the translation, or NULL to use the
+	     current system default keymap.
+
+<b>   RESULTS</b>
+	success - TRUE if the translation worked, FALSE otherwise.
+
+<b>   BUGS</b>
+	This function currently handles one-deep dead keys (such as
+	&#060;alt f&#062;o ). It does not look up the high key map (keystrokes
+	with scan codes greater than 0x40).
+
+	Prior to V40, this function was not initializing the ie_SubClass
+	and ie_TimeStamp fields of the <a href="../Includes_and_Autodocs_3._guide/node061A.html#line256">InputEvent</a> structure. A simple work
+	around to the problem is to clear these values to 0 before making
+	a call to this function:
+
+		struct <a href="../Includes_and_Autodocs_3._guide/node061A.html#line256">InputEvent</a> ie;
+
+		    ie.ie_SubClass           = 0;
+		    ie.ie_TimeStamp.tv_secs  = 0;
+		    ie.ie_TimeStamp.tv_micro = 0;
+		    if (InvertKeyMap(ansiCode,&#038;ie,NULL))
+		    ...
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0042.html">cx_lib/InvertString()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="DrawBorder()" TITLE="intuition.library/DrawBorder" -->
+<head>
+<title>intuition.library/DrawBorder</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node020E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0210.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    DrawBorder -- Draw the specified <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line600">Border</a> structure into a <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>.
+
+SYNOPSIS
+    DrawBorder( <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line600">Border</a>, LeftOffset, TopOffset )
+                A0        A1      D0          D1
+
+    VOID DrawBorder( struct <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line600">Border</a> *, WORD, WORD );
+
+FUNCTION
+    First, sets up the draw mode and pens in the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> according to the
+    arguments of the <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line600">Border</a> structure.  Then, draws the vectors of
+    the border argument into the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a>, offset by the left and top
+    offsets.
+
+    As with all graphics rendering routines, the border will be clipped to
+    to the boundaries of the RastPort's layer, if it exists.  This is
+    the case with window RastPorts.
+
+    This routine will draw all borders in the NULL-terminated list linked
+    by the NextBorder field of the border argument.
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> = pointer to the <a href="../Includes_and_Autodocs_2._guide/node00AF.html#line55">RastPort</a> to receive the border rendering
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line600">Border</a> = pointer to a <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line600">Border</a> structure
+    LeftOffset = the offset to be added to each vector's x coordinate
+    TopOffset = the offset to be added to each vector's y coordinate
+
+RESULT
+    None
+
+BUGS
+
+SEE ALSO
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

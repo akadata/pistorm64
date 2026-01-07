@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_9" NODE="9-2-3" TITLE="9 / Intuition Input / IDCMP Events and the Input Focus" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>9 / Intuition Input / IDCMP Events and the Input Focus</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node01D2.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node01D4.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Although at any given time many applications may be waiting for input, in
+most cases only the active application (the one with the currently active
+window) will receive IDCMP messages.
+
+Since the IDCMP messages are, in general, directed to a single window,
+this window is said to have the input focus--the input from a variety of
+sources is focused on this single location.
+
+The active window is generally selected by the user, although it is
+possible for applications to change the active window.  See the
+&#034;<a href="../Libraries_Manual_guide/node010F.html">Intuition Windows</a>&#034; chapter for information on selecting or setting the
+active window.  Be aware that changing the active window will change the
+input focus.  Usually this change is performed following user action--the
+user selects a window with the mouse, or activates a new application.
+Changes to the input focus without user control, such as activating
+another window while the user is working in an application, may confuse
+<a name="line18">the user. Perform such changes with great care.</a>
+
+Not all events are sent only to the active IDCMP.  Some events, such as
+&#034;disk inserted,&#034; may be useful to many programs, so Intuition translates
+these events into separate messages, one for each application.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

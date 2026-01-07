@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="amigaguide" NODE="AddAmigaGuideHostA()" TITLE="amigaguide.library/AddAmigaGuideHostA" -->
+<head>
+<title>amigaguide.library/AddAmigaGuideHostA</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0006.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0008.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        AddAmigaGuideHostA - Add a dynamic node host.           (V34)
+
+<b>    SYNOPSIS</b>
+        handle = AddAmigaGuideHostA (hook, name, attrs);
+        d0                            a0    d0    a1
+
+        AMIGAGUIDEHOST AddAmigaGuideHostA (struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a>,
+                                          struct <a href="../Includes_and_Autodocs_3._guide/node064C.html#line31">TagItem</a> *);
+
+<b>    FUNCTION</b>
+        This function adds a callback hook to the dynamic node list.
+
+        A dynamic node allows an application to incorporate context-
+        sensitive or live project data within their help system.
+
+<b>    INPUTS</b>
+        hook - The callback hook.
+        name - Name of the <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line144">AmigaGuideHost</a> database that you are adding.
+            The name must be unique.
+        attrs - Additional attributes.  None are defined at this time.
+
+<b>    RETURNS</b>
+        Returns NULL if unable to add the dynamic node host, otherwise
+        returns a pointer to a handle that will eventually be passed
+        to RemoveAmigaGuideHost() to remove the dynamic node host from
+        the list.
+
+<b>    NOTES</b>
+        When AmigaGuide attempts to resolve a LINK command, it performs
+        the following sequence of events.
+
+           Splits the name into a path, a database and a node (only
+             the node is required).
+           Opens the database.
+           Performs the following searches until the node is found:
+             Search the local database.
+             Search the local cross reference list.
+             Search the local dynamic node host.
+             Search the global help file (system help).
+             Search the global cross reference list.
+             Search the global dynamic node hosts.
+
+<b>    SEE ALSO</b>
+        <a href="../Includes_and_Autodocs_3._guide/node0010.html">RemoveAmigaGuideHostA()</a>
+
+<b>    EXAMPLE</b>
+
+        /* <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> dispatcher */
+        ULONG __asm hookEntry(
+                register __a0 struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *h,
+                register __a2 VOID *obj,
+                register __a1 VOID *msg)
+        {
+            /* Pass the parameters on the stack */
+            return ((h-&#062;h_SubEntry)(h, obj, msg));
+        }
+
+        ULONG __saveds
+        dispatchAmigaGuideHost (struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> *h, <a href="../Includes_and_Autodocs_3._guide/node0654.html#line57">STRPTR</a> db, <a href="../Includes_and_Autodocs_3._guide/node0636.html#line28">Msg</a> msg)
+        {
+            struct <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line201">opNodeIO</a> *onm = (struct <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line201">opNodeIO</a> *) msg;
+            ULONG retval = 0;
+
+            switch (msg-&#062;MethodID)
+            {
+                /* Does this node belong to you? */
+                case HM_FINDNODE:
+                    {
+                        struct <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line189">opFindHost</a> *ofh = (struct <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line189">opFindHost</a> *) msg;
+
+                        kprintf(&#034;Find [%s] in %sn&#034;, ofh-&#062;ofh_Node, db);
+
+                        /* Return TRUE to indicate that it's your node,
+                         * otherwise return FALSE. */
+                         retval = TRUE;
+                    }
+                    break;
+
+                /* <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open</a> a node. */
+                case HM_OPENNODE:
+                    kprintf(&#034;Open [%s] in %sn&#034;, onm-&#062;onm_Node, db);
+
+                    /* Provide the contents of the node */
+                    onm-&#062;onm_DocBuffer = TEMP_NODE;
+                    onm-&#062;onm_BuffLen   = strlen(TEMP_NODE);
+
+                    /* Indicate that we were able to open the node */
+                    retval = TRUE;
+                    break;
+
+                /* <a href="../Includes_and_Autodocs_3._guide/node0149.html">Close</a> a node, that has no users. */
+                case HM_CLOSENODE:
+                    kprintf(&#034;Close [%s] in %sn&#034;, onm-&#062;onm_Node, db);
+
+                    /* Indicate that we were able to close the node */
+                    retval = TRUE;
+                    break;
+
+                /* Free any extra memory */
+                case HM_EXPUNGE:
+                    kprintf(&#034;Expunge [%s]n&#034;, db);
+                    break;
+
+                default:
+                    kprintf(&#034;Unknown method %ldn&#034;, msg-&#062;MethodID);
+                    break;
+            }
+
+            return (retval);
+        }
+
+        main(int argc, char **argv)
+        {
+            struct <a href="../Includes_and_Autodocs_3._guide/node0617.html#line27">Hook</a> hook;
+            AMIGAGUIDEHOST hh;
+
+            /* <a href="../Includes_and_Autodocs_3._guide/node0196.html">Open</a> the library */
+            if (AmigaGuideBase = OpenLibrary(&#034;amigaguide.library&#034;, 33))
+            {
+                /* Initialize the hook */
+                hook.h_Entry    = hookEntry;
+                hook.h_SubEntry = dispatchAmigaGuideHost;
+
+                /* Add the <a href="../Includes_and_Autodocs_3._guide/node05D2.html#line144">AmigaGuideHost</a> to the system */
+                if (hh = AddAmigaGuideHost(&#038;hook, &#034;ExampleHost&#034;, NULL))
+                {
+                    /* <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait</a> until we're told to quit */
+                    Wait(SIGBREAKF_CTRL_C);
+
+                    /* Try removing the host */
+                    while (RemoveAmigaGuideHost(hh, NULL) &#062; 0)
+                    {
+                        /* <a href="../Includes_and_Autodocs_3._guide/node0246.html">Wait</a> a while */
+                        Delay(5);
+                    }
+                }
+
+                /* close the library */
+                CloseLibrary(AmigaGuideBase);
+            }
+        }
+
+<b>    BUGS</b>
+        When a dynamic node host is first added it will receive a
+        HM_FINDNODE message with an onm_Node of &#034;Main&#034;.  The
+        AGA_HelpGroup attribute will always be zero for this
+        particular message.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

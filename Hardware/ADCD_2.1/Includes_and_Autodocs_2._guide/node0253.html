@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="AutoDocs/intuition" NODE="SetMenuStrip()" TITLE="intuition.library/SetMenuStrip" -->
+<head>
+<title>intuition.library/SetMenuStrip</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0252.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0254.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+NAME
+    SetMenuStrip -- Attach a menu strip to a window.
+
+SYNOPSIS
+    Success = SetMenuStrip( <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a>, <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line61">Menu</a> )
+    D0                      A0      A1
+
+    BOOL SetMenuStrip( struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> *, struct <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line61">Menu</a> * );
+
+FUNCTION
+    Attaches the menu strip to the window.  After calling this routine,
+    if the user presses the menu button, this specified menu strip
+    will be displayed and accessible by the user.
+
+    Menus with zero menu items are not allowed.
+
+    NOTE:  You should always design your menu strip changes to be a
+    two-way operation, where for every menu strip you add to your
+    window you should always plan to clear that strip sometime.  Even
+    in the simplest case, where you will have just one menu strip for
+    the lifetime of your window, you should always clear the menu strip
+    before closing the window.  If you already have a menu strip attached
+    to this window, the correct procedure for changing to a new menu
+    strip involves calling <a href="../Includes_and_Autodocs_2._guide/node0205.html">ClearMenuStrip()</a> to clear the old first.
+
+    The sequence of events should be:
+    - <a href="../Includes_and_Autodocs_2._guide/node0239.html">OpenWindow()</a>
+    - zero or more iterations of:
+    - SetMenuStrip()
+    - <a href="../Includes_and_Autodocs_2._guide/node0205.html">ClearMenuStrip()</a>
+    - <a href="../Includes_and_Autodocs_2._guide/node0208.html">CloseWindow()</a>
+
+INPUTS
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> = pointer to a <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line797">Window</a> structure
+    <a href="../Includes_and_Autodocs_2._guide/node00D4.html#line61">Menu</a> = pointer to the first menu in the menu strip
+
+RESULT
+    TRUE if there were no problems.  TRUE always, since this routine
+    will wait until it is OK to proceed.
+
+BUGS
+
+SEE ALSO
+    <a href="../Includes_and_Autodocs_2._guide/node0205.html">ClearMenuStrip()</a>, <a href="../Includes_and_Autodocs_2._guide/node024A.html">ResetMenuStrip()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

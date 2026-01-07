@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_FS_SMUS" NODE="16-5-3-5" TITLE=" Standard Data and Property Chunks / Data Chunk TRAK " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title> Standard Data and Property Chunks / Data Chunk TRAK </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node02B6.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node02B8.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The main contents of a score is stored in one or more TRAK chunks
+representing parallel &#034;tracks&#034;.  One TRAK chunk per track.
+
+The contents of a TRAK chunk is an array of 16-bit &#034;events&#034; such as
+&#034;note&#034;, &#034;rest&#034;, and &#034;set instrument&#034;.  Events are really commands to a
+simple scheduler, stored in time order.  The tracks can be polyphonic,
+that is, they can contain chorded &#034;note&#034; events.
+
+Each event is stored as an &#034;SEvent&#034; record.  (&#034;SEvent&#034; means &#034;simple
+musical event&#034;.)  Each SEvent has an 8-bit type field called an &#034;sID&#034; and
+8 bits of type-dependent data.  This is like a machine language
+instruction with an 8-bit opcode and an 8-bit operand.
+
+This format is extensible since new event types can be defined in the
+future. The &#034;note&#034; and &#034;rest&#034; events are the only ones that every program
+must understand.  We will carefully design any new event types so that
+programs can safely skip over unrecognized events in a score.
+
+Caution: ID codes must be allocated by a central clearinghouse  to avoid
+conflicts.  Commodore Applications and Technical Support provides this
+clearinghouse service.
+
+Here are the C type definitions for TRAK and &#034;SEvent&#034; and the currently
+defined sID values.  Afterward are details on each SEvent.
+
+  #define ID_TRAK MakeID('T', 'R', 'A', 'K')
+  /* TRAK chunk contains an SEvent[].       */
+<a name="line29"></a>
+  /* SEvent: Simple musical event.          */
+  typedef struct {
+      UBYTE sID;      /* SEvent type code   */
+      UBYTE data;     /* sID-dependent data */
+      } SEvent;
+
+  /* SEvent type codes &#034;sID&#034;.                                            */
+  #define SID_FirstNote     0
+  #define SID_LastNote    127 /* sIDs in the range SID_FirstNote through
+                               * SID_LastNote (sign bit = 0) are notes.
+                               * The sID is the MIDI tone number (pitch).*/
+
+  #define SID_Rest        128 /* a rest (same data format as a note).    */
+
+  #define SID_Instrument  129 /* set instrument number for this track.   */
+  #define SID_TimeSig     130 /* set time signature for this track.      */
+  #define SID_KeySig      131 /* set key signature for this track.       */
+  #define SID_Dynamic     132 /* set volume for this track.              */
+  #define SID_MIDI_Chnl   133 /* set MIDI channel number (sequencers)    */
+  #define SID_MIDI_Preset 134 /* set MIDI preset number (sequencers)     */
+  #define SID_Clef        135 /* inline clef change.
+                               * 0=Treble, 1=Bass, 2=Alto, 3=Tenor.(new) */
+  #define SID_Tempo       136 /* Inline tempo in beats per minute.(new)  */
+
+  /* SID values 144 through 159: reserved for Instant Music SEvents.     */
+
+  /* Remaining sID values up through 254: reserved for future
+   * standardization.         */
+
+  #define SID_Mark        255 /* sID reserved for an end-mark in RAM.    */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

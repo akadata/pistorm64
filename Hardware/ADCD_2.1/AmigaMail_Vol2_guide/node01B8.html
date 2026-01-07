@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="IV-69/hide.c" NODE="MAIN" TITLE="IV-69/hide.c" -->
+<head>
+<title>IV-69/hide.c</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../AmigaMail_Vol2_guide/node01B7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../AmigaMail_Vol2_guide/node01B9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+;/* Hide.c - Execute me to compile me with SAS/C 6.56
+sc DATA=NEAR NMINC STRMERGE STREQ NOSTKCHK SAVEDS IGNORE=73 Hide.c
+slink FROM LIB:c.o,Hide.o TO Hide LIBRARY LIB:sc.lib,LIB:amiga.lib
+quit
+*/
+/*
+Copyright (c) 1991-1999 Amiga, Inc.
+
+This example is provided in electronic form by Amiga, Inc.
+for use with the Amiga Mail Volume II technical publication.
+Amiga Mail Volume II contains additional information on the correct
+usage of the techniques and operating system functions presented in
+these examples.  The source and executable code of these examples may
+only be distributed in free electronic form, via bulletin board or
+as part of a fully non-commercial and freely redistributable
+diskette.  Both the source and executable code (including comments)
+must be included, without modification, in any copy.  This example
+may not be published in printed form or distributed with any
+commercial product. However, the programming techniques and support
+routines set forth in these examples may be used in the development
+of original executable software products for Amiga
+computers.
+
+All other rights reserved.
+
+This example is provided &#034;as-is&#034; and is subject to change; no
+warranties are made.  All use is at your own risk. No liability or
+responsibility is assumed.
+*/
+
+#include &#060;intuition/intuition.h&#062;
+#include &#060;intuition/screens.h&#062;
+#include &#060;graphics/text.h&#062;
+#include &#060;libraries/gadtools.h&#062;
+#include &#060;workbench/startup.h&#062;
+#include &#060;workbench/workbench.h&#062;
+#include &#034;hide.h&#034;
+
+#ifdef LATTICE
+#include &#060;clib/alib_protos.h&#062;
+#include &#060;clib/exec_protos.h&#062;
+#include &#060;clib/intuition_protos.h&#062;
+#include &#060;clib/gadtools_protos.h&#062;
+#include &#060;clib/graphics_protos.h&#062;
+#include &#060;clib/wb_protos.h&#062;
+
+/* disable SAS/C CTRL-C handing */
+int             CXBRK(void)
+{
+    return (0);
+}
+int             chkabort(void)
+{
+    return (0);
+}
+
+#endif
+
+struct IntuitionBase *IntuitionBase;
+struct GfxBase *GfxBase;
+struct WorkbenchBase *WorkbenchBase;
+struct Library *GadToolsBase;
+
+LONG            main(void);
+
+LONG
+main(void)
+{
+    struct Window  *window;
+    struct IntuiMessage *imsg;
+    struct Gadget  *gadgetcontext;
+    struct Gadget  *gadget, *hidegadget;
+    struct MsgPort *appport;
+    struct NewGadget ng;
+    struct TextExtent textextent;
+    struct AppIcon *appicon = NULL;
+    struct AppMessage *appmsg;
+    UWORD           left, top;
+    void           *visualinfo;
+    ULONG           signal, windowsignal, waitmask;
+    BOOL            ABORT = FALSE;
+    BOOL            CONTINUE, ICONIFY;
+
+    if (IntuitionBase = OpenLibrary(&#034;intuition.library&#034;, 37))
+    {
+        /* Open GfxBase to use TextExtent() so we can handle proportional fonts */
+        if (GfxBase = OpenLibrary(&#034;graphics.library&#034;, 37))
+        {
+            /* Open gadtools for that lonely gadget */
+            if (GadToolsBase = OpenLibrary(&#034;gadtools.library&#034;, 37))
+            {
+                if (WorkbenchBase = OpenLibrary(&#034;workbench.library&#034;, 37))
+                {
+                    /* Message to receive appmessage on */
+                    if (appport = CreateMsgPort())
+                    {
+                        /* open a window with tags */
+                        left = top = 50;
+                        do
+                        {
+                            /* no NewWindow structure, tags only */
+                            if (window = OpenWindowTags(NULL,
+                                         /* Open at far left corner */
+                                         WA_Left, left,
+                                         WA_Top, top,
+                                         WA_Width, 150,
+                                         WA_Height, 80,
+                                         WA_Title, (LONG) &#034;hide&#034;,
+                                         WA_Flags, WFLG_DRAGBAR |
+                                             WFLG_DEPTHGADGET | WFLG_CLOSEGADGET |
+                                             WFLG_ACTIVATE | WFLG_SMART_REFRESH |
+                                             WFLG_NOCAREREFRESH,
+                                         WA_IDCMP,
+                                             IDCMP_CLOSEWINDOW | IDCMP_GADGETUP,
+                                         TAG_DONE))
+                            {
+                                windowsignal = 1L &#060;&#060; window-&#062;UserPort-&#062;mp_SigBit;
+                                /*
+                                 * Get the visual info gadtools needs for the
+                                 * screen we opened on
+                                 */
+                                if (visualinfo = GetVisualInfoA(window-&#062;WScreen, NULL))
+                                {
+
+                                    /*
+                                     * Create a simple gadtools button and sort
+                                     * of lay it out
+                                     */
+                                    if (gadget = CreateContext(&#038;gadgetcontext))
+                                    {
+
+                                        /*
+                                         * Use TextExtent to handle
+                                         * proportional fonts
+                                         */
+                                        TextExtent(&#038;(window-&#062;WScreen-&#062;RastPort),
+                                                   &#034;Hide&#034;, 4, &#038;textextent);
+                                        ng.ng_Width = textextent.te_Width + 8;
+                                        ng.ng_LeftEdge = (window-&#062;Width / 2)
+                                                              - (ng.ng_Width / 2);
+                                        ng.ng_Height = textextent.te_Height + 4;
+                                        ng.ng_TopEdge = (
+                                            (window-&#062;Height - window-&#062;BorderTop
+                                                - window-&#062;BorderBottom) / 2)
+                                            + (ng.ng_Height / 2);
+                                        ng.ng_TextAttr = window-&#062;WScreen-&#062;Font;
+                                        ng.ng_GadgetText = &#034;Hide&#034;;
+                                        ng.ng_VisualInfo = visualinfo;
+                                        ng.ng_GadgetID = 1;
+                                        ng.ng_Flags = PLACETEXT_IN;
+                                        hidegadget = gadget =
+                                            CreateGadget(BUTTON_KIND, gadget,
+                                                         &#038;ng, TAG_END);
+                                        AddGList(window, gadget, -1, -1, NULL);
+                                        RefreshGList(gadget, window, NULL, -1);
+                                        GT_RefreshWindow(window, NULL);
+
+                                        CONTINUE = TRUE;
+                                        waitmask = windowsignal|
+                                                       1L &#060;&#060; appport-&#062;mp_SigBit;
+                                        do
+                                        {
+                                            signal = Wait(waitmask);
+
+                                          if (signal &#038; windowsignal)
+                                            {
+                                                while (imsg = (struct IntuiMessage *)
+                                                    GetMsg(window-&#062;UserPort))
+                                                {
+                                                    if (imsg-&#062;Class ==
+                                                            IDCMP_CLOSEWINDOW)
+                                                    {
+                                                        ABORT = TRUE;
+                                                        CONTINUE = FALSE;
+                                                        ICONIFY = FALSE;
+                                                    }
+                                                    else
+                                                    if (imsg-&#062;Class == IDCMP_GADGETUP)
+                                                        ICONIFY = TRUE;
+                                                    ReplyMsg((struct Message *) imsg);
+                                                }
+                                            }
+                                            if (signal &#038; (1L &#060;&#060; appport-&#062;mp_SigBit))
+                                            {
+                                                while (appmsg = (struct AppMessage *)
+                                                    GetMsg(appport))
+                                                {
+
+                                                    /*
+                                                     * If am-&#062;NumArgs is zero
+                                                     * the user double-clicked
+                                                     * on our icon, otherwise
+                                                     * one or more icons were
+                                                     * dropped on top of it.
+                                                     */
+                                                    if (appmsg-&#062;am_NumArgs == 0)
+                                                    {
+                                                        RemoveAppIcon(appicon);
+                                                        CONTINUE = FALSE;
+                                                    }
+                                                    ReplyMsg(
+                                                        (struct Message *) appmsg);
+                                                }
+                                            }
+                                            if (ICONIFY)
+                                            {
+
+                                                /*
+                                                 * Add appicon, close window if
+                                                 * succesful
+                                                 */
+                                                appicon = AddAppIcon(1, NULL, &#034;Hide&#034;,
+                                                    appport, NULL, &#038;AppIconDObj, NULL);
+                                                if (appicon == NULL)
+                                                {
+                                                    DisplayBeep(window-&#062;WScreen);
+                                                }
+                                                else
+                                                {
+                                                    RemoveGadget(window, hidegadget);
+                                                    left = window-&#062;LeftEdge;
+                                                    top = window-&#062;TopEdge;
+                                                    CloseWindow(window);
+                                                    window = NULL;
+                                                    /* there is no window
+                                                     * message port anymore */
+                                                    waitmask =
+                                                        1L &#060;&#060; appport-&#062;mp_SigBit;
+                                                }
+                                                ICONIFY = FALSE;
+                                            }
+                                        } while (CONTINUE == TRUE);
+                                        if (window)
+                                            RemoveGadget(window, hidegadget);
+                                        FreeGadgets(gadgetcontext);
+                                    }
+                                    FreeVisualInfo(visualinfo);
+                                }
+
+
+                                if (window)
+                                {
+                                    left = window-&#062;LeftEdge;
+                                    top = window-&#062;TopEdge;
+                                    CloseWindow(window);
+                                }
+                            }
+                        } while (ABORT == FALSE);
+                        DeleteMsgPort(appport);
+                    }
+                    CloseLibrary(WorkbenchBase);
+                }
+                CloseLibrary(GadToolsBase);
+            }
+            CloseLibrary(GfxBase);
+        }
+        CloseLibrary(IntuitionBase);
+    }
+    return (0);
+}
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

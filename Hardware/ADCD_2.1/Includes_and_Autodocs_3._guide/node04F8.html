@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="penmap_ic" NODE="--datasheet--" TITLE="penmap_ic/--datasheet--" -->
+<head>
+<title>penmap_ic/--datasheet--</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node04F7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node04F9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+        penmap_ic -- create penmap BOOPSI objects
+
+<b>    SUPERCLASS</b>
+        imageclass
+
+<b>    REQUIRES</b>
+        None.
+
+<b>    DESCRIPTION</b>
+        This class will yield color remapped images on any public screen.
+        It also supports bitmap scaling. If used with V39 or or greater
+        of AmigaOS it can take advantage of pen sharing.
+
+<b>    METHODS</b>
+        OM_NEW -- Create the penmap image.  Passed to superclass,
+            then OM_SET.
+
+        OM_GET -- Get object attributes.  Passed to superclass first.
+
+        OM_SET -- Set object attributes.  Passed to superclass first.
+
+        OM_UPDATE -- Set object notification attributes.  Passed to
+            superclass first.
+
+        IM_DRAW -- Renders the image. Supports IDS_NORMAL and
+            IDS_SELECTED drawing states, and does not require
+            a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line65">DrawInfo</a> structure. The graphics.library function
+            <a href="../Includes_and_Autodocs_3._guide/node02B1.html">BitMapScale</a> () to scale the image if required.
+
+        IM_DRAWFRAME -- Renders the image scaled to the frame size
+            specified. Supports IDS_NORMAL and IDS_SELECTED drawing
+            states, and does not require a <a href="../Includes_and_Autodocs_3._guide/node0602.html#line65">DrawInfo</a> structure.
+            The graphics.library function <a href="../Includes_and_Autodocs_3._guide/node02B1.html">BitMapScale</a> () to scale
+            the image.
+
+        IM_HITFRAME -- Asks the object if a point would be inside it
+            if the object was confined (scaled) to the given
+            rectangular bounds. Returns TRUE if the given point would
+            be inside the object, otherwise FALSE.
+
+        IM_ERASEFRAME -- Erase the object using the rectangular
+            frame size.
+
+        All other methods are passed to the superclass, including OM_DISPOSE.
+
+<b>    ATTRIBUTES</b>
+
+        IA_Left (WORD)
+        IA_Top (WORD)
+            Set starting position/offset of image.
+            Defaults to 0.
+
+           (Applicability is OM_NEW, OM_SET, OM_GET)
+
+        IA_Width (WORD)
+        IA_Height (WORD)
+            Set size of the image, scaling via <a href="../Includes_and_Autodocs_3._guide/node02B1.html">BitMapScale()</a> if different
+            from the chunky image data size.
+
+            Defaults to width and height of IA_Data.
+
+           (Applicability is OM_NEW, OM_SET, OM_GET)
+
+        IA_BGPen
+            Specify background pen of a normal image.
+
+            Defaults to BACKGROUNDPEN of the screen passed in PENMAP_Screen.
+
+           (Applicability is OM_NEW, OM_SET, OM_GET)
+
+        IA_Pens
+            Sets the pens which the values in the data array represents.
+
+           (Applicability is OM_NEW, OM_GET)
+
+        IA_Data
+           Chunky format image data for normal render.
+
+           The data format is a <a href="../Includes_and_Autodocs_3._guide/node0654.html#line50">UBYTE</a> array of chunky pen numbers.
+           Note this data must be WORD aligned, as the first 4 bytes
+           are accessed as two WORDs which specify the width and
+           height of the following chunky image data.
+
+           Defaults to NULL.
+
+           (Applicability is OM_NEW, OM_SET)
+
+        PENMAP_SelectedData
+           Chunky format image data for selected image render.
+
+           (Applicability is OM_NEW, OM_SET)
+
+        PENMAP_Palette
+           An array of ULONG describing the palette for the picture.
+           If you are obtaining pens yourself, you should only pass the
+           IA_Pens attribute at object creation time.
+
+           The format of the array is:
+
+           ULONG palette[] =
+           {
+               number_triplets,
+               red1, green1, blue1,
+               red2, green2, blue2,
+               ...
+           };
+
+           (Applicability is OM_NEW, OM_GET)
+
+        PENMAP_Screen (struct <a href="../Includes_and_Autodocs_3._guide/node0602.html#line132">Screen</a> *)
+            Pointer to the screen to use image on. This attribute MUST
+            be provided when creating an object of this class.
+
+           Defaults to NULL.
+
+           (Applicability is OM_NEW, OM_GET)
+
+        PENMAP_Transparent (BOOL)
+           Remaps chunky pen 0 to the BACKGROUNDPEN.
+
+           Defaults to FALSE.
+
+           (Applicability is OM_NEW, OM_SET)
+
+        PENMAP_Precision
+            Set the precision for ObtainBestPen() when penmap is used
+            under AmigaOS 3.0 or later. See the ObtainBestPen autodoc
+            for more details.
+
+            Defaults to PRECISION_IMAGE.
+
+            Applicability is (OM_NEW, OM_SET)
+
+        PENMAP_ColorMap (struct <a href="../Includes_and_Autodocs_3._guide/node05ED.html#line142">ColorMap</a> *)
+            Pointer to a colormap to use in obtaining best matching pens.
+            This tag or, PENMAP_Screen must be provided when creating an
+            object of this class. If PENMAP_Screen is passed, penmap will
+            use Screen-&#062;ViewPort.ColorMap.
+
+           Defaults to NULL.
+
+           (Applicability is OM_NEW, OM_GET)
+
+        PENMAP_MaskBlit (BOOL)
+           Causes penmap to render on screen using a mask plane. This
+           mask plane is created dynamically by the class.
+
+           The mask is created by OR'ing the source bitplanes in to a single
+           mask plane using some nifty blitting techniques. This tag should
+           be used if penmap objects are used in a layout group that may
+           contain a user or program specified backfill. This will allow the
+           backfill pattern to flow around the image, making it transparent.
+
+           Defaults to FALSE.
+
+           (Applicability is OM_NEW, OM_SET)
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

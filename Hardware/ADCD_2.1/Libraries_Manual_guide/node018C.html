@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_6" NODE="6-2-10" TITLE="6 / Setting Up Menus / About Menu Item Boxes" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>6 / Setting Up Menus / About Menu Item Boxes</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node018B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node018D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+<a name="line2">The item box is the rectangle containing the menu items or sub-items.</a>
+
+The size and location of the item or sub-item boxes is not directly
+described by the application.  Instead, the size is indirectly described
+by the placement of items and sub-items.  When presented with a menu
+strip, Intuition first calculates the minimum size box required to hold
+the items.  It then adjusts the box to ensure the menu display conforms to
+certain design philosophy constraints for items and sub-items.
+
+     <a href="../Libraries_Manual_guide/node05D6.html">Figure 6-2: Example Item Box</a> 
+
+The item box must start no further right than the leftmost position of the
+menu header's select box.  It must end no further left than the rightmost
+position of the menu header's select box.  The top edge of each item box
+must overlap the screen's title bar by one line.  Each sub-item box must
+<a name="line17">overlap its item's select box somewhere.</a>
+
+    Always Overlap.
+    ---------------
+    If your application is designed to work on systems prior to V37, do
+    not leave space between sub-items in a sub-item list.  This may cause
+    flickering as the pointer moves off one item into the gap between the
+    items.  Even a single line between the items may cause flickering.
+    This flickering is eliminated starting with V37.
+
+     <a href="../Libraries_Manual_guide/node05D7.html">Figure 6-3: Example Sub-item Box</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

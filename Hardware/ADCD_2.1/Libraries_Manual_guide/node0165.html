@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_5" NODE="5-12-1" TITLE="5 / String Gadget Type / Integer Gadget Type" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>5 / String Gadget Type / Integer Gadget Type</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0164.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0166.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The integer gadget is really a special case of the <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget type.
+Initialize the gadget as a string gadget, then set the <a href="../Libraries_Manual_guide/node014B.html#line91">GACT_LONGINT</a> flag
+in the gadget's <a href="../Libraries_Manual_guide/node0149.html#line53">Activation</a> field.
+
+The user interacts with an integer gadget using exactly the same rules as
+for a <a href="../Libraries_Manual_guide/node0164.html">string</a> gadget, but Intuition filters the input, allows the user to
+enter only a plus or minus sign and digits.  The integer gadget returns a
+signed 32-bit integer in the <a href="../Libraries_Manual_guide/node016B.html">StringInfo</a> variable <a href="../Libraries_Manual_guide/node016B.html#line80">LongInt</a>.
+
+To initialize an integer gadget to a value, preload the input buffer with
+an ASCII representation of the initial integer. It is not sufficient to
+initialize the gadget by merely setting a value in the <a href="../Libraries_Manual_guide/node016B.html#line80">LongInt</a> variable.
+
+Integer gadgets have the <a href="../Libraries_Manual_guide/node016B.html#line80">LongInt</a> value updated whenever the ASCII contents
+of the gadget changes, and again when the gadget is deactivated.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="icon" NODE="FreeFreeList()" TITLE="icon.library/FreeFreeList" -->
+<head>
+<title>icon.library/FreeFreeList</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node034A.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node034C.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	FreeFreeList - free all memory in a free list.
+
+<b>   SYNOPSIS</b>
+	FreeFreeList(free)
+	             A0
+
+	void FreeFreeList(struct <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line85">FreeList</a> *);
+
+<b>   FUNCTION</b>
+	This routine frees all memory in a free list, and the
+	free list itself.  It is useful for easily getting
+	rid of all memory in a series of structures.  There is
+	a free list in a Workbench object, and this contains
+	all the memory associated with that object.
+
+	A <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line85">FreeList</a> is a list of <a href="../Includes_and_Autodocs_3._guide/node062D.html#line55">MemList</a> structures.  See the
+	<a href="../Includes_and_Autodocs_3._guide/node062D.html#line55">MemList</a> and <a href="../Includes_and_Autodocs_3._guide/node062D.html#line39">MemEntry</a> documentation for more information.
+
+	If the <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line85">FreeList</a> itself is in the free list, it must be
+	in the first <a href="../Includes_and_Autodocs_3._guide/node062D.html#line55">MemList</a> in the <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line85">FreeList</a>.
+
+<b>   INPUTS</b>
+	free -- a pointer to a <a href="../Includes_and_Autodocs_3._guide/node05D6.html#line85">FreeList</a> structure; as of V44
+	    a NULL free parameter will be ignored.
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01E6.html">exec.library/AllocEntry</a>
+	<a href="../Includes_and_Autodocs_3._guide/node020D.html">exec.library/FreeEntry</a>
+	<a href="../Includes_and_Autodocs_3._guide/node0343.html">icon.library/AddFreeList</a>
+	<a href="../Includes_and_Autodocs_3._guide/node05D6.html">workbench/workbench.h</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

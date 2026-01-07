@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="AIFF-14" TITLE="AIFF.doc / AIFF / The Application Specific Chunk " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>AIFF.doc / AIFF / The Application Specific Chunk </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0226.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0228.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Application Specific Chunk can be used for any purposes whatsoever by
+developers and application authors.  For example, an application that
+edits sounds might want to use this chunk to store editor state parameters
+such as magnification levels, last cursor position, etc.
+
+    #define	ApplicationSpecificID 'APPL' /* ckID for Application */
+					     /*  Specific Chunk.     */
+    typedef struct {
+	ID		ckID;
+	long		ckSize;
+	OSType		applicationSignature;
+	char		data[];
+    } ApplicationSpecificChunk;
+
+The ckID is always 'APPL'.  The ckSize is the size of the data portion of
+the chunk, in bytes.  It does not include the 8 bytes used by ckID and
+ckSize.
+
+The applicationSignature identifies a particular application.  For
+Macintosh applications, this will be the application's four character
+signature.
+
+The OSType field is used by applications which run on platforms from Apple
+Computer, Inc.  For the Apple II, the OStype field should be set to
+'pdos'. For the Macintosh, this field should be set to the four character
+signature as registered with Apple Technical Support.
+
+The data field is the data specific to the application.
+
+The Application Specific Chunk is optional.  Any number of Application
+Specific Chunks may exist in a single FORM AIFF.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

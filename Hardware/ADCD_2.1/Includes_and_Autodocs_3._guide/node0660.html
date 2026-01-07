@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/graphics/gfxmacros.h" NODE="MAIN" TITLE="include/graphics/gfxmacros.h" -->
+<head>
+<title>include/graphics/gfxmacros.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node065F.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0661.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_GFXMACROS_H
+#define	GRAPHICS_GFXMACROS_H
+/*
+**	$VER: gfxmacros.h 39.3 (31.5.1993)
+**	Includes Release 44.1
+**
+**
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+
+#ifndef  GRAPHICS_RASTPORT_H
+#include &#060;graphics/rastport.h&#062;
+#endif
+
+#ifndef  GRAPHICS_GFXBASE_H
+#include &#060;graphics/gfxbase.h&#062;
+#endif
+
+#ifndef  HARDWARE_CUSTOM_H
+#include &#060;hardware/custom.h&#062;
+#endif
+
+#ifndef  HARDWARE_DMABITS_H
+#include &#060;hardware/dmabits.h&#062;
+#endif
+
+/* NOTE: Define the following symbol in your source code
+ *       if you need the old style macros defined below.
+ *       Otherwise you will get the more robust versions
+ *       instead.
+ */
+#ifdef OLD_GRAPHICS_GFXMACROS_H
+#define ON_DISPLAY	custom.dmacon = BITSET|DMAF_RASTER;
+#define OFF_DISPLAY	custom.dmacon = BITCLR|DMAF_RASTER;
+#define ON_SPRITE	custom.dmacon = BITSET|DMAF_SPRITE;
+#define OFF_SPRITE	custom.dmacon = BITCLR|DMAF_SPRITE;
+
+#define ON_VBLANK	custom.intena = BITSET|INTF_VERTB;
+#define OFF_VBLANK	custom.intena = BITCLR|INTF_VERTB;
+
+#define SetDrPt(w,p)	{(w)-&#062;LinePtrn = p;(w)-&#062;Flags |= FRST_DOT;(w)-&#062;linpatcnt=15;}
+#define SetAfPt(w,p,n)	{(w)-&#062;AreaPtrn = p;(w)-&#062;AreaPtSz = n;}
+
+#define SetOPen(w,c)	{(w)-&#062;AOlPen = c;(w)-&#062;Flags |= AREAOUTLINE;}
+#define SetWrMsk(w,m)	{(w)-&#062;Mask = m;}
+
+/* the SafeSetxxx macros are backwards (pre V39 graphics) compatible versions */
+/* using these macros will make your code do the right thing under V39 AND V37 */
+#define SafeSetOutlinePen(w,c)	  {if (GfxBase-&#062;LibNode.lib_Version&#060;39) { (w)-&#062;AOlPen = c;(w)-&#062;Flags |= AREAOUTLINE;} else SetOutlinePen(w,c); }
+#define SafeSetWriteMask(w,m)	{if (GfxBase-&#062;LibNode.lib_Version&#060;39) { (w)-&#062;Mask = (m);} else SetWriteMask(w,m); }
+
+/* synonym for GetOPen for consistency with SetOutlinePen */
+#define GetOutlinePen(rp) GetOPen(rp)
+
+#define BNDRYOFF(w)	{(w)-&#062;Flags &#038;= ~AREAOUTLINE;}
+
+#define CINIT(c,n)	  UCopperListInit(c,n);
+#define CMOVE(c,a,b)	{ CMove(c,&#038;a,b);CBump(c); }
+#define CWAIT(c,a,b)	{ CWait(c,a,b);CBump(c); }
+#define CEND(c)	{ CWAIT(c,10000,255); }
+
+#define DrawCircle(rp,cx,cy,r)	DrawEllipse(rp,cx,cy,r,r);
+#define AreaCircle(rp,cx,cy,r)	AreaEllipse(rp,cx,cy,r,r);
+#else /* OLD_GRAPHICS_GFXMACROS_H */
+
+
+#define ON_DISPLAY	custom.dmacon = BITSET|DMAF_RASTER
+#define OFF_DISPLAY	custom.dmacon = BITCLR|DMAF_RASTER
+#define ON_SPRITE	custom.dmacon = BITSET|DMAF_SPRITE
+#define OFF_SPRITE	custom.dmacon = BITCLR|DMAF_SPRITE
+
+#define ON_VBLANK	custom.intena = BITSET|INTF_VERTB
+#define OFF_VBLANK	custom.intena = BITCLR|INTF_VERTB
+
+
+#define SetDrPt(w,p)	do { \
+				(w)-&#062;LinePtrn = (p); \
+				(w)-&#062;Flags |= FRST_DOT; \
+				(w)-&#062;linpatcnt = 15; \
+			} while (0)
+
+#define SetAfPt(w,p,n)	do { \
+				(w)-&#062;AreaPtrn = p; \
+				(w)-&#062;AreaPtSz = n; \
+			} while (0)
+
+#define SetOPen(w,c)	do { \
+				(w)-&#062;AOlPen = c; \
+				(w)-&#062;Flags |= AREAOUTLINE; \
+			} while (0)
+
+#define SetWrMsk(w,m)	do { \
+				(w)-&#062;Mask = m; \
+			} while (0)
+
+/* the SafeSetxxx macros are backwards (pre V39 graphics) compatible versions */
+/* using these macros will make your code do the right thing under V39 AND V37 */
+
+#define SafeSetOutlinePen(w,c)	do { \
+					if (GfxBase-&#062;LibNode.lib_Version &#060; 39) \
+						SetOPen(w,c); \
+					else \
+						SetOutlinePen(w,c); \
+				} while (0)
+
+#define SafeSetWriteMask(w,m)	do { \
+					if (GfxBase-&#062;LibNode.lib_Version &#060; 39) \
+						SetWrMsk(w,m); \
+					else \
+						SetWriteMask(w,m); \
+				} while (0)
+
+/* synonym for GetOPen for consistency with SetOutlinePen */
+#define GetOutlinePen(rp) GetOPen(rp)
+
+
+#define BNDRYOFF(w)	do { \
+				(w)-&#062;Flags &#038;= ~AREAOUTLINE; \
+			} while (0)
+
+
+#define CINIT(c,n)	UCopperListInit(c,n)
+
+#define CMOVE(c,a,b)	do { \
+				CMove(c,&#038;a,b); \
+				CBump(c); \
+			} while (0)
+
+#define CWAIT(c,a,b)	do { \
+				CWait(c,a,b); \
+				CBump(c); \
+			} while (0)
+
+#define CEND(c)		do { \
+				CWAIT(c,10000,255); \
+			} while (0)
+
+
+#define DrawCircle(rp,cx,cy,r)	DrawEllipse(rp,cx,cy,r,r)
+#define AreaCircle(rp,cx,cy,r)	AreaEllipse(rp,cx,cy,r,r)
+
+
+#endif /* OLD_GRAPHICS_GFXMACROS_H */
+
+#endif	/* GRAPHICS_GFXMACROS_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

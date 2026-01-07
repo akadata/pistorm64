@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_1" NODE="1-2" TITLE="1 Introduction to Amiga System Devices / Accessing a Device" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>1 Introduction to Amiga System Devices / Accessing a Device</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0004.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0006.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+Accessing a device requires obtaining a message port, allocating memory
+for a specialized message packet called an I/O request, setting a pointer
+to the message port in the I/O request, and finally, establishing the link
+to the device itself by opening it.  An example of how to do this will be
+<a name="line6">provided later in this chapter.</a>
+
+The message port is used by the device to return messages to you.  A
+message port is obtained by calling the <a href="../Includes_and_Autodocs_2._guide/node0345.html">CreateMsgPort()</a> or <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a>
+function.  You must delete the message port when you are finished by
+calling the <a href="../Includes_and_Autodocs_2._guide/node0349.html">DeleteMsgPort()</a> or <a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a> function.
+
+For pre-V36 versions of the operating system (before Release 2.0), use the
+amiga.lib functions <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a> and <a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a>; for V36 and higher, use
+the Exec functions <a href="../Includes_and_Autodocs_2._guide/node0345.html">CreateMsgPort()</a> and <a href="../Includes_and_Autodocs_2._guide/node0349.html">DeleteMsgPort()</a>. <a href="../Includes_and_Autodocs_2._guide/node0148.html">CreatePort()</a> and
+<a href="../Includes_and_Autodocs_2._guide/node0153.html">DeletePort()</a> are upward compatible, you can use them with V36/V37;
+<a href="../Includes_and_Autodocs_2._guide/node0345.html">CreateMsgPort()</a> and <a href="../Includes_and_Autodocs_2._guide/node0349.html">DeleteMsgPort()</a> are not backward compatible, however.
+
+The I/O request is used to send commands and data from your application to
+the device.  The I/O request consists of fields used to hold the command
+you wish to execute and any parameters it requires.  You set up the fields
+with the appropriate information and send it to the device by using Exec
+I/O functions.
+
+At least four methods exist for creating an I/O request:
+
+   *  Declaring it as a structure.  The memory required will be allocated
+      at compile time.
+
+   *  Declaring it as a pointer and calling the <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a> function.  You
+      will have to call the <a href="../Includes_and_Autodocs_2._guide/node0355.html">FreeMem()</a> function to release the memory when
+      you are done.
+
+   *  Declaring it as a pointer and calling the <a href="../Includes_and_Autodocs_2._guide/node0147.html">CreateExtIO()</a> function.
+      This function not only allocates the memory for the request, it also
+      puts the message port in the I/O request.  You will have to call the
+      <a href="../Includes_and_Autodocs_2._guide/node0152.html">DeleteExtIO()</a> function to delete the I/O request when you are done.
+      This is the pre-V36 method (used in 1.3 and earlier versions of the
+<a name="line39">      operating system), but is upward compatible.</a>
+
+   *  Declaring it as a pointer and calling the <a href="../Includes_and_Autodocs_2._guide/node0344.html">CreateIORequest()</a> function.
+      This function not only allocates the memory for the request, it also
+      puts the message port in the I/O request.  You will have to call the
+      <a href="../Includes_and_Autodocs_2._guide/node0348.html">DeleteIORequest()</a> function to delete the I/O request when you are
+      done.  This is the V36/V37 method; it is not backwards compatible.
+
+The message port pointer in the I/O request tells the device where to
+respond with messages for your application.  You must set a pointer to the
+message port in the I/O request if you declare it as a structure or
+<a name="line50">allocate memory for it using <a href="../Includes_and_Autodocs_2._guide/node0332.html">AllocMem()</a>.</a>
+
+The device is opened by calling the <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> function.  In addition to
+establishing the link to the device, OpenDevice() also initializes fields
+in the I/O request.  OpenDevice() has this format:
+
+  return = OpenDevice(device_name,unit_number,
+                     (struct IORequest *)IORequest,flags)
+
+<a name="line59">where:</a>
+
+   *  device_name is one of the following NULL-terminated strings for
+      system devices:
+
+        audio.device        keyboard.device    serial.device
+        clipboard.device    narrator.device    timer.device
+        console.device      parallel.device    trackdisk.device
+        gameport.device     printer.device     input.device
+        scsi.device
+
+   *  unit_number refers to one of the logical units of the device. Devices
+      with one unit always use unit 0.  Multiple unit devices like the
+      trackdisk device and the timer device use the different units for
+<a name="line73">      specific purposes.  The device chapters discuss the units in detail.</a>
+
+   *  <a href="../Includes_and_Autodocs_2._guide/node0094.html#line20">IORequest</a> is the structure discussed above.  Some of the devices have
+      their own I/O requests defined in their include files and others use
+      standard I/O requests, (<a href="../Includes_and_Autodocs_2._guide/node0094.html#line29">IOStdReq</a>).  The device chapters list the I/O
+      request that each device requires.
+
+   *  flags are bits set to indicate options for some of the devices.  This
+      field is set to zero for devices which don't accept options when they
+      are opened.  The device chapters and autodocs list the flags values
+      and uses.
+
+   *  return is an indication of whether the <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> was successful
+      with zero indicating success.  Never assume that a device will
+      successfully open.  Check the return value and act accordingly.
+
+   Zero Equals Success for OpenDevice().
+   -------------------------------------
+   Unlike most Amiga system functions, <a href="../Includes_and_Autodocs_2._guide/node0366.html">OpenDevice()</a> returns zero for
+   success and a device-specific error value for failure.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

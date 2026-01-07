@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="exec" NODE="AddTail()" TITLE="exec.library/AddTail" -->
+<head>
+<title>exec.library/AddTail</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node01E0.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node01E2.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>   NAME</b>
+	AddTail -- append node to tail of a list
+
+<b>   SYNOPSIS</b>
+	AddTail(list, node)
+                A0    A1
+
+	void AddTail(struct <a href="../Includes_and_Autodocs_3._guide/node0628.html#line19">List</a> *, struct <a href="../Includes_and_Autodocs_3._guide/node062F.html#line21">Node</a> *);
+
+<b>   FUNCTION</b>
+	Add a node to the tail of a doubly linked list.  Assembly
+	programmers may prefer to use the ADDTAIL macro from
+	&#034;exec/lists.i&#034;.
+
+<b>   WARNING</b>
+	This function does not arbitrate for access to the list.  The
+	calling task must be the owner of the involved list.
+
+<b>   INPUTS</b>
+	list - a pointer to the target list header
+	node - a pointer to the node to insert at tail of the list
+
+<b>   SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node01D9.html">AddHead()</a>, <a href="../Includes_and_Autodocs_3._guide/node0206.html">Enqueue()</a>, <a href="../Includes_and_Autodocs_3._guide/node0219.html">Insert()</a>, <a href="../Includes_and_Autodocs_3._guide/node022F.html">Remove()</a>, <a href="../Includes_and_Autodocs_3._guide/node022B.html">RemHead()</a>, <a href="../Includes_and_Autodocs_3._guide/node0233.html">RemTail()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

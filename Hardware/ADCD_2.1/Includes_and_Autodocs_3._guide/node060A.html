@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="include/graphics/gfxnodes.h" NODE="MAIN" TITLE="include/graphics/gfxnodes.h" -->
+<head>
+<title>include/graphics/gfxnodes.h</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0609.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node060B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_GFXNODES_H
+#define	GRAPHICS_GFXNODES_H
+/*
+**	$VER: gfxnodes.h 39.0 (21.8.1991)
+**	Includes Release 44.1
+**
+**	graphics extended node definintions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+
+#ifndef EXEC_NODES_H
+#include &#060;exec/nodes.h&#062;
+#endif
+<a name="line16"></a>
+struct	ExtendedNode	{
+struct	Node	*xln_Succ;
+struct	Node	*xln_Pred;
+UBYTE	xln_Type;
+BYTE	xln_Pri;
+char	*xln_Name;
+UBYTE	xln_Subsystem;
+UBYTE	xln_Subtype;
+LONG	xln_Library;
+LONG	(*xln_Init)();
+};
+
+#define SS_GRAPHICS	0x02
+
+#define	VIEW_EXTRA_TYPE		1
+#define	VIEWPORT_EXTRA_TYPE	2
+#define	SPECIAL_MONITOR_TYPE	3
+#define	MONITOR_SPEC_TYPE	4
+
+#endif	/* GRAPHICS_GFXNODES_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_11" NODE="11-5-2" TITLE="11 / Amiga BootStrap / Bootpoint Booting" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>11 / Amiga BootStrap / Bootpoint Booting</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node007D.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node007F.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+BootPoint booting follows this sequence:
+
+   1. The eb_MountList node must contain a valid BootPoint:
+
+       a) <a href="../Includes_and_Autodocs_2._guide/node00FC.html#line32">ConfigDev</a> pointer (in ln_Name) is non-zero,
+
+       b) diagnostic area pointer (in cd_Rom er_Reserved0c) is non-zero,
+
+       c) DAC_CONFIGTIME set in da_Config.
+
+   2. The boot routine of a valid boot node is invoked as follows:
+
+       a) The address of the boot routine is calculated from da_BootPoint.
+
+       b) The resulting boot routine is invoked with the <a href="../Includes_and_Autodocs_2._guide/node00FC.html#line32">ConfigDev</a> pointer
+          on the stack in C fashion (i.e., (*boot)(configDev);). Moreover,
+          register A2 will contain the address of the associated
+          eb_MountList node.
+
+   3. Return from the boot routine indicates failure to boot.
+
+If all entries fail to boot, the user is prompted to put a bootable disk
+into a floppy drive with the &#034;strap screen&#034;.  The system floppy drives
+are polled for new disks.  When one appears, the &#034;strap screen&#034; is removed
+and the appropriate boot mechanism is applied as described above.  The
+process of prompting and trying continues till a successful boot occurs.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

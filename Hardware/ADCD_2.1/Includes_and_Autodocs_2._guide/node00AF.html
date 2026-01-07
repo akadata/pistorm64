@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/rastport.h" NODE="MAIN" TITLE="Includes/graphics/rastport.h" -->
+<head>
+<title>Includes/graphics/rastport.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00AE.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00B0.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_RASTPORT_H
+#define	GRAPHICS_RASTPORT_H
+/*
+**	$Filename: graphics/rastport.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef EXEC_TYPES_H
+#include &#060;exec/types.h&#062;
+#endif
+<a name="line18"></a>
+#ifndef GRAPHICS_GFX_H
+#include &#060;graphics/gfx.h&#062;
+#endif
+<a name="line22"></a>
+struct AreaInfo
+<a name="line24">{</a>
+<a name="line25">    WORD   *VctrTbl;	     /* ptr to start of vector table */</a>
+<a name="line26">    WORD   *VctrPtr;	     /* ptr to current vertex */</a>
+<a name="line27">    BYTE    *FlagTbl;	      /* ptr to start of vector flag table */</a>
+<a name="line28">    BYTE    *FlagPtr;	      /* ptrs to areafill flags */</a>
+<a name="line29">    WORD   Count;	     /* number of vertices in list */</a>
+<a name="line30">    WORD   MaxCount;	     /* AreaMove/Draw will not allow Count&#062;MaxCount*/</a>
+    WORD   FirstX,FirstY;    /* first point for this polygon */
+};
+<a name="line33"></a>
+struct TmpRas
+<a name="line35">{</a>
+<a name="line36">    BYTE *RasPtr;</a>
+    LONG Size;
+};
+<a name="line39"></a>
+<a name="line40">/* unoptimized for 32bit alignment of pointers */</a>
+struct GelsInfo
+<a name="line42">{</a>
+    BYTE sprRsrvd;	      /* flag of which sprites to reserve from
+<a name="line44">				 vsprite system */</a>
+<a name="line45">    UBYTE Flags;	      /* system use */</a>
+    struct VSprite *gelHead, *gelTail; /* dummy vSprites for list management*/
+<a name="line47">    /* pointer to array of 8 WORDS for sprite available lines */</a>
+    WORD *nextLine;
+<a name="line49">    /* pointer to array of 8 pointers for color-last-assigned to vSprites */</a>
+<a name="line50">    WORD **lastColor;</a>
+<a name="line51">    struct collTable *collHandler;     /* addresses of collision routines */</a>
+<a name="line52">    WORD leftmost, rightmost, topmost, bottommost;</a>
+   APTR firstBlissObj,lastBlissObj;    /* system use only */
+};
+<a name="line55"></a>
+struct RastPort
+<a name="line57">{</a>
+<a name="line58">    struct  Layer *Layer;</a>
+<a name="line59">    struct  BitMap   *BitMap;</a>
+<a name="line60">    UWORD  *AreaPtrn;	     /* ptr to areafill pattern */</a>
+<a name="line61">    struct  TmpRas *TmpRas;</a>
+<a name="line62">    struct  AreaInfo *AreaInfo;</a>
+<a name="line63">    struct  GelsInfo *GelsInfo;</a>
+<a name="line64">    UBYTE   Mask;	      /* write mask for this raster */</a>
+<a name="line65">    BYTE    FgPen;	      /* foreground pen for this raster */</a>
+<a name="line66">    BYTE    BgPen;	      /* background pen  */</a>
+<a name="line67">    BYTE    AOlPen;	      /* areafill outline pen */</a>
+<a name="line68">    BYTE    DrawMode;	      /* drawing mode for fill, lines, and text */</a>
+<a name="line69">    BYTE    AreaPtSz;	      /* 2^n words for areafill pattern */</a>
+<a name="line70">    BYTE    linpatcnt;	      /* current line drawing pattern preshift */</a>
+<a name="line71">    BYTE    dummy;</a>
+<a name="line72">    UWORD  Flags;	     /* miscellaneous control bits */</a>
+<a name="line73">    UWORD  LinePtrn;	     /* 16 bits for textured lines */</a>
+<a name="line74">    WORD   cp_x, cp_y;	     /* current pen position */</a>
+<a name="line75">    UBYTE   minterms[8];</a>
+<a name="line76">    WORD   PenWidth;</a>
+<a name="line77">    WORD   PenHeight;</a>
+<a name="line78">    struct  TextFont *Font;   /* current font address */</a>
+<a name="line79">    UBYTE   AlgoStyle;	      /* the algorithmically generated style */</a>
+<a name="line80">    UBYTE   TxFlags;	      /* text specific flags */</a>
+<a name="line81">    UWORD   TxHeight;	      /* text height */</a>
+<a name="line82">    UWORD   TxWidth;	      /* text nominal width */</a>
+<a name="line83">    UWORD   TxBaseline;       /* text baseline */</a>
+<a name="line84">    WORD    TxSpacing;	      /* text spacing (per character) */</a>
+<a name="line85">    APTR    *RP_User;</a>
+    ULONG   longreserved[2];
+<a name="line87">#ifndef GFX_RASTPORT_1_2</a>
+<a name="line88">    UWORD   wordreserved[7];  /* used to be a node */</a>
+    UBYTE   reserved[8];      /* for future use */
+#endif
+};
+
+<a name="line93">/* drawing modes */</a>
+<a name="line94">#define JAM1	    0	      /* jam 1 color into raster */</a>
+<a name="line95">#define JAM2	    1	      /* jam 2 colors into raster */</a>
+<a name="line96">#define COMPLEMENT  2	      /* XOR bits into raster */</a>
+#define INVERSVID   4	      /* inverse video for drawing modes */
+
+<a name="line99">/* these are the flag bits for RastPort flags */</a>
+<a name="line100">#define FRST_DOT    0x01      /* draw the first dot of this line ? */</a>
+#define ONE_DOT     0x02      /* use one dot mode for drawing lines */
+<a name="line102">#define DBUFFER     0x04      /* flag set when RastPorts</a>
+				 are double-buffered */
+
+	     /* only used for bobs */
+<a name="line106"></a>
+<a name="line107">#define AREAOUTLINE 0x08      /* used by areafiller */</a>
+#define NOCROSSFILL 0x20      /* areafills have no crossovers */
+
+/* there is only one style of clipping: raster clipping */
+/* this preserves the continuity of jaggies regardless of clip window */
+/* When drawing into a RastPort, if the ptr to ClipRect is nil then there */
+/* is no clipping done, this is dangerous but useful for speed */
+
+#endif	/* GRAPHICS_RASTPORT_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

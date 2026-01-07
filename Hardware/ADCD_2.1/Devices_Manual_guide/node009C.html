@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_12" NODE="12-2" TITLE="12 Serial Device / Device Interface" INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>12 Serial Device / Device Interface</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node009B.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node009D.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The serial device operates like the other Amiga devices.  To use it, you
+must first open the serial device, then send I/O requests to it, and then
+close it when finished.  See the &#034;<a href="../Devices_Manual_guide/node0006.html">Introduction to Amiga System Devices</a>&#034;
+<a name="line5">chapter for general information on device usage.</a>
+
+<a name="line7">The I/O request used by the serial device is called IOExtSer.</a>
+
+    struct IOExtSer
+       {
+        struct   IOStdReq IOSer;
+        ULONG    io_CtlChar;    /* control characters */
+        ULONG    io_RBufLen;    /* length in bytes of serial read buffer */
+        ULONG    io_ExtFlags;   /* additional serial flags */
+        ULONG    io_Baud;       /* baud rate */
+        ULONG    io_BrkTime;    /* duration of break in microseconds */
+        struct   iOTArray  io_TermArray;  /* termination character array */
+        UBYTE    io_ReadLen;    /* number of bits per read character */
+        UBYTE    io_WriteLen;   /* number of bits per write character */
+        UBYTE    io_StopBits;   /* number of stopbits for read */
+<a name="line21">        UBYTE    io_SerFlags;   /* serial device flags */</a>
+        UWORD    io_Status;     /* status of serial port and lines */
+    };
+
+See the include file devices/<a href="../Includes_and_Autodocs_2._guide/node004B.html">serial.h</a> for the complete structure
+definition.
+
+ <a href="../Devices_Manual_guide/node009D.html">Opening The Serial Device</a> 		 <a href="../Devices_Manual_guide/node009F.html">Writing To The Serial Device</a> 
+ <a href="../Devices_Manual_guide/node009E.html">Reading From The Serial Device</a> 	 <a href="../Devices_Manual_guide/node00A0.html">Closing The Serial Device</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

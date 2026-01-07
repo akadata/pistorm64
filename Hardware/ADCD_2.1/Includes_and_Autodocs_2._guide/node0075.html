@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/dos/dos_lib.i" NODE="MAIN" TITLE="Includes/dos/dos_lib.i" -->
+<head>
+<title>Includes/dos/dos_lib.i</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0074.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0076.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+	IFND	DOS_DOS_LIB_I
+DOS_DOS_LIB_I	SET	1
+**
+**	$Filename: dos/dos_lib.i $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.1 $
+**	$Date: 90/11/04 $
+**
+**	Library interface offsets for DOS library
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+**
+
+reserve EQU	4
+vsize	EQU	6
+count	SET	-vsize*(reserve+1)
+LIBENT	MACRO
+_LVO\1	EQU	count
+count	SET	count-vsize
+	ENDM
+*
+*
+*
+   LIBENT   Open
+   LIBENT   Close
+   LIBENT   Read
+   LIBENT   Write
+   LIBENT   Input
+   LIBENT   Output
+   LIBENT   Seek
+   LIBENT   DeleteFile
+   LIBENT   Rename
+   LIBENT   Lock
+   LIBENT   UnLock
+   LIBENT   DupLock
+   LIBENT   Examine
+   LIBENT   ExNext
+   LIBENT   Info
+   LIBENT   CreateDir
+   LIBENT   CurrentDir
+   LIBENT   IoErr
+   LIBENT   CreateProc
+   LIBENT   Exit
+   LIBENT   LoadSeg
+   LIBENT   UnLoadSeg
+   LIBENT   GetPacket
+   LIBENT   QueuePacket
+   LIBENT   DeviceProc
+   LIBENT   SetComment
+   LIBENT   SetProtection
+   LIBENT   DateStamp
+   LIBENT   Delay
+   LIBENT   WaitForChar
+   LIBENT   ParentDir
+   LIBENT   IsInteractive
+   LIBENT   Execute
+
+	ENDC	; DOS_DOS_LIB_I
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

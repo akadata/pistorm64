@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Devices/Dev_A_3PF_Specs" NODE="AIFF-1" TITLE="AIFF.doc / AIFF / Data Types " INDEX="Devices/Dev_Index/MAIN" -->
+<head>
+<title>AIFF.doc / AIFF / Data Types </title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Devices_Manual_guide/node012A.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Devices_Manual_guide/node0213.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Devices_Manual_guide/node0215.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+A C-like language will be used to describe the data structures in this
+document The data types used are listed below.
+
+char:          8 bits signed.  A char can contain more than just ASCII
+               characters.  It can contain any number from -128 to 127
+               (inclusive).
+unsigned char: 8 bits signed. Contains numbers from 0 to 255 (inclusive).
+short:         16 bits signed.  Contains any number from -32,768 to 32,767
+               (inclusive).
+unsigned short:16 bits unsigned.  Contains any number from 0 to 65,535
+               (inclusive).
+long:          32 bits signed. Contains any number from -2,147,483,648
+               to 2,147,483,647 (inclusive).
+unsigned long: 32 bits unsigned. Contains any number from 0 to
+               4,294,967,295 (inclusive).
+extended:      80 bit IEEE Standard 754 floating point number (Standard
+               Apple Numeric Environment [SANE] data type Extended)
+pstring:       Pascal-style string, a one-byte count followed by text
+               bytes.  The total number of bytes in this data type should
+               be even.  A pad byte can be added to the end of the text to
+               accomplish this.  This pad byte is not reflected in the
+               count.
+ID:            32 bits,the concatenation of four printable ASCII characters
+               in the range ' ' (space, 0x20) through '~' (tilde, 0x7E).
+               Leading spaces are not allowed in the ID but trailing spaces
+               are OK.  Control characters are forbidden.
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

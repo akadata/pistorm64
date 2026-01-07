@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/graphics/text.h" NODE="MAIN" TITLE="Includes/graphics/text.h" -->
+<head>
+<title>Includes/graphics/text.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node00A7.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node00A9.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef	GRAPHICS_TEXT_H
+#define	GRAPHICS_TEXT_H
+/*
+**	$Filename: graphics/text.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 37.0 $
+**	$Date: 91/01/07 $
+**
+**	graphics library text structures
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef	EXEC_PORTS_H
+#include	&#034;exec/ports.h&#034;
+#endif	/* EXEC_PORTS_H */
+<a name="line18"></a>
+#ifndef	GRAPHICS_GFX_H
+#include	&#034;graphics/gfx.h&#034;
+#endif	/* GRAPHICS_GFX_H */
+
+#ifndef	UTILITY_TAGITEM_H
+#include	&#034;utility/tagitem.h&#034;
+#endif	/* UTILITY_TAGITEM_H */
+<a name="line26"></a>
+<a name="line27">/*------ Font Styles ------------------------------------------------*/</a>
+<a name="line28">#define	FS_NORMAL	0	/* normal text (no style bits set) */</a>
+<a name="line29">#define	FSB_UNDERLINED	0	/* underlined (under baseline) */</a>
+<a name="line30">#define	FSF_UNDERLINED	0x01</a>
+<a name="line31">#define	FSB_BOLD	1	/* bold face text (ORed w/ shifted) */</a>
+<a name="line32">#define	FSF_BOLD	0x02</a>
+<a name="line33">#define	FSB_ITALIC	2	/* italic (slanted 1:2 right) */</a>
+<a name="line34">#define	FSF_ITALIC	0x04</a>
+<a name="line35">#define	FSB_EXTENDED	3	/* extended face (wider than normal) */</a>
+#define	FSF_EXTENDED	0x08
+<a name="line37"></a>
+<a name="line38">#define	FSB_COLORFONT	6	/* this uses ColorTextFont structure */</a>
+<a name="line39">#define	FSF_COLORFONT	0x40</a>
+<a name="line40">#define	FSB_TAGGED	7	/* the TextAttr is really an TTextAttr, */</a>
+#define	FSF_TAGGED	0x80
+<a name="line42"></a>
+<a name="line43">/*------ Font Flags -------------------------------------------------*/</a>
+<a name="line44">#define	FPB_ROMFONT	0	/* font is in rom */</a>
+<a name="line45">#define	FPF_ROMFONT	0x01</a>
+<a name="line46">#define	FPB_DISKFONT	1	/* font is from diskfont.library */</a>
+<a name="line47">#define	FPF_DISKFONT	0x02</a>
+<a name="line48">#define	FPB_REVPATH	2	/* designed path is reversed (e.g. left) */</a>
+<a name="line49">#define	FPF_REVPATH	0x04</a>
+<a name="line50">#define	FPB_TALLDOT	3	/* designed for hires non-interlaced */</a>
+<a name="line51">#define	FPF_TALLDOT	0x08</a>
+<a name="line52">#define	FPB_WIDEDOT	4	/* designed for lores interlaced */</a>
+<a name="line53">#define	FPF_WIDEDOT	0x10</a>
+<a name="line54">#define	FPB_PROPORTIONAL 5	/* character sizes can vary from nominal */</a>
+<a name="line55">#define	FPF_PROPORTIONAL 0x20</a>
+#define	FPB_DESIGNED	6	/* size explicitly designed, not constructed */
+				/* note: if you do not set this bit in your */
+				/* textattr, then a font may be constructed */
+				/* for you by scaling an existing rom or disk */
+<a name="line60">				/* font (under V36 and above). */</a>
+#define	FPF_DESIGNED	0x40
+<a name="line62">    /* bit 7 is always clear for fonts on the graphics font list */</a>
+<a name="line63">#define	FPB_REMOVED	7	/* the font has been removed */</a>
+#define	FPF_REMOVED	(1&#060;&#060;7)
+<a name="line65"></a>
+<a name="line66">/****** TextAttr node, matches text attributes in RastPort **********/</a>
+<a name="line67">struct TextAttr {</a>
+<a name="line68">    STRPTR  ta_Name;		/* name of the font */</a>
+<a name="line69">    UWORD   ta_YSize;		/* height of the font */</a>
+<a name="line70">    UBYTE   ta_Style;		/* intrinsic font style */</a>
+    UBYTE   ta_Flags;		/* font preferences and flags */
+};
+<a name="line73"></a>
+<a name="line74">struct TTextAttr {</a>
+<a name="line75">    STRPTR  tta_Name;		/* name of the font */</a>
+<a name="line76">    UWORD   tta_YSize;		/* height of the font */</a>
+<a name="line77">    UBYTE   tta_Style;		/* intrinsic font style */</a>
+<a name="line78">    UBYTE   tta_Flags;		/* font preferences and flags */</a>
+    struct TagItem *tta_Tags;	/* extended attributes */
+};
+
+
+<a name="line83">/****** Text Tags ***************************************************/</a>
+#define	TA_DeviceDPI	(1|TAG_USER)	/* Tag value is Point union: */
+					/* Hi word XDPI, Lo word YDPI */
+<a name="line86"></a>
+#define	MAXFONTMATCHWEIGHT	32767	/* perfect match from WeighTAMatch */
+
+<a name="line89"></a>
+<a name="line90">/****** TextFonts node **********************************************/</a>
+<a name="line91">struct TextFont {</a>
+    struct Message tf_Message;	/* reply message for font removal */
+<a name="line93">				/* font name in LN	  \    used in this */</a>
+<a name="line94">    UWORD   tf_YSize;		/* font height		  |    order to best */</a>
+<a name="line95">    UBYTE   tf_Style;		/* font style		  |    match a font */</a>
+<a name="line96">    UBYTE   tf_Flags;		/* preferences and flags  /    request. */</a>
+<a name="line97">    UWORD   tf_XSize;		/* nominal font width */</a>
+<a name="line98">    UWORD   tf_Baseline;	/* distance from the top of char to baseline */</a>
+    UWORD   tf_BoldSmear;	/* smear to affect a bold enhancement */
+<a name="line100"></a>
+    UWORD   tf_Accessors;	/* access count */
+<a name="line102"></a>
+<a name="line103">    UBYTE   tf_LoChar;		/* the first character described here */</a>
+<a name="line104">    UBYTE   tf_HiChar;		/* the last character described here */</a>
+    APTR    tf_CharData;	/* the bit character data */
+<a name="line106"></a>
+<a name="line107">    UWORD   tf_Modulo;		/* the row modulo for the strike font data */</a>
+    APTR    tf_CharLoc;		/* ptr to location data for the strike font */
+<a name="line109">				/*   2 words: bit offset then size */</a>
+<a name="line110">    APTR    tf_CharSpace;	/* ptr to words of proportional spacing data */</a>
+    APTR    tf_CharKern;	/* ptr to words of kerning data */
+};
+<a name="line113"></a>
+<a name="line114">/* unfortunately, this needs to be explicitly typed */</a>
+#define	tf_Extension	tf_Message.mn_ReplyPort
+
+<a name="line117">/*-----	tfe_Flags0 (partial definition) ----------------------------*/</a>
+<a name="line118">#define TE0B_NOREMFONT	0	/* disallow RemFont for this font */</a>
+#define TE0F_NOREMFONT	0x01
+<a name="line120"></a>
+<a name="line121">struct TextFontExtension {	/* this structure is read-only */</a>
+<a name="line122">    UWORD   tfe_MatchWord;		/* a magic cookie for the extension */</a>
+<a name="line123">    UBYTE   tfe_Flags0;			/* (system private flags) */</a>
+<a name="line124">    UBYTE   tfe_Flags1;			/* (system private flags) */</a>
+<a name="line125">    struct TextFont *tfe_BackPtr;	/* validation of compilation */</a>
+<a name="line126">    struct MsgPort *tfe_OrigReplyPort;	/* original value in tf_Extension */</a>
+<a name="line127">    struct TagItem *tfe_Tags;		/* Text Tags for the font */</a>
+<a name="line128">    UWORD  *tfe_OFontPatchS;		/* (system private use) */</a>
+    UWORD  *tfe_OFontPatchK;		/* (system private use) */
+    /* this space is reserved for future expansion */
+};
+
+/******	ColorTextFont node ******************************************/
+<a name="line134">/*-----	ctf_Flags --------------------------------------------------*/</a>
+<a name="line135">#define	CT_COLORMASK	0x000F	/* mask to get to following color styles */</a>
+<a name="line136">#define	CT_COLORFONT	0x0001	/* color map contains designer's colors */</a>
+#define	CT_GREYFONT	0x0002	/* color map describes even-stepped */
+<a name="line138">				/* brightnesses from low to high */</a>
+#define	CT_ANTIALIAS	0x0004	/* zero background thru fully saturated char */
+<a name="line140"></a>
+<a name="line141">#define	CTB_MAPCOLOR	0	/* map ctf_FgColor to the rp_FgPen if it's */</a>
+#define	CTF_MAPCOLOR	0x0001	/* is a valid color within ctf_Low..ctf_High */
+<a name="line143"></a>
+<a name="line144">/*----- ColorFontColors --------------------------------------------*/</a>
+<a name="line145">struct ColorFontColors {</a>
+<a name="line146">    UWORD   cfc_Reserved;	/* *must* be zero */</a>
+<a name="line147">    UWORD   cfc_Count;		/* number of entries in cfc_ColorTable */</a>
+    UWORD  *cfc_ColorTable;	/* 4 bit per component color map packed xRGB */
+};
+<a name="line150"></a>
+<a name="line151">/*-----	ColorTextFont ----------------------------------------------*/</a>
+<a name="line152">struct ColorTextFont {</a>
+<a name="line153">    struct TextFont ctf_TF;</a>
+<a name="line154">    UWORD   ctf_Flags;		/* extended flags */</a>
+<a name="line155">    UBYTE   ctf_Depth;		/* number of bit planes */</a>
+<a name="line156">    UBYTE   ctf_FgColor;	/* color that is remapped to FgPen */</a>
+<a name="line157">    UBYTE   ctf_Low;		/* lowest color represented here */</a>
+<a name="line158">    UBYTE   ctf_High;		/* highest color represented here */</a>
+<a name="line159">    UBYTE   ctf_PlanePick;	/* PlanePick ala Images */</a>
+<a name="line160">    UBYTE   ctf_PlaneOnOff;	/* PlaneOnOff ala Images */</a>
+<a name="line161">    struct ColorFontColors *ctf_ColorFontColors; /* colors for font */</a>
+    APTR    ctf_CharData[8];	/*pointers to bit planes ala tf_CharData */
+};
+<a name="line164"></a>
+<a name="line165">/****** TextExtent node *********************************************/</a>
+<a name="line166">struct TextExtent {</a>
+<a name="line167">    UWORD   te_Width;		/* same as TextLength */</a>
+<a name="line168">    UWORD   te_Height;		/* same as tf_YSize */</a>
+    struct Rectangle te_Extent;	/* relative to CP */
+};
+
+#endif	/* GRAPHICS_TEXT_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

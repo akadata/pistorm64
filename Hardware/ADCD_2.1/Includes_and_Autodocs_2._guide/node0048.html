@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Includes/devices/clipboard.h" NODE="MAIN" TITLE="Includes/devices/clipboard.h" -->
+<head>
+<title>Includes/devices/clipboard.h</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_2._guide/node0047.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_2._guide/node0049.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+#ifndef     DEVICES_CLIPBOARD_H
+#define     DEVICES_CLIPBOARD_H
+/*
+**	$Filename: devices/clipboard.h $
+**	$Release: 2.04 Includes, V37.4 $
+**	$Revision: 36.5 $
+**	$Date: 90/11/02 $
+**
+**	clipboard.device structure definitions
+**
+**	(C) Copyright 1985-1999 Amiga, Inc.
+**	    All Rights Reserved
+*/
+<a name="line14"></a>
+#ifndef	EXEC_TYPES_H
+#include	&#034;exec/types.h&#034;
+<a name="line17">#endif</a>
+#ifndef	EXEC_NODES_H
+#include	&#034;exec/nodes.h&#034;
+<a name="line20">#endif</a>
+#ifndef	EXEC_LISTS_H
+#include	&#034;exec/lists.h&#034;
+<a name="line23">#endif</a>
+#ifndef	EXEC_PORTS_H
+#include	&#034;exec/ports.h&#034;
+#endif
+<a name="line27"></a>
+<a name="line28">#define	CBD_POST		(CMD_NONSTD+0)</a>
+<a name="line29">#define	CBD_CURRENTREADID	(CMD_NONSTD+1)</a>
+<a name="line30">#define	CBD_CURRENTWRITEID	(CMD_NONSTD+2)</a>
+#define	CBD_CHANGEHOOK		(CMD_NONSTD+3)
+<a name="line32"></a>
+#define	CBERR_OBSOLETEID	1
+
+<a name="line35"></a>
+<a name="line36">struct ClipboardUnitPartial {</a>
+<a name="line37">    struct  Node cu_Node;	/* list of units */</a>
+    ULONG   cu_UnitNum;		/* unit number for this unit */
+    /* the remaining unit data is private to the device */
+};
+
+<a name="line42"></a>
+<a name="line43">struct IOClipReq {</a>
+<a name="line44">    struct Message io_Message;</a>
+<a name="line45">    struct Device *io_Device;	/* device node pointer	*/</a>
+<a name="line46">    struct ClipboardUnitPartial *io_Unit; /* unit node pointer */</a>
+<a name="line47">    UWORD   io_Command;		/* device command */</a>
+<a name="line48">    UBYTE   io_Flags;		/* including QUICK and SATISFY */</a>
+<a name="line49">    BYTE    io_Error;		/* error or warning num */</a>
+<a name="line50">    ULONG   io_Actual;		/* number of bytes transferred */</a>
+<a name="line51">    ULONG   io_Length;		/* number of bytes requested */</a>
+<a name="line52">    STRPTR  io_Data;		/* either clip stream or post port */</a>
+<a name="line53">    ULONG   io_Offset;		/* offset in clip stream */</a>
+    LONG    io_ClipID;		/* ordinal clip identifier */
+};
+<a name="line56"></a>
+#define	PRIMARY_CLIP	0	/* primary clip unit */
+<a name="line58"></a>
+<a name="line59">struct SatisfyMsg {</a>
+<a name="line60">    struct Message sm_Msg;	/* the length will be 6 */</a>
+<a name="line61">    UWORD   sm_Unit;		/* which clip unit this is */</a>
+    LONG    sm_ClipID;		/* the clip identifier of the post */
+};
+<a name="line64"></a>
+<a name="line65">struct ClipHookMsg {</a>
+<a name="line66">    ULONG   chm_Type;		/* zero for this structure format */</a>
+    LONG    chm_ChangeCmd;	/* command that caused this hook invocation: */
+<a name="line68">				/*   either CMD_UPDATE or CBD_POST */</a>
+    LONG    chm_ClipID;		/* the clip identifier of the new data */
+};
+
+#endif	/* DEVICES_CLIPBOARD_H */
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

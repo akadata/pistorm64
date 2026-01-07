@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/39.2 FILE="dos" NODE="DeviceProc()" TITLE="dos.library/DeviceProc" -->
+<head>
+<title>dos.library/DeviceProc</title>
+</head>
+<body text="#000000" bgcolor="#AAAAAA">
+<img src="../images/toc_d.gif" alt="[Contents]">
+<img src="../images/index_d.gif" alt="[Index]">
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Includes_and_Autodocs_3._guide/node0153.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Includes_and_Autodocs_3._guide/node0155.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+
+<b>    NAME</b>
+	DeviceProc -- Return the process <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> of specific I/O handler
+
+<b>    SYNOPSIS</b>
+	process = DeviceProc( name )
+	D0		      D1
+
+	struct <a href="../Includes_and_Autodocs_3._guide/node062E.html#line27">MsgPort</a> *DeviceProc (STRPTR)
+
+<b>    FUNCTION</b>
+	DeviceProc() returns the process identifier of the process which
+	handles the device associated with the specified name. If no
+	process handler can be found then the result is zero. If the name
+	refers to an assign then a directory lock is returned in <a href="../Includes_and_Autodocs_3._guide/node0182.html">IoErr()</a>.
+	This lock should not be UnLock()ed or Examine()ed (if you wish to do
+	so, <a href="../Includes_and_Autodocs_3._guide/node0156.html">DupLock()</a> it first).
+
+<b>    BUGS</b>
+	In V36, if you try to DeviceProc() something relative to an assign
+	made with <a href="../Includes_and_Autodocs_3._guide/node0142.html">AssignPath()</a>, it will fail.  This is because there's no
+	way to know when to unlock the lock.  If you're writing code for
+	V36 or later, it is highly advised you use <a href="../Includes_and_Autodocs_3._guide/node0177.html">GetDeviceProc()</a> instead,
+	or make your code conditional on V36 to use GetDeviceProc()/
+	<a href="../Includes_and_Autodocs_3._guide/node0170.html">FreeDeviceProc()</a>.
+
+<b>    SEE ALSO</b>
+	<a href="../Includes_and_Autodocs_3._guide/node0177.html">GetDeviceProc()</a>, <a href="../Includes_and_Autodocs_3._guide/node0170.html">FreeDeviceProc()</a>, <a href="../Includes_and_Autodocs_3._guide/node0156.html">DupLock()</a>, <a href="../Includes_and_Autodocs_3._guide/node01C8.html">UnLock()</a>, <a href="../Includes_and_Autodocs_3._guide/node015C.html">Examine()</a>
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

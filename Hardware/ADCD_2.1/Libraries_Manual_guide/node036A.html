@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_27" NODE="27-5" TITLE="27 Graphics Primitives / User Copper Lists" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>27 Graphics Primitives / User Copper Lists</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node0369.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node036B.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+The Copper coprocessor allows you to produce mid-screen changes in certain
+hardware registers in addition to changes that the system software already
+provides.  For example, it is the Copper that allows the Amiga to split
+the viewing area into multiple draggable screens, each with its own
+<a name="line6">independent set of colors.</a>
+
+To create your own mid-screen effects on the system hardware registers,
+you provide &#034;user Copper lists&#034; that can be merged into the system Copper
+lists.
+
+In the <a href="../Libraries_Manual_guide/node032B.html#line59">ViewPort</a> data structure there is a pointer named UCopIns.  If this
+pointer value is non-NULL, it points to a user Copper list that you have
+dynamically allocated and initialized to contain your own special
+<a name="line15">hardware-stuffing instructions.</a>
+
+You allocate a user Copper list by an instruction sequence such as the
+following:
+
+    struct UCopList *uCopList = NULL;
+
+    /* Allocate memory for the Copper list.  Make certain that the */
+    /* initial memory is cleared.                                  */
+    uCopList = (struct UCopList *)
+            AllocMem(sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CLEAR);
+
+    if (uCopList == NULL)
+            return(FALSE);
+
+
+    Note:
+    -----
+     User Copper lists do not have to be in Chip RAM.
+
+ <a href="../Libraries_Manual_guide/node036B.html">Copper List Macros</a>    <a href="../Libraries_Manual_guide/node059E.html">Copper List Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>

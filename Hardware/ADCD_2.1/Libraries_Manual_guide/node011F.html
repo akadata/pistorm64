@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<!-- AG2HTML: CONVERTER=AG2HTML/1.1 FORMAT=AMIGAGUIDE/34.11 FILE="Libraries/Lib_4" NODE="4-5-5" TITLE="4 / Preserving the Window Display / Setting Up A SuperBitMap Window" INDEX="Libraries/Lib_Index/MAIN" -->
+<head>
+<title>4 / Preserving the Window Display / Setting Up A SuperBitMap Window</title>
+</head>
+<body>
+<img src="../images/toc_d.gif" alt="[Contents]">
+<a href="../Libraries_Manual_guide/node002C.html"><img src="../images/index.gif" alt="[Index]" border=0></a>
+<img src="../images/help_d.gif" alt="[Help]">
+<img src="../images/retrace_d.gif" alt="[Retrace]">
+<a href="../Libraries_Manual_guide/node011E.html"><img src="../images/prev.gif" alt="[Browse &#060;]" border=0></a>
+<a href="../Libraries_Manual_guide/node0120.html"><img src="../images/next.gif" alt="[Browse &#062;]" border=0></a>
+<hr>
+<pre>
+<!-- AG2HTML: BODY=START -->
+SuperBitMap windows are created by setting the WFLG_SUPER_BITMAP flag, or
+by specifying the <a href="../Libraries_Manual_guide/node0125.html#line126">WA_SuperBitMap</a> tag in the <a href="../Libraries_Manual_guide/node0103.html">OpenWindowTagList()</a> call.  A
+pointer to an allocated and initialized <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> structure must be provided.
+
+A SuperBitMap window requires the application to allocate and initialize
+its own bitmap.  This entails allocating a <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> structure, initializing
+<a name="line8">the structure and allocating memory for the bit planes.</a>
+
+Allocate a <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> structure with the Exec <a href="../Libraries_Manual_guide/node02A7.html">AllocMem()</a> function.  Then use
+the graphics function <a href="../Libraries_Manual_guide/node032E.html">InitBitMap()</a> to initialize the BitMap structure:
+
+    void InitBitMap( struct BitMap *bitMap, long depth,
+                     long width, long height );
+
+<a href="../Libraries_Manual_guide/node032E.html">InitBitMap()</a> fills in fields in the <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> structure describing how a
+linear memory area is organized as a series of one or more rectangular
+<a name="line18">bit-planes.</a>
+
+Once you have allocated and initialized the <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a> structure, use the
+graphics library function <a href="../Libraries_Manual_guide/node032E.html">AllocRaster()</a> to allocate the memory space for
+all the bit planes.
+
+    PLANEPTR AllocRaster( unsigned long width, unsigned long height );
+
+The <a href="../Libraries_Manual_guide/node05BD.html">example</a> listed in the next section shows how to allocate a <a href="../Libraries_Manual_guide/node00F1.html#line4">BitMap</a>
+structure, initialize it with <a href="../Libraries_Manual_guide/node032E.html">InitBitMap()</a> and use <a href="../Libraries_Manual_guide/node032E.html">AllocRaster()</a> function
+to set up memory for the bitplanes.
+
+ <a href="../Libraries_Manual_guide/node0120.html">Graphics and Layers Functions for SuperBitMap Windows</a> 
+ <a href="../Libraries_Manual_guide/node05BD.html">SuperBitMap Window Example</a> 
+<!-- AG2HTML: BODY=END -->
+</pre>
+
+<!-- [amigadev.elowar.com] Automatically generated content... -->
+<hr />
+<pre>[Back to <a href="http://amigadev.elowar.com/">Amiga Developer Docs</a>]</pre>
+<!-- [amigadev.elowar.com] End of automatically generated content. -->
+
+</body>
+</html>
