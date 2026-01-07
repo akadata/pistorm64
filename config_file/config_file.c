@@ -22,8 +22,8 @@ const char* map_type_names[MAPTYPE_NUM] = {
 };
 
 const char* config_item_names[CONFITEM_NUM] = {
-    "NONE",  "cpu",      "map",      "loopcycles", "jit",    "jitfpu",
-    "mouse", "keyboard", "platform", "setvar",     "kbfile",
+    "NONE",      "cpu",      "map",      "loopcycles", "jit",    "jitfpu",
+    "mouse",     "keyboard", "platform", "setvar",     "kbfile", "state-sock",
 };
 
 const char* mapcmd_names[MAPCMD_NUM] = {
@@ -349,6 +349,10 @@ void free_config_file(struct emulator_config* cfg) {
     free(cfg->keyboard_file);
     cfg->keyboard_file = NULL;
   }
+  if (cfg->state_sock_path) {
+    free(cfg->state_sock_path);
+    cfg->state_sock_path = NULL;
+  }
 
   m68k_clear_ranges();
 
@@ -517,6 +521,14 @@ struct emulator_config* load_config_file(char* filename) {
       cfg->keyboard_file = (char*)calloc(1, strlen(cur_cmd) + 1);
       strcpy(cfg->keyboard_file, cur_cmd);
       printf("[CFG] Set keyboard event source file to %s.\n", cfg->keyboard_file);
+      break;
+    case CONFITEM_STATE_SOCK:
+      get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+      if (strlen(cur_cmd)) {
+        cfg->state_sock_path = (char*)calloc(1, strlen(cur_cmd) + 1);
+        strcpy(cfg->state_sock_path, cur_cmd);
+        printf("[CFG] State socket set to %s.\n", cfg->state_sock_path);
+      }
       break;
     case CONFITEM_PLATFORM: {
       char platform_name[128], platform_sub[128];

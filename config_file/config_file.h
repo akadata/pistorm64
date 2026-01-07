@@ -48,6 +48,7 @@ typedef enum {
   CONFITEM_PLATFORM,
   CONFITEM_SETVAR,
   CONFITEM_KBFILE,
+  CONFITEM_STATE_SOCK,
   CONFITEM_NUM,
 } config_items;
 
@@ -74,6 +75,7 @@ struct emulator_config {
   struct platform_config* platform;
 
   char *mouse_file, *keyboard_file;
+  char* state_sock_path;
 
   char mouse_toggle_key, keyboard_toggle_key;
   unsigned char mouse_enabled, mouse_autoconnect, keyboard_enabled, keyboard_grab,

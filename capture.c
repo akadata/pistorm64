@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
 
 #include "gpio/ps_protocol.h"
 #include "platforms/amiga/registers/agnus.h"
@@ -25,11 +28,13 @@ static void usage(const char *prog) {
           "          [--bpl1 <addr>] ... [--bpl6 <addr>] [--mod1 <val>] [--mod2 <val>]\n"
           "          [--rowbytes <val>] [--line-step <val>] [--coplist <addr>]\n"
           "          [--dump-coplist <n>]\n"
+          "          [--state-sock <path>]\n"
           "          [--version]\n"
           "\n"
           "Defaults: width=320 height=256 planes=auto out=capture.ppm\n"
           "Notes:\n"
           "- This reads chip RAM via the GPIO protocol while the emulator runs.\n"
+          "- If --state-sock is set, capture asks the emulator for display state first.\n"
           "- For HAM/EHB, pass --ham or --ehb to override mode detection.\n"
           "- Some custom registers are write-only on real hardware; use overrides if reads look invalid.\n",
           prog);
@@ -61,6 +66,154 @@ static uint32_t read_bpl_ptr(uint32_t pth, uint32_t ptl) {
   uint32_t hi = (uint32_t)ps_read_16(pth) & 0xFFFFu;
   uint32_t lo = (uint32_t)ps_read_16(ptl) & 0xFFFFu;
   return ((hi << 16) | lo) & CHIP_MASK;
+}
+
+struct state_snapshot {
+  uint64_t ts_us;
+  uint32_t cop1lc;
+  uint32_t cop2lc;
+  uint16_t bplcon0;
+  uint16_t bplcon1;
+  uint16_t bplcon2;
+  uint16_t bpl1mod;
+  uint16_t bpl2mod;
+  uint16_t diwstrt;
+  uint16_t diwstop;
+  uint16_t ddfstrt;
+  uint16_t ddfstop;
+  uint32_t bpl[6];
+  uint8_t bpl_valid[6];
+};
+
+static const char *json_find_key(const char *buf, const char *key) {
+  static char needle[64];
+  snprintf(needle, sizeof(needle), "\"%s\":", key);
+  return strstr(buf, needle);
+}
+
+static int json_read_u32(const char *buf, const char *key, uint32_t *out) {
+  const char *p = json_find_key(buf, key);
+  if (!p) {
+    return 0;
+  }
+  p = strchr(p, ':');
+  if (!p) {
+    return 0;
+  }
+  p++;
+  while (*p == ' ' || *p == '\t') {
+    p++;
+  }
+  *out = (uint32_t)strtoul(p, NULL, 10);
+  return 1;
+}
+
+static int json_read_u64(const char *buf, const char *key, uint64_t *out) {
+  const char *p = json_find_key(buf, key);
+  if (!p) {
+    return 0;
+  }
+  p = strchr(p, ':');
+  if (!p) {
+    return 0;
+  }
+  p++;
+  while (*p == ' ' || *p == '\t') {
+    p++;
+  }
+  *out = (uint64_t)strtoull(p, NULL, 10);
+  return 1;
+}
+
+static int json_read_u16(const char *buf, const char *key, uint16_t *out) {
+  uint32_t v = 0;
+  if (!json_read_u32(buf, key, &v)) {
+    return 0;
+  }
+  *out = (uint16_t)v;
+  return 1;
+}
+
+static int json_read_u32_array6(const char *buf, const char *key, uint32_t out[6]) {
+  const char *p = json_find_key(buf, key);
+  if (!p) {
+    return 0;
+  }
+  p = strchr(p, '[');
+  if (!p) {
+    return 0;
+  }
+  p++;
+  for (int i = 0; i < 6; i++) {
+    out[i] = (uint32_t)strtoul(p, (char **)&p, 10);
+    if (!p) {
+      return 0;
+    }
+    if (i < 5) {
+      p = strchr(p, ',');
+      if (!p) {
+        return 0;
+      }
+      p++;
+    }
+  }
+  return 1;
+}
+
+static int json_read_u8_array6(const char *buf, const char *key, uint8_t out[6]) {
+  uint32_t tmp[6] = {0};
+  if (!json_read_u32_array6(buf, key, tmp)) {
+    return 0;
+  }
+  for (int i = 0; i < 6; i++) {
+    out[i] = (uint8_t)tmp[i];
+  }
+  return 1;
+}
+
+static int fetch_state_snapshot(const char *path, struct state_snapshot *snap) {
+  struct sockaddr_un addr;
+  int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+  if (fd < 0) {
+    return 0;
+  }
+
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
+
+  if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    close(fd);
+    return 0;
+  }
+
+  const char *req = "SNAPSHOT\n";
+  (void)write(fd, req, strlen(req));
+
+  char buf[1024];
+  ssize_t n = read(fd, buf, sizeof(buf) - 1);
+  close(fd);
+  if (n <= 0) {
+    return 0;
+  }
+  buf[n] = '\0';
+
+  memset(snap, 0, sizeof(*snap));
+  json_read_u64(buf, "ts_us", &snap->ts_us);
+  json_read_u32(buf, "cop1lc", &snap->cop1lc);
+  json_read_u32(buf, "cop2lc", &snap->cop2lc);
+  json_read_u16(buf, "bplcon0", &snap->bplcon0);
+  json_read_u16(buf, "bplcon1", &snap->bplcon1);
+  json_read_u16(buf, "bplcon2", &snap->bplcon2);
+  json_read_u16(buf, "bpl1mod", &snap->bpl1mod);
+  json_read_u16(buf, "bpl2mod", &snap->bpl2mod);
+  json_read_u16(buf, "diwstrt", &snap->diwstrt);
+  json_read_u16(buf, "diwstop", &snap->diwstop);
+  json_read_u16(buf, "ddfstrt", &snap->ddfstrt);
+  json_read_u16(buf, "ddfstop", &snap->ddfstop);
+  json_read_u32_array6(buf, "bpl", snap->bpl);
+  json_read_u8_array6(buf, "bpl_valid", snap->bpl_valid);
+  return 1;
 }
 
 static void read_row(uint8_t *dst, uint32_t base, uint32_t bytes) {
@@ -223,6 +376,9 @@ int main(int argc, char **argv) {
   uint32_t rowbytes_override = 0;
   int have_line_step = 0;
   uint32_t line_step_override = 0;
+  const char *state_sock_path = NULL;
+  struct state_snapshot snap;
+  int have_snap = 0;
 
   for (int i = 1; i < argc; i++) {
     const char *arg = argv[i];
@@ -307,9 +463,50 @@ int main(int argc, char **argv) {
       if (i + 1 >= argc) usage(argv[0]);
       line_step_override = parse_u32(argv[++i]);
       have_line_step = 1;
+    } else if (!strcmp(arg, "--state-sock")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      state_sock_path = argv[++i];
     } else {
       usage(argv[0]);
       return 1;
+    }
+  }
+
+  if (!state_sock_path) {
+    const char *env_sock = getenv("PISTORM_STATE_SOCK");
+    if (env_sock && env_sock[0]) {
+      state_sock_path = env_sock;
+    }
+  }
+
+  if (state_sock_path && state_sock_path[0]) {
+    have_snap = fetch_state_snapshot(state_sock_path, &snap);
+    if (have_snap) {
+      if (planes < 0) {
+        int bpu = (snap.bplcon0 >> 12) & 0x7;
+        if (bpu == 0) {
+          bpu = 1;
+        }
+        planes = bpu;
+      }
+      if (auto_mode) {
+        use_ham = (snap.bplcon0 & 0x0800u) != 0;
+        use_ehb = (snap.bplcon0 & 0x0400u) != 0;
+      }
+      if (!have_mod1) {
+        mod1_override = snap.bpl1mod;
+        have_mod1 = 1;
+      }
+      if (!have_mod2) {
+        mod2_override = snap.bpl2mod;
+        have_mod2 = 1;
+      }
+      for (int p = 0; p < 6; p++) {
+        if (!have_bpl[p] && snap.bpl_valid[p]) {
+          bpl_override[p] = snap.bpl[p] & CHIP_MASK;
+          have_bpl[p] = 1;
+        }
+      }
     }
   }
 
@@ -323,6 +520,18 @@ int main(int argc, char **argv) {
   uint16_t ddfstrt = (uint16_t)ps_read_16(DDFSTRT);
   uint16_t ddfstop = (uint16_t)ps_read_16(DDFSTOP);
   struct cop_state cop = {0};
+
+  if (have_snap) {
+    if (bplcon0 == 0xFFFF || !have_coplist) {
+      bplcon0 = snap.bplcon0;
+      bpl1mod = snap.bpl1mod;
+      bpl2mod = snap.bpl2mod;
+      diwstrt = snap.diwstrt;
+      diwstop = snap.diwstop;
+      ddfstrt = snap.ddfstrt;
+      ddfstop = snap.ddfstop;
+    }
+  }
   if (have_coplist) {
     parse_copper_list(coplist_addr, &cop);
     if (dump_coplist) {
@@ -375,11 +584,15 @@ int main(int argc, char **argv) {
     bpl2mod = 0;
   }
 
-  if (show_info || have_coplist) {
+  if (show_info || have_coplist || have_snap) {
     printf("BPLCON0=0x%04X planes=%d\n", bplcon0, planes);
     printf("DIWSTRT=0x%04X DIWSTOP=0x%04X DDFSTRT=0x%04X DDFSTOP=0x%04X\n",
            diwstrt, diwstop, ddfstrt, ddfstop);
     printf("BPL1MOD=0x%04X BPL2MOD=0x%04X\n", bpl1mod, bpl2mod);
+    if (have_snap) {
+      printf("SNAPSHOT cop1lc=0x%08X cop2lc=0x%08X ts_us=%llu\n", snap.cop1lc, snap.cop2lc,
+             (unsigned long long)snap.ts_us);
+    }
   }
 
   if (planes < 1 || planes > 6) {

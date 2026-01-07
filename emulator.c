@@ -38,8 +38,11 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <sys/select.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <unistd.h>
 
 #include "m68kops.h"
@@ -80,7 +83,11 @@ uint32_t last_irq = 8;
 uint32_t last_last_irq = 8;
 
 static int bpl_log_enabled = 0;
+static int bpl_state_enabled = 0;
+static pthread_mutex_t bpl_state_lock = PTHREAD_MUTEX_INITIALIZER;
 static uint16_t bplcon0_last;
+static uint16_t bplcon1_last;
+static uint16_t bplcon2_last;
 static uint16_t bpl1mod_last;
 static uint16_t bpl2mod_last;
 static uint16_t diwstrt_last;
@@ -89,12 +96,23 @@ static uint16_t ddfstrt_last;
 static uint16_t ddfstop_last;
 static uint16_t bpl_pth_last[6];
 static uint16_t bpl_ptl_last[6];
+static uint8_t bpl_pth_seen[6];
+static uint8_t bpl_ptl_seen[6];
 static uint16_t cop1_pth_last;
 static uint16_t cop1_ptl_last;
 static uint16_t cop2_pth_last;
 static uint16_t cop2_ptl_last;
+static uint64_t bpl_last_update_us;
+
+static int state_sock_running = 0;
+static int state_sock_fd = -1;
+static pthread_t state_sock_thread;
+static char state_sock_path[108];
+static int state_sock_path_set = 0;
 
 #define REG_BPLCON0 0xDFF100
+#define REG_BPLCON1 0xDFF102
+#define REG_BPLCON2 0xDFF104
 #define REG_BPL1MOD 0xDFF108
 #define REG_BPL2MOD 0xDFF10A
 #define REG_DIWSTRT 0xDFF08E
@@ -119,6 +137,7 @@ static uint16_t cop2_ptl_last;
 #define REG_COP2LCL 0xDFF086
 
 static void bpl_log_print(void) {
+  pthread_mutex_lock(&bpl_state_lock);
   uint16_t bpu = (bplcon0_last >> 12) & 0x7;
   uint16_t hires = (bplcon0_last & 0x8000) ? 1 : 0;
   uint16_t ham = (bplcon0_last & 0x0800) ? 1 : 0;
@@ -138,15 +157,31 @@ static void bpl_log_print(void) {
            bpl_pth_last[5], bpl_ptl_last[5]);
   LOG_INFO("[BPL] COP1LC=0x%04X%04X COP2LC=0x%04X%04X\n",
            cop1_pth_last, cop1_ptl_last, cop2_pth_last, cop2_ptl_last);
+  pthread_mutex_unlock(&bpl_state_lock);
+}
+
+static uint64_t monotonic_us(void) {
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  return (uint64_t)ts.tv_sec * 1000000ull + (uint64_t)ts.tv_nsec / 1000ull;
 }
 
 static void bpl_log_update(uint32_t addr, uint16_t val) {
   int changed = 0;
 
+  pthread_mutex_lock(&bpl_state_lock);
   switch (addr) {
   case REG_BPLCON0:
     changed |= (bplcon0_last != val);
     bplcon0_last = val;
+    break;
+  case REG_BPLCON1:
+    changed |= (bplcon1_last != val);
+    bplcon1_last = val;
+    break;
+  case REG_BPLCON2:
+    changed |= (bplcon2_last != val);
+    bplcon2_last = val;
     break;
   case REG_BPL1MOD:
     changed |= (bpl1mod_last != val);
@@ -175,50 +210,62 @@ static void bpl_log_update(uint32_t addr, uint16_t val) {
   case REG_BPL1PTH:
     changed |= (bpl_pth_last[0] != val);
     bpl_pth_last[0] = val;
+    bpl_pth_seen[0] = 1;
     break;
   case REG_BPL1PTL:
     changed |= (bpl_ptl_last[0] != val);
     bpl_ptl_last[0] = val;
+    bpl_ptl_seen[0] = 1;
     break;
   case REG_BPL2PTH:
     changed |= (bpl_pth_last[1] != val);
     bpl_pth_last[1] = val;
+    bpl_pth_seen[1] = 1;
     break;
   case REG_BPL2PTL:
     changed |= (bpl_ptl_last[1] != val);
     bpl_ptl_last[1] = val;
+    bpl_ptl_seen[1] = 1;
     break;
   case REG_BPL3PTH:
     changed |= (bpl_pth_last[2] != val);
     bpl_pth_last[2] = val;
+    bpl_pth_seen[2] = 1;
     break;
   case REG_BPL3PTL:
     changed |= (bpl_ptl_last[2] != val);
     bpl_ptl_last[2] = val;
+    bpl_ptl_seen[2] = 1;
     break;
   case REG_BPL4PTH:
     changed |= (bpl_pth_last[3] != val);
     bpl_pth_last[3] = val;
+    bpl_pth_seen[3] = 1;
     break;
   case REG_BPL4PTL:
     changed |= (bpl_ptl_last[3] != val);
     bpl_ptl_last[3] = val;
+    bpl_ptl_seen[3] = 1;
     break;
   case REG_BPL5PTH:
     changed |= (bpl_pth_last[4] != val);
     bpl_pth_last[4] = val;
+    bpl_pth_seen[4] = 1;
     break;
   case REG_BPL5PTL:
     changed |= (bpl_ptl_last[4] != val);
     bpl_ptl_last[4] = val;
+    bpl_ptl_seen[4] = 1;
     break;
   case REG_BPL6PTH:
     changed |= (bpl_pth_last[5] != val);
     bpl_pth_last[5] = val;
+    bpl_pth_seen[5] = 1;
     break;
   case REG_BPL6PTL:
     changed |= (bpl_ptl_last[5] != val);
     bpl_ptl_last[5] = val;
+    bpl_ptl_seen[5] = 1;
     break;
   case REG_COP1LCH:
     changed |= (cop1_pth_last != val);
@@ -237,11 +284,178 @@ static void bpl_log_update(uint32_t addr, uint16_t val) {
     cop2_ptl_last = val;
     break;
   default:
+    pthread_mutex_unlock(&bpl_state_lock);
     return;
   }
 
   if (changed) {
+    bpl_last_update_us = monotonic_us();
+  }
+  pthread_mutex_unlock(&bpl_state_lock);
+
+  if (bpl_log_enabled && changed) {
     bpl_log_print();
+  }
+}
+
+struct bpl_state_snapshot {
+  uint64_t ts_us;
+  uint32_t cop1lc;
+  uint32_t cop2lc;
+  uint16_t bplcon0;
+  uint16_t bplcon1;
+  uint16_t bplcon2;
+  uint16_t bpl1mod;
+  uint16_t bpl2mod;
+  uint16_t diwstrt;
+  uint16_t diwstop;
+  uint16_t ddfstrt;
+  uint16_t ddfstop;
+  uint32_t bpl[6];
+  uint8_t bpl_valid[6];
+};
+
+static void bpl_snapshot_fill(struct bpl_state_snapshot* snap) {
+  pthread_mutex_lock(&bpl_state_lock);
+  snap->ts_us = bpl_last_update_us;
+  snap->cop1lc = ((uint32_t)cop1_pth_last << 16) | cop1_ptl_last;
+  snap->cop2lc = ((uint32_t)cop2_pth_last << 16) | cop2_ptl_last;
+  snap->bplcon0 = bplcon0_last;
+  snap->bplcon1 = bplcon1_last;
+  snap->bplcon2 = bplcon2_last;
+  snap->bpl1mod = bpl1mod_last;
+  snap->bpl2mod = bpl2mod_last;
+  snap->diwstrt = diwstrt_last;
+  snap->diwstop = diwstop_last;
+  snap->ddfstrt = ddfstrt_last;
+  snap->ddfstop = ddfstop_last;
+  for (int i = 0; i < 6; i++) {
+    snap->bpl[i] = ((uint32_t)bpl_pth_last[i] << 16) | bpl_ptl_last[i];
+    snap->bpl_valid[i] = (bpl_pth_seen[i] && bpl_ptl_seen[i]) ? 1 : 0;
+  }
+  pthread_mutex_unlock(&bpl_state_lock);
+}
+
+static void bpl_snapshot_format_json(const struct bpl_state_snapshot* snap, char* buf,
+                                     size_t len) {
+  snprintf(
+      buf, len,
+      "{"
+      "\"ts_us\":%llu,"
+      "\"cop1lc\":%u,"
+      "\"cop2lc\":%u,"
+      "\"bplcon0\":%u,"
+      "\"bplcon1\":%u,"
+      "\"bplcon2\":%u,"
+      "\"bpl1mod\":%u,"
+      "\"bpl2mod\":%u,"
+      "\"diwstrt\":%u,"
+      "\"diwstop\":%u,"
+      "\"ddfstrt\":%u,"
+      "\"ddfstop\":%u,"
+      "\"bpl\":[%u,%u,%u,%u,%u,%u],"
+      "\"bpl_valid\":[%u,%u,%u,%u,%u,%u]"
+      "}\n",
+      (unsigned long long)snap->ts_us, snap->cop1lc, snap->cop2lc, snap->bplcon0,
+      snap->bplcon1, snap->bplcon2, snap->bpl1mod, snap->bpl2mod, snap->diwstrt,
+      snap->diwstop, snap->ddfstrt, snap->ddfstop, snap->bpl[0], snap->bpl[1],
+      snap->bpl[2], snap->bpl[3], snap->bpl[4], snap->bpl[5], snap->bpl_valid[0],
+      snap->bpl_valid[1], snap->bpl_valid[2], snap->bpl_valid[3], snap->bpl_valid[4],
+      snap->bpl_valid[5]);
+}
+
+static void* state_socket_thread_fn(void* arg) {
+  const char* path = (const char*)arg;
+  struct sockaddr_un addr;
+  char req[64];
+  char resp[512];
+
+  state_sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+  if (state_sock_fd < 0) {
+    perror("[STATE] socket");
+    return NULL;
+  }
+
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
+  unlink(path);
+
+  if (bind(state_sock_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+    perror("[STATE] bind");
+    close(state_sock_fd);
+    state_sock_fd = -1;
+    return NULL;
+  }
+
+  if (listen(state_sock_fd, 4) < 0) {
+    perror("[STATE] listen");
+    close(state_sock_fd);
+    state_sock_fd = -1;
+    return NULL;
+  }
+
+  state_sock_running = 1;
+  while (!emulator_exiting) {
+    fd_set readfds;
+    struct timeval tv;
+    FD_ZERO(&readfds);
+    FD_SET(state_sock_fd, &readfds);
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+
+    int sel = select(state_sock_fd + 1, &readfds, NULL, NULL, &tv);
+    if (sel <= 0) {
+      continue;
+    }
+
+    int client = accept(state_sock_fd, NULL, NULL);
+    if (client < 0) {
+      continue;
+    }
+
+    ssize_t n = read(client, req, sizeof(req) - 1);
+    if (n > 0) {
+      req[n] = '\0';
+    } else {
+      req[0] = '\0';
+    }
+
+    if (n <= 0 || strncmp(req, "SNAPSHOT", 8) == 0) {
+      struct bpl_state_snapshot snap;
+      bpl_snapshot_fill(&snap);
+      bpl_snapshot_format_json(&snap, resp, sizeof(resp));
+      (void)write(client, resp, strlen(resp));
+    }
+
+    close(client);
+  }
+
+  if (state_sock_fd >= 0) {
+    close(state_sock_fd);
+    state_sock_fd = -1;
+  }
+  unlink(path);
+  state_sock_running = 0;
+  return NULL;
+}
+
+static void start_state_socket(const char* path) {
+  if (!path || !path[0]) {
+    return;
+  }
+  if (state_sock_running) {
+    LOG_INFO("[STATE] Socket already running at %s\n", state_sock_path);
+    return;
+  }
+  strncpy(state_sock_path, path, sizeof(state_sock_path) - 1);
+  state_sock_path[sizeof(state_sock_path) - 1] = '\0';
+  state_sock_path_set = 1;
+  bpl_state_enabled = 1;
+  if (pthread_create(&state_sock_thread, NULL, state_socket_thread_fn, state_sock_path) != 0) {
+    perror("[STATE] pthread_create");
+  } else {
+    LOG_INFO("[STATE] Socket listening at %s\n", state_sock_path);
   }
 }
 
@@ -892,6 +1106,7 @@ void sigint_handler(int sig_num) {
 
 int main(int argc, char* argv[]) {
   int g;
+  const char* state_sock_cli = NULL;
 
   pistorm_selftest_alignment();
 
@@ -931,6 +1146,13 @@ int main(int argc, char* argv[]) {
         } else {
           log_set_level(level);
         }
+      }
+    }
+    if (strcmp(argv[g], "--state-sock") == 0) {
+      if (g + 1 >= argc) {
+        printf("%s switch found, but no socket path specified.\n", argv[g]);
+      } else {
+        state_sock_cli = argv[++g];
       }
     }
     if (strcmp(argv[g], "--cpu_type") == 0 || strcmp(argv[g], "--cpu") == 0) {
@@ -1012,6 +1234,16 @@ switch_config:
   }
 
   if (cfg) {
+    if (!state_sock_path_set) {
+      const char* env_sock = getenv("PISTORM_STATE_SOCK");
+      if (state_sock_cli && state_sock_cli[0]) {
+        start_state_socket(state_sock_cli);
+      } else if (cfg->state_sock_path && cfg->state_sock_path[0]) {
+        start_state_socket(cfg->state_sock_path);
+      } else if (env_sock && env_sock[0]) {
+        start_state_socket(env_sock);
+      }
+    }
     if (cfg->cpu_type)
       cpu_type = cfg->cpu_type;
     if (cfg->loop_cycles)
@@ -1615,7 +1847,7 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
 }
 
 void m68k_write_memory_8(unsigned int address, unsigned int value) {
-  if (bpl_log_enabled && (address & 0xFFFF0000u) == 0xDFF00000u) {
+  if ((bpl_log_enabled || bpl_state_enabled) && (address & 0xFFFF0000u) == 0xDFF00000u) {
     bpl_log_update(address, (uint16_t)(value & 0xFFu));
   }
   if (platform_write_check(OP_TYPE_BYTE, address, value)) {
@@ -1631,7 +1863,7 @@ void m68k_write_memory_8(unsigned int address, unsigned int value) {
 }
 
 void m68k_write_memory_16(unsigned int address, unsigned int value) {
-  if (bpl_log_enabled && (address & 0xFFFF0000u) == 0xDFF00000u) {
+  if ((bpl_log_enabled || bpl_state_enabled) && (address & 0xFFFF0000u) == 0xDFF00000u) {
     bpl_log_update(address, (uint16_t)value);
   }
   if (platform_write_check(OP_TYPE_WORD, address, value)) {
@@ -1663,22 +1895,25 @@ void m68k_write_memory_32(unsigned int address, unsigned int value) {
 
   if (address & 0x01) {
     ps_write_8((uint32_t)address, value & 0xFF);
-    if (bpl_log_enabled && ((address + 1) & 0xFFFF0000u) == 0xDFF00000u) {
+    if ((bpl_log_enabled || bpl_state_enabled) &&
+        ((address + 1) & 0xFFFF0000u) == 0xDFF00000u) {
       bpl_log_update(address + 1, (uint16_t)((value >> 8) & 0xFFFF));
     }
     ps_write_16((uint32_t)address + 1, htobe16(((value >> 8) & 0xFFFF)));
-    if (bpl_log_enabled && ((address + 3) & 0xFFFF0000u) == 0xDFF00000u) {
+    if ((bpl_log_enabled || bpl_state_enabled) &&
+        ((address + 3) & 0xFFFF0000u) == 0xDFF00000u) {
       bpl_log_update(address + 3, (uint16_t)(value >> 24));
     }
     ps_write_8((uint32_t)address + 3, (value >> 24));
     return;
   }
 
-  if (bpl_log_enabled && (address & 0xFFFF0000u) == 0xDFF00000u) {
+  if ((bpl_log_enabled || bpl_state_enabled) && (address & 0xFFFF0000u) == 0xDFF00000u) {
     bpl_log_update(address, (uint16_t)(value >> 16));
   }
   ps_write_16((uint32_t)address, value >> 16);
-  if (bpl_log_enabled && ((address + 2) & 0xFFFF0000u) == 0xDFF00000u) {
+  if ((bpl_log_enabled || bpl_state_enabled) &&
+      ((address + 2) & 0xFFFF0000u) == 0xDFF00000u) {
     bpl_log_update(address + 2, (uint16_t)value);
   }
   ps_write_16((uint32_t)address + 2, value);
