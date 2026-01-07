@@ -35,6 +35,7 @@ static uint32_t saved_gp0ctl;
 static uint32_t saved_gp0div;
 static uint32_t saved_gpfsel0;
 static int cleanup_registered;
+static int bpl_log_enabled;
 
 unsigned int gpfsel0;
 unsigned int gpfsel1;
@@ -53,6 +54,48 @@ static inline volatile uint32_t* cm_reg(uint32_t off) {
 
 static inline volatile uint32_t* gpio_reg(uint32_t off) {
   return (volatile uint32_t*)(((uint8_t*)gpio) + off);
+}
+
+static void bpl_log_write(unsigned int address, unsigned int data, int width_bits) {
+  if (!bpl_log_enabled) {
+    return;
+  }
+  if (address < 0xDFF000 || address >= 0xE00000) {
+    return;
+  }
+
+  switch (address) {
+  case 0xDFF080: // COP1LCH
+  case 0xDFF082: // COP1LCL
+  case 0xDFF084: // COP2LCH
+  case 0xDFF086: // COP2LCL
+  case 0xDFF08E: // DIWSTRT
+  case 0xDFF090: // DIWSTOP
+  case 0xDFF092: // DDFSTRT
+  case 0xDFF094: // DDFSTOP
+  case 0xDFF100: // BPLCON0
+  case 0xDFF102: // BPLCON1
+  case 0xDFF104: // BPLCON2
+  case 0xDFF108: // BPL1MOD
+  case 0xDFF10A: // BPL2MOD
+  case 0xDFF0E0: // BPL1PTH
+  case 0xDFF0E2: // BPL1PTL
+  case 0xDFF0E4: // BPL2PTH
+  case 0xDFF0E6: // BPL2PTL
+  case 0xDFF0E8: // BPL3PTH
+  case 0xDFF0EA: // BPL3PTL
+  case 0xDFF0EC: // BPL4PTH
+  case 0xDFF0EE: // BPL4PTL
+  case 0xDFF0F0: // BPL5PTH
+  case 0xDFF0F2: // BPL5PTL
+  case 0xDFF0F4: // BPL6PTH
+  case 0xDFF0F6: // BPL6PTL
+    fprintf(stderr, "[BPLW] addr=0x%06X data=0x%04X width=%d\n", address,
+            data & 0xFFFFu, width_bits);
+    break;
+  default:
+    break;
+  }
 }
 
 static int setup_io() {
@@ -284,6 +327,10 @@ void ps_setup_protocol()  {
     atexit(ps_cleanup_protocol);
     cleanup_registered = 1;
   }
+  if (getenv("PISTORM_BPL_LOG")) {
+    bpl_log_enabled = 1;
+    fprintf(stderr, "[BPLW] ps_protocol logging enabled\n");
+  }
   setup_gpclk();
   usleep(5000);
 
@@ -295,6 +342,7 @@ void ps_setup_protocol()  {
 }
 
 void ps_write_16(unsigned int address, unsigned int data) {
+  bpl_log_write(address, data, 16);
   *(gpio + 0) = GPFSEL0_OUTPUT;
   *(gpio + 1) = GPFSEL1_OUTPUT;
   *(gpio + 2) = GPFSEL2_OUTPUT;
@@ -323,6 +371,7 @@ void ps_write_16(unsigned int address, unsigned int data) {
 }
 
 void ps_write_8(unsigned int address, unsigned int data) {
+  bpl_log_write(address, data, 8);
   if ((address & 1) == 0)
     data = data + (data << 8); // EVEN, A0=0,UDS
   else
