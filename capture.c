@@ -23,7 +23,7 @@ static void usage(const char *prog) {
           "Usage: %s [--out <file>] [--width <px>] [--height <px>] [--planes <n>]\n"
           "          [--ehb] [--ham] [--info]\n"
           "          [--bpl1 <addr>] ... [--bpl6 <addr>] [--mod1 <val>] [--mod2 <val>]\n"
-          "          [--rowbytes <val>] [--line-step <val>]\n"
+          "          [--rowbytes <val>] [--line-step <val>] [--coplist <addr>]\n"
           "\n"
           "Defaults: width=320 height=256 planes=auto out=capture.ppm\n"
           "Notes:\n"
@@ -73,6 +73,115 @@ static void read_row(uint8_t *dst, uint32_t base, uint32_t bytes) {
   }
 }
 
+struct cop_state {
+  uint16_t bplcon0;
+  int have_bplcon0;
+  uint16_t bpl1mod;
+  uint16_t bpl2mod;
+  int have_mod1;
+  int have_mod2;
+  uint16_t diwstrt;
+  uint16_t diwstop;
+  uint16_t ddfstrt;
+  uint16_t ddfstop;
+  uint16_t bpl_pth[6];
+  uint16_t bpl_ptl[6];
+  int have_pth[6];
+  int have_ptl[6];
+};
+
+static void parse_copper_list(uint32_t addr, struct cop_state *st) {
+  memset(st, 0, sizeof(*st));
+  addr &= CHIP_MASK;
+  for (int i = 0; i < 2048; i++) {
+    uint16_t w1 = (uint16_t)ps_read_16(addr + (uint32_t)(i * 4));
+    uint16_t w2 = (uint16_t)ps_read_16(addr + (uint32_t)(i * 4 + 2));
+    if (w1 == 0xFFFF && w2 == 0xFFFE) {
+      break;
+    }
+    if (w1 & 0x0001u) {
+      continue; // WAIT/SKIP
+    }
+    uint32_t reg = 0xDFF000u + (uint32_t)(w1 & 0x01FEu);
+    switch (reg) {
+    case BPLCON0:
+      st->bplcon0 = w2;
+      st->have_bplcon0 = 1;
+      break;
+    case BPL1MOD:
+      st->bpl1mod = w2;
+      st->have_mod1 = 1;
+      break;
+    case BPL2MOD:
+      st->bpl2mod = w2;
+      st->have_mod2 = 1;
+      break;
+    case DIWSTRT:
+      st->diwstrt = w2;
+      break;
+    case DIWSTOP:
+      st->diwstop = w2;
+      break;
+    case DDFSTRT:
+      st->ddfstrt = w2;
+      break;
+    case DDFSTOP:
+      st->ddfstop = w2;
+      break;
+    case BPL1PTH:
+      st->bpl_pth[0] = w2;
+      st->have_pth[0] = 1;
+      break;
+    case BPL1PTL:
+      st->bpl_ptl[0] = w2;
+      st->have_ptl[0] = 1;
+      break;
+    case BPL2PTH:
+      st->bpl_pth[1] = w2;
+      st->have_pth[1] = 1;
+      break;
+    case BPL2PTL:
+      st->bpl_ptl[1] = w2;
+      st->have_ptl[1] = 1;
+      break;
+    case BPL3PTH:
+      st->bpl_pth[2] = w2;
+      st->have_pth[2] = 1;
+      break;
+    case BPL3PTL:
+      st->bpl_ptl[2] = w2;
+      st->have_ptl[2] = 1;
+      break;
+    case BPL4PTH:
+      st->bpl_pth[3] = w2;
+      st->have_pth[3] = 1;
+      break;
+    case BPL4PTL:
+      st->bpl_ptl[3] = w2;
+      st->have_ptl[3] = 1;
+      break;
+    case BPL5PTH:
+      st->bpl_pth[4] = w2;
+      st->have_pth[4] = 1;
+      break;
+    case BPL5PTL:
+      st->bpl_ptl[4] = w2;
+      st->have_ptl[4] = 1;
+      break;
+    case BPL6PTH:
+      st->bpl_pth[5] = w2;
+      st->have_pth[5] = 1;
+      break;
+    case BPL6PTL:
+      st->bpl_ptl[5] = w2;
+      st->have_ptl[5] = 1;
+      break;
+    default:
+      break;
+    }
+  }
+}
+
 int main(int argc, char **argv) {
   const char *out_path = "capture.ppm";
   uint32_t width = 320;
@@ -82,6 +191,8 @@ int main(int argc, char **argv) {
   int use_ham = 0;
   int show_info = 0;
   int auto_mode = 1;
+  uint32_t coplist_addr = 0;
+  int have_coplist = 0;
   uint32_t bpl_override[6] = {0};
   int have_bpl[6] = {0};
   int have_mod1 = 0;
@@ -115,6 +226,10 @@ int main(int argc, char **argv) {
       auto_mode = 0;
     } else if (!strcmp(arg, "--info")) {
       show_info = 1;
+    } else if (!strcmp(arg, "--coplist")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      coplist_addr = parse_u32(argv[++i]);
+      have_coplist = 1;
     } else if (!strcmp(arg, "--bpl1")) {
       if (i + 1 >= argc) usage(argv[0]);
       bpl_override[0] = parse_u32(argv[++i]);
@@ -175,13 +290,30 @@ int main(int argc, char **argv) {
   uint16_t diwstop = (uint16_t)ps_read_16(DIWSTOP);
   uint16_t ddfstrt = (uint16_t)ps_read_16(DDFSTRT);
   uint16_t ddfstop = (uint16_t)ps_read_16(DDFSTOP);
+  struct cop_state cop = {0};
+  if (have_coplist) {
+    parse_copper_list(coplist_addr, &cop);
+    if (bplcon0 == 0xFFFF && cop.have_bplcon0) {
+      bplcon0 = cop.bplcon0;
+    }
+    if (cop.have_mod1 && !have_mod1) {
+      bpl1mod = cop.bpl1mod;
+    }
+    if (cop.have_mod2 && !have_mod2) {
+      bpl2mod = cop.bpl2mod;
+    }
+    if (cop.diwstrt) diwstrt = cop.diwstrt;
+    if (cop.diwstop) diwstop = cop.diwstop;
+    if (cop.ddfstrt) ddfstrt = cop.ddfstrt;
+    if (cop.ddfstop) ddfstop = cop.ddfstop;
+  }
 
   if (planes < 0) {
     int bpu = (int)((bplcon0 >> 12) & 0x7);
     if (bplcon0 == 0xFFFF || bpu == 0 || bpu == 7) {
       fprintf(stderr,
               "BPLCON0 read looks invalid (0x%04X). "
-              "Pass --planes and --bplN overrides.\n",
+              "Pass --planes/--bplN or --coplist.\n",
               bplcon0);
       return 1;
     }
@@ -241,11 +373,14 @@ int main(int argc, char **argv) {
     if (p == 3) ptr = read_bpl_ptr(BPL4PTH, BPL4PTL);
     if (p == 4) ptr = read_bpl_ptr(BPL5PTH, BPL5PTL);
     if (p == 5) ptr = read_bpl_ptr(BPL6PTH, BPL6PTL);
+    if (ptr == CHIP_MASK && have_coplist && cop.have_pth[p] && cop.have_ptl[p]) {
+      ptr = ((uint32_t)cop.bpl_pth[p] << 16) | cop.bpl_ptl[p];
+      ptr &= CHIP_MASK;
+    }
     if (ptr == CHIP_MASK) {
       fprintf(stderr,
-              "BPL%d pointer read looks invalid (0x%06X). "
-              "Pass --bpl%d <addr>.\n",
-              p + 1, ptr, p + 1);
+              "BPL%d pointer not resolved. Provide --bpl%d or --coplist.\n",
+              p + 1, p + 1);
       return 1;
     }
     ptrs[p] = ptr;

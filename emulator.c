@@ -89,6 +89,10 @@ static uint16_t ddfstrt_last;
 static uint16_t ddfstop_last;
 static uint16_t bpl_pth_last[6];
 static uint16_t bpl_ptl_last[6];
+static uint16_t cop1_pth_last;
+static uint16_t cop1_ptl_last;
+static uint16_t cop2_pth_last;
+static uint16_t cop2_ptl_last;
 
 #define REG_BPLCON0 0xDFF100
 #define REG_BPL1MOD 0xDFF108
@@ -109,6 +113,10 @@ static uint16_t bpl_ptl_last[6];
 #define REG_BPL5PTL 0xDFF0F2
 #define REG_BPL6PTH 0xDFF0F4
 #define REG_BPL6PTL 0xDFF0F6
+#define REG_COP1LCH 0xDFF080
+#define REG_COP1LCL 0xDFF082
+#define REG_COP2LCH 0xDFF084
+#define REG_COP2LCL 0xDFF086
 
 static void bpl_log_print(void) {
   uint16_t bpu = (bplcon0_last >> 12) & 0x7;
@@ -128,6 +136,8 @@ static void bpl_log_print(void) {
   LOG_INFO("[BPL] BPL4=0x%04X%04X BPL5=0x%04X%04X BPL6=0x%04X%04X\n",
            bpl_pth_last[3], bpl_ptl_last[3], bpl_pth_last[4], bpl_ptl_last[4],
            bpl_pth_last[5], bpl_ptl_last[5]);
+  LOG_INFO("[BPL] COP1LC=0x%04X%04X COP2LC=0x%04X%04X\n",
+           cop1_pth_last, cop1_ptl_last, cop2_pth_last, cop2_ptl_last);
 }
 
 static void bpl_log_update(uint32_t addr, uint16_t val) {
@@ -209,6 +219,22 @@ static void bpl_log_update(uint32_t addr, uint16_t val) {
   case REG_BPL6PTL:
     changed |= (bpl_ptl_last[5] != val);
     bpl_ptl_last[5] = val;
+    break;
+  case REG_COP1LCH:
+    changed |= (cop1_pth_last != val);
+    cop1_pth_last = val;
+    break;
+  case REG_COP1LCL:
+    changed |= (cop1_ptl_last != val);
+    cop1_ptl_last = val;
+    break;
+  case REG_COP2LCH:
+    changed |= (cop2_pth_last != val);
+    cop2_pth_last = val;
+    break;
+  case REG_COP2LCL:
+    changed |= (cop2_ptl_last != val);
+    cop2_ptl_last = val;
     break;
   default:
     return;
