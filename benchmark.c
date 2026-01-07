@@ -27,6 +27,7 @@ struct wait_stats {
   uint32_t sample_next;
   uint32_t timing_stride;
   uint32_t timing_next;
+  uint32_t last_p95;
 };
 
 static volatile const char *g_smoke_phase = NULL;
@@ -111,6 +112,7 @@ static void stats_init(struct wait_stats *st, uint64_t total_txns, uint32_t *sam
   st->sample_next = 0;
   st->timing_stride = g_wait_timing_stride ? g_wait_timing_stride : 1;
   st->timing_next = 0;
+  st->last_p95 = 0;
 }
 
 static void stats_update(struct wait_stats *st, uint32_t wait_us) {
@@ -171,6 +173,7 @@ static void stats_report(const struct wait_stats *st, char *out, size_t outlen) 
   if (idx > st->sample_count) idx = st->sample_count;
   uint32_t p95 = sorted[idx - 1];
   free(sorted);
+  ((struct wait_stats *)st)->last_p95 = p95;
   double avg = (double)st->total_us / (double)st->count;
   snprintf(out, outlen, "avg=%.2f p95=%u max=%u", avg, p95, st->max_us);
 }
@@ -612,7 +615,7 @@ static int parse_region_arg(const char *arg, struct region *out) {
 }
 
 static void usage(const char *prog) {
-  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N] [--wait-sample N] [--smoke] [--memtest]\n", prog);
+  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N] [--pacing-sweep min:max:step] [--wait-sample N] [--smoke] [--memtest]\n", prog);
   printf("Default: chip ram 1024 KB at base 0x000000\n");
   printf("Example: %s --chip-kb 1024 --region fast:0x200000:8192 --repeat 3\n", prog);
 }
@@ -632,6 +635,8 @@ int main(int argc, char *argv[]) {
   int pacing_us = 0;
   int smoke = 0;
   int memtest = 0;
+  int sweep_enabled = 0;
+  int sweep_min = 0, sweep_max = 0, sweep_step = 1;
 
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--chip-kb") && i + 1 < argc) {
@@ -656,6 +661,17 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(argv[i], "--pacing-us") && i + 1 < argc) {
       pacing_us = atoi(argv[++i]);
       if (pacing_us < 0) pacing_us = 0;
+    } else if (!strcmp(argv[i], "--pacing-sweep") && i + 1 < argc) {
+      const char *spec = argv[++i];
+      int a = 0, b = 0, c = 0;
+      if (sscanf(spec, "%d:%d:%d", &a, &b, &c) != 3 || c <= 0 || a < 0 || b < a) {
+        printf("Invalid --pacing-sweep format, expected min:max:step\n");
+        return 1;
+      }
+      sweep_enabled = 1;
+      sweep_min = a;
+      sweep_max = b;
+      sweep_step = c;
     } else if (!strcmp(argv[i], "--wait-sample") && i + 1 < argc) {
       int s = atoi(argv[++i]);
       if (s < 1) s = 1;
@@ -695,6 +711,64 @@ int main(int argc, char *argv[]) {
       any_fail |= memtest_region(&regions[i]);
     }
     return any_fail ? 1 : 0;
+  }
+
+  if (sweep_enabled) {
+    const struct region *r = &regions[0];
+    uint32_t size = r->size & ~3u;
+    uint32_t sink = 0;
+    struct wait_stats st_w16, st_r16, st_w32, st_r32;
+    uint32_t samples_w16[10000], samples_r16[10000];
+    uint32_t samples_w32[10000], samples_r32[10000];
+    int burst = burst_sizes[0];
+
+    printf("[SWEEP] region=%s base=0x%06X size=%u KB burst=%d repeat=%d wait_sample=%u\n",
+           r->name, r->base, size / SIZE_KILO, burst, repeats, g_wait_timing_stride);
+    printf("[SWEEP] pacing_us w16 r16 w32 r32 wait_p95 wait_max\n");
+
+    for (int p = sweep_min; p <= sweep_max; p += sweep_step) {
+      double best_w16 = 1e9, best_r16 = 1e9, best_w32 = 1e9, best_r32 = 1e9;
+      uint32_t p95 = 0, max_us = 0;
+
+      for (int i = 0; i < repeats; i++) {
+        stats_init(&st_w16, size / 2u, samples_w16, 10000);
+        stats_init(&st_r16, size / 2u, samples_r16, 10000);
+        stats_init(&st_w32, size / 4u, samples_w32, 10000);
+        stats_init(&st_r32, size / 4u, samples_r32, 10000);
+        double tw16 = bench_write16(r->base, size, burst, p, &st_w16);
+        double tr16 = bench_read16(r->base, size, burst, p, &st_r16, &sink);
+        double tw32 = bench_write32(r->base, size, burst, p, &st_w32);
+        double tr32 = bench_read32(r->base, size, burst, p, &st_r32, &sink);
+        if (tw16 < best_w16) best_w16 = tw16;
+        if (tr16 < best_r16) best_r16 = tr16;
+        if (tw32 < best_w32) best_w32 = tw32;
+        if (tr32 < best_r32) best_r32 = tr32;
+      }
+
+      char tmp[64];
+      stats_report(&st_w16, tmp, sizeof(tmp));
+      if (st_w16.last_p95 > p95) p95 = st_w16.last_p95;
+      if (st_w16.max_us > max_us) max_us = st_w16.max_us;
+      stats_report(&st_r16, tmp, sizeof(tmp));
+      if (st_r16.last_p95 > p95) p95 = st_r16.last_p95;
+      if (st_r16.max_us > max_us) max_us = st_r16.max_us;
+      stats_report(&st_w32, tmp, sizeof(tmp));
+      if (st_w32.last_p95 > p95) p95 = st_w32.last_p95;
+      if (st_w32.max_us > max_us) max_us = st_w32.max_us;
+      stats_report(&st_r32, tmp, sizeof(tmp));
+      if (st_r32.last_p95 > p95) p95 = st_r32.last_p95;
+      if (st_r32.max_us > max_us) max_us = st_r32.max_us;
+
+      double mb = (double)size / (1024.0 * 1024.0);
+      double w16_mbs = (best_w16 > 0.0) ? (mb / best_w16) : 0.0;
+      double r16_mbs = (best_r16 > 0.0) ? (mb / best_r16) : 0.0;
+      double w32_mbs = (best_w32 > 0.0) ? (mb / best_w32) : 0.0;
+      double r32_mbs = (best_r32 > 0.0) ? (mb / best_r32) : 0.0;
+
+      printf("%9d %.2f %.2f %.2f %.2f %8u %8u\n",
+             p, w16_mbs, r16_mbs, w32_mbs, r32_mbs, p95, max_us);
+    }
+    return 0;
   }
 
   for (int i = 0; i < region_count; i++) {
