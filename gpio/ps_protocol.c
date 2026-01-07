@@ -151,6 +151,9 @@ static void bpl_log_write(unsigned int address, unsigned int data, int width_bit
         if (combined == bplw_cop2_prev && bplw_cop2_last != 0 && bplw_cop2_prev != 0) {
           bplw_cop2_flip_count++;
           if (bplw_cop2_flip_count >= 8) {
+            if (!bplw_cop2_suppress) {
+              fprintf(stderr, "[BPLW] COP2LC change complete (repeating)\n");
+            }
             bplw_cop2_suppress = 1;
           }
         } else {
@@ -174,6 +177,9 @@ static void bpl_log_write(unsigned int address, unsigned int data, int width_bit
         if (combined == bplw_cop2_prev && bplw_cop2_last != 0 && bplw_cop2_prev != 0) {
           bplw_cop2_flip_count++;
           if (bplw_cop2_flip_count >= 8) {
+            if (!bplw_cop2_suppress) {
+              fprintf(stderr, "[BPLW] COP2LC change complete (repeating)\n");
+            }
             bplw_cop2_suppress = 1;
           }
         } else {
