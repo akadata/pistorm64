@@ -36,6 +36,19 @@ Source: Hardware/ADCD_2.1/_txt/Hardware_Manual_guide/node00D3.html.txt
 - AUTOCONFIG space (pre-relocation): 0xE80000 - 0xE8FFFF
 - Secondary AUTOCONFIG space: 0xE90000 - 0xEFFFFF
 
+## Model Quick Compare
+See Hardware/ADCD_2.1/docs/MEMORY_MAP_REF.md for full details.
+
+| Model | Chip RAM | Notable memory/I/O regions |
+| --- | --- | --- |
+| A1000 | 256KB (0x000000-0x03FFFF) | Kickstart from disk; early map per node00D3 |
+| A500 | 512KB-1MB (0x000000-0x0FFFFF) | Trapdoor slow RAM 0x00C00000-0x00C7FFFF |
+| A600 | 1MB chip typical | PCMCIA windows 0x00A0xxxx, IDE config 0x00DAxxxx |
+| A1200 | 2MB chip typical | PCMCIA + IDE windows, Z3 via accelerators |
+| A2000 | 512KB-1MB chip | Z2 expansions, 0x200000-0x9FFFFF |
+| A3000 | 1MB chip + Z3 | 0x01000000+ motherboard RAM regions |
+| A4000 | 2MB chip + Z3 | 0x01000000+ motherboard RAM, Z3 space |
+
 ## Notes
 - AUTOCONFIG chaining uses /CFGINn and /CFGOUTn, allowing only one card to respond at a time. See Hardware/ADCD_2.1/docs/AUTOCONFIG.md.
 - DMACON and interrupt registers are in the custom chip space (0xDFF000 base). See Hardware/ADCD_2.1/docs/DMA.md and Hardware/ADCD_2.1/docs/CUSTOM_REGS.md.
