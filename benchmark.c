@@ -637,6 +637,7 @@ int main(int argc, char *argv[]) {
   int memtest = 0;
   int sweep_enabled = 0;
   int sweep_min = 0, sweep_max = 0, sweep_step = 1;
+  int sweep_burst = 16;
 
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--chip-kb") && i + 1 < argc) {
@@ -672,6 +673,9 @@ int main(int argc, char *argv[]) {
       sweep_min = a;
       sweep_max = b;
       sweep_step = c;
+    } else if (!strcmp(argv[i], "--sweep-burst") && i + 1 < argc) {
+      sweep_burst = atoi(argv[++i]);
+      if (sweep_burst < 1) sweep_burst = 1;
     } else if (!strcmp(argv[i], "--wait-sample") && i + 1 < argc) {
       int s = atoi(argv[++i]);
       if (s < 1) s = 1;
@@ -720,8 +724,10 @@ int main(int argc, char *argv[]) {
     struct wait_stats st_w16, st_r16, st_w32, st_r32;
     uint32_t samples_w16[10000], samples_r16[10000];
     uint32_t samples_w32[10000], samples_r32[10000];
-    int burst = burst_sizes[0];
+    int burst = sweep_burst;
 
+    printf("[SWEEPDBG] min=%d max=%d step=%d burst=%d size_kb=%u repeat=%d wait_sample=%u\n",
+           sweep_min, sweep_max, sweep_step, burst, size / SIZE_KILO, repeats, g_wait_timing_stride);
     printf("[SWEEP] region=%s base=0x%06X size=%u KB burst=%d repeat=%d wait_sample=%u\n",
            r->name, r->base, size / SIZE_KILO, burst, repeats, g_wait_timing_stride);
     printf("[SWEEP] pacing_us w16 r16 w32 r32 wait_p95 wait_max\n");
@@ -767,6 +773,7 @@ int main(int argc, char *argv[]) {
 
       printf("%9d %.2f %.2f %.2f %.2f %8u %8u\n",
              p, w16_mbs, r16_mbs, w32_mbs, r32_mbs, p95, max_us);
+      fflush(stdout);
     }
     return 0;
   }

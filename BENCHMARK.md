@@ -54,7 +54,7 @@ sudo ./benchmark --chip-kb 1024 --repeat 3 --pacing-us 5
 Sweep pacing values and report throughput with wait statistics:
 
 ```
-sudo ./benchmark --chip-kb 1024 --repeat 3 --wait-sample 16 --pacing-sweep 0:50:2
+sudo ./benchmark --chip-kb 1024 --repeat 3 --wait-sample 16 --pacing-sweep 0:50:2 --sweep-burst 16
 ```
 
 Output columns:
@@ -62,6 +62,9 @@ Output columns:
 ```
 pacing_us w16 r16 w32 r32 wait_p95 wait_max
 ```
+
+Note: higher pacing values add a delay per transaction, so sweeps can take
+several minutes. Reduce `--chip-kb` or `--repeat` if needed.
 
 ## Wait Timing Sampling
 
