@@ -165,18 +165,16 @@ static uint32_t try_read_plld_hz_from_debugfs(void) {
 }
 
 static void setup_gpclk() {
-    /*
-      IMPORTANT:
-      - Use an integer divider (DIVF=0) and MASH=0.
-      - Do not inherit MASH/SRC from whatever firmware left in GP0CTL.
-
-      Empirically on your Alpine boot, DIVI=2, DIVF=0 with SRC=PLLD is stable
-      (250MHz). The previous 200MHz path used DIVF=2048 and depended on MASH
-      state; if firmware leaves MASH=1, that can produce an unstable clock for
-      this external bus.
-    */
-
-    const uint32_t target_hz = 250000000u;   // stable on your captures
+    const char *env_target = getenv("PISTORM_CLK_HZ");
+    uint32_t target_hz = 200000000u;
+    if (env_target && *env_target) {
+      unsigned long parsed = strtoul(env_target, NULL, 10);
+      if (parsed >= 100000000u && parsed <= 500000000u) {
+        target_hz = (uint32_t)parsed;
+      } else {
+        fprintf(stderr, "[CLK] Ignoring PISTORM_CLK_HZ=%s (out of range)\n", env_target);
+      }
+    }
     volatile uint32_t* gp0ctl = cm_reg(CLK_GP0_CTL);
     volatile uint32_t* gp0div = cm_reg(CLK_GP0_DIV);
 
@@ -189,38 +187,31 @@ static void setup_gpclk() {
         fprintf(stderr, "[CLK] PLLD rate: %u Hz\n", src_hz);
     }
 
-    /*
-      Compute divider, but force integer divider and MASH=0.
-      For 500MHz/250MHz this becomes exactly DIVI=2, DIVF=0.
-    */
     double div = (double)src_hz / (double)target_hz;
     if (div < 1.0) div = 1.0;
-    if (div > 4095.0) div = 4095.0;
-    uint32_t divi = (uint32_t)(div + 0.5);   // nearest integer
-    if (divi < 1) divi = 1;
-    if (divi > 4095) divi = 4095;
-    uint32_t div_reg = (divi << 12);         // DIVF forced to 0
+    if (div > 4095.999) div = 4095.999;
+    uint32_t divi = (uint32_t)div;
+    double frac = div - (double)divi;
+    uint32_t divf = (uint32_t)(frac * 4096.0 + 0.5);
+    if (divf >= 4096u) {
+      divi += 1u;
+      divf -= 4096u;
+    }
+    if (divi < 1u) divi = 1u;
+    if (divi > 4095u) divi = 4095u;
+    uint32_t div_reg = (divi << 12) | (divf & 0xFFFu);
+    uint32_t mash = (divf != 0u) ? 1u : 0u;
 
-    /*
-      Key change:
-      Clear GP0CTL first (PASSWD|0), do not preserve old bits.
-      This matches your proven devmem2 sequence (writing 0x5a000000).
-    */
-    *gp0ctl = CLK_PASSWD | 0u;
+    *gp0ctl = CLK_PASSWD | GPCLK_CTL_KILL;
     if (wait_busy(gp0ctl, 0, 2000) < 0) {
-        fprintf(stderr, "[CLK] Warning: GPCLK0 BUSY did not clear after clear\n");
+      fprintf(stderr, "[CLK] Warning: GPCLK0 BUSY did not clear after kill\n");
     }
 
     *gp0div = CLK_PASSWD | div_reg;
 
-    /*
-      Program SRC=PLLD, EN=1, MASH=0 explicitly.
-      (MASH=0 is critical because DIVF=0; also avoids inherited jitter states.)
-    */
     uint32_t newctl = 0u;
-    newctl &= ~GPCLK_CTL_SRC_MASK;
     newctl |= (GPCLK_SRC_PLLD & GPCLK_CTL_SRC_MASK);
-    newctl &= ~GPCLK_CTL_MASH_MASK;
+    newctl |= ((mash << 9) & GPCLK_CTL_MASH_MASK);
     newctl |= GPCLK_CTL_ENAB;
     *gp0ctl = CLK_PASSWD | newctl;
 
@@ -231,7 +222,9 @@ static void setup_gpclk() {
     uint32_t rd_ctl = *gp0ctl;
     uint32_t rd_div = *gp0div;
     uint32_t rd_divi = (rd_div >> 12) & 0xFFF;
-    double actual_hz = (rd_divi ? ((double)src_hz / (double)rd_divi) : 0.0);
+    uint32_t rd_divf = rd_div & 0xFFF;
+    double actual_div = (double)rd_divi + ((double)rd_divf / 4096.0);
+    double actual_hz = (actual_div > 0.0) ? ((double)src_hz / actual_div) : 0.0;
 
     if ((rd_ctl & GPCLK_CTL_SRC_MASK) != GPCLK_SRC_PLLD) {
         fprintf(stderr, "[CLK] Warning: GPCLK0 SRC=%u (expected %u)\n",
