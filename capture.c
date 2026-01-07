@@ -219,7 +219,7 @@ int main(int argc, char **argv) {
   }
 
   uint32_t ptrs[6];
-  for (int p = 0; p < 6; p++) {
+  for (int p = 0; p < planes; p++) {
     if (have_bpl[p]) {
       ptrs[p] = bpl_override[p] & CHIP_MASK;
       continue;

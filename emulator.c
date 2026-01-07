@@ -327,6 +327,17 @@ static void amiga_reset_and_wait(const char* tag) {
   printf("[RST] Warning: TXN_IN_PROGRESS still set after reset (%s)\n", tag);
 }
 
+// Configurable emulator options
+unsigned int cpu_type = M68K_CPU_TYPE_68000;
+unsigned int loop_cycles = 300;
+static unsigned int ipl_nop_count = 8;
+static const unsigned int ipl_nop_count_default = 8;
+unsigned int irq_status = 0;
+
+static const unsigned int loop_cycles_cap = 10000; // cap slices to keep service latency reasonable
+struct emulator_config* cfg = NULL;
+char keyboard_file[256] = "/dev/input/event1";
+
 static void configure_ipl_nops(void) {
   unsigned int value = ipl_nop_count_default;
   const char* env = getenv("PISTORM_IPL_NOP_COUNT");
@@ -343,17 +354,6 @@ static void configure_ipl_nops(void) {
   ipl_nop_count = value;
   printf("[CFG] IPL NOP count: %u\n", ipl_nop_count);
 }
-
-// Configurable emulator options
-unsigned int cpu_type = M68K_CPU_TYPE_68000;
-unsigned int loop_cycles = 300;
-static unsigned int ipl_nop_count = 8;
-static const unsigned int ipl_nop_count_default = 8;
-unsigned int irq_status = 0;
-
-static const unsigned int loop_cycles_cap = 10000; // cap slices to keep service latency reasonable
-struct emulator_config* cfg = NULL;
-char keyboard_file[256] = "/dev/input/event1";
 
 uint64_t trig_irq = 0, serv_irq = 0;
 uint16_t irq_delay = 0;
@@ -380,7 +380,8 @@ void* ipl_task(void* args) {
       // NOP
       if (!irq) {
         M68K_END_TIMESLICE;
-        NOP irq = 1;
+        NOP;
+        irq = 1;
       }
       // usleep( 0 );
     } else {
@@ -391,7 +392,7 @@ void* ipl_task(void* args) {
           irq = 0;
         }
         M68K_END_TIMESLICE;
-        NOP
+        NOP;
         // usleep( 0 );
       }
     }
