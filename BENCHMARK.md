@@ -46,7 +46,7 @@ Add a fixed delay (microseconds) after each transaction to emulate
 emulator pacing effects:
 
 ```
-sudo ./benchmark --chip-kb 1024 --repeat 3 --pacing-us 5
+sudo ./benchmark --chip-kb 1024 --repeat 3 --pacing-us 5 --pacing-mode burst
 ```
 
 ## Pacing Sweep
@@ -54,13 +54,13 @@ sudo ./benchmark --chip-kb 1024 --repeat 3 --pacing-us 5
 Sweep pacing values and report throughput with wait statistics:
 
 ```
-sudo ./benchmark --chip-kb 1024 --repeat 3 --wait-sample 16 --pacing-sweep 0:50:2 --sweep-burst 16
+sudo ./benchmark --chip-kb 1024 --repeat 3 --wait-sample 16 --pacing-sweep 0:50:2 --sweep-burst 16 --pacing-mode burst
 ```
 
 Output columns:
 
 ```
-pacing_us w16 r16 w32 r32 wait_p95 wait_max
+pacing_us w16 r16 w32 r32 wait_p95 wait_max txns16 txns32
 ```
 
 Note: higher pacing values add a delay per transaction, so sweeps can take
