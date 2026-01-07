@@ -13,6 +13,8 @@
 #define SIZE_KILO 1024u
 #define SIZE_MEGA (1024u * 1024u)
 
+extern volatile unsigned int *gpio;
+
 struct region {
   const char *name;
   uint32_t base;
