@@ -25,9 +25,12 @@ struct wait_stats {
   uint32_t sample_max;
   uint32_t sample_stride;
   uint32_t sample_next;
+  uint32_t timing_stride;
+  uint32_t timing_next;
 };
 
 static volatile const char *g_smoke_phase = NULL;
+static uint32_t g_wait_timing_stride = 1;
 
 struct region {
   const char *name;
@@ -87,6 +90,11 @@ static uint32_t wait_txn_timed_us(void) {
   return (uint32_t)us;
 }
 
+static void wait_txn_spin(void) {
+  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {
+  }
+}
+
 static void stats_init(struct wait_stats *st, uint64_t total_txns, uint32_t *samples, uint32_t max_samples) {
   st->count = 0;
   st->total_us = 0;
@@ -101,6 +109,8 @@ static void stats_init(struct wait_stats *st, uint64_t total_txns, uint32_t *sam
     st->sample_stride = 1;
   }
   st->sample_next = 0;
+  st->timing_stride = g_wait_timing_stride ? g_wait_timing_stride : 1;
+  st->timing_next = 0;
 }
 
 static void stats_update(struct wait_stats *st, uint32_t wait_us) {
@@ -116,6 +126,24 @@ static void stats_update(struct wait_stats *st, uint32_t wait_us) {
     }
     st->sample_next--;
   }
+}
+
+static void stats_wait(struct wait_stats *st) {
+  if (st->timing_stride <= 1) {
+    uint32_t wait_us = wait_txn_timed_us();
+    stats_update(st, wait_us);
+    return;
+  }
+
+  if (st->timing_next == 0) {
+    uint32_t wait_us = wait_txn_timed_us();
+    stats_update(st, wait_us);
+    st->timing_next = st->timing_stride - 1;
+    return;
+  }
+
+  wait_txn_spin();
+  st->timing_next--;
 }
 
 static int cmp_u32(const void *a, const void *b) {
@@ -225,8 +253,7 @@ static inline void write8_raw(uint32_t address, uint8_t data, struct wait_stats 
   GPIO_WRITEREG(REG_DATA, (v & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_HI, (0x0100u | (address >> 16)));
-  uint32_t wait_us = wait_txn_timed_us();
-  stats_update(st, wait_us);
+  stats_wait(st);
   if (pacing_us > 0) usleep((useconds_t)pacing_us);
 }
 
@@ -234,8 +261,7 @@ static inline uint8_t read8_raw(uint32_t address, struct wait_stats *st, int pac
   GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_HI, (0x0300u | (address >> 16)));
   GPIO_PIN_RD;
-  uint32_t wait_us = wait_txn_timed_us();
-  stats_update(st, wait_us);
+  stats_wait(st);
   uint32_t value = ((*(gpio + 13) >> 8) & 0xFFFFu);
   END_TXN;
   if (pacing_us > 0) usleep((useconds_t)pacing_us);
@@ -247,8 +273,7 @@ static inline void write16_raw(uint32_t address, uint16_t data, struct wait_stat
   GPIO_WRITEREG(REG_DATA, (data & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_HI, (0x0000u | (address >> 16)));
-  uint32_t wait_us = wait_txn_timed_us();
-  stats_update(st, wait_us);
+  stats_wait(st);
   if (pacing_us > 0) usleep((useconds_t)pacing_us);
 }
 
@@ -256,8 +281,7 @@ static inline uint16_t read16_raw(uint32_t address, struct wait_stats *st, int p
   GPIO_WRITEREG(REG_ADDR_LO, (address & 0xFFFFu));
   GPIO_WRITEREG(REG_ADDR_HI, (0x0200u | (address >> 16)));
   GPIO_PIN_RD;
-  uint32_t wait_us = wait_txn_timed_us();
-  stats_update(st, wait_us);
+  stats_wait(st);
   uint16_t value = (uint16_t)(((*(gpio + 13) >> 8) & 0xFFFFu));
   END_TXN;
   if (pacing_us > 0) usleep((useconds_t)pacing_us);
@@ -588,7 +612,7 @@ static int parse_region_arg(const char *arg, struct region *out) {
 }
 
 static void usage(const char *prog) {
-  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N] [--smoke] [--memtest]\n", prog);
+  printf("Usage: %s [--chip-kb N] [--region name:base:size_kb] [--repeat N] [--burst N] [--pacing-us N] [--wait-sample N] [--smoke] [--memtest]\n", prog);
   printf("Default: chip ram 1024 KB at base 0x000000\n");
   printf("Example: %s --chip-kb 1024 --region fast:0x200000:8192 --repeat 3\n", prog);
 }
@@ -632,6 +656,10 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(argv[i], "--pacing-us") && i + 1 < argc) {
       pacing_us = atoi(argv[++i]);
       if (pacing_us < 0) pacing_us = 0;
+    } else if (!strcmp(argv[i], "--wait-sample") && i + 1 < argc) {
+      int s = atoi(argv[++i]);
+      if (s < 1) s = 1;
+      g_wait_timing_stride = (uint32_t)s;
     } else if (!strcmp(argv[i], "--smoke")) {
       smoke = 1;
     } else if (!strcmp(argv[i], "--memtest")) {
