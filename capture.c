@@ -81,6 +81,7 @@ int main(int argc, char **argv) {
   int use_ehb = 0;
   int use_ham = 0;
   int show_info = 0;
+  int auto_mode = 1;
   uint32_t bpl_override[6] = {0};
   int have_bpl[6] = {0};
   int have_mod1 = 0;
@@ -105,36 +106,45 @@ int main(int argc, char **argv) {
     } else if (!strcmp(arg, "--planes")) {
       if (i + 1 >= argc) usage(argv[0]);
       planes = (int)parse_u32(argv[++i]);
+      auto_mode = 0;
     } else if (!strcmp(arg, "--ehb")) {
       use_ehb = 1;
+      auto_mode = 0;
     } else if (!strcmp(arg, "--ham")) {
       use_ham = 1;
+      auto_mode = 0;
     } else if (!strcmp(arg, "--info")) {
       show_info = 1;
     } else if (!strcmp(arg, "--bpl1")) {
       if (i + 1 >= argc) usage(argv[0]);
       bpl_override[0] = parse_u32(argv[++i]);
       have_bpl[0] = 1;
+      auto_mode = 0;
     } else if (!strcmp(arg, "--bpl2")) {
       if (i + 1 >= argc) usage(argv[0]);
       bpl_override[1] = parse_u32(argv[++i]);
       have_bpl[1] = 1;
+      auto_mode = 0;
     } else if (!strcmp(arg, "--bpl3")) {
       if (i + 1 >= argc) usage(argv[0]);
       bpl_override[2] = parse_u32(argv[++i]);
       have_bpl[2] = 1;
+      auto_mode = 0;
     } else if (!strcmp(arg, "--bpl4")) {
       if (i + 1 >= argc) usage(argv[0]);
       bpl_override[3] = parse_u32(argv[++i]);
       have_bpl[3] = 1;
+      auto_mode = 0;
     } else if (!strcmp(arg, "--bpl5")) {
       if (i + 1 >= argc) usage(argv[0]);
       bpl_override[4] = parse_u32(argv[++i]);
       have_bpl[4] = 1;
+      auto_mode = 0;
     } else if (!strcmp(arg, "--bpl6")) {
       if (i + 1 >= argc) usage(argv[0]);
       bpl_override[5] = parse_u32(argv[++i]);
       have_bpl[5] = 1;
+      auto_mode = 0;
     } else if (!strcmp(arg, "--mod1")) {
       if (i + 1 >= argc) usage(argv[0]);
       mod1_override = (uint16_t)parse_u32(argv[++i]);
@@ -178,7 +188,7 @@ int main(int argc, char **argv) {
     planes = bpu;
   }
 
-  if (!use_ham && !use_ehb && bplcon0 != 0xFFFF) {
+  if (auto_mode && !use_ham && !use_ehb && bplcon0 != 0xFFFF) {
     use_ham = (bplcon0 & 0x0800u) != 0;
     use_ehb = (bplcon0 & 0x0400u) != 0;
     if (use_ham && use_ehb) {
