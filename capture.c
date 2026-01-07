@@ -23,6 +23,7 @@ static void usage(const char *prog) {
           "Usage: %s [--out <file>] [--width <px>] [--height <px>] [--planes <n>]\n"
           "          [--ehb] [--ham] [--info]\n"
           "          [--bpl1 <addr>] ... [--bpl6 <addr>] [--mod1 <val>] [--mod2 <val>]\n"
+          "          [--rowbytes <val>] [--line-step <val>]\n"
           "\n"
           "Defaults: width=320 height=256 planes=auto out=capture.ppm\n"
           "Notes:\n"
@@ -86,6 +87,9 @@ int main(int argc, char **argv) {
   int have_mod2 = 0;
   uint16_t mod1_override = 0;
   uint16_t mod2_override = 0;
+  uint32_t rowbytes_override = 0;
+  int have_line_step = 0;
+  uint32_t line_step_override = 0;
 
   for (int i = 1; i < argc; i++) {
     const char *arg = argv[i];
@@ -139,6 +143,13 @@ int main(int argc, char **argv) {
       if (i + 1 >= argc) usage(argv[0]);
       mod2_override = (uint16_t)parse_u32(argv[++i]);
       have_mod2 = 1;
+    } else if (!strcmp(arg, "--rowbytes")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      rowbytes_override = parse_u32(argv[++i]);
+    } else if (!strcmp(arg, "--line-step")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      line_step_override = parse_u32(argv[++i]);
+      have_line_step = 1;
     } else {
       usage(argv[0]);
       return 1;
@@ -200,6 +211,9 @@ int main(int argc, char **argv) {
   }
 
   uint32_t bytes_per_row = (width + 7) / 8;
+  if (rowbytes_override) {
+    bytes_per_row = rowbytes_override;
+  }
   if (width % 16) {
     fprintf(stderr, "Warning: width not multiple of 16; capture may be skewed.\n");
   }
@@ -258,6 +272,9 @@ int main(int argc, char **argv) {
     uint32_t line_off_even = (uint32_t)((int32_t)bytes_per_row + (int16_t)bpl2mod);
     for (int p = 0; p < planes; p++) {
       uint32_t line_off = (p & 1) ? line_off_even : line_off_odd;
+      if (have_line_step) {
+        line_off = line_step_override;
+      }
       uint32_t addr = ptrs[p] + y * line_off;
       read_row(row_planes[p], addr, bytes_per_row);
     }
