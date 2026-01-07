@@ -460,8 +460,8 @@ static void run_region(const struct region *r, int repeats, int burst, int pacin
 }
 
 static void smoke_sig_handler(int sig) {
-  const char *phase = g_smoke_phase ? g_smoke_phase : "unknown";
-  fprintf(stderr, "[SMOKE] Crash during %s (signal %d)\n", phase, sig);
+  const volatile char *phase = g_smoke_phase ? g_smoke_phase : "unknown";
+  fprintf(stderr, "[SMOKE] Crash during %s (signal %d)\n", (const char *)phase, sig);
   _exit(1);
 }
 
