@@ -193,7 +193,6 @@ static void setup_gpclk() {
     uint32_t divi = (uint32_t)(div + 0.5); // nearest integer divider
     if (divi < 1u) divi = 1u;
     if (divi > 4095u) divi = 4095u;
-    uint32_t divf = 0u; // force integer divider for stability
     uint32_t div_reg = (divi << 12);
     uint32_t mash = 0u;
 
