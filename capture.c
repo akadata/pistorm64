@@ -13,6 +13,11 @@
 
 #define CHIP_MASK 0x1FFFFF
 
+// ps_protocol.c expects this symbol from the emulator core.
+void m68k_set_irq(unsigned int level) {
+  (void)level;
+}
+
 static void usage(const char *prog) {
   fprintf(stderr,
           "Usage: %s [--out <file>] [--width <px>] [--height <px>] [--planes <n>]\n"
