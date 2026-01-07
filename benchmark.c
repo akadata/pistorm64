@@ -796,7 +796,7 @@ int main(int argc, char *argv[]) {
            g_pacing_kind == PACING_SPIN ? "spin" : "sleep");
     printf("[SWEEP] region=%s base=0x%06X size=%u KB burst=%d repeat=%d wait_sample=%u\n",
            r->name, r->base, size / SIZE_KILO, burst, repeats, g_wait_timing_stride);
-    printf("[SWEEP] pacing_us w16 r16 w32 r32 wait_p95 wait_max txns16 txns32\n");
+    printf("[SWEEP] pacing_us w16 r16 w32 r32 r32_16eq wait_p95 wait_max txns16 txns32 exp_delay_us16 exp_delay_us32\n");
 
     for (int p = sweep_min; p <= sweep_max; p += sweep_step) {
       double best_w16 = 1e9, best_r16 = 1e9, best_w32 = 1e9, best_r32 = 1e9;
@@ -836,9 +836,23 @@ int main(int argc, char *argv[]) {
       double r16_mbs = (best_r16 > 0.0) ? (mb / best_r16) : 0.0;
       double w32_mbs = (best_w32 > 0.0) ? (mb / best_w32) : 0.0;
       double r32_mbs = (best_r32 > 0.0) ? (mb / best_r32) : 0.0;
+      double r32_16eq_mbs = r32_mbs * 2.0;
+      uint32_t bursts16 = (txns16 + (uint32_t)burst - 1u) / (uint32_t)burst;
+      uint32_t bursts32 = (txns32 + (uint32_t)burst - 1u) / (uint32_t)burst;
+      uint64_t exp_delay_us16 = 0;
+      uint64_t exp_delay_us32 = 0;
+      if (pacing_mode == PACING_BURST) {
+        exp_delay_us16 = (uint64_t)bursts16 * (uint64_t)p;
+        exp_delay_us32 = (uint64_t)bursts32 * (uint64_t)p;
+      } else {
+        exp_delay_us16 = (uint64_t)txns16 * (uint64_t)p;
+        exp_delay_us32 = (uint64_t)txns32 * (uint64_t)p;
+      }
 
-      printf("%9d %.2f %.2f %.2f %.2f %8u %8u %7u %7u\n",
-             p, w16_mbs, r16_mbs, w32_mbs, r32_mbs, p95, max_us, txns16, txns32);
+      printf("%9d %.2f %.2f %.2f %.2f %.2f %8u %8u %7u %7u %13llu %13llu\n",
+             p, w16_mbs, r16_mbs, w32_mbs, r32_mbs, r32_16eq_mbs,
+             p95, max_us, txns16, txns32,
+             (unsigned long long)exp_delay_us16, (unsigned long long)exp_delay_us32);
       fflush(stdout);
     }
     return 0;
