@@ -507,6 +507,10 @@ int main(int argc, char **argv) {
           have_bpl[p] = 1;
         }
       }
+      if (!have_coplist && snap.cop2lc) {
+        coplist_addr = snap.cop2lc;
+        have_coplist = 1;
+      }
     }
   }
 
@@ -522,34 +526,52 @@ int main(int argc, char **argv) {
   struct cop_state cop = {0};
 
   if (have_snap) {
-    if (bplcon0 == 0xFFFF || !have_coplist) {
-      bplcon0 = snap.bplcon0;
-      bpl1mod = snap.bpl1mod;
-      bpl2mod = snap.bpl2mod;
-      diwstrt = snap.diwstrt;
-      diwstop = snap.diwstop;
-      ddfstrt = snap.ddfstrt;
-      ddfstop = snap.ddfstop;
-    }
+    bplcon0 = snap.bplcon0;
+    bpl1mod = snap.bpl1mod;
+    bpl2mod = snap.bpl2mod;
+    diwstrt = snap.diwstrt;
+    diwstop = snap.diwstop;
+    ddfstrt = snap.ddfstrt;
+    ddfstop = snap.ddfstop;
   }
   if (have_coplist) {
     parse_copper_list(coplist_addr, &cop);
     if (dump_coplist) {
       dump_copper_list(coplist_addr, dump_coplist);
     }
+    if ((!have_snap && bplcon0 == 0xFFFF) || (have_snap && bplcon0 == 0x0000)) {
+      if (cop.have_bplcon0) {
+        bplcon0 = cop.bplcon0;
+      }
+    }
+    if (!have_snap && cop.have_mod1 && !have_mod1) {
+      bpl1mod = cop.bpl1mod;
+    }
+    if (!have_snap && cop.have_mod2 && !have_mod2) {
+      bpl2mod = cop.bpl2mod;
+    }
+    if (!have_snap) {
+      if (cop.diwstrt) diwstrt = cop.diwstrt;
+      if (cop.diwstop) diwstop = cop.diwstop;
+      if (cop.ddfstrt) ddfstrt = cop.ddfstrt;
+      if (cop.ddfstop) ddfstop = cop.ddfstop;
+    }
+    for (int p = 0; p < 6; p++) {
+      if (!have_bpl[p] && cop.have_pth[p] && cop.have_ptl[p]) {
+        bpl_override[p] =
+            (((uint32_t)cop.bpl_pth[p] << 16) | cop.bpl_ptl[p]) & CHIP_MASK;
+        have_bpl[p] = 1;
+      }
+    }
     if (bplcon0 == 0xFFFF && cop.have_bplcon0) {
       bplcon0 = cop.bplcon0;
     }
-    if (cop.have_mod1 && !have_mod1) {
-      bpl1mod = cop.bpl1mod;
-    }
-    if (cop.have_mod2 && !have_mod2) {
-      bpl2mod = cop.bpl2mod;
-    }
-    if (cop.diwstrt) diwstrt = cop.diwstrt;
-    if (cop.diwstop) diwstop = cop.diwstop;
-    if (cop.ddfstrt) ddfstrt = cop.ddfstrt;
-    if (cop.ddfstop) ddfstop = cop.ddfstop;
+  }
+
+  if (have_snap && snap.ts_us == 0) {
+    fprintf(stderr,
+            "Warning: snapshot has no updates yet (ts_us=0). "
+            "Emulator may not have written display regs.\n");
   }
 
   if (planes < 0) {
