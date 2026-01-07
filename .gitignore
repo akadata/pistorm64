@@ -33,3 +33,8 @@ qwen.resume
 *.jdf
 *.dd
 *.pdf
+
+# Do not include the new binary regtool, it may be built for musl-libc and we dont want confusion
+# peek and poke Amiga hardware here ;) 
+regtool
+
