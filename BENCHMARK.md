@@ -60,7 +60,7 @@ sudo ./benchmark --chip-kb 1024 --repeat 3 --wait-sample 16 --pacing-sweep 0:50:
 Output columns:
 
 ```
-pacing_us w16 r16 w32 r32 wait_p95 wait_max txns16 txns32
+pacing_us w16 r16 w32 r32 r32_16eq wait_p95 wait_max txns16 txns32 exp_delay_us16 exp_delay_us32
 ```
 
 Note: `--pacing-kind spin` avoids scheduler jitter but burns CPU.
