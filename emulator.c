@@ -260,6 +260,13 @@ void* ipl_task(void* args) {
     // usleep( 0 );
     // NOP NOP
   noppers:
+    /*
+      Deterministic, low-jitter pacing for the IPL/status polling path.
+      This prevents hammering TXN_IN_PROGRESS, gives the CPLD state machine
+      time to advance, and avoids scheduler noise vs usleep(). It also reduces
+      contention with the main emulation loop. Removing or shrinking this can
+      cause instability, missed edges, or worse overall latency.
+    */
     NOP NOP NOP NOP NOP NOP NOP NOP
     // NOP NOP NOP NOP NOP NOP NOP NOP
     // NOP NOP NOP NOP NOP NOP NOP NOP
