@@ -16,8 +16,10 @@ Usage:
 ./regtool --force --audio-test --audio-addr 0x00010000 --audio-len 256 --audio-period 200 --audio-vol 64
 ./regtool --force --audio-stop
 
-./regtool --force --kbd-led on
-./regtool --force --kbd-led off
+./regtool --force --disk-led on
+./regtool --force --disk-led off
+./regtool --force --power-led on
+./regtool --force --power-led off
 ```
 
 Notes:
@@ -25,6 +27,7 @@ Notes:
 - CIA registers are spaced 0x100 apart. Use 8-bit accesses for CIA.
 - Writes require `--force` because they can disrupt the running system.
 - Audio test writes a simple square wave into chip RAM and enables AUD0 DMA.
+- Disk LED is CIAA port A bit 1 (active low). Power LED on A500 is not software controlled.
 
 Common addresses:
 - DMACONR: 0xDFF002

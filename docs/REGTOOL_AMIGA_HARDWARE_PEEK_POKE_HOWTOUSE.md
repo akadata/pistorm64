@@ -29,10 +29,12 @@ Write a custom register:
 ./regtool --force --write16 0xDFF096 0x8200
 ```
 
-Toggle keyboard LED (CIAA Port A):
+Toggle disk LED (CIAA Port A, active low):
 ```
-./regtool --force --kbd-led on
-./regtool --force --kbd-led off
+./regtool --force --disk-led on
+./regtool --force --disk-led off
+./regtool --force --power-led on
+./regtool --force --power-led off
 ```
 
 ## Audio Test (AUD0)
@@ -75,6 +77,7 @@ Careful writes (can affect the running system):
 - CIA ICR reads clear interrupt flags; avoid rapid polling of CIAICR.
 - Avoid writing to undefined bits or registers.
 - For chip RAM writes, keep addresses in the chip range and aligned to the access width.
+- A500 power LED is hardware-wired; `--power-led` is a no-op.
 
 ## Next Ideas (If You Want)
 - Sprite helper: load sprite data to chip RAM and set SPRx pointers.
