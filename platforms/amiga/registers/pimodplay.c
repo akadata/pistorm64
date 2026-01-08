@@ -28,6 +28,9 @@ void m68k_set_irq(unsigned int level) {
 #define MOD_CHANNELS 4
 
 static double paula_clock_hz(int is_pal);
+static void sleep_seconds(double seconds);
+static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
+                               uint16_t period, uint16_t vol);
 
 static volatile sig_atomic_t stop_requested = 0;
 
