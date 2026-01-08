@@ -25,6 +25,8 @@ void m68k_set_irq(unsigned int level) {
 #define DMAF_AUD0   0x0001
 #define CHIP_ADDR_MASK 0x0FFFFFu
 
+static double paula_clock_hz(int is_pal);
+
 static volatile sig_atomic_t stop_requested = 0;
 
 static void usage(const char *prog) {
