@@ -123,6 +123,7 @@ static int setup_io() {
 #define GPCLK_CTL_SRC_MASK  0xFu
 #define GPCLK_CTL_MASH_MASK (3u << 9)   // bits 9..10
 #define GPCLK_SRC_PLLD      6u
+#define GPCLK_SRC_PLLC      5u
 
 
 static int wait_busy(volatile uint32_t* ctl, int want_busy, int timeout_us) {
@@ -164,8 +165,29 @@ static uint32_t try_read_plld_hz_from_debugfs(void) {
   return 0;
 }
 
+static uint32_t try_read_pllc_hz_from_debugfs(void) {
+  const char* paths[] = {
+    "/sys/kernel/debug/clk/pllc/clk_rate",
+    "/sys/kernel/debug/clk/pllc_core/clk_rate",
+    "/sys/kernel/debug/clk/pllc_per/clk_rate",
+  };
+
+  for (size_t i = 0; i < (sizeof(paths) / sizeof(paths[0])); i++) {
+    int fd = open(paths[i], O_RDONLY);
+    if (fd < 0) continue;
+    char buf[64] = {0};
+    ssize_t rd = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (rd <= 0) continue;
+    unsigned long long hz = strtoull(buf, NULL, 10);
+    if (hz > 1000000ull && hz < 2000000000ull) return (uint32_t)hz;
+  }
+  return 0;
+}
+
 static void setup_gpclk() {
     const char *env_target = getenv("PISTORM_CLK_HZ");
+    const char *env_src = getenv("PISTORM_CLK_SRC");
     uint32_t target_hz = 250000000u;
     if (env_target && *env_target) {
       unsigned long parsed = strtoul(env_target, NULL, 10);
@@ -179,12 +201,34 @@ static void setup_gpclk() {
     volatile uint32_t* gp0div = cm_reg(CLK_GP0_DIV);
 
     uint32_t plld_hz = try_read_plld_hz_from_debugfs();
+    uint32_t pllc_hz = try_read_pllc_hz_from_debugfs();
     uint32_t src_hz  = plld_hz ? plld_hz : 500000000u;
+    uint32_t src_sel = GPCLK_SRC_PLLD;
 
     if (!plld_hz) {
         fprintf(stderr, "[CLK] PLLD rate not found; assuming %u Hz\n", src_hz);
     } else {
         fprintf(stderr, "[CLK] PLLD rate: %u Hz\n", src_hz);
+    }
+    if (pllc_hz) {
+        fprintf(stderr, "[CLK] PLLC rate: %u Hz\n", pllc_hz);
+    }
+
+    if (env_src && *env_src) {
+      if (!strcmp(env_src, "pllc")) {
+        src_sel = GPCLK_SRC_PLLC;
+        if (pllc_hz) src_hz = pllc_hz;
+      } else if (!strcmp(env_src, "plld")) {
+        src_sel = GPCLK_SRC_PLLD;
+        src_hz = plld_hz ? plld_hz : 500000000u;
+      } else {
+        fprintf(stderr, "[CLK] Ignoring PISTORM_CLK_SRC=%s (expected pllc/plld)\n", env_src);
+      }
+    } else if (target_hz == 200000000u) {
+      // Preserve main-branch behavior: use PLLC with DIVI=6 for 200MHz on Pi3-class systems.
+      src_sel = GPCLK_SRC_PLLC;
+      if (pllc_hz) src_hz = pllc_hz;
+      fprintf(stderr, "[CLK] Using PLLC for 200MHz target (main-branch behavior)\n");
     }
 
     double div = (double)src_hz / (double)target_hz;
@@ -204,7 +248,7 @@ static void setup_gpclk() {
     *gp0div = CLK_PASSWD | div_reg;
 
     uint32_t newctl = 0u;
-    newctl |= (GPCLK_SRC_PLLD & GPCLK_CTL_SRC_MASK);
+    newctl |= (src_sel & GPCLK_CTL_SRC_MASK);
     newctl |= ((mash << 9) & GPCLK_CTL_MASH_MASK);
     newctl |= GPCLK_CTL_ENAB;
     *gp0ctl = CLK_PASSWD | newctl;
@@ -220,9 +264,9 @@ static void setup_gpclk() {
     double actual_div = (double)rd_divi + ((double)rd_divf / 4096.0);
     double actual_hz = (actual_div > 0.0) ? ((double)src_hz / actual_div) : 0.0;
 
-    if ((rd_ctl & GPCLK_CTL_SRC_MASK) != GPCLK_SRC_PLLD) {
+    if ((rd_ctl & GPCLK_CTL_SRC_MASK) != src_sel) {
         fprintf(stderr, "[CLK] Warning: GPCLK0 SRC=%u (expected %u)\n",
-                rd_ctl & GPCLK_CTL_SRC_MASK, GPCLK_SRC_PLLD);
+                rd_ctl & GPCLK_CTL_SRC_MASK, src_sel);
     }
 
     fprintf(stderr,
