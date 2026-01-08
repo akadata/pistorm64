@@ -53,11 +53,19 @@ Usage:
 
 WAV playback:
 - `sudo ./pimodplay --wav <file> --rate <hz>`
-  (Rate overrides period; WAV must be PCM mono 8/16-bit.)
+  (Rate overrides period; WAV must be PCM 8/16-bit.)
 
 Sample formats:
 - Paula expects signed 8-bit PCM. `--wav` converts to signed automatically.
 - For raw files, use `--u8` if the raw data is unsigned (default) or `--s8` if it is signed.
+
+Stereo + filter:
+- `sudo ./pimodplay --wav <file> --rate <hz> --stream --stereo`
+- `sudo ./pimodplay --raw <file> --rate <hz> --stream --stereo --s8`
+- `sudo ./pimodplay --raw <file> --rate <hz> --stream --lpf 4500`
+Notes:
+- `--stereo` expects interleaved L/R samples and uses AUD0/AUD1.
+- Use `--addr` low enough so both channels fit in 2MB chip RAM.
 
 MOD playback (basic):
 - `sudo ./pimodplay --mod <file>`

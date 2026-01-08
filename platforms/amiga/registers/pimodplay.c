@@ -31,6 +31,12 @@ static double paula_clock_hz(int is_pal);
 static void sleep_seconds(double seconds);
 static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
                                uint16_t period, uint16_t vol);
+static void audio_program_note_ch(int ch, uint32_t addr, const uint8_t *buf,
+                                  size_t len, uint16_t period, uint16_t vol);
+static void apply_lpf_mono(int8_t *data, size_t samples, double rate_hz,
+                           double cutoff_hz);
+static void apply_lpf_stereo(int8_t *data, size_t frames, double rate_hz,
+                             double cutoff_hz);
 
 static volatile sig_atomic_t stop_requested = 0;
 
@@ -40,7 +46,7 @@ static void usage(const char *prog) {
           "\n"
           "Raw sample playback (AUD0 DMA):\n"
           "  --raw <file>        8-bit unsigned sample data\n"
-          "  --wav <file>        WAV PCM mono (8/16-bit)\n"
+          "  --wav <file>        WAV PCM mono/stereo (8/16-bit)\n"
           "  --addr <hex>        Chip RAM load address (default 0x00080000)\n"
           "  --period <val>      Paula period (default 200)\n"
           "  --rate <hz>         Sample rate (overrides --period)\n"
@@ -50,6 +56,9 @@ static void usage(const char *prog) {
           "  --chunk-bytes <n>   Stream chunk size (default 131070 bytes)\n"
           "  --u8                Raw input is unsigned 8-bit (default for --raw)\n"
           "  --s8                Raw input is signed 8-bit\n"
+          "  --stereo            Raw/WAV is stereo interleaved (AUD0/AUD1)\n"
+          "  --mono              Force mono (downmix if WAV is stereo)\n"
+          "  --lpf <hz>          Apply low-pass filter (Hz)\n"
           "\n"
           "Built-in tune:\n"
           "  --saints            Play \"When the Saints\" on AUD0\n"
@@ -122,8 +131,9 @@ static uint16_t period_from_rate(double rate_hz, int is_pal) {
   return (uint16_t)(period + 0.5);
 }
 
-static uint8_t *read_wav_mono_s8(const char *path, size_t *out_len,
-                                 unsigned *out_rate_hz) {
+static uint8_t *read_wav_s8(const char *path, size_t *out_len,
+                            unsigned *out_rate_hz, int *out_channels,
+                            int force_mono) {
   FILE *f = fopen(path, "rb");
   if (!f) {
     perror(path);
@@ -193,9 +203,10 @@ static uint8_t *read_wav_mono_s8(const char *path, size_t *out_len,
     if (data_offset >= 0 && sample_rate != 0) break;
   }
 
-  if (audio_format != 1 || channels != 1 || sample_rate == 0 ||
+  if (audio_format != 1 || sample_rate == 0 ||
       (bits_per_sample != 8 && bits_per_sample != 16) ||
-      data_offset < 0 || data_size == 0) {
+      data_offset < 0 || data_size == 0 ||
+      (channels != 1 && channels != 2)) {
     fclose(f);
     return NULL;
   }
@@ -206,8 +217,11 @@ static uint8_t *read_wav_mono_s8(const char *path, size_t *out_len,
   }
 
   uint8_t *out = NULL;
+  size_t frames = 0;
   if (bits_per_sample == 8) {
-    out = (uint8_t *)malloc(data_size);
+    frames = data_size / channels;
+    size_t out_samples = force_mono ? frames : frames * channels;
+    out = (uint8_t *)malloc(out_samples);
     if (!out) {
       fclose(f);
       return NULL;
@@ -217,34 +231,78 @@ static uint8_t *read_wav_mono_s8(const char *path, size_t *out_len,
       free(out);
       return NULL;
     }
-    for (size_t i = 0; i < data_size; i++) {
-      out[i] = (uint8_t)((int)out[i] - 128);
+    if (channels == 2 && force_mono) {
+      for (size_t i = 0; i < frames; i++) {
+        int l = (int)out[i * 2] - 128;
+        int r = (int)out[i * 2 + 1] - 128;
+        int v = (l + r) / 2;
+        out[i] = (uint8_t)(int8_t)v;
+      }
+      *out_len = frames;
+    } else {
+      for (size_t i = 0; i < data_size; i++) {
+        out[i] = (uint8_t)((int)out[i] - 128);
+      }
+      *out_len = data_size;
     }
-    *out_len = data_size;
   } else {
-    size_t samples = data_size / 2;
-    out = (uint8_t *)malloc(samples);
+    frames = data_size / (2u * channels);
+    size_t out_samples = force_mono ? frames : frames * channels;
+    out = (uint8_t *)malloc(out_samples);
     if (!out) {
       fclose(f);
       return NULL;
     }
-    for (size_t i = 0; i < samples; i++) {
-      int16_t s = 0;
-      if (fread(&s, sizeof(s), 1, f) != 1) {
-        fclose(f);
-        free(out);
-        return NULL;
+    if (channels == 1) {
+      for (size_t i = 0; i < frames; i++) {
+        int16_t s = 0;
+        if (fread(&s, sizeof(s), 1, f) != 1) {
+          fclose(f);
+          free(out);
+          return NULL;
+        }
+        int v = s / 256;
+        if (v < -128) v = -128;
+        if (v > 127) v = 127;
+        out[i] = (uint8_t)(int8_t)v;
       }
-      int v = s / 256;
-      if (v < -128) v = -128;
-      if (v > 127) v = 127;
-      out[i] = (uint8_t)(int8_t)v;
+      *out_len = frames;
+    } else if (force_mono) {
+      for (size_t i = 0; i < frames; i++) {
+        int16_t l = 0;
+        int16_t r = 0;
+        if (fread(&l, sizeof(l), 1, f) != 1 ||
+            fread(&r, sizeof(r), 1, f) != 1) {
+          fclose(f);
+          free(out);
+          return NULL;
+        }
+        int v = ((int)l + (int)r) / 512;
+        if (v < -128) v = -128;
+        if (v > 127) v = 127;
+        out[i] = (uint8_t)(int8_t)v;
+      }
+      *out_len = frames;
+    } else {
+      for (size_t i = 0; i < frames * 2u; i++) {
+        int16_t s = 0;
+        if (fread(&s, sizeof(s), 1, f) != 1) {
+          fclose(f);
+          free(out);
+          return NULL;
+        }
+        int v = s / 256;
+        if (v < -128) v = -128;
+        if (v > 127) v = 127;
+        out[i] = (uint8_t)(int8_t)v;
+      }
+      *out_len = frames * 2u;
     }
-    *out_len = samples;
   }
 
   fclose(f);
   *out_rate_hz = sample_rate;
+  *out_channels = force_mono ? 1 : channels;
   return out;
 }
 
@@ -314,7 +372,6 @@ static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
     if (chunk > chunk_bytes) chunk = chunk_bytes;
     if (chunk < 2) break;
 
-    write_chip_ram(addr_masked, buf + offset, chunk);
     audio_program_note(addr_masked, buf + offset, chunk, period, vol);
 
     double chunk_sec = (double)chunk / rate_hz;
@@ -329,6 +386,63 @@ static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
     if (seconds > 0 && elapsed >= (double)seconds) break;
   }
   audio_stop();
+}
+
+static void audio_play_stream_stereo(uint32_t addr, const uint8_t *buf, size_t len,
+                                     uint16_t period, uint16_t vol,
+                                     double rate_hz, unsigned seconds,
+                                     size_t chunk_bytes) {
+  uint32_t addr_l = addr & CHIP_ADDR_MASK;
+  uint32_t addr_r = (addr + 0x20000u) & CHIP_ADDR_MASK;
+  size_t max_chunk = 0xFFFFu * 2u;
+  if (chunk_bytes == 0 || chunk_bytes > max_chunk) chunk_bytes = max_chunk;
+  if (rate_hz <= 0.0) rate_hz = 1.0;
+  if (len < 2) return;
+  if (addr_r + chunk_bytes > 0x200000u) {
+    fprintf(stderr, "Stereo addr range exceeds 2MB chip RAM; use --addr lower.\n");
+    return;
+  }
+
+  size_t total_frames = len / 2u;
+  size_t offset_frames = 0;
+  double elapsed = 0.0;
+  uint8_t *left = (uint8_t *)malloc(chunk_bytes);
+  uint8_t *right = (uint8_t *)malloc(chunk_bytes);
+  if (!left || !right) {
+    free(left);
+    free(right);
+    return;
+  }
+
+  size_t chunk_frames = chunk_bytes;
+  while (offset_frames < total_frames && !stop_requested) {
+    size_t frames = total_frames - offset_frames;
+    if (frames > chunk_frames) frames = chunk_frames;
+    if (frames < 2) break;
+
+    for (size_t i = 0; i < frames; i++) {
+      left[i] = buf[(offset_frames + i) * 2u + 0];
+      right[i] = buf[(offset_frames + i) * 2u + 1];
+    }
+
+    audio_program_note_ch(0, addr_l, left, frames, period, vol);
+    audio_program_note_ch(1, addr_r, right, frames, period, vol);
+
+    double chunk_sec = (double)frames / rate_hz;
+    if (seconds > 0 && elapsed + chunk_sec > (double)seconds) {
+      chunk_sec = (double)seconds - elapsed;
+      if (chunk_sec <= 0.0) break;
+    }
+    sleep_seconds(chunk_sec);
+    elapsed += chunk_sec;
+    offset_frames += frames;
+
+    if (seconds > 0 && elapsed >= (double)seconds) break;
+  }
+
+  audio_stop_all();
+  free(left);
+  free(right);
 }
 
 static double paula_clock_hz(int is_pal) {
@@ -371,6 +485,45 @@ static void sleep_seconds(double seconds) {
   nanosleep(&ts, NULL);
 }
 
+static void apply_lpf_mono(int8_t *data, size_t samples, double rate_hz,
+                           double cutoff_hz) {
+  if (!data || samples == 0 || cutoff_hz <= 0.0 || rate_hz <= 0.0) return;
+  double x = 2.0 * 3.141592653589793 * cutoff_hz;
+  double alpha = x / (x + rate_hz);
+  double y = 0.0;
+  for (size_t i = 0; i < samples; i++) {
+    double in = (double)data[i];
+    y = y + alpha * (in - y);
+    int v = (int)lrint(y);
+    if (v < -128) v = -128;
+    if (v > 127) v = 127;
+    data[i] = (int8_t)v;
+  }
+}
+
+static void apply_lpf_stereo(int8_t *data, size_t frames, double rate_hz,
+                             double cutoff_hz) {
+  if (!data || frames == 0 || cutoff_hz <= 0.0 || rate_hz <= 0.0) return;
+  double x = 2.0 * 3.141592653589793 * cutoff_hz;
+  double alpha = x / (x + rate_hz);
+  double yl = 0.0;
+  double yr = 0.0;
+  for (size_t i = 0; i < frames; i++) {
+    double in_l = (double)data[i * 2u + 0];
+    double in_r = (double)data[i * 2u + 1];
+    yl = yl + alpha * (in_l - yl);
+    yr = yr + alpha * (in_r - yr);
+    int vl = (int)lrint(yl);
+    int vr = (int)lrint(yr);
+    if (vl < -128) vl = -128;
+    if (vl > 127) vl = 127;
+    if (vr < -128) vr = -128;
+    if (vr > 127) vr = 127;
+    data[i * 2u + 0] = (int8_t)vl;
+    data[i * 2u + 1] = (int8_t)vr;
+  }
+}
+
 static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
                                uint16_t period, uint16_t vol) {
   uint32_t addr_masked = addr & CHIP_ADDR_MASK;
@@ -390,6 +543,26 @@ static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
   ps_write_16(AUD0PER, period);
   ps_write_16(AUD0VOL, vol);
   ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_AUD0);
+}
+
+static void audio_program_note_ch(int ch, uint32_t addr, const uint8_t *buf,
+                                  size_t len, uint16_t period, uint16_t vol) {
+  uint32_t addr_masked = addr & CHIP_ADDR_MASK;
+  size_t len_words_full = (len + 1u) / 2u;
+  if (len_words_full > 0xFFFFu) {
+    len_words_full = 0xFFFFu;
+    len = len_words_full * 2u;
+  }
+  uint16_t len_words = (uint16_t)len_words_full;
+
+  write_chip_ram(addr, buf, len);
+  ps_write_16(AUD_VOL[ch], 0);
+  ps_write_16(AUD_LCH[ch], (addr_masked >> 16) & 0x1Fu);
+  ps_write_16(AUD_LCL[ch], addr_masked & 0xFFFFu);
+  ps_write_16(AUD_LEN[ch], len_words);
+  ps_write_16(AUD_PER[ch], period);
+  ps_write_16(AUD_VOL[ch], vol);
+  ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | AUD_DMA_MASK[ch]);
 }
 
 static int play_saints_song(uint32_t addr, double rate_hz, unsigned bpm,
@@ -765,6 +938,9 @@ int main(int argc, char **argv) {
   int stream = 0;
   size_t chunk_bytes = 0;
   int raw_unsigned = 1;
+  int stereo = 0;
+  int force_mono = 0;
+  double lpf_hz = 0.0;
 
   if (argc < 2) {
     usage(argv[0]);
@@ -830,6 +1006,19 @@ int main(int argc, char **argv) {
     }
     if (!strcmp(arg, "--s8")) {
       raw_unsigned = 0;
+      continue;
+    }
+    if (!strcmp(arg, "--stereo")) {
+      stereo = 1;
+      continue;
+    }
+    if (!strcmp(arg, "--mono")) {
+      force_mono = 1;
+      continue;
+    }
+    if (!strcmp(arg, "--lpf")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      lpf_hz = strtod(argv[++i], NULL);
       continue;
     }
     if (!strcmp(arg, "--saints")) {
@@ -907,15 +1096,22 @@ int main(int argc, char **argv) {
 
   size_t len = 0;
   uint8_t *buf = NULL;
+  int channels = 1;
   if (wav_path) {
     unsigned wav_rate = 0;
-    buf = read_wav_mono_s8(wav_path, &len, &wav_rate);
+    buf = read_wav_s8(wav_path, &len, &wav_rate, &channels, force_mono);
     if (!buf || len == 0) {
       fprintf(stderr, "Failed to read WAV: %s\n", wav_path);
       free(buf);
       return 1;
     }
     if (rate_hz == 0) rate_hz = wav_rate;
+    if (channels == 2 && force_mono) channels = 1;
+    if (channels == 2 && !stereo) {
+      fprintf(stderr, "WAV is stereo; pass --stereo or --mono.\n");
+      free(buf);
+      return 1;
+    }
   } else {
     buf = read_file(raw_path, &len);
     if (buf && raw_unsigned) {
@@ -923,9 +1119,15 @@ int main(int argc, char **argv) {
         buf[i] = (uint8_t)((int)buf[i] - 128);
       }
     }
+    if (stereo) channels = 2;
   }
   if (!buf || len == 0) {
     fprintf(stderr, "Failed to read sample.\n");
+    free(buf);
+    return 1;
+  }
+  if (channels == 2 && (len % 2u) != 0u) {
+    fprintf(stderr, "Stereo input must be even length (interleaved LR).\n");
     free(buf);
     return 1;
   }
@@ -938,10 +1140,35 @@ int main(int argc, char **argv) {
   if (stream) {
     if (!seconds_set) seconds = 0;
     size_t effective_chunk = chunk_bytes ? chunk_bytes : 0xFFFFu * 2u;
-    printf("[STREAM] addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu PAL=%d\n",
-           addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, effective_chunk, is_pal);
-    audio_play_stream(addr, buf, len, period, vol, (double)rate_hz, seconds, chunk_bytes);
+    if (lpf_hz > 0.0) {
+      if (channels == 2) {
+        apply_lpf_stereo((int8_t *)buf, len / 2u, (double)rate_hz, lpf_hz);
+      } else {
+        apply_lpf_mono((int8_t *)buf, len, (double)rate_hz, lpf_hz);
+      }
+    }
+    if (channels == 2) {
+      printf("[STREAM] stereo addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu PAL=%d\n",
+             addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, effective_chunk, is_pal);
+      audio_play_stream_stereo(addr, buf, len, period, vol, (double)rate_hz, seconds, chunk_bytes);
+    } else {
+      printf("[STREAM] addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu PAL=%d\n",
+             addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, effective_chunk, is_pal);
+      audio_play_stream(addr, buf, len, period, vol, (double)rate_hz, seconds, chunk_bytes);
+    }
   } else {
+    if (lpf_hz > 0.0) {
+      if (channels == 2) {
+        apply_lpf_stereo((int8_t *)buf, len / 2u, (double)rate_hz, lpf_hz);
+      } else {
+        apply_lpf_mono((int8_t *)buf, len, (double)rate_hz, lpf_hz);
+      }
+    }
+    if (channels == 2) {
+      fprintf(stderr, "Stereo requires --stream (AUD0/AUD1).\n");
+      free(buf);
+      return 1;
+    }
     printf("[RAW] addr=0x%06X bytes=%zu period=%u vol=%u seconds=%u PAL=%d\n",
            addr & 0x1FFFFu, len, period, vol, seconds, is_pal);
     audio_play_raw(addr, buf, len, period, vol, seconds);
