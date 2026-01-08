@@ -11,7 +11,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -19,12 +18,6 @@
 
 #include "ps_protocol.h"
 #include "m68k.h"
-
-#include <string.h>
-
-#ifndef BCM2708_PERI_SIZE
-#define BCM2708_PERI_SIZE 0x01000000u
-#endif
 
 volatile unsigned int *gpio;
 volatile unsigned int *gpclk;
@@ -37,57 +30,7 @@ unsigned int gpfsel0_o;
 unsigned int gpfsel1_o;
 unsigned int gpfsel2_o;
 
-static uint32_t bcm2708_peri_base = BCM2708_PERI_BASE;
-
-static uint32_t read_be32(const uint8_t *p) {
-  return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) |
-         ((uint32_t)p[2] << 8) | (uint32_t)p[3];
-}
-
-static uint32_t detect_peri_base(void) {
-  const char *env = getenv("PISTORM_PERI_BASE");
-  if (env && *env) {
-    char *end = NULL;
-    unsigned long parsed = strtoul(env, &end, 0);
-    if (end && *end == '\0' && parsed != 0) {
-      return (uint32_t)parsed;
-    }
-    fprintf(stderr, "[CLK] Ignoring PISTORM_PERI_BASE=%s (invalid)\n", env);
-  }
-
-  int fd = open("/proc/device-tree/soc/ranges", O_RDONLY);
-  if (fd >= 0) {
-    uint8_t buf[16] = {0};
-    ssize_t got = read(fd, buf, sizeof(buf));
-    close(fd);
-    if (got >= 12) {
-      uint32_t cell0 = read_be32(&buf[0]);
-      uint32_t cell1 = read_be32(&buf[4]);
-      uint32_t cell2 = read_be32(&buf[8]);
-      uint32_t cell3 = (got >= 16) ? read_be32(&buf[12]) : 0;
-
-      uint32_t parent_hi = 0;
-      uint32_t parent_lo = 0;
-      if (got >= 16) {
-        parent_hi = cell1;
-        parent_lo = cell2;
-      } else {
-        parent_lo = cell1;
-      }
-
-      (void)cell0;
-      (void)cell3;
-      if (parent_hi == 0 && parent_lo != 0) {
-        return parent_lo;
-      }
-    }
-  }
-
-  return BCM2708_PERI_BASE;
-}
-
 static void setup_io() {
-  bcm2708_peri_base = detect_peri_base();
   int fd = open("/dev/mem", O_RDWR | O_SYNC);
   if (fd < 0) {
     printf("Unable to open /dev/mem. Run as root using sudo?\n");
@@ -100,7 +43,7 @@ static void setup_io() {
       PROT_READ | PROT_WRITE,  // Enable reading & writting to mapped memory
       MAP_SHARED,              // Shared with other processes
       fd,                      // File to map
-      bcm2708_peri_base        // Offset to GPIO peripheral
+      BCM2708_PERI_BASE        // Offset to GPIO peripheral
   );
 
   close(fd);
@@ -117,72 +60,26 @@ static void setup_io() {
 static void setup_gpclk() {
   // Enable 200MHz CLK output on GPIO4, adjust divider and pll source depending
   // on pi model
-  uint32_t divi = 6;
-  uint32_t src = 5; // PLLC
-  const char* env_div = getenv("PISTORM_CLK_DIVI");
-  const char* env_src = getenv("PISTORM_CLK_SRC");
-
-  if (env_div && *env_div) {
-    unsigned long parsed = strtoul(env_div, NULL, 10);
-    if (parsed >= 1 && parsed <= 4095) {
-      divi = (uint32_t)parsed;
-    } else {
-      fprintf(stderr, "[CLK] Ignoring PISTORM_CLK_DIVI=%s (out of range)\n", env_div);
-    }
-  }
-  if (env_src && *env_src) {
-    if (!strcmp(env_src, "plld")) {
-      src = 6;
-    } else if (!strcmp(env_src, "pllc")) {
-      src = 5;
-    } else {
-      fprintf(stderr, "[CLK] Ignoring PISTORM_CLK_SRC=%s (expected pllc/plld)\n", env_src);
-    }
-  }
-
-  const int log_clk = (getenv("PISTORM_CLK_LOG") != NULL);
-
   *(gpclk + (CLK_GP0_CTL / 4)) = CLK_PASSWD | (1 << 5);
   usleep(10);
   while ((*(gpclk + (CLK_GP0_CTL / 4))) & (1 << 7))
     ;
   usleep(100);
   *(gpclk + (CLK_GP0_DIV / 4)) =
-      CLK_PASSWD | (divi << 12);  // divider (integer only)
+      CLK_PASSWD | (6 << 12);  // divider , 6=200MHz on pi3
   usleep(10);
   *(gpclk + (CLK_GP0_CTL / 4)) =
-      CLK_PASSWD | src | (1 << 4);  // pll? 6=plld, 5=pllc
+      CLK_PASSWD | 5 | (1 << 4);  // pll? 6=plld, 5=pllc
   usleep(10);
   while (((*(gpclk + (CLK_GP0_CTL / 4))) & (1 << 7)) == 0)
     ;
   usleep(100);
 
   SET_GPIO_ALT(PIN_CLK, 0);  // gpclk0
-
-  if (log_clk) {
-    uint32_t ctl = *(gpclk + (CLK_GP0_CTL / 4));
-    uint32_t div = *(gpclk + (CLK_GP0_DIV / 4));
-    fprintf(stderr, "[CLK] setup_gpclk src=%u divi=%u ctl=0x%08x div=0x%08x\n",
-            src, divi, ctl, div);
-  }
-}
-
-static void setup_pulls(void) {
-  // Pi 4 (BCM2711) uses GPPUPPDN0..3 instead of legacy GPIO_PULL/CLK.
-  if (bcm2708_peri_base == 0xFE000000u) {
-    const uint32_t GPPUPPDN0 = 0xE4u / 4u;
-    uint32_t val = *(gpio + GPPUPPDN0);
-    // Pull-down GPIO0 and GPIO1 (TXN_IN_PROGRESS, IPL0).
-    val &= ~((0x3u << 0) | (0x3u << 2));
-    val |= (0x2u << 0) | (0x2u << 2);
-    *(gpio + GPPUPPDN0) = val;
-    usleep(10);
-  }
 }
 
 void ps_setup_protocol() {
   setup_io();
-  setup_pulls();
   setup_gpclk();
 
   *(gpio + 10) = 0xffffec;
@@ -216,7 +113,8 @@ void ps_write_16(unsigned int address, unsigned int data) {
   *(gpio + 1) = GPFSEL1_INPUT;
   *(gpio + 2) = GPFSEL2_INPUT;
 
-  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {}
+  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))
+    ;
 }
 
 void ps_write_8(unsigned int address, unsigned int data) {
@@ -248,15 +146,14 @@ void ps_write_8(unsigned int address, unsigned int data) {
   *(gpio + 1) = GPFSEL1_INPUT;
   *(gpio + 2) = GPFSEL2_INPUT;
 
-  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {}
+  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))
+    ;
 }
 
 void ps_write_32(unsigned int address, unsigned int value) {
   ps_write_16(address, value >> 16);
   ps_write_16(address + 2, value);
 }
-
-#define NOP asm("nop"); asm("nop");
 
 unsigned int ps_read_16(unsigned int address) {
   *(gpio + 0) = GPFSEL0_OUTPUT;
@@ -280,7 +177,9 @@ unsigned int ps_read_16(unsigned int address) {
   *(gpio + 7) = (REG_DATA << PIN_A0);
   *(gpio + 7) = 1 << PIN_RD;
 
-  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {}
+  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))
+    ;
+
   unsigned int value = *(gpio + 13);
 
   *(gpio + 10) = 0xffffec;
@@ -310,7 +209,9 @@ unsigned int ps_read_8(unsigned int address) {
   *(gpio + 7) = (REG_DATA << PIN_A0);
   *(gpio + 7) = 1 << PIN_RD;
 
-  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS)) {}
+  while (*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))
+    ;
+
   unsigned int value = *(gpio + 13);
 
   *(gpio + 10) = 0xffffec;
@@ -324,7 +225,9 @@ unsigned int ps_read_8(unsigned int address) {
 }
 
 unsigned int ps_read_32(unsigned int address) {
-  return (ps_read_16(address) << 16) | ps_read_16(address + 2);
+  unsigned int a = ps_read_16(address);
+  unsigned int b = ps_read_16(address + 2);
+  return (a << 16) | b;
 }
 
 void ps_write_status_reg(unsigned int value) {
@@ -335,10 +238,7 @@ void ps_write_status_reg(unsigned int value) {
   *(gpio + 7) = ((value & 0xffff) << 8) | (REG_STATUS << PIN_A0);
 
   *(gpio + 7) = 1 << PIN_WR;
-  *(gpio + 7) = 1 << PIN_WR; // delay
-#ifdef CHIP_FASTPATH
-  *(gpio + 7) = 1 << PIN_WR; // delay 210810
-#endif
+  *(gpio + 7) = 1 << PIN_WR;  // delay
   *(gpio + 10) = 1 << PIN_WR;
   *(gpio + 10) = 0xffffec;
 
@@ -353,14 +253,9 @@ unsigned int ps_read_status_reg() {
   *(gpio + 7) = 1 << PIN_RD;
   *(gpio + 7) = 1 << PIN_RD;
   *(gpio + 7) = 1 << PIN_RD;
-#ifdef CHIP_FASTPATH
-  *(gpio + 7) = 1 << PIN_RD; // delay 210810
-  *(gpio + 7) = 1 << PIN_RD; // delay 210810
-#endif
 
   unsigned int value = *(gpio + 13);
-  while ((value=*(gpio + 13)) & (1 << PIN_TXN_IN_PROGRESS)) {}
-  
+
   *(gpio + 10) = 0xffffec;
 
   return (value >> 8) & 0xffff;
@@ -381,7 +276,6 @@ void ps_pulse_reset() {
 
 unsigned int ps_get_ipl_zero() {
   unsigned int value = *(gpio + 13);
-  while ((value=*(gpio + 13)) & (1 << PIN_TXN_IN_PROGRESS)) {}
   return value & (1 << PIN_IPL_ZERO);
 }
 
