@@ -200,8 +200,9 @@ int main(int argc, char **argv) {
                 (gpio4_f == 3) ? "ALT4" :
                                  "ALT5";
 
-	    // uint32_t src  = (ctl >> 4) & 0xF;
-	    uint32_t src  = (ctl >> 4) & 0x7;   // 3-bit SRC
+            uint32_t src  = ctl & 0xFu;          // bits 0..3
+            uint32_t en   = (ctl >> 4) & 0x1;    // bit 4
+            uint32_t busy = (ctl >> 7) & 0x1;    // bit 7
 
             uint32_t divi = (div >> 12) & 0xFFF;
             uint32_t divf = div & 0xFFF;
@@ -217,10 +218,13 @@ int main(int argc, char **argv) {
                    gpio4_mode,
                    ctl,
                    src, src_name(src),
-                   (ctl >> 7) & 1,
+                   en,
                    div,
                    divi, divf, d,
                    hz / 1e6);
+            if (always || changed) {
+                printf("    (BUSY=%u)\n", busy);
+            }
 
             last_ctl = ctl;
             last_div = div;
