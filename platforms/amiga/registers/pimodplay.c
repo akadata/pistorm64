@@ -48,6 +48,8 @@ static void usage(const char *prog) {
           "  --seconds <n>       Playback duration (default 5)\n"
           "  --stream            Stream long samples in chunks\n"
           "  --chunk-bytes <n>   Stream chunk size (default 131070 bytes)\n"
+          "  --u8                Raw input is unsigned 8-bit (default for --raw)\n"
+          "  --s8                Raw input is signed 8-bit\n"
           "\n"
           "Built-in tune:\n"
           "  --saints            Play \"When the Saints\" on AUD0\n"
@@ -120,7 +122,7 @@ static uint16_t period_from_rate(double rate_hz, int is_pal) {
   return (uint16_t)(period + 0.5);
 }
 
-static uint8_t *read_wav_mono_u8(const char *path, size_t *out_len,
+static uint8_t *read_wav_mono_s8(const char *path, size_t *out_len,
                                  unsigned *out_rate_hz) {
   FILE *f = fopen(path, "rb");
   if (!f) {
@@ -215,6 +217,9 @@ static uint8_t *read_wav_mono_u8(const char *path, size_t *out_len,
       free(out);
       return NULL;
     }
+    for (size_t i = 0; i < data_size; i++) {
+      out[i] = (uint8_t)((int)out[i] - 128);
+    }
     *out_len = data_size;
   } else {
     size_t samples = data_size / 2;
@@ -230,10 +235,10 @@ static uint8_t *read_wav_mono_u8(const char *path, size_t *out_len,
         free(out);
         return NULL;
       }
-      int v = 128 + (s / 256);
-      if (v < 0) v = 0;
-      if (v > 255) v = 255;
-      out[i] = (uint8_t)v;
+      int v = s / 256;
+      if (v < -128) v = -128;
+      if (v > 127) v = 127;
+      out[i] = (uint8_t)(int8_t)v;
     }
     *out_len = samples;
   }
@@ -759,6 +764,7 @@ int main(int argc, char **argv) {
   double gate_ratio = 0.70;
   int stream = 0;
   size_t chunk_bytes = 0;
+  int raw_unsigned = 1;
 
   if (argc < 2) {
     usage(argv[0]);
@@ -816,6 +822,14 @@ int main(int argc, char **argv) {
     if (!strcmp(arg, "--chunk-bytes")) {
       if (i + 1 >= argc) usage(argv[0]);
       chunk_bytes = (size_t)parse_u32(argv[++i]);
+      continue;
+    }
+    if (!strcmp(arg, "--u8")) {
+      raw_unsigned = 1;
+      continue;
+    }
+    if (!strcmp(arg, "--s8")) {
+      raw_unsigned = 0;
       continue;
     }
     if (!strcmp(arg, "--saints")) {
@@ -895,7 +909,7 @@ int main(int argc, char **argv) {
   uint8_t *buf = NULL;
   if (wav_path) {
     unsigned wav_rate = 0;
-    buf = read_wav_mono_u8(wav_path, &len, &wav_rate);
+    buf = read_wav_mono_s8(wav_path, &len, &wav_rate);
     if (!buf || len == 0) {
       fprintf(stderr, "Failed to read WAV: %s\n", wav_path);
       free(buf);
@@ -904,6 +918,11 @@ int main(int argc, char **argv) {
     if (rate_hz == 0) rate_hz = wav_rate;
   } else {
     buf = read_file(raw_path, &len);
+    if (buf && raw_unsigned) {
+      for (size_t i = 0; i < len; i++) {
+        buf[i] = (uint8_t)((int)buf[i] - 128);
+      }
+    }
   }
   if (!buf || len == 0) {
     fprintf(stderr, "Failed to read sample.\n");
