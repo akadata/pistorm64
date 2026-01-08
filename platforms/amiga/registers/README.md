@@ -47,6 +47,7 @@ Usage:
 - `sudo ./pimodplay --raw <file> --period <val> --vol <0-64> --seconds <n>`
 - `sudo ./pimodplay --saints --tempo 180`
 - Default timing is PAL (50 Hz). Use `--ntsc` to select 60 Hz.
+  If the tune is too long for AUD0LEN, increase `--tempo`.
 
 Note:
 - `--mod` is reserved for the full MOD replay engine and is not implemented yet.
