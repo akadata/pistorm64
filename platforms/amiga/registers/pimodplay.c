@@ -27,6 +27,13 @@ void m68k_set_irq(unsigned int level) {
 #define MOD_MAX_SAMPLES 31
 #define MOD_CHANNELS 4
 
+static const uint32_t AUD_LCH[MOD_CHANNELS] = {AUD0LCH, AUD1LCH, AUD2LCH, AUD3LCH};
+static const uint32_t AUD_LCL[MOD_CHANNELS] = {AUD0LCL, AUD1LCL, AUD2LCL, AUD3LCL};
+static const uint32_t AUD_LEN[MOD_CHANNELS] = {AUD0LEN, AUD1LEN, AUD2LEN, AUD3LEN};
+static const uint32_t AUD_PER[MOD_CHANNELS] = {AUD0PER, AUD1PER, AUD2PER, AUD3PER};
+static const uint32_t AUD_VOL[MOD_CHANNELS] = {AUD0VOL, AUD1VOL, AUD2VOL, AUD3VOL};
+static const uint16_t AUD_DMA_MASK[MOD_CHANNELS] = {0x0001, 0x0002, 0x0004, 0x0008};
+
 static double paula_clock_hz(int is_pal);
 static void sleep_seconds(double seconds);
 static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
@@ -663,13 +670,6 @@ typedef struct {
   double rate_hz;
   double time_left;
 } mod_chan_t;
-
-static const uint32_t AUD_LCH[MOD_CHANNELS] = {AUD0LCH, AUD1LCH, AUD2LCH, AUD3LCH};
-static const uint32_t AUD_LCL[MOD_CHANNELS] = {AUD0LCL, AUD1LCL, AUD2LCL, AUD3LCL};
-static const uint32_t AUD_LEN[MOD_CHANNELS] = {AUD0LEN, AUD1LEN, AUD2LEN, AUD3LEN};
-static const uint32_t AUD_PER[MOD_CHANNELS] = {AUD0PER, AUD1PER, AUD2PER, AUD3PER};
-static const uint32_t AUD_VOL[MOD_CHANNELS] = {AUD0VOL, AUD1VOL, AUD2VOL, AUD3VOL};
-static const uint16_t AUD_DMA_MASK[MOD_CHANNELS] = {0x0001, 0x0002, 0x0004, 0x0008};
 
 static int mod_read_u16(const uint8_t *p) {
   return ((int)p[0] << 8) | (int)p[1];
