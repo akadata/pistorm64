@@ -140,6 +140,8 @@ static void setup_gpclk() {
     }
   }
 
+  const int log_clk = (getenv("PISTORM_CLK_LOG") != NULL);
+
   *(gpclk + (CLK_GP0_CTL / 4)) = CLK_PASSWD | (1 << 5);
   usleep(10);
   while ((*(gpclk + (CLK_GP0_CTL / 4))) & (1 << 7))
@@ -156,6 +158,13 @@ static void setup_gpclk() {
   usleep(100);
 
   SET_GPIO_ALT(PIN_CLK, 0);  // gpclk0
+
+  if (log_clk) {
+    uint32_t ctl = *(gpclk + (CLK_GP0_CTL / 4));
+    uint32_t div = *(gpclk + (CLK_GP0_DIV / 4));
+    fprintf(stderr, "[CLK] setup_gpclk src=%u divi=%u ctl=0x%08x div=0x%08x\n",
+            src, divi, ctl, div);
+  }
 }
 
 void ps_setup_protocol() {
