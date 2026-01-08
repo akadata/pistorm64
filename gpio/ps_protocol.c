@@ -33,7 +33,57 @@ unsigned int gpfsel0_o;
 unsigned int gpfsel1_o;
 unsigned int gpfsel2_o;
 
+static uint32_t bcm2708_peri_base = BCM2708_PERI_BASE;
+
+static uint32_t read_be32(const uint8_t *p) {
+  return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) |
+         ((uint32_t)p[2] << 8) | (uint32_t)p[3];
+}
+
+static uint32_t detect_peri_base(void) {
+  const char *env = getenv("PISTORM_PERI_BASE");
+  if (env && *env) {
+    char *end = NULL;
+    unsigned long parsed = strtoul(env, &end, 0);
+    if (end && *end == '\0' && parsed != 0) {
+      return (uint32_t)parsed;
+    }
+    fprintf(stderr, "[CLK] Ignoring PISTORM_PERI_BASE=%s (invalid)\n", env);
+  }
+
+  int fd = open("/proc/device-tree/soc/ranges", O_RDONLY);
+  if (fd >= 0) {
+    uint8_t buf[16] = {0};
+    ssize_t got = read(fd, buf, sizeof(buf));
+    close(fd);
+    if (got >= 12) {
+      uint32_t cell0 = read_be32(&buf[0]);
+      uint32_t cell1 = read_be32(&buf[4]);
+      uint32_t cell2 = read_be32(&buf[8]);
+      uint32_t cell3 = (got >= 16) ? read_be32(&buf[12]) : 0;
+
+      uint32_t parent_hi = 0;
+      uint32_t parent_lo = 0;
+      if (got >= 16) {
+        parent_hi = cell1;
+        parent_lo = cell2;
+      } else {
+        parent_lo = cell1;
+      }
+
+      (void)cell0;
+      (void)cell3;
+      if (parent_hi == 0 && parent_lo != 0) {
+        return parent_lo;
+      }
+    }
+  }
+
+  return BCM2708_PERI_BASE;
+}
+
 static void setup_io() {
+  bcm2708_peri_base = detect_peri_base();
   int fd = open("/dev/mem", O_RDWR | O_SYNC);
   if (fd < 0) {
     printf("Unable to open /dev/mem. Run as root using sudo?\n");
@@ -46,7 +96,7 @@ static void setup_io() {
       PROT_READ | PROT_WRITE,  // Enable reading & writting to mapped memory
       MAP_SHARED,              // Shared with other processes
       fd,                      // File to map
-      BCM2708_PERI_BASE        // Offset to GPIO peripheral
+      bcm2708_peri_base        // Offset to GPIO peripheral
   );
 
   close(fd);
