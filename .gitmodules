@@ -1,0 +1,3 @@
+[submodule "external/DiagROM"]
+	path = external/DiagROM
+	url = https://github.com/ChuckyGang/DiagROM.git

@@ -1015,7 +1015,9 @@ switch_config:
   }
 
   #ifdef PS_PROTOCOL_HAS_CLEANUP
+#ifdef PS_PROTOCOL_HAS_CLEANUP
   ps_cleanup_protocol();
+#endif
   #endif
 
   return 0;

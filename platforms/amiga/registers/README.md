@@ -37,3 +37,15 @@ Use the register offsets and base addresses as the source of truth.
 ## Header Layout
 - amiga_custom_chips.h: convenience include + base ranges
 - agnus.h, paula.h, blitter.h, denise.h, cia.h: per-chip groupings
+
+## Pi-Side Tools
+### pimodplay (raw Paula DMA test)
+Build:
+- `./build_pimodplay.sh`
+
+Usage:
+- `sudo ./pimodplay --raw <file> --period <val> --vol <0-64> --seconds <n>`
+- Default timing is PAL (50 Hz). Use `--ntsc` to select 60 Hz.
+
+Note:
+- `--mod` is reserved for the full MOD replay engine and is not implemented yet.

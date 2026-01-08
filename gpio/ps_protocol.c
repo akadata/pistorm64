@@ -61,16 +61,39 @@ static void setup_io() {
 static void setup_gpclk() {
   // Enable 200MHz CLK output on GPIO4, adjust divider and pll source depending
   // on pi model
+  uint32_t divi = 6;
+  uint32_t src = 5; // PLLC
+  const char* env_div = getenv("PISTORM_CLK_DIVI");
+  const char* env_src = getenv("PISTORM_CLK_SRC");
+
+  if (env_div && *env_div) {
+    unsigned long parsed = strtoul(env_div, NULL, 10);
+    if (parsed >= 1 && parsed <= 4095) {
+      divi = (uint32_t)parsed;
+    } else {
+      fprintf(stderr, "[CLK] Ignoring PISTORM_CLK_DIVI=%s (out of range)\n", env_div);
+    }
+  }
+  if (env_src && *env_src) {
+    if (!strcmp(env_src, "plld")) {
+      src = 6;
+    } else if (!strcmp(env_src, "pllc")) {
+      src = 5;
+    } else {
+      fprintf(stderr, "[CLK] Ignoring PISTORM_CLK_SRC=%s (expected pllc/plld)\n", env_src);
+    }
+  }
+
   *(gpclk + (CLK_GP0_CTL / 4)) = CLK_PASSWD | (1 << 5);
   usleep(10);
   while ((*(gpclk + (CLK_GP0_CTL / 4))) & (1 << 7))
     ;
   usleep(100);
   *(gpclk + (CLK_GP0_DIV / 4)) =
-      CLK_PASSWD | (6 << 12);  // divider , 6=200MHz on pi3
+      CLK_PASSWD | (divi << 12);  // divider (integer only)
   usleep(10);
   *(gpclk + (CLK_GP0_CTL / 4)) =
-      CLK_PASSWD | 5 | (1 << 4);  // pll? 6=plld, 5=pllc
+      CLK_PASSWD | src | (1 << 4);  // pll? 6=plld, 5=pllc
   usleep(10);
   while (((*(gpclk + (CLK_GP0_CTL / 4))) & (1 << 7)) == 0)
     ;
