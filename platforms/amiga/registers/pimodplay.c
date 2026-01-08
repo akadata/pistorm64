@@ -21,6 +21,7 @@ void m68k_set_irq(unsigned int level) {
 #define DMAF_SETCLR 0x8000
 #define DMAF_MASTER 0x0200
 #define DMAF_AUD0   0x0001
+#define CHIP_ADDR_MASK 0x0FFFFFu
 
 static volatile sig_atomic_t stop_requested = 0;
 
@@ -115,8 +116,14 @@ static void audio_stop(void) {
 
 static void audio_play_raw(uint32_t addr, const uint8_t *buf, size_t len,
                            uint16_t period, uint16_t vol, unsigned seconds) {
-  uint32_t addr_masked = addr & 0x1FFFFu;
-  uint16_t len_words = (uint16_t)((len + 1u) / 2u);
+  uint32_t addr_masked = addr & CHIP_ADDR_MASK;
+  size_t len_words_full = (len + 1u) / 2u;
+  if (len_words_full > 0xFFFFu) {
+    fprintf(stderr, "Sample too long for AUD0LEN (%zu words). Trim or split.\n", len_words_full);
+    len_words_full = 0xFFFFu;
+    len = len_words_full * 2u;
+  }
+  uint16_t len_words = (uint16_t)len_words_full;
 
   write_chip_ram(addr, buf, len);
 
@@ -259,8 +266,8 @@ int main(int argc, char **argv) {
     if (!strcmp(arg, "--tempo")) {
       if (i + 1 >= argc) usage(argv[0]);
       tempo = (unsigned)parse_u32(argv[++i]);
-      if (tempo < 30) tempo = 30;
-      if (tempo > 300) tempo = 300;
+      if (tempo < 1) tempo = 1;
+      if (tempo > 600) tempo = 600;
       continue;
     }
     if (!strcmp(arg, "--pal")) {
@@ -296,14 +303,25 @@ int main(int argc, char **argv) {
     double clock = paula_clock_hz(is_pal);
     double rate_hz = clock / (double)period;
     size_t len = 0;
-    uint8_t *buf = build_saints(rate_hz, tempo, &len);
-    if (!buf || len == 0) {
+  uint8_t *buf = build_saints(rate_hz, tempo, &len);
+  if (!buf || len == 0) {
       fprintf(stderr, "Failed to build tune buffer.\n");
       free(buf);
       return 1;
     }
-    uint32_t addr_masked = addr & 0x1FFFFu;
-    uint16_t len_words = (uint16_t)((len + 1u) / 2u);
+  uint32_t addr_masked = addr & CHIP_ADDR_MASK;
+  size_t len_words_full = (len + 1u) / 2u;
+  if (len_words_full > 0xFFFFu) {
+    double scale = (double)len_words_full / 65535.0;
+    unsigned suggested = (unsigned)(tempo * scale + 0.5);
+    fprintf(stderr,
+            "[WARN] Tune too long for AUD0LEN (%zu words). Truncating.\n"
+            "       Try higher tempo (suggested ~%u bpm).\n",
+            len_words_full, suggested);
+    len_words_full = 0xFFFFu;
+    len = len_words_full * 2u;
+  }
+  uint16_t len_words = (uint16_t)len_words_full;
     if (len_words == 0) {
       fprintf(stderr, "Tune is too short.\n");
       free(buf);
@@ -315,8 +333,8 @@ int main(int argc, char **argv) {
       return 1;
     }
     double seconds_total = (double)len / rate_hz;
-    printf("[SAINTS] addr=0x%06X bytes=%zu rate=%.1fHz period=%u vol=%u bpm=%u PAL=%d\n",
-           addr_masked, len, rate_hz, period, vol, tempo, is_pal);
+  printf("[SAINTS] addr=0x%06X bytes=%zu rate=%.1fHz period=%u vol=%u bpm=%u PAL=%d\n",
+         addr_masked, len, rate_hz, period, vol, tempo, is_pal);
     write_chip_ram(addr, buf, len);
     ps_write_16(AUD0LCH, (addr_masked >> 16) & 0x1Fu);
     ps_write_16(AUD0LCL, addr_masked & 0xFFFFu);
