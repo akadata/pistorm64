@@ -40,6 +40,8 @@ static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
                                uint16_t period, uint16_t vol);
 static void audio_program_note_ch(int ch, uint32_t addr, const uint8_t *buf,
                                   size_t len, uint16_t period, uint16_t vol);
+static void program_channel(int ch, uint32_t addr, uint32_t len_bytes,
+                            uint16_t period, uint8_t vol);
 static void apply_lpf_mono(int8_t *data, size_t samples, double rate_hz,
                            double cutoff_hz);
 static void apply_lpf_stereo(int8_t *data, size_t frames, double rate_hz,
@@ -61,6 +63,7 @@ static void usage(const char *prog) {
           "  --seconds <n>       Playback duration (default 5)\n"
           "  --stream            Stream long samples in chunks\n"
           "  --chunk-bytes <n>   Stream chunk size (default 131070 bytes)\n"
+          "  --buffers <n>       Stream buffers in Chip RAM (default 2)\n"
           "  --u8                Raw input is unsigned 8-bit (default for --raw)\n"
           "  --s8                Raw input is signed 8-bit\n"
           "  --stereo            Raw/WAV is stereo interleaved (AUD0/AUD1)\n"
@@ -366,29 +369,47 @@ static void audio_play_raw(uint32_t addr, const uint8_t *buf, size_t len,
 static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
                               uint16_t period, uint16_t vol,
                               double rate_hz, unsigned seconds,
-                              size_t chunk_bytes) {
+                              size_t chunk_bytes, size_t buffers) {
   uint32_t addr_masked = addr & CHIP_ADDR_MASK;
   size_t max_chunk = 0xFFFFu * 2u;
   if (chunk_bytes == 0 || chunk_bytes > max_chunk) chunk_bytes = max_chunk;
+  chunk_bytes &= ~1u;
+  if (chunk_bytes < 2) chunk_bytes = 2;
+  if (buffers < 1) buffers = 1;
   if (rate_hz <= 0.0) rate_hz = 1.0;
+  if (addr_masked + chunk_bytes * buffers > 0x200000u) {
+    fprintf(stderr, "Stream buffer range exceeds 2MB Chip RAM; use --addr lower or fewer buffers.\n");
+    return;
+  }
 
   size_t offset = 0;
   double elapsed = 0.0;
+  size_t slot = 0;
   while (offset < len && !stop_requested) {
     size_t chunk = len - offset;
     if (chunk > chunk_bytes) chunk = chunk_bytes;
     if (chunk < 2) break;
 
-    audio_program_note(addr_masked, buf + offset, chunk, period, vol);
+    uint32_t addr_slot = addr_masked + (uint32_t)(slot * chunk_bytes);
+    write_chip_ram(addr_slot, buf + offset, chunk);
 
     double chunk_sec = (double)chunk / rate_hz;
     if (seconds > 0 && elapsed + chunk_sec > (double)seconds) {
       chunk_sec = (double)seconds - elapsed;
       if (chunk_sec <= 0.0) break;
     }
-    sleep_seconds(chunk_sec);
+
+    if (elapsed == 0.0) {
+      program_channel(0, addr_slot, (uint32_t)chunk, period, (uint8_t)vol);
+    } else {
+      sleep_seconds(chunk_sec * 0.95);
+      program_channel(0, addr_slot, (uint32_t)chunk, period, (uint8_t)vol);
+      sleep_seconds(chunk_sec * 0.05);
+    }
+
     elapsed += chunk_sec;
     offset += chunk;
+    slot = (slot + 1u) % buffers;
 
     if (seconds > 0 && elapsed >= (double)seconds) break;
   }
@@ -398,15 +419,17 @@ static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
 static void audio_play_stream_stereo(uint32_t addr, const uint8_t *buf, size_t len,
                                      uint16_t period, uint16_t vol,
                                      double rate_hz, unsigned seconds,
-                                     size_t chunk_bytes) {
+                                     size_t chunk_bytes, size_t buffers) {
   uint32_t addr_l = addr & CHIP_ADDR_MASK;
-  uint32_t addr_r = (addr + 0x20000u) & CHIP_ADDR_MASK;
   size_t max_chunk = 0xFFFFu * 2u;
   if (chunk_bytes == 0 || chunk_bytes > max_chunk) chunk_bytes = max_chunk;
+  if (buffers < 1) buffers = 1;
   if (rate_hz <= 0.0) rate_hz = 1.0;
   if (len < 2) return;
-  if (addr_r + chunk_bytes > 0x200000u) {
-    fprintf(stderr, "Stereo addr range exceeds 2MB chip RAM; use --addr lower.\n");
+  uint32_t per_chan_bytes = (uint32_t)(chunk_bytes * buffers);
+  uint32_t addr_r = (addr_l + per_chan_bytes) & CHIP_ADDR_MASK;
+  if (addr_r + per_chan_bytes > 0x200000u) {
+    fprintf(stderr, "Stereo buffer range exceeds 2MB chip RAM; use --addr lower or fewer buffers.\n");
     return;
   }
 
@@ -422,6 +445,7 @@ static void audio_play_stream_stereo(uint32_t addr, const uint8_t *buf, size_t l
   }
 
   size_t chunk_frames = chunk_bytes;
+  size_t slot = 0;
   while (offset_frames < total_frames && !stop_requested) {
     size_t frames = total_frames - offset_frames;
     if (frames > chunk_frames) frames = chunk_frames;
@@ -432,17 +456,28 @@ static void audio_play_stream_stereo(uint32_t addr, const uint8_t *buf, size_t l
       right[i] = buf[(offset_frames + i) * 2u + 1];
     }
 
-    audio_program_note_ch(0, addr_l, left, frames, period, vol);
-    audio_program_note_ch(1, addr_r, right, frames, period, vol);
+    uint32_t addr_l_slot = addr_l + (uint32_t)(slot * chunk_bytes);
+    uint32_t addr_r_slot = addr_r + (uint32_t)(slot * chunk_bytes);
+    write_chip_ram(addr_l_slot, left, frames);
+    write_chip_ram(addr_r_slot, right, frames);
 
     double chunk_sec = (double)frames / rate_hz;
     if (seconds > 0 && elapsed + chunk_sec > (double)seconds) {
       chunk_sec = (double)seconds - elapsed;
       if (chunk_sec <= 0.0) break;
     }
-    sleep_seconds(chunk_sec);
+    if (elapsed == 0.0) {
+      program_channel(0, addr_l_slot, (uint32_t)frames, period, (uint8_t)vol);
+      program_channel(1, addr_r_slot, (uint32_t)frames, period, (uint8_t)vol);
+    } else {
+      sleep_seconds(chunk_sec * 0.95);
+      program_channel(0, addr_l_slot, (uint32_t)frames, period, (uint8_t)vol);
+      program_channel(1, addr_r_slot, (uint32_t)frames, period, (uint8_t)vol);
+      sleep_seconds(chunk_sec * 0.05);
+    }
     elapsed += chunk_sec;
     offset_frames += frames;
+    slot = (slot + 1u) % buffers;
 
     if (seconds > 0 && elapsed >= (double)seconds) break;
   }
@@ -937,6 +972,7 @@ int main(int argc, char **argv) {
   double gate_ratio = 0.70;
   int stream = 0;
   size_t chunk_bytes = 0;
+  size_t buffers = 2;
   int raw_unsigned = 1;
   int stereo = 0;
   int force_mono = 0;
@@ -998,6 +1034,12 @@ int main(int argc, char **argv) {
     if (!strcmp(arg, "--chunk-bytes")) {
       if (i + 1 >= argc) usage(argv[0]);
       chunk_bytes = (size_t)parse_u32(argv[++i]);
+      continue;
+    }
+    if (!strcmp(arg, "--buffers")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      buffers = (size_t)parse_u32(argv[++i]);
+      if (buffers < 1) buffers = 1;
       continue;
     }
     if (!strcmp(arg, "--u8")) {
@@ -1148,13 +1190,15 @@ int main(int argc, char **argv) {
       }
     }
     if (channels == 2) {
-      printf("[STREAM] stereo addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu PAL=%d\n",
-             addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, effective_chunk, is_pal);
-      audio_play_stream_stereo(addr, buf, len, period, vol, (double)rate_hz, seconds, chunk_bytes);
+      printf("[STREAM] stereo addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu buffers=%zu PAL=%d\n",
+             addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, effective_chunk, buffers, is_pal);
+      audio_play_stream_stereo(addr, buf, len, period, vol, (double)rate_hz,
+                               seconds, chunk_bytes, buffers);
     } else {
-      printf("[STREAM] addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu PAL=%d\n",
-             addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, effective_chunk, is_pal);
-      audio_play_stream(addr, buf, len, period, vol, (double)rate_hz, seconds, chunk_bytes);
+      printf("[STREAM] addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu buffers=%zu PAL=%d\n",
+             addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, effective_chunk, buffers, is_pal);
+      audio_play_stream(addr, buf, len, period, vol, (double)rate_hz,
+                        seconds, chunk_bytes, buffers);
     }
   } else {
     if (lpf_hz > 0.0) {

@@ -47,6 +47,7 @@ Usage:
 - `sudo ./pimodplay --raw <file> --period <val> --vol <0-64> --seconds <n>`
 - `sudo ./pimodplay --raw <file> --rate <hz> --stream`
 - `sudo ./pimodplay --raw <file> --rate <hz> --stream --chunk-bytes 65536`
+- `sudo ./pimodplay --raw <file> --rate <hz> --stream --chunk-bytes 65536 --buffers 3`
 - `sudo ./pimodplay --saints --tempo 180`
 - Default timing is PAL (50 Hz). Use `--ntsc` to select 60 Hz.
   If the tune is too long for AUD0LEN, increase `--tempo`.
