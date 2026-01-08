@@ -167,8 +167,22 @@ static void setup_gpclk() {
   }
 }
 
+static void setup_pulls(void) {
+  // Pi 4 (BCM2711) uses GPPUPPDN0..3 instead of legacy GPIO_PULL/CLK.
+  if (bcm2708_peri_base == 0xFE000000u) {
+    const uint32_t GPPUPPDN0 = 0xE4u / 4u;
+    uint32_t val = *(gpio + GPPUPPDN0);
+    // Pull-down GPIO0 and GPIO1 (TXN_IN_PROGRESS, IPL0).
+    val &= ~((0x3u << 0) | (0x3u << 2));
+    val |= (0x2u << 0) | (0x2u << 2);
+    *(gpio + GPPUPPDN0) = val;
+    usleep(10);
+  }
+}
+
 void ps_setup_protocol() {
   setup_io();
+  setup_pulls();
   setup_gpclk();
 
   *(gpio + 10) = 0xffffec;
