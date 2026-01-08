@@ -751,6 +751,7 @@ int main(int argc, char **argv) {
   unsigned rate_hz = 0;
   uint16_t vol = 64u;
   unsigned seconds = 5;
+  int seconds_set = 0;
   int stop_only = 0;
   int is_pal = 1;
   int play_saints_flag = 0;
@@ -805,6 +806,7 @@ int main(int argc, char **argv) {
     if (!strcmp(arg, "--seconds")) {
       if (i + 1 >= argc) usage(argv[0]);
       seconds = (unsigned)parse_u32(argv[++i]);
+      seconds_set = 1;
       continue;
     }
     if (!strcmp(arg, "--stream")) {
@@ -915,8 +917,10 @@ int main(int argc, char **argv) {
     rate_hz = (unsigned)(paula_clock_hz(is_pal) / (double)period + 0.5);
   }
   if (stream) {
+    if (!seconds_set) seconds = 0;
+    size_t effective_chunk = chunk_bytes ? chunk_bytes : 0xFFFFu * 2u;
     printf("[STREAM] addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu PAL=%d\n",
-           addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, chunk_bytes, is_pal);
+           addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, effective_chunk, is_pal);
     audio_play_stream(addr, buf, len, period, vol, (double)rate_hz, seconds, chunk_bytes);
   } else {
     printf("[RAW] addr=0x%06X bytes=%zu period=%u vol=%u seconds=%u PAL=%d\n",
