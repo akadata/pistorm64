@@ -45,6 +45,8 @@ Build:
 
 Usage:
 - `sudo ./pimodplay --raw <file> --period <val> --vol <0-64> --seconds <n>`
+- `sudo ./pimodplay --raw <file> --rate <hz> --stream`
+- `sudo ./pimodplay --raw <file> --rate <hz> --stream --chunk-bytes 65536`
 - `sudo ./pimodplay --saints --tempo 180`
 - Default timing is PAL (50 Hz). Use `--ntsc` to select 60 Hz.
   If the tune is too long for AUD0LEN, increase `--tempo`.
@@ -53,5 +55,6 @@ WAV playback:
 - `sudo ./pimodplay --wav <file> --rate <hz>`
   (Rate overrides period; WAV must be PCM mono 8/16-bit.)
 
-Note:
-- `--mod` is reserved for the full MOD replay engine and is not implemented yet.
+MOD playback (basic):
+- `sudo ./pimodplay --mod <file>`
+- 4-channel ProTracker MODs, basic effects (volume, speed/bpm, pattern jump/break).
