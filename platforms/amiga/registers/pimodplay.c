@@ -8,6 +8,7 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
+#include <math.h>
 
 #include "gpio/ps_protocol.h"
 #include "paula.h"
@@ -33,6 +34,10 @@ static void usage(const char *prog) {
           "  --period <val>      Paula period (default 200)\n"
           "  --vol <0-64>        Volume (default 64)\n"
           "  --seconds <n>       Playback duration (default 5)\n"
+          "\n"
+          "Built-in tune:\n"
+          "  --saints            Play \"When the Saints\" on AUD0\n"
+          "  --tempo <bpm>       Tune tempo (default 180)\n"
           "\n"
           "MOD playback (planned):\n"
           "  --mod <file>        ProTracker MOD (not yet implemented)\n"
@@ -128,6 +133,75 @@ static void audio_play_raw(uint32_t addr, const uint8_t *buf, size_t len,
   audio_stop();
 }
 
+static double paula_clock_hz(int is_pal) {
+  return is_pal ? 3546895.0 : 3579545.0;
+}
+
+static void gen_sine(uint8_t *dst, size_t samples, double freq_hz, double rate_hz) {
+  const double two_pi = 6.283185307179586;
+  size_t attack = (size_t)(rate_hz * 0.01);
+  size_t release = (size_t)(rate_hz * 0.03);
+  if (attack < 1) attack = 1;
+  if (release < 1) release = 1;
+  if (attack + release > samples) {
+    attack = samples / 4;
+    release = samples / 4;
+  }
+
+  for (size_t i = 0; i < samples; i++) {
+    double amp = 1.0;
+    if (i < attack) {
+      amp = (double)i / (double)attack;
+    } else if (i + release > samples) {
+      amp = (double)(samples - i) / (double)release;
+    }
+    double s = sin(two_pi * freq_hz * ((double)i / rate_hz));
+    int v = 128 + (int)(amp * 127.0 * s);
+    if (v < 0) v = 0;
+    if (v > 255) v = 255;
+    dst[i] = (uint8_t)v;
+  }
+}
+
+static uint8_t *build_saints(double rate_hz, unsigned bpm, size_t *out_len) {
+  struct note {
+    double freq;
+    double beats;
+  };
+  const double C4 = 261.63;
+  const double D4 = 293.66;
+  const double E4 = 329.63;
+  const double F4 = 349.23;
+  const double G4 = 392.00;
+
+  const struct note seq[] = {
+    {C4,1},{E4,1},{F4,1},{G4,1},{C4,1},{E4,1},{F4,1},{G4,1},
+    {C4,1},{E4,1},{F4,1},{G4,1},{E4,1},{C4,1},{E4,1},{D4,1},
+    {E4,1},{E4,1},{D4,1},{C4,1},{E4,1},{G4,1},{G4,1},{F4,1},
+    {F4,1},{E4,1},{F4,1},{G4,1},{E4,1},{C4,1},{D4,1},{C4,1},
+  };
+
+  const double beat_sec = 60.0 / (double)bpm;
+  size_t total_samples = 0;
+  for (size_t i = 0; i < sizeof(seq) / sizeof(seq[0]); i++) {
+    total_samples += (size_t)(seq[i].beats * beat_sec * rate_hz);
+  }
+
+  uint8_t *buf = (uint8_t *)malloc(total_samples);
+  if (!buf) return NULL;
+
+  size_t pos = 0;
+  for (size_t i = 0; i < sizeof(seq) / sizeof(seq[0]); i++) {
+    size_t samples = (size_t)(seq[i].beats * beat_sec * rate_hz);
+    if (pos + samples > total_samples) samples = total_samples - pos;
+    gen_sine(buf + pos, samples, seq[i].freq, rate_hz);
+    pos += samples;
+  }
+
+  *out_len = total_samples;
+  return buf;
+}
+
 int main(int argc, char **argv) {
   const char *raw_path = NULL;
   const char *mod_path = NULL;
@@ -137,6 +211,8 @@ int main(int argc, char **argv) {
   unsigned seconds = 5;
   int stop_only = 0;
   int is_pal = 1;
+  int play_saints = 0;
+  unsigned tempo = 180;
 
   if (argc < 2) {
     usage(argv[0]);
@@ -176,6 +252,17 @@ int main(int argc, char **argv) {
       seconds = (unsigned)parse_u32(argv[++i]);
       continue;
     }
+    if (!strcmp(arg, "--saints")) {
+      play_saints = 1;
+      continue;
+    }
+    if (!strcmp(arg, "--tempo")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      tempo = (unsigned)parse_u32(argv[++i]);
+      if (tempo < 30) tempo = 30;
+      if (tempo > 300) tempo = 300;
+      continue;
+    }
     if (!strcmp(arg, "--pal")) {
       is_pal = 1;
       continue;
@@ -198,6 +285,51 @@ int main(int argc, char **argv) {
 
   if (stop_only) {
     audio_stop();
+    return 0;
+  }
+
+  if (play_saints) {
+    if (raw_path || mod_path) {
+      fprintf(stderr, "--saints cannot be combined with --raw/--mod\n");
+      return 1;
+    }
+    double clock = paula_clock_hz(is_pal);
+    double rate_hz = clock / (double)period;
+    size_t len = 0;
+    uint8_t *buf = build_saints(rate_hz, tempo, &len);
+    if (!buf || len == 0) {
+      fprintf(stderr, "Failed to build tune buffer.\n");
+      free(buf);
+      return 1;
+    }
+    uint32_t addr_masked = addr & 0x1FFFFu;
+    uint16_t len_words = (uint16_t)((len + 1u) / 2u);
+    if (len_words == 0) {
+      fprintf(stderr, "Tune is too short.\n");
+      free(buf);
+      return 1;
+    }
+    if (len_words == 0xFFFFu) {
+      fprintf(stderr, "Tune too long for AUD0LEN.\n");
+      free(buf);
+      return 1;
+    }
+    double seconds_total = (double)len / rate_hz;
+    printf("[SAINTS] addr=0x%06X bytes=%zu rate=%.1fHz period=%u vol=%u bpm=%u PAL=%d\n",
+           addr_masked, len, rate_hz, period, vol, tempo, is_pal);
+    write_chip_ram(addr, buf, len);
+    ps_write_16(AUD0LCH, (addr_masked >> 16) & 0x1Fu);
+    ps_write_16(AUD0LCL, addr_masked & 0xFFFFu);
+    ps_write_16(AUD0LEN, len_words);
+    ps_write_16(AUD0PER, period);
+    ps_write_16(AUD0VOL, vol);
+    ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_AUD0);
+    unsigned sleep_left = (unsigned)(seconds_total + 0.5);
+    while (sleep_left-- && !stop_requested) {
+      sleep(1);
+    }
+    audio_stop();
+    free(buf);
     return 0;
   }
 
