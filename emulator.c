@@ -252,7 +252,7 @@ void* ipl_task(void* args) {
           irq = 0;
         }
         M68K_END_TIMESLICE;
-        NOP
+        NOP;
         // usleep( 0 );
       }
     }
