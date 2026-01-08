@@ -96,7 +96,12 @@ this code that are retained.
  */
 
 typedef uint64_t flag;
-typedef uint8_t bool;
+
+#ifndef __cplusplus
+  #include <stdbool.h>
+#else
+  // C++ already has bool
+#endif
 
 #define LIT64( a ) a##ULL
 

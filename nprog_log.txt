@@ -1,0 +1,12 @@
+Open On-Chip Debugger 0.12.0
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Info : BCM2835 GPIO JTAG/SWD bitbang driver
+Info : clock speed 10 kHz
+Info : JTAG tap: max2.tap tap/device found: 0x020a10dd (mfg: 0x06e (Altera), part: 0x20a1, ver: 0x0)
+Warn : gdb services need one or more targets defined
+svf processing file: "./rtl/EPM240_bitstream.svf"
+adapter speed: 100 kHz
+
+shutdown command invoked
