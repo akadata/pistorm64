@@ -202,7 +202,7 @@ static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
   ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_AUD0);
 }
 
-static int play_saints(uint32_t addr, double rate_hz, unsigned bpm,
+static int play_saints_song(uint32_t addr, double rate_hz, unsigned bpm,
                        uint16_t period, uint16_t vol) {
   struct note {
     double freq;
@@ -255,7 +255,7 @@ int main(int argc, char **argv) {
   unsigned seconds = 5;
   int stop_only = 0;
   int is_pal = 1;
-  int play_saints = 0;
+  int play_saints_flag = 0;
   unsigned tempo = 180;
 
   if (argc < 2) {
@@ -297,7 +297,7 @@ int main(int argc, char **argv) {
       continue;
     }
     if (!strcmp(arg, "--saints")) {
-      play_saints = 1;
+      play_saints_flag = 1;
       continue;
     }
     if (!strcmp(arg, "--tempo")) {
@@ -332,7 +332,7 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  if (play_saints) {
+  if (play_saints_flag) {
     if (raw_path || mod_path) {
       fprintf(stderr, "--saints cannot be combined with --raw/--mod\n");
       return 1;
@@ -342,7 +342,7 @@ int main(int argc, char **argv) {
     uint32_t addr_masked = addr & CHIP_ADDR_MASK;
     printf("[SAINTS] addr=0x%06X rate=%.1fHz period=%u vol=%u bpm=%u PAL=%d\n",
            addr_masked, rate_hz, period, vol, tempo, is_pal);
-    if (play_saints(addr, rate_hz, tempo, period, vol) != 0) {
+    if (play_saints_song(addr, rate_hz, tempo, period, vol) != 0) {
       fprintf(stderr, "Failed to play tune.\n");
       return 1;
     }
