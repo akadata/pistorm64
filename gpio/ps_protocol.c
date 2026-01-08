@@ -22,6 +22,10 @@
 
 #include <string.h>
 
+#ifndef BCM2708_PERI_SIZE
+#define BCM2708_PERI_SIZE 0x01000000u
+#endif
+
 volatile unsigned int *gpio;
 volatile unsigned int *gpclk;
 
