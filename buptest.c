@@ -38,7 +38,7 @@ uint8_t total_errors = 0;
 void sigint_handler(int sig_num) {
   printf("Received sigint %d, exiting.\n", sig_num);
   printf("Total number of transaction errors occured: %d\n", total_errors);
-  ps_cleanup_protocol();
+  //ps_cleanup_protocol();
   if (mem_fd) {
     close(mem_fd);
   }
