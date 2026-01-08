@@ -24,6 +24,8 @@ void m68k_set_irq(unsigned int level) {
 #define DMAF_MASTER 0x0200
 #define DMAF_AUD0   0x0001
 #define CHIP_ADDR_MASK 0x0FFFFFu
+#define MOD_MAX_SAMPLES 31
+#define MOD_CHANNELS 4
 
 static double paula_clock_hz(int is_pal);
 
@@ -41,14 +43,16 @@ static void usage(const char *prog) {
           "  --rate <hz>         Sample rate (overrides --period)\n"
           "  --vol <0-64>        Volume (default 64)\n"
           "  --seconds <n>       Playback duration (default 5)\n"
+          "  --stream            Stream long samples in chunks\n"
+          "  --chunk-bytes <n>   Stream chunk size (default 131070 bytes)\n"
           "\n"
           "Built-in tune:\n"
           "  --saints            Play \"When the Saints\" on AUD0\n"
           "  --tempo <bpm>       Tune tempo (default 180)\n"
           "  --gate <0.0-1.0>    Note gate ratio (default 0.70)\n"
           "\n"
-          "MOD playback (planned):\n"
-          "  --mod <file>        ProTracker MOD (not yet implemented)\n"
+          "MOD playback (basic):\n"
+          "  --mod <file>        ProTracker MOD (4-channel, basic effects)\n"
           "\n"
           "Timing:\n"
           "  --pal (default)     50 Hz tick base\n"
@@ -252,6 +256,14 @@ static void audio_stop(void) {
   ps_write_16(DMACON, DMAF_MASTER | DMAF_AUD0);
 }
 
+static void audio_stop_all(void) {
+  ps_write_16(AUD0VOL, 0);
+  ps_write_16(AUD1VOL, 0);
+  ps_write_16(AUD2VOL, 0);
+  ps_write_16(AUD3VOL, 0);
+  ps_write_16(DMACON, DMAF_MASTER | DMAF_AUD0 | 0x0002 | 0x0004 | 0x0008);
+}
+
 static void audio_play_raw(uint32_t addr, const uint8_t *buf, size_t len,
                            uint16_t period, uint16_t vol, unsigned seconds) {
   uint32_t addr_masked = addr & CHIP_ADDR_MASK;
@@ -274,6 +286,39 @@ static void audio_play_raw(uint32_t addr, const uint8_t *buf, size_t len,
 
   for (unsigned i = 0; i < seconds && !stop_requested; i++) {
     sleep(1);
+  }
+  audio_stop();
+}
+
+static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
+                              uint16_t period, uint16_t vol,
+                              double rate_hz, unsigned seconds,
+                              size_t chunk_bytes) {
+  uint32_t addr_masked = addr & CHIP_ADDR_MASK;
+  size_t max_chunk = 0xFFFFu * 2u;
+  if (chunk_bytes == 0 || chunk_bytes > max_chunk) chunk_bytes = max_chunk;
+  if (rate_hz <= 0.0) rate_hz = 1.0;
+
+  size_t offset = 0;
+  double elapsed = 0.0;
+  while (offset < len && !stop_requested) {
+    size_t chunk = len - offset;
+    if (chunk > chunk_bytes) chunk = chunk_bytes;
+    if (chunk < 2) break;
+
+    write_chip_ram(addr_masked, buf + offset, chunk);
+    audio_program_note(addr_masked, buf + offset, chunk, period, vol);
+
+    double chunk_sec = (double)chunk / rate_hz;
+    if (seconds > 0 && elapsed + chunk_sec > (double)seconds) {
+      chunk_sec = (double)seconds - elapsed;
+      if (chunk_sec <= 0.0) break;
+    }
+    sleep_seconds(chunk_sec);
+    elapsed += chunk_sec;
+    offset += chunk;
+
+    if (seconds > 0 && elapsed >= (double)seconds) break;
   }
   audio_stop();
 }
@@ -396,6 +441,304 @@ static int play_saints_song(uint32_t addr, double rate_hz, unsigned bpm,
   return 0;
 }
 
+typedef struct {
+  char name[22];
+  uint32_t length_bytes;
+  int8_t finetune;
+  uint8_t volume;
+  uint32_t loop_start_bytes;
+  uint32_t loop_len_bytes;
+  uint32_t chip_addr;
+  const uint8_t *data;
+} mod_sample_t;
+
+typedef struct {
+  uint8_t sample;
+  uint16_t period;
+  uint8_t effect;
+  uint8_t param;
+} mod_event_t;
+
+typedef struct {
+  char name[21];
+  uint8_t song_len;
+  uint8_t restart;
+  uint8_t orders[128];
+  uint8_t num_patterns;
+  mod_sample_t samples[MOD_MAX_SAMPLES];
+  mod_event_t *patterns;
+  uint8_t *data;
+  size_t data_len;
+  size_t pattern_offset;
+  size_t sample_offset;
+} mod_file_t;
+
+typedef struct {
+  uint8_t sample;
+  uint16_t period;
+  uint8_t volume;
+  uint32_t loop_start_bytes;
+  uint32_t loop_len_bytes;
+  double rate_hz;
+  double time_left;
+} mod_chan_t;
+
+static const uint32_t AUD_LCH[MOD_CHANNELS] = {AUD0LCH, AUD1LCH, AUD2LCH, AUD3LCH};
+static const uint32_t AUD_LCL[MOD_CHANNELS] = {AUD0LCL, AUD1LCL, AUD2LCL, AUD3LCL};
+static const uint32_t AUD_LEN[MOD_CHANNELS] = {AUD0LEN, AUD1LEN, AUD2LEN, AUD3LEN};
+static const uint32_t AUD_PER[MOD_CHANNELS] = {AUD0PER, AUD1PER, AUD2PER, AUD3PER};
+static const uint32_t AUD_VOL[MOD_CHANNELS] = {AUD0VOL, AUD1VOL, AUD2VOL, AUD3VOL};
+static const uint16_t AUD_DMA_MASK[MOD_CHANNELS] = {0x0001, 0x0002, 0x0004, 0x0008};
+
+static int mod_read_u16(const uint8_t *p) {
+  return ((int)p[0] << 8) | (int)p[1];
+}
+
+static int mod_is_4ch_tag(const uint8_t *tag) {
+  return !memcmp(tag, "M.K.", 4) || !memcmp(tag, "M!K!", 4) ||
+         !memcmp(tag, "4CHN", 4) || !memcmp(tag, "FLT4", 4);
+}
+
+static int read_mod(const char *path, mod_file_t *out) {
+  memset(out, 0, sizeof(*out));
+  out->data = read_file(path, &out->data_len);
+  if (!out->data || out->data_len < 1084) return -1;
+
+  const uint8_t *p = out->data;
+  memcpy(out->name, p, 20);
+  out->name[20] = '\0';
+  p += 20;
+
+  for (int i = 0; i < MOD_MAX_SAMPLES; i++) {
+    mod_sample_t *s = &out->samples[i];
+    memcpy(s->name, p, 22);
+    p += 22;
+    uint16_t len_words = (uint16_t)mod_read_u16(p);
+    p += 2;
+    uint8_t finetune = *p++;
+    uint8_t volume = *p++;
+    uint16_t loop_start = (uint16_t)mod_read_u16(p);
+    p += 2;
+    uint16_t loop_len = (uint16_t)mod_read_u16(p);
+    p += 2;
+
+    s->length_bytes = (uint32_t)len_words * 2u;
+    s->finetune = (int8_t)(finetune & 0x0F);
+    if (s->finetune & 0x08) s->finetune -= 16;
+    s->volume = volume > 64 ? 64 : volume;
+    s->loop_start_bytes = (uint32_t)loop_start * 2u;
+    s->loop_len_bytes = (uint32_t)loop_len * 2u;
+  }
+
+  out->song_len = *p++;
+  out->restart = *p++;
+  memcpy(out->orders, p, 128);
+  p += 128;
+
+  if ((size_t)(p - out->data + 4) > out->data_len) return -1;
+  if (!mod_is_4ch_tag(p)) {
+    fprintf(stderr, "Unsupported MOD tag: %.4s (only 4ch supported)\n", p);
+    return -1;
+  }
+  p += 4;
+
+  uint8_t max_pat = 0;
+  for (int i = 0; i < 128; i++) {
+    if (out->orders[i] > max_pat) max_pat = out->orders[i];
+  }
+  out->num_patterns = (uint8_t)(max_pat + 1u);
+  out->pattern_offset = 1084;
+  out->sample_offset = out->pattern_offset + (size_t)out->num_patterns * 1024u;
+  if (out->sample_offset > out->data_len) return -1;
+
+  size_t total_events = (size_t)out->num_patterns * 64u * MOD_CHANNELS;
+  out->patterns = (mod_event_t *)calloc(total_events, sizeof(mod_event_t));
+  if (!out->patterns) return -1;
+
+  for (uint8_t pat = 0; pat < out->num_patterns; pat++) {
+    size_t base = out->pattern_offset + (size_t)pat * 1024u;
+    for (int row = 0; row < 64; row++) {
+      for (int ch = 0; ch < MOD_CHANNELS; ch++) {
+        size_t off = base + (size_t)row * 16u + (size_t)ch * 4u;
+        if (off + 3 >= out->data_len) return -1;
+        uint8_t b0 = out->data[off + 0];
+        uint8_t b1 = out->data[off + 1];
+        uint8_t b2 = out->data[off + 2];
+        uint8_t b3 = out->data[off + 3];
+        mod_event_t *e = &out->patterns[(pat * 64u + row) * MOD_CHANNELS + ch];
+        e->sample = (uint8_t)((b0 & 0xF0) | ((b2 & 0xF0) >> 4));
+        e->period = (uint16_t)(((b0 & 0x0F) << 8) | b1);
+        e->effect = (uint8_t)(b2 & 0x0F);
+        e->param = b3;
+      }
+    }
+  }
+
+  size_t sample_pos = out->sample_offset;
+  for (int i = 0; i < MOD_MAX_SAMPLES; i++) {
+    mod_sample_t *s = &out->samples[i];
+    if (s->length_bytes == 0) {
+      s->data = NULL;
+      continue;
+    }
+    if (sample_pos + s->length_bytes > out->data_len) return -1;
+    s->data = out->data + sample_pos;
+    sample_pos += s->length_bytes;
+  }
+  return 0;
+}
+
+static void free_mod(mod_file_t *mod) {
+  free(mod->patterns);
+  free(mod->data);
+  memset(mod, 0, sizeof(*mod));
+}
+
+static void program_channel(int ch, uint32_t addr, uint32_t len_bytes,
+                            uint16_t period, uint8_t vol) {
+  uint32_t addr_masked = addr & CHIP_ADDR_MASK;
+  size_t len_words_full = (len_bytes + 1u) / 2u;
+  if (len_words_full == 0) return;
+  if (len_words_full > 0xFFFFu) len_words_full = 0xFFFFu;
+  uint16_t len_words = (uint16_t)len_words_full;
+
+  ps_write_16(AUD_VOL[ch], 0);
+  ps_write_16(AUD_LCH[ch], (addr_masked >> 16) & 0x1Fu);
+  ps_write_16(AUD_LCL[ch], addr_masked & 0xFFFFu);
+  ps_write_16(AUD_LEN[ch], len_words);
+  ps_write_16(AUD_PER[ch], period);
+  ps_write_16(AUD_VOL[ch], vol);
+  ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | AUD_DMA_MASK[ch]);
+}
+
+static int play_mod(const char *path, uint32_t base_addr, int is_pal) {
+  mod_file_t mod;
+  if (read_mod(path, &mod) != 0) {
+    fprintf(stderr, "Failed to load MOD: %s\n", path);
+    free_mod(&mod);
+    return -1;
+  }
+
+  uint32_t addr = base_addr & CHIP_ADDR_MASK;
+  uint32_t offset = 0;
+  for (int i = 0; i < MOD_MAX_SAMPLES; i++) {
+    mod_sample_t *s = &mod.samples[i];
+    if (!s->data || s->length_bytes == 0) continue;
+    s->chip_addr = (addr + offset) & CHIP_ADDR_MASK;
+    write_chip_ram(s->chip_addr, s->data, s->length_bytes);
+    offset += (s->length_bytes + 1u) & ~1u;
+    if ((addr + offset) > 0x200000u) {
+      fprintf(stderr, "MOD samples exceed 2MB Chip RAM. Aborting.\n");
+      free_mod(&mod);
+      return -1;
+    }
+  }
+
+  unsigned speed = 6;
+  unsigned bpm = 125;
+  double tick_sec = 2.5 / (double)bpm;
+  uint8_t pos = 0;
+  uint8_t row = 0;
+  unsigned tick = 0;
+  mod_chan_t chan[MOD_CHANNELS];
+  memset(chan, 0, sizeof(chan));
+
+  printf("[MOD] \"%s\" patterns=%u song_len=%u bpm=%u speed=%u PAL=%d\n",
+         mod.name, mod.num_patterns, mod.song_len, bpm, speed, is_pal);
+
+  while (!stop_requested && pos < mod.song_len) {
+    uint8_t pat = mod.orders[pos];
+    if (pat >= mod.num_patterns) break;
+    mod_event_t *row_events = &mod.patterns[(pat * 64u + row) * MOD_CHANNELS];
+
+    if (tick == 0) {
+      int jump_pos = -1;
+      int break_row = -1;
+
+      for (int ch = 0; ch < MOD_CHANNELS; ch++) {
+        mod_event_t *e = &row_events[ch];
+        if (e->sample > 0 && e->sample <= MOD_MAX_SAMPLES) {
+          chan[ch].sample = e->sample;
+          mod_sample_t *s = &mod.samples[e->sample - 1];
+          chan[ch].volume = s->volume;
+          chan[ch].loop_start_bytes = s->loop_start_bytes;
+          chan[ch].loop_len_bytes = s->loop_len_bytes;
+        }
+
+        if (e->period) {
+          chan[ch].period = e->period;
+          mod_sample_t *s = &mod.samples[(chan[ch].sample ? chan[ch].sample : 1) - 1];
+          double rate_hz = paula_clock_hz(is_pal) / (double)e->period;
+          chan[ch].rate_hz = rate_hz;
+          uint32_t intro_bytes = s->loop_start_bytes ? s->loop_start_bytes : s->length_bytes;
+          chan[ch].time_left = rate_hz > 0 ? (double)intro_bytes / rate_hz : 0.0;
+          program_channel(ch, s->chip_addr, s->length_bytes, e->period, chan[ch].volume);
+        }
+
+        if (e->effect == 0x0C) {
+          uint8_t v = e->param > 64 ? 64 : e->param;
+          chan[ch].volume = v;
+          ps_write_16(AUD_VOL[ch], v);
+        } else if (e->effect == 0x0F) {
+          if (e->param <= 32 && e->param > 0) {
+            speed = e->param;
+          } else if (e->param > 32) {
+            bpm = e->param;
+            tick_sec = 2.5 / (double)bpm;
+          }
+        } else if (e->effect == 0x0B) {
+          jump_pos = e->param;
+        } else if (e->effect == 0x0D) {
+          break_row = ((e->param >> 4) & 0x0F) * 10 + (e->param & 0x0F);
+        }
+      }
+
+      if (jump_pos >= 0) {
+        pos = (uint8_t)jump_pos;
+        row = 0;
+        tick = 0;
+        continue;
+      }
+      if (break_row >= 0) {
+        pos = (uint8_t)(pos + 1);
+        row = (uint8_t)break_row;
+        tick = 0;
+        continue;
+      }
+    } else {
+      for (int ch = 0; ch < MOD_CHANNELS; ch++) {
+        if (chan[ch].loop_len_bytes > 2 && chan[ch].rate_hz > 0.0) {
+          chan[ch].time_left -= tick_sec;
+          if (chan[ch].time_left <= 0.0) {
+            mod_sample_t *s = &mod.samples[(chan[ch].sample ? chan[ch].sample : 1) - 1];
+            program_channel(ch,
+                            s->chip_addr + chan[ch].loop_start_bytes,
+                            chan[ch].loop_len_bytes,
+                            chan[ch].period,
+                            chan[ch].volume);
+            chan[ch].time_left = (double)chan[ch].loop_len_bytes / chan[ch].rate_hz;
+          }
+        }
+      }
+    }
+
+    sleep_seconds(tick_sec);
+    tick++;
+    if (tick >= speed) {
+      tick = 0;
+      row++;
+      if (row >= 64) {
+        row = 0;
+        pos++;
+      }
+    }
+  }
+
+  audio_stop_all();
+  free_mod(&mod);
+  return 0;
+}
+
 int main(int argc, char **argv) {
   const char *raw_path = NULL;
   const char *wav_path = NULL;
@@ -410,6 +753,8 @@ int main(int argc, char **argv) {
   int play_saints_flag = 0;
   unsigned tempo = 180;
   double gate_ratio = 0.70;
+  int stream = 0;
+  size_t chunk_bytes = 0;
 
   if (argc < 2) {
     usage(argv[0]);
@@ -457,6 +802,15 @@ int main(int argc, char **argv) {
     if (!strcmp(arg, "--seconds")) {
       if (i + 1 >= argc) usage(argv[0]);
       seconds = (unsigned)parse_u32(argv[++i]);
+      continue;
+    }
+    if (!strcmp(arg, "--stream")) {
+      stream = 1;
+      continue;
+    }
+    if (!strcmp(arg, "--chunk-bytes")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      chunk_bytes = (size_t)parse_u32(argv[++i]);
       continue;
     }
     if (!strcmp(arg, "--saints")) {
@@ -517,11 +871,14 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  if (mod_path) {
-    fprintf(stderr,
-            "MOD playback not yet implemented (raw DMA works).\n"
-            "Use --raw for now. PAL=%d\n", is_pal);
+  if (mod_path && (raw_path || wav_path)) {
+    fprintf(stderr, "--mod cannot be combined with --raw/--wav\n");
     return 1;
+  }
+
+  if (mod_path) {
+    int rc = play_mod(mod_path, addr, is_pal);
+    return rc == 0 ? 0 : 1;
   }
 
   if (!raw_path && !wav_path) {
@@ -551,10 +908,18 @@ int main(int argc, char **argv) {
 
   if (rate_hz) {
     period = period_from_rate((double)rate_hz, is_pal);
+  } else {
+    rate_hz = (unsigned)(paula_clock_hz(is_pal) / (double)period + 0.5);
   }
-  printf("[RAW] addr=0x%06X bytes=%zu period=%u vol=%u seconds=%u PAL=%d\n",
-         addr & 0x1FFFFu, len, period, vol, seconds, is_pal);
-  audio_play_raw(addr, buf, len, period, vol, seconds);
+  if (stream) {
+    printf("[STREAM] addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu PAL=%d\n",
+           addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, chunk_bytes, is_pal);
+    audio_play_stream(addr, buf, len, period, vol, (double)rate_hz, seconds, chunk_bytes);
+  } else {
+    printf("[RAW] addr=0x%06X bytes=%zu period=%u vol=%u seconds=%u PAL=%d\n",
+           addr & 0x1FFFFu, len, period, vol, seconds, is_pal);
+    audio_play_raw(addr, buf, len, period, vol, seconds);
+  }
   free(buf);
   return 0;
 }
