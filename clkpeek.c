@@ -38,28 +38,61 @@ static int read_file(const char *path, uint8_t **buf_out, size_t *len_out) {
 // On Raspberry Pi this property typically contains 3 big-endian u32 cells:
 // bus_addr (0x7e000000), cpu_addr (PERI_BASE), size (0x01000000)
 static uint32_t detect_peri_base(void) {
+    const char *env = getenv("PISTORM_PERI_BASE");
+    if (env && *env) {
+        char *end = NULL;
+        unsigned long parsed = strtoul(env, &end, 0);
+        if (end && *end == '\0' && parsed != 0) {
+            return (uint32_t)parsed;
+        }
+        fprintf(stderr, "[CLK] Ignoring PISTORM_PERI_BASE=%s (invalid)\n", env);
+    }
+
     uint8_t *buf = NULL;
     size_t len = 0;
 
     if (read_file("/proc/device-tree/soc/ranges", &buf, &len) == 0 && len >= 12) {
-        uint32_t bus  = be32(buf + 0);
-        uint32_t cpu  = be32(buf + 4);
-        uint32_t size = be32(buf + 8);
-        free(buf);
-
-        // Sanity: bus is often 0x7e000000, size often 0x01000000
-        if (cpu == 0x20000000u || cpu == 0x3F000000u || cpu == 0xFE000000u) {
-            (void)bus; (void)size;
-            return cpu;
+        size_t stride = 0;
+        if (len % 16 == 0) {
+            stride = 16;
+        } else if (len % 12 == 0) {
+            stride = 12;
         }
-        // If it’s something else but non-zero, still return it.
-        if (cpu != 0) return cpu;
+
+        if (stride != 0) {
+            for (size_t off = 0; off + stride <= len; off += stride) {
+                uint32_t bus = be32(buf + off + 0);
+                uint32_t cell1 = be32(buf + off + 4);
+                uint32_t cell2 = be32(buf + off + 8);
+                uint32_t cell3 = (stride == 16) ? be32(buf + off + 12) : 0;
+
+                uint32_t cpu = 0;
+                if (stride == 16) {
+                    uint32_t parent_hi = cell1;
+                    uint32_t parent_lo = cell2;
+                    if (parent_hi == 0 && parent_lo != 0) cpu = parent_lo;
+                } else {
+                    cpu = cell1;
+                }
+
+                // Sanity: bus is often 0x7e000000, size often 0x01000000
+                if (cpu == 0x20000000u || cpu == 0x3F000000u || cpu == 0xFE000000u) {
+                    (void)bus; (void)cell3;
+                    free(buf);
+                    return cpu;
+                }
+                if (cpu != 0) {
+                    free(buf);
+                    return cpu;
+                }
+            }
+        }
+        free(buf);
     } else {
         free(buf);
     }
 
     // Fallback: try model-compatible defaults
-    // Many Zero/2/3 use 0x3F..., Pi4/400 use 0xFE...
     return 0x3F000000u;
 }
 
@@ -203,4 +236,3 @@ int main(int argc, char **argv) {
     close(fd);
     return 0;
 }
-
