@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <time.h>
+#include <ctype.h>
 
 #include "gpio/ps_protocol.h"
 #include "paula.h"
@@ -32,8 +33,10 @@ static void usage(const char *prog) {
           "\n"
           "Raw sample playback (AUD0 DMA):\n"
           "  --raw <file>        8-bit unsigned sample data\n"
+          "  --wav <file>        WAV PCM mono (8/16-bit)\n"
           "  --addr <hex>        Chip RAM load address (default 0x00080000)\n"
           "  --period <val>      Paula period (default 200)\n"
+          "  --rate <hz>         Sample rate (overrides --period)\n"
           "  --vol <0-64>        Volume (default 64)\n"
           "  --seconds <n>       Playback duration (default 5)\n"
           "\n"
@@ -98,6 +101,137 @@ static uint8_t *read_file(const char *path, size_t *out_len) {
   fclose(f);
   *out_len = (size_t)len;
   return buf;
+}
+
+static uint16_t period_from_rate(double rate_hz, int is_pal) {
+  double clock = paula_clock_hz(is_pal);
+  double period = clock / rate_hz;
+  if (period < 1.0) period = 1.0;
+  if (period > 65535.0) period = 65535.0;
+  return (uint16_t)(period + 0.5);
+}
+
+static uint8_t *read_wav_mono_u8(const char *path, size_t *out_len,
+                                 unsigned *out_rate_hz) {
+  FILE *f = fopen(path, "rb");
+  if (!f) {
+    perror(path);
+    return NULL;
+  }
+
+  char riff[4];
+  if (fread(riff, 1, 4, f) != 4 || memcmp(riff, "RIFF", 4) != 0) {
+    fclose(f);
+    return NULL;
+  }
+  if (fseek(f, 4, SEEK_CUR) != 0) {
+    fclose(f);
+    return NULL;
+  }
+  char wave[4];
+  if (fread(wave, 1, 4, f) != 4 || memcmp(wave, "WAVE", 4) != 0) {
+    fclose(f);
+    return NULL;
+  }
+
+  uint16_t audio_format = 0;
+  uint16_t channels = 0;
+  uint32_t sample_rate = 0;
+  uint16_t bits_per_sample = 0;
+  long data_offset = -1;
+  uint32_t data_size = 0;
+
+  while (1) {
+    char chunk_id[4];
+    uint32_t chunk_size = 0;
+    if (fread(chunk_id, 1, 4, f) != 4) break;
+    if (fread(&chunk_size, 4, 1, f) != 1) break;
+
+    if (!memcmp(chunk_id, "fmt ", 4)) {
+      uint16_t fmt_tag = 0;
+      uint16_t fmt_channels = 0;
+      uint32_t fmt_rate = 0;
+      uint16_t fmt_bps = 0;
+      if (fread(&fmt_tag, sizeof(fmt_tag), 1, f) != 1 ||
+          fread(&fmt_channels, sizeof(fmt_channels), 1, f) != 1 ||
+          fread(&fmt_rate, sizeof(fmt_rate), 1, f) != 1) {
+        fclose(f);
+        return NULL;
+      }
+      if (fseek(f, 6, SEEK_CUR) != 0) {
+        fclose(f);
+        return NULL;
+      }
+      if (fread(&fmt_bps, sizeof(fmt_bps), 1, f) != 1) {
+        fclose(f);
+        return NULL;
+      }
+      audio_format = fmt_tag;
+      channels = fmt_channels;
+      sample_rate = fmt_rate;
+      bits_per_sample = fmt_bps;
+      long remain = (long)chunk_size - 16;
+      if (remain > 0) fseek(f, remain, SEEK_CUR);
+    } else if (!memcmp(chunk_id, "data", 4)) {
+      data_offset = ftell(f);
+      data_size = chunk_size;
+      fseek(f, chunk_size, SEEK_CUR);
+    } else {
+      fseek(f, chunk_size, SEEK_CUR);
+    }
+    if (data_offset >= 0 && sample_rate != 0) break;
+  }
+
+  if (audio_format != 1 || channels != 1 || sample_rate == 0 ||
+      (bits_per_sample != 8 && bits_per_sample != 16) ||
+      data_offset < 0 || data_size == 0) {
+    fclose(f);
+    return NULL;
+  }
+
+  if (fseek(f, data_offset, SEEK_SET) != 0) {
+    fclose(f);
+    return NULL;
+  }
+
+  uint8_t *out = NULL;
+  if (bits_per_sample == 8) {
+    out = (uint8_t *)malloc(data_size);
+    if (!out) {
+      fclose(f);
+      return NULL;
+    }
+    if (fread(out, 1, data_size, f) != data_size) {
+      fclose(f);
+      free(out);
+      return NULL;
+    }
+    *out_len = data_size;
+  } else {
+    size_t samples = data_size / 2;
+    out = (uint8_t *)malloc(samples);
+    if (!out) {
+      fclose(f);
+      return NULL;
+    }
+    for (size_t i = 0; i < samples; i++) {
+      int16_t s = 0;
+      if (fread(&s, sizeof(s), 1, f) != 1) {
+        fclose(f);
+        free(out);
+        return NULL;
+      }
+      int v = 128 + (s / 256);
+      if (v < 0) v = 0;
+      if (v > 255) v = 255;
+      out[i] = (uint8_t)v;
+    }
+    *out_len = samples;
+  }
+
+  fclose(f);
+  *out_rate_hz = sample_rate;
+  return out;
 }
 
 static void write_chip_ram(uint32_t addr, const uint8_t *buf, size_t len) {
@@ -262,9 +396,11 @@ static int play_saints_song(uint32_t addr, double rate_hz, unsigned bpm,
 
 int main(int argc, char **argv) {
   const char *raw_path = NULL;
+  const char *wav_path = NULL;
   const char *mod_path = NULL;
   uint32_t addr = 0x00080000u;
   uint16_t period = 200u;
+  unsigned rate_hz = 0;
   uint16_t vol = 64u;
   unsigned seconds = 5;
   int stop_only = 0;
@@ -285,6 +421,11 @@ int main(int argc, char **argv) {
       raw_path = argv[++i];
       continue;
     }
+    if (!strcmp(arg, "--wav")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      wav_path = argv[++i];
+      continue;
+    }
     if (!strcmp(arg, "--mod")) {
       if (i + 1 >= argc) usage(argv[0]);
       mod_path = argv[++i];
@@ -298,6 +439,11 @@ int main(int argc, char **argv) {
     if (!strcmp(arg, "--period")) {
       if (i + 1 >= argc) usage(argv[0]);
       period = (uint16_t)parse_u32(argv[++i]);
+      continue;
+    }
+    if (!strcmp(arg, "--rate")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      rate_hz = (unsigned)parse_u32(argv[++i]);
       continue;
     }
     if (!strcmp(arg, "--vol")) {
@@ -376,19 +522,34 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  if (!raw_path) {
+  if (!raw_path && !wav_path) {
     usage(argv[0]);
     return 1;
   }
 
   size_t len = 0;
-  uint8_t *buf = read_file(raw_path, &len);
+  uint8_t *buf = NULL;
+  if (wav_path) {
+    unsigned wav_rate = 0;
+    buf = read_wav_mono_u8(wav_path, &len, &wav_rate);
+    if (!buf || len == 0) {
+      fprintf(stderr, "Failed to read WAV: %s\n", wav_path);
+      free(buf);
+      return 1;
+    }
+    if (rate_hz == 0) rate_hz = wav_rate;
+  } else {
+    buf = read_file(raw_path, &len);
+  }
   if (!buf || len == 0) {
-    fprintf(stderr, "Failed to read sample: %s\n", raw_path);
+    fprintf(stderr, "Failed to read sample.\n");
     free(buf);
     return 1;
   }
 
+  if (rate_hz) {
+    period = period_from_rate((double)rate_hz, is_pal);
+  }
   printf("[RAW] addr=0x%06X bytes=%zu period=%u vol=%u seconds=%u PAL=%d\n",
          addr & 0x1FFFFu, len, period, vol, seconds, is_pal);
   audio_play_raw(addr, buf, len, period, vol, seconds);
