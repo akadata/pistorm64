@@ -55,6 +55,10 @@ WAV playback:
 - `sudo ./pimodplay --wav <file> --rate <hz>`
   (Rate overrides period; WAV must be PCM mono 8/16-bit.)
 
+Sample formats:
+- Paula expects signed 8-bit PCM. `--wav` converts to signed automatically.
+- For raw files, use `--u8` if the raw data is unsigned (default) or `--s8` if it is signed.
+
 MOD playback (basic):
 - `sudo ./pimodplay --mod <file>`
 - 4-channel ProTracker MODs, basic effects (volume, speed/bpm, pattern jump/break).
