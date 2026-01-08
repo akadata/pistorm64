@@ -125,6 +125,11 @@ static void disk_led(int on) {
 
   ps_write_8(CIAADDR_A, ddr);
   ps_write_8(CIAAPRA, pra);
+
+  ddr = (uint8_t)ps_read_8(CIAADDR_A);
+  pra = (uint8_t)ps_read_8(CIAAPRA);
+  printf("disk-led %s (DDRA=0x%02X PRA=0x%02X)\n",
+         on ? "on" : "off", ddr, pra);
 }
 
 static void power_led(int on) {

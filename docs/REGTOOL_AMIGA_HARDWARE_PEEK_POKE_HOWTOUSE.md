@@ -35,6 +35,11 @@ Toggle disk LED (CIAA Port A, active low):
 ./regtool --force --disk-led off
 ./regtool --force --power-led on
 ./regtool --force --power-led off
+
+Notes:
+- Disk LED is active-low on CIAA Port A bit 1. The tool prints DDRA/PRA readback.
+- If the LED does not appear to change, the OS or disk DMA may be immediately
+  overriding the bit. Try again with minimal disk activity.
 ```
 
 ## Audio Test (AUD0)
