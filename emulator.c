@@ -1330,6 +1330,7 @@ void sigint_handler(int sig_num) {
 int main(int argc, char* argv[]) {
   int g;
   const char* state_sock_cli = NULL;
+  const char* state_sock_env = NULL;
 
   pistorm_selftest_alignment();
 
@@ -1345,6 +1346,8 @@ int main(int argc, char* argv[]) {
 #ifdef BUILD_GIT_REV
   printf("[BUILD] git=%s date=%s\n", BUILD_GIT_REV, BUILD_DATE);
 #endif
+
+  state_sock_env = getenv("PISTORM_STATE_SOCK");
 
   // const struct sched_param priority = {99};
 
@@ -1417,6 +1420,14 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  if (state_sock_cli && state_sock_cli[0]) {
+    bpl_state_enabled = 1;
+    start_state_socket(state_sock_cli);
+  } else if (state_sock_env && state_sock_env[0]) {
+    bpl_state_enabled = 1;
+    start_state_socket(state_sock_env);
+  }
+
 switch_config:
   srand(clock());
 
@@ -1458,13 +1469,9 @@ switch_config:
 
   if (cfg) {
     if (!state_sock_path_set) {
-      const char* env_sock = getenv("PISTORM_STATE_SOCK");
-      if (state_sock_cli && state_sock_cli[0]) {
-        start_state_socket(state_sock_cli);
-      } else if (cfg->state_sock_path && cfg->state_sock_path[0]) {
+      if (cfg->state_sock_path && cfg->state_sock_path[0]) {
+        bpl_state_enabled = 1;
         start_state_socket(cfg->state_sock_path);
-      } else if (env_sock && env_sock[0]) {
-        start_state_socket(env_sock);
       }
     }
     if (cfg->cpu_type)
