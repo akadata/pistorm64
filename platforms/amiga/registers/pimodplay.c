@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <math.h>
+#include <time.h>
 
 #include "gpio/ps_protocol.h"
 #include "paula.h"
@@ -170,7 +171,39 @@ static void gen_sine(uint8_t *dst, size_t samples, double freq_hz, double rate_h
   }
 }
 
-static uint8_t *build_saints(double rate_hz, unsigned bpm, size_t *out_len) {
+static void sleep_seconds(double seconds) {
+  if (seconds <= 0.0) return;
+  struct timespec ts;
+  ts.tv_sec = (time_t)seconds;
+  ts.tv_nsec = (long)((seconds - (double)ts.tv_sec) * 1000000000.0);
+  if (ts.tv_nsec < 0) ts.tv_nsec = 0;
+  if (ts.tv_nsec >= 1000000000L) ts.tv_nsec = 999999999L;
+  nanosleep(&ts, NULL);
+}
+
+static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
+                               uint16_t period, uint16_t vol) {
+  uint32_t addr_masked = addr & CHIP_ADDR_MASK;
+  size_t len_words_full = (len + 1u) / 2u;
+  if (len_words_full > 0xFFFFu) {
+    len_words_full = 0xFFFFu;
+    len = len_words_full * 2u;
+  }
+  uint16_t len_words = (uint16_t)len_words_full;
+
+  write_chip_ram(addr, buf, len);
+  ps_write_16(AUD0VOL, 0);
+  ps_write_16(DMACON, DMAF_MASTER | DMAF_AUD0);
+  ps_write_16(AUD0LCH, (addr_masked >> 16) & 0x1Fu);
+  ps_write_16(AUD0LCL, addr_masked & 0xFFFFu);
+  ps_write_16(AUD0LEN, len_words);
+  ps_write_16(AUD0PER, period);
+  ps_write_16(AUD0VOL, vol);
+  ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_AUD0);
+}
+
+static int play_saints(uint32_t addr, double rate_hz, unsigned bpm,
+                       uint16_t period, uint16_t vol) {
   struct note {
     double freq;
     double beats;
@@ -189,24 +222,28 @@ static uint8_t *build_saints(double rate_hz, unsigned bpm, size_t *out_len) {
   };
 
   const double beat_sec = 60.0 / (double)bpm;
-  size_t total_samples = 0;
+  const size_t max_samples = 0xFFFFu * 2u;
+  uint8_t *buf = (uint8_t *)malloc(max_samples);
+  if (!buf) return -1;
+
   for (size_t i = 0; i < sizeof(seq) / sizeof(seq[0]); i++) {
-    total_samples += (size_t)(seq[i].beats * beat_sec * rate_hz);
+    if (stop_requested) break;
+    double note_sec = seq[i].beats * beat_sec;
+    size_t remaining = (size_t)(note_sec * rate_hz);
+    if (remaining < 16) remaining = 16;
+
+    while (remaining > 0 && !stop_requested) {
+      size_t chunk = remaining > max_samples ? max_samples : remaining;
+      gen_sine(buf, chunk, seq[i].freq, rate_hz);
+      audio_program_note(addr, buf, chunk, period, vol);
+      sleep_seconds((double)chunk / rate_hz);
+      remaining -= chunk;
+    }
   }
 
-  uint8_t *buf = (uint8_t *)malloc(total_samples);
-  if (!buf) return NULL;
-
-  size_t pos = 0;
-  for (size_t i = 0; i < sizeof(seq) / sizeof(seq[0]); i++) {
-    size_t samples = (size_t)(seq[i].beats * beat_sec * rate_hz);
-    if (pos + samples > total_samples) samples = total_samples - pos;
-    gen_sine(buf + pos, samples, seq[i].freq, rate_hz);
-    pos += samples;
-  }
-
-  *out_len = total_samples;
-  return buf;
+  audio_stop();
+  free(buf);
+  return 0;
 }
 
 int main(int argc, char **argv) {
@@ -302,52 +339,13 @@ int main(int argc, char **argv) {
     }
     double clock = paula_clock_hz(is_pal);
     double rate_hz = clock / (double)period;
-    size_t len = 0;
-  uint8_t *buf = build_saints(rate_hz, tempo, &len);
-  if (!buf || len == 0) {
-      fprintf(stderr, "Failed to build tune buffer.\n");
-      free(buf);
+    uint32_t addr_masked = addr & CHIP_ADDR_MASK;
+    printf("[SAINTS] addr=0x%06X rate=%.1fHz period=%u vol=%u bpm=%u PAL=%d\n",
+           addr_masked, rate_hz, period, vol, tempo, is_pal);
+    if (play_saints(addr, rate_hz, tempo, period, vol) != 0) {
+      fprintf(stderr, "Failed to play tune.\n");
       return 1;
     }
-  uint32_t addr_masked = addr & CHIP_ADDR_MASK;
-  size_t len_words_full = (len + 1u) / 2u;
-  if (len_words_full > 0xFFFFu) {
-    double scale = (double)len_words_full / 65535.0;
-    unsigned suggested = (unsigned)(tempo * scale + 0.5);
-    fprintf(stderr,
-            "[WARN] Tune too long for AUD0LEN (%zu words). Truncating.\n"
-            "       Try higher tempo (suggested ~%u bpm).\n",
-            len_words_full, suggested);
-    len_words_full = 0xFFFFu;
-    len = len_words_full * 2u;
-  }
-  uint16_t len_words = (uint16_t)len_words_full;
-    if (len_words == 0) {
-      fprintf(stderr, "Tune is too short.\n");
-      free(buf);
-      return 1;
-    }
-    if (len_words == 0xFFFFu) {
-      fprintf(stderr, "Tune too long for AUD0LEN.\n");
-      free(buf);
-      return 1;
-    }
-    double seconds_total = (double)len / rate_hz;
-  printf("[SAINTS] addr=0x%06X bytes=%zu rate=%.1fHz period=%u vol=%u bpm=%u PAL=%d\n",
-         addr_masked, len, rate_hz, period, vol, tempo, is_pal);
-    write_chip_ram(addr, buf, len);
-    ps_write_16(AUD0LCH, (addr_masked >> 16) & 0x1Fu);
-    ps_write_16(AUD0LCL, addr_masked & 0xFFFFu);
-    ps_write_16(AUD0LEN, len_words);
-    ps_write_16(AUD0PER, period);
-    ps_write_16(AUD0VOL, vol);
-    ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_AUD0);
-    unsigned sleep_left = (unsigned)(seconds_total + 0.5);
-    while (sleep_left-- && !stop_requested) {
-      sleep(1);
-    }
-    audio_stop();
-    free(buf);
     return 0;
   }
 
