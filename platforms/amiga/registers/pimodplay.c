@@ -40,6 +40,7 @@ static void usage(const char *prog) {
           "Built-in tune:\n"
           "  --saints            Play \"When the Saints\" on AUD0\n"
           "  --tempo <bpm>       Tune tempo (default 180)\n"
+          "  --gate <0.0-1.0>    Note gate ratio (default 0.70)\n"
           "\n"
           "MOD playback (planned):\n"
           "  --mod <file>        ProTracker MOD (not yet implemented)\n"
@@ -203,7 +204,7 @@ static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
 }
 
 static int play_saints_song(uint32_t addr, double rate_hz, unsigned bpm,
-                       uint16_t period, uint16_t vol) {
+                            uint16_t period, uint16_t vol, double gate_ratio) {
   struct note {
     double freq;
     double beats;
@@ -215,10 +216,11 @@ static int play_saints_song(uint32_t addr, double rate_hz, unsigned bpm,
   const double G4 = 392.00;
 
   const struct note seq[] = {
-    {C4,1},{E4,1},{F4,1},{G4,1},{C4,1},{E4,1},{F4,1},{G4,1},
-    {C4,1},{E4,1},{F4,1},{G4,1},{E4,1},{C4,1},{E4,1},{D4,1},
-    {E4,1},{E4,1},{D4,1},{C4,1},{E4,1},{G4,1},{G4,1},{F4,1},
-    {F4,1},{E4,1},{F4,1},{G4,1},{E4,1},{C4,1},{D4,1},{C4,1},
+    {C4,1},{E4,1},{F4,1},{G4,3},{0,1},
+    {C4,1},{E4,1},{F4,1},{G4,3},{0,1},
+    {C4,1},{E4,1},{F4,1},{G4,1},{E4,1},{C4,1},{E4,1},{D4,2},
+    {E4,1},{E4,1},{D4,1},{C4,1},{E4,1},{G4,2},{F4,1},
+    {F4,1},{E4,1},{F4,1},{G4,1},{E4,1},{C4,1},{D4,1},{C4,2},
   };
 
   const double beat_sec = 60.0 / (double)bpm;
@@ -228,8 +230,18 @@ static int play_saints_song(uint32_t addr, double rate_hz, unsigned bpm,
 
   for (size_t i = 0; i < sizeof(seq) / sizeof(seq[0]); i++) {
     if (stop_requested) break;
-    double note_sec = seq[i].beats * beat_sec;
-    size_t remaining = (size_t)(note_sec * rate_hz);
+    double step_sec = seq[i].beats * beat_sec;
+    if (seq[i].freq <= 0.0) {
+      ps_write_16(AUD0VOL, 0);
+      sleep_seconds(step_sec);
+      continue;
+    }
+
+    if (gate_ratio < 0.05) gate_ratio = 0.05;
+    if (gate_ratio > 0.95) gate_ratio = 0.95;
+    double gate_sec = step_sec * gate_ratio;
+    double rest_sec = step_sec - gate_sec;
+    size_t remaining = (size_t)(gate_sec * rate_hz);
     if (remaining < 16) remaining = 16;
 
     while (remaining > 0 && !stop_requested) {
@@ -239,6 +251,8 @@ static int play_saints_song(uint32_t addr, double rate_hz, unsigned bpm,
       sleep_seconds((double)chunk / rate_hz);
       remaining -= chunk;
     }
+    ps_write_16(AUD0VOL, 0);
+    sleep_seconds(rest_sec);
   }
 
   audio_stop();
@@ -257,6 +271,7 @@ int main(int argc, char **argv) {
   int is_pal = 1;
   int play_saints_flag = 0;
   unsigned tempo = 180;
+  double gate_ratio = 0.70;
 
   if (argc < 2) {
     usage(argv[0]);
@@ -307,6 +322,11 @@ int main(int argc, char **argv) {
       if (tempo > 600) tempo = 600;
       continue;
     }
+    if (!strcmp(arg, "--gate")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      gate_ratio = strtod(argv[++i], NULL);
+      continue;
+    }
     if (!strcmp(arg, "--pal")) {
       is_pal = 1;
       continue;
@@ -340,9 +360,9 @@ int main(int argc, char **argv) {
     double clock = paula_clock_hz(is_pal);
     double rate_hz = clock / (double)period;
     uint32_t addr_masked = addr & CHIP_ADDR_MASK;
-    printf("[SAINTS] addr=0x%06X rate=%.1fHz period=%u vol=%u bpm=%u PAL=%d\n",
-           addr_masked, rate_hz, period, vol, tempo, is_pal);
-    if (play_saints_song(addr, rate_hz, tempo, period, vol) != 0) {
+    printf("[SAINTS] addr=0x%06X rate=%.1fHz period=%u vol=%u bpm=%u gate=%.2f PAL=%d\n",
+           addr_masked, rate_hz, period, vol, tempo, gate_ratio, is_pal);
+    if (play_saints_song(addr, rate_hz, tempo, period, vol, gate_ratio) != 0) {
       fprintf(stderr, "Failed to play tune.\n");
       return 1;
     }
