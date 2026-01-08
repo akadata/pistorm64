@@ -1014,7 +1014,9 @@ switch_config:
     cfg->platform->shutdown(cfg);
   }
 
+  #ifdef PS_PROTOCOL_HAS_CLEANUP
   ps_cleanup_protocol();
+  #endif
 
   return 0;
 }
