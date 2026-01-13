@@ -34,7 +34,8 @@ static const uint32_t AUD_PER[MOD_CHANNELS] = {AUD0PER, AUD1PER, AUD2PER, AUD3PE
 static const uint32_t AUD_VOL[MOD_CHANNELS] = {AUD0VOL, AUD1VOL, AUD2VOL, AUD3VOL};
 static const uint32_t AUD_DAT[MOD_CHANNELS] = {AUD0DAT, AUD1DAT, AUD2DAT, AUD3DAT};
 static const uint16_t AUD_DMA_MASK[MOD_CHANNELS] = {0x0001, 0x0002, 0x0004, 0x0008};
-static const double STREAM_GUARD_LEAD = 0.98;
+static const double STREAM_GUARD_LEAD = 0.99;
+static const double STREAM_PREROLL_SEC = 0.50;
 
 typedef struct {
   int left;
@@ -458,6 +459,29 @@ static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
   double prev_play_sec = 0.0;
   int started = 0;
   size_t chunk_index = 0;
+  /* Optional pre-roll of silence so Paula's first discarded word and startup latency
+     do not eat real audio content. */
+  if (STREAM_PREROLL_SEC > 0.0) {
+    size_t pre_frames = (size_t)(rate_hz * STREAM_PREROLL_SEC);
+    if (pre_frames > chunk_bytes) pre_frames = chunk_bytes;
+    if (pre_frames >= 2) {
+      uint8_t *zero = (uint8_t *)calloc(1, chunk_bytes);
+      if (zero) {
+        stop_channels(AUD_DMA_MASK[0]);
+        prime_channel_dat(0, zero, pre_frames);
+        write_chip_ram(addr_masked, zero, pre_frames);
+        uint16_t pre_len_words = (uint16_t)((pre_frames + 1u) / 2u);
+        program_channel_regs(0, addr_masked, pre_len_words, period, (uint8_t)vol);
+        start_channels(AUD_DMA_MASK[0]);
+        prev_play_sec = (double)pre_frames / rate_hz;
+        started = 1;
+        if (log_chunks) {
+          printf("[PREROLL] %.3fs silence frames=%zu\n", STREAM_PREROLL_SEC, pre_frames);
+        }
+      }
+      free(zero);
+    }
+  }
   while (offset < len && !stop_requested) {
     size_t chunk = len - offset;
     if (chunk > chunk_bytes) chunk = chunk_bytes;
@@ -488,7 +512,7 @@ static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
       double guard = prev_play_sec * STREAM_GUARD_LEAD;
       double tail = prev_play_sec - guard;
       if (guard > 0.0) sleep_seconds(guard);
-      // Preload next chunk pointers/len; DMA will pick them up on next restart.
+      // Preload next chunk pointers/len; Paula will pick them up on next restart.
       ps_write_16(AUD_LCH[0], (addr_slot >> 16) & 0x1Fu);
       ps_write_16(AUD_LCL[0], addr_slot & 0xFFFFu);
       ps_write_16(AUD_LEN[0], len_words);
@@ -559,6 +583,26 @@ static void audio_play_stream_stereo(uint32_t addr, const uint8_t *buf, size_t l
   int started = 0;
   size_t chunk_index = 0;
   size_t total_chunks = (total_frames + chunk_frames - 1u) / chunk_frames;
+  if (STREAM_PREROLL_SEC > 0.0) {
+    size_t pre_frames = (size_t)(rate_hz * STREAM_PREROLL_SEC);
+    if (pre_frames > chunk_frames) pre_frames = chunk_frames;
+    if (pre_frames >= 2) {
+      memset(left, 0, pre_frames);
+      memset(right, 0, pre_frames);
+      stop_channels(dma_mask);
+      prime_channel_dat(map->left, left, pre_frames);
+      prime_channel_dat(map->right, right, pre_frames);
+      uint16_t pre_len_words = (uint16_t)((pre_frames + 1u) / 2u);
+      program_channel_regs(map->left, addr_l, pre_len_words, period, (uint8_t)vol);
+      program_channel_regs(map->right, addr_r, pre_len_words, period, (uint8_t)vol);
+      start_channels(dma_mask);
+      prev_play_sec = (double)pre_frames / rate_hz;
+      started = 1;
+      if (log_chunks) {
+        printf("[PREROLL] %.3fs silence frames=%zu\n", STREAM_PREROLL_SEC, pre_frames);
+      }
+    }
+  }
   while (offset_frames < total_frames && !stop_requested) {
     size_t frames = total_frames - offset_frames;
     if (frames > chunk_frames) frames = chunk_frames;
@@ -597,8 +641,6 @@ static void audio_play_stream_stereo(uint32_t addr, const uint8_t *buf, size_t l
       double guard = prev_play_sec * STREAM_GUARD_LEAD;
       double tail = prev_play_sec - guard;
       if (guard > 0.0) sleep_seconds(guard);
-      prime_channel_dat(map->left, left, frames);
-      prime_channel_dat(map->right, right, frames);
       program_channel_regs(map->left, addr_l_slot, len_words, period, (uint8_t)vol);
       program_channel_regs(map->right, addr_r_slot, len_words, period, (uint8_t)vol);
       if (log_chunks) {
