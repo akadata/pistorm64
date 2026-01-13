@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0287.html
+TITLE: dos.library/Cli
+
 dos.library/Cli ]" border=0> NAME Cli -- Returns a pointer to the CLI structure of the process (V36) SYNOPSIS cli_ptr = Cli() D0 struct CommandLineInterface *Cli(void) FUNCTION Returns a pointer to the CLI structure of the current process, or NULL if the process has no CLI structure. RESULT cli_ptr - pointer to the CLI structure, or NULL. SEE ALSO [Back to Amiga Developer Docs ]

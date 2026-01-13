@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0214.html
+TITLE: intuition.library/EndRequest
+
 intuition.library/EndRequest ]" border=0> NAME EndRequest -- Remove a currently active requester. SYNOPSIS EndRequest( Requester , Window ) A0 A1 VOID EndRequest( struct Requester *, struct Window * ); FUNCTION Ends the request by erasing the requester and decoupling it from the window. Note that this doesn't necessarily clear all requesters from the window, only the specified one. If the window labors under other requesters, they will remain in the window. INPUTS Requester = pointer to the requester to be removed Window = pointer to the Window structure with which this requester is associated RESULT None BUGS SEE ALSO Request() [Back to Amiga Developer Docs ]

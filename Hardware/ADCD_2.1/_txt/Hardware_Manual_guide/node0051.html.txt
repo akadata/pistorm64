@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0051.html
+TITLE: 2 / Using the Copper Registers / Jump Strobe Address
+
 2 / Using the Copper Registers / Jump Strobe Address ]" border=0> When you write to a Copper strobe address, the Copper reloads its program counter from the corresponding location register . The Copper can write its own location registers and strobe addresses to perform programmed jumps. For instance, you might MOVE an indirect address into the COP2LC location register. Then, any MOVE instruction that addresses COPJMP2 strobes this indirect address into the program counter. There are two jump strobe addresses: COPJMP1/Restart Copper from address contained in COP1LC . COPJMP2/Restart Copper from address contained in COP2LC . [Back to Amiga Developer Docs ]

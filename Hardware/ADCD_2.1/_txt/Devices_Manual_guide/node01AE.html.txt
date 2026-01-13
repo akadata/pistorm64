@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node01AE.html
+TITLE: ILBM IFF Interleaved Bitmap / Standard Properties
+
 ILBM IFF Interleaved Bitmap / Standard Properties ]" border=0> ILBM has several defined property chunk s that act on the main data chunks. The required property " BMHD " and any optional properties must appear before any " BODY " chunk. (Since an ILBM has only one BODY chunk, any following properties would be superfluous.) Any of these properties may be shared over a LIST of several ILBMs by putting them in a PROP ILBM (See the EA IFF 85 document). BMHD CMAP GRAB DEST SPRT CAMG [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0270.html
+TITLE: fuelgauge_gc.doc
+
 fuelgauge_gc.doc ]" border=0> --datasheet-- FUELGAUGE_GetClass() [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node009C.html
+TITLE: C / New Features of the Enhanced Chip Set / New Blitter Range
+
 C / New Features of the Enhanced Chip Set / New Blitter Range ]" border=0> The enhanced Agnus provides rectangular blits up to 32k by 32k pixels in size. [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node03D3.html
+TITLE: utility.library/Date2Amiga
+
 utility.library/Date2Amiga ]" border=0> NAME Date2Amiga -- Calculate seconds from 01-Jan-1978. (V36) SYNOPSIS AmigaTime = Date2Amiga( Date ) D0 A0 ULONG Date2Amiga( struct ClockData * ); FUNCTION Calculates the number of seconds from 01-Jan-1978 to the date specified in the ClockData structure. INPUTS Date - pointer to a ClockData structure containing the date of interest. RESULTS AmigaTime - the number of seconds from 01-Jan-1978 to the date specified in Date. NOTES This function does no sanity checking of the data in Date. SEE ALSO Amiga2Date() , CheckDate() BUGS [Back to Amiga Developer Docs ]

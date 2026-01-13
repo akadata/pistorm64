@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0437.html
+TITLE: layout_gc.doc
+
 layout_gc.doc ]" border=0> --datasheet-- ActivateLayoutGadget() FlushLayoutDomainCache() LAYOUT_GetClass() LayoutLimits() RethinkLayout() [Back to Amiga Developer Docs ]

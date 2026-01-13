@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node051A.html
+TITLE: B / strgclass / Attributes: STRINGA_EditHook (I)
+
 B / strgclass / Attributes: STRINGA_EditHook (I) ]" border=0> Custom string gadget edit hook. [Back to Amiga Developer Docs ]

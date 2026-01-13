@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node00A0.html
+TITLE: Regions Index
+
 Regions Index ]" border=0> Regions, 703 changing, 722 clearing, 722 creating, 720 for clipping, 93 removing, 720 [Back to Amiga Developer Docs ]

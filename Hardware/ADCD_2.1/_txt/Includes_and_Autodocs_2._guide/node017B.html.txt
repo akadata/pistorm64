@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node017B.html
+TITLE: asl.doc
+
 asl.doc ]" border=0> AllocAslRequest() AslRequest() FreeFileRequest() AllocFileRequest() FreeAslRequest() RequestFile() [Back to Amiga Developer Docs ]

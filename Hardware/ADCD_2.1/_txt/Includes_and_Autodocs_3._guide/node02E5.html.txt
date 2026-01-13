@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node02E5.html
+TITLE: graphics.library/GetDrMd
+
 graphics.library/GetDrMd ]" border=0> NAME GetDrMd -- Get the draw mode value for a RastPort (V39). SYNOPSIS mode = GetDrMd ( rp ) d0 a0 ULONG GetDrMd(struct RastPort *) FUNCTION Return the current value of the draw mode for the rastport. This function should be used instead of peeking the structure directly, because future graphics devices may store it differently. INPUTS rp = a pointer to a valid RastPort structure. BUGS NOTES SEE ALSO SetDrMd() graphics/gfx.h [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node02AF.html
+TITLE: graphics.library/AttemptLockLayerRom
+
 graphics.library/AttemptLockLayerRom ]" border=0> * NAME AttemptLockLayerRom -- Attempt to Lock Layer structure by ROM(gfx lib) code SYNOPSIS gotit = AttemptLockLayerRom( layer ) d0 a5 BOOL AttempLockLayerRom( struct Layer * ); FUNCTION Query the current state of the lock on this Layer . If it is already locked then return FALSE, could not lock. If the Layer was not locked then lock it and return TRUE. This call does not destroy any registers. This call nests so that callers in this chain will not lock themselves out. INPUTS layer - pointer to Layer structure RESULT gotit - TRUE or FALSE depending on whether the Layer was successfully locked by the caller. SEE ALSO LockLayerRom() UnlockLayerRom() [Back to Amiga Developer Docs ]

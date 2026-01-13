@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node007A.html
+TITLE: Libraries Index
+
 Libraries Index ]" border=0> Libraries adding, 443 calling a library function, 437 relation to devices, 442 sharing library bases, 467 [Back to Amiga Developer Docs ]

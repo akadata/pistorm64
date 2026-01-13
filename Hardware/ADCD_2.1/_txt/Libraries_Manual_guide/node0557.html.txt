@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0557.html
+TITLE: D / Errors / Performance Loss in Other Processes
+
 D / Errors / Performance Loss in Other Processes ]" border=0> This is often caused by a one program doing one or more of the following: busy waiting or polling; running at a higher priority; doing lengthy Forbid() s, Disable() s, or interrupts. [Back to Amiga Developer Docs ]

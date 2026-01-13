@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node023F.html
+TITLE: 14 Workbench and Icon Library / The Icon Library
+
 14 Workbench and Icon Library / The Icon Library ]" border=0> The .info file is the center of interaction between applications and Workbench. To help support the Workbench iconic interface and manage .info files, the Amiga operating system provides the icon library. The icon library allows you to create icons for data files and directories under program control and examine icons to obtain their Tool Types and other characteristics. Icon Library Data Structures Icon Library Functions The Tool Types Array Example of Reading Icons and Parsing Tool Types [Back to Amiga Developer Docs ]

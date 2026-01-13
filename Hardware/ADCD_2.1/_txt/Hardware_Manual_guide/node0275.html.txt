@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0275.html
+TITLE: Memory allocation Index
+
 Memory allocation Index ]" border=0> Memory allocation audio, 137 formula for playfields, 76 playfields, 52 [Back to Amiga Developer Docs ]

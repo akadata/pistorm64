@@ -1,0 +1,1 @@
+10 / Example Printer Driver Source Code / HP_Laserjet ]" border=0> The driver for the HP_LaserJet can be generated with the following Makefile. Makefile init.asm transfer.asm macros.i data.c transfer.c printertag.asm dospecial.c density.c hp_rev.i render.c [Back to Amiga Developer Docs ]

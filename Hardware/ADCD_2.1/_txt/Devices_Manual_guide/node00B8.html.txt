@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node00B8.html
+TITLE: 5 Gameport Device / Setting and Reading the Controller Type
+
 5 Gameport Device / Setting and Reading the Controller Type ]" border=0> Determining The Controller Type Setting The Controller Type [Back to Amiga Developer Docs ]

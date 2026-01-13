@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node046F.html
+TITLE: 34 / Keymap Functions / Details Of the Keymap Structure
+
 34 / Keymap Functions / Details Of the Keymap Structure ]" border=0> A KeyMap structure contains pointers to arrays which determine the translation from raw key codes to ANSI characters. struct KeyMap { UBYTE *km_LoKeyMapTypes; ULONG *km_LoKeyMap; UBYTE *km_LoCapsable; UBYTE *km_LoRepeatable; UBYTE *km_HiKeyMapTypes; ULONG *km_HiKeyMap; UBYTE *km_HiCapsable; UBYTE *km_HiRepeatable; }; LoKeyMap and HighKeyMap String Output Keys LoKeyMapTypes and HiKeyMapTypes Capsable Bit Tables More About Qualifiers Repeatable Bit Tables [Back to Amiga Developer Docs ]

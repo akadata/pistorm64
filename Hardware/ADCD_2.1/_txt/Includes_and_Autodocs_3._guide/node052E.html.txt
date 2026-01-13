@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node052E.html
+TITLE: reaction.lib/LBRemNode
+
 reaction.lib/LBRemNode ]" border=0> NAME LBRemNode -- V41 listbrowser.gadget LBM_REMNODE method stub SYNOPSIS node = LBRemNode( gadget, window, requester, node ) ULONG LBRemNode( struct Gadget *, struct Window *, struct Requester *, struct Node * ); FUNCTION A function stub for calling LibDoGadgetMethodA() to remove and free a node from a listbrowser list. This function mostly exists for completeness's sake. INPUTS gadget = listbrowser object window = the window in which the gadget is, or NULL requester = the requester of the window, or NULL node = the node to free RESULT Nonzero on success. NOTES This function uses the LibDoGadgetMethodA() function also defined in this link library. SEE ALSO LibDoGadgetMethodA() [Back to Amiga Developer Docs ]

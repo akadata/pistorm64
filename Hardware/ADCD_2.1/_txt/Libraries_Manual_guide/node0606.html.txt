@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0606.html
+TITLE: lib_examples/sample_protos.h
+
 lib_examples/sample_protos.h ]" border=0> /* sample_protos.h - prototypes for sample.library functions */ #ifndef SAMPLE_PROTOS_H #define SAMPLE_PROTOS_H LONG AddThese(LONG,LONG); LONG Double(LONG); #endif /* SAMPLE_PROTOS_H */ [Back to Amiga Developer Docs ]

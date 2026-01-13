@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node00A9.html
+TITLE: Scrolling Index
+
 Scrolling Index ]" border=0> Scrolling a RastPort, 593 auto screen, 49 keyboard qualifiers, 74 screens, 63 , 74 [Back to Amiga Developer Docs ]

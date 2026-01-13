@@ -1,0 +1,1 @@
+A Register Summary / DENISEID ]" border=0> Agnus/ Read/ Denise/ Register Address Write Paula Function -------- ------- ----- ------- -------- DENISEID 07C R D( E ) Chip revision level for Denise (video out chip) [Back to Amiga Developer Docs ]

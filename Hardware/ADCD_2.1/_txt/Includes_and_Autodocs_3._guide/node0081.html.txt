@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0081.html
+TITLE: bitmap_ic.doc
+
 bitmap_ic.doc ]" border=0> --datasheet-- BITMAP_GetClass() [Back to Amiga Developer Docs ]

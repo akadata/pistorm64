@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0457.html
+TITLE: graphics.library/InitVPort
+
 graphics.library/InitVPort ]" border=0> NAME InitVPort - Initialize ViewPort structure. SYNOPSIS InitVPort( vp ) a0 void InitVPort( struct ViewPort * ); FUNCTION Initialize ViewPort structure to default values. INPUTS vp - pointer to a ViewPort structure RESULT ViewPort structure set to all 0's. (1.0,1.1) New field added SpritePriorities, initialized to 0x24 (1.2) BUGS SEE ALSO MakeVPort() graphics/view.h [Back to Amiga Developer Docs ]

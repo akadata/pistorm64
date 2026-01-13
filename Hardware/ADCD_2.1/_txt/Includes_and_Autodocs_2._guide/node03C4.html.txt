@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node03C4.html
+TITLE: mathffp.library/SPCmp
+
 mathffp.library/SPCmp ]" border=0> NAME SPCmp -- Compares two floating point numbers. SYNOPSIS result = SPCmp(fnum1, fnum2) D0 D0 D1 int SPCmp(float fnum1, float fnum2); FUNCTION Accepts two floating point numbers and returns the condition codes set to indicate the result of said comparison. Additionally, the integer functional result is returned to indicate the result of said comparison. INPUTS fnum1 - floating point number. fnum2 - floating point number. RESULT Condition codes set to reflect the following branches: GT - fnum2 > fnum1 GE - fnum2 >= fnum1 EQ - fnum2 = fnum1 NE - fnum2 != fnum1 LT - fnum2 fnum1 > fnum2 -1 => fnum1 fnum1 = fnum2 BUGS None. SEE ALSO [Back to Amiga Developer Docs ]

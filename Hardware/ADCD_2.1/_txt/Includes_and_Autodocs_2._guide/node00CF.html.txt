@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node00CF.html
+TITLE: Includes/hardware/blit.i
+
 Includes/hardware/blit.i ]" border=0> IFND HARDWARE_BLIT_I HARDWARE_BLIT_I SET 1 ** ** $Filename: hardware/blit.i $ ** $Release: 2.04 Includes, V37.4 $ ** $Revision: 36.3 $ ** $Date: 90/11/05 $ ** ** Defines for direct hardware use of the blitter. ** ** (C) Copyright 1985-1999 Amiga, Inc. ** All Rights Reserved ** IFND EXEC_TYPES_I INCLUDE "exec/types.i" ENDC ;EXEC_TYPES_I STRUCTURE bltnode,0 LONG bn_n LONG bn_function BYTE bn_stat BYTE bn_dummy WORD bn_blitsize WORD bn_beamsync LONG bn_cleanup LABEL bn_SIZEOF * bit defines used by blit queuer CLEANMEn equ 6 CLEANME equ 1 [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0230.html
+TITLE: 13 / Preferences in Release 2 / OSCN
+
 13 / Preferences in Release 2 / OSCN ]" border=0> struct OverscanPrefs { ULONG os_Reserved[4]; ULONG os_DisplayID; /* Displaymode ID */ Point os_ViewPos; /* View X/Y Offset */ Point os_Text; /* TEXT overscan dimension */ struct Rectangle os_Standard; /* STANDARD overscan dimension */ }; [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0181.html
+TITLE: asl.library/RequestFile
+
 asl.library/RequestFile ]" border=0> NAME RequestFile -- request user to select file(s) (V36) SYNOPSIS BOOL result = RequestFile( request ) D0 A0 BOOL result; struct FileRequester *request; FUNCTION RequestFile() displays a file requester and waits for the user to select filenames or cancel the request. This function is identical to the AslRequest() function, except that there is no TagList to modify the settings for the requester. See AslRequest() for details. INPUT request = struct FileRequester * returned by AllocFileRequest() . RESULT result - See AslRequest() result. NULL indicates cancelled. SEE ALSO AllocFileRequest() , FreeFileRequest() , AslRequest() [Back to Amiga Developer Docs ]

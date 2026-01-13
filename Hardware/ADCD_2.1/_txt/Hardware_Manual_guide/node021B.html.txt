@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node021B.html
+TITLE: Glossary / quantization noise
+
 Glossary / quantization noise ]" border=0> In audio applications, noise introduced by round-off errors when you are trying to reproduce a signal by approximation. [Back to Amiga Developer Docs ]

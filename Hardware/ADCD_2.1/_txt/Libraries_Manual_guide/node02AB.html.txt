@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node02AB.html
+TITLE: 20 / Memory Functions / Memory Information Functions
+
 20 / Memory Functions / Memory Information Functions ]" border=0> The memory information routines AvailMem() and TypeOfMem() can provide the amount of memory available in the system, and the attributes of a particular block of memory. Memory Requirements Calling Memory Information Functions [Back to Amiga Developer Docs ]

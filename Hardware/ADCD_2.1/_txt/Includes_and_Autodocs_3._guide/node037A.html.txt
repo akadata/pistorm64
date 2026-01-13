@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node037A.html
+TITLE: iffparse.library/StopChunk
+
 iffparse.library/StopChunk ]" border=0> NAME StopChunk -- declare a chunk which should cause ParseIFF to return. (V36) SYNOPSIS error = StopChunk(iff, type, id); D0 A0 D0 D1 LONG StopChunk(struct IFFHandle *, LONG , LONG); type; FUNCTION Installs an entry handler for the specified chunk which will cause the ParseIFF() function to return control to the caller when this chunk is encountered. This is only of value when ParseIFF() is called with the IFFPARSE_SCAN control code. INPUTS iff - pointer to IFFHandle structure (need not be open). type - type code for chunk to declare (ex. "ILBM"). id - identifier for chunk to declare (ex. "BODY"). RESULT error - 0 if successful or an IFFERR_#? error code if unsuccessful. SEE ALSO StopChunks() , ParseIFF() , [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0315.html
+TITLE: graphics.library/RemBob
+
 graphics.library/RemBob ]" border=0> NAME RemBob -- Macro to remove a Bob from the gel list. SYNOPSIS RemBob(bob) RemBob(struct Bob *); FUNCTION Marks a Bob as no-longer-required. The gels internal code then removes the Bob from the list of active gels the next time DrawGList is executed. This is implemented as a macro. If the user is double-buffering the Bob , it could take two calls to DrawGList before the Bob actually disappears from the RastPort . INPUTS Bob = pointer to the Bob to be removed RESULT BUGS SEE ALSO RemIBob() DrawGList() graphics/gels.h graphics/gfxmacros.h [Back to Amiga Developer Docs ]

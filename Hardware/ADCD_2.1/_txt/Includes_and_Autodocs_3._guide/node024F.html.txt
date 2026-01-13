@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node024F.html
+TITLE: SAD/READ_ARRAY
+
 SAD/READ_ARRAY ]" border=0> READ ARRAY - Read a range of bytes Command: $AF $0F Data: $ww $xx $yy $zz $qq $rr $ss $tt Read a range of bytes from address for bytes Will return that number of bytes... Command will be ACK'ed when received. Command ACK: $00 $0F Command DONE: $1F $0F $uu [$uu ...] [Back to Amiga Developer Docs ]

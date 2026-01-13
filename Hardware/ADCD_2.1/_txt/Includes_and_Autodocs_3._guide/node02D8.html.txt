@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node02D8.html
+TITLE: graphics.library/FreeCopList
+
 graphics.library/FreeCopList ]" border=0> NAME FreeCopList -- deallocate intermediate copper list SYNOPSIS FreeCopList(coplist) a0 void FreeCopList( struct CopList *); FUNCTION Deallocate all memory associated with this copper list. INPUTS coplist - pointer to structure CopList RESULTS memory returned to memory manager BUGS SEE ALSO graphics/copper.h [Back to Amiga Developer Docs ]

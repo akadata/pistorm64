@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0166.html
+TITLE: 5 / String Gadget Type / String Gadget IDCMP Messages
+
 5 / String Gadget Type / String Gadget IDCMP Messages ]" border=0> If the application has specified the GACT_RELVERIFY activation flag, it will be sent an IDCMP_GADGETUP message when the gadget is properly deactivated. This happens when Return or Enter is pressed, when tabbing to the next string gadget (where supported), and when a custom string editing hook returns SGA_END . The gadget may become inactive without the application receiving an IDCMP_GADGETUP message. This will happen if the user performs some other operation with the mouse or if another window is activated. The gadget may still contain updated, valid information even though the IDCMP_GADGETUP message was not received. [Back to Amiga Developer Docs ]

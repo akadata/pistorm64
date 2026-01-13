@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node035F.html
+TITLE: iffparse.library/CurrentChunk
+
 iffparse.library/CurrentChunk ]" border=0> NAME CurrentChunk -- get context node for current chunk. (V36) SYNOPSIS top = CurrentChunk(iff); D0 A0 struct ContextNode *CurrentChunk(struct IFFHandle *); FUNCTION Returns the top context node for the given IFFHandle structure. The top context node corresponds to the chunk most recently pushed on the stack, which is the chunk where the stream is currently positioned. The ContextNode structure contains information on the type of chunk currently being parsed (or written), its size and the current position within the chunk. INPUTS iff - pointer to IFFHandle structure RESULT top - pointer to top context node or NULL if none SEE ALSO PushChunk() , PopChunk() , ParseIFF() , ParentChunk() , [Back to Amiga Developer Docs ]

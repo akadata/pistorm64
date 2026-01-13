@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0532.html
+TITLE: realtime.doc
+
 realtime.doc ]" border=0> CreatePlayer() DeletePlayer() ExternalSync() FindConductor() GetPlayerAttrsA() LockRealTime() NextConductor() SetConductorState() SetPlayerAttrs() UnlockRealTime() [Back to Amiga Developer Docs ]

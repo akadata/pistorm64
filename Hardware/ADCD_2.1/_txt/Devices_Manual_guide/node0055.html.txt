@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0055.html
+TITLE: 10 / Creating a Printer Driver / Writing Alphanumeric Printer Drivers
+
 10 / Creating a Printer Driver / Writing Alphanumeric Printer Drivers ]" border=0> The alphanumeric portion of the printer driver is designed to convert ANSI x3.64 style commands into the specific escape codes required by each individual printer. For example, the ANSI code for underline-on is ESC[4m. The Commodore MPS-1250 printer would like a ESC[-1 to set underline-on. The HP LaserJet accepts ESC[&dD as a start underline command. By using the printer driver, all printers may be handled in a similar manner. There are two parts to the alphanumeric portion of the printer driver: the Command Table data table and the DoSpecial() routine. Command Table DoSpecial() Printertag.asm Extended Character Table Character Conversion Routine [Back to Amiga Developer Docs ]

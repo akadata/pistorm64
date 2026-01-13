@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node020A.html
+TITLE: 12 / / The Public Classes / The Gadgetclass Subclasses
+
 12 / / The Public Classes / The Gadgetclass Subclasses ]" border=0> Like imageclass , applications do not normally create objects of gadgetclass , but instead create objects of its subclasses. Currently, gadgetclass has four subclasses: propgclass An easy to implement, horizontal or vertical proportional gadget. strgclass A string gadget. groupgclass A special gadget class that creates one composite gadget out of several others. buttongclass A button gadget that keeps sending button presses while the user holds it down. buttongclass has a subclass of its own: frbuttonclass A buttongclass gadget that outlines its imagery with a frame. For specific information on these classes, see the Boopsi Class Reference in the Appendix B of this manual. [Back to Amiga Developer Docs ]

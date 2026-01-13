@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0072.html
+TITLE: J Index
+
 J Index ]" border=0> JAM1, 234 , 237 , 239 , 242-243 , 585 - with INVERSVID, 585 JAM1 mode - in drawing, 584 JAM2, 239 , 242-243 , 585 JAM2 mode - in drawing, 584 Justification - menu item text, 190 [Back to Amiga Developer Docs ]

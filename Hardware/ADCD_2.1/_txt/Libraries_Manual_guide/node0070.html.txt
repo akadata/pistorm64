@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0070.html
+TITLE: IntuiText structure Index
+
 IntuiText structure Index ]" border=0> IntuiText structure, 123 , 180 , 190 , 191 , 192 , 213 , 223 , 224 , 239 , 239-240 , 240 , 243 BackPen, 239 , 242-243 DrawMode, 239 FrontPen, 239-240 , 242-243 IText, 240 , 241 ITextFont, 240 , 241 , 243 LeftEdge, 240 , 240 NextText, 240 , 243 TopEdge, 240 , 240 [Back to Amiga Developer Docs ]

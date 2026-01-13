@@ -1,0 +1,1 @@
+Glossary / device ]" border=0> A PIC; e.g., a Zorro bus master or bus slave. [Back to Amiga Developer Docs ]

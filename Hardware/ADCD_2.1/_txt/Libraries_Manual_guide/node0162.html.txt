@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0162.html
+TITLE: 5 / / Initialization of Proportional Gadget / of the Gadget Structure
+
 5 / / Initialization of Proportional Gadget / of the Gadget Structure ]" border=0> In the Gadget structure, set the GadgetType field to GTYP_PROPGADGET and place the address of the PropInfo structure in the SpecialInfo field. When using AUTOKNOB , the GadgetRender field must point to an Image structure. The Image need not be initialized when using AUTOKNOB, but the structure must be provided. These Image structures may not be shared between gadgets, each must have its own. To use application imagery for the knob , set GadgetRender to point to an initialized Image structure. If the knob highlighting is done by alternate image ( GFLG_GADGHIMAGE ), the alternate image must be the same size and type as the normal knob image. [Back to Amiga Developer Docs ]

@@ -1,0 +1,1 @@
+Glossary / Denise ]" border=0> One of the three main Amiga custom chips. Contains the circuitry for the color pallete, sprites, and video output. [Back to Amiga Developer Docs ]

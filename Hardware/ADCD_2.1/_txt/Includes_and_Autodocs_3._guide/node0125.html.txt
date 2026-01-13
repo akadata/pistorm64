@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0125.html
+TITLE: debug.lib/KGetChar
+
 debug.lib/KGetChar ]" border=0> NAME KGetChar - get a character from the console (defaults to the serial port at 9600 baud) SYNOPSIS char = KGetChar() D0 FUNCTION busy wait until a character arrives from the console. KGetChar is the assembly interface, _KGetChar and _kgetc are the C interfaces. [Back to Amiga Developer Docs ]

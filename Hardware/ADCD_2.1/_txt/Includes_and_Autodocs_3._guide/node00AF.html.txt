@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node00AF.html
+TITLE: cd.device/CD_PROTSTATUS
+
 cd.device/CD_PROTSTATUS ]" border=0> NAME CD_PROTSTATUS -- return whether the current disk is write-protected. FUNCTION This command is used to determine whether the current disk is write-protected. Currently, this function always returns write- protected status. If write-once CDs are made available at some point, this may change. IO REQUEST INPUT io_Device preset by the call to OpenDevice() io_Unit preset by the call to OpenDevice() io_Command CD_PROTSTATUS IO REQUEST RESULT io_Error - 0 for success, or an error code as defined in io_Actual - 0 means the disk is NOT write-protected, while any other value indicates it is. [Back to Amiga Developer Docs ]

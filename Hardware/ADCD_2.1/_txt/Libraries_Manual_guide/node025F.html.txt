@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node025F.html
+TITLE: 15 / GadTools Gadgets / The Kinds of GadTools Gadgets
+
 15 / GadTools Gadgets / The Kinds of GadTools Gadgets ]" border=0> This section discusses the unique features of each kind of gadget supported by the GadTools library. Button Gadgets Text-Entry and Number-Entry Gadgets Checkbox Gadgets Mutually-Exclusive Gadgets Cycle Gadgets Slider Gadgets Scroller Gadgets Listview Gadgets Palette Gadgets Text-Display and Numeric-Display Gadgets Generic Gadgets [Back to Amiga Developer Docs ]

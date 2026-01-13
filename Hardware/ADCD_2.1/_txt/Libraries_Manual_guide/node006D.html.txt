@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node006D.html
+TITLE: Interrupt Structure Index
+
 Interrupt Structure Index ]" border=0> Interrupt Structure, 520 , 521 , 521 , 525 , 527 is_Data, 521 , 524 , 525 is_Node, 525 [Back to Amiga Developer Docs ]

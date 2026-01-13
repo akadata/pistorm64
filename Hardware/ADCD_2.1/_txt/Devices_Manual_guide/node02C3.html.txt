@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node02C3.html
+TITLE: SMUS IFF Simple Musical Score / Appendix A. Quick Reference
+
 SMUS IFF Simple Musical Score / Appendix A. Quick Reference ]" border=0> Type Definitions SMUS Regular Expression [Back to Amiga Developer Docs ]

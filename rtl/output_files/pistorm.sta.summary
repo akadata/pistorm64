@@ -1,0 +1,29 @@
+------------------------------------------------------------
+TimeQuest Timing Analyzer Summary
+------------------------------------------------------------
+
+Type  : Setup 'PI_CLK'
+Slack : 0.073
+TNS   : 0.000
+
+Type  : Setup 'M68K_CLK'
+Slack : 66.559
+TNS   : 0.000
+
+Type  : Hold 'PI_CLK'
+Slack : 1.375
+TNS   : 0.000
+
+Type  : Hold 'M68K_CLK'
+Slack : 1.640
+TNS   : 0.000
+
+Type  : Minimum Pulse Width 'PI_CLK'
+Slack : 1.711
+TNS   : 0.000
+
+Type  : Minimum Pulse Width 'M68K_CLK'
+Slack : 70.234
+TNS   : 0.000
+
+------------------------------------------------------------

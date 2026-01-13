@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0470.html
+TITLE: mathffp.doc
+
 mathffp.doc ]" border=0> SPAbs() SPAdd() SPCeil() SPCmp() SPDiv() SPFix() SPFloor() SPFlt() SPMul() SPNeg() SPSub() SPTst() [Back to Amiga Developer Docs ]

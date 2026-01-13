@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node04D8.html
+TITLE: clipboard.doc
+
 clipboard.doc ]" border=0> CBD_CHANGEHOOK CBD_POST CMD_WRITE CBD_CURRENTREADID CMD_READ CBD_CURRENTWRITEID CMD_UPDATE [Back to Amiga Developer Docs ]

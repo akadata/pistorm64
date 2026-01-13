@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01BC.html
+TITLE: Glossary / automatic mode
+
 Glossary / automatic mode ]" border=0> 1. With sprites, the normal mode in which the sprite DMA channel automatically retrieves and displays all of the data for a sprite. 2. In audio applications, the normal mode in which the audio DMA channels automatically retrieve sound data. [Back to Amiga Developer Docs ]

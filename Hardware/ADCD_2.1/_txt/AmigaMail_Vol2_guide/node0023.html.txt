@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node0023.html
+TITLE: Gameport.device
+
 Gameport.device ]" border=0> * Initial state of hardware lines may differ. [Back to Amiga Developer Docs ]

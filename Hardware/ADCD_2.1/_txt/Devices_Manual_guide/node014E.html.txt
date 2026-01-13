@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node014E.html
+TITLE: RigidDiskBlock Index
+
 RigidDiskBlock Index ]" border=0> RigidDiskBlock, 253 creation, 253 non-ROM filing system, 257 specification, 253 use of information, 256 [Back to Amiga Developer Docs ]

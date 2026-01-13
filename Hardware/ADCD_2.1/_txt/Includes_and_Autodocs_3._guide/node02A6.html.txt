@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node02A6.html
+TITLE: graphics.library/Animate
+
 graphics.library/Animate ]" border=0> NAME Animate -- Processes every AnimOb in the current animation list. SYNOPSIS Animate(anKey, rp) A0 A1 void Animate(struct AnimOb **, struct RastPort *); FUNCTION For every AnimOb in the list - update its location and velocities - call the AnimOb's special routine if one is supplied - for each component of the AnimOb - if this sequence times out, switch to the new one - call this component's special routine if one is supplied - set the sequence's VSprite's y,x coordinates based on whatever these routines cause INPUTS ankey = address of the variable that points to the head AnimOb rp = pointer to the RastPort structure RESULT BUGS SEE ALSO AddAnimOb() graphics/gels.h graphics/rastport.h [Back to Amiga Developer Docs ]

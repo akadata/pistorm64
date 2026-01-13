@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0139.html
+TITLE: Graphic Dumps Index
+
 Graphic Dumps Index ]" border=0> Graphic Dumps additional notes, 194 [Back to Amiga Developer Docs ]

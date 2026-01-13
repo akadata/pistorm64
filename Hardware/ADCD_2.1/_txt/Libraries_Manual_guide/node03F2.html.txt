@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node03F2.html
+TITLE: 30 / / / Allocating and Deallocating Layer_Info
+
 30 / / / Allocating and Deallocating Layer_Info ]" border=0> Use NewLayerInfo() to allocate and initialize a Layer_Info structure and associated sub-structures. struct Layer_Info *NewLayerInfo( void ); You must call this function before attempting to use any of the other layers functions described below. When you have finished with a Layer_Info structure, use DisposeLayerInfo() to deallocate it. void DisposeLayerInfo( struct Layer_Info *li ); This function deallocates a Layer_Info and associated structures previously allocated with NewLayerInfo() . [Back to Amiga Developer Docs ]

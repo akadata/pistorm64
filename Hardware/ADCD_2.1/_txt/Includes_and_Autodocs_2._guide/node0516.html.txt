@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0516.html
+TITLE: printer.device/CMD_START
+
 printer.device/CMD_START ]" border=0> NAME CMD_START -- restart after stop (immediate) FUNCTION CMD_START restarts the unit after a stop command. IO REQUEST io_Message mn_ReplyPort set if quick I/O is not possible io_Device preset by the call to OpenDevice io_Command CMD_START io_Flags IOB_QUICK set if quick I/O is possible [Back to Amiga Developer Docs ]

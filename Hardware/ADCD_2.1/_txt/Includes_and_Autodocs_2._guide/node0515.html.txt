@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0515.html
+TITLE: printer.device/CMD_RESET
+
 printer.device/CMD_RESET ]" border=0> NAME CMD_RESET -- reset the printer FUNCTION CMD_RESET resets the printer device without destroying handles to the open device. IO REQUEST io_Message mn_ReplyPort set if quick I/O is not possible io_Device preset by the call to OpenDevice io_Command CMD_RESET io_Flags IOB_QUICK set if quick I/O is possible [Back to Amiga Developer Docs ]

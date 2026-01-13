@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node010F.html
+TITLE: E / Explanation of Connectors / External Disk Interface Specification
+
 E / Explanation of Connectors / External Disk Interface Specification ]" border=0> The 23-pin D-type connector with sockets (DB23S) at the rear of the Amiga is nominally used to interface to MFM devices. Pin Assignment (J7) Identification Mode Limitations [Back to Amiga Developer Docs ]

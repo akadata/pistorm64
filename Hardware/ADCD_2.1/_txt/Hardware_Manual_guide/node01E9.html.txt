@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01E9.html
+TITLE: Glossary / dual-playfield mode
+
 Glossary / dual-playfield mode ]" border=0> A display mode that allows you to manage two separate display memories, giving you two separately controllable displays at the same time. [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node050A.html
+TITLE: B / propgclass / Attributes: GA_Border (I)
+
 B / propgclass / Attributes: GA_Border (I) ]" border=0> Propgclass intercepts this gadgetclass attribute to prevent gadgetclass from setting up a border. If an application tries to set this attribute for a propgclass gadget, the prop gadget turns itself into an AUTOKNOB gadget. [Back to Amiga Developer Docs ]

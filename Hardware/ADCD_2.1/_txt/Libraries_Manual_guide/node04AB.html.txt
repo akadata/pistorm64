@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node04AB.html
+TITLE: 37 / Function Reference / 32-Bit Integer Math Function Reference
+
 37 / Function Reference / 32-Bit Integer Math Function Reference ]" border=0> The following are brief descriptions of the utility library functions which pertain to 32-bit integer math. Table 37-8: Utility 32-Bit Math Functions ___________________________________________________________ | | | Function Description | |===========================================================| | SDivMod32() Signed 32 by 32-bit division and modulus. | | SMult32() Signed 32 by 32-bit multiplication. | |-----------------------------------------------------------| | UDivMod32() Unsigned 32 by 32-bit division modulus. | | UMult32() Unsigned 32 by 32-bit multiplication. | |___________________________________________________________| [Back to Amiga Developer Docs ]

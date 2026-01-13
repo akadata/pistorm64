@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0223.html
+TITLE: Glossary / sampling rate
+
 Glossary / sampling rate ]" border=0> The number of samples played per second. Also used to mean the rate at which the samples were originally recorded. [Back to Amiga Developer Docs ]

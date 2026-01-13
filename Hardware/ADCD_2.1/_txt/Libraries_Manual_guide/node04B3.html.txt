@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node04B3.html
+TITLE: A / Amiga.lib / Graphics
+
 A / Amiga.lib / Graphics ]" border=0> AddTOF() and RemTOF() AddTOF() adds a task to the vertical-blanking interval interrupt server chain. This frees C programmers from the burden of having to write an assembly language routine to perform this function. The task can be removed with RemTOF(). [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0544.html
+TITLE: resource.library/RL_NewObjectA
+
 resource.library/RL_NewObjectA ]" border=0> NAME RL_NewObjectA - create a new object (V44) SYNOPSIS object = RL_NewObjectA(resource,id,taglist) D0 A0 D0 A1 Object *RL_NewObjectA(RESOURCEFILE, RESOURCEID, struct TagItem *);; FUNCTION The routine creates a new object with a given numeric id. INPUTS resource -- a pointer to a resource id -- a numeric id taglist -- a pointer to an array of TagItem . The tags are moved forward to the call of NewObjectA, NewDTObjectA or whatever is called to create the object RESULTS object -- a pointer to an Object or NULL. SEE ALSO intuition.library/NewObjectA datatypes.library/NewDTObjectA resource.library/RL_DisposeObject [Back to Amiga Developer Docs ]

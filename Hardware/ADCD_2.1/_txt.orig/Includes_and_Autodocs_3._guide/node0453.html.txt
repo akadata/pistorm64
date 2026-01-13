@@ -1,0 +1,1 @@
+locale.library/CloseLocale ]" border=0> NAME CloseLocale -- close a locale. (V38) SYNOPSIS CloseLocale(locale); A0 VOID CloseLocale(struct Locale *); FUNCTION Concludes access to a locale. INPUTS locale - an opened locale. A NULL locale is a valid parameter and is simply ignored. SEE ALSO OpenLocale() , [Back to Amiga Developer Docs ]

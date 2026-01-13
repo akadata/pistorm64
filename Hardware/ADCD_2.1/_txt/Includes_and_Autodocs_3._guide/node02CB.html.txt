@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node02CB.html
+TITLE: graphics.library/DisposeRegion
+
 graphics.library/DisposeRegion ]" border=0> NAME DisposeRegion -- Return all space for this region to free memory pool. SYNOPSIS DisposeRegion(region) a0 void DisposeRegion( struct Region * ); FUNCTION Free all RegionRectangles for this Region then free the Region itself. INPUTS region - pointer to Region structure BUGS SEE ALSO NewRegion() graphics/regions.h [Back to Amiga Developer Docs ]

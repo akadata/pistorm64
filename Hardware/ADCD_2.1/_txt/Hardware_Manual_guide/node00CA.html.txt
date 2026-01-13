@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node00CA.html
+TITLE: 4 / Summary of Sprite Registers / Pointers
+
 4 / Summary of Sprite Registers / Pointers ]" border=0> Pointers are registers that are used by the system to point to the current data being used. During a screen display, the registers are incremented to point to the data being used as the screen display progresses. Therefore, pointer registers must be freshly written during the start of the vertical blanking period. SPR0PTH and SPR0PTL [Back to Amiga Developer Docs ]

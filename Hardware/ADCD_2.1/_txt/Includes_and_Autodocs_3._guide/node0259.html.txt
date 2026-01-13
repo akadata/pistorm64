@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0259.html
+TITLE: SAD/WRITE_LONG
+
 SAD/WRITE_LONG ]" border=0> WRITE LONG - Write the given data to the address given Command: $AF $03 Data: $ww $xx $yy $zz $qq $rr $ss $tt Write the long to address Command will be ACK'ed when received. Command ACK: $00 $03 Command DONE: $1F $03 [Back to Amiga Developer Docs ]

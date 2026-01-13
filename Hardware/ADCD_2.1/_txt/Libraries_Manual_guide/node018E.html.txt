@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node018E.html
+TITLE: 6 / Setting Up Menus / Toggle Selection
+
 6 / Setting Up Menus / Toggle Selection ]" border=0> Some of the checkmarked menu items may be of the toggle select type. Each time the user accesses such an item, it changes state, selected or unselected. To make an attribute item toggle select, set both the CHECKIT and the MENUTOGGLE flags for that menu item. Of course, the CHECKED flag may be preset to the desired initial state. [Back to Amiga Developer Docs ]

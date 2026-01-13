@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node00A7.html
+TITLE: Screen Structure Index
+
 Screen Structure Index ]" border=0> Screen Structure, 40 , 45 , 54 , 58 , 82 , 108 , 235 1.3 compatible usage, 19 BarLayer, 40 BitMap, 40 BlockPen, 55 DetailPen, 55 Font, 41 , 58 , 215 LayerInfo, 40 LeftEdge, 40 , 86 MouseX, 40 MouseY, 40 RastPort, 40 TopEdge, 40 , 86 UserData, 41 ViewPort, 40 , 64 WBorBottom, 40 , 89 WBorLeft, 40 , 89 WBorRight, 40 , 89 WBorTop, 40 , 89 [Back to Amiga Developer Docs ]

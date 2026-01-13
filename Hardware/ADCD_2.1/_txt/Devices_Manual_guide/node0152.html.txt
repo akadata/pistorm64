@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0152.html
+TITLE: Setting The Mouse Position Index
+
 Setting The Mouse Position Index ]" border=0> Setting The Mouse Position basic method, 110 pre-V36 absolute position, 110 pre-V36 relative position, 110 V36 absolute position, 110 V36 normalized position, 110 V36 relative position, 110 [Back to Amiga Developer Docs ]

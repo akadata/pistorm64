@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node04D0.html
+TITLE: B / modelclass / Changed Methods: OM_NOTIFY/OM_UPDATE
+
 B / modelclass / Changed Methods: OM_NOTIFY/OM_UPDATE ]" border=0> This method tells an object to forward the message in the form of an OM_UPDATE message to all the objects in its broadcast list. The modelclass does not map the attributes in these OM_UPDATE messages. Because modelclass inherits behavior from icclass , if the model has an ICA_TARGET and ICA_MAP , it will also send a mapped OM_UPDATE message to its ICA_TARGET. The return values for these methods are not explicitly defined. See the rootclass OM_NOTIFY / OM_UPDATE and icclass OM_NOTIFY/OM_UPDATE descriptions for more information. [Back to Amiga Developer Docs ]

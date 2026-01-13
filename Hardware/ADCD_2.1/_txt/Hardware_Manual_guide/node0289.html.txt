@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0289.html
+TITLE: VPOSR Index
+
 VPOSR Index ]" border=0> VPOSR, 229 , 298 , 299 in playfields, 66 with beam counter, 216 with light pen, 238-239 [Back to Amiga Developer Docs ]

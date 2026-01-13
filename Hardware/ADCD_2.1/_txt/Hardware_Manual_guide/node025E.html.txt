@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node025E.html
+TITLE: Custom Chips Index
+
 Custom Chips Index ]" border=0> Custom Chips, 2 , 170 , 255 control registers, 19 register, 263 steal cycles, 4 [Back to Amiga Developer Docs ]

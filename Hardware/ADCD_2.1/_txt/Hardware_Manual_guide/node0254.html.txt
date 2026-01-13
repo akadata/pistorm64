@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0254.html
+TITLE: CIAAPRA Index
+
 CIAAPRA Index ]" border=0> CIAAPRA, 229 , 232 , 233 , 241 , 241 disk, 244 [Back to Amiga Developer Docs ]

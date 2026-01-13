@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node005C.html
+TITLE: asl.library/FreeAslRequest
+
 asl.library/FreeAslRequest ]" border=0> NAME FreeAslRequest -- frees resources allocated by AllocAslRequest() . (V36) SYNOPSIS FreeAslRequest(requester); A0 VOID FreeAslRequest(APTR); FUNCTION FreeAslRequest() frees any system resources allocated by AllocAslRequest() . Once a requester has been freed, it can no longer be used with other calls to AslRequest() . INPUTS requester - requester obtained from AllocAslRequest() , or NULL in which case this function does nothing. SEE ALSO AllocAslRequest() [Back to Amiga Developer Docs ]

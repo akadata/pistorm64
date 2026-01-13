@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node015B.html
+TITLE: dos.library/ExAllEnd
+
 dos.library/ExAllEnd ]" border=0> NAME ExAllEnd -- Stop an ExAll() (V39) SYNOPSIS ExAllEnd(lock, buffer, size, type, control) D1 D2 D3 D4 D5 ExAllEnd(BPTR, STRPTR , LONG , LONG ,struct ExAllControl *) FUNCTION Stops an ExAll() on a directory before it hits NO_MORE_ENTRIES. The full set of arguments that had been passed to ExAll() must be passed to ExAllEnd(), so it can handle filesystems that can't abort an ExAll() directly. INPUTS lock - Lock on directory to be examined. buffer - Buffer for data returned (MUST be at least word-aligned, preferably long-word aligned). size - Size in bytes of 'buffer'. type - Type of data to be returned. control - Control data structure (see notes above). MUST have been allocated by AllocDosObject! SEE ALSO ExAll() , AllocDosObject() [Back to Amiga Developer Docs ]

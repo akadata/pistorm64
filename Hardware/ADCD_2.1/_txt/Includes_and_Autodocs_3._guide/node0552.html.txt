@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0552.html
+TITLE: scroller_gc.doc
+
 scroller_gc.doc ]" border=0> --datasheet-- SCROLLER_GetClass() [Back to Amiga Developer Docs ]

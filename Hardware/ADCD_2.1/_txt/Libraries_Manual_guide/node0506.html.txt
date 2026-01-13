@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0506.html
+TITLE: B / gadgetclass / Attributes: GA_SysGType (IS)
+
 B / gadgetclass / Attributes: GA_SysGType (IS) ]" border=0> This attribute corresponds to the system gadget type portion of the gadget's Gadget.GadgetType fields. This attribute is any one of the following flags (from intuition.h >): GTYP_SIZING, GTYP_WDRAGGING, GTYP_SDRAGGING, GTYP_WUPFRONT, GTYP_SUPFRONT, GTYP_WDOWNBACK, GTYP_SDOWNBACK, GTYP_CLOSE See the " Intuition Gadgets " chapter of the Amiga ROM Kernel Reference Manual: Libraries for more information. [Back to Amiga Developer Docs ]

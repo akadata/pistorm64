@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0541.html
+TITLE: D / Errors / Crashes--Workbench Only
+
 D / Errors / Crashes--Workbench Only ]" border=0> If you are crashing near the first DOS call, either your stack is too small or your startup code did not GetMsg() the WBStartup message from the process message port. If your program crashes during execution or during your exit procedure only when started from Workbench, and your startup opens no stdio window or NIL: file handles for WB programs, then make sure you are not writing anything to stdout ( printf() , etc.) when started from WB (argc==0). See also " Crashes--After Exit ". [Back to Amiga Developer Docs ]

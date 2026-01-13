@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node01C1.html
+TITLE: iffparse.library/FindCollection
+
 iffparse.library/FindCollection ]" border=0> NAME FindCollection -- Get a pointer to the current list of collection items. SYNOPSIS ci = FindCollection (iff, type, id) d0 a0 d0 d1 struct CollectionItem *ci; struct IFFHandle *iff; LONG type, id; FUNCTION Returns a pointer to a list of CollectionItem structures for each of the collection chunks of the given type encountered so far in the course of parsing this IFF file. The items appearing first in the list will be the ones encountered most recently. INPUTS iff - pointer to IFFHandle struct. type - type code to search for. id - identifier code to search for. RESULT ci - pointer to last collection chunk encountered with links to previous ones. EXAMPLE NOTES BUGS SEE ALSO CollectionChunk() , CollectionChunks() [Back to Amiga Developer Docs ]

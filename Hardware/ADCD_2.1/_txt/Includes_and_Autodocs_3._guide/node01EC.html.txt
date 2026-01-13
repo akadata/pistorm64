@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node01EC.html
+TITLE: exec.library/AttemptSemaphore
+
 exec.library/AttemptSemaphore ]" border=0> NAME AttemptSemaphore -- try to obtain without blocking SYNOPSIS success = AttemptSemaphore(signalSemaphore) D0 A0 LONG AttemptSemaphore(struct SignalSemaphore *); FUNCTION This call is similar to ObtainSemaphore() , except that it will not block if the semaphore could not be locked. INPUT signalSemaphore -- an initialized signal semaphore structure RESULT success -- TRUE if the semaphore was locked, false if some other task already possessed the semaphore. NOTE This call does NOT preserve registers. SEE ALSO ObtainSemaphore() ObtainSemaphoreShared() , ReleaseSemaphore() , exec/semaphores.h [Back to Amiga Developer Docs ]

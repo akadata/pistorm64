@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node021A.html
+TITLE: Glossary / potentiometer
+
 Glossary / potentiometer ]" border=0> An electrical analog device used to adjust some variable value. [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0237.html
+TITLE: Glossary / write-only
+
 Glossary / write-only ]" border=0> Describes a register that can be written to but cannot be read. [Back to Amiga Developer Docs ]

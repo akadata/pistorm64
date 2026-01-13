@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node01C2.html
+TITLE: 8 / Creating Borders / Directly Drawing the Borders
+
 8 / Creating Borders / Directly Drawing the Borders ]" border=0> Borders may be directly drawn by the application by calling the function DrawBorder() . void DrawBorder( struct RastPort *rp, struct Border *border, long leftOffset, long topOffset ); The rp argument is a pointer to the RastPort into which the border should be drawn. This rastport may come from a Window or Screen structure. The border argument is a pointer to a list of Border structures which are to be rendered. The list may contain a single Border structure. The leftOffset and topOffset arguments are the external component, or base position, for this list of Border s. The LeftEdge and TopEdge values of each Border structure are added to these to determine the Border position. Borders may also be indirectly drawn by attaching them to gadgets, menus or requesters. [Back to Amiga Developer Docs ]

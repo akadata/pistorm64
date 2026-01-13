@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0547.html
+TITLE: rexxsyslib.doc
+
 rexxsyslib.doc ]" border=0> ClearRexxMsg() CreateArgstring() CreateRexxMsg() DeleteArgstring() DeleteRexxMsg() FillRexxMsg() IsRexxMsg() LengthArgstring() LockRexxBase() UnlockRexxBase() [Back to Amiga Developer Docs ]

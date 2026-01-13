@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0195.html
+TITLE: dos.library/NextDosEntry
+
 dos.library/NextDosEntry ]" border=0> NAME NextDosEntry -- Get the next Dos List entry (V36) SYNOPSIS newdlist = NextDosEntry(dlist,flags) D0 D1 D2 struct DosList *NextDosEntry(struct DosList *,ULONG) FUNCTION Find the next Dos List entry of the right type. You MUST have locked the types you're looking for. Returns NULL if there are no more of that type in the list. INPUTS dlist - The current device entry. flags - What type of entries to look for. RESULT newdlist - The next device entry of the right type or NULL. SEE ALSO AddDosEntry() , RemDosEntry() , FindDosEntry() , LockDosList() , MakeDosEntry() , FreeDosEntry() [Back to Amiga Developer Docs ]

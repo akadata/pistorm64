@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node01F7.html
+TITLE: 11 Special Functions / Easy Memory Allocation and Deallocation
+
 11 Special Functions / Easy Memory Allocation and Deallocation ]" border=0> Intuition has a pair of routines that enable applications to make multiple memory allocations which are easily deallocated with a single call. The Intuition routines for memory management are AllocRemember() and FreeRemember() . These routines rely upon the Remember structure to track allocations. Intuition Helps You Remember The Remember Structure How to Remember An Example of Remembering [Back to Amiga Developer Docs ]

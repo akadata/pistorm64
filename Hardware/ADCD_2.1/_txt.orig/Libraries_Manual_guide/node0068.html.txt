@@ -1,0 +1,1 @@
+IDCMP Index ]" border=0> IDCMP, 31 , 247 application allocated, 249 Boopsi, 301 creation, 249 definition, 90 discard messages, 113 Flags, 257 freeing, 249 in easy requesters, 215 input events, 249 message structure, 250 queue limits, 113 requester, 210 shared, 253-254 WA_IDCMP tag, 107 [Back to Amiga Developer Docs ]

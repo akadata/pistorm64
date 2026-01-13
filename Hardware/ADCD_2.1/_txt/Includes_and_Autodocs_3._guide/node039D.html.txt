@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node039D.html
+TITLE: intuition.library/ClearMenuStrip
+
 intuition.library/ClearMenuStrip ]" border=0> NAME ClearMenuStrip -- Clear (detach) the menu strip from the window. SYNOPSIS ClearMenuStrip( Window ) A0 VOID ClearMenuStrip( struct Window * ); FUNCTION Detaches the current menu strip from the window; menu strips are attached to windows using the SetMenuStrip() function (or, for V36, ResetMenuStrip() ). If the menu is in use (for that matter if any menu is in use) this function will block (Wait()) until the user has finished. Call this function before you make any changes to the data in a Menu or MenuItem structure which is part of a menu strip linked into a window. INPUTS Window = pointer to a window structure RESULT None BUGS SEE ALSO SetMenuStrip() , ResetMenuStrip() [Back to Amiga Developer Docs ]

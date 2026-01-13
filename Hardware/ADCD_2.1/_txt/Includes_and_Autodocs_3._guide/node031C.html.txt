@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node031C.html
+TITLE: graphics.library/ScrollVPort
+
 graphics.library/ScrollVPort ]" border=0> NAME ScrollVPort -- Reinterpret RasInfo information in ViewPort to reflect the current Offset values. SYNOPSIS ScrollVPort( vp ) a0 void ScrollVPort(struct ViewPort *vp); FUNCTION After the programmer has adjusted the Offset values in the RasInfo structures of ViewPort , change the the copper lists to reflect the the Scroll positions. Changing the BitMap ptr in RasInfo and not changing the the Offsets will effect a double buffering affect. INPUTS vp - pointer to a ViewPort structure that is currently be displayed. RESULTS modifies hardware and intermediate copperlists to reflect new RasInfo BUGS pokes not fast enough to avoid some visible hashing of display (V37) This function was re-written in V39 and is ~10 times faster than before. SEE ALSO MakeVPort() MrgCop() LoadView() graphics/view.h [Back to Amiga Developer Docs ]

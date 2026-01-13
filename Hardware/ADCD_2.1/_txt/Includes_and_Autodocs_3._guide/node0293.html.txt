@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0293.html
+TITLE: getscreenmode_gc.doc
+
 getscreenmode_gc.doc ]" border=0> --datasheet-- GETSCREENMODE_GetClass() [Back to Amiga Developer Docs ]

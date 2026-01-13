@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node037A.html
+TITLE: 28 / Using Simple (Hardware) Sprites / Simple Sprite Functions
+
 28 / Using Simple (Hardware) Sprites / Simple Sprite Functions ]" border=0> There are four basic functions that you use to to control Simple Sprites: GetSprite() Attempts to allocates a sprite for exclusive use ChangeSprite() Modifies a Simple Sprite's image data MoveSprite() Changes a Simple Sprite's position FreeSprite() Relinquishes a sprite so it can be used by others To use these Simple Sprite functions (or the VSprite functions) the SPRITE flag must have been set in the NewScreen structure for OpenScreen() . If Intuition is not being used, this flag must be specified in the View and ViewPort data structures before MakeVPort() is called. Accessing A Hardware Sprite Changing The Appearance Of A Simple Sprite Moving A Simple Sprite Relinquishing A Simple Sprite Controlling Sprite DMA Complete Simple Sprite Example [Back to Amiga Developer Docs ]

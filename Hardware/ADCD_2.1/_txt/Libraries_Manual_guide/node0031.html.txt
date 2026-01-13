@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0031.html
+TITLE: Alert Index
+
 Alert Index ]" border=0> Alert, 220 application, 220 DEADEND_ALERT, 220 DisplayAlert(), 221 positioning, 220 RECOVERY_ALERT, 220 screen mode ID, 220 software error, 474 system, 220 [Back to Amiga Developer Docs ]

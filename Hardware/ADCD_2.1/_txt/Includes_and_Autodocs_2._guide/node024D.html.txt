@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node024D.html
+TITLE: intuition.library/ScreenToFront
+
 intuition.library/ScreenToFront ]" border=0> NAME ScreenToFront -- Make the specified screen the frontmost. SYNOPSIS ScreenToFront( Screen ) A0 VOID ScreenToFront( struct Screen * ); FUNCTION Brings the specified Screen to the front of the display. INPUTS Screen = a pointer to a Screen structure RESULT None BUGS SEE ALSO ScreenToBack() [Back to Amiga Developer Docs ]

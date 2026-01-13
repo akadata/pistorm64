@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node014C.html
+TITLE: Render() Index
+
 Render() Index ]" border=0> Render(), 203 cases, 203 clearing and initializing pixel buffer, 205 closing down, 206 dumping a pixel buffer, 205 master initialization, 203 pre-master initialization, 203 putting pixels in a buffer, 205 switching to next color, 206 [Back to Amiga Developer Docs ]

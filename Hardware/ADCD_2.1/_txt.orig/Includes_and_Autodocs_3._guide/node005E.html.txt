@@ -1,0 +1,1 @@
+asl.library/RequestFile ]" border=0> NAME RequestFile -- request user to select files. (V36) SYNOPSIS result = RequestFile(requester); D0 A0 BOOL RequestFile(struct FileRequester *); NOTES This function is obsolete, please use AslRequest() instead. SEE ALSO AslRequest() [Back to Amiga Developer Docs ]

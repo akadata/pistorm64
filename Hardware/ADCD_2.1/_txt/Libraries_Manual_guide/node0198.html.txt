@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0198.html
+TITLE: 6 Intuition Menus / Menu Data Structures
+
 6 Intuition Menus / Menu Data Structures ]" border=0> The specifications for the menu structures are given below. Menus are the headers that show in the menu bar, and MenuItems are the items and sub-items that can be chosen by the user. Menu Structure MenuItem Structure MenuItem Flags [Back to Amiga Developer Docs ]

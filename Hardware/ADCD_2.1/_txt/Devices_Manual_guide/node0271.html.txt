@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0271.html
+TITLE: A / IFF Third Party Public Form and Chunk Specification / HEAD.doc
+
 A / IFF Third Party Public Form and Chunk Specification / HEAD.doc ]" border=0> Flow - New Horizons Software TITLE: HEAD (FORM used by Flow - New Horizons Software, Inc.) IFF FORM / CHUNK DESCRIPTION Form/Chunk ID: FORM HEAD, Chunks NEST, TEXT, FSCC Date Submitted: 03/87 Submitted by: James Bayless - New Horizons Software, Inc. FORM CHUNKS [Back to Amiga Developer Docs ]

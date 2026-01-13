@@ -1,0 +1,1 @@
+penmap_ic.doc ]" border=0> --datasheet-- PENMAP_GetClass() [Back to Amiga Developer Docs ]

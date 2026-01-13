@@ -1,0 +1,1 @@
+Gameport.device ]" border=0> * Initial state of hardware lines may differ. [Back to Amiga Developer Docs ]

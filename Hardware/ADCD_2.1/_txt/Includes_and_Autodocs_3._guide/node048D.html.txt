@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node048D.html
+TITLE: mathieeedoubtrans.library/IEEEDPAtan
+
 mathieeedoubtrans.library/IEEEDPAtan ]" border=0> NAME IEEEDPAtan -- compute the arctangent of a floating point number SYNOPSIS x = IEEEDPAtan( y ); d0/d1 d0/d1 double x,y; FUNCTION Compute arctangent of y in IEEE double precision INPUTS y - IEEE double precision floating point value RESULT x - IEEE double precision floating point value BUGS SEE ALSO IEEEDPTan() , IEEEDPAsin() , IEEEDPACos() [Back to Amiga Developer Docs ]

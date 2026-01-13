@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node03F1.html
+TITLE: 30 / / Creating and Using New Layers / Creating the Layers
+
 30 / / Creating and Using New Layers / Creating the Layers ]" border=0> The application must first allocate and initialize a Layer_Info data structure which the system uses to keep track of layers that are created, use statements like: struct Layer_Info *theLayerInfo; if (NULL != (theLayerInfo = NewLayerInfo())) { /* use Layer_Info */ DisposeLayerInfo(theLayerInfo); } Layers may be created in the common bit map by calling CreateUpfrontLayer() or CreateBehindLayer() , with a sequence such as the following: struct Layer *layer; struct Layer_Info *theLayerInfo; struct BitMap *theBitMap; /* requests construction of a smart refresh layer. */ if (NULL == (layer = CreateUpfrontLayer(theLayerInfo, theBitMap, 20, 20, 100, 80, LAYERSMART, NULL))) error("CreateUpfrontLayer() failed."); else { ; /* layer successfully created here. */ } [Back to Amiga Developer Docs ]

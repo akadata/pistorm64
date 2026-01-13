@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node018A.html
+TITLE: III-1/Diagram2.ilbm
+
 III-1/Diagram2.ilbm ]" border=0> [Back to Amiga Developer Docs ]

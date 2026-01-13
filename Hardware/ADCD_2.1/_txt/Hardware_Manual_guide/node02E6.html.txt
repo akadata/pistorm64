@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node02E6.html
+TITLE: Hard_Pics/8-5.pic
+
 Hard_Pics/8-5.pic ]" border=0> [Back to Amiga Developer Docs ]

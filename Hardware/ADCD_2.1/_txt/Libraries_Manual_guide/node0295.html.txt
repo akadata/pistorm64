@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0295.html
+TITLE: 18 / What is a Library? / Minimum Subset of Library Vectors
+
 18 / What is a Library? / Minimum Subset of Library Vectors ]" border=0> The first four code vectors of a library must be the following entries: OPEN is the entry point called by the function OpenLibrary() . In most libraries, OPEN increments the library variable lib_OpenCnt . This variable is also used by CLOSE and EXPUNGE. CLOSE is the entry point called by the function CloseLibrary() . It decrements the library variable lib_OpenCnt and may do a delayed EXPUNGE. EXPUNGE prepares the library for removal from the system. This often includes deallocating memory resources that were reserved during initialization. EXPUNGE not only frees the memory allocated for data structures, but also the areas reserved for the library node itself. RESERVED is a fourth function vector reserved for future use. It must always return zero. [Back to Amiga Developer Docs ]

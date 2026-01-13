@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node016C.html
+TITLE: DGetChar
+
 DGetChar ]" border=0> NAME DGetChar - get a character from the parallel port SYNOPSIS char = DGetChar() D0 FUNCTION get the next character from the parallel port. [Back to Amiga Developer Docs ]

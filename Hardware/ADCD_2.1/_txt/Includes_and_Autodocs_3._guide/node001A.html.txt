@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node001A.html
+TITLE: amiga_lib.doc
+
 amiga_lib.doc ]" border=0> ACrypt() AddTOF() afp() ArgArrayDone() ArgArrayInit() ArgInt() ArgString() arnd() BeginIO() CallHook() CallHookA() CheckRexxMsg() CoerceMethod() CoerceMethodA() CreateExtIO() CreatePort() CreateStdIO() CreateTask() CxCustom() CxDebug() CxFilter() CxSender() CxSignal() CxTranslate() dbf() DeleteExtIO() DeletePort() DeleteStdIO() DeleteTask() DoMethod() DoMethodA() DoSuperMethod() DoSuperMethodA() FastRand() fpa() FreeIEvents() GetRexxVar() HookEntry() HotKey() InvertString() LibAllocPooled() LibCreatePool() LibDeletePool() LibFreePooled() NewList() printf() RangeRand() RemTOF() SetRexxVar() SetSuperAttrs() sprintf() stdio() TimeDelay() [Back to Amiga Developer Docs ]

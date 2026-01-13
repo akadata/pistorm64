@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node052B.html
+TITLE: reaction.lib/GetCode
+
 reaction.lib/GetCode ]" border=0> NAME GetCode -- return the true IDCMP message code SYNOPSIS code = GetCode( imsg ) UWORD GetCode( struct IntuiMessage * ) FUNCTION Returns the true IntuiMessage code field. Layout.gadget replaces the IDCMP_GADGETUP message with an IDCMP_IDCMPUPDATE. This function will return the "gadgetup code" from the IDCMPUPDATE taglist if it is found there, and otherwise the normal imsg->Code. INPUTS imsg -- a pointer to an IntuiMessage RESULTS The message's code field [Back to Amiga Developer Docs ]

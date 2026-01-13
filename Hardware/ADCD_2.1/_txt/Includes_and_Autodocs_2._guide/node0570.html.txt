@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0570.html
+TITLE: FD/battclock_lib.fd
+
 FD/battclock_lib.fd ]" border=0> * "battclock.resource" ##base _BattClockBase ##bias 6 ##public ResetBattClock()() ReadBattClock()() WriteBattClock(time)(d0) ##private battclockPrivate1()() battclockPrivate2()() ##end [Back to Amiga Developer Docs ]

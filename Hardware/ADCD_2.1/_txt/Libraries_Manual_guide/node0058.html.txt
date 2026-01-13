@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0058.html
+TITLE: Exceptions Index
+
 Exceptions Index ]" border=0> Exceptions, 473 680x0, 473 Exec, 473 SetExcept(), 473 synchronous, 474 tc_ExceptCode, 473 tc_ExceptData, 473 [Back to Amiga Developer Docs ]

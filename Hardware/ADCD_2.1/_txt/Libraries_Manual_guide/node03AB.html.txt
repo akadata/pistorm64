@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node03AB.html
+TITLE: 28 / / Collisions and GEL Structure Extensions
+
 28 / / Collisions and GEL Structure Extensions ]" border=0> This section covers two topics that are applicable to all GELs: how to extend GEL data structures for your own purposes and how to detect collisions between GELs and other graphics objects. Detecting Gel Collisions Setting Up For Boundary Collisions Adding User Extensions To Gel Data Structures [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0153.html
+TITLE: amiga.lib/DeletePort
+
 amiga.lib/DeletePort ]" border=0> NAME DeletePort - free a message port created by CreatePort() SYNOPSIS DeletePort(port) VOID DeletePort(struct MsgPort *); FUNCTION Frees a message port created by CreatePort . All messages that may have been attached to this port must have already been replied before this function is called. INPUTS port - message port to delete SEE ALSO CreatePort() [Back to Amiga Developer Docs ]

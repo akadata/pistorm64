@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node013F.html
+TITLE: Keyboard Device Index
+
 Keyboard Device Index ]" border=0> Keyboard Device, 104 , 119 adding a reset handler routine, 124 additional information, 130 closing, 121 commands and functions, 120 device interface, 121 IORequest structures, 121 keyboard events, 119 opening, 121 reading keyboard events, 128 reading the keyboard matrix, 121 removing a reset handler routine, 124 signaling the end of a reset routine, 124 [Back to Amiga Developer Docs ]

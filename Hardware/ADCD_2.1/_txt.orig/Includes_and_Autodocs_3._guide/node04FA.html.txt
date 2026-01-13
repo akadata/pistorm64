@@ -1,0 +1,1 @@
+picture_dtc.doc ]" border=0> picture.datatype() [Back to Amiga Developer Docs ]

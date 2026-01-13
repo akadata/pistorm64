@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01D3.html
+TITLE: Glossary / color table
+
 Glossary / color table ]" border=0> The set of 32 color registers. [Back to Amiga Developer Docs ]

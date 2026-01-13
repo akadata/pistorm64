@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node053A.html
+TITLE: filesysres.doc
+
 filesysres.doc ]" border=0> --background-- [Back to Amiga Developer Docs ]

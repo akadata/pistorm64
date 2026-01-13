@@ -1,0 +1,1 @@
+DrawMode Index ]" border=0> DrawMode and Intuition text, 239 border, 234 in Border structure, 237 in flood fill, 591 in stencil drawing, 594 Intuition text, 242 with BltTemplate(), 596 [Back to Amiga Developer Docs ]

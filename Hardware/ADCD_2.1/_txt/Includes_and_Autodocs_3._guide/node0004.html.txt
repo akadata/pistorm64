@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0004.html
+TITLE: amigaguide.doc
+
 amigaguide.doc ]" border=0> --background-- --rexxhost-- AddAmigaGuideHostA() AmigaGuideSignal() CloseAmigaGuide() GetAmigaGuideAttr() GetAmigaGuideMsg() GetAmigaGuideString() LockAmigaGuideBase() OpenAmigaGuideA() OpenAmigaGuideAsyncA() RemoveAmigaGuideHostA() ReplyAmigaGuideMsg() SendAmigaGuideCmdA() SendAmigaGuideContextA() SetAmigaGuideAttrsA() SetAmigaGuideContextA() UnlockAmigaGuideBase() [Back to Amiga Developer Docs ]

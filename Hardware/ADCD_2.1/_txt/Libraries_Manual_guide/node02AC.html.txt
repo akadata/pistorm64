@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node02AC.html
+TITLE: 20 / / Memory Information Functions / Memory Requirements
+
 20 / / Memory Information Functions / Memory Requirements ]" border=0> The same attribute flags used in memory allocation routines are valid for the memory information routines. There is also an additional flag, MEMF_LARGEST , which can be used in the AvailMem() routine to find out what the largest available memory block of a particular type is. Specifying the MEMF_TOTAL flag will return the total amount of memory currently available. [Back to Amiga Developer Docs ]

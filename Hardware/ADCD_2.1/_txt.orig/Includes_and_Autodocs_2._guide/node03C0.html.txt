@@ -1,0 +1,1 @@
+mathffp.doc ]" border=0> SPAbs() SPCmp() SPFloor() SPNeg() SPAdd() SPDiv() SPFlt() SPSub() SPCeil() SPFix() SPMul() SPTst() [Back to Amiga Developer Docs ]

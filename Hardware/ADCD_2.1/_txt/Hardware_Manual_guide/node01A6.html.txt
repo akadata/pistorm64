@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01A6.html
+TITLE: 8 Interface Hardware / Parallel I/O Interface
+
 8 Interface Hardware / Parallel I/O Interface ]" border=0> The general-purpose bi-directional parallel interface is a 25-pin connector on the back panel of the computer. This connector is generally used for a parallel printer. For each data byte written to the parallel port register, the hardware automatically generates a pulse on the data ready pin. The acknowledge pulse from the parallel device is hooked up to an interrupt. For pin connections and timing, see Appendix E and Appendix F . [Back to Amiga Developer Docs ]

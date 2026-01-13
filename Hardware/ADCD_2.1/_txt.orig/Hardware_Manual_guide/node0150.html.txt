@@ -1,0 +1,1 @@
+F / / Interface Signals / RS3-RS0 - address inputs ]" border=0> The address inputs select the internal registers as described by the register map [Back to Amiga Developer Docs ]

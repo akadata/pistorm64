@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node05A2.html
+TITLE: utility.library/FreeTagItems
+
 utility.library/FreeTagItems ]" border=0> NAME FreeTagItems -- free an allocated tag list. (V36) SYNOPSIS FreeTagItems(tagList); A0 VOID FreeTagItems(struct TagItem *); FUNCTION Frees the memory of a TagItem list allocated either by AllocateTagItems() or CloneTagItems() . INPUTS tagList - list to free, must have been obtained from AllocateTagItems() or CloneTagItems() (may be NULL) SEE ALSO , AllocateTagItems() , CloneTagItems() [Back to Amiga Developer Docs ]

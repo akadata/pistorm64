@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node00C4.html
+TITLE: chooser_gc/FreeChooserNode
+
 chooser_gc/FreeChooserNode ]" border=0> NAME FreeChooserNode -- Free a Chooser node. SYNOPSIS VOID FreeChooserNode(struct Node *) FreeChooserNode(node) FUNCTION Frees a ChooserNode allocated with AllocChooserNodeA() . INPUTS node - The node to free. SEE ALSO AllocChooserNodeA() [Back to Amiga Developer Docs ]

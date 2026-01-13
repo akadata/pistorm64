@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node01FA.html
+TITLE: Amiga® RKM Devices: Appendix A - IFF: Interchange File Format
+
 Amiga® RKM Devices: Appendix A - IFF: Interchange File Format ]" border=0> ILBM - Interleaved Bitmap FTXT - Formatted Text SMUS - Simple Musical Score 8SVX - 8-bit Sampled Voice [Back to Amiga Developer Docs ]

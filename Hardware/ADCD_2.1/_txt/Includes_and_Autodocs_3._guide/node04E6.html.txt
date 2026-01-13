@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node04E6.html
+TITLE: page_gc/RefreshPageGadget
+
 page_gc/RefreshPageGadget ]" border=0> NAME RefreshPageGadget -- Refresh gadget in a paged layout SYNOPSIS RefreshPageGadget(gad, page, win, req) A0 A1 A2 A3 void RefreshPageGadget(struct Gadget *, Object *, struct Window *, struct Requester *) FUNCTION Like RefreshGList(gad,win,req,1), but passes a NULL window and requester pointer if the gadget is not on the currently visible page. [Back to Amiga Developer Docs ]

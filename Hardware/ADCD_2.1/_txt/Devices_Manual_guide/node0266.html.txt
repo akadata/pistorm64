@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0266.html
+TITLE: FANT.doc / Misc Fantavision Structures
+
 FANT.doc / Misc Fantavision Structures ]" border=0> typedef struct Rect { int left, top, right, bottom; }; typedef struct Point { int h, v; }; [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node02E2.html
+TITLE: graphics.library/GetBPen
+
 graphics.library/GetBPen ]" border=0> NAME GetBPen -- Get the B Pen value for a RastPort (V39). SYNOPSIS pen = GetBPen ( rp ) d0 a0 ULONG GetBPen(struct RastPort *) FUNCTION Return the current value of the B pen for the rastport. This function should be used instead of peeking the structure directly, because future graphics devices may store it differently, using more bits. INPUTS rp = a pointer to a valid RastPort structure. BUGS NOTES SEE ALSO SetBPen() graphics/gfx.h [Back to Amiga Developer Docs ]

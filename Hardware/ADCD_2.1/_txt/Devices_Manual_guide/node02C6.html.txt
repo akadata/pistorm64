@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node02C6.html
+TITLE: SMUS IFF Simple Musical Score / Appendix B. SMUS Example
+
 SMUS IFF Simple Musical Score / Appendix B. SMUS Example ]" border=0> Here's a box diagram for a simple example, a SMUS with two instruments and two tracks. Each track contains 1 note event and 1 rest event. +-----------------------+ | | | 'FORM' 94 | FORM 94 SMUS | | -- +-----------------------+ | | | | | 'SMUS' | | | | | | +-----------------+ | | | | 'SHDR' 4 | | .SHDR 4 | | |-----------------| | | | | 12800, 127, 2 | | | | +-----------------+ | | | | | | +-----------------+ | | | | 'NAME' 10 | | .NAME 10 | | |-----------------| | | | | 'Fugue in C' | | | | +-----------------+ | | | | | | +-----------------+ | | | | 'INS1' 9 | | .INS1 9 | | |-----------------| | | | | 1, 0, 0, 0, | | | | | 'Piano' | | 94 [Back to Amiga Developer Docs ]

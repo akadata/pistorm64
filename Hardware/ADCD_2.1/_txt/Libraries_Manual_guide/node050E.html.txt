@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node050E.html
+TITLE: B / propgclass / Attributes: PGA_Borderless (I)
+
 B / propgclass / Attributes: PGA_Borderless (I) ]" border=0> This is a boolean attribute which corresponds to the PROPBORDERLESS flag of the PropInfo structure's Flags field (defined in intuition.h >). If this attribute is TRUE, the new propgclass object will not have a border around it. In an AUTOKNOB propgclass gadget, if the PROPNEWLOOK flag is set as well (see the PGA_NewLook attribute), the knob will have a 3D appearance. [Back to Amiga Developer Docs ]

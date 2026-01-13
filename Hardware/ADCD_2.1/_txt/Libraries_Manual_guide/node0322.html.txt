@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0322.html
+TITLE: 27 / Display Routines and Structures / Characteristics of a Viewport
+
 27 / Display Routines and Structures / Characteristics of a Viewport ]" border=0> To describe a ViewPort fully, you need to set the following parameters: height, width, depth and display mode. In addition to these parameters, you must tell the system the location in memory from which the data for the ViewPort display should be retrieved (by associating with it a BitMap structure) and how to position the final ViewPort display on the screen. The ViewPort will take on the user's default Workbench colors unless otherwise instructed with a ColorMap . See the section called " Preparing the ColorMap Structure " for more information. [Back to Amiga Developer Docs ]

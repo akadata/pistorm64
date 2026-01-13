@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node057C.html
+TITLE: FD/console_lib.fd
+
 FD/console_lib.fd ]" border=0> * "console.device" ##base _ConsoleDevice ##bias 42 ##public CDInputHandler(events,consoleDevice)(a0/a1) RawKeyConvert(events,buffer,length,keyMap)(a0/a1,d1/a2) ##private *--- functions in V36 or higher (distributed as Release 2.0) --- consolePrivate1()() consolePrivate2()() consolePrivate3()() consolePrivate4()() ##end [Back to Amiga Developer Docs ]

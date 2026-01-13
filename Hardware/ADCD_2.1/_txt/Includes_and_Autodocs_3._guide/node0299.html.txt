@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0299.html
+TITLE: gradientslider_gc.doc
+
 gradientslider_gc.doc ]" border=0> gradientslider.gadget() [Back to Amiga Developer Docs ]

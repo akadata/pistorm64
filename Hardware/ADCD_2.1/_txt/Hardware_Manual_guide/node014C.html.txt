@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node014C.html
+TITLE: F / Hardware Connection Details / Interface Signals
+
 F / Hardware Connection Details / Interface Signals ]" border=0> Clock input DB7-DB0 - data bus inputs/outputs CS - chip-select input IRQ - interrupt request output R/W - read/write input RES - reset input RS3-RS0 - address inputs [Back to Amiga Developer Docs ]

@@ -1,0 +1,1 @@
+33 / Parsing / Other Chunk Management Functions ]" border=0> Several other functions are available for controlling the parser. CollectionChunk() and FindCollection() StopOnExit() EntryHandler() ExitHandler() [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0481.html
+TITLE: graphics.library/SyncSBitMap
+
 graphics.library/SyncSBitMap ]" border=0> NAME SyncSBitMap -- Syncronize Super BitMap with whatever is in the standard Layer bounds. SYNOPSIS SyncSBitMap( layer ) a0 void SyncSBitMap( struct Layer * ); FUNCTION Copy all bits from ClipRects in Layer into Super BitMap BitMap . This is used for those functions that do not want to deal with the ClipRect structures but do want to be able to work with a SuperBitMap Layer . INPUTS layer - pointer to a Layer that has a SuperBitMap The Layer should already be locked by the caller. RESULT After calling this function, the programmer can manipulate the bits in the superbitmap associated with the layer. Afterwards, the programmer should call CopySBitMap to copy the bits back into the onscreen layer. BUGS SEE ALSO CopySBitMap() graphics/clip.h [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0350.html
+TITLE: exec.library/FindResident
+
 exec.library/FindResident ]" border=0> NAME FindResident - find a resident module by name SYNOPSIS resident = FindResident(name) D0 A1 struct Resident *FindResident(STRPTR); FUNCTION Search the system resident tag list for a resident tag ("ROMTag") with the given name. If found return a pointer to the resident tag structure, else return zero. Resident modules are used by the system to pull all its parts together at startup. Resident tags are also found in disk based devices and libraries. INPUTS name - pointer to name string RESULT resident - pointer to the resident tag structure or zero if none found. SEE ALSO exec/resident.h , InitResident [Back to Amiga Developer Docs ]

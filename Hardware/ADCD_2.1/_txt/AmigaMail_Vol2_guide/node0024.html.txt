@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node0024.html
+TITLE: Serial.device
+
 Serial.device ]" border=0> * Clears io_Device on CloseDevice() (since 1.3.2) [Back to Amiga Developer Docs ]

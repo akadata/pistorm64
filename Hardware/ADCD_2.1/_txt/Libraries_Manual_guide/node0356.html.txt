@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0356.html
+TITLE: 27 / / Using the Graphics Drawing Routines / Drawing Individual Pixels
+
 27 / / Using the Graphics Drawing Routines / Drawing Individual Pixels ]" border=0> You can set a specific pixel to a desired color by using a statement like this: SHORT x, y; LONG result; result = WritePixel(&rastPort, x, y); WritePixel() uses the primary drawing pen and changes the pixel at that x,y position to the desired color if the x,y coordinate falls within the boundaries of the RastPort . A value of 0 is returned if the write was successful; a value of -1 is returned if x,y was outside the range of the RastPort. [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0110.html
+TITLE: 4 / Communicating with Intuition / The IDCMP And Gadgets
+
 4 / Communicating with Intuition / The IDCMP And Gadgets ]" border=0> One way for a user to communicate with a program running under Intuition is through the use of gadgets. There are two basic kinds of gadgets: system gadgets, which are predefined and managed by Intuition, and application gadgets. System Gadgets Application Gadgets [Back to Amiga Developer Docs ]

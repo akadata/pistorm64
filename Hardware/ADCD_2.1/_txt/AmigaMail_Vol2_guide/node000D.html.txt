@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node000D.html
+TITLE: XIII: Hardware
+
 XIII: Hardware ]" border=0> XIII-1 Video Adapter Diagrams XIII-5 The 68030 and 68040 and the Zorro III Bus XIII-11 Expanding RAM on the Amiga 4000 XIII-15 A1200 CPU Card Expansion RAM XIII-17 A600 Game Port Connector Form Factor [Back to Amiga Developer Docs ]

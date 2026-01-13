@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node02DB.html
+TITLE: Hard_Pics/5-4.pic
+
 Hard_Pics/5-4.pic ]" border=0> [Back to Amiga Developer Docs ]

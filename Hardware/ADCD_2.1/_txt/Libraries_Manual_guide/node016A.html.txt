@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node016A.html
+TITLE: 5 / / Gadget Structure For String Gadgets / Imagery and Highlighting
+
 5 / / Gadget Structure For String Gadgets / Imagery and Highlighting ]" border=0> Any type of image may be supplied for the rendering of a string gadget--image, border, or no image at all. The highlighting for a string gadget must be the complementing type ( GFLG_GADGHCOMP ). Alternate imagery may not be used for highlighting. [Back to Amiga Developer Docs ]

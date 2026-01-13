@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0208.html
+TITLE: Glossary / multitasking
+
 Glossary / multitasking ]" border=0> The ability to perform more than one operation, or task, at a time. [Back to Amiga Developer Docs ]

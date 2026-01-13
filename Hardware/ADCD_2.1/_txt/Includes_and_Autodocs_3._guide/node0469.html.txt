@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0469.html
+TITLE: lowlevel.library/RemKBInt
+
 lowlevel.library/RemKBInt ]" border=0> NAME RemKBInt -- remove a previously installed keyboard interrupt. (V40) SYNOPSIS RemKBInt(intHandle); A1 VOID RemKBInt(APTR); FUNCTION Remove a keyboard interrupt routine previously added with AddKBInt() . INPUTS intHandle - handle obtained from AddKBInt() . This may be NULL, in which case this function does nothing. SEE ALSO AddKBInt() [Back to Amiga Developer Docs ]

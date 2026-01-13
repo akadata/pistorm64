@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node018D.html
+TITLE: 8 / Floppy Disk Controller / Registers Used by the Disk Subsystem
+
 8 / Floppy Disk Controller / Registers Used by the Disk Subsystem ]" border=0> The disk subsystem uses two ports on the system's 8520 CIA chips, and several registers in the Paula chip: CIAAPRA ($BFE001) four input bits for disk sensing CIABPRB ($BFD100) eight output bits for disk selection, control and stepping ADKCON ($DFF09E) control bits (write only register) ADKCONR ($DFF010) control bits (read only register) DSKPTH ($DFF020) DMA pointer (32 bits) DSKLEN ($DFF024) length of DMA DSKBYTR ($DFF01A) Disk data byte and status read DSKSYNC ($DFF07E) Disk sync finder; holds a match word [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node02E6.html
+TITLE: dos.library/RemDosEntry
+
 dos.library/RemDosEntry ]" border=0> NAME RemDosEntry -- Removes a Dos List entry from it's list (V36) SYNOPSIS success = RemDosEntry(dlist) D0 D1 BOOL RemDosEntry(struct DosList *) FUNCTION This removes an entry from the Dos Device list. The memory associated with the entry is NOT freed. NOTE: you must have locked the Dos List with the appropriate flags before calling this routine. Handler writers should see the AddDosEntry() caveats about locking and use a similar workaround to avoid deadlocks. INPUTS dlist - Device list entry to be removed. RESULT success - Success/failure indicator SEE ALSO AddDosEntry() , FindDosEntry() , NextDosEntry() , LockDosList() , MakeDosEntry() , FreeDosEntry() [Back to Amiga Developer Docs ]

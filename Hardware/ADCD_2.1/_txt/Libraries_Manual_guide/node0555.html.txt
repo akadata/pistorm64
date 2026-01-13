@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0555.html
+TITLE: D / Errors / Menu Problems
+
 D / Errors / Menu Problems ]" border=0> A flickering menu is caused by leaving a pixel or more space between menu subitems when designing your menu. Crashing after browsing a menu (looking at menu without selecting any items) is caused by not properly handling MENUNULL select messages. Multiple selection not working is caused by not handling NextSelect properly. See the " Intuition Menus " chapter. [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0194.html
+TITLE: 6 / / Intercepting Menu Operations / A Warning on the MENUSTATE Flag
+
 6 / / Intercepting Menu Operations / A Warning on the MENUSTATE Flag ]" border=0> The MENUSTATE flag is set by Intuition in Window .Flags when the menus of that window are in use. Beware: in typical event driven programming, such a state variable is not on the same timetable as the application's input message handling, and should not be used to draw profound conclusions in any program. Use IDCMP_MENUVERIFY to synchronize with the menu handling. [Back to Amiga Developer Docs ]

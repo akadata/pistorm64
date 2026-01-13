@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node00D7.html
+TITLE: Amiga® RKM Libraries: 3 Intuition Screens
+
 Amiga® RKM Libraries: 3 Intuition Screens ]" border=0> Intuition screens are the basis of any display Intuition can make. Screens determine the fundamental characteristics of the display such as the resolution and palette and they set up the environment for multiple, overlapping windows that makes it possible for each application to have its own separate visual context. This chapter shows how to use existing screens and how to create new screens. Types of Screens Overscan and the Display Clip Screen Data Structures Intuition Screens and the Graphics Library Custom Screen Functions Advanced Screen Programming Public Screen Functions Other Screen Functions DrawInfo and the 3D Look Function Reference [Back to Amiga Developer Docs ]

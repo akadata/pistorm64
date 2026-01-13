@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0056.html
+TITLE: Error Index
+
 Error Index ]" border=0> Error display, 204 incorrect custom chips, 45 monitor not available, 45 no Chip memory, 45 no memory, 45 open screen, 45 screen name collision, 45 unknown mode, 45 [Back to Amiga Developer Docs ]

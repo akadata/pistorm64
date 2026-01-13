@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0187.html
+TITLE: icon.library/FreeDiskObject
+
 icon.library/FreeDiskObject ]" border=0> NAME FreeDiskObject - free all memory in a Workbench disk object. SYNOPSIS FreeDiskObject(diskobj) A0 void FreeDiskObject(struct DiskObject *); FUNCTION This routine frees all memory in a Workbench disk object, and the object itself. It is implemented via FreeFreeList() . GetDiskObject() takes care of all the initialization required to set up the object's free list. This procedure may ONLY be called on a DiskObject allocated via GetDiskObject() . INPUTS diskobj -- a pointer to a DiskObject structure RESULTS None SEE ALSO GetDiskObject() , PutDiskObject() , DeleteDiskObject() , FreeFreeList() BUGS None [Back to Amiga Developer Docs ]

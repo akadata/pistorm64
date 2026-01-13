@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node03A3.html
+TITLE: 28 / / Bob Priorities / Letting the System Decide Priorities
+
 28 / / Bob Priorities / Letting the System Decide Priorities ]" border=0> The priority issue can be ignored and the system will render the Bobs as it finds them in the GelsInfo list. To do this, set the Bob's Before and After pointers to NULL. Since the GelsInfo list is sorted by GEL x, y values, Bobs that are higher on the display will appear behind the lower ones, and Bobs that are more to the left on the display will appear behind Bobs on the right. As Bobs are moved about the display, their priorities will change. [Back to Amiga Developer Docs ]

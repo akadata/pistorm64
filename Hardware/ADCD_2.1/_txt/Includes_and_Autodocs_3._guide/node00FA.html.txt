@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node00FA.html
+TITLE: console.doc
+
 console.doc ]" border=0> CD_ASKDEFAULTKEYMAP CD_ASKKEYMAP CD_SETDEFAULTKEYMAP CD_SETKEYMAP CDInputHandler() CMD_CLEAR CMD_READ CMD_WRITE OpenDevice() RawKeyConvert() [Back to Amiga Developer Docs ]

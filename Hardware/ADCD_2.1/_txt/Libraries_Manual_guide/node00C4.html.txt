@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node00C4.html
+TITLE: Workbench Index
+
 Workbench Index ]" border=0> Workbench, 25 , 52 , 929 AppMessage, 359 close screen, 52 introduction, 25 open screen, 52 screen, 75 , 933 screen to back, 52 screen to front, 52 shortcut key functions, 281 stack size, 352 startup code, 364 startup message, 364 start-up message, 364 ToolTypes, 354 windows on screen, 82 .info file, 345 [Back to Amiga Developer Docs ]

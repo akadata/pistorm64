@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0439.html
+TITLE: 33 / / Other Chunk Management Functions / EntryHandler()
+
 33 / / Other Chunk Management Functions / EntryHandler() ]" border=0> This is used to install your own custom chunk entry handler. See the " Custom Chunk Handlers " section below for more information. StopChunk() , PropChunk() , and CollectionChunk() are internally built on top of this. [Back to Amiga Developer Docs ]

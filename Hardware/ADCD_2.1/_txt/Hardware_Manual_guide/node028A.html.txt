@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node028A.html
+TITLE: Zorro Expansion Bus Index
+
 Zorro Expansion Bus Index ]" border=0> Zorro Expansion Bus, 383 A2000, 384 , 387 , 387 , 387 , 391 A3000, 384 , 387 , 387 , 387 autoconfiguration, 431 mechanical specifications, 427 memory mapping, 388 multiple transfer timing, 420 quick interrupt timing, 422 read timing, 416 write timing, 418 Zorro II signals, 391 , 437-439 Zorro III signals, 409 , 437-439 [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0037.html
+TITLE: 2 / Hardware Control Commands / CMD_RESET
+
 2 / Hardware Control Commands / CMD_RESET ]" border=0> CMD_RESET restores all the audio hardware registers. It clears the attach bits, restores the audio interrupt vectors if the programmer has changed them, and performs the CMD_FLUSH command to cancel all requests to the channels. CMD_RESET also unstops channels that have had a CMD_STOP performed on them. CMD_RESET does not unlock channels that have been locked by ADCMD_LOCK . [Back to Amiga Developer Docs ]

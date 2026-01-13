@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01E7.html
+TITLE: Glossary / display window
+
 Glossary / display window ]" border=0> The portion of the bitmap selected for display. Also, the actual size of the on-screen display. [Back to Amiga Developer Docs ]

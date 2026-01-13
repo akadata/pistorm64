@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node01D4.html
+TITLE: VII-1/DR2D-1.pic
+
 VII-1/DR2D-1.pic ]" border=0> [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01F5.html
+TITLE: Glossary / high resolution (Hires)
+
 Glossary / high resolution (Hires) ]" border=0> A horizontal display mode in which 640 pixels are displayed across a horizontal line in a normal-sized display. On the Amiga a high resolution display is often called Hires. [Back to Amiga Developer Docs ]

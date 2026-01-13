@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0193.html
+TITLE: 6 / Setting Up Menus / Intercepting Normal Menu Operations
+
 6 / Setting Up Menus / Intercepting Normal Menu Operations ]" border=0> IDCMP_MENUVERIFY gives the program the opportunity to react before menu operations take place and, optionally, to cancel menu operations. Menus may be completely disabled by removing the menu strip with a call to ClearMenuStrip() . A Warning on the MENUSTATE Flag Shortcuts and IDCMP_MENUVERIFY Menu Verify IDCMP_MENUVERIFY and Deadlock [Back to Amiga Developer Docs ]

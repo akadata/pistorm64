@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0086.html
+TITLE: bullet.library/CloseEngine
+
 bullet.library/CloseEngine ]" border=0> NAME CloseEngine -- Release an engine handle SYNOPSIS CloseEngine(engineHandle) A0 void CloseEngine(struct GlyphEngine *); FUNCTION This function releases the engine handle acquired with OpenEngine . It first releases any data acquired with ObtainInfoA associated with the engineHandle that has not yet been released. INPUTS engineHandle -- the handle acquired via OpenEngine . If zero, no operation is performed. RESULT This function has no result. The only error that can occur is when the when an invalid engineHandle is supplied: the application is assumed not to do that. EXAMPLE EndGame(code, arg1, arg2, arg3, arg3) { ... CloseEngine(EngineHandle); ... } SEE ALSO OpenEngine() [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0276.html
+TITLE: Modulo Index
+
 Modulo Index ]" border=0> Modulo blitter, 172 in basic playfield, 60-62 in horizontal scrolling, 82 in interlaced mode, 62 in larger playfield, 73 [Back to Amiga Developer Docs ]

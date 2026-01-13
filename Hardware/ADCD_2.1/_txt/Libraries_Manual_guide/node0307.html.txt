@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0307.html
+TITLE: 26 / Servicing Interrupts / Interrupt Data Structure
+
 26 / Servicing Interrupts / Interrupt Data Structure ]" border=0> Interrupt handlers and servers are defined by the Exec Interrupt structure. This structure specifies an interrupt routine entry point and data pointer. The C definition of this structure is as follows: struct Interrupt { struct Node is_Node; APTR is_Data; VOID (*is_Code)(); }; Once this structure has been properly initialized, it can be used for either a handler or a server. [Back to Amiga Developer Docs ]

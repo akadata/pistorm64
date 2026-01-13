@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node00CC.html
+TITLE: 4 / Summary of Sprite Registers / Control Registers
+
 4 / Summary of Sprite Registers / Control Registers ]" border=0> SPR0POS SPR0CTL [Back to Amiga Developer Docs ]

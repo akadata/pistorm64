@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0084.html
+TITLE: bullet.doc
+
 bullet.doc ]" border=0> --background-- CloseEngine() ObtainInfoA() OpenEngine() ReleaseInfoA() SetInfoA() [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node01C9.html
+TITLE: 8 / Creating Text / Determining Text Length
+
 8 / Creating Text / Determining Text Length ]" border=0> To determine the pixel length of a given IntuiText string, call the IntuiTextLength() function. LONG IntuiTextLength( struct IntuiText *iText ); Set the iText argument to point to the IntuiText structure whose length is to be found. This function will return the length of the iText text string in pixels. Note that if the ITextFont field of the given IntuiText is set to NULL, or Intuition cannot access the specified font, then GfxBase->DefaultFont will be used in determining the length of the text. This may not be the same as the RastPort font with which the text would be printed. [Back to Amiga Developer Docs ]

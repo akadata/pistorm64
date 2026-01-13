@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node03E6.html
+TITLE: gadtools.doc
+
 gadtools.doc ]" border=0> CreateContext() FreeVisualInfo() GT_PostFilterIMsg() CreateGadgetA() GetVisualInfoA() GT_RefreshWindow() CreateMenusA() GT_BeginRefresh() GT_ReplyIMsg() DrawBevelBoxA() GT_EndRefresh() GT_SetGadgetAttrsA() FreeGadgets() GT_FilterIMsg() LayoutMenuItemsA() FreeMenus() GT_GetIMsg() LayoutMenusA() [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node02A5.html
+TITLE: graphics.library/AndRegionRegion
+
 graphics.library/AndRegionRegion ]" border=0> NAME AndRegionRegion -- Perform 2d AND operation of one region with second region, leaving result in second region. SYNOPSIS status = AndRegionRegion(region1,region2) d0 a0 a1 BOOL AndregionRegion(struct Region *, struct Region * ); FUNCTION Remove any portion of region2 that is not in region1. INPUTS region1 - pointer to Region structure region2 - pointer to Region structure to use and for result RESULTS status - return TRUE if successful operation return FALSE if ran out of memory BUGS SEE ALSO OrRegionRegion() AndRectRegion() graphics/regions.h [Back to Amiga Developer Docs ]

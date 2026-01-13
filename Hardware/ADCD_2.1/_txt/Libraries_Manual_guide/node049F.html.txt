@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node049F.html
+TITLE: 37 / / Advanced Tag Usage / Random Access of Tag Lists
+
 37 / / Advanced Tag Usage / Random Access of Tag Lists ]" border=0> The GetTagData() function will return the data for the specified attribute. If there isn't a tag that matches, then the default value is returned. APTR sound; /* Get the sound data that our function will use. */ sound = (APTR) GetTagData (MGA_Sound, (ULONG) DefaultSound, attrs); [Back to Amiga Developer Docs ]
