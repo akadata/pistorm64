@@ -18,7 +18,7 @@ EXENAME          = emulator
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 WARNINGS   ?= -Wall -Wextra -pedantic
-OPT_LEVEL  ?= -O0
+OPT_LEVEL  ?= -O3
 ifdef O
 OPT_LEVEL := -O$(O)
 endif
@@ -36,9 +36,9 @@ USE_EC_FPU ?= 0
 USE_VC     ?= 0
 # Perf toggles
 USE_LTO    ?= 0
-USE_NO_PLT ?= 0 
-OMIT_FP    ?= 0
-USE_PIPE   ?= 0
+USE_NO_PLT ?= 1 
+OMIT_FP    ?= 1
+USE_PIPE   ?= 1
 # Quiet noisy-but-benign warnings from the generated 68k core.
 M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable
 # Default CPU flags; overridden by PLATFORM selections below.
