@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node042E.html
+TITLE: graphics.library/CloseFont
+
 graphics.library/CloseFont ]" border=0> NAME CloseFont -- Release a pointer to a system font. SYNOPSIS CloseFont(font) A1 void CloseFont(struct TextFont *); FUNCTION This function indicates that the font specified is no longer in use. It is used to close a font opened by OpenFont , so that fonts that are no longer in use do not consume system resources. INPUTS font - a font pointer as returned by OpenFont() or OpenDiskFont() RESULT BUGS SEE ALSO OpenFont() diskfont.library/OpenDiskFont graphics/text.h [Back to Amiga Developer Docs ]

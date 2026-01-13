@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node054C.html
+TITLE: misc.doc
+
 misc.doc ]" border=0> AllocMiscResource() FreeMiscResource() [Back to Amiga Developer Docs ]

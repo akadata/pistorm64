@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node03F5.html
+TITLE: 30 / / Creating and Using New Layers / Changing a Viewpoint
+
 30 / / Creating and Using New Layers / Changing a Viewpoint ]" border=0> The ScrollLayer() function changes the portion of a super bitmap that is shown by a layer: void ScrollLayer( long dummy, struct Layer *layer, long dx, long dy ); This function is most useful with super bitmap layers but can also simulate the effect on other layer types by adding the scroll offset to all future rendering. [Back to Amiga Developer Docs ]

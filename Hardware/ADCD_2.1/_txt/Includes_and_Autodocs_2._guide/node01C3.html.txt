@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node01C3.html
+TITLE: iffparse.library/FindProp
+
 iffparse.library/FindProp ]" border=0> NAME FindProp -- Search for a stored property chunk. SYNOPSIS sp = FindProp (iff, type, id) d0 a0 d0 d1 struct StoredProperty *sp; struct IFFHandle *iff; LONG type, id; FUNCTION Searches for the stored property which is valid in the given context. Property chunks are automatically stored by ParseIFF() when pre-declared by PropChunk() or PropChunks() . The StoredProperty struct, if found, contains a pointer to a data buffer containing the contents of the stored property. INPUTS iff - pointer to IFFHandle struct. type - type code for chunk to search for (ex. "ILBM"). id - identifier code for chunk to search for (ex. "CMAP"). RESULT sp - pointer to stored property, if found, or NULL if none found. EXAMPLE NOTES BUGS SEE ALSO PropChunk() , PropChunks() [Back to Amiga Developer Docs ]

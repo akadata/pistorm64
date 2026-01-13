@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node01DA.html
+TITLE: VII-25/AmigaGuide.ilbm
+
 VII-25/AmigaGuide.ilbm ]" border=0> [Back to Amiga Developer Docs ]

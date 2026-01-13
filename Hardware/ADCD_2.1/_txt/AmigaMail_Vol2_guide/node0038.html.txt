@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node0038.html
+TITLE: battmem.resource (basename: _BattMemBase)
+
 battmem.resource (basename: _BattMemBase) ]" border=0> ObtainBattSemaphore()() - Obtain access to nonvolatile ram. (V36) ReadBattMem(buffer,offset,length)(a0,d0/d1) - Read a bitstring from nonvolatile ram. (V36) ReleaseBattSemaphore()() - Allow nonvolatile ram to others. (V36) WriteBattMem(buffer,offset,length)(a0,d0/d1) - Write a bitstring to nonvolatile ram. (V36) [Back to Amiga Developer Docs ]

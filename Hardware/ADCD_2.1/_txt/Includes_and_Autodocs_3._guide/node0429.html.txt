@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0429.html
+TITLE: layers.library/LockLayers
+
 layers.library/LockLayers ]" border=0> NAME LockLayers -- lock all layers from graphics output. SYNOPSIS LockLayers( li ) a0 void LockLayers( struct Layer_Info *); FUNCTION First calls LockLayerInfo() Make all layers in this layer list locked. INPUTS li - pointer to Layer_Info structure BUGS SEE ALSO LockLayer() , LockLayerInfo() , graphics/layers.h [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0319.html
+TITLE: 27 / Introduction / About ECS
+
 27 / Introduction / About ECS ]" border=0> ECS stands for Enhanced Chip Set, the latest version of the Amiga's custom chips that provides for improved graphics capabilities. Some of the special features of the Amiga's graphics sub-system such as the VGA, Productivity and SuperHires display modes require the ECS. SuperHires (35 nanosecond) Pixel Resolutions Productivity Mode Selectable PAL/NTSC Determining Chip Versions [Back to Amiga Developer Docs ]

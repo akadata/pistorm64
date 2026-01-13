@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node0037.html
+TITLE: battclock.resource (basename: _BattClockBase)
+
 battclock.resource (basename: _BattClockBase) ]" border=0> ReadBattClock()() - Read time from clock chip. (V36) ResetBattClock()() - Reset the clock chip. (V36) WriteBattClock(time)(d0) - Set the time on the clock chip. (V36) [Back to Amiga Developer Docs ]

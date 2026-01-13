@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0577.html
+TITLE: timer.device/GetSysTime
+
 timer.device/GetSysTime ]" border=0> NAME GetSysTime -- Get the system time. (V36) SYNOPSIS GetSysTime( Dest ) A0 void GetSysTime( struct timeval * ); FUNCTION Ask the system what time it is. The system time starts off at zero at power on, but may be initialized via the TR_SETSYSTIME timer.device command. System time is monotonocally increasing and guarenteed to be unique (except when the system time is set back). A0 will be left unchanged. This function is less expensive to use than the TR_GETSYSTIME IORequest . INPUTS Dest -- pointer to a timeval structure to hold the system time. RESULTS Dest -- the timeval structure will contain the system time. NOTES This function may be called from interrupts. SEE ALSO timer.device/TR_GETSYSTIME , timer.device/TR_SETSYSTIME , BUGS [Back to Amiga Developer Docs ]

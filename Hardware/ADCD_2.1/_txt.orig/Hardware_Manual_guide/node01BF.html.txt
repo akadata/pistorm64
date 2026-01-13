@@ -1,0 +1,1 @@
+Glossary / baud rate ]" border=0> Rate of data transmission through a serial port. [Back to Amiga Developer Docs ]

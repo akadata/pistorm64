@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0277.html
+TITLE: NTSC Index
+
 NTSC Index ]" border=0> NTSC, 62 , 100 , 100 audio, 140 , 141 , 158-159 blitter, 193 clock, 2 playfield, 49 , 52 , 57 , 58 serial baud rate, 255 sprites, 100 , 100 vertical blank, 219 video, 3 , 24 , 27 , 34 , 40-41 , 45 , 304 [Back to Amiga Developer Docs ]

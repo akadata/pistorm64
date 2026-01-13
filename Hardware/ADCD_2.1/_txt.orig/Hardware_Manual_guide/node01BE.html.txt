@@ -1,0 +1,1 @@
+Glossary / barrel shifter ]" border=0> Blitter circuit that allows movement of images on pixel boundaries. [Back to Amiga Developer Docs ]

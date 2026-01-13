@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0310.html
+TITLE: Amiga® RKM Libraries: 27 Graphics Primitives
+
 Amiga® RKM Libraries: 27 Graphics Primitives ]" border=0> Introduction User Copper Lists Display Routines and Structures ECS and Genlocking Features Advanced Topics Function Reference Drawing Routines [Back to Amiga Developer Docs ]

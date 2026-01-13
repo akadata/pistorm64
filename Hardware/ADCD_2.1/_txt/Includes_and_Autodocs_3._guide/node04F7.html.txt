@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node04F7.html
+TITLE: penmap_ic.doc
+
 penmap_ic.doc ]" border=0> --datasheet-- PENMAP_GetClass() [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01CE.html
+TITLE: Glossary / clock
+
 Glossary / clock ]" border=0> A free running signal driven at a fixed frequency to the bus, used mainly for clocking state machines on Zorro II cards. [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node00BB.html
+TITLE: cd.device/OpenDevice
+
 cd.device/OpenDevice ]" border=0> NAME OpenDevice - Open a CD unit for access SYNOPSIS error = OpenDevice("cd.device", UnitNumber, IORequest , flags); D0 A0 D0 A1 D1 FUNCTION Opens the cd.device and creates an IORequest for use in accessing the CD. INPUTS UnitNumber - Normally zero; however, this is described as: Ones digit = Unit (SCSI unit number) Tens digit = LUN (disk within disk changer) Hundreds digit = Card number (SCSI card) Thousands digit = Reserved (must be zero) IORequest - Pointer to a struct(IOStdReq) flags - Should be zero. RESULTS error 0 = success, otherwise this is an error. NOTES SEE ALSO CloseDevice() [Back to Amiga Developer Docs ]

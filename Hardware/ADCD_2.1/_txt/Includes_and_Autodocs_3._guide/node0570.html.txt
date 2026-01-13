@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0570.html
+TITLE: text_dtc.doc
+
 text_dtc.doc ]" border=0> text.datatype() [Back to Amiga Developer Docs ]

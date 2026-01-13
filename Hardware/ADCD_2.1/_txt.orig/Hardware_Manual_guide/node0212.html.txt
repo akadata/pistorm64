@@ -1,0 +1,1 @@
+Glossary / Paula ]" border=0> One of the three main Amiga custom chips, Paula contains audio, disk, and interrupt circuitry. [Back to Amiga Developer Docs ]

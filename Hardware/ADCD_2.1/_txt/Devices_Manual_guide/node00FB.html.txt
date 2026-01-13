@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node00FB.html
+TITLE: 14 Trackdisk Device / Additional Information on the Trackdisk Device
+
 14 Trackdisk Device / Additional Information on the Trackdisk Device ]" border=0> Additional programming information on the trackdisk device can be found in the include files and the autodocs for the trackdisk device. Both are contained in the Amiga ROM Kernel Reference Manual: Includes and Autodocs. Trackdisk Device Information ----------------------------------- INCLUDES devices/ trackdisk.h devices/ trackdisk.h AUTODOCS trackdisk.doc [Back to Amiga Developer Docs ]

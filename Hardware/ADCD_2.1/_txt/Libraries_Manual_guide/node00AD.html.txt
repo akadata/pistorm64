@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node00AD.html
+TITLE: SprColors pointer Index
+
 SprColors pointer Index ]" border=0> SprColors pointer in VSprite structure, 626 in VSprite troubleshooting, 632 [Back to Amiga Developer Docs ]

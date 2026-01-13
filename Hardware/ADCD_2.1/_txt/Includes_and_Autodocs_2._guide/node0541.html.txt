@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0541.html
+TITLE: battmem.resource/ObtainBattSemaphore
+
 battmem.resource/ObtainBattSemaphore ]" border=0> NAME ObtainBattSemaphore -- Obtain access to nonvolatile ram. (V36) SYNOPSIS ObtainBattSemaphore( ) void ObtainBattSemaphore( void ); FUNCTION Aquires exclusive access to the system nonvolatile ram. INPUTS RESULTS NOTES SEE ALSO BUGS [Back to Amiga Developer Docs ]

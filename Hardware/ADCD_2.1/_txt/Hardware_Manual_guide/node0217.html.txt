@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0217.html
+TITLE: Glossary / playfield object
+
 Glossary / playfield object ]" border=0> Subsection of a playfield that is used in playfield animation. [Back to Amiga Developer Docs ]

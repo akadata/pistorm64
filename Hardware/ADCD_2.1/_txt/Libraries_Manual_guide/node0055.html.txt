@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0055.html
+TITLE: EasyStruct structure Index
+
 EasyStruct structure Index ]" border=0> EasyStruct structure, 216 es_Flags, 216 es_GadgetFormat, 216 , 217 es_StructSize, 216 es_TextFormat, 216 , 217 es_Title, 216 [Back to Amiga Developer Docs ]

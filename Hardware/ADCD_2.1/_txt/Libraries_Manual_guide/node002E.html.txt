@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node002E.html
+TITLE: 680x0 Index
+
 680x0 Index ]" border=0> 680x0 68040, 479 Cache, 479 caches, 477 CopyBack mode, 479 development guidelines, 15 Exceptions, 473 Floating Point Unit, 477 FPU, 477 GetCC(), 478 Interrupt stack, 477 ISP, 477 Master stack, 477 MSP, 477 Paged Memory Management Unit, 477 PMMU, 477 programming guidelines, 17 Register usage conventions, self-modifying code, 478 SetSR(), 478 SSP, 477 Stack, 477 Supervisor Mode, 477 Supervisor stack, 477 User stack, 477 USP, 477 [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node02D2.html
+TITLE: 8SVX IFF 8-Bit Sampled Voice / Appendix A. Quick Reference
+
 8SVX IFF 8-Bit Sampled Voice / Appendix A. Quick Reference ]" border=0> Type Definitions 8SVX Regular Expression [Back to Amiga Developer Docs ]

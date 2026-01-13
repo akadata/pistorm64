@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0496.html
+TITLE: 37 Utility Library / Tags
+
 37 Utility Library / Tags ]" border=0> The implementation of tags is one of the many new features of Release 2. Tags make it possible to add new parameters to system functions without interfering with the original parameters. They also make specifying parameter lists much clearer and easier. Tag Functions and Structures Simple Tag Usage Example Simple Tag Usage Advanced Tag Usage [Back to Amiga Developer Docs ]

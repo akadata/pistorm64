@@ -1,0 +1,1 @@
+Glossary / Shell ]" border=0> The command line interface used to send typed commands to the Amiga. One of the three user interfaces built into the Amiga. [Back to Amiga Developer Docs ]

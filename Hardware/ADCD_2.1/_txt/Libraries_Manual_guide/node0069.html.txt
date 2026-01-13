@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0069.html
+TITLE: IFF Index
+
 IFF Index ]" border=0> IFF, 777 Chunk, 778 example file, 780 FORM, 778-779 - size, 780 FORM types, 799 FTXT, 803 ILBM, 800 , 801 , 802 introduction, 778 Preferences, 338 [Back to Amiga Developer Docs ]

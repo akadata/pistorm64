@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0260.html
+TITLE: DR2D.doc / The OFNT FORM
+
 DR2D.doc / The OFNT FORM ]" border=0> OFNT OFHD KERN CHDF [Back to Amiga Developer Docs ]

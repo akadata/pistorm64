@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01B3.html
+TITLE: Glossary / Amiga keys
+
 Glossary / Amiga keys ]" border=0> Two keys on the keyboard to the left and right of the space bar. [Back to Amiga Developer Docs ]

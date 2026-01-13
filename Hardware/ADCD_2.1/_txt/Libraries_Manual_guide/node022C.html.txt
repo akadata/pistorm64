@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node022C.html
+TITLE: 13 / / Preference File Format in Release 2 / The Data Chunk
+
 13 / / Preference File Format in Release 2 / The Data Chunk ]" border=0> The data Chunk that follows the header Chunk depends on the kind of Preferences data the file contains. The types of Preferences data Chunks that are currently part of the system are: Table 13-2: IFF Chunk Types in Release 2 Preferences Data Files Chunk Name Used With ---------- --------- FONT Fonts, used for all font Preferences files. In future the PrefHeader may indicate what the font is used for. ICTL IControl INPT Input OSCN Overscan PGFX PrinterGfx PTXT PrinterText SCRM ScreenMode SERL Serial Each chunk contains a structure applicable to the type. [Back to Amiga Developer Docs ]

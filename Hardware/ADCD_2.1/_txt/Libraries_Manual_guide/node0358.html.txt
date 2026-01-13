@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0358.html
+TITLE: 27 / / Using Graphics Drawing Routines / Drawing Ellipses and Circles
+
 27 / / Using Graphics Drawing Routines / Drawing Ellipses and Circles ]" border=0> Two functions are associated with drawing ellipses: DrawCircle() and DrawEllipse() . DrawCircle(), a macro that calls DrawEllipse(), will draw a circle from the specified center point using the specified radius. This function is executed by the statement: DrawCircle(&rastPort, center_x, center_y, radius); Similarly, DrawEllipse() draws an ellipse with the specified radii from the specified center point: DrawEllipse(&rastPort, center_x, center_y, horiz_r, vert_r); Neither function performs clipping on a non-layered RastPort . [Back to Amiga Developer Docs ]

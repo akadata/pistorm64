@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node02DD.html
+TITLE: Hard_Pics/6-13.pic
+
 Hard_Pics/6-13.pic ]" border=0> [Back to Amiga Developer Docs ]

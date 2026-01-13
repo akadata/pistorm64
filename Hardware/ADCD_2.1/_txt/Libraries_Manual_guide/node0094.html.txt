@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0094.html
+TITLE: Pens Index
+
 Pens Index ]" border=0> Pens and Intuition text, 239 background, 58 block, 47 , 57 , 106 compatible, 55 custom, 56 detail, 47 , 57 , 106 DrawInfo, 106 fill, 58 from public screen, 56 highlight text, 58 in Border structure, 238 Intuition text, 242 monochrome, 55 new look, 55 SA_Pens, 47 screens, 59 shadow, 58 shine (highlight), 58 text, 57 text on fill, 58 with graphics, 85 Workbench, 57 [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node02A2.html
+TITLE: graphics.library/AllocRaster
+
 graphics.library/AllocRaster ]" border=0> NAME AllocRaster -- Allocate space for a bitplane. SYNOPSIS planeptr = AllocRaster( width, height ) d0 d0 d1 PLANEPTR AllocRaster(ULONG,ULONG); FUNCTION This function calls the memory allocation routines to allocate memory space for a bitplane "width" bits wide and "height" bits high. INPUTS width - number of columns in bitplane height - number of rows in bitplane RESULT planeptr - pointer to first word in bitplane, or NULL if it was not possible to allocate the desired amount of memory. NOTES In order to assure proper alignment of display memory, the AllocBitMap() function should be used instead of AllocRaster when you wish to allocate display memory (rasters which are attached to a ViewPort or Screen). BUGS SEE ALSO FreeRaster() graphics/gfx.h [Back to Amiga Developer Docs ]

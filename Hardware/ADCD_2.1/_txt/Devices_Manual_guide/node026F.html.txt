@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node026F.html
+TITLE: FANT.doc / Fantavision high-level IFF format
+
 FANT.doc / Fantavision high-level IFF format ]" border=0> /* FORM FANT FHDR - background - FORM ILBM if Background is non-zero BMHD BODY - bitmap list - NOTE: If a bitmap has a mask, it will be compute during load time. FORM ILBM times NumberOfBitMaps BMHD BODY - sound list - { FORM 8SVX times NumberOfSounds VHDR BODY SEFX } Default parameters for sound - frame list - { FRAM times NumberOfFrames SEFX if sound for channel 1. SEFX if sound for channel 2. POLY times NumberOfPolys { CSTR Text of poly if PolyType = pTEXTBLOCK CSTR } } Name of font */ [Back to Amiga Developer Docs ]

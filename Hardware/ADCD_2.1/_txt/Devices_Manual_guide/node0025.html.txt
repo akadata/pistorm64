@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0025.html
+TITLE: 2 / Audio And System I/O Functions / AbortIO()
+
 2 / Audio And System I/O Functions / AbortIO() ]" border=0> This function can be used to cancel requests for ADCMD_ALLOCATE , ADCMD_LOCK , CMD_WRITE , or ADCMD_WAITCYCLE . When used with the audio device, AbortIO() always succeeds. [Back to Amiga Developer Docs ]

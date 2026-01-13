@@ -1,0 +1,1 @@
+SAD/READ_LONG ]" border=0> READ LONG - Read a long from the given address Command: $AF $06 Data: $ww $xx $yy $zz Read a long from address Returns as result Command will be ACK'ed when received. Command ACK: $00 $06 Command DONE: $1F $06 $qq $rr $ss $tt [Back to Amiga Developer Docs ]

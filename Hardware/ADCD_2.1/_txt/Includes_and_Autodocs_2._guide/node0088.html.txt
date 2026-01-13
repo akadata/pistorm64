@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0088.html
+TITLE: Includes/exec/initializers.i
+
 Includes/exec/initializers.i ]" border=0> IFND EXEC_INITIALIZERS_I EXEC_INITIALIZERS_I SET 1 ** ** $Filename: exec/initializers.i $ ** $Release: 2.04 Includes, V37.4 $ ** $Revision: 36.5 $ ** $Date: 90/05/10 $ ** ** Macros for creating InitStruct() tables ** ** (C) Copyright 1985-1999 Amiga, Inc. ** All Rights Reserved ** INITBYTE MACRO ; &offset,&value IFLE (\1)-255 ;If offset >16)&$0FF) DC.W ((\2)&$0FFFF) ENDM ENDC ; EXEC_INITIALIZERS_I [Back to Amiga Developer Docs ]

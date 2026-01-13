@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node00F7.html
+TITLE: E / Amiga I/O Connector Pins / Keyboard
+
 E / Amiga I/O Connector Pins / Keyboard ]" border=0> KEYBOARD ...RJ11 (Not Applicable to the A500) --------------------------------------------- A1000 A2000/A3000 ----- ----------- 1 +5 Volts KCLK 2 CLOCK KDAT 3 DATA NC 4 GND GND 5 +5 Volts [Back to Amiga Developer Docs ]

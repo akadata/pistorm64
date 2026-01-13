@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node049D.html
+TITLE: mathieeedoubtrans.library/IEEEDPSin
+
 mathieeedoubtrans.library/IEEEDPSin ]" border=0> NAME IEEEDPSin -- compute the sine of a floating point number SYNOPSIS x = IEEEDPSin( y ); d0/d1 d0/d1 double x,y; FUNCTION Compute sine of y in IEEE double precision INPUTS y - IEEE double precision floating point value RESULT x - IEEE double precision floating point value BUGS SEE ALSO IEEEDPAsin() , IEEEDPTan() , IEEEDPCos() [Back to Amiga Developer Docs ]

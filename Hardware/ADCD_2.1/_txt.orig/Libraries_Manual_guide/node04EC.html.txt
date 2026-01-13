@@ -1,0 +1,1 @@
+B / fillrectclass / Changed Methods: IM_DRAW ]" border=0> This method asks a fillrectclass object to render itself relative to the position ( LeftEdge and TopEdge ) and dimensions ( Width and Height ) in its embedded Image structure. See the imageclass description of IM_DRAW for more details. [Back to Amiga Developer Docs ]

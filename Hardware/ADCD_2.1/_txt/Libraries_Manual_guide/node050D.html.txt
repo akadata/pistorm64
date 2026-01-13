@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node050D.html
+TITLE: B / propgclass / Attributes: PGA_NewLook (I)
+
 B / propgclass / Attributes: PGA_NewLook (I) ]" border=0> This is a boolean attribute which corresponds to the PROPNEWLOOK flag PropInfo structure's Flags field (defined in intuition.h >). If this attribute is TRUE, the new propgclass object will use Release 2 imagery rather than the Release 1.3 imagery. [Back to Amiga Developer Docs ]

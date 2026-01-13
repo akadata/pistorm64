@@ -1,0 +1,1 @@
+3 / Advanced Topics / Interactions Among Playfields and Other Objects ]" border=0> Playfields share the display with sprites. Chapter 7, System Control Hardware, shows how playfields can be given different video display priorities relative to the sprites and how playfields can collide with (overlap) the sprites or each other. [Back to Amiga Developer Docs ]

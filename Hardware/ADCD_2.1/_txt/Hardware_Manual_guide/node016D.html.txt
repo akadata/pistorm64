@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node016D.html
+TITLE: 7 / / Setting and Clearing Bits / Disk Interrupt
+
 7 / / Setting and Clearing Bits / Disk Interrupt ]" border=0> Bits 12 and 1 of the interrupt registers are assigned to disk interrupts. Bit 12, DSKSYN, indicates that the sync register matches disk data. This bit generates a level 5 interrupt . Bit 1, DSKBLK, indicates "disk block finished." It is used to indicate that the specified disk DMA task that you have requested has been completed. This bit generates a level 1 interrupt . More information about disk data transfer and interrupts may be found in Chapter 8, "Interface Hardware." [Back to Amiga Developer Docs ]

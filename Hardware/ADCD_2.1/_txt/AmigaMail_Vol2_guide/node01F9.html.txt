@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node01F9.html
+TITLE: sana2.device/S2_ONLINE
+
 sana2.device/S2_ONLINE ]" border=0> NAME Online -- Put a network interface back in service. FUNCTION This command places an offline network interface back into service. IO REQUEST ios2_Command - S2_ONLINE. RESULTS ios2_Error - Zero if successful; non-zero otherwise. ios2_WireError - More specific error number. NOTES This command is responsible for putting the network interface hardware back into a known state (as close as possible to the state before S2_OFFLINE) and resets the unit global and special statistics. SEE ALSO S2_OFFLINE BUGS [Back to Amiga Developer Docs ]

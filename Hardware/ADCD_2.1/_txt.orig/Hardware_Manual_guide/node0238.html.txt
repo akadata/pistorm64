@@ -1,0 +1,1 @@
+Glossary / word ]" border=0> Based on the Motorola conventions, a word is equal to 2 bytes. [Back to Amiga Developer Docs ]

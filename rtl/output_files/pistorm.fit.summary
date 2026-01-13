@@ -1,0 +1,11 @@
+Fitter Status : Successful - Thu Jan  8 19:21:51 2026
+Quartus II 64-Bit Version : 13.0.1 Build 232 06/12/2013 SP 1 SJ Full Version
+Revision Name : pistorm
+Top-level Entity Name : pistorm
+Family : MAX II
+Device : EPM570T100C5
+Timing Models : Final
+Total logic elements : 65 / 570 ( 11 % )
+Total pins : 56 / 76 ( 74 % )
+Total virtual pins : 0
+UFM blocks : 0 / 1 ( 0 % )

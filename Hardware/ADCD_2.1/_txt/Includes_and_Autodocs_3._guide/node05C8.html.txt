@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node05C8.html
+TITLE: window_cl.doc
+
 window_cl.doc ]" border=0> --datasheet-- WINDOW_GetClass() WM_CLOSE WM_HANDLEINPUT WM_ICONIFY WM_OPEN [Back to Amiga Developer Docs ]

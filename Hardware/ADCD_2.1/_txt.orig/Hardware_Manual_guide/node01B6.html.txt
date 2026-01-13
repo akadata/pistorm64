@@ -1,0 +1,1 @@
+Glossary / amplitude modulation ]" border=0> In audio applications, a means of producing complex audio effects by using one audio channel to alter the amplitude of another. [Back to Amiga Developer Docs ]

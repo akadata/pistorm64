@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node01EC.html
+TITLE: LISTs, CATs, and Shared Properties (Advanced topics) / Group LIST
+
 LISTs, CATs, and Shared Properties (Advanced topics) / Group LIST ]" border=0> A LIST defines a group very much like CAT but it also gives a scope for PROP s (see below). And unlike CATs, LISTs should not be merged without understanding their contents. Structurally, a LIST is a chunk with ckID "LIST" containing a "contents type" ID, optional shared properties, and the nested contents ( FORM s, LISTs, and CAT s), in that order. The ckSize of each contained chunk is a relative pointer to the next one. A LIST is not an arbitrary linked list - the cells are simply concatenated. LIST ::= "LIST" #{ ContentsType PROP* (FORM | LIST | CAT)* } ContentsType ::= ID [Back to Amiga Developer Docs ]

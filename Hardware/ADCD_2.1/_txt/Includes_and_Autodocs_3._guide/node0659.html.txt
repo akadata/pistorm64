@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0659.html
+TITLE: include/libraries/dos.h
+
 include/libraries/dos.h ]" border=0> #ifndef LIBRARIES_DOS_H #define LIBRARIES_DOS_H /* ** $VER: dos.h 36.2 (12.7.1990) ** Includes Release 44.1 ** ** Standard C header for AmigaDOS ** ** (C) Copyright 1985-1999 Amiga, Inc. ** All Rights Reserved */ #ifndef DOS_DOS_H #include #endif #endif /* LIBRARIES_DOS_H */ [Back to Amiga Developer Docs ]

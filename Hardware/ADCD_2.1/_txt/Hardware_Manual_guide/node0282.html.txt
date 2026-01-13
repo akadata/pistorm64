@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0282.html
+TITLE: Serial Port Index
+
 Serial Port Index ]" border=0> Serial Port, 255 characteristics, 327 pin assignment, 326 specification, 326 timing, 327 [Back to Amiga Developer Docs ]

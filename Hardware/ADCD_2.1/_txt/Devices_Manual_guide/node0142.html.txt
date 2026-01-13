@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0142.html
+TITLE: mouth_rb Index
+
 mouth_rb Index ]" border=0> mouth_rb sync field values, 141 [Back to Amiga Developer Docs ]

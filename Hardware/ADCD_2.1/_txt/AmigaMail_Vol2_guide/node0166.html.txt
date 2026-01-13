@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node0166.html
+TITLE: I-7/simpleFR.ilbm
+
 I-7/simpleFR.ilbm ]" border=0> [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node00D1.html
+TITLE: clicktab_gc/GetClickTabNodeAttrsA
+
 clicktab_gc/GetClickTabNodeAttrsA ]" border=0> NAME GetClickTabNodeAttrsA -- Get attributes about a ClickTab node. SYNOPSIS VOID GetClickTabNodeAttrs(struct Node *, Tag , ...) GetClickTabNodeAttrs(node, firsttag, ...) VOID GetClickTabNodeAttrsA(struct Node *, struct TagItem *) GetClickTabNodeAttrsA(node, taglist) FUNCTION The ClickTab uses a private node structure and all attributes are hidden, and must therefore be accessed with this function. INPUTS node - The ClickTab node to get the information on. taglist - A tag list of attributes to get. ti_Tag is the attribute to get and ti_Data is a pointer to a location to copy the result to. The exception is LBNA_Column, which is used to specify a column to get attributes on. SEE ALSO SetClickTabNodeAttrsA() [Back to Amiga Developer Docs ]

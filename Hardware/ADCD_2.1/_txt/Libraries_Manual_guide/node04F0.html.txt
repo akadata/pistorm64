@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node04F0.html
+TITLE: B Boopsi Class Reference / itexticlass
+
 B Boopsi Class Reference / itexticlass ]" border=0> Class: itexticlass Superclass: imageclass Include File: imageclass.h > This is a class of image objects that render an IntuiText structure. Using some of the imageclass attributes, the object can override some of the parameters in the IntuiText structure. This class makes it easy to share an IntuiText structure between objects. New Methods: ------------ None. Changed Methods: ---------------- IM_DRAW/IM_DRAWFRAME [Back to Amiga Developer Docs ]

@@ -1,0 +1,1 @@
+Glossary / blanking interval ]" border=0> Time period when the video beam is outside the display area. [Back to Amiga Developer Docs ]

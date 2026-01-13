@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01F3.html
+TITLE: Glossary / hidden cycles
+
 Glossary / hidden cycles ]" border=0> Cycles that occur on the local bus of a system, but can't be seen by devices on the expansion bus. [Back to Amiga Developer Docs ]

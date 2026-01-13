@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0202.html
+TITLE: Glossary / microsecond (us)
+
 Glossary / microsecond (us) ]" border=0> One millionth of second (1/1,000,000). [Back to Amiga Developer Docs ]

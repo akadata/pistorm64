@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node04EF.html
+TITLE: parallel.device/CMD_START
+
 parallel.device/CMD_START ]" border=0> NAME Start -- restart paused I/O over the parallel port FUNCTION This command restarts the current I/O activity on the parallel port by reactivating the handshaking sequence. IO REQUEST io_Message mn_ReplyPort initialized io_Device set by OpenDevice io_Unit set by OpenDevice io_Command CMD_START (07) SEE ALSO parallel.device/CMD_STOP [Back to Amiga Developer Docs ]

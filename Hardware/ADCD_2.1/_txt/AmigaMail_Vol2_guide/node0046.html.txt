@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node0046.html
+TITLE: keymap.library (basename: _KeymapBase)
+
 keymap.library (basename: _KeymapBase) ]" border=0> AskKeyMapDefault()() - Ask for a pointer to the current default MapANSI(string,count,buffer,length,keyMap)(a0,d0/a1,d1/a2) - Encode an ANSI string into keycodes. (V36) MapRawKey(event,buffer,length,keyMap)(a0/a1,d1/a2) - Decode single raw key input event to an ANSI SetKeyMapDefault(keyMap)(a0) - Set the current default keymap. (V36) [Back to Amiga Developer Docs ]

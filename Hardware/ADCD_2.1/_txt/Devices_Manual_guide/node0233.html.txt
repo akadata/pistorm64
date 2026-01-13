@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0233.html
+TITLE: ANBM.doc / ANBM
+
 ANBM.doc / ANBM ]" border=0> Chunk Description: The ANBM chunk identifes this file as an animated bitmap Chunk Spec: #define ANBM MakeID('A','N','B','M') Disk record: none [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node013D.html
+TITLE: Input Device Index
+
 Input Device Index ]" border=0> Input Device, 101 adding a handler, 108 additional information, 118 and Intuition, 114 closing, 106 commands and functions, 102 designing an input handler, 108 determining current qualifiers, 113 device interface, 103 event handler, 108 generating input events, 109 input events, 105 key repeat events, 113 memory deallocation, 109 new features, 101 opening, 103 PeekQualifier(), 113 removing a handler, 109 setting key repeat interval, 113 setting key repeat timing, 112 setting mouse port report, 107 setting mouse port, 107 setting the mouse position, 110 time specification, 104 [Back to Amiga Developer Docs ]

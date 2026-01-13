@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node028D.html
+TITLE: getfile_gc.doc
+
 getfile_gc.doc ]" border=0> --datasheet-- GETFILE_GetClass() [Back to Amiga Developer Docs ]

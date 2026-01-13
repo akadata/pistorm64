@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0119.html
+TITLE: datatypes.library/SetDTAttrsA
+
 datatypes.library/SetDTAttrsA ]" border=0> NAME SetDTAttrsA - Set attributes for an object. (V39) SYNOPSIS retval = SetDTAttrsA (o, win, req, attrs); d0 a0 a1 a2 a3 ULONG SetDTAttrsA (Object *, struct Window *, struct Requester *, struct TagItem *); retval = SetDTAttrs (o, win, req, tag1, ...); ULONG SetDTAttrs (Object *, struct Window *, struct Requester *, Tag tag1, ...); FUNCTION This function is used to set the attributes of a data type object. INPUTS o - Pointer to an object as returned by NewDTObjectA() . win - Window that the object has been added to. attrs - Attributes to set, terminated with TAG_DONE. TAGS see for tags. SEE ALSO GetDTAttrsA() , intuition.library/SetGadgetAttrsA() [Back to Amiga Developer Docs ]

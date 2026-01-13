@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0380.html
+TITLE: iffparse.library/WriteChunkRecords
+
 iffparse.library/WriteChunkRecords ]" border=0> NAME WriteChunkRecords -- write records from a buffer to the current chunk. (V36) SYNOPSIS error = WriteChunkRecords(iff, buf, recsize, numrec); D0 A0 A1 D0 D1 LONG WriteChunkRecords(struct IFFHandle *, APTR , LONG , LONG); FUNCTION Writes record elements from the buffer into the top chunk. This function operates much like ReadChunkBytes() . INPUTS iff - pointer to IFFHandle structure. buf - pointer to buffer area containing data. recsize - size of data records to write. numrec - number of data records to write. RESULT error - (positive) number of whole records written if successful or a (negative) IFFERR_#? error code if unsuccessful. SEE ALSO WriteChunkBytes() , [Back to Amiga Developer Docs ]

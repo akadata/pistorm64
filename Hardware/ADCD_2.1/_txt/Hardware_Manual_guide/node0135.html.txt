@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0135.html
+TITLE: F / / Interval Timers (Timer A, Timer B) / PB on/off
+
 F / / Interval Timers (Timer A, Timer B) / PB on/off ]" border=0> A control bit (CRx1) allows the timer output to appear on a port B output line (PB6 for timer A and PB7 for timer B). This function overrides the DDRB control bit and forces the appropriate PB line to become an output. [Back to Amiga Developer Docs ]

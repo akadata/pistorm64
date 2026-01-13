@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node01FB.html
+TITLE: 11 Intuition Special Functions / Current Time Values
+
 11 Intuition Special Functions / Current Time Values ]" border=0> The function CurrentTime() gets the current time values. To use this function, first declare the variables Seconds and Micros. Then, when the application call the function, the current time is copied into the argument pointers. void CurrentTime( ULONG *seconds, ULONG *micros ); See the DOS library Autodocs in the AmigaDOS Manual (Bantam Books) for more information on functions dealing with the date and time. The DOS library includes such functions as DateToStr() , StrToDate() , SetFileDate() and CompareDates() . [Back to Amiga Developer Docs ]

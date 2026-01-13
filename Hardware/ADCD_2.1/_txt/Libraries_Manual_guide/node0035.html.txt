@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0035.html
+TITLE: attributes Index
+
 attributes Index ]" border=0> attribute Boopsi, 293 - attribute/value pairs, 294 mapping, 299 - see ICA_MAP OM_GET, 311 setting, 309 [Back to Amiga Developer Docs ]

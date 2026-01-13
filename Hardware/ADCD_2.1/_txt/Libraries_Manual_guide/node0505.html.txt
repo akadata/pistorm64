@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0505.html
+TITLE: B / gadgetclass / Attributes: GA_Highlight (IS)
+
 B / gadgetclass / Attributes: GA_Highlight (IS) ]" border=0> This attribute corresponds to the GFLG_GADGHIGHBITS portion of the gadget's Gadget.Flags field. This attribute can be one of four values (from intuition.h >): GFLG_GADGHCOMP , GFLG_GADGHBOX , GFLG_GADGHIMAGE , GFLG_GADGHNONE See the " Intuition Gadgets " chapter of the Amiga ROM Kernel Reference Manual: Libraries for more information. [Back to Amiga Developer Docs ]

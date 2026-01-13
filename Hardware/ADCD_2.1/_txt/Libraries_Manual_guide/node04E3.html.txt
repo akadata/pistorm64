@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node04E3.html
+TITLE: B / frameiclass / Changed Methods: IM_DRAWFRAME
+
 B / frameiclass / Changed Methods: IM_DRAWFRAME ]" border=0> This method is almost the same as the frameiclass IM_DRAW method, except this method accepts a width and height that overrides the width and height stored in the object's Image structure. It uses the same drawing states as the frameiclass's IM_DRAW method. See the imageclass description for IM_DRAWFRAME for more information. [Back to Amiga Developer Docs ]

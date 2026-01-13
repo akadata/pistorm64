@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node020C.html
+TITLE: XIII-1/23PF29PFAnalog.ilbm
+
 XIII-1/23PF29PFAnalog.ilbm ]" border=0> [Back to Amiga Developer Docs ]

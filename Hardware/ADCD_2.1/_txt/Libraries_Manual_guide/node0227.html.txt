@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0227.html
+TITLE: 13 Preferences / Preferences in Release 2
+
 13 Preferences / Preferences in Release 2 ]" border=0> Under Release 2 (V36), the way Preferences are handled is significantly different. No longer is there one Preferences program with one configuration file. Instead there can be any number of Preferences editors (there are currently 13), each with its own separate configuration file covering a specific area. All these Preferences editors have the same look and feel. Using separate Preferences editors and configuration files allows for adding new Preferences items (and editors) in future versions of the OS. Preferences Editors and Storage The ENV: Directory and Notification Preference File Format In Release 2 FONT INPT PGFX SCRM ICTL OSCN PTXT SERL Other Preferences File Formats in Release 2 Reading a Preferences File [Back to Amiga Developer Docs ]

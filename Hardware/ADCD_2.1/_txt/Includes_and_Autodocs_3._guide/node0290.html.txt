@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0290.html
+TITLE: getfont_gc.doc
+
 getfont_gc.doc ]" border=0> --datasheet-- GETFONT_GetClass() [Back to Amiga Developer Docs ]

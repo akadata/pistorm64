@@ -1,0 +1,1 @@
+D / Errors / Windows--Visual Problems ]" border=0> Many visual problems in windows can be caused by improper font specification or improper setting of gadget flags. See the Appendix E on " Release 2 Compatibility " for detailed information on common problems. [Back to Amiga Developer Docs ]

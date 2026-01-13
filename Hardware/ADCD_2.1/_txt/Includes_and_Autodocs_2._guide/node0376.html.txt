@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0376.html
+TITLE: exec.library/RemSemaphore
+
 exec.library/RemSemaphore ]" border=0> NAME RemSemaphore -- remove a signal semaphore from the system SYNOPSIS RemSemaphore(signalSemaphore) A1 void RemSemaphore(struct SignalSemaphore *); FUNCTION This function removes a signal semaphore structure from the system's signal semaphore list. Subsequent attempts to rendezvous by name with this semaphore will fail. INPUTS signalSemaphore -- an initialized signal semaphore structure SEE ALSO AddSemaphore , FindSemaphore [Back to Amiga Developer Docs ]

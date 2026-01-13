@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0136.html
+TITLE: F / / Interval Timers (Timer A, Timer B) / Toggle/pulse
+
 F / / Interval Timers (Timer A, Timer B) / Toggle/pulse ]" border=0> A control bit (CRx2) selects the output applied to port B while the PB on/off bit is ON. On every timer underflow, the output can either toggle or generate a single positive pulse of one cycle duration. The toggle output is set high whenever the timer is started, and set low by RES . [Back to Amiga Developer Docs ]

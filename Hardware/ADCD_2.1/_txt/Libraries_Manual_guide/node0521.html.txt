@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0521.html
+TITLE: B / buttongclass / Changed Methods: GM_HANDLEINPUT
+
 B / buttongclass / Changed Methods: GM_HANDLEINPUT ]" border=0> This method continuously issues OM_NOTIFY messages for each IECLASS_TIMER event it gets. The OM_NOTIFY message's OPUF_INTERIM flag (from opUpdate.opu_Flags ) is set for all but the final OM_NOTIFY. The OM_NOTIFY message contains one attribute/value pair, GA_ID. If the pointer is currently over the gadget image, the value of this attribute/value pair is the gadget's actual GA_ID (from the Gadget.GadgetID field). If the pointer isn't over the image, the value is the negative of the gadget's actual GA_ID. [Back to Amiga Developer Docs ]

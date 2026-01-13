@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0238.html
+TITLE: Glossary / word
+
 Glossary / word ]" border=0> Based on the Motorola conventions, a word is equal to 2 bytes. [Back to Amiga Developer Docs ]

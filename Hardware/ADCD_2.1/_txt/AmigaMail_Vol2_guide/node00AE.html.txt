@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node00AE.html
+TITLE: IM_MOVE
+
 IM_MOVE ]" border=0> The IM_MOVE method erases and redraws an image. It is intended for use in some subclass of imageclass that performs animation or smooth dragging. Currently, no public boopsi classes implement this method. [Back to Amiga Developer Docs ]

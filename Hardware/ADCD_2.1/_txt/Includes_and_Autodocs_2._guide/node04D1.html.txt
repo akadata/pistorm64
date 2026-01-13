@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node04D1.html
+TITLE: serial.device/CMD_START
+
 serial.device/CMD_START ]" border=0> NAME Start -- restart paused I/O over the serial port FUNCTION This function restarts all current I/O on the serial port by sending an xON to the "other side", and submitting a "logical xON" to "our side", if/when appropriate to current activity. IO REQUEST io_Message mn_ReplyPort initialized io_Device set by OpenDevice io_Unit set by OpenDevice io_Command CMD_START RESULTS SEE ALSO serial.device/CMD_STOP [Back to Amiga Developer Docs ]

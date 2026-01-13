@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0014.html
+TITLE: 9 / Device Interface / Closing The Parallel Device
+
 9 / Device Interface / Closing The Parallel Device ]" border=0> Each OpenDevice() must eventually be matched by a call to CloseDevice() . When the last close is performed, the device will deallocate all resources and buffers. The latest parameter settings will be saved for the next open. All I/O requests must be complete before CloseDevice() . If any requests are still pending, abort them with AbortIO(): if (!(CheckIO(ParallelIO))) { AbortIO(ParallelIO); /* Ask device to abort request, if pending */ } WaitIO(ParallelIO); /* Wait for abort, then clean up */ CloseDevice((struct IORequest *)ParallelIO); [Back to Amiga Developer Docs ]

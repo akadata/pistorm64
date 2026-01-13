@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node052C.html
+TITLE: B / groupgclass / Changed Methods: OM_SET
+
 B / groupgclass / Changed Methods: OM_SET ]" border=0> This method passes most attributes to the superclass, but propagates changes in position to its members appropriately. Also, GA_Width and GA_Height are calculated from the position and dimension of the membership. [Back to Amiga Developer Docs ]

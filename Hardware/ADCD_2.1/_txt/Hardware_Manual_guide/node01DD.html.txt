@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01DD.html
+TITLE: Glossary / data fetch
+
 Glossary / data fetch ]" border=0> The number of words fetched for each line of the display. [Back to Amiga Developer Docs ]

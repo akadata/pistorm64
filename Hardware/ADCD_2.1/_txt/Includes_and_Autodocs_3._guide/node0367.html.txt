@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0367.html
+TITLE: iffparse.library/FreeLocalItem
+
 iffparse.library/FreeLocalItem ]" border=0> NAME FreeLocalItem -- deallocate a local context item structure. (V36) SYNOPSIS FreeLocalItem(localItem); A0 VOID FreeLocalItem(struct LocalContextItem *); FUNCTION Frees the memory for the local context item and any associated user memory as allocated with AllocLocalItem() . User purge vectors should call this function after they have freed any other resources associated with this item. Note that FreeLocalItem() does NOT call the custom purge vector set up through SetLocalItemPurge(); all it does is free the local context item. (This implies that your custom purge vector would want to call this to ultimately free the LocalContextItem.) INPUTS localItem - pointer to LocalContextItem created with AllocLocalItem . Starting with V39, this may be NULL. SEE ALSO AllocLocalItem() , [Back to Amiga Developer Docs ]

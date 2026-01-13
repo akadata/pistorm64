@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node017D.html
+TITLE: dos.library/Info
+
 dos.library/Info ]" border=0> NAME Info -- Returns information about the disk SYNOPSIS success = Info( lock, parameterBlock ) D0 D1 D2 BOOL Info(BPTR, struct InfoData *) FUNCTION Info() can be used to find information about any disk in use. 'lock' refers to the disk, or any file on the disk. The parameter block is returned with information about the size of the disk, number of free blocks and any soft errors. INPUTS lock - BCPL pointer to a lock parameterBlock - pointer to an InfoData structure (longword aligned) RESULTS success - boolean SPECIAL NOTE: Note that InfoData structure must be longword aligned. [Back to Amiga Developer Docs ]

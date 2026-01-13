@@ -1,0 +1,1 @@
+E I/O Connectors And Interfaces / Part 1 - Amiga I/O Connector Pins ]" border=0> This is a list of the I/O connections to the outside world on the Amiga. RS232 and MIDI Port External Disk Parallel Port External SCSI Disk Keyboard RAMEX Video Expansion Video Display Enhancer Joy Sticks RF Monitor [Back to Amiga Developer Docs ]

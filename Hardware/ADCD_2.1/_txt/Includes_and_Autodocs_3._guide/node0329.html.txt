@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0329.html
+TITLE: graphics.library/SetRGB32CM
+
 graphics.library/SetRGB32CM ]" border=0> NAME SetRGB32CM -- Set one color register for this ColorMap . (V39) SYNOPSIS SetRGB32CM( cm, n, r, g, b) a0 d0 d1 d2 d3 void SetRGB4CM( struct ColorMap *, ULONG, ULONG, ULONG , ULONG); INPUTS cm = colormap n = the number of the color register to set. Must not exceed the numbe r of colors allocated for the colormap. r = red level (32 bit unsigned left justified fraction) g = green level b = blue level RESULT Store the (r,g,b) triplet at index n of the ColorMap structure. This function can be used to set up a ColorMap before before linking it into a viewport. BUGS SEE ALSO GetColorMap() GetRGB32() SetRGB32() SetRGB4CM() graphics/view.h [Back to Amiga Developer Docs ]

@@ -1,0 +1,1 @@
+FgPen Index ]" border=0> FgPen in complement mode, 585 in flood fill, 590 , 591 in JAM1 mode, 584 in line drawing, 588 in RastPort, 584 in rectangle fill, 592 with BltTemplate(), 596 [Back to Amiga Developer Docs ]

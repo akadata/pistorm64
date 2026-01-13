@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node01C5.html
+TITLE: iffparse.library/FreeIFF
+
 iffparse.library/FreeIFF ]" border=0> NAME FreeIFF -- Deallocate an IFFHandle struct. SYNOPSIS FreeIFF (iff) a0 struct IFFHandle *iff; FUNCTION Deallocates all resources associated with this IFFHandle struct. The struct MUST have already been closed with CloseIFF() . INPUTS iff - pointer to IFFHandle struct to free. RESULT EXAMPLE NOTES BUGS SEE ALSO AllocIFF() , CloseIFF() [Back to Amiga Developer Docs ]

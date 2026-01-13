@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node026E.html
+TITLE: mathtrans.library/SPFieee
+
 mathtrans.library/SPFieee ]" border=0> NAME SPFieee - convert single precision ieee to FFP number SYNOPSIS fnum = SPFieee(ieeenum); d0.l float fnum; float ieeenum; FUNCTION Accepts a standard single precision format returns the same number, converted to Motorola fast floating point number INPUTS ieeenum - IEEE Single Precision Floating Point RESULT fnum - Motorola fast floating point number BUGS None SEE ALSO SPTieee [Back to Amiga Developer Docs ]

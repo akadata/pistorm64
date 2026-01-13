@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node009B.html
+TITLE: Qualifier Index
+
 Qualifier Index ]" border=0> Qualifier, 281-282 Alt, 282 Amiga, 282 Caps Lock, 282 Ctrl, 282 mouse button, 282 numeric pad, 282 repeat, 277 , 282 Shift, 282 [Back to Amiga Developer Docs ]

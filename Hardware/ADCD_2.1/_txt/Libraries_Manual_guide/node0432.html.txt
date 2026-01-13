@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0432.html
+TITLE: 33 / Parsing / Controlling Parsing
+
 33 / Parsing / Controlling Parsing ]" border=0> ParseIFF() , if left to itself, wouldn't do anything useful. Ideally, it should stop at strategic places so we can look at the chunks. Here's where it can get complicated. There are many functions provided to help control the parsing process; only the common ones are covered here. Additional functions are described in the Autodocs for iffparse.library (for the complete Autodocs, refer to the Amiga ROM Kernel Reference Manual: Includes and Autodocs also by Addison-Wesley). StopChunk() PropChunk()/FindProp() [Back to Amiga Developer Docs ]

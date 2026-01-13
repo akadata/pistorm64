@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0616.html
+TITLE: lib_startup/RXstartup.i
+
 lib_startup/RXstartup.i ]"> RXSTARTUP SET 1 [Back to Amiga Developer Docs ]

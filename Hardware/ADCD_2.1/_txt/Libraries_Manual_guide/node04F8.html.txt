@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node04F8.html
+TITLE: B / gadgetclass / Changed Methods: OM_NEW
+
 B / gadgetclass / Changed Methods: OM_NEW ]" border=0> This method allocates space for an embedded struct Gadget (defined in intuition.h >) and initializes some of the attributes defined by gadgetclass . [Back to Amiga Developer Docs ]

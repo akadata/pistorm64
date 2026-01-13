@@ -1,0 +1,1 @@
+C Enhanced Chip Set / New Features of the Enhanced Chip Set ]" border=0> The new features of the Enhanced Chip Set are as follows: New Memory Limits New Monitor Scan Rates New Blitter Range New Genlock Capabilities New Mode Resolutions Built-in A2024 support [Back to Amiga Developer Docs ]

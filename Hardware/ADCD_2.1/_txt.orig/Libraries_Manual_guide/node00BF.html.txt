@@ -1,0 +1,1 @@
+ViewPort Index ]" border=0> ViewPort and Simple Sprite colors, 618 ColorMap, 542 colors, 543 , 553 display instructions, 555 display memory, 549 displaying, 541 function, 541 Height, 542 interlaced, 548 low-resolution, 553 modes, 544 , 545 Modes in Release 2, 564 multiple, 553 parameters, 542 Width, 543 width of and sprite display, 543 [Back to Amiga Developer Docs ]

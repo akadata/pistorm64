@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0609.html
+TITLE: lib_examples/samplebase.h
+
 lib_examples/samplebase.h ]" border=0> /* samplebase.h -- C include file defining sample.library base */ #ifndef SAMPLE_BASE_H #define SAMPLE_BASE_H #ifndef EXEC_TYPES_H #include #endif EXEC_TYPES_H #ifndef EXEC_LIBRARIES_H #include #endif EXEC_LIBRARIES_H /* library data structures-- Note that the library base begins with a library node */ struct SampleBase { struct Library LibNode; UBYTE Flags; UBYTE pad; /* We are now longword aligned */ ULONG SysLib; ULONG DosLib; ULONG SegList; }; #define SAMPLENAME "sample.library" #endif /* SAMPLE_BASE_H */ [Back to Amiga Developer Docs ]

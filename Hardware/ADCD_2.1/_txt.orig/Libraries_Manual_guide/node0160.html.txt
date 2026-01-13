@@ -1,0 +1,1 @@
+5 / Proportional Gadget / Initialization of a Proportional Gadget ]" border=0> The proportional gadget is initialized like any other gadget, with the addition of the PropInfo structure. Initialization of the PropInfo Structure Initialization of the Gadget Structure [Back to Amiga Developer Docs ]

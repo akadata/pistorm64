@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0447.html
+TITLE: 33 / / Context Nodes / CurrentChunk()
+
 33 / / Context Nodes / CurrentChunk() ]" border=0> You can obtain a pointer to the current ContextNode through the function CurrentChunk() : currentnode = CurrentChunk (iff); The ContextNode tells you the type, ID, and size of the currently active chunk. If there is no currently active context, NULL is returned. [Back to Amiga Developer Docs ]

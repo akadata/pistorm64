@@ -1,0 +1,1 @@
+The DR2D Chunks ]" border=0> FORM (0x464F524D) /* All drawings are a FORM */ DR2D (0x44523244) /* ID of 2D drawing */ [Back to Amiga Developer Docs ]

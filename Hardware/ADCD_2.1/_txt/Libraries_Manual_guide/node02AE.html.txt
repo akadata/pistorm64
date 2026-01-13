@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node02AE.html
+TITLE: 20 / Memory Functions / Using Memory Copy Functions
+
 20 / Memory Functions / Using Memory Copy Functions ]" border=0> For memory block copies, the CopyMem() and CopyMemQuick() functions can be used. Copying System Memory [Back to Amiga Developer Docs ]

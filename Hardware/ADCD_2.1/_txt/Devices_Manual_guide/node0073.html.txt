@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0073.html
+TITLE: Amiga® RKM Devices: 11 SCSI Device
+
 Amiga® RKM Devices: 11 SCSI Device ]" border=0> The Small Computer System Interface (SCSI) hardware of the A3000 and A2091/A590 is controlled by the SCSI device. The SCSI device allows an application to send Exec I/O commands and SCSI commands to a SCSI peripheral. Common SCSI peripherals include hard drives, streaming tape units and CD-ROM drives. SCSI Device Commands and Functions Device Interface SCSI-Direct RigidDiskBlock - Fields and Implementation Amiga BootStrap SCSI-Direct Example Additional Information on the SCSI Device [Back to Amiga Developer Docs ]

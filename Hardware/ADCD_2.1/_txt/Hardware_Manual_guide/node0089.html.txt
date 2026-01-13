@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0089.html
+TITLE: 3 / / Horiz. Scrolling / Specifying Data Fetch in Horizontal Scrolling
+
 3 / / Horiz. Scrolling / Specifying Data Fetch in Horizontal Scrolling ]" border=0> The normal data-fetch start for non-scrolled displays is ($38). If horizontal scrolling is desired, then the data fetch must start one word sooner ( DDFSTRT = $0030). Incidentally, this will disable sprite 7 . DDFSTOP remains unchanged. Remember that the settings of the data-fetch registers affect both playfields. [Back to Amiga Developer Docs ]

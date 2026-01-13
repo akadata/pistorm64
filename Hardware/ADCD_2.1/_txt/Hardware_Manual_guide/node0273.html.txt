@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0273.html
+TITLE: Light Pen Index
+
 Light Pen Index ]" border=0> Light Pen, 333 connections, 228 pins, 333 reading, 238 registers, 238 [Back to Amiga Developer Docs ]

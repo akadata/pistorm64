@@ -1,0 +1,1 @@
+B / frbuttonclass / Attributes: GA_DrawInfo (I) ]" border=0> This attribute passes a pointer to a valid DrawInfo structure. If the frbuttonclass gadget is going to frame plain text (passed to it in the GA_Text attribute), the frbuttonclass gadget requires a DrawInfo structure to properly calculate the dimensions of the text. [Back to Amiga Developer Docs ]

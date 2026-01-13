@@ -1,0 +1,1 @@
+A / IFF Third Party Public Form and Chunk Specification / ILBM.DRNG.doc ]" border=0> DPaint IV enhanced color cycle chunk (EA) DRNG Chunk for FORM ILBM ------------------------ Submitted by Lee Taran Enhanced Color Cycling Capabilities DPaintIV DRNG Chunk [Back to Amiga Developer Docs ]

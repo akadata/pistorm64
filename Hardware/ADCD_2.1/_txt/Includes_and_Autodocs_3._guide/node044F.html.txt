@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node044F.html
+TITLE: locale.library/--environment_vars--
+
 locale.library/--environment_vars-- ]" border=0> Starting with V40, locale.library maintains a global environment variable called "Language" which contains the name of the current default language as used in the system. This is the name of the language associated with the Locale structure returned by OpenLocale(NULL). EXAMPLE From a shell: Echo "The system language currently is: $Language" will print the name of the current system language ("english", "français", etc) [Back to Amiga Developer Docs ]

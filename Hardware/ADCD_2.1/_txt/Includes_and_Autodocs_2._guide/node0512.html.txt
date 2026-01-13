@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0512.html
+TITLE: printer.doc
+
 printer.doc ]" border=0> CMD_FLUSH CMD_START PRD_DUMPRPORT PRD_RAWWRITE CMD_INVALID CMD_STOP PRD_PRTCOMMAND PWrite() CMD_RESET CMD_WRITE PRD_QUERY [Back to Amiga Developer Docs ]

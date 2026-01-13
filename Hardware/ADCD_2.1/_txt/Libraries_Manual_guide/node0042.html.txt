@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0042.html
+TITLE: Checkmark Index
+
 Checkmark Index ]" border=0> Checkmark custom (for menus), 107 menu items, 181 menus, 170 mutual exclude, 182 positioning, 182 size, 182 tracking, 182 , 185 [Back to Amiga Developer Docs ]

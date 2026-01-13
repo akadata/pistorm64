@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0050.html
+TITLE: animation_dtc.doc
+
 animation_dtc.doc ]" border=0> animation.datatype() [Back to Amiga Developer Docs ]

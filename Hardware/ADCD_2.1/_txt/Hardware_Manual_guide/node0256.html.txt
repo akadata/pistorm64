@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0256.html
+TITLE: Collision Index
+
 Collision Index ]" border=0> Collision, 213 control register, 215 detection register, 214 [Back to Amiga Developer Docs ]

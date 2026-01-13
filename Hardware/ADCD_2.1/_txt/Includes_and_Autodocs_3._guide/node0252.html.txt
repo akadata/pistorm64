@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0252.html
+TITLE: SAD/READ_WORD
+
 SAD/READ_WORD ]" border=0> READ WORD - Read a word from the given address (V40 SAD) Command: $AF $05 Data: $ww $xx $yy $zz Read a word from address Returns as result Command will be ACK'ed when received. Command ACK: $00 $05 Command DONE: $1F $05 $qq $rr BUGS This command does not return correct values in pre-V40 EXEC. [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node009C.html
+TITLE: Queue Limit Index
+
 Queue Limit Index ]" border=0> Queue Limit, 113 IDCMP_UPDATE, 277 keyboard repeat, 108 mouse, 108 mouse move, 268 raw key, 277 vanilla key, 277 [Back to Amiga Developer Docs ]

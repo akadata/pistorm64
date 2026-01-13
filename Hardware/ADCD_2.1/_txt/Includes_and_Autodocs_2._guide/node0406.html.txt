@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0406.html
+TITLE: wb.doc
+
 wb.doc ]" border=0> AddAppIconA() AddAppWindowA() RemoveAppMenuItem() AddAppMenuItemA() RemoveAppIcon() RemoveAppWindow() [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node01D1.html
+TITLE: VI-1/fig3.ilbm
+
 VI-1/fig3.ilbm ]" border=0> [Back to Amiga Developer Docs ]

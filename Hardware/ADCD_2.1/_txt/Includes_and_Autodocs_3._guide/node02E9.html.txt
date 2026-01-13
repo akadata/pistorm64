@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node02E9.html
+TITLE: graphics.library/GetRGB32
+
 graphics.library/GetRGB32 ]" border=0> NAME GetRGB32 -- Set a series of color registers for this Viewport. (V39) SYNOPSIS GetRGB32( cm, firstcolor, ncolors, table ) a0 d0 d1 a1 void GetRGB32( struct ColorMap *, ULONG, ULONG, ULONG *); INPUTS cm = colormap firstcolor = the first color register to get ncolors = the number of color registers to set. table=a pointer to a series of 32-bit RGB triplets. RESULT The ULONG data pointed to by 'table' will be filled with the 32 bit fractional RGB values from the colormap. BUGS NOTES 'Table' should point to at least ncolors*3 longwords. SEE ALSO LoadRGB4() GetColorMap() LoadRGB32() SetRGB32CM() graphics/view.h [Back to Amiga Developer Docs ]

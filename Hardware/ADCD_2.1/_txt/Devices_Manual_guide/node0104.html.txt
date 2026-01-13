@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0104.html
+TITLE: 7 / Amiga Reset Handling / Removing A Reset Handler (KBD_REMRESETHANDLER)
+
 7 / Amiga Reset Handling / Removing A Reset Handler (KBD_REMRESETHANDLER) ]" border=0> This command is used to remove a keyboard reset handler from the system. You need to supply the same Interrupt structure to this command that you used with the KBD_ADDRESETHANDLER command. [Back to Amiga Developer Docs ]

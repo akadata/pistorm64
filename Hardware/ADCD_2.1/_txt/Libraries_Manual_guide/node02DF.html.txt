@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node02DF.html
+TITLE: 23 / List Functions / Special Case Insertion
+
 23 / List Functions / Special Case Insertion ]" border=0> Although the Insert() function allows new nodes to be inserted at the head and the tail of a list, the AddHead() and AddTail() functions will do so with higher efficiency. Adding to the head or tail of a list is common practice in first-in-first-out ( FIFO ) or last-in-first-out ( LIFO or stack) operations. For example, AddHead( header , node ) would insert the node at the head of the specified list. [Back to Amiga Developer Docs ]

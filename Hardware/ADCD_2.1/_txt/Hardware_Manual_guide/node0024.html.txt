@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0024.html
+TITLE: A Register Summary / BPLxPTH, BPLxPTL
+
 A Register Summary / BPLxPTH, BPLxPTL ]" border=0> Agnus/ Read/ Denise/ Register Address Write Paula Function -------- ------- ----- ------- -------- BPLxPTH 0E0 W A Bitplane x pointer (high 3 bits) BPLxPTL 0E2 W A Bitplane x pointer (low 15 bits) This pair of registers contains the 18-bit pointer to the address of bitplane x (x=1,2,3,4,5,6) DMA data. This pointer must be reinitialized by the processor or copper to point to the beginning of bitplane data every vertical blank time. [Back to Amiga Developer Docs ]

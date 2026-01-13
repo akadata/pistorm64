@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0082.html
+TITLE: MakeVPort() Index
+
 MakeVPort() Index ]" border=0> MakeVPort(), 66 , 555 , 610 , 709 allocating memory, 560 and Simple Sprites, 619 in double-buffering, 579 [Back to Amiga Developer Docs ]

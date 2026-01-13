@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0155.html
+TITLE: 7 System Control Hardware / Video Priorities
+
 7 System Control Hardware / Video Priorities ]" border=0> You can control the priorities of various objects on the screen to give the illusion of three dimensions. The section below shows how playfield priority may be changed relative to sprites. Fixed Sprite Priorities Understanding Video Priorities How Sprites are Grouped Setting the Priority Control Register [Back to Amiga Developer Docs ]

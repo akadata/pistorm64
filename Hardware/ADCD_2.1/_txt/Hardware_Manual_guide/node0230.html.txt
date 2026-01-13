@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0230.html
+TITLE: Glossary / timbre
+
 Glossary / timbre ]" border=0> The distinctive quality of a sound produced by its overtones. [Back to Amiga Developer Docs ]

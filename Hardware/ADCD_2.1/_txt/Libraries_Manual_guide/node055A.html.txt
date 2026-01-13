@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node055A.html
+TITLE: D / Errors / Windows--Borders Flicker after Resize
+
 D / Errors / Windows--Borders Flicker after Resize ]" border=0> Set the NOCAREREFESH flag. Even SMART_REFRESH windows may generate refresh events if there is a sizing gadget. If you don't have specific code to handle this, you must set the NOCAREREFRESH flag. If you do have refresh code, be sure to use the Begin / EndRefresh() calls. Failure to do one or the other will leave Intuition in an intermediate state, and slow down operation for all windows on the screen. [Back to Amiga Developer Docs ]

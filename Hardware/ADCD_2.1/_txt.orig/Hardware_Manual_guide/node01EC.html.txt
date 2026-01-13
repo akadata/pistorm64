@@ -1,0 +1,1 @@
+Glossary / Exec ]" border=0> The Amiga system module which manages memory and performs other important low-level tasks. [Back to Amiga Developer Docs ]

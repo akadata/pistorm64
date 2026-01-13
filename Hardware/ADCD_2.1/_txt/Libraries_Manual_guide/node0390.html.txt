@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0390.html
+TITLE: 28 / / Displaying the VSprites / Synchronizing with the Display
+
 28 / / Displaying the VSprites / Synchronizing with the Display ]" border=0> To synchronize application functions with the display, call the system function WaitTOF() . WaitTOF() holds your task until the vertical-blanking interval (blank area at the top of the screen) has begun. At that time, the system has retrieved the current Copper instruction list and is ready to allow generation of a new list. WaitTOF(); WaitTOF() takes no arguments and returns no values. It simply suspends your task until the video beam is at the top of field. [Back to Amiga Developer Docs ]

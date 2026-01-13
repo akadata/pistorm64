@@ -1,0 +1,1 @@
+mathieeesingbas.doc ]" border=0> IEEESPAbs() IEEESPAdd() IEEESPCeil() IEEESPCmp() IEEESPDiv() IEEESPFix() IEEESPFloor() IEEESPFlt() IEEESPMul() IEEESPNeg() IEEESPSub() IEEESPTst() [Back to Amiga Developer Docs ]

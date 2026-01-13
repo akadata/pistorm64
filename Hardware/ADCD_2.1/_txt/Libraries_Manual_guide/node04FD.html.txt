@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node04FD.html
+TITLE: B / gadgetclass / Attributes:GA_Left, GA_Top, GA_Width, GA_Height (IS)
+
 B / gadgetclass / Attributes:GA_Left, GA_Top, GA_Width, GA_Height (IS) ]" border=0> These attributes correspond to the Gadget structure's LeftEdge , TopEdge , Width , and Height fields. Setting these clears the " gadget relative " flags (below). [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node00C9.html
+TITLE: 13 Timer Device / Additional Information on the Timer Device
+
 13 Timer Device / Additional Information on the Timer Device ]" border=0> Additional programming information on the timer device and the utilities library can be found in their include files and Autodocs. All are contained in the Amiga ROM Kernel Reference Manual: Includes and Autodocs. Timer Device Information ------------------------------- INCLUDES devices/ timer.h devices/ timer.i utility/ date.h utility/ date.i AUTODOCS timer.doc utility.doc [Back to Amiga Developer Docs ]

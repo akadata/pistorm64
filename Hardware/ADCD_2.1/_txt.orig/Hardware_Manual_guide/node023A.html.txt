@@ -1,0 +1,1 @@
+Amiga® Hardware Reference Manual: J Custom Chip Pin Allocation List ]" border=0> This section gives the pin assignments used by the Amiga's custom chip set. NOTE: * Means an active low signal. Original Agnus Pin Assignment Paula Pin Assignment Denise Pin Assignment Fat Agnus Pin Assignment [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node01B1.html
+TITLE: dos.library/SetArgStr
+
 dos.library/SetArgStr ]" border=0> NAME SetArgStr -- Sets the arguments for the current process (V36) SYNOPSIS oldptr = SetArgStr(ptr) D0 D1 STRPTR SetArgStr(STRPTR) FUNCTION Sets the arguments for the current program. The ptr MUST be reset to it's original value before process exit. INPUTS ptr - pointer to new argument string. RESULT oldptr - the previous argument string SEE ALSO GetArgStr() , RunCommand() [Back to Amiga Developer Docs ]

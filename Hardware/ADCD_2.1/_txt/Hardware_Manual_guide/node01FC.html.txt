@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01FC.html
+TITLE: Glossary / longword
+
 Glossary / longword ]" border=0> Based on the Motorola conventions, a longword is equal to 4 bytes. [Back to Amiga Developer Docs ]

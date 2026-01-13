@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0130.html
+TITLE: B,C Index
+
 B,C Index ]" border=0> BattClock Resource, 325 - additional information, 327 - functions, 325 BattMem Resource, 327 - additional information, 327 - functions, 327 BeginIO(), , , 18 , 271 Boot priority - floppy disks, 258 Caps Lock key, 78 Cause(), 314 CBD_CHANGEHOOK command, 42 - caveats, 43 CBD_CURRENTREADID command, 40 Cbio.c, 50 Changehook_Test.c, 47 CheckIO(), CIA Resource --> Cia_Interval.c, 329 Clipboard Device --> Clipboard Tool, 38 Clipdemo.c, 43 ClipID, 41 Clip - identification, 37 Closing A Device, - outstanding I/O requests, CMD_CLEAR Command, 310 CMD_READ Command, 307 CMD_UPDATE Command, 310 CMD_WRITE command, 177 CMD_WRITE Command, 308 CmpTime(), 295 Commodore SCSI Drives - unit numbers, 250 Complex_Serial.c, 280 Console Device --> Console.c, 81 Current Clip, 40 [Back to Amiga Developer Docs ]

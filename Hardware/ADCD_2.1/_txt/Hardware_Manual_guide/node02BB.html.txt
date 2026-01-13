@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node02BB.html
+TITLE: K Zorro Expansion Bus / Electrical Specifications
+
 K Zorro Expansion Bus / Electrical Specifications ]" border=0> The Zorro III bus has a number of electrical specifications that are very important for PIC designers to consider, along with the timing parameters of course. It's extremely important to base designs on the specification of the backplane, rather than the actual behavior of the backplane. New backplanes for new machines are designed to conform to the specification, they are not necessarily based on previous designs. This is especially important with the Zorro III bus, since timing is far more critical than in the past, and the bus controller is designed from this specification, rather than the reverse, as in the Amiga 2000. Expansion Bus Loading Temperature Range Slot Power Availability [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node02EC.html
+TITLE: Devices/iffp/amiga.h
+
 Devices/iffp/amiga.h ]" border=0> /* IFF application include files */ #ifndef AMIGA_H #define AMIGA_H #include #include #include #include #include #include #include #include #include #include #include #include #include #include #include #include #include #include #include #include "iffp/debug.h" #endif [Back to Amiga Developer Docs ]

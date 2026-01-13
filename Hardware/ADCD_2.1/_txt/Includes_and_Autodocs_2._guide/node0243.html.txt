@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0243.html
+TITLE: intuition.library/ReleaseGIRPort
+
 intuition.library/ReleaseGIRPort ]" border=0> NAME ReleaseGIRPort -- Release a custom gadget RastPort . (V36) SYNOPSIS ReleaseGIRPort( RPort ) A0 VOID ReleaseGIRPort( struct RastPort * ); FUNCTION The corresponding function to ObtainGIRPort() , it releases arbitration used by Intuition for gadget RastPorts. INPUTS Pointer to the RastPort returned by ObtainGIRPort() . This pointer can be NULL, in which case nothing happens. RESULT None BUGS SEE ALSO ObtainGIRPort() , Custom Gadget documentation [Back to Amiga Developer Docs ]

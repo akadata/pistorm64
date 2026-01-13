@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0008.html
+TITLE: intuition
+
 intuition ]" border=0> cghooks.h gadgetclass.h intuition.h preferences.h cghooks.i gadgetclass.i intuition.i preferences.i classes.h icclass.h intuitionbase.h screens.h classes.i icclass.i intuitionbase.i screens.i classusr.h imageclass.h iobsolete.h sghooks.h classusr.i imageclass.i iobsolete.i sghooks.i [Back to Amiga Developer Docs ]

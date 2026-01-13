@@ -1,0 +1,1 @@
+Glossary / request ]" border=0> Asking for the use of some resource; the Zorro III bus has two kinds of requests, bus requests and quick interrupt requests. [Back to Amiga Developer Docs ]

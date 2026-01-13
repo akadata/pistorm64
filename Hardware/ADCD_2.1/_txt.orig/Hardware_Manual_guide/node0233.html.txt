@@ -1,0 +1,1 @@
+Glossary / tri-state ]" border=0> A signal driven to a high impedence condition is said to be tri-stated. [Back to Amiga Developer Docs ]

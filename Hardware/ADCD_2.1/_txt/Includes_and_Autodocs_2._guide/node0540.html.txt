@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0540.html
+TITLE: battmem.doc
+
 battmem.doc ]" border=0> ObtainBattSemaphore() ReleaseBattSemaphore() ReadBattMem() WriteBattMem() [Back to Amiga Developer Docs ]

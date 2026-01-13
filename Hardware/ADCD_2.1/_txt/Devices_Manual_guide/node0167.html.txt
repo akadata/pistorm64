@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0167.html
+TITLE: FORM Specs from the Original EA Document / FTXT IFF Formatted Text
+
 FORM Specs from the Original EA Document / FTXT IFF Formatted Text ]" border=0> Date: November 15, 1985 (Updated Oct, 1988 Commodore-Amiga, Inc.) From: Steve Shaw and Jerry Morrison, Electronic Arts and Bob "Kodiak" Burns, Commodore-Amiga Status: Adopted Introduction Standard Data and Property Chunks FTXT Stripper Appendix A: Character Code Table Appendix B: FTXT Example Appendix C: ISO/ANSI Control Sequences [Back to Amiga Developer Docs ]

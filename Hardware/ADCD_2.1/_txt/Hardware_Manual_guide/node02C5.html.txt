@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node02C5.html
+TITLE: K / Mechanical Specifications / PIC with Video Option
+
 K / Mechanical Specifications / PIC with Video Option ]" border=0> This drawing shows the basic Zorro III PIC, with both Zorro III and the Amiga Video Slot fingers specified. All of the dimensions are in millimeters. Please consult the A500/A2000 Technical Reference Manual for the form factor specification of a video-only card that will fit both Amiga 2000 and Amiga 3000 computers. | | | 7.62 -->| | | | | | | +---| 22.4 | | | | | | | | | | v v | | ----- +-------+ # # +-------+ # # +--+ # # +-----+ -- | # # | | # # | | # # | ^ +------------------+ +-------+ +-------+ | | | | | | | | | 43.18| | 23.495| | | | | | | | | Figure K-16: PIC with Video Option [Back to Amiga Developer Docs ]

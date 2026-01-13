@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0176.html
+TITLE: Devices/Dev_examples/macros.i
+
 Devices/Dev_examples/macros.i ]" border=0> ********************************************************************** * * printer device macro definitions * ********************************************************************** *------ external definition macros ----------------------------------- XREF_EXE MACRO XREF _LVO\1 ENDM XREF_DOS MACRO XREF _LVO\1 ENDM XREF_GFX MACRO XREF _LVO\1 ENDM XREF_ITU MACRO XREF _LVO\1 ENDM *------ library dispatch macros -------------------------------------- CALLEXE MACRO CALLLIB _LVO\1 ENDM LINKEXE MACRO LINKLIB _LVO\1,_SysBase ENDM LINKDOS MACRO LINKLIB _LVO\1,_DOSBase ENDM LINKGFX MACRO LINKLIB _LVO\1,_GfxBase ENDM LINKITU MACRO LINKLIB _LVO\1,_IntuitionBase ENDM [Back to Amiga Developer Docs ]

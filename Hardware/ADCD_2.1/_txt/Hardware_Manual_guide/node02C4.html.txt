@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node02C4.html
+TITLE: K / Mechanical Specifications / PIC with ISA Option
+
 K / Mechanical Specifications / PIC with ISA Option ]" border=0> This drawing shows the basic Zorro III PIC, with both Zorro III and the ISA Bus fingers specified. All of the dimensions are in millimeters. | | | 7.62 -->| | | | | | | +---| 22.4 | | | | | | | | | | v v | | ----- +-------+ # # +--+ # # +--+ # # +-----+ -- | # # | | # # | | # # | ^ +------------------+ +-------+ +------------+ | | | | | | | | | | | 23.495| | | | | | | | | Figure K-15: PIC with ISA Option [Back to Amiga Developer Docs ]

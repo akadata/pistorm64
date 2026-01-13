@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node043E.html
+TITLE: listbrowser_gc.doc
+
 listbrowser_gc.doc ]" border=0> --datasheet-- LISTBROWSER_GetClass() LBM_ADDNODE LBM_EDITNODE LBM_REMNODE AllocListBrowserNodeA() FreeListBrowserList() FreeListBrowserNode() GetListBrowserNodeAttrsA() HideAllListBrowserChildren() HideListBrowserNodeChildren() ListBrowserSelectAll() SetListBrowserNodeAttrsA() ShowAllListBrowserChildren() ShowListBrowserNodeChildren() [Back to Amiga Developer Docs ]

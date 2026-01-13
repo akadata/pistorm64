@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0045.html
+TITLE: Clipping Rectangles Index
+
 Clipping Rectangles Index ]" border=0> Clipping Rectangles in layers, 704 , 711 , 712 , 719 modifying regions, 722 [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node017E.html
+TITLE: 8 / Controller Port Interface / Registers used with Controller Port
+
 8 / Controller Port Interface / Registers used with Controller Port ]" border=0> The Amiga chip registers that handle the controller port I/O are listed below. JOY0DAT ($DFF00A) Counter for digital (mouse) input (port 1) JOY1DAT ($DFF00C) Counter for digital (mouse) input (port 2) CIAAPRA ($BFE001) Input and output for pin 6 (port 1 & 2 fire buttons) POT0DAT ($DFF012) Counter for proportional input (port 1) POT1DAT ($DFF014) Counter for proportional input (port 2) POTGO ($DFF034) Write proportional pin values and start counters POTGOR ($DFF016) Read proportional pin values BPLCON0 ($DFF100) Bit 3 enables the light pen latch VPOSR ($DFF004) Read light pen position (high order bits) VHPOSR ($DFF006) Read light pen position (low order bits) [Back to Amiga Developer Docs ]

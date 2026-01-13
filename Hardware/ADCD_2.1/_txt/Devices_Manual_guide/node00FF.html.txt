@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node00FF.html
+TITLE: 7 / Device Interface / Opening The Keyboard Device
+
 7 / Device Interface / Opening The Keyboard Device ]" border=0> Three primary steps are required to open the keyboard device: * Create a message port using the CreatePort() function. * Create an extended I/O request structure using the CreateExtIO() function. CreateExtIO() will initialize the I/O request with your reply port. * Open the keyboard device. Call OpenDevice() , passing the I/O request. struct MsgPort *KeyMP; /* Pointer for Message Port */ struct IOStdReq *KeyIO; /* Pointer for I/O request */ if (KeyMP=CreatePort(NULL,NULL)) if (KeyIO=(struct IOStdReq *)CreateExtIO(KeyMP,sizeof(struct IOStdReq))) if (OpenDevice( "keyboard.device",NULL,(struct IORequest *)KeyIO,NULL)) printf("keyboard.device did not open\n"); [Back to Amiga Developer Docs ]

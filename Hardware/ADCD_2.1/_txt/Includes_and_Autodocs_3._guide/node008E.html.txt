@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node008E.html
+TITLE: cardres.doc
+
 cardres.doc ]" border=0> BeginCardAccess() CardAccessSpeed() CardChangeCount() CardForceChange() CardInterface() CardMiscControl() CardProgramVoltage() CardResetCard() CardResetRemove() CopyTuple() DeviceTuple() EndCardAccess() GetCardMap() IfAmigaXIP() OwnCard() ReadCardStatus() ReleaseCard() [Back to Amiga Developer Docs ]

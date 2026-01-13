@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0086.html
+TITLE: Menu structure Index
+
 Menu structure Index ]" border=0> Menu structure, 179 , 188-189 , 189-190 BeatX, 189 BeatY, 189 definition, 188 FirstItem, 189 , 189 Flags, 189 Height, 188 JazzX, 189 JazzY, 189 LeftEdge, 188 , 189 MenuName, 189 NextMenu, 188 TopEdge, 188 , 189 Width, 188 [Back to Amiga Developer Docs ]

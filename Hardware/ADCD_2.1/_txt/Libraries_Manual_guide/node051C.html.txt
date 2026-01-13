@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node051C.html
+TITLE: B / strgclass / STRINGA_ReplaceMode - STRINGA_NoFilterMode (IS)
+
 B / strgclass / STRINGA_ReplaceMode - STRINGA_NoFilterMode (IS) ]" border=0> STRINGA_ReplaceMode, STRINGA_FixedFieldMode, STRINGA_NoFilterMode (IS) - These three are independent Boolean equivalents to the individual flags that you can set for STRINGA_EditModes . [Back to Amiga Developer Docs ]

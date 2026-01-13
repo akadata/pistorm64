@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node018E.html
+TITLE: Devices/Dev_examples/cb.h
+
 Devices/Dev_examples/cb.h ]" border=0> /*********************************************************************** * * cb.h - Include file used by clipdemo.c, changehook_test.c and cbio.c * ***********************************************************************/ struct cbbuf { ULONG size; /* size of memory allocation */ ULONG count; /* number of characters after stripping */ UBYTE *mem; /* pointer to memory containing data */ }; #define MAKE_ID(a,b,c,d) ((a [Back to Amiga Developer Docs ]

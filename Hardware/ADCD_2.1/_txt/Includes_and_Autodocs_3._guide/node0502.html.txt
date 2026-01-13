@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0502.html
+TITLE: printer.doc
+
 printer.doc ]" border=0> --background-- CallErrHook() CMD_FLUSH CMD_INVALID CMD_RESET CMD_START CMD_STOP CMD_WRITE PBothReady() PRD_DUMPRPORT PRD_DUMPRPORTTAGS PRD_EDITPREFS PRD_PRTCOMMAND PRD_QUERY PRD_RAWWRITE PRD_READPREFS PRD_SETERRHOOK PRD_WRITEPREFS PQuery() PRead() PWrite() [Back to Amiga Developer Docs ]

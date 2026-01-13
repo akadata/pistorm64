@@ -1,1 +1,4 @@
+SOURCE: AmigaMail_Vol2_guide/node0064.html
+TITLE: Obsolete Packets
+
 Obsolete Packets ]" border=0> There are several packet types that are documented within the system include files that are obsolete. A file system is not expected to handle these packets and any program which sends these packets can not expect them to work: ACTION_DISK_CHANGE 33 ACTION_DISK_TYPE 32 ACTION_EVENT 6 ACTION_GET_BLOCK 2 ACTION_SET_MAP 4 Of particular note here is ACTION_DISK_CHANGE. The DiskChange command uses the ACTION_INHIBIT packet to accomplish its task. [Back to Amiga Developer Docs ]

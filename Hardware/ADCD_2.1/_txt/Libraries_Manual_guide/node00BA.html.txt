@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node00BA.html
+TITLE: TRAP Index
+
 TRAP Index ]" border=0> TRAP address error, 474 bus error, 474 CHK instruction, 474 illegal instruction, 474 line 1010 emulator, 474 line 1111 emulator, 474 privilege violation, 474 trace, 474 trap instructions, 474 TRAPV instruction, 474 zero divide, 474 [Back to Amiga Developer Docs ]

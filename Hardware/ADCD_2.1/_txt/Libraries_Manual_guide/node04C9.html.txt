@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node04C9.html
+TITLE: B / icclass / Attributes: ICA_TARGET (IS)
+
 B / icclass / Attributes: ICA_TARGET (IS) ]" border=0> This attribute stores the address of the icclass object's target object. Whenever the icclass object receives an OM_NOTIFY or OM_UPDATE message, it forwards that message to its target in the form of an OM_UPDATE message. If the icclass object has an attribute mapping list (see the ICA_MAP attribute below), it also maps the OM_NOTIFY/OM_UPDATE message's attribute IDs to new ones before forwarding the message. If the value of ICA_TARGET is ICTARGET_IDCMP, the icclass object sends an IDCMP_IDCMPUPDATE IntuiMessage to its window instead of forwarding an OM_UPDATE message. See the rootclass description of OM_UPDATE for more information. [Back to Amiga Developer Docs ]

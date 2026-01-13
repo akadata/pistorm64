@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node04C2.html
+TITLE: narrator.device/CMD_FLUSH
+
 narrator.device/CMD_FLUSH ]" border=0> NAME CMD_FLUSH - Aborts all inprogress and queued requests SYNOPSIS Standard device command. FUNCTION Aborts all inprogress and queued speech requests. INPUTS Valid IORequest block with the io_Command field set to CMD_FLUSH. A valid IORequest block is one with its io_Message structure, and io_Device and io_Unit fields properly initialized. The easiest way to insure proper initialization is to make a copy of the IORequest block after a successful OpenDevice call. RESULTS io_Error in IORequest block set to 0 SEE ALSO Exec input/output documentation. [Back to Amiga Developer Docs ]

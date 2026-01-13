@@ -1,0 +1,1 @@
+6 Blitter Hardware / Interrupt Flag ]" border=0> The blitter also has an interrupt flag that is set whenever a blit finishes. This flag, INTF_BLIT , can generate a 680x0 interrupt if enabled. For more information on interrupts , see Chapter 7: "System Control Hardware." [Back to Amiga Developer Docs ]

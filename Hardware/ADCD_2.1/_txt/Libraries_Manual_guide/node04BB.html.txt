@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node04BB.html
+TITLE: B Boopsi Class Reference / rootclass
+
 B Boopsi Class Reference / rootclass ]" border=0> Class: rootclass Superclass: None Include File: classusr.h > This is the universal base class for all other classes. New Methods: ------------ OM_NEW OM_ADDTAIL OM_DISPOSE OM_REMOVE The following methods are described at the rootclass level although its up to the subclasses to actually implement them. If a class does not implement these methods, it should either return zero, indicating that this class does not support the method, or defer processing on to its superclass. OM_ADDMEMBER OM_GET OM_UPDATE OM_REMMEMBER OM_SET OM_NOTIFY Changed Methods: ---------------- Not applicable. Attributes: ----------- None. [Back to Amiga Developer Docs ]

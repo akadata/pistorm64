@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node01AD.html
+TITLE: ILBM IFF Interleaved Bitmap / Reference
+
 ILBM IFF Interleaved Bitmap / Reference ]" border=0> "EA IFF 85" Standard for Interchange Format Files describes the underlying conventions for all IFF files. Amiga® is a registered trademark of Commodore-Amiga, Inc. Electronic Arts(tm) is a trademark of Electronic Arts. Macintosh(tm) is a trademark licensed to Apple Computer, Inc. MacPaint(tm) is a trademark of Apple Computer, Inc. [Back to Amiga Developer Docs ]

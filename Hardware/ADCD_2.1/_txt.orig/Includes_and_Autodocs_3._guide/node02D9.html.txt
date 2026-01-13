@@ -1,0 +1,1 @@
+graphics.library/FreeCprList ]" border=0> NAME FreeCprList -- deallocate hardware copper list SYNOPSIS FreeCprList(cprlist) a0 void FreeCprList(struct cprlist *); FUNCTION return cprlist to free memory pool INPUTS cprlist - pointer to cprlist structure RESULTS memory returned and made available to other tasks BUGS SEE ALSO graphics/copper.h [Back to Amiga Developer Docs ]

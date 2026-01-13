@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node053A.html
+TITLE: D / Errors / CLI Won't Close on RUN
+
 D / Errors / CLI Won't Close on RUN ]" border=0> A CLI can't close if a program has a Lock() on the CLI input or output stream ("*"). If your program is RUN >NIL: from a CLI, that CLI should be able to close unless your code or your compiler's startup code explicitly opens "*". [Back to Amiga Developer Docs ]

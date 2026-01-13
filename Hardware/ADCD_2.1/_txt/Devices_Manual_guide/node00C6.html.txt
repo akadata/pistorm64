@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node00C6.html
+TITLE: 13 Timer Device / Using the Time Arithmetic Functions
+
 13 Timer Device / Using the Time Arithmetic Functions ]" border=0> As indicated above, the time arithmetic functions are accessed in the timer device structure as if they were a routine library. To use them, you create an IORequest block and open the timer. In the IORequest block is a pointer to the device's base address. This address is needed to access each routine as an offset - for example, _LVOAddTime, _LVOSubTime, _LVOCmpTime - from that base address. Timer_Arithmetic.c Why Use Time Arithmetic? [Back to Amiga Developer Docs ]

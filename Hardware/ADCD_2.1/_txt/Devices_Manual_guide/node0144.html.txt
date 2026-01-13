@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0144.html
+TITLE: narrator_rb Index
+
 narrator_rb Index ]" border=0> narrator_rb field descriptions, 136 field descriptions, 137 field descriptions, 138 [Back to Amiga Developer Docs ]

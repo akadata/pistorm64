@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node0287.html
+TITLE: VHPOSR Index
+
 VHPOSR Index ]" border=0> VHPOSR, 229 with beam counter, 216 with light pen, 238 [Back to Amiga Developer Docs ]

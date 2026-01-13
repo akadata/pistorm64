@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node01BA.html
+TITLE: iffparse.library/CloseClipboard
+
 iffparse.library/CloseClipboard ]" border=0> NAME CloseClipboard -- Close and free an open ClipboardHandle . SYNOPSIS CloseClipboard (clip) a0 struct ClipboardHandle *clip; FUNCTION Closes the clipboard.device and frees the ClipboardHandle structure. INPUTS clip - pointer to ClipboardHandle struct created with OpenClipboard . RESULT EXAMPLE NOTES BUGS SEE ALSO OpenClipboard() , InitIFFasClip() [Back to Amiga Developer Docs ]

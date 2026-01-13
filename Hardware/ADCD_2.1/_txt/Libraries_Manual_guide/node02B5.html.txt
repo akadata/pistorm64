@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node02B5.html
+TITLE: 20 / Allocating Multiple Memory / Summary of Allocation Routines
+
 20 / Allocating Multiple Memory / Summary of Allocation Routines ]" border=0> AllocEntry() and FreeEntry() These are routines for allocating and freeing multiple memory blocks with a single call. InitStruct() This routine initializes memory from data and offset values in a table. Typically only assembly language programs benefit from using this routine. For more details see the Amiga ROM Kernel Reference Manual: Include & Autodocs. [Back to Amiga Developer Docs ]

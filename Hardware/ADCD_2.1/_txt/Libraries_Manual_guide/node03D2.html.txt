@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node03D2.html
+TITLE: Amiga® RKM Libraries: 29 Graphics Library and Text
+
 Amiga® RKM Libraries: 29 Graphics Library and Text ]" border=0> On the Amiga, rendering text is similar to rendering lines and shapes. The Amiga graphics library provides text functions based around the RastPort structure, which makes it easy to intermix graphics and text. About Amiga Fonts The Text Function Does the Text Fit? Font Scaling and Aspect Ratio Some Things to Look Out For What Fonts Are Available? How is an Amiga Font Structured in Memory? But What About Color Fonts? The Composition of a Bitmap Font on Disk Function Reference [Back to Amiga Developer Docs ]

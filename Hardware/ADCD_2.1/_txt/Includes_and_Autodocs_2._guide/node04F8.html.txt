@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node04F8.html
+TITLE: timer.device/AddTime
+
 timer.device/AddTime ]" border=0> NAME AddTime -- Add one time request to another. SYNOPSIS AddTime( Dest, Source ) A0 A1 void AddTime( struct timeval *, struct timeval *); FUNCTION This routine adds one timeval structure to another. The results are stored in the destination (Dest + Source -> Dest) A0 and A1 will be left unchanged INPUTS Dest, Source -- pointers to timeval structures. NOTES This function may be called from interrupts. SEE ALSO timer.device/CmpTime() , timer.device/SubTime() BUGS [Back to Amiga Developer Docs ]

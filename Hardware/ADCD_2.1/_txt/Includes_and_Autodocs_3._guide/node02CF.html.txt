@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node02CF.html
+TITLE: graphics.library/DrawGList
+
 graphics.library/DrawGList ]" border=0> NAME DrawGList -- Process the gel list, queueing VSprites, drawing Bobs. SYNOPSIS DrawGList(rp, vp) A1 A0 void DrawGList(struct RastPort *, struct ViewPort *); FUNCTION Performs one pass of the current gel list. - If nextLine and lastColor are defined, these are initialized for each gel. - If it's a VSprite , build it into the copper list. - If it's a Bob , draw it into the current raster. - Copy the save values into the "old" variables, double-buffering if required. INPUTS rp = pointer to the RastPort where Bobs will be drawn vp = pointer to the ViewPort for which VSprites will be created RESULT BUGS MUSTDRAW isn't implemented yet. SEE ALSO InitGels() graphics/gels.h graphics/rastport.h graphics/view.h [Back to Amiga Developer Docs ]

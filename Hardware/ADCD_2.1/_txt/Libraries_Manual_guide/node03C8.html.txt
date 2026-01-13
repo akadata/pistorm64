@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node03C8.html
+TITLE: 28 / / Specifying Animation Object / Setting Up Ring Motion Control
+
 28 / / Specifying Animation Object / Setting Up Ring Motion Control ]" border=0> To make a given component trigger a move of the AnimOb you set the RINGTRIGGER bit of that AnimComp 's Flags field. When the system software encounters this flag, it adds the values of RingXTrans and RingYTrans to the AnX and AnY values of the controlling AnimOb. The next time you execute DrawGList() , the drawing sequence will use the new position. You usually set RINGTRIGGER in only one of the animation components in a sequence (the last one); however, you can use this flag and the translation variables any way you wish. [Back to Amiga Developer Docs ]

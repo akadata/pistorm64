@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01FA.html
+TITLE: Glossary / light pen
+
 Glossary / light pen ]" border=0> A controller device consisting of a stylus and tablet used for drawing something on the screen. [Back to Amiga Developer Docs ]

@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node03F4.html
+TITLE: 30 / / Creating and Using New Layers / Moving and Sizing Layers
+
 30 / / Creating and Using New Layers / Moving and Sizing Layers ]" border=0> The layers library includes three functions for moving and sizing layers: LONG MoveLayer( long dummy, struct Layer *layer, long dx, long dy ); LONG SizeLayer( long dummy, struct Layer *layer, long dx, long dy ); LONG MoveSizeLayer( struct Layer *layer, long dx, long dy, long dw, long dh); MoveLayer() moves a layer to a new position relative to its current position. SizeLayer() changes the size of a layer by modifying the coordinates of the lower right corner of the layer. MoveSizeLayer() changes both the size and position of a layer in a single call. [Back to Amiga Developer Docs ]

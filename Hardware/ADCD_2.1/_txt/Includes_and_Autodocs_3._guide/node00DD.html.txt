@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node00DD.html
+TITLE: colorwheel.gadget/ConvertHSBToRGB
+
 colorwheel.gadget/ConvertHSBToRGB ]" border=0> NAME ConvertHSBToRGB -- convert from an HSB color space to an RGB color space. (V39) SYNOPSIS ConvertHSBToRGB(hsb, rgb); A0 A1 VOID ConvertHSBToRGB(struct ColorWheelHSB *, struct ColorWheelRGB *); FUNCTION Converts a color from an HSB representation to an RGB representation. INPUTS hsb - filled-in ColorWheelHSB structure containing the values to convert rgb - structure to receive the converted values BUGS Even though all communication with the color wheel is done using full 32-bit color components, color calculations are currently done using 16-bit math, which can cause certain rounding errors to appear. [Back to Amiga Developer Docs ]

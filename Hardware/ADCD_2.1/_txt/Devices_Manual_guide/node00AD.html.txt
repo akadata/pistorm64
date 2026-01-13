@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node00AD.html
+TITLE: 12 Serial Device / Additional Information on the Serial Device
+
 12 Serial Device / Additional Information on the Serial Device ]" border=0> Additional programming information on the serial device can be found in the include files and the Autodocs for the serial device. Both are contained in the Amiga ROM Kernel Reference Manual: Includes and Autodocs. Serial Device Information -------------------------------- INCLUDES devices/ serial.h devices/ serial.i AUTODOCS serial.doc [Back to Amiga Developer Docs ]

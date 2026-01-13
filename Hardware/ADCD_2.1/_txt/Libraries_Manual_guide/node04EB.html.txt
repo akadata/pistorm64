@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node04EB.html
+TITLE: B Boopsi Class Reference / fillrectclass
+
 B Boopsi Class Reference / fillrectclass ]" border=0> Class: fillrectclass Superclass: imageclass Include File: imageclass.h > This is a class of filled rectangles. The fillrectclass object can use a pattern to fill in its interior. New Methods: ------------ None. Changed Methods: ---------------- IM_DRAW IM_DRAW Attributes: ----------- IA_APattern, IA_APatSize (IS) IA_Mode (IS) [Back to Amiga Developer Docs ]

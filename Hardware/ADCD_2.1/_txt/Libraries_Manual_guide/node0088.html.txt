@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node0088.html
+TITLE: Message Port Index
+
 Message Port Index ]" border=0> Message Port, 446 creation, 446 , 501 deletion, 501 IDCMP, 249 Intuition, 247 public, 501 [Back to Amiga Developer Docs ]

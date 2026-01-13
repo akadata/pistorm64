@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_2._guide/node0146.html
+TITLE: amiga.lib/CoerceMethodA
+
 amiga.lib/CoerceMethodA ]" border=0> NAME CoerceMethodA -- Perform method on coerced object. (V36) SYNOPSIS result = CoerceMethodA( cl, obj, msg ) ULONG CoerceMethodA( struct IClass *, Object *, Msg * ); FUNCTION Boopsi support function that invokes the supplied message on the specified object, as though it were the specified class. INPUTS cl - pointer to boopsi class to receive the message obj - pointer to boopsi object msg - pointer to method-specific message to send RESULT result - class and message-specific result. NOTES While this function requires V36 or higher intuition.library, it first appeared in V37 amiga.lib. Some early example code may refer to this function as CM(). SEE ALSO CoerceMethod() , DoMethodA() , DoSuperMethodA() , ROM Kernel Manual boopsi section [Back to Amiga Developer Docs ]

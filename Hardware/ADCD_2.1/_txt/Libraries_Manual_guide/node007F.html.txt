@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node007F.html
+TITLE: LoadView() Index
+
 LoadView() Index ]" border=0> LoadView(), 66 , 610 , 709 effect of freeing memory, 560 in display ViewPorts, 555 [Back to Amiga Developer Docs ]

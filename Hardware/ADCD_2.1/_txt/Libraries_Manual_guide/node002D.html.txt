@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node002D.html
+TITLE: Misc Index
+
 Misc Index ]" border=0> 1.3 - compatibility, 18 2.0 - compatibility, 923 , differences, 923 32-bit math, 878 - example, 879 , function reference, 883 , functions, 878 3D Look - window title bar, 107 , windows, 79 4703, 517 68000 - crash, 916 68020, 917 68030, 917 68040 - crash, 916 680x0, --> 68881, 845 , 853 68882, 853 [Back to Amiga Developer Docs ]

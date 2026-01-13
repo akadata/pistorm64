@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node01B7.html
+TITLE: Glossary / arbitration
+
 Glossary / arbitration ]" border=0> The unambiguous selection of one request out of a number of possible simultaneous requests for a resource. There are two kinds of arbitration in a Zorro III system; bus arbitration and quick interrupt arbitration. [Back to Amiga Developer Docs ]

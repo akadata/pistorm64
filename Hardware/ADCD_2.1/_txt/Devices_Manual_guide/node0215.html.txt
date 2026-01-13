@@ -1,1 +1,4 @@
+SOURCE: Devices_Manual_guide/node0215.html
+TITLE: AIFF.doc / AIFF / Constants
+
 AIFF.doc / AIFF / Constants ]" border=0> Decimal values are referred to as a string of digits, for example 123, 0, 100 are all decimal numbers. Hexadecimal values are preceded by a 0x - e.g., 0x0A, 0x1, 0x64. [Back to Amiga Developer Docs ]

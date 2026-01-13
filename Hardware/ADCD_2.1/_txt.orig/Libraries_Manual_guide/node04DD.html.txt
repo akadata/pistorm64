@@ -1,0 +1,1 @@
+B / imageclass / Attributes: IA_Data (ISG) ]" border=0> A pointer to general image data. This value is stored in the ImageData field of the Image structure. [Back to Amiga Developer Docs ]

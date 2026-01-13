@@ -1,1 +1,4 @@
+SOURCE: Libraries_Manual_guide/node042F.html
+TITLE: 33 / Stream Management / Termination
+
 33 / Stream Management / Termination ]" border=0> Termination is simple. Just call CloseIFF (iff). This may be called at any time, and terminates IFFParse's transaction with the stream. The stream itself is not closed. The IFFHandle may be reused; you may safely call OpenIFF() on it again. You are responsible for closing the streams you opened. A stream used in an IFFHandle must generally remain open until you CloseIFF(). [Back to Amiga Developer Docs ]

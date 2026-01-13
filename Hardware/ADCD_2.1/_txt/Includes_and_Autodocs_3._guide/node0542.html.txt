@@ -1,1 +1,4 @@
+SOURCE: Includes_and_Autodocs_3._guide/node0542.html
+TITLE: resource.library/RL_GetObjectArray
+
 resource.library/RL_GetObjectArray ]" border=0> NAME RL_GetObjectArray - get a pointer to a group of objects (V44) SYNOPSIS group = RL_GetObjectArray(resource,object,id) D0 A0 A1 D0 Object **RL_GetObjectArray(RESOURCEFILE, Object *, RESOURCEID); FUNCTION If you allocated an Object using RL_NewObjectA a lot of additional Objects and group of Objects may be allocated automatically. This functions returns a pointer to a group of objects with a given group ID. Never release the group with RL_DisposeGroupA. The group is released automatically if the object is released INPUTS resource -- a pointer to a resource object -- a pointer to an Object id -- a numeric id of a object group RESULTS group -- a pointer to an array of pointers to Object SEE ALSO resource.library/RL_NewObjectA resource.library/RL_NewGroupA [Back to Amiga Developer Docs ]

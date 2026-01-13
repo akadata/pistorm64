@@ -1,0 +1,1 @@
+battmem.doc ]" border=0> ObtainBattSemaphore() ReadBattMem() ReleaseBattSemaphore() WriteBattMem() [Back to Amiga Developer Docs ]

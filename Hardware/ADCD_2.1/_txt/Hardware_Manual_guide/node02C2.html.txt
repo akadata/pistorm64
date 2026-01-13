@@ -1,1 +1,4 @@
+SOURCE: Hardware_Manual_guide/node02C2.html
+TITLE: K Zorro Expansion Bus / Mechanical Specifications
+
 K Zorro Expansion Bus / Mechanical Specifications ]" border=0> This section covers the various mechanical details of Zorro III cards. For Zorro II cards, the mechanical specifications are given in the A500/A2000 Technical Reference Manual. Basic Zorro III PIC PIC With Isa Option PIC With Video Option [Back to Amiga Developer Docs ]
