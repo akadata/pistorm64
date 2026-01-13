@@ -67,72 +67,72 @@ M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but
 # Default CPU flags; overridden by PLATFORM selections below.
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 # Raylib paths can be swapped if you use a custom build.
-RAYLIB_INC    ?= -I./raylib
-RAYLIB_LIBDIR ?= -L./raylib_drm
+RAYLIB_INC    ?= -I./src/raylib
+RAYLIB_LIBDIR ?= -L./src/raylib_drm
 
 
 MAINFILES =
 
-MAINFILES += emulator.c
-MAINFILES += log.c
-MAINFILES += memory_mapped.c
+MAINFILES += src/emulator.c
+MAINFILES += src/log.c
+MAINFILES += src/memory_mapped.c
 
-MAINFILES += config_file/config_file.c
-MAINFILES += config_file/rominfo.c
+MAINFILES += src/config_file/config_file.c
+MAINFILES += src/config_file/rominfo.c
 
-MAINFILES += input/input.c
+MAINFILES += src/input/input.c
 MAINFILES += gpio/ps_protocol.c
 MAINFILES += gpio/rpi_peri.c
 
-MAINFILES += platforms/platforms.c
+MAINFILES += src/platforms/platforms.c
 
-MAINFILES += platforms/amiga/amiga-autoconf.c
-MAINFILES += platforms/amiga/amiga-platform.c
-MAINFILES += platforms/amiga/amiga-registers.c
-MAINFILES += platforms/amiga/amiga-interrupts.c
+MAINFILES += src/platforms/amiga/amiga-autoconf.c
+MAINFILES += src/platforms/amiga/amiga-platform.c
+MAINFILES += src/platforms/amiga/amiga-registers.c
+MAINFILES += src/platforms/amiga/amiga-interrupts.c
 
-MAINFILES += platforms/mac68k/mac68k-platform.c
+MAINFILES += src/platforms/mac68k/mac68k-platform.c
 
-MAINFILES += platforms/dummy/dummy-platform.c
-MAINFILES += platforms/dummy/dummy-registers.c
+MAINFILES += src/platforms/dummy/dummy-platform.c
+MAINFILES += src/platforms/dummy/dummy-registers.c
 
-MAINFILES += platforms/amiga/Gayle.c
-MAINFILES += platforms/amiga/hunk-reloc.c
-MAINFILES += platforms/amiga/cdtv-dmac.c
+MAINFILES += src/platforms/amiga/Gayle.c
+MAINFILES += src/platforms/amiga/hunk-reloc.c
+MAINFILES += src/platforms/amiga/cdtv-dmac.c
 
-MAINFILES += platforms/amiga/rtg/rtg.c
-MAINFILES += platforms/amiga/rtg/rtg-output-raylib.c
-MAINFILES += platforms/amiga/rtg/rtg-gfx.c
+MAINFILES += src/platforms/amiga/rtg/rtg.c
+MAINFILES += src/platforms/amiga/rtg/rtg-output-raylib.c
+MAINFILES += src/platforms/amiga/rtg/rtg-gfx.c
 
-MAINFILES += platforms/amiga/piscsi/piscsi.c
-MAINFILES += platforms/amiga/net/pi-net.c
+MAINFILES += src/platforms/amiga/piscsi/piscsi.c
+MAINFILES += src/platforms/amiga/net/pi-net.c
 
-MAINFILES += platforms/shared/rtc.c
-MAINFILES += platforms/shared/common.c
+MAINFILES += src/platforms/shared/rtc.c
+MAINFILES += src/platforms/shared/common.c
 
 # self-tests
-MAINFILES += selftest.c
+MAINFILES += src/selftest.c
 
 
 ifeq ($(USE_RAYLIB),0)
-MAINFILES := $(filter-out platforms/amiga/rtg/rtg-output-raylib.c,$(MAINFILES))
-MAINFILES += platforms/amiga/rtg/rtg-output-null.c
+MAINFILES := $(filter-out src/platforms/amiga/rtg/rtg-output-raylib.c,$(MAINFILES))
+MAINFILES += src/platforms/amiga/rtg/rtg-output-null.c
 endif
 
 ifeq ($(USE_ALSA),0)
-MAINFILES := $(filter-out platforms/amiga/ahi/pi_ahi.c,$(MAINFILES))
-MAINFILES += platforms/amiga/ahi/pi_ahi_stub.c
+MAINFILES := $(filter-out src/platforms/amiga/ahi/pi_ahi.c,$(MAINFILES))
+MAINFILES += src/platforms/amiga/ahi/pi_ahi_stub.c
 LDLIBS_ALSA :=
 else
-MAINFILES := $(filter-out platforms/amiga/ahi/pi_ahi_stub.c,$(MAINFILES))
-MAINFILES += platforms/amiga/ahi/pi_ahi.c
+MAINFILES := $(filter-out src/platforms/amiga/ahi/pi_ahi_stub.c,$(MAINFILES))
+MAINFILES += src/platforms/amiga/ahi/pi_ahi.c
 LDLIBS_ALSA := -lasound
 endif
 
 
 ifeq ($(USE_VC),0)
-MAINFILES := $(filter-out platforms/amiga/pistorm-dev/pistorm-dev.c,$(MAINFILES))
-MAINFILES += platforms/amiga/pistorm-dev/pistorm-dev-stub.c
+MAINFILES := $(filter-out src/platforms/amiga/pistorm-dev/pistorm-dev.c,$(MAINFILES))
+MAINFILES += src/platforms/amiga/pistorm-dev/pistorm-dev-stub.c
 VC_INC    :=
 VC_LIBDIR :=
 LDLIBS_VC :=
@@ -150,9 +150,9 @@ ifeq ($(USE_EC_FPU),1)
 DEFINES += -DPISTORM_ENABLE_020_FPU -DPISTORM_ENABLE_EC040_FPU
 endif
 
-MUSASHIFILES     = m68kcpu.c m68kdasm.c softfloat/softfloat.c softfloat/softfloat_fpsp.c
-MUSASHIGENCFILES = m68kops.c
-MUSASHIGENHFILES = m68kops.h
+MUSASHIFILES     = src/musashi/m68kcpu.c src/musashi/m68kdasm.c src/softfloat/softfloat.c src/softfloat/softfloat_fpsp.c
+MUSASHIGENCFILES = src/musashi/m68kops.c
+MUSASHIGENHFILES = src/musashi/m68kops.h
 MUSASHIGENERATOR = m68kmake
 
 EXE =
@@ -161,7 +161,7 @@ EXEPATH = ./
 # Define the m68k related files separately to control build order
 M68KFILES = $(MUSASHIFILES) $(MUSASHIGENCFILES)
 .CFILES   = $(MAINFILES) $(M68KFILES)
-.OFILES   = $(.CFILES:%.c=%.o) a314/a314.o
+.OFILES   = $(.CFILES:%.c=%.o) src/a314/a314.o
 
 CC  ?= gcc
 CXX ?= g++
@@ -176,13 +176,13 @@ PIPE_FLAGS= $(if $(filter 1,$(USE_PIPE)),-pipe,)
 # Platform-specific tuning and raylib variants.
 ifeq ($(PLATFORM),PI4)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc -mfpu=neon-fp-armv8 -mfloat-abi=hard
-RAYLIB_INC    = -I./raylib_pi4_test
-RAYLIB_LIBDIR = -L./raylib_pi4_test
+RAYLIB_INC    = -I./src/raylib_pi4_test
+RAYLIB_LIBDIR = -L./src/raylib_pi4_test
 DEFINES      += -DRPI4_TEST
 else ifeq ($(PLATFORM),PI4_64BIT)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
-RAYLIB_INC    = -I./raylib_pi4_test
-RAYLIB_LIBDIR = -L./raylib_pi4_test
+RAYLIB_INC    = -I./src/raylib_pi4_test
+RAYLIB_LIBDIR = -L./src/raylib_pi4_test
 DEFINES      += -DRPI4_TEST
 else ifeq ($(PLATFORM),PI3_BULLSEYE)
 CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
@@ -216,7 +216,7 @@ RAYLIB_INC    =
 RAYLIB_LIBDIR =
 endif
 
-INCLUDES  = -I. $(RAYLIB_INC) $(VC_INC)
+INCLUDES  = -I. -Isrc -Isrc/musashi $(RAYLIB_INC) $(VC_INC)
 LDSEARCH  = -L/usr/local/lib $(VC_LIBDIR) $(RAYLIB_LIBDIR)
 
 CFLAGS       = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS)
@@ -241,33 +241,33 @@ clean:
 # Link is atomic: write to $@.tmp then move into place on success.
 OBJS_LINK = $(filter %.o,$^)
 
-$(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) a314/a314.o
+$(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) src/a314/a314.o
 	$(CC) $(LDFLAGS) -o $@.tmp $(OBJS_LINK) $(LDLIBS) && mv -f $@.tmp $@
 
 # Explicit rules to keep the generated 68k core quiet on unused-temp warnings.
-m68kcpu.o: m68kcpu.c m68kops.h
+src/musashi/m68kcpu.o: src/musashi/m68kcpu.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
 
-m68kops.o: m68kops.c m68kops.h
+src/musashi/m68kops.o: src/musashi/m68kops.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
 
-m68kdasm.o: m68kdasm.c m68kops.h
+src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
 
-emulator.o: emulator.c m68kops.h
+src/emulator.o: src/emulator.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
 
-buptest: buptest.c gpio/ps_protocol.c gpio/rpi_peri.c
+buptest: src/buptest/buptest.c gpio/ps_protocol.c gpio/rpi_peri.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-a314/a314.o: a314/a314.cc a314/a314.h
-	$(CXX) -MMD -MP -c -o a314/a314.o $(OPT_LEVEL) a314/a314.cc $(CPUFLAGS) $(DEFINES) -I. -I..
+src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
+	$(CXX) -MMD -MP -c -o src/a314/a314.o $(OPT_LEVEL) src/a314/a314.cc $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
-	$(EXEPATH)$(MUSASHIGENERATOR)$(EXE)
+	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f src/musashi/$(MUSASHIGENERATOR)$(EXE)
 
-$(MUSASHIGENERATOR)$(EXE): $(MUSASHIGENERATOR).c
-	$(CC) -MMD -MP -o $(MUSASHIGENERATOR)$(EXE) $(MUSASHIGENERATOR).c
+$(MUSASHIGENERATOR)$(EXE): src/musashi/$(MUSASHIGENERATOR).c
+	$(CC) -MMD -MP -o $(MUSASHIGENERATOR)$(EXE) src/musashi/$(MUSASHIGENERATOR).c
 
--include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) a314/a314.d $(MUSASHIGENERATOR).d
+-include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d
 
