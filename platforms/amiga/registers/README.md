@@ -37,6 +37,7 @@ Use the register offsets and base addresses as the source of truth.
 ## Header Layout
 - amiga_custom_chips.h: convenience include + base ranges
 - agnus.h, paula.h, blitter.h, denise.h, cia.h: per-chip groupings
+<<<<<<< HEAD
 
 ## Pi-Side Tools
 ### pimodplay (raw Paula DMA test)
@@ -71,3 +72,5 @@ Notes:
 MOD playback (basic):
 - `sudo ./pimodplay --mod <file>`
 - 4-channel ProTracker MODs, basic effects (volume, speed/bpm, pattern jump/break).
+=======
+>>>>>>> piscsi64-working-from-tag

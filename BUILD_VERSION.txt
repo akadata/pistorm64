@@ -1,0 +1,3 @@
+target=regtool
+git_rev=061a89bc-dirty
+build_utc=2026-01-08T05:44:39Z
