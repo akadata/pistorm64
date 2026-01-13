@@ -6,6 +6,8 @@
 #include "config_file/config_file.h"
 #include <endian.h>
 
+#include <endian.h>
+
 uint8_t dmac_reg_idx = 0;
 uint8_t dmac_reg_values[0xFFFF];
 

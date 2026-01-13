@@ -1,0 +1,1173 @@
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [STATE] Socket listening at /tmp/pistorm_state.sock
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [STATE] Socket listening at /tmp/pistorm_state.sock
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 80010000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AMIGA] A314 emulation enabled.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI][INIT] cpu=68030(6) autoconf_base=0x00000000 z2_fast=0x00400000+0x400000 rom_dest=pending
+[INFO] [PISCSI][INIT] Boot ROM loaded: size=16384 bytes driver_offset=0x1000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][INIT] Mapped unit 0 to /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 0: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 0: scanning partitions.
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: scanning filesystem headers.
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][INIT] Unit 0: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 0: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 0: testing DH0 boot block signature.
+[INFO] [PISCSI][SELFTEST] DH0 boot block signature not DOS\0 (sig=0x50415254)
+[INFO] [PISCSI][SELFTEST] Unit 0: HDF validation passed (/home/smalley/Amiga/WorkBench3.1PFS3-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 1 to /home/smalley/Amiga/Utils-16GB.hdf size=16139354112 bytes.
+[INFO] [PISCSI][RDB] Unit 1: CHS=31272/16/63 block_size=512
+[INFO] [PISCSI][PART] Unit 1: scanning partitions.
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 1: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 1: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 1: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in /home/smalley/Amiga/Utils-16GB.hdf
+[INFO] [PISCSI][SELFTEST] Unit 1: HDF validation passed (/home/smalley/Amiga/Utils-16GB.hdf)
+[INFO] [PISCSI][INIT] Mapped unit 6 to platforms/amiga/pistorm.hdf size=2621440 bytes.
+[INFO] [PISCSI][RDB] Unit 6: CHS=160/1/32 block_size=512
+[INFO] [PISCSI][PART] Unit 6: scanning partitions.
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [PISCSI][FS] Unit 6: scanning filesystem headers.
+[INFO] [PISCSI][INIT] Unit 6: map/scan complete.
+[INFO] [PISCSI][SELFTEST] Unit 6: running HDF integrity validation.
+[INFO] [PISCSI][SELFTEST] Valid RDB signature found in platforms/amiga/pistorm.hdf
+[INFO] [PISCSI][SELFTEST] Unit 6: HDF validation passed (platforms/amiga/pistorm.hdf)
+[INFO] [STATE] Socket listening at /tmp/pistorm_state.sock
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 4MB of Z2 Fast RAM configured at $400000
+[INFO] [AMIGA] 32MB of Z3 Fast RAM configured at $10000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [PISCSI][PART] Unit 0: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 0: partition 1 name=DH1 len=3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #1 PFS/3
+[INFO] [PISCSI][FS] Unit 0: loaded filesystem #2 DOS/1
+[INFO] [PISCSI][PART] Unit 1: partition 0 name=DH0 len=3
+[INFO] [PISCSI][PART] Unit 1: partition 1 name=DH1 len=3
+[INFO] [PISCSI][PART] Unit 6: partition 0 name=DH99 len=4
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00400000-12000000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00E90000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00600000, Size: 4 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-12000000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00EA0000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-42000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI][INIT] Shutdown: closing mapped drives and file system cache.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
