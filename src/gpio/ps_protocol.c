@@ -17,7 +17,7 @@
 #include <unistd.h>
 
 #include "ps_protocol.h"
-#include "m68k.h"
+#include "src/musashi/m68k.h"
 
 volatile unsigned int *gpio;
 volatile unsigned int *gpclk;
