@@ -73,8 +73,8 @@ static void usage(const char *prog) {
           "  --vol <0-64>        Volume (default 64)\n"
           "  --seconds <n>       Playback duration (default 5)\n"
           "  --stream            Stream long samples in chunks\n"
-          "  --chunk-bytes <n>   Stream chunk size (default 131070 bytes)\n"
-          "  --buffers <n>       Stream buffers in Chip RAM (default 2)\n"
+          "  --chunk-bytes <n>   Stream chunk size (default 32768 bytes)\n"
+          "  --buffers <n>       Stream buffers in Chip RAM (default 3)\n"
           "  --u8                Raw input is unsigned 8-bit (default for --raw)\n"
           "  --s8                Raw input is signed 8-bit\n"
           "  --stereo            Raw/WAV is stereo interleaved (AUD0/AUD1 by default)\n"
@@ -1129,8 +1129,8 @@ int main(int argc, char **argv) {
   unsigned tempo = 180;
   double gate_ratio = 0.70;
   int stream = 0;
-  size_t chunk_bytes = 0;
-  size_t buffers = 2;
+  size_t chunk_bytes = 32768u;
+  size_t buffers = 3;
   int raw_unsigned = 1;
   int stereo = 0;
   stereo_map_t stereo_map = {0, 1};
