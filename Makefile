@@ -25,13 +25,15 @@ endif
 # Set USE_GOLD=1 to link with gold if available.
 USE_GOLD   ?= 0
 # Toggle RTG output backends: 1=raylib (default), 0=null stub.
-USE_RAYLIB ?= 0
+USE_RAYLIB ?= 1
 # Toggle ALSA-based audio (Pi AHI). If 0, drop pi_ahi and -lasound.
 USE_ALSA   ?= 1
 # Toggle PMMU emulation (68030/040). Default on; disable with USE_PMMU=0 if needed.
 USE_PMMU   ?= 1
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0
+
+ARCH_FEATURES ?= 
 # Toggle Pi host (/opt/vc) support for dev tools.
 USE_VC     ?= 0
 # Perf toggles
@@ -42,10 +44,10 @@ USE_PIPE   ?= 1
 # Quiet noisy-but-benign warnings from the generated 68k core.
 M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable
 # Default CPU flags; overridden by PLATFORM selections below.
-CPUFLAGS   ?= -march=native -mtune=native
+CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 # Raylib paths can be swapped if you use a custom build.
 RAYLIB_INC    ?= -I./raylib
-RAYLIB_LIBDIR ?= -L./raylib_drm
+RAYLIB_LIBDIR ?= -L./raylib
 
 
 MAINFILES =
