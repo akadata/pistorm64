@@ -80,7 +80,7 @@ void piscsi_init() {
     }
 
     if (piscsi_rom_ptr == NULL) {
-        FILE *in = fopen("./platforms/amiga/piscsi/piscsi.rom", "rb");
+        FILE *in = fopen("./src/platforms/amiga/piscsi/piscsi.rom", "rb");
         if (in == NULL) {
             printf("[PISCSI] Could not open PISCSI Boot ROM file for reading!\n");
             // Zero out the boot ROM offset from the autoconfig ROM.
