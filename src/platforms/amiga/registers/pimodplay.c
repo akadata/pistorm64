@@ -32,14 +32,26 @@ static const uint32_t AUD_LCL[MOD_CHANNELS] = {AUD0LCL, AUD1LCL, AUD2LCL, AUD3LC
 static const uint32_t AUD_LEN[MOD_CHANNELS] = {AUD0LEN, AUD1LEN, AUD2LEN, AUD3LEN};
 static const uint32_t AUD_PER[MOD_CHANNELS] = {AUD0PER, AUD1PER, AUD2PER, AUD3PER};
 static const uint32_t AUD_VOL[MOD_CHANNELS] = {AUD0VOL, AUD1VOL, AUD2VOL, AUD3VOL};
+static const uint32_t AUD_DAT[MOD_CHANNELS] = {AUD0DAT, AUD1DAT, AUD2DAT, AUD3DAT};
 static const uint16_t AUD_DMA_MASK[MOD_CHANNELS] = {0x0001, 0x0002, 0x0004, 0x0008};
+static const double STREAM_GUARD_LEAD = 0.98;
+
+typedef struct {
+  int left;
+  int right;
+} stereo_map_t;
 
 static double paula_clock_hz(int is_pal);
 static void sleep_seconds(double seconds);
 static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
                                uint16_t period, uint16_t vol);
-static void program_channel(int ch, uint32_t addr, uint32_t len_bytes,
-                            uint16_t period, uint8_t vol);
+static void program_channel_regs(int ch, uint32_t addr, uint16_t len_words,
+                                 uint16_t period, uint8_t vol);
+static inline uint16_t stereo_mask(const stereo_map_t *map);
+static inline void prime_channel_dat(int ch, const uint8_t *buf, size_t len);
+static inline uint16_t enforce_min_period(uint16_t period, int is_pal);
+static void start_channels(uint16_t mask);
+static void stop_channels(uint16_t mask);
 static void apply_lpf_mono(int8_t *data, size_t samples, double rate_hz,
                            double cutoff_hz);
 static void apply_lpf_stereo(int8_t *data, size_t frames, double rate_hz,
@@ -64,9 +76,11 @@ static void usage(const char *prog) {
           "  --buffers <n>       Stream buffers in Chip RAM (default 2)\n"
           "  --u8                Raw input is unsigned 8-bit (default for --raw)\n"
           "  --s8                Raw input is signed 8-bit\n"
-          "  --stereo            Raw/WAV is stereo interleaved (AUD0/AUD1)\n"
+          "  --stereo            Raw/WAV is stereo interleaved (AUD0/AUD1 by default)\n"
+          "  --stereo-map L,R    Override stereo channel map (e.g. 0,1 or 3,2)\n"
           "  --mono              Force mono (downmix if WAV is stereo)\n"
           "  --lpf <hz>          Apply low-pass filter (Hz)\n"
+          "  --log-chunks        Log streaming chunk start/end\n"
           "\n"
           "Built-in tune:\n"
           "  --saints            Play \"When the Saints\" on AUD0\n"
@@ -325,9 +339,49 @@ static void write_chip_ram(uint32_t addr, const uint8_t *buf, size_t len) {
   }
 }
 
+static inline uint16_t stereo_mask(const stereo_map_t *map) {
+  return (uint16_t)(AUD_DMA_MASK[map->left] | AUD_DMA_MASK[map->right]);
+}
+
+static inline void prime_channel_dat(int ch, const uint8_t *buf, size_t len) {
+  uint16_t word = 0;
+  if (len >= 2) {
+    word = ((uint16_t)buf[0] << 8) | (uint16_t)buf[1];
+  } else if (len == 1) {
+    word = ((uint16_t)buf[0] << 8);
+  }
+  ps_write_16(AUD_DAT[ch], word);
+}
+
+static inline uint16_t enforce_min_period(uint16_t period, int is_pal) {
+  uint16_t min_period = is_pal ? 123u : 124u;
+  return (period < min_period) ? min_period : period;
+}
+
+static void stop_channels(uint16_t mask) {
+  if (mask) ps_write_16(DMACON, DMAF_MASTER | mask);
+}
+
+static void start_channels(uint16_t mask) {
+  if (mask) ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | mask);
+}
+
+static void program_channel_regs(int ch, uint32_t addr, uint16_t len_words,
+                                 uint16_t period, uint8_t vol) {
+  if (len_words == 0) return;
+  uint32_t addr_masked = addr & CHIP_ADDR_MASK;
+
+  ps_write_16(AUD_VOL[ch], 0);
+  ps_write_16(AUD_LCH[ch], (addr_masked >> 16) & 0x1Fu);
+  ps_write_16(AUD_LCL[ch], addr_masked & 0xFFFFu);
+  ps_write_16(AUD_LEN[ch], len_words);
+  ps_write_16(AUD_PER[ch], period);
+  ps_write_16(AUD_VOL[ch], vol);
+}
+
 static void audio_stop(void) {
   ps_write_16(AUD0VOL, 0);
-  ps_write_16(DMACON, DMAF_MASTER | DMAF_AUD0);
+  stop_channels(AUD_DMA_MASK[0]);
 }
 
 static void audio_stop_all(void) {
@@ -335,7 +389,24 @@ static void audio_stop_all(void) {
   ps_write_16(AUD1VOL, 0);
   ps_write_16(AUD2VOL, 0);
   ps_write_16(AUD3VOL, 0);
-  ps_write_16(DMACON, DMAF_MASTER | DMAF_AUD0 | 0x0002 | 0x0004 | 0x0008);
+  stop_channels(AUD_DMA_MASK[0] | AUD_DMA_MASK[1] | AUD_DMA_MASK[2] | AUD_DMA_MASK[3]);
+}
+
+// Ensure Paula/custom audio registers are in a clean state even if the emulator
+// hasn't run (avoids stale DMA/interrupt state on cold boot).
+static void audio_reset_hw(void) {
+  ps_write_16(DMACON, 0x7FFF);
+  ps_write_16(INTENA, 0x7FFF);
+  ps_write_16(INTREQ, 0x7FFF);
+  ps_write_16(ADKCON, 0x7FFF);
+  for (int ch = 0; ch < MOD_CHANNELS; ch++) {
+    ps_write_16(AUD_VOL[ch], 0);
+    ps_write_16(AUD_LEN[ch], 0);
+    ps_write_16(AUD_PER[ch], 0);
+    ps_write_16(AUD_LCH[ch], 0);
+    ps_write_16(AUD_LCL[ch], 0);
+    ps_write_16(AUD_DAT[ch], 0);
+  }
 }
 
 static void audio_play_raw(uint32_t addr, const uint8_t *buf, size_t len,
@@ -351,12 +422,10 @@ static void audio_play_raw(uint32_t addr, const uint8_t *buf, size_t len,
 
   write_chip_ram(addr, buf, len);
 
-  ps_write_16(AUD0LCH, (addr_masked >> 16) & 0x1Fu);
-  ps_write_16(AUD0LCL, addr_masked & 0xFFFFu);
-  ps_write_16(AUD0LEN, len_words);
-  ps_write_16(AUD0PER, period);
-  ps_write_16(AUD0VOL, vol);
-  ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_AUD0);
+  stop_channels(AUD_DMA_MASK[0]);
+  prime_channel_dat(0, buf, len);
+  program_channel_regs(0, addr_masked, len_words, period, vol);
+  start_channels(AUD_DMA_MASK[0]);
 
   for (unsigned i = 0; i < seconds && !stop_requested; i++) {
     sleep(1);
@@ -367,7 +436,8 @@ static void audio_play_raw(uint32_t addr, const uint8_t *buf, size_t len,
 static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
                               uint16_t period, uint16_t vol,
                               double rate_hz, unsigned seconds,
-                              size_t chunk_bytes, size_t buffers) {
+                              size_t chunk_bytes, size_t buffers,
+                              int log_chunks) {
   uint32_t addr_masked = addr & CHIP_ADDR_MASK;
   size_t max_chunk = 0xFFFFu * 2u;
   if (chunk_bytes == 0 || chunk_bytes > max_chunk) chunk_bytes = max_chunk;
@@ -375,14 +445,19 @@ static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
   if (chunk_bytes < 2) chunk_bytes = 2;
   if (buffers < 1) buffers = 1;
   if (rate_hz <= 0.0) rate_hz = 1.0;
-  if (addr_masked + chunk_bytes * buffers > 0x200000u) {
-    fprintf(stderr, "Stream buffer range exceeds 2MB Chip RAM; use --addr lower or fewer buffers.\n");
+  uint64_t span = (uint64_t)addr_masked + (uint64_t)chunk_bytes * (uint64_t)buffers;
+  if (span > 0x100000u) {
+    fprintf(stderr, "Stream buffer range exceeds 1MB Chip RAM; use --addr lower or fewer buffers.\n");
     return;
   }
 
+  size_t total_chunks = (len + chunk_bytes - 1u) / chunk_bytes;
   size_t offset = 0;
   double elapsed = 0.0;
   size_t slot = 0;
+  double prev_play_sec = 0.0;
+  int started = 0;
+  size_t chunk_index = 0;
   while (offset < len && !stop_requested) {
     size_t chunk = len - offset;
     if (chunk > chunk_bytes) chunk = chunk_bytes;
@@ -391,25 +466,55 @@ static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
     uint32_t addr_slot = addr_masked + (uint32_t)(slot * chunk_bytes);
     write_chip_ram(addr_slot, buf + offset, chunk);
 
+    uint16_t len_words = (uint16_t)((chunk + 1u) / 2u);
     double chunk_sec = (double)chunk / rate_hz;
     if (seconds > 0 && elapsed + chunk_sec > (double)seconds) {
       chunk_sec = (double)seconds - elapsed;
       if (chunk_sec <= 0.0) break;
     }
 
-    if (elapsed == 0.0) {
-      program_channel(0, addr_slot, (uint32_t)chunk, period, (uint8_t)vol);
+    if (!started) {
+      stop_channels(AUD_DMA_MASK[0]);
+      prime_channel_dat(0, buf + offset, chunk);
+      program_channel_regs(0, addr_slot, len_words, period, (uint8_t)vol);
+      start_channels(AUD_DMA_MASK[0]);
+      if (log_chunks) {
+        printf("[CHUNK %zu/%zu] start slot=%zu addr=0x%06X len=%zu\n",
+               chunk_index + 1u, total_chunks, slot, addr_slot, chunk);
+      }
+      prev_play_sec = chunk_sec;
+      started = 1;
     } else {
-      sleep_seconds(chunk_sec * 0.95);
-      program_channel(0, addr_slot, (uint32_t)chunk, period, (uint8_t)vol);
-      sleep_seconds(chunk_sec * 0.05);
+      double guard = prev_play_sec * STREAM_GUARD_LEAD;
+      double tail = prev_play_sec - guard;
+      if (guard > 0.0) sleep_seconds(guard);
+      // Preload next chunk pointers/len; DMA will pick them up on next restart.
+      ps_write_16(AUD_LCH[0], (addr_slot >> 16) & 0x1Fu);
+      ps_write_16(AUD_LCL[0], addr_slot & 0xFFFFu);
+      ps_write_16(AUD_LEN[0], len_words);
+      if (log_chunks) {
+        printf("[CHUNK %zu/%zu] queued slot=%zu addr=0x%06X len=%zu\n",
+               chunk_index + 1u, total_chunks, slot, addr_slot, chunk);
+      }
+      if (tail > 0.0) sleep_seconds(tail);
+      if (log_chunks) {
+        printf("[CHUNK %zu/%zu] end\n", chunk_index, total_chunks);
+      }
+      prev_play_sec = chunk_sec;
     }
 
     elapsed += chunk_sec;
     offset += chunk;
     slot = (slot + 1u) % buffers;
+    chunk_index++;
 
     if (seconds > 0 && elapsed >= (double)seconds) break;
+  }
+  if (started && !stop_requested) {
+    if (prev_play_sec > 0.0) sleep_seconds(prev_play_sec);
+    if (log_chunks) {
+      printf("[CHUNK %zu/%zu] end\n", chunk_index, total_chunks);
+    }
   }
   audio_stop();
 }
@@ -417,19 +522,25 @@ static void audio_play_stream(uint32_t addr, const uint8_t *buf, size_t len,
 static void audio_play_stream_stereo(uint32_t addr, const uint8_t *buf, size_t len,
                                      uint16_t period, uint16_t vol,
                                      double rate_hz, unsigned seconds,
-                                     size_t chunk_bytes, size_t buffers) {
+                                     size_t chunk_bytes, size_t buffers,
+                                     const stereo_map_t *map,
+                                     int log_chunks) {
   uint32_t addr_l = addr & CHIP_ADDR_MASK;
+  const uint16_t dma_mask = stereo_mask(map);
   size_t max_chunk = 0xFFFFu * 2u;
   if (chunk_bytes == 0 || chunk_bytes > max_chunk) chunk_bytes = max_chunk;
+  chunk_bytes &= ~1u;
+  if (chunk_bytes < 2) chunk_bytes = 2;
   if (buffers < 1) buffers = 1;
   if (rate_hz <= 0.0) rate_hz = 1.0;
   if (len < 2) return;
   uint32_t per_chan_bytes = (uint32_t)(chunk_bytes * buffers);
-  uint32_t addr_r = (addr_l + per_chan_bytes) & CHIP_ADDR_MASK;
-  if (addr_r + per_chan_bytes > 0x200000u) {
-    fprintf(stderr, "Stereo buffer range exceeds 2MB chip RAM; use --addr lower or fewer buffers.\n");
+  uint64_t addr_r_unmasked = (uint64_t)addr_l + (uint64_t)per_chan_bytes;
+  if (addr_r_unmasked + (uint64_t)per_chan_bytes > 0x100000u) {
+    fprintf(stderr, "Stereo buffer range exceeds 1MB chip RAM; use --addr lower or fewer buffers.\n");
     return;
   }
+  uint32_t addr_r = (uint32_t)addr_r_unmasked & CHIP_ADDR_MASK;
 
   size_t total_frames = len / 2u;
   size_t offset_frames = 0;
@@ -444,6 +555,10 @@ static void audio_play_stream_stereo(uint32_t addr, const uint8_t *buf, size_t l
 
   size_t chunk_frames = chunk_bytes;
   size_t slot = 0;
+  double prev_play_sec = 0.0;
+  int started = 0;
+  size_t chunk_index = 0;
+  size_t total_chunks = (total_frames + chunk_frames - 1u) / chunk_frames;
   while (offset_frames < total_frames && !stop_requested) {
     size_t frames = total_frames - offset_frames;
     if (frames > chunk_frames) frames = chunk_frames;
@@ -459,27 +574,57 @@ static void audio_play_stream_stereo(uint32_t addr, const uint8_t *buf, size_t l
     write_chip_ram(addr_l_slot, left, frames);
     write_chip_ram(addr_r_slot, right, frames);
 
+    uint16_t len_words = (uint16_t)((frames + 1u) / 2u);
     double chunk_sec = (double)frames / rate_hz;
     if (seconds > 0 && elapsed + chunk_sec > (double)seconds) {
       chunk_sec = (double)seconds - elapsed;
       if (chunk_sec <= 0.0) break;
     }
-    if (elapsed == 0.0) {
-      program_channel(0, addr_l_slot, (uint32_t)frames, period, (uint8_t)vol);
-      program_channel(1, addr_r_slot, (uint32_t)frames, period, (uint8_t)vol);
+    if (!started) {
+      stop_channels(dma_mask);
+      prime_channel_dat(map->left, left, frames);
+      prime_channel_dat(map->right, right, frames);
+      program_channel_regs(map->left, addr_l_slot, len_words, period, (uint8_t)vol);
+      program_channel_regs(map->right, addr_r_slot, len_words, period, (uint8_t)vol);
+      start_channels(dma_mask);
+      if (log_chunks) {
+        printf("[CHUNK %zu/%zu] start slot=%zu addrL=0x%06X addrR=0x%06X frames=%zu\n",
+               chunk_index + 1u, total_chunks, slot, addr_l_slot, addr_r_slot, frames);
+      }
+      prev_play_sec = chunk_sec;
+      started = 1;
     } else {
-      sleep_seconds(chunk_sec * 0.95);
-      program_channel(0, addr_l_slot, (uint32_t)frames, period, (uint8_t)vol);
-      program_channel(1, addr_r_slot, (uint32_t)frames, period, (uint8_t)vol);
-      sleep_seconds(chunk_sec * 0.05);
+      double guard = prev_play_sec * STREAM_GUARD_LEAD;
+      double tail = prev_play_sec - guard;
+      if (guard > 0.0) sleep_seconds(guard);
+      prime_channel_dat(map->left, left, frames);
+      prime_channel_dat(map->right, right, frames);
+      program_channel_regs(map->left, addr_l_slot, len_words, period, (uint8_t)vol);
+      program_channel_regs(map->right, addr_r_slot, len_words, period, (uint8_t)vol);
+      if (log_chunks) {
+        printf("[CHUNK %zu/%zu] start slot=%zu addrL=0x%06X addrR=0x%06X frames=%zu\n",
+               chunk_index + 1u, total_chunks, slot, addr_l_slot, addr_r_slot, frames);
+      }
+      if (tail > 0.0) sleep_seconds(tail);
+      if (log_chunks) {
+        printf("[CHUNK %zu/%zu] end\n", chunk_index, total_chunks);
+      }
+      prev_play_sec = chunk_sec;
     }
     elapsed += chunk_sec;
     offset_frames += frames;
     slot = (slot + 1u) % buffers;
+    chunk_index++;
 
     if (seconds > 0 && elapsed >= (double)seconds) break;
   }
 
+  if (started && !stop_requested) {
+    if (prev_play_sec > 0.0) sleep_seconds(prev_play_sec);
+    if (log_chunks) {
+      printf("[CHUNK %zu/%zu] end\n", chunk_index, total_chunks);
+    }
+  }
   audio_stop_all();
   free(left);
   free(right);
@@ -575,14 +720,10 @@ static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
   uint16_t len_words = (uint16_t)len_words_full;
 
   write_chip_ram(addr, buf, len);
-  ps_write_16(AUD0VOL, 0);
-  ps_write_16(DMACON, DMAF_MASTER | DMAF_AUD0);
-  ps_write_16(AUD0LCH, (addr_masked >> 16) & 0x1Fu);
-  ps_write_16(AUD0LCL, addr_masked & 0xFFFFu);
-  ps_write_16(AUD0LEN, len_words);
-  ps_write_16(AUD0PER, period);
-  ps_write_16(AUD0VOL, vol);
-  ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_AUD0);
+  stop_channels(AUD_DMA_MASK[0]);
+  prime_channel_dat(0, buf, len);
+  program_channel_regs(0, addr_masked, len_words, period, vol);
+  start_channels(AUD_DMA_MASK[0]);
 }
 
 
@@ -797,13 +938,9 @@ static void program_channel(int ch, uint32_t addr, uint32_t len_bytes,
   if (len_words_full > 0xFFFFu) len_words_full = 0xFFFFu;
   uint16_t len_words = (uint16_t)len_words_full;
 
-  ps_write_16(AUD_VOL[ch], 0);
-  ps_write_16(AUD_LCH[ch], (addr_masked >> 16) & 0x1Fu);
-  ps_write_16(AUD_LCL[ch], addr_masked & 0xFFFFu);
-  ps_write_16(AUD_LEN[ch], len_words);
-  ps_write_16(AUD_PER[ch], period);
-  ps_write_16(AUD_VOL[ch], vol);
-  ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | AUD_DMA_MASK[ch]);
+  stop_channels(AUD_DMA_MASK[ch]);
+  program_channel_regs(ch, addr_masked, len_words, period, vol);
+  start_channels(AUD_DMA_MASK[ch]);
 }
 
 static int play_mod(const char *path, uint32_t base_addr, int is_pal) {
@@ -822,8 +959,8 @@ static int play_mod(const char *path, uint32_t base_addr, int is_pal) {
     s->chip_addr = (addr + offset) & CHIP_ADDR_MASK;
     write_chip_ram(s->chip_addr, s->data, s->length_bytes);
     offset += (s->length_bytes + 1u) & ~1u;
-    if ((addr + offset) > 0x200000u) {
-      fprintf(stderr, "MOD samples exceed 2MB Chip RAM. Aborting.\n");
+    if ((addr + offset) > 0x100000u) {
+      fprintf(stderr, "MOD samples exceed 1MB Chip RAM. Aborting.\n");
       free_mod(&mod);
       return -1;
     }
@@ -954,8 +1091,10 @@ int main(int argc, char **argv) {
   size_t buffers = 2;
   int raw_unsigned = 1;
   int stereo = 0;
+  stereo_map_t stereo_map = {0, 1};
   int force_mono = 0;
   double lpf_hz = 0.0;
+  int log_chunks = 0;
 
   if (argc < 2) {
     usage(argv[0]);
@@ -1033,6 +1172,21 @@ int main(int argc, char **argv) {
       stereo = 1;
       continue;
     }
+    if (!strcmp(arg, "--stereo-map")) {
+      if (i + 1 >= argc) usage(argv[0]);
+      const char *map = argv[++i];
+      int l = -1;
+      int r = -1;
+      if (sscanf(map, "%d,%d", &l, &r) != 2 || l < 0 || l > 3 || r < 0 || r > 3 ||
+          l == r) {
+        fprintf(stderr, "--stereo-map expects L,R with channels 0-3 (e.g. 0,1 or 3,2).\n");
+        return 1;
+      }
+      stereo = 1;
+      stereo_map.left = l;
+      stereo_map.right = r;
+      continue;
+    }
     if (!strcmp(arg, "--mono")) {
       force_mono = 1;
       continue;
@@ -1040,6 +1194,10 @@ int main(int argc, char **argv) {
     if (!strcmp(arg, "--lpf")) {
       if (i + 1 >= argc) usage(argv[0]);
       lpf_hz = strtod(argv[++i], NULL);
+      continue;
+    }
+    if (!strcmp(arg, "--log-chunks")) {
+      log_chunks = 1;
       continue;
     }
     if (!strcmp(arg, "--saints")) {
@@ -1077,9 +1235,11 @@ int main(int argc, char **argv) {
   ps_setup_protocol();
   signal(SIGINT, handle_sigint);
   signal(SIGTERM, handle_sigint);
+  audio_reset_hw();
+  audio_stop_all();
 
   if (stop_only) {
-    audio_stop();
+    audio_stop_all();
     return 0;
   }
 
@@ -1152,12 +1312,27 @@ int main(int argc, char **argv) {
     free(buf);
     return 1;
   }
+  uint32_t addr_masked = addr & CHIP_ADDR_MASK;
+  if ((addr_masked & 1u) != 0u) {
+    fprintf(stderr, "--addr must be word-aligned for Paula DMA (got 0x%06X)\n", addr_masked);
+    free(buf);
+    return 1;
+  }
+  addr = addr_masked;
 
+  double clock_hz = paula_clock_hz(is_pal);
   if (rate_hz) {
     period = period_from_rate((double)rate_hz, is_pal);
-  } else {
-    rate_hz = (unsigned)(paula_clock_hz(is_pal) / (double)period + 0.5);
   }
+  uint16_t period_clamped = enforce_min_period(period, is_pal);
+  if (period_clamped != period) {
+    fprintf(stderr, "Period too small; clamped to %u (PAL=%d)\n", period_clamped, is_pal);
+    period = period_clamped;
+  } else {
+    period = period_clamped;
+  }
+  double rate_eff = clock_hz / (double)period;
+  rate_hz = (unsigned)(rate_eff + 0.5);
   if (stream) {
     if (!seconds_set) seconds = 0;
     size_t effective_chunk = chunk_bytes ? chunk_bytes : 0xFFFFu * 2u;
@@ -1169,15 +1344,16 @@ int main(int argc, char **argv) {
       }
     }
     if (channels == 2) {
-      printf("[STREAM] stereo addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu buffers=%zu PAL=%d\n",
-             addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, effective_chunk, buffers, is_pal);
+      printf("[STREAM] stereo addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu buffers=%zu chL=%d chR=%d PAL=%d\n",
+             addr & CHIP_ADDR_MASK, len, period, vol, rate_hz, seconds, effective_chunk, buffers,
+             stereo_map.left, stereo_map.right, is_pal);
       audio_play_stream_stereo(addr, buf, len, period, vol, (double)rate_hz,
-                               seconds, chunk_bytes, buffers);
+                               seconds, chunk_bytes, buffers, &stereo_map, log_chunks);
     } else {
       printf("[STREAM] addr=0x%06X bytes=%zu period=%u vol=%u rate=%uHz seconds=%u chunk=%zu buffers=%zu PAL=%d\n",
-             addr & 0x1FFFFu, len, period, vol, rate_hz, seconds, effective_chunk, buffers, is_pal);
+             addr & CHIP_ADDR_MASK, len, period, vol, rate_hz, seconds, effective_chunk, buffers, is_pal);
       audio_play_stream(addr, buf, len, period, vol, (double)rate_hz,
-                        seconds, chunk_bytes, buffers);
+                        seconds, chunk_bytes, buffers, log_chunks);
     }
   } else {
     if (lpf_hz > 0.0) {
@@ -1193,7 +1369,7 @@ int main(int argc, char **argv) {
       return 1;
     }
     printf("[RAW] addr=0x%06X bytes=%zu period=%u vol=%u seconds=%u PAL=%d\n",
-           addr & 0x1FFFFu, len, period, vol, seconds, is_pal);
+           addr & CHIP_ADDR_MASK, len, period, vol, seconds, is_pal);
     audio_play_raw(addr, buf, len, period, vol, seconds);
   }
   free(buf);

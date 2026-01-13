@@ -141,7 +141,39 @@ src/platforms/amiga/registers/
 ├── amiga_custom_chips.h # Common custom chip definitions
 ```
 
+## Known Issues
+
+### Audio Channel Problem
+Currently, pimodplay has limitations in how it utilizes the Amiga's four audio channels. Analysis of the code reveals:
+
+- For raw mono playback (`--raw` or `--wav` without `--stereo`), pimodplay uses only **Channel 0** (AUD0)
+- For stereo streaming (`--wav` with `--stereo`), pimodplay uses **Channels 0 and 1** (AUD0 and AUD1)
+- The streaming stereo implementation assigns left channel to AUD0 and right channel to AUD1
+- Channels 2 and 3 (AUD2 and AUD3) are not currently utilized in typical playback
+
+According to Amiga hardware specifications, the correct stereo assignment should be:
+- **Left Output:** Channels 0 and 3 (AUD0 and AUD3)
+- **Right Output:** Channels 1 and 2 (AUD1 and AUD2)
+
+This means the current stereo implementation is using AUD0/AUD1 instead of the optimal AUD0/AUD3 and AUD1/AUD2 combination, which could affect the audio output characteristics.
+
+**Audio Channel Registers:**
+- **Channel 0:** AUD0LCH (0x0A0), AUD0LCL (0x0A2), AUD0LEN (0x0A4), AUD0PER (0x0A6), AUD0VOL (0x0A8), AUD0DAT (0x0AA)
+- **Channel 1:** AUD1LCH (0x0B0), AUD1LCL (0x0B2), AUD1LEN (0x0B4), AUD1PER (0x0B6), AUD1VOL (0x0B8), AUD1DAT (0x0BA)
+- **Channel 2:** AUD2LCH (0x0C0), AUD2LCL (0x0C2), AUD2LEN (0x0C4), AUD2PER (0x0C6), AUD2VOL (0x0C8), AUD2DAT (0x0CA)
+- **Channel 3:** AUD3LCH (0x0D0), AUD3LCL (0x0D2), AUD3LEN (0x0D4), AUD3PER (0x0D6), AUD3VOL (0x0D8), AUD3DAT (0x0DA)
+
+**How Amiga Stereo Works:**
+- **Four Channels:** The Paula chip has four hardware audio channels (0, 1, 2, 3) for 8-bit sound.
+- **Left/Right Assignment:**
+  - Left: Channels 0 and 3 feed the left audio jack.
+  - Right: Channels 1 and 2 feed the right audio jack.
+- **Independent Control:** Each channel has its own 6-bit volume control (0-64) and sample rate settings, allowing for rich, separated sound.
+- **Stereo Output:** The hardware mixes these four channels into two distinct outputs (left and right) via the Amiga's RCA jacks.
+
+For optimal stereo output, pimodplay should be updated to properly utilize all four channels according to the correct left/right assignment.
+
 ## Status
 
-This is a very much work-in-progress demo, but it does work reliably. It represents a significant advancement in PiStorm technology by enabling direct hardware communication without emulation overhead.
+This is a very much work-in-progress demo, but it does work reliably. It represents a significant advancement in PiStorm technology by enabling direct hardware communication without emulation overhead. However, the audio channel implementation needs refinement to properly utilize all four Paula audio channels for correct stereo output.
 
