@@ -81,8 +81,8 @@ MAINFILES += src/config_file/config_file.c
 MAINFILES += src/config_file/rominfo.c
 
 MAINFILES += src/input/input.c
-MAINFILES += gpio/ps_protocol.c
-MAINFILES += gpio/rpi_peri.c
+MAINFILES += src/gpio/ps_protocol.c
+MAINFILES += src/gpio/rpi_peri.c
 
 MAINFILES += src/platforms/platforms.c
 
@@ -257,7 +257,7 @@ src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
 
-buptest: src/buptest/buptest.c gpio/ps_protocol.c gpio/rpi_peri.c
+buptest: src/buptest/buptest.c src/gpio/ps_protocol.c src/gpio/rpi_peri.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h

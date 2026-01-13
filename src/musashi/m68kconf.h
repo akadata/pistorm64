@@ -32,7 +32,7 @@
 #ifndef M68KCONF__HEADER
 #define M68KCONF__HEADER
 
-#include "emulator.h"
+#include "src/emulator.h"
 
 /* Configuration switches.
  * Use OPT_SPECIFY_HANDLER for configuration options that allow callbacks.
@@ -202,7 +202,7 @@
 #define M68K_USE_64_BIT  OPT_ON
 
 
-#include "emulator.h"
+#include "src/emulator.h"
 
 
 //#define m68k_read_memory_8(A)  read16(A)

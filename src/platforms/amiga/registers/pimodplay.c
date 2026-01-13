@@ -12,7 +12,7 @@
 #include <time.h>
 #include <ctype.h>
 
-#include "gpio/ps_protocol.h"
+#include "src/gpio/ps_protocol.h"
 #include "paula.h"
 
 // ps_protocol.c expects this symbol from the emulator core.
@@ -38,8 +38,6 @@ static double paula_clock_hz(int is_pal);
 static void sleep_seconds(double seconds);
 static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
                                uint16_t period, uint16_t vol);
-static void audio_program_note_ch(int ch, uint32_t addr, const uint8_t *buf,
-                                  size_t len, uint16_t period, uint16_t vol);
 static void program_channel(int ch, uint32_t addr, uint32_t len_bytes,
                             uint16_t period, uint8_t vol);
 static void apply_lpf_mono(int8_t *data, size_t samples, double rate_hz,
@@ -587,25 +585,6 @@ static void audio_program_note(uint32_t addr, const uint8_t *buf, size_t len,
   ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_AUD0);
 }
 
-static void audio_program_note_ch(int ch, uint32_t addr, const uint8_t *buf,
-                                  size_t len, uint16_t period, uint16_t vol) {
-  uint32_t addr_masked = addr & CHIP_ADDR_MASK;
-  size_t len_words_full = (len + 1u) / 2u;
-  if (len_words_full > 0xFFFFu) {
-    len_words_full = 0xFFFFu;
-    len = len_words_full * 2u;
-  }
-  uint16_t len_words = (uint16_t)len_words_full;
-
-  write_chip_ram(addr, buf, len);
-  ps_write_16(AUD_VOL[ch], 0);
-  ps_write_16(AUD_LCH[ch], (addr_masked >> 16) & 0x1Fu);
-  ps_write_16(AUD_LCL[ch], addr_masked & 0xFFFFu);
-  ps_write_16(AUD_LEN[ch], len_words);
-  ps_write_16(AUD_PER[ch], period);
-  ps_write_16(AUD_VOL[ch], vol);
-  ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | AUD_DMA_MASK[ch]);
-}
 
 static int play_saints_song(uint32_t addr, double rate_hz, unsigned bpm,
                             uint16_t period, uint16_t vol, double gate_ratio) {

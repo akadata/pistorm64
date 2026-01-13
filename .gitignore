@@ -13,6 +13,9 @@ pistorm/BlankPFS3-*
 emulator
 buptest
 m68kmake
+buptest
+pimodplay
+regtool
 *.o
 *.d
 *.a

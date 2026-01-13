@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "gpio/ps_protocol.h"
+#include "src/gpio/ps_protocol.h"
 #include "paula.h"
 #include "cia.h"
 

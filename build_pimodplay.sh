@@ -1,1 +1,1 @@
-gcc -O2 -Wall -Wextra -I./ platforms/amiga/registers/pimodplay.c gpio/ps_protocol.c gpio/rpi_peri.c -lm -o pimodplay
+gcc -O2 -Wall -Wextra -I./ src/platforms/amiga/registers/pimodplay.c src/gpio/ps_protocol.c src/gpio/rpi_peri.c -lm -o pimodplay

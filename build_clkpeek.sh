@@ -1,1 +1,2 @@
-gcc -O2 -Wall -Wextra clkpeek.c -o clkpeek
+gcc -O2 -Wall -Wextra -I. src/clkpeek/clkpeek.c src/gpio/ps_protocol.c src/gpio/rpi_peri.c -o clkpeek
+
