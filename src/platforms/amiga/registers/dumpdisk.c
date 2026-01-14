@@ -32,6 +32,7 @@ void m68k_set_irq(unsigned int level) { (void)level; }
 static volatile sig_atomic_t stop_requested = 0;
 static uint8_t prb_shadow = 0xFF;
 static uint8_t ciaa_pra_shadow = 0xFF;
+static const int MAX_ARM_RETRIES = 5;
 
 static void on_sigint(int signo) {
   (void)signo;
@@ -187,14 +188,26 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Kick DMA: bit15 enable, bit14 direction (0 = read), bits 0-13 length words.
   uint16_t len = (uint16_t)(words & 0x3FFFu);
   uint16_t want_len = 0x8000u | len;
-  ps_write_16(DSKLEN, want_len);
+  // Retry DSKLEN write until it sticks or fail.
+  uint16_t cur_len = 0;
+  for (int tries = 0; tries < MAX_ARM_RETRIES; tries++) {
+    ps_write_16(DSKLEN, want_len);
+    cur_len = (uint16_t)ps_read_16(DSKLEN);
+    if (cur_len == want_len) break;
+    usleep(1000);
+  }
   uint16_t arm_bytr = (uint16_t)ps_read_16(DSKBYTR);
   uint16_t arm_int = (uint16_t)ps_read_16(INTREQR);
-  uint16_t cur_len = (uint16_t)ps_read_16(DSKLEN);
   uint16_t dskpth = (uint16_t)ps_read_16(DSKPTH);
   uint16_t dskptl = (uint16_t)ps_read_16(DSKPTL);
   printf("DMA armed: DSKPTH=0x%04X DSKPTL=0x%04X DSKLEN=0x%04X (wanted 0x%04X) DSKBYTR=0x%04X INTREQR=0x%04X\n",
          dskpth, dskptl, cur_len, want_len, arm_bytr, arm_int);
+  if (cur_len != want_len) {
+    fprintf(stderr, "DSKLEN did not latch (wanted 0x%04X, got 0x%04X)\n", want_len, cur_len);
+    ps_write_16(DSKLEN, 0);
+    ps_write_16(DMACON, DMAF_DISK);
+    return -1;
+  }
   // Wait for interrupt or timeout.
   const int max_poll = 1000000;  // ~1s in 1us polls
   for (int i = 0; i < max_poll; i++) {
