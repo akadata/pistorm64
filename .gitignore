@@ -36,6 +36,8 @@ qwen.resume
 *.jdf
 *.dd
 *.pdf
+*.pvs
+*.sr
 
 # Do not include tool binaries
 build/
