@@ -39,6 +39,9 @@ qwen.resume
 
 # Do not include tool binaries
 build/
+build/ioharness
+build/regtool
+build/dumpdisk
 regtool
 ioharness
 dumpdisk
