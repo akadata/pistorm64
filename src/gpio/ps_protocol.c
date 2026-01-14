@@ -6,18 +6,16 @@
   Niklas Ekström 2021 (https://github.com/niklasekstrom)
 */
 
+#define _XOPEN_SOURCE 600  // for usleep prototype with -std=c11
 #include <errno.h>
 #include <fcntl.h>
 #include <stddef.h>
-// Enable POSIX prototypes like usleep
-#define _XOPEN_SOURCE 600
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 #include "ps_protocol.h"
 #include "src/musashi/m68k.h"
