@@ -112,6 +112,33 @@ static void step_track(int steps, int outwards) {
   }
 }
 
+static int seek_track0(void) {
+  // Try outward first, then inward if needed.
+  for (int attempt = 0; attempt < 2; attempt++) {
+    int outwards = (attempt == 0) ? 1 : 0;
+    if (outwards) prb_shadow |= CIAB_DSKDIREC;
+    else prb_shadow &= (uint8_t)~CIAB_DSKDIREC;
+    ps_write_8(CIABPRB, prb_shadow);
+    for (int i = 0; i < 90; i++) {
+      prb_shadow |= CIAB_DSKSTEP;
+      ps_write_8(CIABPRB, prb_shadow);
+      usleep(2000);
+      prb_shadow &= (uint8_t)~CIAB_DSKSTEP;
+      ps_write_8(CIABPRB, prb_shadow);
+      usleep(2000);
+      uint8_t pra = (uint8_t)ps_read_8(CIAAPRA);
+      if ((pra & CIAA_DSKTRACK0) == 0) {
+        printf("Reached track0 (attempt %d, steps %d, dir %s)\n",
+               attempt, i + 1, outwards ? "out" : "in");
+        return 0;
+      }
+      if (stop_requested) return -1;
+    }
+  }
+  printf("WARN: track0 not detected after seeks\n");
+  return -1;
+}
+
 static void log_status(const char *label) {
   uint8_t pra = (uint8_t)ps_read_8(CIAAPRA);
   uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
@@ -222,8 +249,8 @@ int main(int argc, char **argv) {
   motor_on();
   usleep(500000);  // spin-up 0.5s
   log_status("after motor on");
-  // Seek outward to track 0.
-  step_track(82, 1);
+  // Seek to track 0 with sensor check.
+  seek_track0();
   log_status("after seek to track0");
   // Pre-seek to track 40 like Kickstart scan does.
   step_track(40, 0);  // 0 = inward
