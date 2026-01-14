@@ -74,6 +74,7 @@ static void init_disk_port(void) {
   // Disk control is all of CIAB port B: motor, select, side, direction, step.
   ddrb_shadow = 0xFF;  // all outputs
   ps_write_8(CIABDDRB, ddrb_shadow);
+  ps_write_8(CIABDDRB + 1, ddrb_shadow);  // odd lane in case wiring expects it
   // Clear CIAB control registers to plain I/O mode.
   ps_write_8(CIABCRA, 0x00);
   ps_write_8(CIABCRB, 0x00);
@@ -92,6 +93,7 @@ static void force_drive0_outputs(void) {
   prb_shadow |= (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3 | CIAB_DSKSIDE);
   prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR | CIAB_DSKSTEP);
   ps_write_8(CIABPRB, prb_shadow);
+  ps_write_8(CIABPRB + 1, prb_shadow);  // odd lane mirror
   usleep(1000);
 }
 
