@@ -78,9 +78,10 @@ static void init_disk_port(void) {
   ps_write_8(CIABCRA, 0x00);
   ps_write_8(CIABCRB, 0x00);
   prb_shadow = (uint8_t)ps_read_8(CIABPRB);
-  // Default to drive 0 selected, motor on, side 0 (active low).
+  // Default to drive 0 selected, motor on, side 0 (active low), STEP idle high.
   prb_shadow = (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3);  // high
-  prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR | CIAB_DSKSIDE | CIAB_DSKSTEP | CIAB_DSKDIREC);
+  prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR | CIAB_DSKSIDE | CIAB_DSKDIREC);
+  prb_shadow |= CIAB_DSKSTEP;  // idle high (active low)
   ps_write_8(CIABPRB, prb_shadow);
   usleep(1000);
 }
@@ -90,7 +91,8 @@ static void force_drive0_outputs(void) {
   ps_write_8(CIABDDRB, ddrb_shadow);
   // Drive0 selected (bit3=0), others high, motor on (bit7=0), side0 (bit2=0).
   prb_shadow |= (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3 | CIAB_DSKSIDE);
-  prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR | CIAB_DSKSTEP);
+  prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR);
+  prb_shadow |= CIAB_DSKSTEP;  // idle high
   ps_write_8(CIABPRB, prb_shadow);
   usleep(1000);
 }
@@ -171,20 +173,34 @@ static void set_side(int side) {
   ps_write_8(CIABPRB + 1, prb_shadow);
 }
 
-static void step_track(int steps, int outwards) {
+static void step_pulse(int outwards) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKDIREC | CIAB_DSKSTEP);
-  if (outwards) prb_shadow |= CIAB_DSKDIREC;      // 1 = out, 0 = in (per hardware manual)
+  static int last_dir = -1;
+  if (outwards) prb_shadow |= CIAB_DSKDIREC;  // 1 = out, 0 = in (per hardware manual)
   else prb_shadow &= (uint8_t)~CIAB_DSKDIREC;
   ps_write_8(CIABPRB, prb_shadow);
-  for (int i = 0; i < steps; i++) {
-    prb_shadow |= CIAB_DSKSTEP;
-    ps_write_8(CIABPRB, prb_shadow);
-    usleep(2000);
-    prb_shadow &= (uint8_t)~CIAB_DSKSTEP;
-    ps_write_8(CIABPRB, prb_shadow);
-    usleep(2000);
-    if (stop_requested) break;
+  // After a direction change, allow the required settle before stepping.
+  if (last_dir != outwards) {
+    usleep(20000);  // >=18ms per hardware spec
+  }
+  last_dir = outwards;
+
+  // STEP* is active low; idle high then pulse low briefly.
+  prb_shadow |= CIAB_DSKSTEP;  // ensure idle high
+  ps_write_8(CIABPRB, prb_shadow);
+  usleep(5);
+  prb_shadow &= (uint8_t)~CIAB_DSKSTEP;
+  ps_write_8(CIABPRB, prb_shadow);
+  usleep(1000);  // low pulse width (~1ms, above 1us min)
+  prb_shadow |= CIAB_DSKSTEP;
+  ps_write_8(CIABPRB, prb_shadow);
+  usleep(3000);  // settle >=3ms
+}
+
+static void step_track(int steps, int outwards) {
+  for (int i = 0; i < steps && !stop_requested; i++) {
+    step_pulse(outwards);
   }
 }
 
@@ -197,14 +213,7 @@ static int seek_track0(void) {
     ps_write_8(CIABPRB, prb_shadow);
     ps_write_8(CIABPRB + 1, prb_shadow);
     for (int i = 0; i < 90; i++) {
-      prb_shadow |= CIAB_DSKSTEP;
-      ps_write_8(CIABPRB, prb_shadow);
-      ps_write_8(CIABPRB + 1, prb_shadow);
-      usleep(2000);
-      prb_shadow &= (uint8_t)~CIAB_DSKSTEP;
-      ps_write_8(CIABPRB, prb_shadow);
-      ps_write_8(CIABPRB + 1, prb_shadow);
-      usleep(2000);
+      step_pulse(outwards);
       uint8_t pra = (uint8_t)ps_read_8(CIAAPRA);
       if ((pra & CIAA_DSKTRACK0) == 0) {
         printf("Reached track0 (attempt %d, steps %d, dir %s)\n",
@@ -243,12 +252,14 @@ static void log_status(const char *label) {
 static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Clear any pending disk interrupt.
   ps_write_16(INTREQ, INTF_DSKBLK | INTF_DSKSYN);
-  // Clear DSKLEN to stop any previous DMA.
-  ps_write_16(DSKLEN, 0);
-  // Enable MSBSYNC so DMA waits for sync word.
-  ps_write_16(ADKCON, ADKF_SETCLR | ADKF_MSBSYNC);
-  (void)ps_read_16(DSKBYTR);
-  // Enable disk interrupt + master interrupt.
+  // Stop any previous DMA via DSKLEN and DMACON.
+  ps_write_16(DSKLEN, 0x4000);
+  ps_write_16(DMACON, DMAF_DISK);
+  // Clear disk-related ADKCON bits, then set read defaults (FAST + WORDSYNC + MFM).
+  ps_write_16(ADKCON, ADKF_FAST | ADKF_WORDSYNC | ADKF_MFMPREC | ADKF_MSBSYNC |
+                        ADKF_PRECOMP0 | ADKF_PRECOMP1 | ADKF_PRECOMP2);
+  ps_write_16(ADKCON, ADKF_SETCLR | ADKF_FAST | ADKF_WORDSYNC | ADKF_MFMPREC);
+  // Arm disk interrupts (DSKBLK) + master.
   ps_write_16(INTENA, INTF_SETCLR | INTF_DSKBLK | INTF_INTEN);
   // Program DMA pointer (word address; lower bit must be 0).
   uint32_t ptr = (chip_addr & 0x1FFFFEu) >> 1;  // word address into chip RAM
@@ -263,7 +274,9 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Kick DMA: bit15 enable, bit14 direction (0 = read), bits 0-13 length words.
   uint16_t len = (uint16_t)(words & 0x3FFFu);
   uint16_t want_len = 0x8000u | len;  // bit15 enables DMA, bit14=0 => read
+  ps_write_16(DSKLEN, 0x4000);        // force off per HW sequence
   ps_write_16(DSKLEN, want_len);      // write-only; readback is undefined on real hardware
+  ps_write_16(DSKLEN, want_len);      // must be written twice to start DMA
   uint16_t arm_bytr = (uint16_t)ps_read_16(DSKBYTR);
   uint16_t arm_int = (uint16_t)ps_read_16(INTREQR);
   printf("DMA armed: DSKPTH=0x%04X DSKPTL=0x%04X DSKLEN(w)=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X\n",
@@ -272,7 +285,7 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   const int max_poll = 1000000;  // ~1s in 1us polls
   for (int i = 0; i < max_poll; i++) {
     if (stop_requested) {
-      ps_write_16(DSKLEN, 0);
+      ps_write_16(DSKLEN, 0x4000);
       ps_write_16(DMACON, DMAF_DISK);
       return -2;
     }
@@ -280,7 +293,7 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
     if (intreq & INTF_DSKBLK) {
       ps_write_16(INTREQ, INTF_DSKBLK);  // clear
       // Stop DMA.
-      ps_write_16(DSKLEN, 0);
+      ps_write_16(DSKLEN, 0x4000);
       ps_write_16(DMACON, DMAF_DISK);
       return 0;
     }
@@ -292,7 +305,7 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
     usleep(10);  // slow the loop slightly
   }
   // Stop DMA on timeout.
-  ps_write_16(DSKLEN, 0);
+  ps_write_16(DSKLEN, 0x4000);
   ps_write_16(DMACON, DMAF_DISK);
   return -1;
 }
@@ -345,6 +358,7 @@ int main(int argc, char **argv) {
   }
   motor_on();
   usleep(800000);  // spin-up
+  wait_for_ready(500);
   log_status("after motor on");
 
   if (spin_test) {
@@ -392,7 +406,7 @@ int main(int argc, char **argv) {
       // Reassert motor/select in case a previous iteration turned anything off.
       select_drive(drive);
       motor_on();
-      usleep(200000);  // allow motor/select to settle
+      usleep(500000);  // allow motor/select to settle (motor spec: ~500ms spin-up)
   set_side(s);
   if (t > 0 || s > 0) {
     // Step one track inward between logical tracks after side 1, else stay on same cylinder for side toggle.
