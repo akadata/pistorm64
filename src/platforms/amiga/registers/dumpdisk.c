@@ -3,18 +3,23 @@
 // NOTE: This reads raw MFM track data via Paula disk DMA; output is raw track dumps,
 // not decoded ADF. Further MFM decode is required to produce sector data.
 
+#define _XOPEN_SOURCE 600
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 #include "src/gpio/ps_protocol.h"
 #include "amiga_custom_chips.h"
 #include "paula.h"
 #include "agnus.h"
 #include "cia.h"
+
+// ps_protocol.c expects this symbol; we don't drive a CPU here.
+void m68k_set_irq(unsigned int level) { (void)level; }
 
 // Paula disk registers
 #define DSK_SYNC_WORD 0x4489

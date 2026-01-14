@@ -3,13 +3,16 @@
 // Exercises LEDs, disk control lines (motor/select/step/side), joystick/mouse counters,
 // POT inputs, serial/parallel status lines. Uses ps_protocol to read/write bus.
 
+#define _XOPEN_SOURCE 600
 #include <ctype.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 #include "src/gpio/ps_protocol.h"
 #include "amiga_custom_chips.h"
@@ -18,6 +21,9 @@
 #include "denise.h"
 
 static volatile sig_atomic_t stop_poll = 0;
+
+// ps_protocol.c expects this symbol; we don't drive a CPU here.
+void m68k_set_irq(unsigned int level) { (void)level; }
 
 static void on_sigint(int signo) {
   (void)signo;
