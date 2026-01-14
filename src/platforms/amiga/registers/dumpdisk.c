@@ -90,7 +90,7 @@ static void set_side(int side) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKSIDE);
   uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  if (side) prb |= CIAB_DSKSIDE;
+  if (side) prb |= CIAB_DSKSIDE;   // 1 = lower head on standard drives
   else prb &= (uint8_t)~CIAB_DSKSIDE;
   ps_write_8(CIABPRB, prb);
 }
@@ -117,6 +117,8 @@ static void step_track(int steps, int outwards) {
 static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Clear any pending disk interrupt.
   ps_write_16(INTREQ, INTF_DSKBLK);
+  // Clear DSKLEN to stop any previous DMA.
+  ps_write_16(DSKLEN, 0);
   // Enable word sync on 0x4489.
   ps_write_16(ADKCON, ADKF_SETCLR | ADKF_MSBSYNC);
   // Program DMA pointer.
