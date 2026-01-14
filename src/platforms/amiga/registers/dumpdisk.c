@@ -345,7 +345,6 @@ int main(int argc, char **argv) {
   }
   motor_on();
   usleep(800000);  // spin-up
-  wait_for_ready(800);
   log_status("after motor on");
 
   if (spin_test) {
@@ -357,8 +356,8 @@ int main(int argc, char **argv) {
                 ddrb_shadow, prb_shadow);
         break;
       }
-      wait_for_ready(250);
       log_status("spin poll");
+      wait_for_ready(250);
     }
     motor_off();
     return 0;
