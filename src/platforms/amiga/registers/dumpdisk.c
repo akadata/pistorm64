@@ -158,25 +158,31 @@ static void log_status(const char *label) {
   uint16_t dsklen = (uint16_t)ps_read_16(DSKLEN);  // note: DSKLEN is write-only; readback is undefined
   uint16_t dskbytr = (uint16_t)ps_read_16(DSKBYTR);
   uint16_t intreq = (uint16_t)ps_read_16(INTREQR);
-  printf("%s: CIAAPRA=0x%02X (RDY=%d TRK0=%d PROT=%d CHG=%d) CIABPRB=0x%02X DSKLEN=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X\n",
+  uint16_t intena = (uint16_t)ps_read_16(INTENAR);
+  uint16_t dmaconr = (uint16_t)ps_read_16(DMACONR);
+  uint16_t adkconr = (uint16_t)ps_read_16(ADKCONR);
+  printf("%s: CIAAPRA=0x%02X (RDY=%d TRK0=%d PROT=%d CHG=%d) CIABPRB=0x%02X "
+         "DSKLEN=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X INTENAR=0x%04X DMACONR=0x%04X ADKCONR=0x%04X\n",
          label,
          pra,
          (pra & CIAA_DSKRDY) ? 0 : 1,       // active low
          (pra & CIAA_DSKTRACK0) ? 0 : 1,    // active low
          (pra & CIAA_DSKPROT) ? 1 : 0,      // 1 = write-protected
          (pra & CIAA_DSKCHANGE) ? 1 : 0,    // 1 = disk change detected
-         prb, dsklen, dskbytr, intreq);
+         prb, dsklen, dskbytr, intreq, intena, dmaconr, adkconr);
 }
 
 // Paula disk DMA -------------------------------------------------------------
 static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Clear any pending disk interrupt.
-  ps_write_16(INTREQ, INTF_DSKBLK);
+  ps_write_16(INTREQ, INTF_DSKBLK | INTF_DSKSYN);
   // Clear DSKLEN to stop any previous DMA.
   ps_write_16(DSKLEN, 0);
-  // Disable MSBSYNC (clear) and clear stale sync/flags.
-  ps_write_16(ADKCON, ADKF_MSBSYNC);  // clear MSBSYNC
+  // Enable MSBSYNC so DMA waits for sync word.
+  ps_write_16(ADKCON, ADKF_SETCLR | ADKF_MSBSYNC);
   (void)ps_read_16(DSKBYTR);
+  // Enable disk interrupt + master interrupt.
+  ps_write_16(INTENA, INTF_SETCLR | INTF_DSKBLK | INTF_INTEN);
   // Program DMA pointer (word address; lower bit must be 0).
   uint32_t ptr = (chip_addr & 0x1FFFFEu) >> 1;  // word address into chip RAM
   uint16_t ptr_hi = (uint16_t)((ptr >> 16) & 0xFFFFu);
