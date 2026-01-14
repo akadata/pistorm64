@@ -72,7 +72,7 @@ static void overlay_off(void) {
 
 static void init_disk_port(void) {
   // Disk control is all of CIAB port B: motor, select, side, direction, step.
-  ddrb_shadow = 0xFF;
+  ddrb_shadow = 0xFF;  // all outputs
   ps_write_8(CIABDDRB, ddrb_shadow);
   // Clear CIAB control registers to plain I/O mode.
   ps_write_8(CIABCRA, 0x00);
@@ -83,6 +83,16 @@ static void init_disk_port(void) {
   prb_shadow |= (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3 | CIAB_DSKMOTOR | CIAB_DSKSIDE);
   prb_shadow &= (uint8_t)~CIAB_DSKSTEP;
   ps_write_8(CIABPRB, prb_shadow);
+}
+
+static void force_drive0_outputs(void) {
+  ddrb_shadow = 0xFF;
+  ps_write_8(CIABDDRB, ddrb_shadow);
+  // Drive0 selected (bit3=0), others high, motor on (bit7=0), side0 (bit2=0).
+  prb_shadow |= (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3 | CIAB_DSKSIDE);
+  prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR | CIAB_DSKSTEP);
+  ps_write_8(CIABPRB, prb_shadow);
+  usleep(1000);
 }
 
 static int wait_for_ready(int timeout_ms) {
@@ -297,10 +307,7 @@ int main(int argc, char **argv) {
 
   overlay_off();
   init_disk_port();
-  prb_shadow = (uint8_t)ps_read_8(CIABPRB);
-
-  overlay_off();
-
+  force_drive0_outputs();
   select_drive(drive);
   set_side(0);
   motor_on();
