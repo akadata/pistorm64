@@ -32,6 +32,7 @@ void m68k_set_irq(unsigned int level) { (void)level; }
 static volatile sig_atomic_t stop_requested = 0;
 static uint8_t prb_shadow = 0xFF;
 static uint8_t ciaa_pra_shadow = 0xFF;
+static uint8_t ddrb_shadow = 0xFF;
 
 static void on_sigint(int signo) {
   (void)signo;
@@ -67,6 +68,21 @@ static void overlay_off(void) {
   ciaa_pra_shadow = (uint8_t)ps_read_8(pra);
   ciaa_pra_shadow &= (uint8_t)~CIAA_OVERLAY;
   ps_write_8(pra, ciaa_pra_shadow);
+}
+
+static void init_disk_port(void) {
+  // Disk control is all of CIAB port B: motor, select, side, direction, step.
+  ddrb_shadow = 0xFF;
+  ps_write_8(CIABDDRB, ddrb_shadow);
+  // Clear CIAB control registers to plain I/O mode.
+  ps_write_8(CIABCRA, 0x00);
+  ps_write_8(CIABCRB, 0x00);
+  prb_shadow = (uint8_t)ps_read_8(CIABPRB);
+  // Default to drive 0 selected, motor off, side 0.
+  prb_shadow &= (uint8_t)~CIAB_DSKSEL0;
+  prb_shadow |= (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3 | CIAB_DSKMOTOR | CIAB_DSKSIDE);
+  prb_shadow &= (uint8_t)~CIAB_DSKSTEP;
+  ps_write_8(CIABPRB, prb_shadow);
 }
 
 static int wait_for_ready(int timeout_ms) {
