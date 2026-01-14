@@ -99,6 +99,22 @@ static void force_drive0_outputs(void) {
   usleep(1000);
 }
 
+static void write_ddrb_locked(uint8_t val, const char *why) {
+  ddrb_shadow = val;
+  ps_write_8(CIABDDRB, val);
+  ps_write_8(CIABDDRB + 1, val);
+  uint8_t rd = (uint8_t)ps_read_8(CIABDDRB);
+  printf("%s: CIABDDRB=0x%02X (readback)\n", why, rd);
+}
+
+static void write_prb_locked(uint8_t val, const char *why) {
+  prb_shadow = val;
+  ps_write_8(CIABPRB, val);
+  ps_write_8(CIABPRB + 1, val);
+  uint8_t rd = (uint8_t)ps_read_8(CIABPRB);
+  printf("%s: CIABPRB=0x%02X (readback)\n", why, rd);
+}
+
 static int wait_for_ready(int timeout_ms) {
   const int polls = timeout_ms / 10;
   for (int i = 0; i < polls; i++) {
@@ -319,20 +335,17 @@ int main(int argc, char **argv) {
 
   overlay_off();
   init_disk_port();
-  force_drive0_outputs();
-  select_drive(drive);
-  set_side(0);
+  // Hard-lock CIAB lines: DDRB=0xFF, PRB=0x70 (motor+DS0 asserted, side0).
+  write_ddrb_locked(0xFF, "ddrb init");
+  write_prb_locked(0x70, "prb init");
   motor_on();
-  usleep(1500000);  // spin-up
-  for (int i = 0; i < 5; i++) {
-    force_drive0_outputs();
-    wait_for_ready(200);
-  }
+  usleep(800000);  // spin-up
+  wait_for_ready(800);
   log_status("after motor on");
 
   if (spin_test) {
     for (int i = 0; i < 10 && !stop_requested; i++) {
-      force_drive0_outputs();
+      write_prb_locked(0x70, "spin reassert");
       wait_for_ready(250);
       log_status("spin poll");
     }
