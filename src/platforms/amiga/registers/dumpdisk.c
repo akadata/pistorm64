@@ -59,7 +59,7 @@ static void motor_on(void) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKMOTOR);
   uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  prb |= CIAB_DSKMOTOR;  // active high
+  prb |= CIAB_DSKMOTOR;  // active high on Amiga drives
   ps_write_8(CIABPRB, prb);
 }
 
@@ -81,8 +81,8 @@ static void select_drive(int drive) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, mask);
   uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  prb |= mask;           // deassert all (active low)
-  prb &= (uint8_t)~sel_bit;  // assert target
+  prb |= mask;                // deassert all (active low)
+  prb &= (uint8_t)~sel_bit;   // assert target
   ps_write_8(CIABPRB, prb);
 }
 
@@ -99,16 +99,16 @@ static void step_track(int steps, int outwards) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKDIREC | CIAB_DSKSTEP);
   uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  if (outwards) prb |= CIAB_DSKDIREC;
+  if (outwards) prb |= CIAB_DSKDIREC;      // 1 = out, 0 = in (per hardware manual)
   else prb &= (uint8_t)~CIAB_DSKDIREC;
   ps_write_8(CIABPRB, prb);
   for (int i = 0; i < steps; i++) {
     prb |= CIAB_DSKSTEP;
     ps_write_8(CIABPRB, prb);
-    usleep(5000);
+    usleep(2000);
     prb &= (uint8_t)~CIAB_DSKSTEP;
     ps_write_8(CIABPRB, prb);
-    usleep(5000);
+    usleep(2000);
     if (stop_requested) break;
   }
 }
@@ -144,6 +144,14 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
       ps_write_16(DSKLEN, 0);
       ps_write_16(DMACON, DMAF_DISK);
       return 0;
+    }
+    if (i % 1000 == 0) {
+      uint16_t bytr = (uint16_t)ps_read_16(DSKBYTR);
+      // Check DSKBYTR bit15 (DSKVALID), bit14 (DSKACTIVE), bit13 (DSKSYNC)
+      if ((bytr & 0x8000u) == 0) {
+        // Data not valid yet; keep waiting
+        ;
+      }
     }
     usleep(1);
   }
@@ -192,7 +200,7 @@ int main(int argc, char **argv) {
 
   select_drive(drive);
   motor_on();
-  usleep(50000);  // spin-up
+  usleep(500000);  // spin-up 0.5s
   // Seek to track 0 by stepping outward generously.
   step_track(82, 1);
 
