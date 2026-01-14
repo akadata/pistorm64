@@ -38,7 +38,8 @@ static void on_sigint(int signo) {
   (void)signo;
   stop_requested = 1;
   // Try to shut down motor promptly on Ctrl-C.
-  ps_write_8(CIABPRB, (uint8_t)(prb_shadow | CIAB_DSKMOTOR));
+  prb_shadow |= CIAB_DSKMOTOR;
+  ps_write_8(CIABPRB, prb_shadow);
 }
 
 static uint32_t parse_u32(const char *s) {
@@ -142,9 +143,19 @@ static void motor_on(void) {
 static void motor_off(void) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKMOTOR);
+  // Latch motor-off: set motor high, briefly deassert selects, then reassert the current drive
+  // to clock the motor bit, and finally release selects.
   prb_shadow |= CIAB_DSKMOTOR;
+  // Deassert all selects.
+  prb_shadow |= (uint8_t)(CIAB_DSKSEL0 | CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3);
   ps_write_8(CIABPRB, prb_shadow);
-  ps_write_8(CIABPRB + 1, prb_shadow);
+  // Pulse drive 0 select low to latch motor-off.
+  prb_shadow &= (uint8_t)~CIAB_DSKSEL0;
+  ps_write_8(CIABPRB, prb_shadow);
+  usleep(1000);
+  // Release select.
+  prb_shadow |= CIAB_DSKSEL0;
+  ps_write_8(CIABPRB, prb_shadow);
 }
 
 static void select_drive(int drive) {
@@ -271,6 +282,7 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   ps_write_16(DSKSYNC, DSK_SYNC_WORD);
   // Enable disk DMA master + disk.
   ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_DISK);
+  uint16_t dmaconr = (uint16_t)ps_read_16(DMACONR);
   // Kick DMA: bit15 enable, bit14 direction (0 = read), bits 0-13 length words.
   uint16_t len = (uint16_t)(words & 0x3FFFu);
   uint16_t want_len = 0x8000u | len;  // bit15 enables DMA, bit14=0 => read
@@ -279,8 +291,8 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   ps_write_16(DSKLEN, want_len);      // must be written twice to start DMA
   uint16_t arm_bytr = (uint16_t)ps_read_16(DSKBYTR);
   uint16_t arm_int = (uint16_t)ps_read_16(INTREQR);
-  printf("DMA armed: DSKPTH=0x%04X DSKPTL=0x%04X DSKLEN(w)=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X\n",
-         ptr_hi, ptr_lo, want_len, arm_bytr, arm_int);
+  printf("DMA armed: DSKPTH=0x%04X DSKPTL=0x%04X DSKLEN(w)=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X DMACONR=0x%04X\n",
+         ptr_hi, ptr_lo, want_len, arm_bytr, arm_int, dmaconr);
   // Wait for interrupt or timeout.
   const int max_poll = 1000000;  // ~1s in 1us polls
   for (int i = 0; i < max_poll; i++) {
