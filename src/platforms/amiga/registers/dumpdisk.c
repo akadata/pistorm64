@@ -395,26 +395,27 @@ int main(int argc, char **argv) {
   // Seek to track 0 with sensor check.
   seek_track0();
   log_status("after seek to track0");
-  // Seek to track 80 (outermost), then back to track 0.
-  step_track(80, 0);  // inward toward high tracks
-  log_status("after seek to track80");
-  seek_track0();
-  log_status("after re-seek to track0");
 
-  // Exercise head movement backwards in 5-track steps from 80 to 0.
-  for (int back = 75; back >= 0; back -= 5) {
-    step_track(5, 0);  // inward 5 tracks
-    printf("Head step to approx track %d\n", back);
-    usleep(20000);
+  // Skip long sweeps for quick single-track dumps; keep it minimal.
+  if (!(tracks == 1 && sides == 1)) {
+    // Seek to track 80 (outermost), then back to track 0.
+    step_track(80, 0);  // inward toward high tracks
+    log_status("after seek to track80");
+    seek_track0();
+    log_status("after re-seek to track0");
+
+    // Exercise head movement backwards in 5-track steps from 80 to 0.
+    for (int back = 75; back >= 0; back -= 5) {
+      step_track(5, 0);  // inward 5 tracks
+      printf("Head step to approx track %d\n", back);
+      usleep(20000);
+    }
+    seek_track0();
+    log_status("after backstep sweep to track0");
   }
-  seek_track0();
-  log_status("after backstep sweep to track0");
-  // Ensure DDRB/prb are sane before data reads.
-  force_drive0_outputs();
 
   for (int t = 0; t < tracks && !stop_requested; t++) {
     for (int s = 0; s < sides && !stop_requested; s++) {
-      force_drive0_outputs();
       // Reassert motor/select in case a previous iteration turned anything off.
       select_drive(drive);
       motor_on();
@@ -429,6 +430,11 @@ int main(int argc, char **argv) {
   // Small settle time after head move/side change.
   usleep(20000);
   wait_for_ready(500);
+      // Ensure DDRB/PRB are sane immediately before DMA.
+      force_drive0_outputs();
+      select_drive(drive);
+      set_side(s);
+      wait_for_ready(200);
       log_status("before DMA");
 
       int rc = read_track_raw(CHIP_BUF_ADDR, TRACK_RAW_WORDS);
