@@ -113,6 +113,22 @@ static void step_track(int steps, int outwards) {
   }
 }
 
+static void log_status(const char *label) {
+  uint8_t pra = (uint8_t)ps_read_8(CIAAPRA);
+  uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
+  uint16_t dsklen = (uint16_t)ps_read_16(DSKLEN);
+  uint16_t dskbytr = (uint16_t)ps_read_16(DSKBYTR);
+  uint16_t intreq = (uint16_t)ps_read_16(INTREQR);
+  printf("%s: CIAAPRA=0x%02X (RDY=%d TRK0=%d PROT=%d CHG=%d) CIABPRB=0x%02X DSKLEN=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X\n",
+         label,
+         pra,
+         (pra & CIAA_DSKRDY) ? 0 : 1,
+         (pra & CIAA_DSKTRACK0) ? 0 : 1,
+         (pra & CIAA_DSKPROT) ? 1 : 0,
+         (pra & CIAA_DSKCHANGE) ? 1 : 0,
+         prb, dsklen, dskbytr, intreq);
+}
+
 // Paula disk DMA -------------------------------------------------------------
 static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Clear any pending disk interrupt.
@@ -203,8 +219,13 @@ int main(int argc, char **argv) {
   select_drive(drive);
   motor_on();
   usleep(500000);  // spin-up 0.5s
-  // Seek to track 0 by stepping outward generously.
+  log_status("after motor on");
+  // Seek outward to track 0.
   step_track(82, 1);
+  log_status("after seek to track0");
+  // Pre-seek to track 40 like Kickstart scan does.
+  step_track(40, 0);  // 0 = inward
+  log_status("after seek to track40");
 
   for (int t = 0; t < tracks && !stop_requested; t++) {
     for (int s = 0; s < sides && !stop_requested; s++) {
@@ -215,6 +236,7 @@ int main(int argc, char **argv) {
           step_track(1, 0);
         }
       }
+      log_status("before DMA");
 
       int rc = read_track_raw(CHIP_BUF_ADDR, TRACK_RAW_WORDS);
       if (rc == -2) {
