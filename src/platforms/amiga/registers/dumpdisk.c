@@ -132,6 +132,11 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Wait for interrupt or timeout.
   const int max_poll = 1000000;  // ~1s in 1us polls
   for (int i = 0; i < max_poll; i++) {
+    if (stop_requested) {
+      ps_write_16(DSKLEN, 0);
+      ps_write_16(DMACON, DMAF_DISK);
+      return -2;
+    }
     uint16_t intreq = (uint16_t)ps_read_16(INTREQR);
     if (intreq & INTF_DSKBLK) {
       ps_write_16(INTREQ, INTF_DSKBLK);  // clear
@@ -201,7 +206,14 @@ int main(int argc, char **argv) {
         }
       }
 
-      if (read_track_raw(CHIP_BUF_ADDR, TRACK_RAW_WORDS) != 0) {
+      int rc = read_track_raw(CHIP_BUF_ADDR, TRACK_RAW_WORDS);
+      if (rc == -2) {
+        fprintf(stderr, "Abort requested\n");
+        fclose(fp);
+        motor_off();
+        return 1;
+      }
+      if (rc != 0) {
         fprintf(stderr, "Track %d side %d: DMA timeout\n", t, s);
         fclose(fp);
         motor_off();
