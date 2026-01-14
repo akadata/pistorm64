@@ -135,9 +135,8 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   ps_write_16(INTREQ, INTF_DSKBLK);
   // Clear DSKLEN to stop any previous DMA.
   ps_write_16(DSKLEN, 0);
-  // Enable word sync on 0x4489.
-  ps_write_16(ADKCON, ADKF_SETCLR | ADKF_MSBSYNC);
-  // Clear disk byter to remove stale flags.
+  // Disable MSBSYNC (clear) and clear stale sync/flags.
+  ps_write_16(ADKCON, ADKF_MSBSYNC);  // clear MSBSYNC
   (void)ps_read_16(DSKBYTR);
   // Program DMA pointer.
   ps_write_16(DSKPTH, (chip_addr >> 16) & 0xFFFFu);
@@ -169,7 +168,13 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
       ps_write_16(DMACON, DMAF_DISK);
       return 0;
     }
-    usleep(1);
+    if ((i % 100000) == 0) {
+      uint16_t bytr = (uint16_t)ps_read_16(DSKBYTR);
+      uint16_t cur_len = (uint16_t)ps_read_16(DSKLEN);
+      printf(" ... poll %d DSKBYTR=0x%04X DSKLEN=0x%04X INTREQR=0x%04X\n",
+             i, bytr, cur_len, (uint16_t)ps_read_16(INTREQR));
+    }
+    usleep(10);  // slow the loop slightly
   }
   // Stop DMA on timeout.
   ps_write_16(DSKLEN, 0);
