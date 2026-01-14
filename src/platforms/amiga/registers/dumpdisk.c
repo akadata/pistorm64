@@ -31,6 +31,7 @@ void m68k_set_irq(unsigned int level) { (void)level; }
 
 static volatile sig_atomic_t stop_requested = 0;
 static uint8_t prb_shadow = 0xFF;
+static uint8_t ciaa_pra_shadow = 0xFF;
 
 static void on_sigint(int signo) {
   (void)signo;
@@ -54,6 +55,18 @@ static void ensure_output(uint32_t ddr_addr, uint8_t mask) {
     ddr |= mask;
     ps_write_8(ddr_addr, ddr);
   }
+}
+
+static void overlay_off(void) {
+  // Ensure CIAA overlay bit is cleared so custom chip space is visible.
+  uint32_t ddra = CIAA_BASE + CIADDRA;
+  uint32_t pra  = CIAA_BASE + CIAPRA;
+  uint8_t ddr = (uint8_t)ps_read_8(ddra);
+  ddr |= CIAA_OVERLAY;
+  ps_write_8(ddra, ddr);
+  ciaa_pra_shadow = (uint8_t)ps_read_8(pra);
+  ciaa_pra_shadow &= (uint8_t)~CIAA_OVERLAY;
+  ps_write_8(pra, ciaa_pra_shadow);
 }
 
 static void motor_on(void) {
@@ -173,11 +186,15 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_DISK);
   // Kick DMA: bit15 enable, bit14 direction (0 = read), bits 0-13 length words.
   uint16_t len = (uint16_t)(words & 0x3FFFu);
-  ps_write_16(DSKLEN, 0x8000u | len);
+  uint16_t want_len = 0x8000u | len;
+  ps_write_16(DSKLEN, want_len);
   uint16_t arm_bytr = (uint16_t)ps_read_16(DSKBYTR);
   uint16_t arm_int = (uint16_t)ps_read_16(INTREQR);
-  printf("DMA armed: DSKLEN=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X\n",
-         (uint16_t)ps_read_16(DSKLEN), arm_bytr, arm_int);
+  uint16_t cur_len = (uint16_t)ps_read_16(DSKLEN);
+  uint16_t dskpth = (uint16_t)ps_read_16(DSKPTH);
+  uint16_t dskptl = (uint16_t)ps_read_16(DSKPTL);
+  printf("DMA armed: DSKPTH=0x%04X DSKPTL=0x%04X DSKLEN=0x%04X (wanted 0x%04X) DSKBYTR=0x%04X INTREQR=0x%04X\n",
+         dskpth, dskptl, cur_len, want_len, arm_bytr, arm_int);
   // Wait for interrupt or timeout.
   const int max_poll = 1000000;  // ~1s in 1us polls
   for (int i = 0; i < max_poll; i++) {
@@ -245,9 +262,11 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  overlay_off();
+
   select_drive(drive);
   motor_on();
-  usleep(500000);  // spin-up 0.5s
+  usleep(800000);  // spin-up
   log_status("after motor on");
   // Seek to track 0 with sensor check.
   seek_track0();
