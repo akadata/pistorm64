@@ -261,8 +261,8 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Stop any previous DMA via DSKLEN and DMACON.
   ps_write_16(DSKLEN, 0x4000);
   ps_write_16(DMACON, DMAF_DISK);
-  // Set ADKCON for MFM fast, word sync, MFM precomp (read path).
-  ps_write_16(ADKCON, ADKF_SETCLR | ADKF_FAST | ADKF_WORDSYNC | ADKF_MFMPREC);
+  // Set ADKCON for MFM fast, MFM precomp (read path). WORDSYNC off so DMA starts immediately.
+  ps_write_16(ADKCON, ADKF_SETCLR | ADKF_FAST | ADKF_MFMPREC);
   // Arm disk interrupts (DSKBLK) + master.
   ps_write_16(INTENA, INTF_SETCLR | INTF_DSKBLK | INTF_INTEN);
   // Program DMA pointer (word address; lower bit must be 0).
