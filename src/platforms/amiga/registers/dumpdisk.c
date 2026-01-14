@@ -74,7 +74,6 @@ static void init_disk_port(void) {
   // Disk control is all of CIAB port B: motor, select, side, direction, step.
   ddrb_shadow = 0xFF;  // all outputs
   ps_write_8(CIABDDRB, ddrb_shadow);
-  ps_write_8(CIABDDRB + 1, ddrb_shadow);  // odd lane in case wiring expects it
   // Clear CIAB control registers to plain I/O mode.
   ps_write_8(CIABCRA, 0x00);
   ps_write_8(CIABCRB, 0x00);
@@ -83,26 +82,22 @@ static void init_disk_port(void) {
   prb_shadow = (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3);  // high
   prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR | CIAB_DSKSIDE | CIAB_DSKSTEP | CIAB_DSKDIREC);
   ps_write_8(CIABPRB, prb_shadow);
-  ps_write_8(CIABPRB + 1, prb_shadow);
   usleep(1000);
 }
 
 static void force_drive0_outputs(void) {
   ddrb_shadow = 0xFF;
   ps_write_8(CIABDDRB, ddrb_shadow);
-  ps_write_8(CIABDDRB + 1, ddrb_shadow);
   // Drive0 selected (bit3=0), others high, motor on (bit7=0), side0 (bit2=0).
   prb_shadow |= (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3 | CIAB_DSKSIDE);
   prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR | CIAB_DSKSTEP);
   ps_write_8(CIABPRB, prb_shadow);
-  ps_write_8(CIABPRB + 1, prb_shadow);  // odd lane mirror
   usleep(1000);
 }
 
 static void write_ddrb_locked(uint8_t val, const char *why) {
   ddrb_shadow = val;
   ps_write_8(CIABDDRB, val);
-  ps_write_8(CIABDDRB + 1, val);
   uint8_t rd = (uint8_t)ps_read_8(CIABDDRB);
   printf("%s: CIABDDRB=0x%02X (readback)\n", why, rd);
   if (rd != val) {
@@ -113,7 +108,6 @@ static void write_ddrb_locked(uint8_t val, const char *why) {
 static void write_prb_locked(uint8_t val, const char *why) {
   prb_shadow = val;
   ps_write_8(CIABPRB, val);
-  ps_write_8(CIABPRB + 1, val);
   uint8_t rd = (uint8_t)ps_read_8(CIABPRB);
   printf("%s: CIABPRB=0x%02X (readback)\n", why, rd);
   if (rd != val) {
