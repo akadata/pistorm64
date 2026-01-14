@@ -263,6 +263,7 @@ int main(int argc, char **argv) {
   int drive = 0;
   int tracks = 80;
   int sides = 2;
+  int spin_test = 0;
 
   for (int i = 1; i < argc; i++) {
     const char *arg = argv[i];
@@ -282,18 +283,16 @@ int main(int argc, char **argv) {
       sides = (int)parse_u32(argv[++i]);
       continue;
     }
-    fprintf(stderr, "Usage: %s [--out file] [--drive 0-3] [--tracks 80] [--sides 2]\n", argv[0]);
+    if (!strcmp(arg, "--spin-test")) {
+      spin_test = 1;
+      continue;
+    }
+    fprintf(stderr, "Usage: %s [--out file] [--drive 0-3] [--tracks 80] [--sides 2] [--spin-test]\n", argv[0]);
     return 1;
   }
 
   signal(SIGINT, on_sigint);
   ps_setup_protocol();
-
-  FILE *fp = fopen(outfile, "wb");
-  if (!fp) {
-    perror("fopen");
-    return 1;
-  }
 
   overlay_off();
   prb_shadow = (uint8_t)ps_read_8(CIABPRB);
@@ -303,6 +302,22 @@ int main(int argc, char **argv) {
   usleep(1500000);  // spin-up
   wait_for_ready(1000);
   log_status("after motor on");
+
+  if (spin_test) {
+    for (int i = 0; i < 10 && !stop_requested; i++) {
+      wait_for_ready(250);
+      log_status("spin poll");
+    }
+    motor_off();
+    return 0;
+  }
+
+  FILE *fp = fopen(outfile, "wb");
+  if (!fp) {
+    perror("fopen");
+    motor_off();
+    return 1;
+  }
   // Seek to track 0 with sensor check.
   seek_track0();
   log_status("after seek to track0");
