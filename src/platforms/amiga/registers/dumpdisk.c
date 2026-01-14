@@ -92,12 +92,8 @@ static void init_disk_port(void) {
 static void force_drive0_outputs(void) {
   ddrb_shadow = 0xFF;
   ps_write_8(CIABDDRB, ddrb_shadow);
-  // Drive0 selected (bit3=0), others high, motor on (bit7=0), side0 (bit2=0).
-  prb_shadow = (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3);  // high on other selects
-  prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR);              // select 0 + motor on
-  prb_shadow &= (uint8_t)~CIAB_DSKSIDE;                                // side 0
-  prb_shadow &= (uint8_t)~CIAB_DSKDIREC;                               // dir inward (0)
-  prb_shadow |= CIAB_DSKSTEP;                                          // idle high
+  // Drive0 selected (bit3=0), others high, motor on (bit7=0), side0 (bit2=0), dir inward (0), step high.
+  prb_shadow = 0x70;  // 0b01110000: SEL0=0, SEL1-3=1, MOTOR=0, SIDE=0, DIR=0, STEP=1
   ps_write_8(CIABPRB, prb_shadow);
   usleep(1000);
 }
@@ -430,11 +426,16 @@ int main(int argc, char **argv) {
   // Small settle time after head move/side change.
   usleep(20000);
   wait_for_ready(500);
-      // Ensure DDRB/PRB are sane immediately before DMA.
+      // Ensure DDRB/PRB are sane immediately before DMA: DS0 + motor on, side/direction set.
       force_drive0_outputs();
-      select_drive(drive);
-      set_side(s);
+      if (s) ps_write_8(CIABPRB, (uint8_t)(prb_shadow | CIAB_DSKSIDE));
+      usleep(20000);
       wait_for_ready(200);
+      // If ready/track0 disappeared, abort this attempt.
+      uint8_t pra_now = (uint8_t)ps_read_8(CIAAPRA);
+      if ((pra_now & CIAA_DSKRDY) || (pra_now & CIAA_DSKTRACK0)) {
+        printf("WARN: drive not ready or track0 lost before DMA (PRA=0x%02X)\n", pra_now);
+      }
       log_status("before DMA");
 
       int rc = read_track_raw(CHIP_BUF_ADDR, TRACK_RAW_WORDS);
