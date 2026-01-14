@@ -38,6 +38,7 @@ qwen.resume
 *.pdf
 *.pvs
 *.sr
+codex.resume
 
 # Do not include tool binaries
 build/
