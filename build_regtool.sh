@@ -1,1 +1,4 @@
-gcc -O2 -Wall -Wextra -I./ src/platforms/amiga/registers/regtool.c src/gpio/ps_protocol.c src/gpio/rpi_peri.c -o regtool
+#!/usr/bin/env bash
+# Backward-compatible wrapper for build_reg_tools.sh
+set -euo pipefail
+exec "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/build_reg_tools.sh" "$@"

@@ -7,9 +7,6 @@
 
 #include "amiga_custom_chips.h"
 
-// PAULA base address is 0xDFF000
-#define PAULA_BASE 0xDFF000
-
 // Audio Channel 0 Registers
 #define AUD0LCH  (PAULA_BASE + 0x0A0)  // Audio channel 0 location high
 #define AUD0LCL  (PAULA_BASE + 0x0A2)  // Audio channel 0 location low
