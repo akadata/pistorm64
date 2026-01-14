@@ -37,6 +37,8 @@ static uint8_t ddrb_shadow = 0xFF;
 static void on_sigint(int signo) {
   (void)signo;
   stop_requested = 1;
+  // Try to shut down motor promptly on Ctrl-C.
+  ps_write_8(CIABPRB, (uint8_t)(prb_shadow | CIAB_DSKMOTOR));
 }
 
 static uint32_t parse_u32(const char *s) {
@@ -255,9 +257,7 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Stop any previous DMA via DSKLEN and DMACON.
   ps_write_16(DSKLEN, 0x4000);
   ps_write_16(DMACON, DMAF_DISK);
-  // Clear disk-related ADKCON bits, then set read defaults (FAST + WORDSYNC + MFM).
-  ps_write_16(ADKCON, ADKF_FAST | ADKF_WORDSYNC | ADKF_MFMPREC | ADKF_MSBSYNC |
-                        ADKF_PRECOMP0 | ADKF_PRECOMP1 | ADKF_PRECOMP2);
+  // Set ADKCON for MFM fast, word sync, MFM precomp (read path).
   ps_write_16(ADKCON, ADKF_SETCLR | ADKF_FAST | ADKF_WORDSYNC | ADKF_MFMPREC);
   // Arm disk interrupts (DSKBLK) + master.
   ps_write_16(INTENA, INTF_SETCLR | INTF_DSKBLK | INTF_INTEN);
