@@ -137,7 +137,6 @@ static void motor_on(void) {
   ensure_output(ddrb, CIAB_DSKMOTOR);
   prb_shadow &= (uint8_t)~CIAB_DSKMOTOR;  // active low on Amiga drives
   ps_write_8(CIABPRB, prb_shadow);
-  ps_write_8(CIABPRB + 1, prb_shadow);
 }
 
 static void motor_off(void) {
@@ -170,10 +169,8 @@ static void select_drive(int drive) {
   prb_shadow |= mask;                // deassert all (active low)
   prb_shadow &= (uint8_t)~sel_bit;   // assert target
   ps_write_8(CIABPRB, prb_shadow);
-  ps_write_8(CIABPRB + 1, prb_shadow);
   // Ensure motor is still on after select.
   ps_write_8(CIABPRB, prb_shadow);
-  ps_write_8(CIABPRB + 1, prb_shadow);
   usleep(1000);
 }
 
@@ -183,7 +180,6 @@ static void set_side(int side) {
   if (side) prb_shadow |= CIAB_DSKSIDE;   // 1 = lower head on standard drives
   else prb_shadow &= (uint8_t)~CIAB_DSKSIDE;
   ps_write_8(CIABPRB, prb_shadow);
-  ps_write_8(CIABPRB + 1, prb_shadow);
 }
 
 static void step_pulse(int outwards) {
@@ -224,7 +220,6 @@ static int seek_track0(void) {
     if (outwards) prb_shadow |= CIAB_DSKDIREC;
     else prb_shadow &= (uint8_t)~CIAB_DSKDIREC;
     ps_write_8(CIABPRB, prb_shadow);
-    ps_write_8(CIABPRB + 1, prb_shadow);
     for (int i = 0; i < 90; i++) {
       step_pulse(outwards);
       uint8_t pra = (uint8_t)ps_read_8(CIAAPRA);
@@ -412,9 +407,12 @@ int main(int argc, char **argv) {
   }
   seek_track0();
   log_status("after backstep sweep to track0");
+  // Ensure DDRB/prb are sane before data reads.
+  force_drive0_outputs();
 
   for (int t = 0; t < tracks && !stop_requested; t++) {
     for (int s = 0; s < sides && !stop_requested; s++) {
+      force_drive0_outputs();
       // Reassert motor/select in case a previous iteration turned anything off.
       select_drive(drive);
       motor_on();
