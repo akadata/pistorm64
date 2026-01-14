@@ -82,6 +82,9 @@ static void select_drive(int drive) {
   prb_shadow |= mask;                // deassert all (active low)
   prb_shadow &= (uint8_t)~sel_bit;   // assert target
   ps_write_8(CIABPRB, prb_shadow);
+  // Ensure motor is still on after select.
+  ps_write_8(CIABPRB, prb_shadow);
+  usleep(1000);
 }
 
 static void set_side(int side) {
