@@ -137,6 +137,8 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   ps_write_16(DSKLEN, 0);
   // Enable word sync on 0x4489.
   ps_write_16(ADKCON, ADKF_SETCLR | ADKF_MSBSYNC);
+  // Clear disk byter to remove stale flags.
+  (void)ps_read_16(DSKBYTR);
   // Program DMA pointer.
   ps_write_16(DSKPTH, (chip_addr >> 16) & 0xFFFFu);
   ps_write_16(DSKPTL, chip_addr & 0xFFFFu);
@@ -162,14 +164,6 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
       ps_write_16(DSKLEN, 0);
       ps_write_16(DMACON, DMAF_DISK);
       return 0;
-    }
-    if (i % 1000 == 0) {
-      uint16_t bytr = (uint16_t)ps_read_16(DSKBYTR);
-      // Check DSKBYTR bit15 (DSKVALID), bit14 (DSKACTIVE), bit13 (DSKSYNC)
-      if ((bytr & 0x8000u) == 0) {
-        // Data not valid yet; keep waiting
-        ;
-      }
     }
     usleep(1);
   }
