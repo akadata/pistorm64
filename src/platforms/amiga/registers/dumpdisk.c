@@ -117,6 +117,8 @@ static void step_track(int steps, int outwards) {
 static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Clear any pending disk interrupt.
   ps_write_16(INTREQ, INTF_DSKBLK);
+  // Enable word sync on 0x4489.
+  ps_write_16(ADKCON, ADKF_SETCLR | ADKF_MSBSYNC);
   // Program DMA pointer.
   ps_write_16(DSKPTH, (chip_addr >> 16) & 0xFFFFu);
   ps_write_16(DSKPTL, chip_addr & 0xFFFFu);
@@ -128,15 +130,21 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   uint16_t len = (uint16_t)(words & 0x3FFFu);
   ps_write_16(DSKLEN, 0x8000u | len);
   // Wait for interrupt or timeout.
-  const int max_poll = 200000;  // ~200ms in 1us polls
+  const int max_poll = 1000000;  // ~1s in 1us polls
   for (int i = 0; i < max_poll; i++) {
     uint16_t intreq = (uint16_t)ps_read_16(INTREQR);
     if (intreq & INTF_DSKBLK) {
       ps_write_16(INTREQ, INTF_DSKBLK);  // clear
+      // Stop DMA.
+      ps_write_16(DSKLEN, 0);
+      ps_write_16(DMACON, DMAF_DISK);
       return 0;
     }
     usleep(1);
   }
+  // Stop DMA on timeout.
+  ps_write_16(DSKLEN, 0);
+  ps_write_16(DMACON, DMAF_DISK);
   return -1;
 }
 
