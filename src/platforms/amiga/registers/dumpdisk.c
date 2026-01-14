@@ -252,13 +252,20 @@ int main(int argc, char **argv) {
   // Seek to track 0 with sensor check.
   seek_track0();
   log_status("after seek to track0");
-  // Seek to track 80 (outermost), then back to track 0, then to track 40.
+  // Seek to track 80 (outermost), then back to track 0.
   step_track(80, 0);  // inward toward high tracks
   log_status("after seek to track80");
   seek_track0();
   log_status("after re-seek to track0");
-  step_track(40, 0);  // 0 = inward
-  log_status("after seek to track40");
+
+  // Exercise head movement backwards in 5-track steps from 80 to 0.
+  for (int back = 75; back >= 0; back -= 5) {
+    step_track(5, 0);  // inward 5 tracks
+    printf("Head step to approx track %d\n", back);
+    usleep(20000);
+  }
+  seek_track0();
+  log_status("after backstep sweep to track0");
 
   for (int t = 0; t < tracks && !stop_requested; t++) {
     for (int s = 0; s < sides && !stop_requested; s++) {
