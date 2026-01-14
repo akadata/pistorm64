@@ -252,7 +252,11 @@ int main(int argc, char **argv) {
   // Seek to track 0 with sensor check.
   seek_track0();
   log_status("after seek to track0");
-  // Pre-seek to track 40 like Kickstart scan does.
+  // Seek to track 80 (outermost), then back to track 0, then to track 40.
+  step_track(80, 0);  // inward toward high tracks
+  log_status("after seek to track80");
+  seek_track0();
+  log_status("after re-seek to track0");
   step_track(40, 0);  // 0 = inward
   log_status("after seek to track40");
 
