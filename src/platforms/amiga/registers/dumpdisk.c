@@ -183,13 +183,14 @@ static int seek_track0(void) {
 static void log_status(const char *label) {
   uint8_t pra = (uint8_t)ps_read_8(CIAAPRA);
   uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
+  uint8_t ddrb = (uint8_t)ps_read_8(CIABDDRB);
   uint16_t dsklen = (uint16_t)ps_read_16(DSKLEN);  // note: DSKLEN is write-only; readback is undefined
   uint16_t dskbytr = (uint16_t)ps_read_16(DSKBYTR);
   uint16_t intreq = (uint16_t)ps_read_16(INTREQR);
   uint16_t intena = (uint16_t)ps_read_16(INTENAR);
   uint16_t dmaconr = (uint16_t)ps_read_16(DMACONR);
   uint16_t adkconr = (uint16_t)ps_read_16(ADKCONR);
-  printf("%s: CIAAPRA=0x%02X (RDY=%d TRK0=%d PROT=%d CHG=%d) CIABPRB=0x%02X "
+  printf("%s: CIAAPRA=0x%02X (RDY=%d TRK0=%d PROT=%d CHG=%d) CIABPRB=0x%02X CIABDDRB=0x%02X "
          "DSKLEN=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X INTENAR=0x%04X DMACONR=0x%04X ADKCONR=0x%04X\n",
          label,
          pra,
@@ -197,7 +198,7 @@ static void log_status(const char *label) {
          (pra & CIAA_DSKTRACK0) ? 0 : 1,    // active low
          (pra & CIAA_DSKPROT) ? 1 : 0,      // 1 = write-protected
          (pra & CIAA_DSKCHANGE) ? 1 : 0,    // 1 = disk change detected
-         prb, dsklen, dskbytr, intreq, intena, dmaconr, adkconr);
+         prb, ddrb, dsklen, dskbytr, intreq, intena, dmaconr, adkconr);
 }
 
 // Paula disk DMA -------------------------------------------------------------
@@ -295,9 +296,13 @@ int main(int argc, char **argv) {
   ps_setup_protocol();
 
   overlay_off();
+  init_disk_port();
   prb_shadow = (uint8_t)ps_read_8(CIABPRB);
 
+  overlay_off();
+
   select_drive(drive);
+  set_side(0);
   motor_on();
   usleep(1500000);  // spin-up
   wait_for_ready(1000);
@@ -342,16 +347,16 @@ int main(int argc, char **argv) {
       select_drive(drive);
       motor_on();
       usleep(200000);  // allow motor/select to settle
-      set_side(s);
-      if (t > 0 || s > 0) {
-        // Step one track inward between logical tracks after side 1, else stay on same cylinder for side toggle.
-        if (s == 0 && t > 0) {
-          step_track(1, 0);
-        }
-      }
-      // Small settle time after head move/side change.
-      usleep(20000);
-      wait_for_ready(500);
+  set_side(s);
+  if (t > 0 || s > 0) {
+    // Step one track inward between logical tracks after side 1, else stay on same cylinder for side toggle.
+    if (s == 0 && t > 0) {
+      step_track(1, 0);
+    }
+  }
+  // Small settle time after head move/side change.
+  usleep(20000);
+  wait_for_ready(500);
       log_status("before DMA");
 
       int rc = read_track_raw(CHIP_BUF_ADDR, TRACK_RAW_WORDS);
