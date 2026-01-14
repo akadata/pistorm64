@@ -27,7 +27,7 @@ void m68k_set_irq(unsigned int level) { (void)level; }
 // Raw track parameters (standard DD ~0x1A00 bytes per track per side)
 #define TRACK_RAW_BYTES 0x1A00u
 #define TRACK_RAW_WORDS (TRACK_RAW_BYTES / 2u)
-#define CHIP_BUF_ADDR   0x00040000u  // chip RAM buffer for DMA
+#define CHIP_BUF_ADDR   0x00008000u  // chip RAM buffer for DMA (keep within 16-bit word ptr)
 
 static volatile sig_atomic_t stop_requested = 0;
 static uint8_t prb_shadow = 0xFF;
@@ -178,9 +178,10 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Disable MSBSYNC (clear) and clear stale sync/flags.
   ps_write_16(ADKCON, ADKF_MSBSYNC);  // clear MSBSYNC
   (void)ps_read_16(DSKBYTR);
-  // Program DMA pointer.
-  ps_write_16(DSKPTH, (chip_addr >> 16) & 0xFFFFu);
-  ps_write_16(DSKPTL, chip_addr & 0xFFFFu);
+  // Program DMA pointer (word address; lower bit must be 0).
+  uint32_t ptr = (chip_addr & 0x1FFFFEu) >> 1;  // word address into chip RAM
+  ps_write_16(DSKPTH, (ptr >> 16) & 0xFFFFu);
+  ps_write_16(DSKPTL, ptr & 0xFFFFu);
   // Sync word and length.
   ps_write_16(DSKSYNC, DSK_SYNC_WORD);
   // Enable disk DMA master + disk.
@@ -203,10 +204,8 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   printf("DMA armed: DSKPTH=0x%04X DSKPTL=0x%04X DSKLEN=0x%04X (wanted 0x%04X) DSKBYTR=0x%04X INTREQR=0x%04X\n",
          dskpth, dskptl, cur_len, want_len, arm_bytr, arm_int);
   if (cur_len != want_len) {
-    fprintf(stderr, "DSKLEN did not latch (wanted 0x%04X, got 0x%04X)\n", want_len, cur_len);
-    ps_write_16(DSKLEN, 0);
-    ps_write_16(DMACON, DMAF_DISK);
-    return -1;
+    fprintf(stderr, "WARN: DSKLEN readback mismatch (wanted 0x%04X, got 0x%04X) — continuing\n",
+            want_len, cur_len);
   }
   // Wait for interrupt or timeout.
   const int max_poll = 1000000;  // ~1s in 1us polls
@@ -279,7 +278,7 @@ int main(int argc, char **argv) {
 
   select_drive(drive);
   motor_on();
-  usleep(800000);  // spin-up
+  usleep(1500000);  // spin-up
   log_status("after motor on");
   // Seek to track 0 with sensor check.
   seek_track0();
@@ -301,6 +300,10 @@ int main(int argc, char **argv) {
 
   for (int t = 0; t < tracks && !stop_requested; t++) {
     for (int s = 0; s < sides && !stop_requested; s++) {
+      // Reassert motor/select in case a previous iteration turned anything off.
+      select_drive(drive);
+      motor_on();
+      usleep(5000);
       set_side(s);
       if (t > 0 || s > 0) {
         // Step one track inward between logical tracks after side 1, else stay on same cylinder for side toggle.
