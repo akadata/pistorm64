@@ -149,6 +149,10 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   // Kick DMA: bit15 enable, bit14 direction (0 = read), bits 0-13 length words.
   uint16_t len = (uint16_t)(words & 0x3FFFu);
   ps_write_16(DSKLEN, 0x8000u | len);
+  uint16_t arm_bytr = (uint16_t)ps_read_16(DSKBYTR);
+  uint16_t arm_int = (uint16_t)ps_read_16(INTREQR);
+  printf("DMA armed: DSKLEN=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X\n",
+         (uint16_t)ps_read_16(DSKLEN), arm_bytr, arm_int);
   // Wait for interrupt or timeout.
   const int max_poll = 1000000;  // ~1s in 1us polls
   for (int i = 0; i < max_poll; i++) {
