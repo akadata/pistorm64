@@ -1,0 +1,2 @@
+register,address,chip,chipset_variant,chipset_revisions,width_bits,access,io,interrupt,relationship_to_other_chips,notes,manual_nodes
+CUSTOM_CHIP_SIZE,0x001000,amiga_custom_chips,Aggregate custom chip header,,16,rw,chip-register,,,Size of custom chip register aperture.,node0060

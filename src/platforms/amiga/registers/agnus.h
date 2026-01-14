@@ -5,8 +5,7 @@
 #ifndef AGNUS_H
 #define AGNUS_H
 
-// AGNUS base address is 0xDFF000
-#define AGNUS_BASE 0xDFF000
+#include "amiga_custom_chips.h"
 
 // DMA Control Registers (shared with Paula)
 #ifndef DMACONR

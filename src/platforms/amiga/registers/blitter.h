@@ -5,8 +5,7 @@
 #ifndef BLITTER_H
 #define BLITTER_H
 
-// BLITTER base address is 0xDFF000
-#define BLITTER_BASE 0xDFF000
+#include "amiga_custom_chips.h"
 
 // Blitter Control Registers
 #define BLTCON0  (BLITTER_BASE + 0x040)  // Blitter control 0
