@@ -30,6 +30,7 @@ void m68k_set_irq(unsigned int level) { (void)level; }
 #define CHIP_BUF_ADDR   0x00040000u  // chip RAM buffer for DMA
 
 static volatile sig_atomic_t stop_requested = 0;
+static uint8_t prb_shadow = 0xFF;
 
 static void on_sigint(int signo) {
   (void)signo;
@@ -58,17 +59,15 @@ static void ensure_output(uint32_t ddr_addr, uint8_t mask) {
 static void motor_on(void) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKMOTOR);
-  uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  prb &= (uint8_t)~CIAB_DSKMOTOR;  // active low on Amiga drives
-  ps_write_8(CIABPRB, prb);
+  prb_shadow &= (uint8_t)~CIAB_DSKMOTOR;  // active low on Amiga drives
+  ps_write_8(CIABPRB, prb_shadow);
 }
 
 static void motor_off(void) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKMOTOR);
-  uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  prb |= CIAB_DSKMOTOR;
-  ps_write_8(CIABPRB, prb);
+  prb_shadow |= CIAB_DSKMOTOR;
+  ps_write_8(CIABPRB, prb_shadow);
 }
 
 static void select_drive(int drive) {
@@ -80,34 +79,31 @@ static void select_drive(int drive) {
   uint8_t sel_bit = (uint8_t)(CIAB_DSKSEL0 << drive);
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, mask);
-  uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  prb |= mask;                // deassert all (active low)
-  prb &= (uint8_t)~sel_bit;   // assert target
-  ps_write_8(CIABPRB, prb);
+  prb_shadow |= mask;                // deassert all (active low)
+  prb_shadow &= (uint8_t)~sel_bit;   // assert target
+  ps_write_8(CIABPRB, prb_shadow);
 }
 
 static void set_side(int side) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKSIDE);
-  uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  if (side) prb |= CIAB_DSKSIDE;   // 1 = lower head on standard drives
-  else prb &= (uint8_t)~CIAB_DSKSIDE;
-  ps_write_8(CIABPRB, prb);
+  if (side) prb_shadow |= CIAB_DSKSIDE;   // 1 = lower head on standard drives
+  else prb_shadow &= (uint8_t)~CIAB_DSKSIDE;
+  ps_write_8(CIABPRB, prb_shadow);
 }
 
 static void step_track(int steps, int outwards) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKDIREC | CIAB_DSKSTEP);
-  uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  if (outwards) prb |= CIAB_DSKDIREC;      // 1 = out, 0 = in (per hardware manual)
-  else prb &= (uint8_t)~CIAB_DSKDIREC;
-  ps_write_8(CIABPRB, prb);
+  if (outwards) prb_shadow |= CIAB_DSKDIREC;      // 1 = out, 0 = in (per hardware manual)
+  else prb_shadow &= (uint8_t)~CIAB_DSKDIREC;
+  ps_write_8(CIABPRB, prb_shadow);
   for (int i = 0; i < steps; i++) {
-    prb |= CIAB_DSKSTEP;
-    ps_write_8(CIABPRB, prb);
+    prb_shadow |= CIAB_DSKSTEP;
+    ps_write_8(CIABPRB, prb_shadow);
     usleep(2000);
-    prb &= (uint8_t)~CIAB_DSKSTEP;
-    ps_write_8(CIABPRB, prb);
+    prb_shadow &= (uint8_t)~CIAB_DSKSTEP;
+    ps_write_8(CIABPRB, prb_shadow);
     usleep(2000);
     if (stop_requested) break;
   }
