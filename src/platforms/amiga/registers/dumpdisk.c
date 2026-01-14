@@ -93,9 +93,11 @@ static void force_drive0_outputs(void) {
   ddrb_shadow = 0xFF;
   ps_write_8(CIABDDRB, ddrb_shadow);
   // Drive0 selected (bit3=0), others high, motor on (bit7=0), side0 (bit2=0).
-  prb_shadow |= (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3 | CIAB_DSKSIDE);
-  prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR);
-  prb_shadow |= CIAB_DSKSTEP;  // idle high
+  prb_shadow = (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3);  // high on other selects
+  prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR);              // select 0 + motor on
+  prb_shadow &= (uint8_t)~CIAB_DSKSIDE;                                // side 0
+  prb_shadow &= (uint8_t)~CIAB_DSKDIREC;                               // dir inward (0)
+  prb_shadow |= CIAB_DSKSTEP;                                          // idle high
   ps_write_8(CIABPRB, prb_shadow);
   usleep(1000);
 }
