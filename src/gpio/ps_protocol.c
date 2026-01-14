@@ -9,6 +9,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stddef.h>
+// Enable POSIX prototypes like usleep
+#define _XOPEN_SOURCE 600
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
