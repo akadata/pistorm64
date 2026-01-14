@@ -79,16 +79,18 @@ static void init_disk_port(void) {
   ps_write_8(CIABCRA, 0x00);
   ps_write_8(CIABCRB, 0x00);
   prb_shadow = (uint8_t)ps_read_8(CIABPRB);
-  // Default to drive 0 selected, motor off, side 0.
-  prb_shadow &= (uint8_t)~CIAB_DSKSEL0;
-  prb_shadow |= (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3 | CIAB_DSKMOTOR | CIAB_DSKSIDE);
-  prb_shadow &= (uint8_t)~CIAB_DSKSTEP;
+  // Default to drive 0 selected, motor on, side 0 (active low).
+  prb_shadow = (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3);  // high
+  prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR | CIAB_DSKSIDE | CIAB_DSKSTEP | CIAB_DSKDIREC);
   ps_write_8(CIABPRB, prb_shadow);
+  ps_write_8(CIABPRB + 1, prb_shadow);
+  usleep(1000);
 }
 
 static void force_drive0_outputs(void) {
   ddrb_shadow = 0xFF;
   ps_write_8(CIABDDRB, ddrb_shadow);
+  ps_write_8(CIABDDRB + 1, ddrb_shadow);
   // Drive0 selected (bit3=0), others high, motor on (bit7=0), side0 (bit2=0).
   prb_shadow |= (uint8_t)(CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3 | CIAB_DSKSIDE);
   prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 | CIAB_DSKMOTOR | CIAB_DSKSTEP);
@@ -114,6 +116,7 @@ static void motor_on(void) {
   ensure_output(ddrb, CIAB_DSKMOTOR);
   prb_shadow &= (uint8_t)~CIAB_DSKMOTOR;  // active low on Amiga drives
   ps_write_8(CIABPRB, prb_shadow);
+  ps_write_8(CIABPRB + 1, prb_shadow);
 }
 
 static void motor_off(void) {
@@ -121,6 +124,7 @@ static void motor_off(void) {
   ensure_output(ddrb, CIAB_DSKMOTOR);
   prb_shadow |= CIAB_DSKMOTOR;
   ps_write_8(CIABPRB, prb_shadow);
+  ps_write_8(CIABPRB + 1, prb_shadow);
 }
 
 static void select_drive(int drive) {
@@ -135,8 +139,10 @@ static void select_drive(int drive) {
   prb_shadow |= mask;                // deassert all (active low)
   prb_shadow &= (uint8_t)~sel_bit;   // assert target
   ps_write_8(CIABPRB, prb_shadow);
+  ps_write_8(CIABPRB + 1, prb_shadow);
   // Ensure motor is still on after select.
   ps_write_8(CIABPRB, prb_shadow);
+  ps_write_8(CIABPRB + 1, prb_shadow);
   usleep(1000);
 }
 
@@ -146,6 +152,7 @@ static void set_side(int side) {
   if (side) prb_shadow |= CIAB_DSKSIDE;   // 1 = lower head on standard drives
   else prb_shadow &= (uint8_t)~CIAB_DSKSIDE;
   ps_write_8(CIABPRB, prb_shadow);
+  ps_write_8(CIABPRB + 1, prb_shadow);
 }
 
 static void step_track(int steps, int outwards) {
@@ -172,12 +179,15 @@ static int seek_track0(void) {
     if (outwards) prb_shadow |= CIAB_DSKDIREC;
     else prb_shadow &= (uint8_t)~CIAB_DSKDIREC;
     ps_write_8(CIABPRB, prb_shadow);
+    ps_write_8(CIABPRB + 1, prb_shadow);
     for (int i = 0; i < 90; i++) {
       prb_shadow |= CIAB_DSKSTEP;
       ps_write_8(CIABPRB, prb_shadow);
+      ps_write_8(CIABPRB + 1, prb_shadow);
       usleep(2000);
       prb_shadow &= (uint8_t)~CIAB_DSKSTEP;
       ps_write_8(CIABPRB, prb_shadow);
+      ps_write_8(CIABPRB + 1, prb_shadow);
       usleep(2000);
       uint8_t pra = (uint8_t)ps_read_8(CIAAPRA);
       if ((pra & CIAA_DSKTRACK0) == 0) {
@@ -314,11 +324,15 @@ int main(int argc, char **argv) {
   set_side(0);
   motor_on();
   usleep(1500000);  // spin-up
-  wait_for_ready(1000);
+  for (int i = 0; i < 5; i++) {
+    force_drive0_outputs();
+    wait_for_ready(200);
+  }
   log_status("after motor on");
 
   if (spin_test) {
     for (int i = 0; i < 10 && !stop_requested; i++) {
+      force_drive0_outputs();
       wait_for_ready(250);
       log_status("spin poll");
     }
