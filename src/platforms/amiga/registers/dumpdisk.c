@@ -32,7 +32,6 @@ void m68k_set_irq(unsigned int level) { (void)level; }
 static volatile sig_atomic_t stop_requested = 0;
 static uint8_t prb_shadow = 0xFF;
 static uint8_t ciaa_pra_shadow = 0xFF;
-static const int MAX_ARM_RETRIES = 5;
 
 static void on_sigint(int signo) {
   (void)signo;
@@ -156,7 +155,7 @@ static int seek_track0(void) {
 static void log_status(const char *label) {
   uint8_t pra = (uint8_t)ps_read_8(CIAAPRA);
   uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  uint16_t dsklen = (uint16_t)ps_read_16(DSKLEN);
+  uint16_t dsklen = (uint16_t)ps_read_16(DSKLEN);  // note: DSKLEN is write-only; readback is undefined
   uint16_t dskbytr = (uint16_t)ps_read_16(DSKBYTR);
   uint16_t intreq = (uint16_t)ps_read_16(INTREQR);
   printf("%s: CIAAPRA=0x%02X (RDY=%d TRK0=%d PROT=%d CHG=%d) CIABPRB=0x%02X DSKLEN=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X\n",
@@ -180,33 +179,22 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
   (void)ps_read_16(DSKBYTR);
   // Program DMA pointer (word address; lower bit must be 0).
   uint32_t ptr = (chip_addr & 0x1FFFFEu) >> 1;  // word address into chip RAM
-  ps_write_16(DSKPTH, (ptr >> 16) & 0xFFFFu);
-  ps_write_16(DSKPTL, ptr & 0xFFFFu);
+  uint16_t ptr_hi = (uint16_t)((ptr >> 16) & 0xFFFFu);
+  uint16_t ptr_lo = (uint16_t)(ptr & 0xFFFFu);
+  ps_write_16(DSKPTH, ptr_hi);
+  ps_write_16(DSKPTL, ptr_lo);
   // Sync word and length.
   ps_write_16(DSKSYNC, DSK_SYNC_WORD);
   // Enable disk DMA master + disk.
   ps_write_16(DMACON, DMAF_SETCLR | DMAF_MASTER | DMAF_DISK);
   // Kick DMA: bit15 enable, bit14 direction (0 = read), bits 0-13 length words.
   uint16_t len = (uint16_t)(words & 0x3FFFu);
-  uint16_t want_len = 0x8000u | len;
-  // Retry DSKLEN write until it sticks or fail.
-  uint16_t cur_len = 0;
-  for (int tries = 0; tries < MAX_ARM_RETRIES; tries++) {
-    ps_write_16(DSKLEN, want_len);
-    cur_len = (uint16_t)ps_read_16(DSKLEN);
-    if (cur_len == want_len) break;
-    usleep(1000);
-  }
+  uint16_t want_len = 0x8000u | len;  // bit15 enables DMA, bit14=0 => read
+  ps_write_16(DSKLEN, want_len);      // write-only; readback is undefined on real hardware
   uint16_t arm_bytr = (uint16_t)ps_read_16(DSKBYTR);
   uint16_t arm_int = (uint16_t)ps_read_16(INTREQR);
-  uint16_t dskpth = (uint16_t)ps_read_16(DSKPTH);
-  uint16_t dskptl = (uint16_t)ps_read_16(DSKPTL);
-  printf("DMA armed: DSKPTH=0x%04X DSKPTL=0x%04X DSKLEN=0x%04X (wanted 0x%04X) DSKBYTR=0x%04X INTREQR=0x%04X\n",
-         dskpth, dskptl, cur_len, want_len, arm_bytr, arm_int);
-  if (cur_len != want_len) {
-    fprintf(stderr, "WARN: DSKLEN readback mismatch (wanted 0x%04X, got 0x%04X) — continuing\n",
-            want_len, cur_len);
-  }
+  printf("DMA armed: DSKPTH=0x%04X DSKPTL=0x%04X DSKLEN(w)=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X\n",
+         ptr_hi, ptr_lo, want_len, arm_bytr, arm_int);
   // Wait for interrupt or timeout.
   const int max_poll = 1000000;  // ~1s in 1us polls
   for (int i = 0; i < max_poll; i++) {
@@ -223,12 +211,11 @@ static int read_track_raw(uint32_t chip_addr, uint32_t words) {
       ps_write_16(DMACON, DMAF_DISK);
       return 0;
     }
-    if ((i % 100000) == 0) {
-      uint16_t bytr = (uint16_t)ps_read_16(DSKBYTR);
-      uint16_t cur_len = (uint16_t)ps_read_16(DSKLEN);
-      printf(" ... poll %d DSKBYTR=0x%04X DSKLEN=0x%04X INTREQR=0x%04X\n",
-             i, bytr, cur_len, (uint16_t)ps_read_16(INTREQR));
-    }
+      if ((i % 100000) == 0) {
+        uint16_t bytr = (uint16_t)ps_read_16(DSKBYTR);
+        printf(" ... poll %d DSKBYTR=0x%04X INTREQR=0x%04X\n",
+               i, bytr, (uint16_t)ps_read_16(INTREQR));
+      }
     usleep(10);  // slow the loop slightly
   }
   // Stop DMA on timeout.
@@ -303,7 +290,7 @@ int main(int argc, char **argv) {
       // Reassert motor/select in case a previous iteration turned anything off.
       select_drive(drive);
       motor_on();
-      usleep(5000);
+      usleep(200000);  // allow motor/select to settle
       set_side(s);
       if (t > 0 || s > 0) {
         // Step one track inward between logical tracks after side 1, else stay on same cylinder for side toggle.
@@ -311,6 +298,8 @@ int main(int argc, char **argv) {
           step_track(1, 0);
         }
       }
+      // Small settle time after head move/side change.
+      usleep(20000);
       log_status("before DMA");
 
       int rc = read_track_raw(CHIP_BUF_ADDR, TRACK_RAW_WORDS);
