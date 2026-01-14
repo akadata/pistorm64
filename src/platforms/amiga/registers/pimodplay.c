@@ -14,6 +14,7 @@
 
 #include "src/gpio/ps_protocol.h"
 #include "paula.h"
+#include "agnus.h"   // DMACON/DMA bits
 
 // ps_protocol.c expects this symbol from the emulator core.
 void m68k_set_irq(unsigned int level) {

@@ -5,8 +5,7 @@
 #ifndef DENISE_H
 #define DENISE_H
 
-// DENISE base address is 0xDFF000
-#define DENISE_BASE 0xDFF000
+#include "amiga_custom_chips.h"
 
 // Input Sampling Registers
 #define JOY0DAT  (DENISE_BASE + 0x00A)  // Joystick/mouse 0 (vertical/horizontal counters)

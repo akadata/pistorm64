@@ -5,6 +5,8 @@
 #ifndef PAULA_H
 #define PAULA_H
 
+#include "amiga_custom_chips.h"
+
 // PAULA base address is 0xDFF000
 #define PAULA_BASE 0xDFF000
 
@@ -70,22 +72,6 @@
 #define ADKCONR  (PAULA_BASE + 0x010)  // Audio/disk control read
 #define ADKCON   (PAULA_BASE + 0x09E)  // Audio/disk control write
 
-// Input Sampling Registers
-#define JOY0DAT  (PAULA_BASE + 0x00A)  // Joystick/mouse 0
-#define JOY1DAT  (PAULA_BASE + 0x00C)  // Joystick/mouse 1
-
-// Collision Detection
-#define CLXDAT   (PAULA_BASE + 0x00E)  // Collision data (read/clear)
-#define CLXCON   (PAULA_BASE + 0x098)  // Collision control
-
-// DMA Control (shared with AGNUS)
-#ifndef DMACONR
-#define DMACONR  (PAULA_BASE + 0x002)  // Read DMA control / blitter status
-#endif
-#ifndef DMACON
-#define DMACON   (PAULA_BASE + 0x096)  // Write DMA control (set/clear)
-#endif
-
 // Audio Control Bits (ADKCON/ADKCONR)
 #define ADKF_SETCLR   0x8000  // Set/Clear control bit
 #define ADKF_MFMPREC  0x4000  // MFM compatibility mode
@@ -122,40 +108,44 @@
 #define ADKB_CH0PEN   1
 #define ADKB_ADLNK    0
 
-// Interrupt Bits
+// Interrupt Bits (INTENA/INTREQ) — matches Hardware Manual table
 #define INTF_SETCLR   0x8000  // Set/Clear control bit
-#define INTF_INTEN    0x4000  // Master interrupt enable
+#define INTF_INTEN    0x4000  // Master interrupt enable (no request)
 #define INTF_EXTER    0x2000  // External interrupt
-#define INTF_DSKBLK   0x1000  // Disk block done
-#define INTF_RASTER   0x0800  // Raster beam
-#define INTF_AUD3     0x0400  // Audio channel 3
-#define INTF_AUD2     0x0200  // Audio channel 2
-#define INTF_AUD1     0x0100  // Audio channel 1
-#define INTF_AUD0     0x0080  // Audio channel 0
-#define INTF_BLIT     0x0040  // Blitter done
-#define INTF_SPRITE   0x0020  // Sprite overflow/duplicate
-#define INTF_COPPER   0x0010  // Copper
-#define INTF_VERTB    0x0008  // Vertical blank
-#define INTF_PORTS    0x0004  // I/O ports and timers
-#define INTF_SOFTWARE 0x0002  // Software interrupt
-#define INTF_DSKSYNC  0x0001  // Disk sync
+#define INTF_DSKSYN   0x1000  // Disk sync pattern matched
+#define INTF_RBF      0x0800  // Serial receive buffer full
+#define INTF_AUD3     0x0400  // Audio channel 3 block finished
+#define INTF_AUD2     0x0200  // Audio channel 2 block finished
+#define INTF_AUD1     0x0100  // Audio channel 1 block finished
+#define INTF_AUD0     0x0080  // Audio channel 0 block finished
+#define INTF_BLIT     0x0040  // Blitter finished
+#define INTF_VERTB    0x0020  // Start of vertical blank
+#define INTF_COPER    0x0010  // Copper
+#define INTF_PORTS    0x0008  // I/O ports and timers
+#define INTF_SOFTINT  0x0004  // Software interrupt
+#define INTF_DSKBLK   0x0002  // Disk block finished
+#define INTF_TBE      0x0001  // Serial transmit buffer empty
+
+// Backward-compatible aliases (previous names)
+#define INTF_DSKSYNC INTF_DSKSYN
+#define INTF_SOFTWARE INTF_SOFTINT
 
 // INTF bit numbers
 #define INTB_SETCLR   15
 #define INTB_INTEN    14
 #define INTB_EXTER    13
-#define INTB_DSKBLK   12
-#define INTB_RASTER   11
+#define INTB_DSKSYN   12
+#define INTB_RBF      11
 #define INTB_AUD3     10
 #define INTB_AUD2     9
 #define INTB_AUD1     8
 #define INTB_AUD0     7
 #define INTB_BLIT     6
-#define INTB_SPRITE   5
-#define INTB_COPPER   4
-#define INTB_VERTB    3
-#define INTB_PORTS    2
-#define INTB_SOFTWARE 1
-#define INTB_DSKSYNC  0
+#define INTB_VERTB    5
+#define INTB_COPER    4
+#define INTB_PORTS    3
+#define INTB_SOFTINT  2
+#define INTB_DSKBLK   1
+#define INTB_TBE      0
 
 #endif // PAULA_H

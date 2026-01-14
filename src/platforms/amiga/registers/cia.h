@@ -5,11 +5,7 @@
 #ifndef CIA_H
 #define CIA_H
 
-// CIAA base address (odd addresses, low byte)
-#define CIAA_BASE 0xBFE001
-
-// CIAB base address (even addresses, high byte)
-#define CIAB_BASE 0xBFD000
+#include "amiga_custom_chips.h"
 
 // CIA Register Offsets (added to base address)
 // Note: CIA registers are spaced 0x100 apart in the 68k address map.

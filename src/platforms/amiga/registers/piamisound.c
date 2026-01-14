@@ -12,6 +12,7 @@
 
 #include "src/gpio/ps_protocol.h"
 #include "paula.h"
+#include "agnus.h"  // DMACON and DMA bit masks
 
 #define DMAF_SETCLR 0x8000
 #define DMAF_MASTER 0x0200

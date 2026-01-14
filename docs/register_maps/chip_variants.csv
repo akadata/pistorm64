@@ -1,0 +1,13 @@
+family,chipset,chip,marketing_name,part_number,revision,package,max_chip_ram,machine_models,notes
+OCS,Memory,Agnus,Fat Agnus,8371,,PLCC,0.5MB,"A1000,A500,A2000 (early)",512K/1MB variants depending on board wiring
+ECS,Memory,Agnus,Fat Agnus,8372A,,PLCC,1MB,"A500,A2000",1MB chip RAM capable
+ECS,Memory,Agnus,Fat/Fatter Agnus,8372B,,PLCC,2MB,"A3000 (ECS), some late A2000",2MB chip RAM capable
+ECS,Memory,Agnus,Fatter Agnus,8375,,PLCC,2MB,"A500+,A600,A3000 (ECS)",2MB chip RAM capable
+AGA,Memory,Alice,Alice,,,"",2MB,"A1200,A4000",AGA Agnus-equivalent (integrates blitter/Copper)
+OCS,Memory,Agnus,Fat Agnus (NTSC),8370,,PLCC,0.5MB,"A500/A2000 NTSC",NTSC timing variant
+OCS,Video,Denise,Denise,8362,,PLCC,,,"OCS video output"
+ECS,Video,Denise,Super Denise,8373,,PLCC,,,"Adds productivity modes and ECS features"
+AGA,Video,Denise,Lisa,,,QFP,,,"AGA Denise-equivalent with 24-bit palette/8 bitplanes"
+Custom,Bus,Gary,Gary,,,PLCC,,,"A500/A2000 bus/overlay logic"
+Custom,Bus,Gary,Fat Gary,,,PLCC,,,"A3000/A4000 bus/overlay logic"
+Audio,Audio,Paula,Paula,8364,,PLCC,,,"Stable across OCS/ECS/AGA; handles audio, disk, serial, ports"

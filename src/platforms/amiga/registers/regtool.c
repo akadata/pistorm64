@@ -8,6 +8,7 @@
 
 #include "src/gpio/ps_protocol.h"
 #include "paula.h"
+#include "agnus.h"
 #include "cia.h"
 
 // ps_protocol.c expects this symbol from the emulator core.
