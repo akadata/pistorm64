@@ -59,7 +59,7 @@ static void motor_on(void) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKMOTOR);
   uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  prb |= CIAB_DSKMOTOR;  // active high on Amiga drives
+  prb &= (uint8_t)~CIAB_DSKMOTOR;  // active low on Amiga drives
   ps_write_8(CIABPRB, prb);
 }
 
@@ -67,7 +67,7 @@ static void motor_off(void) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKMOTOR);
   uint8_t prb = (uint8_t)ps_read_8(CIABPRB);
-  prb &= (uint8_t)~CIAB_DSKMOTOR;
+  prb |= CIAB_DSKMOTOR;
   ps_write_8(CIABPRB, prb);
 }
 
@@ -122,10 +122,10 @@ static void log_status(const char *label) {
   printf("%s: CIAAPRA=0x%02X (RDY=%d TRK0=%d PROT=%d CHG=%d) CIABPRB=0x%02X DSKLEN=0x%04X DSKBYTR=0x%04X INTREQR=0x%04X\n",
          label,
          pra,
-         (pra & CIAA_DSKRDY) ? 0 : 1,
-         (pra & CIAA_DSKTRACK0) ? 0 : 1,
-         (pra & CIAA_DSKPROT) ? 1 : 0,
-         (pra & CIAA_DSKCHANGE) ? 1 : 0,
+         (pra & CIAA_DSKRDY) ? 0 : 1,       // active low
+         (pra & CIAA_DSKTRACK0) ? 0 : 1,    // active low
+         (pra & CIAA_DSKPROT) ? 1 : 0,      // 1 = write-protected
+         (pra & CIAA_DSKCHANGE) ? 1 : 0,    // 1 = disk change detected
          prb, dsklen, dskbytr, intreq);
 }
 
