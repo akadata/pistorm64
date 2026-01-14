@@ -69,6 +69,18 @@ static void overlay_off(void) {
   ps_write_8(pra, ciaa_pra_shadow);
 }
 
+static int wait_for_ready(int timeout_ms) {
+  const int polls = timeout_ms / 10;
+  for (int i = 0; i < polls; i++) {
+    uint8_t pra = (uint8_t)ps_read_8(CIAAPRA);
+    if ((pra & CIAA_DSKRDY) == 0) return 0;  // active low -> ready
+    usleep(10000);
+  }
+  printf("WARN: drive not ready after %dms (CIAAPRA=0x%02X)\n",
+         timeout_ms, (unsigned)ps_read_8(CIAAPRA) & 0xFFu);
+  return -1;
+}
+
 static void motor_on(void) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKMOTOR);
@@ -268,10 +280,12 @@ int main(int argc, char **argv) {
   }
 
   overlay_off();
+  prb_shadow = (uint8_t)ps_read_8(CIABPRB);
 
   select_drive(drive);
   motor_on();
   usleep(1500000);  // spin-up
+  wait_for_ready(1000);
   log_status("after motor on");
   // Seek to track 0 with sensor check.
   seek_track0();
@@ -306,6 +320,7 @@ int main(int argc, char **argv) {
       }
       // Small settle time after head move/side change.
       usleep(20000);
+      wait_for_ready(500);
       log_status("before DMA");
 
       int rc = read_track_raw(CHIP_BUF_ADDR, TRACK_RAW_WORDS);
