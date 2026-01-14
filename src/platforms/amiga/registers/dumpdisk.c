@@ -105,6 +105,9 @@ static void write_ddrb_locked(uint8_t val, const char *why) {
   ps_write_8(CIABDDRB + 1, val);
   uint8_t rd = (uint8_t)ps_read_8(CIABDDRB);
   printf("%s: CIABDDRB=0x%02X (readback)\n", why, rd);
+  if (rd != val) {
+    fprintf(stderr, "%s: DDRB write verify FAILED (wanted 0x%02X got 0x%02X)\n", why, val, rd);
+  }
 }
 
 static void write_prb_locked(uint8_t val, const char *why) {
@@ -113,6 +116,9 @@ static void write_prb_locked(uint8_t val, const char *why) {
   ps_write_8(CIABPRB + 1, val);
   uint8_t rd = (uint8_t)ps_read_8(CIABPRB);
   printf("%s: CIABPRB=0x%02X (readback)\n", why, rd);
+  if (rd != val) {
+    fprintf(stderr, "%s: PRB write verify FAILED (wanted 0x%02X got 0x%02X)\n", why, val, rd);
+  }
 }
 
 static int wait_for_ready(int timeout_ms) {
@@ -338,6 +344,11 @@ int main(int argc, char **argv) {
   // Hard-lock CIAB lines: DDRB=0xFF, PRB=0x70 (motor+DS0 asserted, side0).
   write_ddrb_locked(0xFF, "ddrb init");
   write_prb_locked(0x70, "prb init");
+  if (ddrb_shadow != 0xFF || prb_shadow != 0x70) {
+    fprintf(stderr, "ERROR: Failed to latch CIAB DDRB/PRB (ddrb=0x%02X prb=0x%02X)\n",
+            ddrb_shadow, prb_shadow);
+    return 1;
+  }
   motor_on();
   usleep(800000);  // spin-up
   wait_for_ready(800);
@@ -345,7 +356,13 @@ int main(int argc, char **argv) {
 
   if (spin_test) {
     for (int i = 0; i < 10 && !stop_requested; i++) {
+      write_ddrb_locked(0xFF, "spin ddrb");
       write_prb_locked(0x70, "spin reassert");
+      if (ddrb_shadow != 0xFF || prb_shadow != 0x70) {
+        fprintf(stderr, "ERROR: Spin write verify failed (ddrb=0x%02X prb=0x%02X)\n",
+                ddrb_shadow, prb_shadow);
+        break;
+      }
       wait_for_ready(250);
       log_status("spin poll");
     }
