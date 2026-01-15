@@ -506,6 +506,9 @@ static void ps_request_pins(void)
 	for (size_t i = 0; i < ARRAY_SIZE(pins); i++) {
 		int ret = gpio_request(pins[i], "pistorm");
 
+		if (ret == -EPROBE_DEFER)
+			continue;
+
 		if (ret && ret != -EBUSY)
 			pr_warn("pistorm: gpio %u request failed: %d\n", pins[i], ret);
 	}
@@ -582,11 +585,14 @@ MODULE_DESCRIPTION("PiStorm64 kernel backend: GPIO + GPCLK bus engine for PiStor
 MODULE_LICENSE("GPL");
 MODULE_VERSION("0.1.0");
 
+MODULE_INFO(project, "PiStorm64");
 MODULE_INFO(firmware, "N/A");
-MODULE_INFO(name, "pistorm64");
+MODULE_INFO(name, "pistorm");
 MODULE_INFO(alias, "pistorm");
 MODULE_INFO(url, "https://github.com/akadata/pistorm");
-MODULE_INFO(supported, "Pi Zero 2 W (BCM2837), Pi 4-class");
+MODULE_INFO(known_working, "Pi Zero 2 W (BCM2837, Pi 3-class)");
+MODULE_INFO(tested, "Pi Zero 2 W (BCM2837, Pi 3-class) on Linux 6.12.62+rpt-rpi-v8");
+MODULE_INFO(targets, "BCM2837 (Pi 3-class), BCM2711 (Pi 4-class)");
 MODULE_INFO(intree, "N");   /* out-of-tree */
 MODULE_INFO(pistorm64, "GPIO/GPCLK backend only; userspace CPU stays userspace");
 MODULE_INFO(git, PISTORM64_GIT);
