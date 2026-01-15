@@ -280,6 +280,10 @@ unsigned int ps_get_ipl_zero() {
   return value & (1 << PIN_IPL_ZERO);
 }
 
+unsigned int ps_gpio_lev() {
+  return *(gpio + 13);
+}
+
 #define INT2_ENABLED 1
 
 void ps_update_irq() {
