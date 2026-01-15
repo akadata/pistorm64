@@ -5,6 +5,8 @@ pistorm-objs := src/pistorm.o
 
 ccflags-y += -I$(src)/include -I$(src)/include/uapi -I$(PWD)/../include -I$(PWD)/../include/uapi
 
+ccflags-y += -DPISTORM64_GIT=\"$(shell git rev-parse --short HEAD 2>/dev/null || echo nogit)\"
+
 KDIR ?= /lib/modules/$(shell uname -r)/build
 PWD  := $(shell pwd)
 
