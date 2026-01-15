@@ -1,0 +1,12 @@
+cc -Wall -Wextra -pedantic  -L/usr/local/lib    -o emulator.tmp src/musashi/m68kops.o src/emulator.o src/log.o src/memory_mapped.o src/config_file/config_file.o src/config_file/rominfo.o src/input/input.o src/gpio/ps_protocol_kmod.o src/gpio/rpi_peri.o src/platforms/platforms.o src/platforms/amiga/amiga-autoconf.o src/platforms/amiga/amiga-platform.o src/platforms/amiga/amiga-registers.o src/platforms/amiga/amiga-interrupts.o src/platforms/mac68k/mac68k-platform.o src/platforms/dummy/dummy-platform.o src/platforms/dummy/dummy-registers.o src/platforms/amiga/Gayle.o src/platforms/amiga/hunk-reloc.o src/platforms/amiga/cdtv-dmac.o src/platforms/amiga/rtg/rtg.o src/platforms/amiga/rtg/rtg-gfx.o src/platforms/amiga/piscsi/piscsi.o src/platforms/amiga/net/pi-net.o src/platforms/shared/rtc.o src/platforms/shared/common.o src/selftest.o src/platforms/amiga/rtg/rtg-output-null.o src/platforms/amiga/ahi/pi_ahi.o src/platforms/amiga/pistorm-dev/pistorm-dev-stub.o src/musashi/m68kcpu.o src/musashi/m68kdasm.o src/softfloat/softfloat.o src/softfloat/softfloat_fpsp.o src/a314/a314.o   -lasound -ldl -lstdc++ -lm -pthread && mv -f emulator.tmp emulator
+/usr/bin/ld: src/emulator.o: in function `ipl_task':
+emulator.c:(.text+0x94): undefined reference to `gpio'
+/usr/bin/ld: emulator.c:(.text+0x98): undefined reference to `gpio'
+/usr/bin/ld: src/emulator.o: in function `cpu_task':
+emulator.c:(.text+0x4db4): undefined reference to `gpio'
+/usr/bin/ld: emulator.c:(.text+0x4db8): undefined reference to `gpio'
+/usr/bin/ld: src/emulator.o: in function `main':
+emulator.c:(.text.startup+0x31c): undefined reference to `gpio'
+/usr/bin/ld: src/emulator.o:emulator.c:(.text.startup+0x320): more undefined references to `gpio' follow
+collect2: error: ld returned 1 exit status
+make: *** [Makefile:254: emulator] Error 1
