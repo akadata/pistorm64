@@ -141,9 +141,19 @@ static void motor_on(void) {
 static void motor_off(void) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKMOTOR);
-  prb_shadow |= CIAB_DSKMOTOR;  // turn motor off (active low - set high)
+  // Latch motor-off: set motor high, briefly deassert selects, then reassert the current drive
+  // to clock the motor bit, and finally release selects.
+  prb_shadow |= CIAB_DSKMOTOR;
+  // Deassert all selects.
+  prb_shadow |= (uint8_t)(CIAB_DSKSEL0 | CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3);
   ps_write_8(CIABPRB, prb_shadow);
-  usleep(1000); // Brief delay to ensure motor signal settles
+  // Pulse drive 0 select low to latch motor-off.
+  prb_shadow &= (uint8_t)~CIAB_DSKSEL0;
+  ps_write_8(CIABPRB, prb_shadow);
+  usleep(1000);
+  // Release select.
+  prb_shadow |= CIAB_DSKSEL0;
+  ps_write_8(CIABPRB, prb_shadow);
 }
 
 // Alternative motor control function that ensures proper drive selection and motor control
@@ -477,7 +487,11 @@ int main(int argc, char **argv) {
     }
   }
 
+  // Proper cleanup: turn off motor and restore known state
   motor_off();
+  // Restore initial state to known values
+  write_ddrb_locked(0xFF, "cleanup ddrb");
+  write_prb_locked(0x70, "cleanup prb");
   fclose(fp);
   printf("Dump complete: %s\n", outfile);
   return 0;
