@@ -190,6 +190,8 @@ else ifeq ($(PLATFORM),PI_64BIT)
 CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
 else ifeq ($(PLATFORM),ZEROW2_64)
 CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
+else ifeq ($(PLATFORM),NATIVE)
+CPUFLAGS = -march=native	
 endif
 
 # Optional manual overrides for CPU tuning.

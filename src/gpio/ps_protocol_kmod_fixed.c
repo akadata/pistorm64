@@ -1,4 +1,4 @@
-// src/gpio/ps_protocol_kmod.c - Kernel module backend implementation
+// src/gpio/ps_protocol_kmod.c - Kernel module backend for PiStorm protocol
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -23,74 +23,6 @@ static int ps_open_dev(void) {
 // This will be a dummy pointer that we intercept with our functions
 volatile unsigned int* gpio = (volatile unsigned int*)0xDEADBEEF;  // Dummy address
 
-// Helper functions for GPIO operations (when using kernel module backend)
-void ps_gpio_set_input(int gpio_pin) {
-    // In kernel module backend, this would send an ioctl to configure pin as input
-    if (ps_open_dev() < 0) return;
-    struct pistorm_busop op = {
-        .addr   = 0xDEADBEEF,  // Special address for GPIO setup
-        .value  = (gpio_pin << 16) | 0x0001,  // Pin number and input flag
-        .width  = PISTORM_W32,
-        .is_read= 0,
-        .flags  = 0x01,  // Special flag for GPIO setup
-    };
-    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
-}
-
-void ps_gpio_set_output(int gpio_pin) {
-    // In kernel module backend, this would send an ioctl to configure pin as output
-    if (ps_open_dev() < 0) return;
-    struct pistorm_busop op = {
-        .addr   = 0xDEADBEEF,  // Special address for GPIO setup
-        .value  = (gpio_pin << 16) | 0x0002,  // Pin number and output flag
-        .width  = PISTORM_W32,
-        .is_read= 0,
-        .flags  = 0x01,  // Special flag for GPIO setup
-    };
-    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
-}
-
-void ps_gpio_set_alt(int gpio_pin, int alt_func) {
-    // In kernel module backend, this would send an ioctl to configure pin as alt function
-    if (ps_open_dev() < 0) return;
-    struct pistorm_busop op = {
-        .addr   = 0xDEADBEEF,  // Special address for GPIO setup
-        .value  = (gpio_pin << 16) | (alt_func & 0xFF),  // Pin number and alt function
-        .width  = PISTORM_W32,
-        .is_read= 0,
-        .flags  = 0x02,  // Special flag for alt function setup
-    };
-    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
-}
-
-unsigned int ps_gpio_pull_read(void) {
-    // In kernel module backend, this would send an ioctl to read pull state
-    if (ps_open_dev() < 0) return 0;
-    struct pistorm_busop op = {
-        .addr   = 0xDEADBEEF,  // Special address for GPIO setup
-        .value  = 0x03,  // Pull read command
-        .width  = PISTORM_W32,
-        .is_read= 1,
-        .flags  = 0x03,  // Special flag for pull read
-    };
-    int rc = ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
-    return (rc == 0) ? op.value : 0;
-}
-
-unsigned int ps_gpio_pullclk0_read(void) {
-    // In kernel module backend, this would send an ioctl to read pull clock state
-    if (ps_open_dev() < 0) return 0;
-    struct pistorm_busop op = {
-        .addr   = 0xDEADBEEF,  // Special address for GPIO setup
-        .value  = 0x04,  // Pull clock read command
-        .width  = PISTORM_W32,
-        .is_read= 1,
-        .flags  = 0x04,  // Special flag for pull clock read
-    };
-    int rc = ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
-    return (rc == 0) ? op.value : 0;
-}
-
 int ps_setup_protocol(void) {
     if (ps_open_dev() < 0) return -1;
     return ioctl(ps_fd, PISTORM_IOC_SETUP);
@@ -104,6 +36,36 @@ int ps_reset_state_machine(void) {
 int ps_pulse_reset(void) {
     if (ps_open_dev() < 0) return -1;
     return ioctl(ps_fd, PISTORM_IOC_PULSE_RESET);
+}
+
+// Function to handle the specific access pattern *(gpio + offset)
+// This is what the emulator uses to read GPIO register states
+unsigned int gpio_access_wrapper(int offset) {
+    if (ps_open_dev() < 0) return 0xFFFFFFFF;
+    
+    // The emulator typically reads from *(gpio + 13) which corresponds to GPLEV0
+    // This register contains the current state of GPIO pins
+    if (offset == 13) {  // GPLEV0 register access pattern
+        // This is a special operation to query pin states
+        struct pistorm_busop op = {
+            .addr   = 0xBADBAD00,  // Special address to indicate pin state query
+            .value  = 0,
+            .width  = PISTORM_W32,
+            .is_read= 1,
+            .flags  = 0x01,  // Special flag to indicate pin state query
+        };
+        
+        int rc = ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
+        if (rc == 0) {
+            return op.value;
+        } else {
+            // Default: indicate no transaction in progress, IPL not zero
+            return 0xFFFFEC;  // This would indicate TXN_IN_PROGRESS = 0 and IPL_ZERO = 0
+        }
+    }
+    
+    // For other offsets, return a default value
+    return 0xFFFFFFFF;
 }
 
 unsigned int ps_read_8(unsigned int addr) {

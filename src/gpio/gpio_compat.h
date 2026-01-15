@@ -32,8 +32,6 @@
 #define GPCLR1  0x2c
 #define GPLEV0  0x34
 #define GPLEV1  0x38
-#define GPEDS0  0x40
-#define GPEDS1  0x44
 
 // Global gpio pointer - this will be a fake pointer for kernel module compatibility
 extern volatile unsigned int* gpio;

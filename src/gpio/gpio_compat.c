@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "pistorm.h"  // UAPI header
+#include "include/uapi/linux/pistorm.h"
 #include "gpio_compat.h"
 
 // Global gpio pointer - this is what the emulator expects
@@ -27,72 +27,7 @@ static int ps_open_dev(void) {
     return (ps_fd >= 0) ? 0 : -1;
 }
 
-int init_gpio_compat_layer(void) {
-    return ps_open_dev();
-}
-
-// This function simulates *(gpio + offset) for reading
-unsigned int gpio_read_reg(int reg_offset) {
-    if (ps_open_dev() < 0) return 0;
-    
-    // This is a simplified implementation - in reality, we'd need to map
-    // the register offset to the appropriate operation
-    // For now, we'll handle the specific case of reading GPIO status
-    
-    // The emulator typically reads from *(gpio + 13) which corresponds to GPLEV0
-    // This gives the current state of GPIO pins
-    if (reg_offset == 13) {  // GPLEV0 register access
-        // For now, return a default value that indicates pins are in expected state
-        // In a real implementation, we'd need to query the actual pin states
-        // through the kernel module
-        
-        // This is a placeholder - we need to implement a proper way to get pin states
-        struct pistorm_busop op = {
-            .addr   = 0xDEADBEEF,  // Special address to indicate pin state query
-            .value  = 0,
-            .width  = PISTORM_W32,
-            .is_read= 1,
-            .flags  = 0,
-        };
-        
-        // For now, return a value that indicates no transaction in progress and IPL zero
-        // This is a simplified placeholder implementation
-        unsigned int result = 0;
-        
-        // In a real implementation, we'd need to have the kernel module
-        // provide a way to read the current state of the GPIO pins
-        // For now, let's return a value that makes sense for the emulator
-        result = 0xFFFFEC;  // Default value that would indicate pins are in expected state
-        
-        return result;
-    }
-    
-    // For other registers, we'd need specific handling
-    return 0xFFFFFFFF;  // Return all bits high as default
-}
-
-// This function simulates *(gpio + offset) = value for writing
-void gpio_write_reg(int reg_offset, unsigned int value) {
-    if (ps_open_dev() < 0) return;
-    
-    // This is a simplified implementation - in reality, we'd need to map
-    // the register offset and value to the appropriate operation
-    // For now, this is a placeholder
-    
-    struct pistorm_busop op = {
-        .addr   = 0xDEADBEEF + reg_offset,  // Special address to indicate register write
-        .value  = value,
-        .width  = PISTORM_W32,
-        .is_read= 0,
-        .flags  = 0,
-    };
-    
-    // In a real implementation, we'd need to handle different register writes appropriately
-    // For now, this is just a placeholder
-    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
-}
-
-// Additional helper functions for the emulator
+// Additional helper functions for the emulator compatibility
 unsigned int ps_read_status_reg(void) {
     if (ps_open_dev() < 0) return 0;
     struct pistorm_busop op = {
@@ -208,32 +143,60 @@ void ps_write_32(unsigned addr, unsigned value) {
     ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
 }
 
-// Function to simulate the specific access pattern used by emulator
-// This handles the *(gpio + 13) access pattern
-unsigned int ps_get_gpio_register(int offset) {
-    if (offset == 13) {
-        // This is the GPLEV0 access pattern used by emulator
-        // It checks for TXN_IN_PROGRESS and IPL_ZERO
-        // We need to return a value that represents the current pin states
+int init_gpio_compat_layer(void) {
+    return ps_open_dev();
+}
+
+// This function simulates *(gpio + offset) for reading
+unsigned int gpio_read_reg(int reg_offset) {
+    if (ps_open_dev() < 0) return 0xFFFFFFFF;
+    
+    // This is a simplified implementation - in reality, we'd need to map
+    // the register offset to the appropriate operation
+    // For the emulator compatibility, we'll handle the specific case of reading GPIO status
+    
+    // The emulator typically reads from *(gpio + 13) which corresponds to GPLEV0
+    // This gives the current state of GPIO pins
+    if (reg_offset == 13) {  // GPLEV0 register access (pin level register)
+        // For now, return a default value that indicates pins are in expected state
+        // In a real implementation, we'd need to query the actual pin states
+        // through the kernel module
         
-        // For now, let's implement a more realistic version
-        // In a real implementation, the kernel module would need to provide
-        // a way to query the current state of the GPIO pins
+        // This is a placeholder - we need to implement a proper way to get pin states
         struct pistorm_busop op = {
-            .addr   = 0xBADBAD00,  // Special address to indicate pin state query
+            .addr   = 0xDEADBEEF,  // Special address to indicate pin state query
             .value  = 0,
             .width  = PISTORM_W32,
             .is_read= 1,
-            .flags  = 0x01,  // Special flag to indicate pin state query
+            .flags  = 0,
         };
         
-        int rc = ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
-        if (rc == 0) {
-            return op.value;
-        } else {
-            // Default: no transaction in progress, IPL not zero
-            return 0xFFFFEC;  // This would indicate TXN_IN_PROGRESS = 0 and other pins as expected
-        }
+        // For now, return a value that makes sense for the emulator
+        // This would indicate no transaction in progress and IPL not zero
+        return 0xFFFFEC;  // Default value that would indicate pins are in expected state
     }
-    return 0xFFFFFFFF;  // Default for other registers
+    
+    // For other registers, we'd need specific handling
+    return 0xFFFFFFFF;  // Return all bits high as default
+}
+
+// This function simulates *(gpio + offset) = value for writing
+void gpio_write_reg(int reg_offset, unsigned int value) {
+    if (ps_open_dev() < 0) return;
+    
+    // This is a simplified implementation - in reality, we'd need to map
+    // the register offset and value to the appropriate operation
+    // For now, this is just a placeholder
+    
+    struct pistorm_busop op = {
+        .addr   = 0xDEADBEEF + reg_offset,  // Special address to indicate register write
+        .value  = value,
+        .width  = PISTORM_W32,
+        .is_read= 0,
+        .flags  = 0,
+    };
+    
+    // In a real implementation, we'd need to handle different register writes appropriately
+    // For now, this is just a placeholder
+    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
 }
