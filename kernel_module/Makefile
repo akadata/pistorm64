@@ -5,8 +5,6 @@ obj-m += pistorm_kernel_module.o
 # Source files
 pistorm_kernel_module-objs := src/pistorm_kernel_module.o
 
-ccflags-y += -I$(src)/include -I$(src)/include/uapi
-
 KDIR ?= /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 

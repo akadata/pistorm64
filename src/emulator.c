@@ -192,7 +192,7 @@ static void amiga_reset_and_wait(const char* tag) {
 
     int timeout_us = 20000;
     while (timeout_us > 0) {
-      if (!(ps_gpio_lev() & (1 << PIN_TXN_IN_PROGRESS))) {
+      if (!(*(gpio + 13) & (1 << PIN_TXN_IN_PROGRESS))) {
         amiga_warmup_bus();
         return;
       }
@@ -230,7 +230,7 @@ void* ipl_task(void* args) {
     if (emulator_exiting || end_signal) {
       break;
     }
-    value = ps_gpio_lev();
+    value = *(gpio + 13);
     if (value & (1 << PIN_TXN_IN_PROGRESS)) {
       goto noppers;
     }
