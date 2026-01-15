@@ -1,8 +1,7 @@
-// src/gpio/ps_protocol_kmod_shim.c
+// src/gpio/ps_protocol_kmod.c
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <sys/mman.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -10,7 +9,7 @@
 #include <string.h>
 
 // Include our UAPI header
-#include "include/uapi/linux/pistorm.h"
+#include "pistorm.h"   // This should be the copy from our repo
 
 static int ps_fd = -1;
 
