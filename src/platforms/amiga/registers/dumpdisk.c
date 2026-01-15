@@ -438,24 +438,46 @@ int main(int argc, char **argv) {
 
   for (int t = 0; t < tracks && !stop_requested; t++) {
     for (int s = 0; s < sides && !stop_requested; s++) {
-      // Reassert motor/select in case a previous iteration turned anything off.
+      // After head movements, reassert motor/select to ensure drive is ready
       ensure_motor_on_with_drive_select(drive);
       usleep(500000);  // allow motor/select to settle (motor spec: ~500ms spin-up)
-  set_side(s);
-  if (t > 0 || s > 0) {
-    // Step one track inward between logical tracks after side 1, else stay on same cylinder for side toggle.
-    if (s == 0 && t > 0) {
-      step_track(1, 0);
-    }
-  }
-  // Small settle time after head move/side change.
-  usleep(20000);
-  wait_for_ready(500);
+
+      set_side(s);
+      if (t > 0 || s > 0) {
+        // Step one track inward between logical tracks after side 1, else stay on same cylinder for side toggle.
+        if (s == 0 && t > 0) {
+          step_track(1, 0);
+        }
+      }
+      // Longer settle time after head move/side change, especially after extensive movement.
+      usleep(100000);  // Increased from 20ms to 100ms
+
+      // Check if drive is ready, and if not, try to reinitialize
+      int ready_rc = wait_for_ready(1000);  // Increased timeout
+      if (ready_rc != 0) {
+        printf("Drive not ready after head movement, attempting reinit...\n");
+        // Try to reinitialize by turning motor off and on again
+        motor_off();
+        usleep(100000);  // Wait 100ms
+        ensure_motor_on_with_drive_select(drive);
+        usleep(800000);  // Full spin-up time
+        ready_rc = wait_for_ready(1000);
+        if (ready_rc != 0) {
+          printf("ERROR: Drive still not ready after reinitialization attempt\n");
+          log_status("final status before abort");
+          fclose(fp);
+          motor_off();
+          return 1;
+        }
+      }
+
       // Ensure DDRB/PRB are sane immediately before DMA: DS0 + motor on, side/direction set.
       force_drive0_outputs();
       if (s) ps_write_8(CIABPRB, (uint8_t)(prb_shadow | CIAB_DSKSIDE));
-      usleep(20000);
-      wait_for_ready(200);
+      usleep(50000);  // Increased from 20ms to 50ms for more settling
+
+      // Final check before DMA
+      wait_for_ready(500);
       // If ready/track0 disappeared, abort this attempt.
       uint8_t pra_now = (uint8_t)ps_read_8(CIAAPRA);
       if ((pra_now & CIAA_DSKRDY) || (pra_now & CIAA_DSKTRACK0)) {
