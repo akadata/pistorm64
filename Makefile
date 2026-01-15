@@ -303,6 +303,8 @@ install: all
 	done
 	$(INSTALL) -d $(INSTALL_DIR)/src/platforms/amiga/piscsi
 	$(INSTALL) -m 644 src/platforms/amiga/piscsi/piscsi.rom $(INSTALL_DIR)/src/platforms/amiga/piscsi/piscsi.rom
+	$(INSTALL) -d $(INSTALL_DIR)/src/a314
+	cp -a src/a314/files_pi $(INSTALL_DIR)/src/a314/
 	cp -a data $(INSTALL_DIR)/
 	[ -f pistorm.LICENSE ] && $(INSTALL) -m 644 pistorm.LICENSE $(INSTALL_DIR)/
 
