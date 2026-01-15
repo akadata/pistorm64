@@ -70,6 +70,9 @@ CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 RAYLIB_INC    ?= -I./src/raylib
 RAYLIB_LIBDIR ?= -L./src/raylib_drm
 PISTORM_KMOD  ?= 0
+PREFIX        ?= /opt/pistorm64
+DESTDIR       ?=
+INSTALL       ?= install
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol.c
 ifeq ($(PISTORM_KMOD),1)
@@ -237,13 +240,16 @@ LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS)
 LDLIBS   = $(LDLIBS_RAYLIB) $(LDLIBS_VC) $(LDLIBS_ALSA) -ldl -lstdc++ -lm -pthread
 
 TARGET = $(EXENAME)$(EXE)
+INSTALL_DIR := $(DESTDIR)$(PREFIX)
+CONFIG_FILES := default.cfg amiga.cfg mac68k.cfg test.cfg x68k.cfg
+INSTALL_BINS := $(TARGET) buptest pistorm_truth_test
 
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
 
-DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) $(MUSASHIGENERATOR)$(EXE)
+DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE)
 
-all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest
+all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test
 
 clean:
 	rm -f $(DELETEFILES)
@@ -268,8 +274,15 @@ src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
 
-buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/gpio/rpi_peri.c
-	$(CC) $(CFLAGS) -o $@ $^
+buptest:
+	@if [ -f src/buptest/buptest.c ]; then \
+		$(CC) $(CFLAGS) -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/gpio/rpi_peri.c; \
+	else \
+		echo "buptest skipped (src/buptest/buptest.c missing)"; \
+	fi
+
+pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
+	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
 	$(CXX) -MMD -MP -c -o src/a314/a314.o $(OPT_LEVEL) src/a314/a314.cc $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi
@@ -280,4 +293,31 @@ $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 $(MUSASHIGENERATOR)$(EXE): src/musashi/$(MUSASHIGENERATOR).c
 	$(CC) -MMD -MP -o $(MUSASHIGENERATOR)$(EXE) src/musashi/$(MUSASHIGENERATOR).c
 
--include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d
+install: all
+	$(INSTALL) -d $(INSTALL_DIR)
+	for bin in $(INSTALL_BINS); do \
+		[ -x $$bin ] && $(INSTALL) -m 755 $$bin $(INSTALL_DIR)/; \
+	done
+	for cfg in $(CONFIG_FILES); do \
+		[ -f $$cfg ] && $(INSTALL) -m 644 $$cfg $(INSTALL_DIR)/; \
+	done
+	$(INSTALL) -d $(INSTALL_DIR)/src/platforms/amiga/piscsi
+	$(INSTALL) -m 644 src/platforms/amiga/piscsi/piscsi.rom $(INSTALL_DIR)/src/platforms/amiga/piscsi/piscsi.rom
+	cp -a data $(INSTALL_DIR)/
+	[ -f pistorm.LICENSE ] && $(INSTALL) -m 644 pistorm.LICENSE $(INSTALL_DIR)/
+
+uninstall:
+	rm -rf $(INSTALL_DIR)
+
+kernel_module:
+	$(MAKE) -C kernel_module module
+
+kernel_install: kernel_module
+	$(MAKE) -C kernel_module install
+
+kernel_clean:
+	$(MAKE) -C kernel_module clean
+
+-include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d
+
+.PHONY: all clean buptest pistorm_truth_test install uninstall kernel_module kernel_install kernel_clean
