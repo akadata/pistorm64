@@ -93,7 +93,7 @@ static void force_drive0_outputs(void) {
   ddrb_shadow = 0xFF;
   ps_write_8(CIABDDRB, ddrb_shadow);
   // Drive0 selected (bit3=0), motor on (bit7=0), others high. Matches Amiga/X-Copy mapping.
-  prb_shadow = 0x77;  // 0b01110111: PB7=0(motor), PB6-4=1, PB3=0(sel0), PB2-0=1
+  prb_shadow = 0x70;  // default high on PB2-0; select/motor asserted; side/dir/step set later.
   ps_write_8(CIABPRB, prb_shadow);
   usleep(1000);
 }
