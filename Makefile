@@ -69,6 +69,12 @@ CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 # Raylib paths can be swapped if you use a custom build.
 RAYLIB_INC    ?= -I./src/raylib
 RAYLIB_LIBDIR ?= -L./src/raylib_drm
+PISTORM_KMOD  ?= 0
+
+PS_PROTOCOL_SRC := src/gpio/ps_protocol.c
+ifeq ($(PISTORM_KMOD),1)
+PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
+endif
 
 
 MAINFILES =
@@ -81,7 +87,7 @@ MAINFILES += src/config_file/config_file.c
 MAINFILES += src/config_file/rominfo.c
 
 MAINFILES += src/input/input.c
-MAINFILES += src/gpio/ps_protocol.c
+MAINFILES += $(PS_PROTOCOL_SRC)
 MAINFILES += src/gpio/rpi_peri.c
 
 MAINFILES += src/platforms/platforms.c
@@ -219,6 +225,11 @@ endif
 INCLUDES  = -I. -Isrc -Isrc/musashi $(RAYLIB_INC) $(VC_INC)
 LDSEARCH  = -L/usr/local/lib $(VC_LIBDIR) $(RAYLIB_LIBDIR)
 
+ifeq ($(PISTORM_KMOD),1)
+INCLUDES += -Iinclude -Iinclude/uapi
+DEFINES  += -DPISTORM_KMOD
+endif
+
 CFLAGS       = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS)
 M68K_CFLAGS   = $(CFLAGS) $(M68K_WARN_SUPPRESS)
 LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS)
@@ -257,7 +268,7 @@ src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
 
-buptest: src/buptest/buptest.c src/gpio/ps_protocol.c src/gpio/rpi_peri.c
+buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/gpio/rpi_peri.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
@@ -270,4 +281,3 @@ $(MUSASHIGENERATOR)$(EXE): src/musashi/$(MUSASHIGENERATOR).c
 	$(CC) -MMD -MP -o $(MUSASHIGENERATOR)$(EXE) src/musashi/$(MUSASHIGENERATOR).c
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d
-
