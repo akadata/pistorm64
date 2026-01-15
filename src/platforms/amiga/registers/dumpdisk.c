@@ -376,6 +376,8 @@ int main(int argc, char **argv) {
 
   signal(SIGINT, on_sigint);
   ps_setup_protocol();
+  ps_reset_state_machine();
+  ps_pulse_reset();
 
   overlay_off();
   init_disk_port();
