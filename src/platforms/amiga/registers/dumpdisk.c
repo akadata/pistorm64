@@ -135,24 +135,40 @@ static void motor_on(void) {
   ensure_output(ddrb, CIAB_DSKMOTOR);
   prb_shadow &= (uint8_t)~CIAB_DSKMOTOR;  // active low on Amiga drives
   ps_write_8(CIABPRB, prb_shadow);
+  usleep(1000); // Brief delay to ensure motor signal settles
 }
 
 static void motor_off(void) {
   uint32_t ddrb = CIAB_BASE + CIADDRB;
   ensure_output(ddrb, CIAB_DSKMOTOR);
-  // Latch motor-off: set motor high, briefly deassert selects, then reassert the current drive
-  // to clock the motor bit, and finally release selects.
-  prb_shadow |= CIAB_DSKMOTOR;
-  // Deassert all selects.
+  prb_shadow |= CIAB_DSKMOTOR;  // turn motor off (active low - set high)
+  ps_write_8(CIABPRB, prb_shadow);
+  usleep(1000); // Brief delay to ensure motor signal settles
+}
+
+// Alternative motor control function that ensures proper drive selection and motor control
+static void ensure_motor_on_with_drive_select(int drive) {
+  uint32_t ddrb = CIAB_BASE + CIADDRB;
+  uint8_t mask = CIAB_DSKSEL0 | CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3 | CIAB_DSKMOTOR;
+  ensure_output(ddrb, mask);
+
+  // Deassert all selects first
   prb_shadow |= (uint8_t)(CIAB_DSKSEL0 | CIAB_DSKSEL1 | CIAB_DSKSEL2 | CIAB_DSKSEL3);
+  // Select the target drive (active low)
+  prb_shadow &= (uint8_t)~(CIAB_DSKSEL0 << drive);
+  // Turn motor on (active low - clear bit)
+  prb_shadow &= (uint8_t)~CIAB_DSKMOTOR;
+
   ps_write_8(CIABPRB, prb_shadow);
-  // Pulse drive 0 select low to latch motor-off.
-  prb_shadow &= (uint8_t)~CIAB_DSKSEL0;
-  ps_write_8(CIABPRB, prb_shadow);
-  usleep(1000);
-  // Release select.
-  prb_shadow |= CIAB_DSKSEL0;
-  ps_write_8(CIABPRB, prb_shadow);
+  usleep(10000); // Allow time for drive to become ready
+
+  // Double-check the motor is on and drive is selected
+  uint8_t current_prb = (uint8_t)ps_read_8(CIABPRB);
+  if ((current_prb & CIAB_DSKMOTOR) != 0) {
+    // Motor is off, turn it back on
+    prb_shadow &= (uint8_t)~CIAB_DSKMOTOR;
+    ps_write_8(CIABPRB, prb_shadow);
+  }
 }
 
 static void select_drive(int drive) {
@@ -361,7 +377,7 @@ int main(int argc, char **argv) {
             ddrb_shadow, prb_shadow);
     return 1;
   }
-  motor_on();
+  ensure_motor_on_with_drive_select(drive);
   usleep(800000);  // spin-up
   wait_for_ready(500);
   log_status("after motor on");
@@ -413,8 +429,7 @@ int main(int argc, char **argv) {
   for (int t = 0; t < tracks && !stop_requested; t++) {
     for (int s = 0; s < sides && !stop_requested; s++) {
       // Reassert motor/select in case a previous iteration turned anything off.
-      select_drive(drive);
-      motor_on();
+      ensure_motor_on_with_drive_select(drive);
       usleep(500000);  // allow motor/select to settle (motor spec: ~500ms spin-up)
   set_side(s);
   if (t > 0 || s > 0) {
