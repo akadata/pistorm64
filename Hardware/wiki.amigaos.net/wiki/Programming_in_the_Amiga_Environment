@@ -1,0 +1,799 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Programming in the Amiga Environment - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_6R3TbDv_vcRQHuo8eAAAAAo","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Programming_in_the_Amiga_Environment","wgTitle":"Programming in the Amiga Environment","wgCurRevisionId":12449,"wgRevisionId":12449,"wgArticleId":10,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":[
+"*"],"wgCategories":["Need Update"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Programming_in_the_Amiga_Environment","wgRelevantArticleId":10,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","ext.pygments":"ready","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["ext.pygments.view","site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%2Cpygments%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-Programming_in_the_Amiga_Environment rootpage-Programming_in_the_Amiga_Environment skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">Programming in the Amiga Environment</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/Version_Strings" title="Version Strings">Version Strings</a> &gt; <a href="/wiki/Tags" title="Tags">Tags</a> &gt; <a href="/wiki/Callback_Hooks" title="Callback Hooks">Callback Hooks</a> &gt; <a href="/wiki/GUI_Programming" title="GUI Programming">GUI Programming</a> &gt; <a href="/wiki/Programming_in_the_Amiga_Environment" title="Programming in the Amiga Environment">Programming in the Amiga Environment</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><table style="margin:0 auto;width:450px;color:red;border:thin solid;background-color:#FFAAAA;">
+<tbody><tr>
+<td style="width:80px"><span class="mw-default-size" typeof="mw:File"><a href="/wiki/File:Warning.png" class="mw-file-description"><img src="/w/images/c/cb/Warning.png" decoding="async" width="64" height="64" class="mw-file-element" /></a></span>
+</td>
+<td style="padding:3px;"><i><b>This page is not yet fully updated to AmigaOS 4.x some of the information contained here may not be applicable in part or totally.</b></i>
+</td></tr></tbody></table>
+<div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Programming_in_the_Amiga_Environment"><span class="tocnumber">1</span> <span class="toctext">Programming in the Amiga Environment</span></a>
+<ul>
+<li class="toclevel-2 tocsection-2"><a href="#Multitasking"><span class="tocnumber">1.1</span> <span class="toctext">Multitasking</span></a></li>
+<li class="toclevel-2 tocsection-3"><a href="#What_the_System_Does_For_You"><span class="tocnumber">1.2</span> <span class="toctext">What the System Does For You</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="#What_the_System_Doesn&#39;t_Do_For_You"><span class="tocnumber">1.3</span> <span class="toctext">What the System Doesn't Do For You</span></a></li>
+<li class="toclevel-2 tocsection-5"><a href="#Libraries_of_functions"><span class="tocnumber">1.4</span> <span class="toctext">Libraries of functions</span></a>
+<ul>
+<li class="toclevel-3 tocsection-6"><a href="#Opening_a_Library_in_C"><span class="tocnumber">1.4.1</span> <span class="toctext">Opening a Library in C</span></a></li>
+<li class="toclevel-3 tocsection-7"><a href="#Another_Kind_of_Function_Library"><span class="tocnumber">1.4.2</span> <span class="toctext">Another Kind of Function Library</span></a></li>
+<li class="toclevel-3 tocsection-8"><a href="#Libraries,_Devices_and_Resources"><span class="tocnumber">1.4.3</span> <span class="toctext">Libraries, Devices and Resources</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-9"><a href="#Dynamic_memory_architecture"><span class="tocnumber">1.5</span> <span class="toctext">Dynamic memory architecture</span></a>
+<ul>
+<li class="toclevel-3 tocsection-10"><a href="#Exec:_The_System_Executive"><span class="tocnumber">1.5.1</span> <span class="toctext">Exec: The System Executive</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-11"><a href="#Operating_system_versions"><span class="tocnumber">1.6</span> <span class="toctext">Operating system versions</span></a>
+<ul>
+<li class="toclevel-3 tocsection-12"><a href="#About_Release_4"><span class="tocnumber">1.6.1</span> <span class="toctext">About Release 4</span></a></li>
+<li class="toclevel-3 tocsection-13"><a href="#Two_Kinds_of_Memory"><span class="tocnumber">1.6.2</span> <span class="toctext">Two Kinds of Memory</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-14"><a href="#About_the_Examples"><span class="tocnumber">2</span> <span class="toctext">About the Examples</span></a></li>
+<li class="toclevel-1 tocsection-15"><a href="#General_Amiga_Development_Guidelines"><span class="tocnumber">3</span> <span class="toctext">General Amiga Development Guidelines</span></a>
+<ul>
+<li class="toclevel-2 tocsection-16"><a href="#Hardware_programming_guidelines"><span class="tocnumber">3.1</span> <span class="toctext">Hardware programming guidelines</span></a></li>
+<li class="toclevel-2 tocsection-17"><a href="#AmigaOS_Interface_Style_Guide"><span class="tocnumber">3.2</span> <span class="toctext">AmigaOS Interface Style Guide</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-18"><a href="#Error_Reports"><span class="tocnumber">4</span> <span class="toctext">Error Reports</span></a></li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="Programming_in_the_Amiga_Environment">Programming in the Amiga Environment</span></h2>
+<p>To program in the Amiga's dynamic environment you need to understand these special features of the Amiga's design:
+</p>
+<ul><li>Multitasking (without memory protection)</li>
+<li>Shared libraries of functions</li>
+<li>Dynamic memory architecture (no memory map)</li>
+<li>Operating system versions</li>
+<li>Custom chips with DMA access (two kinds of memory)</li></ul>
+<h3><span class="mw-headline" id="Multitasking">Multitasking</span></h3>
+<p>The key feature of the Amiga's operating system design is <i>multitasking</i>. Multitasking means many programs, or tasks, reside in memory at the same time sharing system resources with one another. Programs take turns running so it appears that many programs are running simultaneously.
+</p><p>Multitasking is based on the concept that a program spends most of its time waiting for things to happen. A program waits for events like key presses, mouse movement, or disk activity. While a program is waiting, the CPU is idle. The CPU could be used to run a different program during this idle period if there was a convenient method for rapidly switching from one program to another. This is what multitasking does.
+</p>
+<h3><span class="mw-headline" id="What_the_System_Does_For_You">What the System Does For You</span></h3>
+<p>The Amiga uses <i>preemptive multitasking</i> which means that the operating system keeps track of all the tasks in memory and decides which one should run. The system checks hundreds of times per second to see which task should be run based on whether or not it is waiting, and other factors. Since the system handles all the work of task switching, multitasking is transparent to the application. From the application's point of view, it appears to have the machine all to itself.
+</p><p>The Amiga OS also manages the sharing of resources between tasks. This is important because in order for a variety of tasks to run independently in the Amiga's multitasking environment, tasks must be prevented from interfering with one another. Imagine if five tasks were allowed to use the parallel port at the same time. The result would be I/O chaos. To prevent this, the operating system provides an arbitration method (usually a function call) for every system resource. For instance you must call a function, AllocMem(), to get exclusive access to a block of memory.
+</p>
+<h3><span id="What_the_System_Doesn.27t_Do_For_You"></span><span class="mw-headline" id="What_the_System_Doesn't_Do_For_You">What the System Doesn't Do For You</span></h3>
+<p>The Amiga operating system handles most of the housekeeping needed for multitasking, but this does not mean that applications don't have to worry about multitasking at all. The current generation of Amiga systems do not have hardware memory protection, so there is nothing to stop a task from using memory it has not legally acquired. An errant task can easily corrupt some other task by accidentally overwriting its instructions or data. Amiga programmers need to be extra careful with memory; one bad memory pointer can cause the machine to crash (debugging utilities such as MungWall and Enforcer will prevent this).
+</p><p>In fact, Amiga programmers need to be careful with every system resource, not just memory. All system resources from audio channels to the floppy disk drives are shared among tasks. Before using a resource, you must ask the system for access to the resource. This may fail if the resource is already being used by another task. Once you have control of a resource, no other task can use it, so give it up as soon as you are finished. When your program exits, you must give everything back whether it's memory, access to a file, or an I/O port. You are responsible for this, the system will not do it for you automatically.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>What Every Amiga Programmer Should Know
+</th></tr>
+<tr>
+<td>The Amiga is a <i>multitasking</i> computer. Keep in mind that other tasks are running at the same time as your application. Always ask the system for control of any resource you need; some other task may already be using it. Give it back as soon as you are done; another task may want to use it. This applies to just about every computing activity your application can perform.
+</td></tr></tbody></table>
+<h3><span class="mw-headline" id="Libraries_of_functions">Libraries of functions</span></h3>
+<p>Most of the routines that make up the Amiga's operating system are organized into groups called libraries. Each library then contains one or more interfaces. In order to call a function on the Amiga you must first open the library that contains the function. Next, you get the interface which contains the function you want to call. For example, if you want to call the Read() function to read data from disk you must first open the <a href="/wiki/AmigaDOS_Introduction" title="AmigaDOS Introduction">DOS</a> library and then get the "main" interface the Read() function is defined in.
+</p><p>The system's master library, called <a href="/wiki/Exec" title="Exec">Exec</a>, is always open. <a href="/wiki/Exec" title="Exec">Exec</a> keeps track of all the other <a href="/wiki/Exec_Libraries" title="Exec Libraries">libraries</a> and is in charge of opening and closing them. <a href="/wiki/Exec" title="Exec">Exec</a>'s "main" interface contains the OpenLibrary() function which is used to open all the other libraries.
+</p><p>Almost any program you write for the Amiga will have to call the OpenLibrary() and GetInterface() functions. Usage is as follows:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="c1">// Global: declare this above main()</span>
+<span class="linenos" data-line="2"></span><span class="k">struct</span><span class="w"> </span><span class="nc">Library</span><span class="w"> </span><span class="o">*</span><span class="n">LibBase</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="k">struct</span><span class="w"> </span><span class="nc">Interface</span><span class="w"> </span><span class="o">*</span><span class="n">LibIFace</span><span class="p">;</span>
+<span class="linenos" data-line="4"></span>
+<span class="linenos" data-line="5"></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="linenos" data-line="6"></span><span class="p">{</span>
+<span class="linenos" data-line="7"></span><span class="w">  </span><span class="n">LibBase</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">OpenLibrary</span><span class="p">(</span><span class="s">&quot;library.name&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">libversion</span><span class="p">);</span>
+<span class="linenos" data-line="8"></span><span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="n">LibBase</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span>
+<span class="linenos" data-line="9"></span><span class="w">  </span><span class="p">{</span>
+<span class="linenos" data-line="10"></span><span class="w">    </span><span class="c1">// Library did not open, so exit.</span>
+<span class="linenos" data-line="11"></span><span class="w">  </span><span class="p">}</span>
+<span class="linenos" data-line="12"></span><span class="w">  </span><span class="k">else</span>
+<span class="linenos" data-line="13"></span><span class="w">  </span><span class="p">{</span>
+<span class="linenos" data-line="14"></span><span class="w">    </span><span class="n">LibIFace</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">GetInterface</span><span class="p">(</span><span class="n">LibBase</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ifaceversion</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+<span class="linenos" data-line="15"></span><span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">LibIFace</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span>
+<span class="linenos" data-line="16"></span><span class="w">    </span><span class="p">{</span>
+<span class="linenos" data-line="17"></span><span class="w">        </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">CloseLibrary</span><span class="p">(</span><span class="n">LibBase</span><span class="p">);</span>
+<span class="linenos" data-line="18"></span><span class="w">       </span><span class="c1">// Could not get Interface, so exit.</span>
+<span class="linenos" data-line="19"></span><span class="w">    </span><span class="p">}</span>
+<span class="linenos" data-line="20"></span><span class="w">    </span><span class="k">else</span>
+<span class="linenos" data-line="21"></span><span class="w">    </span><span class="p">{</span>
+<span class="linenos" data-line="22"></span><span class="w">      </span><span class="c1">// Interface obtained, so use its functions.</span>
+<span class="linenos" data-line="23"></span><span class="w">    </span><span class="p">}</span>
+<span class="linenos" data-line="24"></span><span class="w">  </span><span class="p">}</span>
+<span class="linenos" data-line="25"></span><span class="p">}</span>
+</pre></div>
+<dl><dt>LibBase</dt>
+<dd>This is a pointer to the library structure in memory, often referred to as the <i>library base</i>. The library may or may not be global depending on your needs. The name of this pointer may be changed although it is proper to use the established standard name. Refer to the list below for the appropriate name.</dd></dl>
+<dl><dt>LibIFace</dt>
+<dd>This is a pointer to the interface structure in memory. The interface may or may not be global depending on your needs. The name of this pointer may be changed although it is proper to use the established standard name. Refer to the list below for the appropriate name.</dd></dl>
+<dl><dt>library.name</dt>
+<dd>This is a C string that describes the name of the library you wish to open. The list of Amiga library names is given below.</dd></dl>
+<dl><dt>main</dt>
+<dd>This is a C string that describes the name of the interface you wish to use. The list of Amiga interface names depends on the library and is given below.</dd></dl>
+<dl><dt>libversion</dt>
+<dd>This should be set to the earliest acceptable library version. A value of 0 matches any version. A value of 53 means you require at least version 53 or a later version of the library. If the library version in the system is older than the one you specify, OpenLibrary() will fail (return 0).</dd></dl>
+<dl><dt>ifaceversion</dt>
+<dd>This should be set to the interface version you require. Each interface has a unique version number which defines all the functions in that interface. Most often an interface will have a single interface version of 1. If the interface version in the system does not match, GetInterface() will fail (return 0).</dd></dl>
+<p>The table listed below shows all the function libraries that are currently part of the Amiga system software.
+</p>
+<table class="wikitable">
+<caption>Parameters to use with OpenLibrary()
+</caption>
+<tbody><tr>
+<th>Library Name
+</th>
+<th>Library Base
+</th>
+<th>Oldest Library Version In Use
+</th>
+<th>Interface Name:Version
+</th></tr>
+<tr>
+<td>library.name<sup>*</sup></td>
+<td>LibBase</td>
+<td>version</td>
+<td>iface.name:version
+</td></tr>
+<tr>
+<td>asl.library</td>
+<td>AslBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>commodities.library</td>
+<td>CxBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>diskfont.library</td>
+<td>DiskfontBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>dos.library</td>
+<td>DOSBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td><a href="/wiki/Introduction_to_Exec" title="Introduction to Exec">exec.library</a></td>
+<td>ExecBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td><a href="/wiki/Expansion_Library" title="Expansion Library">expansion.library</a></td>
+<td>ExpansionBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>gadtools.library</td>
+<td>GadToolsBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>graphics.library</td>
+<td>GfxBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>icon.library</td>
+<td>IconBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>iffparse.library</td>
+<td>IFFParseBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>intuition.library</td>
+<td>IntuitionBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>keymap.library</td>
+<td>KeymapBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>layers.library</td>
+<td>LayersBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>mathffp.library</td>
+<td>MathBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>mathtrans.library</td>
+<td>MathTransBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>mathieeedoubbas.library</td>
+<td>MathIeeeDoubBasBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>mathieeedoubtrans.library</td>
+<td>MathIeeeDoubTransBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>mathieeesingbas.library</td>
+<td>MathIeeeSingBasBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>mathieeesingtrans.library</td>
+<td>MathIeeeSingTransBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>rexxsyslib.library</td>
+<td>RexxSysBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>translator.library</td>
+<td>TranslatorBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td><a href="/wiki/Utility_Library" title="Utility Library">utility.library</a></td>
+<td>UtilityBase</td>
+<td>50</td>
+<td>main:1
+</td></tr>
+<tr>
+<td>workbench.library</td>
+<td>WorkbenchBase</td>
+<td>50</td>
+<td>main:1
+</td></tr></tbody></table>
+<p><sup>*</sup> Other libraries may exist that are not supplied by the AmigaOS development team since it is a feature of the operating system to allow such libraries.
+</p>
+<h4><span class="mw-headline" id="Opening_a_Library_in_C">Opening a Library in C</span></h4>
+<p>Here's a brief example showing how OpenLibrary() and GetInterface() are used in C.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cm">/* easy.c: a complete example of how to open an Amiga function library in C.</span>
+<span class="linenos" data-line="2"></span><span class="cm"> * In this case the function library is Intuition. Once the Intuition</span>
+<span class="linenos" data-line="3"></span><span class="cm"> * function library is open and the interface obtains, any Intuition function</span>
+<span class="linenos" data-line="4"></span><span class="cm"> * can be called. This example uses the DisplayBeep() function of Intuition to</span>
+<span class="linenos" data-line="5"></span><span class="cm"> * flash the screen.</span>
+<span class="linenos" data-line="6"></span><span class="cm"> */</span>
+<span class="linenos" data-line="7"></span>
+<span class="linenos" data-line="8"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;proto/exec.h&gt;</span>
+<span class="linenos" data-line="9"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;proto/intuition.h&gt;</span>
+<span class="linenos" data-line="10"></span>
+<span class="linenos" data-line="11"></span><span class="k">struct</span><span class="w"> </span><span class="nc">Library</span><span class="w"> </span><span class="o">*</span><span class="n">IntuitionBase</span><span class="p">;</span>
+<span class="linenos" data-line="12"></span><span class="k">struct</span><span class="w"> </span><span class="nc">IntuitionIFace</span><span class="w"> </span><span class="o">*</span><span class="n">IIntuition</span><span class="p">;</span>
+<span class="linenos" data-line="13"></span>
+<span class="linenos" data-line="14"></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="linenos" data-line="15"></span><span class="p">{</span>
+<span class="linenos" data-line="16"></span><span class="w">    </span><span class="n">IntuitionBase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">OpenLibrary</span><span class="p">(</span><span class="s">&quot;intuition.library&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">);</span>
+<span class="linenos" data-line="17"></span>
+<span class="linenos" data-line="18"></span><span class="w">    </span><span class="c1">// Note it is safe to call GetInterface() with a NULL library pointer.</span>
+<span class="linenos" data-line="19"></span><span class="w">    </span><span class="n">IIntuition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IntuitionIFace</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">GetInterface</span><span class="p">(</span><span class="n">IntuitionBase</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+<span class="linenos" data-line="20"></span>
+<span class="linenos" data-line="21"></span><span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">IIntuition</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w">           </span><span class="cm">/* Check to see if it actually opened.   */</span>
+<span class="linenos" data-line="22"></span><span class="w">    </span><span class="p">{</span><span class="w">                                </span><span class="cm">/* The Intuition library is now open so  */</span>
+<span class="linenos" data-line="23"></span><span class="w">        </span><span class="n">IIntuition</span><span class="o">-&gt;</span><span class="n">DisplayBeep</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">  </span><span class="cm">/* any of its functions may be used.     */</span>
+<span class="linenos" data-line="24"></span><span class="w">    </span><span class="p">}</span>
+<span class="linenos" data-line="25"></span>
+<span class="linenos" data-line="26"></span><span class="w">    </span><span class="c1">// Always drop the interface and close the library if not in use.</span>
+<span class="linenos" data-line="27"></span><span class="w">    </span><span class="c1">// Note it is safe to call DropInterface() and CloseLibrary() with NULL pointers.</span>
+<span class="linenos" data-line="28"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DropInterface</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">Interface</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">IIntuition</span><span class="p">);</span>
+<span class="linenos" data-line="29"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">CloseLibrary</span><span class="p">(</span><span class="n">IntuitionBase</span><span class="p">);</span>
+<span class="linenos" data-line="30"></span><span class="p">}</span>
+</pre></div>
+<h4><span class="mw-headline" id="Another_Kind_of_Function_Library">Another Kind of Function Library</span></h4>
+<p>The Amiga has two kinds of libraries: run-time libraries and link libraries. All the libraries discussed so far are run-time libraries. Run-time libraries make up most of the Amiga's operating system and are the main topic of this book.
+</p><p>There is another type of library known as a link library. Even though a link library is a collection of functions just like a run-time library, there are some major differences in the two types.
+</p><p>A run-time, or shared library is a group of functions managed by <a href="/wiki/Exec" title="Exec">Exec</a> that resides either in ROM or on disk (in the "LIBS:" directory). A run-time library must be opened before it can be used (as explained above). The functions in a run-time library are accessed dynamically at run-time and can be used by many programs at once even though only one copy of the library is in memory. A disk based run-time library is loaded into memory only if requested by a program and can be automatically flushed from memory when no longer needed.
+</p><p>A link library is a group of functions on disk that are managed by the compiler at link time. Link libraries do not have to be opened before they are used, instead you must link your code with the library when you compile a program. The functions in a link library are actually copied into every program that uses them. For instance the exit() function used in the C program listed above is not part of any of the libraries that make up the Amiga OS. It comes from the link library supplied with the compiler. The code that performs the exit() function is copied into the program when it is compiled.
+</p>
+<h4><span id="Libraries.2C_Devices_and_Resources"></span><span class="mw-headline" id="Libraries,_Devices_and_Resources">Libraries, Devices and Resources</span></h4>
+<p>Most of the Amiga's OS routines are organized into groups of shared run-time libraries. The Amiga also has specialized function groups called <i>devices</i> and <i>resources</i> that programmers use to perform basic I/O operations or access low-level hardware.
+</p><p>Devices and resources are similar in concept to a shared run-time library. They are managed by <a href="/wiki/Exec" title="Exec">Exec</a> and must be opened before they can be used. Their functions are separate from the programs that use them and are accessed dynamically at run time. Multiple programs can access the device or resource even though only one copy exists in memory (a few resources can only be used by one program at a time.)
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:LibFig1-1a.png" class="mw-file-description"><img src="/w/images/7/79/LibFig1-1a.png" decoding="async" width="732" height="928" class="mw-file-element" /></a><figcaption><b>Figure 1-1: Amiga System Software Hierarchy</b></figcaption></figure>
+<center></center>
+<p>Devices and resources are managed by <a href="/wiki/Exec" title="Exec">Exec</a> just as libraries are. For more information on devices and resources, see the respective sections.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>What Every Amiga Programmer Should Know
+</th></tr>
+<tr>
+<td>The functions in the Amiga OS are accessed through shared run-time libraries. Libraries must be opened before their functions may be used. The system's master library, <a href="/wiki/Exec" title="Exec">Exec</a>, is always open. The <a href="/wiki/Exec" title="Exec">Exec</a> function OpenLibrary() is used to open all other libraries.
+</td></tr></tbody></table>
+<h3><span class="mw-headline" id="Dynamic_memory_architecture">Dynamic memory architecture</span></h3>
+<p>Unlike some microcomputer operating systems, the AmigaOS relies on absolute memory addresses as little as possible. Instead the Amiga OS uses a technique (sometimes referred to as soft machine architecture) which allows system routines and data structures to be positioned anywhere in memory.
+</p><p>Amiga run-time libraries may be positioned anywhere in memory because they are always accessed through a jump table. Each library whether in ROM or loaded from disk has an associated Library structure and jump table in RAM.
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:LibFig1-1b.png" class="mw-file-description"><img src="/w/images/1/18/LibFig1-1b.png" decoding="async" width="542" height="403" class="mw-file-element" /></a><figcaption>Amiga Library Structure and Jump Table</figcaption></figure>
+<p>The system knows where the jump table starts in RAM because when a library is opened for the first time, <a href="/wiki/Exec" title="Exec">Exec</a> creates the library structure and keeps track of its location. The order of the entries in the library's jump table is always preserved between versions of the OS but the functions they point to can be anywhere in memory. Hence, system routines in ROM may be moved from one version of the OS to another. Given the location of the jump table and the appropriate offset into the table, any function can always be found.
+</p><p>Not only are system routines relocatable but system data structures are too. In the Amiga's multitasking environment, multiple applications run at the same time and each may have its own screen, memory, open files, and even its own subtasks. Since any number of application tasks are run and stopped at the user's option, system data structures have to be set up as needed. They cannot be set up ahead of time at a fixed memory location because there is no way to tell how many and what type will be needed.
+</p><p>The Amiga system software manages this confusion by using <i>linked lists</i> of information about items such as libraries, tasks, screens, files and available memory. A linked list is a chain of data items with each data item containing a pointer to the next item in the chain. Given a pointer to the first item in a linked list, pointers to all the other items in the chain can be found.
+</p>
+<h4><span class="mw-headline" id="Exec:_The_System_Executive">Exec: The System Executive</span></h4>
+<p>On the Amiga, the module that keeps track of linked lists is <a href="/wiki/Exec" title="Exec">Exec</a>, the system executive. <a href="/wiki/Exec" title="Exec">Exec</a> is the heart of the Amiga operating system since it also is in charge of multitasking, granting access to system resources (like memory) and managing the Amiga library system.
+</p><p>As previously discussed, memory location 4 ($0000 0004), also known as SysBase, contains a pointer to the <a href="/wiki/Exec" title="Exec">Exec</a> library structure. This is the only absolutely defined location in the Amiga operating system. A program need only know where to find the <a href="/wiki/Exec" title="Exec">Exec</a> library to find, use and manipulate all other system code and data.
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:LibFig1-2.png" class="mw-file-description"><img src="/w/images/e/e4/LibFig1-2.png" decoding="async" width="900" height="632" class="mw-file-element" /></a><figcaption><a href="/wiki/Exec" title="Exec">Exec</a> and the Organization of the Amiga OS</figcaption></figure>
+<p>The diagram above shows how the entire Amiga operating system is built as a tree starting at SysBase. <a href="/wiki/Exec" title="Exec">Exec</a> keeps linked lists of all the system libraries, devices, memory, tasks and other data structures. Each of these in turn can have its own variables and linked lists of data structures built onto it. In this way, the flexibility of the OS is preserved so that upgrades can be made without jeopardizing compatibility.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>What Every Amiga Programmer Should Know
+</th></tr>
+<tr>
+<td>The Amiga has a dynamic memory map. There are no fixed locations for operating system variables and routines. Do not call ROM routines or access system data structures directly. Instead use the indirect access methods provided by the system.
+</td></tr></tbody></table>
+<h3><span class="mw-headline" id="Operating_system_versions">Operating system versions</span></h3>
+<p>The Amiga operating system has undergone several major revisions. The latest revision is Release 4.1 (corresponds to library version 53).
+</p><p>See the table in the <a href="/wiki/Introduction_to_Exec#Libraries_and_Devices" title="Introduction to Exec">Libraries and Devices</a> section for details on which version corresponds to which OS release.
+</p><p>The examples listed throughout this wiki assume you are using Release 4.0 or higher.
+</p><p>Many of the libraries and functions documented in this manual are available in all versions of the Amiga operating system. Others are completely new and cannot be used unless you have successfully opened the appropriate version of the library.
+</p><p>To find out which functions are new, refer to the SDK. The functions which are new are marked with <i>(V50)</i> or <i>(V51)</i> in the NAME line of the function Autodoc. These new functions require you to use the corresponding version number (50, 51, or higher) when opening the library.
+</p><p>Exit gracefully and informatively if the required library version is not available.
+</p>
+<h4><span class="mw-headline" id="About_Release_4">About Release 4</span></h4>
+<p>Release 4 first appeared on the <i>AmigaOne XE</i>. This initial version corresponds to Kickstart 4.0, system library version number V50.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>What Every Amiga Programmer Should Know
+</th></tr>
+<tr>
+<td>Some libraries or specific functions are not available in older versions of the Amiga operating system. Be sure to ask for the lowest library version that meets the requirements of your program.
+</td></tr></tbody></table>
+<h4><span class="mw-headline" id="Two_Kinds_of_Memory">Two Kinds of Memory</span></h4>
+<p>To keep the Classic Amiga running efficiently, the Classic Amiga has two memory buses and two kinds of memory. <i>Chip memory</i> is memory that both the CPU and custom chips can access. <i>Fast memory</i> is memory that only the CPU (and certain expansion cards) can access. Since Chip memory is shared, CPU access may be slowed down if the custom chips are doing heavy-duty processing. CPU access to Fast memory is never slowed down by contention with the custom chips.
+</p><p>The distinction between Chip memory and Fast memory is very important for Classic Amiga programmers to keep in mind because any data accessed directly by the custom chips such as video display data, audio data or sprite data <i>must be in Chip memory</i>.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<td><i>What Every Amiga Programmer Should Know</i>: The Classic Amiga has <i>two</i> kinds of memory: <i>Chip</i> memory and <i>Fast</i> memory. Use the right kind.
+</td></tr></tbody></table>
+<p><b>NOTE</b>
+There is no such thing as <i>Chip</i> memory in any of new PowerPC-based Amiga systems. The two types of memory only applies to the Classic Amiga hardware platforms such as the A1200 and A4000 models.
+</p>
+<h2><span class="mw-headline" id="About_the_Examples">About the Examples</span></h2>
+<p>For the most part, the examples in this book are written in C.
+</p><p>C examples have been compiled using the standard Software Development Kit (SDK) using GCC.
+</p><p>In general, the examples are also compatible with vbcc and other C compilers, however some changes will usually be necessary.
+</p><p>Specifically, all the C examples assume that the automatic Ctrl-C feature of the compiler has been disabled. For SAS C (and Lattice C revisions 4.0 and greater) this is handled with:
+</p>
+<pre>/* Add this before main() to override the default Ctrl-C handling
+ * provided in SAS (Lattice) C.  Ctrl-C event will be ignored */
+
+int CXBRK ( void )   { return(0); }
+int chkabort( void ) { return(0); }
+</pre>
+<p>Other changes may be required depending on the example and the C compiler you are using. Most of the C examples do not require any special options and rely on the defaults provided by the SDK.
+</p><p>Except where noted, each example was linked with the standard newlib startup code which provides the following interfaces: IExec, IDOS and IUtility.
+</p>
+<h2><span class="mw-headline" id="General_Amiga_Development_Guidelines">General Amiga Development Guidelines</span></h2>
+<p>This sections presents specific guidelines that all Amiga programmers must follow. Some of these guidelines are for advanced programmers.
+</p>
+<ul><li>Check for memory loss. Arrange your Workbench screen so that you have a Shell available and can start your program without rearranging any windows. In the Shell window type Avail flush several times (the flush option requires the Release 2 version of the Avail command). Note the total amount of free memory. Run your program (do not rearrange any windows other than those created by the program) and then exit. At the Shell, type Avail flush several times again. Compare the total amount of free memory with the earlier figure. They should be the same. Any difference indicates that your application is not freeing some memory it used or is not closing a disk-loaded library, device or font it opened. Note that under Release 2, a small amount of memory loss is normal if your application is the first to use the audio or narrator device.</li></ul>
+<ul><li>Use all of the program debugging and stress tools that are available when writing and testing your code. New debugging tools such as Enforcer, MungWall, and Scratch can help find uninitialized pointers, attempted use of freed memory and misuse of scratch registers or condition codes (even in programs that appear to work perfectly).</li></ul>
+<ul><li>Always make sure you actually get any system resource that you ask for. This applies to memory, windows, screens, file handles, libraries, devices, ports, etc. Where an error value or return is possible, ensure that there is a reasonable failure path. Many poorly written programs will appear to be reliable, until some error condition (such as memory full or a disk problem) causes the program to continue with an invalid or null pointer, or branch to untested error handling code.</li></ul>
+<ul><li>Always clean up after yourself. This applies for both normal program exit and program termination due to error conditions. Anything that was opened must be closed, anything allocated must be deallocated. It is generally correct to do closes and deallocations in reverse order of the opens and allocations. Be sure to check your development language manual and startup code; some items may be closed or deallocated automatically for you, especially in abort conditions. If you write in the C language, make sure your code handles Ctrl-C properly.</li></ul>
+<ul><li>Remember that memory, peripheral configurations, and ROMs differ between models and between individual systems. Do not make assumptions about memory address ranges, storage device names, or the locations of system structures or code. Never call ROM routines directly. Beware of any example code you find that calls routines at addresses in the $F00000 $FFFFFF range. These are ROM routines and they will move with every OS release. The only supported interface to system ROM code is through the library, device, and resource calls.</li></ul>
+<ul><li>Never assume library bases or structures will exist at any particular memory location. The only absolute address in the system is $00000004, which contains a pointer to the Exec library base. Do not modify or depend on the format of private system structures. This includes the poking of copper lists, memory lists, and library bases.</li></ul>
+<ul><li>Never assume that programs can access hardware resources directly. Most hardware is controlled by system software that will not respond well to interference from other programs. Shared hardware requires programs to use the proper sharing protocols. Use the defined interface; it is the best way to ensure that your software will continue to operate on future models of the Amiga.</li></ul>
+<ul><li>Never access shared data structures directly without the proper mutual exclusion (locking). Remember that other tasks may be accessing the same structures.</li></ul>
+<ul><li>The system does not monitor the size of a program's stack. (Your compiler may have an option to do this for you.) Take care that your program does not cause stack overflow and provide extra stack space for the possibility that some functions may use up additional stack space in future versions of the OS.</li></ul>
+<ul><li>Never use a polling loop to test signal bits. If your program waits for external events like menu selection or keystrokes, do not bog down the multitasking system by busy-waiting in a loop. Instead, let your task go to sleep by <i>Wait()</i>ing on its signal bits. For example:</li></ul>
+<pre> signals = (ULONG)Wait(  (1&lt;&lt;windowPtr-&gt;UserPort-&gt;mp_SigBit) |
+                         (1&lt;&lt;consoleMsgPortPtr-&gt;mp_SigBit)  );
+</pre>
+<ul><li>This turns the signal bit number for each port into a mask, then combines them as the argument for the Exec library Wait() function. When your task wakes up, handle all of the messages at each port where the mp_SigBit is set. There may be more than one message per port, or no messages at the port. Make sure that you ReplyMsg() to all messages that are not replies themselves. If you have no signal bits to Wait() on, use Delay() or WaitTOF() to provide a measured delay.</li></ul>
+<ul><li>Tasks (and processes) execute in <i>680x0</i> user mode. Supervisor mode is reserved for interrupts, traps, and task dispatching. Take extreme care if your code executes in supervisor mode. Exceptions while in supervisor mode are deadly.</li></ul>
+<ul><li>Most system functions require a particular execution environment. All DOS functions and any functions that might call DOS (such as the opening of a disk-resident library, font, or device) can only be executed from a process. A task is not sufficient. Most other kernel functions may be executed from tasks. Only a few may be executed from interrupts.</li></ul>
+<ul><li>Never disable interrupts or multitasking for long periods. If you use Forbid() or Disable(), you should be aware that execution of any system function that performs the Wait() function will temporarily suspend the Forbid() or Disable() state, and allow multitasking and interrupts to occur. Such functions include almost all forms of DOS and device I/O, including common <i>stdio</i> functions like printf().</li></ul>
+<ul><li>Never tie up system resources unless it is absolutely necessary. For example, if your program does not require constant use of the printer, open the printer device only when you need it. This will allow other tasks to use the printer while your program is running. You must provide a reasonable error response if a resource is not available when you need it.</li></ul>
+<ul><li>All data for the custom chips must reside in Chip memory (type MEMF_CHIP). This includes bitplanes, sound samples, trackdisk buffers, and images for sprites, bobs, pointers, and gadgets. The AllocMem() call takes a flag for specifying the type of memory. A program that specifies the wrong type of memory may appear to run correctly because many Amigas have only Chip memory. (On all models of the Amiga, the first 512K of memory is Chip memory. In later models, Chip memory may occupy up to the first one or two megabytes).</li></ul>
+<ul><li>However, once expansion memory has been added to an Amiga (type MEMF_FAST), any memory allocations will be made in the expansion memory area by default. Hence, a program can run correctly on an unexpanded Amiga which has only Chip memory while crashing on an Amiga which has expanded memory. A developer with only Chip memory may fail to notice that memory was incorrectly specified.</li></ul>
+<ul><li>Most compilers have options to mark specific data structures or object modules so that they will load into Chip RAM. Some older compilers provide the Atom utility for marking object modules. If this method is unacceptable, use the AllocMem() call to dynamically allocate Chip memory, and copy your data there.</li></ul>
+<ul><li>When making allocations that do not require Chip memory, do not explicitly ask for Fast memory. Instead ask for memory type MEMF_PUBLIC or 0L as appropriate. If Fast memory is available, you will get it.</li></ul>
+<ul><li>Never use software delay loops! Under the multitasking operating system, the time spent in a loop can be better used by other tasks. Even ignoring the effect it has on multitasking, timing loops are inaccurate and will wait different amounts of time depending on the specific model of Amiga computer. The timer device provides precision timing for use under the multitasking system and it works the same on all models of the Amiga. The AmigaDOS Delay() function or the graphics library WaitTOF() function provide a simple interface for longer delays. The <i>8520</i> I/O chips provide timers for developers who are bypassing the operating system (see the <i>Amiga Hardware Reference Manual</i> for more information).</li></ul>
+<p>Always obey structure conventions!
+</p>
+<ul><li>All non-byte fields must be word-aligned. Longwords should be longword-aligned for performance.</li></ul>
+<ul><li>All address pointers should be 32 bits (not 24 bits). Never use the upper byte for data.</li></ul>
+<ul><li>Fields that are not defined to contain particular initial values must be initialized to zero. This includes pointer fields.</li></ul>
+<ul><li>All reserved or unused fields must be initialized to zero for future compatibility.</li></ul>
+<ul><li>Data structures to be accessed by the custom chips, public data structures (such as a task control block), and structures which must be longword aligned must <b>not</b> be allocated on a program's stack.</li></ul>
+<ul><li>Dynamic allocation of structures with AllocMem() provides longword aligned memory of a specified type with optional initialization to zero, which is useful in the allocation of structures.</li></ul>
+<h3><span class="mw-headline" id="Hardware_programming_guidelines">Hardware programming guidelines</span></h3>
+<p>If you find it necessary to program the hardware directly, then it is your responsibility to write code that will work correctly on the various models and configurations of the Amiga. Be sure to properly request and gain control of the hardware resources you are manipulating, and be especially careful in the following areas:
+</p>
+<ul><li>Kickstart 2.0 uses the <i>8520</i> Complex Interface Adaptor (CIA) chips differently than 1.3 did. To ensure compatibility, you must always ask for CIA access using the cia.resource AddICRVector() and RemICRVector() functions. Do not make assumptions about what the system might be using the CIA chips for. If you write directly to the CIA chip registers, do not expect system services such as the trackdisk device to function. If you are leaving the system up, do not read or write to the CIA Interrupt Control Registers directly; use the cia.resource AbleICR(), and SetICR() functions. Even if you are taking over the machine, do not assume the initial contents of any of the CIA registers or the state of any enabled interrupts.</li></ul>
+<ul><li>All custom chip registers are Read-only or Write-only. Do not read Write-only registers, and do not write to Read-only registers.</li></ul>
+<ul><li>Never write data to, or interpret data from the unused bits or addresses in the custom chip space. To be software-compatible with future chip revisions, all undefined bits must be set to zeros on writes, and must be masked out on reads before interpreting the contents of the register.</li></ul>
+<ul><li>Never write past the current end of custom chip space. Custom chips may be extended or enhanced to provide additional registers, or to use bits that are currently undefined in existing registers.</li></ul>
+<ul><li>Never read, write, or use any currently undefined address ranges or registers. The current and future usage of such areas is reserved by the AmigaOS development team and is subject to change.</li></ul>
+<ul><li>Never assume that a hardware register will be initialized to any particular value. Different versions of the OS may leave registers set to different values. Check the <i>Amiga Hardware Reference Manual</i> to ensure that you are setting up all the registers that affect your code.</li></ul>
+<h3><span class="mw-headline" id="AmigaOS_Interface_Style_Guide">AmigaOS Interface Style Guide</span></h3>
+<p>In order to make all programs in AmigaOS look consistent, AmigaOS provides some default thumbnails that developers must use in their GUI. These pictures are located in the <b>tbimages:</b> assign. They are installed in any AmigaOS installation.
+Note that something may still go wrong and these pictures may not be found. In this case, the program must provide a fallback method instead of just failing. The developer can choose to display text-only toolbars or include default pictures with their program.
+</p><p>While the look of windows and gadgets can be changed by the user, the default look is similar to this: 
+</p><p><span class="mw-default-size" typeof="mw:File"><a href="/wiki/File:About.png" class="mw-file-description"><img src="/w/images/7/7c/About.png" decoding="async" width="321" height="188" class="mw-file-element" /></a></span>
+</p>
+<h2><span class="mw-headline" id="Error_Reports">Error Reports</span></h2>
+<p>All corrections and bug report should be made by posting a new topic at AmigaOS' support forum. The support forum is located at <a rel="nofollow" class="external free" href="http://support.amigaos.net">http://support.amigaos.net</a>
+</p>
+<!-- 
+NewPP limit report
+Cached time: 20260114023105
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.051 seconds
+Real time usage: 0.305 seconds
+Preprocessor visited node count: 134/1000000
+Post‐expand include size: 1683/2097152 bytes
+Template argument size: 1232/2097152 bytes
+Highest expansion depth: 3/100
+Expensive parser function count: 2/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 10104/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%  261.458      1 -total
+  0.24%    0.639      4 Template:Note
+  0.21%    0.552      1 Template:NeedUpdate
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:10-0!canonical and timestamp 20260114023105 and revision id 12449. Rendering was triggered because: page-view
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=Programming_in_the_Amiga_Environment&amp;oldid=12449">http://wiki.amigaos.net/w/index.php?title=Programming_in_the_Amiga_Environment&amp;oldid=12449</a>"</div></div>
+		<div id="catlinks" class="catlinks" data-mw="interface"><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="/wiki/Special:Categories" title="Special:Categories">Category</a>: <ul><li><a href="/wiki/Category:Need_Update" title="Category:Need Update">Need Update</a></li></ul></div></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Programming+in+the+Amiga+Environment" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-main" class="selected mw-list-item"><a href="/wiki/Programming_in_the_Amiga_Environment" title="View the content page [c]" accesskey="c"><span>Page</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=Talk:Programming_in_the_Amiga_Environment&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/Programming_in_the_Amiga_Environment"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=Programming_in_the_Amiga_Environment&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=Programming_in_the_Amiga_Environment&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/Programming_in_the_Amiga_Environment" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/Programming_in_the_Amiga_Environment" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=Programming_in_the_Amiga_Environment&amp;oldid=12449" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=Programming_in_the_Amiga_Environment&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=Programming+in+the+Amiga+Environment"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=Programming+in+the+Amiga+Environment&amp;oldid=12449&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=Programming_in_the_Amiga_Environment&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 26 January 2025, at 19:09.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":447,"wgPageParseReport":{"limitreport":{"cputime":"0.051","walltime":"0.305","ppvisitednodes":{"value":134,"limit":1000000},"postexpandincludesize":{"value":1683,"limit":2097152},"templateargumentsize":{"value":1232,"limit":2097152},"expansiondepth":{"value":3,"limit":100},"expensivefunctioncount":{"value":2,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":10104,"limit":5000000},"timingprofile":["100.00%  261.458      1 -total","  0.24%    0.639      4 Template:Note","  0.21%    0.552      1 Template:NeedUpdate"]},"cachereport":{"timestamp":"20260114023105","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>

@@ -1,0 +1,1147 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Migration Guide - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_4h3TbDv_vcRQHuo8YgAAAAo","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Migration_Guide","wgTitle":"Migration Guide","wgCurRevisionId":12437,"wgRevisionId":12437,"wgArticleId":196,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],
+"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Migration_Guide","wgRelevantArticleId":196,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","ext.pygments":"ready","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["ext.pygments.view","site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%2Cpygments%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-Migration_Guide rootpage-Migration_Guide skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">Migration Guide</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/SDK_Release_Notes" title="SDK Release Notes">SDK Release Notes</a> &gt; <a href="/wiki/SDK_FAQ" title="SDK FAQ">SDK FAQ</a> &gt; <a href="/wiki/SDK_Developer_Tools" title="SDK Developer Tools">SDK Developer Tools</a> &gt; <a href="/wiki/Coding_Guidelines" title="Coding Guidelines">Coding Guidelines</a> &gt; <a href="/wiki/Migration_Guide" title="Migration Guide">Migration Guide</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Introduction"><span class="tocnumber">1</span> <span class="toctext">Introduction</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Source_Code_Level"><span class="tocnumber">2</span> <span class="toctext">Source Code Level</span></a>
+<ul>
+<li class="toclevel-2 tocsection-3"><a href="#Include_Files"><span class="tocnumber">2.1</span> <span class="toctext">Include Files</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="#Library_Bases_and_Interface_Pointers"><span class="tocnumber">2.2</span> <span class="toctext">Library Bases and Interface Pointers</span></a></li>
+<li class="toclevel-2 tocsection-5"><a href="#Type_Consistency"><span class="tocnumber">2.3</span> <span class="toctext">Type Consistency</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-6"><a href="#Programming_Considerations"><span class="tocnumber">3</span> <span class="toctext">Programming Considerations</span></a>
+<ul>
+<li class="toclevel-2 tocsection-7"><a href="#Library_Initialization_using_libauto"><span class="tocnumber">3.1</span> <span class="toctext">Library Initialization using libauto</span></a></li>
+<li class="toclevel-2 tocsection-8"><a href="#Manual_Library_Initialization"><span class="tocnumber">3.2</span> <span class="toctext">Manual Library Initialization</span></a></li>
+<li class="toclevel-2 tocsection-9"><a href="#Opening_Devices"><span class="tocnumber">3.3</span> <span class="toctext">Opening Devices</span></a></li>
+<li class="toclevel-2 tocsection-10"><a href="#Calling_Library_Functions"><span class="tocnumber">3.4</span> <span class="toctext">Calling Library Functions</span></a></li>
+<li class="toclevel-2 tocsection-11"><a href="#Interface_Basics"><span class="tocnumber">3.5</span> <span class="toctext">Interface Basics</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-12"><a href="#Calling_68K_Functions"><span class="tocnumber">4</span> <span class="toctext">Calling 68K Functions</span></a>
+<ul>
+<li class="toclevel-2 tocsection-13"><a href="#68k_Library_Entries"><span class="tocnumber">4.1</span> <span class="toctext">68k Library Entries</span></a></li>
+<li class="toclevel-2 tocsection-14"><a href="#68k_Hook_Functions"><span class="tocnumber">4.2</span> <span class="toctext">68k Hook Functions</span></a></li>
+<li class="toclevel-2 tocsection-15"><a href="#68k_Interrupts"><span class="tocnumber">4.3</span> <span class="toctext">68k Interrupts</span></a></li>
+<li class="toclevel-2 tocsection-16"><a href="#Calling_The_Emulator_Directly"><span class="tocnumber">4.4</span> <span class="toctext">Calling The Emulator Directly</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-17"><a href="#Other_Programming_Considerations"><span class="tocnumber">5</span> <span class="toctext">Other Programming Considerations</span></a>
+<ul>
+<li class="toclevel-2 tocsection-18"><a href="#General_Hook_Functions"><span class="tocnumber">5.1</span> <span class="toctext">General Hook Functions</span></a></li>
+<li class="toclevel-2 tocsection-19"><a href="#Varargs"><span class="tocnumber">5.2</span> <span class="toctext">Varargs</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-20"><a href="#Memory"><span class="tocnumber">6</span> <span class="toctext">Memory</span></a>
+<ul>
+<li class="toclevel-2 tocsection-21"><a href="#The_MEMF_PUBLIC_flag"><span class="tocnumber">6.1</span> <span class="toctext">The MEMF_PUBLIC flag</span></a></li>
+<li class="toclevel-2 tocsection-22"><a href="#Visible_Changes_in_the_Memory_Subsystem"><span class="tocnumber">6.2</span> <span class="toctext">Visible Changes in the Memory Subsystem</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-23"><a href="#Known_Incompatibilities"><span class="tocnumber">7</span> <span class="toctext">Known Incompatibilities</span></a></li>
+<li class="toclevel-1 tocsection-24"><a href="#libauto_Libraries"><span class="tocnumber">8</span> <span class="toctext">libauto Libraries</span></a></li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="Introduction">Introduction</span></h2>
+<p>In spite of being largely compatible with the classic API, there are a few rules that a programmer should be aware of when porting programs from the 68k-based AmigaOS 3.x to the new PowerPC-based AmigaOS 4. This document tries to outline the process and also point to a few potential traps and issues.
+</p>
+<h2><span class="mw-headline" id="Source_Code_Level">Source Code Level</span></h2>
+<h4><span class="mw-headline" id="Include_Files">Include Files</span></h4>
+<p>Include files used to be a problematic issue under OS 3.x because there where a lot of different compilers, and most of them tended to use their own naming scheme and glue to bind to the operating system. The well-known SAS/C and StormC compiler systems used #pragma's for this purpose while gcc used inline functions or #define directives. AmigaOS 4 at the moment supports two compiler systems (GNU GCC and the vbcc package) and both use the same scheme for include files.
+</p><p>To use a library under AmigaOS 4, you simply include its proto file, in addition to any other file that may be required. For example, to use Intuition Windows and Screens, you would add the following to your program:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;intuition/intuition.h&gt;</span>
+<span class="linenos" data-line="2"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;intuition/screens.h&gt;</span>
+<span class="linenos" data-line="3"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;proto/intuition.h&gt;</span>
+</pre></div>
+<p>The proto file includes the required headers, which might depend on the compiler you are using. Just including the proto file will ensure maximum compatibility between different compilers.
+</p><p>A few preprocessor symbols influence the way that the system bindings are included. Table 1 summarizes these symbols. They are typically defined in a Makefile, although they may as well be put into #define directives. Don't worry if you don't understand everything in that table; things will become clearer further down this document.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Symbol
+</th>
+<th>Meaning
+</th></tr>
+<tr>
+<td>__USE_INLINE__
+</td>
+<td>This symbol makes the protofile include an inline4 file as well. An inline4 file contains preprocessor macros for functions that resemble the classic way of calling system functions (i.e. functions as opposed to methods). Primarily intended for backward compatibility with older source code, or general compatibility.
+</td></tr>
+<tr>
+<td>__NOLIBBASE__
+</td>
+<td>Inhibits the definition of the library base associated with the proto file. Usually a proto file declares an extern symbol for the library base.
+</td></tr>
+<tr>
+<td>__USE_BASETYPE__
+</td>
+<td>If __NOLIBBASE__ is not defined, this symbol specifies whether the library base is declared with its "real" type (for example struct IntuitionBase for Intuition) or with the abstract base type for the class of resource (struct Library or struct Device). Only library implementors should use this symbol; normally, all library base structures are private and should not be examined. The default behavior is to declare all library bases as struct Library and all device bases as struct Device.
+</td></tr>
+<tr>
+<td>__NOGLOBALIFACE__
+</td>
+<td>Proto files for libraries that declare static global interfaces (like all "classic" libraries) normally also declare the interface pointer inside their proto file, unless this symbol is defined. Normally, you would only use this if you want to store the interface pointer elsewhere, for example in a library base.
+</td></tr></tbody></table>
+<p>Table 1: Preprocessor symbols that control the proto file
+</p><p>Speaking of preprocessor symbols, the compiler defines a preprocessor symbol when targeting AmigaOS 4.x: __amigaos4__ and you can use this symbol for optional compilation of code.
+</p>
+<h4><span class="mw-headline" id="Library_Bases_and_Interface_Pointers">Library Bases and Interface Pointers</span></h4>
+<p>Library bases should not normally be declared inside a source file. The proto file usually declares the required library base itself. If you want to do it anyway, you should define the preprocessor symbol __NOLIBBASE__ to prevent the proto file from doing it.
+</p><p>Contrary to the old system, AmigaOS 4 has a slightly different way of calling library functions. The old system used to call a library function by making a relative jump into a jump table located directly in front of the library base. AmigaOS 4 keeps these jump tables for backwards compatibility only - only 68k functions are still called this way. The new OS now keeps jump tables in a separate pointer called the "Interface Pointer", or short "interface". Basically an interface is a structure with a bit of housekeeping information and a lot of inline function pointers. A library may export more than one interface pointer (it usually exports at least two).
+</p><p>Almost all libraries export an interface by the name of "main". The exact type of this interface depends on the library. For example, exec.library will export a main interface of type "struct ExecIFace *" (Note that it would theoretically be possible for another library to export an interface of type "struct ExecIFace *").
+</p><p>Like the library bases formerly used to call library functions, by convention a global variable is used to make the ExecIFace pointer available to all functions in your program. The name of that variable is constructed by prepending the library base name ("Exec" in this example) with a capital I. Thus, the global struct ExecIFace * would be called IExec. Note that this is simply a convention introduced by the proto files. You do not need to even use a global interface pointer, as much as you don't need to use a global library pointer (neither now in AmigaOS 4, nor in AmigaOS 3.9 or earlier).
+</p>
+<h4><span class="mw-headline" id="Type_Consistency">Type Consistency</span></h4>
+<p>The PowerPC architectural manual frequently uses the word "word" to signify a 32 bit quantity. However in classic AmigaOS, the types WORD and UWORD meant a 16 bit signed and unsigned quantity. Likewise, an 8 bit quantity used to be called BYTE or UBYTE and 32 bit "words" where called LONG and ULONG. No 64 bit quantity existed. To clean up the naming of base types, these types have all been deprecated for AmigaOS 4. The new types are consistently called int or uint followed by the number of bits, for example uint32 signifies a 32 bit unsigned quantity. Likewise, the typing has been extended to include a 64 bit quantity. Table 2 lists the new types and the "classic" types they replace. Note that the old types are still available through preprocessor defines, but should not be used anymore in new code.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>New Type
+</th>
+<th>Old Type
+</th>
+<th>Significance
+</th></tr>
+<tr>
+<td>int8
+</td>
+<td>BYTE
+</td>
+<td>8 bit signed
+</td></tr>
+<tr>
+<td>uint8
+</td>
+<td>UBYTE
+</td>
+<td>8 bit unsigned integer
+</td></tr>
+<tr>
+<td>int16
+</td>
+<td>WORD
+</td>
+<td>16 bit signed
+</td></tr>
+<tr>
+<td>uint16
+</td>
+<td>UWORD
+</td>
+<td>16 bit unsigned integer
+</td></tr>
+<tr>
+<td>int32
+</td>
+<td>LONG
+</td>
+<td>32 bit signed
+</td></tr>
+<tr>
+<td>uint32
+</td>
+<td>ULONG
+</td>
+<td>32 bit unsigned integer
+</td></tr>
+<tr>
+<td>int64
+</td>
+<td>None existed
+</td>
+<td>64 bit signed
+</td></tr>
+<tr>
+<td>uint64
+</td>
+<td>None existed
+</td>
+<td>64 bit unsigned integer
+</td></tr>
+<tr>
+<td>float32
+</td>
+<td>FLOAT
+</td>
+<td>32 bit single-precision floating point number
+</td></tr>
+<tr>
+<td>float64
+</td>
+<td>DOUBLE
+</td>
+<td>64 bit double-precision floating point number
+</td></tr></tbody></table>
+<p>Table 2: New Base Types
+</p>
+<h2><span class="mw-headline" id="Programming_Considerations">Programming Considerations</span></h2>
+<h4><span class="mw-headline" id="Library_Initialization_using_libauto">Library Initialization using libauto</span></h4>
+<p>System libraries may be opened automatically using the libauto link library. libauto can automatically open a number of system libraries (see <a href="#libauto_Libraries">libauto Libraries</a> for a list of these libraries) and also set up their interface pointers. If you include the proto file in your program and link with libauto, the appropriate library will be all set up. For example, including &lt;proto/intuition.h&gt; will set up IntuitionBase and IIntuition automatically so that they are all set up when your program enters the main() function. The following example program opens a simple window, waits a bit then closes it again:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;proto/exec.h&gt;</span>
+<span class="linenos" data-line="2"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;proto/dos.h&gt;</span>
+<span class="linenos" data-line="3"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;proto/intuition.h&gt;</span>
+<span class="linenos" data-line="4"></span>
+<span class="linenos" data-line="5"></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="linenos" data-line="6"></span><span class="p">{</span>
+<span class="linenos" data-line="7"></span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">Window</span><span class="w"> </span><span class="o">*</span><span class="n">win</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IIntuition</span><span class="o">-&gt;</span><span class="n">OpenWindowTags</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span>
+<span class="linenos" data-line="8"></span><span class="w">  </span><span class="n">WA_Title</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Example Window&quot;</span><span class="p">,</span>
+<span class="linenos" data-line="9"></span><span class="w">  </span><span class="n">WA_Width</span><span class="p">,</span><span class="w"> </span><span class="mi">640</span><span class="p">,</span>
+<span class="linenos" data-line="10"></span><span class="w">  </span><span class="n">WA_Height</span><span class="p">,</span><span class="w"> </span><span class="mi">480</span><span class="p">,</span>
+<span class="linenos" data-line="11"></span><span class="w">  </span><span class="n">TAG_END</span><span class="p">);</span>
+<span class="linenos" data-line="12"></span>
+<span class="linenos" data-line="13"></span><span class="w"> </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Delay</span><span class="p">(</span><span class="mi">150</span><span class="p">);</span>
+<span class="linenos" data-line="14"></span>
+<span class="linenos" data-line="15"></span><span class="w"> </span><span class="n">IIntuition</span><span class="o">-&gt;</span><span class="n">CloseWindow</span><span class="p">(</span><span class="n">win</span><span class="p">);</span>
+<span class="linenos" data-line="16"></span>
+<span class="linenos" data-line="17"></span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos" data-line="18"></span><span class="p">}</span>
+</pre></div>
+<p>For the time being, ignore the way that functions are written (IIntuition-&gt;OpenWindowTags as opposed to a simple OpenWindowTags, we'll cover that later).
+</p><p>Save this program as windowtest.c and compile it with:
+</p>
+<pre>gcc -o windowtest windowtest.c -lauto
+</pre>
+<h4><span class="mw-headline" id="Manual_Library_Initialization">Manual Library Initialization</span></h4>
+<p>Libraries can also be initialized by hand. As with the old system, the function to do this is exec.library's OpenLibrary function. However, as we have hinted above, the library base is not the only requirement for using a library - you need to retrieve the interface pointer (or rather, all interface pointers you need) from the library to make use of it. On the classic system, opening for example intuition.library looked like this:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">IntuitionBase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IntuitionBase</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">OpenLibrary</span><span class="p">(</span><span class="s">&quot;intuition.library&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">36</span><span class="p">);</span>
+<span class="linenos" data-line="2"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IntuitionBase</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="n">PanicExit</span><span class="p">(</span><span class="s">&quot;Cannot open intuition library&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="3"></span>
+<span class="linenos" data-line="4"></span><span class="c1">// ...</span>
+<span class="linenos" data-line="5"></span><span class="k">struct</span><span class="w"> </span><span class="nc">Window</span><span class="w"> </span><span class="o">*</span><span class="n">win</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenWindowTags</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+<span class="linenos" data-line="6"></span><span class="c1">// ...</span>
+<span class="linenos" data-line="7"></span>
+<span class="linenos" data-line="8"></span><span class="n">CloseWindow</span><span class="p">(</span><span class="n">win</span><span class="p">);</span>
+</pre></div>
+<p>Under AmigaOS 4, this will look like this:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">IntuitionBase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">OpenLibrary</span><span class="p">(</span><span class="s">&quot;intuition.library&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">);</span>
+<span class="linenos" data-line="2"></span><span class="n">IIntuition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IntuitionIFace</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">GetInterface</span><span class="p">(</span>
+<span class="linenos" data-line="3"></span><span class="w"> </span><span class="n">IntuitionBase</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+<span class="linenos" data-line="4"></span>
+<span class="linenos" data-line="5"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IIntuition</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="linenos" data-line="6"></span><span class="w"> </span><span class="n">PanicExit</span><span class="p">(</span><span class="s">&quot;Cannot obtain main interface from Intuition&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="7"></span><span class="p">}</span>
+<span class="linenos" data-line="8"></span>
+<span class="linenos" data-line="9"></span><span class="c1">// ...</span>
+<span class="linenos" data-line="10"></span><span class="k">struct</span><span class="w"> </span><span class="nc">Window</span><span class="w"> </span><span class="o">*</span><span class="n">win</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IIntuition</span><span class="o">-&gt;</span><span class="n">OpenWindowTags</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+<span class="linenos" data-line="11"></span><span class="c1">// ...</span>
+<span class="linenos" data-line="12"></span>
+<span class="linenos" data-line="13"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DropInterface</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">Interface</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">IIntuition</span><span class="p">);</span>
+<span class="linenos" data-line="14"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">CloseLibrary</span><span class="p">(</span><span class="n">IntuitionBase</span><span class="p">);</span>
+</pre></div>
+<p>Changed passes have been marked in bold. As you can see, there are some obvious changes:
+</p>
+<ol><li>All functions are prefixed by either IExec-&gt; or IIntuition-&gt;.</li>
+<li>An additional variable, IIntuition is initialized.</li>
+<li>IntuitionBase is now a struct Library and no longer needs a typecast.</li></ol>
+<p>The new variable is called the "interface pointer". Note that when you call GetInterface, you need to pass in the library base from which you want to retrieve the interface pointer, its name ("main" in this case, as in almost all classic libraries) and a version number (1 is the base version). The last parameter is a pointer to a tag list; for defined tag items please consult the autodoc.
+</p><p>The interface pointer is needed to actually call the functions of a library (remember that the "original" jump table only contains 68k pointers). Thus, to call an Intuition function, you write "IIntution-&gt;OpenWindowTags" instead of a simple "OpenWindowTags". Note that there are ways around this; as we said in the introduction, using the preprocessor symbol __USE_INLINE__ will automatically include a file that contains a macro definition of the following type:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cp">#define OpenWindowTags(...) \</span>
+<span class="linenos" data-line="2"></span><span class="cp"> IIntuition-&gt;OpenWindowTags(__VA_ARGS__)</span>
+</pre></div>
+<p>This will both ensure compatibility with old source code, as well as allowing you to maintain different versions of your software.
+</p>
+<h4><span class="mw-headline" id="Opening_Devices">Opening Devices</span></h4>
+<p>Opening a device also works largely the same as under OS 3.x. If a device doesn't export its own function table, like serial device, then there is no additional step required. If, on the other hand, the device does export its own function table, you need to retrieve the interface pointer just as you would retrieve the interface pointer from a library. For example, timer device is usually opened like this (error checking removed for clarity):
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="k">struct</span><span class="w"> </span><span class="nc">MsgPort</span><span class="w"> </span><span class="o">*</span><span class="n">TimerMP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AllocSysObject</span><span class="p">(</span><span class="n">ASOT_PORT</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+<span class="linenos" data-line="2"></span>
+<span class="linenos" data-line="3"></span><span class="k">struct</span><span class="w"> </span><span class="nc">TimeRequest</span><span class="w"> </span><span class="o">*</span><span class="n">TimerIO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AllocSysObjectTags</span><span class="p">(</span><span class="n">AOST_IOREQUEST</span><span class="p">,</span>
+<span class="linenos" data-line="4"></span><span class="w"> </span><span class="n">ASOIOR_Size</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">TimeRequest</span><span class="p">),</span>
+<span class="linenos" data-line="5"></span><span class="w"> </span><span class="n">ASOIOR_ReplyPort</span><span class="p">,</span><span class="w"> </span><span class="n">TimerMP</span><span class="p">,</span>
+<span class="linenos" data-line="6"></span><span class="w"> </span><span class="n">TAG_END</span><span class="p">);</span>
+<span class="linenos" data-line="7"></span>
+<span class="linenos" data-line="8"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">OpenDevice</span><span class="p">(</span><span class="n">TIMERNAME</span><span class="p">,</span><span class="w"> </span><span class="n">UNIT_MICROHZ</span><span class="p">,</span><span class="w"> </span><span class="n">TimerIO</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="linenos" data-line="9"></span>
+<span class="linenos" data-line="10"></span><span class="k">struct</span><span class="w"> </span><span class="nc">Library</span><span class="w"> </span><span class="o">*</span><span class="n">TimerBase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">Library</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">TimerIO</span><span class="o">-&gt;</span><span class="n">tr_node</span><span class="p">.</span><span class="n">io_Device</span><span class="p">;</span>
+<span class="linenos" data-line="11"></span>
+<span class="linenos" data-line="12"></span><span class="k">struct</span><span class="w"> </span><span class="nc">TimerIFace</span><span class="w"> </span><span class="o">*</span><span class="n">ITimer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">TimerIFace</span><span class="w"> </span><span class="o">*</span><span class="p">)</span>
+<span class="linenos" data-line="13"></span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">GetInterface</span><span class="p">(</span><span class="n">TimerBase</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+<span class="linenos" data-line="14"></span>
+<span class="linenos" data-line="15"></span><span class="n">ITimer</span><span class="o">-&gt;</span><span class="n">GetSysTime</span><span class="p">(</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="n">tv</span><span class="p">);</span>
+<span class="linenos" data-line="16"></span>
+<span class="linenos" data-line="17"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">CheckIO</span><span class="p">(</span><span class="n">TimerIO</span><span class="p">))</span>
+<span class="linenos" data-line="18"></span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AbortIO</span><span class="p">(</span><span class="n">TimerIO</span><span class="p">);</span>
+<span class="linenos" data-line="19"></span>
+<span class="linenos" data-line="20"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">WaitIO</span><span class="p">(</span><span class="n">TimerIO</span><span class="p">);</span>
+<span class="linenos" data-line="21"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DropInterface</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">Interface</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">ITimer</span><span class="p">);</span>
+<span class="linenos" data-line="22"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">CloseDevice</span><span class="p">(</span><span class="n">TimerIO</span><span class="p">);</span>
+<span class="linenos" data-line="23"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">FreeSysObject</span><span class="p">(</span><span class="n">ASOT_IOREQUEST</span><span class="p">,</span><span class="w"> </span><span class="n">TimerIO</span><span class="p">);</span>
+<span class="linenos" data-line="24"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">FreeSysObject</span><span class="p">(</span><span class="n">ASOT_PORT</span><span class="p">,</span><span class="w"> </span><span class="n">TimerMP</span><span class="p">);</span>
+</pre></div>
+<p>As you can see, except for the initialization of the interface pointer, everything is the same. The AllocSysObject functions at the top are new to Exec V50, and fulfill the same function as AllocDosObject in DOS. Consult the autodoc for more info. Also note the timer.device structures have been renamed.
+</p>
+<h4><span class="mw-headline" id="Calling_Library_Functions">Calling Library Functions</span></h4>
+<p>We've basically covered this before already, but we'll review it here for completeness. A libraries interface pointer can be used to call the libraries functions. Thus, if you want to call an Exec function, you need to explicitly call the "method" from the interface.
+</p><p>You might wonder why we chose this path instead of simply providing stub functions. Well, for one thing if you do not like this kind of calling mechanism, you can completely isolate yourself from it by using the inline4 macro files. These "simulate" the use of "normal" functions, however, they come with the same issues as the preprocessor based inlines of the classic gcc, namely that - as preprocessor macros - they aren't aware of name spaces and scopes, and are blindly replaced on a textual basis. Thus, if you have for example a C++ class list that contains a member function AddHead, the preprocessor will most likely complain that you used a macro with the wrong number of arguments.
+</p><p>Likewise, it means that the name of a function needs to be unique across the whole system. The result are longer function names with redundant naming.
+</p><p>Finally, the interfaces allow for other things. For example, expansion library uses interfaces in a sort of object-oriented way - every PCI device on the bus is represented by a separate interface. That means that instead of repeating the PCI bus, device and function ID's as parameters every time, you can write something like:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MyDevice</span><span class="o">-&gt;</span><span class="n">ReadConfigByte</span><span class="p">(</span><span class="n">PCI_INTERRUPT_LINE</span><span class="p">);</span>
+<span class="linenos" data-line="2"></span><span class="n">MyDevice</span><span class="o">-&gt;</span><span class="n">WriteConfigByte</span><span class="p">(</span><span class="n">PCI_INTERRUPT_LINE</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x0F</span><span class="p">);</span>
+</pre></div>
+<p>The following chapter goes a bit deeper into the matter; you may skip it if you want, since ported classic programs will seldom need to make use of interfaces other than the basic initialization and cleanup tasks.
+</p>
+<h4><span class="mw-headline" id="Interface_Basics">Interface Basics</span></h4>
+<p>Interfaces have a usage count. That count is implicitly incremented when you call GetInterface and decremented again on DropInterface. You can explicitly do that using the Obtain() and Release() method that all interfaces implement. You must do this if you intend to use the interface you obtained somewhere outside the context of your task. For example, consider an image loader library that returns a picture in the form of an interface. Suppose that this interface contains a Print() method that you can use to send the image to a printer. Quite naturally, this will take its time, so the program launches a subtask that takes care of that. The subtask would look something like that (some error handling removed for clarity):
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="kt">void</span><span class="w"> </span><span class="nf">print_task</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">PictureIFace</span><span class="w"> </span><span class="o">*</span><span class="n">IPicture</span><span class="p">)</span>
+<span class="linenos" data-line="2"></span><span class="p">{</span>
+<span class="linenos" data-line="3"></span><span class="w"> </span><span class="n">IPicture</span><span class="o">-&gt;</span><span class="n">Print</span><span class="p">(</span><span class="n">some_printer_description</span><span class="p">);</span>
+<span class="linenos" data-line="4"></span><span class="w"> </span><span class="n">IPicture</span><span class="o">-&gt;</span><span class="n">Release</span><span class="p">();</span>
+<span class="linenos" data-line="5"></span><span class="p">}</span>
+<span class="linenos" data-line="6"></span>
+<span class="linenos" data-line="7"></span><span class="c1">// Somewhere else...</span>
+<span class="linenos" data-line="8"></span><span class="k">struct</span><span class="w"> </span><span class="nc">PictureIFace</span><span class="w"> </span><span class="o">*</span><span class="n">IPicture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ILoader</span><span class="o">-&gt;</span><span class="n">Load</span><span class="p">(</span><span class="s">&quot;DH0:Backdrop.jpg&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="9"></span>
+<span class="linenos" data-line="10"></span><span class="c1">// Pass the picture to the print spooler.</span>
+<span class="linenos" data-line="11"></span><span class="n">IPicture</span><span class="o">-&gt;</span><span class="n">Obtain</span><span class="p">();</span><span class="w"> </span><span class="c1">// Add a reference so that it will not vanish too soon</span>
+<span class="linenos" data-line="12"></span>
+<span class="linenos" data-line="13"></span><span class="c1">// Create the spooler task. CreateTaskTags is new for V50.</span>
+<span class="linenos" data-line="14"></span><span class="c1">// Note how you can now pass arguments to the created task.</span>
+<span class="linenos" data-line="15"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">CreateTaskTags</span><span class="p">(</span><span class="s">&quot;Printer Spooler&quot;</span><span class="p">,</span>
+<span class="linenos" data-line="16"></span><span class="w"> </span><span class="n">SPOOLER_PRIORITY</span><span class="p">,</span><span class="w"> </span><span class="n">print_task</span><span class="p">,</span><span class="w"> </span><span class="n">SPOOLER_STACK_SIZE</span><span class="p">,</span>
+<span class="linenos" data-line="17"></span><span class="w"> </span><span class="n">AT_Param</span><span class="p">,</span><span class="w"> </span><span class="n">IPicture</span><span class="p">,</span>
+<span class="linenos" data-line="18"></span><span class="w"> </span><span class="n">TAG_END</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span>
+<span class="linenos" data-line="19"></span><span class="p">{</span>
+<span class="linenos" data-line="20"></span><span class="w"> </span><span class="c1">// Task creation failed.</span>
+<span class="linenos" data-line="21"></span><span class="w"> </span><span class="n">IPicture</span><span class="o">-&gt;</span><span class="n">Release</span><span class="p">();</span><span class="w"> </span><span class="c1">// Release the unused reference.</span>
+<span class="linenos" data-line="22"></span>
+<span class="linenos" data-line="23"></span><span class="w"> </span><span class="n">do_some_error_stuff</span><span class="p">();</span>
+<span class="linenos" data-line="24"></span><span class="p">}</span>
+<span class="linenos" data-line="25"></span>
+<span class="linenos" data-line="26"></span><span class="c1">// Spooler is running, we don&#39;t need our copy anymore.</span>
+<span class="linenos" data-line="27"></span><span class="n">IPicture</span><span class="o">-&gt;</span><span class="n">Release</span><span class="p">();</span>
+</pre></div>
+<p>What is happening here? The Load() method would create the IPicture interface, thus giving us a fully usable IPicture interface with one reference. Since we want to pass it to a subtask, we do add another reference to the internal counter (increasing it to two) and pass it on down to the spooler task. After that task is running, we simply mark our copy as unused by calling Release() on it (we're now back at one again).
+</p><p>When the spooler is done, it will call Release() itself again, thus bringing the counter to zero. If the usage counter of an interface ever reaches zero, this indicates to the system that the interface is done with, and will trigger the interface's destruction.
+</p>
+<h2><span class="mw-headline" id="Calling_68K_Functions">Calling 68K Functions</span></h2>
+<p>Some system code as well as some application code might still be 68k based. Usually an application programmer doesn't need to worry about this, though as most of the details are handled internally by the system. Typical places where PowerPC to 68k transitions take place are:
+</p>
+<ol><li>68k libraries</li>
+<li>68k hook functions</li>
+<li>68k interrupts</li></ol>
+<h4><span class="mw-headline" id="68k_Library_Entries">68k Library Entries</span></h4>
+<p>For this discussion we assume that we have a disk based library called "foo.library" that is written in 68k code. Previously we have said that library calls always go through an interface - in most cases called "main" - but obviously the writer of the 68k library was unaware of this mechanism.
+</p><p>In order to present a unified calling mechanism to the programmer, 68k libraries are called through the same interfaces as a PowerPC library would. Since the original library doesn't provide this interface, a disk-resident stub library will do that. In our case, this library would be called "foo.l.main". The 'l' comes from the first letter of the resource type ("library" in this case), and the "main" is the name of the interface it provides. Thus, the "foo.l.main" stub will provide the interface "main" for "foo.library". If you call ObtainInterface() on a 68k library, the system will automatically scan its library search path for the file "foo.l.main" and if found, will try to open it and obtain the interface.
+</p><p>While this may look strange at first sight, it offers the possibility to migrate "foo.library" to PowerPC later on without the need to even recompile the application(s) using it. Furthermore, for a transition the "foo.l.main" interface may contain a few "real" PowerPC functions - normally it is composed from stub functions that call the 68k emulator.
+</p><p>The downside is that (at the time of writing) the "foo.l.main" library will not be created automatically. There are tools available in the SDK to build it from an SFD file, though. This process is described in a different document.
+</p>
+<h4><span class="mw-headline" id="68k_Hook_Functions">68k Hook Functions</span></h4>
+<p>Hook functions in general are completely transparent when it comes to PowerPC vs. 68k issues. You must not call a hook function directly, though - doing this used to be legal in the pre-4.0 era, but will result in an ISI exception for AmigaOS 4.
+</p><p>Hook functions must be called through Utility's CallHookPkt function. Invoking a hook this way will make sure that the appropriate measures are met - either by invoking the emulator, or by a real jump into the code.
+</p>
+<h4><span class="mw-headline" id="68k_Interrupts">68k Interrupts</span></h4>
+<p>As with hook functions, interrupts are handled completely transparently. When an interrupt is added to the system, a few checks are done and the interrupt's ln_Type field may be modified. This is done to ensure minimum latency when the interrupt occurs. The consequence is that you may not change the is_Code field of an interrupt node without removing and re-adding it to the system first.
+</p>
+<h4><span class="mw-headline" id="Calling_The_Emulator_Directly">Calling The Emulator Directly</span></h4>
+<p>In rare cases you might want to directly call the 68k emulator to execute 68k code. Exec provides the function Emulate for this purpose. Emulate can be called with an implicit register mapping and an arbitrary address. For more information on Emulate please refer to its autodoc.
+</p>
+<h2><span class="mw-headline" id="Other_Programming_Considerations">Other Programming Considerations</span></h2>
+<h4><span class="mw-headline" id="General_Hook_Functions">General Hook Functions</span></h4>
+<p>Hook functions used to be called with a specific mapping of 68k registers. Quite naturally, there are no 68k registers on a PowerPC machine, so the programmer needs to be a bit careful when writing a hook function.
+</p><p>CallHookPkt, or its vararg version CallHook, will always adhere to the PowerPC SysV ABI, and therefore the order of the parameters in the called function is important (it was always to be considered bad style to rearrange the parameters of a hook function, but possible through the explicit declaration of register mappings).
+</p><p>A hook function should always look like this:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">uint32</span><span class="w"> </span><span class="nf">HookFunction</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">Hook</span><span class="w"> </span><span class="o">*</span><span class="n">hook</span><span class="p">,</span><span class="w"> </span><span class="n">APTR</span><span class="w"> </span><span class="n">object</span><span class="p">,</span><span class="w"> </span><span class="n">APTR</span><span class="w"> </span><span class="n">message</span><span class="p">);</span>
+</pre></div>
+<p>The first argument, hook, points to the hook with which this function was invoked. The second paramter, objec, is a generic 'target' for the oeration, and depends on the context that this hook is being called in. The final argument, message, is a pointer to a message package whose layout also depends on the hook context.
+</p><p>Hook functions need to have the VARARGS68K tag. The next chapter will describe what that means.
+</p>
+<h4><span class="mw-headline" id="Varargs">Varargs</span></h4>
+<p>Although frequently used, the following code is highly system- and compiler-dependent:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="kt">void</span><span class="w"> </span><span class="nf">somefunc</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">messageid</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="linenos" data-line="2"></span><span class="p">{</span>
+<span class="linenos" data-line="3"></span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)(</span><span class="o">&amp;</span><span class="n">messageid</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="linenos" data-line="4"></span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">messageid</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">some_id</span><span class="p">)</span>
+<span class="linenos" data-line="5"></span><span class="w"> </span><span class="p">{</span>
+<span class="linenos" data-line="6"></span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">message</span><span class="p">;</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="linenos" data-line="7"></span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">message</span><span class="p">;</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="linenos" data-line="8"></span><span class="w"> </span><span class="c1">// ...</span>
+</pre></div>
+<p>This code assumes that arguments are put on the stack in sequential order, which happens to be true by chance but cannot be counted on. On AmigaOS 4.0 onwards, the system uses the PowerPC SystemV ABI, which doesn't allow for such tricks. ANSI-C defines a specific mechanism for variable number of arguments functions, namely va_start(), va_end() and va_arg(). . Under all normal circumstances, these must be used on AmigaOS 4.
+</p><p>The only legal way to express the above code is:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdarg.h&gt;</span>
+<span class="linenos" data-line="2"></span><span class="kt">void</span><span class="w"> </span><span class="nf">somefunc</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">messageid</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="linenos" data-line="3"></span><span class="p">{</span>
+<span class="linenos" data-line="4"></span><span class="w"> </span><span class="kt">va_list</span><span class="w"> </span><span class="n">ap</span><span class="p">;</span>
+<span class="linenos" data-line="5"></span><span class="w"> </span><span class="n">va_start</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span><span class="w"> </span><span class="n">messageid</span><span class="p">);</span>
+<span class="linenos" data-line="6"></span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">messageid</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">some_id</span><span class="p">)</span>
+<span class="linenos" data-line="7"></span><span class="w"> </span><span class="p">{</span>
+<span class="linenos" data-line="8"></span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">va_arg</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span><span class="w"> </span><span class="n">uint16</span><span class="p">);</span>
+<span class="linenos" data-line="9"></span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">va_arg</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span><span class="w"> </span><span class="n">uint16</span><span class="p">);</span>
+<span class="linenos" data-line="10"></span><span class="w"> </span><span class="c1">// ...</span>
+<span class="linenos" data-line="11"></span><span class="w"> </span><span class="p">}</span>
+<span class="linenos" data-line="12"></span>
+<span class="linenos" data-line="13"></span><span class="w"> </span><span class="n">va_end</span><span class="p">(</span><span class="n">ap</span><span class="p">);</span>
+<span class="linenos" data-line="14"></span><span class="p">}</span>
+</pre></div>
+<p>There is one exception to this rule, though. Under certain circumstances it is necessary to be able to use these stack varargs because of compatibility. The AmigaOS 4 compilers must support a means to specify this as a special linkage parameter for a function. The SDK include file amiga_compiler.h encapsulates the details in a common macro VARARGS68K. A function declared with this tag is handled differently by the compiler, so that the calling method outlined at the beginning of this chapter works. The tag may be used both to declare a function within your program as well as declaring a function outside your program. The former is required for example for hook functions, while the latter may be required for legacy code.
+</p><p>Such a function still needs to access the parameters in a special way. The first argument (messageid in this example) still is passed in a register according to the ABI specs. The following fragment shows how to handle this case.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdarg.h&gt;</span>
+<span class="linenos" data-line="2"></span>
+<span class="linenos" data-line="3"></span><span class="kt">void</span><span class="w"> </span><span class="nf">somefunc</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">messageid</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="n">VARARGS68K</span><span class="p">;</span>
+<span class="linenos" data-line="4"></span>
+<span class="linenos" data-line="5"></span><span class="kt">void</span><span class="w"> </span><span class="nf">somefunc</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">messageid</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="linenos" data-line="6"></span><span class="p">{</span>
+<span class="linenos" data-line="7"></span><span class="w"> </span><span class="kt">va_list</span><span class="w"> </span><span class="n">ap</span><span class="p">;</span>
+<span class="linenos" data-line="8"></span><span class="w"> </span><span class="n">va_startlinear</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span><span class="w"> </span><span class="n">messageid</span><span class="p">);</span>
+<span class="linenos" data-line="9"></span>
+<span class="linenos" data-line="10"></span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">va_getlinearva</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">);</span>
+<span class="linenos" data-line="11"></span>
+<span class="linenos" data-line="12"></span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">messageid</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">some_id</span><span class="p">)</span>
+<span class="linenos" data-line="13"></span><span class="w"> </span><span class="p">{</span>
+<span class="linenos" data-line="14"></span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="n">uint16</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">message</span><span class="p">;</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="linenos" data-line="15"></span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="n">uint16</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">message</span><span class="p">;</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="linenos" data-line="16"></span><span class="w"> </span><span class="c1">// ...</span>
+<span class="linenos" data-line="17"></span><span class="w"> </span><span class="p">}</span>
+<span class="linenos" data-line="18"></span>
+<span class="linenos" data-line="19"></span><span class="w"> </span><span class="n">va_end</span><span class="p">(</span><span class="n">ap</span><span class="p">);</span>
+<span class="linenos" data-line="20"></span><span class="p">}</span>
+</pre></div>
+<p>Note that parameters passed in this way are always longword-aligned. On the 68k this used to be different depending on the compiler - another reason why you should avoid this kind of calling mechanism.
+</p>
+<h2><span class="mw-headline" id="Memory">Memory</span></h2>
+<h4><span class="mw-headline" id="The_MEMF_PUBLIC_flag">The MEMF_PUBLIC flag</span></h4>
+<p>The memory subsystem of AmigaOS 4 has seen a radical overhaul. Although the API stays mostly the same, there are a few things to look out for when porting old code, as well as when writing new code.
+</p><p>A general rule of thumb is: Don't use it. There is usually no reason why you should be using MEMF_PUBLIC memory. On AmigaOS 3.9 and earlier you had to allocate e.g. Messages and Message Ports in public memory; this is no longer needed under AmigaOS 4 - instead use the MEMF_SHARED flag. The MEMF_SHARED flag shares a lot of the properties that its public counterpart has, but is much more "friendly" to the system.
+</p><p>For more information about MEMF_PUBLIC see <a href="/wiki/Obsolete_Exec_Memory_Allocation" title="Obsolete Exec Memory Allocation">Obsolete Exec Memory Allocation</a>.
+</p>
+<h4><span class="mw-headline" id="Visible_Changes_in_the_Memory_Subsystem">Visible Changes in the Memory Subsystem</span></h4>
+<p>Most of the changes done to the memory system under AmigaOS 4 is done "under the hood" and invisible to the application programmer. However, a few changes may affect the programmer, and therefore need to be taken care of.
+</p><p>First of all, memory is virtualized. That means that any access to unallocated memory will invariably result in an abnormal termination of your program. Like the Enforcer in earlier versions of the system, the AmigaOS 4 memory system does not tolerate any such access. Contrary to the Enforcer, however, such illegal accesses are fatal. AmigaOS 4 software must not access illegal memory areas.
+</p><p>Memory will, as a rule, go away at the very moment that it is freed. Being inside a forbid state does not allow you to access memory after freeing it.
+</p><p>Also, virtualized memory means that the physical address where memory is located does not necessarily match the virtual address that you are using. While that doesn't have any impact in normal operation, it is something that device driver writers will have to take care of - there are calls in Exec that map physical to virtual and vice versa. In addition, memory that appears continuous to your application (which uses virtual addresses) need not be continuous in physical memory.
+</p><p>In the past some clever programmers where scanning Exec's memory lists, in spite of a comment that clearly marked them as "private". This will no longer be tolerated in AmigaOS. In fact, chances are that the memory lists are uninitialized, since the traditional memory allocation schemes are in the process of being phased out at the time of writing in favor of a new and much faster memory allocation.
+</p><p>As we have already mentioned, there are some new memory flags for application programmers. MEMF_SHARED is one of them, the semantics of which have already been described above. Another one of these is MEMF_EXECUTABLE. Normally, executable code may not be placed into an arbitrary section of memory. If you intend to generate code dynamically, you must use MEMF_EXECUTABLE to allocate the memory. Also note that the code section of your program is write protected, so self-modifying is not possible unless you allocate a piece of MEMF_EXECUTABLE memory and generate your code there.
+</p><p>Please refer to <a href="/wiki/Exec_Memory_Allocation" title="Exec Memory Allocation">Exec Memory Allocation</a> for more information.
+</p>
+<h2><span class="mw-headline" id="Known_Incompatibilities">Known Incompatibilities</span></h2>
+<p>Due to the migration to PowerPC and other changes in the system itself, there are a few known incompatibilities with old software and/or source code that may cause trouble. This is true both for porting software to run on AmigaOS 4 natively as well as binary 68k legacy programs. The following list tries to outline the known issues and tries to list workarounds.
+</p><p>Most of these issues are caused by inappropriate programming, for example exploiting undocumented or internal features. In general, if you strictly adhere to the programming guidelines your program should work unmodified, but some things that where tolerated under OS 3.9 and earlier will no longer work.
+</p>
+<ul><li>Assembler programmers should NOT simply check the zero flag if the function is documented to return 0 or non-null. For example, if you open a device it is NOT sufficient to check the zero flag to find out if the open was successful or not. This assumes that the return value is set up at the very end of the function and that no operation had any influence on it; furthermore, since the emulator "only" calls native code and passes the return value to your 68k function, the flag bits are not affected. This was never supposed to work, and will no longer work. A simple "cmp.l #0,d0" or "tst.l d0" will be sufficient.</li></ul>
+<ul><li>Access to any unmapped/unallocated memory fill most likely result in a fatal crash. It is not OK to "temporarily store" results somewhere because your application "happens to know" that the area is free. Likewise, NULL pointer access will invariably result in a crash. The user will be able to click "continue" in the Grim Reaper window that will pop up, though, but the result will be undefined.</li></ul>
+<ul><li>It has never been documented where and how (if at all) AllocVec stores the size of the block it has allocated. Therefore, it has always been illegal to try to access the four bytes before the actual allocation to find the size of the block. Code that will use this "feature" will no longer work, since AmigaOS 4's AllocVec does not necessarily put anything there.</li></ul>
+<ul><li>Public data does not belong on the stack. If you want to send a message, allocate it with AllocSysObjectTags() using the ASOT_MESSAGE type. The following code is broken:</li></ul>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="kt">void</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="linenos" data-line="2"></span><span class="p">{</span>
+<span class="linenos" data-line="3"></span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">Message</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span>
+<span class="linenos" data-line="4"></span><span class="w"> </span><span class="c1">// ...</span>
+<span class="linenos" data-line="5"></span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">PutMsg</span><span class="p">(</span><span class="n">port</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
+<span class="linenos" data-line="6"></span><span class="p">}</span>
+</pre></div>
+<ul><li>Locale library uses new country/language names. All language names are represented by their English name because it eliminates the need for special characters that the file system may not support or that require a special font to display.</li></ul>
+<ul><li>Do not copy font flags. Font flags carry a specific meaning that may or may not be specific to a certain font. For example, setting the FSF_ANTIALIASED flag on a bitmap font may cause unpredictable behavior.</li></ul>
+<ul><li>It never was, and never will be, legal to access memory after you have freed it. No matter if you are in Forbid() state or not, a program MUST NOT access memory after it called FreeMem() or any other function that frees memory. Doing so will invariably cause a crash of your program. It is not OK to assume that memory will stay available up to the next Permit(). Freeing memory will most likely trigger immediate un-mapping of associated memory pages, meaning that any further access will result in a Data Storage (DSI) exception. The same holds true for executable memory that is freed due to a FreeVec or UnLoadSeg. The next instruction to be executed will no longer be there because the memory has vanished, resulting in an ISI exception.</li></ul>
+<h2><span class="mw-headline" id="libauto_Libraries">libauto Libraries</span></h2>
+<p>The following global variables are automatically handled by the current libauto. Note that the entries in bold are automatically supplied by your C library's startup code and are always available (clib2 does not provide UtilityBase and IUtility):
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Library
+</th>
+<th>Interface(s)
+</th></tr>
+<tr>
+<td>AmigaGuideBase
+</td>
+<td>IAmigaGuide
+</td></tr>
+<tr>
+<td>ApplicationBase
+</td>
+<td>IApplication, IPrefsObjects
+</td></tr>
+<tr>
+<td>ARexxBase
+</td>
+<td>IARexx
+</td></tr>
+<tr>
+<td>AslBase
+</td>
+<td>IAsl
+</td></tr>
+<tr>
+<td>BevelBase
+</td>
+<td>IBevel
+</td></tr>
+<tr>
+<td>BitMapBase
+</td>
+<td>IBitMap
+</td></tr>
+<tr>
+<td>SocketBase
+</td>
+<td>ISocket
+</td></tr>
+<tr>
+<td>ButtonBase
+</td>
+<td>IButton
+</td></tr>
+<tr>
+<td>CheckBoxBase
+</td>
+<td>ICheckBox
+</td></tr>
+<tr>
+<td>ChooserBase
+</td>
+<td>IChooser
+</td></tr>
+<tr>
+<td>ClickTabBase
+</td>
+<td>IClickTab
+</td></tr>
+<tr>
+<td>ColorWheelBase
+</td>
+<td>IColorWheel
+</td></tr>
+<tr>
+<td>CxBase
+</td>
+<td>ICommodities
+</td></tr>
+<tr>
+<td>DataTypesBase
+</td>
+<td>IDataTypes
+</td></tr>
+<tr>
+<td>DateBrowserBase
+</td>
+<td>IDateBrowser
+</td></tr>
+<tr>
+<td>DiskfontBase
+</td>
+<td>IDiskfont
+</td></tr>
+<tr>
+<td>DOSBase
+</td>
+<td><b>IDOS</b>
+</td></tr>
+<tr>
+<td>DrawListBase
+</td>
+<td>IDrawList
+</td></tr>
+<tr>
+<td>ElfBase
+</td>
+<td>IElf
+</td></tr>
+<tr>
+<td>ExecBase
+</td>
+<td><b>IExec</b>, IDebug
+</td></tr>
+<tr>
+<td>ExpansionBase
+</td>
+<td>IExpansion
+</td></tr>
+<tr>
+<td>FillerBase
+</td>
+<td>IFiller
+</td></tr>
+<tr>
+<td>FuelGaugeBase
+</td>
+<td>IFuelGauge
+</td></tr>
+<tr>
+<td>GadToolsBase
+</td>
+<td>IGadTools
+</td></tr>
+<tr>
+<td>GetColorBase
+</td>
+<td>IGetColor
+</td></tr>
+<tr>
+<td>GetFileBase
+</td>
+<td>IGetFile
+</td></tr>
+<tr>
+<td>GetFontBase
+</td>
+<td>IGetFont
+</td></tr>
+<tr>
+<td>GetScreenModeBase
+</td>
+<td>IGetScreenMode
+</td></tr>
+<tr>
+<td>GlyphBase
+</td>
+<td>IGlyph
+</td></tr>
+<tr>
+<td>GfxBase
+</td>
+<td>IGraphics
+</td></tr>
+<tr>
+<td>IconBase
+</td>
+<td>IIcon
+</td></tr>
+<tr>
+<td>IFFParseBase
+</td>
+<td>IIFFParse
+</td></tr>
+<tr>
+<td>InputBase
+</td>
+<td>IInput
+</td></tr>
+<tr>
+<td>IntegerBase
+</td>
+<td>IInteger
+</td></tr>
+<tr>
+<td>IntuitionBase
+</td>
+<td>IIntuition
+</td></tr>
+<tr>
+<td>KeymapBase
+</td>
+<td>IKeymap
+</td></tr>
+<tr>
+<td>LabelBase
+</td>
+<td>ILabel
+</td></tr>
+<tr>
+<td>LayersBase
+</td>
+<td>ILayers
+</td></tr>
+<tr>
+<td>LayoutBase
+</td>
+<td>ILayout
+</td></tr>
+<tr>
+<td>ListBrowserBase
+</td>
+<td>IListBrowser
+</td></tr>
+<tr>
+<td>LocaleBase
+</td>
+<td><b>ILocale</b>
+</td></tr>
+<tr>
+<td>LowLevelBase
+</td>
+<td>ILowLevel
+</td></tr>
+<tr>
+<td>MiniGLBase
+</td>
+<td>IMiniGL
+</td></tr>
+<tr>
+<td>PaletteBase
+</td>
+<td>IPalette
+</td></tr>
+<tr>
+<td>PenMapBase
+</td>
+<td>IPenMap
+</td></tr>
+<tr>
+<td>P96Base
+</td>
+<td>IP96
+</td></tr>
+<tr>
+<td>PictureBase
+</td>
+<td>IPicture
+</td></tr>
+<tr>
+<td>PopupMenuBase
+</td>
+<td>IPopupMenu
+</td></tr>
+<tr>
+<td>RadioButtonBase
+</td>
+<td>IRadioButton
+</td></tr>
+<tr>
+<td>RequesterBase
+</td>
+<td>IRequester
+</td></tr>
+<tr>
+<td>RexxSysBase
+</td>
+<td>IRexxSys
+</td></tr>
+<tr>
+<td>ScreenBlanker
+</td>
+<td>IScreenBlanker
+</td></tr>
+<tr>
+<td>ScrollerBase
+</td>
+<td>IScroller
+</td></tr>
+<tr>
+<td>SketchBoardBase
+</td>
+<td>ISketchBoard
+</td></tr>
+<tr>
+<td>SliderBase
+</td>
+<td>ISlider
+</td></tr>
+<tr>
+<td>SpaceBase
+</td>
+<td>ISpace
+</td></tr>
+<tr>
+<td>SpeedBarBase
+</td>
+<td>ISpeedBar
+</td></tr>
+<tr>
+<td>StringBase
+</td>
+<td>IString
+</td></tr>
+<tr>
+<td>TextClipBase
+</td>
+<td>ITextClip
+</td></tr>
+<tr>
+<td>TextEditorBase
+</td>
+<td>ITextEditor
+</td></tr>
+<tr>
+<td>TimerBase
+</td>
+<td>ITimer
+</td></tr>
+<tr>
+<td>TimesyncBase
+</td>
+<td>ITimesync
+</td></tr>
+<tr>
+<td>TimezoneBase
+</td>
+<td>ITimezone
+</td></tr>
+<tr>
+<td>UserGroupBase
+</td>
+<td>IUserGroup
+</td></tr>
+<tr>
+<td>UtilityBase
+</td>
+<td><b>IUtility</b>
+</td></tr>
+<tr>
+<td>VirtualBase
+</td>
+<td>IVirtual
+</td></tr>
+<tr>
+<td>WorkbenchBase
+</td>
+<td>IWorkbench
+</td></tr>
+<tr>
+<td>WindowBase
+</td>
+<td>IWindow
+</td></tr>
+<tr>
+<td>xadMasterBase
+</td>
+<td>IxadMaster
+</td></tr></tbody></table>
+<!-- 
+NewPP limit report
+Cached time: 20260114022851
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.118 seconds
+Real time usage: 1.858 seconds
+Preprocessor visited node count: 139/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 2/100
+Expensive parser function count: 13/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 32887/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 -total
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:196-0!canonical and timestamp 20260114022851 and revision id 12437. Rendering was triggered because: page-view
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=Migration_Guide&amp;oldid=12437">http://wiki.amigaos.net/w/index.php?title=Migration_Guide&amp;oldid=12437</a>"</div></div>
+		<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Migration+Guide" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-main" class="selected mw-list-item"><a href="/wiki/Migration_Guide" title="View the content page [c]" accesskey="c"><span>Page</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=Talk:Migration_Guide&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/Migration_Guide"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=Migration_Guide&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=Migration_Guide&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/Migration_Guide" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/Migration_Guide" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=Migration_Guide&amp;oldid=12437" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=Migration_Guide&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=Migration+Guide"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=Migration+Guide&amp;oldid=12437&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=Migration_Guide&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 26 January 2025, at 19:08.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":90,"wgPageParseReport":{"limitreport":{"cputime":"0.118","walltime":"1.858","ppvisitednodes":{"value":139,"limit":1000000},"postexpandincludesize":{"value":0,"limit":2097152},"templateargumentsize":{"value":0,"limit":2097152},"expansiondepth":{"value":2,"limit":100},"expensivefunctioncount":{"value":13,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":32887,"limit":5000000},"timingprofile":["100.00%    0.000      1 -total"]},"cachereport":{"timestamp":"20260114022851","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>

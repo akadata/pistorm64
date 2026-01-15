@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>UI Style Guide Workbench - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_4x3TbDv_vcRQHuo8ZQAAAAo","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"UI_Style_Guide_Workbench","wgTitle":"UI Style Guide Workbench","wgCurRevisionId":6236,"wgRevisionId":6236,"wgArticleId":483,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[
+"User Interface Style Guide"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"UI_Style_Guide_Workbench","wgRelevantArticleId":483,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-UI_Style_Guide_Workbench rootpage-UI_Style_Guide_Workbench skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">UI Style Guide Workbench</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/Coding_Guidelines" title="Coding Guidelines">Coding Guidelines</a> &gt; <a href="/wiki/Migration_Guide" title="Migration Guide">Migration Guide</a> &gt; <a href="/wiki/Autodoc_Style_Guide" title="Autodoc Style Guide">Autodoc Style Guide</a> &gt; <a href="/wiki/User_Interface_Style_Guide" title="User Interface Style Guide">User Interface Style Guide</a> &gt; <a href="/wiki/UI_Style_Guide_Workbench" title="UI Style Guide Workbench">UI Style Guide Workbench</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Workbench"><span class="tocnumber">1</span> <span class="toctext">Workbench</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Icons"><span class="tocnumber">2</span> <span class="toctext">Icons</span></a>
+<ul>
+<li class="toclevel-2 tocsection-3"><a href="#The_.info_File"><span class="tocnumber">2.1</span> <span class="toctext">The .info File</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="#Icon_Design"><span class="tocnumber">2.2</span> <span class="toctext">Icon Design</span></a>
+<ul>
+<li class="toclevel-3 tocsection-5"><a href="#Size"><span class="tocnumber">2.2.1</span> <span class="toctext">Size</span></a></li>
+<li class="toclevel-3 tocsection-6"><a href="#Look_and_Feel"><span class="tocnumber">2.2.2</span> <span class="toctext">Look and Feel</span></a></li>
+<li class="toclevel-3 tocsection-7"><a href="#Color_Palette"><span class="tocnumber">2.2.3</span> <span class="toctext">Color Palette</span></a></li>
+<li class="toclevel-3 tocsection-8"><a href="#Auxiliary_Buttons"><span class="tocnumber">2.2.4</span> <span class="toctext">Auxiliary Buttons</span></a></li>
+<li class="toclevel-3 tocsection-9"><a href="#Tips_for_Icon_Design"><span class="tocnumber">2.2.5</span> <span class="toctext">Tips for Icon Design</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-10"><a href="#Icon_Types"><span class="tocnumber">2.3</span> <span class="toctext">Icon Types</span></a>
+<ul>
+<li class="toclevel-3 tocsection-11"><a href="#Disk_Icons"><span class="tocnumber">2.3.1</span> <span class="toctext">Disk Icons</span></a></li>
+<li class="toclevel-3 tocsection-12"><a href="#Drawer_Icons"><span class="tocnumber">2.3.2</span> <span class="toctext">Drawer Icons</span></a></li>
+<li class="toclevel-3 tocsection-13"><a href="#Trashcan_Icons"><span class="tocnumber">2.3.3</span> <span class="toctext">Trashcan Icons</span></a></li>
+<li class="toclevel-3 tocsection-14"><a href="#Tool_Icons"><span class="tocnumber">2.3.4</span> <span class="toctext">Tool Icons</span></a></li>
+<li class="toclevel-3 tocsection-15"><a href="#Project_Icons"><span class="tocnumber">2.3.5</span> <span class="toctext">Project Icons</span></a></li>
+<li class="toclevel-3 tocsection-16"><a href="#Icon_Families"><span class="tocnumber">2.3.6</span> <span class="toctext">Icon Families</span></a></li>
+<li class="toclevel-3 tocsection-17"><a href="#Create_Icons?"><span class="tocnumber">2.3.7</span> <span class="toctext">Create Icons?</span></a></li>
+<li class="toclevel-3 tocsection-18"><a href="#Positioning"><span class="tocnumber">2.3.8</span> <span class="toctext">Positioning</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-19"><a href="#Argument_Passing"><span class="tocnumber">3</span> <span class="toctext">Argument Passing</span></a>
+<ul>
+<li class="toclevel-2 tocsection-20"><a href="#Tool_Types_and_Default_Tool"><span class="tocnumber">3.1</span> <span class="toctext">Tool Types and Default Tool</span></a>
+<ul>
+<li class="toclevel-3 tocsection-21"><a href="#Tool_Types"><span class="tocnumber">3.1.1</span> <span class="toctext">Tool Types</span></a></li>
+<li class="toclevel-3 tocsection-22"><a href="#Default_Tool"><span class="tocnumber">3.1.2</span> <span class="toctext">Default Tool</span></a></li>
+<li class="toclevel-3 tocsection-23"><a href="#Altering_Icons"><span class="tocnumber">3.1.3</span> <span class="toctext">Altering Icons</span></a></li>
+<li class="toclevel-3 tocsection-24"><a href="#Tool_Types_and_Networks"><span class="tocnumber">3.1.4</span> <span class="toctext">Tool Types and Networks</span></a></li>
+<li class="toclevel-3 tocsection-25"><a href="#Standard_Tool_Types_Arguments"><span class="tocnumber">3.1.5</span> <span class="toctext">Standard Tool Types Arguments</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-26"><a href="#The_Apps"><span class="tocnumber">3.2</span> <span class="toctext">The Apps</span></a>
+<ul>
+<li class="toclevel-3 tocsection-27"><a href="#AppWindows"><span class="tocnumber">3.2.1</span> <span class="toctext">AppWindows</span></a></li>
+<li class="toclevel-3 tocsection-28"><a href="#AppIcons"><span class="tocnumber">3.2.2</span> <span class="toctext">AppIcons</span></a></li>
+<li class="toclevel-3 tocsection-29"><a href="#AppMenus"><span class="tocnumber">3.2.3</span> <span class="toctext">AppMenus</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-30"><a href="#Preferences"><span class="tocnumber">3.3</span> <span class="toctext">Preferences</span></a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="Workbench">Workbench</span></h2>
+<p>In a way, Workbench is just another program - but as the default interface on the Amiga, it's one program that many users will pass through on their way to your application. Although it has other facets and functions, it's the interface between your program and Workbench that is of concern in this chapter.
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:SG7-1.png" class="mw-file-description"><img src="/w/images/e/e6/SG7-1.png" decoding="async" width="740" height="592" class="mw-file-element" /></a><figcaption>The workbench screen</figcaption></figure>
+<h2><span class="mw-headline" id="Icons">Icons</span></h2>
+<p>Icons are an important part of AmigaOS. Users like beautiful icons that describe a program in a clear and memorable way. Icons are pictorial representations of devices, directories, files, applications, objects or actions. Your program should have icons for anything the user can access including the main program itself, documentation files and any tools that may accompany the program. 
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:Ram-icon-evolution.png" class="mw-file-description"><img src="/w/images/4/4b/Ram-icon-evolution.png" decoding="async" width="512" height="256" class="mw-file-element" /></a><figcaption>Evolution of the AmigaOS RAM Disk icon</figcaption></figure>
+<h3><span class="mw-headline" id="The_.info_File">The .info File</span></h3>
+<p>The icon imagery is found in a file bearing the suffix ".info". For example, the icon for a data file called "myletter" would be found, along with some other information, in the file "myletter.info".
+</p>
+<h3><span class="mw-headline" id="Icon_Design">Icon Design</span></h3>
+<p>A good icon quickly communicates the function it represents. The Workbench offers a photo-illustrative icon style - it approaches the realism of photography but uses the features of illustrations to convey a lot of information in a small space. An illustration provides much more flexibility for conveying a concept in a very small space and it also gives you necessary control over details, perspective, light and shadow, texture, and so on.  
+</p><p>The Calculator icon and the NotePad icon are good examples. 
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:SG7-2.png" class="mw-file-description"><img src="/w/images/5/56/SG7-2.png" decoding="async" width="240" height="168" class="mw-file-element" /></a><figcaption>The Calculator and NotePad icons</figcaption></figure>
+<p>The AmigaOS is the only operating system that use two different images to display the state of the icon (normal and selected state) The selected image features a glow effect, which makes them easier to recognize. Both pictures are combined to an icon for a simple but most realistic looking animation.
+</p>
+<figure class="mw-default-size mw-halign-center" typeof="mw:File"><a href="/wiki/File:Icon-two-states.gif" class="mw-file-description"><img src="/w/images/6/6e/Icon-two-states.gif" decoding="async" width="400" height="160" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<h4><span class="mw-headline" id="Size">Size</span></h4>
+<p>The maximum size for an icon is 256 pixels wide by 256 pixels high. The icons will be scaled down to the desired size as adjusted in the Workbench Preferences.
+</p>
+<figure class="mw-default-size mw-halign-center" typeof="mw:File"><a href="/wiki/File:Icon-sizes.png" class="mw-file-description"><img src="/w/images/5/50/Icon-sizes.png" decoding="async" width="512" height="256" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>The painting area of an icon is defied in three virtual sections: 
+</p>
+<ul><li>The main icon area with a size of 200 x200 pixels for the illustration itself.</li>
+<li>The extra icon area with a size of 12 pixels on each side for the shadow, badges, signs and additional space for motion.</li>
+<li>The effect area with a size of 16 pixels on each side for the glow effect.</li></ul>
+<h4><span class="mw-headline" id="Look_and_Feel">Look and Feel</span></h4>
+<p>The angles and shadows used for depicting various kinds of icons are intended to reflect how the objects would appear in reality. All icon elements have a common light source from in front above. The various perspectives are achieved by changing the position of an imaginary camera capturing the icon. 
+</p><p>The AmigaOS style guide allows two general perspectives to display icons: icons look like they are placed on a workbench in front of you and icons that look like pined flat on the wall.
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:Icon-look-and-feel.png" class="mw-file-description"><img src="/w/images/5/5a/Icon-look-and-feel.png" decoding="async" width="240" height="168" class="mw-file-element" /></a><figcaption>Preferred perspectives for AmigaOS icons (Docky icons)</figcaption></figure>
+<p>When the icon state is changed to select the light source will change extremely provide a glow effect. The colors of the icons will get darker (33&#160;%) and a rich yellow shine will be added to the image to generate a great looking glow effect.
+</p>
+<h4><span class="mw-headline" id="Color_Palette">Color Palette</span></h4>
+<p>Color is a very important visual element of the AmigaOS icons as it has associated meanings and usually elicits emotional responses - to obtain it is very important to use color consistently.
+</p><p>AmigaOS icons use a basic harmonized RGB color palette and gradients based on these colors to generate a more realistic appearance. To achieve this goal, the colors need to work well together in many contexts. 
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:Icon-color-palette.png" class="mw-file-description"><img src="/w/images/b/b1/Icon-color-palette.png" decoding="async" width="320" height="240" class="mw-file-element" /></a><figcaption>Palette of AmigaOS icons</figcaption></figure>
+<h4><span class="mw-headline" id="Auxiliary_Buttons">Auxiliary Buttons</span></h4>
+<p>Icons for Preferences, Commodities and Dockies use buttons to separate them from other programs and make them easily distinguishable for the user.
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:Icon-auxiliary-buttons.png" class="mw-file-description"><img src="/w/images/9/9f/Icon-auxiliary-buttons.png" decoding="async" width="320" height="120" class="mw-file-element" /></a><figcaption>Buttons for Preferences, Commodities and Dockies</figcaption></figure>
+<h4><span class="mw-headline" id="Tips_for_Icon_Design">Tips for Icon Design</span></h4>
+<p>Before you use words in an icon, think about how extensive a distribution you would like to see your product achieve. It's better to have an icon communicate through symbolism than language. Use global imagery that the user will easily recognize. Also avoid abstract or local symbolism and play on words. Keep your icons as simple as possible, fewer details might make your icons easier to distinguish in scaled down versions. Use the right perspective and colors for your icon. Avoid using the Boing Ball logo – the user usually knows on which system he is working.
+</p>
+<h3><span class="mw-headline" id="Icon_Types">Icon Types</span></h3>
+<p>There are five types of icons on the Workbench: disk icons, drawer icons, trashcan icons, tool icons and project icons.
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:Default-icon-types.png" class="mw-file-description"><img src="/w/images/2/2b/Default-icon-types.png" decoding="async" width="640" height="128" class="mw-file-element" /></a><figcaption>Default disk, drawer, trashcan, tool and project icons of AmigaOS</figcaption></figure>
+<h4><span class="mw-headline" id="Disk_Icons">Disk Icons</span></h4>
+<p>A disk icon represents a device for data storage. A double-click on a disk icon shows the content of the device in a filer
+</p>
+<h4><span class="mw-headline" id="Drawer_Icons">Drawer Icons</span></h4>
+<p>A drawer icon represents a directory of a device for data storage. A double-click on a drawer icon shows the content of the directory in a filer.
+</p>
+<h4><span class="mw-headline" id="Trashcan_Icons">Trashcan Icons</span></h4>
+<p>A trashcan icon represents a temporary storage for files that have been deleted. A double-click on a trashcan icon shows the deleted files in a filer.
+</p>
+<h4><span class="mw-headline" id="Tool_Icons">Tool Icons</span></h4>
+<p>A tool icon represents an executable file such as an application. A double-click on a tool icon will run the application. The look of tool icons varies from application to application.
+</p>
+<h4><span class="mw-headline" id="Project_Icons">Project Icons</span></h4>
+<p>A project icon represents a data file. Typically, a double-click on this icon will cause the application that created the data to run and automatically load this data.
+</p><p>The look of a project icon is usually determined by the application that created it and by the type of data it represents. However there is also a default project icon included in the system.
+</p>
+<h4><span class="mw-headline" id="Icon_Families">Icon Families</span></h4>
+<p>An icon family is a set of icons that use the same symbolism that makes is easier for the user to identify files that are associated with a program. An icon family usually consists of an icon for the drawer and the program itself, but additional icons for project, preferences, tools or even drives might be a good idea.
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:Icon-families.png" class="mw-file-description"><img src="/w/images/9/9d/Icon-families.png" decoding="async" width="384" height="128" class="mw-file-element" /></a><figcaption>Example of an icon family: tool, drawer and project icon of AmiFIG</figcaption></figure>
+<h4><span id="Create_Icons.3F"></span><span class="mw-headline" id="Create_Icons?">Create Icons?</span></h4>
+<p>When your application creates a data file, it should, by default, create a .info file to go with it. Many users are accustomed to accessing their projects via an icon.
+</p><p>Create the icon after the user successfully saves the project. This will prevent the possibility of project-less icons in the system.
+</p><p>Your application, however, should allow the user the option of saving files without creating icons. The recommended way of doing this is to have an item in the Settings menu called Create Icons?. This item should be enabled by default. See <a href="/wiki/UI_Style_Guide_Menus" title="UI Style Guide Menus">UI Style Guide Menus</a> for more information.
+</p>
+<h4><span class="mw-headline" id="Positioning">Positioning</span></h4>
+<p>New project icons should never be saved in a specific position. Rather they should be positioned algorithmically by Workbench (see the Workbench flag NO_ICON_POSITION). In the same vein, if the imagery of an existing icon is changed (e.g. the application creates a reduced version of the project for use as the icon imagery) the icon should be saved without a specific position.
+</p>
+<h2><span class="mw-headline" id="Argument_Passing">Argument Passing</span></h2>
+<p>To make the common operation of starting up programs more powerful, the Amiga provides ways of passing along more specific information to the application. This process of providing additional information to a program that's about to run is known as argument passing.
+</p><p>When using the Shell, the system is straightforward. The user runs an application by typing its name along with additional information such as the name of a file to operate on and any command options. The entire command line is then passed to the program as an argument.
+</p><p>The Workbench also provides means of passing arguments - but it is tied to icons instead of lines of type.
+</p>
+<h3><span class="mw-headline" id="Tool_Types_and_Default_Tool">Tool Types and Default Tool</span></h3>
+<p>Applications started from Workbench receive startup information from the system in the form of a WBStartup message. The WBStartup message can be used to get various Workbench arguments including those found in the Tool Types and Default Tool fields of the icon the user clicked on.
+</p>
+<h4><span class="mw-headline" id="Tool_Types">Tool Types</span></h4>
+<p>If you click once on any tool icon and choose "Information..." from the Workbench's Icon menu, you should see a requester with a field for Tool Types.
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:SG7-4.png" class="mw-file-description"><img src="/w/images/3/36/SG7-4.png" decoding="async" width="457" height="334" class="mw-file-element" /></a><figcaption>The Information requester for a tool icon</figcaption></figure>
+<p>Arguments placed in this field take the form KEYWORD=value. KEYWORD is an argument name specified by your application, and value is a number or string that should be assigned to that argument.
+</p><p>For instance, the Tool Types field of a text display program might be set to LINES=20 to indicate how many lines to display at once.
+</p><p>Normally, the Tool Types information is filled in when the .info file is created; subsequent operations only read this information.
+</p>
+<h4><span class="mw-headline" id="Default_Tool">Default Tool</span></h4>
+<p>The Information requester for a project icon is different than that of a tool icon - it has both a Default Tool field and a Tool Types field. The Default Tool field tells the system which application is used to edit the project. When a user double-clicks on a project icon, the application specified in the Default Tool field gets run and the data is passed to that application via the WBStartup message.
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:SG7-5.png" class="mw-file-description"><img src="/w/images/d/d1/SG7-5.png" decoding="async" width="455" height="292" class="mw-file-element" /></a><figcaption>An Information requester for a project icon</figcaption></figure>
+<h4><span class="mw-headline" id="Altering_Icons">Altering Icons</span></h4>
+<p>If your application needs to alter an icon for some reason, change only the things you intend to change and preserve the rest. If your application needs to change the Tool Types field, for instance, leave the imagery, position and Default Tool field alone.
+</p><p>More important, change only the Tool Types entries relevant to your application - do not rewrite Tool Types from scratch for an existing project. If the icon has a Tool Types entry that your application does not recognize, that entry should be preserved.
+</p>
+<h4><span class="mw-headline" id="Tool_Types_and_Networks">Tool Types and Networks</span></h4>
+<p>You should support project-specific Tool Types arguments. With the advent of networked Amigas sharing the same applications, this becomes increasingly important. Tool Types arguments written to specific projects will allow networked users to override Tool Types arguments written to the application's tool icon - arguments that have probably been set for the least common denominator.
+</p>
+<h4><span class="mw-headline" id="Standard_Tool_Types_Arguments">Standard Tool Types Arguments</span></h4>
+<p>Some Tool Types arguments are already used in the system. If they apply to your application, support them; if not, take care that your Tool Types arguments don't conflict with these. Listed below are some of the more common Tool Types arguments found in the system:
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Note
+</th></tr>
+<tr>
+<td>Take care that your Tool Types arguments don't conflict with those listed here.
+</td></tr></tbody></table>
+<table class="wikitable">
+<tbody><tr>
+<th>Tool Type
+</th>
+<th>Notes
+</th></tr>
+<tr>
+<td>WINDOW=CON:&lt;window spec&gt;
+</td>
+<td>
+</td></tr>
+<tr>
+<td>DONOTWAIT
+</td>
+<td>Don't wait for return; used by wbstartup
+</td></tr>
+<tr>
+<td>TOOLPRI=&lt;priority&gt;
+<p>	STARTPRI=&lt;priority (-127 to 128)
+</p>
+</td>
+<td>Used to set your program's priority
+</td></tr>
+<tr>
+<td>PUBSCREEN=&lt;name&gt;
+</td>
+<td>The name of the public screen to open on
+</td></tr>
+<tr>
+<td>STARTUP=&lt;name&gt;
+</td>
+<td>ARexx script to run at startup time
+</td></tr>
+<tr>
+<td>PORTNAME=&lt;name&gt;
+</td>
+<td>Name to assign to your application's ARexx port; overrides default naming system
+</td></tr>
+<tr>
+<td>SETTINGS=&lt;name&gt;
+</td>
+<td>Allows a user to specify a settings file
+</td></tr>
+<tr>
+<td>UNIT=&lt;number&gt;
+</td>
+<td>Device or unit number
+</td></tr>
+<tr>
+<td>DEVICE=&lt;parallel/serial&gt;
+</td>
+<td>The name of the device to use
+</td></tr>
+<tr>
+<td>FILE=&lt;file pathname&gt;
+</td>
+<td>
+</td></tr>
+<tr>
+<td>WAIT=&lt;number (of seconds)&gt;
+</td>
+<td>
+</td></tr>
+<tr>
+<td>PREFS=&lt;prefstype&gt;
+</td>
+<td>
+</td></tr>
+<tr>
+<td>CX_POPUP=&lt;yes/no&gt;
+</td>
+<td>
+</td></tr>
+<tr>
+<td>CX_POPKEY=&lt;CX key specifier&gt;
+</td>
+<td>
+</td></tr>
+<tr>
+<td>CX_PRIORITY=&lt;CX priority level&gt;
+</td>
+<td>
+</td></tr>
+<tr>
+<td>&lt;CX fkey spec&gt;=&lt;CX string spec&gt;
+</td>
+<td>
+</td></tr></tbody></table>
+<h3><span class="mw-headline" id="The_Apps">The Apps</span></h3>
+<p>Other facilities also exist in Workbench that allow an application to get more information while the application is already running. These are known as AppWindow, AppIcon and AppMenu.
+</p><p>For example, a text editor's windows may function as AppWindows. A user would be able to drag the icon of a file into the window and that file would be loaded automatically.
+</p><p>AppWindows, AppIcons and AppMenus are aimed at the user. By using techniques that are totally graphic-oriented (Tool Types arguments still eventually come down to a line of type), the Apps bring the power of argument passing more into line with the "point-and-click" metaphor.
+</p>
+<h4><span class="mw-headline" id="AppWindows">AppWindows</span></h4>
+<p>An AppWindow is a special kind of Workbench window that allows the user to drag icons into it. It's basically a graphical alternative to a file requester.
+</p><p>Applications that set up an AppWindow will receive a message from Workbench whenever the user moves an icon into that AppWindow. The message contains the name of the file or directory that the icon represents.
+</p><p>For instance, Workbench's IconEdit is an AppWindow with three different areas which users can drag icons into - each with a different purpose. When the user drags an icon into the large box, the icon is loaded as a project. When an icon is dragged into the box labelled "Normal", its image is used for the normal (not selected) image. Likewise for an icon that is dragged into the box labelled "Selected" - its image becomes the activated image for the icon.
+</p>
+<figure class="mw-halign-center" typeof="mw:File/Frame"><a href="/wiki/File:SG7-6.png" class="mw-file-description"><img src="/w/images/7/72/SG7-6.png" decoding="async" width="854" height="542" class="mw-file-element" /></a><figcaption>IconEdit is an example of an AppWindow. It has three different drop areas which do three different things</figcaption></figure>
+<p>An AppWindow will often use icon drop box gadgets to indicate the active area where the user may drop an icon. Note: IconEdit did not follow this convention because it was more important to indicate the function of each area by its imagery (e.g. the "normal" area can be clicked on, etc.).
+</p><p>The window should activate when an icon is dragged into it.
+</p><p>AppWindows work whether the application is running on the Workbench screen or not. Users may also drag icons from another screen to the Workbench screen.
+</p>
+<h4><span class="mw-headline" id="AppIcons">AppIcons</span></h4>
+<p>An AppIcon is similar an AppWindow - it allows the user to pass a graphical argument to a running application. The only difference is that AppWindows use a window to accept the argument and AppIcons use an icon.
+</p><p>The image for an AppIcon should give some indication what operations it supports; ie. whether it represents an iconized application or supports dropped projects. Avoid vague imagery.
+</p><p>AppIcons are useful for programs that operate in the background with little other user interaction - a print spooler is a good example.
+</p><p>Double-clicking on an AppIcon should normally open a window offering information and controls. For example, a print spooler could open a status window in which the user could rename, abort or re-order the things he sent to be printed.
+</p>
+<h4><span class="mw-headline" id="AppMenus">AppMenus</span></h4>
+<p>An AppMenu allows your application to add a custom menu item to the Tools menu on Workbench. An application that sets up an AppMenu item will receive a message from Workbench whenever the user picks that item from the Workbench menu.
+</p>
+<h3><span class="mw-headline" id="Preferences">Preferences</span></h3>
+<p>Applications can also get arguments from Preferences. Via Preferences, the user can graphically set up the system defaults to suit his taste and needs.
+</p><p>Through Preferences, the user can control such things as screen fonts, colors and other global information that your application should respect.
+</p><p>You can create a preference editor to handle the defaults used by your application. See <a href="/wiki/UI_Style_Guide_Preferences" title="UI Style Guide Preferences">UI Style Guide Preferences</a> for more information.
+</p>
+<!-- 
+NewPP limit report
+Cached time: 20260114023059
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.032 seconds
+Real time usage: 0.034 seconds
+Preprocessor visited node count: 112/1000000
+Post‐expand include size: 115/2097152 bytes
+Template argument size: 79/2097152 bytes
+Highest expansion depth: 3/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.661      1 Template:Note
+100.00%    0.661      1 -total
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:483-0!canonical and timestamp 20260114023059 and revision id 6236. Rendering was triggered because: page-view
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=UI_Style_Guide_Workbench&amp;oldid=6236">http://wiki.amigaos.net/w/index.php?title=UI_Style_Guide_Workbench&amp;oldid=6236</a>"</div></div>
+		<div id="catlinks" class="catlinks" data-mw="interface"><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="/wiki/Special:Categories" title="Special:Categories">Category</a>: <ul><li><a href="/w/index.php?title=Category:User_Interface_Style_Guide&amp;action=edit&amp;redlink=1" class="new" title="Category:User Interface Style Guide (page does not exist)">User Interface Style Guide</a></li></ul></div></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=UI+Style+Guide+Workbench" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-main" class="selected mw-list-item"><a href="/wiki/UI_Style_Guide_Workbench" title="View the content page [c]" accesskey="c"><span>Page</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=Talk:UI_Style_Guide_Workbench&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/UI_Style_Guide_Workbench"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=UI_Style_Guide_Workbench&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=UI_Style_Guide_Workbench&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/UI_Style_Guide_Workbench" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/UI_Style_Guide_Workbench" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=UI_Style_Guide_Workbench&amp;oldid=6236" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=UI_Style_Guide_Workbench&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=UI+Style+Guide+Workbench"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=UI+Style+Guide+Workbench&amp;oldid=6236&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=UI_Style_Guide_Workbench&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 1 August 2013, at 18:16.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":116,"wgPageParseReport":{"limitreport":{"cputime":"0.032","walltime":"0.034","ppvisitednodes":{"value":112,"limit":1000000},"postexpandincludesize":{"value":115,"limit":2097152},"templateargumentsize":{"value":79,"limit":2097152},"expansiondepth":{"value":3,"limit":100},"expensivefunctioncount":{"value":0,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":0,"limit":5000000},"timingprofile":["100.00%    0.661      1 Template:Note","100.00%    0.661      1 -total"]},"cachereport":{"timestamp":"20260114023059","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>

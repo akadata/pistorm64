@@ -1,0 +1,733 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>UserDoc:Shell - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_3USIJ4f3C6Y1Puo1kgAAAAs","wgCanonicalNamespace":"UserDoc","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":100,"wgPageName":"UserDoc:Shell","wgTitle":"Shell","wgCurRevisionId":12516,"wgRevisionId":12516,"wgArticleId":492,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],"wgPageViewLanguage":
+"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"UserDoc:Shell","wgRelevantArticleId":492,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","ext.pygments":"ready","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["ext.pygments.view","site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%2Cpygments%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-100 ns-subject page-UserDoc_Shell rootpage-UserDoc_Shell skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-namespace">UserDoc</span><span class="mw-page-title-separator">:</span><span class="mw-page-title-main">Shell</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/UserDoc:How_AmigaOS_Works" title="UserDoc:How AmigaOS Works">UserDoc:How AmigaOS Works</a> &gt; <a href="/wiki/Workbench/Prefs" title="Workbench/Prefs">Workbench/Prefs</a> &gt; <a href="/wiki/UserDoc:Introduction_to_AmigaOS" title="UserDoc:Introduction to AmigaOS">UserDoc:Introduction to AmigaOS</a> &gt; <a href="/wiki/UserDoc:Workbench" title="UserDoc:Workbench">UserDoc:Workbench</a> &gt; <a href="/wiki/UserDoc:Shell" title="UserDoc:Shell">UserDoc:Shell</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#What_is_a_shell?"><span class="tocnumber">1</span> <span class="toctext">What is a shell?</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Starting,_closing_and_customising_a_shell"><span class="tocnumber">2</span> <span class="toctext">Starting, closing and customising a shell</span></a>
+<ul>
+<li class="toclevel-2 tocsection-3"><a href="#Opening_a_Shell_with_default_settings"><span class="tocnumber">2.1</span> <span class="toctext">Opening a Shell with default settings</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="#Opening_a_shell_defining_its_attributes"><span class="tocnumber">2.2</span> <span class="toctext">Opening a shell defining its attributes</span></a>
+<ul>
+<li class="toclevel-3 tocsection-5"><a href="#Legacy_mode"><span class="tocnumber">2.2.1</span> <span class="toctext">Legacy mode</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-6"><a href="#Defining_preferences_to_customise_the_shell"><span class="tocnumber">2.3</span> <span class="toctext">Defining preferences to customise the shell</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="#Closing_a_shell"><span class="tocnumber">2.4</span> <span class="toctext">Closing a shell</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-8"><a href="#Using_a_shell"><span class="tocnumber">3</span> <span class="toctext">Using a shell</span></a>
+<ul>
+<li class="toclevel-2 tocsection-9"><a href="#Shell_features"><span class="tocnumber">3.1</span> <span class="toctext">Shell features</span></a></li>
+<li class="toclevel-2 tocsection-10"><a href="#Menus"><span class="tocnumber">3.2</span> <span class="toctext">Menus</span></a>
+<ul>
+<li class="toclevel-3 tocsection-11"><a href="#Project_menu"><span class="tocnumber">3.2.1</span> <span class="toctext">Project menu</span></a></li>
+<li class="toclevel-3 tocsection-12"><a href="#Edit_menu"><span class="tocnumber">3.2.2</span> <span class="toctext">Edit menu</span></a></li>
+<li class="toclevel-3 tocsection-13"><a href="#View_menu"><span class="tocnumber">3.2.3</span> <span class="toctext">View menu</span></a></li>
+<li class="toclevel-3 tocsection-14"><a href="#Settings_menu"><span class="tocnumber">3.2.4</span> <span class="toctext">Settings menu</span></a></li>
+<li class="toclevel-3 tocsection-15"><a href="#Extras_menu"><span class="tocnumber">3.2.5</span> <span class="toctext">Extras menu</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-16"><a href="#Using_the_command_history"><span class="tocnumber">3.3</span> <span class="toctext">Using the command history</span></a></li>
+<li class="toclevel-2 tocsection-17"><a href="#Using_the_display_history"><span class="tocnumber">3.4</span> <span class="toctext">Using the display history</span></a></li>
+<li class="toclevel-2 tocsection-18"><a href="#Command_line_editing"><span class="tocnumber">3.5</span> <span class="toctext">Command line editing</span></a></li>
+<li class="toclevel-2 tocsection-19"><a href="#Command/Filename_completion"><span class="tocnumber">3.6</span> <span class="toctext">Command/Filename completion</span></a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+<h2><span id="What_is_a_shell.3F"></span><span class="mw-headline" id="What_is_a_shell?">What is a shell?</span></h2>
+ <figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:Shell_2tabs.png" class="mw-file-description"><img src="/w/images/c/ce/Shell_2tabs.png" decoding="async" width="304" height="174" class="mw-file-element" /></a><figcaption>Two shells console window</figcaption></figure> 
+<p>The Shell/Console is a text based window that provides a mechanism for the user to send commands to the operating system or run user programs. It is a low-level version of the Graphical User Interface (GUI) known as the <a href="/wiki/UserDoc:Workbench" title="UserDoc:Workbench">Workbench</a>. Some commands are unique to the Shell, just as some are unique to the Workbench. In practice, the two user interfaces complement each other with a large amount of overlap. The choice is left to personal taste.
+</p><p>The user-supplied commands and responses from the Shell and other programs can be displayed in a Console text window on the screen. This window can be a simple one with a few features or complex ones with different tabs (see picture), an automatic display history or other features that give a better user experience. You can open only one shell in a window, or open different shells in the same console window. If you decide to work with different shells, each one you start will be opened in a different tab in the same console window. Each shell is independent and you can navigate between each of them by a keyboard shortcut or menu item.
+</p><p>Alternatively, the user interface may be used via a remote mechanism such as a terminal program running on another computer. Such a remote machine might be connected via a serial interface, a network connection or other means.
+</p>
+<h2><span id="Starting.2C_closing_and_customising_a_shell"></span><span class="mw-headline" id="Starting,_closing_and_customising_a_shell">Starting, closing and customising a shell</span></h2>
+<h3><span class="mw-headline" id="Opening_a_Shell_with_default_settings">Opening a Shell with default settings</span></h3>
+<p>You can open a shell doing like this:
+</p>
+<ul><li>Double click the Shell icon that you can find in the System folder of the system partition. <span class="mw-default-size" typeof="mw:File"><a href="/wiki/File:Shell_Icon.png" class="mw-file-description"><img src="/w/images/7/72/Shell_Icon.png" decoding="async" width="52" height="74" class="mw-file-element" /></a></span></li></ul>
+<ul><li>Issue one of the following commands <b>newshell</b>, <b>newcli</b> or <b>cli</b>. As an example, you can use such command in the <b>Execute...</b> requester of the Workbench.</li></ul>
+<h3><span class="mw-headline" id="Opening_a_shell_defining_its_attributes">Opening a shell defining its attributes</span></h3>
+<p>If you issue the <b>newshell</b> command without an argument, the default value will be used and a shell will be opened positionned at the top left of the screen, with a height of 130 pixels and it will take the width of the screen. The <b>newshell</b> command can also be used with a special argument that describes how the shell should look. This is the WINDOW template that looks like this:
+</p><p><b>CON:[X]/[Y]/[width]/[height]/[title]/[options]</b> where:
+</p>
+<dl><dt>X</dt>
+<dd>is the number of pixels from the left edge of the screen to the left border of the console window. Use no value (i.e. //) to specify the minimum possible pixels. Use the value -1 to generate a window that is centred horizontally on the screen.</dd></dl>
+<dl><dt>Y</dt>
+<dd>is the number of pixels from the top of the screen to the top of the console window. Use no value (//) to specify the minimum possible pixels. Use the value -1 to generate a window that is centred vertically on the screen.</dd></dl>
+<dl><dt>width</dt>
+<dd>is the width of the console window, in pixels. Use no value (//) to specify the full width of the screen.</dd></dl>
+<dl><dt>height</dt>
+<dd>is the height of the console window, in pixels. Use no value (//) to specify minimum possible height.</dd></dl>
+<dl><dt>title</dt>
+<dd>is the text that appears in the console window title bar. Note that if you want to use a title with spaces in it you need to enclose the whole specification line in double quotes ("). This is the same as using file names with spaces.</dd></dl>
+<p>You can incorporate "formatting" descriptors in the title. These will expand at run time to show different text in the Window title. 
+The following format descriptors are the same as those available for the command prompt.
+</p>
+<dl><dd><dl><dt>%E</dt>
+<dd>Displays the execution time of the last program run; this is given as the number of seconds, followed by the decimal point, and the fraction of a second. This corresponds to the value of the $_RunTime environment variable.</dd></dl></dd></dl>
+<dl><dd><dl><dt>%N</dt>
+<dd>Displays the Shell number. This is also available in the form of the Process environment variable.</dd></dl></dd></dl>
+<dl><dd><dl><dt>%R</dt>
+<dd>Displays the return code for the last operation. This is also available as the $RC environment variable.</dd></dl></dd></dl>
+<dl><dd><dl><dt>%S</dt>
+<dd>Displays the current directory (full path).</dd></dl></dd></dl>
+<dl><dd><dl><dt>%W</dt>
+<dd>Displays the error code set by the last operation; this is what the WHY command will print the corresponding error message for. This is also available as the $Result2 environment variable.</dd></dl></dd></dl>
+<p>These additional format descriptors are unique to the console:
+</p>
+<dl><dd><dl><dt>%D</dt></dl></dd>
+<dd>Displays the date in the Locale form.
+<dl><dt>%F</dt></dl></dd>
+<dd>Displays the number of rows of display history filed to disk.
+<dl><dt>%H</dt></dl></dd>
+<dd>Displays the number of rows of display History in the text buffer.
+<dl><dt>%s (lower case)</dt></dl></dd>
+<dd>Displays the current directory (last part only).
+<dl><dt>%T</dt></dl></dd>
+<dd>Displays the current time.</dd></dl>
+<p>Use slashes (/) to separate the parameters and options.
+</p>
+<dl><dt>options</dt>
+<dd>You can use here any of the following options:</dd></dl>
+<dl><dd><dl><dt>AUTO</dt>
+<dd>The window automatically appears when the program needs input or produces output. Selecting the Shell's close gadget closes the window, but it re-opens immediately since it is expecting input.</dd></dl></dd></dl>
+<dl><dd><dl><dt>ALT</dt>
+<dd>The window appears in the specified size and position when the zoom gadget is clicked. The four parameters must be separated with slashes (for example, ALT 30/30/200/200). If the ALT option is not specified, the alternative window size is full screen.</dd></dl></dd></dl>
+<dl><dd><dl><dt>BACKDROP</dt>
+<dd>The window appears on the backdrop, behind all the Workbench windows. This console window cannot be brought to the front of the screen; you have to resize the Workbench windows to see it.</dd></dl></dd></dl>
+<dl><dd><dl><dt>CHARSET</dt>
+<dd>The window font will be opened with the specified charset if possible. The charset is specified as a string, eg: CHARSET=ISO-8859-15.</dd></dl></dd></dl>
+<dl><dd><dl><dt>CLOSE</dt>
+<dd>The window has all the standard gadgets, including a close gadget.</dd></dl></dd></dl>
+<dl><dd><dl><dt>COLUMS</dt>
+<dd>Specify the number of columns of text in the window to be opened, given as the number of characters rather than as pixels. This option overrides the <i>width</i> parameter of the window specification.</dd></dl></dd></dl>
+<dl><dd><dl><dt>INACTIVE</dt>
+<dd>The window opens, but is not made the active window.</dd></dl></dd></dl>
+<dl><dd><dl><dt>LEGACY</dt>
+<dd>This option forces the window to be opened without history, ClickTab or a scrollbar. It might be useful to use with older, non-conforming applications that use the console. If this option and the TABBED option are both present on the command line, the LEGACY option will take precedence.</dd>
+<dd>The NOHISTORY option is a synonym for this option but can be over-ruled by a later TABBED option. Refer also to the notes for the TABBED option. Please see the section below to understand why this LEGACY mode exists.</dd></dl></dd></dl>
+<dl><dd><dl><dt>NOAPPWINDOW</dt>
+<dd>The window is not registered as an AppWindow, so you can't drop icons onto it.</dd></dl></dd></dl>
+<dl><dd><dl><dt>NOBORDER</dt>
+<dd>The window opens without any left or bottom window border. Only the zoom, depth and sizing gadgets are available.</dd></dl></dd></dl>
+<dl><dd><dl><dt>NOCLOSE</dt>
+<dd>The window does not have a close gadget. If you open a console normally, there is no close gadget. If you open a console using the AUTO option, there is automatically a close gadget on the window.</dd></dl></dd></dl>
+<dl><dd><dl><dt>NODEPTH</dt>
+<dd>The window has no window depth gadget.</dd></dl></dd></dl>
+<dl><dd><dl><dt>NODRAG</dt>
+<dd>The window cannot be dragged. It has zoom, depth and sizing gadgets, but no close gadget.</dd></dl></dd></dl>
+<dl><dd><dl><dt>NOICONIFY</dt>
+<dd>The window is opened without an iconify gadget. The window can still be iconified by use of the <i>Right-Amiga I</i> keyboard shortcut or the corresponding menu item.</dd></dl></dd></dl>
+<dl><dd><dl><dt>NOSIZE</dt>
+<dd>The window has no size gadget.</dd></dl></dd></dl>
+<dl><dd><dl><dt>NOSCROLLBAR</dt>
+<dd>The window opens without a scrollbar in the right border. This option is forced if the LEGACY option is specified.</dd></dl></dd></dl>
+<dl><dd><dl><dt>ROWS</dt>
+<dd>Specify the number of rows in the window to be opened, given as the number of characters rather than as pixels. This option overrides the 'height' parameter of the window specification.</dd></dl></dd></dl>
+<dl><dd><dl><dt>SCREEN</dt>
+<dd>The window opens on a public screen. The screen does not have to be already open. You specify the name of the screen after the SCREEN keyword. You can interpose spaces or one "=" sign between the SCREEN keyword and the screen name. For instance, all these four versions work the same:</dd>
+<dd><div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">SCREENScreenName</span>
+<span class="linenos" data-line="2"></span><span class="n">SCREEN</span><span class="w"> </span><span class="n">ScreenName</span>
+<span class="linenos" data-line="3"></span><span class="n">SCREEN</span><span class="o">=</span><span class="n">ScreenName</span>
+<span class="linenos" data-line="4"></span><span class="n">SCREEN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ScreenName</span>
+</pre></div></dd>
+<dd>If the window is to open on the frontmost public screen, use two * (asterisks) in place of the screen name. Note that a single asterisk will be "swallowed" by AmigaDOS before the con-handler sees it, so two are required.</dd></dl></dd></dl>
+<dl><dd><dl><dt>SIMPLE</dt>
+<dd>If you enlarge the window, the text expands to fill the new available space, allowing you to see text that had been scrolled out of the window (this is the default behaviour).</dd></dl></dd></dl>
+<dl><dd><dl><dt>TABBED</dt>
+<dd>The window is opened with a ClickTab gadget, allowing subsequent Shells to share the window frame. The currently visible and active Shell may then be selected by clicking on the Tab gadget or by using a keyboard shortcut. Closing individual Shells (one at a time) does not close the Tabbed window until all Shells have been closed, but you can close all Shells at once by holding the Shift key whilst clicking the Close gadget. This option is not available with a pre-existing Window.</dd></dl></dd></dl>
+<dl><dd><dl><dd>If the window is opened with History enabled (i.e. <b>without</b> the LEGACY option), but the TABBED option is omitted, you can still open multiple Shells in the window, but there will be no ClickTab gadget. You will have to use the <i>Right-Amiga &lt;</i> and <i>Right-Amiga &gt;</i> shortcut keys or the menu Select item to switch the display from one Shell to another.</dd>
+<dd>Default: Not tabbed.</dd></dl></dd></dl>
+<dl><dd><dl><dt>WAIT</dt>
+<dd>The window can only be closed by selecting the close gadget or entering Ctrl-\. If WAIT is specified without the CLOSE option, there is no close gadget and the window can only be closed by typing Ctrl-\.</dd></dl></dd></dl>
+<dl><dd><dl><dt>WINDOW</dt>
+<dd>This option is intended for use by applications only and is of limited use to a user.</dd>
+<dd>A window previously opened through intuition.library/OpenWindow or intuition.library/OpenWindowTagList should be attached to the new console. The window's address must be given as a parameter given as a hexadecimal number. Any leading "0x" prefix is ignored. Note that History and multiple Shell features can not be used with an existing window.</dd></dl></dd></dl>
+<p><b>Example:</b>
+</p><p>newshell "CON:0/0//300/This is a shell/CLOSE"
+</p><p>Note: double quotes (") are used because there are spaces in the title string.
+</p>
+<h4><span class="mw-headline" id="Legacy_mode">Legacy mode</span></h4>
+<p>There are two types of console window, the old legacy window and the new style with more features (which is the default). The old legacy window is maintained for compatibility with older programs and will not normally be used by a Shell. The legacy console does not support history or shared windows, does not have a menu and mimics as closely as possible the behaviour of the old con-handler and console (pre-AmigaOS 4.1 versions).
+</p>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:Shell_legacy.png" class="mw-file-description"><img src="/w/images/c/ce/Shell_legacy.png" decoding="async" width="212" height="86" class="mw-file-element" /></a><figcaption>Shell in legacy mode</figcaption></figure>
+<p>When running programs other than a Shell (for example, text editors or file display applications), you may find that some older programs do not behave as you would expect from experience with the <i>old</i> con-handler and console. In many cases older programs did not obey the documentation and relied on behaviour that is different in the new con-handler and console.
+</p><p>If you have a program that runs from a Shell and <i>misbehaves</i>, try running it from a <i>legacy</i> Shell/console. That can be done by specifying the LEGACY option in the NewShell command line or the tooltypes in the Shell icon.
+</p><p>Unless you choose otherwise, a new-style Shell window will have these features over the <i>old</i> style:
+</p>
+<ul><li>Scrollbar for scrolling display history up and down</li>
+<li>Iconify gadget to Iconify the window;</li>
+<li>Menu that allows various attributes to be changed.</li></ul>
+<p>Note: the above features are optional and can be determined by the options on the command line when the Shell window is opened. The window can not be changed once it has been opened.
+</p>
+<h3><span class="mw-headline" id="Defining_preferences_to_customise_the_shell">Defining preferences to customise the shell</span></h3>
+<p>The prefs editor allows you to select and save some preferences to be used as defaults when a Shell console is opened. Not all console settings can be chosen and some may be later over-ridden under program control. The Prefs editor can be run from the Prefs drawer, but can also be run from the console menu (present in a new-style console only). Some options in the editor are different for the two methods.
+</p><p>Note that some attributes of an already opened console window can not be changed immediately. If the current Shell is displayed in a window with Tabs, you can change the attribute from the preferences editor, then clone the Shell and the new Shell will show the modified attribute(s).
+These attributes are:
+</p>
+<ul><li>Max lines in text buffer;</li>
+<li>Save history on exit;</li>
+<li>History drawer;</li>
+<li>Command buffer, kB.</li></ul>
+<p>The GUI shows several areas in the window, used to select settings of particular variables as defaults. There are three "pages" of settings, selected by clicking one or other of the Tabs at the top of the window.
+</p>
+<pre>    Appearance Page            
+                     Text Font 
+                  Cursor Style 
+               ClickTab Labels 
+             Emulation Options 
+    Text Colors Page           
+                       Palette 
+              Foreground Color 
+              Background Color 
+                   Sample Text 
+    Completion Page            
+               Name Completion 
+            Command Completion 
+                 Other Options 
+    Options Page               
+               Display History 
+                  Text Options 
+         Save Settings Options 
+</pre>
+<p>Note: The preferences editor can be called from the console menu, if the console has been opened with the "History" or "Tabbed" attributes. You
+can exit from the preferences editor in the normal way with "Save", "Use" or "Cancel". If you select "Use", there are more settings that specify
+how the changed settings will affect other Shells and windows.
+</p><p>When making changes to the console attributes from the menu, be aware that attributes of the window layout can not be changed in the current window.
+If you wish to change one or more of these attributes, you must "Save" or "Use" the settings and specify that the changes are to apply to "Future
+Windows". The new attribute(s) (for example, "Box around Text") will then be used when future windows are opened.
+</p>
+<h3><span class="mw-headline" id="Closing_a_shell">Closing a shell</span></h3>
+<p>To Exit from a Shell, you can:
+</p>
+<ul><li>Type <b>EndCLI</b> or <b>EndShell</b> at the command prompt;</li>
+<li>Type one of the keyboard shortcuts <i>Ctrl \</i> or <i>Right-Amiga K</i>; or</li>
+<li>Click in the Close gadget (not all Console windows have a Close gadget, but it is normal for a Shell window to have one). If there are two or more Shells sharing this window, you can close them all at once by holding the Shift key and clicking the Close gadget. The keyboard shortcut <i>Right-Amiga Q</i> will also close all Shells at once.</li></ul>
+<h2><span class="mw-headline" id="Using_a_shell">Using a shell</span></h2>
+<p>A shell being a text only interface you will use it almost exclusively with the keyboard. You will type commands or use keyboard shortcuts to act on the shell. Also there are a few graphic elements that will require the use of a mouse: menu items, window sliders, tabs...
+</p>
+<h3><span class="mw-headline" id="Shell_features">Shell features</span></h3>
+<p>A shell always features a <i>command</i> history. It allows you to check previous commands and issue them again.
+</p><p>By default a shell features a <i>display</i> history that allows you to scroll back in time and see what was displayed before. A scrollbar will allow display history to be scrolled back into the window. History can also be scrolled by Keyboard Shortcuts.
+</p><p>Any Console window (legacy or new style) can also be iconified, whereupon it shrinks into an icon on the Workbench. You can iconify the Shell window by any of these means:
+</p>
+<ul><li>Click the Iconify gadget (if present) on the window top border;</li>
+<li>Type <i>Right-Amiga I</i> while the shell window is activated;</li>
+<li>Select <i>Iconify</i> from the console menu.</li></ul>
+<p>A single Console window can display any one of several Shells. The Shell currently <i>in front</i> can be changed by:
+</p>
+<ul><li>Clicking on one of the Tabs in the ClickTab gadget (if used);</li>
+<li>Using a keyboard shortcut to go forward to the next or back to the previous Shell;</li>
+<li>Using a menu item to go forward to the next or back to the previous Shell;</li>
+<li>Using a menu item to directly select a different Shell.</li></ul>
+<p>When a different Shell is selected for display by one of the above means, the window changes to display the <i>new</i> Shell. The window Title bar, Scrollbar settings and text attributes all change to the settings of the new Shell.
+</p><p>Any other Shells displayed in the Console window continue with whatever they were doing and are not affected by the display change. You can bring any one of them to the front and it will behave as if it had merely been covered by another window.
+</p>
+<h3><span class="mw-headline" id="Menus">Menus</span></h3>
+<h4><span class="mw-headline" id="Project_menu">Project menu</span></h4>
+<p>Some items in the Project menu may not appear, depending on the mode in which the window has been opened. These dependencies are listed with each item below.
+</p>
+<ul><li>New shell</li></ul>
+<p>This option opens a clone of the Shell that was running at the time the menu item was selected. It is equivalent to the keystroke <i>Right-Amiga N</i>.
+</p>
+<hr />
+<ul><li>Load history...</li></ul>
+<p>This item brings up an ASL requester, allowing you to select an ASCII file that will be read into the console as though it were command history. Any control characters or escape sequences embedded in the file will be actioned in the normal manner when loaded.
+Notes: display history files are saved without any formatting, therefore the text may not appear the same in the window as it did before being saved. The file is read simply as a string of text and any Shell commands in it are
+not recognised or actioned. Therefore, the con-handler's <i>command</i> history will not contain any of the saved commands in the display history file.
+</p>
+<ul><li>Save history...</li></ul>
+<p>This item brings up an ASL requester, allowing you to nominate a drawer and file name under which to save the current display history. Notes: the display history is saved without any formatting codes. The history is not changed after the text is saved.
+</p>
+<ul><li>Clear history</li></ul>
+<p>This item clears all display history except that which is in the current window. Any temporary disk files are also cleared.
+</p>
+<hr />
+<ul><li>Iconify</li></ul>
+<p>this iconifies the shell into an icon on the Workbench screen. The icon will be named with the process ID of the shell. This is equivalent to the keystroke <i>Right-Amiga I</i>.
+</p>
+<ul><li>About...</li></ul>
+<p>This gives the version numbers of the console.device and the console.handler. It is equivalent to the keystroke <i>Right-Amiga&#160;?</i>.
+</p>
+<hr />
+<ul><li>Close shell</li></ul>
+<p>This item issues a CLOSEWINDOW command (equivalent to typing Ctrl-\ or <i>Right-Amiga K</i>). It will close only the current Shell and will appear only when there are two or more Shells in the window.
+The window may not close if there are unfinished tasks running.
+</p>
+<ul><li>Close all</li></ul>
+<p>This item closes every Shell operating in the current window. Some or all of the Shells may remain open if they have tasks still running. It is equivalent to the keystroke <i>Right-Amiga Q</i>.
+</p>
+<h4><span class="mw-headline" id="Edit_menu">Edit menu</span></h4>
+<ul><li>Copy - copies the selected text into the clipboard.</li>
+<li>Paste - pastes the text from the clipboard to the shell prompt.</li></ul>
+<h4><span class="mw-headline" id="View_menu">View menu</span></h4>
+<ul><li>Prev shell</li></ul>
+<p>This item will only appear if you have more than one Shell open in the window. It will appear with or without a ClickTab gadget in the window. When selected, it changes the current Shell to the previous Shell, where "previous" refers to the Tabs in a ClickTab Window. If there is no ClickTab in this window, the "previous" Shell is that opened before the currently active Shell. If the current Shell is the first Shell opened, this item will select the last Shell opened. It is equivalent to the keystroke <i>Right-Amiga &lt;</i>.
+</p>
+<ul><li>Next shell</li></ul>
+<p>This item will only appear if you have more than one Shell open in the window. It will appear with or without a ClickTab gadget in the window. When selected, it changes the current Shell to the next Shell, where "next" refers to the Tabs in a ClickTab Window. If there is no ClickTab in this window, the "next" Shell is that opened before the currently active Shell. If the current Shell is the last Shell opened, this item will select the first Shell opened. It is equivalent to the keystroke <i>Right-Amiga &gt;</i>.
+</p>
+<ul><li>Select...</li></ul>
+<p>This item will only appear if you have more than one Shell open in the window. It will appear with or without a ClickTab gadget in the window. If you have two or more Shells open, the "Select" item will open a pop-up window showing you the names of each open Shell. The names are taken from the ClickTab Labels assigned in the Prefs editor. If you click on any named Shell in the list, that Shell will become the "front" Shell. You can close the pop-up window with the mouse or double-click on the name you want.
+</p>
+<h4><span class="mw-headline" id="Settings_menu">Settings menu</span></h4>
+<p>The Settings menu allows you to alter the Preferences of the current window. All Shells operating in that window will be affected by any changes you make.
+</p>
+<ul><li>Edit...</li></ul>
+<p>This item calls the Preferences Editor. You may make any changes you wish, then Use, Save or Cancel them as you please. If you exit with "Save",
+they will be saved in ENVARC: and all consoles opened after that time will use the new settings. If you exit with "Use", additional prefs settings
+will decide whether the changes apply to this window only, this window and all future windows or future windows only. Additionally, if the current window has two or more Shells operating under different Tabs, you can specify whether the changes are to apply to the frontmost Shell only, or to all Shells within that window.
+</p>
+<ul><li>Load...</li></ul>
+<p>This item opens an ASL requester that allows you to select a special settings file that you have saved somewhere. Its contents will affect only the
+current window.
+</p>
+<ul><li>Save As...</li></ul>
+<p>This item opens an ASL requester that allows you to choose the drawer and file name under which the settings will be saved.
+</p>
+<h4><span class="mw-headline" id="Extras_menu">Extras menu</span></h4>
+<p>The Extras menu contains only the "Help" item.
+</p>
+<ul><li>Help...</li></ul>
+<p>This item displays the console Help file with Multiview. It is equivalent to typing the keystroke <i>Right-Amiga H</i> or the Help or Scroll Lock keys.
+</p>
+<h3><span class="mw-headline" id="Using_the_command_history">Using the command history</span></h3>
+<p>The Command history is provided and maintained by the console. Note that this is the history of previous <i>commands</i> only, not the responses to them or any program output. Do not confuse it with the <i>display</i> history which you can scroll up and down with the scrollbar on the right.
+</p><p>Every input command you type is stored by the console and can be retrieved by the Up-arrow key. You can navigate up or down through the history using the Command History Shortcut Keys. When you reached a command you would like to execute again, just press the <i>Enter</i> key to validate.
+Note that whatever you type that remains on the display will be stored in the display history when it scrolls off the screen. So you could achieve the same effect by scrolling back the display history, selecting the desired command
+by clicking and dragging with the mouse, typing <i>Right-Amiga C</i> to capture it, then <i>Right-Amiga V</i> to paste it on the command line.
+</p><p>There is also a Shell command <i>history</i> that prints out all the commands you have entered since the Shell session began (but none of the responses or program output).
+</p>
+<h3><span class="mw-headline" id="Using_the_display_history">Using the display history</span></h3>
+<p>The Display history is only maintained if the console window is opened with a command line containing the option "History" or "Tabbed". The history can be saved after the Shell editing session. Refer to Console Prefs editor for details about saving the display history by default.
+</p><p>When one of the above options was specified on the Shell command line, the Console that is opened can maintain and display in a memory-resident buffer, any display lines scrolled off the top of the display. You have a choice of what (if anything) you want to save when the console is closed. This choice is selected in the Console Prefs editor.
+Lines of text (both commands and program output) that have scrolled off the top of the display may be scrolled back by any of these means:
+</p>
+<ul><li>Use the mouse to click and drag the scrollbar;</li>
+<li>Use the mouse to click on the arrows at the bottom of the scrollbar;</li>
+<li>Use the mousewheel to scroll the display up or down;</li>
+<li>Use the keyboard Page Up or Page Down keys (only with PC-style keyboards);</li></ul>
+<p>or
+</p>
+<ul><li>Use the keyboard shortcut keys Alt/Up arrow or Alt/Down arrow.</li></ul>
+<p>Scrolling the display may scroll the command line (including the cursor) off the display, making the cursor disappear. If that happens, the cursor will reappear when the command line is scrolled back onto the display. You can get the command line and the cursor back onto the display at any time by:
+</p>
+<ul><li>Typing any character on the keyboard (it will appear on the command line);</li>
+<li>Moving the cursor forward or back on the command line; or</li>
+<li>Using the Up or Down arrows to scroll through command history.</li></ul>
+<p>In any of the above cases, the display will instantly switch back to the original place, displaying the command line.
+</p><p>Some operations can clear the screen (eg printing a Form Feed character). Since the command line is often at the bottom of the display, such events force all lines of the display above the command line to scroll off the top of the display before the display is cleared. This means that none of the history before the clear operation is lost.
+</p><p>The number of lines of text stored in the text buffer is limited to the maximum defined by the Console Prefs. When that maximum is exceeded, the console device may start to "cull" lines from the text buffer into a disk file (if the Console Prefs allow it). Any lines of history that have been written to the disk file are still accessible by scrolling back through the history, but only a line at a time (Page Up does not work under that condition).
+</p><p>Naturally, if several Shells share a Console window (with or without a ClickTab gadget), each such Shell has its own independent history file.
+</p><p>When the Shell is closed (and the Console preferences allow it), any remaining rows of text on the display will be written out to the history file before it is closed. If the option is selected in the Console Prefs, the file will be saved, otherwise it will be deleted.
+</p><p>The Prefs Options allows you to choose what, if any, history to save when the session is closed.
+</p><p>The saved history file is called "ConsoleTextnnnn", where "nnnn" is a unique serial number identifying the console display. The "nnnn" serial number is incremented and written back to ENVARC: after every new console is opened.
+</p>
+<h3><span class="mw-headline" id="Command_line_editing">Command line editing</span></h3>
+<p>While using the shell you will probably have to move around in the current line and to change some text to fix errors. Here are the keyboard shortcuts you can use to make your work with the shell easier.
+</p>
+<ul><li><i>Left-arrow</i></li></ul>
+<p>Moves cursor one character to the left.
+</p>
+<ul><li><i>Alt Left-arrow</i></li></ul>
+<p>Moves cursor to the beginning of the current word, or to the beginning of the previous word, or to the beginning of the line.
+</p>
+<ul><li><i>Shift Left-arrow</i>, <i>Ctrl A</i>, <i>Home</i> ("PC"-style keyboards only)</li></ul>
+<p>Moves cursor to the beginning of the line.
+</p>
+<ul><li><i>Right-arrow</i></li></ul>
+<p>Moves cursor one character to the right.
+</p>
+<ul><li><i>Alt Right-arrow</i></li></ul>
+<p>Moves cursor to the beginning of the next word, or to the end of the line.
+</p>
+<ul><li><i>Shift Right-arrow</i>, <i>Ctrl Z</i>, <i>End</i> ("PC"-style keyboards only)</li></ul>
+<p>Moves cursor to the end of the line.
+</p>
+<ul><li><i>Backspace</i></li></ul>
+<p>Deletes the character to the left of the cursor. All characters at and to the right of the cursor are shifted one character left to fill in the
+gap. The cursor moves one character left.
+</p>
+<ul><li><i>Alt Backspace</i></li></ul>
+<p>Deletes the whole word to the left of the cursor.
+</p>
+<ul><li><i>Delete</i></li></ul>
+<p>Deletes the character under the cursor. All characters to the right of the cursor are shifted one character left to fill in the gap. The cursor does
+not move.
+</p>
+<ul><li><i>Alt Delete</i></li></ul>
+<p>Deletes the whole word to the right of the cursor.
+</p>
+<ul><li><i>Ctrl H</i></li></ul>
+<p>Deletes the previous character (same as Backspace).
+</p>
+<ul><li><i>Ctrl M</i></li></ul>
+<p>Processes the command line (same as Enter).
+</p>
+<ul><li><i>Ctrl J</i></li></ul>
+<p>Adds a line feed.
+</p>
+<ul><li><i>Ctrl X</i></li></ul>
+<p>Deletes the current line.
+</p>
+<ul><li><i>Ctrl K</i></li></ul>
+<p>Deletes everything from the cursor forward to the end of the line.
+</p>
+<ul><li><i>Ctrl Y</i></li></ul>
+<p>Replaces the characters deleted with <i>Ctrl K</i>.
+</p>
+<ul><li><i>Ctrl U</i></li></ul>
+<p>Deletes everything from the cursor backward to the start of the line.
+</p>
+<h3><span id="Command.2FFilename_completion"></span><span class="mw-headline" id="Command/Filename_completion">Command/Filename completion</span></h3>
+<p>Coming soon...
+</p>
+<!-- 
+NewPP limit report
+Cached time: 20260114023053
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.030 seconds
+Real time usage: 0.162 seconds
+Preprocessor visited node count: 65/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 2/100
+Expensive parser function count: 1/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 689/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 -total
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:492-0!canonical and timestamp 20260114023053 and revision id 12516. Rendering was triggered because: page-view
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=UserDoc:Shell&amp;oldid=12516">http://wiki.amigaos.net/w/index.php?title=UserDoc:Shell&amp;oldid=12516</a>"</div></div>
+		<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=UserDoc%3AShell" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-userdoc" class="selected mw-list-item"><a href="/wiki/UserDoc:Shell" title="View the subject page [c]" accesskey="c"><span>UserDoc</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=UserDoc_talk:Shell&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/UserDoc:Shell"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Shell&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Shell&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/UserDoc:Shell" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/UserDoc:Shell" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Shell&amp;oldid=12516" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Shell&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=UserDoc%3AShell"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=UserDoc%3AShell&amp;oldid=12516&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Shell&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 26 January 2025, at 19:22.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":241,"wgPageParseReport":{"limitreport":{"cputime":"0.030","walltime":"0.162","ppvisitednodes":{"value":65,"limit":1000000},"postexpandincludesize":{"value":0,"limit":2097152},"templateargumentsize":{"value":0,"limit":2097152},"expansiondepth":{"value":2,"limit":100},"expensivefunctioncount":{"value":1,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":689,"limit":5000000},"timingprofile":["100.00%    0.000      1 -total"]},"cachereport":{"timestamp":"20260114023053","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>

@@ -1,0 +1,419 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>UserDoc:Main - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_14U3PFXsXhbKC1TSTgAAAAI","wgCanonicalNamespace":"UserDoc","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":100,"wgPageName":"UserDoc:Main","wgTitle":"Main","wgCurRevisionId":11809,"wgRevisionId":11809,"wgArticleId":455,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],"wgPageViewLanguage":
+"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"UserDoc:Main","wgRelevantArticleId":455,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-100 ns-subject page-UserDoc_Main rootpage-UserDoc_Main skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-namespace">UserDoc</span><span class="mw-page-title-separator">:</span><span class="mw-page-title-main">Main</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/Main_Page" title="Main Page">Main Page</a> &gt; <a href="/wiki/UserDoc:Main" title="UserDoc:Main">UserDoc:Main</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Welcome_to_AmigaOS"><span class="tocnumber">1</span> <span class="toctext">Welcome to AmigaOS</span></a>
+<ul>
+<li class="toclevel-2 tocsection-2"><a href="#AmigaOS:_The_flexible_operating_system"><span class="tocnumber">1.1</span> <span class="toctext">AmigaOS:  The flexible operating system</span></a></li>
+<li class="toclevel-2 tocsection-3"><a href="#Some_AmigaOS_features"><span class="tocnumber">1.2</span> <span class="toctext">Some AmigaOS features</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="#AmigaOS_platform_targets"><span class="tocnumber">1.3</span> <span class="toctext">AmigaOS platform targets</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-5"><a href="#How_does_AmigaOS_work?_-_Concepts"><span class="tocnumber">2</span> <span class="toctext">How does AmigaOS work? - Concepts</span></a></li>
+<li class="toclevel-1 tocsection-6"><a href="#How_to_use_AmigaOS?"><span class="tocnumber">3</span> <span class="toctext">How to use AmigaOS?</span></a></li>
+<li class="toclevel-1 tocsection-7"><a href="#Manuals"><span class="tocnumber">4</span> <span class="toctext">Manuals</span></a></li>
+<li class="toclevel-1 tocsection-8"><a href="#Applications"><span class="tocnumber">5</span> <span class="toctext">Applications</span></a></li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="Welcome_to_AmigaOS">Welcome to AmigaOS</span></h2>
+<p>AmigaOS was born in 1985 and delivered what contemporary personal computer operating systems could only dream of.  As the first "multimedia" operating system, it was trivial for AmigaOS computers to display animations while playing music and reading data from disks.  Such multimedia and multitasking finesse drew many people to this system.  Some of them are famous: <a rel="nofollow" class="external text" href="https://www.warhol.org/exhibition/warhol-and-the-amiga/">Andy Warhol</a>, Sir Arthur C. Clarke, <a rel="nofollow" class="external text" href="http://www.polyphoto.com/upchug/AEcastro.html">NASA</a>, Hollywood and the TV broadcasting industry, and many others that thought <a rel="nofollow" class="external text" href="http://www.youtube.com/watch?v=PWeO5IkCssk">only Amiga makes it possible</a>.
+</p><p>Today many people still think AmigaOS has something special that makes it more interesting and rewarding than other systems. This system allows the user to control the computer, not the other way around. It is a system you fully understand that is easier and more flexible to use.  In other words, AmigaOS is <b>more fun</b>.
+</p>
+<h3><span class="mw-headline" id="AmigaOS:_The_flexible_operating_system">AmigaOS:  The flexible operating system</span></h3>
+<p>AmigaOS is an operating system:  a collection of efficient programs written to start the computer, let the user control the computer, and present feedback to the user.
+</p><p>AmigaOS is designed with ease of use and flexibility in mind. To begin with, AmigaOS provides a clear view of your computer, your applications and files. A number of methods are available to let your computer serve you, whether graphically with a mouse, using the "Shell" command line, or by some other means the user prefers.
+</p><p>AmigaOS strives to avoid stupid limitations that can be found on other systems. AmigaOS users can organise their files the way they like. There are few limits on file hierarchy, locations and file names.  Drives don't have to be named with a letter or cryptic names (such as C:, or sda1), your files don't have to reside in your "Documents" folder and your hard drives aren't hidden from you. If you're not writing to drives and you want to "shut down", why wait for the OS to allow that?  With AmigaOS, just hit the power switch. Done.
+</p><p>An Amiga does not start with pre-installed applications serving some sales conglomerate, marketing organization or their big brother. AmigaOS does not do actions behind the user's back. As unique as it is today, the AmigaOS computer serves the user and not the other way around. With one of the largest proportions of user-programmers around, the trustworthy AmigaOS user-friendly ethic is mirrored in AmigaOS applications.
+</p><p>Since the first versions more than twenty-five years ago, AmigaOS has also been designed to serve efficiently. Optimizing  applications and OS code has always been the goal of programmers and developers of this operating system.  The result is an operating system and applications that take less space on your hard drives, waste less time loading, consume less memory, require less processing power, and respond more quickly to the user.
+</p><p>And every update of AmigaOS doesn't demand you must buy newer, more powerful hardware. AmigaOS currently runs on twenty year old 200MHz computers or brand new dual core 1,800MHz computers.  It's the user's choice how they want to <b>enjoy</b> AmigaOS.
+</p>
+<h3><span class="mw-headline" id="Some_AmigaOS_features">Some AmigaOS features</span></h3>
+<p>Here are some of the features of AmigaOS that make it easy to control your computer. Some of these concepts were copied by other operating systems which tend to show they are the correct way of doing things.
+</p>
+<ul><li><b>Small footprint:</b> AmigaOS can work with 64 MB of memory. On disk, a default installation only takes around 200 MB.  The smaller footprint translates into a more responsive user experience given any hardware.</li></ul>
+<ul><li><b>Straightforward operating system design:</b> With a clear layout and easy to understand names  (Classes, Libs, Fonts, Prefs, Storage, etc.),  you can easily understand what everything in AmigaOS is and what it does for you.  Nothing is hidden from the user and the user is not restricted by AmigaOS.</li></ul>
+<ul><li><b>User configurable graphic interface:</b>  Using the provided "preferences editors," the user can dramatically reconfigure how AmigaOS looks, sounds, runs and responds to every user whim.</li></ul>
+<ul><li><b>File recognition based on file content:</b>  You can name a file <b>whatever you want</b>, even without an extension. Examples: "my file" or "picture of Jay in Santa Clara".  There is no need to add an extension to explain what the file is, like ".txt" or ".jpg". AmigaOS really examines the <b>file content</b> to recognise what type of file it is.</li></ul>
+<ul><li><b>Logical assignments:</b> Easily set and use logical names names for directories located anywhere on your system.  For example, "Auto:" can point to your directory "car show pictures" buried on your media drive.</li></ul>
+<ul><li><b>Ram disk concept:</b>  On AmigaOS there is a special disk called the <b>Ram disk</b> which represents a part of your computer memory. This area is not fixed. It automatically grows whenever you store files in it.  For example, it's a great place to unpack files to install from there, greatly speeding up the installation.</li></ul>
+<ul><li><b>Command line and graphical user interfaces:</b>  Both the the graphical user interface (GUI) and command line interface (where you type commands into a window with the keyboard)  can be used to manage AmigaOS, its programs and files.   Both interfaces are intergated with each other so you can easily use command lines from the GUI or open graphical elements from a command line.</li></ul>
+<ul><li><b>ARexx Ports:</b>  Throughout AmigaOS and third party programs, "ARexx" message ports let one application talk with others so that apps work together to serve the user.  AmigaOS also provides the lightweight ARexx and modern Python programming languages that can control AmigaOS and applications with ARexx ports.</li></ul>
+<ul><li><b>Resident Commands:</b> Commands can be made resident, i.e., they are kept in memory so that they can be reused with no loading time.</li></ul>
+<ul><li><b>Restart only the operating system:</b> if you feel the need to restart the system, you can do so by restarting <b>only AmigaOS</b> and not the whole computer.</li></ul>
+<h3><span class="mw-headline" id="AmigaOS_platform_targets">AmigaOS platform targets</span></h3>
+<p>While the original versions of AmigaOS ran on computers of the eighties using Motorola 68k series CPU chips, the current AmigaOS runs on computers using PowerPC processor chips <a rel="nofollow" class="external text" href="http://www.amigaos.net/content/72/supported-hardware">hardware</a>. These can be older Amiga computers (also called "Classic Amigas") with PPC "accelerator cards" or new generation Amiga PPC computers. 
+</p><p>In this guide, we will concentrate on the current AmigaOS running on the <a href="/wiki/AmigaOS_Platforms" title="AmigaOS Platforms">supported hardware</a>.
+</p>
+<h2><span id="How_does_AmigaOS_work.3F_-_Concepts"></span><span class="mw-headline" id="How_does_AmigaOS_work?_-_Concepts">How does AmigaOS work? - Concepts</span></h2>
+<p>In this page we will discuss  <a href="/wiki/UserDoc:How_AmigaOS_Works" title="UserDoc:How AmigaOS Works">how AmigaOS works</a>:
+</p>
+<ul><li><a href="/wiki/UserDoc:How_AmigaOS_Works#The_most_important_components" title="UserDoc:How AmigaOS Works">The most important components</a> (Exec, AmigaDOS, Intuition...)</li>
+<li><a href="/wiki/UserDoc:How_AmigaOS_Works#How_is_my_data_stored.3F" title="UserDoc:How AmigaOS Works">how files and data are stored</a></li>
+<li><a href="/wiki/UserDoc:How_AmigaOS_Works#All_AmigaOS_components" title="UserDoc:How AmigaOS Works">all AmigaOS components are described</a></li>
+<li><a href="/wiki/UserDoc:How_AmigaOS_Works#AmigaOS_boot_procedure" title="UserDoc:How AmigaOS Works">how AmigaOS is booted on your Amiga computer</a></li>
+<li><a href="/wiki/Workbench/Prefs" title="Workbench/Prefs">AmigaOS settings programs</a></li>
+<li>...</li></ul>
+<h2><span id="How_to_use_AmigaOS.3F"></span><span class="mw-headline" id="How_to_use_AmigaOS?">How to use AmigaOS?</span></h2>
+<p>AmigaOS is a collection of components that oversee the computer hardware &amp; data and provide the user with easy, understandable tools to manage and use them.
+</p><p>In the following <a href="/wiki/UserDoc:Introduction_to_AmigaOS" title="UserDoc:Introduction to AmigaOS">Introduction to AmigaOS pages</a> we will discuss the basic concepts:
+</p>
+<ul><li>how to use AmigaOS</li>
+<li>what the AmigaOS graphic user interface is composed of</li>
+<li>what interfaces AmigaOS provides, including the <a href="/wiki/UserDoc:Workbench" title="UserDoc:Workbench">Workbench</a>, the <a href="/wiki/UserDoc:Shell" title="UserDoc:Shell">Shell</a> or scripting languages.</li></ul>
+<p>From the introduction page, you can continue with more detailed pages on the <a href="/wiki/UserDoc:Workbench" title="UserDoc:Workbench">Workbench</a> and the <a href="/wiki/AmigaDOS_manual" title="AmigaDOS manual">AmigaDOS manual</a> .   Now let's start with this <a href="/wiki/UserDoc:Introduction_to_AmigaOS" title="UserDoc:Introduction to AmigaOS">Introduction to AmigaOS</a>.
+</p>
+<h2><span class="mw-headline" id="Manuals">Manuals</span></h2>
+<p><a href="/wiki/AmigaOS_Manual" title="AmigaOS Manual">AmigaOS Manual</a> - AmigaOS Manual
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional" class="mw-redirect" title="Bars &amp; Pipes Professional">Bars &amp; Pipes Professional</a> - MIDI Sequencer
+</p>
+<h2><span class="mw-headline" id="Applications">Applications</span></h2>
+<p><a href="/wiki/AmigaOS_Applications" title="AmigaOS Applications">AmigaOS Applications</a> - A sampling of AmigaOS applications available in a variety of categories.
+</p>
+<!-- 
+NewPP limit report
+Cached time: 20260114022107
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.012 seconds
+Real time usage: 0.012 seconds
+Preprocessor visited node count: 38/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 2/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 -total
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:455-0!canonical and timestamp 20260114022107 and revision id 11809. Rendering was triggered because: diff-page
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=UserDoc:Main&amp;oldid=11809">http://wiki.amigaos.net/w/index.php?title=UserDoc:Main&amp;oldid=11809</a>"</div></div>
+		<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=UserDoc%3AMain" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-userdoc" class="selected mw-list-item"><a href="/wiki/UserDoc:Main" title="View the subject page [c]" accesskey="c"><span>UserDoc</span></a></li><li id="ca-talk" class="mw-list-item"><a href="/wiki/UserDoc_talk:Main" rel="discussion" title="Discussion about the content page [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/UserDoc:Main"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Main&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Main&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/UserDoc:Main" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/UserDoc:Main" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Main&amp;oldid=11809" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Main&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=UserDoc%3AMain"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=UserDoc%3AMain&amp;oldid=11809&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Main&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 25 December 2020, at 03:48.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":79,"wgPageParseReport":{"limitreport":{"cputime":"0.012","walltime":"0.012","ppvisitednodes":{"value":38,"limit":1000000},"postexpandincludesize":{"value":0,"limit":2097152},"templateargumentsize":{"value":0,"limit":2097152},"expansiondepth":{"value":2,"limit":100},"expensivefunctioncount":{"value":0,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":0,"limit":5000000},"timingprofile":["100.00%    0.000      1 -total"]},"cachereport":{"timestamp":"20260114022107","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>

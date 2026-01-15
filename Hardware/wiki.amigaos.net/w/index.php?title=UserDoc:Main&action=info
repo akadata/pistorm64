@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Information for "UserDoc:Main" - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":true,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_37BJ9xcRZIDwixAAAwAAABE","wgCanonicalNamespace":"UserDoc","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":100,"wgPageName":"UserDoc:Main","wgTitle":"Main","wgCurRevisionId":11809,"wgRevisionId":0,"wgArticleId":455,"wgIsArticle":false,"wgIsRedirect":false,"wgAction":"info","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],"wgPageViewLanguage":"en",
+"wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"UserDoc:Main","wgRelevantArticleId":455,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","mediawiki.interface.helpers.styles":"ready","mediawiki.action.styles":"ready","mediawiki.helplink":"ready","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["site","mediawiki.page.ready","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%7Cmediawiki.action.styles%7Cmediawiki.helplink%7Cmediawiki.interface.helpers.styles%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="noindex,nofollow,max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-100 ns-subject page-UserDoc_Main rootpage-UserDoc_Main skin-vector action-info"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	<div id="mw-indicator-mw-helplink" class="mw-indicator"><a href="https://www.mediawiki.org/wiki/Special:MyLanguage/Page_information" target="_blank" class="mw-helplink"><span class="mw-helplink-icon"></span>Help</a></div>
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading">Information for "UserDoc:Main"</h1>
+	<div id="bodyContent" class="vector-body">
+		
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/UserDoc_talk:Main" title="UserDoc talk:Main">UserDoc talk:Main</a> &gt; <a href="/wiki/UserDoc:Main" title="UserDoc:Main">UserDoc:Main</a> &gt; <a href="/wiki/Special:WhatLinksHere/UserDoc:Main" title="Special:WhatLinksHere/UserDoc:Main">Special:WhatLinksHere/UserDoc:Main</a> &gt; <a href="/wiki/Special:RecentChangesLinked/UserDoc:Main" title="Special:RecentChangesLinked/UserDoc:Main">Special:RecentChangesLinked/UserDoc:Main</a> &gt; <a href="/wiki/UserDoc:Main" title="UserDoc:Main">UserDoc:Main</a></div><h2 id="Basic_information"><span id="mw-pageinfo-header-basic"></span>Basic information</h2>
+<table class="wikitable mw-page-info">
+<tr id="mw-pageinfo-display-title" style="vertical-align: top;"><td>Display title</td><td>UserDoc:Main</td></tr>
+<tr id="mw-pageinfo-default-sort" style="vertical-align: top;"><td>Default sort key</td><td>Main</td></tr>
+<tr id="mw-pageinfo-length" style="vertical-align: top;"><td>Page length (in bytes)</td><td>8,141</td></tr>
+<tr id="mw-pageinfo-namespace-id" style="vertical-align: top;"><td>Namespace ID</td><td>100</td></tr>
+<tr id="mw-pageinfo-namespace" style="vertical-align: top;"><td>Namespace</td><td>UserDoc</td></tr>
+<tr id="mw-pageinfo-article-id" style="vertical-align: top;"><td>Page ID</td><td>455</td></tr>
+<tr style="vertical-align: top;"><td>Page content language</td><td>en - English</td></tr>
+<tr id="mw-pageinfo-content-model" style="vertical-align: top;"><td>Page content model</td><td>wikitext</td></tr>
+<tr id="mw-pageinfo-robot-policy" style="vertical-align: top;"><td>Indexing by robots</td><td>Allowed</td></tr>
+<tr style="vertical-align: top;"><td><a href="/w/index.php?title=Special:WhatLinksHere/UserDoc:Main&amp;hidelinks=1&amp;hidetrans=1" title="Special:WhatLinksHere/UserDoc:Main">Number of redirects to this page</a></td><td>0</td></tr>
+</table>
+<h2 id="Page_protection"><span id="mw-pageinfo-header-restrictions"></span>Page protection</h2>
+<table class="wikitable mw-page-info">
+<tr id="mw-restriction-edit" style="vertical-align: top;"><td>Edit</td><td>Allow all users (infinite)</td></tr>
+<tr id="mw-restriction-move" style="vertical-align: top;"><td>Move</td><td>Allow all users (infinite)</td></tr>
+</table>
+<a href="/w/index.php?title=Special:Log&amp;type=protect&amp;page=UserDoc%3AMain" title="Special:Log">View the protection log for this page.</a>
+<h2 id="Edit_history"><span id="mw-pageinfo-header-edits"></span>Edit history</h2>
+<table class="wikitable mw-page-info">
+<tr id="mw-pageinfo-firstuser" style="vertical-align: top;"><td>Page creator</td><td><a href="/w/index.php?title=User:Philippe_Ferrucci&amp;action=edit&amp;redlink=1" class="new mw-userlink" title="User:Philippe Ferrucci (page does not exist)" data-mw-revid="2935"><bdi>Philippe Ferrucci</bdi></a> <span class="mw-usertoollinks">(<a href="/w/index.php?title=User_talk:Philippe_Ferrucci&amp;action=edit&amp;redlink=1" class="new mw-usertoollinks-talk" title="User talk:Philippe Ferrucci (page does not exist)">talk</a> | <a href="/wiki/Special:Contributions/Philippe_Ferrucci" class="mw-usertoollinks-contribs" title="Special:Contributions/Philippe Ferrucci">contribs</a>)</span></td></tr>
+<tr id="mw-pageinfo-firsttime" style="vertical-align: top;"><td>Date of page creation</td><td><a href="/w/index.php?title=UserDoc:Main&amp;oldid=2935" title="UserDoc:Main">10:31, 8 June 2012</a></td></tr>
+<tr id="mw-pageinfo-lastuser" style="vertical-align: top;"><td>Latest editor</td><td><a href="/w/index.php?title=User:Ray_Sbaitso&amp;action=edit&amp;redlink=1" class="new mw-userlink" title="User:Ray Sbaitso (page does not exist)" data-mw-revid="11809"><bdi>Ray Sbaitso</bdi></a> <span class="mw-usertoollinks">(<a href="/w/index.php?title=User_talk:Ray_Sbaitso&amp;action=edit&amp;redlink=1" class="new mw-usertoollinks-talk" title="User talk:Ray Sbaitso (page does not exist)">talk</a> | <a href="/wiki/Special:Contributions/Ray_Sbaitso" class="mw-usertoollinks-contribs" title="Special:Contributions/Ray Sbaitso">contribs</a>)</span></td></tr>
+<tr id="mw-pageinfo-lasttime" style="vertical-align: top;"><td>Date of latest edit</td><td><a href="/w/index.php?title=UserDoc:Main&amp;oldid=11809" title="UserDoc:Main">03:48, 25 December 2020</a></td></tr>
+<tr id="mw-pageinfo-edits" style="vertical-align: top;"><td>Total number of edits</td><td>102</td></tr>
+<tr id="mw-pageinfo-authors" style="vertical-align: top;"><td>Total number of distinct authors</td><td>9</td></tr>
+<tr id="mw-pageinfo-recent-edits" style="vertical-align: top;"><td>Recent number of edits (within past 90 days)</td><td>0</td></tr>
+<tr id="mw-pageinfo-recent-authors" style="vertical-align: top;"><td>Recent number of distinct authors</td><td>0</td></tr>
+</table>
+
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/wiki/UserDoc:Main">http://wiki.amigaos.net/wiki/UserDoc:Main</a>"</div></div>
+		<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=UserDoc%3AMain&amp;returntoquery=action%3Dinfo" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-userdoc" class="selected mw-list-item"><a href="/wiki/UserDoc:Main" title="View the subject page [c]" accesskey="c"><span>UserDoc</span></a></li><li id="ca-talk" class="mw-list-item"><a href="/wiki/UserDoc_talk:Main" rel="discussion" title="Discussion about the content page [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="mw-list-item"><a href="/wiki/UserDoc:Main"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Main&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Main&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/UserDoc:Main" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/UserDoc:Main" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Main&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":85});});</script>
+</body>
+</html>

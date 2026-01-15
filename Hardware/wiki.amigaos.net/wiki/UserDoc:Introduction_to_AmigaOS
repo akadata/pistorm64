@@ -1,0 +1,712 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>UserDoc:Introduction to AmigaOS - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_3USIJ4f3C6Y1Puo1kAAAAAs","wgCanonicalNamespace":"UserDoc","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":100,"wgPageName":"UserDoc:Introduction_to_AmigaOS","wgTitle":"Introduction to AmigaOS","wgCurRevisionId":7731,"wgRevisionId":7731,"wgArticleId":471,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],
+"wgCategories":[],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"UserDoc:Introduction_to_AmigaOS","wgRelevantArticleId":471,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-100 ns-subject page-UserDoc_Introduction_to_AmigaOS rootpage-UserDoc_Introduction_to_AmigaOS skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-namespace">UserDoc</span><span class="mw-page-title-separator">:</span><span class="mw-page-title-main">Introduction to AmigaOS</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer" title="AmigaOS Documentation Wiki:General disclaimer">AmigaOS Documentation Wiki:General disclaimer</a> &gt; <a href="/wiki/AmigaOS_Platforms" title="AmigaOS Platforms">AmigaOS Platforms</a> &gt; <a href="/wiki/UserDoc:How_AmigaOS_Works" title="UserDoc:How AmigaOS Works">UserDoc:How AmigaOS Works</a> &gt; <a href="/wiki/Workbench/Prefs" title="Workbench/Prefs">Workbench/Prefs</a> &gt; <a href="/wiki/UserDoc:Introduction_to_AmigaOS" title="UserDoc:Introduction to AmigaOS">UserDoc:Introduction to AmigaOS</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><p>Like any modern personal computer system, AmigaOS presents a graphic interface and relies on common peripherals to let the user control their system.  
+Beyond most systems, AmigaOS provides more flexibility and options in how the user can approach, configure and use their Amiga computer.
+</p><p>In this page we will describe the details of AmigaOS graphic user interface (GUI) - how screens, windows and gadgets are presented and how you can use them.
+We will also describe the various means by which the user can control and operate AmigaOS.  In additional pages, you can read about  <a href="/wiki/UserDoc:How_AmigaOS_Works" title="UserDoc:How AmigaOS Works">how AmigaOS works</a>  and what its components are.
+</p>
+<div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#AmigaOS_Input_-_Point,_Click_and_Type"><span class="tocnumber">1</span> <span class="toctext">AmigaOS Input - Point, Click and Type</span></a>
+<ul>
+<li class="toclevel-2 tocsection-2"><a href="#Using_the_mouse"><span class="tocnumber">1.1</span> <span class="toctext">Using the mouse</span></a></li>
+<li class="toclevel-2 tocsection-3"><a href="#Using_the_keyboard"><span class="tocnumber">1.2</span> <span class="toctext">Using the keyboard</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-4"><a href="#The_AmigaOS_GUI_-_Intuition"><span class="tocnumber">2</span> <span class="toctext">The AmigaOS GUI - Intuition</span></a>
+<ul>
+<li class="toclevel-2 tocsection-5"><a href="#Screens"><span class="tocnumber">2.1</span> <span class="toctext">Screens</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="#Windows"><span class="tocnumber">2.2</span> <span class="toctext">Windows</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="#Menus"><span class="tocnumber">2.3</span> <span class="toctext">Menus</span></a>
+<ul>
+<li class="toclevel-3 tocsection-8"><a href="#Consistent_Organization"><span class="tocnumber">2.3.1</span> <span class="toctext">Consistent Organization</span></a></li>
+<li class="toclevel-3 tocsection-9"><a href="#Menu_Variations"><span class="tocnumber">2.3.2</span> <span class="toctext">Menu Variations</span></a>
+<ul>
+<li class="toclevel-4 tocsection-10"><a href="#Pop-Up_Menus"><span class="tocnumber">2.3.2.1</span> <span class="toctext">Pop-Up Menus</span></a></li>
+<li class="toclevel-4 tocsection-11"><a href="#Context_Menus"><span class="tocnumber">2.3.2.2</span> <span class="toctext">Context Menus</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-12"><a href="#Icons"><span class="tocnumber">2.4</span> <span class="toctext">Icons</span></a>
+<ul>
+<li class="toclevel-3 tocsection-13"><a href="#Description"><span class="tocnumber">2.4.1</span> <span class="toctext">Description</span></a></li>
+<li class="toclevel-3 tocsection-14"><a href="#Icon_states"><span class="tocnumber">2.4.2</span> <span class="toctext">Icon states</span></a></li>
+<li class="toclevel-3 tocsection-15"><a href="#App_Icons"><span class="tocnumber">2.4.3</span> <span class="toctext">App Icons</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-16"><a href="#Graphic_gadgets"><span class="tocnumber">2.5</span> <span class="toctext">Graphic gadgets</span></a>
+<ul>
+<li class="toclevel-3 tocsection-17"><a href="#Buttons"><span class="tocnumber">2.5.1</span> <span class="toctext">Buttons</span></a></li>
+<li class="toclevel-3 tocsection-18"><a href="#Text_gadgets"><span class="tocnumber">2.5.2</span> <span class="toctext">Text gadgets</span></a></li>
+<li class="toclevel-3 tocsection-19"><a href="#Sliders_&amp;_Scroll_Bars"><span class="tocnumber">2.5.3</span> <span class="toctext">Sliders &amp; Scroll Bars</span></a></li>
+<li class="toclevel-3 tocsection-20"><a href="#Cycle_gadgets"><span class="tocnumber">2.5.4</span> <span class="toctext">Cycle gadgets</span></a></li>
+<li class="toclevel-3 tocsection-21"><a href="#Check_Box_&amp;_Radio_Button_gadgets"><span class="tocnumber">2.5.5</span> <span class="toctext">Check Box &amp; Radio Button gadgets</span></a></li>
+<li class="toclevel-3 tocsection-22"><a href="#Tabs"><span class="tocnumber">2.5.6</span> <span class="toctext">Tabs</span></a></li>
+<li class="toclevel-3 tocsection-23"><a href="#Requesters"><span class="tocnumber">2.5.7</span> <span class="toctext">Requesters</span></a></li>
+<li class="toclevel-3 tocsection-24"><a href="#Keyboard_Operation_of_Gadgets"><span class="tocnumber">2.5.8</span> <span class="toctext">Keyboard Operation of Gadgets</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-25"><a href="#Finding_Files_in_AmigaOS"><span class="tocnumber">3</span> <span class="toctext">Finding Files in AmigaOS</span></a></li>
+<li class="toclevel-1 tocsection-26"><a href="#Controlling_AmigaOS_-_Which_Way?"><span class="tocnumber">4</span> <span class="toctext">Controlling AmigaOS - Which Way?</span></a>
+<ul>
+<li class="toclevel-2 tocsection-27"><a href="#The_Workbench_&amp;_Intuition"><span class="tocnumber">4.1</span> <span class="toctext">The Workbench &amp; Intuition</span></a></li>
+<li class="toclevel-2 tocsection-28"><a href="#The_Shell_&amp;_DOS_Commands"><span class="tocnumber">4.2</span> <span class="toctext">The Shell &amp; DOS Commands</span></a></li>
+<li class="toclevel-2 tocsection-29"><a href="#Scripts_&amp;_Messages"><span class="tocnumber">4.3</span> <span class="toctext">Scripts &amp; Messages</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-30"><a href="#AmigaOS_System_Tools"><span class="tocnumber">5</span> <span class="toctext">AmigaOS System Tools</span></a></li>
+<li class="toclevel-1 tocsection-31"><a href="#AmigaOS_Utilities"><span class="tocnumber">6</span> <span class="toctext">AmigaOS Utilities</span></a></li>
+<li class="toclevel-1 tocsection-32"><a href="#AmigaOS_Preferences"><span class="tocnumber">7</span> <span class="toctext">AmigaOS Preferences</span></a></li>
+</ul>
+</div>
+
+<h2><span id="AmigaOS_Input_-_Point.2C_Click_and_Type"></span><span class="mw-headline" id="AmigaOS_Input_-_Point,_Click_and_Type">AmigaOS Input - Point, Click and Type</span></h2>
+<p>There are two common ways you can use and control your AmigaOS system - by mouse and keyboard.  
+</p><p>But AmigaOS also lets you control your system by other input devices (like touchscreens or voice recognition) depending on drivers and devices connected.  Depending on software installed, AmigaOS can also be remotely controlled by networked protocols (like VNC and Synergy).  Finally, AmigaOS can be controlled internal scripts set up by the User.
+</p>
+<h3><span class="mw-headline" id="Using_the_mouse">Using the mouse</span></h3>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:Style2.5.png" class="mw-file-description"><img src="/w/images/b/b9/Style2.5.png" decoding="async" width="512" height="256" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>Typically in AmigaOS, you use a mouse to act on graphic elements (like "gadgets", "icons" or webpage "links").  By default, AmigaOS expects and supports mice or trackball pointing devices with at least two buttons.  The left mouse button is used to "left-click" on graphic objects, to select them or operate them. The right mouse button is used to "right-click" and display the menus of the current application.
+</p><p>Optionally, one can use a mouse or trackball device with three (a "middle" button) and four buttons.  With such devices, the functionality of the additional buttons can vary by application or environment.  These functionalities can typically be configured by the user in specific applications or within AmigaOS (globally).
+</p><p>Furthermore, scroll wheels are supported by AmigaOS in a context-based fashion.  If the current application's window is scrollable, the scrollwheel will act on that area.  If the mouse pointer is positioned over a specifically scrollable gadget, the scrollwheel will affect that gadget.
+</p><p>In some applications and environments, you can also "double-click" (click twice, quickly) with the left button on an object to engage them.  In the Workbench file manager, a single mouse click will only "select" an icon, whereas a double-click will open drawer/directory, run an application or open a file in an associated program.
+</p><p>Beside "clicking" - pressing down and releasing a mouse button at a specific location - you can also perform what is known as "dragging", which means clicking down and then moving the mouse around before releasing the mouse button.  This is typically always done with the left mouse button and is done to select objects (draw a box around them), to adjust a control slider or to resize a window.
+</p><p><br style="clear: both" /> 
+</p>
+<h3><span class="mw-headline" id="Using_the_keyboard">Using the keyboard</span></h3>
+<p>Of course the keyboard is used to enter text into text editing areas.  But your keyboard can do so much more with its special "qualifier" keys and AmigaOS.
+</p><p>The most common example of a qualifier key is the "Shift" key which causes typed text to be made upper-case or capitalized.  There are more qualifier keys on most keyboards, here is a list of all of them:
+</p>
+<ul><li><b>the Shift keys</b> - the common key that causes your text to be capitalized.</li>
+<li><b>The "Alternate" keys</b> - the "Alt" keys typically to the bottom right and left of the keyboard.</li>
+<li><b>the "Control" keys</b> - the "Ctrl" keys also to the bottom right and left of the keyboard.</li>
+<li><b>the "Amiga" keys</b> - special "A" keys on the right and left side of the space bar.  Besides being unique to AmigaOS, the right and left Amiga keys always mean different things (unlike the rest of the qualifier keys, most of the time).  If you have a non-AmigaOS keyboard, the "Windows" or MacOS "Command" keys function as "Amiga" keys.
+<ul><li><b>the Right Amiga key</b> - is used for "short cuts" within your current application.</li>
+<li><b>the Left Amiga key</b> - is used for "short cuts" that are globally active anytime and anywhere in your AmigaOS system.</li></ul></li></ul>
+<p>While all of these qualifier keys don't usually do anything on their own, when you press and hold one or more of these keys down while pressing regular keys, they can change what you type (capitalizing or making alternate characters) or become powerful "short-cuts" within your applications or throughout your entire AmigaOS system.
+</p><p>The most famous short-cuts are the <b>copy</b>, <b>cut</b> and <b>paste</b> operations that you can perform on selected text:
+</p>
+<ul><li>the <b>Right-Amiga C</b> short-cut copies any selected text or content to the Clipboard.</li>
+<li>the <b>Right-Amiga X</b> short-cut "cuts" any selected text or content to the Clipboard.</li>
+<li>the <b>Right-Amiga V</b> short-cut "pastes" any text or content from the Clipboard into your application (at the current cursor location).</li></ul>
+<h2><span class="mw-headline" id="The_AmigaOS_GUI_-_Intuition">The AmigaOS GUI - Intuition</span></h2>
+<p>When AmigaOS has started, you will typically see the Workbench file manager. This is the start of your experience with the AmigaOS GUI and its most basic elements: a screen with menus and windows containing icons and "gagdets". These components are the basic building blocks of virtually all AmigaOS &amp; application interfaces.
+</p><p>As with most things in AmigaOS, almost all of the following components can also be almost infinitely reconfigured, adjusted and graphically varied by the user. In the AmigaOS "Preferences" drawer, the "GUI", "ASL", "Locale", "Font", "Palette", "Poiner", "PopUpMenu", "Screens", "Workbench" and "WBPattern" preference editors easily allow a user to reconfigure the look and feel of their Amiga's GUI in dramatic ways.
+</p><p>AmigaOS also supports the use of alternate GUI systems in parallel with the default "Intuition" (aka "Reaction") GUI system. By default AmigaOS also comes with the "Magic User Interface" system ("MUI", a variant of the basic AmigaOS GUI system). Aside from Intuition, MUI can be reconfigured even more widely using its own MUI configuration app.
+</p><p>Additionally, AmigaOS can use a number of third-party "cross-platform" GUI systems: "AmiCygnix" GUI system - a native X11 GUI implementation for AmigaOS - and a native port of the "Qt" GUI system. With either of these systems, it is possible to run ported applications compiled for AmigaOS, but running with these cross-platform GUI systems.
+</p><p>To start with, we will explore the elements that make up the AmigaOS GUI system.
+</p>
+<h3><span class="mw-headline" id="Screens">Screens</span></h3>
+<p>As start-up, the Workbench will be running on its "Workbench Screen".  This will be the default location where most other application windows will also appear when started.
+</p><p>Typically an AmigaOS screen will have a "title bar" across the top with a graphical "depth gadget" at the right end.  In the case of the Workbench screen, there will be an AmigaOS "boing ball" at the left end and the title bar will display certain system information (OS version, memory availability, etc.) Within the screen, the Workbench and any other applications can open windows, display icons and other GUI devices. If you right-click over the title bar, it becomes a "Menu Bar", showing you the control menus that are available for that application.
+</p><p>In many cases, other applications may open screens in addition to the Workbench screen. The "depth gadget" at the right end of each screen's title bar allows you to click from screen from screen. Besides clicking on the screen's depth gadet, AmigaOS also lets the user see other screens behind the front screen by "dragging" down on the screen title bar.
+</p><p>The characteristics of the Workbench screen such as resolution and color depth can be configured in the "Screenmode" preferences editor. Other screens can be either be configured in the "Screens" preferences editor or from within individual applications. Typically, AmigaOS applications also give the user the choice of whether application runs on their own screens or the "public" Workbench screen.
+</p>
+<h3><span class="mw-headline" id="Windows">Windows</span></h3>
+<p>Windows are graphic containers that appear within AmigaOS screens. Windows can be created by any number of different applications - the Workbench, Shell sessions or applications. Outside of the Workbench file manager, each window usually reflects each individual running application. In some cases, one application may open multiple documents in separate windows or additional "requester" windows might appear for an application.
+</p><p><span class="mw-default-size" typeof="mw:File"><a href="/wiki/File:LibFig4-1.png" class="mw-file-description"><img src="/w/images/3/39/LibFig4-1.png" decoding="async" width="823" height="566" class="mw-file-element" /></a></span>
+</p><p>Almost all windows of AmigaOS will have these common elements:
+</p>
+<ul><li><b>Borders</b> - A border around the window's contents. Holding the Shift+Left-Amiga keys down while dragging any border will drag the window around.</li>
+<li><b>Title bar</b> - A thicker top border that typically contains a name of the application or its contents. The area of the title bar acts as a "drag bar" which you can use to drag the window around the screen.</li>
+<li><b>Depth gadget</b> - The right-most gadget in the top title bar that either pulls the window to front (if it isn't frontmost) or pushes it to the back (if it's in front). Holding down the Shift key while clicking this gagdet pushes the window to the back.</li></ul>
+<p>In AmigaOS, windows may also optionally have these additional features and elements:
+</p>
+<ul><li><b>Close gadget</b> - The left-most gadget in the title bar that closes the window.</li>
+<li><b>Scroll bar(s) and arrows</b> - If the contents of the window can be scrolled in vertically and/or horizontally, there will be a scroll bar with arrow scroll buttons. These scroll bars can also be used if the mouse pointer is over a scroll bar and the mouse scroll wheel is used.</li>
+<li><b>Zoom gadget</b> - the second gadget from the right-most of the title bar which switches the window between two sizes. Holding down the Shift key while clicking this gadget will make it fill the screen.</li>
+<li><b>Iconification gadget</b> - left-most of the right-hand gadgets in the title bar which causes the window to disappear into an icon on the Workbench background - thus "Iconifying" the window or application.</li>
+<li><b>Sizing gadget</b> - In the case of windows that can be resized, this is the gadget in the bottom right corner of the window that you can drag to resize the window.</li></ul>
+<p>Each AmigaOS application can use many different combinations of these features in the make up of their windows.
+</p>
+<h3><span class="mw-headline" id="Menus">Menus</span></h3>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:LibFig2-4.png" class="mw-file-description"><img src="/w/images/3/3c/LibFig2-4.png" decoding="async" width="617" height="536" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>Menus are lists of items that will allow you to see and use what commands are available in an application. The Workbench uses menus you can use to perform actions on the Workbench and its contents. Menus typically provide many more functions and commands than can be presented to the user than just graphic buttons, etc. within an application's window, as a result they are a primary way most applications are used.
+</p><p>In AmigaOS menus can always be found for the current application by moving the mouse to the top of the screen and holding down the right mouse button. The screen title bar will become a menu bar and will show the names of all the current application's menus.
+</p><p>By dragging with the right mouse button, each menu will display its "menu items". Each of those menu items corresponds to a command or setting, and can be selected by releasing the right mouse button while the desired menu item is highlighted. In some cases you will find a "check box" on a menu item which you can select to toggle a setting. In other cases, you will find that menu items have a little arrow head that indicates that item actually has a "sub-menu" - a menu within a menu. Menus ending with an ellipsis ("...") indicate that menu item will open a window that can be cancelled without committing any command.  For those menu items that might be deactivated (they may not apply at the moment), they will be "greyed-out".
+</p><p>The labels of many menu items will also include a letter or two with an "A" at the right edge.  This indicates what the keyboard Right-Amiga "short cut" is the equivalent of using that menu item within that application. In the above screen shot, you can see that pressing the two keys - "Right-Amiga" and "N" - would do the same as that menu item - to create a new drawer.
+<br style="clear: both" />
+</p>
+<h4><span class="mw-headline" id="Consistent_Organization">Consistent Organization</span></h4>
+<p>For the sake of consistency (when applicable), the first two AmigaOS menus of any application are typically organized with the following hierarchy and use these keyboard equivalents:
+</p>
+<table border="0">
+<tbody><tr>
+<td><b>First Menu:</b>
+<hr />
+</td>
+<td></td>
+<td>Keyboard equivalent:</td>
+<td><b>Second Menu:</b>
+<hr />
+</td>
+<td></td>
+<td>Keyboard equivalent:
+</td></tr>
+<tr>
+<td><b>PROJECT</b>
+<hr />
+</td>
+<td></td>
+<td></td>
+<td><b>EDIT</b>
+<hr />
+</td>
+<td>
+</td></tr>
+<tr>
+<td><b>New</b></td>
+<td>= Create new project in application.</td>
+<td>Right-Amiga N</td>
+<td><b>Cut</b></td>
+<td>= Cut the selected content into the Clipboard.</td>
+<td>Right-Amiga X
+</td></tr>
+<tr>
+<td><b>Open...</b></td>
+<td>= Open the file containing a project.</td>
+<td>Right-Amiga O</td>
+<td><b>Copy</b></td>
+<td>= Copy the selected content into the Clipboard.</td>
+<td>Right-Amiga C
+</td></tr>
+<tr>
+<td><b>Save</b></td>
+<td>= Save the project to it's current file name.</td>
+<td>Right-Amiga S</td>
+<td><b>Paste</b></td>
+<td>= Paste the Clipboard contents into the project (at the current location).</td>
+<td>Right-Amiga V
+</td></tr>
+<tr>
+<td><b>Save As...</b></td>
+<td>= Save the project to a file of a new name.</td>
+<td></td>
+<td><b>Undo</b></td>
+<td>= Undo the last change to current project.</td>
+<td>Right-Amiga Z
+</td></tr>
+<tr>
+<td><b>Print</b></td>
+<td>= Print the current project.</td>
+<td>Right-Amiga P</td>
+<td><b>Redo</b></td>
+<td>= Restore the last change "undone" in the current project.</td>
+<td>
+</td></tr>
+<tr>
+<td><b>Close</b></td>
+<td>= Close the project.</td>
+<td></td>
+<td></td>
+<td></td>
+<td>
+</td></tr>
+<tr>
+<td><b>Quit</b></td>
+<td>= Quit the application.</td>
+<td>Right-Amiga Q</td>
+<td>
+</td></tr></tbody></table>
+<h4><span class="mw-headline" id="Menu_Variations">Menu Variations</span></h4>
+<p>AmigaOS also includes some additional ways menus can be presented to the user:
+</p>
+<h5><span class="mw-headline" id="Pop-Up_Menus">Pop-Up Menus</span></h5>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:OS4-WBPopUpMenu.jpg" class="mw-file-description"><img src="/w/images/8/8b/OS4-WBPopUpMenu.jpg" decoding="async" width="337" height="271" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>In the GUI preferences editor you can configure menus to "pop-up" under the mouse pointer whenever you right-click the mouse. This means you do not need to move the mouse to the top of the screen to use the menus. There are also options for making menus "sticky", meaning that you don't need to drag the mouse to navigate the menus, but rather just right click and the menus stay open until you make a selection or click away.
+<br style="clear: both" />
+</p>
+<h5><span class="mw-headline" id="Context_Menus">Context Menus</span></h5>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:OS4-WBContextMenu.jpg" class="mw-file-description"><img src="/w/images/7/75/OS4-WBContextMenu.jpg" decoding="async" width="469" height="542" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>The Workbench (with a utility added by default) and many applications provide "contextual menus".  This means that you can put your mouse pointer over elements and right-click to pop-up a menu of things that are specific to the item you clicked over.  In the case of the Workbench (with the Context Menus utility), right clicking on a file will pop-up a menu of things that could be done with that file, like deleting it.
+</p><p>All of these features provide both a simple means of using many functions within an application and at the same time allowing the user to configure a very efficient user interface that responds to nearly every whim.
+<br style="clear: both" />
+</p>
+<h3><span class="mw-headline" id="Icons">Icons</span></h3>
+<h4><span class="mw-headline" id="Description">Description</span></h4>
+<p>Icons are small images which can represent a disk, a directory, an application file or data file. Icons are primarilly used within the AmigaOS Workbench environment to represent all the file system objects the user can manipulate. With these icons it is possible to select files, open them, delete them or move them around within the Workbench. Applications may also make more limited use of icons to represent file system objects or may be used as imagery in an "icon bar" of buttons that can be clicked to perform various actions represented by icon imagery, like the Clock above.
+</p>
+<table style="text-align: center;">
+<tbody><tr>
+<td><figure class="mw-halign-left" typeof="mw:File/Frame"><a href="/wiki/File:LibDiskIcon.png" class="mw-file-description"><img src="/w/images/a/ab/LibDiskIcon.png" decoding="async" width="64" height="64" class="mw-file-element" /></a><figcaption>Drive icon</figcaption></figure>  <figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:Icons.png" class="mw-file-description"><img src="/w/images/f/fc/Icons.png" decoding="async" width="448" height="228" class="mw-file-element" /></a><figcaption>Directory with sub-directory, data and application file icons</figcaption></figure>
+</td></tr></tbody></table>
+<p>AmigaOS also uses different icon imagery to indicate various types of icons - drives, directories, files and applications.  Drive or partition icons look like little hard drives.  
+A directory icon will look like a cabinet &amp; drawer whereas a file icon will be designed to give a clue about the file content.
+Data files are normally shown with a "page" motif and some graphics or text to reflect the file type.
+Application files typically have the most free-form graphics that reflect their purpose, name or developer.
+</p><p>The user can also edit the icon imagery using the icon editor, change how icons react to being double-clicked and adjust parameters stored within the icon file that affect how the represented file will be used.
+</p><p>Many applications and all AmigaOS file requesters allow Workbench icons to be "dragged and dropped" into the application or requester windows and the associated file will be recognized by the application, if possible.
+</p>
+<h4><span class="mw-headline" id="Icon_states">Icon states</span></h4>
+<p>Icons can look different not only because of their image but also depending on their state.  
+</p><p>As you can see in the directory example, the 2 top left icons appear semi-transparent. This subtle difference reflects whether the file or directory has an associated icon file with it. In AmigaOS, any directory or file can have such an icon file that stores a unique icon image, unique program settings or specific settings for that file or directory. That information can be adjusted within the Workbench and is automatically stored in a companion file with the same name, but with an added <b>.info</b> suffix.  
+</p><p>While many files and directories and most applications have such ".info files" with them, they are not required and the Workbench can be set to show you "default icons" (based on the file types, etc.) so you can manipulate the corresponding objects. Of course, AmigaOS can also be configured on a directory-by-directory basis to only show files that have associated ".info" files.
+</p><p>In the same picture, the two top right directory icons also look slightly different. While the <b>Utilities selected</b> and the <b>Utilities unselected</b> are the same icon, their image is a bit different. The drawer of the first one is slightly opened and there is a "glow" effect arround the first icon. These two visual clues show you the first directory icon has been selected by the user whereas the second one is not.
+</p>
+<h4><span class="mw-headline" id="App_Icons">App Icons</span></h4>
+<p>Many applications provide the option to be "iconified" either by clicking on an iconification gadget in their window title bars or by selecting a menu item.  In those events, the application's window will disappear and an "app icon" will appear on the background of the Workbench screen.  Double-clicking on the app icon will cause the icon to disappear and the application's window to reappear.  Even while the application is iconified, it does continue to run and perform whatever the user may have it doing.
+</p><p>Some applications may also place an app icon on the Workbench background even while the application is open to allow the user to be able to drop other file icons on the app icon and have them be used by the application.
+</p>
+<h3><span class="mw-headline" id="Graphic_gadgets">Graphic gadgets</span></h3>
+<p>Within AmigaOS and application windows, there can be any number of graphic devices meant to be operated by your mouse with clicks and drags - these are known as "gagdets".  In most cases, the gagdets are simple analogs of real world objects - like buttons you press with your finger, forms you fill out with a pencil or tabs on folders.
+</p><p><span class="mw-default-size" typeof="mw:File"><a href="/wiki/File:LibFig5-1.png" class="mw-file-description"><img src="/w/images/2/2a/LibFig5-1.png" decoding="async" width="701" height="702" class="mw-file-element" /></a></span>
+</p>
+<h4><span class="mw-headline" id="Buttons">Buttons</span></h4>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:OS4-Buttons.jpg" class="mw-file-description"><img src="/w/images/4/40/OS4-Buttons.jpg" decoding="async" width="152" height="87" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>Buttons (or "Boolean gadgets") are some of the most common GUI objects.  With a simple left-click of your mouse button, they are used to perform actions, set configurations or indicate choices.  
+</p><p>In AmigaOS, clicking "down" on a button typically causes the button to be rendered differently, to reflect that it has been "pressed".  Engaging the button is not actually recognized until you let go with the mouse button over the graphic gadget.  This means that while the gadget has been clicked down, you always have the option of moving the mouse off the button gadget and then letting go and it will be as though the button had never been "pressed" or clicked on.
+<br style="clear: both" />
+</p>
+<h4><span class="mw-headline" id="Text_gadgets">Text gadgets</span></h4>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:OS4-StringGadgets.jpg" class="mw-file-description"><img src="/w/images/1/14/OS4-StringGadgets.jpg" decoding="async" width="473" height="72" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>A text gadget (or "String gadget") works like a space in a paper form to be filled out - left click in the gadget, you will see a cursor appear and you can type your answer.
+Once you've finished typing your infrormation, you can either press the enter, carriage-return or tab keys for your entry to be recognized.
+</p><p>Text or string gadgets can also come in a number of variants for specific uses.  Some can limit input to be numeric only (and may have adjacent buttons to increment or decrement the value).  Some string gadgets may be specifically be meant for file or directory names and they have adjacent gagdets that will bring up a file requester to set the value.  Many times a numeric gadget is paired with a slider gadget (as in the example above), where the value can either be set by typing in the gadget or by using the slider.
+<br style="clear: both" />
+</p>
+<h4><span id="Sliders_.26_Scroll_Bars"></span><span class="mw-headline" id="Sliders_&amp;_Scroll_Bars">Sliders &amp; Scroll Bars</span></h4>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:OS4-SliderGadgets.jpg" class="mw-file-description"><img src="/w/images/4/45/OS4-SliderGadgets.jpg" decoding="async" width="394" height="222" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>Slider gadgets work like controls many of have seen on their stereo systems - left-click and drag on the gadget "knob"  to move it back and forth to set a value.  A more sophisticated variant of the slider is the "scroll bar" that has a variably sized scroll bar contained in a scroll box that lets you see what proportion of the active range is visible or active.
+</p><p>With all slider and scroller gadgets AmigaOS also lets you click in the area to either side of the knob or slider to adjust the setting.  In the case of sliders, the value will typically move by a fixed amount (+/- 1 or some suitable increment).  In the case of scroll bars, clicking in the scroll box on either side of the scroll bar will cause the value to move in increments of the scroll bar size.  Scroll bars also come with "scroll arrows" at the end of the scroll box that allow for finer movement of the scroll bar.
+<br style="clear: both" />
+</p>
+<h4><span class="mw-headline" id="Cycle_gadgets">Cycle gadgets</span></h4>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:OS4-CycleGadgets.jpg" class="mw-file-description"><img src="/w/images/6/67/OS4-CycleGadgets.jpg" decoding="async" width="153" height="63" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>Cycle gagdets are a variant on buttons that let you select from a number of specific choices.  You can either click on the majority of the gadget to pop-up a list of choices to select from or click on the circular arrow to cycle between the list of choices.  Cycle gagdets rarely cause actions to occur, they just adjust some setting or configuration.
+<br style="clear: both" />
+</p>
+<h4><span id="Check_Box_.26_Radio_Button_gadgets"></span><span class="mw-headline" id="Check_Box_&amp;_Radio_Button_gadgets">Check Box &amp; Radio Button gadgets</span></h4>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:OS4-CheckRadioGadgets.jpg" class="mw-file-description"><img src="/w/images/7/7e/OS4-CheckRadioGadgets.jpg" decoding="async" width="233" height="124" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>Another variant of buttons, check boxes can be clicked to set on/off or yes/no conditions with a checkmark, just like a check box in a paper form.  Radio buttons are another variant where two or more round buttons are presented in a set and only one of the set can be clicked and activated, like the buttons on a stereo system.
+<br style="clear: both" />
+</p>
+<h4><span class="mw-headline" id="Tabs">Tabs</span></h4>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:OS4-Tabs.jpg" class="mw-file-description"><img src="/w/images/5/5b/OS4-Tabs.jpg" decoding="async" width="489" height="99" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>Tabs are a graphical gadget that is used in combination with a "pages" or sets of gadgets and/or information, and you can click on the "tabs" to switch between the pages - like you might in a real notebook with tabbed pages.  This provides a efficient way to present more information and settings in a compact interface.
+<br style="clear: both" />
+</p>
+<h4><span class="mw-headline" id="Requesters">Requesters</span></h4>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:LibFig2-5.png" class="mw-file-description"><img src="/w/images/c/c8/LibFig2-5.png" decoding="async" width="341" height="200" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>As one uses AmigaOS and its applications, from time to time a "Requester" window may appear to ask the user a question - basically windows with gadgets in them. Such requesters can appear to confirm an action, obtain more information, make a selection or configuration. Typically a series of buttons across the bottom of the window will dispatch the requester, with the bottom-left button gadget indicating some affirmative choice and the bottom-right button gagdet cancelling the requester (performing no action or change).
+<br style="clear: both" />
+</p>
+<h4><span class="mw-headline" id="Keyboard_Operation_of_Gadgets">Keyboard Operation of Gadgets</span></h4>
+<p>As with so many things, AmigaOS and its applications provide a secondary way to operate many of these gadgets - by keyboard.  If a window contains text gadgets, pressing your keyboard's TAB key will activate the text gadgets in sequence (a cursor will appear in each so you can type &amp; edit).  Each press of the TAB key will cycle to the next gadget and pressing SHIFT + TAB will cycle through the gadgets in reverse order.
+</p><p>You may have noticed in many of the above sample images that many of the gagdets or their adjacent "label" texts contain a single underlined character.  This is a sign that pressing that key on your keyboard will activate that gadget.  Each gadget can then be operated by your keyboard - just like clicking on a button, clicking on a tab, setting a text or numeric value, etc.  Of course, if you are in the midst of typing in a text gadget, then things you type will go into that gadget instead of operating other gagdets.
+</p>
+<h2><span class="mw-headline" id="Finding_Files_in_AmigaOS">Finding Files in AmigaOS</span></h2>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:OS4-ASLReq.jpg" class="mw-file-description"><img src="/w/images/f/ff/OS4-ASLReq.jpg" decoding="async" width="538" height="554" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>AmigaOS provides a consistent method for navigating your file system and finding your files from within your apps - the "ASL file requester".  It is used by everything in AmigaOS and most third party applications.  It is the window (or "requester") that appears when you want to open or save files.
+</p><p>As you can see, the ASL file requester presents the files in a given location in your file systems (a directory or "drawer") and shows their size, date of creation or last modification and any comments attached to the file.  The above example shows the same directory as appeared above in this page.
+</p><p>At the bottom corners of the window are buttons to accept the selection ("OK") or cancel the requester.  Between those are buttons to view all the drives &amp; partitions on your system ("Volumes") or to move to the "Parent" of the current directory.
+</p><p>Also at the bottom of the window you will see three text gadgets.  The first of these is optional and allows you to filter what is shown in the file list - it is now shown filtering out any file with a ".info" suffix (those are AmigaOS icon files).  The next two lines reflect the current directory path name and the currently selected file name (also selected in the file list above).  In the case of saving files, you would type any name you wanted in the bottom text field to create a new file.  Clicking on the titles of the file list will let you sort the file list.
+</p><p>Of course this being AmigaOS, the ASL requester has its own "preferences editor" that lets you set how the requester appears, is sorted by default and a number of mouse button short-cuts.
+<br style="clear: both" />
+</p>
+<h2><span id="Controlling_AmigaOS_-_Which_Way.3F"></span><span class="mw-headline" id="Controlling_AmigaOS_-_Which_Way?">Controlling AmigaOS - Which Way?</span></h2>
+<p>AmigaOS provides a number of parallel ways that the user can control and put their Amigas to use.  The easiest and most common method is to use the AmigaOS graphic icons, windows and mouse interface - the "Workbench" - using all the GUI elements described above.  But AmigaOS also provides a more traditional or "old fashioned" method called a command line interface (the "CLI" or "Shell"), where the user can type text commands and interact using a text interface.  AmigaOS also provides a unique means of "interprocess communications" where user can have many applications and parts of the OS "talk" to each other. 
+</p>
+<h3><span id="The_Workbench_.26_Intuition"></span><span class="mw-headline" id="The_Workbench_&amp;_Intuition">The Workbench &amp; Intuition</span></h3>
+<p>As we described above, AmigaOS provides the "Workbench", a straightforward, efficient and easy graphical means to start applications, manage your computer and all your files.   Files and programs are represented with icons, generally known as "Projects" and "Tools".  They can be stored in any arrangement of directories ("Drawers").  You double-click on a program icon and it will open in a Intuition GUI window on your Workbench screen. 
+</p><p>Please see the section about the AmigaOS <a rel="nofollow" class="external text" href="http://wiki.amigaos.net/index.php/UserDoc:Workbench">Workbench</a> to learn these concepts:
+</p>
+<ul><li>What is the Workbench</li>
+<li>Workbench menus</li>
+<li>Keyboard control</li>
+<li>Workbench requesters</li>
+<li>Configuration</li>
+<li>Workbench help</li></ul>
+<h3><span id="The_Shell_.26_DOS_Commands"></span><span class="mw-headline" id="The_Shell_&amp;_DOS_Commands">The Shell &amp; DOS Commands</span></h3>
+<figure class="mw-halign-right" typeof="mw:File/Frame"><a href="/wiki/File:OS4-Window-Shell.jpg" class="mw-file-description"><img src="/w/images/c/ce/OS4-Window-Shell.jpg" decoding="async" width="562" height="311" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<p>The AmigaOS Shell can be opened by double-clicking the "Shell" icon in the AmigaOS "System" drawer.  The Shell is a text based interface that allows you to perform most of the same operations as the Workbench - to run and interact with application programs, manage files and control your Amiga computer.  AmigaOS also comes with dozens of standard "DOS commands" (programs purely meant for Shell usage).  Simply enter the name of a program or command (like "dir") and press Enter, the command or program will run and it will print its results in the Shell window.  While considered old fashioned, many users find the Shell to still be the most efficient way to perform many tasks on the Amigas.
+</p><p>Please see the section on the <a href="/wiki/UserDoc:Shell" title="UserDoc:Shell">AmigaOS Shell</a> to learn more.
+<br style="clear: both" />
+</p>
+<h3><span id="Scripts_.26_Messages"></span><span class="mw-headline" id="Scripts_&amp;_Messages">Scripts &amp; Messages</span></h3>
+<p>Scripts are simple text files that contain a list of commands written in a variety of languages: the AmigaDOS, Arexx and Python languages are provided with AmigaOS - there are many others.  Each of these language has its strengths.  You'll have to learn the one that suits what you want to do.  You can create a script using a text editor. You can run such scripts from the Workbench or from the shell (or from any other script). By using ARexx ports provided by AmigaOS components (the Workbench or Multiview, for example) or third-party applications, scripts can be used to make your computer perform a wide variety of actions.
+</p>
+<h2><span class="mw-headline" id="AmigaOS_System_Tools">AmigaOS System Tools</span></h2>
+<p>AmigaOS comes with a variety of programs to help in the preparation of your computer.  These include tools for:
+</p>
+<ul><li>Drive preparation (Media Toolbox, Format, Format DCRW &amp; Mounter).</li>
+<li>Font Handling (TypeManager &amp; FixFonts).</li>
+<li>Script Languages (RexxMast and Python).</li>
+<li>The Shell.</li>
+<li>Miscellaneous Utilities (Find, Help, Grim Reaper &amp; Ringhio Server).</li></ul>
+<h2><span class="mw-headline" id="AmigaOS_Utilities">AmigaOS Utilities</span></h2>
+<p>AmigaOS comes with a selection of utilities to assist the user, including:
+</p>
+<ul><li>Commodities.</li>
+<li>Editors (Notepad, MEmacs, PrefsObjectEditor &amp; IconEdit).</li>
+<li>Postscript oriented apps (AmiPDF, AmiGS &amp; Ghostscript).</li>
+<li>Disk apps (PartitionWizard &amp; RawDisk).</li>
+<li>Screenblankers.</li>
+<li>AmiDock and Dockies.</li>
+<li>The Unarc dearchiver.</li>
+<li>PlayCD.</li>
+<li>Several "sub-programs" that are used by other system utilities (blankers, dockies)</li>
+<li>Miscellaneous apps (Clock, printing apps, KeyShow, install apps, etc.).</li></ul>
+<p>Read <a href="/wiki/Utilities" title="Utilities">here</a> to find all of them explained further.
+</p>
+<h2><span class="mw-headline" id="AmigaOS_Preferences">AmigaOS Preferences</span></h2>
+<p>AmigaOS comes with a number of small programs used for modifying the system's settings. These are stored in the <a href="/wiki/Prefs" class="mw-redirect" title="Prefs">Prefs</a> drawer, and include programs for modifying the following settings:
+</p>
+<ul><li>General appearance</li>
+<li>Screen resolution</li>
+<li>Desktop and window backgrounds</li>
+<li>Language settings</li>
+<li>Keyboard and mouse settings</li>
+<li>Printer settings</li>
+<li>Audio settings</li></ul>
+<p>Read <a href="/wiki/Prefs" class="mw-redirect" title="Prefs">here</a> for details and explanations of all the preference programs.
+</p>
+<!-- 
+NewPP limit report
+Cached time: 20260114023053
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.040 seconds
+Real time usage: 0.043 seconds
+Preprocessor visited node count: 129/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 2/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 -total
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:471-0!canonical and timestamp 20260114023053 and revision id 7731. Rendering was triggered because: page-view
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=UserDoc:Introduction_to_AmigaOS&amp;oldid=7731">http://wiki.amigaos.net/w/index.php?title=UserDoc:Introduction_to_AmigaOS&amp;oldid=7731</a>"</div></div>
+		<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=UserDoc%3AIntroduction+to+AmigaOS" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-userdoc" class="selected mw-list-item"><a href="/wiki/UserDoc:Introduction_to_AmigaOS" title="View the subject page [c]" accesskey="c"><span>UserDoc</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=UserDoc_talk:Introduction_to_AmigaOS&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/UserDoc:Introduction_to_AmigaOS"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Introduction_to_AmigaOS&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Introduction_to_AmigaOS&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/UserDoc:Introduction_to_AmigaOS" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/UserDoc:Introduction_to_AmigaOS" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Introduction_to_AmigaOS&amp;oldid=7731" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Introduction_to_AmigaOS&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=UserDoc%3AIntroduction+to+AmigaOS"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=UserDoc%3AIntroduction+to+AmigaOS&amp;oldid=7731&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=UserDoc:Introduction_to_AmigaOS&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 5 June 2014, at 14:50.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":122,"wgPageParseReport":{"limitreport":{"cputime":"0.040","walltime":"0.043","ppvisitednodes":{"value":129,"limit":1000000},"postexpandincludesize":{"value":0,"limit":2097152},"templateargumentsize":{"value":0,"limit":2097152},"expansiondepth":{"value":2,"limit":100},"expensivefunctioncount":{"value":0,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":0,"limit":5000000},"timingprofile":["100.00%    0.000      1 -total"]},"cachereport":{"timestamp":"20260114023053","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>
