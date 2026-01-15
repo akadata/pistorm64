@@ -1,0 +1,56 @@
+# Makefile for PiStorm kernel module
+# This file coordinates the build of the kernel module and associated tools
+
+# Kernel module build
+obj-m += pistorm_kernel_module.o
+
+# Source files for the kernel module
+pistorm_kernel_module-objs := pistorm_kernel_module_main.o
+
+KDIR ?= /lib/modules/$(shell uname -r)/build
+PWD := $(shell pwd)
+
+# Default target
+all: module userspace
+
+# Build the kernel module
+module:
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
+
+# Build userspace tools
+userspace: smoke_test
+
+# Build smoke test
+smoke_test: tools/pistorm_smoke.c
+	gcc -o pistorm_smoke_test tools/pistorm_smoke.c
+
+# Install the module
+install:
+	sudo install -D -m 644 pistorm_kernel_module.ko /lib/modules/$(shell uname -r)/extra/pistorm_kernel_module.ko
+	sudo depmod -a
+
+# Load the module
+load:
+	sudo insmod ./pistorm_kernel_module.ko
+	sudo chmod 666 /dev/pistorm0
+
+# Unload the module
+unload:
+	sudo rmmod pistorm_kernel_module 2>/dev/null || true
+
+# Clean build artifacts
+clean:
+	$(MAKE) -C $(KDIR) M=$(PWD) clean
+	rm -f pistorm_smoke_test
+
+# Generate documentation
+docs:
+	@echo "Documentation available in PISTORM_KERNEL_MODULE_IMPLEMENTATION.md"
+
+# Test the module
+test: load
+	@echo "Testing module functionality..."
+	@ls -la /dev/pistorm0 && echo "Device node created successfully" || echo "Error: Device node not found"
+	@sudo timeout 5s ./pistorm_smoke_test && echo "Smoke test passed" || echo "Smoke test failed"
+
+.PHONY: all module userspace smoke_test install load unload clean docs test
