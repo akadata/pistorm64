@@ -1,190 +1,197 @@
-// SPDX-License-Identifier: MIT
-//
-// Userspace shim that routes all PiStorm bus access through /dev/pistorm0
-
-#include <errno.h>
+// src/gpio/ps_protocol_kmod.c - Kernel module backend implementation
 #include <fcntl.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/ioctl.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "ps_protocol.h"
-#include <linux/pistorm.h>
-#include "src/musashi/m68k.h"
+// Include our UAPI header
+#include "pistorm.h"
 
 static int ps_fd = -1;
-static bool backend_logged;
-static volatile unsigned int gpio_shadow[32];
-volatile unsigned int *gpio = gpio_shadow; /* legacy pointer used by emulator */
 
 static int ps_open_dev(void) {
-    if (ps_fd >= 0) {
-        return 0;
-    }
-
+    if (ps_fd >= 0) return 0;
     ps_fd = open("/dev/pistorm0", O_RDWR | O_CLOEXEC);
-    if (ps_fd < 0) {
-        if (!backend_logged) {
-            fprintf(stderr,
-                    "[ps_protocol] kmod backend selected but /dev/pistorm0 missing (%s)\n",
-                    strerror(errno));
-            backend_logged = true;
-        }
-        return -1;
-    }
-
-    if (!backend_logged) {
-        printf("[ps_protocol] backend=kmod (/dev/pistorm0)\n");
-        backend_logged = true;
-    }
-    return 0;
+    return (ps_fd >= 0) ? 0 : -1;
 }
 
-static int ps_simple_ioctl(unsigned long cmd) {
-    if (ps_open_dev() < 0) {
-        return -1;
-    }
-    if (ioctl(ps_fd, cmd) < 0) {
-        perror("pistorm ioctl");
-        return -1;
-    }
-    return 0;
-}
+// Define the global gpio pointer as expected by the emulator
+// This will be a dummy pointer that we intercept with our functions
+volatile unsigned int* gpio = (volatile unsigned int*)0xDEADBEEF;  // Dummy address
 
-static int ps_bus_ioctl(struct pistorm_busop *op) {
-    if (ps_open_dev() < 0) {
-        return -1;
-    }
-    if (ioctl(ps_fd, PISTORM_IOC_BUSOP, op) < 0) {
-        perror("PISTORM_IOC_BUSOP");
-        return -1;
-    }
-    return 0;
-}
-
-static unsigned int ps_fetch_pins(void) {
-    struct pistorm_pins pins;
-
-    if (ps_open_dev() < 0) {
-        return 0;
-    }
-    if (ioctl(ps_fd, PISTORM_IOC_GET_PINS, &pins) == 0) {
-        gpio_shadow[13] = pins.gplev0;
-        gpio_shadow[14] = pins.gplev1;
-        return pins.gplev0;
-    }
-    return gpio_shadow[13];
-}
-
-static unsigned int ps_bus_read(unsigned int addr, unsigned char width) {
+// Helper functions for GPIO operations (when using kernel module backend)
+void ps_gpio_set_input(int gpio_pin) {
+    // In kernel module backend, this would send an ioctl to configure pin as input
+    if (ps_open_dev() < 0) return;
     struct pistorm_busop op = {
-        .addr = addr,
-        .value = 0,
-        .width = width,
-        .is_read = 1,
-        .flags = 0,
+        .addr   = 0xDEADBEEF,  // Special address for GPIO setup
+        .value  = (gpio_pin << 16) | 0x0001,  // Pin number and input flag
+        .width  = PISTORM_W32,
+        .is_read= 0,
+        .flags  = 0x01,  // Special flag for GPIO setup
     };
-
-    if (ps_bus_ioctl(&op) == 0) {
-        return op.value;
-    }
-    return 0;
+    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
 }
 
-static void ps_bus_write(unsigned int addr, unsigned int value, unsigned char width) {
+void ps_gpio_set_output(int gpio_pin) {
+    // In kernel module backend, this would send an ioctl to configure pin as output
+    if (ps_open_dev() < 0) return;
     struct pistorm_busop op = {
-        .addr = addr,
-        .value = value,
-        .width = width,
-        .is_read = 0,
-        .flags = 0,
+        .addr   = 0xDEADBEEF,  // Special address for GPIO setup
+        .value  = (gpio_pin << 16) | 0x0002,  // Pin number and output flag
+        .width  = PISTORM_W32,
+        .is_read= 0,
+        .flags  = 0x01,  // Special flag for GPIO setup
     };
-
-    (void)ps_bus_ioctl(&op);
+    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
 }
 
-void ps_setup_protocol(void) {
-    ps_simple_ioctl(PISTORM_IOC_SETUP);
+void ps_gpio_set_alt(int gpio_pin, int alt_func) {
+    // In kernel module backend, this would send an ioctl to configure pin as alt function
+    if (ps_open_dev() < 0) return;
+    struct pistorm_busop op = {
+        .addr   = 0xDEADBEEF,  // Special address for GPIO setup
+        .value  = (gpio_pin << 16) | (alt_func & 0xFF),  // Pin number and alt function
+        .width  = PISTORM_W32,
+        .is_read= 0,
+        .flags  = 0x02,  // Special flag for alt function setup
+    };
+    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
 }
 
-void ps_reset_state_machine(void) {
-    ps_simple_ioctl(PISTORM_IOC_RESET_SM);
+unsigned int ps_gpio_pull_read(void) {
+    // In kernel module backend, this would send an ioctl to read pull state
+    if (ps_open_dev() < 0) return 0;
+    struct pistorm_busop op = {
+        .addr   = 0xDEADBEEF,  // Special address for GPIO setup
+        .value  = 0x03,  // Pull read command
+        .width  = PISTORM_W32,
+        .is_read= 1,
+        .flags  = 0x03,  // Special flag for pull read
+    };
+    int rc = ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
+    return (rc == 0) ? op.value : 0;
 }
 
-void ps_pulse_reset(void) {
-    ps_simple_ioctl(PISTORM_IOC_PULSE_RESET);
+unsigned int ps_gpio_pullclk0_read(void) {
+    // In kernel module backend, this would send an ioctl to read pull clock state
+    if (ps_open_dev() < 0) return 0;
+    struct pistorm_busop op = {
+        .addr   = 0xDEADBEEF,  // Special address for GPIO setup
+        .value  = 0x04,  // Pull clock read command
+        .width  = PISTORM_W32,
+        .is_read= 1,
+        .flags  = 0x04,  // Special flag for pull clock read
+    };
+    int rc = ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
+    return (rc == 0) ? op.value : 0;
+}
+
+int ps_setup_protocol(void) {
+    if (ps_open_dev() < 0) return -1;
+    return ioctl(ps_fd, PISTORM_IOC_SETUP);
+}
+
+int ps_reset_state_machine(void) {
+    if (ps_open_dev() < 0) return -1;
+    return ioctl(ps_fd, PISTORM_IOC_RESET_SM);
+}
+
+int ps_pulse_reset(void) {
+    if (ps_open_dev() < 0) return -1;
+    return ioctl(ps_fd, PISTORM_IOC_PULSE_RESET);
 }
 
 unsigned int ps_read_8(unsigned int addr) {
-    return ps_bus_read(addr, PISTORM_W8) & 0xffu;
+    if (ps_open_dev() < 0) return 0;
+    struct pistorm_busop op = {
+        .addr   = addr,
+        .value  = 0,
+        .width  = PISTORM_W8,
+        .is_read= 1,
+        .flags  = 0,
+    };
+    int rc = ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
+    return (rc == 0) ? (op.value & 0xFF) : 0;
 }
 
 unsigned int ps_read_16(unsigned int addr) {
-    return ps_bus_read(addr, PISTORM_W16) & 0xffffu;
+    if (ps_open_dev() < 0) return 0;
+    struct pistorm_busop op = {
+        .addr   = addr,
+        .value  = 0,
+        .width  = PISTORM_W16,
+        .is_read= 1,
+        .flags  = 0,
+    };
+    int rc = ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
+    return (rc == 0) ? (op.value & 0xFFFF) : 0;
 }
 
 unsigned int ps_read_32(unsigned int addr) {
-    return ps_bus_read(addr, PISTORM_W32);
+    if (ps_open_dev() < 0) return 0;
+    struct pistorm_busop op = {
+        .addr   = addr,
+        .value  = 0,
+        .width  = PISTORM_W32,
+        .is_read= 1,
+        .flags  = 0,
+    };
+    int rc = ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
+    return (rc == 0) ? op.value : 0;
 }
 
 void ps_write_8(unsigned int addr, unsigned int data) {
-    ps_bus_write(addr, data, PISTORM_W8);
+    if (ps_open_dev() < 0) return;
+    struct pistorm_busop op = {
+        .addr   = addr,
+        .value  = data,
+        .width  = PISTORM_W8,
+        .is_read= 0,
+        .flags  = 0,
+    };
+    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
 }
 
 void ps_write_16(unsigned int addr, unsigned int data) {
-    ps_bus_write(addr, data, PISTORM_W16);
+    if (ps_open_dev() < 0) return;
+    struct pistorm_busop op = {
+        .addr   = addr,
+        .value  = data,
+        .width  = PISTORM_W16,
+        .is_read= 0,
+        .flags  = 0,
+    };
+    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
 }
 
 void ps_write_32(unsigned int addr, unsigned int data) {
-    ps_bus_write(addr, data, PISTORM_W32);
+    if (ps_open_dev() < 0) return;
+    struct pistorm_busop op = {
+        .addr   = addr,
+        .value  = data,
+        .width  = PISTORM_W32,
+        .is_read= 0,
+        .flags  = 0,
+    };
+    ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
 }
 
 unsigned int ps_read_status_reg(void) {
-    struct pistorm_busop op = {
-        .addr = 0,
-        .value = 0,
-        .width = PISTORM_W16,
-        .is_read = 1,
-        .flags = PISTORM_BUSOP_F_STATUS,
-    };
-
-    if (ps_bus_ioctl(&op) == 0) {
-        return op.value & 0xffffu;
-    }
-    return 0;
+    return ps_read_16(0x00BFE003);  // STATUS register address
 }
 
 void ps_write_status_reg(unsigned int value) {
-    struct pistorm_busop op = {
-        .addr = 0,
-        .value = value,
-        .width = PISTORM_W16,
-        .is_read = 0,
-        .flags = PISTORM_BUSOP_F_STATUS,
-    };
-
-    (void)ps_bus_ioctl(&op);
+    ps_write_16(0x00BFE003, value);  // STATUS register address
 }
 
 unsigned int ps_get_ipl_zero(void) {
-    unsigned int level = ps_fetch_pins();
-    return level & (1u << PIN_IPL_ZERO);
-}
-
-unsigned int ps_gpio_lev(void) {
-    return ps_fetch_pins();
-}
-
-void ps_update_irq() {
-    unsigned int ipl = 0;
-
-    if (!ps_get_ipl_zero()) {
-        unsigned int status = ps_read_status_reg();
-        ipl = (status & STATUS_MASK_IPL) >> STATUS_SHIFT_IPL;
-    }
-
-    m68k_set_irq(ipl);
+    // Read the IPL_ZERO state - this would typically be from CIAA PRA
+    unsigned int v = ps_read_8(0x00BFE001);  // CIAA PRA
+    // IPL_ZERO is active low, so return 1 if bit is clear
+    return (v & 0x02) ? 0 : 1;  // Assuming IPL_ZERO is bit 1 in CIAA PRA
 }

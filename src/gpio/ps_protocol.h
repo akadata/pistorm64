@@ -81,7 +81,6 @@ void ps_reset_state_machine();
 void ps_pulse_reset();
 
 unsigned int ps_get_ipl_zero();
-unsigned int ps_gpio_lev();
 
 #define read8 ps_read_8
 #define read16 ps_read_16
