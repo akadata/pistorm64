@@ -92,8 +92,8 @@ static void init_disk_port(void) {
 static void force_drive0_outputs(void) {
   ddrb_shadow = 0xFF;
   ps_write_8(CIABDDRB, ddrb_shadow);
-  // Drive0 selected (bit3=0), others high, motor on (bit7=0), side0 (bit2=0), dir inward (0), step high.
-  prb_shadow = 0x70;  // 0b01110000: SEL0=0, SEL1-3=1, MOTOR=0, SIDE=0, DIR=0, STEP=1
+  // Drive0 selected (bit3=0), motor on (bit7=0), others high. Matches Amiga/X-Copy mapping.
+  prb_shadow = 0x77;  // 0b01110111: PB7=0(motor), PB6-4=1, PB3=0(sel0), PB2-0=1
   ps_write_8(CIABPRB, prb_shadow);
   usleep(1000);
 }
