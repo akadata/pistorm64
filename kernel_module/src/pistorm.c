@@ -19,7 +19,15 @@
 
 #include <linux/pistorm.h>
 
+#ifndef PISTORM64_GIT
+#define PISTORM64_GIT "unknown"
+#endif
+
 #define DEVICE_NAME "pistorm"
+
+#ifndef PISTORM64_GIT
+	#define PISTORM64_GIT "unknown"
+#endif
 
 /* GPIO register offsets */
 #define GPIO_GPFSEL0 0x00
@@ -569,6 +577,18 @@ static void __exit pistorm_exit(void)
 module_init(pistorm_init);
 module_exit(pistorm_exit);
 
-MODULE_AUTHOR("PiStorm maintainers");
-MODULE_DESCRIPTION("PiStorm GPIO/GPCLK kernel backend");
+MODULE_AUTHOR("AKADATA LIMITED (PiStorm64)");
+MODULE_DESCRIPTION("PiStorm64 kernel backend: GPIO + GPCLK bus engine for PiStorm CPLD");
 MODULE_LICENSE("GPL");
+MODULE_VERSION("0.1.0");
+
+MODULE_INFO(firmware, "N/A");
+MODULE_INFO(name, "pistorm64");
+MODULE_INFO(alias, "pistorm");
+MODULE_INFO(url, "https://github.com/akadata/pistorm");
+MODULE_INFO(supported, "Pi Zero 2 W (BCM2837), Pi 4-class");
+MODULE_INFO(intree, "N");   /* out-of-tree */
+MODULE_INFO(pistorm64, "GPIO/GPCLK backend only; userspace CPU stays userspace");
+MODULE_INFO(git, PISTORM64_GIT);
+MODULE_INFO(clock, "GPCLK0 alt0 on GPIO4, PLLC source, divider=6 (~200MHz target)");
+MODULE_INFO(gpio, "Pins: 0 TXN_IN_PROGRESS(in), 1 IPL_ZERO(in), 2 A0(out), 3 A1(out), 4 GPCLK0(alt0), 5 RESET(out), 6 RD(out), 7 WR(out), 8-23 D0..D15(bidir)");
