@@ -9,6 +9,7 @@ tools=(
 "src/platforms/amiga/registers/regtool.c"
 "src/platforms/amiga/registers/ioharness.c"
 "src/platforms/amiga/registers/dumpdisk.c"
+"src/platforms/amiga/registers/motor_test.c"
 )
 LIBS="src/gpio/ps_protocol.c"
 
