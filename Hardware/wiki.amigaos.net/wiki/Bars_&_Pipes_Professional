@@ -1,0 +1,668 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Bars and Pipes Professional - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_3kSIJ4f3C6Y1Puo1lQAAAAs","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Bars_and_Pipes_Professional","wgTitle":"Bars and Pipes Professional","wgCurRevisionId":9975,"wgRevisionId":9975,"wgArticleId":710,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":
+[],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Bars_and_Pipes_Professional","wgRelevantArticleId":710,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgRedirectedFrom":"Bars_\u0026_Pipes_Professional","wgInternalRedirectTargetUrl":"/wiki/Bars_and_Pipes_Professional"};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["mediawiki.action.view.redirect","site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="canonical" href="http://wiki.amigaos.net/wiki/Bars_and_Pipes_Professional">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-Bars_and_Pipes_Professional rootpage-Bars_and_Pipes_Professional skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">Bars and Pipes Professional</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"><span class="mw-redirectedfrom">(Redirected from <a href="/w/index.php?title=Bars_%26_Pipes_Professional&amp;redirect=no" class="mw-redirect" title="Bars &amp; Pipes Professional">Bars &amp; Pipes Professional</a>)</span></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/UserDoc:Workbench" title="UserDoc:Workbench">UserDoc:Workbench</a> &gt; <a href="/wiki/UserDoc:Shell" title="UserDoc:Shell">UserDoc:Shell</a> &gt; <a href="/wiki/AmigaDOS_manual" title="AmigaDOS manual">AmigaDOS manual</a> &gt; <a href="/wiki/AmigaOS_Manual" title="AmigaOS Manual">AmigaOS Manual</a> &gt; <a href="/wiki/Bars_and_Pipes_Professional" title="Bars and Pipes Professional">Bars and Pipes Professional</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Author_and_Copyright"><span class="tocnumber">1</span> <span class="toctext">Author and Copyright</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Welcome_Aboard!"><span class="tocnumber">2</span> <span class="toctext">Welcome Aboard!</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="#Installation"><span class="tocnumber">3</span> <span class="toctext">Installation</span></a>
+<ul>
+<li class="toclevel-2 tocsection-4"><a href="#Quick_Installation"><span class="tocnumber">3.1</span> <span class="toctext">Quick Installation</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-5"><a href="#Touring_the_MIDI_setup"><span class="tocnumber">4</span> <span class="toctext">Touring the MIDI setup</span></a>
+<ul>
+<li class="toclevel-2 tocsection-6"><a href="#Overview"><span class="tocnumber">4.1</span> <span class="toctext">Overview</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="#The_MIDI_Interface"><span class="tocnumber">4.2</span> <span class="toctext">The MIDI Interface</span></a></li>
+<li class="toclevel-2 tocsection-8"><a href="#MIDI_Interface_Ports"><span class="tocnumber">4.3</span> <span class="toctext">MIDI Interface Ports</span></a></li>
+<li class="toclevel-2 tocsection-9"><a href="#Multiple_MIDI_In_Ports"><span class="tocnumber">4.4</span> <span class="toctext">Multiple MIDI In Ports</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-10"><a href="#A_Quick_Tour"><span class="tocnumber">5</span> <span class="toctext">A Quick Tour</span></a>
+<ul>
+<li class="toclevel-2 tocsection-11"><a href="#Introduction"><span class="tocnumber">5.1</span> <span class="toctext">Introduction</span></a></li>
+<li class="toclevel-2 tocsection-12"><a href="#Running_Bars&amp;Pipes_Professional"><span class="tocnumber">5.2</span> <span class="toctext">Running Bars&amp;Pipes Professional</span></a>
+<ul>
+<li class="toclevel-3 tocsection-13"><a href="#Running_From_The_Workbench_Icon"><span class="tocnumber">5.2.1</span> <span class="toctext">Running From The Workbench Icon</span></a></li>
+<li class="toclevel-3 tocsection-14"><a href="#Running_From_A_Shell"><span class="tocnumber">5.2.2</span> <span class="toctext">Running From A Shell</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-15"><a href="#The_Default_Screen_Setup"><span class="tocnumber">5.3</span> <span class="toctext">The Default Screen Setup</span></a></li>
+<li class="toclevel-2 tocsection-16"><a href="#The_Tracks_Window"><span class="tocnumber">5.4</span> <span class="toctext">The Tracks Window</span></a></li>
+<li class="toclevel-2 tocsection-17"><a href="#The_PipeLine"><span class="tocnumber">5.5</span> <span class="toctext">The PipeLine</span></a></li>
+<li class="toclevel-2 tocsection-18"><a href="#The_Flags_Area"><span class="tocnumber">5.6</span> <span class="toctext">The Flags Area</span></a></li>
+<li class="toclevel-2 tocsection-19"><a href="#Control_Buttons"><span class="tocnumber">5.7</span> <span class="toctext">Control Buttons</span></a></li>
+<li class="toclevel-2 tocsection-20"><a href="#The_Main_Menu"><span class="tocnumber">5.8</span> <span class="toctext">The Main Menu</span></a></li>
+<li class="toclevel-2 tocsection-21"><a href="#Window_Icons_and_the_Windows_Menu"><span class="tocnumber">5.9</span> <span class="toctext">Window Icons and the Windows Menu</span></a>
+<ul>
+<li class="toclevel-3 tocsection-22"><a href="#Window_Icons"><span class="tocnumber">5.9.1</span> <span class="toctext">Window Icons</span></a></li>
+<li class="toclevel-3 tocsection-23"><a href="#The_Windows_Menu"><span class="tocnumber">5.9.2</span> <span class="toctext">The Windows Menu</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-24"><a href="#Sections"><span class="tocnumber">6</span> <span class="toctext">Sections</span></a></li>
+<li class="toclevel-1 tocsection-25"><a href="#Accessories"><span class="tocnumber">7</span> <span class="toctext">Accessories</span></a></li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="Author_and_Copyright">Author and Copyright</span></h2>
+<p>This documentation is based on the original copyrighted manual.<br />
+<b>Copyright (c) 1993 The Blue Ribbon SoundWorks, Ltd.</b>
+</p><p>The original documentation has been modified and enhanced where needed to reflect the changes made to the AmigaOS 4 specific port.
+</p><p>All changes and modifications are<br />
+<b>Copyright (c) 2013 Lyle Hazelwood and Steven Solie.</b>
+</p><p>Explicit written permission to copy and edit the original manuals has been secured.
+</p>
+<h2><span id="Welcome_Aboard.21"></span><span class="mw-headline" id="Welcome_Aboard!">Welcome Aboard!</span></h2>
+<p>These documents are for the AmigaOS 4 port of Bars &amp; Pipes Professional. A few notes may be useful:
+The original program will be referred to as Bars &amp; Pipes Professional, the AmigaOS specific port will be called <i>Bars &amp; Pipes Professional for AmigaOS</i> instead.
+</p><p>This port is based on Bars&amp;Pipes Professional version 2.5c. The AmigaOS 4 version was provided by Alfred von Faust, and he worked for many years to keep it alive. Lyle Hazelwood has recently taken the port over and is continuing to keep the program current.
+</p><p>Thank you for downloading Bars &amp; Pipes Professional. In the pages to come, you will understand why you've made an important choice. With Bars &amp; Pipes Professional, you're truly bound only by the limits of your own creativity. We encourage you to read this manual, since it contains thorough explanations of Bars &amp; Pipes Professional's wide array of features. Bars &amp; Pipes Professional is a high-end MIDI sequencing and composition package. In order to use it, you must have a MIDI sound module or keyboard connected to your Amiga via a CAMD supported MIDI interface.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Note
+</th></tr>
+<tr>
+<td>If you would like to use the Amiga's Internal sounds instead of MIDI, we suggest <a rel="nofollow" class="external text" href="http://www.os4depot.net/index.php?function=showfile&amp;file=audio/play/softsyn.lha">SoftSyn</a> available at <a rel="nofollow" class="external text" href="http://www.os4depot.net">OS4Depot</a>.
+</td></tr></tbody></table>
+<p>Everyone at The Blue Ribbon SoundWorks is dedicated to producing the highest quality software and software support in the industry. We have invested thousands of hours of research and development in our products. Much of that time is spent in listening to and learning from people like you. Blue Ribbon products are designed to be affordable, ongoing investments that are improved and expanded over time. We've provided expansion through program updates and add-on software, such as the Creativity Kit and the Pro Studio Kit. If you are a C programmer, with the Rules For Tools add-on, you can even create your own enhancements to Bars &amp; Pipes Professional!
+</p>
+<h2><span class="mw-headline" id="Installation">Installation</span></h2>
+<h3><span class="mw-headline" id="Quick_Installation">Quick Installation</span></h3>
+<p>Bars&amp;Pipes Professional is easy to install on your AmigaOS computer.
+</p><p>To install Bars&amp;Pipes Professional:
+</p>
+<ol><li>Make sure that you have at least two megabytes of space left on your hard disk.</li>
+<li>Unarc the Bars&amp;Pipes Professional archive to wherever you'd like to keep the program.</li>
+<li>You'll also need camd.library which is already included with AmigaOS.</li>
+<li>Run Bars&amp;Pipes Professional from the drawer on your hard disk.</li></ol>
+<p>On the first run, Bars&amp;Pipes will ask you to select a screen mode. Please select an ARGB mode for best results. Once the program is open, under the "Preferences" menu, select "Environment" and then "Save" to save your screen choice.
+</p>
+<h2><span class="mw-headline" id="Touring_the_MIDI_setup">Touring the MIDI setup</span></h2>
+<h3><span class="mw-headline" id="Overview">Overview</span></h3>
+<p>Bars&amp;Pipes Professional works with any CAMD-compatible synthesizer, sound module or application. Let's look at some standard ways to connect MIDI instruments to your Amiga computer.
+</p>
+<h3><span class="mw-headline" id="The_MIDI_Interface">The MIDI Interface</span></h3>
+<p>In order to use Bars&amp;Pipes Professional, you must first own a MIDI interface. The MIDI interface serves as a translator between your MIDI instrument(s) and your Amiga.
+</p><p>Before using Bars&amp;Pipes Professional, first connect your MIDI interface to your Amiga. It may connect to a sound board joystick port, or to USB.
+</p>
+<h3><span class="mw-headline" id="MIDI_Interface_Ports">MIDI Interface Ports</span></h3>
+<p>Most MIDI interfaces feature one MIDI in, one MIDI out, and possibly one MIDI thru port. The MIDI in and MIDI out ports are the most important aspects of a MIDI interface.
+</p>
+<h3><span class="mw-headline" id="Multiple_MIDI_In_Ports">Multiple MIDI In Ports</span></h3>
+<p>CAMD supports any number of MIDI Inputs and Outputs. While it is possible to set the input and output individually for each track, you can (and should) set a default input and output that will be used as defaults for every track that does not have an input or output specified. These are set and saved from the Preferences/Environment window.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Connecting MIDI Devices
+</th></tr>
+<tr>
+<td>Connect the MIDI OUT from your interface to the MIDI IN on your synth or sound module.<br />
+<p>Connect the MIDI OUT from your keyboard or other instrument to MIDI IN on your interface.
+</p>
+</td></tr></tbody></table>
+<p>If your MIDI gear has a USB port, CAMD may be able to access it directly by using the <a rel="nofollow" class="external text" href="http://os4depot.net/share/driver/misc/usbmidi.lha">USB Driver</a>
+</p><p>(is the usb MIDI driver part of the OS??)
+</p>
+<h2><span class="mw-headline" id="A_Quick_Tour">A Quick Tour</span></h2>
+<h3><span class="mw-headline" id="Introduction">Introduction</span></h3>
+<p>Bars&amp;Pipes Professional is an innovative composition environment with an extensive arsenal of features and options. Before exploring it in depth, let's take a quick tour!
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Note
+</th></tr>
+<tr>
+<td>If you need help connecting your MIDI equipment to your Amiga, please read <a href="/wiki/Bars_%26_Pipes_Professional#Touring_the_MIDI_setup" class="mw-redirect" title="Bars &amp; Pipes Professional">Touring The MIDI Setup</a>.
+</td></tr></tbody></table>
+<h3><span id="Running_Bars.26Pipes_Professional"></span><span class="mw-headline" id="Running_Bars&amp;Pipes_Professional">Running Bars&amp;Pipes Professional</span></h3>
+<p>Before you run Bars&amp;Pipes Professional, you must first install it. If you have not yet done so, please see <a href="/wiki/Bars_%26_Pipes_Professional#Installation" class="mw-redirect" title="Bars &amp; Pipes Professional">Installation</a>.
+</p>
+<h4><span class="mw-headline" id="Running_From_The_Workbench_Icon">Running From The Workbench Icon</span></h4>
+<p>You can run Bars&amp;Pipes Professional from Workbench by double-clicking on its program icon.
+</p><p>Doing so opens Bars&amp;Pipes Professional with an empty Song. Alternatively, you can double-click on a Bars&amp;Pipes Song icon. Doing this opens Bars&amp;Pipes Professional with the selected Song already loaded.
+</p>
+<h4><span class="mw-headline" id="Running_From_A_Shell">Running From A Shell</span></h4>
+<p>You can also run Bars&amp;Pipes Professional from a shell. Make sure your stack size is at least 100,000 bytes when running the program this way.
+</p>
+<h3><span class="mw-headline" id="The_Default_Screen_Setup">The Default Screen Setup</span></h3>
+<p>When Bars&amp;Pipes Professional first starts up, you'll see the Tracks window and a group of icons along the right side of the screen. These icons represent various unopened windows.
+</p><p>Double-click on any icon to open its associated window. Click on the close button in the top left corner of an open window to revert it to its associated icon.
+</p>
+<h3><span class="mw-headline" id="The_Tracks_Window">The Tracks Window</span></h3>
+<p><span class="mw-default-size" typeof="mw:File"><a href="/wiki/File:Tracks.png" class="mw-file-description"><img src="/w/images/c/ca/Tracks.png" decoding="async" width="607" height="278" class="mw-file-element" /></a></span>
+</p><p>The Tracks window represents the heart and soul of Bars&amp;Pipes Professional. It is where multi-track recording takes place. It is also the primary place for organizing the PipeLines and Tools which give Bars&amp;Pipes Professional so much of its power and flexibility. Let's take a brief look:
+</p>
+<h3><span class="mw-headline" id="The_PipeLine">The PipeLine</span></h3>
+<p><span class="mw-default-size" typeof="mw:File"><a href="/wiki/File:PipeLine.png" class="mw-file-description"><img src="/w/images/5/5c/PipeLine.png" decoding="async" width="576" height="14" class="mw-file-element" /></a></span>
+</p><p>The Tracks window contains individual Tracks, into which you will record your music. These Tracks run from left to right in rows, with measure and beat lines drawn from top to bottom.
+</p><p>Starting from left to right, each Track contains the following components:
+</p>
+<ul><li>The Track Name, which identifies a particular Track;</li>
+<li>The Input Selector box, or Input Arrow, which selects which Track(s) are to receive incoming music;</li>
+<li>The Input PipeLine, which holds Tools that process the music as it flows into the Sequencer;</li></ul>
+<table class="wikitable">
+<tbody><tr>
+<th>Note
+</th></tr>
+<tr>
+<td>When first running Bars&amp;Pipes Professional, you will most likely see a MIDI In Tool in the Input PipeLine. This acts as the source for the Track's PipeLine, and, hence, the Track. This is further explained in <a href="/wiki/Bars_%26_Pipes_Professional:_Recording" title="Bars &amp; Pipes Professional: Recording">Basic Recording</a>.
+</td></tr></tbody></table>
+<ul><li>The Play/Merge/Record Selector, which displays a blue letter P while the Track is in Play mode, a red letter M while the Track is in Merge mode, and a red letter R while the Track is in Record Mode;</li>
+<li>The Sequencer area, which holds and displays the MIDI events, or Sequence, that make up the recording;</li>
+<li>The Thru/Play Only/Mute Selector, or faucet, which switches the Track between Thru, Play Only, and Mute modes;</li>
+<li>The Output PipeLine, which holds Tools such as the MIDI Out Tool that process the music as it flows out of the Sequencer; and</li>
+<li>The MIDI Channel Selector, or Output channel, which displays the MIDI channel over which the final MIDI Out Tool sends.</li></ul>
+<table class="wikitable">
+<tbody><tr>
+<th>Note
+</th></tr>
+<tr>
+<td>This selector is used by the standard MIDI Out Tool. Non MIDI-specific output Tools, such as most Multi-Media Tools, do not need MIDI channels.
+</td></tr></tbody></table>
+<h3><span class="mw-headline" id="The_Flags_Area">The Flags Area</span></h3>
+<p><span class="mw-default-size" typeof="mw:File"><a href="/wiki/File:Flags.png" class="mw-file-description"><img src="/w/images/0/00/Flags.png" decoding="async" width="600" height="11" class="mw-file-element" /></a></span>
+</p><p>Above the Tracks area is the Flags area.
+</p><p>Bars&amp;Pipes Professional uses these flags to mark specific points in music time for certain operations, such as punch in and auto-locate. It also displays the current time signature and measure numbers in this area.
+</p><p>Bars&amp;Pipes Professional displays twelve Flag icons across the top of the Tracks. You can grab these with the mouse and drag them from left to right. Use the Flags to set positions in your music for editing, recording, looping, and more.
+</p><p>A Flag appearing during the displayed section has an attached vertical stem intersecting all of the Tracks. If you've placed the Flag in a measure which precedes the displayed section, it appears on the left side of the Sequencer. If you've placed it in a measure that follows the displayed section, it appears on the right.
+</p><p>To relocate a Flag, first scroll the Sequencer so that the desired location shows in the Sequencer. Then drag the Flag to its position. To move a Flag to the beginning of the Song, drag it all the way to the left side of the screen. To move it to the end of the Song, drag it all the way to the right. Flags snap to the alignment specified in the Align with... option in the Preferences menu.
+</p><p>The following Flags are found in the Flags area:
+</p>
+<ul><li>The Position Marker Flag or Song Position Flag (the red triangle with the blue border) which shows the current position in your Song;</li></ul>
+<table class="wikitable">
+<tbody><tr>
+<th>Note
+</th></tr>
+<tr>
+<td>If you press the Play button, your Song starts at this point.
+</td></tr></tbody></table>
+<ul><li>The two Edit Flags (solid purple triangles), which determine the part of your Song that is affected by Cut, Paste, and other editing operations;</li></ul>
+<p>The Auto-Locate Flags (blue rectangles marked M1 through M4), which mark important points in your composition;
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Note
+</th></tr>
+<tr>
+<td>You can immediately move to these points by using the corresponding M1 through M4 buttons in the Transport Controls window.
+</td></tr></tbody></table>
+<ul><li>The Punch In and Punch Out flags (yellow rectangles marked IN and OUT), which allow you to record over a restricted part of your Song;</li>
+<li>The Loop Flags (red rectangles containing curved lines with arrows), which mark sections for use with Loop-Mode editing and the Loop Tool; and</li>
+<li>The Stop Sign (the red hexagon with the white border), which marks the point at which Bars&amp;Pipes Professional is to stop playback.</li></ul>
+<table class="wikitable">
+<tbody><tr>
+<th>Note
+</th></tr>
+<tr>
+<td>This feature is useful when you want to sit back and listen to part of a Song while you're away from the keyboard, or if you're performing live or recording a sequence to tape and want the Song to stop upon completion.
+</td></tr></tbody></table>
+<h3><span class="mw-headline" id="Control_Buttons">Control Buttons</span></h3>
+<p><span class="mw-default-size" typeof="mw:File"><a href="/wiki/File:ControlButtons.png" class="mw-file-description"><img src="/w/images/7/71/ControlButtons.png" decoding="async" width="551" height="20" class="mw-file-element" /></a></span>
+</p><p>The Tracks Window's control buttons are above the Flags area.
+</p><p>From left to right are the following buttons:
+</p>
+<ul><li>The Solo button, which both chooses and displays whether the highlighted Track is soloed, muted, or neither;</li>
+<li>The ToolPad, which holds up to sixteen Tools to be used with the Toolize feature;</li>
+<li>The Group selector buttons, which identify combinations of Tracks;</li>
+<li>The Group button, which determines if clicking on a Track adds to a group or not;</li>
+<li>The Up/Down arrows, which move the highlighted Track up or down in the list of Tracks;</li>
+<li>The Tempo button, which chooses and displays the current tempo;</li>
+<li>The Start button, which starts the Sequencer from the beginning of your composition;</li>
+<li>The Play button, which starts the Sequencer from the current Song position, denoted by the red and blue triangular Song Position Flag, found in the Flags Area;</li>
+<li>The Rewind button, which moves the Song Position Flag to the left, toward the beginning of the piece;</li>
+<li>The Fast Forward button, which moves the Song Position Flag to the right, toward the end;</li>
+<li>The Measure display, which shows the measure number in which the Song Position Flag currently resides; and</li>
+<li>The Record button, which chooses and displays whether the Sequencer is in record or playback mode.</li>
+<li>Sizing And Scrolling The Tracks</li></ul>
+<p>Use the scroll bar and arrows on the right side of the Tracks window to scroll through the Tracks, in order to view those which don't fit in the display.
+</p><p>At the bottom of the Tracks window, you'll find a set of scroll bars, single arrows, and double arrows. Use the scroll bar and single arrows to search forward and backward. For example, to scroll the Track names from left to right, use the scroll bar and single arrows below the list of Track names.
+</p><p>Use the double arrows to resize sections of the display by dragging the arrows from left to right. With the double arrows, you can resize your display to show only what you want to view.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Note
+</th></tr>
+<tr>
+<td>You can control how much space is available by using different screen resolutions. Lower resolutions like 800X600 will make everything large and easy to read, while higher resolutions will provides plenty of room for additional Tracks.
+</td></tr></tbody></table>
+<h3><span class="mw-headline" id="The_Main_Menu">The Main Menu</span></h3>
+<p>As you may know, in the Amiga's windowing environment each window can have a different menu. Some of the windows in Bars&amp;Pipes Professional do have their own menus, however, most share one menu, the Main menu.
+</p><p>To access the Main menu, click on the Tracks window or the background with the left mouse button. Then, to select one of the Main menu options, click and hold the right mouse button, while moving the mouse pointer to your desired selection.
+</p>
+<h3><span class="mw-headline" id="Window_Icons_and_the_Windows_Menu">Window Icons and the Windows Menu</span></h3>
+<p>Several windows in Bars&amp;Pipes Professional are accessible from both icons, located at the right side of the screen, and menu commands, located in the Windows menu found in the Main menu set.
+</p>
+<h4><span class="mw-headline" id="Window_Icons">Window Icons</span></h4>
+<p>To the right of the Tracks window, you'll see a column of icons. These icons represent various windows. Double-clicking on an icon opens the window, while clicking on the close gadget of a window turns it back into an icon.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Note
+</th></tr>
+<tr>
+<td>The Tracks window itself can be closed and turned into an icon. To do so, click on the close gadget in the upper left hand corner of the Tracks window. The close gadget looks like a square with a smaller square inside of it. Notice that the Tracks window turns into an icon of railroad Tracks. Double-click on the Tracks icon to reopen the window.
+</td></tr></tbody></table>
+<h4><span class="mw-headline" id="The_Windows_Menu">The Windows Menu</span></h4>
+<p>Each window can also be accessed from the Windows menu in the Main menu. This includes many additional windows that do not have icons. Let's take a quick tour of all the windows in the Windows menu. As we do this, we'll get a quick glimpse of the various capabilities of Bars&amp;Pipes Professional. Open each window by selecting it in the Windows menu. If a window has an Icon, notice that the icon disappears. Close the window by clicking on its close button (top left.) You might also experiment with double-clicking on the window icons to become familiar with each.
+</p>
+<figure class="mw-default-size mw-halign-right" typeof="mw:File"><a href="/wiki/File:WindowsMenu.png" class="mw-file-description"><img src="/w/images/5/5f/WindowsMenu.png" decoding="async" width="31" height="240" class="mw-file-element" /></a><figcaption></figcaption></figure>
+<dl><dt>Accessories</dt>
+<dd>Accessories are separate modules that add new features to Bars&amp;Pipes Professional. Use the Accessories window to install, use and remove your Accessories. The Accessory window may also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>ClipBoard</dt>
+<dd>When the ClipBoard window is open, cut copy and paste editing operations store and retrieve from it. Use this to move music around between different parts of the program. The ClipBoard window may also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Define...</dt>
+<dd>You can define your own Scales, Chords, Rhythms, and Patch Lists using the four Define windows opened from the submenu.</dd></dl>
+<dl><dt>Edit PadTool Controls</dt>
+<dd>If you have a Tool in the ToolPad, the Edit PadTool Controls command opens the Control window for that Tool.</dd></dl>
+<dl><dt>Icons</dt>
+<dd>The Icons window allows you to keep all of the window icons in their own separate window. Opening the Icons window automatically collects the window icons and places them inside the Icons window. Closing the Icons window causes the window Icons to return to their previous positions.</dd></dl>
+<dl><dt>Information</dt>
+<dd>The Information window provides useful information about the state of your project and computer. The Information window may also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Master Parameters</dt>
+<dd>The Master Parameters window accesses a special master Track where you may set up global Time Signature, Lyrics, Scales, Chords, Dynamics, and Rhythm changes. The Master Parameters window may also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Media Madness</dt>
+<dd>The Media Madness window brings multi-media production to Bars&amp;Pipes Professional. With this window, you can place Multi-Media Tools in each Track, and edit a complete Multi-Media presentation. The Media Madness window can also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Metronome</dt>
+<dd>Use the Metronome window to set up your metronome click - internal Amiga audio, MIDI or visual. The Metronome can also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Mini Transport</dt>
+<dd>The Mini Transport window provides a subset of the main Transport Controls window (see below.) It's designed to be small and innocuous. You can open it from anywhere simply by pressing the 'M' key on your keyboard.</dd></dl>
+<dl><dt>Mix Maestro</dt>
+<dd>Use Mix Maestro to do a complete automated mixdown of your performance. Mix Maestro provides a volume slider and pan pot for each Track. As the Song plays, drag the slider to lower or raise the volume and turn the knob to rotate the sound left or right. Mix Maestro memorizes your moves and plays them back faithfully. The Mix Maestro window can also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Record Activation</dt>
+<dd>By default, when Bars&amp;Pipes Professional's Sequencer records into a Track, it erases all MIDI event types (note, pitch bend, etc.) and replaces them with the new. However, with the Record Activation window you can tell the Sequencer to ignore specific MIDI types. For example, you can set it to record over pitch bend while leaving notes intact. The Record Activation window may also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Set Flags</dt>
+<dd>The Set Flags window allows you to position any Flag in the Track's window by typing in the location you want for the Flag, either in music or SMPTE time. Open the Set Flags window by choosing Set Flags from the Main menu's Windows menu, or double-click on the Set Flags icon.</dd></dl>
+<dl><dd>To determine music time or SMPTE time, click on the SMPTE/Music Time button. To change the Flag, click on the numbers to the right of the Flag representation.</dd></dl>
+<dl><dt>Song Construction</dt>
+<dd>Edit your music at the highest level with the Song Construction window. Create, drag, duplicate and erase everything from individual measures to entire sections. The Song Construction window can also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Tempo Map</dt>
+<dd>Use the Tempo Map window to create a graphical Tempo Map for your performance. With a Tempo Map, you can tell Bars&amp;Pipes Professional when to speed up and slow down as it plays your music. The Tempo Map window can also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Tempo Palette</dt>
+<dd>You may set four preset Tempos in the Tempo Palette window, and then switch instantly to anyone at any time. The Tempo Palette can also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Time Line Scoring</dt>
+<dd>Connect several Songs into one performance on a SMPTE time line using the Time Line Scoring window. This is useful for laying out an extended piece where different Songs occur at different times. The Time Line Scoring window can also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>ToolBox</dt>
+<dd>The ToolBox window displays several rows of square icons. These represent Tools. Each Tool can be placed in a Track's PipeLine where it performs a specific task to the MIDI music as it flows through the pipe. To place a Tool in a PipeLine, click on the Tool with the left mouse button, and, while holding the button down, drag the Tool to the destination Track's PipeLine. Although the ToolBox displays a palette of available Tools, you may install more Tools, create your own Tools, as well as remove Tools from Bars&amp;Pipes Professional, thereby changing the collection of available Tools in the ToolBox. The ToolBox can also be opened by double-clicking on its icon.</dd></dl>
+<dl><dt>Tracks</dt>
+<dd>This command opens the main Tracks window, which is also accessed by double-clicking on its icon.</dd></dl>
+<dl><dt>Transport</dt>
+<dd>This window provides the complete set of commands to control the movement of Bars&amp;Pipes Professional's Sequencer. Notice that the Transport window duplicates many of the commands found in the top of the Tracks window as well as all the commands in the Mini Transport. You may click on identical buttons to achieve identical results. The Transport Controls window displays the current time in music time (Measures, Beats and Clocks) as well as SMPTE time (Hours, Minutes, Seconds and Frames.) It also adds additional buttons for using the Punch and Loop Flags as well as setting and using all of the Flags. The Transport window can also be opened by double-clicking on its icon.</dd></dl>
+<h2><span class="mw-headline" id="Sections">Sections</span></h2>
+<p><a href="/wiki/Bars_%26_Pipes_Professional:_Playing_a_Demo_Song_File" title="Bars &amp; Pipes Professional: Playing a Demo Song File">Bars &amp; Pipes Professional: Playing a Demo Song File</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Recording" title="Bars &amp; Pipes Professional: Recording">Bars &amp; Pipes Professional: Recording</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Tools" title="Bars &amp; Pipes Professional: Tools">Bars &amp; Pipes Professional: Tools</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Note_Editing" title="Bars &amp; Pipes Professional: Note Editing">Bars &amp; Pipes Professional: Note Editing</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_MIDI_Event_Editing" title="Bars &amp; Pipes Professional: MIDI Event Editing">Bars &amp; Pipes Professional: MIDI Event Editing</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Editing_Song_Parameters" title="Bars &amp; Pipes Professional: Editing Song Parameters">Bars &amp; Pipes Professional: Editing Song Parameters</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Printing_Notation" title="Bars &amp; Pipes Professional: Printing Notation">Bars &amp; Pipes Professional: Printing Notation</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_The_List_Editor" title="Bars &amp; Pipes Professional: The List Editor">Bars &amp; Pipes Professional: The List Editor</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_System_Exclusive" title="Bars &amp; Pipes Professional: System Exclusive">Bars &amp; Pipes Professional: System Exclusive</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_The_Metronome" title="Bars &amp; Pipes Professional: The Metronome">Bars &amp; Pipes Professional: The Metronome</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_The_Transport_Controls" title="Bars &amp; Pipes Professional: The Transport Controls">Bars &amp; Pipes Professional: The Transport Controls</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Timing,_Syncing_and_Tempo" title="Bars &amp; Pipes Professional: Timing, Syncing and Tempo">Bars &amp; Pipes Professional: Timing, Syncing and Tempo</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Tempo_Mapping" title="Bars &amp; Pipes Professional: Tempo Mapping">Bars &amp; Pipes Professional: Tempo Mapping</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Advanced_Sequencing" title="Bars &amp; Pipes Professional: Advanced Sequencing">Bars &amp; Pipes Professional: Advanced Sequencing</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Multi-Track_Editing" title="Bars &amp; Pipes Professional: Multi-Track Editing">Bars &amp; Pipes Professional: Multi-Track Editing</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Song_Construction" title="Bars &amp; Pipes Professional: Song Construction">Bars &amp; Pipes Professional: Song Construction</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Mix_Maestro" title="Bars &amp; Pipes Professional: Mix Maestro">Bars &amp; Pipes Professional: Mix Maestro</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Time_Line_Scoring" title="Bars &amp; Pipes Professional: Time Line Scoring">Bars &amp; Pipes Professional: Time Line Scoring</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Create-a-Tool" title="Bars &amp; Pipes Professional: Create-a-Tool">Bars &amp; Pipes Professional: Create-a-Tool</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Tool_Trays" title="Bars &amp; Pipes Professional: Tool Trays">Bars &amp; Pipes Professional: Tool Trays</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Scales,_Chords,_Rythms_and_Patches" title="Bars &amp; Pipes Professional: Scales, Chords, Rythms and Patches">Bars &amp; Pipes Professional: Scales, Chords, Rythms and Patches</a>
+</p><p><a href="/wiki/Bars_%26_Pipes_Professional:_Customizing_Your_Environment" title="Bars &amp; Pipes Professional: Customizing Your Environment">Bars &amp; Pipes Professional: Customizing Your Environment</a>
+</p>
+<h2><span class="mw-headline" id="Accessories">Accessories</span></h2>
+<p>Accessories can be loaded by openeing the accessories window and selecting "load" from the menu.
+At this time SmerFF is the only accessory available. It allows loading and saving MIDI files.
+</p>
+<!-- 
+NewPP limit report
+Cached time: 20260114023054
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.056 seconds
+Real time usage: 0.059 seconds
+Preprocessor visited node count: 184/1000000
+Post‐expand include size: 2327/2097152 bytes
+Template argument size: 1971/2097152 bytes
+Highest expansion depth: 3/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    3.166      1 -total
+ 62.82%    1.989     10 Template:Note
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:710-0!canonical and timestamp 20260114023054 and revision id 9975. Rendering was triggered because: page-view
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=Bars_and_Pipes_Professional&amp;oldid=9975">http://wiki.amigaos.net/w/index.php?title=Bars_and_Pipes_Professional&amp;oldid=9975</a>"</div></div>
+		<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Bars+and+Pipes+Professional" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-main" class="selected mw-list-item"><a href="/wiki/Bars_and_Pipes_Professional" title="View the content page [c]" accesskey="c"><span>Page</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=Talk:Bars_and_Pipes_Professional&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/Bars_and_Pipes_Professional"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=Bars_and_Pipes_Professional&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=Bars_and_Pipes_Professional&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/Bars_and_Pipes_Professional" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/Bars_and_Pipes_Professional" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=Bars_and_Pipes_Professional&amp;oldid=9975" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=Bars_and_Pipes_Professional&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=Bars+and+Pipes+Professional"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=Bars+and+Pipes+Professional&amp;oldid=9975&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=Bars_and_Pipes_Professional&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 3 March 2019, at 10:41.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":189,"wgPageParseReport":{"limitreport":{"cputime":"0.056","walltime":"0.059","ppvisitednodes":{"value":184,"limit":1000000},"postexpandincludesize":{"value":2327,"limit":2097152},"templateargumentsize":{"value":1971,"limit":2097152},"expansiondepth":{"value":3,"limit":100},"expensivefunctioncount":{"value":0,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":0,"limit":5000000},"timingprofile":["100.00%    3.166      1 -total"," 62.82%    1.989     10 Template:Note"]},"cachereport":{"timestamp":"20260114023054","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>

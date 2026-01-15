@@ -1,0 +1,513 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Troubleshooting Your Software - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_4x3TbDv_vcRQHuo8aAAAAAo","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Troubleshooting_Your_Software","wgTitle":"Troubleshooting Your Software","wgCurRevisionId":8531,"wgRevisionId":8531,"wgArticleId":45,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],
+"wgCategories":["Debug"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Troubleshooting_Your_Software","wgRelevantArticleId":45,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-Troubleshooting_Your_Software rootpage-Troubleshooting_Your_Software skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">Troubleshooting Your Software</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/User_Interface_Style_Guide" title="User Interface Style Guide">User Interface Style Guide</a> &gt; <a href="/wiki/UI_Style_Guide_Workbench" title="UI Style Guide Workbench">UI Style Guide Workbench</a> &gt; <a href="/wiki/Game_Programming_Guidelines" title="Game Programming Guidelines">Game Programming Guidelines</a> &gt; <a href="/wiki/Translation_Guidelines" title="Translation Guidelines">Translation Guidelines</a> &gt; <a href="/wiki/Troubleshooting_Your_Software" title="Troubleshooting Your Software">Troubleshooting Your Software</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Troubleshooting_Your_Software"><span class="tocnumber">1</span> <span class="toctext">Troubleshooting Your Software</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Typical_Problems"><span class="tocnumber">2</span> <span class="toctext">Typical Problems</span></a>
+<ul>
+<li class="toclevel-2 tocsection-3"><a href="#Audio:_Corrupted_Samples"><span class="tocnumber">2.1</span> <span class="toctext">Audio: Corrupted Samples</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="#Character_Input/Output_Problems"><span class="tocnumber">2.2</span> <span class="toctext">Character Input/Output Problems</span></a></li>
+<li class="toclevel-2 tocsection-5"><a href="#CLI_Error_Message_Problems"><span class="tocnumber">2.3</span> <span class="toctext">CLI Error Message Problems</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="#CLI_Won&#39;t_Close_on_RUN"><span class="tocnumber">2.4</span> <span class="toctext">CLI Won't Close on RUN</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="#Crashes_and_Memory_Corruption"><span class="tocnumber">2.5</span> <span class="toctext">Crashes and Memory Corruption</span></a>
+<ul>
+<li class="toclevel-3 tocsection-8"><a href="#After_Exit"><span class="tocnumber">2.5.1</span> <span class="toctext">After Exit</span></a></li>
+<li class="toclevel-3 tocsection-9"><a href="#Subtasks,_Interrupts"><span class="tocnumber">2.5.2</span> <span class="toctext">Subtasks, Interrupts</span></a></li>
+<li class="toclevel-3 tocsection-10"><a href="#Window_Related"><span class="tocnumber">2.5.3</span> <span class="toctext">Window Related</span></a></li>
+<li class="toclevel-3 tocsection-11"><a href="#Workbench_Only"><span class="tocnumber">2.5.4</span> <span class="toctext">Workbench Only</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-12"><a href="#Device-related_Problems"><span class="tocnumber">2.6</span> <span class="toctext">Device-related Problems</span></a></li>
+<li class="toclevel-2 tocsection-13"><a href="#Disk_Icon_Won&#39;t_Go_Away"><span class="tocnumber">2.7</span> <span class="toctext">Disk Icon Won't Go Away</span></a></li>
+<li class="toclevel-2 tocsection-14"><a href="#DOS-related_Problems"><span class="tocnumber">2.8</span> <span class="toctext">DOS-related Problems</span></a></li>
+<li class="toclevel-2 tocsection-15"><a href="#Fails_only_on_machines_with_Fast_RAM"><span class="tocnumber">2.9</span> <span class="toctext">Fails only on machines with Fast RAM</span></a></li>
+<li class="toclevel-2 tocsection-16"><a href="#Graphics:_Corrupted_Images"><span class="tocnumber">2.10</span> <span class="toctext">Graphics: Corrupted Images</span></a></li>
+<li class="toclevel-2 tocsection-17"><a href="#Hangs"><span class="tocnumber">2.11</span> <span class="toctext">Hangs</span></a>
+<ul>
+<li class="toclevel-3 tocsection-18"><a href="#One_Program_Only"><span class="tocnumber">2.11.1</span> <span class="toctext">One Program Only</span></a></li>
+<li class="toclevel-3 tocsection-19"><a href="#Whole_System"><span class="tocnumber">2.11.2</span> <span class="toctext">Whole System</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-20"><a href="#Memory_Loss"><span class="tocnumber">2.12</span> <span class="toctext">Memory Loss</span></a>
+<ul>
+<li class="toclevel-3 tocsection-21"><a href="#CLI_Only"><span class="tocnumber">2.12.1</span> <span class="toctext">CLI Only</span></a></li>
+<li class="toclevel-3 tocsection-22"><a href="#CTRL-C_Exit_Only"><span class="tocnumber">2.12.2</span> <span class="toctext">CTRL-C Exit Only</span></a></li>
+<li class="toclevel-3 tocsection-23"><a href="#During_Execution"><span class="tocnumber">2.12.3</span> <span class="toctext">During Execution</span></a></li>
+<li class="toclevel-3 tocsection-24"><a href="#Workbench_Only_2"><span class="tocnumber">2.12.4</span> <span class="toctext">Workbench Only</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-25"><a href="#Menu_Problems"><span class="tocnumber">2.13</span> <span class="toctext">Menu Problems</span></a></li>
+<li class="toclevel-2 tocsection-26"><a href="#Out-of-Sync_Response_to_Input"><span class="tocnumber">2.14</span> <span class="toctext">Out-of-Sync Response to Input</span></a></li>
+<li class="toclevel-2 tocsection-27"><a href="#Performance_Loss_in_Other_Processes"><span class="tocnumber">2.15</span> <span class="toctext">Performance Loss in Other Processes</span></a></li>
+<li class="toclevel-2 tocsection-28"><a href="#Windows"><span class="tocnumber">2.16</span> <span class="toctext">Windows</span></a>
+<ul>
+<li class="toclevel-3 tocsection-29"><a href="#Borders_Flicker_after_Resize"><span class="tocnumber">2.16.1</span> <span class="toctext">Borders Flicker after Resize</span></a></li>
+<li class="toclevel-3 tocsection-30"><a href="#Visual_Problems"><span class="tocnumber">2.16.2</span> <span class="toctext">Visual Problems</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-31"><a href="#General_Debugging_Techniques"><span class="tocnumber">3</span> <span class="toctext">General Debugging Techniques</span></a>
+<ul>
+<li class="toclevel-2 tocsection-32"><a href="#Narrow_the_search"><span class="tocnumber">3.1</span> <span class="toctext">Narrow the search</span></a></li>
+<li class="toclevel-2 tocsection-33"><a href="#Isolate_the_problem"><span class="tocnumber">3.2</span> <span class="toctext">Isolate the problem</span></a></li>
+<li class="toclevel-2 tocsection-34"><a href="#Use_debugging_tools"><span class="tocnumber">3.3</span> <span class="toctext">Use debugging tools</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-35"><a href="#A_Final_Word_About_Testing"><span class="tocnumber">4</span> <span class="toctext">A Final Word About Testing</span></a></li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="Troubleshooting_Your_Software">Troubleshooting Your Software</span></h2>
+<p>Many Amiga programming errors have classic symptoms. This guide will help you to eliminate or avoid these problems in your software.
+</p>
+<h2><span class="mw-headline" id="Typical_Problems">Typical Problems</span></h2>
+<h3><span class="mw-headline" id="Audio:_Corrupted_Samples">Audio: Corrupted Samples</span></h3>
+<p>On Classic Amiga hardware, the bit data for audio samples <i>must</i> be in Chip RAM. Check your compiler manual for directives or flags which will place your audio sample data in Chip RAM. Or dynamically allocate Chip RAM and copy or load the audio sample there.
+</p>
+<h3><span id="Character_Input.2FOutput_Problems"></span><span class="mw-headline" id="Character_Input/Output_Problems">Character Input/Output Problems</span></h3>
+<p>RAWKEY users must be aware that RAWKEY codes can be different letters or symbols on national keyboards. If you need to use RAWKEY, run the codes through RawKeyConvert() (see the <a href="/w/index.php?title=Intuition_Mouse_and_Keyboard&amp;action=edit&amp;redlink=1" class="new" title="Intuition Mouse and Keyboard (page does not exist)">Intuition Mouse and Keyboard</a>) to get proper translation to correct ASCII codes. Improper display or processing of high-ASCII international characters can be caused by incorrect tolower()/toupper(), or by sign extension of character values when switched on or assigned into larger size variables. Use unsigned variables such as UBYTE (not char) for strings and characters whenever possible. Internationally correct string functions are provided in the utility.library.
+</p>
+<h3><span class="mw-headline" id="CLI_Error_Message_Problems">CLI Error Message Problems</span></h3>
+<p>Improper error messages are caused by calling exit(n) with an invalid or missing return value <i>n</i>. Assembler programmers using startup code should jump to the startup code's _exit with a valid return value on the stack. Programs without startup code should return with a valid value in D0. Valid return values such as RETURN_OK, RETURN_WARN, RETURN_FAIL are defined in &lt;dos/dos.h&gt; and &lt;dos/dos.i&gt;. Values outside of these ranges (-1 for instance) can cause invalid CLI error messages such as "not an object module". Useful hint - if your program is called from a script, your valid return value can be conditionally branched on in the script (i.e., call program, then perform actions based on IF WARN or IF NOT WARN). RETURN_FAIL will cause the script to stop if a normal FAILAT value is being used in script.
+</p>
+<h3><span id="CLI_Won.27t_Close_on_RUN"></span><span class="mw-headline" id="CLI_Won't_Close_on_RUN">CLI Won't Close on RUN</span></h3>
+<p>A CLI can't close if a program has a Lock() on the CLI input or output stream (&quot;*&quot;). If your program is "RUN &gt;NIL:" from a CLI, that CLI should be able to close unless your code or your compiler's startup code explicitly opens &quot;*&quot;.
+</p>
+<h3><span class="mw-headline" id="Crashes_and_Memory_Corruption">Crashes and Memory Corruption</span></h3>
+<p>Memory corruption, address errors, and illegal instruction errors are generally caused by use of an uninitialized, incorrectly initialized, or already freed/closed pointer or memory. You may be using the pointer directly, or it may be one that you placed (or forgot to place) in a structure passed to system calls. Or you may be overwriting one of your arrays, or accidentally modifying or incrementing a pointer later used in a free/close. Be sure to test the return of all open/allocation type functions before using the result, and only close/free things that you successfully opened/allocated. Use watchdog/torture utilities such as <i>MemGuard</i> to catch use of uninitialized pointers or freed memory, and other memory misuse problems. Use the debugging tool <i>TNT</i> to get additional debugging information instead of a Software Error requester. You may also be overflowing your stack - your compiler's stack checking option may be able to catch this. Cut stack usage by dynamically allocating large structures, buffers, and arrays which are currently defined inside your functions.
+</p><p>Corruption or crashes can also be caused by passing wrong or missing arguments to a system call (for example SetAPen(3) or SetAPen(win,3), instead of SetAPen(rp,3)). C programmers should use function prototypes to catch such errors. If using short integers be sure to explicitly type long constants as long (e.g., 42L). (For example, with short ints, 1 &lt;&lt; 17 may become zero). If corruption is occurring during exit, use printf() (or kprintf(), etc.) with Delay(n) to slow down your cleanup and broadcast each step. See <a href="/wiki/Understanding_the_alert_error_numbers" title="Understanding the alert error numbers">Understanding the alert error numbers</a> for Amiga-specific alert numbers. Also see "Crashes - After Exit" below.
+</p>
+<h4><span class="mw-headline" id="After_Exit">After Exit</span></h4>
+<p>If this only happens when you start your program from Workbench, then you are probably UnLocking() one of the WBStartup message wa_Locks, or UnLocking() the Lock() returned from an initial CurrentDir() call. If you CurrentDir(), save the lock returned initially, and CurrentDir() back to it before you exit. Only UnLock() locks that <i>you</i> created.
+</p><p>If you are crashing from both Workbench and CLI, and you are only crashing <i>after</i> exit, then you are probably either freeing/closing something twice, or freeing/closing something your did not actually allocate/open, or you may be leaving an outstanding device I/O request or other wakeup request. You must abort and WaitIO() any outstanding I/O requests before you free things and exit (see the Autodocs for your device, and for Exec AbortIO() and WaitIO()). Similar problems can be caused by deleting a subtask that might be in a WaitTOF(). Only delete subtasks when you are sure they are in a safe state such as Wait(0L).
+</p>
+<h4><span id="Subtasks.2C_Interrupts"></span><span class="mw-headline" id="Subtasks,_Interrupts">Subtasks, Interrupts</span></h4>
+<p>If part of your code runs on a different stack or the system stack, you must turn off compiler stack-checking options. If part of your code is called directly by the system or by other tasks, you must use long code/long data or use special compiler flags or options to assure that the correct base registers are set up for your subtask or interrupt code.
+</p>
+<h4><span class="mw-headline" id="Window_Related">Window Related</span></h4>
+<p>Be careful not to CloseWindow() a window during a while(msg=GetMsg(...)) loop on that window's port (next GetMsg() would be on freed pointer). Also, use ModifyIDCMP(NULL) with care, especially if using one port with multiple windows. Be sure to ClearMenuStrip() any menus before closing a window, and do not free items such as dynamically allocated gadgets and menus while they are attached to a window. Do not reference an IntuiMessage's IAddress field as a structure pointer of any kind before determining it <i>is</i> a structure pointer (this depends on the Class of the IntuiMessage). If a crash or problem only occurs when opening a window after extended use of your program, check to make sure that your program is properly freeing up signals allocated indirectly by CreatePort(), OpenWindow() or ModifyIDCMP().
+</p>
+<h4><span class="mw-headline" id="Workbench_Only">Workbench Only</span></h4>
+<p>If you are crashing near the first DOS call, either your stack is too small or your startup code did not GetMsg() the WBStartup message from the process message port. If your program crashes during execution or during your exit procedure only when started from Workbench, and your startup opens no stdio window or "NIL:" file handles for WB programs, then make sure you are not writing anything to stdout (printf(), etc.) when started from WB (argc==0). See also "Crashes - After Exit".
+</p>
+<h3><span class="mw-headline" id="Device-related_Problems">Device-related Problems</span></h3>
+<p>Device-related problems may caused by: improperly initialized port or I/O request structures (use CreatePort() and CreateExtIO()); use of a too-small I/O request (see the device's &lt;.h&gt; files and Autodocs for information on the required type of I/O request); re-use of an I/O request before it has returned from the device (use the debugging tool <i>IO_Torture</i> to catch this); failure to abort and wait for an outstanding device request before exiting; waiting on a signal/port/message allocated by a different task.
+</p>
+<h3><span id="Disk_Icon_Won.27t_Go_Away"></span><span class="mw-headline" id="Disk_Icon_Won't_Go_Away">Disk Icon Won't Go Away</span></h3>
+<p>This occurs when a program leaves a Lock() on one or more of a disk's files or directories. A memory loss of exactly 24 bytes is usually Lock() which has not been UnLocked().
+</p>
+<h3><span class="mw-headline" id="DOS-related_Problems">DOS-related Problems</span></h3>
+<p>In general, any dos.library function which fills in a structure for you (for example, Examine()), requires that the structure be longword aligned. In most cases, the only way to insure longword alignment in C is to dynamically allocate the structure. Unless documented otherwise, dos.library functions may only be called from a process, not from a task. Also note that a process's pr_MsgPort is intended for the exclusive use of dos.library. (The port may be used to receive a WbStartup message as long as the message is GetMsg()'d from the port before DOS is used.
+</p>
+<h3><span class="mw-headline" id="Fails_only_on_machines_with_Fast_RAM">Fails only on machines with Fast RAM</span></h3>
+<p>Data and buffers which will be accessed directly by the custom chips <i>must</i> be in Chip RAM. This includes bitplanes (use OpenScreen() or AllocRaster()), audio samples, trackdisk buffers, and the graphic image data for sprites, pointers, bobs, images, gadgets, etc. Use compiler or linker flags to force Chip RAM loading of any initialized data needing to be in Chip RAM, or dynamically allocate Chip RAM and copy any initialization data there.
+</p>
+<h3><span class="mw-headline" id="Graphics:_Corrupted_Images">Graphics: Corrupted Images</span></h3>
+<p>On classic Amiga hardware, the bit data for graphic images such as sprites, pointers, bobs, and gadgets <i>must</i> be in Chip RAM. Check your compiler manual for directives or flags which will place your graphic image data in Chip RAM. Or dynamically allocate Chip RAM and copy them there.
+</p>
+<h3><span class="mw-headline" id="Hangs">Hangs</span></h3>
+<h4><span class="mw-headline" id="One_Program_Only">One Program Only</span></h4>
+<p>Program hangs are generally caused by Wait()ing on the wrong signal bits, on the wrong port, on the wrong message, or on some other event that will never occur. This can occur if the event you are waiting on is not coming, or if one task tries to Wait(), WaitPort(), or WaitIO() on a signal, port, or window that was created by a different task. Both WaitIO() and WaitPort() can call Wait(), and you cannot Wait() on another task's signals. Hangs can also be caused by verify deadlocks. Be sure to turn off all Intuition verify messages (such as MENUVERIFY) before calling AutoRequest() or doing disk access.
+</p>
+<h4><span class="mw-headline" id="Whole_System">Whole System</span></h4>
+<p>This is generally caused by a Disable() without a corresponding Enable(). It can also be caused by memory corruption, especially corruption of low memory. See "Crashes and Memory Corruption".
+</p>
+<h3><span class="mw-headline" id="Memory_Loss">Memory Loss</span></h3>
+<p>First determine that your program is actually causing a memory loss. It is important to boot with a standard Workbench because a number of third party items such as some background utilities, shells, and network handlers dynamically allocate and free pieces of memory. Open a Shell for memory checking, and a Shell or Workbench drawer for starting your program. Arrange windows so that all are accessible, and so that no window rearrangement will be needed to run your program.
+</p><p>In the Shell, type Avail FLUSH&lt;RET&gt; several times (2.0 option). This will flush all non-open disk-loaded fonts, devices, etc., from memory. Note the amount of free memory. Now without rearranging any windows, start your program and use all of your program features. Exit your program, wait a few seconds, then type Avail FLUSH&lt;RET&gt; several times. Note the amount of free memory. If this matches the first value you noted, your program is fine, and is not causing a memory loss.
+</p><p>If memory was actually lost, and your program can be run from CLI or Workbench, then try the above procedure with both methods of starting your program. Note that under 2.0, there will be a slight permanent (until reboot) memory usage of about 672 bytes when the audio.device or narrator.device is first opened. See "Memory Loss - CLI Only" and "Memory Loss - WB Only" if appropriate. If you lose memory from both WB and CLI, then check all of the open/alloc/get/create/lock type calls in your code, and make sure that there is a matching close/free/delete/unlock type call for each of them (note - there are a few system calls that have or require no corresponding free - check the Autodocs). Generally, the close/free/delete/unlock calls should be in opposite order of the allocations.
+</p><p>If you are losing a fixed small amount of memory, look for a structure of that size in the Structure Offsets listing in the SDK. For example, a loss of exactly 24 bytes is probably a Lock() which has not been UnLocked(). If you are using ScrollRaster(), be aware that ScrollRaster() left or right in a Superbitmap window with no TmpRas will lose memory under 1.3 (workaround - attach a TmpRas). If you lose much more memory when started from Workbench, make sure your program is not using Exit(n). This would bypass startup code cleanups and prevent a Workbench-loaded program from being unloaded. Use exit(n) instead.
+</p>
+<h4><span class="mw-headline" id="CLI_Only">CLI Only</span></h4>
+<p>Make sure you are testing in a standard environment. Some third-party shells dynamically allocate history buffers, or cause other memory fluctuations. Also, if your program executes different code when started from CLI, check that code and its cleanup. And check your startup.asm if you wrote your own.
+</p>
+<h4><span class="mw-headline" id="CTRL-C_Exit_Only">CTRL-C Exit Only</span></h4>
+<p>You have Amiga-specific resources opened or allocated and you have not disabled your compiler's automatic Ctrl-C handling (causing all of <i>your</i> program cleanups to be skipped). Disable the compiler‚Äôs Ctrl-C handling and handle Ctrl-C (SIGBREAKF_CTRL_C) yourself.
+</p>
+<h4><span class="mw-headline" id="During_Execution">During Execution</span></h4>
+<p>A continuing memory loss during execution can be caused by failure to keep up with voluminous IDCMP messages such as MOUSEMOVE messages. Intuition cannot re-use IDCMP message blocks until you ReplyMsg() them. If your window's allotted message blocks are all in use, new sets will be allocated and not freed till the window is closed. Continuing memory losses can also be caused by a program loop containing an allocation-type call without a corresponding free.
+</p>
+<h4><span class="mw-headline" id="Workbench_Only_2">Workbench Only</span></h4>
+<p>Commonly, this is caused by a failure of your code to unload after you exit. Make sure that your code is being linked with a standard correct startup module, and do <i>not</i> use the Exit(n) function to exit your program. This function will bypass your startup code's cleanup, including its ReplyMsg() of the WBStartup message (which would signal Workbench to unload your program from memory). You should exit via either exit(n) where <i>n</i> is a valid DOS error code such as RETURN_OK (&lt;dos/libraries.h&gt;), or via final "}" or return. Assembler programmers using startup code can JMP to _exit with a long return value on stack, or use the RTS instruction.
+</p>
+<h3><span class="mw-headline" id="Menu_Problems">Menu Problems</span></h3>
+<p>A flickering menu is caused by leaving a pixel or more space between menu subitems when designing your menu. Crashing after browsing a menu (looking at menu without selecting any items) is caused by not properly handling MENUNULL select messages. Multiple selection not working is caused by not handling NextSelect properly. See the <a href="/wiki/Intuition_Menus" title="Intuition Menus">Intuition Menus</a> chapter.
+</p>
+<h3><span class="mw-headline" id="Out-of-Sync_Response_to_Input">Out-of-Sync Response to Input</span></h3>
+<p>Caused by failing to handle all received signals or all possible messages after a Wait() or WaitPort() call. More than one event or message may have caused your program to awakened. Check the signals returned by Wait() and act on every one that is set. At ports which may have more than one message (for instance, a window's IDCMP port), you must handle the messages in a while(msg=GetMsg(...)) loop.
+</p>
+<h3><span class="mw-headline" id="Performance_Loss_in_Other_Processes">Performance Loss in Other Processes</span></h3>
+<p>This is often caused by a one program doing one or more of the following: busy waiting or polling; running at a higher priority; doing lengthy Forbids(), Disables(), or interrupts.
+</p>
+<h3><span class="mw-headline" id="Windows">Windows</span></h3>
+<h4><span class="mw-headline" id="Borders_Flicker_after_Resize">Borders Flicker after Resize</span></h4>
+<p>Set the NOCAREREFESH flag. Even SMART_REFRESH windows may generate refresh events if there is a sizing gadget. If you don't have specific code to handle this, you must set the NOCAREREFRESH flag. If you do have refresh code, be sure to use the Begin()/EndRefresh() calls. Failure to do one or the other will leave Intuition in an intermediate state, and slow down operation for all windows on the screen.
+</p>
+<h4><span class="mw-headline" id="Visual_Problems">Visual Problems</span></h4>
+<p>Many visual problems in windows can be caused by improper font specification or improper setting of gadget flags. See "Release 4 Compatibility" for detailed information on common problems.
+</p>
+<h2><span class="mw-headline" id="General_Debugging_Techniques">General Debugging Techniques</span></h2>
+<h3><span class="mw-headline" id="Narrow_the_search">Narrow the search</span></h3>
+<p>Use methodical testing procedures, and debugging messages if necessary, to locate the problem area. Low level code can be debugged using IExec-&gt;DebugPrintf() serial messages. Check the initial values, allocation, use, and freeing of all pointers and structures used in the problem area. Check that all of your system and internal function calls pass correct initialized arguments, and that all possible error returns are checked for and handled.
+</p>
+<h3><span class="mw-headline" id="Isolate_the_problem">Isolate the problem</span></h3>
+<p>If errors cannot be found, simplify your code to the smallest possible example that still functions. Often you will find that this smallest example will not have the problem. If so, add back the other features of your code until the problem reappears, then debug that section.
+</p>
+<h3><span class="mw-headline" id="Use_debugging_tools">Use debugging tools</span></h3>
+<p>A variety of debugging tools are available to help locate faulty code. Some of these are source level and other debuggers (e.g. <a href="/wiki/GDB_for_Beginners" title="GDB for Beginners">GDB</a> or <a rel="nofollow" class="external text" href="http://os4depot.net/index.php?function=showfile&amp;file=development/debug/db101.lha">db101</a>), crash interceptors, vital watchdog and memory invalidation tools like <a rel="nofollow" class="external text" href="http://os4depot.net/index.php?function=showfile&amp;file=development/debug/memguard.lha"><i>MemGuard</i></a>.
+</p><p>AmigaOS4's <a href="/wiki/Debug_Kernel" title="Debug Kernel">Debug Kernel</a> is probably the first step of practical debugging.
+</p>
+<h2><span class="mw-headline" id="A_Final_Word_About_Testing">A Final Word About Testing</span></h2>
+<p>Test your program with memory watchdog and invalidation tools on a wide variety of systems and configurations. Programs with coding errors may appear to work properly on one or more configurations, but may fail or cause fatal problems on another. Test all of your program functions on every machine.
+</p><p>Test all error and abort code. A program with missing error checks or unsafe cleanup might work fine when all of the items it opens or allocates are available, but may fail fatally when an error or problem is encountered. Try your code with missing files, filenames with spaces, incorrect filenames, cancelled requesters, Ctrl-C, missing libraries or devices, low memory, missing hardware, etc.
+</p><p>Test all of your text input functions with high-ASCII characters (such as the character produced by pressing Alt-F then "A"). Note that RAWKEY codes can be different keyboard characters on national keyboards (higher levels of keyboard input are automatically translated to the proper characters).
+</p><p>Write good code. Test it. Then make it great.
+</p>
+<!-- 
+NewPP limit report
+Cached time: 20260114023059
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.016 seconds
+Real time usage: 0.017 seconds
+Preprocessor visited node count: 110/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 2/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 -total
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:45-0!canonical and timestamp 20260114023059 and revision id 8531. Rendering was triggered because: page-view
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=Troubleshooting_Your_Software&amp;oldid=8531">http://wiki.amigaos.net/w/index.php?title=Troubleshooting_Your_Software&amp;oldid=8531</a>"</div></div>
+		<div id="catlinks" class="catlinks" data-mw="interface"><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="/wiki/Special:Categories" title="Special:Categories">Category</a>: <ul><li><a href="/wiki/Category:Debug" title="Category:Debug">Debug</a></li></ul></div></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Troubleshooting+Your+Software" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-main" class="selected mw-list-item"><a href="/wiki/Troubleshooting_Your_Software" title="View the content page [c]" accesskey="c"><span>Page</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=Talk:Troubleshooting_Your_Software&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/Troubleshooting_Your_Software"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=Troubleshooting_Your_Software&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=Troubleshooting_Your_Software&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/Troubleshooting_Your_Software" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/Troubleshooting_Your_Software" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=Troubleshooting_Your_Software&amp;oldid=8531" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=Troubleshooting_Your_Software&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=Troubleshooting+Your+Software"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=Troubleshooting+Your+Software&amp;oldid=8531&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=Troubleshooting_Your_Software&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 9 December 2015, at 13:38.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":120,"wgPageParseReport":{"limitreport":{"cputime":"0.016","walltime":"0.017","ppvisitednodes":{"value":110,"limit":1000000},"postexpandincludesize":{"value":0,"limit":2097152},"templateargumentsize":{"value":0,"limit":2097152},"expansiondepth":{"value":2,"limit":100},"expensivefunctioncount":{"value":0,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":0,"limit":5000000},"timingprofile":["100.00%    0.000      1 -total"]},"cachereport":{"timestamp":"20260114023059","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>

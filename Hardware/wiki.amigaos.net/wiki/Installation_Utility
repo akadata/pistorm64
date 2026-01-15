@@ -1,0 +1,860 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Installation Utility - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_7B3TbDv_vcRQHuo8fAAAAAo","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Installation_Utility","wgTitle":"Installation Utility","wgCurRevisionId":12317,"wgRevisionId":12317,"wgArticleId":679,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],
+"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Installation_Utility","wgRelevantArticleId":679,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-Installation_Utility rootpage-Installation_Utility skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">Installation Utility</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/Programming_in_the_Amiga_Environment" title="Programming in the Amiga Environment">Programming in the Amiga Environment</a> &gt; <a href="/wiki/Libraries_and_Devices" title="Libraries and Devices">Libraries and Devices</a> &gt; <a href="/wiki/Release_4_Compatibility" title="Release 4 Compatibility">Release 4 Compatibility</a> &gt; <a href="/wiki/Writing_apps_for_Xena" title="Writing apps for Xena">Writing apps for Xena</a> &gt; <a href="/wiki/Installation_Utility" title="Installation Utility">Installation Utility</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#How_the_Installer_Works"><span class="tocnumber">1</span> <span class="toctext">How the Installer Works</span></a>
+<ul>
+<li class="toclevel-2 tocsection-2"><a href="#Basic_Concept"><span class="tocnumber">1.1</span> <span class="toctext">Basic Concept</span></a></li>
+<li class="toclevel-2 tocsection-3"><a href="#Running_an_Installation_Script"><span class="tocnumber">1.2</span> <span class="toctext">Running an Installation Script</span></a>
+<ul>
+<li class="toclevel-3 tocsection-4"><a href="#From_the_Command_Line"><span class="tocnumber">1.2.1</span> <span class="toctext">From the Command Line</span></a></li>
+<li class="toclevel-3 tocsection-5"><a href="#From_the_Workbench"><span class="tocnumber">1.2.2</span> <span class="toctext">From the Workbench</span></a>
+<ul>
+<li class="toclevel-4 tocsection-6"><a href="#Tool_Types"><span class="tocnumber">1.2.2.1</span> <span class="toctext">Tool Types</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-7"><a href="#Example_Script"><span class="tocnumber">2</span> <span class="toctext">Example Script</span></a></li>
+<li class="toclevel-1 tocsection-8"><a href="#Python_Interface"><span class="tocnumber">3</span> <span class="toctext">Python Interface</span></a>
+<ul>
+<li class="toclevel-2 tocsection-9"><a href="#Introduction"><span class="tocnumber">3.1</span> <span class="toctext">Introduction</span></a></li>
+<li class="toclevel-2 tocsection-10"><a href="#Python_Functions_in_the_Installer_Package"><span class="tocnumber">3.2</span> <span class="toctext">Python Functions in the Installer Package</span></a>
+<ul>
+<li class="toclevel-3 tocsection-11"><a href="#NewPage"><span class="tocnumber">3.2.1</span> <span class="toctext">NewPage</span></a></li>
+<li class="toclevel-3 tocsection-12"><a href="#GotoPage"><span class="tocnumber">3.2.2</span> <span class="toctext">GotoPage</span></a></li>
+<li class="toclevel-3 tocsection-13"><a href="#SetString"><span class="tocnumber">3.2.3</span> <span class="toctext">SetString</span></a></li>
+<li class="toclevel-3 tocsection-14"><a href="#SetInteger"><span class="tocnumber">3.2.4</span> <span class="toctext">SetInteger</span></a></li>
+<li class="toclevel-3 tocsection-15"><a href="#SetObject"><span class="tocnumber">3.2.5</span> <span class="toctext">SetObject</span></a></li>
+<li class="toclevel-3 tocsection-16"><a href="#GetString,_GetInteger,_GetObject"><span class="tocnumber">3.2.6</span> <span class="toctext">GetString, GetInteger, GetObject</span></a></li>
+<li class="toclevel-3 tocsection-17"><a href="#RunInstaller"><span class="tocnumber">3.2.7</span> <span class="toctext">RunInstaller</span></a></li>
+<li class="toclevel-3 tocsection-18"><a href="#AddPackage"><span class="tocnumber">3.2.8</span> <span class="toctext">AddPackage</span></a></li>
+<li class="toclevel-3 tocsection-19"><a href="#SetPackageOption"><span class="tocnumber">3.2.9</span> <span class="toctext">SetPackageOption</span></a></li>
+<li class="toclevel-3 tocsection-20"><a href="#SelectPackage"><span class="tocnumber">3.2.10</span> <span class="toctext">SelectPackage</span></a></li>
+<li class="toclevel-3 tocsection-21"><a href="#IsPackageSelected"><span class="tocnumber">3.2.11</span> <span class="toctext">IsPackageSelected</span></a></li>
+<li class="toclevel-3 tocsection-22"><a href="#AddPostInstallAction"><span class="tocnumber">3.2.12</span> <span class="toctext">AddPostInstallAction</span></a></li>
+<li class="toclevel-3 tocsection-23"><a href="#GetDeviceList"><span class="tocnumber">3.2.13</span> <span class="toctext">GetDeviceList</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-24"><a href="#GUIs"><span class="tocnumber">3.3</span> <span class="toctext">GUIs</span></a>
+<ul>
+<li class="toclevel-3 tocsection-25"><a href="#Creating_a_GUI"><span class="tocnumber">3.3.1</span> <span class="toctext">Creating a GUI</span></a></li>
+<li class="toclevel-3 tocsection-26"><a href="#Grouping_UI_Elements"><span class="tocnumber">3.3.2</span> <span class="toctext">Grouping UI Elements</span></a></li>
+<li class="toclevel-3 tocsection-27"><a href="#UI_Elements"><span class="tocnumber">3.3.3</span> <span class="toctext">UI Elements</span></a>
+<ul>
+<li class="toclevel-4 tocsection-28"><a href="#AddLabel"><span class="tocnumber">3.3.3.1</span> <span class="toctext">AddLabel</span></a></li>
+<li class="toclevel-4 tocsection-29"><a href="#AddString"><span class="tocnumber">3.3.3.2</span> <span class="toctext">AddString</span></a></li>
+<li class="toclevel-4 tocsection-30"><a href="#AddButton"><span class="tocnumber">3.3.3.3</span> <span class="toctext">AddButton</span></a></li>
+<li class="toclevel-4 tocsection-31"><a href="#AddCheckBox"><span class="tocnumber">3.3.3.4</span> <span class="toctext">AddCheckBox</span></a></li>
+<li class="toclevel-4 tocsection-32"><a href="#AddRadioButton"><span class="tocnumber">3.3.3.5</span> <span class="toctext">AddRadioButton</span></a></li>
+<li class="toclevel-4 tocsection-33"><a href="#AddChooser"><span class="tocnumber">3.3.3.6</span> <span class="toctext">AddChooser</span></a></li>
+<li class="toclevel-4 tocsection-34"><a href="#AddSpace"><span class="tocnumber">3.3.3.7</span> <span class="toctext">AddSpace</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-35"><a href="#UI_Element_Settings"><span class="tocnumber">3.3.4</span> <span class="toctext">UI Element Settings</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-36"><a href="#Hints"><span class="tocnumber">4</span> <span class="toctext">Hints</span></a></li>
+</ul>
+</div>
+
+<h1><span class="mw-headline" id="How_the_Installer_Works">How the Installer Works</span></h1>
+<h2><span class="mw-headline" id="Basic_Concept">Basic Concept</span></h2>
+<p>The installation utility executes a python script that sets up the installation. In addition to standard Python commands the installation utility provides a module called "installer" and an interface to it. Using this interface you can create the different pages that can be found in almost all installation processes: a welcome page, a displayed licence page, a selection page, an installation page and finally a finish page.
+In the end, there are only a few script commands required.
+</p>
+<h2><span class="mw-headline" id="Running_an_Installation_Script">Running an Installation Script</span></h2>
+<h3><span class="mw-headline" id="From_the_Command_Line">From the Command Line</span></h3>
+<pre> "Installation Utility" PACKAGE/A,PACKAGENAME/K,LANG=LANGUAGE/K,LOGO/K,BACKFILL/K
+</pre>
+<p>In order to run an installation from the command line, invoke the installation utility giving your script file as an argument and if you want a logo to be displayed at the top of the window:
+</p>
+<pre>"SYS:Utilities/Installation utility" PACKAGE=myscript.py LOGO=mylogo.png
+</pre>
+<p>Note: the logo will be displayed all along the installation process.
+</p><p><i>Note2: right now you need to set these argument names with capital letters, as shown above.</i>
+</p>
+<h3><span class="mw-headline" id="From_the_Workbench">From the Workbench</span></h3>
+<p>Add a project icon to your script and use <i>SYS:Utilities/Installation Utility</i> as the default tool.
+</p>
+<h4><span class="mw-headline" id="Tool_Types">Tool Types</span></h4>
+<p>Installation Utility supports the following tool types:
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th style="text-align:left;">Tool Type
+</th>
+<th style="text-align:left;">Description
+</th></tr>
+<tr style="vertical-align: top;">
+<td>BACKFILL=&lt;image file&gt;</td>
+<td>An image that will be used to fill the Installation Utility window's background.
+</td></tr>
+<tr style="vertical-align: top;">
+<td>LANGUAGE=&lt;language&gt;</td>
+<td>Language that your installation script should use. In order to work, your installation script must support the supplied language.
+</td></tr>
+<tr style="vertical-align: top;">
+<td>LOGO=&lt;image file&gt;</td>
+<td>An image that will be displayed on top of every installation page.
+</td></tr>
+<tr style="vertical-align: top;">
+<td>PACKAGENAME=&lt;name&gt;</td>
+<td>This tooltype is used to specify the script name to execute. It is useful if you want to use a standalone icon that will open a script with a different name or in another directory. (Default: <i>package.py</i>)
+</td></tr></tbody></table>
+<h1><span class="mw-headline" id="Example_Script">Example Script</span></h1>
+<p>A minimal install script looks like this:
+</p>
+<pre># Simple, basic installation script
+from installer import *
+
+# These will be used for the first page (welcome) and last page (finish)
+welcomeText = "This is a welcome text, displayed at the first page"
+finishText = "This is the finish message"
+
+# Define the Welcome page
+welcomePage = NewPage(WELCOME)
+SetString(welcomePage, "message", welcomeText)
+
+# Define the License page. The user must accept this license to continue the install process.
+# The license text will be read from a text file called "license.txt" and will be displayed on the page.
+licensePage = NewPage(LICENSE)
+
+# Define a page to select the installation directory
+destinationPage = NewPage(DESTINATION)
+SetString(destinationPage, "message", "Please indicate where you want to install the files .")
+SetString(destinationPage, "destination", "SYS:")
+
+# Define a directory to be copied to the destination
+filePack = AddPackage (FILEPACKAGE,
+	name = "Full directory",
+	description = "Directory to copy as-is in the destination",
+	files = ["data"],
+	optional = False
+	)
+
+# Define a progress page that is shown during the installation
+installPage = NewPage(INSTALL)
+
+# Create a "finish" page.
+finalPage = NewPage(FINISH)
+SetString(finalPage, "message", finishText)
+
+# Finally, this runs the installation.
+RunInstaller()
+</pre>
+<h1><span class="mw-headline" id="Python_Interface">Python Interface</span></h1>
+<h2><span class="mw-headline" id="Introduction">Introduction</span></h2>
+<p>The installer is entirely programmed in Python. For this purpose, it provides a Python module called 'installer' that serves as a functional interface to the GUI. The entire GUI is build out of pages. Pages present different kind of information to the user. The installation can be navigated with a pair of forward/backward buttons to visit each page in turn. Certain pages (notably the INSTALL page) will trigger the installation process itself, although the interface is flexible enough to make an installation that is entirely driven by the Python script. A minimal setup function will create a "default" layout of pages for an installer. The basic is to have a single archive that is installed into a destination drawer created on the disk - about 90% of all installers will do exactly this. Therefore a lot of the mechanics involved in this type of installer is automated.
+</p>
+<h2><span class="mw-headline" id="Python_Functions_in_the_Installer_Package">Python Functions in the Installer Package</span></h2>
+<h3><span class="mw-headline" id="NewPage">NewPage</span></h3>
+<pre>pageId = NewPage( WELCOME|FINISH|DESTINATION|PACKAGESELECT|INSTALL|GUI|PROCESSING|LICENSE|README )
+</pre>
+<p>This function creates a new page and returns its page number for later reference. The only argument to the function is the type of page to create. Possible values are:
+</p>
+<dl><dt>WELCOME</dt>
+<dd>A message page, usually used for displaying a "welcome" message, although other uses are perfectly possible as well.</dd>
+<dd><i>Note:</i> This page is mandatory.</dd></dl>
+<dl><dt>FINISH</dt>
+<dd>A message page that is specifically targeted at closing the installation. This page automatically gets the "finish" attribute set to make the installation change the "cancel" to the "finish" button.</dd></dl>
+<dl><dt>DESTINATION</dt>
+<dd>A page to select a directory to serve as the target for the installation.</dd>
+<dd><i>Note:</i> This page is mandatory.</dd></dl>
+<dl><dt>PACKAGESELECT</dt>
+<dd>A page for selecting packages to be installed.</dd>
+<dd><i>Note:</i> Installation Utility version 53.18 does not support page type PACKAGESELECT.</dd></dl>
+<dl><dt>INSTALL</dt>
+<dd>The presence of this page automatically triggers the installation of the selected packages.</dd></dl>
+<dl><dt>GUI</dt>
+<dd>A page where GUI elements can be added and controlled via a Python handler.</dd></dl>
+<dl><dt>PROCESSING</dt>
+<dd>A page to display a simple progress bar for doing some Python-scripted processing.</dd>
+<dd><i>Note:</i> On Installation Utility version 53.18 the page has no progress bar.</dd></dl>
+<dl><dt>LICENSE</dt>
+<dd>A brickwall page that displays a license agreement that only lets the user continue after accepting the license.</dd>
+<dd><i>Note:</i> The Installation Utility will look for a text file called "license_<i>languagename</i>.language.txt", if not found, it will look for a file called "license.txt".</dd></dl>
+<dl><dt>README</dt>
+<dd>A page that displays a text file from disk for reference/README purposes.</dd>
+<dd><i>Note:</i> The Installation Utility will look for a text file called "readme_<i>languagename</i>.language.txt", if not found, it will look for a file called "readme.txt".</dd></dl>
+<p>If the page cannot be generated, an OSError exception is raised.
+</p>
+<h3><span class="mw-headline" id="GotoPage">GotoPage</span></h3>
+<p>This function accepts a single argument, the page to display. This function should rarely be needed.
+</p>
+<h3><span class="mw-headline" id="SetString">SetString</span></h3>
+<pre>SetString( pageId, variable, content )
+</pre>
+<h3><span class="mw-headline" id="SetInteger">SetInteger</span></h3>
+<pre>SetInteger( pageId, variable, content )
+</pre>
+<h3><span class="mw-headline" id="SetObject">SetObject</span></h3>
+<pre>SetObject( pageId, property, value )
+</pre>
+<p>SetObject allows you to change the properties of a page created with the NewPage function. The PAGEID argument tells which page's property will be changed (see the list of available properties below). The PROPERTY argument is the name of the property to be changed and VALUE is the value to be set for the property.
+</p><p>The following properties are available:
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th style="text-align:left;">Property
+</th>
+<th style="text-align:left;">Explanation
+</th></tr>
+<tr>
+<td><b>align</b></td>
+<td>Page's header alignment: left, center, or right.
+</td></tr>
+<tr>
+<td><b>destination</b></td>
+<td>On a DESTINATION type page, holds the default installation directory path. The path is visible in the page's target directory gadget.
+</td></tr>
+<tr>
+<td><b>entryhandler</b></td>
+<td>Names a subroutine that will be called when the user enters the page. The subroutine must return a boolean value.
+</td></tr>
+<tr>
+<td><b>message</b></td>
+<td>Page's header content (plain text).
+</td></tr>
+<tr>
+<td><b>processor</b></td>
+<td>Names a subroutine that will be called when the user enters the page. The subroutine must return a boolean value.
+</td></tr></tbody></table>
+<h3><span id="GetString.2C_GetInteger.2C_GetObject"></span><span class="mw-headline" id="GetString,_GetInteger,_GetObject">GetString, GetInteger, GetObject</span></h3>
+<pre>value = GetString( pageId, variable)
+</pre>
+<pre>value = GetInteger( pageId, variable)
+</pre>
+<pre>value = GetObject( pageId, variable)
+</pre>
+<p>These functions are the reverse of the above - they read a variable from the page specified as its first argument and the name specified as the second argument. They return a default value if the name was not found.
+</p>
+<h3><span class="mw-headline" id="RunInstaller">RunInstaller</span></h3>
+<pre>RunInstaller()
+</pre>
+<p>This function runs the installer's main loop, and needs to be the last command in an installation. Any subsequent scripting is done via handlers connected to the pages.
+</p>
+<h3><span class="mw-headline" id="AddPackage">AddPackage</span></h3>
+<pre>packageId = AddPackage(
+   type = FILEPACKAGE|ARCHIVEPACKAGE|HANDLERPACKAGE
+   [,name = &lt;name&gt;]
+   [,description = &lt;description&gt;]
+   [,optional = False|True]
+   [,selected = False|True]
+   [,diskspace = &lt;diskspace&gt;]
+   [,featuregroup = &lt;bitmask&gt;]
+   [,alternatepath = &lt;path&gt;]
+   [,files = &lt;file list&gt;]
+)
+</pre>
+<p>This function adds a package to the list of installable packages. The function's interface uses keywords to make it more readable. The keywords are:
+</p>
+<dl><dt>type</dt>
+<dd>The type of package. This can be either FILEPACKAGE, ARCHIVEPACKAGE or HANDLERPACKAGE. A file package copies a list of files to the destination. An archive package unpacks a list of archives at the destination. Finally, a handler package is an abstract package that executes a handler when it is installed or upon certain actions.</dd>
+<dd>This argument MUST be given.</dd>
+<dd><i>Note:</i> Installation Utility version 53.18 does not support package types ARCHIVEPACKAGE and HANDLERPACKAGE.</dd></dl>
+<dl><dt>name</dt>
+<dd>A string that specifies the name of the package. This name is presented to the user of the installer on a PACKAGESELECT page.</dd>
+<dd>A name should be given. It defaults to an empty string.</dd></dl>
+<dl><dt>description</dt>
+<dd>A textual description of the package. It is presented to the user next to the package list on a PACKAGESELECT page if the package is selected in the package list.</dd>
+<dd>The description may be empty, although it is consider bad style. It defaults to an empty string.</dd></dl>
+<dl><dt>optional</dt>
+<dd>A boolean value indicating whether the package is optional to install or required to be installed. A value of True means the package is optional.</dd>
+<dd>Default is True (package is optional)</dd></dl>
+<dl><dt>selected</dt>
+<dd>A boolean indicating whether the package should be pre-selected or not. If True, the package is selected the first time the PACKAGESELECT page is entered.</dd>
+<dd>Default is True (package is selected), although the user might deselect the package on a PACKAGESELECT page</dd></dl>
+<dl><dt>diskspace</dt>
+<dd>An integer value specifying the number of bytes the package occupies after installation. If a zero size is given (or the parameter is omitted) the installer tries to figure out the size requirements automatically, but be warned this might be a time consuming process.</dd>
+<dd>Defaults to zero (try to figure out yourself)</dd></dl>
+<dl><dt>featuregroup</dt>
+<dd>An integer bitmask giving one bit of each feature group defined. A one bit indicates this package is part of the group, while a zero bit indicates it isn't.</dd>
+<dd>Defaults to zero (not in any feature group)</dd></dl>
+<dl><dt>alternatepath</dt>
+<dd>Specifies an alternative installation path. When an alternative path has been defined, Installation Utility ignores the target directory selected in the DESTINATION page and installs the package to the alternative path location. An alternative path can be used when, for example, some files need to be installed into LIBS: instead of the usual destination. This feature should be used with care.</dd>
+<dd>Defaults to None, i.e. no alternate path.</dd></dl>
+<dl><dt>files</dt>
+<dd>A list of strings, each string representing one file associated with this package. The interpretation of these files depend on the package type:
+<dl><dd>ARCHIVEPACKAGE: each file is an archive that is supposed to be extracted into the destination.</dd>
+<dd>HANDLERPACKAGE: The strings are not interpreted in any way, it is up to the handler to do that.</dd>
+<dd>FILEPACKAGE: Each string stands for a file or directory to be copied. Files are straight copies, while directory names are interpreted slightly different: if a directory name is given, that entire directory is copied to the destination, including the directory itself. For example, if you specify "System" then the destination directory will include a "System" directory. On the other hand, if you specify it as "System/" with a trailing slash, the content of the directory will be copied but not the directory itself, i.e. the destination directory would contain all the file and directories in the "System" directory but not the directory itself.</dd>
+<dd><i>Note:</i> directory/file names must be relative to the current directory i.e. where the installer is executed. You cannot use here a complete path name with the volume name like <i>RAM:mydir</i>.</dd></dl></dd>
+<dd>The default is an empty list.</dd></dl>
+<p>The result of this function is a package number, which can be used subsequently to adjust package settings or query certain features.
+</p>
+<h3><span class="mw-headline" id="SetPackageOption">SetPackageOption</span></h3>
+<pre>SetPackageOption( packageId, option, value )
+</pre>
+<p>This function allows you to set package options. It accepts three parameters:
+</p>
+<ul><li>package number</li>
+<li>option to set</li>
+<li>value</li></ul>
+<h3><span class="mw-headline" id="SelectPackage">SelectPackage</span></h3>
+<pre>SelectPackage( packageId, False|True )
+</pre>
+<p>Select or deselect a package for installation.
+</p>
+<h3><span class="mw-headline" id="IsPackageSelected">IsPackageSelected</span></h3>
+<pre>selected = IsPackageSelected( packageId )
+</pre>
+<p>Queries if a package is selected.
+</p>
+<h3><span class="mw-headline" id="AddPostInstallAction">AddPostInstallAction</span></h3>
+<pre>AddPostInstallAction( action )
+</pre>
+<p>Add a post install action for the installation.
+</p>
+<h3><span class="mw-headline" id="GetDeviceList">GetDeviceList</span></h3>
+<pre>deviceList = GetDeviceList()
+</pre>
+<p>Get a list of mounted devices.
+</p>
+<h2><span class="mw-headline" id="GUIs">GUIs</span></h2>
+<p>GUIs must be created from scratch using a procedural interface. The following procedures deal with creating and handling the user interface. In general, the user interface must be generated once and cannot be changed afterwards (with exceptions, see below).
+</p>
+<h3><span class="mw-headline" id="Creating_a_GUI">Creating a GUI</span></h3>
+<pre>StartGUI( pageNumber )
+</pre>
+<pre>EndGUI()
+</pre>
+<p>A GUI is started with a call to <b>StartGUI( pageNumber )</b>. This will start to create a GUI on the indicated page number, and all subsequent calls will add to this GUI until <b>EndGUI()</b> is called. If the indicated page number is invalid or is not a GUI page, ever subsequent calls are ignored until a new StartGUI with a valid page number is called.
+</p><p>Immediately after the call, a single GUI object might be defined. In almost all cases, this will be a group to hold a number of GUI elements.
+</p>
+<h3><span class="mw-headline" id="Grouping_UI_Elements">Grouping UI Elements</span></h3>
+<pre>BeginGroup(
+   [orientation = GROUP_VERTICAL|GROUP_HORIZONTAL]
+   [,label = &lt;label&gt;]
+   [,frame = NONE_FRAME|THIN_FRAME,|BUTTON_FRAME|GROUP_FRAME|FIELD_FRAME
+    |DROPBOX_FRAME|SBAR_HORIZ_FRAME|SBAR_VERT_FRAME|BOX_FRAME|STANDARD_FRAME]
+   [,weight = &lt;weight&gt;]
+)
+</pre>
+<pre>EndGroup()
+</pre>
+<p>Groups are defined with the <b>BeginGroup</b> and <b>EndGroup</b> calls. BeginGroup takes the following keyword arguments:
+</p>
+<dl><dd><dl><dt>orientation</dt>
+<dd>This specifies whether the children of this group are laid out vertically (GROUP_VERTICAL) or horizontally (GROUP_HORIZONTAL). By default the layout is vertically.</dd></dl></dd></dl>
+<dl><dd><dl><dt>label</dt>
+<dd>A short text string that can be displayed as a label for this group. The label is only used if a frame other than NONE_FRAME is specified. By default no label is used.</dd></dl></dd></dl>
+<dl><dd><dl><dt>frame</dt>
+<dd>One of the constants NONE_FRAME, THIN_FRAME, BUTTON_FRAME, GROUP_FRAME, FIELD_FRAME, DROPBOX_FRAME, SBAR_HORIZ_FRAME, SBAR_VERT_FRAME, BOX_FRAME, STANDARD_FRAME. They directly correspond to the bevel styles of bevel.image. Defaults to NONE_FRAME.</dd></dl></dd></dl>
+<dl><dd><dl><dt>weight</dt>
+<dd>An integer defining the weighted width or height of this group. This corresponds to layout.gadget's CHILD_WeightedWidth or CHILD_WeightedHeight tags, depending on the layout direction.</dd></dl></dd></dl>
+<p>EndGroup has no parameters and automatically terminates the last group opened by BeginGroup.
+</p>
+<h3><span class="mw-headline" id="UI_Elements">UI Elements</span></h3>
+<p>User interface elements are added with the following calls. All of these return an ID number.
+</p>
+<h4><span class="mw-headline" id="AddLabel">AddLabel</span></h4>
+<pre>AddLabel(
+    [label = &lt;label&gt;]
+    [,frame = NONE_FRAME|THIN_FRAME,|BUTTON_FRAME|GROUP_FRAME|FIELD_FRAME
+     |DROPBOX_FRAME|SBAR_HORIZ_FRAME|SBAR_VERT_FRAME|BOX_FRAME|STANDARD_FRAME]
+    [,weight = &lt;weight&gt;]
+    [,align = ALIGN_LEFT|ALIGN_RIGHT|ALIGN_CENTER|ALIGN_BLOCK]
+)
+</pre>
+<p>This call adds a text label, with selectable frame. The following keyword arguments are supported:
+</p>
+<dl><dd><dl><dt>label</dt>
+<dd>A string that specifies the label to be displayed. Default is empty, although an empty label doesn't make much sense</dd></dl></dd></dl>
+<dl><dd><dl><dt>frame</dt>
+<dd>A frame to put around the label.</dd></dl></dd></dl>
+<dl><dd><dl><dt>weight</dt>
+<dd>The weight of the label, as explained above.</dd></dl></dd></dl>
+<dl><dd><dl><dt>align</dt>
+<dd>Text alignment to use for the label. Possible values are: ALIGN_LEFT, ALIGN_RIGHT, ALIGN_CENTER, ALIGN_BLOCK</dd></dl></dd></dl>
+<h4><span class="mw-headline" id="AddString">AddString</span></h4>
+<pre>AddString(
+    [label = &lt;label&gt;]
+    [,value = &lt;value&gt;]
+    [,weight = &lt;weight&gt;]
+    [,handler = &lt;callable object&gt;]
+)
+</pre>
+<dl><dd><dl><dt>label</dt>
+<dd>A string that specifies the label to be displayed. Default is empty, although an empty label doesn't make much sense</dd></dl></dd></dl>
+<dl><dd><dl><dt>value</dt>
+<dd>Value to use as the default string</dd></dl></dd></dl>
+<dl><dd><dl><dt>weight</dt>
+<dd>The weight of the label, as explained above.</dd></dl></dd></dl>
+<dl><dd><dl><dt>handler</dt>
+<dd>A Python callable object that is invoked when the string field is clicked. The call is made with the following parameters:
+<dl><dd>handler(page_number, element_id) where page_number is the page number of the GUI page and element_id is the element id returned by this call.</dd></dl></dd></dl></dd></dl>
+<h4><span class="mw-headline" id="AddButton">AddButton</span></h4>
+<pre>buttonId = AddButton(
+    [label = &lt;label&gt;]
+    [,frame = NONE_FRAME|THIN_FRAME,|BUTTON_FRAME|GROUP_FRAME|FIELD_FRAME
+     |DROPBOX_FRAME|SBAR_HORIZ_FRAME|SBAR_VERT_FRAME|BOX_FRAME|STANDARD_FRAME]
+    [,weight = &lt;weight&gt;]
+    [,onclick = &lt;callable object&gt;]
+)
+</pre>
+<p>This call adds a push button object to the current group. The function supports the following keyword arguments:
+</p>
+<dl><dd><dl><dt>label</dt>
+<dd>A string specifying the label to be displayed within the button. Defaults to an empty label.</dd></dl></dd></dl>
+<dl><dd><dl><dt>frame</dt>
+<dd>One of the constants mentioned above for the group. Defaults to BUTTON_FRAME.</dd></dl></dd></dl>
+<dl><dd><dl><dt>weight</dt>
+<dd>As above</dd></dl></dd></dl>
+<dl><dd><dl><dt>onclick</dt>
+<dd>A Python callable object that is invoked when the button is clicked. The call is made with the following parameters:
+<dl><dd>handler(page_number, element_id) where page_number is the page number of the GUI page and element_id is the element id returned by this call.</dd></dl></dd></dl></dd></dl>
+<p>The call returns an id that can be used to construct the variable name for handling attributes of this object.
+</p>
+<h4><span class="mw-headline" id="AddCheckBox">AddCheckBox</span></h4>
+<pre>checkBoxId = AddButton(
+    [label = &lt;label&gt;]
+    [,weight = &lt;weight&gt;]
+    [,checked = False|True]
+    [,onclick = &lt;callable object&gt;]
+)
+</pre>
+<p>This call adds a checkbox object to the GUI. The following keyword arguments are valid:
+</p>
+<dl><dd><dl><dt>label</dt>
+<dd>A string that appears as a label to the right of the checkbox. Defaults to an empty label.</dd></dl></dd></dl>
+<dl><dd><dl><dt>weight</dt>
+<dd>As above</dd></dl></dd></dl>
+<dl><dd><dl><dt>checked</dt>
+<dd>An integer that specifies whether the checkbox is initially checked or not. A zero means the checkbox is clear, any other value says the box is checked.</dd></dl></dd></dl>
+<dl><dd><dl><dt>onclick</dt>
+<dd>A python callable object that is invoked when the checkbox is clicked. The call is made with the following parameters:
+<dl><dd>handler(page_number, element_id, state) where page_number and element_id are the same as above, and state is a 0 if the user just unchecked the checkbox, or a 1 is it was just checked.</dd></dl></dd></dl></dd></dl>
+<p>The call returns an id that can be used to construct the variable name for handling attributes of this object.
+</p>
+<h4><span class="mw-headline" id="AddRadioButton">AddRadioButton</span></h4>
+<pre>radioButtonId = AddRadioButton(
+    &lt;label list&gt;
+    [,weight = &lt;weight&gt;]
+    [,selected = False|True]
+    [,onclick = &lt;callable object&gt;]
+)
+</pre>
+<p>This call adds a set of mutually exclusive radio buttons. The following keyword arguments are valid:
+</p>
+<dl><dd><dl><dt>label list</dt>
+<dd>A list of Python strings, with each of these strings appearing as a choice on the Radio buttons. This parameter is required.</dd></dl></dd></dl>
+<dl><dd><dl><dt>weight</dt>
+<dd>As above</dd></dl></dd></dl>
+<dl><dd><dl><dt>selected</dt>
+<dd>The number of the button initially selected. Defaults to the first button (0).</dd></dl></dd></dl>
+<dl><dd><dl><dt>onclick</dt>
+<dd>A python callable object that is invoked when the radio button is clicked. The call is made with the following parameters:
+<dl><dd>handler(page_number, element_id, selected) where page_number and element_id are the same as above, and selected is the button number that was selected.</dd></dl></dd></dl></dd></dl>
+<p>The call returns an id that can be used to construct the variable name for handling attributes of this object.
+</p>
+<h4><span class="mw-headline" id="AddChooser">AddChooser</span></h4>
+<pre>chooserId = AddChooser(
+    [label = &lt;label&gt;]
+    [,choices = &lt;list&gt;]
+    [,weight = &lt;weight&gt;]
+    [,selected = False|True]
+    [,mode = CHOOSER_POPUP|CHOOSER_DROPDOWN]
+    [,onclick = &lt;callable object&gt;]
+)
+</pre>
+<p>This function adds a chooser gadget to the GUI. The following keyword arguments are valid:
+</p>
+<dl><dd><dl><dt>label</dt>
+<dd>A test string to be displayed in the chooser in pop-up mode (see below). Defaults to an empty string, and is not used for drop-down mode.</dd></dl></dd></dl>
+<dl><dd><dl><dt>choices</dt>
+<dd>A list of text strings to be displayed as choices for the chooser. This argument is mandatory.</dd></dl></dd></dl>
+<dl><dd><dl><dt>weight</dt>
+<dd>As above</dd></dl></dd></dl>
+<dl><dd><dl><dt>selected</dt>
+<dd>The number of the currently visible item in drop-down mode. Defaults to 0.</dd></dl></dd></dl>
+<dl><dd><dl><dt>mode</dt>
+<dd>One of the constants CHOOSER_POPUP or CHOOSER_DROPDOWN. This corresponds to the chooser.gadget CHOOSER_PopUp and CHOOSER_DropDown tag items.</dd></dl></dd></dl>
+<dl><dd><dl><dt>onclick</dt>
+<dd>A python callable object that is invoked when the chooser is clicked. The call is made with the following parameters:
+<dl><dd>handler(page_number, element_id, selected) where page_number and element_id are the same as above, and selected is the title number that was selected.</dd></dl></dd></dl></dd></dl>
+<p>The call returns an id that can be used to construct the variable name for handling attributes of this object.
+</p>
+<h4><span class="mw-headline" id="AddSpace">AddSpace</span></h4>
+<pre>AddSpace([weight = &lt;weight&gt;])
+</pre>
+<p>This call adds a bit of space to the GUI. It accepts only one parameter:
+</p>
+<dl><dd><dl><dt>weight</dt>
+<dd>An integer specifying the weight of the space. Defaults to 1.</dd></dl></dd></dl>
+<p>The call does not return a value. Space does not have any variables.
+</p>
+<h3><span class="mw-headline" id="UI_Element_Settings">UI Element Settings</span></h3>
+<pre>value = GetUIAttr( pageId, elementId, GUI_LABEL|GUI_SELECTED|GUI_CHECKED|GUI_ONCLICK )
+</pre>
+<pre>SetUIAttr( pageId, elementId, GUI_LABEL|GUI_SELECTED|GUI_CHECKED|GUI_ONCLICK, &lt;value&gt; )
+</pre>
+<p>In order to change some aspects of user interface elements (like the selection status of a checkbox) or read their current state, two functions exist called <b>GetUIAttr</b> and <b>SetUIAttr</b>.
+</p><p>The former reads an attribute from an identified user interface element (identified by the page number and element id) while the latter sets (and updates the on-screen representation) of an equally identified element.
+</p><p>A number of attributes can be set and gotten from UI elements; some of them are shared among more than one element type, while others are specific. The following list names the attributes:
+</p>
+<dl><dt>GUI_LABEL (string)</dt>
+<dd>The label displayed on a UI element.</dd>
+<dd>Applies to BUTTON, LABEL, GROUP, CHECKBOX</dd></dl>
+<dl><dt>GUI_SELECTED (integer)</dt>
+<dd>The selected item in a chooser or radio button.</dd>
+<dd>Applies to CHOOSER and RADIOBUTTON</dd></dl>
+<dl><dt>GUI_CHECKED (integer)</dt>
+<dd>Whether the checkbox checkmark is set or not.</dd>
+<dd>Applies to CHECKBOX</dd></dl>
+<dl><dt>GUI_ONCLICK (Python callable)</dt>
+<dd>The handler invoked when the UI element is activated.</dd>
+<dd>Applies to CHOOSER, BUTTON, LABEL, GROUP, CHECKBOX, RADIOBUTTON</dd></dl>
+<h1><span class="mw-headline" id="Hints">Hints</span></h1>
+<ul><li>See the AmigaOS 4 installation script on the AmigaOS Installation CD. It is a big script full of functions. Take it as example and experiment.</li></ul>
+<!-- 
+NewPP limit report
+Cached time: 20260114021857
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.047 seconds
+Real time usage: 0.047 seconds
+Preprocessor visited node count: 252/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 2/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 4004/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 -total
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:679-0!canonical and timestamp 20260114021857 and revision id 12317. Rendering was triggered because: diff-page
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=Installation_Utility&amp;oldid=12317">http://wiki.amigaos.net/w/index.php?title=Installation_Utility&amp;oldid=12317</a>"</div></div>
+		<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Installation+Utility" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-main" class="selected mw-list-item"><a href="/wiki/Installation_Utility" title="View the content page [c]" accesskey="c"><span>Page</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=Talk:Installation_Utility&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/Installation_Utility"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=Installation_Utility&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=Installation_Utility&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/Installation_Utility" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/Installation_Utility" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=Installation_Utility&amp;oldid=12317" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=Installation_Utility&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=Installation+Utility"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=Installation+Utility&amp;oldid=12317&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=Installation_Utility&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 29 July 2022, at 19:43.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":132,"wgPageParseReport":{"limitreport":{"cputime":"0.047","walltime":"0.047","ppvisitednodes":{"value":252,"limit":1000000},"postexpandincludesize":{"value":0,"limit":2097152},"templateargumentsize":{"value":0,"limit":2097152},"expansiondepth":{"value":2,"limit":100},"expensivefunctioncount":{"value":0,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":4004,"limit":5000000},"timingprofile":["100.00%    0.000      1 -total"]},"cachereport":{"timestamp":"20260114021857","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>

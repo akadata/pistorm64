@@ -1,0 +1,501 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Autodocs:Main - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_2IU3PFXsXhbKC1TSUQAAAAI","wgCanonicalNamespace":"Autodocs","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":106,"wgPageName":"Autodocs:Main","wgTitle":"Main","wgCurRevisionId":12372,"wgRevisionId":12372,"wgArticleId":182,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],"wgPageViewLanguage":
+"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Autodocs:Main","wgRelevantArticleId":182,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["site","mediawiki.page.ready","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-106 ns-subject page-Autodocs_Main rootpage-Autodocs_Main skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-namespace">Autodocs</span><span class="mw-page-title-separator">:</span><span class="mw-page-title-main">Main</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/Main_Page" title="Main Page">Main Page</a> &gt; <a href="/wiki/UserDoc:Main" title="UserDoc:Main">UserDoc:Main</a> &gt; <a href="/wiki/DeveloperDoc:Main" title="DeveloperDoc:Main">DeveloperDoc:Main</a> &gt; <a href="/wiki/Tutorials:Main" title="Tutorials:Main">Tutorials:Main</a> &gt; <a href="/wiki/Autodocs:Main" title="Autodocs:Main">Autodocs:Main</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><p>The autodocs are included in the latest <a href="/wiki/SDK_FAQ" title="SDK FAQ">AmigaOS SDK</a> and are also available as text files below:
+</p>
+<ul><li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/a1floppy.doc.txt">a1floppy.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/a1serial_dev.doc.txt">a1serial_dev.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/AI_Driver.doc.txt">AI_Driver.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/amigaguide.doc.txt">amigaguide.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/amigaguide_dtc.doc.txt">amigaguide_dtc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/AmigaInput.doc.txt">AmigaInput.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/amiga_lib.doc.txt">amiga_lib.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/animation_dtc.doc.txt">animation_dtc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/application.doc.txt">application.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/arexx_cl.doc.txt">arexx_cl.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/asl.doc.txt">asl.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/audio.doc.txt">audio.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/battclock.doc.txt">battclock.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/battmem.doc.txt">battmem.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/bevel_ic.doc.txt">bevel_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/biosversion.doc.txt">biosversion.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/bitmap_ic.doc.txt">bitmap_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/bsdsocket.doc.txt">bsdsocket.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/btree.doc.txt">btree.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/bullet.doc.txt">bullet.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/button_gc.doc.txt">button_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/camd.doc.txt">camd.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/cardres.doc.txt">cardres.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/cd.doc.txt">cd.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/checkbox_gc.doc.txt">checkbox_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/chooser_gc.doc.txt">chooser_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/cia.doc.txt">cia.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/clicktab_gc.doc.txt">clicktab_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/clipboard.doc.txt">clipboard.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/colorwheel_gc.doc.txt">colorwheel_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/commodities.doc.txt">commodities.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/console.doc.txt">console.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/datatypes.doc.txt">datatypes.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/datebrowser_gc.doc.txt">datebrowser_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/ddebug_lib.doc.txt">ddebug_lib.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/debug_lib.doc.txt">debug_lib.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/diffview_gc.doc.txt">diffview_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/disk.doc.txt">disk.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/diskfont.doc.txt">diskfont.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/diskio.doc.txt">diskio.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/docky.doc.txt">docky.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/dos.doc.txt">dos.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/dos.dospackets.doc.txt">dos.dospackets.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/dos.obsolete.doc.txt">dos.obsolete.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/drawlist_ic.doc.txt">drawlist_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/elf.doc.txt">elf.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/exec.doc.txt">exec.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/expansion.doc.txt">expansion.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/filesysbox.doc.txt">filesysbox.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/filesysres.doc.txt">filesysres.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/filler_ic.doc.txt">filler_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/fillrect_ic.doc.txt">fillrect_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/frame_ic.doc.txt">frame_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/frbutton_gc.doc.txt">frbutton_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/fuelgauge_gc.doc.txt">fuelgauge_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/gadget_gc.doc.txt">gadget_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/gadtools.doc.txt">gadtools.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/gameport.doc.txt">gameport.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/Gameport_pci.doc.txt">Gameport_pci.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/gauge_ic.doc.txt">gauge_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/getcolor_gc.doc.txt">getcolor_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/getfile_gc.doc.txt">getfile_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/getfont_gc.doc.txt">getfont_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/getscreenmode_gc.doc.txt">getscreenmode_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/glyph_ic.doc.txt">glyph_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/gradientslider_gc.doc.txt">gradientslider_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/graphics.doc.txt">graphics.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/group_gc.doc.txt">group_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/hunk.doc.txt">hunk.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/ibutton_gc.doc.txt">ibutton_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/icon.doc.txt">icon.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/iconmodule.doc.txt">iconmodule.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/ic_cl.doc.txt">ic_cl.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/iffparse.doc.txt">iffparse.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/image_ic.doc.txt">image_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/input.doc.txt">input.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/integer_gc.doc.txt">integer_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/intuition.doc.txt">intuition.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/iscroller_gc.doc.txt">iscroller_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/istring_gc.doc.txt">istring_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/itext_ic.doc.txt">itext_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/keyboard.doc.txt">keyboard.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/keymap.doc.txt">keymap.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/label_ic.doc.txt">label_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/layers.doc.txt">layers.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/layout_gc.doc.txt">layout_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/libamiga_a.doc.txt">libamiga_a.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/listbrowser_gc.doc.txt">listbrowser_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/locale.doc.txt">locale.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/lowlevel.doc.txt">lowlevel.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/mathffp.doc.txt">mathffp.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/mathieeedoubbas.doc.txt">mathieeedoubbas.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/mathieeedoubtrans.doc.txt">mathieeedoubtrans.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/mathieeesingbas.doc.txt">mathieeesingbas.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/mathieeesingtrans.doc.txt">mathieeesingtrans.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/mathtrans.doc.txt">mathtrans.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/menu_cl.doc.txt">menu_cl.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/misc.doc.txt">misc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/model_cl.doc.txt">model_cl.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/narrator.doc.txt">narrator.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/nonvolatile.doc.txt">nonvolatile.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/openfirmware.doc.txt">openfirmware.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/page_gc.doc.txt">page_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/palette_gc.doc.txt">palette_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/parallel.doc.txt">parallel.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/partition_gc.doc.txt">partition_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/penmap_ic.doc.txt">penmap_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/performancemonitor.doc.txt">performancemonitor.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/Picasso96API.doc.txt">Picasso96API.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/picture_dtc.doc.txt">picture_dtc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/pointer_cl.doc.txt">pointer_cl.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/popupmenu_cl.doc.txt">popupmenu_cl.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/potgo.doc.txt">potgo.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/printer.doc.txt">printer.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/prop_gc.doc.txt">prop_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/radiobutton_gc.doc.txt">radiobutton_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/realtime.doc.txt">realtime.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/requester_cl.doc.txt">requester_cl.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/resource.doc.txt">resource.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/rexxsyslib.doc.txt">rexxsyslib.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/root_cl.doc.txt">root_cl.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/scroller_gc.doc.txt">scroller_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/serial_dev.doc.txt">serial_dev.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/sketchboard_gc.doc.txt">sketchboard_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/slider_gc.doc.txt">slider_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/sound_dtc.doc.txt">sound_dtc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/space_gc.doc.txt">space_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/speedbar_gc.doc.txt">speedbar_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/string_gc.doc.txt">string_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/sys_ic.doc.txt">sys_ic.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/tapedeck_gc.doc.txt">tapedeck_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/textclip.doc.txt">textclip.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/texteditor_gc.doc.txt">texteditor_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/text_dtc.doc.txt">text_dtc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/timer.doc.txt">timer.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/timesync.doc.txt">timesync.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/timezone.doc.txt">timezone.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/trackdisk.doc.txt">trackdisk.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/translator.doc.txt">translator.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/usbfd.doc.txt">usbfd.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/usbhcd.doc.txt">usbhcd.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/usbresource.doc.txt">usbresource.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/usbsys.doc.txt">usbsys.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/utility.doc.txt">utility.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/virtual_gc.doc.txt">virtual_gc.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/warp3d.doc.txt">warp3d.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/window_cl.doc.txt">window_cl.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/workbench.doc.txt">workbench.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/xenares.doc.txt">xenares.doc</a></li>
+<li><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/z.doc.txt">z.doc</a></li></ul>
+<!-- 
+NewPP limit report
+Cached time: 20260114023048
+Cache expiry: 86400
+Reduced expiry: false
+Complications: []
+CPU time usage: 0.017 seconds
+Real time usage: 0.017 seconds
+Preprocessor visited node count: 1/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 1/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 -total
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:182-0!canonical and timestamp 20260114023048 and revision id 12372. Rendering was triggered because: page-view
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=Autodocs:Main&amp;oldid=12372">http://wiki.amigaos.net/w/index.php?title=Autodocs:Main&amp;oldid=12372</a>"</div></div>
+		<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Autodocs%3AMain" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-autodocs" class="selected mw-list-item"><a href="/wiki/Autodocs:Main" title="View the subject page [c]" accesskey="c"><span>Autodocs</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=Autodocs_talk:Main&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/Autodocs:Main"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=Autodocs:Main&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=Autodocs:Main&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/Autodocs:Main" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/Autodocs:Main" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=Autodocs:Main&amp;oldid=12372" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=Autodocs:Main&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=Autodocs%3AMain"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=Autodocs%3AMain&amp;oldid=12372&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=Autodocs:Main&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 18 October 2023, at 19:49.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":110,"wgPageParseReport":{"limitreport":{"cputime":"0.017","walltime":"0.017","ppvisitednodes":{"value":1,"limit":1000000},"postexpandincludesize":{"value":0,"limit":2097152},"templateargumentsize":{"value":0,"limit":2097152},"expansiondepth":{"value":1,"limit":100},"expensivefunctioncount":{"value":0,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":0,"limit":5000000},"timingprofile":["100.00%    0.000      1 -total"]},"cachereport":{"timestamp":"20260114023048","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>

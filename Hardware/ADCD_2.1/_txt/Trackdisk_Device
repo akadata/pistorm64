@@ -1,0 +1,1368 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Trackdisk Device - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_cBJKW9AxkVNbCBwLLgAAACE","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Trackdisk_Device","wgTitle":"Trackdisk Device","wgCurRevisionId":12543,"wgRevisionId":12543,"wgArticleId":66,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],
+"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Trackdisk_Device","wgRelevantArticleId":66,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","ext.pygments":"ready","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["ext.pygments.view","site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%2Cpygments%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-Trackdisk_Device rootpage-Trackdisk_Device skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">Trackdisk Device</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/Trackdisk_Device" title="Trackdisk Device">Trackdisk Device</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Trackdisk_Device"><span class="tocnumber">1</span> <span class="toctext">Trackdisk Device</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Trackdisk_Device_Commands_and_Functions"><span class="tocnumber">2</span> <span class="toctext">Trackdisk Device Commands and Functions</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="#Device_Interface"><span class="tocnumber">3</span> <span class="toctext">Device Interface</span></a>
+<ul>
+<li class="toclevel-2 tocsection-4"><a href="#About_Amiga_Floppy_Disks"><span class="tocnumber">3.1</span> <span class="toctext">About Amiga Floppy Disks</span></a></li>
+<li class="toclevel-2 tocsection-5"><a href="#Opening_the_Trackdisk_Device"><span class="tocnumber">3.2</span> <span class="toctext">Opening the Trackdisk Device</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="#Reading_from_the_Trackdisk_Device"><span class="tocnumber">3.3</span> <span class="toctext">Reading from the Trackdisk Device</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="#Writing_to_the_Trackdisk_Device"><span class="tocnumber">3.4</span> <span class="toctext">Writing to the Trackdisk Device</span></a></li>
+<li class="toclevel-2 tocsection-8"><a href="#Closing_the_Trackdisk_Device"><span class="tocnumber">3.5</span> <span class="toctext">Closing the Trackdisk Device</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-9"><a href="#Advanced_Commands"><span class="tocnumber">4</span> <span class="toctext">Advanced Commands</span></a>
+<ul>
+<li class="toclevel-2 tocsection-10"><a href="#Determining_the_Drive_Geometry_Table"><span class="tocnumber">4.1</span> <span class="toctext">Determining the Drive Geometry Table</span></a></li>
+<li class="toclevel-2 tocsection-11"><a href="#Clearing_the_Track_Buffer"><span class="tocnumber">4.2</span> <span class="toctext">Clearing the Track Buffer</span></a></li>
+<li class="toclevel-2 tocsection-12"><a href="#Controlling_the_Drive_Motor"><span class="tocnumber">4.3</span> <span class="toctext">Controlling the Drive Motor</span></a></li>
+<li class="toclevel-2 tocsection-13"><a href="#Updating_a_Track_Sector"><span class="tocnumber">4.4</span> <span class="toctext">Updating a Track Sector</span></a></li>
+<li class="toclevel-2 tocsection-14"><a href="#Formatting_a_Track"><span class="tocnumber">4.5</span> <span class="toctext">Formatting a Track</span></a></li>
+<li class="toclevel-2 tocsection-15"><a href="#Ejecting_a_Disk"><span class="tocnumber">4.6</span> <span class="toctext">Ejecting a Disk</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-16"><a href="#Disk_Status_Commands"><span class="tocnumber">5</span> <span class="toctext">Disk Status Commands</span></a>
+<ul>
+<li class="toclevel-2 tocsection-17"><a href="#Determining_the_Presence_of_a_Disk"><span class="tocnumber">5.1</span> <span class="toctext">Determining the Presence of a Disk</span></a></li>
+<li class="toclevel-2 tocsection-18"><a href="#Determining_the_Write-Protect_Status_of_a_Disk"><span class="tocnumber">5.2</span> <span class="toctext">Determining the Write-Protect Status of a Disk</span></a></li>
+<li class="toclevel-2 tocsection-19"><a href="#Determining_the_Drive_Type"><span class="tocnumber">5.3</span> <span class="toctext">Determining the Drive Type</span></a></li>
+<li class="toclevel-2 tocsection-20"><a href="#Determining_the_Number_of_Tracks_of_a_Drive"><span class="tocnumber">5.4</span> <span class="toctext">Determining the Number of Tracks of a Drive</span></a></li>
+<li class="toclevel-2 tocsection-21"><a href="#Determining_the_Current_Diskchange_Number"><span class="tocnumber">5.5</span> <span class="toctext">Determining the Current Diskchange Number</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-22"><a href="#Commands_for_Diagnostics_and_Repair"><span class="tocnumber">6</span> <span class="toctext">Commands for Diagnostics and Repair</span></a>
+<ul>
+<li class="toclevel-2 tocsection-23"><a href="#Moving_the_Drive_Head_to_a_Specific_Track"><span class="tocnumber">6.1</span> <span class="toctext">Moving the Drive Head to a Specific Track</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-24"><a href="#Notification_of_Disk_Changes"><span class="tocnumber">7</span> <span class="toctext">Notification of Disk Changes</span></a>
+<ul>
+<li class="toclevel-2 tocsection-25"><a href="#Adding_a_Diskchange_Software_Interrupt_Handler"><span class="tocnumber">7.1</span> <span class="toctext">Adding a Diskchange Software Interrupt Handler</span></a></li>
+<li class="toclevel-2 tocsection-26"><a href="#Removing_a_Diskchange_Software_Interrupt_Handler"><span class="tocnumber">7.2</span> <span class="toctext">Removing a Diskchange Software Interrupt Handler</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-27"><a href="#Commands_for_Low-Level_Access"><span class="tocnumber">8</span> <span class="toctext">Commands for Low-Level Access</span></a>
+<ul>
+<li class="toclevel-2 tocsection-28"><a href="#Reading_Raw_Data_from_a_Disk"><span class="tocnumber">8.1</span> <span class="toctext">Reading Raw Data from a Disk</span></a></li>
+<li class="toclevel-2 tocsection-29"><a href="#Writing_Raw_Data_to_a_Disk"><span class="tocnumber">8.2</span> <span class="toctext">Writing Raw Data to a Disk</span></a></li>
+<li class="toclevel-2 tocsection-30"><a href="#Limitations_for_Sync’ed_Reads_and_Writes"><span class="tocnumber">8.3</span> <span class="toctext">Limitations for Sync’ed Reads and Writes</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-31"><a href="#Trackdisk_Device_Errors"><span class="tocnumber">9</span> <span class="toctext">Trackdisk Device Errors</span></a></li>
+<li class="toclevel-1 tocsection-32"><a href="#Example_Trackdisk_Program"><span class="tocnumber">10</span> <span class="toctext">Example Trackdisk Program</span></a></li>
+<li class="toclevel-1 tocsection-33"><a href="#Additional_Information_on_the_Trackdisk_Device"><span class="tocnumber">11</span> <span class="toctext">Additional Information on the Trackdisk Device</span></a></li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="Trackdisk_Device">Trackdisk Device</span></h2>
+<p>The Amiga trackdisk device directly drives the disk, controls the disk motors, reads raw data from the tracks, and writes raw data to the tracks. Normally, you use the AmigaDOS functions to write or read data from the disk. The trackdisk device is the lowest-level software access to the disk data and is used by AmigaDOS to access the disks. The trackdisk device supports the usual commands such as CMD_WRITE and CMD_READ. In addition, it supports an extended form of these commands to allow additional control over the trackdisk device.
+</p>
+<h2><span class="mw-headline" id="Trackdisk_Device_Commands_and_Functions">Trackdisk Device Commands and Functions</span></h2>
+<table class="wikitable">
+<tbody><tr>
+<th>Command
+</th>
+<th>Command Operation
+</th></tr>
+<tr>
+<td>CMD_CLEAR</td>
+<td>Mark track buffer as invalid. Forces the track to be re-read.
+</td></tr>
+<tr>
+<td>ETD_CLEAR</td>
+<td>ETD_CLEAR also checks for a diskchange.
+</td></tr>
+<tr>
+<td>CMD_READ</td>
+<td>Read one or more sectors from a disk.
+</td></tr>
+<tr>
+<td>ETD_READ</td>
+<td>ETD_READ also reads the sector label area and checks for a diskchange.
+</td></tr>
+<tr>
+<td>CMD_UPDATE</td>
+<td>Write out track buffer if it has been changed.
+</td></tr>
+<tr>
+<td>ETD_UPDATE</td>
+<td>ETD_UPDATE also checks for a diskchange.
+</td></tr>
+<tr>
+<td>CMD_WRITE</td>
+<td>Write one or more sectors to a disk.
+</td></tr>
+<tr>
+<td>ETD_WRITE</td>
+<td>ETD_WRITE also writes the sector label area and checks for a diskchange.
+</td></tr>
+<tr>
+<td>TD_ADDCHANGEINT</td>
+<td>Add an interrupt handler to be activated on a diskchange.
+</td></tr>
+<tr>
+<td>TD_CHANGENUM</td>
+<td>Return the current value of the diskchange counter used by the ETD commands to determine if a diskchange has occurred.
+</td></tr>
+<tr>
+<td>TD_CHANGESTATE</td>
+<td>Return the disk present/not-present status of a drive.
+</td></tr>
+<tr>
+<td>TD_EJECT</td>
+<td>Eject a disk from a drive. This command will only work on drives that support an eject command.
+</td></tr>
+<tr>
+<td>TD_FORMAT</td>
+<td>Initialize one or more tracks with a data buffer.
+</td></tr>
+<tr>
+<td>ETD_FORMAT</td>
+<td>ETD_FORMAT also initializes the sector label area.
+</td></tr>
+<tr>
+<td>TD_GETDRIVETYPE</td>
+<td>Return the type of disk drive in use by the unit.
+</td></tr>
+<tr>
+<td>TD_GETGEOMETRY</td>
+<td>Return the disk geometry table.
+</td></tr>
+<tr>
+<td>TD_GETNUMTRACKS</td>
+<td>Return the number of tracks usable with the unit.
+</td></tr>
+<tr>
+<td>TD_MOTOR</td>
+<td>Turn the motor on or off.
+</td></tr>
+<tr>
+<td>ETD_MOTOR</td>
+<td>ETD_MOTOR also checks for a diskchange.
+</td></tr>
+<tr>
+<td>TD_PROTSTATUS</td>
+<td>Return the write-protect status of a disk.
+</td></tr>
+<tr>
+<td>TD_RAWREAD</td>
+<td>Read RAW sector data from disk (unencoded MFM).
+</td></tr>
+<tr>
+<td>ETD_RAWREAD</td>
+<td>ETD_RAWREAD also checks for a diskchange.
+</td></tr>
+<tr>
+<td>TD_RAWWRITE</td>
+<td>Write RAW sector data to disk.
+</td></tr>
+<tr>
+<td>ETD_RAWWRITE</td>
+<td>ETD_RAWWRITE also checks for a diskchange.
+</td></tr>
+<tr>
+<td>TD_REMCHANGEINT</td>
+<td>Remove a diskchange interrupt handler.
+</td></tr>
+<tr>
+<td>TD_SEEK</td>
+<td>Move the head to a specific track.
+</td></tr>
+<tr>
+<td>ETD_SEEK</td>
+<td>ETD_SEEK also checks for a diskchange.
+</td></tr></tbody></table>
+<h2><span class="mw-headline" id="Device_Interface">Device Interface</span></h2>
+<p>The trackdisk device operates like other Amiga devices. To use it, you must first open the device, then send I/O requests to it, and then close it when finished. See <a href="/wiki/Exec_Device_I/O" title="Exec Device I/O">Exec Device I/O</a> for general information on device usage.
+</p><p>The trackdisk device uses two different types of I/O request blocks, IOStdReq and IOExtTD and two types of commands, standard and extended. An IOExtTD is required for the extended trackdisk commands (those beginning with “ETD_”), but can be used for both types of commands. Thus, the IOExtTD is the type of I/O request that will be used in this article.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span>
+<span class="linenos" data-line="2"></span><span class="p">{</span>
+<span class="linenos" data-line="3"></span><span class="w">    </span><span class="k">struct</span><span class="w">  </span><span class="nc">IOStdReq</span><span class="w"> </span><span class="n">iotd_Req</span><span class="p">;</span>
+<span class="linenos" data-line="4"></span><span class="w">    </span><span class="n">ULONG</span><span class="w">   </span><span class="n">iotd_Count</span><span class="p">;</span><span class="w">         </span><span class="cm">/* Diskchange counter */</span>
+<span class="linenos" data-line="5"></span><span class="w">    </span><span class="n">ULONG</span><span class="w">   </span><span class="n">iotd_SecLabel</span><span class="p">;</span><span class="w">      </span><span class="cm">/* Sector label data */</span>
+<span class="linenos" data-line="6"></span><span class="p">};</span>
+</pre></div>
+<p>See the include file devices/trackdisk.h for the complete structure definition.
+</p><p>The enhanced commands listed above—those beginning with “ETD_”— are similar to their standard counterparts but have additional features: they allow you to control whether a command will be executed if the disk has been changed and they allow you to read or write to the sector label portion of a sector.
+</p><p>Enhanced commands require a larger I/O request, IOExtTD, than the IOStdReq request used by the standard commands. IOExtTD contains extra information needed by the enhanced command; since the standard form of a command ignores the extra fields, IOExtTD requests can be used for both types. The extra information takes the form of two extra longwords at the end of the data structure. These commands are performed only if the change count is less than or equal to the value in the iotd_Count field of the command’s request block.
+</p><p>The iotd_Count field keeps old I/O requests from being performed when the disk is changed. Any request found with an iotd_Count less than the current change counter value will be returned with a characteristic error (TDERR_DiskChange) in the io_Error field. This allows stale I/O requests to be returned to the user after a disk has been changed. The current disk-change counter value can be obtained by TD_CHANGENUM. If the user wants enhanced disk I/O but does not care about disk removal, then iotd_Count may be set to the maximum unsigned long integer value (0xFFFFFFFF).
+</p><p>The iotd_SecLabel field allows access to the sector identification section of the sector header. Each sector has 16 bytes of descriptive data space available to it; the trackdisk device does not interpret this data. If iotd_SecLabel is NULL, then this descriptive data is ignored. If it is not NULL, then iotd_SecLabel should point to a series of contiguous 16-byte chunks (one for each sector that is to be read or written). These chunks will be written out to the sector’s label region on a write or filled with the sector’s label area on a read. If a CMD_WRITE (the standard write call) is done, then the sector label area is left unchanged.
+</p>
+<h3><span class="mw-headline" id="About_Amiga_Floppy_Disks">About Amiga Floppy Disks</span></h3>
+<p>The standard 3.5 inch Amiga floppy disk consists of a number of tracks that are NUMSECS (11) sectors of TD_SECTOR (512) usable data bytes plus TD_LABELSIZE (16) bytes of label area. There are usually 2 tracks per cylinder (2 heads) and 80 cylinders per disk. The number of tracks can be found using the TD_GETNUMTRACKS command.
+</p><p>The NUMSECS in some drives may be variable and may change when a disk is inserted. Use TD_GETGEOMETRY to determine the current number of sectors.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Think Tracks not Cylinders
+</th></tr>
+<tr>
+<td>The result is given in tracks and not cylinders. On a standard 3.5&quot; drive, this gives useful space of 880K bytes plus 28K bytes of sector label area per floppy disk.
+</td></tr></tbody></table>
+<p>Although the disk is logically divided up into sectors, all I/O to the disk is done a track at a time. This allows access to the drive with no interleaving and increases the useful storage capacity by about 20 percent. Each disk drive on the system has its own buffer which holds the track data going to and from the drive.
+</p><p>Normally, a read of a sector will only have to copy the data from the track buffer. If the track buffer contains another track’s data, then the buffer will first be written back to the disk (if it is “dirty”) and the new track will be read in. All track boundaries are transparent to the programmer (except for FORMAT, SEEK, and RAWREAD/RAWWRITE commands) because you give the device an offset into the disk in the number of bytes from the start of the disk. The device ensures that the correct track is brought into memory.
+</p><p>The performance of the disk is greatly enhanced if you make effective use of the track buffer. The performance of sequential reads will be up to an order of magnitude greater than reads scattered across the disk. In addition, only full-sector writes on sector boundaries are supported.
+</p><p>The trackdisk device is based upon a standard device structure. It has the following restrictions:
+</p>
+<ul><li>All reads and writes must use an io_Length that is an integer multiple of TD_SECTOR bytes (the sector size in bytes).</li>
+<li>The offset field must be an integer multiple of TD_SECTOR.</li>
+<li>The data buffer must be word-aligned.</li></ul>
+<h3><span class="mw-headline" id="Opening_the_Trackdisk_Device">Opening the Trackdisk Device</span></h3>
+<p>Three primary steps are required to open the trackdisk device:
+</p>
+<ul><li>Create a message port by calling CreatePort(). Reply messages from the device must be directed to a message port.</li>
+<li>Create an extended I/O request structure of type IOExtTD. The IOExtTD structure is created by the CreateExtIO() function.</li>
+<li>Open the trackdisk device. Call OpenDevice(), passing it the extended I/O request.</li></ul>
+<p>For the trackdisk device, the flags parameter of the OpenDevice() function specifies whether you are opening a 3.5’’ drive (flags=0) or a 5.25’’ drive (flags=1). With flags set to 0 trackdisk will only open a 3.5’’ drive. To tell the device to open any drive it understands, set the flags parameter to TDF_ALLOW_NON_3_5. (See the include file devices/trackdisk.h for more information.)
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;devices/trackdisk.h&gt;</span>
+<span class="linenos" data-line="2"></span>
+<span class="linenos" data-line="3"></span><span class="k">struct</span><span class="w"> </span><span class="nc">MsgPort</span><span class="w"> </span><span class="o">*</span><span class="n">TrackMP</span><span class="p">;</span><span class="w">         </span><span class="cm">/* Pointer for message port */</span>
+<span class="linenos" data-line="4"></span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">TrackIO</span><span class="p">;</span><span class="w">         </span><span class="cm">/* Pointer for IORequest */</span>
+<span class="linenos" data-line="5"></span>
+<span class="linenos" data-line="6"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">TrackMP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AllocSysObjectTags</span><span class="p">(</span><span class="n">ASOT_PORT</span><span class="p">,</span><span class="w"> </span><span class="n">TAG_END</span><span class="p">))</span>
+<span class="linenos" data-line="7"></span><span class="p">{</span>
+<span class="linenos" data-line="8"></span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">TrackIO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="p">)</span>
+<span class="linenos" data-line="9"></span><span class="w">           </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AllocSysObjectTags</span><span class="p">(</span><span class="n">ASOT_IOREQUEST</span><span class="p">,</span>
+<span class="linenos" data-line="10"></span><span class="w">               </span><span class="n">ASOIOR_ReplyPort</span><span class="p">,</span><span class="w"> </span><span class="n">TrackMP</span><span class="p">,</span>
+<span class="linenos" data-line="11"></span><span class="w">               </span><span class="n">ASOIOR_Size</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="p">),</span>
+<span class="linenos" data-line="12"></span><span class="w">               </span><span class="n">TAG_END</span><span class="p">))</span>
+<span class="linenos" data-line="13"></span><span class="w">    </span><span class="p">{</span>
+<span class="linenos" data-line="14"></span><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">OpenDevice</span><span class="p">(</span><span class="n">TD_NAME</span><span class="p">,</span><span class="mf">0L</span><span class="p">,(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">TrackIO</span><span class="p">,</span><span class="n">Flags</span><span class="p">))</span>
+<span class="linenos" data-line="15"></span><span class="w">        </span><span class="p">{</span>
+<span class="linenos" data-line="16"></span><span class="w">            </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;%s did not open</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">TD_NAME</span><span class="p">);</span>
+</pre></div>
+<table class="wikitable">
+<tbody><tr>
+<th>Disk Drive Unit Numbers
+</th></tr>
+<tr>
+<td>The unit number—second parameter of the OpenDevice() call—can be any value from 0 to 3. Unit 0 is the built-in 3.5’’ disk drive. Units 1 through 3 represent additional disk drives that may be connected to an Amiga system.
+</td></tr></tbody></table>
+<h3><span class="mw-headline" id="Reading_from_the_Trackdisk_Device">Reading from the Trackdisk Device</span></h3>
+<p>You read from the trackdisk device by passing an IOExtTD to the device with CMD_READ set in io_Command, the number of bytes to be read set in io_Length, the address of the read buffer set in io_Data and the track you want to read—specified as a byte offset from the start of the disk—set in io_Offset.
+</p><p>The byte offset of a particular track is calculated by multiplying the number of the track you want to read by the number of bytes in a track. The number of bytes in a track is obtained by multiplying the number of sectors (NUMSECS) by the number of bytes per sector (TD_SECTOR). Thus you would multiply 11 by 512 to get 5632 bytes per track. To read track 15, you would multiply 15 by 5632 giving 84,480 bytes offset from the beginning of the disk.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cp">#define TRACK_SIZE ((int32) (NUMSECS * TD_SECTOR))</span>
+<span class="linenos" data-line="2"></span><span class="n">uint8</span><span class="w"> </span><span class="o">*</span><span class="n">Readbuffer</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span>
+<span class="linenos" data-line="4"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Readbuffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AllocVecTags</span><span class="p">(</span><span class="n">TRACK_SIZE</span><span class="p">,</span><span class="w"> </span><span class="n">AVT_ClearWithValue</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">TAG_END</span><span class="p">))</span>
+<span class="linenos" data-line="5"></span><span class="p">{</span>
+<span class="linenos" data-line="6"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">TRACK_SIZE</span><span class="p">;</span>
+<span class="linenos" data-line="7"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">Readbuffer</span><span class="p">;</span>
+<span class="linenos" data-line="8"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="9"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CMD_READ</span><span class="p">;</span>
+<span class="linenos" data-line="10"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+<span class="linenos" data-line="11"></span><span class="p">}</span>
+</pre></div>
+<p>For reads using the enhanced read command ETD_READ, the IOExtTD is set the same as above with the addition of setting iotd_Count to the current diskchange number. The diskchange number is returned by the TD_CHANGENUM command (see below). If you wish to also read the sector label area, you must set iotd_SecLabel to a non-NULL value.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">TRACK_SIZE</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">Readbuffer</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="4"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Count</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">change_count</span><span class="p">;</span>
+<span class="linenos" data-line="5"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ETD_READ</span><span class="p">;</span>
+<span class="linenos" data-line="6"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<p>ETD_READ and CMD_READ obey all of the trackdisk device restrictions noted above. They transfer data from the track buffer to the user’s buffer. If the desired sector is already in the track buffer, no disk activity is initiated. If the desired sector is not in the buffer, the track containing that sector is automatically read in. If the data in the current track buffer has been modified, it is written out to the disk before a new track is read.
+</p>
+<h3><span class="mw-headline" id="Writing_to_the_Trackdisk_Device">Writing to the Trackdisk Device</span></h3>
+<p>You write to the trackdisk device by passing an IOExtTD to the device with CMD_WRITE set in io_Command, the number of bytes to be written set in io_Length, the address of the write buffer set in io_Data and the track you want to write—specified as a byte offset from the start of the disk—set in io_Offset.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cp">#define TRACK_SIZE ((int32) (NUMSECS * TD_SECTOR))</span>
+<span class="linenos" data-line="2"></span><span class="n">uint8</span><span class="w"> </span><span class="o">*</span><span class="n">Writebuffer</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span>
+<span class="linenos" data-line="4"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Writebuffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AllocVecTags</span><span class="p">(</span><span class="n">TRACK_SIZE</span><span class="p">,</span><span class="w"> </span><span class="n">AVT_ClearWithValue</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">TAG_END</span><span class="p">))</span>
+<span class="linenos" data-line="5"></span><span class="p">{</span>
+<span class="linenos" data-line="6"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">TRACK_SIZE</span><span class="p">;</span>
+<span class="linenos" data-line="7"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">Writebuffer</span><span class="p">;</span>
+<span class="linenos" data-line="8"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tracknum</span><span class="p">);</span>
+<span class="linenos" data-line="9"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CMD_WRITE</span><span class="p">;</span>
+<span class="linenos" data-line="10"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+<span class="linenos" data-line="11"></span><span class="p">}</span>
+</pre></div>
+<p>For writes using the enhanced write command ETD_WRITE, the IOExtTD is set the same as above with the addition of setting iotd_Count to the current diskchange number. The diskchange number is returned by the TD_CHANGENUM command (see below). If you wish to also write the sector label area, you must set iotd_SecLabel to a non-NULL value.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">TRACK_SIZE</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">Writebuffer</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tracknum</span><span class="p">);</span>
+<span class="linenos" data-line="4"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Count</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">change_count</span><span class="p">;</span>
+<span class="linenos" data-line="5"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ETD_WRITE</span><span class="p">;</span>
+<span class="linenos" data-line="6"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<p>ETD_WRITE and CMD_WRITE obey all of the trackdisk device restrictions noted above. They transfer data from the user’s buffer to the track buffer. If the track that contains this sector is already in the track buffer, no disk activity is initiated. If the desired sector is not in the buffer, the track containing that sector is automatically read in. If the data in the current track buffer has been modified, it is written out to the disk before a new track is read in for modification.
+</p>
+<h3><span class="mw-headline" id="Closing_the_Trackdisk_Device">Closing the Trackdisk Device</span></h3>
+<p>As with all devices, you <i>must</i> close the trackdisk device when you have finished using it. To release the device, a CloseDevice() call is executed with the same IOExtTD used when the device was opened. This only closes the device and makes it available to the rest of the system. It does <b>not</b> deallocate the IOExtTD structure.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">CloseDevice</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<h2><span class="mw-headline" id="Advanced_Commands">Advanced Commands</span></h2>
+<h3><span class="mw-headline" id="Determining_the_Drive_Geometry_Table">Determining the Drive Geometry Table</span></h3>
+<p>The layout geometry of a disk drive can be determined by using the TD_GETGEOMETRY command. The layout can be defined three ways:
+</p>
+<ul><li>TotalSectors</li>
+<li>Cylinders and CylSectors</li>
+<li>Cylinders, Heads, and TrackSectors</li></ul>
+<p>Of the three, TotalSectors is the most accurate, Cylinders and CylSectors is less so, and Cylinders, Heads and TrackSectors is the least accurate. All are usable, though the last two may waste some portion of the available space on some drives.
+</p><p>The TD_GETGEOMETRY commands returns the disk layout geometry in a DriveGeometry structure:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="k">struct</span><span class="w"> </span><span class="nc">DriveGeometry</span>
+<span class="linenos" data-line="2"></span><span class="p">{</span>
+<span class="linenos" data-line="3"></span><span class="w">    </span><span class="n">ULONG</span><span class="w"> </span><span class="n">dg_SectorSize</span><span class="p">;</span><span class="w">        </span><span class="cm">/* in bytes */</span>
+<span class="linenos" data-line="4"></span><span class="w">    </span><span class="n">ULONG</span><span class="w"> </span><span class="n">dg_TotalSectors</span><span class="p">;</span><span class="w">      </span><span class="cm">/* total # of sectors on drive */</span>
+<span class="linenos" data-line="5"></span><span class="w">    </span><span class="n">ULONG</span><span class="w"> </span><span class="n">dg_Cylinders</span><span class="p">;</span><span class="w">         </span><span class="cm">/* number of cylinders */</span>
+<span class="linenos" data-line="6"></span><span class="w">    </span><span class="n">ULONG</span><span class="w"> </span><span class="n">dg_CylSectors</span><span class="p">;</span><span class="w">        </span><span class="cm">/* number of sectors/cylinder */</span>
+<span class="linenos" data-line="7"></span><span class="w">    </span><span class="n">ULONG</span><span class="w"> </span><span class="n">dg_Heads</span><span class="p">;</span><span class="w">             </span><span class="cm">/* number of surfaces */</span>
+<span class="linenos" data-line="8"></span><span class="w">    </span><span class="n">ULONG</span><span class="w"> </span><span class="n">dg_TrackSectors</span><span class="p">;</span><span class="w">      </span><span class="cm">/* number of sectors/track */</span>
+<span class="linenos" data-line="9"></span><span class="w">    </span><span class="n">ULONG</span><span class="w"> </span><span class="n">dg_BufMemType</span><span class="p">;</span><span class="w">        </span><span class="cm">/* preferred buffer memory type */</span>
+<span class="linenos" data-line="10"></span><span class="w">                                </span><span class="cm">/* (usually MEMF_PUBLIC) */</span>
+<span class="linenos" data-line="11"></span><span class="w">    </span><span class="n">UBYTE</span><span class="w"> </span><span class="n">dg_DeviceType</span><span class="p">;</span><span class="w">        </span><span class="cm">/* codes as defined in the SCSI-2 spec*/</span>
+<span class="linenos" data-line="12"></span><span class="w">    </span><span class="n">UBYTE</span><span class="w"> </span><span class="n">dg_Flags</span><span class="p">;</span><span class="w">             </span><span class="cm">/* flags, including removable */</span>
+<span class="linenos" data-line="13"></span><span class="w">    </span><span class="n">UWORD</span><span class="w"> </span><span class="n">dg_Reserved</span><span class="p">;</span>
+<span class="linenos" data-line="14"></span><span class="p">};</span>
+</pre></div>
+<p>See the include file devices/trackdisk.h for the complete structure definition and values for the dg_DeviceType and dg_Flags fields.
+</p><p>You determine the drive layout geometry by passing an IOExtTD with TD_GETGEOMETRY set in io_Command and a pointer to a DriveGeometry structure set in io_Data.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="k">struct</span><span class="w"> </span><span class="nc">DriveGeometry</span><span class="w"> </span><span class="o">*</span><span class="n">Euclid</span><span class="w"> </span><span class="o">=</span>
+<span class="linenos" data-line="2"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AllocVecTags</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">DriveGeometry</span><span class="p">),</span>
+<span class="linenos" data-line="3"></span><span class="w">        </span><span class="n">AVT_Type</span><span class="p">,</span><span class="w"> </span><span class="n">MEMF_SHARED</span><span class="p">,</span>
+<span class="linenos" data-line="4"></span><span class="w">        </span><span class="n">AVT_ClearWithValue</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="linenos" data-line="5"></span><span class="w">        </span><span class="n">TAG_END</span><span class="p">);</span>
+<span class="linenos" data-line="6"></span>
+<span class="linenos" data-line="7"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Euclid</span><span class="p">;</span><span class="w">     </span><span class="cm">/* put layout geometry here */</span>
+<span class="linenos" data-line="8"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_GETGEOMETRY</span><span class="p">;</span>
+<span class="linenos" data-line="9"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<p>TD_GETGEOMETRY is preferred over TD_GETNUMTRACKS for determining the number of tracks on a disk. This is because new drive types may have more sectors or different sector sizes, etc., than standard Amiga drives.
+</p>
+<h3><span class="mw-headline" id="Clearing_the_Track_Buffer">Clearing the Track Buffer</span></h3>
+<p>ETD_CLEAR and CMD_CLEAR mark the track buffer as invalid, forcing a reread of the disk on the next operation. ETD_UPDATE or CMD_UPDATE would be used to force data out to the disk before turning the motor off. ETD_CLEAR or CMD_CLEAR is usually used after having locked out the trackdisk device via the use of the disk resource, when you wish to prevent the track from being updated, or when you wish to force the track to be re-read. ETD_CLEAR or CMD_CLEAR will not do an update, nor will an update command do a clear.
+</p><p>You clear the track buffer by passing an IOExtTD to the device with CMD_CLEAR or ETD_CLEAR set in io_Command. For ETD_CLEAR, you must also set iotd_Count to the current diskchange number.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_CLEAR</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<h3><span class="mw-headline" id="Controlling_the_Drive_Motor">Controlling the Drive Motor</span></h3>
+<p>ETD_MOTOR and TD_MOTOR give you control of the motor. When the trackdisk device executes this command, the old state of the motor is returned in io_Actual. If io_Actual is zero, then the motor was off. Any other value implies that the motor was on. If the motor is just being turned on, the device will delay the proper amount of time to allow the drive to come up to speed. Normally, turning the drive on is not necessary—the device does this automatically if it receives a request when the motor is off.
+</p><p>However, turning the motor off <i>is</i> the programmer’s responsibility. In addition, the standard instructions to the user are that it is safe to remove a disk if, and only if, the motor is off (that is, if the disk light is off).
+</p><p>You control the drive motor by passing an IOExtTD to the device with CMD_MOTOR or ETD_MOTOR set in io_Command and the state you want to put the motor in set in io_Length. If io_Length is set to 1, the trackdisk device will turn on the motor; a 0 will turn it off. For ETD_MOTOR, you must also set iotd_Count to the current diskchange number.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">          </span><span class="cm">/* Turn on the drive motor */</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_MOTOR</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<h3><span class="mw-headline" id="Updating_a_Track_Sector">Updating a Track Sector</span></h3>
+<p>The Amiga trackdisk device does not write data sectors unless it is necessary (you request that a different track be used) or until the user requests that an update be performed. This improves system speed by caching disk operations. The update commands ensure that any buffered data is flushed out to the disk. If the track buffer has not been changed since the track was read in, the update commands do nothing.
+</p><p>You update a data sector by passing an IOExtTD to the device with CMD_UPDATE or ETD_UPDATE set in io_Command. For ETD_UPDATE, you must also set iotd_Count to the current diskchange number.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_UPDATE</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<h3><span class="mw-headline" id="Formatting_a_Track">Formatting a Track</span></h3>
+<p>ETD_FORMAT and TD_FORMAT are used to write data to a track that either has not yet been formatted or has had a hard error on a standard write command. TD_FORMAT completely ignores all data currently on a track and does not check for disk change before performing the command. The device will format the requested tracks, filling each sector with the contents of the buffer pointed to by io_Data field. You should do a read pass to verify the data.
+</p><p>If you have a hard write error during a normal write, you may find it possible to use the TD_FORMAT command to reformat the track as part of your error recovery process. ETD_FORMAT will write the sector label area if the iotd_SecLabel is non-NULL.
+</p><p>You format a track by passing an IOExtTD to the device with CMD_FORMAT or ETD_FORMAT set in io_Command, io_Data set to at least track worth of data, io_Offset field set to the byte offset of the track you want to write and the io_Length set to the length of a track. For ETD_FORMAT, you must also set iotd_Count to the current diskchange number.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cp">#define TRACK_SIZE (NUMSECS * TD_SECTOR)</span>
+<span class="linenos" data-line="2"></span><span class="n">uint8</span><span class="w"> </span><span class="o">*</span><span class="n">Writebuffer</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span>
+<span class="linenos" data-line="4"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">WriteBuffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AllocVecTags</span><span class="p">(</span><span class="n">TRACK_SIZE</span><span class="p">,</span><span class="w"> </span><span class="n">AVT_Type</span><span class="p">,</span><span class="w"> </span><span class="n">MEMF_SHARED</span><span class="p">,</span><span class="w"> </span><span class="n">AVT_ClearWithValue</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">TAG_END</span><span class="p">))</span>
+<span class="linenos" data-line="5"></span><span class="w">    </span><span class="p">{</span>
+<span class="linenos" data-line="6"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">TRACK_SIZE</span><span class="p">;</span>
+<span class="linenos" data-line="7"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="w">    </span><span class="o">=</span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">Writebuffer</span><span class="p">;</span>
+<span class="linenos" data-line="8"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="w">  </span><span class="o">=</span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="9"></span><span class="w">    </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_FORMAT</span><span class="p">;</span>
+<span class="linenos" data-line="10"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+<span class="linenos" data-line="11"></span><span class="w">    </span><span class="p">}</span>
+</pre></div>
+<h3><span class="mw-headline" id="Ejecting_a_Disk">Ejecting a Disk</span></h3>
+<p>Certain disk drive manufacturers allow software control of disk ejection. The trackdisk device provides the TD_EJECT command to tell such drives to eject a disk.
+</p><p>You eject a disk by passing an IOExtTD to the device with TD_EJECT set in io_Command.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_EJECT</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<table class="wikitable">
+<tbody><tr>
+<th>Read the Instruction Manual
+</th></tr>
+<tr>
+<td>The 3.5’’ drives for the Amiga and most other Amiga drive manufacturers do not support software disk ejects. Attempting this command on those drives will result in an error condition. Consult the instruction manual for your disk drive to determine whether this is supported.
+</td></tr></tbody></table>
+<h2><span class="mw-headline" id="Disk_Status_Commands">Disk Status Commands</span></h2>
+<p>Disk status commands return status on the current disk in the opened unit. These commands may be done with quick I/O and thus may be called within interrupt handlers (such as the trackdisk disk change handler). See <a href="/wiki/Exec_Device_I/O" title="Exec Device I/O">Exec Device I/O</a> for more detailed information on quick I/O.
+</p>
+<h3><span class="mw-headline" id="Determining_the_Presence_of_a_Disk">Determining the Presence of a Disk</span></h3>
+<p>You determine the presence of a disk in a drive by passing an IOExtTD to the device with TD_CHANGESTATE set in io_Command. For quick I/O, you must set io_Flags to IOF_QUICK.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IOF_QUICK</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_CHANGESTATE</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">BeginIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<p>TD_CHANGESTATE returns the presence indicator of a disk in io_Actual. The value returned will be zero if a disk is currently in the drive and nonzero if the drive has no disk.
+</p>
+<h3><span class="mw-headline" id="Determining_the_Write-Protect_Status_of_a_Disk">Determining the Write-Protect Status of a Disk</span></h3>
+<p>You determine the write-protect status of a disk by passing an IOExtTD to the device with TD_PROTSTATUS set in io_Command. For quick I/O, you must set io_Flags to IOF_QUICK.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IOF_QUICK</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_PROTSTATUS</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">BeginIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<p>TD_PROTSTATUS returns the write-protect status in io_Actual. The value will be zero if the disk is not write-protected and nonzero if the disk is write-protected.
+</p>
+<h3><span class="mw-headline" id="Determining_the_Drive_Type">Determining the Drive Type</span></h3>
+<p>You determine the drive type of a unit by passing an IOExtTD to the device with TD_GETDRIVETYPE set in io_Command. For quick I/O, you must set io_Flags to IOF_QUICK.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IOF_QUICK</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_GETDRIVETYPE</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">BeginIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<p>TD_GETDRIVETYPE returns the drive type for the unit that was opened in io_Actual. The value will be DRIVE3_5 for 3.5’’ drives and DRIVE5_25 for 5.25’’ drives. The unit can be opened only if the device understands the drive type it is connected to.
+</p>
+<h3><span class="mw-headline" id="Determining_the_Number_of_Tracks_of_a_Drive">Determining the Number of Tracks of a Drive</span></h3>
+<p>You determine the number of a tracks of a drive by passing an IOExtTD to the device with TD_GETNUMTRACKS set in io_Command. For quick I/O, you must set io_Flags to IOF_QUICK.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IOF_QUICK</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_GETNUMTRACKS</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">BeginIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<p>TD_GETNUMTRACKS returns the number of tracks on that device in io_Actual. This is the number of tracks of TD_SECTOR * NUMSECS size. It is not the number of cylinders. With two heads, the number of cylinders is half of the number of tracks. The number of cylinders is equal to the number of tracks divided by the number of heads (surfaces). The standard 3.5’’ Amiga drive has two heads
+</p><p>TD_GETGEOMETRY is the preferred over TD_GETNUMTRACKS especially since new drive types may have more sectors or different sector sizes, etc., than standard Amiga drives.
+</p>
+<h3><span class="mw-headline" id="Determining_the_Current_Diskchange_Number">Determining the Current Diskchange Number</span></h3>
+<p>You determine the current diskchange number of a disk by passing an IOExtTD to the device with TD_CHANGENUM set in io_Command. For quick I/O, you must set io_Flags to IOF_QUICK.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IOF_QUICK</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_CHANGENUM</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">BeginIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<p>TD_CHANGENUM returns the current value of the diskchange counter (as used by the enhanced commands) in io_Actual. The disk change counter is incremented each time the disk is inserted or removed.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IOF_QUICK</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_CHANGENUM</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">BeginIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+<span class="linenos" data-line="4"></span><span class="n">uint32</span><span class="w"> </span><span class="n">change_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Actual</span><span class="p">;</span><span class="w">   </span><span class="cm">/* store current diskchange value */</span>
+<span class="linenos" data-line="5"></span>
+<span class="linenos" data-line="6"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">          </span><span class="cm">/* Turn on the drive motor */</span>
+<span class="linenos" data-line="7"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">change_count</span><span class="p">;</span>
+<span class="linenos" data-line="8"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ETD_MOTOR</span><span class="p">;</span>
+<span class="linenos" data-line="9"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<h2><span class="mw-headline" id="Commands_for_Diagnostics_and_Repair">Commands for Diagnostics and Repair</span></h2>
+<p>The trackdisk device provides commands to move the drive heads to a specific track. These commands are provided for internal diagnostics, disk repair, and head cleaning only.
+</p>
+<h3><span class="mw-headline" id="Moving_the_Drive_Head_to_a_Specific_Track">Moving the Drive Head to a Specific Track</span></h3>
+<p>You move the drive head to a specific track by passing an IOExtTD to the device with TD_SEEK or ETD_SEEK set in io_Command, and io_Offset set to the byte offset of the track to which the seek is to occur.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_SEEK</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<table class="wikitable">
+<tbody><tr>
+<th>Seeking is not Reading
+</th></tr>
+<tr>
+<td>TD_SEEK and ETD_SEEK do not verify their position until the next read. That is, they only move the heads; they do not actually read any data.
+</td></tr></tbody></table>
+<h2><span class="mw-headline" id="Notification_of_Disk_Changes">Notification of Disk Changes</span></h2>
+<p>Many programs will wish to be notified if the user has changed the disk in the active drive. While this can be done via the Intuition DISKREMOVED and DISKINSERTED messages, sometimes more tightly controlled testing is required. The trackdisk device provides commands to initiate interrupt processing when disks change.
+</p><p>Those implementing their own disk change notification support in a file system or device driver should review <a href="/wiki/Supporting_Disk_Change_Events" title="Supporting Disk Change Events">Supporting Disk Change Events</a>.
+</p>
+<h3><span class="mw-headline" id="Adding_a_Diskchange_Software_Interrupt_Handler">Adding a Diskchange Software Interrupt Handler</span></h3>
+<p>The trackdisk device lets you add a software interrupt handler that will be Cause()’ed when a disk insert or remove occurs. Within the handler, you may only call the status commands that can use IOF_QUICK.
+</p><p>You add a software interrupt handler by passing an IOExtTD to the device with a pointer to an Interrupt structure set in io_Data, the length of the structure set in io_Length and TD_ADDCHANGEINT set in io_Command.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">Interrupt</span><span class="p">)</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">Disk_Interrupt</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_ADDCHANGEINT</span><span class="p">;</span>
+<span class="linenos" data-line="4"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">SendIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<table class="wikitable">
+<tbody><tr>
+<th>Going, going, gone
+</th></tr>
+<tr>
+<td>This command does <i>not</i> return when executed. It holds onto the IORequest until the TD_REMCHANGEINT command is executed with that same IORequest. Hence, you must use SendIO() with this command.
+</td></tr></tbody></table>
+<h3><span class="mw-headline" id="Removing_a_Diskchange_Software_Interrupt_Handler">Removing a Diskchange Software Interrupt Handler</span></h3>
+<p>You remove a software interrupt handler by passing the same IOExtTD to the device you used with TD_ADDCHANGEINT but with the io_Command set to TD_REMCHANGEINT. You <i>must</i> pass it the same Interrupt structure used to add the handler.
+</p><p>For maximum compatibility, when you remove the change interrupt handler with the TD_REMCHANGEINT command you must make sure that the TD_ADDCHANGEINT command was successful, and if not, then you will have to remove the IOExtTD as shown below:
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_REMCHANGEINT</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+<span class="linenos" data-line="3"></span>
+<span class="linenos" data-line="4"></span><span class="cm">/* Was the TD_ADDCHANGEINT command successful? */</span>
+<span class="linenos" data-line="5"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">CheckIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span>
+<span class="linenos" data-line="6"></span><span class="p">{</span>
+<span class="linenos" data-line="7"></span><span class="w">   </span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TD_REMCHANGEINT</span><span class="p">;</span>
+<span class="linenos" data-line="8"></span><span class="w">   </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+<span class="linenos" data-line="9"></span><span class="p">}</span>
+<span class="linenos" data-line="10"></span><span class="k">else</span>
+<span class="linenos" data-line="11"></span><span class="p">{</span>
+<span class="linenos" data-line="12"></span><span class="w">   </span><span class="cm">/* The TD_ADDCHANGEINT command was not successful and has been rejected. */</span>
+<span class="linenos" data-line="13"></span><span class="w">   </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">WaitIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+<span class="linenos" data-line="14"></span><span class="p">}</span>
+</pre></div>
+<h2><span class="mw-headline" id="Commands_for_Low-Level_Access">Commands for Low-Level Access</span></h2>
+<p>The trackdisk device provides commands to read and write raw flux changes on the disk. The data returned from a low-level read or sent via a low-level write should be encoded into some form of legal flux patterns. See the <i>Amiga Hardware Reference Manual</i> and books on magnetic media recording and reading.
+</p>
+<h3><span class="mw-headline" id="Reading_Raw_Data_from_a_Disk">Reading Raw Data from a Disk</span></h3>
+<p>ETD_RAWREAD and TD_RAWREAD perform a raw read from a track on the disk. They seek to the specified track and read it into the user’s buffer.
+</p><p><i>No processing of the track is done.</i>
+</p><p>It will appear exactly as the bits come off the disk – typically in some legal flux format (such as MFM, FM, GCR, etc; if you don’t know what these are, you shouldn’t be using this call). Caveat programmer.
+</p><p>This interface is intended for sophisticated programming only. You must fully understand digital magnetic recording to be able to utilize this call. It is also important that you understand that the MFM encoding scheme used by the higher level trackdisk routines may change without notice. Thus, this routine is only really useful for reading and decoding other disks such as MS-DOS formatted disks.
+</p><p>You read raw data from a disk by passing an IOExtTD to the device with TD_RAWREAD or ETD_RAWREAD set in io_Command, the number of bytes to be read set in io_Length (maximum 32K), a pointer to the read buffer set in io_Data, and io_Offset set to the byte offset of the track where you want to the read to begin. For ETD_RAWREAD, you must also set iotd_Count to the current diskchange number.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">1024</span><span class="p">;</span><span class="w">             </span><span class="cm">/* number of bytes to read */</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">Readbuffer</span><span class="p">;</span><span class="w"> </span><span class="cm">/* pointer to buffer */</span>
+<span class="linenos" data-line="3"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">track</span><span class="p">);</span><span class="w"> </span><span class="cm">/* track number */</span>
+<span class="linenos" data-line="4"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Flags</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">IOTDF_INDEX</span><span class="w">       </span><span class="cm">/* Set for index sync */</span>
+<span class="linenos" data-line="5"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Count</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">change_count</span><span class="p">;</span><span class="w">     </span><span class="cm">/* diskchange number */</span>
+<span class="linenos" data-line="6"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ETD_RAWREAD</span><span class="p">;</span>
+<span class="linenos" data-line="7"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<p>A raw read may be synched with the index pulse by setting the IOTDF_INDEXSYNC flag or synched with a $4489 sync pattern by setting the IOTDF_WORDSYNC flag. See the <a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/trackdisk.doc.txt">trackdisk.doc</a> in the SDK for more information about these flags.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Forewarned is Forearmed
+</th></tr>
+<tr>
+<td>The AmigaOS development team may make enhancements to the disk format in the future. The AmigaOS development team intends to provide compatibility within the trackdisk device. Anyone who uses these raw routines is bypassing this upward-compatibility and does so at her own risk.
+</td></tr></tbody></table>
+<h3><span class="mw-headline" id="Writing_Raw_Data_to_a_Disk">Writing Raw Data to a Disk</span></h3>
+<p>ETD_RAWWRITE and TD_RAWWRITE perform a raw write to a track on the disk. They seek to the specified track and write it from the user’s buffer.
+</p><p><i>No processing of the track is done.</i>
+</p><p>It will be written exactly as the bits come out of the buffer – typically in some legal flux format (such as MFM, FM, GCR; if you don’t know what these are, you shouldn’t be using this call). Caveat Programmer.
+</p><p>This interface is intended for sophisticated programming only. You must fully understand digital magnetic recording to be able to utilize this call. It is also important that you understand that the MFM encoding scheme used by the higher level trackdisk routines may change without notice. Thus, this routine is only really useful for encoding and writing other disk formats such as MS-DOS disks.
+</p><p>You write raw data to a disk by passing an IOExtTD to the device with TD_RAWRITE or ETD_RAWRITE set in io_Command, the number of bytes to be written set in io_Length (maximum 32K), a pointer to the write buffer set in io_Data, and io_Offset set to the byte offset of the track where you want to the write to begin. For ETD_RAWWRITE, you must also set iotd_Count to the current diskchange number.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">1024</span><span class="p">;</span><span class="w">              </span><span class="cm">/* number of bytes to write */</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">Writebuffer</span><span class="p">;</span><span class="w"> </span><span class="cm">/* pointer to buffer */</span>
+<span class="linenos" data-line="3"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">track</span><span class="p">);</span><span class="w"> </span><span class="cm">/* track number */</span>
+<span class="linenos" data-line="4"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Flags</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">IOTDF_INDEX</span><span class="w">        </span><span class="cm">/* Set for index sync */</span>
+<span class="linenos" data-line="5"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Count</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">change_count</span><span class="p">;</span><span class="w">      </span><span class="cm">/* diskchange number */</span>
+<span class="linenos" data-line="6"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ETD_RAWWRITE</span><span class="p">;</span>
+<span class="linenos" data-line="7"></span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">);</span>
+</pre></div>
+<p>A raw write may be synched with the index pulse by setting the IOTDF_INDEXSYNC flag or synched with a $4489 sync pattern by setting the IOTDF_WORDSYNC flag. See the <a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/trackdisk.doc.txt">trackdisk.doc</a> in the SDK for more information about these flags.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Beware The Synch On Write
+</th></tr>
+<tr>
+<td>Synch on write will most likely destroy some of the bits following the synch before reliable writing begins. This is due to how the <i>Paula</i> chip implements this feature. Use synch on write very carefully if at all.
+</td></tr></tbody></table>
+<h3><span id="Limitations_for_Sync.E2.80.99ed_Reads_and_Writes"></span><span class="mw-headline" id="Limitations_for_Sync’ed_Reads_and_Writes">Limitations for Sync’ed Reads and Writes</span></h3>
+<p>There is a delay between the index pulse and the start of bits coming in from the drive (e.g. DMA started). It is in the range of 135-200 microseconds. This delay breaks down as follows: 55 microseconds for software interrupt overhead (this is the time from interrupt to the write of the DSKLEN register); 66 microseconds for one horizontal line delay (remember that disk I/O is synchronized with <i>Agnus</i>’ display fetches). The last variable (0-65 microseconds) is an additional scan line since DSKLEN is poked anywhere in the horizontal line. This leaves 15 microseconds unaccounted for. In short, you will almost never get bits within the first 135 microseconds of the index pulse, and may not get it until 200 microseconds. At 4 microsecs/bit, this works out to be between 4 and 7 bytes of user data delay.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th>Forewarned is Forearmed
+</th></tr>
+<tr>
+<td>The AmigaOS development team may make enhancements to the disk format in the future. The AmigaOS development team intends to provide compatibility within the trackdisk device. Anyone who uses these raw routines is bypassing this upward-compatibility and does so at her own risk.
+</td></tr></tbody></table>
+<h2><span class="mw-headline" id="Trackdisk_Device_Errors">Trackdisk Device Errors</span></h2>
+<p>The trackdisk device returns error codes whenever an operation is attempted.
+</p>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">TRACK_SIZE</span><span class="p">;</span>
+<span class="linenos" data-line="2"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">Writebuffer</span><span class="p">;</span>
+<span class="linenos" data-line="3"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tracknum</span><span class="p">);</span>
+<span class="linenos" data-line="4"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Count</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">change_count</span><span class="p">;</span>
+<span class="linenos" data-line="5"></span><span class="n">DiskIO</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ETD_WRITE</span><span class="p">;</span>
+<span class="linenos" data-line="6"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">DiskIO</span><span class="p">))</span>
+<span class="linenos" data-line="7"></span><span class="w">    </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;ETD_WRITE failed.  Error: %ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">DiskIO</span><span class="o">-</span><span class="n">iotd</span><span class="p">.</span><span class="n">io_Error</span><span class="p">);</span>
+</pre></div>
+<p>When an error occurs, these error numbers will be returned in the io_Error field of your IOExtTD block.
+</p>
+<table class="wikitable">
+<caption>Trackdisk Device Error Codes
+</caption>
+<tbody><tr>
+<th>Error
+</th>
+<th>Value
+</th>
+<th>Explanation
+</th></tr>
+<tr>
+<td>TDERR_NotSpecified</td>
+<td>20</td>
+<td>Error could not be determined
+</td></tr>
+<tr>
+<td>TDERR_NoSecHdr</td>
+<td>21</td>
+<td>Could not find sector header
+</td></tr>
+<tr>
+<td>TDERR_BadSecPreamble</td>
+<td>22</td>
+<td>Error in sector preamble
+</td></tr>
+<tr>
+<td>TDERR_BadSecID</td>
+<td>23</td>
+<td>Error in sector identifier
+</td></tr>
+<tr>
+<td>TDERR_BadHdrSum</td>
+<td>24</td>
+<td>Header field has bad checksum
+</td></tr>
+<tr>
+<td>TDERR_BadSecSum</td>
+<td>25</td>
+<td>Sector data field has bad checksum
+</td></tr>
+<tr>
+<td>TDERR_TooFewSecs</td>
+<td>26</td>
+<td>Incorrect number of sectors on track
+</td></tr>
+<tr>
+<td>TDERR_BadSecHdr</td>
+<td>27</td>
+<td>Unable to read sector header
+</td></tr>
+<tr>
+<td>TDERR_WriteProt</td>
+<td>28</td>
+<td>Disk is write-protected
+</td></tr>
+<tr>
+<td>TDERR_DiskChanged</td>
+<td>29</td>
+<td>Disk has been changed or is not currently present
+</td></tr>
+<tr>
+<td>TDERR_SeekError</td>
+<td>30</td>
+<td>While verifying seek position, found seek error
+</td></tr>
+<tr>
+<td>TDERR_NoMem</td>
+<td>31</td>
+<td>Not enough memory to do this operation
+</td></tr>
+<tr>
+<td>TDERR_BadUnitNum</td>
+<td>32</td>
+<td>Bad unit number (unit # not attached)
+</td></tr>
+<tr>
+<td>TDERR_BadDriveType</td>
+<td>33</td>
+<td>Bad drive type (not an Amiga 3.5’’ disk)
+</td></tr>
+<tr>
+<td>TDERR_DriveInUse</td>
+<td>34</td>
+<td>Drive already in use (only one task exclusive)
+</td></tr>
+<tr>
+<td>TDERR_PostReset</td>
+<td>35</td>
+<td>User hit reset; awaiting doom
+</td></tr></tbody></table>
+<h2><span class="mw-headline" id="Example_Trackdisk_Program">Example Trackdisk Program</span></h2>
+<div class="mw-highlight mw-highlight-lang-c mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span></span><span class="linenos" data-line="1"></span><span class="cm">/*</span>
+<span class="linenos" data-line="2"></span><span class="cm"> * Track_Copy.c</span>
+<span class="linenos" data-line="3"></span><span class="cm"> *</span>
+<span class="linenos" data-line="4"></span><span class="cm"> * This program does a track by track copy from one drive to another</span>
+<span class="linenos" data-line="5"></span><span class="cm"> *</span>
+<span class="linenos" data-line="6"></span><span class="cm"> * This program will only run from the CLI.  If started from</span>
+<span class="linenos" data-line="7"></span><span class="cm"> * the workbench, it will just exit...</span>
+<span class="linenos" data-line="8"></span><span class="cm"> *</span>
+<span class="linenos" data-line="9"></span><span class="cm"> * Usage:  trackcopy  dfx dfy</span>
+<span class="linenos" data-line="10"></span><span class="cm"> */</span>
+<span class="linenos" data-line="11"></span>
+<span class="linenos" data-line="12"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;exec/types.h&gt;</span>
+<span class="linenos" data-line="13"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;exec/memory.h&gt;</span>
+<span class="linenos" data-line="14"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;devices/trackdisk.h&gt;</span>
+<span class="linenos" data-line="15"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;dos/dosextens.h&gt;</span>
+<span class="linenos" data-line="16"></span>
+<span class="linenos" data-line="17"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;proto/exec.h&gt;</span>
+<span class="linenos" data-line="18"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;proto/dos.h&gt;</span>
+<span class="linenos" data-line="19"></span>
+<span class="linenos" data-line="20"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="linenos" data-line="21"></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string.h&gt;</span>
+<span class="linenos" data-line="22"></span>
+<span class="linenos" data-line="23"></span>
+<span class="linenos" data-line="24"></span><span class="cp">#define TRACK_SIZE      ((int32)(NUMSECS * TD_SECTOR))</span>
+<span class="linenos" data-line="25"></span>
+<span class="linenos" data-line="26"></span>
+<span class="linenos" data-line="27"></span><span class="cm">/*</span>
+<span class="linenos" data-line="28"></span><span class="cm"> * Turn the BUSY flag off/on for the drive</span>
+<span class="linenos" data-line="29"></span><span class="cm"> * If onflag is TRUE, the disk will be marked as busy...</span>
+<span class="linenos" data-line="30"></span><span class="cm"> *</span>
+<span class="linenos" data-line="31"></span><span class="cm"> * This is to stop the validator from executing while</span>
+<span class="linenos" data-line="32"></span><span class="cm"> * we are playing with the disks.</span>
+<span class="linenos" data-line="33"></span><span class="cm"> */</span>
+<span class="linenos" data-line="34"></span><span class="n">VOID</span><span class="w"> </span><span class="nf">disk_busy</span><span class="p">(</span><span class="n">CONST_STRPTR</span><span class="w"> </span><span class="n">drive</span><span class="p">,</span><span class="w"> </span><span class="n">int32</span><span class="w"> </span><span class="n">onflag</span><span class="p">)</span>
+<span class="linenos" data-line="35"></span><span class="p">{</span>
+<span class="linenos" data-line="36"></span><span class="w">    </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Inhibit</span><span class="p">(</span><span class="n">drive</span><span class="p">,</span><span class="w"> </span><span class="n">onflag</span><span class="p">);</span>
+<span class="linenos" data-line="37"></span><span class="p">}</span>
+<span class="linenos" data-line="38"></span>
+<span class="linenos" data-line="39"></span>
+<span class="linenos" data-line="40"></span><span class="cm">/*</span>
+<span class="linenos" data-line="41"></span><span class="cm"> * This turns the motor off</span>
+<span class="linenos" data-line="42"></span><span class="cm"> */</span>
+<span class="linenos" data-line="43"></span><span class="n">VOID</span><span class="w"> </span><span class="nf">Motor_Off</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">disk</span><span class="p">)</span>
+<span class="linenos" data-line="44"></span><span class="p">{</span>
+<span class="linenos" data-line="45"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos" data-line="46"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="o">=</span><span class="n">TD_MOTOR</span><span class="p">;</span>
+<span class="linenos" data-line="47"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">disk</span><span class="p">);</span>
+<span class="linenos" data-line="48"></span><span class="p">}</span>
+<span class="linenos" data-line="49"></span>
+<span class="linenos" data-line="50"></span>
+<span class="linenos" data-line="51"></span><span class="cm">/*</span>
+<span class="linenos" data-line="52"></span><span class="cm"> * This turns the motor on</span>
+<span class="linenos" data-line="53"></span><span class="cm"> */</span>
+<span class="linenos" data-line="54"></span><span class="n">VOID</span><span class="w">    </span><span class="nf">Motor_On</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">disk</span><span class="p">)</span>
+<span class="linenos" data-line="55"></span><span class="p">{</span>
+<span class="linenos" data-line="56"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="linenos" data-line="57"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="o">=</span><span class="n">TD_MOTOR</span><span class="p">;</span>
+<span class="linenos" data-line="58"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">disk</span><span class="p">);</span>
+<span class="linenos" data-line="59"></span><span class="p">}</span>
+<span class="linenos" data-line="60"></span>
+<span class="linenos" data-line="61"></span>
+<span class="linenos" data-line="62"></span><span class="cm">/*</span>
+<span class="linenos" data-line="63"></span><span class="cm"> * This reads a track, reporting any errors...</span>
+<span class="linenos" data-line="64"></span><span class="cm"> */</span>
+<span class="linenos" data-line="65"></span>
+<span class="linenos" data-line="66"></span><span class="n">int16</span><span class="w"> </span><span class="nf">Read_Track</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">disk</span><span class="p">,</span><span class="n">UBYTE</span><span class="w"> </span><span class="o">*</span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="n">int16</span><span class="w"> </span><span class="n">track</span><span class="p">)</span>
+<span class="linenos" data-line="67"></span><span class="p">{</span>
+<span class="linenos" data-line="68"></span><span class="n">int16</span><span class="w"> </span><span class="n">All_OK</span><span class="o">=</span><span class="n">TRUE</span><span class="p">;</span>
+<span class="linenos" data-line="69"></span>
+<span class="linenos" data-line="70"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="o">=</span><span class="n">TRACK_SIZE</span><span class="p">;</span>
+<span class="linenos" data-line="71"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="o">=</span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">buffer</span><span class="p">;</span>
+<span class="linenos" data-line="72"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="o">=</span><span class="n">CMD_READ</span><span class="p">;</span>
+<span class="linenos" data-line="73"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="o">=</span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="74"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">disk</span><span class="p">);</span>
+<span class="linenos" data-line="75"></span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Error</span><span class="p">)</span>
+<span class="linenos" data-line="76"></span><span class="w">    </span><span class="p">{</span>
+<span class="linenos" data-line="77"></span><span class="w">        </span><span class="n">All_OK</span><span class="o">=</span><span class="n">FALSE</span><span class="p">;</span>
+<span class="linenos" data-line="78"></span><span class="w">        </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;Error %lu when reading track %ld&quot;</span><span class="p">,</span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Error</span><span class="p">,</span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="79"></span><span class="w">    </span><span class="p">}</span>
+<span class="linenos" data-line="80"></span><span class="w">    </span><span class="k">return</span><span class="p">(</span><span class="n">All_OK</span><span class="p">);</span>
+<span class="linenos" data-line="81"></span><span class="p">}</span>
+<span class="linenos" data-line="82"></span>
+<span class="linenos" data-line="83"></span>
+<span class="linenos" data-line="84"></span>
+<span class="linenos" data-line="85"></span><span class="cm">/*</span>
+<span class="linenos" data-line="86"></span><span class="cm"> * This writes a track, reporting any errors...</span>
+<span class="linenos" data-line="87"></span><span class="cm"> */</span>
+<span class="linenos" data-line="88"></span>
+<span class="linenos" data-line="89"></span><span class="n">int16</span><span class="w"> </span><span class="nf">Write_Track</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">disk</span><span class="p">,</span><span class="n">UBYTE</span><span class="w"> </span><span class="o">*</span><span class="n">buffer</span><span class="p">,</span><span class="n">int16</span><span class="w"> </span><span class="n">track</span><span class="p">)</span>
+<span class="linenos" data-line="90"></span><span class="p">{</span>
+<span class="linenos" data-line="91"></span><span class="n">int16</span><span class="w"> </span><span class="n">All_OK</span><span class="o">=</span><span class="n">TRUE</span><span class="p">;</span>
+<span class="linenos" data-line="92"></span>
+<span class="linenos" data-line="93"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Length</span><span class="o">=</span><span class="n">TRACK_SIZE</span><span class="p">;</span>
+<span class="linenos" data-line="94"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Data</span><span class="o">=</span><span class="p">(</span><span class="n">APTR</span><span class="p">)</span><span class="n">buffer</span><span class="p">;</span>
+<span class="linenos" data-line="95"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="o">=</span><span class="n">TD_FORMAT</span><span class="p">;</span>
+<span class="linenos" data-line="96"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Offset</span><span class="o">=</span><span class="p">(</span><span class="n">uint32</span><span class="p">)(</span><span class="n">TRACK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="97"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">disk</span><span class="p">);</span>
+<span class="linenos" data-line="98"></span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Error</span><span class="p">)</span>
+<span class="linenos" data-line="99"></span><span class="w">    </span><span class="p">{</span>
+<span class="linenos" data-line="100"></span><span class="w">        </span><span class="n">All_OK</span><span class="o">=</span><span class="n">FALSE</span><span class="p">;</span>
+<span class="linenos" data-line="101"></span><span class="w">        </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;Error %ld when writing track %ld&quot;</span><span class="p">,</span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Error</span><span class="p">,</span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="102"></span><span class="w">    </span><span class="p">}</span>
+<span class="linenos" data-line="103"></span><span class="w">    </span><span class="k">return</span><span class="p">(</span><span class="n">All_OK</span><span class="p">);</span>
+<span class="linenos" data-line="104"></span><span class="p">}</span>
+<span class="linenos" data-line="105"></span>
+<span class="linenos" data-line="106"></span>
+<span class="linenos" data-line="107"></span>
+<span class="linenos" data-line="108"></span><span class="cm">/*</span>
+<span class="linenos" data-line="109"></span><span class="cm"> * This function finds the number of TRACKS on the device.</span>
+<span class="linenos" data-line="110"></span><span class="cm"> * NOTE That this is TRACKS and not cylinders.  On a Two-Head</span>
+<span class="linenos" data-line="111"></span><span class="cm"> * drive (such as the standard 3.5&quot; drives) the number of tracks</span>
+<span class="linenos" data-line="112"></span><span class="cm"> * is 160, 80 cylinders, 2-heads.</span>
+<span class="linenos" data-line="113"></span><span class="cm"> */</span>
+<span class="linenos" data-line="114"></span>
+<span class="linenos" data-line="115"></span><span class="n">int16</span><span class="w"> </span><span class="nf">FindNumTracks</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">disk</span><span class="p">)</span>
+<span class="linenos" data-line="116"></span><span class="p">{</span>
+<span class="linenos" data-line="117"></span><span class="w">    </span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Command</span><span class="o">=</span><span class="n">TD_GETNUMTRACKS</span><span class="p">;</span>
+<span class="linenos" data-line="118"></span><span class="w">    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">DoIO</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">disk</span><span class="p">);</span>
+<span class="linenos" data-line="119"></span><span class="w">    </span><span class="k">return</span><span class="p">((</span><span class="n">int16</span><span class="p">)</span><span class="n">disk</span><span class="o">-&gt;</span><span class="n">iotd_Req</span><span class="p">.</span><span class="n">io_Actual</span><span class="p">);</span>
+<span class="linenos" data-line="120"></span><span class="p">}</span>
+<span class="linenos" data-line="121"></span>
+<span class="linenos" data-line="122"></span>
+<span class="linenos" data-line="123"></span>
+<span class="linenos" data-line="124"></span>
+<span class="linenos" data-line="125"></span>
+<span class="linenos" data-line="126"></span>
+<span class="linenos" data-line="127"></span>
+<span class="linenos" data-line="128"></span><span class="cm">/*</span>
+<span class="linenos" data-line="129"></span><span class="cm"> * This routine allocates the memory for one track and does</span>
+<span class="linenos" data-line="130"></span><span class="cm"> * the copy loop.</span>
+<span class="linenos" data-line="131"></span><span class="cm"> */</span>
+<span class="linenos" data-line="132"></span>
+<span class="linenos" data-line="133"></span><span class="n">VOID</span><span class="w"> </span><span class="nf">Do_Copy</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">diskreq0</span><span class="p">,</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">diskreq1</span><span class="p">)</span>
+<span class="linenos" data-line="134"></span><span class="p">{</span>
+<span class="linenos" data-line="135"></span><span class="n">UBYTE</span><span class="w"> </span><span class="o">*</span><span class="n">buffer</span><span class="p">;</span>
+<span class="linenos" data-line="136"></span><span class="n">int16</span><span class="w"> </span><span class="n">track</span><span class="p">;</span>
+<span class="linenos" data-line="137"></span><span class="n">int16</span><span class="w"> </span><span class="n">All_OK</span><span class="p">;</span>
+<span class="linenos" data-line="138"></span><span class="n">int16</span><span class="w"> </span><span class="n">NumTracks</span><span class="p">;</span>
+<span class="linenos" data-line="139"></span>
+<span class="linenos" data-line="140"></span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buffer</span><span class="o">=</span><span class="n">IExe</span><span class="o">-&gt;</span><span class="n">AllocVecTags</span><span class="p">(</span><span class="n">TRACK_SIZE</span><span class="p">,</span><span class="w"> </span><span class="n">AVT_Type</span><span class="p">,</span><span class="w"> </span><span class="n">MEMF_SHARED</span><span class="p">,</span><span class="w"> </span><span class="n">TAG_END</span><span class="p">))</span>
+<span class="linenos" data-line="141"></span><span class="w">    </span><span class="p">{</span>
+<span class="linenos" data-line="142"></span><span class="w">        </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot; Starting Motors</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="143"></span><span class="w">        </span><span class="n">Motor_On</span><span class="p">(</span><span class="n">diskreq0</span><span class="p">);</span>
+<span class="linenos" data-line="144"></span><span class="w">        </span><span class="n">Motor_On</span><span class="p">(</span><span class="n">diskreq1</span><span class="p">);</span>
+<span class="linenos" data-line="145"></span><span class="w">        </span><span class="n">All_OK</span><span class="o">=</span><span class="n">TRUE</span><span class="p">;</span>
+<span class="linenos" data-line="146"></span>
+<span class="linenos" data-line="147"></span><span class="w">        </span><span class="n">NumTracks</span><span class="o">=</span><span class="n">FindNumTracks</span><span class="p">(</span><span class="n">diskreq0</span><span class="p">);</span>
+<span class="linenos" data-line="148"></span>
+<span class="linenos" data-line="149"></span><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">track</span><span class="o">=</span><span class="mi">0</span><span class="p">;(</span><span class="n">track</span><span class="o">&lt;</span><span class="n">NumTracks</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">All_OK</span><span class="p">;</span><span class="n">track</span><span class="o">++</span><span class="p">)</span>
+<span class="linenos" data-line="150"></span><span class="w">        </span><span class="p">{</span>
+<span class="linenos" data-line="151"></span><span class="w">            </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot; Reading track %ld</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">,</span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="152"></span>
+<span class="linenos" data-line="153"></span><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">All_OK</span><span class="o">=</span><span class="n">Read_Track</span><span class="p">(</span><span class="n">diskreq0</span><span class="p">,</span><span class="n">buffer</span><span class="p">,</span><span class="n">track</span><span class="p">))</span>
+<span class="linenos" data-line="154"></span><span class="w">            </span><span class="p">{</span>
+<span class="linenos" data-line="155"></span><span class="w">                </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot; Writing track %ld</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">,</span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="156"></span>
+<span class="linenos" data-line="157"></span><span class="w">                </span><span class="n">All_OK</span><span class="o">=</span><span class="n">Write_Track</span><span class="p">(</span><span class="n">diskreq1</span><span class="p">,</span><span class="n">buffer</span><span class="p">,</span><span class="n">track</span><span class="p">);</span>
+<span class="linenos" data-line="158"></span><span class="w">            </span><span class="p">}</span>
+<span class="linenos" data-line="159"></span><span class="w">        </span><span class="p">}</span>
+<span class="linenos" data-line="160"></span><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">All_OK</span><span class="p">)</span><span class="w"> </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot; * Copy complete *&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="161"></span><span class="w">        </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="162"></span><span class="w">        </span><span class="n">Motor_Off</span><span class="p">(</span><span class="n">diskreq0</span><span class="p">);</span>
+<span class="linenos" data-line="163"></span><span class="w">        </span><span class="n">Motor_Off</span><span class="p">(</span><span class="n">diskreq1</span><span class="p">);</span>
+<span class="linenos" data-line="164"></span><span class="w">        </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">FreeVec</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span>
+<span class="linenos" data-line="165"></span><span class="w">    </span><span class="p">}</span>
+<span class="linenos" data-line="166"></span><span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;No memory for track buffer...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="167"></span><span class="p">}</span>
+<span class="linenos" data-line="168"></span>
+<span class="linenos" data-line="169"></span>
+<span class="linenos" data-line="170"></span><span class="cm">/*</span>
+<span class="linenos" data-line="171"></span><span class="cm"> * Prompts the user to remove one of the disks.</span>
+<span class="linenos" data-line="172"></span><span class="cm"> * Since this program makes an EXACT copy of the disks</span>
+<span class="linenos" data-line="173"></span><span class="cm"> * AmigaDOS would get confused by them so one must be removed</span>
+<span class="linenos" data-line="174"></span><span class="cm"> * before the validator is let loose.  Also, note that the</span>
+<span class="linenos" data-line="175"></span><span class="cm"> * disks may NEVER be in drives on the SAME computer at the</span>
+<span class="linenos" data-line="176"></span><span class="cm"> * SAME time unless one of the disks is renamed.  This is due</span>
+<span class="linenos" data-line="177"></span><span class="cm"> * to a bug in the system.  It would normally be prevented</span>
+<span class="linenos" data-line="178"></span><span class="cm"> * by a diskcopy program that knew the disk format and modified</span>
+<span class="linenos" data-line="179"></span><span class="cm"> * the creation date by one clock-tick such that the disks would</span>
+<span class="linenos" data-line="180"></span><span class="cm"> * be different.</span>
+<span class="linenos" data-line="181"></span><span class="cm"> */</span>
+<span class="linenos" data-line="182"></span>
+<span class="linenos" data-line="183"></span><span class="n">VOID</span><span class="w"> </span><span class="nf">Remove_Disks</span><span class="p">(</span><span class="n">VOID</span><span class="p">)</span>
+<span class="linenos" data-line="184"></span><span class="p">{</span>
+<span class="linenos" data-line="185"></span><span class="w">    </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">You *MUST* remove at least one of the disks now.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="186"></span><span class="w">    </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Press RETURN when ready</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="187"></span><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">getchar</span><span class="p">()</span><span class="o">!=</span><span class="sc">&#39;\n&#39;</span><span class="p">);</span>
+<span class="linenos" data-line="188"></span><span class="p">}</span>
+<span class="linenos" data-line="189"></span>
+<span class="linenos" data-line="190"></span>
+<span class="linenos" data-line="191"></span><span class="cm">/*</span>
+<span class="linenos" data-line="192"></span><span class="cm"> * Prompts the user to insert the disks.</span>
+<span class="linenos" data-line="193"></span><span class="cm"> */</span>
+<span class="linenos" data-line="194"></span>
+<span class="linenos" data-line="195"></span><span class="n">VOID</span><span class="w"> </span><span class="nf">Insert_Disks</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">drive1</span><span class="p">[],</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">drive2</span><span class="p">[])</span>
+<span class="linenos" data-line="196"></span><span class="p">{</span>
+<span class="linenos" data-line="197"></span><span class="w">    </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Please insert source disk in %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">drive1</span><span class="p">);</span>
+<span class="linenos" data-line="198"></span><span class="w">    </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">          and destination in %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">drive2</span><span class="p">);</span>
+<span class="linenos" data-line="199"></span><span class="w">    </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Press RETURN when ready</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="200"></span><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">getchar</span><span class="p">()</span><span class="o">!=</span><span class="sc">&#39;\n&#39;</span><span class="p">);</span>
+<span class="linenos" data-line="201"></span><span class="p">}</span>
+<span class="linenos" data-line="202"></span>
+<span class="linenos" data-line="203"></span>
+<span class="linenos" data-line="204"></span><span class="cm">/*</span>
+<span class="linenos" data-line="205"></span><span class="cm"> * Open the devices and mark them as busy</span>
+<span class="linenos" data-line="206"></span><span class="cm"> */</span>
+<span class="linenos" data-line="207"></span><span class="n">VOID</span><span class="w"> </span><span class="nf">Do_OpenDevice</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">diskreq0</span><span class="p">,</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">diskreq1</span><span class="p">,</span><span class="w"> </span><span class="n">int32</span><span class="w"> </span><span class="n">unit</span><span class="p">[])</span>
+<span class="linenos" data-line="208"></span><span class="p">{</span>
+<span class="linenos" data-line="209"></span><span class="kt">char</span><span class="w"> </span><span class="n">drive1</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DFx:&quot;</span><span class="p">;</span><span class="w">  </span><span class="cm">/* String for source drive */</span>
+<span class="linenos" data-line="210"></span><span class="kt">char</span><span class="w"> </span><span class="n">drive2</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DFx:&quot;</span><span class="p">;</span><span class="w">  </span><span class="cm">/* String for destination drive */</span>
+<span class="linenos" data-line="211"></span>
+<span class="linenos" data-line="212"></span><span class="w">    </span><span class="n">drive1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="p">;</span><span class="w">  </span><span class="cm">/* Set drive number for source */</span>
+<span class="linenos" data-line="213"></span>
+<span class="linenos" data-line="214"></span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">OpenDevice</span><span class="p">(</span><span class="n">TD_NAME</span><span class="p">,</span><span class="n">unit</span><span class="p">[</span><span class="mi">0</span><span class="p">],(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">diskreq0</span><span class="p">,</span><span class="mf">0L</span><span class="p">))</span>
+<span class="linenos" data-line="215"></span><span class="w">    </span><span class="p">{</span>
+<span class="linenos" data-line="216"></span><span class="w">          </span><span class="n">disk_busy</span><span class="p">(</span><span class="n">drive1</span><span class="p">,</span><span class="n">TRUE</span><span class="p">);</span>
+<span class="linenos" data-line="217"></span><span class="w">          </span><span class="n">drive2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="p">;</span><span class="w">  </span><span class="cm">/* Set drive number for destination */</span>
+<span class="linenos" data-line="218"></span>
+<span class="linenos" data-line="219"></span><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">OpenDevice</span><span class="p">(</span><span class="n">TD_NAME</span><span class="p">,</span><span class="n">unit</span><span class="p">[</span><span class="mi">1</span><span class="p">],(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">diskreq1</span><span class="p">,</span><span class="mf">0L</span><span class="p">))</span>
+<span class="linenos" data-line="220"></span><span class="w">        </span><span class="p">{</span>
+<span class="linenos" data-line="221"></span><span class="w">            </span><span class="n">disk_busy</span><span class="p">(</span><span class="n">drive2</span><span class="p">,</span><span class="n">TRUE</span><span class="p">);</span>
+<span class="linenos" data-line="222"></span>
+<span class="linenos" data-line="223"></span><span class="w">            </span><span class="n">Insert_Disks</span><span class="p">(</span><span class="n">drive1</span><span class="p">,</span><span class="n">drive2</span><span class="p">);</span>
+<span class="linenos" data-line="224"></span><span class="w">            </span><span class="n">Do_Copy</span><span class="p">(</span><span class="n">diskreq0</span><span class="p">,</span><span class="n">diskreq1</span><span class="p">);</span>
+<span class="linenos" data-line="225"></span><span class="w">            </span><span class="n">Remove_Disks</span><span class="p">();</span>
+<span class="linenos" data-line="226"></span>
+<span class="linenos" data-line="227"></span><span class="w">            </span><span class="n">disk_busy</span><span class="p">(</span><span class="n">drive2</span><span class="p">,</span><span class="n">FALSE</span><span class="p">);</span>
+<span class="linenos" data-line="228"></span><span class="w">            </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">CloseDevice</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">diskreq1</span><span class="p">);</span>
+<span class="linenos" data-line="229"></span><span class="w">        </span><span class="p">}</span>
+<span class="linenos" data-line="230"></span><span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;Could not open %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">drive2</span><span class="p">);</span>
+<span class="linenos" data-line="231"></span>
+<span class="linenos" data-line="232"></span><span class="w">        </span><span class="n">disk_busy</span><span class="p">(</span><span class="n">drive1</span><span class="p">,</span><span class="n">FALSE</span><span class="p">);</span>
+<span class="linenos" data-line="233"></span><span class="w">        </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">CloseDevice</span><span class="p">((</span><span class="k">struct</span><span class="w"> </span><span class="nc">IORequest</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">diskreq0</span><span class="p">);</span>
+<span class="linenos" data-line="234"></span><span class="w">    </span><span class="p">}</span>
+<span class="linenos" data-line="235"></span><span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;Could not open %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">drive1</span><span class="p">);</span>
+<span class="linenos" data-line="236"></span><span class="p">}</span>
+<span class="linenos" data-line="237"></span>
+<span class="linenos" data-line="238"></span>
+<span class="linenos" data-line="239"></span><span class="n">int16</span><span class="w"> </span><span class="nf">ParseArgs</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">,</span><span class="w"> </span><span class="n">int32</span><span class="w"> </span><span class="n">Unit</span><span class="p">[])</span>
+<span class="linenos" data-line="240"></span><span class="cp">#define OKAY 1</span>
+<span class="linenos" data-line="241"></span><span class="p">{</span>
+<span class="linenos" data-line="242"></span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OKAY</span><span class="p">;</span>
+<span class="linenos" data-line="243"></span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">position</span><span class="p">[]</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;First&quot;</span><span class="p">,</span><span class="s">&quot;Second&quot;</span><span class="p">};</span>
+<span class="linenos" data-line="244"></span>
+<span class="linenos" data-line="245"></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+<span class="linenos" data-line="246"></span><span class="w">    </span><span class="p">{</span>
+<span class="linenos" data-line="247"></span><span class="w">    </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">You must specify a source and destination disk</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="248"></span><span class="w">    </span><span class="k">return</span><span class="p">(</span><span class="o">!</span><span class="n">OKAY</span><span class="p">);</span>
+<span class="linenos" data-line="249"></span><span class="w">    </span><span class="p">}</span>
+<span class="linenos" data-line="250"></span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="linenos" data-line="251"></span><span class="w">           </span><span class="p">{</span>
+<span class="linenos" data-line="252"></span><span class="w">           </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">You must specify different disks for source and destination</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="253"></span><span class="w">           </span><span class="k">return</span><span class="p">(</span><span class="o">!</span><span class="n">OKAY</span><span class="p">);</span>
+<span class="linenos" data-line="254"></span><span class="w">           </span><span class="p">}</span>
+<span class="linenos" data-line="255"></span><span class="w">     </span><span class="k">else</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">params</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">OKAY</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">j</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">)</span>
+<span class="linenos" data-line="256"></span><span class="w">           </span><span class="p">{</span>
+<span class="linenos" data-line="257"></span><span class="w">           </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strnicmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="s">&quot;df&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+<span class="linenos" data-line="258"></span><span class="w">             </span><span class="p">{</span>
+<span class="linenos" data-line="259"></span><span class="w">             </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="sc">&#39;3&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;\0&#39;</span><span class="p">)</span>
+<span class="linenos" data-line="260"></span><span class="w">               </span><span class="p">{</span>
+<span class="linenos" data-line="261"></span><span class="w">               </span><span class="n">Unit</span><span class="p">[</span><span class="n">j</span><span class="mi">-1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mh">0x30</span><span class="p">;</span>
+<span class="linenos" data-line="262"></span><span class="w">               </span><span class="p">}</span>
+<span class="linenos" data-line="263"></span><span class="w">             </span><span class="k">else</span>
+<span class="linenos" data-line="264"></span><span class="w">               </span><span class="p">{</span>
+<span class="linenos" data-line="265"></span><span class="w">               </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">%s parameter is wrong, unit number must be 0-3</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">position</span><span class="p">[</span><span class="n">j</span><span class="mi">-1</span><span class="p">]);</span>
+<span class="linenos" data-line="266"></span><span class="w">               </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">!</span><span class="n">OKAY</span><span class="p">;</span>
+<span class="linenos" data-line="267"></span><span class="w">               </span><span class="k">return</span><span class="p">(</span><span class="o">!</span><span class="n">OKAY</span><span class="p">);</span>
+<span class="linenos" data-line="268"></span><span class="w">               </span><span class="p">}</span>
+<span class="linenos" data-line="269"></span><span class="w">             </span><span class="p">}</span>
+<span class="linenos" data-line="270"></span><span class="w">           </span><span class="k">else</span>
+<span class="linenos" data-line="271"></span><span class="w">             </span><span class="p">{</span>
+<span class="linenos" data-line="272"></span><span class="w">             </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">%s parameter is wrong, you must specify a floppy device df0 - df3</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="linenos" data-line="273"></span><span class="w">                     </span><span class="n">position</span><span class="p">[</span><span class="n">j</span><span class="mi">-1</span><span class="p">]);</span>
+<span class="linenos" data-line="274"></span><span class="w">             </span><span class="n">params</span><span class="o">=!</span><span class="n">OKAY</span><span class="p">;</span>
+<span class="linenos" data-line="275"></span><span class="w">             </span><span class="k">return</span><span class="p">(</span><span class="o">!</span><span class="n">OKAY</span><span class="p">);</span>
+<span class="linenos" data-line="276"></span><span class="w">             </span><span class="p">}</span>
+<span class="linenos" data-line="277"></span><span class="w">           </span><span class="n">j</span><span class="o">++</span><span class="p">;</span>
+<span class="linenos" data-line="278"></span><span class="w">           </span><span class="p">}</span>
+<span class="linenos" data-line="279"></span><span class="k">return</span><span class="p">(</span><span class="n">OKAY</span><span class="p">);</span>
+<span class="linenos" data-line="280"></span><span class="p">}</span>
+<span class="linenos" data-line="281"></span>
+<span class="linenos" data-line="282"></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">)</span>
+<span class="linenos" data-line="283"></span><span class="p">{</span>
+<span class="linenos" data-line="284"></span><span class="w">    </span><span class="n">int32</span><span class="w"> </span><span class="n">unit</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="linenos" data-line="285"></span>
+<span class="linenos" data-line="286"></span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ParseArgs</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">,</span><span class="w"> </span><span class="n">unit</span><span class="p">))</span><span class="w">       </span><span class="cm">/* Check inputs */</span>
+<span class="linenos" data-line="287"></span><span class="w">    </span><span class="p">{</span>
+<span class="linenos" data-line="288"></span><span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">MsgPort</span><span class="w"> </span><span class="o">*</span><span class="n">diskPort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AllocSysObjectTags</span><span class="p">(</span><span class="n">ASOT_PORT</span><span class="p">,</span><span class="w"> </span><span class="n">TAG_END</span><span class="p">);</span>
+<span class="linenos" data-line="289"></span><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">diskPort</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span>
+<span class="linenos" data-line="290"></span><span class="w">        </span><span class="p">{</span>
+<span class="linenos" data-line="291"></span><span class="w">            </span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">diskreq0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AllocSysObjectTags</span><span class="p">(</span><span class="n">ASOT_IOREQUEST</span><span class="p">,</span>
+<span class="linenos" data-line="292"></span><span class="w">                </span><span class="n">ASOIOR_Size</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="p">),</span>
+<span class="linenos" data-line="293"></span><span class="w">                </span><span class="n">ASOIOR_ReplyPort</span><span class="p">,</span><span class="w"> </span><span class="n">diskPort</span><span class="p">,</span>
+<span class="linenos" data-line="294"></span><span class="w">                </span><span class="n">TAG_END</span><span class="p">);</span>
+<span class="linenos" data-line="295"></span><span class="w">        </span>
+<span class="linenos" data-line="296"></span><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">diskreq0</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span>
+<span class="linenos" data-line="297"></span><span class="w">            </span><span class="p">{</span>
+<span class="linenos" data-line="298"></span><span class="w">                </span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="w"> </span><span class="o">*</span><span class="n">diskreq1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">AllocSysObjectTags</span><span class="p">(</span><span class="n">ASOT_IOREQUEST</span><span class="p">,</span>
+<span class="linenos" data-line="299"></span><span class="w">                    </span><span class="n">ASOIOR_Size</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">IOExtTD</span><span class="p">),</span>
+<span class="linenos" data-line="300"></span><span class="w">                    </span><span class="n">ASOIOR_ReplyPort</span><span class="p">,</span><span class="w"> </span><span class="n">diskPort</span><span class="p">,</span>
+<span class="linenos" data-line="301"></span><span class="w">                    </span><span class="n">TAG_END</span><span class="p">);</span>
+<span class="linenos" data-line="302"></span><span class="w">            </span>
+<span class="linenos" data-line="303"></span><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">diskreq1</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span>
+<span class="linenos" data-line="304"></span><span class="w">                </span><span class="p">{</span>
+<span class="linenos" data-line="305"></span><span class="w">                    </span><span class="n">Do_OpenDevice</span><span class="p">(</span><span class="n">diskreq0</span><span class="p">,</span><span class="n">diskreq1</span><span class="p">,</span><span class="w"> </span><span class="n">unit</span><span class="p">);</span>
+<span class="linenos" data-line="306"></span><span class="w">                    </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">FreeSysObject</span><span class="p">(</span><span class="n">ASOT_IOREQUEST</span><span class="p">,</span><span class="w"> </span><span class="n">diskreq1</span><span class="p">);</span>
+<span class="linenos" data-line="307"></span><span class="w">                </span><span class="p">}</span>
+<span class="linenos" data-line="308"></span><span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;Out of memory</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="309"></span><span class="w">                </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">FreeSysObject</span><span class="p">(</span><span class="n">ASOT_IOREQUEST</span><span class="p">,</span><span class="w"> </span><span class="n">diskreq0</span><span class="p">);</span>
+<span class="linenos" data-line="310"></span><span class="w">            </span><span class="p">}</span>
+<span class="linenos" data-line="311"></span><span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;Out of memory</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="312"></span><span class="w">            </span><span class="n">IExec</span><span class="o">-&gt;</span><span class="n">FreeSysObject</span><span class="p">(</span><span class="n">ASOT_PORT</span><span class="p">,</span><span class="w"> </span><span class="n">diskPort</span><span class="p">);</span>
+<span class="linenos" data-line="313"></span><span class="w">        </span><span class="p">}</span>
+<span class="linenos" data-line="314"></span><span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">IDOS</span><span class="o">-&gt;</span><span class="n">Printf</span><span class="p">(</span><span class="s">&quot;Could not create diskReq port</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos" data-line="315"></span><span class="w">    </span><span class="p">}</span>
+<span class="linenos" data-line="316"></span><span class="w">    </span>
+<span class="linenos" data-line="317"></span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="linenos" data-line="318"></span><span class="p">}</span>
+</pre></div>
+<table class="wikitable">
+<tbody><tr>
+<th>Only one per customer
+</th></tr>
+<tr>
+<td>Since this example program makes an exact track-for-track duplicate, AmigaDOS will get confused if both disks are in drives on the system at the same time. While the disks are inhibited, this does not cause a problem, but during normal operation, this will cause a system hang. To prevent this, you can relabel one of the disks. A commercial diskcopy program would have to understand the disk format and either relabel the disk or modify the volume creation date/time by a bit in order to make the disks look different to the system.
+</td></tr></tbody></table>
+<h2><span class="mw-headline" id="Additional_Information_on_the_Trackdisk_Device">Additional Information on the Trackdisk Device</span></h2>
+<p>Additional programming information on the trackdisk device can be found in the include files and the autodocs for the trackdisk device. Both are contained in the <a href="/wiki/Autodocs:Main" title="Autodocs:Main">Autodocs</a>.
+</p>
+<table class="wikitable">
+<tbody><tr>
+<th colspan="2">Trackdisk Device Information
+</th></tr>
+<tr>
+<td rowspan="2">Includes</td>
+<td>devices/trackdisk.h
+</td></tr>
+<tr>
+<td>devices/trackdisk.i
+</td></tr>
+<tr>
+<td><a href="/wiki/Autodocs:Main" title="Autodocs:Main">Autodocs</a></td>
+<td><a rel="nofollow" class="external text" href="http://wiki.amigaos.net/amiga/autodocs/trackdisk.doc.txt">trackdisk.doc</a>
+</td></tr></tbody></table>
+<!-- 
+NewPP limit report
+Cached time: 20260114022826
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.247 seconds
+Real time usage: 3.691 seconds
+Preprocessor visited node count: 326/1000000
+Post‐expand include size: 2814/2097152 bytes
+Template argument size: 2526/2097152 bytes
+Highest expansion depth: 3/100
+Expensive parser function count: 27/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 114431/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00% 3409.666      1 -total
+  0.06%    2.179      9 Template:Note
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:66-0!canonical and timestamp 20260114022826 and revision id 12543. Rendering was triggered because: page-view
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=Trackdisk_Device&amp;oldid=12543">http://wiki.amigaos.net/w/index.php?title=Trackdisk_Device&amp;oldid=12543</a>"</div></div>
+		<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Trackdisk+Device" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-main" class="selected mw-list-item"><a href="/wiki/Trackdisk_Device" title="View the content page [c]" accesskey="c"><span>Page</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=Talk:Trackdisk_Device&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/Trackdisk_Device"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=Trackdisk_Device&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=Trackdisk_Device&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/Trackdisk_Device" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/Trackdisk_Device" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=Trackdisk_Device&amp;oldid=12543" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=Trackdisk_Device&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=Trackdisk+Device"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=Trackdisk+Device&amp;oldid=12543&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=Trackdisk_Device&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 26 January 2025, at 19:27.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":120,"wgPageParseReport":{"limitreport":{"cputime":"0.247","walltime":"3.691","ppvisitednodes":{"value":326,"limit":1000000},"postexpandincludesize":{"value":2814,"limit":2097152},"templateargumentsize":{"value":2526,"limit":2097152},"expansiondepth":{"value":3,"limit":100},"expensivefunctioncount":{"value":27,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":114431,"limit":5000000},"timingprofile":["100.00% 3409.666      1 -total","  0.06%    2.179      9 Template:Note"]},"cachereport":{"timestamp":"20260114022826","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>

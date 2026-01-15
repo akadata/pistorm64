@@ -1,0 +1,664 @@
+
+
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>AmigaGuide 101 - AmigaOS Documentation Wiki</title>
+<script>(function(){var className="client-js";var cookie=document.cookie.match(/(?:^|; )docwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"aWb_5B3TbDv_vcRQHuo8awAAAAo","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"AmigaGuide_101","wgTitle":"AmigaGuide 101","wgCurRevisionId":12570,"wgRevisionId":12570,"wgArticleId":622,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],"wgPageViewLanguage":
+"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"AmigaGuide_101","wgRelevantArticleId":622,"wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[]};RLSTATE={"site.styles":"ready","user.styles":"ready","user":"ready","user.options":"loading","skins.vector.styles.legacy":"ready","ext.breadCrumbs":"ready"};RLPAGEMODULES=["site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.breadCrumbs%7Cskins.vector.styles.legacy&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.43.0">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1120">
+<link rel="icon" href="/w/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="AmigaOS Documentation Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//wiki.amigaos.net/w/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="AmigaOS Documentation Wiki Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-AmigaGuide_101 rootpage-AmigaGuide_101 skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><div id="localNotice" data-nosnippet=""><div class="default" lang="en" dir="ltr"><p>Copyright (c) Hyperion Entertainment and contributors.
+</p></div></div></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">AmigaGuide 101</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From AmigaOS Documentation Wiki</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content"><div id="breadcrumbs"> <a href="/wiki/Translation_Guidelines" title="Translation Guidelines">Translation Guidelines</a> &gt; <a href="/wiki/Troubleshooting_Your_Software" title="Troubleshooting Your Software">Troubleshooting Your Software</a> &gt; <a href="/wiki/Understanding_the_alert_error_numbers" title="Understanding the alert error numbers">Understanding the alert error numbers</a> &gt; <a href="/wiki/Debug_Kernel" title="Debug Kernel">Debug Kernel</a> &gt; <a href="/wiki/AmigaGuide_101" title="AmigaGuide 101">AmigaGuide 101</a></div><div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><p><i>adapted from the original AmigaMail article by Jerry Hartzler</i>
+</p>
+<div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Introduction"><span class="tocnumber">1</span> <span class="toctext">Introduction</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Setting_up_AmigaGuide"><span class="tocnumber">2</span> <span class="toctext">Setting up AmigaGuide</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="#The_AmigaGuide_Window"><span class="tocnumber">3</span> <span class="toctext">The AmigaGuide Window</span></a></li>
+<li class="toclevel-1 tocsection-4"><a href="#AmigaGuide_Databases"><span class="tocnumber">4</span> <span class="toctext">AmigaGuide Databases</span></a>
+<ul>
+<li class="toclevel-2 tocsection-5"><a href="#Database_Commands"><span class="tocnumber">4.1</span> <span class="toctext">Database Commands</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="#Node_Commands"><span class="tocnumber">4.2</span> <span class="toctext">Node Commands</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="#Action_Commands"><span class="tocnumber">4.3</span> <span class="toctext">Action Commands</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-8"><a href="#A_Working_Database"><span class="tocnumber">5</span> <span class="toctext">A Working Database</span></a></li>
+<li class="toclevel-1 tocsection-9"><a href="#Using_Link_Points"><span class="tocnumber">6</span> <span class="toctext">Using Link Points</span></a></li>
+<li class="toclevel-1 tocsection-10"><a href="#Troubleshooting"><span class="tocnumber">7</span> <span class="toctext">Troubleshooting</span></a></li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="Introduction">Introduction</span></h2>
+<p>Compared to other platforms, Amiga-based utilities that display on-line documentation are relatively weak.  Until 1991, Amiga users had to rely on basic text viewing utilities like More, which lack the navigational capabilities of hypertext programs.  In a hypertext environment, when the user wants more information on a subject, the user simply clicks on a word and the hypertext utility automatically cross references the subject.  No type of hypertext-like utility was available on the Amiga--that is, until AmigaGuide came along.
+</p><p><a href="/wiki/AmigaGuide" title="AmigaGuide">AmigaGuide</a> can display plain ASCII text files and AmigaGuide databases.  An AmigaGuide database is a single file that consists of a set of documents called nodes.  If you were to convert a book into an AmigaGuide database, a convenient way to organize the database is to make each chapter of the book into a node.  Each node may contain references to other nodes (chapters) or databases (other books), using a link.  When a user selects a link--which usually appears in the form of a button within the text--AmigaGuide dereferences the link and displays its node.  This makes it easier for the user to find the information he is looking for because the user no longer needs to search through a document.  AmigaGuide already knows where the information is.
+</p><p>Buttons within AmigaGuide can do other actions as well, such as execute Shell or ARexx commands.  An ARexx port is also built into AmigaGuide providing users the means to support and control the utility.  Therefore, like a book, an AmigaGuide database can display illustrations.  It can go a step beyond by playing sounds and music, and by being truly interactive with the user, able to ask questions and evaluate responses.
+</p><p>This article was written to familiarize you with AmigaGuide and the format of its databases.
+</p>
+<h2><span class="mw-headline" id="Setting_up_AmigaGuide">Setting up AmigaGuide</span></h2>
+<p>AmigaGuide consists of the AmigaGuide utility and an Exec library called amigaguide.library.  AmigaGuide should be placed in the SYS:Utilities drawer and amigaguide.library placed in the Libs: drawer.  As of Release 3, the OS comes with a utility called MultiView that understands and displays AmigaGuide databases. MultiView requires amigaguide.datatype and datatypes.library in order to display AmigaGuide databases.
+</p><p>AmigaGuide can run from the Workbench or the Shell.  To run from Workbench, the default tool of an AmigaGuide database or text icon should be set to <b>AmigaGuide</b>.
+</p><p>From the Shell, use the following command template:
+</p>
+<pre>   AmigaGuide &lt;my_DataBase&gt;
+</pre>
+<p>where &lt;my_DataBase&gt; is the name of the AmigaGuide database or text file to display.
+</p><p>For example:
+</p>
+<pre>   1&gt; AmigaGuide Autodocs
+</pre>
+<p>attempts to open the Autodocs database.  In its search for a database, AmigaGuide will first look in the current directory and then through the AmigaGuide path for the database.
+</p><p>The AmigaGuide path is a global environment variable.  AmigaGuide stores its environment variables in the ENV:AmigaGuide directory assigned in RAM:.
+</p><p>The variable named path contains the list of directory names that AmigaGuide will search through when it attempts to open a database. Directory names are separated by a space.  The path variable is set and stored in the ENV:AmigaGuide directory through the use of the AmigaDOS SetEnv command (Note that as of Release 3, if the AmigaGuide directory does not exist, SetEnv will not create it).
+</p><p>For example:
+</p>
+<pre>   1&gt; SetEnv AmigaGuide/Path "Workbench:Autodocs Workbench:Includes"
+</pre>
+<p>Of course all variables set in RAM: disappear once the computer is turned off.  To prevent this, copy the file ENV:AmigaGuide/Path to the ENVARC:AmigaGuide directory.  The system copies the ENVARC: directory to ENV: upon start-up.
+</p><p>The MultiView utility uses the  amigaguide.datatype which uses this the environment variable as its path.
+</p>
+<h2><span class="mw-headline" id="The_AmigaGuide_Window">The AmigaGuide Window</span></h2>
+<p>AmigaGuide displays text within an Intuition window.  The window contains scroll bars, buttons and pull-down menus making it easy to browse, search and print text.
+</p><p><span class="mw-default-size" typeof="mw:File"><a href="/wiki/File:Amigaguide.png" class="mw-file-description"><img src="/w/images/e/ee/Amigaguide.png" decoding="async" width="522" height="318" class="mw-file-element" /></a></span>
+</p><p>Along the top edge of the AmigaGuide window is a row of six navigation buttons:
+</p>
+<ul><li>Contents: This button displays the Table Of Contents for the current database or node.  See the @NODE and @TOC commands below.</li></ul>
+<ul><li>Index: This button displays the Index for the current database.  See the @INDEX command below.</li></ul>
+<ul><li>Help: By default, this button displays the database named help.guide in the s: directory.  Under 3.0, the database is named amigaguide.guide in the Help:&lt;country&gt;/sys directory.  This database contains help in using AmigaGuide.</li></ul>
+<ul><li>Retrace: This button goes back to the previous node.</li></ul>
+<ul><li>Browse: These buttons step through the nodes in sequential order (the order they appear in the database).</li></ul>
+<h2><span class="mw-headline" id="AmigaGuide_Databases">AmigaGuide Databases</span></h2>
+<p>Creating an AmigaGuide database is quite simple.  An AmigaGuide database is basically an ASCII text file, embedded with commands to tell AmigaGuide what to do.  Let's take a look at the commands used in AmigaGuide and then make up a simple database.
+</p><p>There are three types of AmigaGuide commands.  Database commands break up a document into nodes.  Node commands set attributes within a node.  Action commands are only found within a special node command called a <b>link point</b>.  As the name implies, action commands perform some action.
+</p>
+<h3><span class="mw-headline" id="Database_Commands">Database Commands</span></h3>
+<p>Database commands should not be used within the nodes themselves. They must start in the first column of a line.  If a line in an AmigaGuide database begins with an at (@) sign, then AmigaGuide interprets the line as a command.  Although the AmigaGuide commands appear here in upper-case, AmigaGuide commands are not case sensitive.
+</p>
+<ul><li>@DATABASE &lt;name&gt; - This command identifies a file as an AmigaGuide database.  It must be the first line of the database.</li></ul>
+<ul><li>@NODE &lt;name&gt; &lt;title&gt; - This command indicates the start of a node. The first node of a database should be named MAIN.  MAIN is typically the master table of contents for the database (see the @TOC node command in the next section).  When AmigaGuide displays the node, it displays &lt;title&gt; in the window's title bar.  If there are any spaces in the &lt;title&gt;, it must be in quotes.  A node name cannot contain spaces, tabs, colons (':') or slants ('/').</li></ul>
+<ul><li>@DNODE &lt;name&gt; - This command indicates the start of a dynamic node. Dynamic nodes are beyond the scope of this introductory article and therefore are not discussed here.</li></ul>
+<ul><li>@INDEX &lt;node name&gt; - This command tells AmigaGuide which node to use as the index for the database.  When the user hits the <b>Index</b> button at the top of the AmigaGuide window, AmigaGuide will display the node specified by this command.  The node can be in another database.  If the node is in another database, the node name is the file name of the database followed by a slant (`/`), followed by the name of the node in the other database.  For example, to access the MAIN node in another database called other_database, the link point looks like this:</li></ul>
+<pre>   @{"my label" LINK other_database/MAIN}
+</pre>
+<p><i>The name of the other database can contain a full path to the other database.  If it doesn't, AmigaGuide will search the AmigaGuide path for the other database.</i>
+</p>
+<ul><li>@REMARK &lt;remark&gt; - This commands lets you add programmer remarks to a database.  AmigaGuide ignores the remarks.</li></ul>
+<h3><span class="mw-headline" id="Node_Commands">Node Commands</span></h3>
+<p>These commands are only valid within a @NODE.  They must start in the
+first column of a line unless otherwise noted.
+</p>
+<ul><li>@ENDNODE &lt;name&gt; - This command ends a node.</li></ul>
+<ul><li>@TITLE &lt;title&gt; - AmigaGuide displays &lt;title&gt; in the node's window title bar.  It must start at the beginning of a line.  This command isn't necessary if you use the &lt;title&gt; option in @NODE.</li></ul>
+<ul><li>@TOC &lt;node name&gt; - This command tells AmigaGuide which node to display when the user hits the Contents button while displaying this node.  If a node does not have a @TOC command, the table of contents defaults to MAIN.  The &lt;node name&gt; can be in another database.  See the @INDEX command in the <a href="#Database_Commands">Database Commands</a> section for more information on the format of &lt;node name&gt;.</li></ul>
+<ul><li>@PREV &lt;node name&gt; - The Browse buttons can be reprogrammed so as not to step through the nodes in sequential order.  For example, if this command appears in a @NODE, AmigaGuide  will display the &lt;node name&gt; node when the user selects the <b>&lt; Browse</b> button while in the current node.  The &lt;node name&gt; can be in another database.  See the @INDEX command in the <a href="#Database_Commands">Database Commands</a> section for more information on the format of &lt;node name&gt;.</li></ul>
+<ul><li>@NEXT &lt;node name&gt; - Similar to @PREV but will display the &lt;node name&gt; node when the user selects <b>Browse &gt;</b> button while in the current node.  The &lt;node name&gt; can be in another database.  See the @INDEX command in the <a href="#Database_Commands">Database Commands</a> section for more information on the format of &lt;node name&gt;.</li></ul>
+<ul><li>@{"&lt;label&gt;" &lt;action command&gt;} - This command is referred to as a link point.  AmigaGuide makes the string &lt;label&gt; into a button.  The &lt;label&gt; must be enclosed by quotes.  When the user hits that button, AmigaGuide carries out &lt;action command&gt; (see the next section of this article for a description of action commands).  A link point does not have to start in the first column, it can appear anywhere on a line.</li></ul>
+<h3><span class="mw-headline" id="Action_Commands">Action Commands</span></h3>
+<p>These commands are for use with the link point command described in the <a href="#Node_Commands">Node Commands</a> section of this article.
+</p>
+<ul><li>LINK &lt;node name&gt; &lt;line#&gt; - This command loads and displays the &lt;node name&gt; node at the line number specified in &lt;line #&gt;.  The &lt;line #&gt; parameter is optional and it defaults to zero.  The node can be in another database.  The &lt;node name&gt; can be in another database.  See the @INDEX command in the <a href="#Database_Commands">Database Commands</a> section for more information on the format of &lt;node name&gt;.</li></ul>
+<p><i>The &lt;line #&gt; parameter is optional and it defaults to zero.  The default line number is line zero.</i>
+</p>
+<ul><li>RX &lt;ARexx command&gt; - This commands executes the ARexx macro named in &lt;ARexx command&gt;.</li></ul>
+<ul><li>RXS &lt;command&gt; - This commands executes the ARexx string file named in &lt;command&gt;.</li></ul>
+<ul><li>SYSTEM &lt;command&gt; - This commands executes the AmigaDOS command named in &lt;command&gt;.</li></ul>
+<ul><li>QUIT - When AmigaGuide encounters this command is shuts down the current database.</li></ul>
+<h2><span class="mw-headline" id="A_Working_Database">A Working Database</span></h2>
+<p>As an example, Let's make the text file below into a simple AmigaGuide database.  The simple database will consists of a single node.
+</p>
+<pre>  What is a user interface? This sweeping phrase covers all
+  aspects of communication between the user and the computer. It
+  includes the innermost mechanisms of the computer and rises to
+  the height of defining a philosophy to guide the interaction
+  between human and machine.  Intuition is, above all else, a
+  philosophy turned into software.  See the Amiga ROM Kernel
+  Reference Manual: Libraries for more information.
+
+  Intuition screens are the basis of any display Intuition can
+  make. Screens determine the fundamental characteristics of the
+  display such as the resolution and palette and they set up the
+  environment for multiple, overlapping windows that makes it
+  possible for each application to have its own separate visual
+  context.
+
+  Windows are rectangular display areas that open on screens.
+  The window acts as a virtual terminal allowing a program to
+  interact with the user as if it had the entire display all to
+  itself. Windows are moveable and can be positioned anywhere
+  within the screen on which they exist.  Windows may also have a
+  title and borders containing various gadgets for controlling
+  the window.
+
+  Gadgets are software controls symbolized by an image that the
+  user can operate with the mouse or keyboard.  They are the
+  Amiga's equivalent of buttons, knobs and dials.
+
+  Menus are command and option lists associated with an
+  application window that the user can bring into view at any
+  time.  These lists provide the user with a simple way to access
+  features of the application without having to remember or enter
+  complex character-based command strings.
+</pre>
+<p>If AmigaGuide displayed the file above, it would appear without any buttons linking it to text files or databases.  To mark this file as an AmigaGuide database, add the @DATABASE command.  As mentioned earlier, it must start on the first line in the first column of the file.
+</p><p>Since there will be no index for this database, the next command can be a @NODE.  For AmigaGuide to open a database, it must contain a node.  Since this will be the first node in the database, it should be named MAIN.
+</p><p>At the bottom of the file, on a separate line, add the @ENDNODE command.  This tells AmigaGuide that the current node ends here.  All nodes must contain an @ENDNODE command.
+</p><p>This is what we have so far:
+</p>
+<pre>   @DATABASE
+   @NODE MAIN
+   What is a user interface? This sweeping phrase covers all
+           .
+           .
+           .
+   complex character-based command strings.
+   @ENDNODE
+</pre>
+<p>The file is now an AmigaGuide database.  However, since the database has only one node and has no link points, the database will still appear as plain text.  Also, AmigaGuide will ghost all of the navigation buttons.  The database can be broken into smaller nodes if desired.  Normally such a short file would not need to be broken up, but it makes a good example.
+</p><p>One important issue to consider while designing an AmigaGuide database is how to lay it out.  Some thought should go into the break-up of a document into manageable nodes, and how these nodes relate--and eventually link--to one another.  Each node should consist of information dealing with one topic and should contain links to other related nodes.
+</p><p>Notice that the example text is about Intuition, but each paragraph discusses a different topic of Intuition.  The first paragraph is an overview followed by four paragraphs: one each on screens, windows, gadgets and menus.  This organization makes it convenient to make each paragraph a node with a table of contents in the beginning: 
+</p>
+<pre>    Intuition Table of Contents
+
+    Introduction
+    Screens
+    Windows
+    Gadgets
+    Menus
+</pre>
+<p>Since the Table of Contents node is first, it is the MAIN node. The other paragraphs follow the MAIN node, each in their own separate node.  So as not to confuse AmigaGuide, each node within a database must have a different name.
+</p>
+<pre>    @DATABASE
+    @NODE MAIN "Intuition Table of Contents"
+    Introduction
+    Screens
+    Windows
+    Gadgets
+    Menus
+    @ENDNODE
+
+    @NODE Intro "Introduction"
+    What is a user interface? This sweeping phrase...
+    @ENDNODE
+
+    @NODE Screen "Screens"
+    Intuition screens are the basis of any display...
+    @ENDNODE
+
+    @NODE Window "Windows"
+    Windows are rectangular display areas that open...
+    @ENDNODE
+
+    @NODE Gadget "Gadgets"
+    Gadgets are software controls symbolized by an...
+    @ENDNODE
+
+    @NODE Menu "Menus"
+    Menus are command and option lists associated...
+    @ENDNODE
+</pre>
+<p>When AmigaGuide loads the database above, AmigaGuide displays the MAIN node with the title string Intuition Table of Contents in the window's title bar.  As the user clicks the Browse buttons at the top of the AmigaGuide window, AmigaGuide steps through each node in the database, displaying each paragraph.  Notice that each node in the database uses the window title parameter.  As the Browse buttons step through the database displaying the different nodes in sequence, the AmigaGuide window title changes to match the title from the current node.
+</p><p>An important limitation of the database above is the only way to access the different nodes is using the ``Browse<i> button to step through them in the order they appear in the database.  The database still has no buttons within the nodes to link to other nodes.</i>
+</p>
+<h2><span class="mw-headline" id="Using_Link_Points">Using Link Points</span></h2>
+<p>The link point command is probably the most commonly used command in a database.  With it you can make a word in one node reference another node.  For example, in the Table of Contents node from the previous example, you can make each entry from the table into a button that references its respective node.
+</p><p>The template for a link point is:
+</p>
+<pre>   @{&lt;label&gt; &lt;action command&gt;}
+</pre>
+<p>The label parameter is the word or phrase in a database that is made into a button, and the action command is the action AmigaGuide takes when the user clicks the button.  For our example, we want each topic in the table of contents to be a label and the action command for each to be a LINK command.  The LINK command loads and displays another node.
+</p>
+<pre>   @{&lt;label&gt; LINK &lt;name&gt; &lt;line#&gt;}
+</pre>
+<p>For example, if you change the word Introduction from the Table of Contents node into a link point it would look like this:
+</p>
+<pre>   @{"Introduction" LINK Intro}
+</pre>
+<p>The &lt;label&gt; string must be in quotes.  If you load the database into AmigaGuide after making the change above, the word Introduction would appear as a button on the Table of Contents screen.  If the user clicks on the Introduction button, AmigaGuide displays the node named Intro.
+</p><p>Unlike other AmigaGuide commands, link points do not need to start in the first column.  This makes it easy to indent a button from the left edge of the window and also to embed a button within a block of text.
+</p><p>Link points can also link to nodes in other databases.  As an example, consider the following excerpt from the Intro node:
+</p>
+<pre> philosophy turned into software.  See the Amiga ROM Kernel Reference
+ Manual: Libraries for more information.
+</pre>
+<p>If an AmigaGuide database of Amiga ROM Kernel Reference Manual: Libraries was readily available,  it would be convenient if the word <i>Libraries</i> from the excerpt was a button, linking the word <i>Libraries</i> directly to the Libraries manual database.  If the Libraries manual database was named Libraries_Manual and it was in the current AmigaGuide path, to make the word Libraries from the Intro node into a link point that opens the Libraries_Manual database, change the excerpt above to the following:
+</p>
+<pre> philosophy turned into software.  See the Amiga ROM Kernel
+ Reference Manual: @{"Libraries" LINK Libraries_Manual/Intro} for more information.
+</pre>
+<p>In the example above, when the user selects the Libraries button, AmigaGuide will try to display the MAIN node from the database called Libraries_Manual.  AmigaGuide will first look for Libraries_Manual in the directory where the example database resides.  If it's not there, AmigaGuide searches through its path for the database.  Alternately, you can supply a full path name to Libraries_Manual.
+</p><p>A link point can also be used to display a picture.  For example, to display an ILBM image of a Workbench screen from the Screen node, use the SYSTEM action command:
+</p>
+<pre>   @{"Picture of a Workbench Screen" SYSTEM "sys:utilities/Display sys:Workbench.pic"}
+</pre>
+<p>From the command above, when the user click the <i>Picture of a Workbench Screen</i> button, SYSTEM executes the Display utility. Display shows the ILBM file sys:Workbench.pic.  Because Display is merely a shell command, you can substitute your own ILBM viewer for Display.
+</p><p>Below is the finished database with a few more interactive link points.
+</p>
+<pre>  @DATABASE
+  @NODE MAIN "Intuition Table of Contents"
+  @{"Introduction" LINK Intro}
+  @{"Screens" LINK Screen}
+  @{"Windows" LINK Window}
+  @{"Gadgets" LINK Gadget}
+  @{"Menus" LINK Menu}
+  @ENDNODE
+
+  @NODE Intro "Introduction"
+  What is a user interface? This sweeping phrase covers all
+  aspects of communication between the user and the computer.  It
+  includes the innermost mechanisms of the computer and rises to
+  the height of defining a philosophy to guide the interaction
+  between human and machine.  Intuition is, above all else, a
+  philosophy turned into software.  See the Amiga ROM Kernel
+  Reference Manual: @{"Libraries" LINK Libraries_Manual/Intro} for more information.
+  @ENDNODE
+
+  @NODE Screen "Screens"
+  Intuition screens are the basis of any display Intuition can
+  make.  Screens determine the fundamental characteristics of the
+  display such as the resolution and palette and they set up the
+  environment for multiple, overlapping @{"windows" LINK Window} that makes it
+  possible for each application to have its own separate visual
+  context.
+
+  @{"Picture of a Workbench Screen" SYSTEM sys:utilities/Display sys:Workbench.pic}
+
+  @ENDNODE
+
+  @NODE Window "Windows"
+  Windows are rectangular display areas that open on @{"screens" LINK screen}.  The
+  window acts as a virtual terminal allowing a program to interact
+  with the user as if it had the entire display all to itself.
+  Windows are moveable and can be positioned anywhere within the
+  screen on which they exist.  Windows may also have a title and
+  borders containing various @{"gadgets" LINK Gadget} for controlling the window.
+  @ENDNODE
+
+  @NODE Gadget "Gadgets"
+  Gadgets are software controls symbolized by an image that the
+  user can operate with the mouse or keyboard.  They are the
+  Amiga's equivalent of buttons, knobs and dials.
+  @ENDNODE
+
+  @NODE Menu "Menus"
+  Menus are command and option lists associated with an
+  application @{"window" LINK Window} that the user can bring into view at any
+  time.  These lists provide the user with a simple way to access
+  features of the application without having to remember or enter
+  complex character-based command strings.
+  @ENDNODE
+</pre>
+<p>Although this is a small sample and only a few basic commands are used, it is a good start to making your own AmigaGuide database.
+</p>
+<h2><span class="mw-headline" id="Troubleshooting">Troubleshooting</span></h2>
+<p>To make it easier to create a bug-free database, below is a list of common mistakes made when editing an AmigaGuide database.
+</p><p>As with any type of programming, errors are bound to crop up.  One of the most common mistakes is spelling errors.  Always double check your spelling of commands.  Also, make sure all commands that should begin in the first column do so.
+</p><p><br />
+</p>
+<ul><li>Symptom:  AmigaGuide displays a database as a text file.  For example, instead of a button, AmigaGuide displays the link point command that was supposed to display the button.</li>
+<li>Cure: AmigaGuide does not think the file is an AmigaGuide database. Check that the first line of the file is the @DATABASE command and that it starts in the first column.</li></ul>
+<p><br />
+</p>
+<ul><li>Symptom: When displaying a database node, AmigaGuide displays nothing in its window.</li>
+<li>Cure: Either the @ENDNODE command is not present in the node or the @ENDCODE command does not start in the first column.</li></ul>
+<p><br />
+</p>
+<ul><li>Symptom: AmigaGuide does not display a button or its label.</li>
+<li>Cure: The &lt;label&gt; parameter in the link point is missing or not enclosed in quotes.</li></ul>
+<p><br />
+</p>
+<ul><li>Symptom: When the user selects a button, AmigaGuide flashes the screen and displays the error message "Couldn't locate &lt;node&gt;".</li>
+<li>Cure: AmigaGuide cannot locate the node specified in the button's link point command.  If the link point command points to a node in another database, the database must be in the AmigaGuide path or the node must contain the full path name to the database.  The link point command also require a NODE name as the last parameter in the path separated by a slant (/).  If the file is only text and not an AmigaGuide database, its path name should end with <b>/MAIN</b>.  If a node or file has any spaces in its name, the path name must be enclosed within quotes.</li></ul>
+<p><br />
+</p>
+<ul><li>Symptom: AmigaGuide flashes the screen when a button is selected but displays no error message.</li>
+<li>Cure: AmigaGuide does not recognize the &lt;action command&gt; parameter in the link point, or AmigaGuide cannot locate the specified node (see the cure above).</li></ul>
+<p><br />
+</p>
+<ul><li>Symptom: AmigaGuide does not fully display a button.</li>
+<li>Cure: Check that all of the link points end with a closing brace (}). Note that there is a bug in AmigaGuide that can crash the system if a link point does not end with a closing brace.</li></ul>
+<p><br />
+</p>
+<ul><li>Symptom: AmigaGuide will not load a database and displays a "Can't find Node" requester.</li>
+<li>Cure: All databases must contain at least one node.  If the file is short, all the text can be in one node called <b>MAIN</b>.  If you do not wish to make the file a database at all, remove the @DATABASE command.</li></ul>
+<p><br />
+</p>
+<ul><li>Symptom: AmigaGuide does not allow the the user to browse the database to its end.  It either stops browsing before reaching the last node, or it gets caught in an endless loop, cycling through a number of nodes.</li>
+<li>Cure: At least two nodes within a single database have the same name. Every node must have a different name unless they are in separate databases.</li></ul>
+<!-- 
+NewPP limit report
+Cached time: 20260114023100
+Cache expiry: 86400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.015 seconds
+Real time usage: 0.016 seconds
+Preprocessor visited node count: 57/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 2/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 4517/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 -total
+-->
+
+<!-- Saved in parser cache with key docwiki:pcache:idhash:622-0!canonical and timestamp 20260114023100 and revision id 12570. Rendering was triggered because: page-view
+ -->
+</div>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="http://wiki.amigaos.net/w/index.php?title=AmigaGuide_101&amp;oldid=12570">http://wiki.amigaos.net/w/index.php?title=AmigaGuide_101&amp;oldid=12570</a>"</div></div>
+		<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="mw-portlet mw-portlet-personal vector-user-menu-legacy vector-menu" aria-labelledby="p-personal-label"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=AmigaGuide+101" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-namespaces-label"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-main" class="selected mw-list-item"><a href="/wiki/AmigaGuide_101" title="View the content page [c]" accesskey="c"><span>Page</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=Talk:AmigaGuide_101&amp;action=edit&amp;redlink=1" rel="discussion" class="new" title="Discussion about the content page (page does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-variants-label"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy vector-menu" aria-labelledby="p-views-label"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/AmigaGuide_101"><span>Read</span></a></li><li id="ca-viewsource" class="mw-list-item"><a href="/w/index.php?title=AmigaGuide_101&amp;action=edit" title="This page is protected.&#10;You can view its source [e]" accesskey="e"><span>View source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=AmigaGuide_101&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown vector-menu" aria-labelledby="p-cactions-label"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search AmigaOS Documentation Wiki" aria-label="Search AmigaOS Documentation Wiki" autocapitalize="sentences" title="Search AmigaOS Documentation Wiki [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-Navigation" class="mw-portlet mw-portlet-Navigation vector-menu-portal portal vector-menu" aria-labelledby="p-Navigation-label"  >
+	<h3
+		id="p-Navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-Developers" class="mw-portlet mw-portlet-Developers vector-menu-portal portal vector-menu" aria-labelledby="p-Developers-label"  >
+	<h3
+		id="p-Developers-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Developers</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Autodocs" class="mw-list-item"><a href="/wiki/Autodocs:Main"><span>Autodocs</span></a></li><li id="n-Tutorials" class="mw-list-item"><a href="/wiki/Tutorials:Main"><span>Tutorials</span></a></li><li id="n-Registries" class="mw-list-item"><a href="/wiki/DeveloperDoc:Registries"><span>Registries</span></a></li><li id="n-Standards" class="mw-list-item"><a href="/wiki/DeveloperDoc:Standards"><span>Standards</span></a></li><li id="n-Reference" class="mw-list-item"><a href="/wiki/DeveloperDoc:Main"><span>Reference</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="https://www.amigaos.net/viewforum.php?f=25" rel="nofollow"><span>AmigaOS Support Forums</span></a></li><li id="n-OS4Coding-Forum" class="mw-list-item"><a href="https://os4coding.net/forum" rel="nofollow"><span>OS4Coding Forum</span></a></li><li id="n-Get-the-SDK" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/index.php/downloads?view=files&amp;parent=30" rel="nofollow"><span>Get the SDK</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Users" class="mw-portlet mw-portlet-Users vector-menu-portal portal vector-menu" aria-labelledby="p-Users-label"  >
+	<h3
+		id="p-Users-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Users</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Workbench" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_Workbench"><span>Workbench</span></a></li><li id="n-DOS" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_AmigaDOS"><span>DOS</span></a></li><li id="n-ARexx" class="mw-list-item"><a href="/wiki/AmigaOS_Manual:_ARexx"><span>ARexx</span></a></li><li id="n-Bars-&amp;-Pipes-Professional" class="mw-list-item"><a href=""><span>Bars &amp; Pipes Professional</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-Links" class="mw-portlet mw-portlet-Links vector-menu-portal portal vector-menu" aria-labelledby="p-Links-label"  >
+	<h3
+		id="p-Links-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Links</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Hyperion-Entertainment" class="mw-list-item"><a href="https://www.hyperion-entertainment.com/" rel="nofollow"><span>Hyperion Entertainment</span></a></li><li id="n-AmigaOS-Web-Site" class="mw-list-item"><a href="https://www.amigaos.net/" rel="nofollow"><span>AmigaOS Web Site</span></a></li><li id="n-AmigaOS-Support-Forums" class="mw-list-item"><a href="http://support.amigaos.net/" rel="nofollow"><span>AmigaOS Support Forums</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="mw-portlet mw-portlet-tb vector-menu-portal portal vector-menu" aria-labelledby="p-tb-label"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/AmigaGuide_101" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/AmigaGuide_101" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-print" class="mw-list-item"><a href="javascript:print();" rel="alternate" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=AmigaGuide_101&amp;oldid=12570" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=AmigaGuide_101&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="mw-portlet mw-portlet-coll-print_export vector-menu-portal portal vector-menu" aria-labelledby="p-coll-print_export-label"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=AmigaGuide+101"><span>Create a book</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=AmigaGuide+101&amp;oldid=12570&amp;writer=rl"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=AmigaGuide_101&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 12 February 2025, at 10:04.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="/wiki/AmigaOS_Documentation_Wiki:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/AmigaOS_Documentation_Wiki:About">About AmigaOS Documentation Wiki</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/AmigaOS_Documentation_Wiki:General_disclaimer">Disclaimers</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><img src="/w/resources/assets/poweredby_mediawiki.svg" alt="Powered by MediaWiki" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":131,"wgPageParseReport":{"limitreport":{"cputime":"0.015","walltime":"0.016","ppvisitednodes":{"value":57,"limit":1000000},"postexpandincludesize":{"value":0,"limit":2097152},"templateargumentsize":{"value":0,"limit":2097152},"expansiondepth":{"value":2,"limit":100},"expensivefunctioncount":{"value":0,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":4517,"limit":5000000},"timingprofile":["100.00%    0.000      1 -total"]},"cachereport":{"timestamp":"20260114023100","ttl":86400,"transientcontent":false}}});});</script>
+</body>
+</html>
