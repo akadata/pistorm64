@@ -468,7 +468,7 @@ static const struct file_operations ps_fops = {
 	.owner = THIS_MODULE,
 	.unlocked_ioctl = ps_ioctl,
 	.open = ps_open,
-	.llseek = no_llseek,
+	.llseek = noop_llseek,
 };
 
 static void __iomem *ps_map_resource(const char *compat, const char *name)
