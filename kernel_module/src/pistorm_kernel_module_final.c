@@ -11,13 +11,32 @@
 #include <linux/ioctl.h>
 #include <linux/miscdevice.h>
 
-// Include our UAPI header
-#include "pistorm.h"
+// Define ioctl constants for PiStorm kernel module
+#define PISTORM_IOC_MAGIC 'p'
+
+enum pistorm_width {
+    PISTORM_W8  = 1,
+    PISTORM_W16 = 2,
+    PISTORM_W32 = 4,
+};
+
+struct pistorm_busop {
+    __u32 addr;
+    __u32 value;   /* for write: input; for read: output */
+    __u8  width;   /* 1/2/4 */
+    __u8  is_read; /* 1=read, 0=write */
+    __u16 flags;   /* future */
+};
+
+/* Ioctl definitions */
+#define PISTORM_IOC_SETUP          _IO(PISTORM_IOC_MAGIC, 0x00)
+#define PISTORM_IOC_RESET_SM       _IO(PISTORM_IOC_MAGIC, 0x01)
+#define PISTORM_IOC_PULSE_RESET    _IO(PISTORM_IOC_MAGIC, 0x02)
+#define PISTORM_IOC_BUSOP          _IOWR(PISTORM_IOC_MAGIC, 0x10, struct pistorm_busop)
 
 #define BCM2708_PERI_BASE 0x3F000000  // Pi3/Pi Zero W2
 #define GPIO_ADDR 0x200000
 #define GPCLK_ADDR 0x101000
-#define BCM2708_PERI_BASE 0x3F000000  // Pi3/Pi Zero W2
 
 // GPIO register offsets
 #define GPFSEL0 0x00
@@ -27,6 +46,7 @@
 #define GPFSEL4 0x10
 #define GPFSEL5 0x14
 #define GPSET0  0x1c
+#define GPSET1  0x20
 #define GPCLR0  0x28
 #define GPCLR1  0x2c
 #define GPLEV0  0x34
@@ -42,6 +62,21 @@
 #define PIN_RD 6
 #define PIN_WR 7
 #define PIN_D(x) (8 + x)
+
+// GPIO function select values
+#define GPIO_INPUT  0
+#define GPIO_OUTPUT 1
+#define GPIO_ALT0   4
+#define GPIO_ALT1   5
+#define GPIO_ALT2   6
+#define GPIO_ALT3   7
+#define GPIO_ALT4   3
+#define GPIO_ALT5   2
+
+// Clock definitions
+#define CLK_PASSWD 0x5a000000
+#define CLK_GP0_CTL 0x70
+#define CLK_GP0_DIV 0x74
 
 struct pistorm_device {
     struct miscdevice miscdev;
@@ -79,7 +114,7 @@ static long pistorm_ioctl(struct file *file, unsigned int cmd, unsigned long arg
         u32 fsel0 = readl(pistorm_dev->gpio_base + GPFSEL0);
         int reset_shift = (PIN_RESET % 10) * 3;
         fsel0 &= ~(7 << reset_shift);
-        fsel0 |= (1 << reset_shift);  // Output mode
+        fsel0 |= (GPIO_OUTPUT << reset_shift);  // Output mode
         writel(fsel0, pistorm_dev->gpio_base + GPFSEL0);
         
         // Drive RESET low (active)
@@ -116,7 +151,6 @@ static long pistorm_ioctl(struct file *file, unsigned int cmd, unsigned long arg
                 // For emulator compatibility, return appropriate values
                 // that indicate the state of TXN_IN_PROGRESS and IPL_ZERO pins
                 // Default: TXN_IN_PROGRESS = 0 (not in progress), IPL_ZERO = 0 (not zero)
-                // This would be represented in the result
                 result = 0xFFFFEC;  // Default state with some pins active/inactive as expected
                 
                 busop.value = result;
