@@ -19,7 +19,7 @@
 #define BE16(val) be16toh(val)
 
 // Uncomment the line below to enable debug output
-//#define PISCSI_DEBUG
+#define PISCSI_DEBUG
 
 #ifdef PISCSI_DEBUG
 #define DEBUG printf
