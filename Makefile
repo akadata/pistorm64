@@ -20,6 +20,8 @@ EXENAME          = emulator
 
 PLATFORM=ZEROW2_64
 
+PISTORM_KMOD ?= 1
+
 # Tunables: edit here instead of hunting through rule bodies.
 # WARNINGS   : compiler warnings; keep strict by default.
 # OPT_LEVEL  : optimisation level (-Os/-O2/-O3). Can also set O=2,3,...
@@ -39,17 +41,23 @@ PLATFORM=ZEROW2_64
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 WARNINGS   ?= -Wall -Wextra -pedantic
 OPT_LEVEL  ?= -O3
+
 ifdef O
 OPT_LEVEL := -O$(O)
 endif
+
 # Set USE_GOLD=1 to link with gold if available.
 USE_GOLD   ?= 0
+
 # Toggle RTG output backends: 1=raylib (default), 0=null stub.
 USE_RAYLIB ?= 0
+
 # Toggle ALSA-based audio (Pi AHI). If 0, drop pi_ahi and -lasound.
 USE_ALSA   ?= 1
+
 # Toggle PMMU emulation (68030/040). Default on; disable with USE_PMMU=0 if needed.
 USE_PMMU   ?= 1
+
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0
 
@@ -61,14 +69,17 @@ USE_LTO    ?= 0
 USE_NO_PLT ?= 1
 OMIT_FP    ?= 1
 USE_PIPE   ?= 1
+
 # Quiet noisy-but-benign warnings from the generated 68k core.
 M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable
+
 # Default CPU flags; overridden by PLATFORM selections below.
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
+
 # Raylib paths can be swapped if you use a custom build.
 RAYLIB_INC    ?= -I./src/raylib
 RAYLIB_LIBDIR ?= -L./src/raylib_drm
-PISTORM_KMOD ?= 1
+
 PREFIX        ?= /opt/pistorm64
 DESTDIR       ?=
 INSTALL       ?= install
