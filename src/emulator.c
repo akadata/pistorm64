@@ -256,7 +256,7 @@ static void* control_task(void* arg) {
     return NULL;
   }
 
-  log_printf("[MONITOR] control socket listening at %s\n", CTRL_SOCK_PATH);
+  LOG_INFO("[MONITOR] control socket listening at %s\n", CTRL_SOCK_PATH);
 
   // Non-blocking accept loop so we can exit when emulator_exiting is set.
   fcntl(listen_fd, F_SETFL, O_NONBLOCK);
@@ -292,16 +292,16 @@ static void* control_task(void* arg) {
         continue;
 
       if (!strcasecmp(line, "reset")) {
-        log_printf("[MONITOR] reset_sm requested via control socket\n");
+        LOG_INFO("[MONITOR] reset_sm requested via control socket\n");
         amiga_reset_and_wait("monitor");
         fprintf(fp, "OK reset\n");
       } else if (!strcasecmp(line, "pulse")) {
-        log_printf("[MONITOR] pulse_reset requested via control socket\n");
+        LOG_INFO("[MONITOR] pulse_reset requested via control socket\n");
         ps_pulse_reset();
         ps_setup_protocol();
         fprintf(fp, "OK pulse\n");
       } else if (!strcasecmp(line, "setup")) {
-        log_printf("[MONITOR] setup requested via control socket\n");
+        LOG_INFO("[MONITOR] setup requested via control socket\n");
         ps_setup_protocol();
         fprintf(fp, "OK setup\n");
       } else if (!strcasecmp(line, "quit")) {
