@@ -88,6 +88,7 @@ static int handle_line(char *line, FILE *io)
 			perror("ioctl(RESET_SM)");
 		/* Re-run setup to put bus/GPIO back into known-good state. */
 		ps_setup();
+		fprintf(io, "OK (reset_sm)\n");
 		return 0;
 	}
 
@@ -95,6 +96,7 @@ static int handle_line(char *line, FILE *io)
 		if (ioctl(ps_fd, PISTORM_IOC_PULSE_RESET) < 0)
 			perror("ioctl(PULSE_RESET)");
 		ps_setup();
+		fprintf(io, "OK (pulse_reset)\n");
 		return 0;
 	}
 
@@ -118,6 +120,8 @@ static int handle_line(char *line, FILE *io)
 	if (!strcmp(cmd, "setup")) {
 		if (ps_setup() < 0)
 			perror("ioctl(SETUP)");
+		else
+			fprintf(io, "OK (setup)\n");
 		return 0;
 	}
 
@@ -255,6 +259,10 @@ int main(int argc, char **argv)
 {
 	const char *dev = DEFAULT_DEV;
 	int listen_port = 0;
+
+	/* Force unbuffered output so prompts/responses show immediately. */
+	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stderr, NULL, _IONBF, 0);
 
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "--dev") && i + 1 < argc) {
