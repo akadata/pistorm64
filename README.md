@@ -93,16 +93,24 @@ This derivative work is also released under the MIT License, continuing the open
 
 **Note:** Pi 4 and 400 are not currently supported but work is in progress (WIP). Suggestions and contributions welcome!
 
-### Build Process
+### Build/Install (kmod backend is default)
 ```bash
-# Build the main emulator
-make
+# build emulator + tools (kmod backend)
+make PISTORM_KMOD=1
 
-# Build specific tools
-./build_regtool.sh
-./build_clkpeek.sh
-./build_pimodplay.sh
+# build + install kernel module
+make kernel_module
+sudo make kernel_install
+sudo modprobe pistorm
+
+# install userland, configs, udev/rtprio helpers
+sudo make PISTORM_KMOD=1 install
+
+# add user to pistorm group (for /dev/pistorm access)
+sudo groupadd -f pistorm
+sudo usermod -aG pistorm <user>
 ```
+Re-login (or `newgrp pistorm`) to pick up group membership. udev and limits.d files are installed by `make install` (see `docs/udev.md`, `docs/rtprio.md`). If you want the legacy userspace GPIO path, override at build time: `make PISTORM_KMOD=0`.
 
 ## Testing Status
 
@@ -139,4 +147,3 @@ This project builds upon the excellent work of the original PiStorm developers. 
 ## Disclaimer
 
 This project is provided as-is under the MIT License. Please ensure you have proper hardware knowledge before connecting any devices. The authors are not responsible for any hardware damage resulting from improper use.
-
