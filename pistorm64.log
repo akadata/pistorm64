@@ -1,0 +1,126 @@
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI] Loaded Boot ROM.
+[INFO] [AMIGA] Platform custom range: 00E80000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [PISCSI] Map 0: [../Amiga/Workbench8GB.hdf] - 7994327040 bytes.
+[INFO] [PISCSI] CHS: 15490 16 63
+[INFO] Finding partitions.
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Partition 1: DH1 (3)
+[INFO] Finding file systems.
+[INFO] [FSHD] Loaded and set up file system 1: PFS/3
+[INFO] [FSHD] Loaded and set up file system 2: DOS/1
+[INFO] Done.
+[INFO] [PISCSI-SELFTEST] Running HDF integrity validation for drive 0...
+[INFO] [PISCSI-SELFTEST] INFO: Valid RDB signature found in ../Amiga/Workbench8GB.hdf
+[INFO] [PISCSI-SELFTEST] Testing DH0 partition accessibility...
+[INFO] [PISCSI-SELFTEST] INFO: No DOS boot block signature in DH0 (signature: 0x50415254)
+[INFO] [PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 0 (../Amiga/Workbench8GB.hdf)
+[INFO] [PISCSI] Map 6: [./src/platforms/amiga/pistorm.hdf] - 2621440 bytes.
+[INFO] [PISCSI] CHS: 160 1 32
+[INFO] Finding partitions.
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] Finding file systems.
+[INFO] Done.
+[INFO] [PISCSI-SELFTEST] Running HDF integrity validation for drive 6...
+[INFO] [PISCSI-SELFTEST] INFO: Valid RDB signature found in ./src/platforms/amiga/pistorm.hdf
+[INFO] [PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 6 (./src/platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 2MB of Z2 Fast RAM configured at $200000
+[INFO] [AMIGA] No Z3 Fast RAM configured.
+[INFO] [AMIGA] Platform custom range: 00E80000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Partition 1: DH1 (3)
+[INFO] [FSHD] Loaded and set up file system 1: PFS/3
+[INFO] [FSHD] Loaded and set up file system 2: DOS/1
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] [AMIGA] Platform custom range: 00E80000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 1 at $00200000-00400000, Size: 2 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EA0000
+[INFO] [AMIGA] Platform custom range: 00E90000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Partition 1: DH1 (3)
+[INFO] [FSHD] Loaded and set up file system 1: PFS/3
+[INFO] [FSHD] Loaded and set up file system 2: DOS/1
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] [AMIGA] Platform custom range: 00E80000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 1 at $00200000-00400000, Size: 2 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EA0000
+[INFO] [AMIGA] Platform custom range: 00E90000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI] Shutting down PiSCSI.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[INFO] [PISCSI] Loaded Boot ROM.
+[INFO] [AMIGA] Platform custom range: 00E80000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [PISCSI] Map 0: [../Amiga/Workbench8GB.hdf] - 7994327040 bytes.
+[INFO] [PISCSI] CHS: 15490 16 63
+[INFO] Finding partitions.
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Partition 1: DH1 (3)
+[INFO] Finding file systems.
+[INFO] [FSHD] Loaded and set up file system 1: PFS/3
+[INFO] [FSHD] Loaded and set up file system 2: DOS/1
+[INFO] Done.
+[INFO] [PISCSI-SELFTEST] Running HDF integrity validation for drive 0...
+[INFO] [PISCSI-SELFTEST] INFO: Valid RDB signature found in ../Amiga/Workbench8GB.hdf
+[INFO] [PISCSI-SELFTEST] Testing DH0 partition accessibility...
+[INFO] [PISCSI-SELFTEST] INFO: No DOS boot block signature in DH0 (signature: 0x50415254)
+[INFO] [PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 0 (../Amiga/Workbench8GB.hdf)
+[INFO] [PISCSI] Map 6: [./src/platforms/amiga/pistorm.hdf] - 2621440 bytes.
+[INFO] [PISCSI] CHS: 160 1 32
+[INFO] Finding partitions.
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] Finding file systems.
+[INFO] Done.
+[INFO] [PISCSI-SELFTEST] Running HDF integrity validation for drive 6...
+[INFO] [PISCSI-SELFTEST] INFO: Valid RDB signature found in ./src/platforms/amiga/pistorm.hdf
+[INFO] [PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 6 (./src/platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 8MB of Z2 Fast RAM configured at $200000
+[INFO] [AMIGA] No Z3 Fast RAM configured.
+[INFO] [AMIGA] Platform custom range: 00E80000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Partition 1: DH1 (3)
+[INFO] [FSHD] Loaded and set up file system 1: PFS/3
+[INFO] [FSHD] Loaded and set up file system 2: DOS/1
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] [AMIGA] Platform custom range: 00E80000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 1 at $00200000-00A00000, Size: 8 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EA0000
+[INFO] [AMIGA] Platform custom range: 00E90000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [PISCSI] Partition 0: DH0 (3)
+[INFO] [PISCSI] Partition 1: DH1 (3)
+[INFO] [FSHD] Loaded and set up file system 1: PFS/3
+[INFO] [FSHD] Loaded and set up file system 2: DOS/1
+[INFO] [PISCSI] Partition 0: DH99 (4)
+[INFO] [AMIGA] Platform custom range: 00E80000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 1 at $00200000-00A00000, Size: 8 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EA0000
+[INFO] [AMIGA] Platform custom range: 00E90000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-01000000
+[INFO] [AMIGA] Performing Amiga platform shutdown.
+[INFO] [PISCSI] Shutting down PiSCSI.
+[INFO] [AUTOCONF] Resetting all autoconf data.
+[INFO] [AMIGA] Platform shutdown completed.
