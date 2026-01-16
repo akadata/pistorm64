@@ -255,6 +255,7 @@ CONFIG_FILES := default.cfg amiga.cfg mac68k.cfg test.cfg x68k.cfg
 INSTALL_BINS := $(TARGET) buptest pistorm_truth_test pistorm_monitor
 UDEV_RULES := etc/udev/99-pistorm.rules
 LIMITS_CONF := etc/security/limits.d/pistorm-rt.conf
+MODULES_LOAD := etc/modules-load.d/pistorm.conf
 HELP_TARGETS = \
 	"make"                             "Build emulator (kmod backend default)" \
 	"make PISTORM_KMOD=0"             "Build emulator with legacy userspace GPIO" \
@@ -342,6 +343,10 @@ install: all
 	if [ -f $(LIMITS_CONF) ]; then \
 		$(INSTALL) -d /etc/security/limits.d; \
 		$(INSTALL) -m 644 $(LIMITS_CONF) /etc/security/limits.d/pistorm-rt.conf; \
+	fi
+	if [ -f $(MODULES_LOAD) ]; then \
+		$(INSTALL) -d /etc/modules-load.d; \
+		$(INSTALL) -m 644 $(MODULES_LOAD) /etc/modules-load.d/pistorm.conf; \
 	fi
 
 uninstall:

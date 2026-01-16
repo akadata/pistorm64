@@ -48,3 +48,4 @@ sudo ./pistorm_monitor --listen 6666
 - No scripting or disassembly—this is a minimal peek/poke tool. For richer automation, wrap it or extend it.
 - Reads/writes use the single BUSOP ioctl; batching is not implemented yet.
 - When the emulator is running, it listens on `/tmp/pistorm_ctrl.sock`. `pistorm_monitor` will notify it after `reset_sm`/`pulse_reset` so the emulator can log `[MONITOR] …` and re-init the bus.
+- If `/dev/pistorm` is missing, the monitor/emulator will try `modprobe pistorm`, but you may need to load the module or install a modules-load.d entry (installed by `make install`) for auto-load at boot.

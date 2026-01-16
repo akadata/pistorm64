@@ -22,6 +22,13 @@ static int ps_open_dev(void) {
     if (ps_fd >= 0) return 0;
     ps_fd = open("/dev/pistorm", O_RDWR | O_CLOEXEC);
     if (ps_fd < 0) {
+        if (errno == ENOENT || errno == ENODEV) {
+            /* Try to load the module if not present */
+            system("/sbin/modprobe pistorm >/dev/null 2>&1");
+            ps_fd = open("/dev/pistorm", O_RDWR | O_CLOEXEC);
+        }
+    }
+    if (ps_fd < 0) {
         if (!backend_logged) {
             fprintf(stderr, "[ps_protocol] kmod backend selected but /dev/pistorm missing (%s)\n",
                     strerror(errno));
