@@ -761,19 +761,31 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             }
 
             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
-            if (!map) {
-                DEBUG("[PISCSI-%d] No mapped range found for read (addr=0x%08X len=%u). Aborting.\n", val, piscsi_u32[2], piscsi_u32[1]);
-                break;
-            }
-
-            DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, r);
-            ssize_t bytes_read = read(d->fd, map, piscsi_u32[1]);
-            if (bytes_read < 0) {
-                DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
-            } else if (bytes_read != (ssize_t)piscsi_u32[1]) {
-                DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
+            if (map) {
+                DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, r);
+                ssize_t bytes_read = read(d->fd, map, piscsi_u32[1]);
+                if (bytes_read < 0) {
+                    DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
+                } else if (bytes_read != (ssize_t)piscsi_u32[1]) {
+                    DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
+                } else {
+                    DEBUG_TRIVIAL("[PISCSI-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, bytes_read);
+                }
             } else {
-                DEBUG_TRIVIAL("[PISCSI-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, bytes_read);
+                // Unmapped target: fall back to CPU copies (slow but correct).
+                DEBUG("[PISCSI-%d] No mapped range found for read (addr=0x%08X len=%u); falling back to CPU copy.\n", val, piscsi_u32[2], piscsi_u32[1]);
+                ssize_t bytes_read = read(d->fd, p->mem_buffer, piscsi_u32[1]);
+                if (bytes_read <= 0) {
+                    DEBUG("[PISCSI-IO-ERROR] Unit:%d READ fallback failed: requested=%d, got=%zd\n", val, piscsi_u32[1], bytes_read);
+                    break;
+                }
+                if (bytes_read != (ssize_t)piscsi_u32[1]) {
+                    DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ (fallback): requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
+                }
+                for (ssize_t i = 0; i < bytes_read; i++) {
+                    m68k_write_memory_8(piscsi_u32[2] + (uint32_t)i, (uint32_t)p->mem_buffer[i]);
+                }
+                DEBUG_TRIVIAL("[PISCSI-IO-SUCCESS] Unit:%d CPU COPY READ: %zd bytes OK\n", val, bytes_read);
             }
             break;
         case PISCSI_CMD_WRITE64:
