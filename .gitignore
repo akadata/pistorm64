@@ -33,6 +33,8 @@ m68kops.h
 qwen.resume
 # *.log
 *.rom 
+# Keep the PiSCSI boot ROM tracked
+!src/platforms/amiga/piscsi/piscsi.rom
 *.jdf
 *.dd
 *.pdf
