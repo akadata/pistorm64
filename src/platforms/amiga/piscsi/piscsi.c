@@ -873,8 +873,12 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             break;
         case PISCSI_CMD_DRIVER:
             DEBUG("[PISCSI] Driver copy/patch called, destination address %.8X.\n", val);
-            r = get_mapped_item_by_address(cfg, val);
-            if (r != -1) {
+            {
+                int32_t r = get_mapped_item_by_address(cfg, val);
+                if (r == -1) {
+                    DEBUG("[PISCSI] Driver destination not in a mapped range; ignoring load.\n");
+                    break;
+                }
                 uint32_t addr = val - cfg->map_offset[r];
                 uint8_t *dst_data = cfg->map_data[r];
                 uint8_t cur_partition = 0;
