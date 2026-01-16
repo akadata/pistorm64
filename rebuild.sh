@@ -1,1 +1,9 @@
-make clean; sudo rmmod -f pistorm ; make PISTORM_KMOD=1 ;make kernel_clean  ;  make kernel_module; sudo make kernel_install; make pistorm_monitor  PISTORM_KMOD=1; sudo make install; sudo modprobe pistorm
+make clean; 
+sudo rmmod -f pistorm
+make PISTORM_KMOD=1
+make kernel_clean
+make kernel_module
+sudo make kernel_install
+make pistorm_monitor  PISTORM_KMOD=1
+sudo make install
+sudo modprobe pistorm
