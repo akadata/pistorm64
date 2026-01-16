@@ -1,0 +1,1 @@
+savedcmd_/home/smalley/pistorm/kernel_module/pistorm.ko := aarch64-linux-gnu-ld -r -EL  -maarch64elf -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T arch/arm64/module.lds -o /home/smalley/pistorm/kernel_module/pistorm.ko /home/smalley/pistorm/kernel_module/pistorm.o /home/smalley/pistorm/kernel_module/pistorm.mod.o /home/smalley/pistorm/kernel_module/.module-common.o

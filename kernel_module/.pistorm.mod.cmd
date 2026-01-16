@@ -1,0 +1,1 @@
+savedcmd_/home/smalley/pistorm/kernel_module/pistorm.mod := printf '%s\n'   src/pistorm.o | awk '!x[$$0]++ { print("/home/smalley/pistorm/kernel_module/"$$0) }' > /home/smalley/pistorm/kernel_module/pistorm.mod
