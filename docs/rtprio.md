@@ -9,13 +9,10 @@ The emulator sets SCHED_RR priorities for CPU/IO/input threads. Without CAP_SYS_
 This is expected unless you grant realtime to your user. To enable RT for the `pistorm` group (example):
 
 1) Ensure the group exists and you are a member (see docs/udev.md).
-2) Add a limits.d file:
+2) Install the limits.d file (shipped as `etc/security/limits.d/pistorm-rt.conf`), either via `make install` or manually:
 
 ```sh
-sudo tee /etc/security/limits.d/pistorm-rt.conf >/dev/null <<'EOF'
-@pistorm - rtprio 95
-@pistorm - memlock unlimited
-EOF
+sudo install -D -m 644 etc/security/limits.d/pistorm-rt.conf /etc/security/limits.d/pistorm-rt.conf
 ```
 
 3) Log out/in (or `newgrp pistorm`) so pam_limits applies.

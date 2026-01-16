@@ -69,7 +69,7 @@ CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 # Raylib paths can be swapped if you use a custom build.
 RAYLIB_INC    ?= -I./src/raylib
 RAYLIB_LIBDIR ?= -L./src/raylib_drm
-PISTORM_KMOD  ?= 0
+PISTORM_KMOD  ?= 1
 PREFIX        ?= /opt/pistorm64
 DESTDIR       ?=
 INSTALL       ?= install
@@ -243,7 +243,8 @@ TARGET = $(EXENAME)$(EXE)
 INSTALL_DIR := $(DESTDIR)$(PREFIX)
 CONFIG_FILES := default.cfg amiga.cfg mac68k.cfg test.cfg x68k.cfg
 INSTALL_BINS := $(TARGET) buptest pistorm_truth_test pistorm_monitor
-UDEV_RULES := udev/99-pistorm.rules
+UDEV_RULES := etc/udev/99-pistorm.rules
+LIMITS_CONF := etc/security/limits.d/pistorm-rt.conf
 HELP_TARGETS = \
 	"make"                             "Build emulator (default backend)" \
 	"make PISTORM_KMOD=1"             "Build emulator with kernel backend shim" \
@@ -326,6 +327,10 @@ install: all
 		$(INSTALL) -m 644 $(UDEV_RULES) /etc/udev/rules.d/99-pistorm.rules; \
 		udevadm control --reload >/dev/null 2>&1 || true; \
 		udevadm trigger --subsystem-match=misc --attr-match=dev=10:262 >/dev/null 2>&1 || true; \
+	fi
+	if [ -f $(LIMITS_CONF) ]; then \
+		$(INSTALL) -d /etc/security/limits.d; \
+		$(INSTALL) -m 644 $(LIMITS_CONF) /etc/security/limits.d/pistorm-rt.conf; \
 	fi
 
 uninstall:

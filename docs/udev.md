@@ -4,7 +4,7 @@ To run the emulator without sudo (kmod backend), add a udev rule that makes `/de
 
 ## Rule
 
-We ship `udev/99-pistorm.rules`:
+We ship `etc/udev/99-pistorm.rules`:
 
 ```
 KERNEL=="pistorm", GROUP="pistorm", MODE="0660"
