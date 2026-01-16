@@ -46,6 +46,8 @@ static const char *op_type_names[4] = {
 #define stop_cpu_emulation(...)
 #endif
 
+#define PIB 0x00
+
 #ifdef FAKESTORM
 #define lseek64 lseek
 #endif
