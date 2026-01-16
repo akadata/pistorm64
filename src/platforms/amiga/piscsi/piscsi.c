@@ -820,7 +820,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
 
             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
             if (map) {
-                DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Write comes from mapped range %d.\n", val, r);
+                DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Write comes from mapped range.\n", val);
                 ssize_t bytes_written = write(d->fd, map, piscsi_u32[1]);
                 if (bytes_written < 0) {
                     DEBUG("[PISCSI-IO-ERROR] Unit:%d WRITE failed: bytes_requested=%d, bytes_written=%zd, errno=%d\n", val, piscsi_u32[1], bytes_written, errno);
