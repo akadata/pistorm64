@@ -187,7 +187,7 @@ static int ps_wait_for_txn_log(const char *op)
 
 	if (ret == -ETIMEDOUT)
 		pr_err("pistorm: txn timeout waiting for %s (PIN_TXN_IN_PROGRESS stuck)\n", op);
-	return -ETIMEDOUT;
+	return ret;
 }
 
 static void ps_write_payload(u32 payload, u32 reg_sel)
