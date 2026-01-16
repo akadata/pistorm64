@@ -718,7 +718,6 @@ void piscsi_debugme(uint32_t index) {
 }
 
 void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
-    int32_t r;
     uint8_t *map;
 #ifndef PISCSI_DEBUG
     if (type) {}
@@ -762,7 +761,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
 
             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
             if (map) {
-                DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, r);
+                DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read hits mapped range.\n", val);
                 ssize_t bytes_read = read(d->fd, map, piscsi_u32[1]);
                 if (bytes_read < 0) {
                     DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
