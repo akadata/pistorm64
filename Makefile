@@ -256,15 +256,16 @@ INSTALL_BINS := $(TARGET) buptest pistorm_truth_test pistorm_monitor
 UDEV_RULES := etc/udev/99-pistorm.rules
 LIMITS_CONF := etc/security/limits.d/pistorm-rt.conf
 HELP_TARGETS = \
-	"make"                             "Build emulator (default backend)" \
-	"make PISTORM_KMOD=1"             "Build emulator with kernel backend shim" \
+	"make"                             "Build emulator (kmod backend default)" \
+	"make PISTORM_KMOD=0"             "Build emulator with legacy userspace GPIO" \
 	"make clean"                      "Remove build artifacts" \
 	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom, a314 files" \
 	"make uninstall [PREFIX=… DESTDIR=…]" "Remove installed tree" \
 	"make kernel_module"              "Build pistorm.ko (out-of-tree)" \
 	"make kernel_install"             "Install pistorm.ko via kernel_module/Makefile" \
 	"make kernel_clean"               "Clean kernel module build outputs" \
-	"make pistorm_monitor"            "Build interactive bus monitor"
+	"make pistorm_monitor"            "Build interactive bus monitor" \
+	"make full_clean_install"         "Stop emulator, rebuild kmod+userland, install"
 
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
@@ -354,6 +355,15 @@ kernel_install: kernel_module
 
 kernel_clean:
 	$(MAKE) -C kernel_module clean
+
+full_clean_install:
+	-pkill -x emulator 2>/dev/null || true
+	-sudo rmmod pistorm 2>/dev/null || true
+	$(MAKE) clean
+	$(MAKE) PISTORM_KMOD=$(PISTORM_KMOD)
+	$(MAKE) kernel_module
+	sudo $(MAKE) kernel_install
+	sudo $(MAKE) PISTORM_KMOD=$(PISTORM_KMOD) install
 
 help:
 	@printf "Available targets:\n"
