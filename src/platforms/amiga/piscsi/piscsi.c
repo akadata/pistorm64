@@ -12,6 +12,7 @@
 #include "config_file/config_file.h"
 #include "gpio/ps_protocol.h"
 #include "log.h"
+#include "log.h"
 #include "piscsi-enums.h"
 #include "piscsi.h"
 #include "platforms/amiga/hunk-reloc.h"
@@ -19,8 +20,8 @@
 #define BE(val) be32toh(val)
 #define BE16(val) be16toh(val)
 
-// Uncomment the line below to enable debug output
-#define PISCSI_DEBUG
+/* Uncomment the line below to enable debug output */
+//#define PISCSI_DEBUG
 
 /* Route printf-style output through the emulator logger so --log captures it. */
 #undef printf
@@ -760,33 +761,19 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             }
 
             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
-            if (map) {
-                DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, r);
-                ssize_t bytes_read = read(d->fd, map, piscsi_u32[1]);
-                if (bytes_read < 0) {
-                    DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
-                } else if (bytes_read != (ssize_t)piscsi_u32[1]) {
-                    DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
-                } else {
-                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, bytes_read);
-                }
+            if (!map) {
+                DEBUG("[PISCSI-%d] No mapped range found for read (addr=0x%08X len=%u). Aborting.\n", val, piscsi_u32[2], piscsi_u32[1]);
+                break;
             }
-            else {
-                DEBUG_TRIVIAL("[PISCSI-%d] No mapped range found for read.\n", val);
-                uint8_t c = 0;
-                int success = 1;
-                for (uint32_t i = 0; i < piscsi_u32[1]; i++) {
-                    ssize_t result = read(d->fd, &c, 1);
-                    if (result <= 0) {
-                        DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE READ failed at offset %d: result=%zd\n", val, i, result);
-                        success = 0;
-                        break;
-                    }
-                    m68k_write_memory_8(piscsi_u32[2] + i, (uint32_t)c);
-                }
-                if (success) {
-                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d BYTE READ: %d bytes OK\n", val, piscsi_u32[1]);
-                }
+
+            DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, r);
+            ssize_t bytes_read = read(d->fd, map, piscsi_u32[1]);
+            if (bytes_read < 0) {
+                DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
+            } else if (bytes_read != (ssize_t)piscsi_u32[1]) {
+                DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
+            } else {
+                DEBUG_TRIVIAL("[PISCSI-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, bytes_read);
             }
             break;
         case PISCSI_CMD_WRITE64:
