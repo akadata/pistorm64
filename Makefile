@@ -243,6 +243,7 @@ TARGET = $(EXENAME)$(EXE)
 INSTALL_DIR := $(DESTDIR)$(PREFIX)
 CONFIG_FILES := default.cfg amiga.cfg mac68k.cfg test.cfg x68k.cfg
 INSTALL_BINS := $(TARGET) buptest pistorm_truth_test pistorm_monitor
+UDEV_RULES := udev/99-pistorm.rules
 HELP_TARGETS = \
 	"make"                             "Build emulator (default backend)" \
 	"make PISTORM_KMOD=1"             "Build emulator with kernel backend shim" \
@@ -320,6 +321,12 @@ install: all
 	cp -a src/a314/files_pi $(INSTALL_DIR)/src/a314/
 	cp -a data $(INSTALL_DIR)/
 	[ -f pistorm.LICENSE ] && $(INSTALL) -m 644 pistorm.LICENSE $(INSTALL_DIR)/
+	if [ -f $(UDEV_RULES) ]; then \
+		$(INSTALL) -d /etc/udev/rules.d; \
+		$(INSTALL) -m 644 $(UDEV_RULES) /etc/udev/rules.d/99-pistorm.rules; \
+		udevadm control --reload >/dev/null 2>&1 || true; \
+		udevadm trigger --subsystem-match=misc --attr-match=dev=10:262 >/dev/null 2>&1 || true; \
+	fi
 
 uninstall:
 	rm -rf $(INSTALL_DIR)
