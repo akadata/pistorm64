@@ -68,10 +68,7 @@ CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 # Raylib paths can be swapped if you use a custom build.
 RAYLIB_INC    ?= -I./src/raylib
 RAYLIB_LIBDIR ?= -L./src/raylib_drm
-# Default to kmod unless explicitly set to 0
-ifeq ($(origin PISTORM_KMOD), undefined)
-PISTORM_KMOD := 1
-endif
+PISTORM_KMOD ?= 1
 PREFIX        ?= /opt/pistorm64
 DESTDIR       ?=
 INSTALL       ?= install
