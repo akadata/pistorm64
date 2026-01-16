@@ -7,7 +7,7 @@
 #include "platforms/platforms.h"
 #include "platforms/shared/rtc.h"
 
-//#define DEBUG_MAC_PLATFORM
+#define DEBUG_MAC_PLATFORM
 
 #ifdef DEBUG_MAC_PLATFORM
 #define DEBUG printf

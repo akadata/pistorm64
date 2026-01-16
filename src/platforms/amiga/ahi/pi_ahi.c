@@ -15,7 +15,7 @@
 
 #include <alsa/asoundlib.h>
 
-//#define AHI_DEBUG
+#define AHI_DEBUG
 
 uint32_t ahi_u32[4];
 uint32_t ahi_addr[4];
