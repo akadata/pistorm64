@@ -69,6 +69,7 @@ struct piscsi_dev {
     uint16_t h, s;
     uint64_t fs;
     int32_t fd;
+    uint8_t  scratch[65536]; /* fallback buffer for unmapped reads/writes */
     uint32_t lba;
     uint32_t num_partitions;
     uint32_t fshd_offs;
