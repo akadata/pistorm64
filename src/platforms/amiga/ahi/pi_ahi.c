@@ -407,7 +407,7 @@ void handle_pi_ahi_write(uint32_t addr_, uint32_t val, uint8_t type) {
     switch (val) {
     case 1:
       amiga_clear_emulating_irq();
-      DEBUG("Interrupt handler triggered. IRQ enabled: %d\n", irq_enabled);
+      DEBUG("Interrupt handler triggered. IRQ enabled: %d\n", irq_disabled ? 0 : 1);
       break;
     case 2:
       ahi_ints_handled++;
