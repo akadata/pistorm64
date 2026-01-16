@@ -20,8 +20,6 @@ EXENAME          = emulator
 
 PLATFORM=ZEROW2_64
 
-PISTORM_KMOD=1
-
 # Tunables: edit here instead of hunting through rule bodies.
 # WARNINGS   : compiler warnings; keep strict by default.
 # OPT_LEVEL  : optimisation level (-Os/-O2/-O3). Can also set O=2,3,...
@@ -70,7 +68,10 @@ CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 # Raylib paths can be swapped if you use a custom build.
 RAYLIB_INC    ?= -I./src/raylib
 RAYLIB_LIBDIR ?= -L./src/raylib_drm
-PISTORM_KMOD  ?= 1
+# Default to kmod unless explicitly set to 0
+ifeq ($(origin PISTORM_KMOD), undefined)
+PISTORM_KMOD := 1
+endif
 PREFIX        ?= /opt/pistorm64
 DESTDIR       ?=
 INSTALL       ?= install
