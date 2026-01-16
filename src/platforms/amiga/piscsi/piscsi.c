@@ -718,6 +718,7 @@ void piscsi_debugme(uint32_t index) {
 }
 
 void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
+    int32_t r;
     uint8_t *map;
 #ifndef PISCSI_DEBUG
     if (type) {}
@@ -963,33 +964,36 @@ skip_disk:;
             break;
         case PISCSI_CMD_COPYFS:
             DEBUG("[PISCSI] Copy file system %d to %.8X and reloc.\n", rom_cur_fs, piscsi_u32[2]);
-            r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
-            if (r != -1) {
-                uint32_t addr = piscsi_u32[2] - cfg->map_offset[r];
-                memcpy(cfg->map_data[r] + addr, filesystems[rom_cur_fs].binary_data, filesystems[rom_cur_fs].h_info.byte_size);
-                filesystems[rom_cur_fs].h_info.base_offset = piscsi_u32[2];
-                reloc_hunks(filesystems[rom_cur_fs].relocs, cfg->map_data[r] + addr, &filesystems[rom_cur_fs].h_info);
-                filesystems[rom_cur_fs].handler = piscsi_u32[2];
+            {
+                int32_t r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
+                if (r != -1) {
+                    uint32_t addr = piscsi_u32[2] - cfg->map_offset[r];
+                    memcpy(cfg->map_data[r] + addr, filesystems[rom_cur_fs].binary_data, filesystems[rom_cur_fs].h_info.byte_size);
+                    filesystems[rom_cur_fs].h_info.base_offset = piscsi_u32[2];
+                    reloc_hunks(filesystems[rom_cur_fs].relocs, cfg->map_data[r] + addr, &filesystems[rom_cur_fs].h_info);
+                    filesystems[rom_cur_fs].handler = piscsi_u32[2];
+                }
             }
             break;
         case PISCSI_CMD_SETFSH: {
             int i = 0;
             DEBUG("[PISCSI] Set handler for partition %d (DeviceNode: %.8X)\n", rom_cur_partition, val);
-            r = get_mapped_item_by_address(cfg, val);
-            if (r != -1) {
-                uint32_t addr = val - cfg->map_offset[r];
-                struct DeviceNode *node = (struct DeviceNode *)(cfg->map_data[r] + addr);
-                char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
+            {
+                int32_t r = get_mapped_item_by_address(cfg, val);
+                if (r != -1) {
+                    uint32_t addr = val - cfg->map_offset[r];
+                    struct DeviceNode *node = (struct DeviceNode *)(cfg->map_data[r] + addr);
+                    char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
 
-                DEBUG("[PISCSI] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
-                // First try exact match
-                for (i = 0; i < piscsi_num_fs; i++) {
-                    if (rom_partition_dostype[rom_cur_partition] == filesystems[i].FS_ID) {
-                        node->dn_SegList = htobe32((((filesystems[i].handler) + filesystems[i].h_info.header_size) >> 2));
-                        node->dn_GlobalVec = 0xFFFFFFFF;
-                        goto fs_found;
+                    DEBUG("[PISCSI] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
+                    // First try exact match
+                    for (i = 0; i < piscsi_num_fs; i++) {
+                        if (rom_partition_dostype[rom_cur_partition] == filesystems[i].FS_ID) {
+                            node->dn_SegList = htobe32((((filesystems[i].handler) + filesystems[i].h_info.header_size) >> 2));
+                            node->dn_GlobalVec = 0xFFFFFFFF;
+                            goto fs_found;
+                        }
                     }
-                }
 
                 // If no exact match, try fallback mappings (e.g., DOS/3 -> DOS/1 for FastFileSystem)
                 uint32_t fallback_dostype = rom_partition_dostype[rom_cur_partition];
