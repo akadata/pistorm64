@@ -21,6 +21,8 @@ EXENAME          = emulator
 PLATFORM=ZEROW2_64
 
 PISTORM_KMOD ?= 1
+EXTRA_CFLAGS ?=
+EXTRA_M68K_CFLAGS ?=
 
 # Tunables: edit here instead of hunting through rule bodies.
 # WARNINGS   : compiler warnings; keep strict by default.
@@ -243,8 +245,8 @@ INCLUDES += -Iinclude -Iinclude/uapi
 DEFINES  += -DPISTORM_KMOD
 endif
 
-CFLAGS       = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS)
-M68K_CFLAGS   = $(CFLAGS) $(M68K_WARN_SUPPRESS)
+CFLAGS       = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
+M68K_CFLAGS   = $(CFLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
 LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS)
 
 LDLIBS   = $(LDLIBS_RAYLIB) $(LDLIBS_VC) $(LDLIBS_ALSA) -ldl -lstdc++ -lm -pthread
