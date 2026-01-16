@@ -47,3 +47,4 @@ sudo ./pistorm_monitor --listen 6666
 - Requires the pistorm kernel module loaded and `/dev/pistorm` accessible (use `sudo` or adjust permissions).
 - No scripting or disassembly—this is a minimal peek/poke tool. For richer automation, wrap it or extend it.
 - Reads/writes use the single BUSOP ioctl; batching is not implemented yet.
+- When the emulator is running, it listens on `/tmp/pistorm_ctrl.sock`. `pistorm_monitor` will notify it after `reset_sm`/`pulse_reset` so the emulator can log `[MONITOR] …` and re-init the bus.

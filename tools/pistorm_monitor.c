@@ -9,11 +9,13 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <unistd.h>
 
 #include "include/uapi/linux/pistorm.h"
 
 #define DEFAULT_DEV "/dev/pistorm"
+#define CTRL_SOCK_PATH "/tmp/pistorm_ctrl.sock"
 #define MAX_LINE 256
 
 static int ps_fd = -1;
@@ -21,6 +23,23 @@ static int ps_fd = -1;
 static int ps_setup(void)
 {
 	return ioctl(ps_fd, PISTORM_IOC_SETUP);
+}
+
+static void notify_emulator(const char *msg)
+{
+	int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+	if (fd < 0)
+		return;
+
+	struct sockaddr_un addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	strncpy(addr.sun_path, CTRL_SOCK_PATH, sizeof(addr.sun_path) - 1);
+
+	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == 0) {
+		(void)write(fd, msg, strlen(msg));
+	}
+	close(fd);
 }
 
 static int ps_open_dev(const char *path)
@@ -88,6 +107,7 @@ static int handle_line(char *line, FILE *io)
 			perror("ioctl(RESET_SM)");
 		/* Re-run setup to put bus/GPIO back into known-good state. */
 		ps_setup();
+		notify_emulator("reset\n");
 		fprintf(io, "OK (reset_sm)\n");
 		return 0;
 	}
@@ -96,6 +116,7 @@ static int handle_line(char *line, FILE *io)
 		if (ioctl(ps_fd, PISTORM_IOC_PULSE_RESET) < 0)
 			perror("ioctl(PULSE_RESET)");
 		ps_setup();
+		notify_emulator("pulse\n");
 		fprintf(io, "OK (pulse_reset)\n");
 		return 0;
 	}

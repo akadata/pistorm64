@@ -32,6 +32,8 @@
 #include <sched.h>
 #include <signal.h>
 #include <errno.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -169,6 +171,9 @@ static const unsigned int loop_cycles_cap = 10000; // cap slices to keep service
 struct emulator_config* cfg = NULL;
 char keyboard_file[256] = "/dev/input/event1";
 
+#define CTRL_SOCK_PATH "/tmp/pistorm_ctrl.sock"
+static pthread_t ctrl_tid = 0;
+
 uint64_t trig_irq = 0, serv_irq = 0;
 uint16_t irq_delay = 0;
 unsigned int amiga_reset = 0;
@@ -219,6 +224,103 @@ static void configure_ipl_nops(void) {
   }
   ipl_nop_count = value;
   printf("[CFG] IPL NOP count: %u\n", ipl_nop_count);
+}
+
+static void* control_task(void* arg) {
+  (void)arg;
+  int listen_fd = -1;
+  struct sockaddr_un addr;
+
+  unlink(CTRL_SOCK_PATH);
+  listen_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+  if (listen_fd < 0) {
+    perror("[MONITOR] socket");
+    return NULL;
+  }
+
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strncpy(addr.sun_path, CTRL_SOCK_PATH, sizeof(addr.sun_path) - 1);
+
+  if (bind(listen_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+    perror("[MONITOR] bind");
+    close(listen_fd);
+    listen_fd = -1;
+    return NULL;
+  }
+
+  if (listen(listen_fd, 1) < 0) {
+    perror("[MONITOR] listen");
+    close(listen_fd);
+    listen_fd = -1;
+    return NULL;
+  }
+
+  log_printf("[MONITOR] control socket listening at %s\n", CTRL_SOCK_PATH);
+
+  // Non-blocking accept loop so we can exit when emulator_exiting is set.
+  fcntl(listen_fd, F_SETFL, O_NONBLOCK);
+
+  while (!emulator_exiting) {
+    int client = accept(listen_fd, NULL, NULL);
+    if (client < 0) {
+      if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
+        usleep(100000);
+        continue;
+      }
+      perror("[MONITOR] accept");
+      break;
+    }
+
+    FILE* fp = fdopen(client, "r+");
+    if (!fp) {
+      perror("[MONITOR] fdopen");
+      close(client);
+      continue;
+    }
+
+    fprintf(fp, "PiStorm ctrl: commands reset|pulse|setup|quit\n");
+    fflush(fp);
+
+    char line[128];
+    while (fgets(line, sizeof(line), fp)) {
+      // Trim newline
+      char* nl = strchr(line, '\n');
+      if (nl)
+        *nl = 0;
+      if (line[0] == 0)
+        continue;
+
+      if (!strcasecmp(line, "reset")) {
+        log_printf("[MONITOR] reset_sm requested via control socket\n");
+        amiga_reset_and_wait("monitor");
+        fprintf(fp, "OK reset\n");
+      } else if (!strcasecmp(line, "pulse")) {
+        log_printf("[MONITOR] pulse_reset requested via control socket\n");
+        ps_pulse_reset();
+        ps_setup_protocol();
+        fprintf(fp, "OK pulse\n");
+      } else if (!strcasecmp(line, "setup")) {
+        log_printf("[MONITOR] setup requested via control socket\n");
+        ps_setup_protocol();
+        fprintf(fp, "OK setup\n");
+      } else if (!strcasecmp(line, "quit")) {
+        fprintf(fp, "bye\n");
+        fflush(fp);
+        break;
+      } else {
+        fprintf(fp, "Unknown: %s\n", line);
+      }
+      fflush(fp);
+    }
+    fclose(fp);
+  }
+
+  if (listen_fd >= 0) {
+    close(listen_fd);
+    unlink(CTRL_SOCK_PATH);
+  }
+  return NULL;
 }
 
 void* ipl_task(void* args) {
@@ -730,6 +832,15 @@ int main(int argc, char* argv[]) {
   pistorm_selftest_alignment();
 
   ps_setup_protocol();
+#ifdef PISTORM_KMOD
+  int ctrl_err = pthread_create(&ctrl_tid, NULL, &control_task, NULL);
+  if (ctrl_err != 0) {
+    printf("[MONITOR] Failed to start control socket: %s\n", strerror(ctrl_err));
+    ctrl_tid = 0;
+  } else {
+    pthread_setname_np(ctrl_tid, "pistorm:ctrl");
+  }
+#endif
 
   log_set_level(LOG_LEVEL_INFO);
 
@@ -1009,6 +1120,13 @@ switch_config:
   if (ipl_tid) {
     pthread_join(ipl_tid, NULL);
   }
+#ifdef PISTORM_KMOD
+  if (ctrl_tid) {
+    emulator_exiting = 1;
+    pthread_join(ctrl_tid, NULL);
+    unlink(CTRL_SOCK_PATH);
+  }
+#endif
 
   if (cfg->platform->shutdown) {
     cfg->platform->shutdown(cfg);
