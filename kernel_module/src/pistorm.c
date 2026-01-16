@@ -180,6 +180,16 @@ static int ps_wait_for_txn(void)
 	return -ETIMEDOUT;
 }
 
+/* Wait with logging on timeout so userspace gets feedback instead of hanging forever. */
+static int ps_wait_for_txn_log(const char *op)
+{
+	int ret = ps_wait_for_txn();
+
+	if (ret == -ETIMEDOUT)
+		pr_err("pistorm: txn timeout waiting for %s (PIN_TXN_IN_PROGRESS stuck)\n", op);
+	return -ETIMEDOUT;
+}
+
 static void ps_write_payload(u32 payload, u32 reg_sel)
 {
 	u32 pins = (payload & GENMASK(23, 8)) | (reg_sel << PIN_A0);
@@ -243,7 +253,7 @@ static int ps_write16(struct pistorm_dev *ps, u32 addr, u16 data)
 	ps_write_payload((addr & 0xffff) << 8, REG_ADDR_LO);
 	ps_write_payload(((0x0000 | (addr >> 16)) << 8), REG_ADDR_HI);
 	ps_set_bus_dir(ps, false);
-	return ps_wait_for_txn();
+	return ps_wait_for_txn_log("write16");
 }
 
 static int ps_write8(struct pistorm_dev *ps, u32 addr, u8 data)
@@ -255,7 +265,7 @@ static int ps_write8(struct pistorm_dev *ps, u32 addr, u8 data)
 	ps_write_payload((addr & 0xffff) << 8, REG_ADDR_LO);
 	ps_write_payload(((0x0100 | (addr >> 16)) << 8), REG_ADDR_HI);
 	ps_set_bus_dir(ps, false);
-	return ps_wait_for_txn();
+	return ps_wait_for_txn_log("write8");
 }
 
 static int ps_read16(struct pistorm_dev *ps, u32 addr, u16 *out)
@@ -271,7 +281,7 @@ static int ps_read16(struct pistorm_dev *ps, u32 addr, u16 *out)
 	ps_write_set(REG_DATA << PIN_A0);
 	ps_write_set(BIT(PIN_RD));
 
-	ret = ps_wait_for_txn();
+	ret = ps_wait_for_txn_log("read16");
 	value = ps_readl(GPIO_GPLEV0);
 	ps_clear_lines();
 
