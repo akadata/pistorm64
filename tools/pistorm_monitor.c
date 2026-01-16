@@ -18,6 +18,11 @@
 
 static int ps_fd = -1;
 
+static int ps_setup(void)
+{
+	return ioctl(ps_fd, PISTORM_IOC_SETUP);
+}
+
 static int ps_open_dev(const char *path)
 {
 	if (ps_fd >= 0)
@@ -53,6 +58,7 @@ static int ps_busop(int is_read, uint8_t width, uint32_t addr, uint32_t *val, ui
 static void cmd_help(FILE *out)
 {
 	fprintf(out, "Commands:\n");
+	fprintf(out, "  setup                       Re-run IOC_SETUP (re-init bus GPIO/clock)\n");
 	fprintf(out, "  r8|r16|r32 <addr> [count]   Read bytes/words/longs\n");
 	fprintf(out, "  w8|w16|w32 <addr> <value>   Write\n");
 	fprintf(out, "  status                      Read PiStorm status register\n");
@@ -80,12 +86,15 @@ static int handle_line(char *line, FILE *io)
 	if (!strcmp(cmd, "reset_sm")) {
 		if (ioctl(ps_fd, PISTORM_IOC_RESET_SM) < 0)
 			perror("ioctl(RESET_SM)");
+		/* Re-run setup to put bus/GPIO back into known-good state. */
+		ps_setup();
 		return 0;
 	}
 
 	if (!strcmp(cmd, "pulse_reset")) {
 		if (ioctl(ps_fd, PISTORM_IOC_PULSE_RESET) < 0)
 			perror("ioctl(PULSE_RESET)");
+		ps_setup();
 		return 0;
 	}
 
@@ -103,6 +112,12 @@ static int handle_line(char *line, FILE *io)
 		uint32_t v = 0;
 		if (ps_busop(1, PISTORM_W16, 0, &v, PISTORM_BUSOP_F_STATUS) == 0)
 			fprintf(io, "STATUS=0x%04x\n", v & 0xffff);
+		return 0;
+	}
+
+	if (!strcmp(cmd, "setup")) {
+		if (ps_setup() < 0)
+			perror("ioctl(SETUP)");
 		return 0;
 	}
 
@@ -172,6 +187,8 @@ static void repl(FILE *io)
 	char line[MAX_LINE];
 
 	fprintf(io, "PiStorm monitor ready. Type 'help' for commands.\n");
+	fprintf(io, "> ");
+	fflush(io);
 	while (fgets(line, sizeof(line), io)) {
 		if (handle_line(line, io))
 			break;
@@ -253,7 +270,7 @@ int main(int argc, char **argv)
 	if (ps_open_dev(dev) < 0)
 		return 1;
 
-	if (ioctl(ps_fd, PISTORM_IOC_SETUP) < 0) {
+	if (ps_setup() < 0) {
 		perror("ioctl(SETUP)");
 		return 1;
 	}
