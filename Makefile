@@ -243,6 +243,15 @@ TARGET = $(EXENAME)$(EXE)
 INSTALL_DIR := $(DESTDIR)$(PREFIX)
 CONFIG_FILES := default.cfg amiga.cfg mac68k.cfg test.cfg x68k.cfg
 INSTALL_BINS := $(TARGET) buptest pistorm_truth_test
+HELP_TARGETS = \
+	"make"                             "Build emulator (default backend)" \
+	"make PISTORM_KMOD=1"             "Build emulator with kernel backend shim" \
+	"make clean"                      "Remove build artifacts" \
+	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom, a314 files" \
+	"make uninstall [PREFIX=… DESTDIR=…]" "Remove installed tree" \
+	"make kernel_module"              "Build pistorm.ko (out-of-tree)" \
+	"make kernel_install"             "Install pistorm.ko via kernel_module/Makefile" \
+	"make kernel_clean"               "Clean kernel module build outputs"
 
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
@@ -319,6 +328,10 @@ kernel_install: kernel_module
 
 kernel_clean:
 	$(MAKE) -C kernel_module clean
+
+help:
+	@printf "Available targets:\n"
+	@printf "  %-32s %s\n" $(HELP_TARGETS)
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d
 
