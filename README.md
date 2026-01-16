@@ -112,6 +112,13 @@ sudo usermod -aG pistorm <user>
 ```
 Re-login (or `newgrp pistorm`) to pick up group membership. udev and limits.d files are installed by `make install` (see `docs/udev.md`, `docs/rtprio.md`). If you want the legacy userspace GPIO path, override at build time: `make PISTORM_KMOD=0`.
 
+### Debug builds (Pi)
+To add symbols without breaking the generated Musashi core, append flags instead of replacing `OPT_LEVEL`:
+```sh
+make clean
+make PISTORM_KMOD=1 EXTRA_CFLAGS="-g" EXTRA_M68K_CFLAGS="-g"
+```
+
 ## Testing Status
 
 - ✅ Pi Zero 2 W with Debian Trixie
