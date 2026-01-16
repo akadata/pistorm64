@@ -11,6 +11,7 @@
 
 #include "config_file/config_file.h"
 #include "gpio/ps_protocol.h"
+#include "log.h"
 #include "piscsi-enums.h"
 #include "piscsi.h"
 #include "platforms/amiga/hunk-reloc.h"
@@ -19,12 +20,15 @@
 #define BE16(val) be16toh(val)
 
 // Uncomment the line below to enable debug output
-#define PISCSI_DEBUG
+//#define PISCSI_DEBUG
+
+/* Route printf-style output through the emulator logger so --log captures it. */
+#undef printf
+#define printf(...) LOG_INFO(__VA_ARGS__)
 
 #ifdef PISCSI_DEBUG
-#define DEBUG printf
-//#define DEBUG_TRIVIAL printf
-#define DEBUG_TRIVIAL(...) do { if (0) printf(__VA_ARGS__); } while (0)
+#define DEBUG(...) LOG_DEBUG(__VA_ARGS__)
+#define DEBUG_TRIVIAL(...) LOG_DEBUG(__VA_ARGS__)
 
 //extern void stop_cpu_emulation(uint8_t disasm_cur);
 #define stop_cpu_emulation(...)
