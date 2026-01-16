@@ -20,6 +20,7 @@ EXENAME          = emulator
 
 PLATFORM=ZEROW2_64
 
+PISTORM_KMOD=1
 
 # Tunables: edit here instead of hunting through rule bodies.
 # WARNINGS   : compiler warnings; keep strict by default.
