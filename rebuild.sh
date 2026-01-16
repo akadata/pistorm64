@@ -1,6 +1,6 @@
 make clean; 
 sudo rmmod -f pistorm
-make PISTORM_KMOD=1
+make PISTORM_KMOD=1 EXTRA_CFLAGS="-DPISCSI_DEBUG"
 make kernel_clean
 make kernel_module
 sudo make kernel_install
