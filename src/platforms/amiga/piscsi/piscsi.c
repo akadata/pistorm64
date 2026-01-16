@@ -717,6 +717,109 @@ void piscsi_debugme(uint32_t index) {
     }
 }
 
+// Read path entry point used by emulator memory accessors.
+uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
+    if (type) {}
+
+    if ((addr & 0xFFFF) >= PISCSI_CMD_ROM) {
+        uint32_t romoffs = (addr & 0xFFFF) - PISCSI_CMD_ROM;
+        if (romoffs < (piscsi_rom_size + PIB)) {
+            uint32_t v = 0;
+            switch (type) {
+                case OP_TYPE_BYTE:
+                    v = piscsi_rom_ptr[romoffs - PIB];
+                    break;
+                case OP_TYPE_WORD:
+                    v = be16toh(*((uint16_t *)&piscsi_rom_ptr[romoffs - PIB]));
+                    break;
+                case OP_TYPE_LONGWORD:
+                    v = be32toh(*((uint32_t *)&piscsi_rom_ptr[romoffs - PIB]));
+                    break;
+            }
+            return v;
+        }
+        return 0;
+    }
+
+    switch (addr & 0xFFFF) {
+        case PISCSI_CMD_ADDR1: case PISCSI_CMD_ADDR2: case PISCSI_CMD_ADDR3: case PISCSI_CMD_ADDR4: {
+            int i = ((addr & 0xFFFF) - PISCSI_CMD_ADDR1) / 4;
+            return piscsi_u32[i];
+        }
+        case PISCSI_CMD_DRVTYPE:
+            if (devs[piscsi_cur_drive].fd == -1) {
+                DEBUG("[PISCSI] %s Read from DRVTYPE %d, drive not attached.\n", op_type_names[type], piscsi_cur_drive);
+                return 0;
+            }
+            DEBUG("[PISCSI] %s Read from DRVTYPE %d, drive attached.\n", op_type_names[type], piscsi_cur_drive);
+            return 1;
+        case PISCSI_CMD_DRVNUM:
+            return piscsi_cur_drive;
+        case PISCSI_CMD_CYLS:
+            DEBUG("[PISCSI] %s Read from CYLS %d: %d\n", op_type_names[type], piscsi_cur_drive, devs[piscsi_cur_drive].c);
+            return devs[piscsi_cur_drive].c;
+        case PISCSI_CMD_HEADS:
+            DEBUG("[PISCSI] %s Read from HEADS %d: %d\n", op_type_names[type], piscsi_cur_drive, devs[piscsi_cur_drive].h);
+            return devs[piscsi_cur_drive].h;
+        case PISCSI_CMD_SECS:
+            DEBUG("[PISCSI] %s Read from SECS %d: %d\n", op_type_names[type], piscsi_cur_drive, devs[piscsi_cur_drive].s);
+            return devs[piscsi_cur_drive].s;
+        case PISCSI_CMD_BLOCKS: {
+            uint32_t blox = devs[piscsi_cur_drive].fs / devs[piscsi_cur_drive].block_size;
+            DEBUG("[PISCSI] %s Read from BLOCKS %d: %d\n", op_type_names[type], piscsi_cur_drive, blox);
+            DEBUG("fs: %llu (%d)\n", (unsigned long long)devs[piscsi_cur_drive].fs, blox);
+            return blox;
+        }
+        case PISCSI_CMD_GETPART:
+            DEBUG("[PISCSI] Get ROM partition %d offset: %.8X\n", rom_cur_partition, rom_partitions[rom_cur_partition]);
+            return rom_partitions[rom_cur_partition];
+        case PISCSI_CMD_GETPRIO:
+            DEBUG("[PISCSI] Get partition %d boot priority: %d\n", rom_cur_partition, rom_partition_prio[rom_cur_partition]);
+            return rom_partition_prio[rom_cur_partition];
+        case PISCSI_CMD_CHECKFS:
+            DEBUG("[PISCSI] Get current loaded file system: %.8X\n", filesystems[rom_cur_fs].FS_ID);
+            return filesystems[rom_cur_fs].FS_ID;
+        case PISCSI_CMD_FSSIZE:
+            DEBUG("[PISCSI] Get alloc size of loaded file system: %d\n", filesystems[rom_cur_fs].h_info.alloc_size);
+            return filesystems[rom_cur_fs].h_info.alloc_size;
+        case PISCSI_CMD_BLOCKSIZE:
+            DEBUG("[PISCSI] Get block size of drive %d: %d\n", piscsi_cur_drive, devs[piscsi_cur_drive].block_size);
+            return devs[piscsi_cur_drive].block_size;
+        case PISCSI_CMD_GET_FS_INFO: {
+            int i = 0;
+            uint32_t val = piscsi_u32[1];
+            int32_t r = get_mapped_item_by_address(cfg, val);
+            if (r != -1) {
+#ifdef PISCSI_DEBUG
+                char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
+                DEBUG("[PISCSI-GET-FS-INFO] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
+#endif
+                for (i = 0; i < piscsi_num_fs; i++) {
+                    if (rom_partition_dostype[rom_cur_partition] == filesystems[i].FS_ID) {
+                        return 0;
+                    }
+                }
+                uint32_t fallback_dostype = rom_partition_dostype[rom_cur_partition];
+                if (fallback_dostype == 0x444F5303) { // DOS/3
+                    fallback_dostype = 0x444F5301;   // DOS/1
+                    for (i = 0; i < piscsi_num_fs; i++) {
+                        if (fallback_dostype == filesystems[i].FS_ID) {
+                            DEBUG("[PISCSI-GET-FS-INFO] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");
+                            return 0;
+                        }
+                    }
+                }
+            }
+            return 1;
+        }
+        default:
+            DEBUG("[!!!PISCSI] WARN: Unhandled %s register read from %.8X\n", op_type_names[type], addr);
+            break;
+    }
+
+    return 0;
+}
+
 void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
     int32_t r;
     uint8_t *map;
@@ -1061,126 +1164,5 @@ fs_found:;
 }
 
 #define PIB 0x00
-
-uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
-    if (type) {}
-
-    if ((addr & 0xFFFF) >= PISCSI_CMD_ROM) {
-        uint32_t romoffs = (addr & 0xFFFF) - PISCSI_CMD_ROM;
-        if (romoffs < (piscsi_rom_size + PIB)) {
-            //DEBUG("[PISCSI] %s read from Boot ROM @$%.4X (%.8X): ", op_type_names[type], romoffs, addr);
-            uint32_t v = 0;
-            switch (type) {
-                case OP_TYPE_BYTE:
-                    v = piscsi_rom_ptr[romoffs - PIB];
-                    //DEBUG("%.2X\n", v);
-                    break;
-                case OP_TYPE_WORD:
-                    v = be16toh(*((uint16_t *)&piscsi_rom_ptr[romoffs - PIB]));
-                    //DEBUG("%.4X\n", v);
-                    break;
-                case OP_TYPE_LONGWORD:
-                    v = be32toh(*((uint32_t *)&piscsi_rom_ptr[romoffs - PIB]));
-                    //DEBUG("%.8X\n", v);
-                    break;
-            }
-            return v;
-        }
-        return 0;
-    }
-
-    switch (addr & 0xFFFF) {
-        case PISCSI_CMD_ADDR1: case PISCSI_CMD_ADDR2: case PISCSI_CMD_ADDR3: case PISCSI_CMD_ADDR4: {
-            int i = ((addr & 0xFFFF) - PISCSI_CMD_ADDR1) / 4;
-            return piscsi_u32[i];
-            break;
-        }
-        case PISCSI_CMD_DRVTYPE:
-            if (devs[piscsi_cur_drive].fd == -1) {
-                DEBUG("[PISCSI] %s Read from DRVTYPE %d, drive not attached.\n", op_type_names[type], piscsi_cur_drive);
-                return 0;
-            }
-            DEBUG("[PISCSI] %s Read from DRVTYPE %d, drive attached.\n", op_type_names[type], piscsi_cur_drive);
-            return 1;
-            break;
-        case PISCSI_CMD_DRVNUM:
-            return piscsi_cur_drive;
-            break;
-        case PISCSI_CMD_CYLS:
-            DEBUG("[PISCSI] %s Read from CYLS %d: %d\n", op_type_names[type], piscsi_cur_drive, devs[piscsi_cur_drive].c);
-            return devs[piscsi_cur_drive].c;
-            break;
-        case PISCSI_CMD_HEADS:
-            DEBUG("[PISCSI] %s Read from HEADS %d: %d\n", op_type_names[type], piscsi_cur_drive, devs[piscsi_cur_drive].h);
-            return devs[piscsi_cur_drive].h;
-            break;
-        case PISCSI_CMD_SECS:
-            DEBUG("[PISCSI] %s Read from SECS %d: %d\n", op_type_names[type], piscsi_cur_drive, devs[piscsi_cur_drive].s);
-            return devs[piscsi_cur_drive].s;
-            break;
-        case PISCSI_CMD_BLOCKS: {
-            uint32_t blox = devs[piscsi_cur_drive].fs / devs[piscsi_cur_drive].block_size;
-            DEBUG("[PISCSI] %s Read from BLOCKS %d: %d\n", op_type_names[type], piscsi_cur_drive, (uint32_t)(devs[piscsi_cur_drive].fs / devs[piscsi_cur_drive].block_size));
-            DEBUG("fs: %llu (%d)\n", (unsigned long long)devs[piscsi_cur_drive].fs, blox);
-            return blox;
-            break;
-        }
-        case PISCSI_CMD_GETPART: {
-            DEBUG("[PISCSI] Get ROM partition %d offset: %.8X\n", rom_cur_partition, rom_partitions[rom_cur_partition]);
-            return rom_partitions[rom_cur_partition];
-            break;
-        }
-        case PISCSI_CMD_GETPRIO:
-            DEBUG("[PISCSI] Get partition %d boot priority: %d\n", rom_cur_partition, rom_partition_prio[rom_cur_partition]);
-            return rom_partition_prio[rom_cur_partition];
-            break;
-        case PISCSI_CMD_CHECKFS:
-            DEBUG("[PISCSI] Get current loaded file system: %.8X\n", filesystems[rom_cur_fs].FS_ID);
-            return filesystems[rom_cur_fs].FS_ID;
-        case PISCSI_CMD_FSSIZE:
-            DEBUG("[PISCSI] Get alloc size of loaded file system: %d\n", filesystems[rom_cur_fs].h_info.alloc_size);
-            return filesystems[rom_cur_fs].h_info.alloc_size;
-        case PISCSI_CMD_BLOCKSIZE:
-            DEBUG("[PISCSI] Get block size of drive %d: %d\n", piscsi_cur_drive, devs[piscsi_cur_drive].block_size);
-            return devs[piscsi_cur_drive].block_size;
-        case PISCSI_CMD_GET_FS_INFO: {
-            int i = 0;
-            uint32_t val = piscsi_u32[1];
-            int32_t r = get_mapped_item_by_address(cfg, val);
-            if (r != -1) {
-#ifdef PISCSI_DEBUG
-                char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
-                DEBUG("[PISCSI-GET-FS-INFO] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
-#endif
-                // First try exact match
-                for (i = 0; i < piscsi_num_fs; i++) {
-                    if (rom_partition_dostype[rom_cur_partition] == filesystems[i].FS_ID) {
-                        return 0;
-                    }
-                }
-
-                // If no exact match, try fallback mappings (e.g., DOS/3 -> DOS/1 for FastFileSystem)
-                uint32_t fallback_dostype = rom_partition_dostype[rom_cur_partition];
-
-                // Map DOS/3 (FFS International) to DOS/1 (FFS) handler since they use the same filesystem
-                if (fallback_dostype == 0x444F5303) { // DOS/3
-                    fallback_dostype = 0x444F5301;   // DOS/1
-                    for (i = 0; i < piscsi_num_fs; i++) {
-                        if (fallback_dostype == filesystems[i].FS_ID) {
-                            DEBUG("[PISCSI-GET-FS-INFO] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");
-                            return 0;
-                        }
-                    }
-                }
-            }
-            return 1;
-        }
-        default:
-            DEBUG("[!!!PISCSI] WARN: Unhandled %s register read from %.8X\n", op_type_names[type], addr);
-            break;
-    }
-
-    return 0;
-}
 
 }
