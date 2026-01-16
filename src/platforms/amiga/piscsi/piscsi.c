@@ -20,7 +20,7 @@
 #define BE16(val) be16toh(val)
 
 // Uncomment the line below to enable debug output
-//#define PISCSI_DEBUG
+#define PISCSI_DEBUG
 
 /* Route printf-style output through the emulator logger so --log captures it. */
 #undef printf
