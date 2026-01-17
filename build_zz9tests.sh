@@ -1,2 +1,2 @@
-gcc zz9fulltest.c gpio/ps_protocol.c -I./ -o zz9fulltest -march=armv8-a -mfloat-abi=hard -mfpu=neon-fp-armv8 -O0
-gcc zz9readloop.c gpio/ps_protocol.c -I./ -o zz9readloop -march=armv8-a -mfloat-abi=hard -mfpu=neon-fp-armv8 -O0
+gcc -O0 -Wall -Wextra -I./ -I./include/uapi zz9fulltest.c src/gpio/ps_protocol_kmod.c -o zz9fulltest
+gcc -O0 -Wall -Wextra -I./ -I./include/uapi zz9readloop.c src/gpio/ps_protocol_kmod.c -o zz9readloop

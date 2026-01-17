@@ -11,12 +11,12 @@ tools=(
 "src/platforms/amiga/registers/dumpdisk.c"
 "src/platforms/amiga/registers/motor_test.c"
 )
-LIBS="src/gpio/ps_protocol.c"
+LIBS="src/gpio/ps_protocol_kmod.c"
 
 echo "Building register tools into $OUT..."
 for src in "${tools[@]}"; do
   bin="$OUT/$(basename "${src%.c}")"
   echo "  cc $src -> $bin"
-  cc -O2 -std=c11 -I"$ROOT" -o "$bin" "$src" $LIBS
+  cc -O2 -std=c11 -I"$ROOT" -I"$ROOT/include/uapi" -o "$bin" "$src" $LIBS
 done
 echo "Done."
