@@ -1151,6 +1151,17 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             DEBUG("Maxtransfer: %.8X Mask: %.8X\n", BE(dat->maxtransfer), BE(dat->transfer_mask));
                             DEBUG("DOSType: %.8X\n", BE(dat->dostype));
 
+                            /* Only force FAST buffers when RDB leaves mem_type unspecified (0).
+                             * Prevents chip-RAM buffers -> CPU-copy fallback -> lockups under stress (e.g. SysInfo DH1). */
+                            uint32_t current_memtype = be32toh(dat->mem_type);
+                            if (current_memtype == 0) {
+                                uint32_t desired_memtype = 0x00000001 | 0x00000004;  // MEMF_PUBLIC | MEMF_FAST
+                                dat->mem_type = htobe32(desired_memtype);
+                                DEBUG("Memtype was 0; forcing FAST|PUBLIC (0x%08x) to avoid chip buffers\n", desired_memtype);
+                            } else {
+                                DEBUG("Memtype already set (0x%08x); leaving as-is\n", current_memtype);
+                            }
+
                             rom_partitions[cur_partition] = addr2 + 0x20 + cfg->map_offset[r];
                             rom_partition_dostype[cur_partition] = dat->dostype;
                             cur_partition++;
