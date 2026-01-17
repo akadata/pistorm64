@@ -168,14 +168,24 @@ static void ps_clear_lines(void)
 	ps_write_clr(mask);
 }
 
+#include <linux/jiffies.h>
+
 static int ps_wait_for_txn(void)
 {
 	int wait = 100000;
+	unsigned long timeout_jiffies = jiffies + msecs_to_jiffies(1000); // 1 second timeout
 
 	while (wait--) {
 		if (!(ps_readl(GPIO_GPLEV0) & BIT(PIN_TXN_IN_PROGRESS)))
 			return 0;
+
 		cpu_relax();
+
+		// Check for timeout periodically to avoid indefinite hangs
+		if (time_after(jiffies, timeout_jiffies)) {
+			pr_err("pistorm: ps_wait_for_txn timed out after 1 second\n");
+			return -ETIMEDOUT;
+		}
 	}
 	return -ETIMEDOUT;
 }
