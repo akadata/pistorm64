@@ -172,7 +172,7 @@ static void ps_clear_lines(void)
 
 static int ps_wait_for_txn(void)
 {
-	unsigned long timeout_jiffies = jiffies + msecs_to_jiffies(1000); // 1 second timeout
+	unsigned long timeout_jiffies = jiffies + msecs_to_jiffies(500); // 500ms timeout
 
 	while (time_before(jiffies, timeout_jiffies)) {
 		if (!(ps_readl(GPIO_GPLEV0) & BIT(PIN_TXN_IN_PROGRESS)))
@@ -181,7 +181,7 @@ static int ps_wait_for_txn(void)
 		cpu_relax();
 	}
 
-	pr_err("pistorm: ps_wait_for_txn timed out after 1 second\n");
+	pr_err("pistorm: ps_wait_for_txn timed out after 500ms\n");
 	return -ETIMEDOUT;
 }
 
