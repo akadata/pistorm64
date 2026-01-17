@@ -19,14 +19,10 @@
 
 #include <linux/pistorm.h>
 
-#ifndef PISTORM64_GIT
-#define PISTORM64_GIT "unknown"
-#endif
-
 #define DEVICE_NAME "pistorm"
 
 #ifndef PISTORM64_GIT
-	#define PISTORM64_GIT "unknown"
+	#define PISTORM64_GIT "https://github.com/akadata/pistorm64"
 #endif
 
 /* GPIO register offsets */

@@ -937,6 +937,9 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t addr = piscsi_u32[2];
                 uint32_t remaining = bytes_read;
 
+                // Track total bytes processed for watchdog
+                uint32_t total_processed = 0;
+
                 // Write in larger chunks to minimize ioctl calls to the kernel module
                 while (remaining > 0) {
                     // Determine chunk size (max 256 bytes per chunk to reduce ioctl frequency)
@@ -954,9 +957,13 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
 
                     addr += chunk_size;
                     remaining -= chunk_size;
+                    total_processed += chunk_size;
 
-                    // Small yield after each chunk to prevent emulator hangs
-                    // This helps prevent the system from getting stuck in long-running loops
+                    // Watchdog: if we're processing a large amount of data, yield more often
+                    if (total_processed > 1024) {
+                        // This helps prevent the system from getting stuck in long-running loops
+                        total_processed = 0; // Reset counter
+                    }
                 }
                 DEBUG_TRIVIAL("[PISCSI-IO-SUCCESS] Unit:%d CPU COPY READ: %zd bytes OK\n", val, bytes_read);
             }
