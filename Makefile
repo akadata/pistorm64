@@ -374,6 +374,8 @@ full_clean_install:
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
 	sudo $(MAKE) PISTORM_KMOD=$(PISTORM_KMOD) install
+	echo "Loading Kernel PiStorm64"
+	sudo modprobe pistorm 2>/dev/null || true
 
 help:
 	@printf "Available targets:\n"
