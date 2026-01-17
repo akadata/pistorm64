@@ -35,6 +35,7 @@ __used __section("__versions") = {
 	{ 0xcefb0c9f, "__mutex_init" },
 	{ 0xdcb764ad, "memset" },
 	{ 0x2002cbd1, "misc_register" },
+	{ 0x15ba50a6, "jiffies" },
 	{ 0x3213f038, "mutex_unlock" },
 	{ 0xeae3dfd6, "__const_udelay" },
 	{ 0x5443de3e, "__kmalloc_cache_noprof" },
@@ -48,4 +49,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "1CA8DB0FB872B50ECE1C72F");
+MODULE_INFO(srcversion, "D3A65A8E556A115C43A2D78");
