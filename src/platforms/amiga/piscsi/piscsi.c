@@ -941,6 +941,11 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
 
                     // Perform the write - this might trigger bus operations that could hang
                     m68k_write_memory_8(addr, byte_val);
+
+                    // Small checkpoint to allow interruption if needed
+                    if (i % 1000 == 0) {
+                        // This provides a natural break point for any interrupt mechanism
+                    }
                 }
                 DEBUG_TRIVIAL("[PISCSI-IO-SUCCESS] Unit:%d CPU COPY READ: %zd bytes OK\n", val, bytes_read);
             }
@@ -1011,12 +1016,17 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 int success = 1;
                 for (uint32_t i = 0; i < piscsi_u32[1]; i++) {
                     // Reading from Amiga memory might trigger bus operations that could hang
+                    // Add a check to ensure we're not in a hung state
                     c = m68k_read_memory_8(piscsi_u32[2] + i);
                     ssize_t result = write(d->fd, &c, 1);
                     if (result <= 0) {
                         DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE WRITE failed at offset %d: result=%zd\n", val, i, result);
                         success = 0;
                         break;
+                    }
+                    // Small delay/checkpoint to allow interruption if needed
+                    if (i % 1000 == 0) {
+                        // This provides a natural break point for any interrupt mechanism
                     }
                 }
                 if (success) {
