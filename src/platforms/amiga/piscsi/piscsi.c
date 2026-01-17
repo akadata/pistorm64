@@ -933,17 +933,25 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 if (bytes_read != (ssize_t)piscsi_u32[1]) {
                     DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ (fallback): requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
                 }
-                // Perform CPU copy with safety measures to prevent hangs
-                int write_errors = 0;
-                for (ssize_t i = 0; i < bytes_read; i++) {
-                    uint32_t addr = piscsi_u32[2] + (uint32_t)i;
-                    uint32_t byte_val = (uint32_t)d->scratch[i];
+                // Batch-write to Amiga memory to reduce ioctl calls and prevent hangs
+                uint32_t addr = piscsi_u32[2];
+                uint32_t remaining = bytes_read;
 
-                    // Perform the write - this might trigger bus operations that could hang
-                    m68k_write_memory_8(addr, byte_val);
+                // Write in larger chunks to minimize ioctl calls to the kernel module
+                while (remaining > 0) {
+                    // Determine chunk size (max 256 bytes per chunk to reduce ioctl frequency)
+                    uint32_t chunk_size = (remaining > 256) ? 256 : remaining;
 
-                    // Small checkpoint to allow interruption if needed
-                    if (i % 1000 == 0) {
+                    // Write the chunk to Amiga memory
+                    for (uint32_t i = 0; i < chunk_size; i++) {
+                        m68k_write_memory_8(addr + i, (uint32_t)d->scratch[bytes_read - remaining + i]);
+                    }
+
+                    addr += chunk_size;
+                    remaining -= chunk_size;
+
+                    // Small delay/checkpoint to allow interruption if needed
+                    if (remaining > 0) {
                         // This provides a natural break point for any interrupt mechanism
                     }
                 }
@@ -1014,18 +1022,34 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 DEBUG_TRIVIAL("[PISCSI-%d] No mapped range found for write.\n", val);
                 uint8_t c = 0;
                 int success = 1;
-                for (uint32_t i = 0; i < piscsi_u32[1]; i++) {
-                    // Reading from Amiga memory might trigger bus operations that could hang
-                    // Add a check to ensure we're not in a hung state
-                    c = m68k_read_memory_8(piscsi_u32[2] + i);
-                    ssize_t result = write(d->fd, &c, 1);
-                    if (result <= 0) {
-                        DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE WRITE failed at offset %d: result=%zd\n", val, i, result);
-                        success = 0;
-                        break;
+
+                // Batch-read from Amiga memory to reduce ioctl calls and prevent hangs
+                uint32_t addr = piscsi_u32[2];
+                uint32_t remaining = piscsi_u32[1];
+
+                // Read in larger chunks to minimize ioctl calls to the kernel module
+                while (remaining > 0) {
+                    // Determine chunk size (max 256 bytes per chunk to reduce ioctl frequency)
+                    uint32_t chunk_size = (remaining > 256) ? 256 : remaining;
+
+                    // Read the chunk from Amiga memory
+                    for (uint32_t i = 0; i < chunk_size; i++) {
+                        c = m68k_read_memory_8(addr + i);
+                        ssize_t result = write(d->fd, &c, 1);
+                        if (result <= 0) {
+                            DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE WRITE failed at offset %d: result=%zd\n", val, (piscsi_u32[1] - remaining + i), result);
+                            success = 0;
+                            break;
+                        }
                     }
+
+                    if (!success) break;
+
+                    addr += chunk_size;
+                    remaining -= chunk_size;
+
                     // Small delay/checkpoint to allow interruption if needed
-                    if (i % 1000 == 0) {
+                    if (remaining > 0) {
                         // This provides a natural break point for any interrupt mechanism
                     }
                 }
