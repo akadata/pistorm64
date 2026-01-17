@@ -205,7 +205,7 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
 
 void* rtgThread(void* args) {
 
-  printf("RTG thread running\n");
+  printf("[RTG] Thread running\n");
   fflush(stdout);
 
   int reinit = 0, old_filter_mode = -1, force_filter_mode = 0;

@@ -36,6 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/resource.h>
@@ -109,6 +110,9 @@ int gayleirq;
 #define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1, io=2, input=3, ipl=0"
 #define PI_RT_ENV "PISTORM_RT"             // e.g. "cpu=60, io=40, input=80, ipl=70"
 
+#define PISTORM64_NAME "KERNEL PiStorm64"
+#define PISTORM64_TAGLINE "JANUS BUS ENGINE"
+
 #define RT_DEFAULT_CPU 60
 #define RT_DEFAULT_IO 40
 #define RT_DEFAULT_INPUT 80
@@ -123,6 +127,16 @@ static int realtime_allowed(void);
 static void amiga_reset_and_wait(const char* tag);
 static void amiga_warmup_bus(void);
 static void configure_ipl_nops(void);
+static void print_help(const char* prog);
+static void print_about(const char* prog);
+
+#define CLI_MAX_LINES 32
+static char* cli_config_lines[CLI_MAX_LINES];
+static int cli_config_count;
+
+static void cli_add_line(const char* fmt, ...);
+static void apply_cli_overrides(struct emulator_config* cfg);
+static int cli_collect_tokens(int argc, char* argv[], int* index, char* out, size_t out_len);
 
 #define MUSASHI_HAX
 
@@ -729,6 +743,17 @@ void sigint_handler(int sig_num) {
 int main(int argc, char* argv[]) {
   int g;
 
+  for (g = 1; g < argc; g++) {
+    if (strcmp(argv[g], "-h") == 0 || strcmp(argv[g], "--help") == 0) {
+      print_help(argv[0]);
+      return 0;
+    }
+    if (strcmp(argv[g], "-a") == 0 || strcmp(argv[g], "--about") == 0) {
+      print_about(argv[0]);
+      return 0;
+    }
+  }
+
   pistorm_selftest_alignment();
 
   ps_setup_protocol();
@@ -760,14 +785,16 @@ int main(int argc, char* argv[]) {
         }
       }
     }
-    if (strcmp(argv[g], "--cpu_type") == 0 || strcmp(argv[g], "--cpu") == 0) {
+    if (strcmp(argv[g], "--cpu_type") == 0 || strcmp(argv[g], "--cpu") == 0 ||
+        strcmp(argv[g], "-C") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no CPU type specified.\n", argv[g]);
       } else {
         g++;
-        cpu_type = get_m68k_cpu_type(argv[g]);
+        cli_add_line("cpu %s", argv[g]);
       }
-    } else if (strcmp(argv[g], "--config-file") == 0 || strcmp(argv[g], "--config") == 0) {
+    } else if (strcmp(argv[g], "--config-file") == 0 || strcmp(argv[g], "--config") == 0 ||
+               strcmp(argv[g], "-c") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no config filename specified.\n", argv[g]);
       } else {
@@ -783,18 +810,83 @@ int main(int argc, char* argv[]) {
           set_pistorm_devcfg_filename(argv[g]);
         }
       }
-    } else if (strcmp(argv[g], "--enable-jit") == 0 || strcmp(argv[g], "--jit") == 0) {
-      enable_jit_backend = 1;
-      printf("[CLI] JIT backend enabled.\n");
-    } else if (strcmp(argv[g], "--enable-jit-fpu") == 0 || strcmp(argv[g], "--jit-fpu") == 0) {
-      enable_fpu_jit_backend = 1;
-      printf("[CLI] FPU JIT backend enabled.\n");
-    } else if (strcmp(argv[g], "--keyboard-file") == 0 || strcmp(argv[g], "--kbfile") == 0) {
+    } else if (strcmp(argv[g], "--enable-jit") == 0 || strcmp(argv[g], "--jit") == 0 ||
+               strcmp(argv[g], "-j") == 0) {
+      cli_add_line("jit on");
+    } else if (strcmp(argv[g], "--enable-jit-fpu") == 0 || strcmp(argv[g], "--jit-fpu") == 0 ||
+               strcmp(argv[g], "-f") == 0) {
+      cli_add_line("jitfpu on");
+    } else if (strcmp(argv[g], "--loopcycles") == 0 || strcmp(argv[g], "-L") == 0) {
+      if (g + 1 >= argc) {
+        printf("%s switch found, but no loopcycles value specified.\n", argv[g]);
+      } else {
+        g++;
+        cli_add_line("loopcycles %s", argv[g]);
+      }
+    } else if (strcmp(argv[g], "--map") == 0 || strcmp(argv[g], "-m") == 0) {
+      char args_buf[384];
+      if (cli_collect_tokens(argc, argv, &g, args_buf, sizeof(args_buf)) != 0) {
+        printf("%s switch found, but no map arguments specified.\n", argv[g]);
+      } else {
+        cli_add_line("map %s", args_buf);
+      }
+    } else if (strcmp(argv[g], "--mouse") == 0 || strcmp(argv[g], "-M") == 0) {
+      if (g + 2 >= argc) {
+        printf("%s switch found, but mouse arguments are incomplete.\n", argv[g]);
+      } else {
+        const char* file = argv[++g];
+        const char* key = argv[++g];
+        const char* auto_mode = "noauto";
+        if (g + 1 < argc && argv[g + 1][0] != '-') {
+          auto_mode = argv[++g];
+        }
+        cli_add_line("mouse %s %s %s", file, key, auto_mode);
+      }
+    } else if (strcmp(argv[g], "--keyboard") == 0 || strcmp(argv[g], "-K") == 0) {
+      if (g + 1 >= argc) {
+        printf("%s switch found, but keyboard arguments are incomplete.\n", argv[g]);
+      } else {
+        const char* key = argv[++g];
+        const char* grab = "nograb";
+        const char* auto_mode = "noauto";
+        if (g + 1 < argc && argv[g + 1][0] != '-') {
+          grab = argv[++g];
+        }
+        if (g + 1 < argc && argv[g + 1][0] != '-') {
+          auto_mode = argv[++g];
+        }
+        cli_add_line("keyboard %s %s %s", key, grab, auto_mode);
+      }
+    } else if (strcmp(argv[g], "--keyboard-file") == 0 || strcmp(argv[g], "--kbfile") == 0 ||
+               strcmp(argv[g], "-k") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no keyboard device path specified.\n", argv[g]);
       } else {
         g++;
-        strcpy(keyboard_file, argv[g]);
+        cli_add_line("kbfile %s", argv[g]);
+      }
+    } else if (strcmp(argv[g], "--platform") == 0 || strcmp(argv[g], "-p") == 0) {
+      if (g + 1 >= argc) {
+        printf("%s switch found, but no platform specified.\n", argv[g]);
+      } else {
+        const char* plat = argv[++g];
+        const char* sub = "";
+        if (g + 1 < argc && argv[g + 1][0] != '-') {
+          sub = argv[++g];
+        }
+        if (strlen(sub)) {
+          cli_add_line("platform %s %s", plat, sub);
+        } else {
+          cli_add_line("platform %s", plat);
+        }
+      }
+    } else if (strcmp(argv[g], "--setvar") == 0 || strcmp(argv[g], "-sv") == 0) {
+      if (g + 2 >= argc) {
+        printf("%s switch found, but setvar arguments are incomplete.\n", argv[g]);
+      } else {
+        const char* var = argv[++g];
+        const char* val = argv[++g];
+        cli_add_line("setvar %s %s", var, val);
       }
     }
   }
@@ -839,6 +931,7 @@ switch_config:
   }
 
   if (cfg) {
+    apply_cli_overrides(cfg);
     if (cfg->cpu_type)
       cpu_type = cfg->cpu_type;
     if (cfg->loop_cycles)
@@ -934,7 +1027,7 @@ switch_config:
     if (err != 0) {
       printf("[ERROR] Cannot create IPL thread: [%s]", strerror(err));
     } else {
-      pthread_setname_np(ipl_tid, "pistorm: ipl");
+      pthread_setname_np(ipl_tid, "pistorm64: ipl");
       printf("[IPL] Thread created successfully\n");
       apply_affinity_from_env("ipl", CORE_IPL);
       apply_realtime_from_env("ipl", RT_DEFAULT_IPL);
@@ -946,7 +1039,7 @@ switch_config:
   if (err != 0) {
     printf("[ERROR] Cannot create keyboard thread: [%s]", strerror(err));
   } else {
-    pthread_setname_np(kbd_tid, "pistorm: kbd");
+    pthread_setname_np(kbd_tid, "pistorm64: kbd");
     printf("[MAIN] Keyboard thread created successfully\n");
     apply_affinity_from_env("input", CORE_INPUT);
   }
@@ -957,7 +1050,7 @@ switch_config:
     if (err != 0) {
       printf("[ERROR] Cannot create mouse thread: [%s]", strerror(err));
     } else {
-      pthread_setname_np(mouse_tid, "pistorm: mouse");
+      pthread_setname_np(mouse_tid, "pistorm64: mouse");
       printf("[MAIN] Mouse thread created successfully\n");
       apply_affinity_from_env("input", CORE_INPUT);
     }
@@ -968,7 +1061,7 @@ switch_config:
   if (err != 0) {
     printf("[ERROR] Cannot create CPU thread: [%s]", strerror(err));
   } else {
-    pthread_setname_np(cpu_tid, "pistorm: cpu");
+    pthread_setname_np(cpu_tid, "pistorm64: cpu");
     printf("[MAIN] CPU thread created successfully\n");
     apply_affinity_from_env("cpu", CORE_CPU);
   }
@@ -1623,4 +1716,106 @@ static void apply_realtime_from_env(const char* role, int default_prio) {
   if (target > 0) {
     set_realtime_priority(role, target);
   }
+}
+
+static void cli_add_line(const char* fmt, ...) {
+  if (cli_config_count >= CLI_MAX_LINES) {
+    printf("[CLI] Too many config overrides; ignoring additional entries.\n");
+    return;
+  }
+
+  char buf[512];
+  va_list args;
+  va_start(args, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, args);
+  va_end(args);
+
+  cli_config_lines[cli_config_count++] = strdup(buf);
+}
+
+static void apply_cli_overrides(struct emulator_config* cfg) {
+  if (!cfg || cli_config_count == 0) {
+    return;
+  }
+
+  for (int i = 0; i < cli_config_count; i++) {
+    if (strncmp(cli_config_lines[i], "platform ", 9) == 0) {
+      apply_config_line(cfg, cli_config_lines[i], 0);
+    }
+  }
+
+  for (int i = 0; i < cli_config_count; i++) {
+    if (strncmp(cli_config_lines[i], "platform ", 9) == 0 ||
+        strncmp(cli_config_lines[i], "setvar ", 7) == 0) {
+      continue;
+    }
+    apply_config_line(cfg, cli_config_lines[i], 0);
+  }
+
+  for (int i = 0; i < cli_config_count; i++) {
+    if (strncmp(cli_config_lines[i], "setvar ", 7) == 0) {
+      apply_config_line(cfg, cli_config_lines[i], 0);
+    }
+  }
+}
+
+static int cli_collect_tokens(int argc, char* argv[], int* index, char* out, size_t out_len) {
+  size_t pos = 0;
+
+  if (!out || out_len == 0)
+    return -1;
+
+  out[0] = '\0';
+
+  while (*index + 1 < argc) {
+    const char* tok = argv[*index + 1];
+    if (tok[0] == '-')
+      break;
+    size_t len = strlen(tok);
+    if (pos + len + 2 > out_len)
+      return -1;
+    if (pos) {
+      out[pos++] = ' ';
+    }
+    memcpy(out + pos, tok, len);
+    pos += len;
+    out[pos] = '\0';
+    (*index)++;
+  }
+
+  return pos ? 0 : -1;
+}
+
+static void print_about(const char* prog) {
+  printf("%s - %s\n", PISTORM64_NAME, PISTORM64_TAGLINE);
+  printf("Usage: %s [options]\n", prog);
+}
+
+static void print_help(const char* prog) {
+  print_about(prog);
+  printf("\n");
+  printf("General:\n");
+  printf("  -h, --help                 Show this help and exit\n");
+  printf("  -a, --about                Show about info and exit\n");
+  printf("  --log [file]               Write log output to file (default: amiga.log)\n");
+  printf("  -l, --log-level <level>    Set log level (error|warn|info|debug)\n");
+  printf("\n");
+  printf("Config (.cfg equivalents):\n");
+  printf("  -c, --config <file>        Load config file\n");
+  printf("  -C, --cpu <type>           CPU type (e.g., 68000, 68020)\n");
+  printf("  -L, --loopcycles <n>       CPU loop cycles\n");
+  printf("  -j, --jit                  Enable JIT backend\n");
+  printf("  -f, --jit-fpu              Enable FPU JIT backend\n");
+  printf("  -m, --map <args...>        Map entry (same syntax as .cfg map line)\n");
+  printf("  -M, --mouse <file> <key> [autoconnect]\n");
+  printf("                             Mouse forwarding (toggle key, optional autoconnect)\n");
+  printf("  -K, --keyboard <key> [grab] [autoconnect]\n");
+  printf("                             Keyboard forwarding (optional grab/autoconnect)\n");
+  printf("  -k, --kbfile <path>        Keyboard event source path\n");
+  printf("  -p, --platform <name> [sub]\n");
+  printf("                             Platform selection\n");
+  printf("  -sv, --setvar <var> <val>  Platform setvar (single-token values only)\n");
+  printf("\n");
+  printf("Notes:\n");
+  printf("  - For complex setvar or multi-arg values, use a .cfg file.\n");
 }

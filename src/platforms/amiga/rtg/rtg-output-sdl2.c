@@ -57,7 +57,7 @@ uint32_t rtg_to_sdl2[RTGFMT_NUM] = {
 
 void* rtgThread(void* args) {
 
-  printf("RTG thread running\n");
+  printf("[RTG] Thread running\n");
   fflush(stdout);
 
   int reinit = 0;

@@ -110,6 +110,7 @@ extern "C" int get_mapped_item_by_address(struct emulator_config* cfg, uint32_t 
 unsigned int get_m68k_cpu_type(char* name);
 struct emulator_config* load_config_file(char* filename);
 void free_config_file(struct emulator_config* cfg);
+int apply_config_line(struct emulator_config* cfg, const char* line, int line_no);
 
 int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
                        unsigned char type);
