@@ -30,9 +30,9 @@
 #define STATUS_SHIFT_IPL 13
 
 //#define BCM2708_PERI_BASE 0x20000000  // pi0-1
-//#define BCM2708_PERI_BASE 0xFE000000  // pi4
+#define BCM2708_PERI_BASE 0xFE000000  // pi4
 
-#define BCM2708_PERI_BASE 0x3F000000  // pi3  - pi zero w2
+//#define BCM2708_PERI_BASE 0x3F000000  // pi3  - pi zero w2
 
 #define BCM2708_PERI_SIZE 0x01000000
 
