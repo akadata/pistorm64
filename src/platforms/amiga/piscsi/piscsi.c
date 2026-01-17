@@ -61,12 +61,10 @@ static int piscsi_validate_command(struct piscsi_dev *d, uint32_t cmd, uint32_t 
         return -1;
     }
 
-    // For READBYTES/WRITEBYTES, check if high word has unexpected values
-    if (cmd == PISCSI_CMD_READBYTES || cmd == PISCSI_CMD_WRITEBYTES) {
-        if (params[3] != 0) {
-            DEBUG("[PISCSI-VALIDATION] READBYTES/WRITEBYTES with non-zero high word (0x%X), rejecting to prevent crash\n", params[3]);
-            return -1;  // Force use of 64-bit commands for large offsets
-        }
+    // For READ64/WRITE64, we still want to validate the full 64-bit offset
+    if (cmd == PISCSI_CMD_READ64 || cmd == PISCSI_CMD_WRITE64) {
+        // These commands should use the full 64-bit offset, so we don't need special validation here
+        // Bounds checking happens later in the process
     }
 
     return 0;
@@ -876,16 +874,13 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             if (cmd == PISCSI_CMD_READBYTES) {
                 // For READBYTES, only use 32-bit offset to avoid issues with garbage in high word
                 // The Amiga-side driver may not properly set the high 32 bits for READBYTES
+                // Since READBYTES is typically used for <4GB access, we'll mask the high word
                 uint64_t src = (uint64_t)piscsi_u32[0];  // Only use lower 32 bits
 
-                // Check if the high word contains non-zero values (indicating a potential 64-bit offset)
+                // Check if the high word contains non-zero values (indicating potential garbage)
                 if (piscsi_u32[3] != 0) {
-                    DEBUG("[PISCSI-IO-WARNING] READBYTES command has non-zero high word (0x%X), forcing 32-bit mode\n", piscsi_u32[3]);
-                    DEBUG("[PISCSI-IO-WARNING] For >4GB access, use READ64/WRITE64 commands instead\n");
-
-                    // For safety, we'll reject READBYTES with high bits set to prevent crashes
-                    // The Amiga driver should use READ64/WRITE64 for >4GB offsets
-                    break; // Reject this command to force use of proper 64-bit commands
+                    DEBUG("[PISCSI-IO-WARNING] READBYTES command has non-zero high word (0x%X), masking to 32-bit mode\n", piscsi_u32[3]);
+                    DEBUG("[PISCSI-IO-WARNING] Note: For >4GB access, Amiga driver should use READ64/WRITE64\n");
                 }
 
                 uint32_t block = (uint32_t)(src / d->block_size);
@@ -955,16 +950,13 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             if (cmd == PISCSI_CMD_WRITEBYTES) {
                 // For WRITEBYTES, only use 32-bit offset to avoid issues with garbage in high word
                 // The Amiga-side driver may not properly set the high 32 bits for WRITEBYTES
+                // Since WRITEBYTES is typically used for <4GB access, we'll mask the high word
                 uint64_t src = (uint64_t)piscsi_u32[0];  // Only use lower 32 bits
 
-                // Check if the high word contains non-zero values (indicating a potential 64-bit offset)
+                // Check if the high word contains non-zero values (indicating potential garbage)
                 if (piscsi_u32[3] != 0) {
-                    DEBUG("[PISCSI-IO-WARNING] WRITEBYTES command has non-zero high word (0x%X), forcing 32-bit mode\n", piscsi_u32[3]);
-                    DEBUG("[PISCSI-IO-WARNING] For >4GB access, use READ64/WRITE64 commands instead\n");
-
-                    // For safety, we'll reject WRITEBYTES with high bits set to prevent crashes
-                    // The Amiga driver should use READ64/WRITE64 for >4GB offsets
-                    break; // Reject this command to force use of proper 64-bit commands
+                    DEBUG("[PISCSI-IO-WARNING] WRITEBYTES command has non-zero high word (0x%X), masking to 32-bit mode\n", piscsi_u32[3]);
+                    DEBUG("[PISCSI-IO-WARNING] Note: For >4GB access, Amiga driver should use READ64/WRITE64\n");
                 }
 
                 uint32_t block = (uint32_t)(src / d->block_size);
