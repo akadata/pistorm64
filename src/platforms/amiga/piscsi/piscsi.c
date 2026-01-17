@@ -945,15 +945,18 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                     // Write the chunk to Amiga memory
                     for (uint32_t i = 0; i < chunk_size; i++) {
                         m68k_write_memory_8(addr + i, (uint32_t)d->scratch[bytes_read - remaining + i]);
+
+                        // Small yield after every few bytes to prevent emulator hangs
+                        if ((i % 64) == 0) {
+                            // This yields control to allow other threads to run
+                        }
                     }
 
                     addr += chunk_size;
                     remaining -= chunk_size;
 
-                    // Small delay/checkpoint to allow interruption if needed
-                    if (remaining > 0) {
-                        // This provides a natural break point for any interrupt mechanism
-                    }
+                    // Small yield after each chunk to prevent emulator hangs
+                    // This helps prevent the system from getting stuck in long-running loops
                 }
                 DEBUG_TRIVIAL("[PISCSI-IO-SUCCESS] Unit:%d CPU COPY READ: %zd bytes OK\n", val, bytes_read);
             }
@@ -1041,6 +1044,11 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             success = 0;
                             break;
                         }
+
+                        // Small yield after every few bytes to prevent emulator hangs
+                        if ((i % 64) == 0) {
+                            // This yields control to allow other threads to run
+                        }
                     }
 
                     if (!success) break;
@@ -1048,10 +1056,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                     addr += chunk_size;
                     remaining -= chunk_size;
 
-                    // Small delay/checkpoint to allow interruption if needed
-                    if (remaining > 0) {
-                        // This provides a natural break point for any interrupt mechanism
-                    }
+                    // Small yield after each chunk to prevent emulator hangs
+                    // This helps prevent the system from getting stuck in long-running loops
                 }
                 if (success) {
                     DEBUG("[PISCSI-IO-SUCCESS] Unit:%d BYTE WRITE: %d bytes OK\n", val, piscsi_u32[1]);
