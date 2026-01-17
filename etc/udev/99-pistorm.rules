@@ -1,0 +1,6 @@
+# Allow non-root access to /dev/pistorm via group membership.
+# Usage:
+#   sudo groupadd -f pistorm
+#   sudo usermod -aG pistorm <username>
+# Then reload udev rules: sudo udevadm control --reload && sudo udevadm trigger
+KERNEL=="pistorm", GROUP="pistorm", MODE="0660"
