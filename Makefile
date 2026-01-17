@@ -256,7 +256,7 @@ LDLIBS   = $(LDLIBS_RAYLIB) $(LDLIBS_VC) $(LDLIBS_ALSA) -ldl -lstdc++ -lm -pthre
 TARGET = $(EXENAME)$(EXE)
 INSTALL_DIR := $(DESTDIR)$(PREFIX)
 CONFIG_FILES := default.cfg amiga.cfg mac68k.cfg test.cfg x68k.cfg
-INSTALL_BINS := $(TARGET) buptest pistorm_truth_test pistorm_monitor
+INSTALL_BINS := $(TARGET) buptest pistorm_truth_test #
 UDEV_RULES := etc/udev/99-pistorm.rules
 LIMITS_CONF := etc/security/limits.d/pistorm-rt.conf
 MODULES_LOAD := etc/modules-load.d/pistorm.conf
@@ -269,15 +269,15 @@ HELP_TARGETS = \
 	"make kernel_module"              "Build pistorm.ko (out-of-tree)" \
 	"make kernel_install"             "Install pistorm.ko via kernel_module/Makefile" \
 	"make kernel_clean"               "Clean kernel module build outputs" \
-	"make pistorm_monitor"            "Build interactive bus monitor" \
+	"make "            "Build interactive bus monitor" \
 	"make full_clean_install"         "Stop emulator, rebuild kmod+userland, install"
 
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
 
-DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest pistorm_monitor pistorm_monitor.d pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE)
+DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest  .d pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE)
 
-all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test pistorm_monitor
+all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test 
 
 clean:
 	rm -f $(DELETEFILES)
@@ -312,7 +312,7 @@ buptest:
 pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
 	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
 
-pistorm_monitor: tools/pistorm_monitor.c include/uapi/linux/pistorm.h
+: tools/.c include/uapi/linux/pistorm.h
 	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
@@ -378,6 +378,6 @@ help:
 	@printf "Available targets:\n"
 	@printf "  %-32s %s\n" $(HELP_TARGETS)
 
--include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d pistorm_monitor.d
+-include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d .d
 
-.PHONY: all clean buptest pistorm_truth_test pistorm_monitor install uninstall kernel_module kernel_install kernel_clean
+.PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_install kernel_clean
