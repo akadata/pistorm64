@@ -456,6 +456,8 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			ret = -EFAULT;
 			break;
 		}
+		pr_debug("ps_ioctl: BUSOP is_read=%d width=%u addr=0x%08x flags=0x%x\n",
+			 busop.is_read, busop.width, busop.addr, busop.flags);
 		ret = ps_handle_busop(ps_dev, &busop);
 		if (!ret && busop.is_read) {
 			if (copy_to_user(argp, &busop, sizeof(busop)))
@@ -467,6 +469,8 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			ret = -EFAULT;
 			break;
 		}
+		pr_debug("ps_ioctl: BATCH count=%u ptr=0x%llx\n",
+			 batch.ops_count, batch.ops_ptr);
 		ret = ps_handle_batch(&batch);
 		break;
 	default:
@@ -487,6 +491,7 @@ static const struct file_operations ps_fops = {
 	.unlocked_ioctl = ps_ioctl,
 	.open = ps_open,
 	.llseek = noop_llseek,
+	.compat_ioctl = ps_ioctl,
 };
 
 static void __iomem *ps_map_resource(const char *compat, const char *name)
