@@ -20,6 +20,9 @@ EXENAME          = emulator
 
 PLATFORM=PI4_64BIT
 
+PISTORM_KMOD ?= 1
+EXTRA_CFLAGS ?=
+EXTRA_M68K_CFLAGS ?=
 
 # Tunables: edit here instead of hunting through rule bodies.
 # WARNINGS   : compiler warnings; keep strict by default.
@@ -40,17 +43,23 @@ PLATFORM=PI4_64BIT
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 WARNINGS   ?= -Wall -Wextra -pedantic
 OPT_LEVEL  ?= -O3
+
 ifdef O
 OPT_LEVEL := -O$(O)
 endif
+
 # Set USE_GOLD=1 to link with gold if available.
 USE_GOLD   ?= 0
+
 # Toggle RTG output backends: 1=raylib (default), 0=null stub.
 USE_RAYLIB ?= 0
+
 # Toggle ALSA-based audio (Pi AHI). If 0, drop pi_ahi and -lasound.
 USE_ALSA   ?= 1
+
 # Toggle PMMU emulation (68030/040). Default on; disable with USE_PMMU=0 if needed.
 USE_PMMU   ?= 1
+
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0
 
@@ -62,14 +71,17 @@ USE_LTO    ?= 0
 USE_NO_PLT ?= 1
 OMIT_FP    ?= 1
 USE_PIPE   ?= 1
+
 # Quiet noisy-but-benign warnings from the generated 68k core.
 M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable
+
 # Default CPU flags; overridden by PLATFORM selections below.
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
+
 # Raylib paths can be swapped if you use a custom build.
 RAYLIB_INC    ?= -I./src/raylib
 RAYLIB_LIBDIR ?= -L./src/raylib_drm
-PISTORM_KMOD  ?= 0
+
 PREFIX        ?= /opt/pistorm64
 DESTDIR       ?=
 INSTALL       ?= install
@@ -199,6 +211,8 @@ else ifeq ($(PLATFORM),PI_64BIT)
 CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
 else ifeq ($(PLATFORM),ZEROW2_64)
 CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
+else ifeq ($(PLATFORM),NATIVE) 
+CPUFLAGS = -march=native
 endif
 
 # Optional manual overrides for CPU tuning.
@@ -233,8 +247,8 @@ INCLUDES += -Iinclude -Iinclude/uapi
 DEFINES  += -DPISTORM_KMOD
 endif
 
-CFLAGS       = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS)
-M68K_CFLAGS   = $(CFLAGS) $(M68K_WARN_SUPPRESS)
+CFLAGS       = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
+M68K_CFLAGS   = $(CFLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
 LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS)
 
 LDLIBS   = $(LDLIBS_RAYLIB) $(LDLIBS_VC) $(LDLIBS_ALSA) -ldl -lstdc++ -lm -pthread
@@ -242,23 +256,28 @@ LDLIBS   = $(LDLIBS_RAYLIB) $(LDLIBS_VC) $(LDLIBS_ALSA) -ldl -lstdc++ -lm -pthre
 TARGET = $(EXENAME)$(EXE)
 INSTALL_DIR := $(DESTDIR)$(PREFIX)
 CONFIG_FILES := default.cfg amiga.cfg mac68k.cfg test.cfg x68k.cfg
-INSTALL_BINS := $(TARGET) buptest pistorm_truth_test
+INSTALL_BINS := $(TARGET) buptest pistorm_truth_test pistorm_monitor
+UDEV_RULES := etc/udev/99-pistorm.rules
+LIMITS_CONF := etc/security/limits.d/pistorm-rt.conf
+MODULES_LOAD := etc/modules-load.d/pistorm.conf
 HELP_TARGETS = \
-	"make"                             "Build emulator (default backend)" \
-	"make PISTORM_KMOD=1"             "Build emulator with kernel backend shim" \
+	"make"                             "Build emulator (kmod backend default)" \
+	"make PISTORM_KMOD=0"             "Build emulator with legacy userspace GPIO" \
 	"make clean"                      "Remove build artifacts" \
 	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom, a314 files" \
 	"make uninstall [PREFIX=… DESTDIR=…]" "Remove installed tree" \
 	"make kernel_module"              "Build pistorm.ko (out-of-tree)" \
 	"make kernel_install"             "Install pistorm.ko via kernel_module/Makefile" \
-	"make kernel_clean"               "Clean kernel module build outputs"
+	"make kernel_clean"               "Clean kernel module build outputs" \
+	"make pistorm_monitor"            "Build interactive bus monitor" \
+	"make full_clean_install"         "Stop emulator, rebuild kmod+userland, install"
 
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
 
-DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE)
+DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest pistorm_monitor pistorm_monitor.d pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE)
 
-all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test
+all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test pistorm_monitor
 
 clean:
 	rm -f $(DELETEFILES)
@@ -293,6 +312,9 @@ buptest:
 pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
 	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
 
+pistorm_monitor: tools/pistorm_monitor.c include/uapi/linux/pistorm.h
+	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
+
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
 	$(CXX) -MMD -MP -c -o src/a314/a314.o $(OPT_LEVEL) src/a314/a314.cc $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi
 
@@ -316,6 +338,20 @@ install: all
 	cp -a src/a314/files_pi $(INSTALL_DIR)/src/a314/
 	cp -a data $(INSTALL_DIR)/
 	[ -f pistorm.LICENSE ] && $(INSTALL) -m 644 pistorm.LICENSE $(INSTALL_DIR)/
+	if [ -f $(UDEV_RULES) ]; then \
+		$(INSTALL) -d /etc/udev/rules.d; \
+		$(INSTALL) -m 644 $(UDEV_RULES) /etc/udev/rules.d/99-pistorm.rules; \
+		udevadm control --reload >/dev/null 2>&1 || true; \
+		udevadm trigger --subsystem-match=misc --attr-match=dev=10:262 >/dev/null 2>&1 || true; \
+	fi
+	if [ -f $(LIMITS_CONF) ]; then \
+		$(INSTALL) -d /etc/security/limits.d; \
+		$(INSTALL) -m 644 $(LIMITS_CONF) /etc/security/limits.d/pistorm-rt.conf; \
+	fi
+	if [ -f $(MODULES_LOAD) ]; then \
+		$(INSTALL) -d /etc/modules-load.d; \
+		$(INSTALL) -m 644 $(MODULES_LOAD) /etc/modules-load.d/pistorm.conf; \
+	fi
 
 uninstall:
 	rm -rf $(INSTALL_DIR)
@@ -329,10 +365,19 @@ kernel_install: kernel_module
 kernel_clean:
 	$(MAKE) -C kernel_module clean
 
+full_clean_install:
+	-pkill -x emulator 2>/dev/null || true
+	-sudo rmmod pistorm 2>/dev/null || true
+	$(MAKE) clean
+	$(MAKE) PISTORM_KMOD=$(PISTORM_KMOD)
+	$(MAKE) kernel_module
+	sudo $(MAKE) kernel_install
+	sudo $(MAKE) PISTORM_KMOD=$(PISTORM_KMOD) install
+
 help:
 	@printf "Available targets:\n"
 	@printf "  %-32s %s\n" $(HELP_TARGETS)
 
--include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d
+-include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d pistorm_monitor.d
 
-.PHONY: all clean buptest pistorm_truth_test install uninstall kernel_module kernel_install kernel_clean
+.PHONY: all clean buptest pistorm_truth_test pistorm_monitor install uninstall kernel_module kernel_install kernel_clean
