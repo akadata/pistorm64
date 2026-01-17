@@ -224,7 +224,7 @@ static void configure_ipl_nops(void) {
 }
 
 void* ipl_task(void* args) {
-  printf("IPL thread running\n");
+  printf("[IPL] Thread running\n");
   uint16_t old_irq = 0;
   uint32_t value;
 
@@ -301,7 +301,7 @@ void* ipl_task(void* args) {
     NOP NOP NOP NOP NOP NOP NOP NOP
     NOP NOP NOP NOP NOP NOP NOP NOP*/
   }
-  printf("IPL thread exiting\n");
+  printf("[IPL] Thread exiting\n");
   return args;
 }
 
@@ -825,7 +825,7 @@ switch_config:
   }
 
   if (!cfg) {
-    printf("No config file specified. Trying to load default.cfg...\n");
+    printf("[CFG] No config file specified. Trying to load default.cfg...\n");
     cfg = load_config_file("default.cfg");
     if (!cfg) {
       printf("Couldn't load default.cfg, empty emulator config will be used.\n");
@@ -935,7 +935,7 @@ switch_config:
       printf("[ERROR] Cannot create IPL thread: [%s]", strerror(err));
     } else {
       pthread_setname_np(ipl_tid, "pistorm: ipl");
-      printf("IPL thread created successfully\n");
+      printf("[IPL] Thread created successfully\n");
       apply_affinity_from_env("ipl", CORE_IPL);
       apply_realtime_from_env("ipl", RT_DEFAULT_IPL);
     }
@@ -1064,7 +1064,17 @@ static inline uint32_t ps_read(uint8_t type, uint32_t addr) {
   case OP_TYPE_WORD:
     return ps_read_16(addr);
   case OP_TYPE_LONGWORD:
-    return ps_read_32(addr);
+    if (addr & 0x01) {
+      uint32_t c = ps_read_8(addr);
+      c |= (be16toh(ps_read_16(addr + 1)) << 8);
+      c |= (ps_read_8(addr + 3) << 24);
+      return htobe32(c);
+    }
+    {
+      uint16_t a = ps_read_16(addr);
+      uint16_t b = ps_read_16(addr + 2);
+      return ((uint32_t)a << 16) | b;
+    }
   }
   // This shouldn't actually happen.
   return 0;
@@ -1079,7 +1089,14 @@ static inline void ps_write(uint8_t type, uint32_t addr, uint32_t val) {
     ps_write_16(addr, val);
     return;
   case OP_TYPE_LONGWORD:
-    ps_write_32(addr, val);
+    if (addr & 0x01) {
+      ps_write_8(addr, val & 0xFF);
+      ps_write_16(addr + 1, htobe16(((val >> 8) & 0xFFFF)));
+      ps_write_8(addr + 3, (val >> 24));
+      return;
+    }
+    ps_write_16(addr, val >> 16);
+    ps_write_16(addr + 2, val);
     return;
   }
   // This shouldn't actually happen.
@@ -1289,14 +1306,9 @@ unsigned int m68k_read_memory_32(unsigned int address) {
   }
 
   if (address & 0x01) {
-    uint32_t c = ps_read_8(address);
-    c |= (be16toh(ps_read_16(address + 1)) << 8);
-    c |= (ps_read_8(address + 3) << 24);
-    return htobe32(c);
+    return ps_read(OP_TYPE_LONGWORD, address);
   }
-  uint16_t a = ps_read_16(address);
-  uint16_t b = ps_read_16(address + 2);
-  return (a << 16) | b;
+  return ps_read(OP_TYPE_LONGWORD, address);
 }
 
 static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t val) {
@@ -1487,14 +1499,11 @@ void m68k_write_memory_32(unsigned int address, unsigned int value) {
   }
 
   if (address & 0x01) {
-    ps_write_8((uint32_t)address, value & 0xFF);
-    ps_write_16((uint32_t)address + 1, htobe16(((value >> 8) & 0xFFFF)));
-    ps_write_8((uint32_t)address + 3, (value >> 24));
+    ps_write(OP_TYPE_LONGWORD, address, value);
     return;
   }
 
-  ps_write_16((uint32_t)address, value >> 16);
-  ps_write_16((uint32_t)address + 2, value);
+  ps_write(OP_TYPE_LONGWORD, address, value);
   return;
 }
 static void set_affinity_for(const char* name, int core_id) {

@@ -36,7 +36,7 @@ struct platform_config* make_platform_config(char* name, char* subsys) {
     printf("No match found for platform name \'%s\', defaulting to none/generic.\n", name);
     platform_id = PLATFORM_NONE;
   } else {
-    printf("Creating platform config for %s...\n", name);
+    printf("[CFG] Creating platform config for %s...\n", name);
   }
 
   cfg = (struct platform_config*)malloc(sizeof(struct platform_config));
