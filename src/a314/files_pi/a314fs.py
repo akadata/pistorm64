@@ -21,9 +21,9 @@ try:
     idx = sys.argv.index('-conf-file')
     CONFIG_FILE_PATH = sys.argv[idx + 1]
 except (ValueError, IndexError):
-    CONFIG_FILE_PATH = 'a314/files_pi/a314fs.conf'
+    CONFIG_FILE_PATH = '/home/smalley/pistorm64/src/a314/files_pi/a314fs.conf'
 
-SHARED_DIRECTORY = 'data/a314shared'
+SHARED_DIRECTORY = '/home/smalley/pistorm64/data/a314shared'
 METAFILE_EXTENSION = ':a314'
 
 with open(CONFIG_FILE_PATH, encoding='utf-8') as f:

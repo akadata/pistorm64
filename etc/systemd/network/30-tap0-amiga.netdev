@@ -1,0 +1,8 @@
+[NetDev]
+Name=tap0
+Kind=tap
+
+[TAP]
+User=smalley
+Group=smalley
+
