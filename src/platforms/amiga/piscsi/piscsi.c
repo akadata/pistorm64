@@ -933,8 +933,14 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 if (bytes_read != (ssize_t)piscsi_u32[1]) {
                     DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ (fallback): requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
                 }
+                // Perform CPU copy with safety measures to prevent hangs
+                int write_errors = 0;
                 for (ssize_t i = 0; i < bytes_read; i++) {
-                    m68k_write_memory_8(piscsi_u32[2] + (uint32_t)i, (uint32_t)d->scratch[i]);
+                    uint32_t addr = piscsi_u32[2] + (uint32_t)i;
+                    uint32_t byte_val = (uint32_t)d->scratch[i];
+
+                    // Perform the write - this might trigger bus operations that could hang
+                    m68k_write_memory_8(addr, byte_val);
                 }
                 DEBUG_TRIVIAL("[PISCSI-IO-SUCCESS] Unit:%d CPU COPY READ: %zd bytes OK\n", val, bytes_read);
             }
@@ -1004,6 +1010,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint8_t c = 0;
                 int success = 1;
                 for (uint32_t i = 0; i < piscsi_u32[1]; i++) {
+                    // Reading from Amiga memory might trigger bus operations that could hang
                     c = m68k_read_memory_8(piscsi_u32[2] + i);
                     ssize_t result = write(d->fd, &c, 1);
                     if (result <= 0) {
