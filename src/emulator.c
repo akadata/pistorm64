@@ -38,6 +38,7 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -118,6 +119,7 @@ static inline uint8_t opcode_is_fpu(uint16_t opcode);
 static void apply_affinity_from_env(const char* role, int default_core);
 static void set_realtime_priority(const char* name, int prio);
 static void apply_realtime_from_env(const char* role, int default_prio);
+static int realtime_allowed(void);
 static void amiga_reset_and_wait(const char* tag);
 static void amiga_warmup_bus(void);
 static void configure_ipl_nops(void);
@@ -1511,6 +1513,19 @@ static void set_affinity_for(const char* name, int core_id) {
   }
 }
 
+static int realtime_allowed(void) {
+  if (geteuid() == 0) {
+    return 1;
+  }
+
+  struct rlimit lim;
+  if (getrlimit(RLIMIT_RTPRIO, &lim) == 0 && lim.rlim_cur > 0) {
+    return 1;
+  }
+
+  return 0;
+}
+
 static void apply_affinity_from_env(const char* role, int default_core) {
   int target = default_core;
   const char* env = getenv(PI_AFFINITY_ENV);
@@ -1561,6 +1576,8 @@ static void set_realtime_priority(const char* name, int prio) {
 }
 
 static void apply_realtime_from_env(const char* role, int default_prio) {
+  static int rt_warned;
+  int allowed = realtime_allowed();
   int target = default_prio;
   const char* env = getenv(PI_RT_ENV);
   if (env && strlen(env)) {
@@ -1582,7 +1599,18 @@ static void apply_realtime_from_env(const char* role, int default_prio) {
       tok = strtok(NULL, ", ");
     }
     free(dup);
+  } else if (!allowed) {
+    return;
   }
+
+  if (!allowed) {
+    if (!rt_warned) {
+      printf("[PRIO] RT scheduling disabled (no CAP_SYS_NICE/RLIMIT_RTPRIO).\n");
+      rt_warned = 1;
+    }
+    return;
+  }
+
   if (target > 0) {
     set_realtime_priority(role, target);
   }
