@@ -87,7 +87,7 @@ static inline void emulate_irq(unsigned int irq) {
 }
 
 void* ahi_timing_task(void* args) {
-  printf("[PI-AHI] AHI timing thread running.\n");
+  printf("[AHI] Thread running.\n");
 
   struct timespec f1, f2;
   struct timespec c1, c2;
