@@ -18,7 +18,7 @@
 
 EXENAME          = emulator
 
-PLATFORM=ZEROW2_64
+PLATFORM=PI4_64BIT
 
 
 # Tunables: edit here instead of hunting through rule bodies.

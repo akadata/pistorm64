@@ -7,7 +7,6 @@
 #include <linux/fs.h>
 #include <linux/gpio.h>
 #include <linux/io.h>
-#include <linux/jiffies.h>
 #include <linux/kernel.h>
 #include <linux/miscdevice.h>
 #include <linux/module.h>
@@ -20,10 +19,14 @@
 
 #include <linux/pistorm.h>
 
+#ifndef PISTORM64_GIT
+#define PISTORM64_GIT "unknown"
+#endif
+
 #define DEVICE_NAME "pistorm"
 
 #ifndef PISTORM64_GIT
-#define PISTORM64_GIT "https://github.com/akadata/pistorm64"
+	#define PISTORM64_GIT "unknown"
 #endif
 
 /* GPIO register offsets */
@@ -39,11 +42,6 @@
 #define CPRMAN_GP0CTL 0x70
 #define CPRMAN_GP0DIV 0x74
 #define CPRMAN_PASSWD 0x5a000000
-
-/* GPCLK control bits (bcm2835 style) */
-#define GPCLK_CTL_ENAB    BIT(4)
-#define GPCLK_CTL_KILL    BIT(5)
-#define GPCLK_CTL_BUSY    BIT(7)
 
 #define GPIO_FSEL_INPUT  0
 #define GPIO_FSEL_OUTPUT 1
@@ -82,19 +80,6 @@ struct pistorm_dev {
 };
 
 static struct pistorm_dev *ps_dev;
-
-/*
- * GPCLK tuning knobs.
- *
- * Default source = PLLC (5) and divisor = 6 matches Pi3/Zero2 behaviour (~200MHz).
- * On Pi4/BCM2711 firmware/clock trees can vary; these params allow tuning without code edits.
- */
-static unsigned int gpclk_src = 5;  /* 5 = PLLC on bcm2835 style clock manager */
-static unsigned int gpclk_div = 6;  /* integer divider */
-module_param(gpclk_src, uint, 0644);
-MODULE_PARM_DESC(gpclk_src, "GPCLK0 clock source (bcm2835 style: 5=PLLC, 6=PLLD, etc.)");
-module_param(gpclk_div, uint, 0644);
-MODULE_PARM_DESC(gpclk_div, "GPCLK0 integer divider (default 6 ~200MHz on Pi3-class)");
 
 static inline u32 ps_readl(u32 off)
 {
@@ -185,24 +170,14 @@ static void ps_clear_lines(void)
 
 static int ps_wait_for_txn(void)
 {
-	unsigned long timeout_jiffies = jiffies + msecs_to_jiffies(500); /* 500ms */
+	int wait = 100000;
 
-	while (time_before(jiffies, timeout_jiffies)) {
+	while (wait--) {
 		if (!(ps_readl(GPIO_GPLEV0) & BIT(PIN_TXN_IN_PROGRESS)))
 			return 0;
 		cpu_relax();
 	}
-
-	pr_err("pistorm: ps_wait_for_txn timed out after 500ms\n");
 	return -ETIMEDOUT;
-}
-
-static int ps_wait_for_txn_log(const char *op)
-{
-	int ret = ps_wait_for_txn();
-	if (ret == -ETIMEDOUT)
-		pr_err("pistorm: txn timeout waiting for %s (PIN_TXN_IN_PROGRESS stuck)\n", op);
-	return ret;
 }
 
 static void ps_write_payload(u32 payload, u32 reg_sel)
@@ -220,37 +195,28 @@ static int ps_setup_gpclk(struct pistorm_dev *ps)
 	if (!ps->cprman_base)
 		return -ENODEV;
 
-	if (gpclk_div == 0 || gpclk_div > 0xfff) {
-		pr_warn("pistorm: invalid gpclk_div=%u (valid 1..4095), refusing\n", gpclk_div);
-		return -EINVAL;
-	}
-
 	/* Disable */
-	writel(CPRMAN_PASSWD | GPCLK_CTL_KILL, ps->cprman_base + CPRMAN_GP0CTL);
+	writel(CPRMAN_PASSWD | BIT(5), ps->cprman_base + CPRMAN_GP0CTL);
 	udelay(10);
 	for (unsigned int i = 0; i < 1000; i++) {
-		if (!(readl(ps->cprman_base + CPRMAN_GP0CTL) & GPCLK_CTL_BUSY))
+		if (!(readl(ps->cprman_base + CPRMAN_GP0CTL) & BIT(7)))
 			break;
 		udelay(1);
 	}
 
-	/* Divider: integer divider in bits 23:12 */
-	writel(CPRMAN_PASSWD | (gpclk_div << 12), ps->cprman_base + CPRMAN_GP0DIV);
+	/* Divider: 6 -> ~200MHz on Pi3/Zero2 */
+	writel(CPRMAN_PASSWD | (6 << 12), ps->cprman_base + CPRMAN_GP0DIV);
 	udelay(10);
-
-	/* Source + enable */
-	writel(CPRMAN_PASSWD | (gpclk_src & 0xf) | GPCLK_CTL_ENAB, ps->cprman_base + CPRMAN_GP0CTL);
+	/* Source PLLC (5) */
+	writel(CPRMAN_PASSWD | 5 | BIT(4), ps->cprman_base + CPRMAN_GP0CTL);
 
 	for (unsigned int i = 0; i < 1000; i++) {
-		if (readl(ps->cprman_base + CPRMAN_GP0CTL) & GPCLK_CTL_BUSY) {
+		if (readl(ps->cprman_base + CPRMAN_GP0CTL) & BIT(7)) {
 			ps->gpclk_ready = true;
-			pr_info("pistorm: gpclk0 configured (src=%u div=%u)\n", gpclk_src, gpclk_div);
 			return 0;
 		}
 		udelay(1);
 	}
-
-	pr_err("pistorm: gpclk0 failed to start (src=%u div=%u)\n", gpclk_src, gpclk_div);
 	return -ETIMEDOUT;
 }
 
@@ -277,7 +243,7 @@ static int ps_write16(struct pistorm_dev *ps, u32 addr, u16 data)
 	ps_write_payload((addr & 0xffff) << 8, REG_ADDR_LO);
 	ps_write_payload(((0x0000 | (addr >> 16)) << 8), REG_ADDR_HI);
 	ps_set_bus_dir(ps, false);
-	return ps_wait_for_txn_log("write16");
+	return ps_wait_for_txn();
 }
 
 static int ps_write8(struct pistorm_dev *ps, u32 addr, u8 data)
@@ -289,7 +255,7 @@ static int ps_write8(struct pistorm_dev *ps, u32 addr, u8 data)
 	ps_write_payload((addr & 0xffff) << 8, REG_ADDR_LO);
 	ps_write_payload(((0x0100 | (addr >> 16)) << 8), REG_ADDR_HI);
 	ps_set_bus_dir(ps, false);
-	return ps_wait_for_txn_log("write8");
+	return ps_wait_for_txn();
 }
 
 static int ps_read16(struct pistorm_dev *ps, u32 addr, u16 *out)
@@ -305,7 +271,7 @@ static int ps_read16(struct pistorm_dev *ps, u32 addr, u16 *out)
 	ps_write_set(REG_DATA << PIN_A0);
 	ps_write_set(BIT(PIN_RD));
 
-	ret = ps_wait_for_txn_log("read16");
+	ret = ps_wait_for_txn();
 	value = ps_readl(GPIO_GPLEV0);
 	ps_clear_lines();
 
@@ -480,8 +446,6 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			ret = -EFAULT;
 			break;
 		}
-		pr_debug("ps_ioctl: BUSOP is_read=%d width=%u addr=0x%08x flags=0x%x\n",
-			 busop.is_read, busop.width, busop.addr, busop.flags);
 		ret = ps_handle_busop(ps_dev, &busop);
 		if (!ret && busop.is_read) {
 			if (copy_to_user(argp, &busop, sizeof(busop)))
@@ -493,8 +457,6 @@ static long ps_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			ret = -EFAULT;
 			break;
 		}
-		pr_debug("ps_ioctl: BATCH count=%u ptr=0x%llx\n",
-			 batch.ops_count, batch.ops_ptr);
 		ret = ps_handle_batch(&batch);
 		break;
 	default:
@@ -515,10 +477,9 @@ static const struct file_operations ps_fops = {
 	.unlocked_ioctl = ps_ioctl,
 	.open = ps_open,
 	.llseek = noop_llseek,
-	.compat_ioctl = ps_ioctl,
 };
 
-static void __iomem *ps_map_resource_compat(const char *compat)
+static void __iomem *ps_map_resource(const char *compat, const char *name)
 {
 	struct device_node *np;
 	void __iomem *base;
@@ -529,19 +490,9 @@ static void __iomem *ps_map_resource_compat(const char *compat)
 
 	base = of_iomap(np, 0);
 	of_node_put(np);
+	if (!base)
+		pr_err("pistorm: failed to map %s\n", name);
 	return base;
-}
-
-static void __iomem *ps_map_resource_multi(const char *name, const char * const *compats)
-{
-	void __iomem *base = NULL;
-	for (; *compats; compats++) {
-		base = ps_map_resource_compat(*compats);
-		if (base)
-			return base;
-	}
-	pr_err("pistorm: failed to map %s via DT\n", name);
-	return NULL;
 }
 
 static void ps_request_pins(void)
@@ -554,8 +505,10 @@ static void ps_request_pins(void)
 
 	for (size_t i = 0; i < ARRAY_SIZE(pins); i++) {
 		int ret = gpio_request(pins[i], "pistorm");
+
 		if (ret == -EPROBE_DEFER)
 			continue;
+
 		if (ret && ret != -EBUSY)
 			pr_warn("pistorm: gpio %u request failed: %d\n", pins[i], ret);
 	}
@@ -565,7 +518,7 @@ static void ps_disable_gpclk(struct pistorm_dev *ps)
 {
 	if (!ps->cprman_base)
 		return;
-	writel(CPRMAN_PASSWD | GPCLK_CTL_KILL, ps->cprman_base + CPRMAN_GP0CTL);
+	writel(CPRMAN_PASSWD | BIT(5), ps->cprman_base + CPRMAN_GP0CTL);
 	udelay(10);
 	ps->gpclk_ready = false;
 }
@@ -574,29 +527,17 @@ static int __init pistorm_init(void)
 {
 	int ret;
 
-	static const char * const gpio_compats[] = {
-		"brcm,bcm2835-gpio",
-		"brcm,bcm2711-gpio",
-		NULL,
-	};
-
-	static const char * const cprman_compats[] = {
-		"brcm,bcm2835-cprman",
-		"brcm,bcm2711-cprman",
-		NULL,
-	};
-
 	ps_dev = kzalloc(sizeof(*ps_dev), GFP_KERNEL);
 	if (!ps_dev)
 		return -ENOMEM;
 
-	ps_dev->gpio_base = ps_map_resource_multi("gpio", gpio_compats);
+	ps_dev->gpio_base = ps_map_resource("brcm,bcm2835-gpio", "gpio");
 	if (!ps_dev->gpio_base) {
 		ret = -ENODEV;
 		goto err_free;
 	}
 
-	ps_dev->cprman_base = ps_map_resource_multi("cprman", cprman_compats);
+	ps_dev->cprman_base = ps_map_resource("brcm,bcm2835-cprman", "cprman");
 	mutex_init(&ps_dev->lock);
 	ps_request_pins();
 
@@ -614,10 +555,8 @@ static int __init pistorm_init(void)
 	if (ret)
 		pr_warn("pistorm: setup_protocol failed: %d\n", ret);
 
-	pr_info("pistorm: /dev/%s ready (gpclk %s, src=%u div=%u)\n",
-		DEVICE_NAME,
-		ps_dev->gpclk_ready ? "on" : "off",
-		gpclk_src, gpclk_div);
+	pr_info("pistorm: /dev/%s ready (gpclk %s)\n",
+		DEVICE_NAME, ps_dev->gpclk_ready ? "on" : "off");
 	return 0;
 
 err_free:
@@ -652,10 +591,10 @@ MODULE_INFO(name, "pistorm");
 MODULE_INFO(alias, "pistorm");
 MODULE_INFO(url, "https://github.com/akadata/pistorm");
 MODULE_INFO(known_working, "Pi Zero 2 W (BCM2837, Pi 3-class)");
-MODULE_INFO(tested, "Pi 4-class (BCM2711) and Pi 3-class on Linux 6.12.62+rpt-rpi-v8");
+MODULE_INFO(tested, "Pi Zero 2 W (BCM2837, Pi 3-class) on Linux 6.12.62+rpt-rpi-v8");
 MODULE_INFO(targets, "BCM2837 (Pi 3-class), BCM2711 (Pi 4-class)");
-MODULE_INFO(intree, "N"); /* out-of-tree */
+MODULE_INFO(intree, "N");   /* out-of-tree */
 MODULE_INFO(pistorm64, "GPIO/GPCLK backend only; userspace CPU stays userspace");
 MODULE_INFO(git, PISTORM64_GIT);
-MODULE_INFO(clock, "GPCLK0 alt0 on GPIO4, src/div configurable via module params gpclk_src/gpclk_div");
+MODULE_INFO(clock, "GPCLK0 alt0 on GPIO4, PLLC source, divider=6 (~200MHz target)");
 MODULE_INFO(gpio, "Pins: 0 TXN_IN_PROGRESS(in), 1 IPL_ZERO(in), 2 A0(out), 3 A1(out), 4 GPCLK0(alt0), 5 RESET(out), 6 RD(out), 7 WR(out), 8-23 D0..D15(bidir)");
