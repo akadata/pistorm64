@@ -51,6 +51,26 @@ static int piscsi_check_bounds(struct piscsi_dev *d, uint64_t offset, uint32_t l
     }
     return 0;
 }
+
+// Validate command parameters to prevent hangs/crashes
+static int piscsi_validate_command(struct piscsi_dev *d, uint32_t cmd, uint32_t unit, uint32_t *params)
+{
+    // Check if device is valid
+    if (d->fd == -1) {
+        DEBUG("[PISCSI-VALIDATION] Attempted operation on unmapped drive %d\n", unit);
+        return -1;
+    }
+
+    // For READBYTES/WRITEBYTES, check if high word has unexpected values
+    if (cmd == PISCSI_CMD_READBYTES || cmd == PISCSI_CMD_WRITEBYTES) {
+        if (params[3] != 0) {
+            DEBUG("[PISCSI-VALIDATION] READBYTES/WRITEBYTES with non-zero high word (0x%X), rejecting to prevent crash\n", params[3]);
+            return -1;  // Force use of 64-bit commands for large offsets
+        }
+    }
+
+    return 0;
+}
 #else
 #define DEBUG(...)
 #define DEBUG_TRIVIAL(...)
@@ -849,13 +869,25 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
         case PISCSI_CMD_READ:
         case PISCSI_CMD_READBYTES:
             d = &devs[val];
-            if (d->fd == -1) {
-                DEBUG("[!!!PISCSI] BUG: Attempted read from unmapped drive %d.\n", val);
-                break;
+            if (piscsi_validate_command(d, cmd, val, piscsi_u32) != 0) {
+                break;  // Validation failed, reject the command
             }
 
             if (cmd == PISCSI_CMD_READBYTES) {
-                uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
+                // For READBYTES, only use 32-bit offset to avoid issues with garbage in high word
+                // The Amiga-side driver may not properly set the high 32 bits for READBYTES
+                uint64_t src = (uint64_t)piscsi_u32[0];  // Only use lower 32 bits
+
+                // Check if the high word contains non-zero values (indicating a potential 64-bit offset)
+                if (piscsi_u32[3] != 0) {
+                    DEBUG("[PISCSI-IO-WARNING] READBYTES command has non-zero high word (0x%X), forcing 32-bit mode\n", piscsi_u32[3]);
+                    DEBUG("[PISCSI-IO-WARNING] For >4GB access, use READ64/WRITE64 commands instead\n");
+
+                    // For safety, we'll reject READBYTES with high bits set to prevent crashes
+                    // The Amiga driver should use READ64/WRITE64 for >4GB offsets
+                    break; // Reject this command to force use of proper 64-bit commands
+                }
+
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:READBYTES io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n",
@@ -874,7 +906,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                     break;
                 lseek64(d->fd, file_offset, SEEK_SET);
             }
-            else {
+            else {  // This is PISCSI_CMD_READ64
                 uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
@@ -916,13 +948,25 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
         case PISCSI_CMD_WRITE:
         case PISCSI_CMD_WRITEBYTES:
             d = &devs[val];
-            if (d->fd == -1) {
-                DEBUG ("[PISCSI] BUG: Attempted write to unmapped drive %d.\n", val);
-                break;
+            if (piscsi_validate_command(d, cmd, val, piscsi_u32) != 0) {
+                break;  // Validation failed, reject the command
             }
 
             if (cmd == PISCSI_CMD_WRITEBYTES) {
-                uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
+                // For WRITEBYTES, only use 32-bit offset to avoid issues with garbage in high word
+                // The Amiga-side driver may not properly set the high 32 bits for WRITEBYTES
+                uint64_t src = (uint64_t)piscsi_u32[0];  // Only use lower 32 bits
+
+                // Check if the high word contains non-zero values (indicating a potential 64-bit offset)
+                if (piscsi_u32[3] != 0) {
+                    DEBUG("[PISCSI-IO-WARNING] WRITEBYTES command has non-zero high word (0x%X), forcing 32-bit mode\n", piscsi_u32[3]);
+                    DEBUG("[PISCSI-IO-WARNING] For >4GB access, use READ64/WRITE64 commands instead\n");
+
+                    // For safety, we'll reject WRITEBYTES with high bits set to prevent crashes
+                    // The Amiga driver should use READ64/WRITE64 for >4GB offsets
+                    break; // Reject this command to force use of proper 64-bit commands
+                }
+
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:WRITEBYTES io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n",
@@ -941,7 +985,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                     break;
                 lseek64(d->fd, file_offset, SEEK_SET);
             }
-            else {
+            else {  // This is PISCSI_CMD_WRITE64
                 uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
