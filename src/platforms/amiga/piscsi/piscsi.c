@@ -40,6 +40,17 @@ static const char *op_type_names[4] = {
     "LONGWORD",
     "MEM",
 };
+
+static int piscsi_check_bounds(struct piscsi_dev *d, uint64_t offset, uint32_t len, int unit, const char *op)
+{
+    uint64_t end = offset + (uint64_t)len;
+    if (end > d->fs) {
+        DEBUG("[PISCSI-IO-ERROR] Unit:%d %s beyond end of disk: off=0x%llx len=%u size=0x%llx\n",
+              unit, op, (unsigned long long)offset, len, (unsigned long long)d->fs);
+        return -1;
+    }
+    return 0;
+}
 #else
 #define DEBUG(...)
 #define DEBUG_TRIVIAL(...)
@@ -848,6 +859,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t block = src / d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:READBYTES io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%X to_addr:0x%.8X\n", val, src, piscsi_u32[1], block, src, piscsi_u32[2]);
+                if (piscsi_check_bounds(d, src, piscsi_u32[1], val, "READBYTES") != 0)
+                    break;
                 lseek(d->fd, src, SEEK_SET);
             }
             else if (cmd == PISCSI_CMD_READ) {
@@ -855,6 +868,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint64_t file_offset = (uint64_t)block * d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:READ io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, block, piscsi_u32[1], block, (unsigned long long)file_offset, piscsi_u32[2]);
+                if (piscsi_check_bounds(d, file_offset, piscsi_u32[1], val, "READ") != 0)
+                    break;
                 lseek(d->fd, file_offset, SEEK_SET);
             }
             else {
@@ -862,6 +877,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:READ64 io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, (unsigned long long)src, piscsi_u32[1], block, (unsigned long long)src, piscsi_u32[2]);
+                if (piscsi_check_bounds(d, src, piscsi_u32[1], val, "READ64") != 0)
+                    break;
                 lseek64(d->fd, src, SEEK_SET);
             }
 
@@ -907,6 +924,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t block = src / d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:WRITEBYTES io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%X from_addr:0x%.8X\n", val, src, piscsi_u32[1], block, src, piscsi_u32[2]);
+                if (piscsi_check_bounds(d, src, piscsi_u32[1], val, "WRITEBYTES") != 0)
+                    break;
                 lseek(d->fd, src, SEEK_SET);
             }
             else if (cmd == PISCSI_CMD_WRITE) {
@@ -914,6 +933,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint64_t file_offset = (uint64_t)block * d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:WRITE io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, block, piscsi_u32[1], block, (unsigned long long)file_offset, piscsi_u32[2]);
+                if (piscsi_check_bounds(d, file_offset, piscsi_u32[1], val, "WRITE") != 0)
+                    break;
                 lseek(d->fd, file_offset, SEEK_SET);
             }
             else {
@@ -921,6 +942,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:WRITE64 io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, (unsigned long long)src, piscsi_u32[1], block, (unsigned long long)src, piscsi_u32[2]);
+                if (piscsi_check_bounds(d, src, piscsi_u32[1], val, "WRITE64") != 0)
+                    break;
                 lseek64(d->fd, src, SEEK_SET);
             }
 
