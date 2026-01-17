@@ -71,6 +71,7 @@ USE_LTO    ?= 0
 USE_NO_PLT ?= 1
 OMIT_FP    ?= 1
 USE_PIPE   ?= 1
+PISTORM_KMOD ?= 1
 
 # Quiet noisy-but-benign warnings from the generated 68k core.
 M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable
