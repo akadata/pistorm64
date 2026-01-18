@@ -6,9 +6,9 @@ StartLimitIntervalSec=0
 Type=simple
 Restart=always
 RestartSec=1
-User=root
-ExecStart=/home/pi/pistorm/emulator
-WorkingDirectory=/home/pi/pistorm
+User=smalley
+ExecStart=/home/smalley/pistorm64/emulator
+WorkingDirectory=/home/smalley/pistorm64
 
 [Install]
 WantedBy=multi-user.target
