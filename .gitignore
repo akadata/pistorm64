@@ -1,21 +1,6 @@
 # Copyrighted files that should not be committed
-Amiga/kickstart.rom
-Amiga/myamiga.cfg
-Amiga/BlankPFS3-*
-Amiga/amiga.cfg
-Amiga/Workbench2.04-PS3-8GB.hdf
-pistorm/amiga.cfg
-pistorm/myamiga.cfg
-pistorm/Workbench2.04-PS3-8GB.hdf
-pistorm/BlankPFS3-*
 
 # Build artifacts
-emulator
-buptest
-m68kmake
-buptest
-pimodplay
-regtool
 *.o
 *.d
 *.a
@@ -41,10 +26,13 @@ qwen.resume
 codex.resume
 
 # Do not include tool binaries
-build/
-build/ioharness
-build/regtool
-build/dumpdisk
 regtool
 ioharness
 dumpdisk
+
+# core dumps / crash artefacts
+core
+core.*
+core.emulator.*
+*.core
+vgcore.*
