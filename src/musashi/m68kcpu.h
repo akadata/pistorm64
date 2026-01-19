@@ -1216,8 +1216,9 @@ static inline uint m68ki_read_imm_32(m68ki_cpu_core *state)
 {
 #if M68K_SEPARATE_READS
 #if M68K_EMULATE_PMMU
-//	if (PMMU_ENABLED)
-//	    address = pmmu_translate_addr(address,1);
+	if (PMMU_ENABLED) {  // THIS BLOCK WAS COMMENTED OUT
+	    address = pmmu_translate_addr(address,1);
+	}
 #endif
 #endif
 	uint32_t address = ADDRESS_68K(REG_PC);

@@ -1,1 +1,1 @@
-Makefile.debug
+Makefile.prod
