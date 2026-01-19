@@ -1,0 +1,105 @@
+!AmigaDos
+; PiGFX RTG Setup Script for PiStorm64
+;
+; This script automates the setup of PiGFX RTG on PiStorm64 systems
+; It follows the instructions from the PiGFX installer readme
+;
+; Setup:
+; - PDH0: (PIBENCH:) = Workbench disk
+; - PDH1: (PIWORK:) = Work disk  
+; - DH99: = PiStorm: volume (actual PiStorm mounted volume)
+; - PiDisk: (PI0:) = Reference disk for PiStorm files
+;
+; This script should be run from the PiGFX Install directory on your work disk
+
+echo "PiGFX RTG Setup Script for PiStorm64"
+echo ""
+echo "Current drive assignments:"
+echo "- PDH0: (PIBENCH:) = Workbench disk"
+echo "- PDH1: (PIWORK:) = Work disk"
+echo "- DH99: = PiStorm: volume (mounted PiStorm)"
+echo ""
+
+; Check if Picasso96 is installed
+if not exist s:P96_Identify
+  echo "WARNING: Picasso96 does not appear to be installed!"
+  echo "Please install Picasso96 first before running this script."
+  echo "You can download Picasso96 v2.0 from Aminet:"
+  echo "https://aminet.net/package/driver/video/Picasso96"
+  endcli
+endif
+
+echo "Checking for original Picasso96 installation files..."
+echo "Please ensure you have the original Picasso96 installation folder"
+echo "(typically called Picasso96Install) available."
+
+; Prompt for original installation path
+echo ""
+echo "Enter the path to your original Picasso96 installation folder:"
+echo "Example: PDH1:Picasso96Install"
+input TO orig_path
+
+if not exist orig_path
+  echo "ERROR: Path does not exist: " orig_path
+  echo "Please verify the path and try again."
+  endcli
+endif
+
+echo "Verifying required files in original installation..."
+if not exist orig_path"/CardInfo"
+  echo "ERROR: CardInfo directory not found in original installation!"
+  echo "Please verify you have the correct Picasso96 installation folder."
+  endcli
+endif
+
+echo "Creating PiGFX card files..."
+
+; Copy and configure the PiGFX card files to the appropriate location
+assign Pigfx: DH99:ENVARC/Picasso96/PiGFX
+if not exist DH99:ENVARC/Picasso96
+  makedir DH99:ENVARC/Picasso96
+endif
+
+if not exist Pigfx:
+  makedir Pigfx:
+endif
+
+; Copy card files from the installer (assuming they're on your work disk)
+copy PDH1:"data:a314-shared/rtg/PiGFX Install/Files"/* Pigfx:/ALL
+
+echo "Configuring monitor file..."
+
+; Create the monitor file for PiGFX
+if not exist DH99:MONITORFILES
+  makedir DH99:MONITORFILES
+endif
+
+; Copy the monitor file
+copy PDH1:"data:a314-shared/rtg/PiGFX Install/Files/MonitorFile" DH99:MONITORFILES/PiGFX_MONITOR
+
+echo "Setting up Picasso96 preferences..."
+
+; Create Picasso96 startup assignment if needed
+if not exist PDH1:S/Startup-Sequence
+  makedir PDH1:S
+endif
+
+; Add assignment to startup-sequence if not already present
+echo "Add the following line to your S:Startup-Sequence if not present:"
+echo "assign Pigfx: DH99:ENVARC/Picasso96/PiGFX"
+
+echo ""
+echo "Setup complete!"
+echo ""
+echo "To complete the installation:"
+echo "1. Run the PiGFX Installer from PDH1:data/a314-shared/rtg/PiGFX Install/"
+echo "2. Point it to your original Picasso96 installation folder: " orig_path
+echo "3. Restart your Amiga"
+echo ""
+echo "If you have issues:"
+echo "- Make sure raylib is properly compiled for DRM output on your PiStorm host"
+echo "- Verify your PiStorm64 emulator is running with RTG enabled (USE_RAYLIB=1)"
+echo "- Check that the PiGFX card files are in the correct location"
+echo "- Ensure your PiStorm is properly mounted as DH99:"
+echo ""
+echo "For additional help, join the PiStorm Discord community."
