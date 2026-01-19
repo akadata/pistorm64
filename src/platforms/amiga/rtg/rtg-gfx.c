@@ -26,7 +26,15 @@ extern uint8_t realtime_graphics_debug;
 
 void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color,
                         uint16_t pitch, uint16_t format) {
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch)];
+  // Add bounds checking to prevent accessing memory beyond rtg_mem
+  uint32_t offset = rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch);
+  if (offset >= (40 * SIZE_MEGA)) {
+    if (realtime_graphics_debug) {
+      printf("rtg_fillrect_solid: Accessing out of bounds memory (offset: 0x%X)\n", offset);
+    }
+    return; // Skip drawing if out of bounds
+  }
+  uint8_t* dptr = &rtg_mem[offset];
   switch (format) {
   case RTGFMT_8BIT_CLUT: {
     for (int xs = 0; xs < w; xs++) {
@@ -67,7 +75,15 @@ void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t
 
 void rtg_fillrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color, uint16_t pitch,
                   uint16_t format, uint8_t mask) {
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch)];
+  // Add bounds checking to prevent accessing memory beyond rtg_mem
+  uint32_t offset = rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch);
+  if (offset >= (40 * SIZE_MEGA)) {
+    if (realtime_graphics_debug) {
+      printf("rtg_fillrect: Accessing out of bounds memory (offset: 0x%X)\n", offset);
+    }
+    return; // Skip drawing if out of bounds
+  }
+  uint8_t* dptr = &rtg_mem[offset];
 
   for (int ys = 0; ys < h; ys++) {
     for (int xs = 0; xs < w; xs++) {
@@ -81,7 +97,15 @@ void rtg_invertrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t pit
                     uint8_t mask) {
   if (mask) {
   }
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch)];
+  // Add bounds checking to prevent accessing memory beyond rtg_mem
+  uint32_t offset = rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch);
+  if (offset >= (40 * SIZE_MEGA)) {
+    if (realtime_graphics_debug) {
+      printf("rtg_invertrect: Accessing out of bounds memory (offset: 0x%X)\n", offset);
+    }
+    return; // Skip drawing if out of bounds
+  }
+  uint8_t* dptr = &rtg_mem[offset];
   for (int ys = 0; ys < h; ys++) {
     switch (format) {
     case RTGFMT_8BIT_CLUT: {
@@ -119,8 +143,17 @@ void rtg_blitrect(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, 
                   uint16_t pitch, uint16_t format, uint8_t mask) {
   if (mask) {
   }
-  uint8_t* sptr = &rtg_mem[rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch)];
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (dx * rtg_pixel_size[format]) + (dy * pitch)];
+  // Add bounds checking to prevent accessing memory beyond rtg_mem
+  uint32_t src_offset = rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch);
+  uint32_t dst_offset = rtg_address_adj[0] + (dx * rtg_pixel_size[format]) + (dy * pitch);
+  if (src_offset >= (40 * SIZE_MEGA) || dst_offset >= (40 * SIZE_MEGA)) {
+    if (realtime_graphics_debug) {
+      printf("rtg_blitrect: Accessing out of bounds memory (src: 0x%X, dst: 0x%X)\n", src_offset, dst_offset);
+    }
+    return; // Skip drawing if out of bounds
+  }
+  uint8_t* sptr = &rtg_mem[src_offset];
+  uint8_t* dptr = &rtg_mem[dst_offset];
 
   uint32_t xdir = 1, pitchstep = pitch;
 
@@ -150,8 +183,17 @@ void rtg_blitrect(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, 
 
 void rtg_blitrect_solid(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, uint16_t h,
                         uint16_t pitch, uint16_t format) {
-  uint8_t* sptr = &rtg_mem[rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch)];
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (dx * rtg_pixel_size[format]) + (dy * pitch)];
+  // Add bounds checking to prevent accessing memory beyond rtg_mem
+  uint32_t src_offset = rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch);
+  uint32_t dst_offset = rtg_address_adj[0] + (dx * rtg_pixel_size[format]) + (dy * pitch);
+  if (src_offset >= (40 * SIZE_MEGA) || dst_offset >= (40 * SIZE_MEGA)) {
+    if (realtime_graphics_debug) {
+      printf("rtg_blitrect_solid: Accessing out of bounds memory (src: 0x%X, dst: 0x%X)\n", src_offset, dst_offset);
+    }
+    return; // Skip drawing if out of bounds
+  }
+  uint8_t* sptr = &rtg_mem[src_offset];
+  uint8_t* dptr = &rtg_mem[dst_offset];
 
   uint32_t xdir = 1, pitchstep = pitch;
 
@@ -180,10 +222,21 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
                                   uint8_t minterm) {
   if (minterm) {
   }
-  uint8_t* sptr = &rtg_mem[src_addr - (PIGFX_RTG_BASE + PIGFX_REG_SIZE) +
-                           (sx * rtg_pixel_size[format]) + (sy * srcpitch)];
-  uint8_t* dptr = &rtg_mem[dst_addr - (PIGFX_RTG_BASE + PIGFX_REG_SIZE) +
-                           (dx * rtg_pixel_size[format]) + (dy * dstpitch)];
+  // Calculate offsets with bounds checking
+  uint32_t src_offset = src_addr - (PIGFX_RTG_BASE + PIGFX_REG_SIZE) +
+                        (sx * rtg_pixel_size[format]) + (sy * srcpitch);
+  uint32_t dst_offset = dst_addr - (PIGFX_RTG_BASE + PIGFX_REG_SIZE) +
+                        (dx * rtg_pixel_size[format]) + (dy * dstpitch);
+
+  if (src_offset >= (40 * SIZE_MEGA) || dst_offset >= (40 * SIZE_MEGA)) {
+    if (realtime_graphics_debug) {
+      printf("rtg_blitrect_nomask_complete: Accessing out of bounds memory (src: 0x%X, dst: 0x%X)\n",
+             src_offset, dst_offset);
+    }
+    return; // Skip drawing if out of bounds
+  }
+  uint8_t* sptr = &rtg_mem[src_offset];
+  uint8_t* dptr = &rtg_mem[dst_offset];
 
   uint32_t xdir = 1, src_pitchstep = srcpitch, dst_pitchstep = dstpitch;
   uint8_t draw_mode = minterm;
@@ -286,7 +339,15 @@ extern struct emulator_config* cfg;
 void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t src_addr,
                       uint32_t fgcol, uint32_t bgcol, uint16_t pitch, uint16_t t_pitch,
                       uint16_t format, uint16_t offset_x, uint8_t mask, uint8_t draw_mode) {
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[1] + (x * rtg_pixel_size[format]) + (y * pitch)];
+  // Add bounds checking to prevent accessing memory beyond rtg_mem
+  uint32_t offset = rtg_address_adj[1] + (x * rtg_pixel_size[format]) + (y * pitch);
+  if (offset >= (40 * SIZE_MEGA)) {
+    if (realtime_graphics_debug) {
+      printf("rtg_blittemplate: Accessing out of bounds memory (offset: 0x%X)\n", offset);
+    }
+    return; // Skip drawing if out of bounds
+  }
+  uint8_t* dptr = &rtg_mem[offset];
   uint8_t* sptr = NULL;
   uint8_t cur_bit = 0, base_bit = 0, cur_byte = 0;
   uint8_t invert = (draw_mode & DRAWMODE_INVERSVID);
@@ -433,7 +494,15 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
   if (mask) {
   }
 
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[1] + (x * rtg_pixel_size[format]) + (y * pitch)];
+  // Add bounds checking to prevent accessing memory beyond rtg_mem
+  uint32_t offset = rtg_address_adj[1] + (x * rtg_pixel_size[format]) + (y * pitch);
+  if (offset >= (40 * SIZE_MEGA)) {
+    if (realtime_graphics_debug) {
+      printf("rtg_blitpattern: Accessing out of bounds memory (offset: 0x%X)\n", offset);
+    }
+    return; // Skip drawing if out of bounds
+  }
+  uint8_t* dptr = &rtg_mem[offset];
   uint8_t *sptr = NULL, *sptr_base = NULL;
   uint8_t cur_bit = 0, base_bit = 0, cur_byte = 0;
   uint8_t invert = (draw_mode & DRAWMODE_INVERSVID);
@@ -594,7 +663,15 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
     break;
   }
 
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (y1 * pitch)];
+  // Add bounds checking to prevent accessing memory beyond rtg_mem
+  uint32_t offset = rtg_address_adj[0] + (y1 * pitch);
+  if (offset >= (40 * SIZE_MEGA)) {
+    if (realtime_graphics_debug) {
+      printf("rtg_drawline_solid: Accessing out of bounds memory (offset: 0x%X)\n", offset);
+    }
+    return; // Skip drawing if out of bounds
+  }
+  uint8_t* dptr = &rtg_mem[offset];
 
   int32_t line_step = pitch;
   int8_t x_step = 1;
@@ -613,6 +690,12 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
   ix = dy_abs >> 1;
   iy = dx_abs >> 1;
 
+  if (offset + (x * rtg_pixel_size[format]) >= (40 * SIZE_MEGA)) {
+    if (realtime_graphics_debug) {
+      printf("rtg_drawline_solid: Initial pixel access out of bounds\n");
+    }
+    return; // Skip drawing if out of bounds
+  }
   SET_RTG_PIXEL(&dptr[x * rtg_pixel_size[format]], fg_color, format);
 
   if (dx_abs >= dy_abs) {
@@ -623,9 +706,16 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
       if (iy >= dx_abs) {
         iy -= dx_abs;
         dptr += line_step;
+        offset += line_step; // Update offset for bounds checking
       }
       x += x_step;
 
+      if (offset + (x * rtg_pixel_size[format]) >= (40 * SIZE_MEGA)) {
+        if (realtime_graphics_debug) {
+          printf("rtg_drawline_solid: Pixel access out of bounds at iteration %d\n", i);
+        }
+        break; // Stop drawing if out of bounds
+      }
       SET_RTG_PIXEL(&dptr[x * rtg_pixel_size[format]], fg_color, format);
     }
   } else {
@@ -638,7 +728,14 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
         x += x_step;
       }
       dptr += line_step;
+      offset += line_step; // Update offset for bounds checking
 
+      if (offset + (x * rtg_pixel_size[format]) >= (40 * SIZE_MEGA)) {
+        if (realtime_graphics_debug) {
+          printf("rtg_drawline_solid: Pixel access out of bounds at iteration %d\n", i);
+        }
+        break; // Stop drawing if out of bounds
+      }
       SET_RTG_PIXEL(&dptr[x * rtg_pixel_size[format]], fg_color, format);
     }
   }

@@ -237,10 +237,26 @@ void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
       case RTG_ADDR1:
         rtg_address[0] = value;
         rtg_address_adj[0] = value - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
+
+        // Validate the calculated address adjustment to prevent out-of-bounds access
+        if (rtg_address_adj[0] >= (40 * SIZE_MEGA)) {
+          if (realtime_graphics_debug) {
+            printf("Warning: RTG_ADDR1 rtg_address_adj[0] out of bounds (0x%X), clamping to valid range\n", rtg_address_adj[0]);
+          }
+          rtg_address_adj[0] = 0; // Reset to beginning of RTG memory
+        }
         break;
       case RTG_ADDR2:
         rtg_address[1] = value;
         rtg_address_adj[1] = value - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
+
+        // Validate the calculated address adjustment to prevent out-of-bounds access
+        if (rtg_address_adj[1] >= (40 * SIZE_MEGA)) {
+          if (realtime_graphics_debug) {
+            printf("Warning: RTG_ADDR2 rtg_address_adj[1] out of bounds (0x%X), clamping to valid range\n", rtg_address_adj[1]);
+          }
+          rtg_address_adj[1] = 0; // Reset to beginning of RTG memory
+        }
         break;
         CHKREG(RTG_ADDR3, rtg_address[2]);
         CHKREG(RTG_ADDR4, rtg_address[3]);
@@ -324,6 +340,16 @@ static void handle_irtg_command(uint32_t cmd) {
     cmd_mask = (uint8_t)M68KR(M68K_REG_D0);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
+    // Validate the calculated address adjustment to prevent out-of-bounds access
+    if (rtg_address_adj[0] >= (40 * SIZE_MEGA)) {
+      if (realtime_graphics_debug) {
+        printf("Warning: rtg_address_adj[0] out of bounds (0x%X), clamping to valid range\n", rtg_address_adj[0]);
+      }
+      // If the address is way out of bounds, it might indicate a configuration issue
+      // Rather than clamp, let's set to a safe value or skip the operation
+      rtg_address_adj[0] = 0; // Reset to beginning of RTG memory
+    }
+
     if (cmd_mask == 0xFF && be16toh(ln->LinePtrn) == 0xFFFF) {
       rtg_drawline_solid(be16toh(ln->X), be16toh(ln->Y), be16toh(ln->dX), be16toh(ln->dY),
                          be16toh(ln->Length), be32toh(ln->FgPen), CMD_PITCH, RGBF_D7);
@@ -355,6 +381,14 @@ static void handle_irtg_command(uint32_t cmd) {
     cmd_mask = (uint8_t)M68KR(M68K_REG_D5);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
+    // Validate the calculated address adjustment to prevent out-of-bounds access
+    if (rtg_address_adj[0] >= (40 * SIZE_MEGA)) {
+      if (realtime_graphics_debug) {
+        printf("Warning: rtg_address_adj[0] out of bounds (0x%X), clamping to valid range\n", rtg_address_adj[0]);
+      }
+      rtg_address_adj[0] = 0; // Reset to beginning of RTG memory
+    }
+
     if (cmd_mask == 0xFF) {
       rtg_fillrect_solid((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1),
                          (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3),
@@ -378,6 +412,14 @@ static void handle_irtg_command(uint32_t cmd) {
     cmd_mask = (uint8_t)M68KR(M68K_REG_D4);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
+    // Validate the calculated address adjustment to prevent out-of-bounds access
+    if (rtg_address_adj[0] >= (40 * SIZE_MEGA)) {
+      if (realtime_graphics_debug) {
+        printf("Warning: rtg_address_adj[0] out of bounds (0x%X), clamping to valid range\n", rtg_address_adj[0]);
+      }
+      rtg_address_adj[0] = 0; // Reset to beginning of RTG memory
+    }
+
     rtg_invertrect((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1),
                    (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3), CMD_PITCH, RGBF_D7,
                    cmd_mask);
@@ -392,6 +434,14 @@ static void handle_irtg_command(uint32_t cmd) {
 
     cmd_mask = (uint8_t)M68KR(M68K_REG_D6);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
+
+    // Validate the calculated address adjustment to prevent out-of-bounds access
+    if (rtg_address_adj[0] >= (40 * SIZE_MEGA)) {
+      if (realtime_graphics_debug) {
+        printf("Warning: rtg_address_adj[0] out of bounds (0x%X), clamping to valid range\n", rtg_address_adj[0]);
+      }
+      rtg_address_adj[0] = 0; // Reset to beginning of RTG memory
+    }
 
     if (cmd_mask == 0xFF) {
       rtg_blitrect_solid(M68KR(M68K_REG_D0), M68KR(M68K_REG_D1), M68KR(M68K_REG_D2),
@@ -461,6 +511,14 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address[1] = be32toh(r->_p_Memory);
     rtg_address_adj[1] = rtg_address[1] - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
+    // Validate the calculated address adjustment to prevent out-of-bounds access
+    if (rtg_address_adj[1] >= (40 * SIZE_MEGA)) {
+      if (realtime_graphics_debug) {
+        printf("Warning: rtg_address_adj[1] out of bounds (0x%X), clamping to valid range\n", rtg_address_adj[1]);
+      }
+      rtg_address_adj[1] = 0; // Reset to beginning of RTG memory
+    }
+
     rtg_blittemplate(M68KR(M68K_REG_D0), M68KR(M68K_REG_D1), M68KR(M68K_REG_D2), M68KR(M68K_REG_D3),
                      src_addr, fgcol, bgcol, CMD_PITCH, t_pitch, RGBF_D7, x_offset, cmd_mask,
                      draw_mode);
@@ -504,6 +562,14 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address[1] = be32toh(r->_p_Memory);
     rtg_address_adj[1] = rtg_address[1] - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
+    // Validate the calculated address adjustment to prevent out-of-bounds access
+    if (rtg_address_adj[1] >= (40 * SIZE_MEGA)) {
+      if (realtime_graphics_debug) {
+        printf("Warning: rtg_address_adj[1] out of bounds (0x%X), clamping to valid range\n", rtg_address_adj[1]);
+      }
+      rtg_address_adj[1] = 0; // Reset to beginning of RTG memory
+    }
+
     rtg_blitpattern(M68KR(M68K_REG_D0), M68KR(M68K_REG_D1), M68KR(M68K_REG_D2), M68KR(M68K_REG_D3),
                     src_addr, fgcol, bgcol, CMD_PITCH, RGBF_D7, x_offset, y_offset, cmd_mask,
                     draw_mode, loop_rows);
@@ -539,6 +605,14 @@ static void handle_irtg_command(uint32_t cmd) {
     uint16_t bmp_pitch = be16toh(bm->BytesPerRow);
     uint16_t line_pitch = be16toh(r->BytesPerRow);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
+
+    // Validate the calculated address adjustment to prevent out-of-bounds access
+    if (rtg_address_adj[0] >= (40 * SIZE_MEGA)) {
+      if (realtime_graphics_debug) {
+        printf("Warning: rtg_address_adj[0] out of bounds (0x%X), clamping to valid range\n", rtg_address_adj[0]);
+      }
+      rtg_address_adj[0] = 0; // Reset to beginning of RTG memory
+    }
 
     uint8_t minterm = (uint8_t)M68KR(M68K_REG_D6);
     cmd_mask = (uint8_t)M68KR(M68K_REG_D7);
