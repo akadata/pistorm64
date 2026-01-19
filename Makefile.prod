@@ -43,7 +43,7 @@ EXTRA_LDFLAGS ?=
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 WARNINGS   ?= -Wall -Wextra -pedantic
-OPT_LEVEL  ?= -O3
+OPT_LEVEL  ?= -Ofast
 
 ifdef O
 OPT_LEVEL := -O$(O)
@@ -69,8 +69,8 @@ ARCH_FEATURES ?=
 USE_VC     ?= 0
 # Perf toggles
 USE_LTO    ?= 0
-USE_NO_PLT ?= 0
-OMIT_FP    ?= 0
+USE_NO_PLT ?= 1
+OMIT_FP    ?= 1
 USE_PIPE   ?= 1
 PISTORM_KMOD ?= 1
 
@@ -199,18 +199,18 @@ PIPE_FLAGS= $(if $(filter 1,$(USE_PIPE)),-pipe,)
 # Platform-specific tuning and raylib variants.
 ifeq ($(PLATFORM),PI4)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc -mfpu=neon-fp-armv8 -mfloat-abi=hard
-RAYLIB_INC    = -I./src/raylib_pi4_test
-RAYLIB_LIBDIR = -L./src/raylib_pi4_test
+RAYLIB_INC    = -I./src/raylib_drm
+RAYLIB_LIBDIR = -L./src/raylib_drm
 DEFINES      += -DRPI4_TEST
 else ifeq ($(PLATFORM),PI4_64BIT)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
-RAYLIB_INC    = -I./src/raylib_pi4_test
-RAYLIB_LIBDIR = -L./src/raylib_pi4_test
+RAYLIB_INC    = -I./src/raylib_drm
+RAYLIB_LIBDIR = -L./src/raylib_drm
 DEFINES      += -DRPI4_TEST
 else ifeq ($(PLATFORM),PI4_64BIT_DEBUG)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
-RAYLIB_INC    = -I./src/raylib_pi4_test
-RAYLIB_LIBDIR = -L./src/raylib_pi4_test
+RAYLIB_INC    = -I./src/raylib_drm
+RAYLIB_LIBDIR = -L./src/raylib_drm
 DEFINES      += -DRPI4_TEST
 OPT_LEVEL := -O0
 EXTRA_CFLAGS += -g3 -fno-omit-frame-pointer
@@ -384,6 +384,22 @@ full_clean_install:
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
 	sudo $(MAKE) PISTORM_KMOD=$(PISTORM_KMOD) install
+	# Copy boot configuration files
+	sudo cp -f boot/firmware/config.txt /boot/firmware/config.txt
+	sudo cp -f boot/firmware/cmdline.txt /boot/firmware/cmdline.txt
+	# Copy system configuration files
+	sudo cp -f 10-hugepages.conf /etc/sysctl.d/10-hugepages.conf
+	sudo cp -f etc/modules-load.d/pistorm.conf /etc/modules-load.d/pistorm.conf
+	sudo cp -f etc/security/limits.d/pistorm-rt.conf /etc/security/limits.d/pistorm-rt.conf
+	sudo cp -f etc/udev/99-pistorm.rules /etc/udev/rules.d/99-pistorm.rules
+	sudo cp -f etc/systemd/system/kernelpistorm64.service /etc/systemd/system/kernelpistorm64.service
+	# Reload systemd configurations
+	sudo systemctl daemon-reload
+	sudo udevadm control --reload-rules && sudo udevadm trigger
+	# Apply sysctl settings (continue even if hugepages not supported)
+	sudo sysctl -p /etc/sysctl.d/10-hugepages.conf || echo "Note: Some hugepage settings may not be supported on this system"
+	# Enable and start the emulator service
+	sudo systemctl enable kernelpistorm64.service
 	echo "Loading Kernel PiStorm64"
 	sudo modprobe pistorm 2>/dev/null || true
 

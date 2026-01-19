@@ -1,0 +1,31 @@
+# /boot/firmware/config.txt
+
+arm_64bit=1
+auto_initramfs=1
+enable_uart=0
+
+# Let firmware pick best turbo behaviour for the board
+arm_boost=1
+
+# Overclock
+arm_freq=2000
+gpu_freq=600
+
+force_turbo=1
+
+# If pushing to 2000 later, add ONE line like:
+over_voltage_delta=2
+
+# NOTE: PiGFX RTG driver requires OpenGL driver to NOT be enabled
+# Commenting out dtoverlay=vc4-kms-v3d to ensure RTG works properly
+# dtoverlay=vc4-kms-v3d,cma-512
+
+# Framebuffer settings for RTG
+framebuffer_width=1280
+framebuffer_height=720
+framebuffer_depth=32
+framebuffer_ignore_alpha=1
+
+# Performance optimizations
+disable_pvt=1
+initial_turbo=30

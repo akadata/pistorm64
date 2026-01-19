@@ -1,0 +1,1 @@
+console=tty1 root=PARTUUID=0e148d9e-02 rootfstype=ext4 fsck.repair=yes elevator=mq-deadline rootwait cfg80211.ieee80211_regdom=GB loglevel=3 vt.global_cursor_default=0 quiet splash plymouth.ignore-serial-consoles mitigations=off

@@ -1,0 +1,22 @@
+[Unit]
+Description=PiStorm emulator
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=smalley
+ExecStart=/home/smalley/pistorm64/emulator
+WorkingDirectory=/home/smalley/pistorm64
+Nice=-10
+IOSchedulingClass=1
+IOSchedulingPriority=2
+CPUAffinity=2-3
+OOMScoreAdjust=-1000
+Environment=SDL_VIDEODRIVER=drm
+Environment=SDL_FBDEV=/dev/fb0
+
+[Install]
+WantedBy=multi-user.target
+
