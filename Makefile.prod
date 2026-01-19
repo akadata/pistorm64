@@ -80,8 +80,8 @@ M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 
 # Raylib paths can be swapped if you use a custom build.
-RAYLIB_INC    ?= -I./src/raylib_pi4_test #raylib
-RAYLIB_LIBDIR ?= -L./src/raylib_pi4_test #raylib_drm
+RAYLIB_INC    ?= -I./src/raylib #raylib
+RAYLIB_LIBDIR ?= -L./src/raylib_drm #raylib_drm
 
 PREFIX        ?= /opt/pistorm64
 DESTDIR       ?=
