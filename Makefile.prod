@@ -52,7 +52,7 @@ endif
 USE_GOLD   ?= 0
 
 # Toggle RTG output backends: 1=raylib (default), 0=null stub.
-USE_RAYLIB ?= 0
+USE_RAYLIB ?= 1
 
 # Toggle ALSA-based audio (Pi AHI). If 0, drop pi_ahi and -lasound.
 USE_ALSA   ?= 1
@@ -68,8 +68,8 @@ ARCH_FEATURES ?=
 USE_VC     ?= 0
 # Perf toggles
 USE_LTO    ?= 0
-USE_NO_PLT ?= 1
-OMIT_FP    ?= 1
+USE_NO_PLT ?= 0
+OMIT_FP    ?= 0
 USE_PIPE   ?= 1
 PISTORM_KMOD ?= 1
 
@@ -80,8 +80,8 @@ M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 
 # Raylib paths can be swapped if you use a custom build.
-RAYLIB_INC    ?= -I./src/raylib
-RAYLIB_LIBDIR ?= -L./src/raylib_drm
+RAYLIB_INC    ?= -I./src/raylib_pi4_test #raylib
+RAYLIB_LIBDIR ?= -L./src/raylib_pi4_test #raylib_drm
 
 PREFIX        ?= /opt/pistorm64
 DESTDIR       ?=

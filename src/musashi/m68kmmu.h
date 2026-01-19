@@ -1292,6 +1292,7 @@ void m68851_mmu_ops(m68ki_cpu_core *state)
 
 
 /* Apple HMMU translation is much simpler */
+/*  THIS LAST APPLE HMMU WAS COMMENTED OUT */
 /*
 inline uint32 hmmu_translate_addr(uint32 addr_in)
 {
