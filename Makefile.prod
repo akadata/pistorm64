@@ -298,42 +298,42 @@ clean:
 OBJS_LINK = $(filter %.o,$^)
 
 $(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) src/a314/a314.o
-	$(CC) $(LDFLAGS) -o $@.tmp $(OBJS_LINK) $(LDLIBS) && mv -f $@.tmp $@
+	$(CC) $(LDFLAGS) -fopenmp -o $@.tmp $(OBJS_LINK) $(LDLIBS) && mv -f $@.tmp $@
 
 # Explicit rules to keep the generated 68k core quiet on unused-temp warnings.
 src/musashi/m68kcpu.o: src/musashi/m68kcpu.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) -c -fopenmp -o $@ $<
 
 src/musashi/m68kops.o: src/musashi/m68kops.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) -c -fopenmp -o $@ $<
 
 src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) -c -fopenmp -o $@ $<
 
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) -c -fopenmp -o $@ $<
 
 buptest:
 	@if [ -f src/buptest/buptest.c ]; then \
-		$(CC) $(CFLAGS) -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/gpio/rpi_peri.c; \
+		$(CC) $(CFLAGS) -fopenmp -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/gpio/rpi_peri.c; \
 	else \
 		echo "buptest skipped (src/buptest/buptest.c missing)"; \
 	fi
 
 pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
-	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
+	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -fopenmp -o $@ $<
 
 : tools/.c include/uapi/linux/pistorm.h
-	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
+	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -fopenmp -o $@ $<
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
-	$(CXX) -MMD -MP -c -o src/a314/a314.o $(CXXFLAGS) src/a314/a314.cc
+	$(CXX) -MMD -MP -c -fopenmp -o src/a314/a314.o $(CXXFLAGS) src/a314/a314.cc
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f src/musashi/$(MUSASHIGENERATOR)$(EXE)
 
 $(MUSASHIGENERATOR)$(EXE): src/musashi/$(MUSASHIGENERATOR).c
-	$(CC) -MMD -MP -o $(MUSASHIGENERATOR)$(EXE) src/musashi/$(MUSASHIGENERATOR).c
+	$(CC) -MMD -MP -fopenmp -o $(MUSASHIGENERATOR)$(EXE) src/musashi/$(MUSASHIGENERATOR).c
 
 install: all
 	$(INSTALL) -d $(INSTALL_DIR)

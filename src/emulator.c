@@ -44,6 +44,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <omp.h>
+
 #include "m68kops.h"
 
 #define KEY_POLL_INTERVAL_MSEC 5000
