@@ -3,6 +3,7 @@
  * Based on a314d daemon for A314.
  */
 #include <cstddef>
+#include <endian.h>
 #include <arpa/inet.h>
 
 #include <linux/spi/spidev.h>
@@ -145,6 +146,9 @@ static uint8_t channel_status_updated = 0;
 static uint8_t recv_buf[256];
 static uint8_t send_buf[256];
 
+static constexpr size_t MAX_MESSAGE_SIZE = 1 * SIZE_MEGA;
+static constexpr size_t MAX_MEM_RW_LENGTH = 1 * SIZE_MEGA;
+
 struct LogicalChannel;
 struct ClientConnection;
 
@@ -159,7 +163,7 @@ struct MessageHeader
 
 struct MessageBuffer
 {
-    int pos;
+    size_t pos;
     std::vector<uint8_t> data;
 };
 
@@ -206,6 +210,7 @@ struct LogicalChannel
 static void remove_association(LogicalChannel *ch);
 static void clear_packet_queue(LogicalChannel *ch);
 static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, uint8_t *data, uint8_t length);
+static void close_and_remove_connection(ClientConnection *cc);
 
 static std::list<ClientConnection> connections;
 static std::list<RegisteredService> services;
@@ -321,16 +326,29 @@ static void shutdown_server_socket()
     server_socket = -1;
 }
 
-void create_and_send_msg(ClientConnection *cc, int type, int stream_id, uint8_t *data, int length)
+void create_and_send_msg(ClientConnection *cc, int type, int stream_id, const uint8_t *data, size_t length)
 {
+    if (length > MAX_MESSAGE_SIZE)
+    {
+        logger_warn("Refusing to send message with length %zu (max %zu)\n", length, MAX_MESSAGE_SIZE);
+        return;
+    }
+
+    const size_t total_size = sizeof(MessageHeader) + length;
+    if (total_size < sizeof(MessageHeader) || total_size > (sizeof(MessageHeader) + MAX_MESSAGE_SIZE))
+    {
+        logger_warn("Refusing to send message with total size %zu\n", total_size);
+        return;
+    }
+
     MessageBuffer mb;
     mb.pos = 0;
-    mb.data.resize(sizeof(MessageHeader) + length);
+    mb.data.resize(total_size);
 
     MessageHeader *mh = (MessageHeader *)&mb.data[0];
-    mh->length = length;
-    mh->stream_id = stream_id;
-    mh->type = type;
+    mh->length = htole32(static_cast<uint32_t>(length));
+    mh->stream_id = htole32(static_cast<uint32_t>(stream_id));
+    mh->type = static_cast<uint8_t>(type);
     if (length && data)
         memcpy(&mb.data[sizeof(MessageHeader)], data, length);
 
@@ -342,7 +360,7 @@ void create_and_send_msg(ClientConnection *cc, int type, int stream_id, uint8_t 
 
     while (1)
     {
-        int left = mb.data.size() - mb.pos;
+        size_t left = mb.data.size() - mb.pos;
         uint8_t *src = &mb.data[mb.pos];
         ssize_t r = write(cc->fd, src, left);
         if (r == -1)
@@ -364,8 +382,8 @@ void create_and_send_msg(ClientConnection *cc, int type, int stream_id, uint8_t 
             }
         }
 
-        mb.pos += r;
-        if (r == left)
+        mb.pos += static_cast<size_t>(r);
+        if (static_cast<size_t>(r) == left)
         {
             return;
         }
@@ -416,48 +434,91 @@ static void handle_msg_deregister_req(ClientConnection *cc)
     create_and_send_msg(cc, MSG_DEREGISTER_RES, 0, &result, 1);
 }
 
-uint8_t manual_read_buf[64 * SIZE_KILO];
+static std::vector<uint8_t> manual_read_buf;
 
 static void handle_msg_read_mem_req(ClientConnection *cc)
 {
-    uint32_t address = 0;
-    uint32_t length = 0;
+    if (cc->payload.size() != 8)
+    {
+        logger_warn("Invalid READ_MEM payload size (%zu bytes)\n", cc->payload.size());
+        close_and_remove_connection(cc);
+        return;
+    }
 
-    memcpy(&address, &(cc->payload[0]), sizeof(address));
-    memcpy(&length, &(cc->payload[4]), sizeof(length));
-    address = ntohl(address);
-    length = ntohl(length);
+    uint32_t address_le = 0;
+    uint32_t length_le = 0;
 
-    if (get_mapped_item_by_address(cfg, address) != -1) {
-        int32_t index = get_mapped_item_by_address(cfg, address);
+    memcpy(&address_le, &(cc->payload[0]), sizeof(address_le));
+    memcpy(&length_le, &(cc->payload[4]), sizeof(length_le));
+    const uint32_t address = le32toh(address_le);
+    const size_t length = le32toh(length_le);
+
+    if (length == 0 || length > MAX_MEM_RW_LENGTH)
+    {
+        logger_warn("Rejecting READ_MEM length %zu for address 0x%08x\n", length, address);
+        close_and_remove_connection(cc);
+        return;
+    }
+
+    const int32_t index = get_mapped_item_by_address(cfg, address);
+    if (index != -1) {
+        const size_t available = cfg->map_high[index] - address;
+        if (length > available)
+        {
+            logger_warn("Rejecting READ_MEM past mapped region at 0x%08x (len %zu, max %zu)\n", address, length, available);
+            close_and_remove_connection(cc);
+            return;
+        }
+
         uint8_t *map = &cfg->map_data[index][address - cfg->map_offset[index]];
         create_and_send_msg(cc, MSG_READ_MEM_RES, 0, map, length);
     } else {
-        // No idea if this actually works.
-        for (int i = 0; i < length; i++) {
-            manual_read_buf[i] = (unsigned char)ps_read_8(address + i);
+        manual_read_buf.resize(length);
+        for (size_t i = 0; i < length; i++) {
+            manual_read_buf[i] = static_cast<unsigned char>(ps_read_8(address + static_cast<uint32_t>(i)));
         }
-        create_and_send_msg(cc, MSG_READ_MEM_RES, 0, manual_read_buf, length);
+        create_and_send_msg(cc, MSG_READ_MEM_RES, 0, manual_read_buf.data(), length);
     }
-    
 }
 
 static void handle_msg_write_mem_req(ClientConnection *cc)
 {
-    uint32_t address = 0;
+    if (cc->payload.size() < 4)
+    {
+        logger_warn("Invalid WRITE_MEM payload size (%zu bytes)\n", cc->payload.size());
+        close_and_remove_connection(cc);
+        return;
+    }
 
-    memcpy(&address, &(cc->payload[0]), sizeof(address));
-    address = ntohl(address);
-    uint32_t length = cc->payload.size() - 4;
+    uint32_t address_le = 0;
 
-    if (get_mapped_item_by_address(cfg, address) != -1) {
-        int32_t index = get_mapped_item_by_address(cfg, address);
+    memcpy(&address_le, &(cc->payload[0]), sizeof(address_le));
+    const uint32_t address = le32toh(address_le);
+    const size_t length = cc->payload.size() - 4;
+
+    if (length == 0 || length > MAX_MEM_RW_LENGTH)
+    {
+        logger_warn("Rejecting WRITE_MEM length %zu for address 0x%08x\n", length, address);
+        close_and_remove_connection(cc);
+        return;
+    }
+
+    const int32_t index = get_mapped_item_by_address(cfg, address);
+    if (index != -1) {
+        const size_t available = cfg->map_high[index] - address;
+        if (length > available)
+        {
+            logger_warn("Rejecting WRITE_MEM past mapped region at 0x%08x (len %zu, max %zu)\n", address, length, available);
+            close_and_remove_connection(cc);
+            return;
+        }
+
         uint8_t *map = &cfg->map_data[index][address - cfg->map_offset[index]];
         memcpy(map, &(cc->payload[4]), length);
     } else {
         // No idea if this actually works.
-        for (int i = 0; i < length; i++) {
-            ps_write_8(address + i, cc->payload[4 + i]);
+        for (size_t i = 0; i < length; i++) {
+            ps_write_8(address + static_cast<uint32_t>(i), cc->payload[4 + i]);
         }
     }
 
@@ -1038,7 +1099,7 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
     {
         while (1)
         {
-            int left;
+            size_t left;
             uint8_t *dst;
 
             if (cc->payload.empty())
@@ -1048,7 +1109,7 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
             }
             else
             {
-                left = cc->header.length - cc->bytes_read;
+                left = static_cast<size_t>(cc->header.length) - cc->bytes_read;
                 dst = &cc->payload[cc->bytes_read];
             }
 
@@ -1071,14 +1132,24 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
             else
             {
                 cc->bytes_read += r;
-                left -= r;
+                left -= static_cast<size_t>(r);
                 if (!left)
                 {
                     if (cc->payload.empty())
                     {
+                        cc->header.length = le32toh(cc->header.length);
+                        cc->header.stream_id = le32toh(cc->header.stream_id);
+
+                        if (cc->header.length > MAX_MESSAGE_SIZE)
+                        {
+                            logger_warn("Rejecting message length %u (max %zu)\n", cc->header.length, MAX_MESSAGE_SIZE);
+                            close_and_remove_connection(cc);
+                            return;
+                        }
+
                         if (cc->header.length == 0)
                         {
-                            logger_trace("header: length=%d, stream_id=%d, type=%d\n", cc->header.length, cc->header.stream_id, cc->header.type);
+                            logger_trace("header: length=%u, stream_id=%u, type=%d\n", cc->header.length, cc->header.stream_id, cc->header.type);
                             handle_received_message(cc);
                         }
                         else
@@ -1088,7 +1159,7 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
                     }
                     else
                     {
-                        logger_trace("header: length=%d, stream_id=%d, type=%d\n", cc->header.length, cc->header.stream_id, cc->header.type);
+                        logger_trace("header: length=%u, stream_id=%u, type=%d\n", cc->header.length, cc->header.stream_id, cc->header.type);
                         handle_received_message(cc);
                         cc->payload.clear();
                     }
@@ -1104,7 +1175,7 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
         {
             MessageBuffer &mb = cc->message_queue.front();
 
-            int left = mb.data.size() - mb.pos;
+            size_t left = mb.data.size() - mb.pos;
             uint8_t *src = &mb.data[mb.pos];
             ssize_t r = write(cc->fd, src, left);
             if (r == -1)
@@ -1123,8 +1194,8 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
                 }
             }
 
-            mb.pos += r;
-            if (r == left)
+            mb.pos += static_cast<size_t>(r);
+            if (static_cast<size_t>(r) == left)
                 cc->message_queue.pop_front();
         }
     }
