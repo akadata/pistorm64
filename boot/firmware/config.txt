@@ -8,13 +8,11 @@ enable_uart=0
 arm_boost=1
 
 # Overclock
-arm_freq=2000
-gpu_freq=600
+arm_freq=2100
+#gpu_freq=450
 
 force_turbo=1
-
-# If pushing to 2000 later, add ONE line like:
-over_voltage_delta=2
+over_volt=1
 
 # NOTE: PiGFX RTG driver requires OpenGL driver to NOT be enabled
 # Commenting out dtoverlay=vc4-kms-v3d to ensure RTG works properly
