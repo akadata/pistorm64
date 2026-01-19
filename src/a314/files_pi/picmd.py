@@ -78,7 +78,7 @@ def wait_for_msg():
             logger.error('Connection to a314d was closed, terminating.')
             exit(-1)
         header += data
-    (plen, stream_id, ptype) = struct.unpack('=IIB', header)
+    (plen, stream_id, ptype) = struct.unpack('<IIB', header)
     payload = b''
     while len(payload) < plen:
         data = drv.recv(plen - len(payload))
@@ -89,11 +89,11 @@ def wait_for_msg():
     return (stream_id, ptype, payload)
 
 def send_register_req(name):
-    m = struct.pack('=IIB', len(name), 0, MSG_REGISTER_REQ) + name
+    m = struct.pack('<IIB', len(name), 0, MSG_REGISTER_REQ) + name
     drv.sendall(m)
 
 def send_read_mem_req(address, length):
-    m = struct.pack('=IIBII', 8, 0, MSG_READ_MEM_REQ, address, length)
+    m = struct.pack('<IIBII', 8, 0, MSG_READ_MEM_REQ, address, length)
     drv.sendall(m)
 
 def read_mem(address, length):
@@ -105,7 +105,7 @@ def read_mem(address, length):
     return payload
 
 def send_write_mem_req(address, data):
-    m = struct.pack('=IIBI', 4 + len(data), 0, MSG_WRITE_MEM_REQ, address) + data
+    m = struct.pack('<IIBI', 4 + len(data), 0, MSG_WRITE_MEM_REQ, address) + data
     drv.sendall(m)
 
 def write_mem(address, data):
@@ -116,19 +116,19 @@ def write_mem(address, data):
         exit(-1)
 
 def send_connect_response(stream_id, result):
-    m = struct.pack('=IIBB', 1, stream_id, MSG_CONNECT_RESPONSE, result)
+    m = struct.pack('<IIBB', 1, stream_id, MSG_CONNECT_RESPONSE, result)
     drv.sendall(m)
 
 def send_data(stream_id, data):
-    m = struct.pack('=IIB', len(data), stream_id, MSG_DATA) + data
+    m = struct.pack('<IIB', len(data), stream_id, MSG_DATA) + data
     drv.sendall(m)
 
 def send_eos(stream_id):
-    m = struct.pack('=IIB', 0, stream_id, MSG_EOS)
+    m = struct.pack('<IIB', 0, stream_id, MSG_EOS)
     drv.sendall(m)
 
 def send_reset(stream_id):
-    m = struct.pack('=IIB', 0, stream_id, MSG_RESET)
+    m = struct.pack('<IIB', 0, stream_id, MSG_RESET)
     drv.sendall(m)
 
 sessions = {}
@@ -375,7 +375,7 @@ while not done:
                     if len(rbuf) < 9:
                         break
 
-                    (plen, stream_id, ptype) = struct.unpack('=IIB', rbuf[:9])
+                    (plen, stream_id, ptype) = struct.unpack('<IIB', rbuf[:9])
                     if len(rbuf) < 9 + plen:
                         break
 

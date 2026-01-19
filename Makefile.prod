@@ -23,6 +23,7 @@ PLATFORM=PI4_64BIT
 PISTORM_KMOD ?= 1
 EXTRA_CFLAGS ?=
 EXTRA_M68K_CFLAGS ?=
+EXTRA_LDFLAGS ?=
 
 # Tunables: edit here instead of hunting through rule bodies.
 # WARNINGS   : compiler warnings; keep strict by default.
@@ -206,6 +207,14 @@ CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
 RAYLIB_INC    = -I./src/raylib_pi4_test
 RAYLIB_LIBDIR = -L./src/raylib_pi4_test
 DEFINES      += -DRPI4_TEST
+else ifeq ($(PLATFORM),PI4_64BIT_DEBUG)
+CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
+RAYLIB_INC    = -I./src/raylib_pi4_test
+RAYLIB_LIBDIR = -L./src/raylib_pi4_test
+DEFINES      += -DRPI4_TEST
+OPT_LEVEL := -O0
+EXTRA_CFLAGS += -g3 -fno-omit-frame-pointer
+EXTRA_LDFLAGS += -g
 else ifeq ($(PLATFORM),PI3_BULLSEYE)
 CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
 else ifeq ($(PLATFORM),PI_64BIT)
@@ -249,8 +258,9 @@ DEFINES  += -DPISTORM_KMOD
 endif
 
 CFLAGS       = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
+CXXFLAGS     = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
 M68K_CFLAGS   = $(CFLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
-LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS)
+LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS) $(EXTRA_LDFLAGS)
 
 LDLIBS   = $(LDLIBS_RAYLIB) $(LDLIBS_VC) $(LDLIBS_ALSA) -ldl -lstdc++ -lm -pthread
 
@@ -317,7 +327,7 @@ pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
 	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
-	$(CXX) -MMD -MP -c -o src/a314/a314.o $(OPT_LEVEL) src/a314/a314.cc $(CPUFLAGS) $(DEFINES) -I. -Isrc -Isrc/musashi
+	$(CXX) -MMD -MP -c -o src/a314/a314.o $(CXXFLAGS) src/a314/a314.cc
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f src/musashi/$(MUSASHIGENERATOR)$(EXE)
