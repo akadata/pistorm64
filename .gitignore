@@ -11,9 +11,7 @@ pistorm/BlankPFS3-*
 
 # Build artifacts
 emulator
-buptest
 m68kmake
-buptest
 pimodplay
 regtool
 *.o
