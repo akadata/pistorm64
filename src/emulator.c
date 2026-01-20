@@ -103,10 +103,10 @@ int irq;
 int gayleirq;
 
 #define CORE_AUTO -1
-#define CORE_CPU 1
-#define CORE_IO 2
-#define CORE_INPUT 3
-#define CORE_IPL 0
+#define CORE_CPU 3
+#define CORE_IO 1
+#define CORE_INPUT 2
+#define CORE_IPL 2
 
 #define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1, io=2, input=3, ipl=0"
 #define PI_RT_ENV "PISTORM_RT"             // e.g. "cpu=60, io=40, input=80, ipl=70"
@@ -114,8 +114,8 @@ int gayleirq;
 #define PISTORM64_NAME "KERNEL PiStorm64"
 #define PISTORM64_TAGLINE "JANUS BUS ENGINE"
 
-#define RT_DEFAULT_CPU 60
-#define RT_DEFAULT_IO 40
+#define RT_DEFAULT_CPU 80
+#define RT_DEFAULT_IO 60
 #define RT_DEFAULT_INPUT 80
 #define RT_DEFAULT_IPL 70
 
