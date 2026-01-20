@@ -116,14 +116,14 @@ uint8_t get_rtc_byte(uint32_t address_, uint8_t rtc_type) {
   case 0x05: // Hours high?
     if (rtc_type == RTC_TYPE_MSM) {
       if (rtc_mystery_reg[2] & 4) {
-        return (((rtc_time->tm_hour % 12) / 10) | (rtc_time->tm_hour >= 12) ? 0x04 : 0x00);
+        return (((rtc_time->tm_hour % 12) / 10) | ((rtc_time->tm_hour >= 12) ? 0x04 : 0x00));
       } else
         return rtc_time->tm_hour / 10;
     } else {
       if (ricoh_alarm[10] & 0x01) {
         return rtc_time->tm_hour / 10;
       } else {
-        return (((rtc_time->tm_hour % 12) / 10) | (rtc_time->tm_hour >= 12) ? 0x02 : 0x00);
+        return (((rtc_time->tm_hour % 12) / 10) | ((rtc_time->tm_hour >= 12) ? 0x02 : 0x00));
       }
       break;
     }
