@@ -44,7 +44,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <omp.h>
 
 #include "m68kops.h"
 
@@ -239,16 +238,51 @@ static void configure_ipl_nops(void) {
   printf("[CFG] IPL NOP count: %u\n", ipl_nop_count);
 }
 
+// Compile-time toggle for IPL rate limiting - default to disabled to ensure stability
+#ifndef PISTORM_IPL_RATELIMIT_US
+#define PISTORM_IPL_RATELIMIT_US 0
+#endif
+
+#if PISTORM_IPL_RATELIMIT_US > 0
+// Helper function for rate limiting
+static inline uint64_t now_ns(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
+}
+#endif
+
 void* ipl_task(void* args) {
   printf("[IPL] Thread running\n");
   uint16_t old_irq = 0;
   uint32_t value;
 
+#if PISTORM_IPL_RATELIMIT_US > 0
+  // Rate limiting variables for GPIO/status polling
+  static uint64_t last_ns = 0;
+  static const uint64_t poll_interval_ns = (uint64_t)PISTORM_IPL_RATELIMIT_US * 1000ull; // Convert us to ns
+#endif
+
   while (1) {
     if (emulator_exiting || end_signal) {
       break;
     }
+
+#if PISTORM_IPL_RATELIMIT_US > 0
+    // Check if enough time has passed since last poll
+    uint64_t t = now_ns();
+    if (t - last_ns >= poll_interval_ns) {
+        value = ps_gpio_lev();
+        last_ns = t;
+    } else {
+        // Use cached value if not enough time has passed
+        continue;
+    }
+#else
+    // Original behavior - always poll
     value = ps_gpio_lev();
+#endif
+
     if (value & (1 << PIN_TXN_IN_PROGRESS)) {
       goto noppers;
     }
@@ -485,6 +519,9 @@ cpu_loop:
     }
   }
 
+  // Flush any pending batched operations before checking status
+  ps_flush_batch_queue();
+
   if (irq) {
     last_irq = ((ps_read_status_reg() & 0xe000) >> 13);
     uint8_t amiga_irq = amiga_emulated_ipl();
@@ -510,6 +547,9 @@ cpu_loop:
     //    while( amiga_reset==0 );
     //    printf( "CPU emulation reset.\n" );
   }
+
+  // Flush any pending batched operations at the end of each CPU loop iteration
+  ps_flush_batch_queue();
 
   if (mouse_hook_enabled && (mouse_extra != 0x00)) {
     // mouse wheel events have occurred; unlike l/m/r buttons, these are queued as keypresses, so
@@ -1145,7 +1185,7 @@ unsigned int cpu_irq_ack(int level) {
 static unsigned int target = 0;
 static uint32_t platform_res, rres;
 
-uint8_t cdtv_dmac_reg_idx_read();
+uint8_t cdtv_dmac_reg_idx_read(void);
 void cdtv_dmac_reg_idx_write(uint8_t value);
 uint32_t cdtv_dmac_read(uint32_t address, uint8_t type);
 void cdtv_dmac_write(uint32_t address, uint32_t value, uint8_t type);

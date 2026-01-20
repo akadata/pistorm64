@@ -154,7 +154,7 @@ unsigned char get_autoconf_size_ext(int size) {
 
 extern void adjust_ranges_amiga(struct emulator_config* cfg);
 
-void autoconfig_reset_all() {
+void autoconfig_reset_all(void) {
   LOG_INFO("[AUTOCONF] Resetting all autoconf data.\n");
   for (int i = 0; i < AC_PIC_LIMIT; i++) {
     ac_z2_type[i] = ACTYPE_NONE;

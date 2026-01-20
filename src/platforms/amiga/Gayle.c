@@ -112,13 +112,13 @@ uint8_t gayle_ide_enabled = 1;
 uint8_t gayle_emulation_enabled = 1;
 uint8_t gayle_ide_adj = 0;
 
-void adjust_gayle_4000() {
+void adjust_gayle_4000(void) {
   gayle_ide_base = GAYLE_IDE_BASE_A4000;
   gayle_ide_adj = 2;
   gayle_a4k_int = 1;
 }
 
-void adjust_gayle_1200() {
+void adjust_gayle_1200(void) {
 }
 
 void set_hard_drive_image_file_amiga(uint8_t index, char* filename) {

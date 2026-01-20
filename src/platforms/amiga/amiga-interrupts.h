@@ -21,9 +21,9 @@ typedef enum {
 } AMIGA_IRQ;
 
 void amiga_emulate_irq(AMIGA_IRQ irq);
-uint8_t amiga_emulated_ipl();
+uint8_t amiga_emulated_ipl(void);
 int amiga_emulating_irq(AMIGA_IRQ irq);
-void amiga_clear_emulating_irq();
+void amiga_clear_emulating_irq(void);
 int amiga_handle_intrqr_read(uint32_t* res);
 int amiga_handle_intrq_write(uint32_t val);
 

@@ -7,11 +7,58 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 // Include our UAPI header
 #include "ps_protocol.h"
 #include <linux/pistorm.h>
 #include "src/musashi/m68k.h"
+
+// Compile-time toggle for batching - default to disabled to ensure stability
+#ifndef PISTORM_ENABLE_BATCH
+#define PISTORM_ENABLE_BATCH 0
+#endif
+
+#if PISTORM_ENABLE_BATCH
+// pick a sane chunk size; tune later
+#ifndef PISTORM_BATCH_MAX
+#define PISTORM_BATCH_MAX 256
+#endif
+
+struct pistorm_busop_batch {
+    uint32_t count;
+    uint64_t ptr;   // userspace pointer to ops[]
+};
+
+static inline int ps_busop_batch(int ps_fd, struct pistorm_busop *ops, uint32_t count)
+{
+    struct pistorm_batch b = {
+        .ops_count = count,
+        .ops_ptr   = (uint64_t)(uintptr_t)ops,
+        .reserved  = 0,
+    };
+    return ioctl(ps_fd, PISTORM_IOC_BATCH, &b);
+}
+
+// Optional: small queue to accumulate ops and flush in one ioctl
+static struct pistorm_busop g_opsq[PISTORM_BATCH_MAX];
+static uint32_t g_opsq_n = 0;
+
+static inline int ps_busopq_flush(int ps_fd)
+{
+    if (!g_opsq_n) return 0;
+    int rc = ps_busop_batch(ps_fd, g_opsq, g_opsq_n);
+    g_opsq_n = 0;
+    return rc;
+}
+
+static inline int ps_busopq_push(int ps_fd, const struct pistorm_busop *op)
+{
+    g_opsq[g_opsq_n++] = *op;
+    if (g_opsq_n >= PISTORM_BATCH_MAX) return ps_busopq_flush(ps_fd);
+    return 0;
+}
+#endif // PISTORM_ENABLE_BATCH
 
 static int ps_fd = -1;
 static int backend_logged;
@@ -54,8 +101,31 @@ void ps_pulse_reset(void) {
         perror("PISTORM_IOC_PULSE_RESET");
 }
 
+
 static int ps_busop(int is_read, int width, unsigned addr, unsigned *val, unsigned short flags) {
     if (ps_open_dev() < 0) return -1;
+
+#if PISTORM_ENABLE_BATCH
+    // For read operations, flush any pending writes first to maintain ordering
+    if (is_read && g_opsq_n > 0) {
+        ps_busopq_flush(ps_fd);
+    }
+
+    // For write operations, use batching to reduce ioctl calls
+    if (!is_read) {
+        struct pistorm_busop op = {
+            .addr   = addr,
+            .value  = val ? *val : 0,
+            .width  = (unsigned char)width,
+            .is_read= (unsigned char)is_read,
+            .flags  = flags,
+        };
+        return ps_busopq_push(ps_fd, &op);
+    }
+#endif
+
+    // For read operations, we need immediate results, so use direct ioctl
+    // Also use direct ioctl when batching is disabled
     struct pistorm_busop op = {
         .addr   = addr,
         .value  = val ? *val : 0,
@@ -141,7 +211,17 @@ unsigned int ps_gpio_lev(void) {
     return gpio_shadow[13];
 }
 
-void ps_update_irq() {
+// Public API to flush the batch queue
+int ps_flush_batch_queue(void) {
+    if (ps_fd < 0) return -1;
+#if PISTORM_ENABLE_BATCH
+    return ps_busopq_flush(ps_fd);
+#else
+    return 0;  // No-op when batching is disabled
+#endif
+}
+
+void ps_update_irq(void) {
     unsigned int ipl = 0;
 
     if (!ps_get_ipl_zero()) {

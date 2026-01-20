@@ -88,7 +88,7 @@ int init_rtg_data(struct emulator_config* cfg_) {
   return 1;
 }
 
-void shutdown_rtg() {
+void shutdown_rtg(void) {
   printf("[RTG] Shutting down RTG.\n");
   if (rtg_on) {
     display_enabled = 0xFF;
@@ -100,7 +100,7 @@ void shutdown_rtg() {
   }
 }
 
-unsigned int rtg_get_fb() {
+unsigned int rtg_get_fb(void) {
   return PIGFX_RTG_BASE + PIGFX_REG_SIZE + framebuffer_addr_adj;
 }
 

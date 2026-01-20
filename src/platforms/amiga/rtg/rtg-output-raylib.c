@@ -463,7 +463,7 @@ void rtg_set_clut_entry(uint8_t index, uint32_t xrgb) {
   dst[3] = 0xFF;
 }
 
-void rtg_init_display() {
+void rtg_init_display(void) {
   int err;
   rtg_on = 1;
 
@@ -489,7 +489,7 @@ void rtg_init_display() {
 }
 
 
-void rtg_shutdown_display() {
+void rtg_shutdown_display(void) {
   printf("RTG display disabled.\n");
 
   shutdown = 1;
@@ -646,7 +646,7 @@ void rtg_set_scale_mode(uint16_t _scale_mode) {
   }
 }
 
-uint16_t rtg_get_scale_mode() {
+uint16_t rtg_get_scale_mode(void) {
   return scale_mode;
 }
 
@@ -678,6 +678,6 @@ void rtg_set_scale_filter(uint16_t _filter_mode) {
   filter_mode = _filter_mode;
 }
 
-uint16_t rtg_get_scale_filter() {
+uint16_t rtg_get_scale_filter(void) {
   return filter_mode;
 }

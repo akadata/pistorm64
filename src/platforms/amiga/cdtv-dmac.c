@@ -11,7 +11,7 @@
 uint8_t dmac_reg_idx = 0;
 uint8_t dmac_reg_values[0xFFFF];
 
-uint8_t cdtv_dmac_reg_idx_read() {
+uint8_t cdtv_dmac_reg_idx_read(void) {
   return dmac_reg_idx;
 }
 

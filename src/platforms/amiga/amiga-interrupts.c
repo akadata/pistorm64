@@ -20,7 +20,7 @@ void amiga_emulate_irq(AMIGA_IRQ irq) {
   }
 }
 
-inline uint8_t amiga_emulated_ipl() {
+inline uint8_t amiga_emulated_ipl(void) {
   return emulated_ipl;
 }
 
@@ -28,7 +28,7 @@ inline int amiga_emulating_irq(AMIGA_IRQ irq) {
   return emulated_irqs & (1 << irq);
 }
 
-void amiga_clear_emulating_irq() {
+void amiga_clear_emulating_irq(void) {
   emulated_irqs = 0;
   emulated_ipl = 0;
 }

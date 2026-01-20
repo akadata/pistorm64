@@ -254,8 +254,8 @@ struct FileSysHeaderBlock {
     uint8_t    fhb_FileSysName[84];
 };
 
-void piscsi_init();
-void piscsi_shutdown();
+void piscsi_init(void);
+void piscsi_shutdown(void);
 void piscsi_map_drive(char *filename, uint8_t index);
 void piscsi_unmap_drive(uint8_t index);
 int piscsi_validate_hdf(struct piscsi_dev *d, char *filename);
@@ -265,6 +265,6 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type);
 uint32_t handle_piscsi_read(uint32_t addr, uint8_t type);
 
 void piscsi_find_filesystems(struct piscsi_dev *d);
-void piscsi_refresh_drives();
+void piscsi_refresh_drives(void);
 
 int load_fs(struct piscsi_fs *fs, char *dosID);

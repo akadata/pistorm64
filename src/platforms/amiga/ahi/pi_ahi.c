@@ -219,7 +219,7 @@ uint32_t pi_ahi_init(char* dev) {
     return 1;
 }
 
-void pi_ahi_shutdown() {
+void pi_ahi_shutdown(void) {
   printf("[PI-AHI] Shutting down Pi-AHI.\n");
   if (pcm_handle) {
     snd_pcm_drop(pcm_handle);

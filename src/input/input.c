@@ -191,7 +191,7 @@ static uint8_t queued_keypresses = 0, queue_output_pos = 0, queue_input_pos = 0;
 static uint8_t queued_keys[256];
 static uint8_t queued_events[256];
 
-void clear_keypress_queue() {
+void clear_keypress_queue(void) {
   memset(queued_keys, 0x80, 256);
   memset(queued_events, 0x80, 256);
   queued_keypresses = 0;
@@ -231,7 +231,7 @@ int queue_keypress(uint8_t keycode, uint8_t event_type, uint8_t platform) {
   return 0;
 }
 
-int get_num_kb_queued() {
+int get_num_kb_queued(void) {
   return queued_keypresses;
 }
 

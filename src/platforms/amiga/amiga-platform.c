@@ -80,7 +80,7 @@ extern void stop_cpu_emulation(uint8_t disasm_cur);
 
 static uint32_t ac_waiting_for_physical_pic = 0;
 
-inline int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
+int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
                              unsigned char type) {
   if (kick13_mode)
     ac_z3_done = 1;
@@ -183,7 +183,7 @@ inline int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, uns
   return -1;
 }
 
-inline int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int val,
+int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int val,
                               unsigned char type) {
   if (kick13_mode)
     ac_z3_done = 1;
@@ -542,7 +542,7 @@ void setvar_amiga(struct emulator_config* cfg, char* var, char* val) {
   if (CHKVAR("piscsi") && !piscsi_enabled) {
     LOG_INFO("[AMIGA] PISCSI Interface Enabled.\n");
     piscsi_enabled = 1;
-    piscsi_init(cfg);
+    piscsi_init();
     add_z2_pic(ACTYPE_PISCSI, 0);
     adjust_ranges_amiga(cfg);
   }
