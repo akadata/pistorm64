@@ -47,7 +47,7 @@
 
 #include "m68kops.h"
 
-#define KEY_POLL_INTERVAL_MSEC 5000
+#define KEY_POLL_INTERVAL_MSEC 1000
 
 unsigned int ovl;
 
@@ -160,13 +160,8 @@ extern int m68ki_remaining_cycles;
 #define M68K_END_TIMESLICE m68k_end_timeslice()
 #endif
 
-#define NOP                                                                                        \
-  do {                                                                                             \
-    asm volatile("nop");                                                                           \
-    asm volatile("nop");                                                                           \
-    asm volatile("nop");                                                                           \
-    asm volatile("nop");                                                                           \
-  } while (0)
+#define NOP1()  __asm__ __volatile__("nop")
+#define NOP 	do { NOP1(); NOP1(); NOP1(); NOP1(); NOP1(); } while (0)
 
 #define DEBUG_EMULATOR
 #ifdef DEBUG_EMULATOR
