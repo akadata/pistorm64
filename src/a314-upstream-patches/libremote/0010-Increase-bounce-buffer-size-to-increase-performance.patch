@@ -1,0 +1,22 @@
+From 843757070ffd2e45126865406bc21fdae529b2a2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Niklas=20Ekstr=C3=B6m?= <mail@niklasekstrom.nu>
+Date: Thu, 30 May 2024 09:34:18 +0200
+Subject: [PATCH 10/13] Increase bounce buffer size to increase performance
+
+
+diff --git a/Software/libremote/library.c b/Software/libremote/library.c
+index b4777d5..259d254 100644
+--- a/Software/libremote/library.c
++++ b/Software/libremote/library.c
+@@ -21,7 +21,7 @@
+ 
+ #define LIB_NEG_SIZE        (LVO_COUNT*6)
+ 
+-#define BOUNCE_BUFFER_SIZE  (4*1024)
++#define BOUNCE_BUFFER_SIZE  (16*1024)
+ 
+ // Must keep VERSION in romtag.asm in sync.
+ #define LIB_VERSION     3
+-- 
+2.47.3
+

@@ -1,0 +1,71 @@
+From 55c27d59b085c104a7cb50c9e245c1c31ae99e19 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Niklas=20Ekstr=C3=B6m?= <mail@niklasekstrom.nu>
+Date: Tue, 28 May 2024 21:45:13 +0200
+Subject: [PATCH 03/13] Update build scripts
+
+
+diff --git a/Software/libremote/build-client.sh b/Software/libremote/build-client.sh
+new file mode 100755
+index 0000000..4ca26ea
+--- /dev/null
++++ b/Software/libremote/build-client.sh
+@@ -0,0 +1,4 @@
++set -e
++set -x
++python gen_proto.py libdecl-$1.json
++vc +aos68k -I${NDK32}/Include_H example_client.c -o ExampleClient
+diff --git a/Software/libremote/build-library.sh b/Software/libremote/build-library.sh
+new file mode 100755
+index 0000000..c018e33
+--- /dev/null
++++ b/Software/libremote/build-library.sh
+@@ -0,0 +1,4 @@
++set -e
++set -x
++python gen_stubs.py libdecl-$1.json
++vc +aos68k -I${NDK32}/Include_H romtag.asm library.c -nostdlib -O2 -o $1.library
+diff --git a/Software/libremote/build.sh b/Software/libremote/build.sh
+deleted file mode 100755
+index eb64bc6..0000000
+--- a/Software/libremote/build.sh
++++ /dev/null
+@@ -1,6 +0,0 @@
+-set -x
+-
+-python gen_stubs.py
+-python gen_proto.py
+-vc +aos68k -I${NDK32}/Include_H romtag.asm library.c -nostdlib -o example.library
+-vc +aos68k -I${NDK32}/Include_H example_client.c -o ExampleClient
+diff --git a/Software/libremote/gen_proto.py b/Software/libremote/gen_proto.py
+index cd96fe0..db46d04 100644
+--- a/Software/libremote/gen_proto.py
++++ b/Software/libremote/gen_proto.py
+@@ -1,6 +1,7 @@
+ import json
++import sys
+ 
+-with open('libdecl.json', 'rt') as f:
++with open(sys.argv[1], 'rt') as f:
+     libdecl = json.load(f)
+ 
+ funcs = libdecl['funcs']
+diff --git a/Software/libremote/gen_stubs.py b/Software/libremote/gen_stubs.py
+index 6f3a47b..2f302a3 100644
+--- a/Software/libremote/gen_stubs.py
++++ b/Software/libremote/gen_stubs.py
+@@ -1,6 +1,7 @@
+ import json
++import sys
+ 
+-with open('libdecl.json', 'rt') as f:
++with open(sys.argv[1], 'rt') as f:
+     libdecl = json.load(f)
+ 
+ funcs = libdecl['funcs']
+diff --git a/Software/libremote/libdecl.json b/Software/libremote/libdecl-example.json
+similarity index 100%
+rename from Software/libremote/libdecl.json
+rename to Software/libremote/libdecl-example.json
+-- 
+2.47.3
+

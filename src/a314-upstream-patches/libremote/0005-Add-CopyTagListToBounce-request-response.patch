@@ -1,0 +1,300 @@
+From fc1f0db42351a946f49837761395119c1c42380e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Niklas=20Ekstr=C3=B6m?= <mail@niklasekstrom.nu>
+Date: Wed, 29 May 2024 09:33:54 +0200
+Subject: [PATCH 05/13] Add CopyTagListToBounce request/response
+
+
+diff --git a/Software/libremote/bsl.py b/Software/libremote/bsl.py
+index 6fef1c2..9a16e5f 100644
+--- a/Software/libremote/bsl.py
++++ b/Software/libremote/bsl.py
+@@ -30,17 +30,20 @@ MSG_COPY_TO_BOUNCE_REQ      = 10
+ MSG_COPY_TO_BOUNCE_RES      = 11
+ MSG_COPY_STR_TO_BOUNCE_REQ  = 12
+ MSG_COPY_STR_TO_BOUNCE_RES  = 13
+-
+-QITEM_SIGNALS = 1
+-QITEM_OP_REQ = 2
+-QITEM_ALLOC_MEM_RES = 3
+-QITEM_FREE_MEM_RES = 4
+-QITEM_COPY_FROM_BOUNCE_RES = 5
+-QITEM_COPY_TO_BOUNCE_RES = 6
+-QITEM_COPY_STR_TO_BOUNCE_RES = 7
+-QITEM_READ_MEM_COMPLETE = 8
+-QITEM_WRITE_MEM_COMPLETE = 9
+-QITEM_RESET = 10
++MSG_COPY_TAG_LIST_TO_BOUNCE_REQ = 14
++MSG_COPY_TAG_LIST_TO_BOUNCE_RES = 15
++
++QITEM_RESET = 1
++QITEM_READ_MEM_COMPLETE = 2
++QITEM_WRITE_MEM_COMPLETE = 3
++QITEM_SIGNALS = 4
++QITEM_OP_REQ = 5
++QITEM_ALLOC_MEM_RES = 6
++QITEM_FREE_MEM_RES = 7
++QITEM_COPY_FROM_BOUNCE_RES = 8
++QITEM_COPY_TO_BOUNCE_RES = 9
++QITEM_COPY_STR_TO_BOUNCE_RES = 10
++QITEM_COPY_TAG_LIST_TO_BOUNCE_RES = 11
+ 
+ SERVICE_NAME = 'bsl'
+ 
+@@ -104,6 +107,15 @@ class LibInstance:
+         threading.Thread(target=self.run).start()
+ 
+     # Put items on queue.
++    def process_stream_reset(self):
++        self.queue.put((QITEM_RESET, None))
++
++    def process_read_mem_complete(self, address: int, data: bytes):
++        self.queue.put((QITEM_READ_MEM_COMPLETE, data))
++
++    def process_write_mem_complete(self, address: int):
++        self.queue.put((QITEM_WRITE_MEM_COMPLETE, None))
++
+     def process_signals(self, signals: int):
+         self.queue.put((QITEM_SIGNALS, signals))
+ 
+@@ -125,14 +137,8 @@ class LibInstance:
+     def process_copy_str_to_bounce_res(self, length: int):
+         self.queue.put((QITEM_COPY_STR_TO_BOUNCE_RES, length))
+ 
+-    def process_read_mem_complete(self, address: int, data: bytes):
+-        self.queue.put((QITEM_READ_MEM_COMPLETE, data))
+-
+-    def process_write_mem_complete(self, address: int):
+-        self.queue.put((QITEM_WRITE_MEM_COMPLETE, None))
+-
+-    def process_stream_reset(self):
+-        self.queue.put((QITEM_RESET, None))
++    def process_copy_tag_list_to_bounce_res(self, length: int):
++        self.queue.put((QITEM_COPY_TAG_LIST_TO_BOUNCE_RES, length))
+ 
+     # Wait for specific queue item.
+     def wait_qitem(self, match_qitem: int):
+@@ -179,6 +185,10 @@ class LibInstance:
+         self.service.send_copy_str_to_bounce_req(self.stream_id, bounce_address, str_address)
+         return self.wait_qitem(QITEM_COPY_STR_TO_BOUNCE_RES)
+ 
++    def copy_tag_list_to_bounce(self, bounce_address: int, tag_list_address: int) -> int:
++        self.service.send_copy_tag_list_to_bounce_req(self.stream_id, bounce_address, tag_list_address)
++        return self.wait_qitem(QITEM_COPY_TAG_LIST_TO_BOUNCE_RES)
++
+     # Read from/write to bounce buffer.
+     def read_mem(self, address: int, length: int) -> bytes:
+         self.service.start_read_mem(self.stream_id, address, length)
+@@ -575,6 +585,11 @@ class LibRemoteService:
+             data = struct.pack('>BBII', MSG_COPY_STR_TO_BOUNCE_REQ, 0, bounce_address, str_address)
+             self.a314d.send_data(stream_id, data)
+ 
++    def send_copy_tag_list_to_bounce_req(self, stream_id: int, bounce_address: int, tag_list_address: int):
++        with self.send_lock:
++            data = struct.pack('>BBII', MSG_COPY_TAG_LIST_TO_BOUNCE_REQ, 0, bounce_address, tag_list_address)
++            self.a314d.send_data(stream_id, data)
++
+     def process_stream_connect(self, stream_id: int, name: bytes):
+         if name == SERVICE_NAME.encode():
+             logger.info('Amiga connected to LibRemote service')
+@@ -612,6 +627,9 @@ class LibRemoteService:
+         elif kind == MSG_COPY_STR_TO_BOUNCE_RES:
+             (length,) = struct.unpack('>I', payload[2:])
+             inst.process_copy_str_to_bounce_res(length)
++        elif kind == MSG_COPY_TAG_LIST_TO_BOUNCE_RES:
++            (length,) = struct.unpack('>I', payload[2:])
++            inst.process_copy_tag_list_to_bounce_res(length)
+ 
+     def process_stream_eos(self, stream_id: int):
+         raise AssertionError('EOS is not supposed to be used')
+diff --git a/Software/libremote/library.c b/Software/libremote/library.c
+index 7c485f2..bd30bf5 100644
+--- a/Software/libremote/library.c
++++ b/Software/libremote/library.c
+@@ -6,6 +6,7 @@
+ #include <exec/libraries.h>
+ #include <exec/semaphores.h>
+ #include <dos/dos.h>
++#include <utility/tagitem.h>
+ 
+ #include <proto/exec.h>
+ #include <proto/dos.h>
+@@ -144,6 +145,17 @@ static void free_chunk(__reg("a6") struct LibRemote *lib, uint32_t address)
+     FreeMem(chunk, chunk->size);
+ }
+ 
++static int get_tag_list_length(struct TagItem *tag_list)
++{
++    int count = 1;
++    while (tag_list->ti_Tag != TAG_DONE && tag_list->ti_Tag != TAG_MORE)
++    {
++        tag_list++;
++        count++;
++    }
++    return count * sizeof(struct TagItem);
++}
++
+ static uint32_t send_request(__reg("a6") struct LibRemote *lib, uint8_t *msg, uint32_t length)
+ {
+     lib->read_req.a314_Buffer = lib->read_buf;
+@@ -230,6 +242,14 @@ static uint32_t send_request(__reg("a6") struct LibRemote *lib, uint8_t *msg, ui
+                             msg_to_send = MSG_COPY_STR_TO_BOUNCE_RES;
+                             done_arg = len;
+                         }
++                        else if (kind == MSG_COPY_TAG_LIST_TO_BOUNCE_REQ)
++                        {
++                            struct CopyTagListToBounceReqMsg *req = (struct CopyTagListToBounceReqMsg *)lib->read_buf;
++                            uint32_t len = get_tag_list_length((void *)req->tag_list_address);
++                            WriteMemA314(req->bounce_address, (void *)req->tag_list_address, len);
++                            msg_to_send = MSG_COPY_TAG_LIST_TO_BOUNCE_RES;
++                            done_arg = len;
++                        }
+ 
+                         lib->read_req.a314_Buffer = lib->read_buf;
+                         lib->read_req.a314_Length = sizeof(lib->read_buf);
+@@ -248,7 +268,7 @@ static uint32_t send_request(__reg("a6") struct LibRemote *lib, uint8_t *msg, ui
+             {
+                 send_buf[0] = msg_to_send;
+                 length = 1;
+-                if (msg_to_send == MSG_ALLOC_MEM_RES || msg_to_send == MSG_COPY_STR_TO_BOUNCE_RES)
++                if (msg_to_send == MSG_ALLOC_MEM_RES || msg_to_send == MSG_COPY_STR_TO_BOUNCE_RES || msg_to_send == MSG_COPY_TAG_LIST_TO_BOUNCE_RES)
+                 {
+                     *(uint32_t *)&send_buf[2] = done_arg;
+                     length = 6;
+diff --git a/Software/libremote/libremote.py b/Software/libremote/libremote.py
+index 3e34b73..2b49aaa 100644
+--- a/Software/libremote/libremote.py
++++ b/Software/libremote/libremote.py
+@@ -30,17 +30,20 @@ MSG_COPY_TO_BOUNCE_REQ      = 10
+ MSG_COPY_TO_BOUNCE_RES      = 11
+ MSG_COPY_STR_TO_BOUNCE_REQ  = 12
+ MSG_COPY_STR_TO_BOUNCE_RES  = 13
+-
+-QITEM_SIGNALS = 1
+-QITEM_OP_REQ = 2
+-QITEM_ALLOC_MEM_RES = 3
+-QITEM_FREE_MEM_RES = 4
+-QITEM_COPY_FROM_BOUNCE_RES = 5
+-QITEM_COPY_TO_BOUNCE_RES = 6
+-QITEM_COPY_STR_TO_BOUNCE_RES = 7
+-QITEM_READ_MEM_COMPLETE = 8
+-QITEM_WRITE_MEM_COMPLETE = 9
+-QITEM_RESET = 10
++MSG_COPY_TAG_LIST_TO_BOUNCE_REQ = 14
++MSG_COPY_TAG_LIST_TO_BOUNCE_RES = 15
++
++QITEM_RESET = 1
++QITEM_READ_MEM_COMPLETE = 2
++QITEM_WRITE_MEM_COMPLETE = 3
++QITEM_SIGNALS = 4
++QITEM_OP_REQ = 5
++QITEM_ALLOC_MEM_RES = 6
++QITEM_FREE_MEM_RES = 7
++QITEM_COPY_FROM_BOUNCE_RES = 8
++QITEM_COPY_TO_BOUNCE_RES = 9
++QITEM_COPY_STR_TO_BOUNCE_RES = 10
++QITEM_COPY_TAG_LIST_TO_BOUNCE_RES = 11
+ 
+ SERVICE_NAME = 'example'
+ 
+@@ -69,6 +72,15 @@ class LibInstance:
+         threading.Thread(target=self.run).start()
+ 
+     # Put items on queue.
++    def process_stream_reset(self):
++        self.queue.put((QITEM_RESET, None))
++
++    def process_read_mem_complete(self, address: int, data: bytes):
++        self.queue.put((QITEM_READ_MEM_COMPLETE, data))
++
++    def process_write_mem_complete(self, address: int):
++        self.queue.put((QITEM_WRITE_MEM_COMPLETE, None))
++
+     def process_signals(self, signals: int):
+         self.queue.put((QITEM_SIGNALS, signals))
+ 
+@@ -90,14 +102,8 @@ class LibInstance:
+     def process_copy_str_to_bounce_res(self, length: int):
+         self.queue.put((QITEM_COPY_STR_TO_BOUNCE_RES, length))
+ 
+-    def process_read_mem_complete(self, address: int, data: bytes):
+-        self.queue.put((QITEM_READ_MEM_COMPLETE, data))
+-
+-    def process_write_mem_complete(self, address: int):
+-        self.queue.put((QITEM_WRITE_MEM_COMPLETE, None))
+-
+-    def process_stream_reset(self):
+-        self.queue.put((QITEM_RESET, None))
++    def process_copy_tag_list_to_bounce_res(self, length: int):
++        self.queue.put((QITEM_COPY_TAG_LIST_TO_BOUNCE_RES, length))
+ 
+     # Wait for specific queue item.
+     def wait_qitem(self, match_qitem: int):
+@@ -144,6 +150,10 @@ class LibInstance:
+         self.service.send_copy_str_to_bounce_req(self.stream_id, bounce_address, str_address)
+         return self.wait_qitem(QITEM_COPY_STR_TO_BOUNCE_RES)
+ 
++    def copy_tag_list_to_bounce(self, bounce_address: int, tag_list_address: int) -> int:
++        self.service.send_copy_tag_list_to_bounce_req(self.stream_id, bounce_address, tag_list_address)
++        return self.wait_qitem(QITEM_COPY_TAG_LIST_TO_BOUNCE_RES)
++
+     # Read from/write to bounce buffer.
+     def read_mem(self, address: int, length: int) -> bytes:
+         self.service.start_read_mem(self.stream_id, address, length)
+@@ -237,6 +247,11 @@ class LibRemoteService:
+             data = struct.pack('>BBII', MSG_COPY_STR_TO_BOUNCE_REQ, 0, bounce_address, str_address)
+             self.a314d.send_data(stream_id, data)
+ 
++    def send_copy_tag_list_to_bounce_req(self, stream_id: int, bounce_address: int, tag_list_address: int):
++        with self.send_lock:
++            data = struct.pack('>BBII', MSG_COPY_TAG_LIST_TO_BOUNCE_REQ, 0, bounce_address, tag_list_address)
++            self.a314d.send_data(stream_id, data)
++
+     def process_stream_connect(self, stream_id: int, name: bytes):
+         if name == SERVICE_NAME.encode():
+             logger.info('Amiga connected to LibRemote service')
+@@ -274,6 +289,9 @@ class LibRemoteService:
+         elif kind == MSG_COPY_STR_TO_BOUNCE_RES:
+             (length,) = struct.unpack('>I', payload[2:])
+             inst.process_copy_str_to_bounce_res(length)
++        elif kind == MSG_COPY_TAG_LIST_TO_BOUNCE_RES:
++            (length,) = struct.unpack('>I', payload[2:])
++            inst.process_copy_tag_list_to_bounce_res(length)
+ 
+     def process_stream_eos(self, stream_id: int):
+         raise AssertionError('EOS is not supposed to be used')
+diff --git a/Software/libremote/messages.h b/Software/libremote/messages.h
+index 86b7c6f..13d5b8f 100644
+--- a/Software/libremote/messages.h
++++ b/Software/libremote/messages.h
+@@ -16,6 +16,8 @@
+ #define MSG_COPY_TO_BOUNCE_RES      11
+ #define MSG_COPY_STR_TO_BOUNCE_REQ  12
+ #define MSG_COPY_STR_TO_BOUNCE_RES  13
++#define MSG_COPY_TAG_LIST_TO_BOUNCE_REQ 14
++#define MSG_COPY_TAG_LIST_TO_BOUNCE_RES 15
+ 
+ struct CopyDesc
+ {
+@@ -108,4 +110,19 @@ struct CopyStrToBounceResMsg // Amiga -> Pi
+     uint32_t length;
+ };
+ 
++struct CopyTagListToBounceReqMsg // Pi -> Amiga
++{
++    uint8_t kind;
++    uint8_t pad;
++    uint32_t bounce_address;
++    uint32_t tag_list_address;
++};
++
++struct CopyTagListToBounceResMsg // Amiga -> Pi
++{
++    uint8_t kind;
++    uint8_t pad;
++    uint32_t length;
++};
++
+ #endif /* __LIBREMOTE_MESSAGES_H */
+-- 
+2.47.3
+

@@ -1,0 +1,120 @@
+diff --git a/Software/a314device/lib_clockport.h b/Software/a314device/lib_clockport.h
+new file mode 100644
+index 0000000..c11dd19
+--- /dev/null
++++ b/Software/a314device/lib_clockport.h
+@@ -0,0 +1,20 @@
++#ifndef LIB_CLOCKPORT_H
++#define LIB_CLOCKPORT_H
++
++#include <exec/nodes.h>
++
++#define CLOCKPORT_NAME      "clockport.library"
++
++#define CDF_ALLOCATED       (1 << 0)
++
++struct ClockportDescriptor
++{
++    struct Node cd_Node;
++    USHORT      cd_Flags;
++    ULONG       cd_Address;
++    char       *cd_Device;
++    UBYTE       cd_LowAddressBit;
++    UBYTE       cd_Interrupt;
++};
++
++#endif /* LIB_CLOCKPORT_H */
+diff --git a/Software/a314device/pi_if_cp.c b/Software/a314device/pi_if_cp.c
+index 202611d..e7995c0 100644
+--- a/Software/a314device/pi_if_cp.c
++++ b/Software/a314device/pi_if_cp.c
+@@ -14,6 +14,8 @@
+ #include "memory_allocator.h"
+ #include "config_file.h"
+ 
++#include "proto_clockport.h"
++
+ // Warning 367 says that an eight bit shift will ignore a byte value,
+ // which is correct, but intentional.
+ #pragma dontwarn 367
+@@ -253,8 +255,57 @@ fail1:
+ 	return success;
+ }
+ 
++int probe_pi_interface_cplib(struct A314Device *dev)
++{
++	int result = FALSE;
++
++	struct Library *ClockportBase = OpenLibrary(CLOCKPORT_NAME, 0);
++	if (!ClockportBase)
++		goto errout1;
++
++	struct ClockportDescriptor *cd = FindClockport(NULL, "a314-cp");
++	if (!cd)
++		goto errout2;
++
++	dev->clockport_address = cd->cd_Address;
++	dev->interrupt_number = cd->cd_Interrupt;
++
++	Forbid();
++
++	for (int i = 7; i >= 0; i--)
++	{
++		if (AllocateClockport(cd))
++			break;
++
++		if (probe_pi_interface_once(dev))
++		{
++			result = TRUE;
++			break;
++		}
++
++		FreeClockport(cd);
++
++		if (i == 0)
++			break;
++
++		Permit();
++		delay_1s();
++		Forbid();
++	}
++
++	Permit();
++
++errout2:
++	CloseLibrary(ClockportBase);
++errout1:
++	return result;
++}
++
+ int probe_pi_interface(struct A314Device *dev)
+ {
++	if (probe_pi_interface_cplib(dev))
++		return TRUE;
++
+ 	dev->clockport_address = DEFAULT_CLOCKPORT_ADDRESS;
+ 	dev->interrupt_number = 6;
+ 
+diff --git a/Software/a314device/proto_clockport.h b/Software/a314device/proto_clockport.h
+new file mode 100644
+index 0000000..9777190
+--- /dev/null
++++ b/Software/a314device/proto_clockport.h
+@@ -0,0 +1,17 @@
++#ifndef PROTO_CLOCKPORT_H
++#define PROTO_CLOCKPORT_H
++
++#include "lib_clockport.h"
++
++extern struct Library *ClockportBase;
++
++struct ClockportDescriptor *__FindClockport(__reg("a6") void *, __reg("a0") struct ClockportDescriptor *, __reg("a1") char *)="\tjsr\t-30(a6)";
++#define FindClockport(old, device) __FindClockport(ClockportBase, old, device)
++
++int __AllocateClockport(__reg("a6") void *, __reg("a0") struct ClockportDescriptor *)="\tjsr\t-36(a6)";
++#define AllocateClockport(cd) __AllocateClockport(ClockportBase, cd)
++
++int __FreeClockport(__reg("a6") void *, __reg("a0") struct ClockportDescriptor *)="\tjsr\t-42(a6)";
++#define FreeClockport(cd) __FreeClockport(ClockportBase, cd)
++
++#endif /* PROTO_CLOCKPORT_H */
