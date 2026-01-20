@@ -1,0 +1,266 @@
+From a18b5b606e5276991bcd9de434b031c58ff89713 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Niklas=20Ekstr=C3=B6m?= <mail@niklasekstrom.nu>
+Date: Thu, 7 Jan 2021 10:07:23 +0100
+Subject: [PATCH 3/6] Update event model to use a separate thread
+
+
+diff --git a/Software/aws/app.py b/Software/aws/app.py
+index d9c4afc..219c144 100644
+--- a/Software/aws/app.py
++++ b/Software/aws/app.py
+@@ -12,12 +12,10 @@ import sys
+ window_sizes = {}
+ 
+ class ConnectionCallbacks(object):
+-    def open_window_fail(self, conn, wid):
+-        print('Window {} failed to open'.format(wid))
+-
+-    def open_window_success(self, conn, wid, width, height, depth):
+-        print('Window {} opened successfully with size {}x{}x{}'.format(wid, width, height, depth))
+-        window_sizes[wid] = (width, height, depth)
++    # Take care as these callbacks are executed in a separate thread!
++    # An option is to forward the notification to the main thread through a queue or socketpair.
++    def connection_closed(self, conn):
++        print('Connection closed')
+ 
+     def event_close_window(self, conn, wid):
+         print('Close button clicked for window {}'.format(wid))
+@@ -39,47 +37,43 @@ print("Connected to AWS")
+ print("Enter command (open/close/flip/help/quit):")
+ 
+ while True:
+-    rl = [sys.stdin, conn]
++    arr = sys.stdin.readline().strip().split()
+     try:
+-        rl, _, _ = select.select(rl, [], [])
+-    except KeyboardInterrupt:
+-        conn.close()
+-        break
+-
+-    if conn in rl:
+-        conn.handle_readable()
+-
+-    if sys.stdin in rl:
+-        arr = sys.stdin.readline().strip().split()
+-        try:
+-            if arr[0] == 'quit':
+-                conn.close()
+-                break
+-            elif arr[0] == 'help':
+-                print_help()
+-            elif arr[0] == 'open':
+-                x, y, w, h = int(arr[1]), int(arr[2]), int(arr[3]), int(arr[4])
+-                title = ' '.join(arr[5:])
+-                wid = conn.open_window(x, y, w, h, title)
+-                print('open_window returned wid {}'.format(wid))
+-            elif arr[0] == 'close':
+-                wid = int(arr[1])
+-                if wid not in window_sizes:
+-                    print('Unknown wid {}'.format(wid))
+-                else:
+-                    conn.close_window(wid)
+-                    del window_sizes[wid]
+-            elif arr[0] == 'flip':
+-                wid = int(arr[1])
+-                if wid not in window_sizes:
+-                    print('Unknown wid {}'.format(wid))
+-                else:
+-                    w, h, d = window_sizes[wid]
+-                    w = (w + 15) & ~15
+-                    pixels = w * h * d
+-                    buffer = bytes([random.randint(0, 255) for _ in range(pixels // 8)])
+-                    conn.copy_flip_window(wid, buffer)
++        if arr[0] == 'quit':
++            conn.close()
++            break
++        elif arr[0] == 'help':
++            print_help()
++        elif arr[0] == 'open':
++            x, y, w, h = int(arr[1]), int(arr[2]), int(arr[3]), int(arr[4])
++            title = ' '.join(arr[5:])
++            wid, size = conn.open_window(x, y, w, h, title)
++            if wid is None:
++                # TODO: Add error message?
++                # TODO: Maybe raise exception instead?
++                print('Failed to open window')
++            else:
++                width, height, depth = size
++                print('Window {} opened successfully with size {}x{}x{}'.format(wid, width, height, depth))
++                window_sizes[wid] = size
++        elif arr[0] == 'close':
++            wid = int(arr[1])
++            if wid not in window_sizes:
++                print('Unknown wid {}'.format(wid))
++            else:
++                conn.close_window(wid)
++                del window_sizes[wid]
++        elif arr[0] == 'flip':
++            wid = int(arr[1])
++            if wid not in window_sizes:
++                print('Unknown wid {}'.format(wid))
+             else:
+-                print('Unknown command: {}'.format(arr[0]))
+-        except Exception as e:
+-            print('Caught exception:', e)
++                w, h, d = window_sizes[wid]
++                w = (w + 15) & ~15
++                num_bytes = w * h * d // 8
++                buffer = bytes([random.randint(0, 255) for _ in range(num_bytes)])
++                conn.copy_flip_window(wid, buffer)
++        else:
++            print('Unknown command: {}'.format(arr[0]))
++    except Exception as e:
++        print('Caught exception:', e)
+diff --git a/Software/aws/awslib.py b/Software/aws/awslib.py
+index 406ec2a..df90b6b 100644
+--- a/Software/aws/awslib.py
++++ b/Software/aws/awslib.py
+@@ -12,6 +12,8 @@ import sys
+ import time
+ import random
+ import string
++import threading
++import queue
+ 
+ logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(lineno)d: %(message)s')
+ logger = logging.getLogger(__name__)
+@@ -31,16 +33,28 @@ class Window(object):
+         self.height = None
+         self.depth = None
+ 
+-class Connection(object):
++class Connection(threading.Thread):
+     def __init__(self, sock, callbacks):
++        super().__init__()
+         self.sock = sock
+         self.callbacks = callbacks
++        self.is_open = True
+         self.next_wid = 0
+         self.windows = {}
+         self.rbuf = None
+-
+-    def fileno(self):
+-        return self.sock.fileno()
++        self.sync_queue = queue.Queue()
++
++    def run(self):
++        while True:
++            rl, _, _ = select.select([self.sock], [], [])
++            if self.sock not in rl:
++                continue
++            if not self.handle_readable():
++                self.is_open = False
++                self.callbacks.connection_closed(self)
++                self.sync_queue.put(None)
++                self.sock.close()
++                break
+ 
+     def send(self, data):
+         data = struct.pack('=I', len(data)) + data
+@@ -48,54 +62,25 @@ class Connection(object):
+ 
+     def close(self):
+         self.sock.shutdown(socket.SHUT_RDWR)
+-        self.sock.close()
+-
+-    def open_window(self, left, top, width, height, title):
+-        wid = self.next_wid
+-        while wid in self.windows:
+-            wid = (wid + 1) % 65536
+-        self.next_wid = (wid + 1) % 65536
+-        self.windows[wid] = Window(wid)
+-        self.send(struct.pack('=BHHHHH', AWS_CLIENT_REQ_OPEN_WINDOW, wid, left, top, width, height) + title.encode('latin-1'))
+-        return wid
+-
+-    def close_window(self, wid):
+-        if wid in self.windows:
+-            self.send(struct.pack('=BH', AWS_CLIENT_REQ_CLOSE_WINDOW, wid))
+-            del self.windows[wid]
+-
+-    def copy_flip_window(self, wid, buffer):
+-        if wid in self.windows:
+-            self.send(struct.pack('=BH', AWS_CLIENT_REQ_COPY_FLIP_BUFFER, wid) + buffer)
++        self.join(2.0)
+ 
+     def process_msg(self, msg):
+         cmd = msg[0]
+         if cmd == AWS_CLIENT_RES_OPEN_WINDOW_FAIL:
+             wid = struct.unpack('=H', msg[1:3])[0]
+-            if wid in self.windows:
+-                self.callbacks.open_window_fail(self, wid)
+-                del self.windows[wid]
++            self.sync_queue.put(None)
+         elif cmd == AWS_CLIENT_RES_OPEN_WINDOW_SUCCESS:
+             wid, width, height, depth = struct.unpack('=HHHH', msg[1:9])
+-            if wid in self.windows:
+-                w = self.windows[wid]
+-                w.width = width
+-                w.height = height
+-                w.depth = depth
+-                self.callbacks.open_window_success(self, wid, width, height, depth)
++            self.sync_queue.put((width, height, depth))
+         elif cmd == AWS_CLIENT_EVENT_CLOSE_WINDOW:
+             wid = struct.unpack('=H', msg[1:3])[0]
+-            if wid in self.windows:
+-                self.callbacks.event_close_window(self, wid)
++            self.callbacks.event_close_window(self, wid)
+ 
+     def handle_readable(self):
+         buf = self.sock.recv(128)
+         if not buf:
+             self.sock.shutdown(socket.SHUT_RDWR)
+-            self.sock.close()
+-            self.sock = None
+-            self.callbacks.connection_closed(self)
+-            return
++            return False
+ 
+         self.rbuf = self.rbuf + buf if self.rbuf else buf
+ 
+@@ -110,8 +95,42 @@ class Connection(object):
+             self.rbuf = None if blen == plen + 4 else self.rbuf[plen + 4:]
+             self.process_msg(msg)
+ 
++        return True
++
++    def open_window(self, left, top, width, height, title):
++        if not self.is_open:
++            return None, None
++
++        wid = self.next_wid
++        while wid in self.windows:
++            wid = (wid + 1) % 65536
++        self.next_wid = (wid + 1) % 65536
++        self.windows[wid] = Window(wid)
++        self.send(struct.pack('=BHHHHH', AWS_CLIENT_REQ_OPEN_WINDOW, wid, left, top, width, height) + title.encode('latin-1'))
++        size = self.sync_queue.get()
++        if not size:
++            del self.windows[wid]
++            return None, None
++        else:
++            w = self.windows[wid]
++            w.width, w.height, w.depth = size
++            return wid, size
++
++    def close_window(self, wid):
++        if not self.is_open or wid not in self.windows:
++            return
++        self.send(struct.pack('=BH', AWS_CLIENT_REQ_CLOSE_WINDOW, wid))
++        del self.windows[wid]
++
++    def copy_flip_window(self, wid, buffer):
++        if not self.is_open or wid not in self.windows:
++            return
++        self.send(struct.pack('=BH', AWS_CLIENT_REQ_COPY_FLIP_BUFFER, wid) + buffer)
++
+ def connect(callbacks):
+     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+     sock.connect(('localhost', 18377))
+     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+-    return Connection(sock, callbacks)
++    conn = Connection(sock, callbacks)
++    conn.start()
++    return conn
+-- 
+2.47.3
+

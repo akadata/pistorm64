@@ -9,6 +9,7 @@ pistorm/myamiga.cfg
 pistorm/Workbench2.04-PS3-8GB.hdf
 pistorm/BlankPFS3-*
 data/a314-shared/*
+src/a314-upstream/
 # Build artifacts
 emulator
 m68kmake

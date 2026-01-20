@@ -1,0 +1,942 @@
+From 29888189602851da7ecf1e50c4c83f66c974d56c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Niklas=20Ekstr=C3=B6m?= <mail@niklasekstrom.nu>
+Date: Fri, 31 May 2024 10:00:23 +0200
+Subject: [PATCH 12/13] Add requests to do small reads/writes in-message
+
+The data itself is sent in the a314 packet. This limits the amount of
+data to around 200 bytes. Doing this avoids a round-trip between
+the service and a314d to read to/write from the bounce buffer.
+
+diff --git a/Software/libremote/bsl.py b/Software/libremote/bsl.py
+index b06dabc..9635e62 100644
+--- a/Software/libremote/bsl.py
++++ b/Software/libremote/bsl.py
+@@ -25,26 +25,32 @@ MSG_ALLOC_MEM_REQ           = 4
+ MSG_ALLOC_MEM_RES           = 5
+ MSG_FREE_MEM_REQ            = 6
+ MSG_FREE_MEM_RES            = 7
+-MSG_COPY_FROM_BOUNCE_REQ    = 8
+-MSG_COPY_FROM_BOUNCE_RES    = 9
+-MSG_COPY_TO_BOUNCE_REQ      = 10
+-MSG_COPY_TO_BOUNCE_RES      = 11
+-MSG_COPY_STR_TO_BOUNCE_REQ  = 12
+-MSG_COPY_STR_TO_BOUNCE_RES  = 13
+-MSG_COPY_TAG_LIST_TO_BOUNCE_REQ = 14
+-MSG_COPY_TAG_LIST_TO_BOUNCE_RES = 15
++MSG_READ_MEM_REQ            = 8
++MSG_READ_MEM_RES            = 9
++MSG_WRITE_MEM_REQ           = 10
++MSG_WRITE_MEM_RES           = 11
++MSG_COPY_FROM_BOUNCE_REQ    = 12
++MSG_COPY_FROM_BOUNCE_RES    = 13
++MSG_COPY_TO_BOUNCE_REQ      = 14
++MSG_COPY_TO_BOUNCE_RES      = 15
++MSG_COPY_STR_TO_BOUNCE_REQ  = 16
++MSG_COPY_STR_TO_BOUNCE_RES  = 17
++MSG_COPY_TAG_LIST_TO_BOUNCE_REQ = 18
++MSG_COPY_TAG_LIST_TO_BOUNCE_RES = 19
+ 
+ QITEM_RESET = 1
+-QITEM_READ_MEM_COMPLETE = 2
+-QITEM_WRITE_MEM_COMPLETE = 3
++QITEM_READ_BOUNCE_COMPLETE = 2
++QITEM_WRITE_BOUNCE_COMPLETE = 3
+ QITEM_SIGNALS = 4
+ QITEM_OP_REQ = 5
+ QITEM_ALLOC_MEM_RES = 6
+ QITEM_FREE_MEM_RES = 7
+-QITEM_COPY_FROM_BOUNCE_RES = 8
+-QITEM_COPY_TO_BOUNCE_RES = 9
+-QITEM_COPY_STR_TO_BOUNCE_RES = 10
+-QITEM_COPY_TAG_LIST_TO_BOUNCE_RES = 11
++QITEM_READ_MEM_RES = 8
++QITEM_WRITE_MEM_RES = 9
++QITEM_COPY_FROM_BOUNCE_RES = 10
++QITEM_COPY_TO_BOUNCE_RES = 11
++QITEM_COPY_STR_TO_BOUNCE_RES = 12
++QITEM_COPY_TAG_LIST_TO_BOUNCE_RES = 13
+ 
+ SERVICE_NAME = 'bsl'
+ 
+@@ -166,11 +172,11 @@ class LibInstance:
+         self.notify_sock.send(b'#')
+ 
+     def process_read_mem_complete(self, address: int, data: bytes):
+-        self.queue.put((QITEM_READ_MEM_COMPLETE, data))
++        self.queue.put((QITEM_READ_BOUNCE_COMPLETE, data))
+         self.notify_sock.send(b'#')
+ 
+     def process_write_mem_complete(self, address: int):
+-        self.queue.put((QITEM_WRITE_MEM_COMPLETE, None))
++        self.queue.put((QITEM_WRITE_BOUNCE_COMPLETE, None))
+         self.notify_sock.send(b'#')
+ 
+     def process_signals(self, signals: int):
+@@ -189,6 +195,14 @@ class LibInstance:
+         self.queue.put((QITEM_FREE_MEM_RES, None))
+         self.notify_sock.send(b'#')
+ 
++    def process_read_mem_res(self, data: bytes):
++        self.queue.put((QITEM_READ_MEM_RES, data))
++        self.notify_sock.send(b'#')
++
++    def process_write_mem_res(self):
++        self.queue.put((QITEM_WRITE_MEM_RES, None))
++        self.notify_sock.send(b'#')
++
+     def process_copy_from_bounce_res(self):
+         self.queue.put((QITEM_COPY_FROM_BOUNCE_RES, None))
+         self.notify_sock.send(b'#')
+@@ -231,6 +245,27 @@ class LibInstance:
+         self.service.send_free_mem_req(self.stream_id, address)
+         return self.wait_qitem(QITEM_FREE_MEM_RES)
+ 
++    def read_mem(self, address: int, length: int) -> bytes:
++        self.service.send_read_mem_req(self.stream_id, [(address, length)])
++        return self.wait_qitem(QITEM_READ_MEM_RES)
++
++    def multi_read_mem(self, descs: List[Tuple[int, int]]) -> List[bytes]:
++        self.service.send_read_mem_req(self.stream_id, descs)
++        combined: bytes = self.wait_qitem(QITEM_READ_MEM_RES)
++        bufs = []
++        offset = 0
++        for _, length in descs:
++            bufs.append(combined[offset:offset + length])
++            offset += length
++        return bufs
++
++    def write_mem(self, address: int, buf: bytes) -> None:
++        self.multi_write_mem([(address, buf)])
++
++    def multi_write_mem(self, descs: List[Tuple[int, bytes]]) -> None:
++        self.service.send_write_mem_req(self.stream_id, descs)
++        self.wait_qitem(QITEM_WRITE_MEM_RES)
++
+     def copy_from_bounce(self, mem_address: int, bounce_address: int, length: int) -> None:
+         self.multi_copy_from_bounce([(mem_address, bounce_address, length)])
+ 
+@@ -254,35 +289,33 @@ class LibInstance:
+         return self.wait_qitem(QITEM_COPY_TAG_LIST_TO_BOUNCE_RES)
+ 
+     # Read from/write to bounce buffer.
+-    def read_mem(self, address: int, length: int) -> bytes:
++    def read_bounce(self, address: int, length: int) -> bytes:
+         self.service.start_read_mem(self.stream_id, address, length)
+-        return self.wait_qitem(QITEM_READ_MEM_COMPLETE)
++        return self.wait_qitem(QITEM_READ_BOUNCE_COMPLETE)
+ 
+-    def write_mem(self, address: int, data: bytes) -> None:
++    def write_bounce(self, address: int, data: bytes) -> None:
+         self.service.start_write_mem(self.stream_id, address, data)
+-        self.wait_qitem(QITEM_WRITE_MEM_COMPLETE)
++        self.wait_qitem(QITEM_WRITE_BOUNCE_COMPLETE)
+ 
+     def read_str(self, address: int) -> str:
+         length = self.copy_str_to_bounce(self.bb_address, address)
+-        data = self.read_mem(self.bb_address, length)
++        data = self.read_bounce(self.bb_address, length)
+         return data.decode('latin-1')
+ 
+     def read_tag_list(self, address: int) -> List[Tuple[int, int]]:
+         length = self.copy_tag_list_to_bounce(self.bb_address, address)
+-        data = self.read_mem(self.bb_address, length)
++        data = self.read_bounce(self.bb_address, length)
+         arr = struct.unpack(f'>{len(data) // 4}I', data)
+         return list(zip(arr[0::2], arr[1::2]))
+ 
+     def set_errno(self, errno: Optional[int]):
+         if errno is not None:
+             self.errno = errno
+-
+             if self.errno_ptr:
+                 size = self.errno_size
+                 fmt = '>B' if size == 1 else ('>H' if size == 2 else '>I')
+                 data = struct.pack(fmt, errno)
+-                self.write_mem(self.bb_address, data)
+-                self.copy_from_bounce(self.errno_ptr, self.bb_address, len(data))
++                self.write_mem(self.errno_ptr, data)
+ 
+     # The implemented library functions.
+     def handle_socket_op(self, domain: int, type_: int, protocol: int):
+@@ -323,8 +356,8 @@ class LibInstance:
+ 
+     def handle_connect_op(self, sock: int, name: int, namelen: int):
+         logger.debug('handle_connect_op(sock=%s, name=%s, namelen=%s)', sock, name, namelen)
+-        self.copy_to_bounce(self.bb_address, name, namelen)
+-        data = self.read_mem(self.bb_address, namelen)
++
++        data = self.read_mem(name, namelen)
+ 
+         (port,) = struct.unpack('>H', data[2:4])
+         host = '.'.join(map(str, data[4:8]))
+@@ -395,7 +428,7 @@ class LibInstance:
+             while len(data) < len_:
+                 take = min(len_ - len(data), self.bb_size)
+                 self.copy_to_bounce(self.bb_address, addr, take)
+-                data += self.read_mem(self.bb_address, take)
++                data += self.read_bounce(self.bb_address, take)
+                 addr += take
+ 
+             sent = s.sock.send(data)
+@@ -431,7 +464,7 @@ class LibInstance:
+             while offset < len(data):
+                 take = min(len(data) - offset, self.bb_size)
+ 
+-                self.write_mem(self.bb_address, data[offset:offset + take])
++                self.write_bounce(self.bb_address, data[offset:offset + take])
+                 self.copy_from_bounce(addr, self.bb_address, take)
+ 
+                 offset += take
+@@ -441,6 +474,74 @@ class LibInstance:
+ 
+         self.service.send_op_res(self.stream_id, result, 0)
+ 
++    # Attempt at optimized version.
++    # Unfortunately doesn't seem to give better performance.
++    def handle_recv_op_opt(self, sock: int, buf: int, len_: int, flags: int):
++        logger.debug('handle_recv_op(sock=%s, buf=%s, len_=%s, flags=%s)', sock, buf, len_, flags)
++
++        MSG_PEEK = 2
++
++        s = self.sockets.get(sock)
++        if not s:
++            # TODO: Set/write errno.
++            result = 2**32 - 1
++        else:
++            recv_flags = 0
++            if flags & MSG_PEEK:
++                recv_flags |= socket.MSG_PEEK
++
++            data = s.sock.recv(len_, recv_flags)
++
++            if len(data) <= self.bb_size:
++                self.write_bounce(self.bb_address, data)
++                self.copy_from_bounce(buf, self.bb_address, len(data))
++            else:
++                offset = 0
++                bb_addr = self.bb_address
++                mem_addr = buf
++
++                take = min(len(data) - offset, self.bb_size // 2)
++                self.write_bounce(bb_addr, data[offset:offset + take])
++                self.service.send_copy_from_bounce_req(self.stream_id, [(mem_addr, bb_addr, take)])
++
++                pending_copy_from_count = 1
++
++                offset += take
++                bb_addr = (self.bb_address + self.bb_size // 2) if bb_addr == self.bb_address else self.bb_address
++                mem_addr += take
++
++                while offset < len(data):
++                    if pending_copy_from_count == 2:
++                        self.wait_qitem(QITEM_COPY_FROM_BOUNCE_RES)
++                        pending_copy_from_count -= 1
++
++                    take = min(len(data) - offset, self.bb_size // 2)
++                    self.service.start_write_mem(self.stream_id, bb_addr, data[offset:offset + take])
++
++                    while True:
++                        qitem, _ = self.queue.get()
++                        if qitem == QITEM_RESET:
++                            raise InterruptedError()
++                        elif qitem == QITEM_COPY_FROM_BOUNCE_RES:
++                            pending_copy_from_count -= 1
++                        elif qitem == QITEM_WRITE_BOUNCE_COMPLETE:
++                            break
++
++                    self.service.send_copy_from_bounce_req(self.stream_id, [(mem_addr, bb_addr, take)])
++                    pending_copy_from_count += 1
++
++                    offset += take
++                    bb_addr = (self.bb_address + self.bb_size // 2) if bb_addr == self.bb_address else self.bb_address
++                    mem_addr += take
++
++                while pending_copy_from_count:
++                    self.wait_qitem(QITEM_COPY_FROM_BOUNCE_RES)
++                    pending_copy_from_count -= 1
++
++            result = len(data)
++
++        self.service.send_op_res(self.stream_id, result, 0)
++
+     def handle_shutdown_op(self, sock: int, how: int):
+         logger.debug('handle_shutdown_op(sock=%s, how=%s)', sock, how)
+         result = 2**32 - 1
+@@ -494,33 +595,25 @@ class LibInstance:
+         # NOTE: FD_SETSIZE is currently hardcoded to 32 bits (one ULONG).
+         # TODO: Look at nfds to see how many ULONGs to copy.
+ 
+-        bb = self.bb_address
+-
+-        copy_reqs = []
++        read_reqs = []
+ 
+         if read_fds:
+-            copy_reqs.append((bb, read_fds, 4))
+-            bb += 4
++            read_reqs.append((read_fds, 4))
+ 
+         if write_fds:
+-            copy_reqs.append((bb, write_fds, 4))
+-            bb += 4
++            read_reqs.append((write_fds, 4))
+ 
+         if except_fds:
+-            copy_reqs.append((bb, except_fds, 4))
+-            bb += 4
++            read_reqs.append((except_fds, 4))
+ 
+         if _timeout:
+-            copy_reqs.append((bb, _timeout, 8))
+-            bb += 8
++            read_reqs.append((_timeout, 8))
+ 
+         if signals:
+-            copy_reqs.append((bb, signals, 4))
+-            bb += 4
++            read_reqs.append((signals, 4))
+ 
+-        if copy_reqs:
+-            self.multi_copy_to_bounce(copy_reqs)
+-            data = self.read_mem(self.bb_address, bb - self.bb_address)
++        if read_reqs:
++            bufs = self.multi_read_mem(read_reqs)
+ 
+         # Extract.
+         offset = 0
+@@ -531,25 +624,25 @@ class LibInstance:
+         signals_val = 0
+ 
+         if read_fds:
+-            (rfds,) = struct.unpack('>I', data[offset:offset+4])
+-            offset += 4
++            (rfds,) = struct.unpack('>I', bufs[offset])
++            offset += 1
+ 
+         if write_fds:
+-            (wfds,) = struct.unpack('>I', data[offset:offset+4])
+-            offset += 4
++            (wfds,) = struct.unpack('>I', bufs[offset])
++            offset += 1
+ 
+         if except_fds:
+-            (xfds,) = struct.unpack('>I', data[offset:offset+4])
+-            offset += 4
++            (xfds,) = struct.unpack('>I', bufs[offset])
++            offset += 1
+ 
+         if _timeout:
+-            sec, usec = struct.unpack('>II', data[offset:offset+8])
++            sec, usec = struct.unpack('>II', bufs[offset])
+             timeout_val = sec + usec / 1e6
+-            offset += 8
++            offset += 1
+ 
+         if signals:
+-            (signals_val,) = struct.unpack('>I', data[offset:offset+4])
+-            offset += 4
++            (signals_val,) = struct.unpack('>I', bufs[offset])
++            offset += 1
+ 
+         logger.debug('rfds=%s, wfds=%s, xfds=%s, timeout=%s, signals=%s)', rfds, wfds, xfds, timeout_val, signals_val)
+ 
+@@ -588,44 +681,22 @@ class LibInstance:
+                 xfds_out |= 1 << s.slot
+ 
+         # Update Xfds.
+-        data = b''
++        write_reqs = []
+ 
+         if read_fds:
+-            data += struct.pack('>I', rfds_out)
++            write_reqs.append((read_fds, struct.pack('>I', rfds_out)))
+ 
+         if write_fds:
+-            data += struct.pack('>I', wfds_out)
++            write_reqs.append((write_fds, struct.pack('>I', wfds_out)))
+ 
+         if except_fds:
+-            data += struct.pack('>I', xfds_out)
++            write_reqs.append((except_fds, struct.pack('>I', xfds_out)))
+ 
+         if signals:
+-            data += struct.pack('>I', 0)
+-
+-        if data:
+-            self.write_mem(self.bb_address, data)
+-
+-            bb = self.bb_address
+-
+-            copy_reqs = []
+-
+-            if read_fds:
+-                copy_reqs.append((read_fds, bb, 4))
+-                bb += 4
+-
+-            if write_fds:
+-                copy_reqs.append((write_fds, bb, 4))
+-                bb += 4
++            write_reqs.append((signals, struct.pack('>I', 0)))
+ 
+-            if except_fds:
+-                copy_reqs.append((except_fds, bb, 4))
+-                bb += 4
+-
+-            if signals:
+-                copy_reqs.append((signals, bb, 4))
+-                bb += 4
+-
+-            self.multi_copy_from_bounce(copy_reqs)
++        if write_reqs:
++            self.multi_write_mem(write_reqs)
+ 
+         result = len(set(rlist_out) | set(wlist_out) | set(xlist_out))
+         self.service.send_op_res(self.stream_id, result, 0)
+@@ -676,8 +747,7 @@ class LibInstance:
+             data = '.'.join(str(x) for x in data)
+             data = data.encode('latin-1') + b'\x00'
+             #logger.debug('data=%s', data)
+-            self.write_mem(self.bb_address, data)
+-            self.copy_from_bounce(self.return_mem_address, self.bb_address, len(data))
++            self.write_mem(self.return_mem_address, data)
+ 
+         result = self.return_mem_address
+         self.service.send_op_res(self.stream_id, result, 0)
+@@ -729,8 +799,7 @@ class LibInstance:
+             data += struct.pack('>II', self.return_mem_address + 28, 0)
+             data += bytes(map(int, host_addr.split('.')))
+ 
+-            self.write_mem(self.bb_address, data)
+-            self.copy_from_bounce(self.return_mem_address, self.bb_address, len(data))
++            self.write_mem(self.return_mem_address, data)
+ 
+             result = self.return_mem_address
+ 
+@@ -971,9 +1040,22 @@ class LibRemoteService:
+             self.write_mem_queue.append((stream_id, address))
+             self.a314d.send_write_mem_req(address, data)
+ 
+-    def send_op_res(self, stream_id: int, result: int, signals_consumed: int):
++    def send_op_res(self, stream_id: int, result: int, signals_consumed: int, copy_reqs: List[Tuple[int, int, int]] = None, write_reqs: List[Tuple[int, bytes]] = None):
++        copy_reqs_count = 0 if copy_reqs is None else len(copy_reqs)
++        data = struct.pack('>BBII', MSG_OP_RES, copy_reqs_count, result, signals_consumed)
++
++        if copy_reqs:
++            for dst, src, length in copy_reqs:
++                data += struct.pack('>III', dst, src, length)
++
++        if write_reqs:
++            for dst, buf in write_reqs:
++                data += struct.pack('>IB', dst, len(buf))
++                if (len(buf) & 1) == 0:
++                    data += b'\x00'
++                data += buf
++
+         with self.send_lock:
+-            data = struct.pack('>BBII', MSG_OP_RES, 0, result, signals_consumed)
+             self.a314d.send_data(stream_id, data)
+ 
+     def send_alloc_mem_req(self, stream_id: int, length: int):
+@@ -986,10 +1068,30 @@ class LibRemoteService:
+             data = struct.pack('>BBI', MSG_FREE_MEM_REQ, 0, address)
+             self.a314d.send_data(stream_id, data)
+ 
++    def send_read_mem_req(self, stream_id: int, descs: List[Tuple[int, int]]):
++        data = struct.pack('>BB', MSG_READ_MEM_REQ, 0)
++        for src, length in descs:
++            data += struct.pack('>IBB', src, length, 0)
++
++        with self.send_lock:
++            self.a314d.send_data(stream_id, data)
++
++    def send_write_mem_req(self, stream_id: int, descs: List[Tuple[int, bytes]]):
++        data = struct.pack('>BB', MSG_WRITE_MEM_REQ, 0)
++        for dst, buf in descs:
++            data += struct.pack('>IB', dst, len(buf))
++            if (len(buf) & 1) == 0:
++                data += b'\x00'
++            data += buf
++
++        with self.send_lock:
++            self.a314d.send_data(stream_id, data)
++
+     def send_copy_from_bounce_req(self, stream_id: int, copies: List[Tuple[int, int, int]]):
+         data = struct.pack('>BB', MSG_COPY_FROM_BOUNCE_REQ, len(copies))
+         for dst, src, length in copies:
+             data += struct.pack('>III', dst, src, length)
++
+         with self.send_lock:
+             self.a314d.send_data(stream_id, data)
+ 
+@@ -997,6 +1099,7 @@ class LibRemoteService:
+         data = struct.pack('>BB', MSG_COPY_TO_BOUNCE_REQ, len(copies))
+         for dst, src, length in copies:
+             data += struct.pack('>III', dst, src, length)
++
+         with self.send_lock:
+             self.a314d.send_data(stream_id, data)
+ 
+@@ -1040,6 +1143,10 @@ class LibRemoteService:
+             inst.process_alloc_mem_res(address)
+         elif kind == MSG_FREE_MEM_RES:
+             inst.process_free_mem_res()
++        elif kind == MSG_READ_MEM_RES:
++            inst.process_read_mem_res(payload[2:])
++        elif kind == MSG_WRITE_MEM_RES:
++            inst.process_write_mem_res()
+         elif kind == MSG_COPY_FROM_BOUNCE_RES:
+             inst.process_copy_from_bounce_res()
+         elif kind == MSG_COPY_TO_BOUNCE_RES:
+diff --git a/Software/libremote/gen_stubs.py b/Software/libremote/gen_stubs.py
+index 2f302a3..3acec58 100644
+--- a/Software/libremote/gen_stubs.py
++++ b/Software/libremote/gen_stubs.py
+@@ -15,7 +15,7 @@ contents += '''struct LibRemote;
+ static ULONG null_func();
+ static BPTR expunge();
+ static BPTR close(__reg("a6") struct LibRemote *lib);
+-static ULONG send_request(__reg("a6") struct LibRemote *lib, UBYTE *msg, ULONG length);
++static ULONG send_request(__reg("a6") struct LibRemote *lib, UBYTE *write_buf, ULONG write_length);
+ 
+ '''
+ 
+@@ -33,12 +33,12 @@ for i, func in enumerate(funcs):
+     if len(args):
+         contents += ', ' + ', '.join(gen_param(reg) for reg, _, _ in args)
+     contents += ')\n{\n'
+-    contents += f'    UBYTE msg[{2 + len(args)*4}];\n'
++    contents += f'    UBYTE write_buf[256];\n'
+     for j, (reg, _, _) in enumerate(args):
+-        contents += f'    *(ULONG *)&msg[{2 + j*4}] = (ULONG){reg};\n'
+-    contents += '    msg[0] = MSG_OP_REQ;\n'
+-    contents += f'    msg[1] = {i};\n'
+-    contents += '    return send_request(lib, msg, sizeof(msg));\n'
++        contents += f'    *(ULONG *)&write_buf[{2 + j*4}] = (ULONG){reg};\n'
++    contents += '    write_buf[0] = MSG_OP_REQ;\n'
++    contents += f'    write_buf[1] = {i};\n'
++    contents += f'    return send_request(lib, write_buf, {2 + len(args)*4});\n'
+     contents += '}\n\n'
+ 
+ contents += '''static ULONG funcs_vector[] =
+diff --git a/Software/libremote/library.c b/Software/libremote/library.c
+index 259d254..0e31fc1 100644
+--- a/Software/libremote/library.c
++++ b/Software/libremote/library.c
+@@ -53,7 +53,7 @@ struct LibRemote
+     struct A314_IORequest read_req;
+     uint32_t bounce_buffer_address;
+     struct MemChunkHdr *chunks;
+-    uint8_t read_buf[128];
++    uint8_t read_buf[256];
+ };
+ 
+ static uint32_t null_func()
+@@ -156,29 +156,27 @@ static int get_tag_list_length(struct TagItem *tag_list)
+     return count * sizeof(struct TagItem);
+ }
+ 
+-static uint32_t send_request(__reg("a6") struct LibRemote *lib, uint8_t *msg, uint32_t length)
++static uint32_t send_request(__reg("a6") struct LibRemote *lib, uint8_t *write_buf, uint32_t write_length)
+ {
+-    lib->read_req.a314_Buffer = lib->read_buf;
++    uint8_t *read_buf = lib->read_buf;
++
++    lib->read_req.a314_Buffer = read_buf;
+     lib->read_req.a314_Length = sizeof(lib->read_buf);
+     lib->read_req.a314_Request.io_Command = A314_READ;
+     SendIO(&lib->read_req.a314_Request);
+ 
+-    lib->write_req.a314_Buffer = msg;
+-    lib->write_req.a314_Length = length;
++    lib->write_req.a314_Buffer = write_buf;
++    lib->write_req.a314_Length = write_length;
+     lib->write_req.a314_Request.io_Command = A314_WRITE;
+     SendIO(&lib->write_req.a314_Request);
+ 
+-    uint8_t send_buf[8];
+-
+     BOOL pending_read = TRUE;
+     BOOL pending_write = TRUE;
+ 
+     uint32_t signals_received = 0;
+     uint32_t signals_to_send = 0;
+-    uint8_t msg_to_send = 0;
+-    uint32_t done_arg;
+ 
+-    while (pending_read || pending_write)
++    while (TRUE)
+     {
+         uint32_t new_signals = Wait(-1);
+ 
+@@ -193,109 +191,167 @@ static uint32_t send_request(__reg("a6") struct LibRemote *lib, uint8_t *msg, ui
+                 if (req == &lib->write_req)
+                     pending_write = FALSE;
+                 else // if (req == &lib->read_req)
+-                {
+-                    uint8_t kind = lib->read_buf[0];
+-
+-                    if (kind == MSG_OP_RES)
+-                        pending_read = FALSE;
+-                    else
+-                    {
+-                        if (kind == MSG_ALLOC_MEM_REQ)
+-                        {
+-                            struct AllocMemReqMsg *req = (struct AllocMemReqMsg *)lib->read_buf;
+-                            done_arg = alloc_chunk(lib, req->length);
+-                            msg_to_send = MSG_ALLOC_MEM_RES;
+-                        }
+-                        else if (kind == MSG_FREE_MEM_REQ)
+-                        {
+-                            struct FreeMemReqMsg *req = (struct FreeMemReqMsg *)lib->read_buf;
+-                            free_chunk(lib, req->address);
+-                            msg_to_send = MSG_FREE_MEM_RES;
+-                        }
+-                        else if (kind == MSG_COPY_FROM_BOUNCE_REQ)
+-                        {
+-                            struct CopyFromBounceReqMsg *req = (struct CopyFromBounceReqMsg *)lib->read_buf;
+-                            struct CopyDesc *cd = (struct CopyDesc *)&req[1];
+-                            for (int i = 0; i < req->copy_count; i++)
+-                            {
+-                                ReadMemA314((void *)cd->dst, cd->src, cd->len);
+-                                cd++;
+-                            }
+-                            msg_to_send = MSG_COPY_FROM_BOUNCE_RES;
+-                        }
+-                        else if (kind == MSG_COPY_TO_BOUNCE_REQ)
+-                        {
+-                            struct CopyToBounceReqMsg *req = (struct CopyToBounceReqMsg *)lib->read_buf;
+-                            struct CopyDesc *cd = (struct CopyDesc *)&req[1];
+-                            for (int i = 0; i < req->copy_count; i++)
+-                            {
+-                                WriteMemA314(cd->dst, (void *)cd->src, cd->len);
+-                                cd++;
+-                            }
+-                            msg_to_send = MSG_COPY_TO_BOUNCE_RES;
+-                        }
+-                        else if (kind == MSG_COPY_STR_TO_BOUNCE_REQ)
+-                        {
+-                            struct CopyStrToBounceReqMsg *req = (struct CopyStrToBounceReqMsg *)lib->read_buf;
+-                            uint32_t len = strlen((void *)req->str_address);
+-                            WriteMemA314(req->bounce_address, (void *)req->str_address, len);
+-                            msg_to_send = MSG_COPY_STR_TO_BOUNCE_RES;
+-                            done_arg = len;
+-                        }
+-                        else if (kind == MSG_COPY_TAG_LIST_TO_BOUNCE_REQ)
+-                        {
+-                            struct CopyTagListToBounceReqMsg *req = (struct CopyTagListToBounceReqMsg *)lib->read_buf;
+-                            uint32_t len = get_tag_list_length((void *)req->tag_list_address);
+-                            WriteMemA314(req->bounce_address, (void *)req->tag_list_address, len);
+-                            msg_to_send = MSG_COPY_TAG_LIST_TO_BOUNCE_RES;
+-                            done_arg = len;
+-                        }
+-
+-                        lib->read_req.a314_Buffer = lib->read_buf;
+-                        lib->read_req.a314_Length = sizeof(lib->read_buf);
+-                        lib->read_req.a314_Request.io_Command = A314_READ;
+-                        SendIO(&lib->read_req.a314_Request);
+-                    }
+-                }
++                    pending_read = FALSE;
+             }
+         }
+ 
+-        if (pending_read && !pending_write)
++        if (!pending_write && !pending_read)
+         {
+-            int16_t length = 0;
++            uint8_t kind = read_buf[0];
++
++            if (kind == MSG_OP_RES)
++                break;
++
++            if (kind == MSG_ALLOC_MEM_REQ)
++            {
++                struct AllocMemReqMsg *req = (struct AllocMemReqMsg *)read_buf;
++                uint32_t addr = alloc_chunk(lib, req->length);
++
++                write_buf[0] = MSG_ALLOC_MEM_RES;
++                *(uint32_t *)&write_buf[2] = addr;
++                write_length = 6;
++            }
++            else if (kind == MSG_FREE_MEM_REQ)
++            {
++                struct FreeMemReqMsg *req = (struct FreeMemReqMsg *)read_buf;
++                free_chunk(lib, req->address);
++
++                write_buf[0] = MSG_FREE_MEM_RES;
++                write_length = 1;
++            }
++            else if (kind == MSG_READ_MEM_REQ)
++            {
++                uint8_t *read_mem_desc = &read_buf[2];
++
++                write_buf[0] = MSG_READ_MEM_RES;
++                write_length = 2;
++                uint8_t *write_to = &write_buf[2];
++
++                while (read_mem_desc - read_buf < lib->read_req.a314_Length)
++                {
++                    uint32_t src = *(uint32_t *)read_mem_desc;
++                    read_mem_desc += 4;
++
++                    uint8_t len = *read_mem_desc++;
++                    read_mem_desc++;
++
++                    memcpy(write_to, (void *)src, len);
++
++                    write_to += len;
++                    write_length += len;
++                }
++            }
++            else if (kind == MSG_WRITE_MEM_REQ)
++            {
++                uint8_t *write_mem_desc = &read_buf[2];
++
++                while (write_mem_desc - read_buf < lib->read_req.a314_Length)
++                {
++                    uint32_t dst = *(uint32_t *)write_mem_desc;
++                    write_mem_desc += 4;
++
++                    uint8_t len = *write_mem_desc++;
++                    if ((len & 1) == 0)
++                        write_mem_desc++;
++
++                    memcpy((void *)dst, write_mem_desc, len);
++
++                    write_mem_desc += len;
++                }
+ 
+-            if (msg_to_send)
++                write_buf[0] = MSG_WRITE_MEM_RES;
++                write_length = 1;
++            }
++            else if (kind == MSG_COPY_FROM_BOUNCE_REQ)
+             {
+-                send_buf[0] = msg_to_send;
+-                length = 1;
+-                if (msg_to_send == MSG_ALLOC_MEM_RES || msg_to_send == MSG_COPY_STR_TO_BOUNCE_RES || msg_to_send == MSG_COPY_TAG_LIST_TO_BOUNCE_RES)
++                struct CopyFromBounceReqMsg *req = (struct CopyFromBounceReqMsg *)read_buf;
++                struct CopyDesc *cd = (struct CopyDesc *)&req[1];
++
++                for (int i = 0; i < req->copy_count; i++)
+                 {
+-                    *(uint32_t *)&send_buf[2] = done_arg;
+-                    length = 6;
++                    ReadMemA314((void *)cd->dst, cd->src, cd->len);
++                    cd++;
+                 }
+-                msg_to_send = 0;
++
++                write_buf[0] = MSG_COPY_FROM_BOUNCE_RES;
++                write_length = 1;
+             }
+-            else if (signals_to_send)
++            else if (kind == MSG_COPY_TO_BOUNCE_REQ)
+             {
+-                send_buf[0] = MSG_SIGNALS;
+-                *(uint32_t *)&send_buf[2] = signals_to_send;
+-                length = 6;
+-                signals_to_send = 0;
++                struct CopyToBounceReqMsg *req = (struct CopyToBounceReqMsg *)read_buf;
++                struct CopyDesc *cd = (struct CopyDesc *)&req[1];
++
++                for (int i = 0; i < req->copy_count; i++)
++                {
++                    WriteMemA314(cd->dst, (void *)cd->src, cd->len);
++                    cd++;
++                }
++
++                write_buf[0] = MSG_COPY_TO_BOUNCE_RES;
++                write_length = 1;
+             }
++            else if (kind == MSG_COPY_STR_TO_BOUNCE_REQ)
++            {
++                struct CopyStrToBounceReqMsg *req = (struct CopyStrToBounceReqMsg *)read_buf;
++                uint32_t len = strlen((void *)req->str_address);
+ 
+-            if (length)
++                WriteMemA314(req->bounce_address, (void *)req->str_address, len);
++
++                write_buf[0] = MSG_COPY_STR_TO_BOUNCE_RES;
++                *(uint32_t *)&write_buf[2] = len;
++                write_length = 6;
++            }
++            else if (kind == MSG_COPY_TAG_LIST_TO_BOUNCE_REQ)
+             {
+-                lib->write_req.a314_Buffer = send_buf;
+-                lib->write_req.a314_Length = length;
+-                lib->write_req.a314_Request.io_Command = A314_WRITE;
+-                SendIO(&lib->write_req.a314_Request);
++                struct CopyTagListToBounceReqMsg *req = (struct CopyTagListToBounceReqMsg *)read_buf;
++                uint32_t len = get_tag_list_length((void *)req->tag_list_address);
+ 
+-                pending_write = TRUE;
++                WriteMemA314(req->bounce_address, (void *)req->tag_list_address, len);
++
++                write_buf[0] = MSG_COPY_TAG_LIST_TO_BOUNCE_RES;
++                *(uint32_t *)&write_buf[2] = len;
++                write_length = 6;
+             }
++            else
++            {
++                // TODO: Should handle this severe error in some other way.
++                // This means that received an unknown message.
++                write_buf[0] = kind + 1;
++                write_length = 1;
++            }
++
++            lib->read_req.a314_Buffer = read_buf;
++            lib->read_req.a314_Length = sizeof(lib->read_buf);
++            lib->read_req.a314_Request.io_Command = A314_READ;
++            SendIO(&lib->read_req.a314_Request);
++
++            lib->write_req.a314_Buffer = write_buf;
++            lib->write_req.a314_Length = write_length;
++            lib->write_req.a314_Request.io_Command = A314_WRITE;
++            SendIO(&lib->write_req.a314_Request);
++
++            pending_read = TRUE;
++            pending_write = TRUE;
++        }
++
++        if (!pending_write && signals_to_send)
++        {
++            write_buf[0] = MSG_SIGNALS;
++            *(uint32_t *)&write_buf[2] = signals_to_send;
++            write_length = 6;
++
++            signals_to_send = 0;
++
++            lib->write_req.a314_Buffer = write_buf;
++            lib->write_req.a314_Length = write_length;
++            lib->write_req.a314_Request.io_Command = A314_WRITE;
++            SendIO(&lib->write_req.a314_Request);
++
++            pending_write = TRUE;
+         }
+     }
+ 
+-    struct OpResMsg *op_msg = (struct OpResMsg *)lib->read_buf;
++    struct OpResMsg *op_msg = (struct OpResMsg *)read_buf;
+     struct CopyDesc *cd = (struct CopyDesc *)&op_msg[1];
+ 
+     for (int i = 0; i < op_msg->copy_count; i++)
+@@ -304,6 +360,22 @@ static uint32_t send_request(__reg("a6") struct LibRemote *lib, uint8_t *msg, ui
+         cd++;
+     }
+ 
++    uint8_t *write_mem_desc = (uint8_t *)cd;
++
++    while (write_mem_desc - read_buf < lib->read_req.a314_Length)
++    {
++        uint32_t dst = *(uint32_t *)write_mem_desc;
++        write_mem_desc += 4;
++
++        uint8_t len = *write_mem_desc++;
++        if ((len & 1) == 0)
++            write_mem_desc++;
++
++        memcpy((void *)dst, write_mem_desc, len);
++
++        write_mem_desc += len;
++    }
++
+     Signal(FindTask(NULL), signals_received & ~(op_msg->signals_consumed));
+ 
+     return op_msg->result;
+diff --git a/Software/libremote/libremote.py b/Software/libremote/libremote.py
+index 2b49aaa..6d03060 100644
+--- a/Software/libremote/libremote.py
++++ b/Software/libremote/libremote.py
+@@ -24,14 +24,18 @@ MSG_ALLOC_MEM_REQ           = 4
+ MSG_ALLOC_MEM_RES           = 5
+ MSG_FREE_MEM_REQ            = 6
+ MSG_FREE_MEM_RES            = 7
+-MSG_COPY_FROM_BOUNCE_REQ    = 8
+-MSG_COPY_FROM_BOUNCE_RES    = 9
+-MSG_COPY_TO_BOUNCE_REQ      = 10
+-MSG_COPY_TO_BOUNCE_RES      = 11
+-MSG_COPY_STR_TO_BOUNCE_REQ  = 12
+-MSG_COPY_STR_TO_BOUNCE_RES  = 13
+-MSG_COPY_TAG_LIST_TO_BOUNCE_REQ = 14
+-MSG_COPY_TAG_LIST_TO_BOUNCE_RES = 15
++MSG_READ_MEM_REQ            = 8
++MSG_READ_MEM_RES            = 9
++MSG_WRITE_MEM_REQ           = 10
++MSG_WRITE_MEM_RES           = 11
++MSG_COPY_FROM_BOUNCE_REQ    = 12
++MSG_COPY_FROM_BOUNCE_RES    = 13
++MSG_COPY_TO_BOUNCE_REQ      = 14
++MSG_COPY_TO_BOUNCE_RES      = 15
++MSG_COPY_STR_TO_BOUNCE_REQ  = 16
++MSG_COPY_STR_TO_BOUNCE_RES  = 17
++MSG_COPY_TAG_LIST_TO_BOUNCE_REQ = 18
++MSG_COPY_TAG_LIST_TO_BOUNCE_RES = 19
+ 
+ QITEM_RESET = 1
+ QITEM_READ_MEM_COMPLETE = 2
+diff --git a/Software/libremote/messages.h b/Software/libremote/messages.h
+index 13d5b8f..4d8f5e5 100644
+--- a/Software/libremote/messages.h
++++ b/Software/libremote/messages.h
+@@ -10,14 +10,18 @@
+ #define MSG_ALLOC_MEM_RES           5
+ #define MSG_FREE_MEM_REQ            6
+ #define MSG_FREE_MEM_RES            7
+-#define MSG_COPY_FROM_BOUNCE_REQ    8
+-#define MSG_COPY_FROM_BOUNCE_RES    9
+-#define MSG_COPY_TO_BOUNCE_REQ      10
+-#define MSG_COPY_TO_BOUNCE_RES      11
+-#define MSG_COPY_STR_TO_BOUNCE_REQ  12
+-#define MSG_COPY_STR_TO_BOUNCE_RES  13
+-#define MSG_COPY_TAG_LIST_TO_BOUNCE_REQ 14
+-#define MSG_COPY_TAG_LIST_TO_BOUNCE_RES 15
++#define MSG_READ_MEM_REQ            8
++#define MSG_READ_MEM_RES            9
++#define MSG_WRITE_MEM_REQ           10
++#define MSG_WRITE_MEM_RES           11
++#define MSG_COPY_FROM_BOUNCE_REQ    12
++#define MSG_COPY_FROM_BOUNCE_RES    13
++#define MSG_COPY_TO_BOUNCE_REQ      14
++#define MSG_COPY_TO_BOUNCE_RES      15
++#define MSG_COPY_STR_TO_BOUNCE_REQ  16
++#define MSG_COPY_STR_TO_BOUNCE_RES  17
++#define MSG_COPY_TAG_LIST_TO_BOUNCE_REQ 18
++#define MSG_COPY_TAG_LIST_TO_BOUNCE_RES 19
+ 
+ struct CopyDesc
+ {
+@@ -73,6 +77,30 @@ struct FreeMemResMsg // Amiga -> Pi
+     uint8_t kind;
+ };
+ 
++struct ReadMemReqMsg // Pi -> Amiga
++{
++    uint8_t kind;
++    uint8_t pad;
++};
++
++struct ReadMemResMsg // Amiga -> Pi
++{
++    uint8_t kind;
++    uint8_t pad;
++};
++
++struct WriteMemReqMsg // Pi -> Amiga
++{
++    uint8_t kind;
++    uint8_t pad;
++};
++
++struct WriteMemResMsg // Amiga -> Pi
++{
++    uint8_t kind;
++    uint8_t pad;
++};
++
+ struct CopyFromBounceReqMsg // Pi -> Amiga
+ {
+     uint8_t kind;
+-- 
+2.47.3
+
