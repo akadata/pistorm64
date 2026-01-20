@@ -75,7 +75,7 @@ static uint32_t cursor_palette[256];
 uint32_t cursor_data[256 * 256];
 uint32_t clut_cursor_texture_data[256 * 256];
 
-void rtg_update_screen() {
+void rtg_update_screen(void) {
 }
 
 uint32_t rtg_to_raylib[RTGFMT_NUM] = {
