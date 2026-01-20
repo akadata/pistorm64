@@ -1188,7 +1188,7 @@ void m68k_pulse_halt(void)
 
 /* Get and set the current CPU context */
 /* This is to allow for multiple CPUs */
-unsigned int m68k_context_size()
+unsigned int m68k_context_size(void)
 {
 	return sizeof(m68ki_cpu_core);
 }
@@ -1328,7 +1328,7 @@ void m68k_add_ram_range(uint32_t addr, uint32_t upper, unsigned char *ptr)
 				changed = 1;
 			}
 			if (changed) {
-				printf("[MUSASHI] Adjusted mapped write range %d: %.8X-%.8X (%p)\n", m68ki_cpu.write_ranges, addr, upper, ptr);
+				printf("[MUSASHI] Adjusted mapped write range %d: %.8X-%.8X (%p)\n", m68ki_cpu.write_ranges, addr, upper, (void *)ptr);
 			}
 			return;
 		}
@@ -1339,7 +1339,7 @@ void m68k_add_ram_range(uint32_t addr, uint32_t upper, unsigned char *ptr)
 		m68ki_cpu.read_upper[m68ki_cpu.read_ranges] = upper;
 		m68ki_cpu.read_data[m68ki_cpu.read_ranges] = ptr;
 		m68ki_cpu.read_ranges++;
-		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, ptr);
+		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, (void *)ptr);
 	}
 	else {
 		printf("Can't Musashi map more than eight RAM/ROM read ranges.\n");
@@ -1349,7 +1349,7 @@ void m68k_add_ram_range(uint32_t addr, uint32_t upper, unsigned char *ptr)
 		m68ki_cpu.write_upper[m68ki_cpu.write_ranges] = upper;
 		m68ki_cpu.write_data[m68ki_cpu.write_ranges] = ptr;
 		m68ki_cpu.write_ranges++;
-		printf("[MUSASHI] Mapped write range %d: %.8X-%.8X (%p)\n", m68ki_cpu.write_ranges, addr, upper, ptr);
+		printf("[MUSASHI] Mapped write range %d: %.8X-%.8X (%p)\n", m68ki_cpu.write_ranges, addr, upper, (void *)ptr);
 	}
 	else {
 		printf("Can't Musashi map more than eight RAM write ranges.\n");
@@ -1379,7 +1379,7 @@ void m68k_add_rom_range(uint32_t addr, uint32_t upper, unsigned char *ptr)
 				changed = 1;
 			}
 			if (changed) {
-				printf("[MUSASHI] Adjusted mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, ptr);
+				printf("[MUSASHI] Adjusted mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, (void *)ptr);
 			}
 			return;
 		}
@@ -1390,7 +1390,7 @@ void m68k_add_rom_range(uint32_t addr, uint32_t upper, unsigned char *ptr)
 		m68ki_cpu.read_upper[m68ki_cpu.read_ranges] = upper;
 		m68ki_cpu.read_data[m68ki_cpu.read_ranges] = ptr;
 		m68ki_cpu.read_ranges++;
-		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, ptr);
+		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, (void *)ptr);
 	}
 	else {
 		printf("Can't Musashi map more than eight RAM/ROM read ranges.\n");
