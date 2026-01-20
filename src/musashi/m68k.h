@@ -213,7 +213,7 @@ void m68k_write_memory_32(unsigned int address, unsigned int value);
 void m68k_add_ram_range(uint32_t addr, uint32_t upper, unsigned char *ptr);
 void m68k_add_rom_range(uint32_t addr, uint32_t upper, unsigned char *ptr);
 void m68k_remove_range(unsigned char *ptr);
-void m68k_clear_ranges();
+void m68k_clear_ranges(void);
 
 /* Special call to simulate undocumented 68k behavior when move.l with a
  * predecrement destination mode is executed.
