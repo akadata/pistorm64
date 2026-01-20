@@ -46,3 +46,7 @@ build/dumpdisk
 regtool
 ioharness
 dumpdisk
+
+# build logs
+clang.log
+gcc.log
