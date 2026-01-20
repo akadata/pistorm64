@@ -345,11 +345,6 @@ void* ipl_task(void* args) {
     for (unsigned int i = 0; i < ipl_nop_count; i++) {
       NOP;
     }
-    // NOP NOP NOP NOP NOP NOP NOP NOP
-    // NOP NOP NOP NOP NOP NOP NOP NOP
-    /*NOP NOP NOP NOP NOP NOP NOP NOP
-    NOP NOP NOP NOP NOP NOP NOP NOP
-    NOP NOP NOP NOP NOP NOP NOP NOP*/
   }
   printf("[IPL] Thread exiting\n");
   return args;
