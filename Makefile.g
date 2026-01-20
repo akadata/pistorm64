@@ -235,9 +235,9 @@ CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
 RAYLIB_INC    = -I./src/raylib_drm
 RAYLIB_LIBDIR = -L./src/raylib_drm
 DEFINES      += -DRPI4_TEST
-OPT_LEVEL := -O0 -g
-EXTRA_CFLAGS += -fno-omit-frame-pointer
-EXTRA_LDFLAGS += 
+OPT_LEVEL := -O0
+EXTRA_CFLAGS += -g3 -fno-omit-frame-pointer
+EXTRA_LDFLAGS += -g
 else ifeq ($(PLATFORM),PI3_BULLSEYE)
 CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
 else ifeq ($(PLATFORM),PI_64BIT)
@@ -321,36 +321,36 @@ clean:
 OBJS_LINK = $(filter %.o,$^)
 
 $(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) src/a314/a314.o
-	$(CC) $(LDFLAGS) -o $@.tmp $(OBJS_LINK) $(LDLIBS) && mv -f $@.tmp $@
+	$(CC) $(LDFLAGS) -g -o $@.tmp $(OBJS_LINK) $(LDLIBS) && mv -f $@.tmp $@
 
 # Explicit rules to keep the generated 68k core quiet on unused-temp warnings.
 src/musashi/m68kcpu.o: src/musashi/m68kcpu.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) -c  -g -o $@ $<
 
 src/musashi/m68kops.o: src/musashi/m68kops.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) -c  -g -o $@ $<
 
 src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) -c  -g -o $@ $<
 
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) -c  -g -o $@ $<
 
 buptest:
 	@if [ -f src/buptest/buptest.c ]; then \
-		$(CC) $(CFLAGS) -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/gpio/rpi_peri.c; \
+		$(CC) $(CFLAGS)  -g -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/gpio/rpi_peri.c; \
 	else \
 		echo "buptest skipped (src/buptest/buptest.c missing)"; \
 	fi
 
 pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
-	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
+	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi  -g -o $@ $<
 
 : tools/.c include/uapi/linux/pistorm.h
-	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
+	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi  -g -o $@ $<
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
-	$(CXX) -MMD -MP -c -o src/a314/a314.o $(CXXFLAGS) src/a314/a314.cc
+	$(CXX) -MMD -MP -c  -g -o src/a314/a314.o $(CXXFLAGS) src/a314/a314.cc
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f src/musashi/$(MUSASHIGENERATOR)$(EXE)
