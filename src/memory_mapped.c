@@ -65,18 +65,28 @@ read_value:;
   case OP_TYPE_BYTE:
     *val = read_addr[0];
     return 1;
-    break;
-  case OP_TYPE_WORD:
-    *val = be16toh(((unsigned short*)read_addr)[0]);
+//    break;
+  case OP_TYPE_WORD: {
+  //  *val = be16toh(((unsigned short*)read_addr)[0]);
+  //  return 1;
+  //  break;
+    uint16_t tmp;
+    __builtin_memcpy(&tmp, read_addr, sizeof(tmp));
+    *val = be16toh(tmp);
     return 1;
-    break;
-  case OP_TYPE_LONGWORD:
-    *val = be32toh(((unsigned int*)read_addr)[0]);
+  }
+  case OP_TYPE_LONGWORD: {
+    //*val = be32toh(((unsigned int*)read_addr)[0]);
+    //return 1;
+    //break;
+    uint32_t tmp;
+    __builtin_memcpy(&tmp, read_addr, sizeof(tmp));
+    *val = be32toh(tmp);
     return 1;
-    break;
+  }
   case OP_TYPE_MEM:
     return -1;
-    break;
+//    break;
   }
 
   return 1;
@@ -130,18 +140,26 @@ write_value:;
   case OP_TYPE_BYTE:
     write_addr[0] = (unsigned char)value;
     return res;
-    break;
-  case OP_TYPE_WORD:
-    ((short*)write_addr)[0] = htobe16(value);
+//    break;
+  case OP_TYPE_WORD: {
+//    ((short*)write_addr)[0] = htobe16(value);
+//    return res;
+//    break;
+    uint16_t tmp = htobe16((uint16_t)value);
+    __builtin_memcpy(write_addr, &tmp, sizeof(tmp));
     return res;
-    break;
-  case OP_TYPE_LONGWORD:
-    ((int*)write_addr)[0] = htobe32(value);
+  }
+  case OP_TYPE_LONGWORD: {
+//    ((int*)write_addr)[0] = htobe32(value);
+//   return res;
+//    break;
+    uint32_t tmp = htobe32((uint32_t)value);
+    __builtin_memcpy(write_addr, &tmp, sizeof(tmp));
     return res;
-    break;
+  }
   case OP_TYPE_MEM:
     return -1;
-    break;
+//    break;
   }
 
   // This should never actually happen.

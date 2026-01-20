@@ -690,8 +690,26 @@ def process_same_lock(key1, key2):
     else:
         return struct.pack('>HH', 0, LOCK_SAME_VOLUME)
 
+def process_set_date(req):
+    # rtype is already known (34)
+    logger.warning('ACTION_SET_DATE(34) raw=%s', req[:64].hex())
+
+    # common pattern in your code: args often start right after the 2-byte rtype
+    # try decoding both 3-arg and 7-arg layouts for visibility
+    if len(req) >= 14:
+        a = struct.unpack('>III', req[2:14])
+        logger.warning('ACTION_SET_DATE(34) args3: %08x %08x %08x', *a)
+
+    if len(req) >= 30:
+        a = struct.unpack('>7I', req[2:30])
+        logger.warning('ACTION_SET_DATE(34) args7: %s', ' '.join(f'{x:08x}' for x in a))
+
+    # ACK success so copying continues while you inspect logs
+    return struct.pack('>HH', 1, 0)
+
+
 def process_request(req):
-    #logger.debug('len(req): %s, req: %s', len(req), list(req))
+    logger.debug('len(req): %s, req: %s', len(req), list(req))
 
     (rtype,) = struct.unpack('>H', req[:2])
 
@@ -758,8 +776,14 @@ def process_request(req):
     elif rtype == ACTION_SAME_LOCK:
         key1, key2 = struct.unpack('>II', req[2:10])
         return process_same_lock(key1, key2)
+    elif rtype == ACTION_SET_DATE:
+        return process_set_date(req)
     elif rtype == ACTION_UNSUPPORTED:
         (dp_Type,) = struct.unpack('>H', req[2:4])
+        if dp_Type == ACTION_SET_DATE:
+            # No args are provided by sender; accept to prevent retries/spam
+            return struct.pack('>HH', 1, 0)
+            #    return process_set_date(req)   # your debug function
         logger.warning('Unsupported action %d (Amiga/a314fs)', dp_Type)
         return struct.pack('>HH', 0, ERROR_ACTION_NOT_KNOWN)
     else:
