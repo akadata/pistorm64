@@ -73,11 +73,11 @@
       m68k_set_irq(0);                                                                             \
   };
 
-void setup_io();
-void gpio_enable_200mhz();
-void gpio_handle_irq();
+void setup_io(void);
+void gpio_enable_200mhz(void);
+void gpio_handle_irq(void);
 
-int gpio_get_irq();
+int gpio_get_irq(void);
 
 uint32_t read8(uint32_t address);
 void write8(uint32_t address, uint32_t data);

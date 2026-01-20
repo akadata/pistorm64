@@ -1440,7 +1440,7 @@ void m68k_remove_range(unsigned char *ptr) {
 	}
 }
 
-void m68k_clear_ranges()
+void m68k_clear_ranges(void)
 {
 	printf("[MUSASHI] Clearing all reads/write memory ranges.\n");
 	for (int i = 0; i < 8; i++) {
