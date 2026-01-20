@@ -278,7 +278,7 @@ static void load_config_file(const char *filename)
             auto &e = on_demand_services.back();
             e.service_name = parts[0];
             e.program = parts[1];
-            for (int i = 1; i < parts.size(); i++)
+            for (size_t i = 1; i < parts.size(); i++)
                 e.arguments.push_back(std::string(parts[i]));
         }
         else if (parts.size() != 0)
@@ -537,6 +537,7 @@ static LogicalChannel *get_associated_channel_by_stream_id(ClientConnection *cc,
 
 static void handle_msg_connect(ClientConnection *cc)
 {
+    (void)cc;  // Parameter intentionally unused
     // We currently don't handle that a client tries to connect to a service on the Amiga.
 }
 
@@ -1377,6 +1378,7 @@ static void shutdown_driver()
 
 static void *thread_start(void *arg)
 {
+    (void)arg;  // Parameter intentionally unused
     main_loop();
     shutdown_driver();
     return NULL;
@@ -1491,11 +1493,15 @@ void a314_write_memory_8(unsigned int address, unsigned int value)
 
 void a314_write_memory_16(unsigned int address, unsigned int value)
 {
+    (void)address;  // Parameter intentionally unused
+    (void)value;    // Parameter intentionally unused
     // Not implemented.
 }
 
 void a314_write_memory_32(unsigned int address, unsigned int value)
 {
+    (void)address;  // Parameter intentionally unused
+    (void)value;    // Parameter intentionally unused
     // Not implemented.
 }
 

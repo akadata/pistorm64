@@ -241,10 +241,12 @@ int apply_config_line(struct emulator_config* cfg, const char* line, int line_no
       case MAPCMD_FILENAME:
         get_next_string(parse_line, cur_cmd, &str_pos, ' ');
         strncpy(mapfile, cur_cmd, sizeof(mapfile) - 1);
+mapfile[sizeof(mapfile) - 1] = '\0';  // Ensure null termination
         break;
       case MAPCMD_MAP_ID:
         get_next_string(parse_line, cur_cmd, &str_pos, ' ');
         strncpy(mapid, cur_cmd, sizeof(mapid) - 1);
+mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
         break;
       case MAPCMD_OVL_REMAP:
         get_next_string(parse_line, cur_cmd, &str_pos, ' ');
