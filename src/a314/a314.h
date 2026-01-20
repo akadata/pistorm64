@@ -17,9 +17,9 @@ extern int a314_base_configured;
 
 #define A314_COM_AREA_SIZE (64 * 1024)
 
-int a314_init();
+int a314_init(void);
 void a314_set_mem_base_size(unsigned int base, unsigned int size);
-void a314_process_events();
+void a314_process_events(void);
 void a314_set_config_file(char* filename);
 
 unsigned int a314_read_memory_8(unsigned int address);

@@ -23,7 +23,7 @@ void pinet_init(char* dev) {
   (void)dev;
 }
 
-void pinet_shutdown() {
+void pinet_shutdown(void) {
   // Aaahh!
 }
 

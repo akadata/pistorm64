@@ -12,7 +12,7 @@
 #define AHIST_INPUT (1 << 29)
 
 uint32_t pi_ahi_init(char* dev);
-void pi_ahi_shutdown();
+void pi_ahi_shutdown(void);
 void handle_pi_ahi_write(uint32_t addr_, uint32_t val, uint8_t type);
 uint32_t handle_pi_ahi_read(uint32_t addr_, uint8_t type);
 int get_ahi_sample_size(uint16_t type);

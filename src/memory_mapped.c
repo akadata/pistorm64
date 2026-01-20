@@ -8,7 +8,6 @@
 #define CHKRANGE(a, b, c) a >= (unsigned int)b&& a < (unsigned int)(b + c)
 #define CHKRANGE_ABS(a, b, c) a >= (unsigned int)b&& a < (unsigned int)c
 
-static unsigned int target;
 extern int ovl;
 
 extern const char* map_type_names[MAPTYPE_NUM];
@@ -19,8 +18,8 @@ const char* op_type_names[OP_TYPE_NUM] = {
     "MEM",
 };
 
-inline int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
-                              unsigned char type) {
+int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
+                       unsigned char type) {
   unsigned char* read_addr = NULL;
 
   for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
@@ -47,8 +46,9 @@ inline int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, un
         break;
       case MAPTYPE_REGISTER:
         if (cfg->platform && cfg->platform->register_read) {
-          if (cfg->platform->register_read(addr, type, &target) != -1) {
-            *val = target;
+          unsigned int local_target;
+          if (cfg->platform->register_read(addr, type, &local_target) != -1) {
+            *val = local_target;
             return 1;
           }
         }
@@ -82,8 +82,8 @@ read_value:;
   return 1;
 }
 
-inline int handle_mapped_write(struct emulator_config* cfg, unsigned int addr, unsigned int value,
-                               unsigned char type) {
+int handle_mapped_write(struct emulator_config* cfg, unsigned int addr, unsigned int value,
+                        unsigned char type) {
   int res = -1;
   unsigned char* write_addr = NULL;
 

@@ -7,8 +7,8 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
 int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int val,
                        unsigned char type);
 
-void adjust_gayle_4000();
-void adjust_gayle_1200();
+void adjust_gayle_4000(void);
+void adjust_gayle_1200(void);
 
 #define GAYLEBASE 0xD80000
 #define GAYLESIZE 0x070000

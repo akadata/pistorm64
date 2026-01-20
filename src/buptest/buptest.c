@@ -77,7 +77,7 @@ static void reset_amiga(const char* tag) {
   }
 }
 
-void ps_reinit() {
+void ps_reinit(void) {
   reset_amiga("reinit");
 
   write8(0xbfe201, 0x0101); // CIA OVL
@@ -88,7 +88,7 @@ unsigned int dump_read_8(unsigned int address) {
   return ps_read_8(address);
 }
 
-int check_emulator() {
+int check_emulator(void) {
 
   DIR* dir;
   struct dirent* ent;

@@ -72,7 +72,7 @@ unsigned int num_partition_names = 0;
 struct hunk_info piscsi_hinfo;
 struct hunk_reloc piscsi_hreloc[256];
 
-void piscsi_init() {
+void piscsi_init(void) {
     for (int i = 0; i < 8; i++) {
         devs[i].fd = -1;
         devs[i].lba = 0;
@@ -108,7 +108,7 @@ void piscsi_init() {
     fflush(stdout);
 }
 
-void piscsi_shutdown() {
+void piscsi_shutdown(void) {
     printf("[PISCSI] Shutting down PiSCSI.\n");
     for (int i = 0; i < 8; i++) {
         if (devs[i].fd != -1) {
@@ -237,7 +237,7 @@ no_rdb_found:;
     return -1;
 }
 
-void piscsi_refresh_drives() {
+void piscsi_refresh_drives(void) {
     piscsi_num_fs = 0;
 
     for (int i = 0; i < NUM_FILESYSTEMS; i++) {
