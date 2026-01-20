@@ -74,7 +74,7 @@ extern uint8_t realtime_graphics_debug;
 extern uint8_t emulator_exiting;
 extern uint8_t rtg_on;
 
-uint8_t realtime_disassembly;
+uint8_t realtime_disassembly = 0;
 uint8_t int2_enabled = 0;
 
 uint32_t do_disasm = 0;
@@ -91,12 +91,14 @@ uint8_t enable_jit_backend = 0;
 uint8_t enable_fpu_jit_backend = 0;
 static int (*fpu_exec_hook)(m68ki_cpu_core* state, uint16_t opcode) = NULL;
 
-char disasm_buf[4096];
+static __thread char disasm_buf[4096];
+// char disasm_buf[4096];
 
 #define KICKBASE 0xF80000
 #define KICKSIZE 0x7FFFF
 
-int mem_fd, mouse_fd = -1;
+int mem_fd = -1; 
+int mouse_fd = -1;
 int keyboard_fd = -1;
 int mem_fd_gpclk;
 int irq;
@@ -160,8 +162,8 @@ extern int m68ki_remaining_cycles;
 #define M68K_END_TIMESLICE m68k_end_timeslice()
 #endif
 
-#define NOP1()  __asm__ __volatile__("nop")
-#define NOP 	do { NOP1(); NOP1(); NOP1(); NOP1(); NOP1(); } while (0)
+#define NOP1()  __asm__ __volatile__("nop" ::: "memory")
+#define NOP 	do { NOP1(); NOP1(); NOP1(); NOP1(); } while (0)
 
 #define DEBUG_EMULATOR
 #ifdef DEBUG_EMULATOR

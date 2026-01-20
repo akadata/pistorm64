@@ -30,6 +30,7 @@ static void fatalerror(char *format, ...) {
 #define DOUBLE_EXPONENT					(unsigned long long)(0x7ff0000000000000)
 #define DOUBLE_MANTISSA					(unsigned long long)(0x000fffffffffffff)
 
+
 /*----------------------------------------------------------------------------
 | Returns 1 if the extended double-precision floating-point value `a' is a
 | NaN; otherwise returns 0.
@@ -37,8 +38,8 @@ static void fatalerror(char *format, ...) {
 
 flag floatx80_is_nan( floatx80 a )
 {
-
-    return ( ( a.high & 0x7FFF ) == 0x7FFF ) && (uint64_t) ( a.low<<1 );
+    return ((a.high & 0x7FFF) == 0x7FFF) && ((a.low << 1) != 0);
+//    return ( ( a.high & 0x7FFF ) == 0x7FFF ) && (uint64_t) ( a.low<<1 );
 
 }
 
@@ -699,7 +700,8 @@ static uint64 READ_EA_64(m68ki_cpu_core *state, int ea)
 
 static floatx80 READ_EA_FPE(m68ki_cpu_core *state, uint32 ea)
 {
-	floatx80 fpr;
+//	floatx80 fpr;
+	floatx80 fpr = (floatx80){ .high = 0, .low = 0 };
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
 
@@ -791,7 +793,8 @@ static floatx80 READ_EA_FPE(m68ki_cpu_core *state, uint32 ea)
 
 static floatx80 READ_EA_PACK(m68ki_cpu_core *state, int ea)
 {
-	floatx80 fpr;
+	floatx80 fpr = (floatx80){ .high = 0, .low = 0 };
+//	floatx80 fpr;
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
 
@@ -1228,7 +1231,9 @@ static void fpgen_rm_reg(m68ki_cpu_core *state, uint16 w2)
 	int src = (w2 >> 10) & 0x7;
 	int dst = (w2 >>  7) & 0x7;
 	int opmode = w2 & 0x7f;
-	floatx80 source;
+	floatx80 source = (floatx80){ .high = 0, .low = 0 };
+
+//	floatx80 source;
 
 	// fmovecr #$f, fp0	f200 5c0f
 
