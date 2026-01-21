@@ -1,18 +1,18 @@
 # Repository Guidelines (PiStorm)
 
-This repo is actively developed on a **build host** (currently a Pi 4), and tested on a **target host** (currently a Pi Zero 2 W) that is mounted over **NFS**. The goal of this file is to make that workflow obvious and reduce foot‑guns.
+This repo is actively developed on a Pi 4, and tested on this host, we have 8gb ram 250gb ssd root. The goal of this file is to make that workflow obvious and reduce foot‑guns.
 
-## Working setup (Pi4 build host → Pi Zero 2 W target)
+## Working setup (Pi4 build host → target same Pi4)
 
 * **Build host (Pi 4):** edit code, run `make`, build tools, and stage artifacts.
-* **Target host (Pi Zero 2 W):** runs the emulator against real hardware; GPIO access typically requires `sudo`.
+* **Target host (Pi 4):** runs the emulator against real hardware; GPIO access typically requires `sudo`.
 * **NFS mount:** the target exports its working tree (or a subdir) and the build host mounts it, so edits/builds on the Pi 4 are immediately visible on the Pi Zero 2 W.
 
 ### Canonical workflow
 
 1. **Edit on Pi 4** in the NFS-mounted repo.
 2. **Build on Pi 4** (fast compile).
-3. **Run on Pi Zero 2 W** (real GPIO + timing + audio + PiStorm hardware).
+3. **Run on Pi 4** (real GPIO + timing + audio + PiStorm hardware).
 
 > Rule of thumb: anything involving GPIO / real bus timing belongs on the Zero; compilation and refactors belong on the Pi 4.
 
@@ -22,7 +22,6 @@ This repo is actively developed on a **build host** (currently a Pi 4), and test
 
   * `mount | grep nfs`
   * `stat .` and verify path is the mounted one
-* On the **Pi Zero 2 W**, confirm the same tree has your latest edits:
 
   * `git status` shows the same changes
 
