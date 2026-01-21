@@ -1,1 +1,0 @@
-savedcmd_/home/smalley/pistorm64/kernel_module/pistorm.o := aarch64-linux-gnu-ld -EL  -maarch64elf -z noexecstack --no-warn-rwx-segments   -r -o /home/smalley/pistorm64/kernel_module/pistorm.o @/home/smalley/pistorm64/kernel_module/pistorm.mod 

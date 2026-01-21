@@ -28,7 +28,7 @@ PISTORM_IPL_RATELIMIT_US=100
 
 PISTORM_KMOD ?= 1
 EXTRA_CFLAGS ?=
-EXTRA_M68K_CFLAGS ?=
+EXTRA_M68K_CFLAGS ?= -O3 -ffast-math
 EXTRA_LDFLAGS ?=
 
 
@@ -61,7 +61,7 @@ endif
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 WARNINGS   ?= -Wall -Wextra -pedantic
-OPT_LEVEL  ?= -O3
+OPT_LEVEL  ?= -O3 -ffast-math
 
 ifdef O
 OPT_LEVEL := -O$(O)
@@ -235,7 +235,7 @@ CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
 RAYLIB_INC    = -I./src/raylib_drm
 RAYLIB_LIBDIR = -L./src/raylib_drm
 DEFINES      += -DRPI4_TEST
-OPT_LEVEL := -O0 -g
+OPT_LEVEL := -O0 
 EXTRA_CFLAGS += -fno-omit-frame-pointer
 EXTRA_LDFLAGS += 
 else ifeq ($(PLATFORM),PI3_BULLSEYE)
