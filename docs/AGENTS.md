@@ -1,30 +1,114 @@
-# PiStorm agent quick-start (Codex/Qwen)
+# Repository Guidelines (PiStorm)
 
-Purpose: minimal, agent-friendly summary of bus/clock/guard rails. Treat as authoritative alongside `docs/bus_interface_notes.md` and `docs/EMP240.md`.
+This repo is actively developed on a **build host** (currently a Pi 4), and tested on a **target host** (currently a Pi Zero 2 W) that is mounted over **NFS**. The goal of this file is to make that workflow obvious and reduce foot‑guns.
 
-## Bus model
-- Data bus: direct 16-bit on GPIO 8–23 ↔ D0–D15. Not multiplexed. CPLD controls direction; required for DMA correctness.
-- Address bus: multiplexed via register selects on GPIO2/3:
-  - `REG_ADDR_LO` (PI_WR): latch A1–A16 from D0–D15.
-  - `REG_ADDR_HI` (PI_WR): latch A17–A23 (+ flags) from D0–D15.
-  - CPLD reconstructs full address.
-- Control/timing: TXN_IN_PROGRESS asserted on addr-low write; CPLD sequences AS/UDS/LDS/RW/FC and DTACK handshake. RESET/HALT driven from STATUS_BIT_INIT. E/VMA generated in CPLD. IPL sampled and exposed in STATUS.
+## Working setup (Pi4 build host → Pi Zero 2 W target)
 
-## Clocking
-- GPCLK0 on GPIO4 feeds CPLD. Nominal 200 MHz; some bitstreams/parts allow ~125 MHz or >200 MHz (Pi Zero2/3/4/400 overclock). Match bitstream expectations.
-- Constraints assume PI_CLK 5 ns, M68K_CLK ~141 ns. Quartus 20.1 projects in `rtl/`.
+* **Build host (Pi 4):** edit code, run `make`, build tools, and stage artifacts.
+* **Target host (Pi Zero 2 W):** runs the emulator against real hardware; GPIO access typically requires `sudo`.
+* **NFS mount:** the target exports its working tree (or a subdir) and the build host mounts it, so edits/builds on the Pi 4 are immediately visible on the Pi Zero 2 W.
 
-## Platform scope
-- Supported focus: Pi Zero 2 W/3 class and Pi4/400. Pi5/RP1 pending dedicated platform path.
+### Canonical workflow
 
-## Build toggles
-- `USE_RAYLIB=0` to drop RTG raylib backend.
-- `BLITTER_ENABLED` (Atari fork) toggles faux blitter compile.
-- CPU tuning via `PLATFORM=` (PI4/PI4_64BIT/PI3_BULLSEYE/ZEROW2_64), `OPT_LEVEL`, `USE_GOLD`.
+1. **Edit on Pi 4** in the NFS-mounted repo.
+2. **Build on Pi 4** (fast compile).
+3. **Run on Pi Zero 2 W** (real GPIO + timing + audio + PiStorm hardware).
 
-## DMA/cache cautions
-- Keep chip/shared RAM uncached when DMA (blitter/Copper/Paula) is active; flush/disable host-side caches touching shared RAM to avoid corruption.
-- Ensure GPCLK is stable; do not rely on bcm2835 helpers for 200 MHz clock—use direct /dev/mem pokes.
+> Rule of thumb: anything involving GPIO / real bus timing belongs on the Zero; compilation and refactors belong on the Pi 4.
 
-## Firmware notes
-- Amiga bitstream (Oct 2021) USERCODE 0x00185866; Atari bitstreams (Dec 2023+) USERCODE 0x0017F4B8 with hold/status fixes. Rebuild via Quartus from `pistorm.v` (Amiga) or `pistormSXB_devEPM240.v`/`EPM570` (Atari).
+### NFS sanity checks
+
+* On the **Pi 4**, confirm you are working inside the NFS mount:
+
+  * `mount | grep nfs`
+  * `stat .` and verify path is the mounted one
+* On the **Pi Zero 2 W**, confirm the same tree has your latest edits:
+
+  * `git status` shows the same changes
+
+## Project structure & module organization
+
+* `src/`: core emulator sources, platforms (`src/platforms/amiga`, `src/platforms/mac68k`), GPIO helpers, Musashi 68k core, and self-tests.
+
+  * GPIO diagnostics: `src/buptest` and `src/test`
+  * Amiga registers/tools (examples): `src/platforms/amiga/registers/`
+* Configs (examples: `amiga.cfg`, `mac68k.cfg`, `default.cfg`) define ROM/HDF paths and runtime options.
+* `data/`: supporting assets (do not commit ROMs/HDFs).
+* Tools/helpers:
+
+  * `tools/` (audio converters, misc helpers)
+  * build scripts: `build_*.sh`
+  * demo binaries (example): `pimodplay` + wrapper `pimodplay.sh`
+* Docs: `docs/`
+* CPLD/bitstream sources: `cpld_code/`
+* Hardware assets: `Hardware/`
+* Service/deployment units: `systemd/`
+
+## Build, test, and development
+
+### Build (on Pi 4)
+
+* Main build:
+
+  * `make [USE_RAYLIB=0 USE_ALSA=0 USE_PMMU=0 PLATFORM=ZEROW2_64]`
+  * `make clean`
+* Tool builds:
+
+  * `./build_regtool.sh`
+  * `./build_clkpeek.sh`
+  * `./build_pimodplay.sh`
+  * `./build_buptest.sh`
+  * `./build_zz9tests.sh`
+
+### Run (on Pi Zero 2 W)
+
+* Emulator (GPIO access usually requires `sudo`):
+
+  * `sudo ./emulator --config <cfg> [--log <file>]`
+* GPIO / clock checks:
+
+  * `sudo ./buptest`
+* Audio sanity:
+
+  * `./pimodplay.sh sample.wav`
+
+### Nix builds
+
+* From `flake/`:
+
+  * `nix build .#pistorm`
+  * output staged under `$out`.
+
+## Coding style & conventions
+
+* Format C/C++ using `.clang-format` (LLVM base):
+
+  * 2-space indent, no tabs, 100-column limit, attached braces, left-aligned pointers.
+  * run: `clang-format -i <file>` before sending changes.
+* Use `snake_case` for functions/variables, ALL_CAPS for constants/defines.
+* Keep logging concise and hardware-focused; avoid speculative comments in hot paths.
+* Prefer Makefile toggles (`USE_RAYLIB`, `USE_ALSA`, `USE_PMMU`, `PLATFORM`) over new ad-hoc `#ifdef`s.
+
+## Testing guidelines
+
+* The emulator runs an alignment self-test on startup.
+* Validate wiring/clock/bitstream with `buptest` on the target hardware.
+* Additional GPIO loopbacks live in `src/test` (hardware only).
+* There is no automated CI.
+
+When reporting results, always include:
+
+* hardware model (Pi Zero 2 W / Pi 4 / etc.)
+* bitstream version (if applicable)
+* config file used
+* exact command line
+* relevant log excerpts
+
+## Git / commits / PR hygiene
+
+* Commit messages: short, present tense (e.g., `fix pimodplay stereo channel map`).
+* Keep one change set per commit.
+* **Do not commit**: binaries, ROMs, HDF images, generated objects.
+* Use focused branches (see `docs/COMMIT_PLAN.md`).
+* PRs should include: problem statement, summary of changes, hardware/config tested, and command output/screenshots if logs/UI changed.
+
