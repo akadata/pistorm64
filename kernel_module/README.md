@@ -1,5 +1,7 @@
 # PiStorm Kernel Module
 
+# (C) Jan 2026 AKADATA LIMITED - All Rights Reserved
+
 ## Loading with Pi 4 GPCLK Tuning
 
 Default (src=5 div=6):
