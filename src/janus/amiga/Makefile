@@ -1,7 +1,7 @@
 AMIGA_PREFIX ?= /opt/amiga
 CC := $(AMIGA_PREFIX)/bin/m68k-amigaos-gcc
 
-CFLAGS ?= -m68000 -O2 -noixemul -DHAS_STDLIB -Wall -Wextra -Wno-unused-parameter
+CFLAGS ?= -m68030 -O2 -noixemul -DHAS_STDLIB -Wall -Wextra -Wno-unused-parameter
 LDFLAGS ?= -lamiga
 
 BINS := janusd janus-client janus-fractal janus-ball janus-juggler
