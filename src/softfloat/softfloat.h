@@ -95,6 +95,7 @@ this code that are retained.
  */
 
 typedef uint64_t flag;
+_Static_assert(sizeof(flag) >= sizeof(uint8_t), "flag must hold at least 0/1");
 
 #ifndef __cplusplus
   #include <stdbool.h>
