@@ -15,6 +15,28 @@
 
 #include "m68k.h"
 
+static inline uint16_t read_be16(const uint8_t* ptr) {
+  uint16_t tmp;
+  memcpy(&tmp, ptr, sizeof(tmp));
+  return be16toh(tmp);
+}
+
+static inline uint32_t read_be32(const uint8_t* ptr) {
+  uint32_t tmp;
+  memcpy(&tmp, ptr, sizeof(tmp));
+  return be32toh(tmp);
+}
+
+static inline void write_be16(uint8_t* ptr, uint16_t value) {
+  uint16_t tmp = htobe16(value);
+  memcpy(ptr, &tmp, sizeof(tmp));
+}
+
+static inline void write_be32(uint8_t* ptr, uint32_t value) {
+  uint32_t tmp = htobe32(value);
+  memcpy(ptr, &tmp, sizeof(tmp));
+}
+
 void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t h,
                 uint8_t minterm, struct BitMap* bm, uint8_t mask, uint16_t dst_pitch,
                 uint16_t src_pitch);
@@ -82,9 +104,9 @@ int init_rtg_data(struct emulator_config* cfg_) {
     return 0;
   }
 
-  m68k_add_ram_range(PIGFX_RTG_BASE + PIGFX_REG_SIZE, 32 * SIZE_MEGA - PIGFX_REG_SIZE, rtg_mem);
+  m68k_add_ram_range(PIGFX_RTG_BASE + PIGFX_REG_SIZE, PIGFX_UPPER, rtg_mem);
   add_mapping(cfg_, MAPTYPE_RAM_NOALLOC, PIGFX_RTG_BASE + PIGFX_REG_SIZE,
-              40 * SIZE_MEGA - PIGFX_REG_SIZE, -1, (char*)rtg_mem, "rtg_mem", 0);
+              40 * SIZE_MEGA, -1, (char*)rtg_mem, "rtg_mem", 0);
   return 1;
 }
 
@@ -111,16 +133,16 @@ extern uint32_t cur_rtg_frame;
 unsigned int rtg_read(uint32_t address, uint8_t mode) {
   // printf("%s read from RTG: %.8X\n", op_type_names[mode], address);
   if (address >= PIGFX_REG_SIZE) {
-    if (rtg_mem && (address - PIGFX_REG_SIZE) < PIGFX_UPPER) {
+    if (rtg_mem && (address - PIGFX_REG_SIZE) < (40 * SIZE_MEGA)) {
       switch (mode) {
       case OP_TYPE_BYTE:
         return (rtg_mem[address - PIGFX_REG_SIZE]);
         break;
       case OP_TYPE_WORD:
-        return be16toh(*((uint16_t*)(&rtg_mem[address - PIGFX_REG_SIZE])));
+        return read_be16(&rtg_mem[address - PIGFX_REG_SIZE]);
         break;
       case OP_TYPE_LONGWORD:
-        return be32toh(*((uint32_t*)(&rtg_mem[address - PIGFX_REG_SIZE])));
+        return read_be32(&rtg_mem[address - PIGFX_REG_SIZE]);
         break;
       default:
         return 0;
@@ -182,16 +204,16 @@ void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
         printf("Write to RTG memory outside frame buffer %.8X (%.8X).\n", (address -
     PIGFX_REG_SIZE), framebuffer_addr);
     }*/
-    if (rtg_mem && (address - PIGFX_REG_SIZE) < PIGFX_UPPER) {
+    if (rtg_mem && (address - PIGFX_REG_SIZE) < (40 * SIZE_MEGA)) {
       switch (mode) {
       case OP_TYPE_BYTE:
         rtg_mem[address - PIGFX_REG_SIZE] = value;
         break;
       case OP_TYPE_WORD:
-        *((uint16_t*)(&rtg_mem[address - PIGFX_REG_SIZE])) = htobe16(value);
+        write_be16(&rtg_mem[address - PIGFX_REG_SIZE], (uint16_t)value);
         break;
       case OP_TYPE_LONGWORD:
-        *((uint32_t*)(&rtg_mem[address - PIGFX_REG_SIZE])) = htobe32(value);
+        write_be32(&rtg_mem[address - PIGFX_REG_SIZE], (uint32_t)value);
         break;
       default:
         return;

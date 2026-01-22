@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "config_file/config_file.h"
 #include <endian.h>
 
@@ -10,6 +11,17 @@
 
 uint8_t dmac_reg_idx = 0;
 uint8_t dmac_reg_values[0xFFFF];
+
+static inline uint16_t read_be16(const uint8_t* ptr) {
+  uint16_t tmp;
+  memcpy(&tmp, ptr, sizeof(tmp));
+  return be16toh(tmp);
+}
+
+static inline void write_be16(uint8_t* ptr, uint16_t value) {
+  uint16_t tmp = htobe16(value);
+  memcpy(ptr, &tmp, sizeof(tmp));
+}
 
 uint8_t cdtv_dmac_reg_idx_read(void) {
   return dmac_reg_idx;
@@ -55,7 +67,7 @@ uint32_t cdtv_dmac_read(uint32_t address, uint8_t type) {
   case OP_TYPE_BYTE:
     return dmac_reg_values[address];
   case OP_TYPE_WORD:
-    return be16toh(*((uint16_t*)&dmac_reg_values[address]));
+    return read_be16(&dmac_reg_values[address]);
   default:
     break;
   }
@@ -70,7 +82,7 @@ void cdtv_dmac_write(uint32_t address, uint32_t value, uint8_t type) {
     return;
   case OP_TYPE_WORD:
     printf("Help, it's a scary word write.\n");
-    *((uint16_t*)&dmac_reg_values[address]) = htobe16(value);
+    write_be16(&dmac_reg_values[address], (uint16_t)value);
     return;
   }
 }

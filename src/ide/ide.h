@@ -64,6 +64,7 @@ struct ide_controller {
   uint16_t data_latch;
 };
 
+//extern ide_controller idectrl;
 extern const uint8_t ide_magic[8];
 
 void ide_reset_begin(struct ide_controller *c);

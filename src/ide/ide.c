@@ -32,7 +32,7 @@
 #define IDE_CMD		1
 #define IDE_DATA_IN	2
 #define IDE_DATA_OUT	3
-  
+ 
 #define DCR_NIEN 	2
 #define DCR_SRST 	4
 

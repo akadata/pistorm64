@@ -53,6 +53,18 @@ SYNTAX: `loopcycles LOOP_CYCLES`
 Example: `loopcycles 300`  
 This command sets the number of CPU cycles the 680x0 core will attempt to execute before breaking out of the CPU emulation loop to service other emulator software things, like IRQs. Setting this value higher than the default `300` **can** increase performance in some cases where not a lot of IRQs are being triggered.
 
+# affinity
+
+SYNTAX: `affinity SPEC`  
+Example: `affinity cpu=3,ipl=2,keyboard=1,mouse=1`  
+This sets thread affinities via the `PISTORM_AFFINITY` environment variable. Supported keys are `cpu`, `ipl`, `input`, `keyboard` (or `kbd`), `mouse`, and `io` (reserved). If `keyboard`/`mouse` are not set, `input` is used as a fallback.
+
+# rtprio
+
+SYNTAX: `rtprio SPEC`  
+Example: `rtprio cpu=80,ipl=70,keyboard=90,mouse=90`  
+This sets SCHED_RR real-time priorities via the `PISTORM_RT` environment variable. Supported keys match `affinity`. These require `CAP_SYS_NICE` or a non-zero `RLIMIT_RTPRIO`.
+
 # platform
 
 SYNTAX: `platform PLATFORM_NAME {SUB_SYSTEM}`  
