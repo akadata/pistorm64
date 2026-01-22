@@ -35,8 +35,18 @@ these four paragraphs for those parts of this code that are retained.
 *----------------------------------------------------------------------------*/
 #include "mamesf.h"
 
+#ifndef __cplusplus
+#  include <stdbool.h>
+#endif
 /*----------------------------------------------------------------------------
 | Symbolic Boolean literals.
 *----------------------------------------------------------------------------*/
-#define FALSE 0
-#define TRUE 1
+
+#ifndef FALSE
+#  define FALSE false
+#endif
+
+#ifndef TRUE
+#  define TRUE  true
+#endif
+
