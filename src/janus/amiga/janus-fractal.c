@@ -124,10 +124,10 @@ int main(void) {
   volatile UWORD* status = NULL;
   int rc = 20;
 
-  UWORD width = 320;
-  UWORD height = 200;
+  UWORD width = 640;
+  UWORD height = 480;
   UWORD stride = 320;
-  UWORD max_iter = 256;
+  UWORD max_iter = 1024;
 
   LONG cx = (LONG)(-1 << 15);
   LONG cy = 0;
