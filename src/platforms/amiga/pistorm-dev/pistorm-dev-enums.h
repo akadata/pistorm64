@@ -50,6 +50,8 @@ enum pistorm_dev_cmds {
   PI_CMD_BLIT_NBPP = 0x020C, // [W] Render an N bpp bitmap of the full specified width to the target
                              // offset with optional color map.
 
+  PI_CMD_JANUS_INIT = 0x0300, // [W] Register Janus ring buffer (PTR1 base, WORD1 size, WORD2 flags)
+
   PI_CMD_QBASIC = 0x0FFC,  // QBasic
   PI_CMD_NIBBLES = 0x0FFE, // Nibbles
 

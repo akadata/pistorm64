@@ -13,6 +13,7 @@
 #include "platforms/amiga/rtg/rtg.h"
 #include "platforms/amiga/piscsi/piscsi.h"
 #include "platforms/amiga/net/pi-net.h"
+#include "janus/janus-ipc.h"
 
 #include <linux/reboot.h>
 #include <sys/reboot.h>
@@ -56,6 +57,184 @@ static uint32_t pi_dbg_val[32];
 static uint32_t pi_dbg_string[32];
 
 static uint32_t pi_cmd_result = 0, shutdown_confirm = 0xFFFFFFFF;
+static uint32_t janus_ring_ptr = 0;
+static uint16_t janus_ring_size = 0;
+static uint16_t janus_ring_flags = 0;
+
+static uint16_t read_be16(const uint8_t* ptr) {
+  return (uint16_t)((ptr[0] << 8) | ptr[1]);
+}
+
+static uint32_t read_be32(const uint8_t* ptr) {
+  return ((uint32_t)ptr[0] << 24) | ((uint32_t)ptr[1] << 16) | ((uint32_t)ptr[2] << 8) |
+         ((uint32_t)ptr[3]);
+}
+
+static void write_be16(uint8_t* ptr, uint16_t val) {
+  ptr[0] = (uint8_t)(val >> 8);
+  ptr[1] = (uint8_t)(val & 0xFF);
+}
+
+static uint16_t janus_ring_used(uint16_t write_idx, uint16_t read_idx, uint16_t ring_size) {
+  if (write_idx >= read_idx) {
+    return (uint16_t)(write_idx - read_idx);
+  }
+  return (uint16_t)(ring_size - (read_idx - write_idx));
+}
+
+static void janus_ring_read(const uint8_t* data, uint16_t ring_size, uint16_t read_idx,
+                            uint8_t* dst, uint16_t len) {
+  for (uint16_t i = 0; i < len; i++) {
+    dst[i] = data[(read_idx + i) % ring_size];
+  }
+}
+
+static void janus_write_u16(uint32_t addr, uint16_t val) {
+  uint8_t* ptr = get_mapped_data_pointer_by_address(cfg, addr);
+  if (ptr) {
+    write_be16(ptr, val);
+  } else {
+    m68k_write_memory_16(addr, val);
+  }
+}
+
+static void janus_render_fractal(uint16_t width, uint16_t height, uint16_t stride,
+                                 uint16_t max_iter, uint32_t dst_ptr, uint32_t status_ptr,
+                                 int32_t cx, int32_t cy, uint32_t scale) {
+  if (width == 0 || height == 0 || stride == 0 || max_iter == 0) {
+    return;
+  }
+
+  uint8_t* dst = get_mapped_data_pointer_by_address(cfg, dst_ptr);
+
+  for (uint16_t y = 0; y < height; y++) {
+    int32_t dy = (int32_t)((int64_t)((int32_t)y - (int32_t)(height / 2)) * (int64_t)scale);
+    for (uint16_t x = 0; x < width; x++) {
+      int32_t dx = (int32_t)((int64_t)((int32_t)x - (int32_t)(width / 2)) * (int64_t)scale);
+      int32_t cr = cx + dx;
+      int32_t ci = cy + dy;
+
+      int32_t zx = 0;
+      int32_t zy = 0;
+      uint16_t iter = 0;
+
+      while (iter < max_iter) {
+        int64_t zx2 = (int64_t)zx * (int64_t)zx;
+        int64_t zy2 = (int64_t)zy * (int64_t)zy;
+        if ((zx2 + zy2) > (4LL << 32)) {
+          break;
+        }
+        int64_t zxy = (int64_t)zx * (int64_t)zy;
+        zx = (int32_t)((zx2 - zy2) >> 16) + cr;
+        zy = (int32_t)(zxy >> 15) + ci;
+        iter++;
+      }
+
+      uint8_t color = (iter >= max_iter) ? 0 : (uint8_t)(255 - ((iter * 255) / max_iter));
+      if (dst) {
+        dst[y * stride + x] = color;
+      } else {
+        m68k_write_memory_8(dst_ptr + (y * stride + x), color);
+      }
+    }
+  }
+
+  if (status_ptr) {
+    janus_write_u16(status_ptr, 1);
+  }
+}
+
+static void janus_dump_ring(void) {
+  if (janus_ring_ptr == 0) {
+    return;
+  }
+
+  uint8_t* base = get_mapped_data_pointer_by_address(cfg, janus_ring_ptr);
+  if (!base) {
+    DEBUG("[JANUS] Ring pointer $%.8X not mapped.\n", janus_ring_ptr);
+    return;
+  }
+
+  uint16_t write_idx = read_be16(base + 0);
+  uint16_t read_idx = read_be16(base + 2);
+  uint16_t size = read_be16(base + 4);
+  uint16_t ring_size = janus_ring_size ? janus_ring_size : size;
+
+  if (ring_size == 0) {
+    DEBUG("[JANUS] Invalid ring size: %u\n", ring_size);
+    return;
+  }
+
+  uint16_t used = janus_ring_used(write_idx, read_idx, ring_size);
+
+  if (used == 0) {
+    return;
+  }
+
+  const uint8_t* data = base + 8;
+
+  while (used >= JANUS_MSG_HEADER_LEN) {
+    uint8_t header[JANUS_MSG_HEADER_LEN];
+    janus_ring_read(data, ring_size, read_idx, header, JANUS_MSG_HEADER_LEN);
+
+    uint16_t cmd = read_be16(header + JANUS_OFF_CMD);
+    uint16_t len = read_be16(header + JANUS_OFF_LEN);
+    uint16_t total = (uint16_t)(JANUS_MSG_HEADER_LEN + len);
+
+    if (len == 0 || total > ring_size) {
+      DEBUG("[JANUS] Invalid message length: %u\n", len);
+      break;
+    }
+
+    if (used < total) {
+      break;
+    }
+
+    uint8_t msg[64];
+    if (total > sizeof(msg)) {
+      DEBUG("[JANUS] Message too large: %u\n", total);
+      read_idx = (uint16_t)((read_idx + total) % ring_size);
+      used = janus_ring_used(write_idx, read_idx, ring_size);
+      continue;
+    }
+
+    janus_ring_read(data, ring_size, read_idx, msg, total);
+
+    if (cmd == JANUS_CMD_FRACTAL && len == JANUS_FRACTAL_PAYLOAD_LEN) {
+      uint16_t width = read_be16(msg + JANUS_OFF_WIDTH);
+      uint16_t height = read_be16(msg + JANUS_OFF_HEIGHT);
+      uint16_t stride = read_be16(msg + JANUS_OFF_STRIDE);
+      uint16_t max_iter = read_be16(msg + JANUS_OFF_MAX_ITER);
+      uint32_t dst_ptr = read_be32(msg + JANUS_OFF_DST_PTR);
+      uint32_t status_ptr = read_be32(msg + JANUS_OFF_STATUS_PTR);
+      int32_t cx = (int32_t)read_be32(msg + JANUS_OFF_CX);
+      int32_t cy = (int32_t)read_be32(msg + JANUS_OFF_CY);
+      uint32_t scale = read_be32(msg + JANUS_OFF_SCALE);
+
+      DEBUG("[JANUS] fractal %ux%u stride=%u iter=%u dst=$%.8X\n", width, height, stride,
+            max_iter, dst_ptr);
+
+      janus_render_fractal(width, height, stride, max_iter, dst_ptr, status_ptr, cx, cy, scale);
+    } else if (cmd == JANUS_CMD_TEXT) {
+      DEBUG("[JANUS] text: ");
+      for (uint16_t i = 0; i < len; i++) {
+        uint8_t ch = msg[JANUS_MSG_HEADER_LEN + i];
+        if (ch < 0x20 || ch > 0x7E) {
+          ch = '.';
+        }
+        DEBUG("%c", ch);
+      }
+      DEBUG("\n");
+    } else {
+      DEBUG("[JANUS] Unknown cmd=%u len=%u\n", cmd, len);
+    }
+
+    read_idx = (uint16_t)((read_idx + total) % ring_size);
+    used = janus_ring_used(write_idx, read_idx, ring_size);
+  }
+
+  write_be16(base + 2, read_idx);
+}
 
 static uint32_t parse_temp_c(const char* buf) {
   char* end = NULL;
@@ -184,6 +363,9 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
   case PI_DBG_VAL8:
     DEBUG("[PISTORM-DEV] Set DEBUG VALUE %d to %d ($%.8X)\n", (addr - PI_DBG_VAL1) / 4, val, val);
     pi_dbg_val[(addr - PI_DBG_VAL1) / 4] = val;
+    if (addr == PI_DBG_VAL1) {
+      janus_dump_ring();
+    }
     break;
   case PI_DBG_STR1:
   case PI_DBG_STR2:
@@ -617,6 +799,19 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
                         pi_word[3], pi_word[4]);
     break;
   }
+  case PI_CMD_JANUS_INIT:
+    if (pi_ptr[0] == 0 || pi_word[0] == 0) {
+      DEBUG("[PISTORM-DEV] Janus init with invalid ring params.\n");
+      pi_cmd_result = PI_RES_INVALIDVALUE;
+    } else {
+      janus_ring_ptr = pi_ptr[0];
+      janus_ring_size = (uint16_t)pi_word[0];
+      janus_ring_flags = (uint16_t)pi_word[1];
+      DEBUG("[PISTORM-DEV] Janus ring init: base $%.8X size %u flags %u\n", janus_ring_ptr,
+            janus_ring_size, janus_ring_flags);
+      pi_cmd_result = PI_RES_OK;
+    }
+    break;
 
   case PI_CMD_NETSTATUS:
     DEBUG("[PISTORM-DEV] Write to NETSTATUS: %d\n", val);
