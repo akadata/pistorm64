@@ -11,6 +11,8 @@
 #include "rominfo.h"
 
 #define M68K_CPU_TYPES M68K_CPU_TYPE_SCC68070
+#define PI_AFFINITY_ENV "PISTORM_AFFINITY"
+#define PI_RT_ENV "PISTORM_RT"
 
 const char* cpu_types[M68K_CPU_TYPES] = {
     "68000", "68010",   "68EC020", "68020", "68EC030",
@@ -22,8 +24,9 @@ const char* map_type_names[MAPTYPE_NUM] = {
 };
 
 const char* config_item_names[CONFITEM_NUM] = {
-    "NONE",  "cpu",      "map",      "loopcycles", "jit",    "jitfpu",
-    "mouse", "keyboard", "platform", "setvar",     "kbfile",
+    "NONE",     "cpu",      "map",      "loopcycles", "jit",    "jitfpu",
+    "mouse",    "keyboard", "platform", "setvar",     "kbfile", "affinity",
+    "rtprio",
 };
 
 const char* mapcmd_names[MAPCMD_NUM] = {
@@ -32,6 +35,10 @@ const char* mapcmd_names[MAPCMD_NUM] = {
 };
 
 int get_config_item_type(char* cmd) {
+  if (strcasecmp(cmd, "rt-prio") == 0) {
+    return CONFITEM_RTPRIO;
+  }
+
   for (int i = 0; i < CONFITEM_NUM; i++) {
     if (strcasecmp(cmd, config_item_names[i]) == 0) {
       return i;
@@ -84,39 +91,49 @@ unsigned int get_int(char* str) {
   if (strlen(str) == 0)
     return -1;
 
-  int ret_int = 0;
+  unsigned int ret_int = 0;
 
-  if (strlen(str) > 2 && str[0] == '0' && str[1] == 'x') {
+  if (strlen(str) > 2 && str[0] == '0' && (str[1] == 'x' || str[1] == 'X')) {
     for (int i = 2; i < (int)strlen(str); i++) {
-      if (str[i] >= '0' && str[i] <= '9') {
-        ret_int = (str[i] - '0') | (ret_int << 4);
+      char c = str[i];
+      if (c >= '0' && c <= '9') {
+        ret_int = (unsigned int)(c - '0') | (ret_int << 4);
       } else {
-        switch (str[i]) {
+        switch (c) {
         case 'A':
+        case 'a':
           ret_int = 0xA | (ret_int << 4);
           break;
         case 'B':
+        case 'b':
           ret_int = 0xB | (ret_int << 4);
           break;
         case 'C':
+        case 'c':
           ret_int = 0xC | (ret_int << 4);
           break;
         case 'D':
+        case 'd':
           ret_int = 0xD | (ret_int << 4);
           break;
         case 'E':
+        case 'e':
           ret_int = 0xE | (ret_int << 4);
           break;
         case 'F':
+        case 'f':
           ret_int = 0xF | (ret_int << 4);
           break;
         case 'K':
+        case 'k':
           ret_int = ret_int * SIZE_KILO;
           break;
         case 'M':
+        case 'm':
           ret_int = ret_int * SIZE_MEGA;
           break;
         case 'G':
+        case 'g':
           ret_int = ret_int * SIZE_GIGA;
           break;
         default:
@@ -127,12 +144,13 @@ unsigned int get_int(char* str) {
     }
     return ret_int;
   } else {
-    ret_int = atoi(str);
-    if (str[strlen(str) - 1] == 'K')
+    ret_int = (unsigned int)strtoul(str, NULL, 10);
+    char last = str[strlen(str) - 1];
+    if (last == 'K' || last == 'k')
       ret_int = ret_int * SIZE_KILO;
-    else if (str[strlen(str) - 1] == 'M')
+    else if (last == 'M' || last == 'm')
       ret_int = ret_int * SIZE_MEGA;
-    else if (str[strlen(str) - 1] == 'G')
+    else if (last == 'G' || last == 'g')
       ret_int = ret_int * SIZE_GIGA;
 
     return ret_int;
@@ -325,6 +343,24 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
     cfg->keyboard_file = (char*)calloc(1, strlen(cur_cmd) + 1);
     strcpy(cfg->keyboard_file, cur_cmd);
     printf("[CFG] Set keyboard event source file to %s.\n", cfg->keyboard_file);
+    break;
+  case CONFITEM_AFFINITY:
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] affinity command requires a value.\n");
+      break;
+    }
+    setenv(PI_AFFINITY_ENV, cur_cmd, 1);
+    printf("[CFG] Set thread affinity: %s.\n", cur_cmd);
+    break;
+  case CONFITEM_RTPRIO:
+    get_next_string(parse_line, cur_cmd, &str_pos, ' ');
+    if (!strlen(cur_cmd)) {
+      printf("[CFG] rtprio command requires a value.\n");
+      break;
+    }
+    setenv(PI_RT_ENV, cur_cmd, 1);
+    printf("[CFG] Set RT priorities: %s.\n", cur_cmd);
     break;
   case CONFITEM_PLATFORM: {
     char platform_name[128], platform_sub[128];

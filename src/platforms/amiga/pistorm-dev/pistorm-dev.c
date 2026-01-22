@@ -18,8 +18,6 @@
 #include <sys/reboot.h>
 #include <endian.h>
 
-#include <interface/vmcs_host/vc_vchi_gencmd.h>
-
 #define DEBUG_PISTORM_DEVICE
 
 #ifdef DEBUG_PISTORM_DEVICE
@@ -59,35 +57,45 @@ static uint32_t pi_dbg_string[32];
 
 static uint32_t pi_cmd_result = 0, shutdown_confirm = 0xFFFFFFFF;
 
-static bool pi_cmd_init = false;
-static VCHI_INSTANCE_T vchi_instance;
-static VCHI_CONNECTION_T* vchi_connection = NULL;
+static uint32_t parse_temp_c(const char* buf) {
+  char* end = NULL;
+  long val = strtol(buf, &end, 10);
+  if (end == buf) {
+    return 0;
+  }
+  if (val > 1000) {
+    val /= 1000;
+  }
+  if (val < 0) {
+    return 0;
+  }
+  return (uint32_t)val;
+}
 
 static uint32_t grab_pi_temperature() {
-  if (!pi_cmd_init) {
-    vcos_init();
-    if (vchi_initialise(&vchi_instance) != 0) {
-      DEBUG("VCHI initialization failed\n");
-      return 0;
-    }
-    if (vchi_connect(NULL, 0, vchi_instance) != 0) {
-      DEBUG("VCHI connection failed\n");
-      return 0;
-    }
-    vc_vchi_gencmd_init(vchi_instance, &vchi_connection, 1);
-    pi_cmd_init = true;
-  }
-  if (vc_gencmd(tmp_string, sizeof(tmp_string), "measure_temp") != 0) {
-    DEBUG("Could not get temperature from VCHI\n");
-    return 0;
-  }
+  static const char* base_paths[] = {
+      "/sys/class/thermal/thermal_zone%d/temp",
+      "/sys/devices/virtual/thermal/thermal_zone%d/temp",
+  };
+  char path[128];
+  char buf[64];
 
-  // Trim to '='
-  char* ptr = strchr(tmp_string, '=');
-  if (!ptr) {
-    return 0;
+  for (size_t p = 0; p < (sizeof(base_paths) / sizeof(base_paths[0])); p++) {
+    for (int i = 0; i < 8; i++) {
+      snprintf(path, sizeof(path), base_paths[p], i);
+      FILE* f = fopen(path, "r");
+      if (!f) {
+        continue;
+      }
+      if (fgets(buf, sizeof(buf), f)) {
+        fclose(f);
+        return parse_temp_c(buf);
+      }
+      fclose(f);
+    }
   }
-  return atoi(ptr + 1);
+  DEBUG("Could not read temperature from sysfs\n");
+  return 0;
 }
 
 int32_t grab_amiga_string(uint32_t addr, uint8_t* dest, uint32_t str_max_len) {
@@ -642,7 +650,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     case PISCSI_CTRL_ENABLE:
       DEBUG("ENABLE\n");
       if (!piscsi_enabled) {
-        piscsi_init(cfg);
+        piscsi_init();
         piscsi_enabled = 1;
         piscsi_refresh_drives();
         pi_cmd_result = PI_RES_OK;

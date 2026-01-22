@@ -54,7 +54,7 @@ endif
 # ARCH_FEATURES : optional AArch64 feature modifiers (e.g. +crc+simd+fp16+lse).
 # CPUFLAGS   : per-platform tuning defaults below; override if needed.
 # RAYLIB_*   : raylib include/lib paths; adjust for custom builds.
-# USE_VC     : set to 0 to drop /opt/vc includes and Pi host support (vc_vchi_gencmd.h).
+# USE_VC     : legacy (no longer required for pistorm-dev).
 # USE_LTO    : set to 1 to enable link-time optimisation (-flto) on build and link.
 # USE_NO_PLT : set to 1 to pass -fno-plt for direct calls (glibc-specific; default off).
 # OMIT_FP    : set to 1 to omit frame pointers (-fomit-frame-pointer) for perf.
@@ -171,17 +171,12 @@ LDLIBS_ALSA := -lasound
 endif
 
 
-ifeq ($(USE_VC),0)
-MAINFILES := $(filter-out src/platforms/amiga/pistorm-dev/pistorm-dev.c,$(MAINFILES))
-MAINFILES += src/platforms/amiga/pistorm-dev/pistorm-dev-stub.c
+# PiStorm-dev now uses sysfs and no longer depends on /opt/vc.
+MAINFILES := $(filter-out src/platforms/amiga/pistorm-dev/pistorm-dev-stub.c,$(MAINFILES))
+MAINFILES += src/platforms/amiga/pistorm-dev/pistorm-dev.c
 VC_INC    :=
 VC_LIBDIR :=
 LDLIBS_VC :=
-else
-VC_INC    := -I/opt/vc/include/
-VC_LIBDIR := -L/opt/vc/lib
-LDLIBS_VC := -lvcos -lvchiq_arm -lvchostif
-endif
 
 ifeq ($(USE_PMMU),1)
 DEFINES += -DPISTORM_EXPERIMENT_PMMU
@@ -191,7 +186,7 @@ ifeq ($(USE_EC_FPU),1)
 DEFINES += -DPISTORM_ENABLE_020_FPU -DPISTORM_ENABLE_EC040_FPU
 endif
 
-MUSASHIFILES     = src/musashi/m68kcpu.c src/musashi/m68kdasm.c src/softfloat/softfloat.c src/softfloat/softfloat_fpsp.c
+MUSASHIFILES     = src/musashi/m68kcpu.c src/musashi/m68kdasm.c src/musashi/softfloat/softfloat.c src/musashi/softfloat/softfloat_fpsp.c
 MUSASHIGENCFILES = src/musashi/m68kops.c
 MUSASHIGENHFILES = src/musashi/m68kops.h
 MUSASHIGENERATOR = m68kmake

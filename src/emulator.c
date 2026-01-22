@@ -110,8 +110,8 @@ int gayleirq;
 #define CORE_INPUT 2
 #define CORE_IPL 2
 
-#define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1, io=2, input=3, ipl=0"
-#define PI_RT_ENV "PISTORM_RT"             // e.g. "cpu=60, io=40, input=80, ipl=70"
+#define PI_AFFINITY_ENV "PISTORM_AFFINITY" // e.g. "cpu=1, ipl=2, input=3, keyboard=3, mouse=3"
+#define PI_RT_ENV "PISTORM_RT"             // e.g. "cpu=60, ipl=40, input=80, keyboard=90"
 
 #define PISTORM64_NAME "KERNEL PiStorm64"
 #define PISTORM64_TAGLINE "JANUS BUS ENGINE"
@@ -586,8 +586,8 @@ void* keyboard_task(void *arg) {
        ungrab_message[] = "[KBD] Ungrabbing keyboard";
 
   printf("[KBD] Keyboard thread started\n");
-  apply_affinity_from_env("input", CORE_INPUT);
-  apply_realtime_from_env("input", RT_DEFAULT_INPUT);
+  apply_affinity_from_env("keyboard", CORE_INPUT);
+  apply_realtime_from_env("keyboard", RT_DEFAULT_INPUT);
 
   // because we permit the keyboard to be grabbed on startup, quickly check if we need to grab it
   if (kb_hook_enabled && cfg->keyboard_grab) {
@@ -714,8 +714,8 @@ void* mouse_task(void *arg) {
   int mpollrc;
 
   printf("[MOUSE] Mouse thread started\n");
-  apply_affinity_from_env("input", CORE_INPUT);
-  apply_realtime_from_env("input", RT_DEFAULT_INPUT);
+  apply_affinity_from_env("mouse", CORE_INPUT);
+  apply_realtime_from_env("mouse", RT_DEFAULT_INPUT);
 
   mpoll[0].fd = mouse_fd;
   mpoll[0].events = POLLIN;
@@ -806,6 +806,18 @@ int main(int argc, char* argv[]) {
       }
       if (log_set_file(path) != 0) {
         printf("Failed to open log file %s.\n", path);
+      }
+    } else if (strcmp(argv[g], "--affinity") == 0) {
+      if (g + 1 >= argc) {
+        printf("%s switch found, but no affinity spec provided.\n", argv[g]);
+      } else {
+        cli_add_line("affinity %s", argv[++g]);
+      }
+    } else if (strcmp(argv[g], "--rtprio") == 0 || strcmp(argv[g], "--rt-prio") == 0) {
+      if (g + 1 >= argc) {
+        printf("%s switch found, but no RT priority spec provided.\n", argv[g]);
+      } else {
+        cli_add_line("rtprio %s", argv[++g]);
       }
     } else if (strcmp(argv[g], "--log-level") == 0 || strcmp(argv[g], "-l") == 0) {
       if (g + 1 >= argc) {
@@ -1649,6 +1661,20 @@ static void set_affinity_for(const char* name, int core_id) {
   }
 }
 
+static int role_has_input_fallback(const char* role) {
+  return (strcmp(role, "keyboard") == 0 || strcmp(role, "mouse") == 0);
+}
+
+static int key_matches_role(const char* role, const char* key) {
+  if (strcasecmp(key, role) == 0) {
+    return 1;
+  }
+  if (strcmp(role, "keyboard") == 0 && strcasecmp(key, "kbd") == 0) {
+    return 1;
+  }
+  return 0;
+}
+
 static int realtime_allowed(void) {
   if (geteuid() == 0) {
     return 1;
@@ -1664,6 +1690,8 @@ static int realtime_allowed(void) {
 
 static void apply_affinity_from_env(const char* role, int default_core) {
   int target = default_core;
+  int fallback = -1;
+  int matched = 0;
   const char* env = getenv(PI_AFFINITY_ENV);
   if (env && strlen(env)) {
     // parse simple comma list key=val
@@ -1673,18 +1701,20 @@ static void apply_affinity_from_env(const char* role, int default_core) {
       char key[16];
       int val = -1;
       if (sscanf(tok, "%15[^=]=%d", key, &val) == 2) {
-        if (strcasecmp(key, "cpu") == 0 && strcmp(role, "cpu") == 0)
+        if (key_matches_role(role, key)) {
           target = val;
-        if (strcasecmp(key, "io") == 0 && strcmp(role, "io") == 0)
-          target = val;
-        if (strcasecmp(key, "input") == 0 && strcmp(role, "input") == 0)
-          target = val;
-        if (strcasecmp(key, "ipl") == 0 && strcmp(role, "ipl") == 0)
-          target = val;
+          matched = 1;
+        }
+        if (!matched && role_has_input_fallback(role) && strcasecmp(key, "input") == 0) {
+          fallback = val;
+        }
       }
       tok = strtok(NULL, ", ");
     }
     free(dup);
+  }
+  if (!matched && fallback >= 0) {
+    target = fallback;
   }
   set_affinity_for(role, target);
 }
@@ -1715,6 +1745,8 @@ static void apply_realtime_from_env(const char* role, int default_prio) {
   static int rt_warned;
   int allowed = realtime_allowed();
   int target = default_prio;
+  int fallback = -1;
+  int matched = 0;
   const char* env = getenv(PI_RT_ENV);
   if (env && strlen(env)) {
     char* dup = strdup(env);
@@ -1723,18 +1755,20 @@ static void apply_realtime_from_env(const char* role, int default_prio) {
       char key[16];
       int val = -1;
       if (sscanf(tok, "%15[^=]=%d", key, &val) == 2) {
-        if (strcasecmp(key, "cpu") == 0 && strcmp(role, "cpu") == 0)
+        if (key_matches_role(role, key)) {
           target = val;
-        if (strcasecmp(key, "io") == 0 && strcmp(role, "io") == 0)
-          target = val;
-        if (strcasecmp(key, "input") == 0 && strcmp(role, "input") == 0)
-          target = val;
-        if (strcasecmp(key, "ipl") == 0 && strcmp(role, "ipl") == 0)
-          target = val;
+          matched = 1;
+        }
+        if (!matched && role_has_input_fallback(role) && strcasecmp(key, "input") == 0) {
+          fallback = val;
+        }
       }
       tok = strtok(NULL, ", ");
     }
     free(dup);
+    if (!matched && fallback >= 0) {
+      target = fallback;
+    }
   } else if (!allowed) {
     return;
   }
@@ -1821,7 +1855,55 @@ static int cli_collect_tokens(int argc, char* argv[], int* index, char* out, siz
 }
 
 static void print_about(const char* prog) {
-  printf("%s - %s\n", PISTORM64_NAME, PISTORM64_TAGLINE);
+  printf("KERNEL PiStorm64 - JANUS BUS ENGINE\n");
+  printf("-----------------------------------\n");
+  printf("KERNEL PiStorm64 is a fork of the PiStorm emulator stack, turning a Raspberry Pi\n");
+  printf("into a Janus-style bus engine for classic Amiga machines.\n");
+  printf("\n");
+  printf("Focus areas:\n");
+  printf("- Clean, hardened memory mapping for Z2/Z3 and CPU-local Fast RAM\n");
+  printf("- RTG (PiGFX / Picasso96) using Pi-side VRAM\n");
+  printf("- LibRemote networking, PiSCSI-backed storage, and co-processor services\n");
+  printf("- Deterministic timing, CPU affinity, and RT priorities on the Pi\n");
+  printf("\n");
+  printf("Upstream and component credits:\n");
+  printf("- PiStorm original project and Amiga platform work:\n");
+  printf("  captain-amygdala and contributors\n");
+  printf("- CPU emulation:\n");
+  printf("  \"Musashi\" 680x0 core by Karl Stenerud\n");
+  printf("- Floating-point emulation:\n");
+  printf("  SoftFloat by John R. Hauser (via MAME-derived milieu)\n");
+  printf("- Storage and SCSI emulation:\n");
+  printf("  PiSCSI / Dayna / SCSI code and contributors\n");
+  printf("- A314 / Amiga-Pi bridge and CPLD foundations:\n");
+  printf("  A314 designed and developed by Niklas Ekstrom,\n");
+  printf("  whose work also underpins the CPLD logic used in PiStorm-class hardware\n");
+  printf("- RTG / PiGFX:\n");
+  printf("  Picasso96 authors and PiGFX-related contributors in the PiStorm tree\n");
+  printf("\n");
+  printf("This fork adds:\n");
+  printf("- A clearer src/platforms layout for Amiga-focused work\n");
+  printf("- A CLI front end for config, threading, and JIT control\n");
+  printf("- Tightened types, memory ranges, and autoconf handling for large Z3 maps\n");
+  printf("- Experiments with Pi-side co-processor style services (JANUS bus engine)\n");
+  printf("\n");
+  printf("Project goals:\n");
+  printf("- Treat the Pi as a disciplined hardware companion, not just a blunt accelerator\n");
+  printf("- Make Fast RAM, RTG, and Pi-side services feel \"native\" to the Amiga\n");
+  printf("- Keep behaviour reproducible and tunable for both benchmarking and real use\n");
+  printf("\n");
+  printf("Tooling and assistance:\n");
+  printf("- Built with GCC/Clang, Make, vim, perf, bustest, and assorted diagnostic tools\n");
+  printf("- Heavy use of AI code assistants (Qwen / Codex / GPT-style),\n");
+  printf("  acting as \"compiler + IDE + static analyser + rubber duck... with a mouth.\"\n");
+  printf("- All architecture decisions, hardware behaviour assumptions, and final code\n");
+  printf("  are curated, reviewed, and tested by the human maintainers.\n");
+  printf("\n");
+  printf("Legal:\n");
+  printf("- Copyright (c) 2026 AKADATA LIMITED - Kernel PiStorm64 (pistorm.ko portions)\n");
+  printf("- All trademarks are property of their respective owners.\n");
+  printf("- This software is provided under the terms of its source license; see LICENSE.\n");
+  printf("\n");
   printf("Usage: %s [options]\n", prog);
 }
 
@@ -1833,6 +1915,8 @@ static void print_help(const char* prog) {
   printf("  -a, --about                Show about info and exit\n");
   printf("  --log [file]               Write log output to file (default: amiga.log)\n");
   printf("  -l, --log-level <level>    Set log level (error|warn|info|debug)\n");
+  printf("  --affinity <spec>          Thread affinity (e.g., cpu=3,ipl=2,keyboard=1,mouse=1)\n");
+  printf("  --rtprio <spec>            RT priorities (SCHED_RR, e.g., cpu=80,ipl=70,keyboard=90)\n");
   printf("\n");
   printf("Config (.cfg equivalents):\n");
   printf("  -c, --config <file>        Load config file\n");
@@ -1852,4 +1936,8 @@ static void print_help(const char* prog) {
   printf("\n");
   printf("Notes:\n");
   printf("  - For complex setvar or multi-arg values, use a .cfg file.\n");
+  printf("  - You can also set %s and %s environment variables for the same specs.\n",
+         PI_AFFINITY_ENV, PI_RT_ENV);
+  printf("  - input=... acts as a fallback for keyboard/mouse if those are not set.\n");
+  printf("  - RT priorities require CAP_SYS_NICE or a non-zero RLIMIT_RTPRIO.\n");
 }

@@ -28,6 +28,28 @@
 #define DEBUG(...)
 #endif
 
+static inline uint16_t read_be16(const uint8_t* ptr) {
+  uint16_t tmp;
+  memcpy(&tmp, ptr, sizeof(tmp));
+  return be16toh(tmp);
+}
+
+static inline uint32_t read_be32(const uint8_t* ptr) {
+  uint32_t tmp;
+  memcpy(&tmp, ptr, sizeof(tmp));
+  return be32toh(tmp);
+}
+
+static inline void write_be16(uint8_t* ptr, uint16_t value) {
+  uint16_t tmp = htobe16(value);
+  memcpy(ptr, &tmp, sizeof(tmp));
+}
+
+static inline void write_be32(uint8_t* ptr, uint32_t value) {
+  uint32_t tmp = htobe32(value);
+  memcpy(ptr, &tmp, sizeof(tmp));
+}
+
 #define IDE_DUMMY
 
 #ifdef IDE_DUMMY
@@ -278,7 +300,8 @@ void writeGayle(unsigned int address, unsigned int value) {
       if (cdtv_mode) {
         // printf("[CDTV] WORD write to SRAM @%.8X (%.8X): %.4X\n", (address & CLOCKMASK) - 0x8000,
         // address, htobe16(value));
-        ((short*)((size_t)(cdtv_sram + (address & CLOCKMASK) - 0x8000)))[0] = htobe16(value);
+        uint8_t* ptr = cdtv_sram + (address & CLOCKMASK) - 0x8000;
+        write_be16(ptr, (uint16_t)value);
       }
       return;
     }
@@ -297,7 +320,8 @@ void writeGayleL(unsigned int address, unsigned int value) {
       if (cdtv_mode) {
         // printf("[CDTV] LONGWORD write to SRAM @%.8X (%.8X): %.8X\n", (address & CLOCKMASK) -
         // 0x8000, address, htobe32(value));
-        ((int*)(size_t)(cdtv_sram + (address & CLOCKMASK) - 0x8000))[0] = htobe32(value);
+        uint8_t* ptr = cdtv_sram + (address & CLOCKMASK) - 0x8000;
+        write_be32(ptr, (uint32_t)value);
       }
       return;
     }
@@ -447,7 +471,8 @@ uint16_t readGayle(unsigned int address) {
         // printf("[CDTV] WORD read from SRAM @%.8X (%.8X): %.4X\n", (address & CLOCKMASK) - 0x8000,
         // address, be16toh( (( unsigned short *) (size_t)(cdtv_sram + (address & CLOCKMASK) -
         // 0x8000))[0]));
-        return be16toh(((unsigned short*)(size_t)(cdtv_sram + (address & CLOCKMASK) - 0x8000))[0]);
+        const uint8_t* ptr = cdtv_sram + (address & CLOCKMASK) - 0x8000;
+        return read_be16(ptr);
       }
       return 0;
     }
@@ -466,7 +491,8 @@ uint32_t readGayleL(unsigned int address) {
         // printf("[CDTV] LONGWORD read from SRAM @%.8X (%.8X): %.8X\n", (address & CLOCKMASK) -
         // 0x8000, address, be32toh( (( unsigned short *) (size_t)(cdtv_sram + (address & CLOCKMASK)
         // - 0x8000))[0]));
-        return be32toh(((unsigned int*)(size_t)(cdtv_sram + (address & CLOCKMASK) - 0x8000))[0]);
+        const uint8_t* ptr = cdtv_sram + (address & CLOCKMASK) - 0x8000;
+        return read_be32(ptr);
       }
       return 0;
     }

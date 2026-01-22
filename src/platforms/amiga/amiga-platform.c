@@ -34,14 +34,14 @@
 int handle_register_read_amiga(unsigned int addr, unsigned char type, unsigned int* val);
 int handle_register_write_amiga(unsigned int addr, unsigned int value, unsigned char type);
 
-extern int ac_z2_current_pic;
+extern uint32_t ac_z2_current_pic;
 extern int ac_z2_done;
-extern int ac_z2_pic_count;
+extern uint32_t ac_z2_pic_count;
 extern int ac_z2_type[AC_PIC_LIMIT];
 extern int ac_z2_index[AC_PIC_LIMIT];
 
-extern int ac_z3_current_pic;
-extern int ac_z3_pic_count;
+extern uint32_t ac_z3_current_pic;
+extern uint32_t ac_z3_pic_count;
 extern int ac_z3_done;
 extern int ac_z3_type[AC_PIC_LIMIT];
 extern int ac_z3_index[AC_PIC_LIMIT];
