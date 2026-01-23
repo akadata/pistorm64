@@ -1,0 +1,531 @@
+smalley@pi4:~/pistorm64 $ sysctl -w kernel.core_pattern='|/usr/lib/systemd/systemd-coredump %P %u %g %s %t %e' 2>/dev/null || true
+smalley@pi4:~/pistorm64 $ ./emulator --log debug.log --log-level debug[SELFTEST] alignment OK (cpu + fpr) | alignof(cpu)=16 offsetof(fpr)=192 sizeof(cpu)=2336
+[ps_protocol] backend=kmod (/dev/pistorm)
+[CFG] No config file specified. Trying to load default.cfg...
+[CFG] Set CPU type to 68030.
+[CFG] ROM identified: Kickstart 3.1 (40.68) 512KB
+[MUSASHI] Mapped read range 1: 00F80000-01000000 (0x7f89baf010)
+[CFG] [MAP 0] Added rom mapping for range 00F80000-00FFFFFF ID: kickstart
+[CFG] Allocating 268435456 bytes for RAM mapping (256 MB)...
+[CFG] [MAP 1] Added ram mapping for range 50000000-5FFFFFFF ID: z3_autoconf_fast
+[CFG] Allocating 8388608 bytes for RAM mapping (8 MB)...
+[CFG] [MAP 2] Added ram mapping for range 00200000-009FFFFF ID: z2_autoconf_fast
+[CFG] [MAP 3] Added register mapping for range 00DC0000-00DCFFFF ID: None
+[CFG] Set CPU loop cycles to 1800.
+[CFG] Set thread affinity: cpu=3,ipl=2,keyboard=1,mouse=1.
+[CFG] Set RT priorities: cpu=80,ipl=70,keyboard=90,mouse=90.
+[CFG] Setting platform to amiga
+[CFG] Creating platform config for amiga...
+[MUSASHI] Mapped read range 2: 70010000-72810000 (0x7f76bac010)
+[MUSASHI] Mapped write range 1: 70010000-72810000 (0x7f76bac010)
+[CFG] Adding 41943040 byte (40 MB) RAM mapping rtg_mem...
+[CFG] [MAP 4] Added ram_noalloc mapping for range 70010000-7280FFFF ID: rtg_mem
+[INFO] [AMIGA] RTG Enabled.
+[INFO] [AMIGA] Platform custom range: 70000000-72810000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[PISCSI] Loaded Boot ROM.
+[INFO] [AMIGA] Platform custom range: 00E80000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[PISCSI] Map 0: [../Amiga/hdf/KernelPiStormBench.hdf] - 16139354112 bytes.
+[PISCSI] CHS: 31272 16 63
+Finding partitions.
+[PISCSI] Partition 0: PDH0 (4)
+[PISCSI] Partition 1: PDH1 (4)
+Finding file systems.
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 0...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ../Amiga/hdf/KernelPiStormBench.hdf
+[PISCSI-SELFTEST] Testing DH0 partition accessibility...
+[PISCSI-SELFTEST] INFO: No DOS boot block signature in DH0 (signature: 0x50415254)
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 0 (../Amiga/hdf/KernelPiStormBench.hdf)
+[PISCSI] Map 6: [./src/platforms/amiga/pistorm.hdf] - 2621440 bytes.
+[PISCSI] CHS: 160 1 32
+Finding partitions.
+[PISCSI] Partition 0: DH99 (4)
+Finding file systems.
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 6...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ./src/platforms/amiga/pistorm.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 6 (./src/platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[A314] Set A314 config filename to ./src/a314/files_pi/a314d.conf.
+[INFO] [AMIGA] A314 emulation enabled.
+[CFG] IPL NOP count: 48
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 8MB of Z2 Fast RAM configured at $200000
+[INFO] [AMIGA] 256MB of Z3 Fast RAM configured at $50000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+Failed to open keyboard event source.
+No IDE drives mounted, disabling Gayle IDE component.
+Setting CPU type to 6.
+[PISCSI] Partition 0: PDH0 (4)
+[PISCSI] Partition 1: PDH1 (4)
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[PISCSI] Partition 0: DH99 (4)
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[IPL] Thread running
+[IPL] Thread created successfully
+Amiga Reset is up...
+[AFF] ipl pinned to core 2
+[PRIO] ipl set to SCHED_RR priority 70
+[MAIN] Keyboard thread created successfully
+[AFF] input pinned to core 2
+[MAIN] CPU thread created successfully
+[AFF] cpu pinned to core 3
+[KBD] Keyboard thread started
+[AFF] keyboard pinned to core 1
+[PRIO] keyboard set to SCHED_RR priority 90
+[AFF] cpu pinned to core 3
+[PRIO] cpu set to SCHED_RR priority 80
+OVL:0
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[MUSASHI] Mapped read range 3: 00200000-00A00000 (0x7f793ad010)
+[MUSASHI] Mapped write range 2: 00200000-00A00000 (0x7f793ad010)
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00A00000, Size: 8 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[MUSASHI] Mapped read range 4: 40000000-50000000 (0x7f79bae010)
+[MUSASHI] Mapped write range 3: 40000000-50000000 (0x7f79bae010)
+[INFO] [AMIGA] Platform custom range: 00E90000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[PISCSI] Partition 0: PDH0 (4)
+[PISCSI] Partition 1: PDH1 (4)
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[PISCSI] Partition 0: DH99 (4)
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+OVL:0
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00A00000, Size: 8 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00E90000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[INFO] Pixel format switch from: 4BPP PLANAR (0) to 32BPP RGB (BGRA) (10)
+[INFO] RTG Thread created successfully
+[INFO] RTG display enabled.
+[INFO] [RTG] Thread running
+INFO: Initializing raylib 5.5
+INFO: Platform backend: NATIVE DRM
+INFO: Supported raylib modules:
+INFO:     > rcore:..... loaded (mandatory)
+INFO:     > rlgl:...... loaded (mandatory)
+INFO:     > rshapes:... loaded (optional)
+INFO:     > rtextures:. loaded (optional)
+INFO:     > rtext:..... loaded (optional)
+INFO:     > rmodels:... loaded (optional)
+INFO:     > raudio:.... loaded (optional)
+INFO: DISPLAY: No graphic card set, trying platform-gpu-card
+INFO: DISPLAY: Failed to open platform-gpu-card, trying card1
+INFO: DISPLAY: Failed to open graphic card1, trying card0
+INFO: DISPLAY: Selected DRM connector mode 1280x720 (1280x720p@60)
+INFO: DISPLAY: Device initialized successfully
+INFO:     > Display size: 1280 x 720
+INFO:     > Screen size:  1280 x 720
+INFO:     > Render size:  1280 x 720
+INFO:     > Viewport offsets: 0, 0
+WARNING: GetCurrentMonitor() not implemented on target platform
+WARNING: GetCurrentMonitor() not implemented on target platform
+WARNING: SetWindowPosition() not available on target platform
+INFO: GL: Supported extensions count: 119
+INFO: GL: OpenGL device information:
+INFO:     > Vendor:   Broadcom
+INFO:     > Renderer: V3D 4.2.14.0
+INFO:     > Version:  OpenGL ES 3.1 Mesa 25.0.7-2+rpt3
+INFO:     > GLSL:     OpenGL ES GLSL ES 3.10
+INFO: GL: VAO extension detected, VAO functions loaded successfully
+INFO: GL: NPOT textures extension detected, full NPOT textures supported
+INFO: GL: DXT compressed textures supported
+INFO: GL: ETC1 compressed textures supported
+WARNING: DRM: Failed to change keyboard mode, an SSH keyboard is probably used
+INFO: PLATFORM: DRM: Initialized successfully
+INFO: TEXTURE: [ID 1] Texture loaded successfully (1x1 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 1] Default texture loaded successfully
+INFO: SHADER: [ID 1] Vertex shader compiled successfully
+INFO: SHADER: [ID 2] Fragment shader compiled successfully
+INFO: SHADER: [ID 3] Program shader loaded successfully
+INFO: SHADER: [ID 3] Default shader loaded successfully
+INFO: RLGL: Render batch vertex buffers loaded successfully in RAM (CPU)
+INFO: RLGL: Render batch vertex buffers loaded successfully in VRAM (GPU)
+INFO: RLGL: Default OpenGL state initialized successfully
+INFO: TEXTURE: [ID 2] Texture loaded successfully (128x128 | GRAY_ALPHA | 1 mipmaps)
+INFO: FONT: Default font loaded successfully (224 glyphs)
+INFO: SYSTEM: Working Directory: /home/smalley/pistorm64
+INFO: TIMER: Target time per frame: 16.667 milliseconds
+INFO: FILEIO: [src/platforms/amiga/rtg/clut.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 5] Program shader loaded successfully
+INFO: FILEIO: [src/platforms/amiga/rtg/bgraswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 6] Program shader loaded successfully
+INFO: FILEIO: [src/platforms/amiga/rtg/argbswizzle.shader] Text file loaded successfully
+INFO: SHADER: [ID 4] Fragment shader compiled successfully
+INFO: SHADER: [ID 7] Program shader loaded successfully
+INFO: TEXTURE: [ID 3] Texture loaded successfully (256x1 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 4] Texture loaded successfully (256x256 | R8G8B8A8 | 1 mipmaps)
+[INFO] Creating 1024x512 raylib window...
+[DEBUG] Setting up raylib framebuffer image.
+[DEBUG] [RTG/RAYLIB] FB init: 1024x512 pitch=4096 bpp=4 addr=0x00001000
+INFO: TEXTURE: [ID 5] Texture loaded successfully (1024x512 | R8G8B8A8 | 1 mipmaps)
+[DEBUG] Loaded framebuffer texture.
+[DEBUG] [W > SW]
+[DEBUG] Adjusted height from 512 to[DEBUG] 640.
+[DEBUG] Adjusted width from 1024 to[DEBUG] 1280.
+[DEBUG] [RTG/RAYLIB] Scale mode=2 src=1024x512 dst=1280.0x640.0 origin=0.0,-40.0
+[DEBUG] rtg_scale_output complete.
+[DEBUG] [RTG/RAYLIB] FB addr update: 0x00001000
+[DEBUG] [RTG/RAYLIB] Frame 0 start: addr=0x00001000 mem=0x7f76bac010 1024x512 pitch=4096 bpp=4 tex_id=5
+[DEBUG] [RTG/RAYLIB] Frame 0 end
+[DEBUG] [RTG/RAYLIB] Frame 1 start: addr=0x00001000 mem=0x7f76bac010 1024x512 pitch=4096 bpp=4 tex_id=5
+[DEBUG] [RTG/RAYLIB] Frame 1 end
+[DEBUG] [RTG/RAYLIB] Frame 2 start: addr=0x00001000 mem=0x7f76bac010 1024x512 pitch=4096 bpp=4 tex_id=5
+[DEBUG] [RTG/RAYLIB] Frame 2 end
+Segmentation fault (core dumped)
+smalley@pi4:~/pistorm64 $ coredumpctl list | head
+TIME                          PID  UID  GID SIG     COREFILE EXE                              SIZE
+Fri 2026-01-23 04:19:14 GMT 22533 1000 1000 SIGSEGV present  /home/smalley/pistorm64/emulator 3.7M
+smalley@pi4:~/pistorm64 $ coredumpctl info emulator
+PID: 22533 (emulator)
+UID: 1000 (smalley)
+GID: 1000 (smalley)
+Signal: 11 (SEGV)
+Timestamp: Fri 2026-01-23 04:19:11 GMT (26s ago)
+Command Line: ./emulator --log debug.log --log-level debug
+Executable: /home/smalley/pistorm64/emulator
+Control Group: /user.slice/user-1000.slice/session-3.scope
+Unit: session-3.scope
+Slice: user-1000.slice
+Session: 3
+Owner UID: 1000 (smalley)
+Boot ID: 8ba46c816e3547c0b5175d4c0c95e113
+Machine ID: f305332979654a8eb2b9d73fb597b453
+Hostname: pi4
+Storage: /var/lib/systemd/coredump/core.emulator.1000.8ba46c816e3547c0b5175d4c0c95e113.22533.1769141951000000.zs>
+Size on Disk: 3.7M
+Message: Process 22533 (emulator) of user 1000 dumped core.
+
+Module libzstd.so.1 from deb libzstd-1.5.7+dfsg-1.arm64
+Module libgcc_s.so.1 from deb gcc-14-14.2.0-19.arm64
+Module libstdc++.so.6 from deb gcc-14-14.2.0-19.arm64
+Stack trace of thread 22537:
+#0  0x0000007f89eb3150 n/a (libc.so.6 + 0xa3150)
+#1  0x000000556e6d68c4 rtg_blitrect_nomask_complete (/home/smalley/pistorm64/emulator + 0xa68c4)
+#2  0x000000556e6d182c rtg_write (/home/smalley/pistorm64/emulator + 0xa182c)
+#3  0x000000556e676474 m68k_op_move_16_ai_i (/home/smalley/pistorm64/emulator + 0x46474)
+#4  0x000000556e6c5e00 cpu_task (/home/smalley/pistorm64/emulator + 0x95e00)
+#5  0x0000007f89e95f78 n/a (libc.so.6 + 0x85f78)
+#6  0x0000007f89efde8c n/a (libc.so.6 + 0xede8c)
+
+Stack trace of thread 22535:
+#0  0x0000007f8a5b2348 n/a (ld-linux-aarch64.so.1 + 0x3c348)
+#1  0x0000007f89ece144 clock_gettime (libc.so.6 + 0xbe144)
+
+Stack trace of thread 22536:
+#0  0x0000007f89e9efa8 n/a (libc.so.6 + 0x8efa8)
+#1  0x0000007f89e92658 n/a (libc.so.6 + 0x82658)
+#2  0x0000007f89e9269c n/a (libc.so.6 + 0x8269c)
+#3  0x0000007f89ef35e0 __poll (libc.so.6 + 0xe35e0)
+#4  0x000000556e6c0918 keyboard_task (/home/smalley/pistorm64/emulator + 0x90918)
+#5  0x0000007f89e95f78 n/a (libc.so.6 + 0x85f78)
+#6  0x0000007f89efde8c n/a (libc.so.6 + 0xede8c)
+
+Stack trace of thread 22534:
+#0  0x0000007f89e9efac n/a (libc.so.6 + 0x8efac)
+#1  0x0000007f89e92658 n/a (libc.so.6 + 0x82658)
+#2  0x0000007f89e9269c n/a (libc.so.6 + 0x8269c)
+#3  0x0000007f89efe144 epoll_pwait (libc.so.6 + 0xee144)
+#4  0x000000556e72393c _ZL12thread_startPv (/home/smalley/pistorm64/emulator + 0xf393c)
+#5  0x0000007f89e95f78 n/a (libc.so.6 + 0x85f78)
+#6  0x0000007f89efde8c n/a (libc.so.6 + 0xede8c)
+
+Stack trace of thread 22539:
+#0  0x0000007f89e9efa8 n/a (libc.so.6 + 0x8efa8)
+#1  0x0000007f89e92658 n/a (libc.so.6 + 0x82658)
+#2  0x0000007f89e929f0 n/a (libc.so.6 + 0x829f0)
+#3  0x0000007f89e953ec pthread_cond_wait (libc.so.6 + 0x853ec)
+#4  0x0000007f6626de70 n/a (libgallium-25.0.7-2+rpt3.so + 0x5ade70)
+#5  0x0000007f662487f0 n/a (libgallium-25.0.7-2+rpt3.so + 0x5887f0)
+#6  0x0000007f6626dd00 n/a (libgallium-25.0.7-2+rpt3.so + 0x5add00)
+#7  0x0000007f89e95f78 n/a (libc.so.6 + 0x85f78)
+#8  0x0000007f89efde8c n/a (libc.so.6 + 0xede8c)
+
+Stack trace of thread 22538:
+#0  0x0000007f89ef95cc ioctl (libc.so.6 + 0xe95cc)
+#1  0x0000007f8a4a7490 drmIoctl (libdrm.so.2 + 0x7490)
+#2  0x0000007f66e6e52c n/a (libgallium-25.0.7-2+rpt3.so + 0x11ae52c)
+#3  0x0000007f66e6e870 n/a (libgallium-25.0.7-2+rpt3.so + 0x11ae870)
+#4  0x0000007f66e76e18 n/a (libgallium-25.0.7-2+rpt3.so + 0x11b6e18)
+#5  0x0000007f66bbf2b0 n/a (libgallium-25.0.7-2+rpt3.so + 0xeff2b0)
+#6  0x000000556e726100 rlDrawRenderBatch (/home/smalley/pistorm64/emulator + 0xf6100)
+#7  0x000000556e738198 EndDrawing (/home/smalley/pistorm64/emulator + 0x108198)
+#8  0x000000556e6d3d1c rtgThread (/home/smalley/pistorm64/emulator + 0xa3d1c)
+#9  0x0000007f89e95f78 n/a (libc.so.6 + 0x85f78)
+#10 0x0000007f89efde8c n/a (libc.so.6 + 0xede8c)
+
+Stack trace of thread 22533:
+#0  0x0000007f89e9efa8 n/a (libc.so.6 + 0x8efa8)
+#1  0x0000007f89e92658 n/a (libc.so.6 + 0x82658)
+#2  0x0000007f89e929f0 n/a (libc.so.6 + 0x829f0)
+#3  0x0000007f89e97af4 n/a (libc.so.6 + 0x87af4)
+#4  0x000000556e648cc0 main (/home/smalley/pistorm64/emulator + 0x18cc0)
+#5  0x0000007f89e3229c n/a (libc.so.6 + 0x2229c)
+#6  0x0000007f89e3237c __libc_start_main (libc.so.6 + 0x2237c)
+#7  0x000000556e649930 _start (/home/smalley/pistorm64/emulator + 0x19930)
+ELF object binary architecture: AARCH64
+smalley@pi4:~/pistorm64 $ coredumpctl gdb emulator
+PID: 22533 (emulator)
+UID: 1000 (smalley)
+GID: 1000 (smalley)
+Signal: 11 (SEGV)
+Timestamp: Fri 2026-01-23 04:19:11 GMT (37s ago)
+Command Line: ./emulator --log debug.log --log-level debug
+Executable: /home/smalley/pistorm64/emulator
+Control Group: /user.slice/user-1000.slice/session-3.scope
+Unit: session-3.scope
+Slice: user-1000.slice
+Session: 3
+Owner UID: 1000 (smalley)
+Boot ID: 8ba46c816e3547c0b5175d4c0c95e113
+Machine ID: f305332979654a8eb2b9d73fb597b453
+Hostname: pi4
+Storage: /var/lib/systemd/coredump/core.emulator.1000.8ba46c816e3547c0b5175d4c0c95e113.22533.1769141951000000.zst(present)
+Size on Disk: 3.7M
+Message: Process 22533 (emulator) of user 1000 dumped core.
+
+Module libzstd.so.1 from deb libzstd-1.5.7+dfsg-1.arm64
+Module libgcc_s.so.1 from deb gcc-14-14.2.0-19.arm64
+Module libstdc++.so.6 from deb gcc-14-14.2.0-19.arm64
+Stack trace of thread 22537:
+#0  0x0000007f89eb3150 n/a (libc.so.6 + 0xa3150)
+#1  0x000000556e6d68c4 rtg_blitrect_nomask_complete (/home/smalley/pistorm64/emulator + 0xa68c4)
+#2  0x000000556e6d182c rtg_write (/home/smalley/pistorm64/emulator + 0xa182c)
+#3  0x000000556e676474 m68k_op_move_16_ai_i (/home/smalley/pistorm64/emulator + 0x46474)
+#4  0x000000556e6c5e00 cpu_task (/home/smalley/pistorm64/emulator + 0x95e00)
+#5  0x0000007f89e95f78 n/a (libc.so.6 + 0x85f78)
+#6  0x0000007f89efde8c n/a (libc.so.6 + 0xede8c)
+
+Stack trace of thread 22535:
+#0  0x0000007f8a5b2348 n/a (ld-linux-aarch64.so.1 + 0x3c348)
+#1  0x0000007f89ece144 clock_gettime (libc.so.6 + 0xbe144)
+
+Stack trace of thread 22536:
+#0  0x0000007f89e9efa8 n/a (libc.so.6 + 0x8efa8)
+#1  0x0000007f89e92658 n/a (libc.so.6 + 0x82658)
+#2  0x0000007f89e9269c n/a (libc.so.6 + 0x8269c)
+#3  0x0000007f89ef35e0 __poll (libc.so.6 + 0xe35e0)
+#4  0x000000556e6c0918 keyboard_task (/home/smalley/pistorm64/emulator + 0x90918)
+#5  0x0000007f89e95f78 n/a (libc.so.6 + 0x85f78)
+#6  0x0000007f89efde8c n/a (libc.so.6 + 0xede8c)
+
+Stack trace of thread 22534:
+#0  0x0000007f89e9efac n/a (libc.so.6 + 0x8efac)
+#1  0x0000007f89e92658 n/a (libc.so.6 + 0x82658)
+#2  0x0000007f89e9269c n/a (libc.so.6 + 0x8269c)
+#3  0x0000007f89efe144 epoll_pwait (libc.so.6 + 0xee144)
+#4  0x000000556e72393c _ZL12thread_startPv (/home/smalley/pistorm64/emulator + 0xf393c)
+#5  0x0000007f89e95f78 n/a (libc.so.6 + 0x85f78)
+#6  0x0000007f89efde8c n/a (libc.so.6 + 0xede8c)
+
+Stack trace of thread 22539:
+#0  0x0000007f89e9efa8 n/a (libc.so.6 + 0x8efa8)
+#1  0x0000007f89e92658 n/a (libc.so.6 + 0x82658)
+#2  0x0000007f89e929f0 n/a (libc.so.6 + 0x829f0)
+#3  0x0000007f89e953ec pthread_cond_wait (libc.so.6 + 0x853ec)
+#4  0x0000007f6626de70 n/a (libgallium-25.0.7-2+rpt3.so + 0x5ade70)
+#5  0x0000007f662487f0 n/a (libgallium-25.0.7-2+rpt3.so + 0x5887f0)
+#6  0x0000007f6626dd00 n/a (libgallium-25.0.7-2+rpt3.so + 0x5add00)
+#7  0x0000007f89e95f78 n/a (libc.so.6 + 0x85f78)
+#8  0x0000007f89efde8c n/a (libc.so.6 + 0xede8c)
+
+Stack trace of thread 22538:
+#0  0x0000007f89ef95cc ioctl (libc.so.6 + 0xe95cc)
+#1  0x0000007f8a4a7490 drmIoctl (libdrm.so.2 + 0x7490)
+#2  0x0000007f66e6e52c n/a (libgallium-25.0.7-2+rpt3.so + 0x11ae52c)
+#3  0x0000007f66e6e870 n/a (libgallium-25.0.7-2+rpt3.so + 0x11ae870)
+#4  0x0000007f66e76e18 n/a (libgallium-25.0.7-2+rpt3.so + 0x11b6e18)
+#5  0x0000007f66bbf2b0 n/a (libgallium-25.0.7-2+rpt3.so + 0xeff2b0)
+#6  0x000000556e726100 rlDrawRenderBatch (/home/smalley/pistorm64/emulator + 0xf6100)
+#7  0x000000556e738198 EndDrawing (/home/smalley/pistorm64/emulator + 0x108198)
+#8  0x000000556e6d3d1c rtgThread (/home/smalley/pistorm64/emulator + 0xa3d1c)
+#9  0x0000007f89e95f78 n/a (libc.so.6 + 0x85f78)
+#10 0x0000007f89efde8c n/a (libc.so.6 + 0xede8c)
+
+Stack trace of thread 22533:
+#0  0x0000007f89e9efa8 n/a (libc.so.6 + 0x8efa8)
+#1  0x0000007f89e92658 n/a (libc.so.6 + 0x82658)
+#2  0x0000007f89e929f0 n/a (libc.so.6 + 0x829f0)
+#3  0x0000007f89e97af4 n/a (libc.so.6 + 0x87af4)
+#4  0x000000556e648cc0 main (/home/smalley/pistorm64/emulator + 0x18cc0)
+#5  0x0000007f89e3229c n/a (libc.so.6 + 0x2229c)
+#6  0x0000007f89e3237c __libc_start_main (libc.so.6 + 0x2237c)
+#7  0x000000556e649930 _start (/home/smalley/pistorm64/emulator + 0x19930)
+ELF object binary architecture: AARCH64
+
+GNU gdb (Debian 16.3-1) 16.3
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "aarch64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from /home/smalley/pistorm64/emulator...
+(No debugging symbols found in /home/smalley/pistorm64/emulator)
+[New LWP 22537]
+[New LWP 22535]
+[New LWP 22536]
+[New LWP 22534]
+[New LWP 22539]
+[New LWP 22538]
+[New LWP 22533]
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1".
+Core was generated by `./emulator --log debug.log --log-level debug'.
+Program terminated with signal SIGSEGV, Segmentation fault.
+#0  0x0000007f89eb3150 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+[Current thread is 1 (Thread 0x7f7537a160 (LWP 22537))]
+(gdb)  set pagination off
+(gdb) thread apply all bt full
+
+Thread 7 (Thread 0x7f8a5a3020 (LWP 22533)):
+#0  0x0000007f89e9efa8 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#1  0x0000007f89e92658 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#2  0x0000007f89e929f0 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#3  0x0000007f89e97af4 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#4  0x000000556e648cc0 in main ()
+No symbol table info available.
+
+Thread 6 (Thread 0x7f74b6a160 (LWP 22538)):
+#0  0x0000007f89ef95cc in ioctl () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#1  0x0000007f8a4a7490 in drmIoctl () from /lib/aarch64-linux-gnu/libdrm.so.2
+No symbol table info available.
+#2  0x0000007f66e6e52c in ?? () from /lib/aarch64-linux-gnu/libgallium-25.0.7-2+rpt3.so
+No symbol table info available.
+#3  0x0000007f66e6e870 in ?? () from /lib/aarch64-linux-gnu/libgallium-25.0.7-2+rpt3.so
+No symbol table info available.
+#4  0x0000007f66e76e18 in ?? () from /lib/aarch64-linux-gnu/libgallium-25.0.7-2+rpt3.so
+No symbol table info available.
+#5  0x0000007f66bbf2b0 in ?? () from /lib/aarch64-linux-gnu/libgallium-25.0.7-2+rpt3.so
+No symbol table info available.
+#6  0x000000556e726100 in rlDrawRenderBatch ()
+No symbol table info available.
+#7  0x000000556e738198 in EndDrawing ()
+No symbol table info available.
+#8  0x000000556e6d3d1c in rtgThread ()
+No symbol table info available.
+#9  0x0000007f89e95f78 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#10 0x0000007f89efde8c in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+
+Thread 5 (Thread 0x7f5c73d160 (LWP 22539)):
+#0  0x0000007f89e9efa8 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#1  0x0000007f89e92658 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#2  0x0000007f89e929f0 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#3  0x0000007f89e953ec in pthread_cond_wait () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#4  0x0000007f6626de70 in ?? () from /lib/aarch64-linux-gnu/libgallium-25.0.7-2+rpt3.so
+No symbol table info available.
+#5  0x0000007f662487f0 in ?? () from /lib/aarch64-linux-gnu/libgallium-25.0.7-2+rpt3.so
+No symbol table info available.
+#6  0x0000007f6626dd00 in ?? () from /lib/aarch64-linux-gnu/libgallium-25.0.7-2+rpt3.so
+No symbol table info available.
+#7  0x0000007f89e95f78 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#8  0x0000007f89efde8c in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+
+Thread 4 (Thread 0x7f76baa160 (LWP 22534)):
+#0  0x0000007f89e9efac in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#1  0x0000007f89e92658 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#2  0x0000007f89e9269c in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#3  0x0000007f89efe144 in epoll_pwait () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#4  0x000000556e72393c in thread_start(void*) ()
+No symbol table info available.
+#5  0x0000007f89e95f78 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#6  0x0000007f89efde8c in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+
+Thread 3 (Thread 0x7f75b8a160 (LWP 22536)):
+#0  0x0000007f89e9efa8 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#1  0x0000007f89e92658 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#2  0x0000007f89e9269c in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#3  0x0000007f89ef35e0 in poll () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#4  0x000000556e6c0918 in keyboard_task ()
+No symbol table info available.
+#5  0x0000007f89e95f78 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#6  0x0000007f89efde8c in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+
+Thread 2 (Thread 0x7f7639a160 (LWP 22535)):
+#0  0x0000007f8a5b2348 in __kernel_clock_gettime ()
+No symbol table info available.
+#1  0x0000007f89ece144 in clock_gettime () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#2  0x000000556e6bfa1c in ipl_task ()
+No symbol table info available.
+#3  0x0000007f89e95f78 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#4  0x0000007f89efde8c in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+
+Thread 1 (Thread 0x7f7537a160 (LWP 22537)):
+#0  0x0000007f89eb3150 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#1  0x000000556e6d68c4 in rtg_blitrect_nomask_complete ()
+No symbol table info available.
+#2  0x000000556e6d182c in rtg_write ()
+No symbol table info available.
+#3  0x000000556e676474 in m68k_op_move_16_ai_i ()
+No symbol table info available.
+#4  0x000000556e6c5e00 in cpu_task ()
+No symbol table info available.
+#5  0x0000007f89e95f78 in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+#6  0x0000007f89efde8c in ?? () from /lib/aarch64-linux-gnu/libc.so.6
+No symbol table info available.
+(gdb) quit
+smalley@pi4:~/pistorm64 $
