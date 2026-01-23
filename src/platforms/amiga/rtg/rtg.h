@@ -38,7 +38,7 @@ void rtg_set_clut_cursor(uint8_t* bmp, uint32_t* pal, int16_t offs_x, int16_t of
 uint16_t rtg_get_scale_filter(void);
 void rtg_palette_debug(uint8_t enable);
 
-int init_rtg_data(struct emulator_config *cfg);
+int init_rtg_data(struct emulator_config* cfg);
 void shutdown_rtg(void);
 
 void rtg_fillrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color, uint16_t pitch,
@@ -87,7 +87,9 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
   tmpl_x ^= 0x01;
 
 #define PATTERN_LOOPY                                                                              \
-  sptr += 2;                                                                                       \
+  if (sptr) {                                                                                      \
+    sptr += 2;                                                                                     \
+  }                                                                                                \
   src_addr += 2;                                                                                   \
   if ((ys + offset_y + 1) % loop_rows == 0) {                                                      \
     if (sptr)                                                                                      \

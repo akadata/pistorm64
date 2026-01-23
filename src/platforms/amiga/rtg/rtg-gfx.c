@@ -19,6 +19,7 @@ extern uint8_t* rtg_mem; // FIXME
 extern uint16_t rtg_user[8];
 extern uint16_t rtg_x[8], rtg_y[8];
 extern uint16_t rtg_format;
+extern uint16_t rtg_display_format;
 
 extern uint32_t framebuffer_addr;
 extern uint32_t framebuffer_addr_adj;
@@ -58,7 +59,8 @@ static int rtg_check_bounds(size_t base, size_t span, const char* tag, uint16_t 
 }
 
 static int rtg_get_ptr_checked(uint32_t base_adj, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
-                               uint16_t pitch, uint16_t format, const char* tag, uint8_t** out_ptr) {
+                               uint16_t pitch, uint16_t format, const char* tag,
+                               uint8_t** out_ptr) {
   if (format >= RTGFMT_NUM) {
     if (rtg_oob_log_count < 20) {
       LOG_WARN("[RTG/OOB] %s invalid format: %u\n", tag, format);
@@ -71,8 +73,8 @@ static int rtg_get_ptr_checked(uint32_t base_adj, uint16_t x, uint16_t y, uint16
   size_t span = 0;
   if (!rtg_calc_span(x_bytes, w, h, pitch, bpp, &span)) {
     if (rtg_oob_log_count < 20) {
-      LOG_WARN("[RTG/OOB] %s invalid span: x=%u y=%u w=%u h=%u pitch=%u fmt=%u\n", tag, x, y, w,
-               h, pitch, format);
+      LOG_WARN("[RTG/OOB] %s invalid span: x=%u y=%u w=%u h=%u pitch=%u fmt=%u\n", tag, x, y, w, h,
+               pitch, format);
       rtg_oob_log_count++;
     }
     return 0;
@@ -213,13 +215,56 @@ void rtg_blitrect(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, 
   }
 
   for (int ys = 0; ys < h; ys++) {
-    if (xdir) {
-      for (int xs = 0; xs < w; xs++) {
-        SET_RTG_PIXEL_MASK(&dptr[xs], sptr[xs], format);
+    if (format == RTGFMT_8BIT_CLUT) {
+      if (xdir) {
+        for (int xs = 0; xs < w; xs++) {
+          SET_RTG_PIXEL_MASK(&dptr[xs], sptr[xs], format);
+        }
+      } else {
+        for (int xs = (int)w - 1; xs >= 0; xs--) {
+          SET_RTG_PIXEL_MASK(&dptr[xs], sptr[xs], format);
+        }
       }
     } else {
-      for (int xs = (int)w - 1; xs >= 0; xs--) {
-        SET_RTG_PIXEL_MASK(&dptr[xs], sptr[xs], format);
+      size_t bpp = rtg_pixel_size[format];
+      if (xdir) {
+        for (int xs = 0; xs < w; xs++) {
+          switch (format) {
+          case RTGFMT_RGB565_LE:
+          case RTGFMT_RGB565_BE:
+          case RTGFMT_BGR565_LE:
+          case RTGFMT_RGB555_LE:
+          case RTGFMT_RGB555_BE:
+          case RTGFMT_BGR555_LE:
+            SET_RTG_PIXEL_MASK(&dptr[xs * bpp], ((uint16_t*)sptr)[xs], format);
+            break;
+          case RTGFMT_RGB32_ABGR:
+          case RTGFMT_RGB32_ARGB:
+          case RTGFMT_RGB32_BGRA:
+          case RTGFMT_RGB32_RGBA:
+            SET_RTG_PIXEL_MASK(&dptr[xs * bpp], ((uint32_t*)sptr)[xs], format);
+            break;
+          }
+        }
+      } else {
+        for (int xs = (int)w - 1; xs >= 0; xs--) {
+          switch (format) {
+          case RTGFMT_RGB565_LE:
+          case RTGFMT_RGB565_BE:
+          case RTGFMT_BGR565_LE:
+          case RTGFMT_RGB555_LE:
+          case RTGFMT_RGB555_BE:
+          case RTGFMT_BGR555_LE:
+            SET_RTG_PIXEL_MASK(&dptr[xs * bpp], ((uint16_t*)sptr)[xs], format);
+            break;
+          case RTGFMT_RGB32_ABGR:
+          case RTGFMT_RGB32_ARGB:
+          case RTGFMT_RGB32_BGRA:
+          case RTGFMT_RGB32_RGBA:
+            SET_RTG_PIXEL_MASK(&dptr[xs * bpp], ((uint32_t*)sptr)[xs], format);
+            break;
+          }
+        }
       }
     }
     sptr += pitchstep;
@@ -384,8 +429,10 @@ extern struct emulator_config* cfg;
 void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t src_addr,
                       uint32_t fgcol, uint32_t bgcol, uint16_t pitch, uint16_t t_pitch,
                       uint16_t format, uint16_t offset_x, uint8_t mask, uint8_t draw_mode) {
+  // P96 uses template blits for window decorations (gadgets/scrollbars/titlebar text/masks).
   uint8_t* dptr = NULL;
-  if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, w, h, pitch, format, "blittemplate", &dptr)) {
+  if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, w, h, pitch, format, "blittemplate",
+                           &dptr)) {
     return;
   }
   uint8_t* sptr = NULL;
@@ -399,11 +446,14 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
   cur_bit = base_bit = (0x80 >> (offset_x % 8));
 
   if (realtime_graphics_debug) {
+    size_t bpp = (format < RTGFMT_NUM) ? rtg_pixel_size[format] : 0;
     LOG_DEBUG("DEBUG: BlitTemplate - %d, %d (%dx%d)\n", x, y, w, h);
     LOG_DEBUG("Src: %.8X\n", src_addr);
     LOG_DEBUG("Dest: %.8X (%.8X)\n", rtg_address[1], rtg_address_adj[1]);
     LOG_DEBUG("pitch: %d t_pitch: %d format: %d\n", pitch, t_pitch, format);
     LOG_DEBUG("offset_x: %d mask: %.2X draw_mode: %d\n", offset_x, mask, draw_mode);
+    LOG_DEBUG("bpp: %zu display_format: %u fb_adj: %.8X\n", bpp, rtg_display_format,
+              framebuffer_addr_adj);
   }
 
   uint32_t fg_color = htobe32(fgcol);
@@ -426,6 +476,17 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
     break;
   default:
     break;
+  }
+
+  if (realtime_graphics_debug) {
+    size_t bpp = (format < RTGFMT_NUM) ? rtg_pixel_size[format] : 0;
+    LOG_DEBUG("DEBUG: BlitTemplate - %d, %d (%dx%d)\n", x, y, w, h);
+    LOG_DEBUG("Src: %.8X\n", src_addr);
+    LOG_DEBUG("Dest: %.8X (%.8X)\n", rtg_address[1], rtg_address_adj[1]);
+    LOG_DEBUG("pitch: %d t_pitch: %d format: %d\n", pitch, t_pitch, format);
+    LOG_DEBUG("offset_x: %d mask: %.2X draw_mode: %d\n", offset_x, mask, draw_mode);
+    LOG_DEBUG("bpp: %zu display_format: %u fb_adj: %.8X\n", bpp, rtg_display_format,
+              framebuffer_addr_adj);
   }
 
   sptr = get_mapped_data_pointer_by_address(cfg, src_addr);
@@ -535,9 +596,24 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
   if (mask) {
   }
 
+#ifdef RTG_STUB_PATTERN
+  uint32_t fill = (draw_mode == DRAWMODE_JAM2) ? bgcol : fgcol;
+  rtg_fillrect_solid(x, y, w, h, fill, pitch, format);
+  return;
+#endif
+
+  // P96 uses pattern blits for window decoration fills and requesters.
   uint8_t* dptr = NULL;
-  if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, w, h, pitch, format, "blitpattern", &dptr)) {
+  if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, w, h, pitch, format, "blitpattern",
+                           &dptr)) {
     return;
+  }
+  if (loop_rows == 0) {
+    if (rtg_oob_log_count < 20) {
+      LOG_WARN("[RTG/OOB] blitpattern invalid loop_rows=0\n");
+      rtg_oob_log_count++;
+    }
+    loop_rows = 1;
   }
   uint8_t *sptr = NULL, *sptr_base = NULL;
   uint8_t cur_bit = 0, base_bit = 0, cur_byte = 0;
@@ -571,6 +647,18 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
     break;
   default:
     break;
+  }
+
+  if (realtime_graphics_debug) {
+    size_t bpp = (format < RTGFMT_NUM) ? rtg_pixel_size[format] : 0;
+    LOG_DEBUG("DEBUG: BlitPattern - %d, %d (%dx%d)\n", x, y, w, h);
+    LOG_DEBUG("Src: %.8X\n", src_addr);
+    LOG_DEBUG("Dest: %.8X (%.8X)\n", rtg_address[1], rtg_address_adj[1]);
+    LOG_DEBUG("pitch: %d format: %d\n", pitch, format);
+    LOG_DEBUG("offset_x: %d offset_y: %d mask: %.2X draw_mode: %d loop_rows: %u\n", offset_x,
+              offset_y, mask, draw_mode, loop_rows);
+    LOG_DEBUG("bpp: %zu display_format: %u fb_adj: %.8X\n", bpp, rtg_display_format,
+              framebuffer_addr_adj);
   }
 
   sptr = get_mapped_data_pointer_by_address(cfg, src_addr);
@@ -918,8 +1006,8 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
     }
     return;
   }
-  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)dx, (uint16_t)dy, (uint16_t)w,
-                           (uint16_t)h, pitch, rtg_format, "p2c_ex_dst", &dptr)) {
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)dx, (uint16_t)dy, (uint16_t)w, (uint16_t)h,
+                           pitch, rtg_format, "p2c_ex_dst", &dptr)) {
     return;
   }
   uint8_t draw_mode = minterm;
@@ -1022,8 +1110,8 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
     }
     return;
   }
-  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)dx, (uint16_t)dy, (uint16_t)w,
-                           (uint16_t)h, pitch, rtg_format, "p2c_dst", &dptr)) {
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)dx, (uint16_t)dy, (uint16_t)w, (uint16_t)h,
+                           pitch, rtg_format, "p2c_dst", &dptr)) {
     return;
   }
 
@@ -1104,8 +1192,8 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
     }
     return;
   }
-  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)dx, (uint16_t)dy, (uint16_t)w,
-                           (uint16_t)h, pitch, rtg_format, "p2d_dst", &dptr)) {
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)dx, (uint16_t)dy, (uint16_t)w, (uint16_t)h,
+                           pitch, rtg_format, "p2d_dst", &dptr)) {
     return;
   }
 
