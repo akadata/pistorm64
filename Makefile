@@ -247,6 +247,12 @@ CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
 else ifeq ($(PLATFORM),ZEROW2_64)
 CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
 else ifeq ($(PLATFORM),NATIVE) 
+VC_INC    :=
+VC_LIBDIR :=
+LDLIBS_VC :=
+RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_INC := -I$(RAYLIB_DIR)/src
+RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 CPUFLAGS = -march=native
 endif
 
