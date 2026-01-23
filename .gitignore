@@ -51,3 +51,4 @@ dumpdisk
 # build logs
 clang.log
 gcc.log
+core.*
