@@ -1,15 +1,13 @@
 /*******************************************************************************************
 *
-*   raylib [core] example - input gestures
-*
-*   Example complexity rating: [★★☆☆] 2/4
+*   raylib [core] example - Input Gestures Detection
 *
 *   Example originally created with raylib 1.4, last time updated with raylib 4.2
 *
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2016-2025 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2016-2024 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -118,6 +116,4 @@ int main(void)
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
-
-    return 0;
 }

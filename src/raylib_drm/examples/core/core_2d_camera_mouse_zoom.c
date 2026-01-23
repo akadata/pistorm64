@@ -2,16 +2,12 @@
 *
 *   raylib [core] example - 2d camera mouse zoom
 *
-*   Example complexity rating: [★★☆☆] 2/4
-*
 *   Example originally created with raylib 4.2, last time updated with raylib 4.2
-*
-*   Example contributed by Jeffery Myers (@JeffM2501) and reviewed by Ramon Santamaria (@raysan5)
 *
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2022-2025 Jeffery Myers (@JeffM2501)
+*   Copyright (c) 2022-2024 Jeffery Myers (@JeffM2501)
 *
 ********************************************************************************************/
 
@@ -23,7 +19,7 @@
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
-int main(void)
+int main ()
 {
     // Initialization
     //--------------------------------------------------------------------------------------
@@ -35,9 +31,9 @@ int main(void)
     Camera2D camera = { 0 };
     camera.zoom = 1.0f;
 
-    int zoomMode = 0;       // 0-Mouse Wheel, 1-Mouse Move
+    int zoomMode = 0;   // 0-Mouse Wheel, 1-Mouse Move
 
-    SetTargetFPS(60);       // Set our game to run at 60 frames-per-second
+    SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -47,7 +43,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         if (IsKeyPressed(KEY_ONE)) zoomMode = 0;
         else if (IsKeyPressed(KEY_TWO)) zoomMode = 1;
-
+        
         // Translate based on mouse right click
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
@@ -68,14 +64,14 @@ int main(void)
                 // Set the offset to where the mouse is
                 camera.offset = GetMousePosition();
 
-                // Set the target to match, so that the camera maps the world space point
+                // Set the target to match, so that the camera maps the world space point 
                 // under the cursor to the screen space point under the cursor at any zoom
                 camera.target = mouseWorldPos;
 
                 // Zoom increment
-                // Uses log scaling to provide consistent zoom speed
-                float scale = 0.2f*wheel;
-                camera.zoom = Clamp(expf(logf(camera.zoom)+scale), 0.125f, 64.0f);
+                float scaleFactor = 1.0f + (0.25f*fabsf(wheel));
+                if (wheel < 0) scaleFactor = 1.0f/scaleFactor;
+                camera.zoom = Clamp(camera.zoom*scaleFactor, 0.125f, 64.0f);
             }
         }
         else
@@ -89,18 +85,17 @@ int main(void)
                 // Set the offset to where the mouse is
                 camera.offset = GetMousePosition();
 
-                // Set the target to match, so that the camera maps the world space point
+                // Set the target to match, so that the camera maps the world space point 
                 // under the cursor to the screen space point under the cursor at any zoom
                 camera.target = mouseWorldPos;
             }
-
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
             {
                 // Zoom increment
-                // Uses log scaling to provide consistent zoom speed
                 float deltaX = GetMouseDelta().x;
-                float scale = 0.005f*deltaX;
-                camera.zoom = Clamp(expf(logf(camera.zoom)+scale), 0.125f, 64.0f);
+                float scaleFactor = 1.0f + (0.01f*fabsf(deltaX));
+                if (deltaX < 0) scaleFactor = 1.0f/scaleFactor;
+                camera.zoom = Clamp(camera.zoom*scaleFactor, 0.125f, 64.0f);
             }
         }
         //----------------------------------------------------------------------------------
@@ -111,7 +106,8 @@ int main(void)
             ClearBackground(RAYWHITE);
 
             BeginMode2D(camera);
-                // Draw the 3d grid, rotated 90 degrees and centered around 0,0
+
+                // Draw the 3d grid, rotated 90 degrees and centered around 0,0 
                 // just so we have something in the XY plane
                 rlPushMatrix();
                     rlTranslatef(0, 25*50, 0);
@@ -121,18 +117,19 @@ int main(void)
 
                 // Draw a reference circle
                 DrawCircle(GetScreenWidth()/2, GetScreenHeight()/2, 50, MAROON);
+                
             EndMode2D();
-
+            
             // Draw mouse reference
             //Vector2 mousePos = GetWorldToScreen2D(GetMousePosition(), camera)
             DrawCircleV(GetMousePosition(), 4, DARKGRAY);
-            DrawTextEx(GetFontDefault(), TextFormat("[%i, %i]", GetMouseX(), GetMouseY()),
+            DrawTextEx(GetFontDefault(), TextFormat("[%i, %i]", GetMouseX(), GetMouseY()), 
                 Vector2Add(GetMousePosition(), (Vector2){ -44, -24 }), 20, 2, BLACK);
 
             DrawText("[1][2] Select mouse zoom mode (Wheel or Move)", 20, 20, 20, DARKGRAY);
             if (zoomMode == 0) DrawText("Mouse left button drag to move, mouse wheel to zoom", 20, 50, 20, DARKGRAY);
             else DrawText("Mouse left button drag to move, mouse press and move to zoom", 20, 50, 20, DARKGRAY);
-
+        
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
@@ -141,6 +138,5 @@ int main(void)
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
-
     return 0;
 }

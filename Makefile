@@ -99,8 +99,12 @@ M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 
 # Raylib paths can be swapped if you use a custom build.
-RAYLIB_INC    ?= -I./src/raylib_drm #raylib
-RAYLIB_LIBDIR ?= -L./src/raylib_drm #raylib_drm
+#RAYLIB_INC    ?= -I./src/raylib_drm #raylib
+#RAYLIB_LIBDIR ?= -L./src/raylib_drm #raylib_drm
+
+RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_INC := -I$(RAYLIB_DIR)/src
+RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 
 PREFIX        ?= /opt/pistorm64
 DESTDIR       ?=
@@ -217,18 +221,21 @@ PIPE_FLAGS= $(if $(filter 1,$(USE_PIPE)),-pipe,)
 # Platform-specific tuning and raylib variants.
 ifeq ($(PLATFORM),PI4)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc -mfpu=neon-fp-armv8 -mfloat-abi=hard
-RAYLIB_INC    = -I./src/raylib_drm
-RAYLIB_LIBDIR = -L./src/raylib_drm
+RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_INC := -I$(RAYLIB_DIR)/src
+RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
 else ifeq ($(PLATFORM),PI4_64BIT)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
-RAYLIB_INC    = -I./src/raylib_drm
-RAYLIB_LIBDIR = -L./src/raylib_drm
+RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_INC := -I$(RAYLIB_DIR)/src
+RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
 else ifeq ($(PLATFORM),PI4_64BIT_DEBUG)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
-RAYLIB_INC    = -I./src/raylib_drm
-RAYLIB_LIBDIR = -L./src/raylib_drm
+RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_INC := -I$(RAYLIB_DIR)/src
+RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
 OPT_LEVEL := -O0 
 EXTRA_CFLAGS += -fno-omit-frame-pointer
@@ -260,12 +267,17 @@ CPUFLAGS := $(patsubst -march=%,-march=%$(ARCH_FEATURES),$(CPUFLAGS))
 CPUFLAGS := $(patsubst -mcpu=%,-mcpu=%$(ARCH_FEATURES),$(CPUFLAGS))
 endif
 
-LDLIBS_RAYLIB = -lraylib -lGLESv2 -lEGL -lgbm -ldrm
+
+RAYLIB_A := $(RAYLIB_LIB)
+BASE_LIBS := -lm -ldl -lstdc++
+RAYLIB_LIBS := $(RAYLIB_A) -lEGL -lGLESv2 -ldrm -lgbm
 ifeq ($(USE_RAYLIB),0)
-LDLIBS_RAYLIB =
+RAYLIB_LIBS :=
 RAYLIB_INC    =
 RAYLIB_LIBDIR =
 endif
+
+LIBS := $(BASE_LIBS)
 
 INCLUDES  = -I. -Isrc -Isrc/musashi $(RAYLIB_INC) $(VC_INC)
 LDSEARCH  = -L/usr/local/lib $(VC_LIBDIR) $(RAYLIB_LIBDIR)
@@ -280,7 +292,7 @@ CXXFLAGS     = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(LTO
 M68K_CFLAGS   = $(CFLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
 LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS) $(EXTRA_LDFLAGS)
 
-LDLIBS   = $(LDLIBS_RAYLIB) $(LDLIBS_VC) $(LDLIBS_ALSA) -ldl -lstdc++ -lm -pthread
+LDLIBS   = $(RAYLIB_LIBS) $(LIBS) $(LDLIBS_VC) $(LDLIBS_ALSA)
 
 TARGET = $(EXENAME)$(EXE)
 INSTALL_DIR := $(DESTDIR)$(PREFIX)
@@ -403,10 +415,10 @@ full:
 	sudo $(MAKE) kernel_install
 	sudo $(MAKE) PISTORM_KMOD=$(PISTORM_KMOD) install
 	# Copy boot configuration files
-	sudo cp -f boot/firmware/config.txt /boot/firmware/config.txt
-	sudo cp -f boot/firmware/cmdline.txt /boot/firmware/cmdline.txt
+	#sudo cp -f boot/firmware/config.txt /boot/firmware/config.txt
+	#sudo cp -f boot/firmware/cmdline.txt /boot/firmware/cmdline.txt
 	# Copy system configuration files
-	sudo cp -f 10-hugepages.conf /etc/sysctl.d/10-hugepages.conf
+	#sudo cp -f 10-hugepages.conf /etc/sysctl.d/10-hugepages.conf
 	sudo cp -f etc/modules-load.d/pistorm.conf /etc/modules-load.d/pistorm.conf
 	sudo cp -f etc/security/limits.d/pistorm-rt.conf /etc/security/limits.d/pistorm-rt.conf
 	sudo cp -f etc/udev/99-pistorm.rules /etc/udev/rules.d/99-pistorm.rules
@@ -417,7 +429,7 @@ full:
 	# Apply sysctl settings (continue even if hugepages not supported)
 	sudo sysctl -p /etc/sysctl.d/10-hugepages.conf || echo "Note: Some hugepage settings may not be supported on this system"
 	# Enable and start the emulator service
-	sudo systemctl enable kernelpistorm64.service
+	#sudo systemctl enable kernelpistorm64.service
 	echo "Loading Kernel PiStorm64"
 	sudo modprobe pistorm 2>/dev/null || true
 

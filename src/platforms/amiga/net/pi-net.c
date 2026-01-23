@@ -9,6 +9,7 @@
 #include "pi-net-enums.h"
 #include "config_file/config_file.h"
 #include "gpio/ps_protocol.h"
+#include "log.h"
 
 uint32_t pinet_u32[4];
 static const char* op_type_names[4] = {
@@ -35,29 +36,30 @@ void handle_pinet_write(uint32_t addr, uint32_t val, uint8_t type) {
 
   switch (addr & 0xFFFF) {
   case PINET_CMD_READ:
-    printf("[PI-NET] Read.\n");
+    LOG_DEBUG("[PI-NET] Read.\n");
     break;
   case PINET_CMD_WRITE:
-    printf("[PI-NET] Write.\n");
+    LOG_DEBUG("[PI-NET] Write.\n");
     break;
   case PINET_CMD_ADDR1:
     pinet_u32[0] = val;
-    printf("[PI-NET] Write to ADDR1: %.8x\n", pinet_u32[0]);
+    LOG_DEBUG("[PI-NET] Write to ADDR1: %.8x\n", pinet_u32[0]);
     break;
   case PINET_CMD_ADDR2:
     pinet_u32[1] = val;
-    printf("[PI-NET] Write to ADDR2: %.8x\n", pinet_u32[1]);
+    LOG_DEBUG("[PI-NET] Write to ADDR2: %.8x\n", pinet_u32[1]);
     break;
   case PINET_CMD_ADDR3:
     pinet_u32[2] = val;
-    printf("[PI-NET] Write to ADDR3: %.8x\n", pinet_u32[2]);
+    LOG_DEBUG("[PI-NET] Write to ADDR3: %.8x\n", pinet_u32[2]);
     break;
   case PINET_CMD_ADDR4:
     pinet_u32[3] = val;
-    printf("[PI-NET] Write to ADDR4: %.8x\n", pinet_u32[3]);
+    LOG_DEBUG("[PI-NET] Write to ADDR4: %.8x\n", pinet_u32[3]);
     break;
   default:
-    printf("[PI-NET] Unhandled %s register write to %.8X: %d\n", op_type_names[type], addr, val);
+    LOG_DEBUG("[PI-NET] Unhandled %s register write to %.8X: %d\n", op_type_names[type], addr,
+              val);
     break;
   }
 }
@@ -66,17 +68,17 @@ uint32_t handle_pinet_read(uint32_t addr_, uint8_t type) {
   uint32_t addr = addr_ & 0xFFFF;
 
   if (addr >= PINET_CMD_MAC && addr < PINET_CMD_IP) {
-    printf("[PI-NET] Read from MAC: %.2X. (%.8X)\n", PI_MAC[addr - PINET_CMD_MAC], addr_);
+    LOG_DEBUG("[PI-NET] Read from MAC: %.2X. (%.8X)\n", PI_MAC[addr - PINET_CMD_MAC], addr_);
     return PI_MAC[addr - PINET_CMD_MAC];
   }
   if (addr >= PINET_CMD_IP && addr < PINET_CMD_BEEF) {
-    printf("[PI-NET] Read from IP: %.2X. (%.8X)\n", PI_IP[addr - PINET_CMD_IP], addr_);
+    LOG_DEBUG("[PI-NET] Read from IP: %.2X. (%.8X)\n", PI_IP[addr - PINET_CMD_IP], addr_);
     return PI_IP[addr - PINET_CMD_IP];
   }
 
   switch (addr & 0xFFFF) {
   default:
-    printf("[PI-NET] Unhandled %s register read from %.8X\n", op_type_names[type], addr);
+    LOG_DEBUG("[PI-NET] Unhandled %s register read from %.8X\n", op_type_names[type], addr);
     break;
   }
 

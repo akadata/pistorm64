@@ -11,7 +11,7 @@ uniform vec4 colDiffuse;
 // Output fragment color
 out vec4 finalColor;
 
-// NOTE: Add your custom variables here
+// NOTE: Add here your custom variables
 
 float gamma = 0.6;
 float numColors = 8.0;

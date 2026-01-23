@@ -1,15 +1,13 @@
 /*******************************************************************************************
 *
-*   raylib [audio] example - module playing
-*
-*   Example complexity rating: [★☆☆☆] 1/4
+*   raylib [audio] example - Module playing (streaming)
 *
 *   Example originally created with raylib 1.5, last time updated with raylib 3.5
 *
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2016-2025 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2016-2024 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -37,7 +35,7 @@ int main(void)
 
     SetConfigFlags(FLAG_MSAA_4X_HINT);  // NOTE: Try to enable MSAA 4X
 
-    InitWindow(screenWidth, screenHeight, "raylib [audio] example - module playing");
+    InitWindow(screenWidth, screenHeight, "raylib [audio] example - module playing (streaming)");
 
     InitAudioDevice();                  // Initialize audio device
 

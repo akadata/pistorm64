@@ -1,17 +1,15 @@
 /*******************************************************************************************
 *
-*   raylib [others] example - embedded files loading
+*   raylib [others] example - Embedded files loading (Wave and Image)
 *
-*   Example complexity rating: [★★☆☆] 2/4
-*
-*   Example originally created with raylib 3.0, last time updated with raylib 3.5
+*   Example originally created with raylib 3.0, last time updated with raylib 2.5
 *
 *   Example contributed by Kristian Holmgren (@defutura) and reviewed by Ramon Santamaria (@raysan5)
 *
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2020-2025 Kristian Holmgren (@defutura) and Ramon Santamaria (@raysan5)
+*   Copyright (c) 2020-2024 Kristian Holmgren (@defutura) and Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 

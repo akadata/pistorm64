@@ -8,7 +8,7 @@ varying vec4 fragColor;
 uniform sampler2D texture0;
 uniform vec4 colDiffuse;
 
-// NOTE: Add your custom variables here
+// NOTE: Add here your custom variables
 
 // NOTE: Render size values should be passed from code
 const float renderWidth = 800;

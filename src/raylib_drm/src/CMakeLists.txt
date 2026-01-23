@@ -8,7 +8,7 @@ include(JoinPaths)
 
 # Sets build type if not set by now
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    if(PROJECT_IS_TOP_LEVEL)
+    if(RAYLIB_IS_MAIN)
         set(default_build_type Debug)
     else()
         message(WARNING "Default build type is not set (CMAKE_BUILD_TYPE)")
@@ -23,7 +23,6 @@ endif()
 # Used as public API to be included into other projects
 set(raylib_public_headers
     raylib.h
-    rcamera.h
     rlgl.h
     raymath.h
     )
@@ -69,7 +68,7 @@ else()
 endif()
 
 if (${PLATFORM} MATCHES "Web")
-    target_link_options(raylib PUBLIC "-sUSE_GLFW=3" -sEXPORTED_RUNTIME_METHODS=ccall)
+    target_link_options(raylib PUBLIC "-sUSE_GLFW=3")
     if(${GRAPHICS} MATCHES "GRAPHICS_API_OPENGL_ES3")
         target_link_options(raylib PUBLIC "-sMIN_WEBGL_VERSION=2")
         target_link_options(raylib PUBLIC "-sMAX_WEBGL_VERSION=2")
@@ -91,8 +90,7 @@ if (BUILD_SHARED_LIBS)
     set_property(TARGET raylib PROPERTY C_VISIBILITY_PRESET hidden)
 endif ()
 
-target_link_libraries(raylib PRIVATE $<BUILD_INTERFACE:${LIBS_PRIVATE}>)
-target_link_libraries(raylib PUBLIC ${LIBS_PUBLIC})
+target_link_libraries(raylib "${LIBS_PRIVATE}")
 
 # Sets some compile time definitions for the pre-processor
 # If CUSTOMIZE_BUILD option is on you will not use config.h by default

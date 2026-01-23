@@ -16,7 +16,7 @@ varying vec2 fragTexCoord;
 varying vec4 fragColor;
 varying vec3 fragNormal;
 
-// NOTE: Add your custom variables here
+// NOTE: Add here your custom variables
 
 // https://github.com/glslify/glsl-inverse
 mat3 inverse(mat3 m)

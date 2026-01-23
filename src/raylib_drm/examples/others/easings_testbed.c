@@ -1,17 +1,15 @@
 /*******************************************************************************************
 *
-*   raylib [others] example - easings testbed
+*   raylib [easings] example - Easings Testbed
 *
 *   Example originally created with raylib 2.5, last time updated with raylib 2.5
-*
-*   Example complexity rating: [★★★☆] 3/4
 *
 *   Example contributed by Juan Miguel López (@flashback-fx) and reviewed by Ramon Santamaria (@raysan5)
 *
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2019-2025 Juan Miguel López (@flashback-fx) and Ramon Santamaria (@raysan5)
+*   Copyright (c) 2019-2024 Juan Miguel López (@flashback-fx ) and Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -108,7 +106,7 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [others] example - easings testbed");
+    InitWindow(screenWidth, screenHeight, "raylib [easings] example - easings testbed");
 
     Vector2 ballPosition = { 100.0f, 100.0f };
 
@@ -221,12 +219,10 @@ int main(void)
 }
 
 
-// NoEase function, used when "no easing" is selected for any axis
-// It just ignores all parameters besides b
+// NoEase function, used when "no easing" is selected for any axis. It just ignores all parameters besides b.
 static float NoEase(float t, float b, float c, float d)
 {
-    // Hack to avoid compiler warning (about unused variables)
-    float burn = t + b + c + d;
+    float burn = t + b + c + d;  // Hack to avoid compiler warning (about unused variables)
     d += burn;
 
     return b;

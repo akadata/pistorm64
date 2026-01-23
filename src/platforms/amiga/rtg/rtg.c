@@ -9,6 +9,7 @@
 #include <time.h>
 #include <stddef.h>
 #include "config_file/config_file.h"
+#include "log.h"
 #include "gpio/ps_protocol.h"
 #include "platforms/amiga/rtg/irtg_structs.h"
 #include "rtg.h"
@@ -75,7 +76,7 @@ extern uint8_t rtg_on;
 extern uint8_t rtg_enabled;
 extern uint8_t rtg_output_in_vblank;
 
-//#define DEBUG_RTG
+#define DEBUG_RTG
 
 #ifdef DEBUG_RTG
 /*static const char *op_type_names[OP_TYPE_NUM] = {
@@ -85,7 +86,7 @@ extern uint8_t rtg_output_in_vblank;
     "MEM",
 };*/
 
-#define DEBUG printf
+#define DEBUG LOG_DEBUG
 #else
 #define DEBUG(...)
 #endif
@@ -100,7 +101,7 @@ static const char* rtg_format_names[RTGFMT_NUM] = {
 int init_rtg_data(struct emulator_config* cfg_) {
   rtg_mem = calloc(1, 40 * SIZE_MEGA);
   if (!rtg_mem) {
-    printf("Failed to allocate RTG video memory.\n");
+    LOG_ERROR("Failed to allocate RTG video memory.\n");
     return 0;
   }
 
@@ -111,7 +112,7 @@ int init_rtg_data(struct emulator_config* cfg_) {
 }
 
 void shutdown_rtg(void) {
-  printf("[RTG] Shutting down RTG.\n");
+  LOG_INFO("[RTG] Shutting down RTG.\n");
   if (rtg_on) {
     display_enabled = 0xFF;
     rtg_on = 0;
@@ -160,7 +161,7 @@ unsigned int rtg_read(uint32_t address, uint8_t mode) {
           wait_rtg_frame = cur_rtg_frame;
         }
         if (wait_rtg_frame == 0)
-          printf("Wait RTG frame was zero!\n");
+          LOG_WARN("Wait RTG frame was zero!\n");
         wait_vblank = 1;
       }
       if (cur_rtg_frame != wait_rtg_frame && wait_vblank) {
@@ -220,7 +221,7 @@ void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
       }
     }
   } else if (address == RTG_DEBUGME) {
-    printf("RTG DEBUGME WRITE: %d.\n", value);
+    LOG_DEBUG("RTG DEBUGME WRITE: %d.\n", value);
   } else {
     switch (mode) {
     case OP_TYPE_BYTE:
@@ -278,7 +279,7 @@ void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
 
 #define gdebug(a)                                                                                  \
   if (realtime_graphics_debug) {                                                                   \
-    printf(a);                                                                                     \
+    LOG_DEBUG(a);                                                                                  \
     m68k_end_timeslice();                                                                          \
     cpu_emulation_running = 0;                                                                     \
   }
@@ -301,12 +302,12 @@ static void handle_irtg_command(uint32_t cmd) {
     // y_offset, D7: RGBFTYPE format
 #ifdef DEBUG_RTG
     if (realtime_graphics_debug) {
-      printf("iSetPanning begin\n");
-      printf("IRTGCmd SetPanning\n");
-      printf("IRTGCmd x: %d y: %d w: %d (%d)\n", M68KR(M68K_REG_D1), M68KR(M68K_REG_D2),
-             M68KR(M68K_REG_D0) << RGBF_D7, M68KR(M68K_REG_D0));
-      printf("BoardInfo: %.8X Addr: %.8X\n", M68KR(M68K_REG_A0), M68KR(M68K_REG_A1));
-      printf("BoardInfo Xoffs: %d Yoffs: %d\n", be16toh(b->XOffset), be16toh(b->YOffset));
+      LOG_DEBUG("iSetPanning begin\n");
+      LOG_DEBUG("IRTGCmd SetPanning\n");
+      LOG_DEBUG("IRTGCmd x: %d y: %d w: %d (%d)\n", M68KR(M68K_REG_D1), M68KR(M68K_REG_D2),
+                M68KR(M68K_REG_D0) << RGBF_D7, M68KR(M68K_REG_D0));
+      LOG_DEBUG("BoardInfo: %.8X Addr: %.8X\n", M68KR(M68K_REG_A0), M68KR(M68K_REG_A1));
+      LOG_DEBUG("BoardInfo Xoffs: %d Yoffs: %d\n", be16toh(b->XOffset), be16toh(b->YOffset));
     }
 #endif
     if (!b)
@@ -324,11 +325,11 @@ static void handle_irtg_command(uint32_t cmd) {
 
 #ifdef DEBUG_RTG
     if (realtime_graphics_debug) {
-      printf("RTG OffsetX/Y: %d/%d\n", rtg_offset_x, rtg_offset_y);
-      printf("RTG Pitch: %d\n", rtg_pitch);
-      printf("RTG FBAddr/Adj: %.8X (%.8X)/%.8X\n", framebuffer_addr, M68KR(M68K_REG_A1),
-             framebuffer_addr_adj);
-      printf("iSetPanning End\n");
+      LOG_DEBUG("RTG OffsetX/Y: %d/%d\n", rtg_offset_x, rtg_offset_y);
+      LOG_DEBUG("RTG Pitch: %d\n", rtg_pitch);
+      LOG_DEBUG("RTG FBAddr/Adj: %.8X (%.8X)/%.8X\n", framebuffer_addr, M68KR(M68K_REG_A1),
+                framebuffer_addr_adj);
+      LOG_DEBUG("iSetPanning End\n");
     }
 #endif
 
@@ -544,18 +545,18 @@ static void handle_irtg_command(uint32_t cmd) {
     gdebug("iP2C begin\n");
 
     if (!bm) {
-      printf("Help! BitMap not in mapped memory.\n");
+      LOG_WARN("Help! BitMap not in mapped memory.\n");
       break;
     } else {
       gdebug("Data is available in mapped memory.\n");
     }
 
     if (realtime_graphics_debug) {
-      printf("bm: 0x%" PRIxPTR " r: 0x%" PRIxPTR "\n", (uintptr_t)bm, (uintptr_t)r);
+      LOG_DEBUG("bm: 0x%" PRIxPTR " r: 0x%" PRIxPTR "\n", (uintptr_t)bm, (uintptr_t)r);
       if (bm)
-        printf("bm pitch: %d\n", be16toh(bm->BytesPerRow));
+        LOG_DEBUG("bm pitch: %d\n", be16toh(bm->BytesPerRow));
       if (r)
-        printf("r pitch: %d\n", be16toh(r->BytesPerRow));
+        LOG_DEBUG("r pitch: %d\n", be16toh(r->BytesPerRow));
     }
 
     uint16_t bmp_pitch = be16toh(bm->BytesPerRow);
@@ -572,7 +573,7 @@ static void handle_irtg_command(uint32_t cmd) {
     break;
   }
   default:
-    printf("[!!!IRTG] Unnkonw/unhandled iRTG command %d.\n", cmd);
+    LOG_WARN("[!!!IRTG] Unnkonw/unhandled iRTG command %d.\n", cmd);
     break;
   }
 }
@@ -583,8 +584,9 @@ static void handle_rtg_command(uint32_t cmd) {
   case RTGCMD_SETGC:
     gdebug("SetGC\n");
     if (rtg_display_format != rtg_format) {
-      printf("Pixel format switch from: %s (%d) to %s (%d)\n", rtg_format_names[rtg_display_format],
-             rtg_display_format, rtg_format_names[rtg_format], rtg_format);
+      LOG_INFO("Pixel format switch from: %s (%d) to %s (%d)\n",
+               rtg_format_names[rtg_display_format], rtg_display_format,
+               rtg_format_names[rtg_format], rtg_format);
     }
     rtg_display_format = rtg_format;
     rtg_display_width = rtg_x[0];
@@ -592,17 +594,19 @@ static void handle_rtg_command(uint32_t cmd) {
     if (rtg_u8[0]) {
       // rtg_pitch = rtg_display_width << rtg_format;
       framebuffer_addr_adj =
-          framebuffer_addr + (rtg_offset_x << rtg_display_format) + (rtg_offset_y * rtg_pitch);
+          framebuffer_addr + (rtg_offset_x * rtg_pixel_size[rtg_display_format]) +
+          (rtg_offset_y * rtg_pitch);
       rtg_total_rows = rtg_y[1];
     } else {
       // rtg_pitch = rtg_display_width << rtg_format;
       framebuffer_addr_adj =
-          framebuffer_addr + (rtg_offset_x << rtg_display_format) + (rtg_offset_y * rtg_pitch);
+          framebuffer_addr + (rtg_offset_x * rtg_pixel_size[rtg_display_format]) +
+          (rtg_offset_y * rtg_pitch);
       rtg_total_rows = rtg_y[1];
     }
     if (realtime_graphics_debug) {
-      printf("Set RTG mode:\n");
-      printf("%dx%d pixels\n", rtg_display_width, rtg_display_height);
+      LOG_DEBUG("Set RTG mode:\n");
+      LOG_DEBUG("%dx%d pixels\n", rtg_display_width, rtg_display_height);
     }
     break;
   case RTGCMD_SETPAN:
@@ -628,15 +632,15 @@ static void handle_rtg_command(uint32_t cmd) {
   case RTGCMD_SETDISPLAY:
     gdebug("SetDisplay\n");
     if (realtime_graphics_debug) {
-      printf("RTG SetDisplay %s\n", (rtg_u8[1]) ? "enabled" : "disabled");
+      LOG_DEBUG("RTG SetDisplay %s\n", (rtg_u8[1]) ? "enabled" : "disabled");
     }
     break;
   case RTGCMD_ENABLE:
   case RTGCMD_SETSWITCH:
     gdebug("SetSwitch\n");
     if (realtime_graphics_debug) {
-      printf("RTG SetSwitch %s\n", ((rtg_x[0]) & 0x01) ? "enabled" : "disabled");
-      printf("LAL: %.4X\n", rtg_x[0]);
+      LOG_DEBUG("RTG SetSwitch %s\n", ((rtg_x[0]) & 0x01) ? "enabled" : "disabled");
+      LOG_DEBUG("LAL: %.4X\n", rtg_x[0]);
     }
     display_enabled = ((rtg_x[0]) & 0x01);
     if (display_enabled != rtg_on) {
@@ -724,10 +728,10 @@ static void handle_rtg_command(uint32_t cmd) {
     gdebug("SetSpriteImage\n");
     break;
   case RTGCMD_DEBUGME:
-    printf("[RTG] DebugMe!\n");
+    LOG_DEBUG("[RTG] DebugMe!\n");
     break;
   default:
-    printf("[!!!RTG] Unknown/unhandled RTG command %d ($%.4X)\n", cmd, cmd);
+    LOG_WARN("[!!!RTG] Unknown/unhandled RTG command %d ($%.4X)\n", cmd, cmd);
     break;
   }
 }

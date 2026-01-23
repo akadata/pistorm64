@@ -11,6 +11,7 @@
 #include <endian.h>
 #include "platforms/amiga/rtg/irtg_structs.h"
 #include "rtg.h"
+#include "log.h"
 
 extern uint32_t rtg_address[8];
 extern uint32_t rtg_address_adj[8];
@@ -24,9 +25,73 @@ extern uint32_t framebuffer_addr_adj;
 
 extern uint8_t realtime_graphics_debug;
 
+static const size_t rtg_mem_size = 40u * SIZE_MEGA;
+static uint32_t rtg_oob_log_count = 0;
+
+static int rtg_calc_span(size_t x_bytes, uint16_t w, uint16_t h, uint16_t pitch, size_t bpp,
+                         size_t* out_span) {
+  if (w == 0 || h == 0 || bpp == 0 || pitch == 0) {
+    return 0;
+  }
+  if (x_bytes > SIZE_MAX - ((size_t)w * bpp)) {
+    return 0;
+  }
+  size_t row_span = x_bytes + ((size_t)w * bpp);
+  if (row_span > pitch) {
+    return 0;
+  }
+  *out_span = ((size_t)pitch * (h - 1)) + row_span;
+  return 1;
+}
+
+static int rtg_check_bounds(size_t base, size_t span, const char* tag, uint16_t pitch, uint16_t w,
+                            uint16_t h, uint16_t format) {
+  if (base >= rtg_mem_size || span > rtg_mem_size - base) {
+    if (rtg_oob_log_count < 20) {
+      LOG_WARN("[RTG/OOB] %s base=0x%zx span=%zu pitch=%u w=%u h=%u fmt=%u\n", tag, base, span,
+               pitch, w, h, format);
+      rtg_oob_log_count++;
+    }
+    return 0;
+  }
+  return 1;
+}
+
+static int rtg_get_ptr_checked(uint32_t base_adj, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                               uint16_t pitch, uint16_t format, const char* tag, uint8_t** out_ptr) {
+  if (format >= RTGFMT_NUM) {
+    if (rtg_oob_log_count < 20) {
+      LOG_WARN("[RTG/OOB] %s invalid format: %u\n", tag, format);
+      rtg_oob_log_count++;
+    }
+    return 0;
+  }
+  size_t bpp = rtg_pixel_size[format];
+  size_t x_bytes = (size_t)x * bpp;
+  size_t span = 0;
+  if (!rtg_calc_span(x_bytes, w, h, pitch, bpp, &span)) {
+    if (rtg_oob_log_count < 20) {
+      LOG_WARN("[RTG/OOB] %s invalid span: x=%u y=%u w=%u h=%u pitch=%u fmt=%u\n", tag, x, y, w,
+               h, pitch, format);
+      rtg_oob_log_count++;
+    }
+    return 0;
+  }
+  size_t base = (size_t)base_adj + x_bytes + ((size_t)y * pitch);
+  if (!rtg_check_bounds(base, span, tag, pitch, w, h, format)) {
+    return 0;
+  }
+  *out_ptr = &rtg_mem[base];
+  return 1;
+}
+
 void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color,
                         uint16_t pitch, uint16_t format) {
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch)];
+  uint8_t* dptr = NULL;
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], x, y, w, h, pitch, format, "fillrect_solid",
+                           &dptr)) {
+    return;
+  }
   switch (format) {
   case RTGFMT_8BIT_CLUT: {
     for (int xs = 0; xs < w; xs++) {
@@ -67,7 +132,10 @@ void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t
 
 void rtg_fillrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color, uint16_t pitch,
                   uint16_t format, uint8_t mask) {
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch)];
+  uint8_t* dptr = NULL;
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], x, y, w, h, pitch, format, "fillrect", &dptr)) {
+    return;
+  }
 
   for (int ys = 0; ys < h; ys++) {
     for (int xs = 0; xs < w; xs++) {
@@ -81,7 +149,10 @@ void rtg_invertrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t pit
                     uint8_t mask) {
   if (mask) {
   }
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch)];
+  uint8_t* dptr = NULL;
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], x, y, w, h, pitch, format, "invertrect", &dptr)) {
+    return;
+  }
   for (int ys = 0; ys < h; ys++) {
     switch (format) {
     case RTGFMT_8BIT_CLUT: {
@@ -119,10 +190,18 @@ void rtg_blitrect(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, 
                   uint16_t pitch, uint16_t format, uint8_t mask) {
   if (mask) {
   }
-  uint8_t* sptr = &rtg_mem[rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch)];
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (dx * rtg_pixel_size[format]) + (dy * pitch)];
+  uint8_t* sptr = NULL;
+  uint8_t* dptr = NULL;
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], x, y, w, h, pitch, format, "blitrect_src", &sptr)) {
+    return;
+  }
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], dx, dy, w, h, pitch, format, "blitrect_dst",
+                           &dptr)) {
+    return;
+  }
 
-  uint32_t xdir = 1, pitchstep = pitch;
+  int xdir = 1;
+  int32_t pitchstep = pitch;
 
   if (y < dy) {
     pitchstep = -pitch;
@@ -139,7 +218,7 @@ void rtg_blitrect(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, 
         SET_RTG_PIXEL_MASK(&dptr[xs], sptr[xs], format);
       }
     } else {
-      for (int xs = w - 1; xs >= x; xs--) {
+      for (int xs = (int)w - 1; xs >= 0; xs--) {
         SET_RTG_PIXEL_MASK(&dptr[xs], sptr[xs], format);
       }
     }
@@ -150,10 +229,19 @@ void rtg_blitrect(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, 
 
 void rtg_blitrect_solid(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, uint16_t h,
                         uint16_t pitch, uint16_t format) {
-  uint8_t* sptr = &rtg_mem[rtg_address_adj[0] + (x * rtg_pixel_size[format]) + (y * pitch)];
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (dx * rtg_pixel_size[format]) + (dy * pitch)];
+  uint8_t* sptr = NULL;
+  uint8_t* dptr = NULL;
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], x, y, w, h, pitch, format, "blitrect_solid_src",
+                           &sptr)) {
+    return;
+  }
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], dx, dy, w, h, pitch, format, "blitrect_solid_dst",
+                           &dptr)) {
+    return;
+  }
 
-  uint32_t xdir = 1, pitchstep = pitch;
+  int xdir = 1;
+  int32_t pitchstep = pitch;
 
   if (y < dy) {
     pitchstep = -pitch;
@@ -180,12 +268,22 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
                                   uint8_t minterm) {
   if (minterm) {
   }
-  uint8_t* sptr = &rtg_mem[src_addr - (PIGFX_RTG_BASE + PIGFX_REG_SIZE) +
-                           (sx * rtg_pixel_size[format]) + (sy * srcpitch)];
-  uint8_t* dptr = &rtg_mem[dst_addr - (PIGFX_RTG_BASE + PIGFX_REG_SIZE) +
-                           (dx * rtg_pixel_size[format]) + (dy * dstpitch)];
+  uint8_t* sptr = NULL;
+  uint8_t* dptr = NULL;
+  uint32_t src_base = src_addr - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
+  uint32_t dst_base = dst_addr - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
+  if (!rtg_get_ptr_checked(src_base, sx, sy, w, h, srcpitch, format, "blitrect_nomask_src",
+                           &sptr)) {
+    return;
+  }
+  if (!rtg_get_ptr_checked(dst_base, dx, dy, w, h, dstpitch, format, "blitrect_nomask_dst",
+                           &dptr)) {
+    return;
+  }
 
-  uint32_t xdir = 1, src_pitchstep = srcpitch, dst_pitchstep = dstpitch;
+  int xdir = 1;
+  int32_t src_pitchstep = srcpitch;
+  int32_t dst_pitchstep = dstpitch;
   uint8_t draw_mode = minterm;
   uint32_t mask = 0xFF;
 
@@ -253,7 +351,7 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
           }
         }
       } else {
-        for (int xs = w - 1; xs >= sx; xs--) {
+        for (int xs = (int)w - 1; xs >= 0; xs--) {
           switch (format) {
           case RTGFMT_8BIT_CLUT:
             HANDLE_MINTERM_PIXEL(sptr[xs], dptr[xs], format);
@@ -276,7 +374,7 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
         }
       }
       sptr += src_pitchstep;
-      dptr += src_pitchstep;
+      dptr += dst_pitchstep;
     }
   }
 }
@@ -286,7 +384,10 @@ extern struct emulator_config* cfg;
 void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t src_addr,
                       uint32_t fgcol, uint32_t bgcol, uint16_t pitch, uint16_t t_pitch,
                       uint16_t format, uint16_t offset_x, uint8_t mask, uint8_t draw_mode) {
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[1] + (x * rtg_pixel_size[format]) + (y * pitch)];
+  uint8_t* dptr = NULL;
+  if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, w, h, pitch, format, "blittemplate", &dptr)) {
+    return;
+  }
   uint8_t* sptr = NULL;
   uint8_t cur_bit = 0, base_bit = 0, cur_byte = 0;
   uint8_t invert = (draw_mode & DRAWMODE_INVERSVID);
@@ -298,11 +399,11 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
   cur_bit = base_bit = (0x80 >> (offset_x % 8));
 
   if (realtime_graphics_debug) {
-    printf("DEBUG: BlitTemplate - %d, %d (%dx%d)\n", x, y, w, h);
-    printf("Src: %.8X\n", src_addr);
-    printf("Dest: %.8X (%.8X)\n", rtg_address[1], rtg_address_adj[1]);
-    printf("pitch: %d t_pitch: %d format: %d\n", pitch, t_pitch, format);
-    printf("offset_x: %d mask: %.2X draw_mode: %d\n", offset_x, mask, draw_mode);
+    LOG_DEBUG("DEBUG: BlitTemplate - %d, %d (%dx%d)\n", x, y, w, h);
+    LOG_DEBUG("Src: %.8X\n", src_addr);
+    LOG_DEBUG("Dest: %.8X (%.8X)\n", rtg_address[1], rtg_address_adj[1]);
+    LOG_DEBUG("pitch: %d t_pitch: %d format: %d\n", pitch, t_pitch, format);
+    LOG_DEBUG("offset_x: %d mask: %.2X draw_mode: %d\n", offset_x, mask, draw_mode);
   }
 
   uint32_t fg_color = htobe32(fgcol);
@@ -330,11 +431,12 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
   sptr = get_mapped_data_pointer_by_address(cfg, src_addr);
   if (!sptr) {
     if (realtime_graphics_debug) {
-      printf("BlitTemplate data NOT available in mapped range, source address: $%.8X\n", src_addr);
+      LOG_DEBUG("BlitTemplate data NOT available in mapped range, source address: $%.8X\n",
+                src_addr);
     }
   } else {
     if (realtime_graphics_debug) {
-      printf("BlitTemplate data available in mapped range at $%.8X\n", src_addr);
+      LOG_DEBUG("BlitTemplate data available in mapped range at $%.8X\n", src_addr);
     }
   }
 
@@ -433,7 +535,10 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
   if (mask) {
   }
 
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[1] + (x * rtg_pixel_size[format]) + (y * pitch)];
+  uint8_t* dptr = NULL;
+  if (!rtg_get_ptr_checked(rtg_address_adj[1], x, y, w, h, pitch, format, "blitpattern", &dptr)) {
+    return;
+  }
   uint8_t *sptr = NULL, *sptr_base = NULL;
   uint8_t cur_bit = 0, base_bit = 0, cur_byte = 0;
   uint8_t invert = (draw_mode & DRAWMODE_INVERSVID);
@@ -471,12 +576,13 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
   sptr = get_mapped_data_pointer_by_address(cfg, src_addr);
   if (!sptr) {
     if (realtime_graphics_debug) {
-      printf("BlitPattern data NOT available in mapped range, source address: $%.8X\n", src_addr);
+      LOG_DEBUG("BlitPattern data NOT available in mapped range, source address: $%.8X\n",
+                src_addr);
       src_addr += (offset_y % loop_rows) * 2;
     }
   } else {
     if (realtime_graphics_debug) {
-      printf("BlitPattern data available in mapped range at $%.8X\n", src_addr);
+      LOG_DEBUG("BlitPattern data available in mapped range at $%.8X\n", src_addr);
     }
     sptr_base = sptr;
     sptr += (offset_y % loop_rows) * 2;
@@ -574,6 +680,25 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
                         uint32_t fgcol, uint16_t pitch, uint16_t format) {
   int16_t x1 = x1_, y1 = y1_;
   int16_t x2 = x1_ + x2_, y2 = y1 + y2_;
+  int32_t min_x = (x1 < x2) ? x1 : x2;
+  int32_t max_x = (x1 > x2) ? x1 : x2;
+  int32_t min_y = (y1 < y2) ? y1 : y2;
+  int32_t max_y = (y1 > y2) ? y1 : y2;
+  if (min_x < 0 || min_y < 0) {
+    if (rtg_oob_log_count < 20) {
+      LOG_WARN("[RTG/OOB] drawline_solid negative coords: (%d,%d)-(%d,%d)\n", x1, y1, x2, y2);
+      rtg_oob_log_count++;
+    }
+    return;
+  }
+  uint8_t* base_ptr = NULL;
+  uint16_t span_w = (uint16_t)(max_x - min_x + 1);
+  uint16_t span_h = (uint16_t)(max_y - min_y + 1);
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)min_x, (uint16_t)min_y, span_w, span_h,
+                           pitch, format, "drawline_solid", &base_ptr)) {
+    return;
+  }
+  (void)base_ptr;
 
   uint32_t fg_color = htobe32(fgcol);
 
@@ -594,7 +719,7 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
     break;
   }
 
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (y1 * pitch)];
+  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + ((size_t)y1 * pitch)];
 
   int32_t line_step = pitch;
   int8_t x_step = 1;
@@ -677,6 +802,25 @@ void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t l
 
   int16_t x1 = x1_, y1 = y1_;
   int16_t x2 = x1_ + x2_, y2 = y1 + y2_;
+  int32_t min_x = (x1 < x2) ? x1 : x2;
+  int32_t max_x = (x1 > x2) ? x1 : x2;
+  int32_t min_y = (y1 < y2) ? y1 : y2;
+  int32_t max_y = (y1 > y2) ? y1 : y2;
+  if (min_x < 0 || min_y < 0) {
+    if (rtg_oob_log_count < 20) {
+      LOG_WARN("[RTG/OOB] drawline negative coords: (%d,%d)-(%d,%d)\n", x1, y1, x2, y2);
+      rtg_oob_log_count++;
+    }
+    return;
+  }
+  uint8_t* base_ptr = NULL;
+  uint16_t span_w = (uint16_t)(max_x - min_x + 1);
+  uint16_t span_h = (uint16_t)(max_y - min_y + 1);
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)min_x, (uint16_t)min_y, span_w, span_h,
+                           pitch, format, "drawline", &base_ptr)) {
+    return;
+  }
+  (void)base_ptr;
   uint16_t cur_bit = 0x8000;
   // uint32_t color_mask = 0xFFFF0000;
   uint8_t invert = 0;
@@ -703,7 +847,7 @@ void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t l
     break;
   }
 
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (y1 * pitch)];
+  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + ((size_t)y1 * pitch)];
 
   int32_t line_step = pitch;
   int8_t x_step = 1;
@@ -766,7 +910,18 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
                 uint8_t minterm, struct BitMap* bm, uint8_t mask, uint16_t dst_pitch,
                 uint16_t src_pitch) {
   uint16_t pitch = dst_pitch;
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (dy * pitch)];
+  uint8_t* dptr = NULL;
+  if (dx < 0 || dy < 0) {
+    if (rtg_oob_log_count < 20) {
+      LOG_WARN("[RTG/OOB] p2c_ex invalid coords: dx=%d dy=%d\n", dx, dy);
+      rtg_oob_log_count++;
+    }
+    return;
+  }
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)dx, (uint16_t)dy, (uint16_t)w,
+                           (uint16_t)h, pitch, rtg_format, "p2c_ex_dst", &dptr)) {
+    return;
+  }
   uint8_t draw_mode = minterm;
 
   uint8_t cur_bit, base_bit, base_byte;
@@ -859,7 +1014,18 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
              uint8_t draw_mode, uint8_t planes, uint8_t mask, uint8_t layer_mask,
              uint16_t src_line_pitch, uint8_t* bmp_data_src) {
   uint16_t pitch = rtg_x[3];
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (dy * pitch)];
+  uint8_t* dptr = NULL;
+  if (dx < 0 || dy < 0) {
+    if (rtg_oob_log_count < 20) {
+      LOG_WARN("[RTG/OOB] p2c invalid coords: dx=%d dy=%d\n", dx, dy);
+      rtg_oob_log_count++;
+    }
+    return;
+  }
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)dx, (uint16_t)dy, (uint16_t)w,
+                           (uint16_t)h, pitch, rtg_format, "p2c_dst", &dptr)) {
+    return;
+  }
 
   uint8_t cur_bit, base_bit, base_byte;
   uint16_t cur_byte = 0, u8_fg = 0;
@@ -872,25 +1038,24 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
   cur_byte = base_byte = ((sx / 8) % src_line_pitch);
 
   if (realtime_graphics_debug) {
-    printf("P2C: %d,%d - %d,%d (%dx%d) %d, %.2X\n", sx, sy, dx, dy, w, h, planes, layer_mask);
-    printf("Mask: %.2X Minterm: %.2X\n", mask, draw_mode);
-    printf("Pitch: %d Src Pitch: %d (!!!: %.4X)\n", pitch, src_line_pitch, rtg_user[0]);
-    printf("Curbyte: %d Curbit: %d\n", cur_byte, cur_bit);
-    printf("Plane size: %d Total size: %d (%X)\n", plane_size, plane_size * planes,
-           plane_size * planes);
-    printf("Source: %.8X - %.8X\n", rtg_address[1], rtg_address_adj[1]);
-    printf("Target: %.8X - %.8X\n", rtg_address[0], rtg_address_adj[0]);
-    fflush(stdout);
+    LOG_DEBUG("P2C: %d,%d - %d,%d (%dx%d) %d, %.2X\n", sx, sy, dx, dy, w, h, planes, layer_mask);
+    LOG_DEBUG("Mask: %.2X Minterm: %.2X\n", mask, draw_mode);
+    LOG_DEBUG("Pitch: %d Src Pitch: %d (!!!: %.4X)\n", pitch, src_line_pitch, rtg_user[0]);
+    LOG_DEBUG("Curbyte: %d Curbit: %d\n", cur_byte, cur_bit);
+    LOG_DEBUG("Plane size: %d Total size: %d (%X)\n", plane_size, plane_size * planes,
+              plane_size * planes);
+    LOG_DEBUG("Source: %.8X - %.8X\n", rtg_address[1], rtg_address_adj[1]);
+    LOG_DEBUG("Target: %.8X - %.8X\n", rtg_address[0], rtg_address_adj[0]);
 
-    printf("Grabbing data from RTG memory.\nData:\n");
+    LOG_DEBUG("Grabbing data from RTG memory.\nData:\n");
     for (int i = 0; i < h; i++) {
       for (int k = 0; k < planes; k++) {
         for (int j = 0; j < src_line_pitch; j++) {
-          printf("%.2X", bmp_data_src[j + (i * src_line_pitch) + (plane_size * k)]);
+          LOG_DEBUG("%.2X", bmp_data_src[j + (i * src_line_pitch) + (plane_size * k)]);
         }
-        printf("  ");
+        LOG_DEBUG("  ");
       }
-      printf("\n");
+      LOG_DEBUG("\n");
     }
   }
 
@@ -931,7 +1096,18 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
              uint8_t draw_mode, uint8_t planes, uint8_t mask, uint8_t layer_mask,
              uint16_t src_line_pitch, uint8_t* bmp_data_src) {
   uint16_t pitch = rtg_x[3];
-  uint8_t* dptr = &rtg_mem[rtg_address_adj[0] + (dy * pitch)];
+  uint8_t* dptr = NULL;
+  if (dx < 0 || dy < 0) {
+    if (rtg_oob_log_count < 20) {
+      LOG_WARN("[RTG/OOB] p2d invalid coords: dx=%d dy=%d\n", dx, dy);
+      rtg_oob_log_count++;
+    }
+    return;
+  }
+  if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)dx, (uint16_t)dy, (uint16_t)w,
+                           (uint16_t)h, pitch, rtg_format, "p2d_dst", &dptr)) {
+    return;
+  }
 
   uint8_t cur_bit, base_bit, base_byte;
   uint16_t cur_byte = 0, u8_fg = 0;
@@ -944,25 +1120,24 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
   cur_byte = base_byte = ((sx / 8) % src_line_pitch);
 
   if (realtime_graphics_debug) {
-    printf("P2D: %d,%d - %d,%d (%dx%d) %d, %.2X\n", sx, sy, dx, dy, w, h, planes, layer_mask);
-    printf("Mask: %.2X Minterm: %.2X\n", mask, draw_mode);
-    printf("Pitch: %d Src Pitch: %d (!!!: %.4X)\n", pitch, src_line_pitch, rtg_user[0]);
-    printf("Curbyte: %d Curbit: %d\n", cur_byte, cur_bit);
-    printf("Plane size: %d Total size: %d (%X)\n", plane_size, plane_size * planes,
-           plane_size * planes);
-    printf("Source: %.8X - %.8X\n", rtg_address[1], rtg_address_adj[1]);
-    printf("Target: %.8X - %.8X\n", rtg_address[0], rtg_address_adj[0]);
-    fflush(stdout);
+    LOG_DEBUG("P2D: %d,%d - %d,%d (%dx%d) %d, %.2X\n", sx, sy, dx, dy, w, h, planes, layer_mask);
+    LOG_DEBUG("Mask: %.2X Minterm: %.2X\n", mask, draw_mode);
+    LOG_DEBUG("Pitch: %d Src Pitch: %d (!!!: %.4X)\n", pitch, src_line_pitch, rtg_user[0]);
+    LOG_DEBUG("Curbyte: %d Curbit: %d\n", cur_byte, cur_bit);
+    LOG_DEBUG("Plane size: %d Total size: %d (%X)\n", plane_size, plane_size * planes,
+              plane_size * planes);
+    LOG_DEBUG("Source: %.8X - %.8X\n", rtg_address[1], rtg_address_adj[1]);
+    LOG_DEBUG("Target: %.8X - %.8X\n", rtg_address[0], rtg_address_adj[0]);
 
-    printf("Grabbing data from RTG memory.\nData:\n");
+    LOG_DEBUG("Grabbing data from RTG memory.\nData:\n");
     for (int i = 0; i < h; i++) {
       for (int k = 0; k < planes; k++) {
         for (int j = 0; j < src_line_pitch; j++) {
-          printf("%.2X", bmp_data_src[j + (i * src_line_pitch) + (plane_size * k)]);
+          LOG_DEBUG("%.2X", bmp_data_src[j + (i * src_line_pitch) + (plane_size * k)]);
         }
-        printf("  ");
+        LOG_DEBUG("  ");
       }
-      printf("\n");
+      LOG_DEBUG("\n");
     }
   }
 
