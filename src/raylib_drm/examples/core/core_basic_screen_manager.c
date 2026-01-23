@@ -1,8 +1,6 @@
 /*******************************************************************************************
 *
-*   raylib [core] example - basic screen manager
-*
-*   Example complexity rating: [★☆☆☆] 1/4
+*   raylib [core] examples - basic screen manager
 *
 *   NOTE: This example illustrates a very simple screen manager based on a states machines
 *
@@ -11,7 +9,7 @@
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2021-2025 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2021-2024 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -48,7 +46,7 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
-        switch (currentScreen)
+        switch(currentScreen)
         {
             case LOGO:
             {

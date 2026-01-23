@@ -3,17 +3,17 @@
 *   rshapes - Basic functions to draw 2d shapes and check collisions
 *
 *   ADDITIONAL NOTES:
-*       Shapes can be draw using 3 types of primitives: LINES, TRIANGLES and QUADS
+*       Shapes can be draw using 3 types of primitives: LINES, TRIANGLES and QUADS.
 *       Some functions implement two drawing options: TRIANGLES and QUADS, by default TRIANGLES
 *       are used but QUADS implementation can be selected with SUPPORT_QUADS_DRAW_MODE define
 *
 *       Some functions define texture coordinates (rlTexCoord2f()) for the shapes and use a
 *       user-provided texture with SetShapesTexture(), the pourpouse of this implementation
-*       is allowing to reduce draw calls when combined with a texture-atlas
+*       is allowing to reduce draw calls when combined with a texture-atlas.
 *
 *       By default, raylib sets the default texture and rectangle at InitWindow()[rcore] to one
 *       white character of default font [rtext], this way, raylib text and shapes can be draw with
-*       a single draw call and it also allows users to configure it the same way with their own fonts
+*       a single draw call and it also allows users to configure it the same way with their own fonts.
 *
 *   CONFIGURATION:
 *       #define SUPPORT_MODULE_RSHAPES
@@ -25,7 +25,7 @@
 *
 *   LICENSE: zlib/libpng
 *
-*   Copyright (c) 2013-2025 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2013-2024 Ramon Santamaria (@raysan5)
 *
 *   This software is provided "as-is", without any express or implied warranty. In no event
 *   will the authors be held liable for any damages arising from the use of this software.
@@ -83,13 +83,14 @@ static Texture2D texShapes = { 1, 1, 1, 1, 7 };                // Texture used o
 static Rectangle texShapesRec = { 0.0f, 0.0f, 1.0f, 1.0f };    // Texture source rectangle used on shapes drawing
 
 //----------------------------------------------------------------------------------
-// Module Internal Functions Declaration
+// Module specific Functions Declaration
 //----------------------------------------------------------------------------------
 static float EaseCubicInOut(float t, float b, float c, float d);    // Cubic easing
 
 //----------------------------------------------------------------------------------
 // Module Functions Definition
 //----------------------------------------------------------------------------------
+
 // Set texture and rectangle to be used on shapes drawing
 // NOTE: It can be useful when using basic shapes and one single font,
 // defining a font char white rectangle would allow drawing everything in a single draw call
@@ -182,28 +183,6 @@ void DrawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color colo
     rlEnd();
 }
 
-// Draw a line defining thickness
-void DrawLineEx(Vector2 startPos, Vector2 endPos, float thick, Color color)
-{
-    Vector2 delta = { endPos.x - startPos.x, endPos.y - startPos.y };
-    float length = sqrtf(delta.x*delta.x + delta.y*delta.y);
-
-    if ((length > 0) && (thick > 0))
-    {
-        float scale = thick/(2*length);
-
-        Vector2 radius = { -scale*delta.y, scale*delta.x };
-        Vector2 strip[4] = {
-            { startPos.x - radius.x, startPos.y - radius.y },
-            { startPos.x + radius.x, startPos.y + radius.y },
-            { endPos.x - radius.x, endPos.y - radius.y },
-            { endPos.x + radius.x, endPos.y + radius.y }
-        };
-
-        DrawTriangleStrip(strip, 4, color);
-    }
-}
-
 // Draw a line (using gl lines)
 void DrawLineV(Vector2 startPos, Vector2 endPos, Color color)
 {
@@ -268,50 +247,26 @@ void DrawLineBezier(Vector2 startPos, Vector2 endPos, float thick, Color color)
     DrawTriangleStrip(points, 2*SPLINE_SEGMENT_DIVISIONS + 2, color);
 }
 
-// Draw a dashed line
-void DrawLineDashed(Vector2 startPos, Vector2 endPos, int dashSize, int spaceSize, Color color)
+// Draw a line defining thickness
+void DrawLineEx(Vector2 startPos, Vector2 endPos, float thick, Color color)
 {
-    // Calculate the vector and length of the line
-    float dx = endPos.x - startPos.x;
-    float dy = endPos.y - startPos.y;
-    float lineLength = sqrtf(dx*dx + dy*dy);
+    Vector2 delta = { endPos.x - startPos.x, endPos.y - startPos.y };
+    float length = sqrtf(delta.x*delta.x + delta.y*delta.y);
 
-    // If the line is too short for dashing or dash size is invalid, draw a solid thick line
-    if ((lineLength < (dashSize + spaceSize)) || (dashSize <= 0))
+    if ((length > 0) && (thick > 0))
     {
-        DrawLineV(startPos, endPos, color);
-        return;
+        float scale = thick/(2*length);
+
+        Vector2 radius = { -scale*delta.y, scale*delta.x };
+        Vector2 strip[4] = {
+            { startPos.x - radius.x, startPos.y - radius.y },
+            { startPos.x + radius.x, startPos.y + radius.y },
+            { endPos.x - radius.x, endPos.y - radius.y },
+            { endPos.x + radius.x, endPos.y + radius.y }
+        };
+
+        DrawTriangleStrip(strip, 4, color);
     }
-
-    // Calculate the normalized direction vector of the line
-    float invLineLength = 1.0f/lineLength;
-    float dirX = dx*invLineLength;
-    float dirY = dy*invLineLength;
-
-    Vector2 currentPos = startPos;
-    float distanceTraveled = 0;
-
-    rlBegin(RL_LINES);
-        rlColor4ub(color.r, color.g, color.b, color.a);
-
-        while (distanceTraveled < lineLength)
-        {
-            // Calculate the end of the current dash
-            float dashEndDist = distanceTraveled + dashSize;
-            if (dashEndDist > lineLength) dashEndDist = lineLength;
-
-            Vector2 dashEndPos = { startPos.x + dashEndDist*dirX, startPos.y + dashEndDist*dirY };
-
-            // Draw the dash segment
-            rlVertex2f(currentPos.x, currentPos.y);
-            rlVertex2f(dashEndPos.x, dashEndPos.y);
-
-            // Update the distance traveled and move the current position for the next dash
-            distanceTraveled = dashEndDist + spaceSize;
-            currentPos.x = startPos.x + distanceTraveled*dirX;
-            currentPos.y = startPos.y + distanceTraveled*dirY;
-        }
-    rlEnd();
 }
 
 // Draw a color-filled circle
@@ -330,7 +285,6 @@ void DrawCircleV(Vector2 center, float radius, Color color)
 // Draw a piece of a circle
 void DrawCircleSector(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color)
 {
-    if (startAngle == endAngle) return;
     if (radius <= 0.0f) radius = 0.1f;  // Avoid div by zero
 
     // Function expects (endAngle > startAngle)
@@ -422,7 +376,6 @@ void DrawCircleSector(Vector2 center, float radius, float startAngle, float endA
 // Draw a piece of a circle outlines
 void DrawCircleSectorLines(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color)
 {
-    if (startAngle == endAngle) return;
     if (radius <= 0.0f) radius = 0.1f;  // Avoid div by zero issue
 
     // Function expects (endAngle > startAngle)
@@ -516,19 +469,13 @@ void DrawCircleLinesV(Vector2 center, float radius, Color color)
 // Draw ellipse
 void DrawEllipse(int centerX, int centerY, float radiusH, float radiusV, Color color)
 {
-    DrawEllipseV((Vector2){ (float)centerX, (float)centerY }, radiusH, radiusV, color);
-}
-
-// Draw ellipse (Vector version)
-void DrawEllipseV(Vector2 center, float radiusH, float radiusV, Color color)
-{
     rlBegin(RL_TRIANGLES);
         for (int i = 0; i < 360; i += 10)
         {
             rlColor4ub(color.r, color.g, color.b, color.a);
-            rlVertex2f(center.x,  center.y);
-            rlVertex2f(center.x + cosf(DEG2RAD*(i + 10))*radiusH, center.y + sinf(DEG2RAD*(i + 10))*radiusV);
-            rlVertex2f(center.x + cosf(DEG2RAD*i)*radiusH, center.y + sinf(DEG2RAD*i)*radiusV);
+            rlVertex2f((float)centerX, (float)centerY);
+            rlVertex2f((float)centerX + cosf(DEG2RAD*(i + 10))*radiusH, (float)centerY + sinf(DEG2RAD*(i + 10))*radiusV);
+            rlVertex2f((float)centerX + cosf(DEG2RAD*i)*radiusH, (float)centerY + sinf(DEG2RAD*i)*radiusV);
         }
     rlEnd();
 }
@@ -536,18 +483,12 @@ void DrawEllipseV(Vector2 center, float radiusH, float radiusV, Color color)
 // Draw ellipse outline
 void DrawEllipseLines(int centerX, int centerY, float radiusH, float radiusV, Color color)
 {
-    DrawEllipseLinesV((Vector2){ (float)centerX, (float)centerY }, radiusH, radiusV, color);
-}
-
-// Draw ellipse outline
-void DrawEllipseLinesV(Vector2 center, float radiusH, float radiusV, Color color)
-{
     rlBegin(RL_LINES);
         for (int i = 0; i < 360; i += 10)
         {
             rlColor4ub(color.r, color.g, color.b, color.a);
-            rlVertex2f(center.x + cosf(DEG2RAD*(i + 10))*radiusH, center.y + sinf(DEG2RAD*(i + 10))*radiusV);
-            rlVertex2f(center.x + cosf(DEG2RAD*i)*radiusH, center.y + sinf(DEG2RAD*i)*radiusV);
+            rlVertex2f(centerX + cosf(DEG2RAD*(i + 10))*radiusH, centerY + sinf(DEG2RAD*(i + 10))*radiusV);
+            rlVertex2f(centerX + cosf(DEG2RAD*i)*radiusH, centerY + sinf(DEG2RAD*i)*radiusV);
         }
     rlEnd();
 }
@@ -831,7 +772,7 @@ void DrawRectangleGradientH(int posX, int posY, int width, int height, Color lef
 }
 
 // Draw a gradient-filled rectangle
-void DrawRectangleGradientEx(Rectangle rec, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
+void DrawRectangleGradientEx(Rectangle rec, Color topLeft, Color bottomLeft, Color topRight, Color bottomRight)
 {
     rlSetTexture(GetShapesTexture().id);
     Rectangle shapeRect = GetShapesTextureRectangle();
@@ -848,11 +789,11 @@ void DrawRectangleGradientEx(Rectangle rec, Color topLeft, Color bottomLeft, Col
         rlTexCoord2f(shapeRect.x/texShapes.width, (shapeRect.y + shapeRect.height)/texShapes.height);
         rlVertex2f(rec.x, rec.y + rec.height);
 
-        rlColor4ub(bottomRight.r, bottomRight.g, bottomRight.b, bottomRight.a);
+        rlColor4ub(topRight.r, topRight.g, topRight.b, topRight.a);
         rlTexCoord2f((shapeRect.x + shapeRect.width)/texShapes.width, (shapeRect.y + shapeRect.height)/texShapes.height);
         rlVertex2f(rec.x + rec.width, rec.y + rec.height);
 
-        rlColor4ub(topRight.r, topRight.g, topRight.b, topRight.a);
+        rlColor4ub(bottomRight.r, bottomRight.g, bottomRight.b, bottomRight.a);
         rlTexCoord2f((shapeRect.x + shapeRect.width)/texShapes.width, shapeRect.y/texShapes.height);
         rlVertex2f(rec.x + rec.width, rec.y);
     rlEnd();
@@ -866,25 +807,22 @@ void DrawRectangleGradientEx(Rectangle rec, Color topLeft, Color bottomLeft, Col
 // but it solves another issue: https://github.com/raysan5/raylib/issues/3884
 void DrawRectangleLines(int posX, int posY, int width, int height, Color color)
 {
-    Matrix mat = rlGetMatrixTransform();
-    float xOffset = 0.5f/mat.m0;
-    float yOffset = 0.5f/mat.m5;
-
+    Matrix mat = rlGetMatrixModelview();
+    float zoomFactor = 0.5f/mat.m0;
     rlBegin(RL_LINES);
         rlColor4ub(color.r, color.g, color.b, color.a);
-        rlVertex2f((float)posX + xOffset, (float)posY + yOffset);
-        rlVertex2f((float)posX + (float)width - xOffset, (float)posY + yOffset);
+        rlVertex2f((float)posX - zoomFactor, (float)posY);
+        rlVertex2f((float)posX + (float)width + zoomFactor, (float)posY);
 
-        rlVertex2f((float)posX + (float)width - xOffset, (float)posY + yOffset);
-        rlVertex2f((float)posX + (float)width - xOffset, (float)posY + (float)height - yOffset);
+        rlVertex2f((float)posX + (float)width, (float)posY - zoomFactor);
+        rlVertex2f((float)posX + (float)width, (float)posY + (float)height + zoomFactor);
 
-        rlVertex2f((float)posX + (float)width - xOffset, (float)posY + (float)height - yOffset);
-        rlVertex2f((float)posX + xOffset, (float)posY + (float)height - yOffset);
+        rlVertex2f((float)posX + (float)width + zoomFactor, (float)posY + (float)height);
+        rlVertex2f((float)posX - zoomFactor, (float)posY + (float)height);
 
-        rlVertex2f((float)posX + xOffset, (float)posY + (float)height - yOffset);
-        rlVertex2f((float)posX + xOffset, (float)posY + yOffset);
+        rlVertex2f((float)posX, (float)posY + (float)height + zoomFactor);
+        rlVertex2f((float)posX, (float)posY - zoomFactor);
     rlEnd();
-
 /*
 // Previous implementation, it has issues... but it does not require view matrix...
 #if defined(SUPPORT_QUADS_DRAW_MODE)
@@ -907,7 +845,7 @@ void DrawRectangleLines(int posX, int posY, int width, int height, Color color)
         rlVertex2f((float)posX + 1, (float)posY + (float)height);
         rlVertex2f((float)posX + 1, (float)posY + 1);
     rlEnd();
-#endif
+//#endif
 */
 }
 
@@ -946,7 +884,7 @@ void DrawRectangleLinesEx(Rectangle rec, float lineThick, Color color)
 void DrawRectangleRounded(Rectangle rec, float roundness, int segments, Color color)
 {
     // Not a rounded rectangle
-    if (roundness <= 0.0f)
+    if ((roundness <= 0.0f) || (rec.width < 1) || (rec.height < 1 ))
     {
         DrawRectangleRec(rec, color);
         return;
@@ -1169,9 +1107,9 @@ void DrawRectangleRounded(Rectangle rec, float roundness, int segments, Color co
 }
 
 // Draw rectangle with rounded edges
+// TODO: This function should be refactored to use RL_LINES, for consistency with other Draw*Lines()
 void DrawRectangleRoundedLines(Rectangle rec, float roundness, int segments, Color color)
 {
-    // NOTE: For line thicknes <=1.0f we use RL_LINES, otherwise wee use RL_QUADS/RL_TRIANGLES
     DrawRectangleRoundedLinesEx(rec, roundness, segments, 1.0f, color);
 }
 
@@ -1222,29 +1160,18 @@ void DrawRectangleRoundedLinesEx(Rectangle rec, float roundness, int segments, f
            P5 ================== P4
     */
     const Vector2 point[16] = {
-        {(float)rec.x + innerRadius + 0.5f, rec.y - lineThick + 0.5f},
-        {(float)(rec.x + rec.width) - innerRadius - 0.5f, rec.y - lineThick + 0.5f},
-        {rec.x + rec.width + lineThick - 0.5f, (float)rec.y + innerRadius + 0.5f}, // PO, P1, P2
-        {rec.x + rec.width + lineThick - 0.5f, (float)(rec.y + rec.height) - innerRadius - 0.5f},
-        {(float)(rec.x + rec.width) - innerRadius - 0.5f, rec.y + rec.height + lineThick - 0.5f}, // P3, P4
-        {(float)rec.x + innerRadius + 0.5f, rec.y + rec.height + lineThick - 0.5f},
-        {rec.x - lineThick + 0.5f, (float)(rec.y + rec.height) - innerRadius - 0.5f},
-        {rec.x - lineThick + 0.5f, (float)rec.y + innerRadius + 0.5f}, // P5, P6, P7
-        {(float)rec.x + innerRadius + 0.5f, rec.y + 0.5f},
-        {(float)(rec.x + rec.width) - innerRadius - 0.5f, rec.y + 0.5f}, // P8, P9
-        {rec.x + rec.width - 0.5f, (float)rec.y + innerRadius + 0.5f},
-        {rec.x + rec.width - 0.5f, (float)(rec.y + rec.height) - innerRadius - 0.5f}, // P10, P11
-        {(float)(rec.x + rec.width) - innerRadius - 0.5f, rec.y + rec.height - 0.5f},
-        {(float)rec.x + innerRadius + 0.5f, rec.y + rec.height - 0.5f}, // P12, P13
-        {rec.x + 0.5f, (float)(rec.y + rec.height) - innerRadius - 0.5f},
-        {rec.x + 0.5f, (float)rec.y + innerRadius + 0.5f} // P14, P15
+        {(float)rec.x + innerRadius, rec.y - lineThick}, {(float)(rec.x + rec.width) - innerRadius, rec.y - lineThick}, { rec.x + rec.width + lineThick, (float)rec.y + innerRadius }, // PO, P1, P2
+        {rec.x + rec.width + lineThick, (float)(rec.y + rec.height) - innerRadius}, {(float)(rec.x + rec.width) - innerRadius, rec.y + rec.height + lineThick}, // P3, P4
+        {(float)rec.x + innerRadius, rec.y + rec.height + lineThick}, { rec.x - lineThick, (float)(rec.y + rec.height) - innerRadius}, {rec.x - lineThick, (float)rec.y + innerRadius}, // P5, P6, P7
+        {(float)rec.x + innerRadius, rec.y}, {(float)(rec.x + rec.width) - innerRadius, rec.y}, // P8, P9
+        { rec.x + rec.width, (float)rec.y + innerRadius }, {rec.x + rec.width, (float)(rec.y + rec.height) - innerRadius}, // P10, P11
+        {(float)(rec.x + rec.width) - innerRadius, rec.y + rec.height}, {(float)rec.x + innerRadius, rec.y + rec.height}, // P12, P13
+        { rec.x, (float)(rec.y + rec.height) - innerRadius}, {rec.x, (float)rec.y + innerRadius} // P14, P15
     };
 
     const Vector2 centers[4] = {
-        {(float)rec.x + innerRadius + 0.5f, (float)rec.y + innerRadius + 0.5f},
-        {(float)(rec.x + rec.width) - innerRadius - 0.5f, (float)rec.y + innerRadius + 0.5f}, // P16, P17
-        {(float)(rec.x + rec.width) - innerRadius - 0.5f, (float)(rec.y + rec.height) - innerRadius - 0.5f},
-        {(float)rec.x + innerRadius + 0.5f, (float)(rec.y + rec.height) - innerRadius - 0.5f} // P18, P19
+        {(float)rec.x + innerRadius, (float)rec.y + innerRadius}, {(float)(rec.x + rec.width) - innerRadius, (float)rec.y + innerRadius}, // P16, P17
+        {(float)(rec.x + rec.width) - innerRadius, (float)(rec.y + rec.height) - innerRadius}, {(float)rec.x + innerRadius, (float)(rec.y + rec.height) - innerRadius} // P18, P19
     };
 
     const float angles[4] = { 180.0f, 270.0f, 0.0f, 90.0f };
@@ -1395,6 +1322,7 @@ void DrawRectangleRoundedLinesEx(Rectangle rec, float roundness, int segments, f
     {
         // Use LINES to draw the outline
         rlBegin(RL_LINES);
+
             // Draw all the 4 corners first: Upper Left Corner, Upper Right Corner, Lower Right Corner, Lower Left Corner
             for (int k = 0; k < 4; ++k) // Hope the compiler is smart enough to unroll this loop
             {
@@ -1417,6 +1345,7 @@ void DrawRectangleRoundedLinesEx(Rectangle rec, float roundness, int segments, f
                 rlVertex2f(point[i].x, point[i].y);
                 rlVertex2f(point[i + 1].x, point[i + 1].y);
             }
+
         rlEnd();
     }
 }
@@ -1430,7 +1359,6 @@ void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color)
     Rectangle shapeRect = GetShapesTextureRectangle();
 
     rlBegin(RL_QUADS);
-        rlNormal3f(0.0f, 0.0f, 1.0f);
         rlColor4ub(color.r, color.g, color.b, color.a);
 
         rlTexCoord2f(shapeRect.x/texShapes.width, shapeRect.y/texShapes.height);
@@ -1440,7 +1368,7 @@ void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color)
         rlVertex2f(v2.x, v2.y);
 
         rlTexCoord2f((shapeRect.x + shapeRect.width)/texShapes.width, (shapeRect.y + shapeRect.height)/texShapes.height);
-        rlVertex2f(v3.x, v3.y);
+        rlVertex2f(v2.x, v2.y);
 
         rlTexCoord2f((shapeRect.x + shapeRect.width)/texShapes.width, shapeRect.y/texShapes.height);
         rlVertex2f(v3.x, v3.y);
@@ -2295,7 +2223,7 @@ bool CheckCollisionPointTriangle(Vector2 point, Vector2 p1, Vector2 p2, Vector2 
 // NOTE: Based on http://jeffreythompson.org/collision-detection/poly-point.php
 bool CheckCollisionPointPoly(Vector2 point, const Vector2 *points, int pointCount)
 {
-    bool collision = false;
+    bool inside = false;
 
     if (pointCount > 2)
     {
@@ -2304,12 +2232,12 @@ bool CheckCollisionPointPoly(Vector2 point, const Vector2 *points, int pointCoun
             if ((points[i].y > point.y) != (points[j].y > point.y) &&
                 (point.x < (points[j].x - points[i].x)*(point.y - points[i].y)/(points[j].y - points[i].y) + points[i].x))
             {
-                collision = !collision;
+                inside = !inside;
             }
         }
     }
 
-    return collision;
+    return inside;
 }
 
 // Check collision between two rectangles
@@ -2414,8 +2342,8 @@ bool CheckCollisionPointLine(Vector2 point, Vector2 p1, Vector2 p2, int threshol
     return collision;
 }
 
-// Check if circle collides with a line created between two points [p1] and [p2]
-bool CheckCollisionCircleLine(Vector2 center, float radius, Vector2 p1, Vector2 p2)
+// Check if circle collides with a line created betweeen two points [p1] and [p2]
+RLAPI bool CheckCollisionCircleLine(Vector2 center, float radius, Vector2 p1, Vector2 p2)
 {
     float dx = p1.x - p2.x;
     float dy = p1.y - p2.y;
@@ -2464,7 +2392,7 @@ Rectangle GetCollisionRec(Rectangle rec1, Rectangle rec2)
 }
 
 //----------------------------------------------------------------------------------
-// Module Internal Functions Definition
+// Module specific Functions Definition
 //----------------------------------------------------------------------------------
 
 // Cubic easing in-out

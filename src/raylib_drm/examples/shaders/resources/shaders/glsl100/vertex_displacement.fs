@@ -6,6 +6,7 @@ precision mediump float;
 varying vec2 fragTexCoord;
 varying float height;
 
+
 void main()
 {
     vec4 darkblue = vec4(0.0, 0.13, 0.18, 1.0);

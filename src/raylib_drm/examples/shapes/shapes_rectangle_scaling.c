@@ -1,8 +1,6 @@
 /*******************************************************************************************
 *
-*   raylib [shapes] example - rectangle scaling
-*
-*   Example complexity rating: [★★☆☆] 2/4
+*   raylib [shapes] example - rectangle scaling by mouse
 *
 *   Example originally created with raylib 2.5, last time updated with raylib 2.5
 *
@@ -11,7 +9,7 @@
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2018-2025 Vlad Adrian (@demizdor) and Ramon Santamaria (@raysan5)
+*   Copyright (c) 2018-2024 Vlad Adrian (@demizdor) and Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -29,7 +27,7 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [shapes] example - rectangle scaling");
+    InitWindow(screenWidth, screenHeight, "raylib [shapes] example - rectangle scaling mouse");
 
     Rectangle rec = { 100, 100, 200, 80 };
 
@@ -65,7 +63,7 @@ int main(void)
             // Check minimum rec size
             if (rec.width < MOUSE_SCALE_MARK_SIZE) rec.width = MOUSE_SCALE_MARK_SIZE;
             if (rec.height < MOUSE_SCALE_MARK_SIZE) rec.height = MOUSE_SCALE_MARK_SIZE;
-
+            
             // Check maximum rec size
             if (rec.width > (GetScreenWidth() - rec.x)) rec.width = GetScreenWidth() - rec.x;
             if (rec.height > (GetScreenHeight() - rec.y)) rec.height = GetScreenHeight() - rec.y;

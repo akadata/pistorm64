@@ -1,17 +1,15 @@
 /*******************************************************************************************
 *
-*   raylib [models] example - loading
-*
-*   Example complexity rating: [★☆☆☆] 1/4
+*   raylib [models] example - Models loading
 *
 *   NOTE: raylib supports multiple models file formats:
 *
 *     - OBJ  > Text file format. Must include vertex position-texcoords-normals information,
-*              if files references some .mtl materials file, it will be loaded (or try to)
+*              if files references some .mtl materials file, it will be loaded (or try to).
 *     - GLTF > Text/binary file format. Includes lot of information and it could
-*              also reference external files, raylib will try loading mesh and materials data
+*              also reference external files, raylib will try loading mesh and materials data.
 *     - IQM  > Binary file format. Includes mesh vertex data but also animation data,
-*              raylib can load .iqm animations
+*              raylib can load .iqm animations.
 *     - VOX  > Binary file format. MagikaVoxel mesh format:
 *              https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
 *     - M3D  > Binary file format. Model 3D format:
@@ -22,7 +20,7 @@
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2014-2025 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2014-2024 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -38,7 +36,7 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [models] example - loading");
+    InitWindow(screenWidth, screenHeight, "raylib [models] example - models loading");
 
     // Define the camera to look into our 3d world
     Camera camera = { 0 };

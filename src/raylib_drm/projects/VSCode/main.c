@@ -15,7 +15,7 @@
 *   This example has been created using raylib 1.0 (www.raylib.com)
 *   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
 *
-*   Copyright (c) 2013-2025 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2013-2024 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -26,18 +26,18 @@
 #endif
 
 //----------------------------------------------------------------------------------
-// Global Variables Definition (local to this module)
+// Local Variables Definition (local to this module)
 //----------------------------------------------------------------------------------
 Camera camera = { 0 };
 Vector3 cubePosition = { 0 };
 
 //----------------------------------------------------------------------------------
-// Module Functions Declaration
+// Local Functions Declaration
 //----------------------------------------------------------------------------------
 static void UpdateDrawFrame(void);          // Update and draw one frame
 
 //----------------------------------------------------------------------------------
-// Program main entry point
+// Main entry point
 //----------------------------------------------------------------------------------
 int main()
 {

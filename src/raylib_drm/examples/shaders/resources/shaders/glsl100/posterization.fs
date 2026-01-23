@@ -10,7 +10,7 @@ varying vec4 fragColor;
 uniform sampler2D texture0;
 uniform vec4 colDiffuse;
 
-// NOTE: Add your custom variables here
+// NOTE: Add here your custom variables
 
 float gamma = 0.6;
 float numColors = 8.0;

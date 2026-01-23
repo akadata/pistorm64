@@ -1,15 +1,13 @@
 /*******************************************************************************************
 *
-*   raylib [textures] example - srcrec dstrec
-*
-*   Example complexity rating: [★★★☆] 3/4
+*   raylib [textures] example - Texture source and destination rectangles
 *
 *   Example originally created with raylib 1.3, last time updated with raylib 1.3
 *
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2015-2025 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2015-2024 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -25,7 +23,7 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [textures] example - srcrec dstrec");
+    InitWindow(screenWidth, screenHeight, "raylib [textures] examples - texture source and destination rectangles");
 
     // NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
 

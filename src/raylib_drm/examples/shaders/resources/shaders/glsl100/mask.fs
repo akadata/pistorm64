@@ -12,7 +12,7 @@ uniform sampler2D mask;
 uniform vec4 colDiffuse;
 uniform int frame;
 
-// NOTE: Add your custom variables here
+// NOTE: Add here your custom variables
 
 void main()
 {

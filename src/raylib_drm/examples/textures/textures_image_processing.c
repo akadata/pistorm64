@@ -1,8 +1,6 @@
 /*******************************************************************************************
 *
-*   raylib [textures] example - image processing
-*
-*   Example complexity rating: [★★★☆] 3/4
+*   raylib [textures] example - Image processing
 *
 *   NOTE: Images are loaded in CPU memory (RAM); textures are loaded in GPU memory (VRAM)
 *
@@ -11,7 +9,7 @@
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2016-2025 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2016-2024 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 

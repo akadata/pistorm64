@@ -1,8 +1,6 @@
 /*******************************************************************************************
 *
-*   raylib [models] example - rlgl solar system
-*
-*   Example complexity rating: [★★★★] 4/4
+*   raylib [models] example - rlgl module usage with push/pop matrix transformations
 *
 *   NOTE: This example uses [rlgl] module functionality (pseudo-OpenGL 1.1 style coding)
 *
@@ -11,7 +9,7 @@
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2018-2025 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2018-2024 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -41,7 +39,7 @@ int main(void)
     const float moonRadius = 0.16f;
     const float moonOrbitRadius = 1.5f;
 
-    InitWindow(screenWidth, screenHeight, "raylib [models] example - rlgl solar system");
+    InitWindow(screenWidth, screenHeight, "raylib [models] example - rlgl module usage with push/pop matrix transformations");
 
     // Define the camera to look into our 3d world
     Camera camera = { 0 };
@@ -128,8 +126,9 @@ int main(void)
 }
 
 //--------------------------------------------------------------------------------------------
-// Module Functions Definition
+// Module Functions Definitions (local)
 //--------------------------------------------------------------------------------------------
+
 // Draw sphere without any matrix transformation
 // NOTE: Sphere is drawn in world position ( 0, 0, 0 ) with radius 1.0f
 void DrawSphereBasic(Color color)

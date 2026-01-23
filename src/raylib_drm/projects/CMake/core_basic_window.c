@@ -31,7 +31,7 @@ int screenHeight = 450;
 void UpdateDrawFrame(void);     // Update and Draw one frame
 
 //----------------------------------------------------------------------------------
-// Program main entry point
+// Main Entry Point
 //----------------------------------------------------------------------------------
 int main()
 {

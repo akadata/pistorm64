@@ -1,17 +1,13 @@
 /*******************************************************************************************
 *
-*   raylib [textures] example - image generation
-*
-*   Example complexity rating: [★★☆☆] 2/4
+*   raylib [textures] example - Procedural images generation
 *
 *   Example originally created with raylib 1.8, last time updated with raylib 1.8
-*
-*   Example contributed by Wilhem Barbier (@nounoursheureux) and reviewed by Ramon Santamaria (@raysan5)
 *
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2017-2025 Wilhem Barbier (@nounoursheureux) and Ramon Santamaria (@raysan5)
+*   Copyright (c) 2O17-2024 Wilhem Barbier (@nounoursheureux) and Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -29,7 +25,7 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [textures] example - image generation");
+    InitWindow(screenWidth, screenHeight, "raylib [textures] example - procedural images generation");
 
     Image verticalGradient = GenImageGradientLinear(screenWidth, screenHeight, 0, RED, BLUE);
     Image horizontalGradient = GenImageGradientLinear(screenWidth, screenHeight, 90, RED, BLUE);
@@ -92,7 +88,7 @@ int main(void)
             DrawRectangleLines(30, 400, 325, 30, Fade(WHITE, 0.5f));
             DrawText("MOUSE LEFT BUTTON to CYCLE PROCEDURAL TEXTURES", 40, 410, 10, WHITE);
 
-            switch (currentTexture)
+            switch(currentTexture)
             {
                 case 0: DrawText("VERTICAL GRADIENT", 560, 10, 20, RAYWHITE); break;
                 case 1: DrawText("HORIZONTAL GRADIENT", 540, 10, 20, RAYWHITE); break;

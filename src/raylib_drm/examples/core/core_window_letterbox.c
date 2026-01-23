@@ -1,8 +1,6 @@
 /*******************************************************************************************
 *
-*   raylib [core] example - window letterbox
-*
-*   Example complexity rating: [★★☆☆] 2/4
+*   raylib [core] example - window scale letterbox (and virtual mouse)
 *
 *   Example originally created with raylib 2.5, last time updated with raylib 4.0
 *
@@ -11,7 +9,7 @@
 *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software
 *
-*   Copyright (c) 2019-2025 Anata (@anatagawa) and Ramon Santamaria (@raysan5)
+*   Copyright (c) 2019-2024 Anata (@anatagawa) and Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
 
@@ -27,12 +25,12 @@
 //------------------------------------------------------------------------------------
 int main(void)
 {
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int windowWidth = 800;
+    const int windowHeight = 450;
 
     // Enable config flags for resizable window and vertical synchro
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - window letterbox");
+    InitWindow(windowWidth, windowHeight, "raylib [core] example - window scale letterbox");
     SetWindowMinSize(320, 240);
 
     int gameScreenWidth = 640;
@@ -86,7 +84,7 @@ int main(void)
             DrawText(TextFormat("Default Mouse: [%i , %i]", (int)mouse.x, (int)mouse.y), 350, 25, 20, GREEN);
             DrawText(TextFormat("Virtual Mouse: [%i , %i]", (int)virtualMouse.x, (int)virtualMouse.y), 350, 55, 20, YELLOW);
         EndTextureMode();
-
+        
         BeginDrawing();
             ClearBackground(BLACK);     // Clear screen background
 
