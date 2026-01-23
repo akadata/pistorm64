@@ -52,3 +52,6 @@ dumpdisk
 clang.log
 gcc.log
 core.*
+core
+core.*
+*.core
