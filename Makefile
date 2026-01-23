@@ -24,23 +24,27 @@ PLATFORM=PI4_64BIT
 PISTORM_ENABLE_BATCH=1
 PISTORM_IPL_RATELIMIT_US=100  
 
-
-
 PISTORM_KMOD ?= 1
-EXTRA_CFLAGS ?=
-EXTRA_M68K_CFLAGS ?= -O3 -ffast-math
-EXTRA_LDFLAGS ?=
 
+# Default compilers (can still override with CC=... directly)
+CC  ?= gcc
+CXX ?= g++
 
+# Legacy shorthand: make C=clang or make C=gcc
 ifeq ($(C),clang)
-CC := clang
+CC  := clang
 CXX := clang++
 endif
 
 ifeq ($(C),gcc)
-CC := gcc
+CC  := gcc
 CXX := g++
 endif
+
+
+EXTRA_CFLAGS ?=
+EXTRA_M68K_CFLAGS ?= -O3 -ffast-math
+EXTRA_LDFLAGS ?=
 
 
 # Tunables: edit here instead of hunting through rule bodies.
@@ -104,10 +108,20 @@ USE_PIPE   ?= 1
 PISTORM_KMOD ?= 1
 
 # Quiet noisy-but-benign warnings from the generated 68k core.
-M68K_WARN_SUPPRESS ?= \
+# Split into common + GCC-only; clang doesn't support every GCC flag.
+M68K_WARN_SUPPRESS_COMMON = \
   -Wno-unused-variable \
-  -Wno-unused-parameter \
+  -Wno-unused-parameter
+
+M68K_WARN_SUPPRESS_GCC = \
   -Wno-unused-but-set-variable
+
+# Pick suppressions based on the actual compiler (CC), not C.
+ifeq ($(findstring clang,$(CC)),clang)
+  M68K_WARN_SUPPRESS ?= $(M68K_WARN_SUPPRESS_COMMON)
+else
+  M68K_WARN_SUPPRESS ?= $(M68K_WARN_SUPPRESS_COMMON) $(M68K_WARN_SUPPRESS_GCC)
+endif
 
 # Default CPU flags; overridden by PLATFORM selections below.
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
