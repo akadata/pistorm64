@@ -60,8 +60,8 @@ endif
 # OMIT_FP    : set to 1 to omit frame pointers (-fomit-frame-pointer) for perf.
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
-#WARNINGS   ?= -Wall -Wextra -pedantic
-WARNINGS ?= \
+WARNINGS   ?= -Wall -Wextra -pedantic
+EMU_WARNINGS ?= \
   -Wall -Wextra -Wpedantic \
   -Wformat=2 -Wwrite-strings -Wcast-qual -Wcast-align \
   -Wpointer-arith -Wstrict-overflow=5 -Wstrict-prototypes -Wmissing-prototypes \
@@ -101,7 +101,10 @@ USE_PIPE   ?= 1
 PISTORM_KMOD ?= 1
 
 # Quiet noisy-but-benign warnings from the generated 68k core.
-M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable
+M68K_WARN_SUPPRESS ?= \
+  -Wno-unused-variable \
+  -Wno-unused-parameter \
+  -Wno-unused-but-set-variable
 
 # Default CPU flags; overridden by PLATFORM selections below.
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
@@ -295,10 +298,25 @@ INCLUDES += -Iinclude -Iinclude/uapi
 DEFINES  += -DPISTORM_KMOD
 endif
 
-CFLAGS       = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
-CXXFLAGS     = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
-M68K_CFLAGS   = $(CFLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
-LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS) $(EXTRA_LDFLAGS)
+# Core flags
+CFLAGS       = $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) \
+               $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) \
+               $(PIPE_FLAGS) $(EXTRA_CFLAGS)
+
+CXXFLAGS     = $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) \
+               $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) \
+               $(PIPE_FLAGS) $(EXTRA_CFLAGS)
+
+# Linker flags (warning flags via compiler driver, harmless)
+LDFLAGS      = $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS) $(EXTRA_LDFLAGS)
+
+# Apply “angry” warnings to normal code
+CFLAGS      += $(EMU_WARNINGS)
+CXXFLAGS    += $(EMU_WARNINGS)
+LDFLAGS     += $(EMU_WARNINGS)
+
+# Musashi gets base warnings + suppressions (and all the other CFLAGS)
+M68K_CFLAGS  = $(WARNINGS) $(CFLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
 
 LDLIBS   = $(RAYLIB_LIBS) $(LIBS) $(LDLIBS_VC) $(LDLIBS_ALSA)
 
