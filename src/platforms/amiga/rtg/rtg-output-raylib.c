@@ -70,7 +70,7 @@ struct rtg_shared_data {
 float scale_x = 1.0f, scale_y = 1.0f;
 static Rectangle srcrect, dstscale;
 static Vector2 origin;
-static uint8_t scale_mode = PIGFX_SCALE_FULL_ASPECT;
+static uint8_t scale_mode = PIGFX_SCALE_FULL;
 static uint8_t filter_mode = 0;
 
 struct rtg_shared_data rtg_share_data;
@@ -218,13 +218,12 @@ static void rtg_autodetect_screen_size(void) {
   int auto_h = 0;
   int req_supported = 0;
   char conn[64] = {0};
-  if (!rtg_detect_screen_size(req_w, req_h, &auto_w, &auto_h, conn, sizeof(conn),
-                              &req_supported)) {
+  if (!rtg_detect_screen_size(req_w, req_h, &auto_w, &auto_h, conn, sizeof(conn), &req_supported)) {
     return;
   }
   if (req_w > 0 && req_h > 0 && !req_supported) {
-    LOG_WARN("[RTG/RAYLIB] Output mode %dx%d not available; falling back to %dx%d\n", req_w,
-             req_h, auto_w, auto_h);
+    LOG_WARN("[RTG/RAYLIB] Output mode %dx%d not available; falling back to %dx%d\n", req_w, req_h,
+             auto_w, auto_h);
   }
   pi_screen_width = auto_w;
   pi_screen_height = auto_h;
@@ -346,19 +345,19 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
     dstscale.height = dst_h;
   }
 
+  if (center) {
+    dstscale.x = (screen_w - dstscale.width) * 0.5f;
+    dstscale.y = (screen_h - dstscale.height) * 0.5f;
+  }
+
   scale_x = (src_w > 0.0f) ? (dstscale.width / src_w) : 1.0f;
   scale_y = (src_h > 0.0f) ? (dstscale.height / src_h) : 1.0f;
 
-  if (center) {
-    origin.x = (dstscale.width - screen_w) * 0.5f;
-    origin.y = (dstscale.height - screen_h) * 0.5f;
-  } else {
-    origin.x = 0.0f;
-    origin.y = 0.0f;
-  }
+  origin.x = 0.0f;
+  origin.y = 0.0f;
 
-  DEBUG("[RTG/RAYLIB] Scale mode=%u src=%ux%u dst=%.1fx%.1f origin=%.1f,%.1f\n", scale_mode,
-        width, height, dstscale.width, dstscale.height, origin.x, origin.y);
+  DEBUG("[RTG/RAYLIB] Scale mode=%u src=%ux%u dst=%.1fx%.1f offset=%.1f,%.1f\n", scale_mode, width,
+        height, dstscale.width, dstscale.height, dstscale.x, dstscale.y);
 }
 
 void* rtgThread(void* args) {
@@ -400,8 +399,8 @@ void* rtgThread(void* args) {
 
   InitWindow(pi_screen_width, pi_screen_height, "Pistorm RTG");
   if (!IsWindowReady()) {
-    LOG_ERROR("[RTG/RAYLIB] InitWindow failed for %dx%d; disabling RTG output.\n",
-              pi_screen_width, pi_screen_height);
+    LOG_ERROR("[RTG/RAYLIB] InitWindow failed for %dx%d; disabling RTG output.\n", pi_screen_width,
+              pi_screen_height);
     rtg_on = 0;
     rtg_initialized = 0;
     display_enabled = 0xFF;
@@ -556,8 +555,8 @@ reinit_raylib:;
     raylib_fb.data = &data->memory[frame_addr];
   }
 
-  LOG_DEBUG("[RTG/RAYLIB] FB init: %ux%u pitch=%u bpp=%zu addr=0x%08X\n", width, height, pitch,
-            bpp, frame_addr);
+  LOG_DEBUG("[RTG/RAYLIB] FB init: %ux%u pitch=%u bpp=%zu addr=0x%08X\n", width, height, pitch, bpp,
+            frame_addr);
   raylib_texture = LoadTextureFromImage(raylib_fb);
   if (raylib_texture.id == 0) {
     LOG_ERROR("[RTG/RAYLIB] Failed to create framebuffer texture; disabling RTG output.\n");
@@ -663,9 +662,15 @@ reinit_raylib:;
       if (mouse_cursor_enabled || clut_cursor_enabled) {
         float mc_x = mouse_cursor_x - frame_offset_x + mouse_cursor_x_adj;
         float mc_y = mouse_cursor_y - frame_offset_y + mouse_cursor_y_adj;
+        float cursor_off_x = dstscale.x;
+        float cursor_off_y = dstscale.y;
+        if (scale_mode == PIGFX_SCALE_CUSTOM || scale_mode == PIGFX_SCALE_CUSTOM_RECT) {
+          cursor_off_x = 0.0f;
+          cursor_off_y = 0.0f;
+        }
         Rectangle cursor_srcrect = {0, 0, mouse_cursor_w, mouse_cursor_h};
-        Rectangle dstrect = {mc_x * scale_x, mc_y * scale_y, (float)mouse_cursor_w * scale_x,
-                             (float)mouse_cursor_h * scale_y};
+        Rectangle dstrect = {cursor_off_x + (mc_x * scale_x), cursor_off_y + (mc_y * scale_y),
+                             (float)mouse_cursor_w * scale_x, (float)mouse_cursor_h * scale_y};
         DrawTexturePro(raylib_cursor_texture, cursor_srcrect, dstrect, origin, 0.0f, RAYWHITE);
       }
 
@@ -699,8 +704,7 @@ reinit_raylib:;
           if (indexed_buf_size < tight_size) {
             void* resized = realloc(indexed_buf, tight_size);
             if (!resized) {
-              LOG_ERROR("[RTG/RAYLIB] Failed to allocate indexed buffer (%zu bytes)\n",
-                        tight_size);
+              LOG_ERROR("[RTG/RAYLIB] Failed to allocate indexed buffer (%zu bytes)\n", tight_size);
             } else {
               indexed_buf = resized;
               indexed_buf_size = tight_size;
@@ -833,7 +837,7 @@ void rtg_init_display(void) {
     }
 #endif
 
-    err = pthread_create(&thread_id, NULL, &rtgThread, (void *)&rtg_share_data);
+    err = pthread_create(&thread_id, NULL, &rtgThread, (void*)&rtg_share_data);
     if (err != 0) {
       rtg_on = 0;
       display_enabled = 0xFF;
@@ -846,7 +850,6 @@ void rtg_init_display(void) {
   }
   LOG_INFO("RTG display enabled.\n");
 }
-
 
 void rtg_shutdown_display(void) {
   LOG_INFO("RTG display disabled.\n");
@@ -870,7 +873,6 @@ void rtg_shutdown_display(void) {
 
   display_enabled = 0xFF;
 }
-
 
 void rtg_show_clut_cursor(uint8_t show) {
   if (clut_cursor_enabled != show) {

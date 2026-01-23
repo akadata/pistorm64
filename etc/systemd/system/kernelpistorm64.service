@@ -7,12 +7,13 @@ Type=simple
 Restart=always
 RestartSec=1
 User=smalley
+#LimitCORE=0
 ExecStart=/home/smalley/pistorm64/emulator
 WorkingDirectory=/home/smalley/pistorm64
 Nice=-10
 IOSchedulingClass=1
 IOSchedulingPriority=2
-CPUAffinity=2-3
+CPUAffinity=1-3
 OOMScoreAdjust=-1000
 Environment=SDL_VIDEODRIVER=drm
 Environment=SDL_FBDEV=/dev/fb0
