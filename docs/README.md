@@ -168,8 +168,7 @@ Upstream foundations:
 
 Tooling and assistance:
   • Built with GCC/Clang, Make, vim, and a lot of bustest.
-  • Heavy use of AI code assistants (Qwen/Codex/GPT-style),
-    acting as “compiler + IDE + static analyser + rubber duck… with a mouth.”
+  • Heavy use of AI code assistants (Qwen/Codex/GPT-style), acting as “compiler + IDE + static analyser + rubber duck… with a mouth.”
 
 ## Disclaimer
 
