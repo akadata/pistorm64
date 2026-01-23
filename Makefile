@@ -60,7 +60,15 @@ endif
 # OMIT_FP    : set to 1 to omit frame pointers (-fomit-frame-pointer) for perf.
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
-WARNINGS   ?= -Wall -Wextra -pedantic
+#WARNINGS   ?= -Wall -Wextra -pedantic
+WARNINGS ?= \
+  -Wall -Wextra -Wpedantic \
+  -Wformat=2 -Wwrite-strings -Wcast-qual -Wcast-align \
+  -Wpointer-arith -Wstrict-overflow=5 -Wstrict-prototypes -Wmissing-prototypes \
+  -Wswitch-enum -Wshadow \
+  -Wconversion -Wsign-conversion \
+  -Wundef -Wvla -Wredundant-decls
+
 OPT_LEVEL  ?= -O3 -ffast-math
 
 ifdef O
@@ -247,12 +255,6 @@ CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
 else ifeq ($(PLATFORM),ZEROW2_64)
 CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
 else ifeq ($(PLATFORM),NATIVE) 
-VC_INC    :=
-VC_LIBDIR :=
-LDLIBS_VC :=
-RAYLIB_DIR := $(CURDIR)/src/raylib_drm
-RAYLIB_INC := -I$(RAYLIB_DIR)/src
-RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 CPUFLAGS = -march=native
 endif
 
