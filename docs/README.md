@@ -73,6 +73,9 @@ This derivative work is also released under the MIT License, continuing the open
 - Bypasses the emulator for specific operations
 - Located in `src/platforms/amiga/registers/`
 
+### JanusD
+- Read all about it in the janus branch
+
 ### Direct Hardware Access Registers
 - Added new registers to enable direct communication with Amiga hardware
 - Allows code to interact with Amiga 500 OCS/ECS without running the full emulator
@@ -121,13 +124,17 @@ sudo insmod pistorm.ko gpclk_src=6 gpclk_div=12
 ```
 
 ## Testing Status
-
-- ✅ Pi Zero 2 W with Debian Trixie
-- ✅ Pi Zero 2 W with Raspbian Buster  
-- ✅ Pi Zero 2 W with Alpine Linux
-- ⚠️ PiRTG - Needs additional testing
+- ✅ Pi4 8GB with Debian Trixie (64 Bit) 6.18.6-v8+ 6.12.62+rpt-rpi-v8
+- ✅ Pi Zero 2 W with Debian Trixie (64 Bit) 6.12.62+rpt-rpi-v8
+- ✅ Pi Zero 2 W with Raspbian Buster (64 Bit)
+- ✅ Pi Zero 2 W with Alpine Linux (64 Bit)
+- ⚠️ PiRTG - Needs additional testing  (64 Bit) Alpha
 - ✅ Direct register access functionality
 - ✅ pimodplay demonstration tool
+- ✅ PISCSI, Full A314 Suite now working Includeing Mounting Read and Write of ADF
+- ⚠️ Kernel PiStorm Janus IPC Ring - Remote IPC janus-fractal and Janusd tested and functional forget emulaton ask another host to do the work.
+
+## compiler + IDE + static analyser + rubber duck… with a mouth.
 
 ## Architecture Notes
 
@@ -152,6 +159,19 @@ This project builds upon the excellent work of the original PiStorm developers. 
 - The Amiga community for continued support and inspiration
 - Raspberry Pi Foundation for the hardware platform
 
+
+Upstream foundations:
+  • PiStorm by the captain-amygdala and contributors
+  • Musashi 68k core by Karl Stenerud and contributors
+  • SoftFloat by John R. Hauser
+  • Picasso96, A314, PiSCSI and the wider Amiga community
+
+Tooling and assistance:
+  • Built with GCC/Clang, Make, vim, and a lot of bustest.
+  • Heavy use of AI code assistants (Qwen/Codex/GPT-style),
+    acting as “compiler + IDE + static analyser + rubber duck… with a mouth.”
+
 ## Disclaimer
 
-This project is provided as-is under the MIT License. Please ensure you have proper hardware knowledge before connecting any devices. The authors are not responsible for any hardware damage resulting from improper use.
+This project is provided as-is under the MIT License. Please ensure you have proper hardware knowledge before connecting any devices. 
+The authors are not responsible for any hardware damage resulting from improper use.
