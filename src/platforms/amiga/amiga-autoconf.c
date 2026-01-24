@@ -122,7 +122,7 @@ int ac_z3_index[AC_PIC_LIMIT];
 uint32_t piscsi_base = 0, pistorm_dev_base = 0;
 extern uint8_t* piscsi_rom_ptr;
 
-unsigned char get_autoconf_size(int size) {
+static unsigned char get_autoconf_size(unsigned int size) {
   if (size == 8 * SIZE_MEGA)
     return AC_MEM_SIZE_8MB;
   if (size == 4 * SIZE_MEGA)
@@ -133,7 +133,7 @@ unsigned char get_autoconf_size(int size) {
     return AC_MEM_SIZE_64KB;
 }
 
-unsigned char get_autoconf_size_ext(int size) {
+static unsigned char get_autoconf_size_ext(unsigned int size) {
   if (size == 16 * SIZE_MEGA)
     return AC_MEM_SIZE_EXT_16MB;
   if (size == 32 * SIZE_MEGA)
@@ -235,7 +235,8 @@ unsigned int autoconfig_read_memory_z3_8(struct emulator_config* cfg, unsigned i
     }
   }
   // printf("Read byte %d from Z3 autoconf for PIC %d (%.2X).\n", address, ac_z3_current_pic, val);
-  return (address & 0x100) ? (val << 4) ^ 0xFF : (val & 0xF0) ^ 0xFF;
+  return (address & 0x100) ? (unsigned int)((val << 4) ^ 0xFF)
+                           : (unsigned int)((val & 0xF0) ^ 0xFF);
 }
 
 int nib_latch = 0;
@@ -249,25 +250,31 @@ void autoconfig_write_memory_z3_8(struct emulator_config* cfg, unsigned int addr
   switch (address & 0xFF) {
   case AC_Z3_REG_WR_ADDR_LO:
     if (nib_latch) {
-      ac_base[ac_z3_current_pic] = (ac_base[ac_z3_current_pic] & 0xFF0F0000) | ((val & 0xF0) << 16);
+      ac_base[ac_z3_current_pic] =
+          (ac_base[ac_z3_current_pic] & 0xFF0F0000) | ((unsigned int)(val & 0xF0) << 16);
       nib_latch = 0;
     } else
-      ac_base[ac_z3_current_pic] = (ac_base[ac_z3_current_pic] & 0xFF000000) | (val << 16);
+      ac_base[ac_z3_current_pic] =
+          (ac_base[ac_z3_current_pic] & 0xFF000000) | ((unsigned int)val << 16);
     break;
   case AC_Z3_REG_WR_ADDR_HI:
     if (nib_latch) {
-      ac_base[ac_z3_current_pic] = (ac_base[ac_z3_current_pic] & 0x0FFF0000) | ((val & 0xF0) << 24);
+      ac_base[ac_z3_current_pic] =
+          (ac_base[ac_z3_current_pic] & 0x0FFF0000) | ((unsigned int)(val & 0xF0) << 24);
       nib_latch = 0;
     }
-    ac_base[ac_z3_current_pic] = (ac_base[ac_z3_current_pic] & 0x00FF0000) | (val << 24);
+    ac_base[ac_z3_current_pic] =
+        (ac_base[ac_z3_current_pic] & 0x00FF0000) | ((unsigned int)val << 24);
     done = 1;
     break;
   case AC_Z3_REG_WR_ADDR_NIB_LO:
-    ac_base[ac_z3_current_pic] = (ac_base[ac_z3_current_pic] & 0xFFF00000) | ((val & 0xF0) << 12);
+    ac_base[ac_z3_current_pic] =
+        (ac_base[ac_z3_current_pic] & 0xFFF00000) | ((unsigned int)(val & 0xF0) << 12);
     nib_latch = 1;
     break;
   case AC_Z3_REG_WR_ADDR_NIB_HI:
-    ac_base[ac_z3_current_pic] = (ac_base[ac_z3_current_pic] & 0xF0FF0000) | ((val & 0xF0) << 20);
+    ac_base[ac_z3_current_pic] =
+        (ac_base[ac_z3_current_pic] & 0xF0FF0000) | ((unsigned int)(val & 0xF0) << 20);
     nib_latch = 1;
     break;
   case AC_Z3_REG_SHUTUP:
@@ -284,7 +291,8 @@ void autoconfig_write_memory_z3_8(struct emulator_config* cfg, unsigned int addr
              ac_base[ac_z3_current_pic]);
     cfg->map_offset[index] = ac_base[ac_z3_current_pic];
     cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
-    m68k_add_ram_range(cfg->map_offset[index], cfg->map_high[index], cfg->map_data[index]);
+    m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                       cfg->map_data[index]);
     ac_z3_current_pic++;
     if (ac_z3_current_pic == ac_z3_pic_count) {
       ac_z3_done = 1;
@@ -304,7 +312,8 @@ void autoconfig_write_memory_z3_16(struct emulator_config* cfg, unsigned int add
   switch (address & 0xFF) {
   case AC_Z3_REG_WR_ADDR_HI:
     // This is, as far as I know, the only register it should write a 16-bit value to.
-    ac_base[ac_z3_current_pic] = (ac_base[ac_z3_current_pic] & 0x00000000) | (val << 16);
+    ac_base[ac_z3_current_pic] =
+        (ac_base[ac_z3_current_pic] & 0x00000000) | ((unsigned int)val << 16);
     done = 1;
     break;
   default:
@@ -318,7 +327,8 @@ void autoconfig_write_memory_z3_16(struct emulator_config* cfg, unsigned int add
              ac_base[ac_z3_current_pic]);
     cfg->map_offset[index] = ac_base[ac_z3_current_pic];
     cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
-    m68k_add_ram_range(cfg->map_offset[index], cfg->map_high[index], cfg->map_data[index]);
+    m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                       cfg->map_data[index]);
     ac_z3_current_pic++;
     if (ac_z3_current_pic == ac_z3_pic_count) {
       ac_z3_done = 1;
@@ -453,7 +463,8 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
       cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
       LOG_INFO("[AUTOCONF] Address of Z2 autoconf RAM assigned to $%.8X\n",
                ac_base[ac_z2_current_pic]);
-      m68k_add_ram_range(cfg->map_offset[index], cfg->map_high[index], cfg->map_data[index]);
+      m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                         cfg->map_data[index]);
       LOG_INFO("[AUTOCONF] Z2 PIC %d at $%.8lX-%.8lX, Size: %d MB\n", ac_z2_current_pic,
                cfg->map_offset[index], cfg->map_high[index], cfg->map_size[index] / SIZE_MEGA);
       break;

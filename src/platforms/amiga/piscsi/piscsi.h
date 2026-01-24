@@ -256,7 +256,7 @@ struct FileSysHeaderBlock {
 
 void piscsi_init(void);
 void piscsi_shutdown(void);
-void piscsi_map_drive(char *filename, uint8_t index);
+void piscsi_map_drive(const char *filename, uint8_t index);
 void piscsi_unmap_drive(uint8_t index);
 int piscsi_validate_hdf(struct piscsi_dev *d, char *filename);
 struct piscsi_dev *piscsi_get_dev(uint8_t index);

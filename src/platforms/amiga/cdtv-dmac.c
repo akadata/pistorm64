@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "config_file/config_file.h"
+#include "amiga-registers.h"
 #include <endian.h>
 
 #include <endian.h>

@@ -398,8 +398,8 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 
       /* Read an instruction and call its handler */
       REG_IR = (uint16_t)m68ki_read_imm_16(state);
-      if (fpu_exec_hook && opcode_is_fpu(REG_IR)) {
-        fpu_exec_hook(state, REG_IR);
+      if (fpu_exec_hook && opcode_is_fpu((uint16_t)REG_IR)) {
+        fpu_exec_hook(state, (uint16_t)REG_IR);
       } else {
         m68ki_instruction_jump_table[REG_IR](state);
       }
@@ -507,7 +507,7 @@ cpu_loop:
       if (irq) {
         cpu_backend_execute(state, 5);
       } else {
-        cpu_backend_execute(state, slice);
+        cpu_backend_execute(state, (int)slice);
       }
     }
   }
@@ -1277,7 +1277,7 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
         uint8_t c = 0, t = 0;
         pop_queued_key(&c, &t);
         t ^= 0x01;
-        rres = ((c << 1) | t) ^ 0xFF;
+        rres = (uint32_t)((((uint32_t)c << 1) | t) ^ 0xFFu);
         *res = rres;
         return 1;
       }
@@ -1285,8 +1285,8 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
       break;
     case JOY0DAT:
       if (mouse_hook_enabled) {
-        unsigned short result = (mouse_dy << 8) | (mouse_dx);
-        *res = (unsigned int)result;
+        uint16_t result = (uint16_t)(((uint16_t)mouse_dy << 8) | mouse_dx);
+        *res = (uint32_t)result;
         return 1;
       }
       return 0;
@@ -1295,7 +1295,7 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
       // This code is kind of strange and should probably be reworked/revoked.
       uint8_t enable = 1;
       rres = (uint16_t)ps_read(type, addr);
-      uint16_t val = rres;
+      uint16_t val = (uint16_t)rres;
       if (val & 0x0007) {
         ipl_enabled[1] = enable;
       }
@@ -1690,7 +1690,7 @@ static int realtime_allowed(void) {
 }
 
 static void apply_affinity_from_env(const char* role, int default_core) {
-  int target = default_core;
+  int target_core = default_core;
   int fallback = -1;
   int matched = 0;
   const char* env = getenv(PI_AFFINITY_ENV);
@@ -1703,7 +1703,7 @@ static void apply_affinity_from_env(const char* role, int default_core) {
       int val = -1;
       if (sscanf(tok, "%15[^=]=%d", key, &val) == 2) {
         if (key_matches_role(role, key)) {
-          target = val;
+          target_core = val;
           matched = 1;
         }
         if (!matched && role_has_input_fallback(role) && strcasecmp(key, "input") == 0) {
@@ -1715,9 +1715,9 @@ static void apply_affinity_from_env(const char* role, int default_core) {
     free(dup);
   }
   if (!matched && fallback >= 0) {
-    target = fallback;
+    target_core = fallback;
   }
-  set_affinity_for(role, target);
+  set_affinity_for(role, target_core);
 }
 
 static void set_realtime_priority(const char* name, int prio) {
@@ -1745,7 +1745,7 @@ static void set_realtime_priority(const char* name, int prio) {
 static void apply_realtime_from_env(const char* role, int default_prio) {
   static int rt_warned;
   int allowed = realtime_allowed();
-  int target = default_prio;
+  int target_prio = default_prio;
   int fallback = -1;
   int matched = 0;
   const char* env = getenv(PI_RT_ENV);
@@ -1757,7 +1757,7 @@ static void apply_realtime_from_env(const char* role, int default_prio) {
       int val = -1;
       if (sscanf(tok, "%15[^=]=%d", key, &val) == 2) {
         if (key_matches_role(role, key)) {
-          target = val;
+          target_prio = val;
           matched = 1;
         }
         if (!matched && role_has_input_fallback(role) && strcasecmp(key, "input") == 0) {
@@ -1768,7 +1768,7 @@ static void apply_realtime_from_env(const char* role, int default_prio) {
     }
     free(dup);
     if (!matched && fallback >= 0) {
-      target = fallback;
+      target_prio = fallback;
     }
   } else if (!allowed) {
     return;
@@ -1782,8 +1782,8 @@ static void apply_realtime_from_env(const char* role, int default_prio) {
     return;
   }
 
-  if (target > 0) {
-    set_realtime_priority(role, target);
+  if (target_prio > 0) {
+    set_realtime_priority(role, target_prio);
   }
 }
 
@@ -1796,20 +1796,27 @@ static void cli_add_line(const char* fmt, ...) {
   char buf[512];
   va_list args;
   va_start(args, fmt);
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+#endif
   vsnprintf(buf, sizeof(buf), fmt, args);
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
   va_end(args);
 
   cli_config_lines[cli_config_count++] = strdup(buf);
 }
 
-static void apply_cli_overrides(struct emulator_config* cfg) {
-  if (!cfg || cli_config_count == 0) {
+static void apply_cli_overrides(struct emulator_config* cfg_local) {
+  if (!cfg_local || cli_config_count == 0) {
     return;
   }
 
   for (int i = 0; i < cli_config_count; i++) {
     if (strncmp(cli_config_lines[i], "platform ", 9) == 0) {
-      apply_config_line(cfg, cli_config_lines[i], 0);
+      apply_config_line(cfg_local, cli_config_lines[i], 0);
     }
   }
 
@@ -1823,7 +1830,7 @@ static void apply_cli_overrides(struct emulator_config* cfg) {
 
   for (int i = 0; i < cli_config_count; i++) {
     if (strncmp(cli_config_lines[i], "setvar ", 7) == 0) {
-      apply_config_line(cfg, cli_config_lines[i], 0);
+      apply_config_line(cfg_local, cli_config_lines[i], 0);
     }
   }
 }

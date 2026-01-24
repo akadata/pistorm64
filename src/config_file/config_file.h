@@ -103,7 +103,7 @@ struct platform_config {
   int (*platform_initial_setup)(struct emulator_config* cfg);
   void (*handle_reset)(struct emulator_config* cfg);
   void (*shutdown)(struct emulator_config* cfg);
-  void (*setvar)(struct emulator_config* cfg, char* var, char* val);
+  void (*setvar)(struct emulator_config* cfg, const char* var, const char* val);
 };
 
 #ifdef __cplusplus
@@ -122,9 +122,9 @@ int get_named_mapped_item(struct emulator_config* cfg, const char* name);
 int get_mapped_item_by_address(struct emulator_config* cfg, uint32_t address);
 uint8_t* get_mapped_data_pointer_by_address(struct emulator_config* cfg, uint32_t address);
 void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int addr,
-                 unsigned int size, int mirr_addr, char* filename, const char* map_id,
+                 unsigned int size, unsigned int mirr_addr, char* filename, const char* map_id,
                  unsigned int autodump);
-unsigned int get_int(char* str);
+unsigned int get_int(const char* str);
 #endif
 
 #endif /* _CONFIG_FILE_H */

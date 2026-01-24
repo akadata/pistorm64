@@ -224,7 +224,7 @@ int ps_flush_batch_queue(void) {
 #endif
 }
 
-void ps_update_irq(void) {
+static void __attribute__((unused)) ps_update_irq(void) {
     unsigned int ipl = 0;
 
     if (!ps_get_ipl_zero()) {

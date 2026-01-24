@@ -91,14 +91,28 @@ void log_message(int level, const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);
   fprintf(stdout, "[%s] ", log_level_name(level));
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+#endif
   vfprintf(stdout, fmt, args);
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
   va_end(args);
   fflush(stdout);
 
   if (log_fp) {
     va_start(args, fmt);
     fprintf(log_fp, "[%s] ", log_level_name(level));
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+#endif
     vfprintf(log_fp, fmt, args);
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
     va_end(args);
     fflush(log_fp);
   }

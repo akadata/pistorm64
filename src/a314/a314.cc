@@ -183,7 +183,7 @@ struct ClientConnection
 {
     int fd;
 
-    int next_stream_id;
+    uint32_t next_stream_id;
 
     int bytes_read;
     MessageHeader header;
@@ -199,7 +199,7 @@ struct LogicalChannel
     int channel_id;
 
     ClientConnection *association;
-    int stream_id;
+    uint32_t stream_id;
 
     bool got_eos_from_ami;
     bool got_eos_from_client;
@@ -209,7 +209,7 @@ struct LogicalChannel
 
 static void remove_association(LogicalChannel *ch);
 static void clear_packet_queue(LogicalChannel *ch);
-static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, uint8_t *data, uint8_t length);
+static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, const uint8_t *data, size_t length);
 static void close_and_remove_connection(ClientConnection *cc);
 
 static std::list<ClientConnection> connections;
@@ -326,7 +326,7 @@ static void shutdown_server_socket()
     server_socket = -1;
 }
 
-void create_and_send_msg(ClientConnection *cc, int type, int stream_id, const uint8_t *data, size_t length)
+static void create_and_send_msg(ClientConnection *cc, int type, int stream_id, const uint8_t *data, size_t length)
 {
     if (length > MAX_MESSAGE_SIZE)
     {
@@ -686,7 +686,7 @@ static void clear_packet_queue(LogicalChannel *ch)
     }
 }
 
-static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, uint8_t *data, uint8_t length)
+static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, const uint8_t *data, size_t length)
 {
     if (ch->packet_queue.empty())
         send_queue.push_back(ch);
@@ -1505,7 +1505,7 @@ void a314_write_memory_32(unsigned int address, unsigned int value)
     // Not implemented.
 }
 
-void a314_set_config_file(char *filename)
+void a314_set_config_file(const char *filename)
 {
     printf ("[A314] Set A314 config filename to %s.\n", filename);
     a314_config_file = std::string(filename);

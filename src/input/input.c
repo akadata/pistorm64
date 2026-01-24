@@ -57,7 +57,7 @@ char keymap_amiga[256] = {
     NONE,        NONE, NONE, NONE, NONE, NONE, 0x7A, 0x7B,
 };
 
-int handle_modifier(struct input_event* ev) {
+static int handle_modifier(struct input_event* ev) {
   int* target_modifier = NULL;
   if (ev->value != KEYPRESS_REPEAT &&
       (ev->code == KEY_LEFTSHIFT || ev->code == KEY_RIGHTSHIFT || ev->code == KEY_LEFTALT ||
@@ -102,7 +102,7 @@ int handle_modifier(struct input_event* ev) {
  * @param *struct/input_event  ev  pointer to input layer event structure
  * @return char
  */
-char char_from_input_event(struct input_event* ev) {
+static char char_from_input_event(struct input_event* ev) {
   switch (ev->code) {
     KEYCASE(KEY_A, 'a', 'A');
     KEYCASE(KEY_B, 'b', 'B');
@@ -157,8 +157,8 @@ int get_key_char(char* c, char* code, char* event_type) {
       handle_modifier(&ie);
       char ret = char_from_input_event(&ie);
       *c = ret;
-      *code = ie.code;
-      *event_type = ie.value;
+      *code = (char)(ie.code & 0xFF);
+      *event_type = (char)(ie.value & 0xFF);
       return 1;
     }
   }
@@ -191,7 +191,7 @@ static uint8_t queued_keypresses = 0, queue_output_pos = 0, queue_input_pos = 0;
 static uint8_t queued_keys[256];
 static uint8_t queued_events[256];
 
-void clear_keypress_queue(void) {
+static void __attribute__((unused)) clear_keypress_queue(void) {
   memset(queued_keys, 0x80, 256);
   memset(queued_events, 0x80, 256);
   queued_keypresses = 0;
@@ -218,7 +218,7 @@ int queue_keypress(uint8_t keycode, uint8_t event_type, uint8_t platform) {
           if (event_type == KEYPRESS_RELEASE) {
             return 0;
           }
-          event_type = capslk;
+          event_type = (uint8_t)capslk;
         }
         queued_keys[queue_output_pos] = keymap[keycode];
         queued_events[queue_output_pos] = event_type;

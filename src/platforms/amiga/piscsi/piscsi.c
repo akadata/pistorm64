@@ -20,7 +20,7 @@
 #define BE16(val) be16toh(val)
 
 // Debug output is controlled at runtime via --log-level debug.
-// #define PISCSI_DEBUG
+#define PISCSI_DEBUG
 
 #ifdef PISCSI_DEBUG
 #define DEBUG LOG_DEBUG
@@ -134,7 +134,7 @@ void piscsi_shutdown(void) {
     }
 }
 
-void piscsi_find_partitions(struct piscsi_dev *d) {
+static void piscsi_find_partitions(struct piscsi_dev *d) {
     int fd = d->fd;
     int cur_partition = 0;
     uint8_t tmp;
@@ -201,7 +201,7 @@ partition_renamed:
     return;
 }
 
-int piscsi_parse_rdb(struct piscsi_dev *d) {
+static int piscsi_parse_rdb(struct piscsi_dev *d) {
     int fd = d->fd;
     int i = 0;
     uint8_t *block = malloc(PISCSI_MAX_BLOCK_SIZE);
@@ -358,7 +358,7 @@ struct piscsi_dev *piscsi_get_dev(uint8_t index) {
     return &devs[index];
 }
 
-void piscsi_map_drive(char *filename, uint8_t index) {
+void piscsi_map_drive(const char *filename, uint8_t index) {
     if (index > 7) {
         printf("[PISCSI] Drive index %d out of range.\nUnable to map file %s to drive.\n", index, filename);
         return;
@@ -512,7 +512,7 @@ void piscsi_unmap_drive(uint8_t index) {
     }
 }
 
-char *io_cmd_name(int index) {
+static char *io_cmd_name(int index) {
     switch (index) {
         case CMD_INVALID: return "INVALID";
         case CMD_RESET: return "RESET";
@@ -554,7 +554,7 @@ char *io_cmd_name(int index) {
 #define GETSCSINAME(a) case a: return ""#a"";
 #define SCSIUNHANDLED(a) return "[!!!PISCSI] Unhandled SCSI command "#a"";
 
-char *scsi_cmd_name(int index) {
+static char *scsi_cmd_name(int index) {
     switch(index) {
         GETSCSINAME(SCSICMD_TEST_UNIT_READY);
         GETSCSINAME(SCSICMD_INQUIRY);
@@ -570,7 +570,7 @@ char *scsi_cmd_name(int index) {
     }
 }
 
-void print_piscsi_debug_message(int index) {
+static void print_piscsi_debug_message(int index) {
     int32_t r = 0;
 
     switch (index) {
@@ -671,7 +671,7 @@ void print_piscsi_debug_message(int index) {
 
 #define DEBUGME_SIMPLE(i, s) case i: DEBUG(s); break;
 
-void piscsi_debugme(uint32_t index) {
+static void piscsi_debugme(uint32_t index) {
     switch (index) {
         DEBUGME_SIMPLE(1, "[PISCSI-DEBUGME] Arrived at DiagEntry.\n");
         DEBUGME_SIMPLE(2, "[PISCSI-DEBUGME] Arrived at BootEntry, for some reason.\n");

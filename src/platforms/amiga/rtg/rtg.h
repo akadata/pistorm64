@@ -74,6 +74,10 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
 void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t h,
              uint8_t draw_mode, uint8_t planes, uint8_t mask, uint8_t layer_mask,
              uint16_t src_line_pitch, uint8_t* bmp_data_src);
+struct BitMap;
+void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t h,
+                uint8_t minterm, struct BitMap* bm, uint8_t mask, uint16_t dst_pitch,
+                uint16_t src_pitch);
 
 #define PATTERN_LOOPX                                                                              \
   if (sptr) {                                                                                      \

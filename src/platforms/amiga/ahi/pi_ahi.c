@@ -86,7 +86,7 @@ static inline void emulate_irq(unsigned int irq) {
   }
 }
 
-void* ahi_timing_task(void* args) {
+static void* ahi_timing_task(void* args) {
   printf("[AHI] Thread running.\n");
 
   struct timespec f1, f2;
@@ -176,7 +176,7 @@ uint32_t pi_ahi_init(const char* dev) {
       goto pcm_init_fail;
     }
 
-    res = snd_pcm_hw_params_set_channels(pcm_handle, params, channels);
+    res = snd_pcm_hw_params_set_channels(pcm_handle, params, (unsigned int)channels);
     if (res < 0) {
       printf("[PI-AHI] Failed to set 16 channels: %s\n", snd_strerror(res));
       goto pcm_init_fail;
@@ -195,7 +195,7 @@ uint32_t pi_ahi_init(const char* dev) {
     }
 
     snd_pcm_hw_params_get_period_size(params, &frames, 0);
-    buff_size = frames * channels * 2;
+    buff_size = (uint32_t)(frames * (snd_pcm_uframes_t)channels * 2u);
     shitbuf = malloc(256 * SIZE_KILO);
 
     snd_pcm_prepare(pcm_handle);
@@ -236,7 +236,7 @@ void pi_ahi_shutdown(void) {
 
 uint32_t dbg_repeat;
 
-void pi_ahi_do_cmd(uint32_t val) {
+static void pi_ahi_do_cmd(uint32_t val) {
   switch (val) {
   case AHI_CMD_START:
     // timing_enabled = 1;
@@ -262,7 +262,9 @@ void pi_ahi_do_cmd(uint32_t val) {
     // printf("[PI-AHI] Driver sent PLAY command: %d samples @$%.8X ($%.8X).\n", ahi_u32[0],
     // ahi_addr[0], (uint32_t)bufptr);
     if (ahi_u32[0] != 0 && ahi_addr[0] != 0) {
-      uint32_t bsize = ahi_u32[0] * get_ahi_sample_size(ahi_u32[3]) * get_ahi_channels(ahi_u32[3]);
+      uint32_t sample_size = (uint32_t)get_ahi_sample_size((uint16_t)ahi_u32[3]);
+      uint32_t channels_u32 = (uint32_t)get_ahi_channels((uint16_t)ahi_u32[3]);
+      uint32_t bsize = ahi_u32[0] * sample_size * channels_u32;
       uint32_t hz = (ahi_u32[0] * (ahi_addr[1] >> 16));
       sprintf(dbgbuf,
               "Samples: %d Rate(?): %dHz MixFreq: %d PlayFreq: %d Channels: %d Bsize: %d Type: %d",
@@ -288,10 +290,10 @@ void pi_ahi_do_cmd(uint32_t val) {
         } else {
           dst_bsize = playback_rate / (ahi_addr[1] >> 16);
         }
-        dst_bsize *= get_ahi_sample_size(ahi_u32[3]) * get_ahi_channels(ahi_u32[3]);
+        dst_bsize *= sample_size * channels_u32;
         // printf("Resampling from %d to %d (%d bytes to %d bytes).\n", ahi_u32[1], playback_rate,
         // bsize, dst_bsize);
-        if (get_ahi_channels(ahi_u32[3]) == 2) {
+        if (channels_u32 == 2) {
           uint32_t* u32ptr = (uint32_t*)bufptr;
           uint32_t* dstptr = (uint32_t*)&shitbuf[sndbuf_offset];
           float step = (float)bsize / (float)dst_bsize;
