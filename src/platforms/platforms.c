@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char* platform_names[PLATFORM_NUM] = {
+static const char* platform_names[PLATFORM_NUM] = {
     "none",
     "amiga",
     "mac68k",
     "x68000",
 };
 
-int get_platform_index(char* name) {
+static int get_platform_index(const char* name) {
   if (!name || strlen(name) == 0)
     return -1;
 

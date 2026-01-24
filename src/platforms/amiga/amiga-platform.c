@@ -456,19 +456,19 @@ more_z3_fast:;
 
 #define CHKVAR(a) (strcmp(var, a) == 0)
 
-void setvar_amiga(struct emulator_config* cfg, char* var, char* val) {
+void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val) {
   if (!var)
     return;
 
   if CHKVAR ("enable_rtc_emulation") {
-    int rtc_enabled = 0;
+    unsigned int rtc_enabled = 0;
     if (!val || strlen(val) == 0)
       rtc_enabled = 1;
     else {
       rtc_enabled = get_int(val);
     }
-    if (rtc_enabled != -1) {
-      configure_rtc_emulation_amiga(rtc_enabled);
+    if (rtc_enabled != (unsigned int)-1) {
+      configure_rtc_emulation_amiga((uint8_t)rtc_enabled);
     }
   }
   if CHKVAR ("hdd0") {
@@ -620,7 +620,7 @@ void setvar_amiga(struct emulator_config* cfg, char* var, char* val) {
 
   if CHKVAR ("swap-df0-df") {
     if (val && strlen(val) != 0 && get_int(val) >= 1 && get_int(val) <= 3) {
-      swap_df0_with_dfx = get_int(val);
+      swap_df0_with_dfx = (int)get_int(val);
       LOG_INFO("[AMIGA] DF0 and DF%d swapped.\n", swap_df0_with_dfx);
     }
   }
@@ -718,7 +718,7 @@ void shutdown_platform_amiga(struct emulator_config* cfg) {
   LOG_INFO("[AMIGA] Platform shutdown completed.\n");
 }
 
-void create_platform_amiga(struct platform_config* cfg, char* subsys) {
+void create_platform_amiga(struct platform_config* cfg, const char* subsys) {
   cfg->register_read = handle_register_read_amiga;
   cfg->register_write = handle_register_write_amiga;
   cfg->custom_read = custom_read_amiga;
