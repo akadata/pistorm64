@@ -139,7 +139,7 @@ void pi_ahi_set_playback_rate(uint32_t rate) {
   printf("[PI-AHI] Playback sample rate set to %dHz.\n", playback_rate);
 }
 
-uint32_t pi_ahi_init(char* dev) {
+uint32_t pi_ahi_init(const char* dev) {
   pthread_t ahi_tid = 0;
   int err;
 

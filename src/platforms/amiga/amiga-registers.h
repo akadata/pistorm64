@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+int handle_register_read_amiga(unsigned int addr, unsigned char type, unsigned int* val);
+int handle_register_write_amiga(unsigned int addr, unsigned int value, unsigned char type);
 void configure_rtc_emulation_amiga(uint8_t enabled);
 void set_hard_drive_image_file_amiga(uint8_t index, char* filename);
 int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int* val,

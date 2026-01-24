@@ -180,9 +180,6 @@ unsigned int rtg_read(uint32_t address, uint8_t mode) {
   return 0;
 }
 
-// Forward declaration
-static struct timespec diff(struct timespec start, struct timespec end);
-
 struct timespec diff(struct timespec start, struct timespec end) {
   struct timespec temp;
   if ((end.tv_nsec - start.tv_nsec) < 0) {
@@ -229,61 +226,27 @@ void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
     switch (mode) {
     case OP_TYPE_BYTE:
       switch (address) {
-        case RTG_U81:
-          rtg_u8[0] = (uint8_t)value;
-          break;
-        case RTG_U82:
-          rtg_u8[1] = (uint8_t)value;
-          break;
-        case RTG_U83:
-          rtg_u8[2] = (uint8_t)value;
-          break;
-        case RTG_U84:
-          rtg_u8[3] = (uint8_t)value;
-          break;
+        CHKREG(RTG_U81, rtg_u8[0]);
+        CHKREG(RTG_U82, rtg_u8[1]);
+        CHKREG(RTG_U83, rtg_u8[2]);
+        CHKREG(RTG_U84, rtg_u8[3]);
       }
       break;
     case OP_TYPE_WORD:
       switch (address) {
-        case RTG_X1:
-          rtg_x[0] = (uint16_t)value;
-          break;
-        case RTG_X2:
-          rtg_x[1] = (uint16_t)value;
-          break;
-        case RTG_X3:
-          rtg_x[2] = (uint16_t)value;
-          break;
-        case RTG_X4:
-          rtg_x[3] = (uint16_t)value;
-          break;
-        case RTG_X5:
-          rtg_x[4] = (uint16_t)value;
-          break;
-        case RTG_Y1:
-          rtg_y[0] = (uint16_t)value;
-          break;
-        case RTG_Y2:
-          rtg_y[1] = (uint16_t)value;
-          break;
-        case RTG_Y3:
-          rtg_y[2] = (uint16_t)value;
-          break;
-        case RTG_Y4:
-          rtg_y[3] = (uint16_t)value;
-          break;
-        case RTG_Y5:
-          rtg_y[4] = (uint16_t)value;
-          break;
-        case RTG_U1:
-          rtg_user[0] = (uint16_t)value;
-          break;
-        case RTG_U2:
-          rtg_user[1] = (uint16_t)value;
-          break;
-        case RTG_FORMAT:
-          rtg_format = (uint16_t)value;
-          break;
+        CHKREG(RTG_X1, rtg_x[0]);
+        CHKREG(RTG_X2, rtg_x[1]);
+        CHKREG(RTG_X3, rtg_x[2]);
+        CHKREG(RTG_X4, rtg_x[3]);
+        CHKREG(RTG_X5, rtg_x[4]);
+        CHKREG(RTG_Y1, rtg_y[0]);
+        CHKREG(RTG_Y2, rtg_y[1]);
+        CHKREG(RTG_Y3, rtg_y[2]);
+        CHKREG(RTG_Y4, rtg_y[3]);
+        CHKREG(RTG_Y5, rtg_y[4]);
+        CHKREG(RTG_U1, rtg_user[0]);
+        CHKREG(RTG_U2, rtg_user[1]);
+        CHKREG(RTG_FORMAT, rtg_format);
       case RTG_COMMAND:
         handle_rtg_command(value);
         break;
@@ -302,18 +265,10 @@ void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
         rtg_address[1] = value;
         rtg_address_adj[1] = value - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
         break;
-      case RTG_ADDR3:
-        rtg_address[2] = value;
-        break;
-      case RTG_ADDR4:
-        rtg_address[3] = value;
-        break;
-      case RTG_RGB1:
-        rtg_rgb[0] = value;
-        break;
-      case RTG_RGB2:
-        rtg_rgb[1] = value;
-        break;
+        CHKREG(RTG_ADDR3, rtg_address[2]);
+        CHKREG(RTG_ADDR4, rtg_address[3]);
+        CHKREG(RTG_RGB1, rtg_rgb[0]);
+        CHKREG(RTG_RGB2, rtg_rgb[1]);
       }
       break;
     }
@@ -336,31 +291,6 @@ static struct P96RenderInfo* r;
 static struct P96BoardInfo* b;
 static struct P96Line* ln;
 static uint8_t cmd_mask;
-
-// Helper functions for safe aligned struct access
-static struct P96BoardInfo* safe_get_board_info(struct emulator_config* cfg, uint32_t addr) {
-    uint8_t* ptr = get_mapped_data_pointer_by_address(cfg, addr);
-    if (!ptr) return NULL;
-    static struct P96BoardInfo temp;
-    memcpy(&temp, ptr, sizeof(temp));
-    return &temp;
-}
-
-static struct P96RenderInfo* safe_get_render_info(struct emulator_config* cfg, uint32_t addr) {
-    uint8_t* ptr = get_mapped_data_pointer_by_address(cfg, addr);
-    if (!ptr) return NULL;
-    static struct P96RenderInfo temp;
-    memcpy(&temp, ptr, sizeof(temp));
-    return &temp;
-}
-
-static struct P96Line* safe_get_line(struct emulator_config* cfg, uint32_t addr) {
-    uint8_t* ptr = get_mapped_data_pointer_by_address(cfg, addr);
-    if (!ptr) return NULL;
-    static struct P96Line temp;
-    memcpy(&temp, ptr, sizeof(temp));
-    return &temp;
-}
 
 static void handle_irtg_command(uint32_t cmd) {
   b = (struct P96BoardInfo*)get_mapped_data_pointer_by_address(cfg, M68KR(M68K_REG_A0));
@@ -418,12 +348,12 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
     if (cmd_mask == 0xFF && be16toh(ln->LinePtrn) == 0xFFFF) {
-      rtg_drawline_solid((int16_t)be16toh(ln->X), (int16_t)be16toh(ln->Y), (int16_t)be16toh(ln->dX), (int16_t)be16toh(ln->dY),
-                         (int16_t)be16toh(ln->Length), be32toh(ln->FgPen), (uint16_t)CMD_PITCH, RGBF_D7);
+      rtg_drawline_solid(be16toh(ln->X), be16toh(ln->Y), be16toh(ln->dX), be16toh(ln->dY),
+                         be16toh(ln->Length), be32toh(ln->FgPen), CMD_PITCH, RGBF_D7);
     } else {
-      rtg_drawline((int16_t)be16toh(ln->X), (int16_t)be16toh(ln->Y), (int16_t)be16toh(ln->dX), (int16_t)be16toh(ln->dY),
-                   (int16_t)be16toh(ln->Length), (int16_t)be16toh(ln->LinePtrn), (int16_t)be16toh(ln->PatternShift),
-                   be32toh(ln->FgPen), be32toh(ln->BgPen), (uint16_t)CMD_PITCH, RGBF_D7, cmd_mask,
+      rtg_drawline(be16toh(ln->X), be16toh(ln->Y), be16toh(ln->dX), be16toh(ln->dY),
+                   be16toh(ln->Length), be16toh(ln->LinePtrn), be16toh(ln->PatternShift),
+                   be32toh(ln->FgPen), be32toh(ln->BgPen), CMD_PITCH, RGBF_D7, cmd_mask,
                    ln->DrawMode);
     }
     gdebug("iDrawLine end\n");
@@ -451,11 +381,11 @@ static void handle_irtg_command(uint32_t cmd) {
     if (cmd_mask == 0xFF) {
       rtg_fillrect_solid((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1),
                          (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3),
-                         M68KR(M68K_REG_D4), (uint16_t)CMD_PITCH, RGBF_D7);
+                         M68KR(M68K_REG_D4), CMD_PITCH, RGBF_D7);
     } else {
       rtg_fillrect((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1),
                    (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3), M68KR(M68K_REG_D4),
-                   (uint16_t)CMD_PITCH, RGBF_D7, cmd_mask);
+                   CMD_PITCH, RGBF_D7, cmd_mask);
     }
     gdebug("iFillRect end\n");
     break;
@@ -472,7 +402,7 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
     rtg_invertrect((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1),
-                   (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3), (uint16_t)CMD_PITCH, RGBF_D7,
+                   (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3), CMD_PITCH, RGBF_D7,
                    cmd_mask);
     gdebug("iInvertRect end\n");
     break;
@@ -487,12 +417,12 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
     if (cmd_mask == 0xFF) {
-      rtg_blitrect_solid((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1), (int16_t)M68KR(M68K_REG_D2),
-                         (int16_t)M68KR(M68K_REG_D3), (int16_t)M68KR(M68K_REG_D4), (int16_t)M68KR(M68K_REG_D5), (uint16_t)CMD_PITCH,
+      rtg_blitrect_solid(M68KR(M68K_REG_D0), M68KR(M68K_REG_D1), M68KR(M68K_REG_D2),
+                         M68KR(M68K_REG_D3), M68KR(M68K_REG_D4), M68KR(M68K_REG_D5), CMD_PITCH,
                          RGBF_D7);
     } else {
-      rtg_blitrect((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1), (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3),
-                   (int16_t)M68KR(M68K_REG_D4), (int16_t)M68KR(M68K_REG_D5), (uint16_t)CMD_PITCH, RGBF_D7, cmd_mask);
+      rtg_blitrect(M68KR(M68K_REG_D0), M68KR(M68K_REG_D1), M68KR(M68K_REG_D2), M68KR(M68K_REG_D3),
+                   M68KR(M68K_REG_D4), M68KR(M68K_REG_D5), CMD_PITCH, RGBF_D7, cmd_mask);
     }
 
     gdebug("iBlitRect end\n");
@@ -511,9 +441,9 @@ static void handle_irtg_command(uint32_t cmd) {
     uint32_t src_addr = be32toh(r->_p_Memory);
     uint32_t dst_addr = be32toh(rt->_p_Memory);
 
-    rtg_blitrect_nomask_complete((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1), (int16_t)M68KR(M68K_REG_D2),
-                                 (int16_t)M68KR(M68K_REG_D3), (int16_t)M68KR(M68K_REG_D4), (int16_t)M68KR(M68K_REG_D5),
-                                 (uint16_t)CMD_PITCH, be16toh(rt->BytesPerRow), src_addr, dst_addr, RGBF_D7,
+    rtg_blitrect_nomask_complete(M68KR(M68K_REG_D0), M68KR(M68K_REG_D1), M68KR(M68K_REG_D2),
+                                 M68KR(M68K_REG_D3), M68KR(M68K_REG_D4), M68KR(M68K_REG_D5),
+                                 CMD_PITCH, be16toh(rt->BytesPerRow), src_addr, dst_addr, RGBF_D7,
                                  minterm);
 
     gdebug("iBlitRectNoMaskComplete end\n");
@@ -554,8 +484,8 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address[1] = be32toh(r->_p_Memory);
     rtg_address_adj[1] = rtg_address[1] - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
-    rtg_blittemplate((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1), (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3),
-                     src_addr, fgcol, bgcol, (uint16_t)CMD_PITCH, t_pitch, RGBF_D7, x_offset, cmd_mask,
+    rtg_blittemplate(M68KR(M68K_REG_D0), M68KR(M68K_REG_D1), M68KR(M68K_REG_D2), M68KR(M68K_REG_D3),
+                     src_addr, fgcol, bgcol, CMD_PITCH, t_pitch, RGBF_D7, x_offset, cmd_mask,
                      draw_mode);
     gdebug("iBlitTemplate end\n");
     break;
@@ -597,8 +527,8 @@ static void handle_irtg_command(uint32_t cmd) {
     rtg_address[1] = be32toh(r->_p_Memory);
     rtg_address_adj[1] = rtg_address[1] - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
 
-    rtg_blitpattern((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1), (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3),
-                    src_addr, fgcol, bgcol, (uint16_t)CMD_PITCH, RGBF_D7, x_offset, y_offset, cmd_mask,
+    rtg_blitpattern(M68KR(M68K_REG_D0), M68KR(M68K_REG_D1), M68KR(M68K_REG_D2), M68KR(M68K_REG_D3),
+                    src_addr, fgcol, bgcol, CMD_PITCH, RGBF_D7, x_offset, y_offset, cmd_mask,
                     draw_mode, loop_rows);
     gdebug("iBlitPattern end\n");
     break;
@@ -636,8 +566,8 @@ static void handle_irtg_command(uint32_t cmd) {
     uint8_t minterm = (uint8_t)M68KR(M68K_REG_D6);
     cmd_mask = (uint8_t)M68KR(M68K_REG_D7);
 
-    rtg_p2c_ex((int16_t)M68KR(M68K_REG_D0), (int16_t)M68KR(M68K_REG_D1), (int16_t)M68KR(M68K_REG_D2), (int16_t)M68KR(M68K_REG_D3),
-               (int16_t)M68KR(M68K_REG_D4), (int16_t)M68KR(M68K_REG_D5), minterm, bm, cmd_mask, line_pitch,
+    rtg_p2c_ex(M68KR(M68K_REG_D0), M68KR(M68K_REG_D1), M68KR(M68K_REG_D2), M68KR(M68K_REG_D3),
+               M68KR(M68K_REG_D4), M68KR(M68K_REG_D5), minterm, bm, cmd_mask, line_pitch,
                bmp_pitch);
     gdebug("iP2C end\n");
     break;
@@ -723,62 +653,62 @@ static void handle_rtg_command(uint32_t cmd) {
     break;
   case RTGCMD_FILLRECT:
     if (rtg_u8[0] == 0xFF || rtg_format != RTGFMT_8BIT_CLUT) {
-      rtg_fillrect_solid((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], rtg_rgb[0], (uint16_t)rtg_x[2], rtg_format);
+      rtg_fillrect_solid(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_rgb[0], rtg_x[2], rtg_format);
       gdebug("FillRect Solid\n");
     } else {
-      rtg_fillrect((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], rtg_rgb[0], (uint16_t)rtg_x[2], rtg_format,
+      rtg_fillrect(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_rgb[0], rtg_x[2], rtg_format,
                    rtg_u8[0]);
       gdebug("FillRect Masked\n");
     }
     break;
   case RTGCMD_INVERTRECT:
-    rtg_invertrect((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (uint16_t)rtg_x[2], rtg_format, rtg_u8[0]);
+    rtg_invertrect(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_format, rtg_u8[0]);
     gdebug("InvertRect\n");
     break;
   case RTGCMD_BLITRECT:
     if (rtg_u8[0] == 0xFF || rtg_format != RTGFMT_8BIT_CLUT) {
-      rtg_blitrect_solid((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (int16_t)rtg_x[2], (int16_t)rtg_y[2], (uint16_t)rtg_x[3],
+      rtg_blitrect_solid(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_x[3],
                          rtg_format);
       gdebug("BlitRect Solid\n");
     } else {
-      rtg_blitrect((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (int16_t)rtg_x[2], (int16_t)rtg_y[2], (uint16_t)rtg_x[3], rtg_format,
+      rtg_blitrect(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_x[3], rtg_format,
                    rtg_u8[0]);
       gdebug("BlitRect Masked\n");
     }
     break;
   case RTGCMD_BLITRECT_NOMASK_COMPLETE:
-    rtg_blitrect_nomask_complete((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (int16_t)rtg_x[2], (int16_t)rtg_y[2],
-                                 (uint16_t)rtg_x[3], (uint16_t)rtg_x[4], rtg_address[0], rtg_address[1], rtg_format,
+    rtg_blitrect_nomask_complete(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2],
+                                 rtg_x[3], rtg_x[4], rtg_address[0], rtg_address[1], rtg_format,
                                  rtg_u8[0]);
     gdebug("BlitRectNoMaskComplete\n");
     break;
   case RTGCMD_BLITPATTERN:
-    rtg_blitpattern((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], rtg_address[0], rtg_rgb[0], rtg_rgb[1],
-                    (uint16_t)rtg_x[3], rtg_format, rtg_x[2], rtg_y[2], rtg_u8[0], rtg_u8[1], rtg_u8[2]);
+    rtg_blitpattern(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_address[0], rtg_rgb[0], rtg_rgb[1],
+                    rtg_x[3], rtg_format, rtg_x[2], rtg_y[2], rtg_u8[0], rtg_u8[1], rtg_u8[2]);
     gdebug("BlitPattern\n");
     return;
   case RTGCMD_BLITTEMPLATE:
-    rtg_blittemplate((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], rtg_address[0], rtg_rgb[0], rtg_rgb[1],
-                     (uint16_t)rtg_x[3], (uint16_t)rtg_x[4], rtg_format, rtg_x[2], rtg_u8[0], rtg_u8[1]);
+    rtg_blittemplate(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_address[0], rtg_rgb[0], rtg_rgb[1],
+                     rtg_x[3], rtg_x[4], rtg_format, rtg_x[2], rtg_u8[0], rtg_u8[1]);
     gdebug("BlitTemplate\n");
     break;
   case RTGCMD_DRAWLINE:
     if (rtg_u8[0] == 0xFF && rtg_y[2] == 0xFFFF)
-      rtg_drawline_solid((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (int16_t)rtg_x[2], rtg_rgb[0], (uint16_t)rtg_x[3],
+      rtg_drawline_solid(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_rgb[0], rtg_x[3],
                          rtg_format);
     else
-      rtg_drawline((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (int16_t)rtg_x[2], (int16_t)rtg_y[2], (int16_t)rtg_x[4], rtg_rgb[0],
-                   rtg_rgb[1], (uint16_t)rtg_x[3], rtg_format, rtg_u8[0], rtg_u8[1]);
+      rtg_drawline(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_x[4], rtg_rgb[0],
+                   rtg_rgb[1], rtg_x[3], rtg_format, rtg_u8[0], rtg_u8[1]);
     gdebug("DrawLine\n");
     break;
   case RTGCMD_P2C:
-    rtg_p2c((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (int16_t)rtg_x[2], (int16_t)rtg_y[2], rtg_u8[1], rtg_u8[2],
-            rtg_u8[0], (uint16_t)(rtg_user[0] >> 0x8), (uint16_t)rtg_x[4], (uint8_t*)&rtg_mem[rtg_address_adj[1]]);
+    rtg_p2c(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_u8[1], rtg_u8[2],
+            rtg_u8[0], (rtg_user[0] >> 0x8), rtg_x[4], (uint8_t*)&rtg_mem[rtg_address_adj[1]]);
     gdebug("Planar2Chunky\n");
     break;
   case RTGCMD_P2D:
-    rtg_p2d((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (int16_t)rtg_x[2], (int16_t)rtg_y[2], rtg_u8[1], rtg_u8[2],
-            rtg_u8[0], (uint16_t)(rtg_user[0] >> 0x8), (uint16_t)rtg_x[4], (uint8_t*)&rtg_mem[rtg_address_adj[1]]);
+    rtg_p2d(rtg_x[0], rtg_y[0], rtg_x[1], rtg_y[1], rtg_x[2], rtg_y[2], rtg_u8[1], rtg_u8[2],
+            rtg_u8[0], (rtg_user[0] >> 0x8), rtg_x[4], (uint8_t*)&rtg_mem[rtg_address_adj[1]]);
     gdebug("Planar2Direct\n");
     break;
   case RTGCMD_SETSPRITE:

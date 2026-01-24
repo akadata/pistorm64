@@ -109,8 +109,8 @@ struct platform_config {
 #ifdef __cplusplus
 extern "C" int get_mapped_item_by_address(struct emulator_config* cfg, uint32_t address);
 #else
-unsigned int get_m68k_cpu_type(char* name);
-struct emulator_config* load_config_file(char* filename);
+unsigned int get_m68k_cpu_type(const char* name);
+struct emulator_config* load_config_file(const char* filename);
 void free_config_file(struct emulator_config* cfg);
 int apply_config_line(struct emulator_config* cfg, const char* line, int line_no);
 
@@ -118,11 +118,11 @@ int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned 
                        unsigned char type);
 int handle_mapped_write(struct emulator_config* cfg, unsigned int addr, unsigned int value,
                         unsigned char type);
-int get_named_mapped_item(struct emulator_config* cfg, char* name);
+int get_named_mapped_item(struct emulator_config* cfg, const char* name);
 int get_mapped_item_by_address(struct emulator_config* cfg, uint32_t address);
 uint8_t* get_mapped_data_pointer_by_address(struct emulator_config* cfg, uint32_t address);
 void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int addr,
-                 unsigned int size, int mirr_addr, char* filename, char* map_id,
+                 unsigned int size, int mirr_addr, char* filename, const char* map_id,
                  unsigned int autodump);
 unsigned int get_int(char* str);
 #endif

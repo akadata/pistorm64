@@ -34,7 +34,7 @@ const char* mapcmd_names[MAPCMD_NUM] = {
     "file", "ovl",  "id",      "autodump_file", "autodump_mem",
 };
 
-int get_config_item_type(char* cmd) {
+static int get_config_item_type(char* cmd) {
   if (strcasecmp(cmd, "rt-prio") == 0) {
     return CONFITEM_RTPRIO;
   }
@@ -48,7 +48,7 @@ int get_config_item_type(char* cmd) {
   return CONFITEM_NONE;
 }
 
-unsigned int get_m68k_cpu_type(char* name) {
+unsigned int get_m68k_cpu_type(const char* name) {
   for (int i = 0; i < M68K_CPU_TYPES; i++) {
     if (strcmp(name, cpu_types[i]) == 0) {
       printf("[CFG] Set CPU type to %s.\n", cpu_types[i]);
@@ -60,7 +60,7 @@ unsigned int get_m68k_cpu_type(char* name) {
   return M68K_CPU_TYPE_68000;
 }
 
-unsigned int get_map_cmd(char* name) {
+static unsigned int get_map_cmd(char* name) {
   for (int i = 1; i < MAPCMD_NUM; i++) {
     if (strcmp(name, mapcmd_names[i]) == 0) {
       return i;
@@ -70,7 +70,7 @@ unsigned int get_map_cmd(char* name) {
   return MAPCMD_UNKNOWN;
 }
 
-unsigned int get_map_type(char* name) {
+static unsigned int get_map_type(char* name) {
   for (int i = 1; i < MAPTYPE_NUM; i++) {
     if (strcmp(name, map_type_names[i]) == 0) {
       return i;
@@ -80,7 +80,7 @@ unsigned int get_map_type(char* name) {
   return MAPTYPE_NONE;
 }
 
-void trim_whitespace(char* str) {
+static void trim_whitespace(char* str) {
   while (strlen(str) != 0 && (str[strlen(str) - 1] == ' ' || str[strlen(str) - 1] == '\t' ||
                               str[strlen(str) - 1] == 0x0A || str[strlen(str) - 1] == 0x0D)) {
     str[strlen(str) - 1] = '\0';
@@ -89,7 +89,7 @@ void trim_whitespace(char* str) {
 
 unsigned int get_int(char* str) {
   if (strlen(str) == 0)
-    return -1;
+    return (unsigned int)-1;
 
   unsigned int ret_int = 0;
 
@@ -157,7 +157,7 @@ unsigned int get_int(char* str) {
   }
 }
 
-void get_next_string(char* str, char* str_out, int* strpos, char separator) {
+static void get_next_string(char* str, char* str_out, int* strpos, char separator) {
   int str_pos = 0, out_pos = 0, startquote = 0, endstring = 0;
 
   if (!str_out)
@@ -399,7 +399,7 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
 }
 
 void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int addr,
-                 unsigned int size, int mirr_addr, char* filename, char* map_id,
+                 unsigned int size, int mirr_addr, char* filename, const char* map_id,
                  unsigned int autodump) {
   unsigned int index = 0, file_size = 0;
   FILE* in = NULL;
@@ -568,7 +568,7 @@ void free_config_file(struct emulator_config* cfg) {
   printf("[CFG] Config file freed. Maybe.\n");
 }
 
-struct emulator_config* load_config_file(char* filename) {
+struct emulator_config* load_config_file(const char* filename) {
   FILE* in = fopen(filename, "rb");
   if (in == NULL) {
     printf("[CFG] Failed to open config file %s for reading.\n", filename);
@@ -618,7 +618,7 @@ load_successful:;
   return cfg;
 }
 
-int get_named_mapped_item(struct emulator_config* cfg, char* name) {
+int get_named_mapped_item(struct emulator_config* cfg, const char* name) {
   if (strlen(name) == 0)
     return -1;
 

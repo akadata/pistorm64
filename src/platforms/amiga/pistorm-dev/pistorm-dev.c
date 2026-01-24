@@ -278,7 +278,7 @@ static uint32_t grab_pi_temperature(void) {
   return 0;
 }
 
-int32_t grab_amiga_string(uint32_t addr, uint8_t* dest, uint32_t str_max_len) {
+static int32_t grab_amiga_string(uint32_t addr, uint8_t* dest, uint32_t str_max_len) {
   int32_t r = get_mapped_item_by_address(cfg, addr);
   uint32_t index = 0;
 
@@ -305,7 +305,7 @@ int32_t grab_amiga_string(uint32_t addr, uint8_t* dest, uint32_t str_max_len) {
   return (int32_t)strlen((const char*)dest);
 }
 
-int32_t amiga_transfer_file(uint32_t addr, char* filename) {
+static int32_t amiga_transfer_file(uint32_t addr, char* filename) {
   FILE* in = fopen(filename, "rb");
   if (in == NULL) {
     DEBUG("[AMIGA_TRANSFER_FILE] Failed to open file %s for reading.\n", filename);
@@ -314,7 +314,7 @@ int32_t amiga_transfer_file(uint32_t addr, char* filename) {
   fseek(in, 0, SEEK_END);
 
   int32_t r = get_mapped_item_by_address(cfg, addr);
-  uint32_t filesize = ftell(in);
+  uint32_t filesize = (uint32_t)ftell(in);
 
   fseek(in, 0, SEEK_SET);
   if (r == -1) {
@@ -796,7 +796,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     // DEBUG("[PISTORM-DEV] Write to SET_CLUT_CURSOR: %d\n", val);
     uint8_t* bmp = get_mapped_data_pointer_by_address(cfg, pi_ptr[0]);
     uint8_t* pal = get_mapped_data_pointer_by_address(cfg, pi_ptr[1]);
-    rtg_set_clut_cursor(bmp, (uint32_t*)pal, (int16_t)pi_word[0], (int16_t)pi_word[1], pi_word[2],
+    rtg_set_clut_cursor(bmp, (uint32_t*)(void*)pal, (int16_t)pi_word[0], (int16_t)pi_word[1], pi_word[2],
                         pi_word[3], pi_word[4]);
     break;
   }
@@ -920,7 +920,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
       } else {
         fclose(tmp);
         if (get_named_mapped_item(cfg, "kickstart") != -1) {
-          uint32_t index = get_named_mapped_item(cfg, "kickstart");
+          int32_t index = get_named_mapped_item(cfg, "kickstart");
           free(cfg->map_data[index]);
           free(cfg->map_id[index]);
           cfg->map_type[index] = MAPTYPE_NONE;
@@ -952,7 +952,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
       } else {
         fclose(tmp);
         if (get_named_mapped_item(cfg, "extended") != -1) {
-          uint32_t index = get_named_mapped_item(cfg, "extended");
+          int32_t index = get_named_mapped_item(cfg, "extended");
           free(cfg->map_data[index]);
           free(cfg->map_id[index]);
           cfg->map_type[index] = MAPTYPE_NONE;
@@ -978,7 +978,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
   case PI_CMD_SHUTDOWN:
     DEBUG("[PISTORM-DEV] Shutdown requested. Confirm by replying with return value to "
           "CONFIRMSHUTDOWN.\n");
-    shutdown_confirm = rand() % 0xFFFF;
+    shutdown_confirm = (uint32_t)(rand() % 0xFFFF);
     pi_cmd_result = shutdown_confirm;
     break;
   case PI_CMD_CONFIRMSHUTDOWN:
@@ -1061,7 +1061,7 @@ uint32_t handle_pistorm_dev_read(uint32_t addr_, uint8_t type) {
         pi_cmd_result = PI_RES_FILENOTFOUND;
       } else {
         fseek(tmp, 0, SEEK_END);
-        pi_longword[0] = ftell(tmp);
+        pi_longword[0] = (uint32_t)ftell(tmp);
         DEBUG("[PISTORM-DEV] Returning file size for file %s: %d bytes.\n", tmp_string,
               pi_longword[0]);
         fclose(tmp);
@@ -1083,7 +1083,7 @@ uint32_t handle_pistorm_dev_read(uint32_t addr_, uint8_t type) {
     break;
   case PI_CMD_RTGSTATUS:
     DEBUG("[PISTORM-DEV] %s Read from RTGSTATUS\n", op_type_names[type]);
-    return (rtg_on << 1) | rtg_enabled;
+    return ((uint32_t)rtg_on << 1) | (uint32_t)rtg_enabled;
     break;
   case PI_CMD_RTG_SCALING:
     DEBUG("[PISTORM-DEV] %s Read from RTG_SCALING\n", op_type_names[type]);
