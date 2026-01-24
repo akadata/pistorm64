@@ -133,7 +133,6 @@ static void configure_ipl_nops(void);
 static void print_help(const char* prog);
 static void print_about(const char* prog);
 
-
 #define CLI_MAX_LINES 32
 static char* cli_config_lines[CLI_MAX_LINES];
 static int cli_config_count;
@@ -152,7 +151,7 @@ extern int m68ki_remaining_cycles;
 
 #define M68K_SET_IRQ(i)                                                                            \
   old_level = CPU_INT_LEVEL;                                                                       \
-  CPU_INT_LEVEL = ((unsigned int)(i) << 8);                                                        \
+  CPU_INT_LEVEL = (i << 8);                                                                        \
   if (old_level != 0x0700 && CPU_INT_LEVEL == 0x0700)                                              \
     m68ki_cpu.nmi_pending = TRUE;
 #define M68K_END_TIMESLICE                                                                         \
@@ -250,7 +249,7 @@ static inline uint64_t now_ns(void) {
 }
 #endif
 
-static void* ipl_task(void* args) {
+void* ipl_task(void* args) {
   printf("[IPL] Thread running\n");
   uint16_t old_irq = 0;
   uint32_t value;
@@ -351,7 +350,7 @@ static void* ipl_task(void* args) {
 static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
   /* eat up any reset cycles */
   if (RESET_CYCLES) {
-    int rc = (int)RESET_CYCLES;
+    int rc = RESET_CYCLES;
     RESET_CYCLES = 0;
     num_cycles -= rc;
     if (num_cycles <= 0)
@@ -397,7 +396,7 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 #endif
 
       /* Read an instruction and call its handler */
-      REG_IR = (uint16_t)m68ki_read_imm_16(state);
+      REG_IR = m68ki_read_imm_16(state);
       if (fpu_exec_hook && opcode_is_fpu(REG_IR)) {
         fpu_exec_hook(state, REG_IR);
       } else {
@@ -473,7 +472,7 @@ static inline void cpu_backend_set_irq(int level) {
   }
 }
 
-static void* cpu_task(void *arg) {
+void* cpu_task(void *arg) {
   (void)arg;
   m68ki_cpu_core* state = &m68ki_cpu;
   state->ovl = ovl;
@@ -516,14 +515,14 @@ cpu_loop:
   ps_flush_batch_queue();
 
   if (irq) {
-    last_irq = (uint32_t)((ps_read_status_reg() & 0xe000) >> 13);
+    last_irq = ((ps_read_status_reg() & 0xe000) >> 13);
     uint8_t amiga_irq = amiga_emulated_ipl();
     if (amiga_irq >= last_irq) {
       last_irq = amiga_irq;
     }
     if (last_irq != 0 && last_irq != last_last_irq) {
       last_last_irq = last_irq;
-      cpu_backend_set_irq((int)last_irq);
+      cpu_backend_set_irq(last_irq);
     }
   }
 
@@ -578,7 +577,7 @@ stop_cpu_emulation:
   return (void*)NULL;
 }
 
-static void* keyboard_task(void *arg) {
+void* keyboard_task(void *arg) {
   (void)arg;
   struct pollfd kbdpoll[1];
   int kpollrc;
@@ -709,7 +708,7 @@ key_end:
   return (void*)NULL;
 }
 
-static void* mouse_task(void *arg) {
+void* mouse_task(void *arg) {
   (void)arg;
   struct pollfd mpoll[1];
   int mpollrc;
@@ -768,7 +767,7 @@ void stop_cpu_emulation(uint8_t disasm_cur) {
   do_disasm = 0;
 }
 
-static void sigint_handler(int sig_num) {
+void sigint_handler(int sig_num) {
   (void)sig_num;
   sigint_seen = 1;
   end_signal = 1;
@@ -939,7 +938,7 @@ int main(int argc, char* argv[]) {
   }
 
 switch_config:
-  srand((unsigned int)clock());
+  srand(clock());
 
   amiga_reset_and_wait("startup");
 
@@ -1184,7 +1183,7 @@ void cpu_pulse_reset(void) {
 
 unsigned int cpu_irq_ack(int level) {
   // printf( "cpu irq ack\n" );
-  return (unsigned int)(24 + level);
+  return 24 + level;
 }
 
 static unsigned int target = 0;
@@ -1200,20 +1199,20 @@ unsigned int garbage = 0;
 static inline uint32_t ps_read(uint8_t type, uint32_t addr) {
   switch (type) {
   case OP_TYPE_BYTE:
-    return (uint32_t)ps_read_8(addr);
+    return ps_read_8(addr);
   case OP_TYPE_WORD:
-    return (uint32_t)ps_read_16(addr);
+    return ps_read_16(addr);
   case OP_TYPE_LONGWORD:
     if (addr & 0x01) {
-      uint32_t c = (uint32_t)ps_read_8(addr);
-      c |= ((uint32_t)be16toh(ps_read_16(addr + 1)) << 8);
-      c |= ((uint32_t)ps_read_8(addr + 3) << 24);
+      uint32_t c = ps_read_8(addr);
+      c |= (be16toh(ps_read_16(addr + 1)) << 8);
+      c |= (ps_read_8(addr + 3) << 24);
       return htobe32(c);
     }
     {
-      uint32_t a = (uint32_t)ps_read_16(addr);
-      uint32_t b = (uint32_t)ps_read_16(addr + 2);
-      return (a << 16) | b;
+      uint16_t a = ps_read_16(addr);
+      uint16_t b = ps_read_16(addr + 2);
+      return ((uint32_t)a << 16) | b;
     }
   }
   // This shouldn't actually happen.
@@ -1223,20 +1222,20 @@ static inline uint32_t ps_read(uint8_t type, uint32_t addr) {
 static inline void ps_write(uint8_t type, uint32_t addr, uint32_t val) {
   switch (type) {
   case OP_TYPE_BYTE:
-    ps_write_8(addr, (uint8_t)val);
+    ps_write_8(addr, val);
     return;
   case OP_TYPE_WORD:
-    ps_write_16(addr, (uint16_t)val);
+    ps_write_16(addr, val);
     return;
   case OP_TYPE_LONGWORD:
     if (addr & 0x01) {
-      ps_write_8(addr, (uint8_t)(val & 0xFF));
-      ps_write_16(addr + 1, htobe16((uint16_t)((val >> 8) & 0xFFFF)));
-      ps_write_8(addr + 3, (uint8_t)(val >> 24));
+      ps_write_8(addr, val & 0xFF);
+      ps_write_16(addr + 1, htobe16(((val >> 8) & 0xFFFF)));
+      ps_write_8(addr + 3, (val >> 24));
       return;
     }
-    ps_write_16(addr, (uint16_t)(val >> 16));
-    ps_write_16(addr + 2, (uint16_t)val);
+    ps_write_16(addr, val >> 16);
+    ps_write_16(addr + 2, val);
     return;
   }
   // This shouldn't actually happen.
@@ -1431,7 +1430,7 @@ unsigned int m68k_read_memory_16(unsigned int address) {
   }
 
   if (address & 0x01) {
-    return ((unsigned int)(ps_read_8(address) << 8) | (unsigned int)ps_read_8(address + 1));
+    return ((ps_read_8(address) << 8) | ps_read_8(address + 1));
   }
   return (unsigned int)ps_read_16((uint32_t)address);
 }
@@ -1446,9 +1445,9 @@ unsigned int m68k_read_memory_32(unsigned int address) {
   }
 
   if (address & 0x01) {
-    return (unsigned int)ps_read(OP_TYPE_LONGWORD, address);
+    return ps_read(OP_TYPE_LONGWORD, address);
   }
-  return (unsigned int)ps_read(OP_TYPE_LONGWORD, address);
+  return ps_read(OP_TYPE_LONGWORD, address);
 }
 
 static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t val) {
@@ -1606,7 +1605,7 @@ void m68k_write_memory_8(unsigned int address, unsigned int value) {
     return;
   }
 
-  ps_write_8((uint32_t)address, (uint8_t)value);
+  ps_write_8((uint32_t)address, value);
   return;
 }
 
@@ -1620,12 +1619,12 @@ void m68k_write_memory_16(unsigned int address, unsigned int value) {
   }
 
   if (address & 0x01) {
-    ps_write_8((uint32_t)address, (uint8_t)(value & 0xFF));
-    ps_write_8((uint32_t)address + 1, (uint8_t)((value >> 8) & 0xFF));
+    ps_write_8((uint32_t)address, value & 0xFF);
+    ps_write_8((uint32_t)address + 1, (value >> 8) & 0xFF);
     return;
   }
 
-  ps_write_16((uint32_t)address, (uint16_t)value);
+  ps_write_16((uint32_t)address, value);
   return;
 }
 
@@ -1639,11 +1638,11 @@ void m68k_write_memory_32(unsigned int address, unsigned int value) {
   }
 
   if (address & 0x01) {
-    ps_write(OP_TYPE_LONGWORD, address, (uint32_t)value);
+    ps_write(OP_TYPE_LONGWORD, address, value);
     return;
   }
 
-  ps_write(OP_TYPE_LONGWORD, address, (uint32_t)value);
+  ps_write(OP_TYPE_LONGWORD, address, value);
   return;
 }
 static void set_affinity_for(const char* name, int core_id) {

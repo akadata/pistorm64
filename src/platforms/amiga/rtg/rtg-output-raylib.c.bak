@@ -17,19 +17,6 @@
 #include <string.h>
 #include <unistd.h>
 
-// Helper functions for safe unaligned memory access
-static inline uint16_t load_u16_be(const uint8_t *p) {
-    uint16_t v;
-    memcpy(&v, p, sizeof v);
-    return be16toh(v);
-}
-
-static inline uint32_t load_u32_be(const uint8_t *p) {
-    uint32_t v;
-    memcpy(&v, p, sizeof v);
-    return be32toh(v);
-}
-
 
 // Default configuration for VideoCore / TV service support (Raspberry Pi only).
 // Makefile can override with -DUSE_VC=1 when vc_tvservice is available.
@@ -131,12 +118,6 @@ static uint32_t cursor_palette[256];
 uint32_t cursor_data[256 * 256];
 uint32_t clut_cursor_texture_data[256 * 256];
 
-// Forward declarations for -Wmissing-prototypes
-extern void rtg_update_screen(void);
-extern void rtg_scale_output(uint16_t width, uint16_t height);
-extern void* rtgThread(void* args);
-extern void update_mouse_cursor(uint8_t* src);
-
 void rtg_update_screen(void) {
 }
 
@@ -145,12 +126,12 @@ static int rtg_read_first_line(const char* path, char* buf, size_t buf_size) {
   if(!file) {
     return 0;
   }
-  if(!fgets(buf, (int)buf_size, file)) {
+  if(!fgets(buf, buf_size, file)) {
     fclose(file);
     return 0;
   }
   fclose(file);
-  int len = (int)strcspn(buf, "\r\n");
+  size_t len = strcspn(buf, "\r\n");
   buf[len] = '\0';
   return 1;
 }
@@ -557,7 +538,7 @@ reinit_raylib:;
   int pitch_ok = (pitch >= row_bytes);
   int addr_ok = pitch_ok && (addr < rtg_mem_size) && (addr + needed <= rtg_mem_size);
 
-  raylib_fb.format = (int)rtg_to_raylib[format];
+  raylib_fb.format = rtg_to_raylib[format];
   raylib_fb.width = width;
   raylib_fb.height = height;
   raylib_fb.mipmaps = 1;
@@ -595,12 +576,11 @@ reinit_raylib:;
       indexed_buf = resized;
       indexed_buf_size = tight_size;
     }
+    const uint16_t* src16 = (const uint16_t*)(data->memory + addr);
     size_t src_stride = pitch / 2;
     for (uint16_t y = 0; y < height; y++) {
       for (uint16_t x = 0; x < width; x++) {
-        size_t src_idx = (x + (y * src_stride)) * sizeof(uint16_t);
-        const uint8_t* src_ptr = data->memory + addr + src_idx;
-        indexed_buf[x + (y * width)] = load_u16_be(src_ptr);
+        indexed_buf[x + (y * width)] = be16toh(src16[x + (y * src_stride)]);
       }
     }
     raylib_fb.data = indexed_buf;
@@ -639,43 +619,43 @@ reinit_raylib:;
 
   while (1) {
     if(rtg_on) {
-      uint16_t current_width = *data->width;
-      uint16_t current_height = *data->height;
-      uint16_t current_format = *data->format;
-      uint16_t current_pitch = *data->pitch;
-      uint16_t current_offset_x = *data->offset_x;
-      uint16_t current_offset_y = *data->offset_y;
-      uint32_t current_addr = *data->addr;
+      uint16_t frame_width = *data->width;
+      uint16_t frame_height = *data->height;
+      uint16_t frame_format = *data->format;
+      uint16_t frame_pitch = *data->pitch;
+      uint16_t frame_offset_x = *data->offset_x;
+      uint16_t frame_offset_y = *data->offset_y;
+      uint32_t frame_addr = *data->addr;
 
-      if(current_format >= RTGFMT_NUM) {
-        LOG_ERROR("[RTG/RAYLIB] Invalid RTG format during frame update: %u\n", current_format);
+      if(frame_format >= RTGFMT_NUM) {
+        LOG_ERROR("[RTG/RAYLIB] Invalid RTG format during frame update: %u\n", frame_format);
         reinit = 1;
         goto shutdown_raylib;
       }
 
-      if(current_width != width || current_height != height || current_format != format ||
-          current_pitch != pitch) {
+      if(frame_width != width || frame_height != height || frame_format != format ||
+          frame_pitch != pitch) {
         LOG_INFO("[RTG/RAYLIB] Mode change detected: %ux%u fmt=%u pitch=%u -> %ux%u fmt=%u "
                  "pitch=%u\n",
-                 width, height, format, pitch, current_width, current_height, current_format,
-                 current_pitch);
+                 width, height, format, pitch, frame_width, frame_height, frame_format,
+                 frame_pitch);
         reinit = 1;
         goto shutdown_raylib;
       }
 
-      if(current_addr != last_frame_addr) {
-        LOG_DEBUG("[RTG/RAYLIB] FB addr update: 0x%08X\n", current_addr);
-        last_frame_addr = current_addr;
+      if(frame_addr != last_frame_addr) {
+        LOG_DEBUG("[RTG/RAYLIB] FB addr update: 0x%08X\n", frame_addr);
+        last_frame_addr = frame_addr;
       }
 
       if(frame_no < 3) {
         LOG_DEBUG("[RTG/RAYLIB] Frame %u start: addr=0x%08X mem=%p %ux%u pitch=%u bpp=%zu "
                   "tex_id=%u\n",
-                  frame_no, current_addr,
-                  (void*)data->memory,
-                  width,
-                  height,
-                  pitch,
+                  frame_no, frame_addr, 
+                  (void*)data->memory, 
+                  width, 
+                  height, 
+                  pitch, 
                   bpp,
                   raylib_texture.id);
       }
@@ -731,8 +711,8 @@ reinit_raylib:;
       }
 
       if(mouse_cursor_enabled || clut_cursor_enabled) {
-        float mc_x = mouse_cursor_x - rtg_offset_x + mouse_cursor_x_adj;
-        float mc_y = mouse_cursor_y - rtg_offset_y + mouse_cursor_y_adj;
+        float mc_x = mouse_cursor_x - frame_offset_x + mouse_cursor_x_adj;
+        float mc_y = mouse_cursor_y - frame_offset_y + mouse_cursor_y_adj;
         float cursor_off_x = dstscale.x;
         float cursor_off_y = dstscale.y;
 
@@ -750,10 +730,10 @@ reinit_raylib:;
       }
 
       if(debug_palette) {
-        if(current_format == RTGFMT_8BIT_CLUT) {
-          Rectangle clut_srcrect = {0, 0, 256, 1};
-          Rectangle clut_dstrect = {0, 0, 1024, 8};
-          DrawTexturePro(raylib_clut_texture, clut_srcrect, clut_dstrect, origin, 0.0f, RAYWHITE);
+        if(format == RTGFMT_8BIT_CLUT) {
+          Rectangle srcrect = {0, 0, 256, 1};
+          Rectangle dstrect = {0, 0, 1024, 8};
+          DrawTexturePro(raylib_clut_texture, srcrect, dstrect, origin, 0.0f, RAYWHITE);
         }
       }
 
@@ -765,18 +745,18 @@ reinit_raylib:;
 
       rtg_output_in_vblank = 1;
       cur_rtg_frame++;
-      size_t addr = (size_t)current_addr;
-      size_t needed = (size_t)current_pitch * height;
+      size_t addr = (size_t)frame_addr;
+      size_t needed = (size_t)frame_pitch * height;
 
-      if(current_pitch < row_bytes) {
-        LOG_WARN("[RTG/RAYLIB] Frame pitch too small: pitch=%u row_bytes=%zu\n", current_pitch,
+      if(frame_pitch < row_bytes) {
+        LOG_WARN("[RTG/RAYLIB] Frame pitch too small: pitch=%u row_bytes=%zu\n", frame_pitch,
                  row_bytes);
       } else if(addr >= rtg_mem_size || needed > rtg_mem_size - addr) {
-        LOG_WARN("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
+        LOG_WARN("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", frame_addr,
                  needed, rtg_mem_size);
-      } else if(current_format == RTGFMT_RGB565_BE || current_format == RTGFMT_RGB555_BE) {
-        if((current_pitch % 2) != 0) {
-          LOG_WARN("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", current_pitch);
+      } else if(format == RTGFMT_RGB565_BE || format == RTGFMT_RGB555_BE) {
+        if((frame_pitch % 2) != 0) {
+          LOG_WARN("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", frame_pitch);
         } else {
           if(indexed_buf_size < tight_size) {
             void* resized = realloc(indexed_buf, tight_size);
@@ -788,18 +768,17 @@ reinit_raylib:;
             }
           }
           if(indexed_buf) {
-            size_t src_stride = current_pitch / 2;
+            const uint16_t* src16 = (const uint16_t*)(data->memory + addr);
+            size_t src_stride = frame_pitch / 2;
             for (uint16_t y = 0; y < height; y++) {
               for (uint16_t x = 0; x < width; x++) {
-                size_t src_idx = (x + (y * src_stride)) * sizeof(uint16_t);
-                const uint8_t* src_ptr = data->memory + addr + src_idx;
-                indexed_buf[x + (y * width)] = load_u16_be(src_ptr);
+                indexed_buf[x + (y * width)] = be16toh(src16[x + (y * src_stride)]);
               }
             }
             UpdateTexture(raylib_texture, indexed_buf);
           }
         }
-      } else if(current_pitch != row_bytes) {
+      } else if(frame_pitch != row_bytes) {
         if(tight_buf_size < tight_size) {
           void* resized = realloc(tight_buf, tight_size);
           if(!resized) {
@@ -810,7 +789,7 @@ reinit_raylib:;
           }
         }
         if(tight_buf) {
-          rtg_copy_tight_rows(tight_buf, data->memory + addr, row_bytes, current_pitch, height);
+          rtg_copy_tight_rows(tight_buf, data->memory + addr, row_bytes, frame_pitch, height);
           UpdateTexture(raylib_texture, tight_buf);
         }
       } else {
@@ -883,7 +862,7 @@ void rtg_set_screen_width(uint32_t width) {
     pi_screen_width_set = 0;
     return;
   }
-  pi_screen_width = (int32_t)width;
+  pi_screen_width = width;
   pi_screen_width_set = 1;
 }
 
@@ -892,7 +871,7 @@ void rtg_set_screen_height(uint32_t height) {
     pi_screen_height_set = 0;
     return;
   }
-  pi_screen_height = (int32_t)height;
+  pi_screen_height = height;
   pi_screen_height_set = 1;
 }
 
@@ -980,9 +959,8 @@ void rtg_set_clut_cursor(uint8_t* bmp, uint32_t* pal, int16_t offs_x, int16_t of
       for (uint8_t x = 0; x < mouse_cursor_w; x++) {
         uint8_t clut_index = bmp[x + (y * w)];
         if(bmp[x + (y * w)] != mask_color) {
-          uint32_t col;
-          memcpy(&col, (uint8_t*)pal + (clut_index * sizeof(uint32_t)), sizeof(col));
-          clut_cursor_texture_data[x + (y * 256)] = (be32toh(col) | 0xFF000000);
+          uint32_t* col = (uint32_t*)((uint8_t*)pal + (clut_index * 3));
+          clut_cursor_texture_data[x + (y * 256)] = (*col | 0xFF000000);
         }
       }
     }
@@ -1007,10 +985,10 @@ void update_mouse_cursor(uint8_t* src) {
   if(src != NULL) {
     memset(clut_cursor_data, 0x00, 256 * 256);
     uint8_t cur_bit = 0x80;
-    uint8_t line_pitch = (uint8_t)((mouse_cursor_w / 8) * 2);
+    uint8_t line_pitch = (mouse_cursor_w / 8) * 2;
 
-    for (uint16_t y = 0; y < mouse_cursor_h; y++) {
-      for (uint16_t x = 0; x < mouse_cursor_w; x++) {
+    for (uint8_t y = 0; y < mouse_cursor_h; y++) {
+      for (uint8_t x = 0; x < mouse_cursor_w; x++) {
         if(src[(x / 8) + (line_pitch * y)] & cur_bit)
           clut_cursor_data[x + (y * 256)] |= 0x01;
         if(src[(x / 8) + (line_pitch * y) + (mouse_cursor_w / 8)] & cur_bit)
@@ -1023,8 +1001,8 @@ void update_mouse_cursor(uint8_t* src) {
     }
   }
 
-  for (uint16_t y = 0; y < mouse_cursor_h; y++) {
-    for (uint16_t x = 0; x < mouse_cursor_w; x++) {
+  for (int y = 0; y < mouse_cursor_h; y++) {
+    for (int x = 0; x < mouse_cursor_w; x++) {
       cursor_data[x + (y * 256)] = cursor_palette[clut_cursor_data[x + (y * 256)]];
     }
   }
@@ -1084,7 +1062,7 @@ void rtg_set_scale_mode(uint16_t _scale_mode) {
   case PIGFX_SCALE_FULL_169:
   case PIGFX_SCALE_FULL:
   case PIGFX_SCALE_NONE:
-    scale_mode = (uint8_t)_scale_mode;
+    scale_mode = _scale_mode;
     rtg_scale_output(rtg_display_width, rtg_display_height);
     break;
   case PIGFX_SCALE_CUSTOM:
@@ -1100,7 +1078,7 @@ uint16_t rtg_get_scale_mode(void) {
 }
 
 void rtg_set_scale_rect(uint16_t _scale_mode, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
-  scale_mode = (uint8_t)_scale_mode;
+  scale_mode = _scale_mode;
 
   origin.x = 0.0f;
   origin.y = 0.0f;
@@ -1124,7 +1102,7 @@ void rtg_set_scale_rect(uint16_t _scale_mode, int16_t x1, int16_t y1, int16_t x2
 }
 
 void rtg_set_scale_filter(uint16_t _filter_mode) {
-  filter_mode = (uint16_t)_filter_mode;
+  filter_mode = _filter_mode;
 }
 
 uint16_t rtg_get_scale_filter(void) {

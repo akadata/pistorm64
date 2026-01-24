@@ -23,11 +23,11 @@ int get_platform_index(char* name) {
   return -1;
 }
 
-void create_platform_amiga(struct platform_config* cfg, char* subsys);
-void create_platform_mac68k(struct platform_config* cfg, char* subsys);
-void create_platform_dummy(struct platform_config* cfg, char* subsys);
+void create_platform_amiga(struct platform_config* cfg, const char* subsys);
+void create_platform_mac68k(struct platform_config* cfg, const char* subsys);
+void create_platform_dummy(struct platform_config* cfg, const char* subsys);
 
-struct platform_config* make_platform_config(char* name, char* subsys) {
+struct platform_config* make_platform_config(const char* name, const char* subsys) {
   struct platform_config* cfg = NULL;
   int platform_id = get_platform_index(name);
 
