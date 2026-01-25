@@ -6,7 +6,7 @@
 #include "rtg.h"
 #include "log.h"
 
-#include "raylib/raylib.h"
+#include "raylib.h"
 
 #include <dirent.h>
 #include <math.h>
