@@ -39,11 +39,6 @@ static inline void store_u16_be(uint8_t *p, uint16_t v) {
     memcpy(p, &v, sizeof v);
 }
 
-static inline void store_u16_le(uint8_t *p, uint16_t v) {
-    v = htole16(v);
-    memcpy(p, &v, sizeof v);
-}
-
 static inline void store_u32_be(uint8_t *p, uint32_t v) {
     v = htobe32(v);
     memcpy(p, &v, sizeof v);
@@ -1177,7 +1172,7 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
         goto skip;
       }
 
-      HANDLE_MINTERM_PIXEL(u8_fg, dptr[x], RTGFMT_8BIT_CLUT);
+      HANDLE_MINTERM_PIXEL(u8_fg, dptr[(size_t)x], RTGFMT_8BIT_CLUT);
 
     skip:;
       if ((cur_bit >>= 1) == 0) {
@@ -1215,15 +1210,15 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
     return;
   }
 
-  uint8_t cur_bit, base_bit, base_byte;
-  uint16_t cur_byte = 0, u8_fg = 0;
+  uint8_t cur_bit, base_bit, base_byte, cur_byte = 0;
+  uint8_t u8_fg = 0;
   // uint32_t color_mask = 0xFFFFFFFF;
 
-  uint32_t plane_size = src_line_pitch * h;
+  uint32_t plane_size = (uint32_t)src_line_pitch * (uint32_t)h;
   uint8_t* bmp_data = bmp_data_src;
 
   cur_bit = base_bit = (0x80 >> (sx % 8));
-  cur_byte = base_byte = ((sx / 8) % src_line_pitch);
+  cur_byte = base_byte = (uint16_t)((sx / 8) % src_line_pitch);
 
   if (realtime_graphics_debug) {
     LOG_DEBUG("P2C: %d,%d - %d,%d (%dx%d) %d, %.2X\n", sx, sy, dx, dy, w, h, planes, layer_mask);
@@ -1239,7 +1234,7 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
     for (int i = 0; i < h; i++) {
       for (int k = 0; k < planes; k++) {
         for (int j = 0; j < src_line_pitch; j++) {
-          LOG_DEBUG("%.2X", bmp_data_src[j + (i * src_line_pitch) + (plane_size * k)]);
+          LOG_DEBUG("%.2X", (uint8_t)bmp_data_src[j + (i * src_line_pitch) + (plane_size * k)]);
         }
         LOG_DEBUG("  ");
       }
@@ -1261,7 +1256,7 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
         goto skip;
       }
 
-      HANDLE_MINTERM_PIXEL(u8_fg, dptr[x], rtg_format);
+      HANDLE_MINTERM_PIXEL(u8_fg, dptr[(size_t)x], rtg_format);
 
     skip:;
       if ((cur_bit >>= 1) == 0) {
@@ -1297,15 +1292,15 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
     return;
   }
 
-  uint8_t cur_bit, base_bit, base_byte;
-  uint16_t cur_byte = 0, u8_fg = 0;
+  uint8_t cur_bit, base_bit, base_byte, cur_byte = 0;
+  uint8_t u8_fg = 0;
   // uint32_t color_mask = 0xFFFFFFFF;
 
-  uint32_t plane_size = src_line_pitch * h;
+  uint32_t plane_size = (uint32_t)src_line_pitch * (uint32_t)h;
   uint8_t* bmp_data = bmp_data_src;
 
   cur_bit = base_bit = (0x80 >> (sx % 8));
-  cur_byte = base_byte = ((sx / 8) % src_line_pitch);
+  cur_byte = base_byte = (uint16_t)((sx / 8) % src_line_pitch);
 
   if (realtime_graphics_debug) {
     LOG_DEBUG("P2D: %d,%d - %d,%d (%dx%d) %d, %.2X\n", sx, sy, dx, dy, w, h, planes, layer_mask);
@@ -1321,7 +1316,7 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
     for (int i = 0; i < h; i++) {
       for (int k = 0; k < planes; k++) {
         for (int j = 0; j < src_line_pitch; j++) {
-          LOG_DEBUG("%.2X", bmp_data_src[j + (i * src_line_pitch) + (plane_size * k)]);
+          LOG_DEBUG("%.2X", (uint8_t)bmp_data_src[j + (i * src_line_pitch) + (plane_size * k)]);
         }
         LOG_DEBUG("  ");
       }
@@ -1360,14 +1355,14 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
         case RTGFMT_BGR555_LE:
           {
             uint16_t color16 = (fg_color >> 16);
-            store_u16_be(&dptr[x * sizeof(uint16_t)], color16);
+            store_u16_be(&dptr[(size_t)x * sizeof(uint16_t)], color16);
           }
           break;
         case RTGFMT_RGB32_ABGR:
         case RTGFMT_RGB32_ARGB:
         case RTGFMT_RGB32_BGRA:
         case RTGFMT_RGB32_RGBA:
-          store_u32_be(&dptr[x * sizeof(uint32_t)], fg_color);
+          store_u32_be(&dptr[(size_t)x * sizeof(uint32_t)], fg_color);
           break;
         }
         goto skip;
@@ -1377,11 +1372,11 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
       if ((cur_bit >>= 1) == 0) {
         cur_bit = 0x80;
         cur_byte++;
-        cur_byte %= src_line_pitch;
+        cur_byte = (uint16_t)(cur_byte % src_line_pitch);
       }
     }
     dptr += pitch;
-    if ((line_y + sy + 1) % h)
+    if ((((int16_t)(line_y + sy + 1)) % (int16_t)h) != 0)
       bmp_data += src_line_pitch;
     else
       bmp_data = bmp_data_src;

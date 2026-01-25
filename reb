@@ -17,4 +17,6 @@ echo - rtg-gfx.c: $RTG
 echo - piscsi.c: $PISCSI
 echo - pistorm-dev.c: $PIDEV
 echo - pi_ahi.c: $PIAHI
-
+sudo modprobe pistorm
+cp emulator emulator.last
+#timeout 30 ./emulator

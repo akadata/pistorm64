@@ -167,6 +167,7 @@ extern int m68ki_remaining_cycles;
 #define NOP 	do { NOP1(); NOP1(); NOP1(); NOP1(); } while (0)
 
 #define DEBUG_EMULATOR
+
 #ifdef DEBUG_EMULATOR
 #define DEBUG printf
 #else
@@ -174,13 +175,13 @@ extern int m68ki_remaining_cycles;
 #endif
 
 // Configurable emulator options
-unsigned int cpu_type = M68K_CPU_TYPE_68000;
-unsigned int loop_cycles = 300;
+unsigned int cpu_type = M68K_CPU_TYPE_68030;
+unsigned int loop_cycles = 1024;
 static unsigned int ipl_nop_count = 8;
 static const unsigned int ipl_nop_count_default = 8;
 unsigned int irq_status = 0;
 
-static const unsigned int loop_cycles_cap = 10000; // cap slices to keep service latency reasonable
+static const unsigned int loop_cycles_cap = 2097152; // cap slices to keep service latency reasonable
 struct emulator_config* cfg = NULL;
 char keyboard_file[256] = "/dev/input/event1";
 
@@ -226,7 +227,7 @@ static void configure_ipl_nops(void) {
     unsigned long parsed = strtoul(env, NULL, 10);
     if (parsed > 4096ul) parsed = 4096ul;
     value = (unsigned int)parsed;
-  } else if (loop_cycles > 300) {
+  } else if (loop_cycles > 2097152) {
     unsigned long scaled = ((unsigned long)ipl_nop_count_default * (unsigned long)loop_cycles) / 300ul;
     if (scaled < ipl_nop_count_default) scaled = ipl_nop_count_default;
     if (scaled > 4096ul) scaled = 4096ul;
