@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include "config_file/config_file.h"
@@ -36,6 +37,11 @@ static inline uint32_t load_u32_le(const uint8_t *p) {
     uint32_t v;
     memcpy(&v, p, sizeof v);
     return le32toh(v);
+}
+
+static inline uint8_t* rtg_line_pixel_ptr(uint8_t* base, int32_t x, uint16_t format) {
+  ptrdiff_t offset = (ptrdiff_t)x * (ptrdiff_t)rtg_pixel_size[format];
+  return base + offset;
 }
 
 static inline void store_u16_be(uint8_t *p, uint16_t v) {
@@ -611,7 +617,7 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
         TEMPLATE_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
           if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {
-            SET_RTG_PIXELS(&dptr[xs * rtg_pixel_size[format]], fg_color, format);
+            SET_RTG_PIXELS(rtg_pixel_at(dptr, (size_t)xs, format), fg_color, format);
           } else {
             SET_RTG_PIXELS_MASK(&dptr[xs], fg_color, format);
           }
@@ -620,7 +626,7 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
           while (cur_bit > 0 && xs < w) {
             if (cur_byte & cur_bit) {
               if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {
-                SET_RTG_PIXEL(&dptr[xs * rtg_pixel_size[format]], fg_color, format);
+                SET_RTG_PIXEL(rtg_pixel_at(dptr, (size_t)xs, format), fg_color, format);
               } else {
                 SET_RTG_PIXEL_MASK(&dptr[xs], fg_color, format);
               }
@@ -640,21 +646,21 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
       for (int xs = 0; xs < w; xs++) {
         TEMPLATE_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
-          if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {
-            SET_RTG_PIXELS2_COND(&dptr[xs * rtg_pixel_size[format]], fg_color, bg_color, format);
-          } else {
-            SET_RTG_PIXELS2_COND_MASK(&dptr[xs * rtg_pixel_size[format]], fg_color, bg_color,
-                                      format);
-          }
+            if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {
+              SET_RTG_PIXELS2_COND(rtg_pixel_at(dptr, (size_t)xs, format), fg_color, bg_color, format);
+            } else {
+              SET_RTG_PIXELS2_COND_MASK(rtg_pixel_at(dptr, (size_t)xs, format), fg_color, bg_color,
+                                        format);
+            }
 
           xs += 7;
         } else {
           while (cur_bit > 0 && xs < w) {
             if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {
-              SET_RTG_PIXEL(&dptr[xs * rtg_pixel_size[format]],
-                            (cur_byte & cur_bit) ? fg_color : bg_color, format);
+                SET_RTG_PIXEL(rtg_pixel_at(dptr, (size_t)xs, format),
+                              (cur_byte & cur_bit) ? fg_color : bg_color, format);
             } else {
-              SET_RTG_PIXEL_MASK(&dptr[xs * rtg_pixel_size[format]],
+              SET_RTG_PIXEL_MASK(rtg_pixel_at(dptr, (size_t)xs, format),
                                  (cur_byte & cur_bit) ? fg_color : bg_color, format);
             }
             xs++;
@@ -672,12 +678,12 @@ void rtg_blittemplate(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t s
       for (int xs = 0; xs < w; xs++) {
         TEMPLATE_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
-          INVERT_RTG_PIXELS(&dptr[xs * rtg_pixel_size[format]], format)
+          INVERT_RTG_PIXELS(rtg_pixel_at(dptr, (size_t)xs, format), format)
           xs += 7;
         } else {
           while (cur_bit > 0 && xs < w) {
             if (cur_byte & cur_bit) {
-              INVERT_RTG_PIXEL(&dptr[xs * rtg_pixel_size[format]], format)
+              INVERT_RTG_PIXEL(rtg_pixel_at(dptr, (size_t)xs, format), format)
             }
             xs++;
             cur_bit >>= 1;
@@ -786,7 +792,7 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
         PATTERN_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
           if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {
-            SET_RTG_PIXELS(&dptr[xs * rtg_pixel_size[format]], fg_color, format);
+            SET_RTG_PIXELS(rtg_pixel_at(dptr, (size_t)xs, format), fg_color, format);
           } else {
             SET_RTG_PIXELS_MASK(&dptr[xs], fg_color, format);
           }
@@ -795,9 +801,9 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
           while (cur_bit > 0 && xs < w) {
             if (cur_byte & cur_bit) {
               if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {
-                SET_RTG_PIXEL(&dptr[xs * rtg_pixel_size[format]], fg_color, format);
+                SET_RTG_PIXEL(rtg_pixel_at(dptr, (size_t)xs, format), fg_color, format);
               } else {
-                SET_RTG_PIXEL_MASK(&dptr[xs], fg_color, format);
+                SET_RTG_PIXEL_MASK(rtg_pixel_at(dptr, (size_t)xs, format), fg_color, format);
               }
             }
             xs++;
@@ -815,22 +821,22 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
       for (int xs = 0; xs < w; xs++) {
         PATTERN_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
-          if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {
-            SET_RTG_PIXELS2_COND(&dptr[xs * rtg_pixel_size[format]], fg_color, bg_color, format);
-          } else {
-            SET_RTG_PIXELS2_COND_MASK(&dptr[xs * rtg_pixel_size[format]], fg_color, bg_color,
-                                      format);
-          }
+            if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {
+              SET_RTG_PIXELS2_COND(rtg_pixel_at(dptr, (size_t)xs, format), fg_color, bg_color, format);
+            } else {
+              SET_RTG_PIXELS2_COND_MASK(rtg_pixel_at(dptr, (size_t)xs, format), fg_color, bg_color,
+                                        format);
+            }
 
           xs += 7;
         } else {
           while (cur_bit > 0 && xs < w) {
             if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {
-              SET_RTG_PIXEL(&dptr[xs * rtg_pixel_size[format]],
-                            (cur_byte & cur_bit) ? fg_color : bg_color, format);
+                SET_RTG_PIXEL(rtg_pixel_at(dptr, (size_t)xs, format),
+                              (cur_byte & cur_bit) ? fg_color : bg_color, format);
             } else {
-              SET_RTG_PIXEL_MASK(&dptr[xs * rtg_pixel_size[format]],
-                                 (cur_byte & cur_bit) ? fg_color : bg_color, format);
+              SET_RTG_PIXEL_MASK(rtg_pixel_at(dptr, (size_t)xs, format),
+                                (cur_byte & cur_bit) ? fg_color : bg_color, format);
             }
             xs++;
             cur_bit >>= 1;
@@ -847,12 +853,12 @@ void rtg_blitpattern(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t sr
       for (int xs = 0; xs < w; xs++) {
         PATTERN_LOOPX;
         if (w >= 8 && cur_bit == 0x80 && xs < w - 8) {
-          INVERT_RTG_PIXELS(&dptr[xs * rtg_pixel_size[format]], format)
+          INVERT_RTG_PIXELS(rtg_pixel_at(dptr, (size_t)xs, format), format)
           xs += 7;
         } else {
           while (cur_bit > 0 && xs < w) {
             if (cur_byte & cur_bit) {
-              INVERT_RTG_PIXEL(&dptr[xs * rtg_pixel_size[format]], format)
+              INVERT_RTG_PIXEL(rtg_pixel_at(dptr, (size_t)xs, format), format)
             }
             xs++;
             cur_bit >>= 1;
@@ -915,7 +921,8 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
   int32_t line_step = pitch;
   int8_t x_step = 1;
 
-  int16_t dx, dy, dx_abs, dy_abs, ix, iy, x = x1;
+  int32_t dx, dy, dx_abs, dy_abs, ix, iy;
+  int16_t x = x1;
 
   if (x2 < x1)
     x_step = -1;
@@ -929,11 +936,11 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
   ix = dy_abs >> 1;
   iy = dx_abs >> 1;
 
-  SET_RTG_PIXEL(&dptr[x * rtg_pixel_size[format]], fg_color, format);
+  SET_RTG_PIXEL(rtg_line_pixel_ptr(dptr, x, format), fg_color, format);
 
   if (dx_abs >= dy_abs) {
     if (!len)
-      len = dx_abs;
+      len = (uint16_t)dx_abs;
     for (uint16_t i = 0; i < len; i++) {
       iy += dy_abs;
       if (iy >= dx_abs) {
@@ -942,11 +949,11 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
       }
       x += x_step;
 
-      SET_RTG_PIXEL(&dptr[x * rtg_pixel_size[format]], fg_color, format);
+      SET_RTG_PIXEL(rtg_line_pixel_ptr(dptr, x, format), fg_color, format);
     }
   } else {
     if (!len)
-      len = dy_abs;
+      len = (uint16_t)dy_abs;
     for (uint16_t i = 0; i < len; i++) {
       ix += dx_abs;
       if (ix >= dy_abs) {
@@ -955,33 +962,36 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
       }
       dptr += line_step;
 
-      SET_RTG_PIXEL(&dptr[x * rtg_pixel_size[format]], fg_color, format);
+      SET_RTG_PIXEL(rtg_line_pixel_ptr(dptr, x, format), fg_color, format);
     }
   }
 }
 
 #define DRAW_LINE_PIXEL                                                                            \
-  if (pattern & cur_bit) {                                                                         \
-    if (invert) {                                                                                  \
-      INVERT_RTG_PIXEL(&dptr[x * rtg_pixel_size[format]], format)                                  \
-    } else {                                                                                       \
-      if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {                                            \
-        SET_RTG_PIXEL(&dptr[x * rtg_pixel_size[format]], fg_color, format);                        \
+  do {                                                                                             \
+    uint8_t* __rtg_line_pixel = rtg_line_pixel_ptr(dptr, x, format);                              \
+    if (pattern & cur_bit) {                                                                       \
+      if (invert) {                                                                                \
+        INVERT_RTG_PIXEL(__rtg_line_pixel, format)                                                 \
       } else {                                                                                     \
-        SET_RTG_PIXEL_MASK(&dptr[x * rtg_pixel_size[format]], fg_color, format);                   \
-      }                                                                                            \
-    }                                                                                              \
-  } else if (draw_mode == DRAWMODE_JAM2) {                                                         \
-    if (invert) {                                                                                  \
-      INVERT_RTG_PIXEL(&dptr[x * rtg_pixel_size[format]], format)                                  \
-    } else {                                                                                       \
-      if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {                                            \
-        SET_RTG_PIXEL(&dptr[x * rtg_pixel_size[format]], bg_color, format);                        \
+        if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {                                          \
+          SET_RTG_PIXEL(__rtg_line_pixel, fg_color, format);                                      \
+        } else {                                                                                  \
+          SET_RTG_PIXEL_MASK(__rtg_line_pixel, fg_color, format);                                 \
+        }                                                                                         \
+      }                                                                                           \
+    } else if (draw_mode == DRAWMODE_JAM2) {                                                       \
+      if (invert) {                                                                                \
+        INVERT_RTG_PIXEL(__rtg_line_pixel, format)                                                 \
       } else {                                                                                     \
-        SET_RTG_PIXEL_MASK(&dptr[x * rtg_pixel_size[format]], bg_color, format);                   \
-      }                                                                                            \
-    }                                                                                              \
-  }                                                                                                \
+        if (mask == 0xFF || format != RTGFMT_8BIT_CLUT) {                                          \
+          SET_RTG_PIXEL(__rtg_line_pixel, bg_color, format);                                      \
+        } else {                                                                                  \
+          SET_RTG_PIXEL_MASK(__rtg_line_pixel, bg_color, format);                                 \
+        }                                                                                         \
+      }                                                                                           \
+    }                                                                                             \
+  } while (0)                                                                                      \
   if ((cur_bit >>= 1) == 0)                                                                        \
     cur_bit = 0x8000;
 
@@ -1043,7 +1053,8 @@ void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t l
   int32_t line_step = pitch;
   int8_t x_step = 1;
 
-  int16_t dx, dy, dx_abs, dy_abs, ix, iy, x = x1;
+  int32_t dx, dy, dx_abs, dy_abs, ix, iy;
+  int16_t x = x1;
 
   if (x2 < x1)
     x_step = -1;
@@ -1068,7 +1079,7 @@ void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t l
 
   if (dx_abs >= dy_abs) {
     if (!len)
-      len = dx_abs;
+      len = (uint16_t)dx_abs;
     for (uint16_t i = 0; i < len; i++) {
       iy += dy_abs;
       if (iy >= dx_abs) {
@@ -1081,7 +1092,7 @@ void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t l
     }
   } else {
     if (!len)
-      len = dy_abs;
+      len = (uint16_t)dy_abs;
     for (uint16_t i = 0; i < len; i++) {
       ix += dx_abs;
       if (ix >= dy_abs) {
