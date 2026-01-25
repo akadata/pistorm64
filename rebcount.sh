@@ -1,9 +1,5 @@
-make full C=clang V=1 2>clang-build.log
-rg "warning:" clang-build.log \
-| rg -v 'src/musashi/' \
-| rg -v 'src/softfloat/' \
-> core-warnings.log
 
+rg "warning:" clang-build.log | rg -v 'src/musashi/' | rg -v 'src/softfloat/' > core-warnings.log
 
 TOTAL=$(rg "warning:" core-warnings.log | wc -l || echo 0)
 PISTORMDEV=$(rg "pistorm-dev.c" core-warnings.log | wc -l || echo 0)
@@ -25,9 +21,3 @@ echo - rtg-gfx.c: $RTGFGX
 echo - piscsi.c: $PISCSI
 echo - pistorm-dev.c: $PIDEV
 echo - pi_ahi.c: $PIAHI
-
-sudo modprobe pistorm
-
-cp emulator emulator.last
-
-#timeout 30 ./emulator
