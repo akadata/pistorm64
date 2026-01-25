@@ -24,13 +24,6 @@ static inline uint16_t load_u16_be(const uint8_t *p) {
     return be16toh(v);
 }
 
-static inline uint32_t load_u32_be(const uint8_t *p) {
-    uint32_t v;
-    memcpy(&v, p, sizeof v);
-    return be32toh(v);
-}
-
-
 // Default configuration for VideoCore / TV service support (Raspberry Pi only).
 // Makefile can override with -DUSE_VC=1 when vc_tvservice is available.
 #ifndef USE_VC
@@ -643,8 +636,6 @@ reinit_raylib:;
       uint16_t current_height = *data->height;
       uint16_t current_format = *data->format;
       uint16_t current_pitch = *data->pitch;
-      uint16_t current_offset_x = *data->offset_x;
-      uint16_t current_offset_y = *data->offset_y;
       uint32_t current_addr = *data->addr;
 
       if(current_format >= RTGFMT_NUM) {
@@ -765,13 +756,13 @@ reinit_raylib:;
 
       rtg_output_in_vblank = 1;
       cur_rtg_frame++;
-      size_t addr = (size_t)current_addr;
+      size_t frame_addr_offset = (size_t)current_addr;
       size_t needed = (size_t)current_pitch * height;
 
       if(current_pitch < row_bytes) {
         LOG_WARN("[RTG/RAYLIB] Frame pitch too small: pitch=%u row_bytes=%zu\n", current_pitch,
                  row_bytes);
-      } else if(addr >= rtg_mem_size || needed > rtg_mem_size - addr) {
+      } else if(frame_addr_offset >= rtg_mem_size || needed > rtg_mem_size - frame_addr_offset) {
         LOG_WARN("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
                  needed, rtg_mem_size);
       } else if(current_format == RTGFMT_RGB565_BE || current_format == RTGFMT_RGB555_BE) {
@@ -1124,7 +1115,7 @@ void rtg_set_scale_rect(uint16_t _scale_mode, int16_t x1, int16_t y1, int16_t x2
 }
 
 void rtg_set_scale_filter(uint16_t _filter_mode) {
-  filter_mode = (uint16_t)_filter_mode;
+  filter_mode = (uint8_t)_filter_mode;
 }
 
 uint16_t rtg_get_scale_filter(void) {
