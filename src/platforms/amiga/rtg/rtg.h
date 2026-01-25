@@ -9,6 +9,7 @@
 
 #define CARD_OFFSET 0
 
+#include <stddef.h>
 #include "rtg_enums.h"
 
 struct emulator_config;
@@ -190,140 +191,52 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
   }
 
 #define SET_RTG_PIXELS_MASK(dest, src, format)                                                     \
-  if (cur_byte & 0x80)                                                                             \
-    (dest)[0] = src ^ ((dest)[0] & ~mask);                                                         \
-  if (cur_byte & 0x40)                                                                             \
-    (dest)[1] = src ^ ((dest)[1] & ~mask);                                                         \
-  if (cur_byte & 0x20)                                                                             \
-    (dest)[2] = src ^ ((dest)[2] & ~mask);                                                         \
-  if (cur_byte & 0x10)                                                                             \
-    (dest)[3] = src ^ ((dest)[3] & ~mask);                                                         \
-  if (cur_byte & 0x08)                                                                             \
-    (dest)[4] = src ^ ((dest)[4] & ~mask);                                                         \
-  if (cur_byte & 0x04)                                                                             \
-    (dest)[5] = src ^ ((dest)[5] & ~mask);                                                         \
-  if (cur_byte & 0x02)                                                                             \
-    (dest)[6] = src ^ ((dest)[6] & ~mask);                                                         \
-  if (cur_byte & 0x01)                                                                             \
-    (dest)[7] = src ^ ((dest)[7] & ~mask);
+  do {                                                                                              \
+    uint8_t* __rtg_dest = (uint8_t*)(dest);                                                         \
+    for (int __rtg_i = 0; __rtg_i < 8; ++__rtg_i) {                                                 \
+      if (cur_byte & (0x80 >> __rtg_i)) {                                                           \
+        SET_RTG_PIXEL_MASK(__rtg_dest + ((size_t)__rtg_i) * rtg_pixel_size[format], src, format);  \
+      }                                                                                             \
+    }                                                                                               \
+  } while (0)
 
 #define SET_RTG_PIXELS2_COND_MASK(dest, src, src2, format)                                         \
-  (dest)[0] = (cur_byte & 0x80) ? src : src2 ^ ((dest)[0] & ~mask);                                \
-  (dest)[1] = (cur_byte & 0x40) ? src : src2 ^ ((dest)[1] & ~mask);                                \
-  (dest)[2] = (cur_byte & 0x20) ? src : src2 ^ ((dest)[2] & ~mask);                                \
-  (dest)[3] = (cur_byte & 0x10) ? src : src2 ^ ((dest)[3] & ~mask);                                \
-  (dest)[4] = (cur_byte & 0x08) ? src : src2 ^ ((dest)[4] & ~mask);                                \
-  (dest)[5] = (cur_byte & 0x04) ? src : src2 ^ ((dest)[5] & ~mask);                                \
-  (dest)[6] = (cur_byte & 0x02) ? src : src2 ^ ((dest)[6] & ~mask);                                \
-  (dest)[7] = (cur_byte & 0x01) ? src : src2 ^ ((dest)[7] & ~mask);
+  do {                                                                                              \
+    uint8_t* __rtg_dest = (uint8_t*)(dest);                                                         \
+    for (int __rtg_i = 0; __rtg_i < 8; ++__rtg_i) {                                                 \
+      uint8_t* __rtg_ptr = __rtg_dest + ((size_t)__rtg_i) * rtg_pixel_size[format];                \
+      if (cur_byte & (0x80 >> __rtg_i)) {                                                           \
+        SET_RTG_PIXEL(__rtg_ptr, src, format);                                                      \
+      } else {                                                                                      \
+        SET_RTG_PIXEL_MASK(__rtg_ptr, src2, format);                                                \
+      }                                                                                             \
+    }                                                                                               \
+  } while (0)
 
 #define SET_RTG_PIXELS(dest, src, format)                                                          \
-  switch (format) {                                                                                \
-  case RTGFMT_8BIT_CLUT:                                                                           \
-    if (cur_byte & 0x80)                                                                           \
-      (dest)[0] = src;                                                                             \
-    if (cur_byte & 0x40)                                                                           \
-      (dest)[1] = src;                                                                             \
-    if (cur_byte & 0x20)                                                                           \
-      (dest)[2] = src;                                                                             \
-    if (cur_byte & 0x10)                                                                           \
-      (dest)[3] = src;                                                                             \
-    if (cur_byte & 0x08)                                                                           \
-      (dest)[4] = src;                                                                             \
-    if (cur_byte & 0x04)                                                                           \
-      (dest)[5] = src;                                                                             \
-    if (cur_byte & 0x02)                                                                           \
-      (dest)[6] = src;                                                                             \
-    if (cur_byte & 0x01)                                                                           \
-      (dest)[7] = src;                                                                             \
-    break;                                                                                         \
-  case RTGFMT_RGB565_LE:                                                                           \
-  case RTGFMT_RGB565_BE:                                                                           \
-  case RTGFMT_BGR565_LE:                                                                           \
-  case RTGFMT_RGB555_LE:                                                                           \
-  case RTGFMT_RGB555_BE:                                                                           \
-  case RTGFMT_BGR555_LE:                                                                           \
-    if (cur_byte & 0x80)                                                                           \
-      ((uint16_t*)dest)[0] = src;                                                                  \
-    if (cur_byte & 0x40)                                                                           \
-      ((uint16_t*)dest)[1] = src;                                                                  \
-    if (cur_byte & 0x20)                                                                           \
-      ((uint16_t*)dest)[2] = src;                                                                  \
-    if (cur_byte & 0x10)                                                                           \
-      ((uint16_t*)dest)[3] = src;                                                                  \
-    if (cur_byte & 0x08)                                                                           \
-      ((uint16_t*)dest)[4] = src;                                                                  \
-    if (cur_byte & 0x04)                                                                           \
-      ((uint16_t*)dest)[5] = src;                                                                  \
-    if (cur_byte & 0x02)                                                                           \
-      ((uint16_t*)dest)[6] = src;                                                                  \
-    if (cur_byte & 0x01)                                                                           \
-      ((uint16_t*)dest)[7] = src;                                                                  \
-    break;                                                                                         \
-  case RTGFMT_RGB32_ABGR:                                                                          \
-  case RTGFMT_RGB32_ARGB:                                                                          \
-  case RTGFMT_RGB32_BGRA:                                                                          \
-  case RTGFMT_RGB32_RGBA:                                                                          \
-    if (cur_byte & 0x80)                                                                           \
-      ((uint32_t*)dest)[0] = src;                                                                  \
-    if (cur_byte & 0x40)                                                                           \
-      ((uint32_t*)dest)[1] = src;                                                                  \
-    if (cur_byte & 0x20)                                                                           \
-      ((uint32_t*)dest)[2] = src;                                                                  \
-    if (cur_byte & 0x10)                                                                           \
-      ((uint32_t*)dest)[3] = src;                                                                  \
-    if (cur_byte & 0x08)                                                                           \
-      ((uint32_t*)dest)[4] = src;                                                                  \
-    if (cur_byte & 0x04)                                                                           \
-      ((uint32_t*)dest)[5] = src;                                                                  \
-    if (cur_byte & 0x02)                                                                           \
-      ((uint32_t*)dest)[6] = src;                                                                  \
-    if (cur_byte & 0x01)                                                                           \
-      ((uint32_t*)dest)[7] = src;                                                                  \
-    break;                                                                                         \
-  }
+  do {                                                                                              \
+    uint8_t* __rtg_dest = (uint8_t*)(dest);                                                         \
+    for (int __rtg_i = 0; __rtg_i < 8; ++__rtg_i) {                                                 \
+      if (cur_byte & (0x80 >> __rtg_i)) {                                                           \
+        SET_RTG_PIXEL(__rtg_dest + ((size_t)__rtg_i) * rtg_pixel_size[format], src, format);        \
+      }                                                                                             \
+    }                                                                                               \
+  } while (0)
 
 #define SET_RTG_PIXELS2_COND(dest, src, src2, format)                                              \
-  switch (format) {                                                                                \
-  case RTGFMT_8BIT_CLUT:                                                                           \
-    (dest)[0] = (cur_byte & 0x80) ? src : src2;                                                    \
-    (dest)[1] = (cur_byte & 0x40) ? src : src2;                                                    \
-    (dest)[2] = (cur_byte & 0x20) ? src : src2;                                                    \
-    (dest)[3] = (cur_byte & 0x10) ? src : src2;                                                    \
-    (dest)[4] = (cur_byte & 0x08) ? src : src2;                                                    \
-    (dest)[5] = (cur_byte & 0x04) ? src : src2;                                                    \
-    (dest)[6] = (cur_byte & 0x02) ? src : src2;                                                    \
-    (dest)[7] = (cur_byte & 0x01) ? src : src2;                                                    \
-    break;                                                                                         \
-  case RTGFMT_RGB565_LE:                                                                           \
-  case RTGFMT_RGB565_BE:                                                                           \
-  case RTGFMT_BGR565_LE:                                                                           \
-  case RTGFMT_RGB555_LE:                                                                           \
-  case RTGFMT_RGB555_BE:                                                                           \
-  case RTGFMT_BGR555_LE:                                                                           \
-    ((uint16_t*)dest)[0] = (cur_byte & 0x80) ? src : src2;                                         \
-    ((uint16_t*)dest)[1] = (cur_byte & 0x40) ? src : src2;                                         \
-    ((uint16_t*)dest)[2] = (cur_byte & 0x20) ? src : src2;                                         \
-    ((uint16_t*)dest)[3] = (cur_byte & 0x10) ? src : src2;                                         \
-    ((uint16_t*)dest)[4] = (cur_byte & 0x08) ? src : src2;                                         \
-    ((uint16_t*)dest)[5] = (cur_byte & 0x04) ? src : src2;                                         \
-    ((uint16_t*)dest)[6] = (cur_byte & 0x02) ? src : src2;                                         \
-    ((uint16_t*)dest)[7] = (cur_byte & 0x01) ? src : src2;                                         \
-    break;                                                                                         \
-  case RTGFMT_RGB32_ABGR:                                                                          \
-  case RTGFMT_RGB32_ARGB:                                                                          \
-  case RTGFMT_RGB32_BGRA:                                                                          \
-  case RTGFMT_RGB32_RGBA:                                                                          \
-    ((uint32_t*)dest)[0] = (cur_byte & 0x80) ? src : src2;                                         \
-    ((uint32_t*)dest)[1] = (cur_byte & 0x40) ? src : src2;                                         \
-    ((uint32_t*)dest)[2] = (cur_byte & 0x20) ? src : src2;                                         \
-    ((uint32_t*)dest)[3] = (cur_byte & 0x10) ? src : src2;                                         \
-    ((uint32_t*)dest)[4] = (cur_byte & 0x08) ? src : src2;                                         \
-    ((uint32_t*)dest)[5] = (cur_byte & 0x04) ? src : src2;                                         \
-    ((uint32_t*)dest)[6] = (cur_byte & 0x02) ? src : src2;                                         \
-    ((uint32_t*)dest)[7] = (cur_byte & 0x01) ? src : src2;                                         \
-    break;                                                                                         \
-  }
+  do {                                                                                              \
+    uint8_t* __rtg_dest = (uint8_t*)(dest);                                                         \
+    for (int __rtg_i = 0; __rtg_i < 8; ++__rtg_i) {                                                 \
+      uint8_t* __rtg_ptr = __rtg_dest + ((size_t)__rtg_i) * rtg_pixel_size[format];                \
+      if (cur_byte & (0x80 >> __rtg_i)) {                                                           \
+        SET_RTG_PIXEL(__rtg_ptr, src, format);                                                      \
+      } else {                                                                                      \
+        SET_RTG_PIXEL(__rtg_ptr, src2, format);                                                     \
+      }                                                                                             \
+    }                                                                                               \
+  } while (0)
+
+#include <string.h>
 
 #define SET_RTG_PIXEL(dest, src, format)                                                           \
   switch (format) {                                                                                \
@@ -335,15 +248,19 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
   case RTGFMT_BGR565_LE:                                                                           \
   case RTGFMT_RGB555_LE:                                                                           \
   case RTGFMT_RGB555_BE:                                                                           \
-  case RTGFMT_BGR555_LE:                                                                           \
-    *((uint16_t*)dest) = src;                                                                      \
+  case RTGFMT_BGR555_LE: {                                                                         \
+    uint16_t tmp = (uint16_t)src;                                                                  \
+    memcpy(dest, &tmp, sizeof(tmp));                                                               \
     break;                                                                                         \
+  }                                                                                                \
   case RTGFMT_RGB32_ABGR:                                                                          \
   case RTGFMT_RGB32_ARGB:                                                                          \
   case RTGFMT_RGB32_BGRA:                                                                          \
-  case RTGFMT_RGB32_RGBA:                                                                          \
-    *((uint32_t*)dest) = src;                                                                      \
+  case RTGFMT_RGB32_RGBA: {                                                                        \
+    uint32_t tmp = (uint32_t)src;                                                                  \
+    memcpy(dest, &tmp, sizeof(tmp));                                                               \
     break;                                                                                         \
+  }                                                                                                \
   }
 
 #define SET_RTG_PIXEL_MASK(dest, src, format)                                                      \
@@ -356,15 +273,19 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
   case RTGFMT_BGR565_LE:                                                                           \
   case RTGFMT_RGB555_LE:                                                                           \
   case RTGFMT_RGB555_BE:                                                                           \
-  case RTGFMT_BGR555_LE:                                                                           \
-    *((uint16_t*)dest) = src;                                                                      \
+  case RTGFMT_BGR555_LE: {                                                                         \
+    uint16_t tmp = (uint16_t)src;                                                                  \
+    memcpy(dest, &tmp, sizeof(tmp));                                                               \
     break;                                                                                         \
+  }                                                                                                \
   case RTGFMT_RGB32_ABGR:                                                                          \
   case RTGFMT_RGB32_ARGB:                                                                          \
   case RTGFMT_RGB32_BGRA:                                                                          \
-  case RTGFMT_RGB32_RGBA:                                                                          \
-    *((uint32_t*)dest) = src;                                                                      \
+  case RTGFMT_RGB32_RGBA: {                                                                        \
+    uint32_t tmp = (uint32_t)src;                                                                  \
+    memcpy(dest, &tmp, sizeof(tmp));                                                               \
     break;                                                                                         \
+  }                                                                                                \
   }
 
 #define INVERT_RTG_PIXEL(dest, format)                                                             \
@@ -377,15 +298,23 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
   case RTGFMT_BGR565_LE:                                                                           \
   case RTGFMT_RGB555_LE:                                                                           \
   case RTGFMT_RGB555_BE:                                                                           \
-  case RTGFMT_BGR555_LE:                                                                           \
-    *((uint16_t*)dest) = ~*((uint16_t*)dest);                                                      \
+  case RTGFMT_BGR555_LE: {                                                                         \
+    uint16_t tmp;                                                                                  \
+    memcpy(&tmp, dest, sizeof(tmp));                                                               \
+    tmp = ~tmp;                                                                                    \
+    memcpy(dest, &tmp, sizeof(tmp));                                                               \
     break;                                                                                         \
+  }                                                                                                \
   case RTGFMT_RGB32_ABGR:                                                                          \
   case RTGFMT_RGB32_ARGB:                                                                          \
   case RTGFMT_RGB32_BGRA:                                                                          \
-  case RTGFMT_RGB32_RGBA:                                                                          \
-    *((uint32_t*)dest) = ~*((uint32_t*)dest);                                                      \
+  case RTGFMT_RGB32_RGBA: {                                                                        \
+    uint32_t tmp;                                                                                  \
+    memcpy(&tmp, dest, sizeof(tmp));                                                               \
+    tmp = ~tmp;                                                                                    \
+    memcpy(dest, &tmp, sizeof(tmp));                                                               \
     break;                                                                                         \
+  }                                                                                                \
   }
 
 #define HANDLE_MINTERM_PIXEL(s, d, f)                                                              \

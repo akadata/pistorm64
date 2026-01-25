@@ -58,6 +58,10 @@ static inline void store_u32_le(uint8_t *p, uint32_t v) {
     memcpy(p, &v, sizeof v);
 }
 
+static inline size_t rtg_index_offset(int index, size_t element_size) {
+    return (size_t)index * element_size;
+}
+
 extern uint32_t rtg_address[8];
 extern uint32_t rtg_address_adj[8];
 extern uint8_t* rtg_mem; // FIXME
@@ -154,7 +158,8 @@ void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t
   case RTGFMT_BGR555_LE: {
     uint16_t color16 = (color & 0xFFFF);
     for (int xs = 0; xs < w; xs++) {
-      store_u16_be(&dptr[xs * sizeof(uint16_t)], color16);
+      size_t offset = (size_t)xs * sizeof(uint16_t);
+      store_u16_be(&dptr[offset], color16);
     }
     break;
   }
@@ -163,14 +168,16 @@ void rtg_fillrect_solid(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t
   case RTGFMT_RGB32_BGRA:
   case RTGFMT_RGB32_RGBA: {
     for (int xs = 0; xs < w; xs++) {
-      store_u32_be(&dptr[xs * sizeof(uint32_t)], color);
+      size_t offset = (size_t)xs * sizeof(uint32_t);
+      store_u32_be(&dptr[offset], color);
     }
     break;
   }
   }
   for (int ys = 1; ys < h; ys++) {
     dptr += pitch;
-    memcpy(dptr, (void*)(size_t)(dptr - pitch), (w * rtg_pixel_size[format]));
+    size_t copy_bytes = (size_t)w * rtg_pixel_size[format];
+    memcpy(dptr, dptr - pitch, copy_bytes);
   }
 }
 
@@ -183,7 +190,8 @@ void rtg_fillrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint32_t color
 
   for (int ys = 0; ys < h; ys++) {
     for (int xs = 0; xs < w; xs++) {
-      SET_RTG_PIXEL_MASK(&dptr[xs * rtg_pixel_size[format]], (color & 0xFF), format);
+      size_t offset = (size_t)xs * rtg_pixel_size[format];
+      SET_RTG_PIXEL_MASK(&dptr[offset], (color & 0xFF), format);
     }
     dptr += pitch;
   }
@@ -205,28 +213,30 @@ void rtg_invertrect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t pit
       }
       break;
     }
-    case RTGFMT_RGB565_LE:
-    case RTGFMT_RGB565_BE:
-    case RTGFMT_BGR565_LE:
-    case RTGFMT_RGB555_LE:
-    case RTGFMT_RGB555_BE:
-    case RTGFMT_BGR555_LE: {
-      for (int xs = 0; xs < w; xs++) {
-        uint16_t val = load_u16_be(&dptr[xs * sizeof(uint16_t)]);
-        val = ~val;
-        store_u16_be(&dptr[xs * sizeof(uint16_t)], val);
+      case RTGFMT_RGB565_LE:
+      case RTGFMT_RGB565_BE:
+      case RTGFMT_BGR565_LE:
+      case RTGFMT_RGB555_LE:
+      case RTGFMT_RGB555_BE:
+      case RTGFMT_BGR555_LE: {
+        for (int xs = 0; xs < w; xs++) {
+          size_t offset = (size_t)xs * sizeof(uint16_t);
+          uint16_t val = load_u16_be(&dptr[offset]);
+          val = ~val;
+          store_u16_be(&dptr[offset], val);
+        }
+        break;
       }
-      break;
-    }
-    case RTGFMT_RGB32_ABGR:
+      case RTGFMT_RGB32_ABGR:
     case RTGFMT_RGB32_ARGB:
     case RTGFMT_RGB32_BGRA:
     case RTGFMT_RGB32_RGBA: {
-      for (int xs = 0; xs < w; xs++) {
-        uint32_t val = load_u32_be(&dptr[xs * sizeof(uint32_t)]);
-        val = ~val;
-        store_u32_be(&dptr[xs * sizeof(uint32_t)], val);
-      }
+        for (int xs = 0; xs < w; xs++) {
+          size_t offset = (size_t)xs * sizeof(uint32_t);
+          uint32_t val = load_u32_be(&dptr[offset]);
+          val = ~val;
+          store_u32_be(&dptr[offset], val);
+        }
       break;
     }
     }
@@ -273,57 +283,65 @@ void rtg_blitrect(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16_t w, 
       }
     } else {
       size_t bpp = rtg_pixel_size[format];
-      if (xdir) {
-        for (int xs = 0; xs < w; xs++) {
-          switch (format) {
-          case RTGFMT_RGB565_LE:
-          case RTGFMT_RGB565_BE:
-          case RTGFMT_BGR565_LE:
-          case RTGFMT_RGB555_LE:
-          case RTGFMT_RGB555_BE:
-          case RTGFMT_BGR555_LE:
-            {
-              uint16_t pixel_val = load_u16_be(&sptr[xs * sizeof(uint16_t)]);
-              SET_RTG_PIXEL_MASK(&dptr[xs * bpp], pixel_val, format);
+        if (xdir) {
+          for (int xs = 0; xs < w; xs++) {
+            switch (format) {
+            case RTGFMT_RGB565_LE:
+            case RTGFMT_RGB565_BE:
+            case RTGFMT_BGR565_LE:
+            case RTGFMT_RGB555_LE:
+            case RTGFMT_RGB555_BE:
+            case RTGFMT_BGR555_LE:
+              {
+                size_t src_offset = rtg_index_offset(xs, sizeof(uint16_t));
+                size_t dst_offset = rtg_index_offset(xs, bpp);
+                uint16_t pixel_val = load_u16_be(&sptr[src_offset]);
+                SET_RTG_PIXEL_MASK(&dptr[dst_offset], pixel_val, format);
+              }
+              break;
+            case RTGFMT_RGB32_ABGR:
+            case RTGFMT_RGB32_ARGB:
+            case RTGFMT_RGB32_BGRA:
+            case RTGFMT_RGB32_RGBA:
+              {
+                size_t src_offset = rtg_index_offset(xs, sizeof(uint32_t));
+                size_t dst_offset = rtg_index_offset(xs, bpp);
+                uint32_t pixel_val = load_u32_be(&sptr[src_offset]);
+                SET_RTG_PIXEL_MASK(&dptr[dst_offset], pixel_val, format);
+              }
+              break;
             }
-            break;
-          case RTGFMT_RGB32_ABGR:
-          case RTGFMT_RGB32_ARGB:
-          case RTGFMT_RGB32_BGRA:
-          case RTGFMT_RGB32_RGBA:
-            {
-              uint32_t pixel_val = load_u32_be(&sptr[xs * sizeof(uint32_t)]);
-              SET_RTG_PIXEL_MASK(&dptr[xs * bpp], pixel_val, format);
+          }
+        } else {
+          for (int xs = (int)w - 1; xs >= 0; xs--) {
+            switch (format) {
+            case RTGFMT_RGB565_LE:
+            case RTGFMT_RGB565_BE:
+            case RTGFMT_BGR565_LE:
+            case RTGFMT_RGB555_LE:
+            case RTGFMT_RGB555_BE:
+            case RTGFMT_BGR555_LE:
+              {
+                size_t src_offset = rtg_index_offset(xs, sizeof(uint16_t));
+                size_t dst_offset = rtg_index_offset(xs, bpp);
+                uint16_t pixel_val = load_u16_be(&sptr[src_offset]);
+                SET_RTG_PIXEL_MASK(&dptr[dst_offset], pixel_val, format);
+              }
+              break;
+            case RTGFMT_RGB32_ABGR:
+            case RTGFMT_RGB32_ARGB:
+            case RTGFMT_RGB32_BGRA:
+            case RTGFMT_RGB32_RGBA:
+              {
+                size_t src_offset = rtg_index_offset(xs, sizeof(uint32_t));
+                size_t dst_offset = rtg_index_offset(xs, bpp);
+                uint32_t pixel_val = load_u32_be(&sptr[src_offset]);
+                SET_RTG_PIXEL_MASK(&dptr[dst_offset], pixel_val, format);
+              }
+              break;
             }
-            break;
           }
         }
-      } else {
-        for (int xs = (int)w - 1; xs >= 0; xs--) {
-          switch (format) {
-          case RTGFMT_RGB565_LE:
-          case RTGFMT_RGB565_BE:
-          case RTGFMT_BGR565_LE:
-          case RTGFMT_RGB555_LE:
-          case RTGFMT_RGB555_BE:
-          case RTGFMT_BGR555_LE:
-            {
-              uint16_t pixel_val = load_u16_be(&sptr[xs * sizeof(uint16_t)]);
-              SET_RTG_PIXEL_MASK(&dptr[xs * bpp], pixel_val, format);
-            }
-            break;
-          case RTGFMT_RGB32_ABGR:
-          case RTGFMT_RGB32_ARGB:
-          case RTGFMT_RGB32_BGRA:
-          case RTGFMT_RGB32_RGBA:
-            {
-              uint32_t pixel_val = load_u32_be(&sptr[xs * sizeof(uint32_t)]);
-              SET_RTG_PIXEL_MASK(&dptr[xs * bpp], pixel_val, format);
-            }
-            break;
-          }
-        }
-      }
     }
     sptr += pitchstep;
     dptr += pitchstep;
@@ -421,13 +439,16 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
   }
 
   if (minterm == MINTERM_SRC) {
-    for (int ys = 0; ys < h; ys++) {
-      if (xdir)
-        memcpy(dptr, sptr, w * rtg_pixel_size[format]);
-      else
-        memmove(dptr, sptr, w * rtg_pixel_size[format]);
-      sptr += src_pitchstep;
-      dptr += dst_pitchstep;
+    {
+      size_t row_bytes = (size_t)w * rtg_pixel_size[format];
+      for (int ys = 0; ys < h; ys++) {
+        if (xdir)
+          memcpy(dptr, sptr, row_bytes);
+        else
+          memmove(dptr, sptr, row_bytes);
+        sptr += src_pitchstep;
+        dptr += dst_pitchstep;
+      }
     }
   } else {
     for (int ys = 0; ys < h; ys++) {
@@ -444,8 +465,10 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
           case RTGFMT_RGB555_BE:
           case RTGFMT_BGR555_LE:
             {
-              uint16_t src_val = load_u16_be(&sptr[xs * sizeof(uint16_t)]);
-              uint16_t dst_val = load_u16_be(&dptr[xs * sizeof(uint16_t)]);
+              size_t src_offset = rtg_index_offset(xs, sizeof(uint16_t));
+              size_t dst_offset = rtg_index_offset(xs, sizeof(uint16_t));
+              uint16_t src_val = load_u16_be(&sptr[src_offset]);
+              uint16_t dst_val = load_u16_be(&dptr[dst_offset]);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
             }
             break;
@@ -454,8 +477,10 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
           case RTGFMT_RGB32_BGRA:
           case RTGFMT_RGB32_RGBA:
             {
-              uint32_t src_val = load_u32_be(&sptr[xs * sizeof(uint32_t)]);
-              uint32_t dst_val = load_u32_be(&dptr[xs * sizeof(uint32_t)]);
+              size_t src_offset = rtg_index_offset(xs, sizeof(uint32_t));
+              size_t dst_offset = rtg_index_offset(xs, sizeof(uint32_t));
+              uint32_t src_val = load_u32_be(&sptr[src_offset]);
+              uint32_t dst_val = load_u32_be(&dptr[dst_offset]);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
             }
             break;
@@ -474,8 +499,10 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
           case RTGFMT_RGB555_BE:
           case RTGFMT_BGR555_LE:
             {
-              uint16_t src_val = load_u16_be(&sptr[xs * sizeof(uint16_t)]);
-              uint16_t dst_val = load_u16_be(&dptr[xs * sizeof(uint16_t)]);
+              size_t src_offset = rtg_index_offset(xs, sizeof(uint16_t));
+              size_t dst_offset = rtg_index_offset(xs, sizeof(uint16_t));
+              uint16_t src_val = load_u16_be(&sptr[src_offset]);
+              uint16_t dst_val = load_u16_be(&dptr[dst_offset]);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
             }
             break;
@@ -484,8 +511,10 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
           case RTGFMT_RGB32_BGRA:
           case RTGFMT_RGB32_RGBA:
             {
-              uint32_t src_val = load_u32_be(&sptr[xs * sizeof(uint32_t)]);
-              uint32_t dst_val = load_u32_be(&dptr[xs * sizeof(uint32_t)]);
+              size_t src_offset = rtg_index_offset(xs, sizeof(uint32_t));
+              size_t dst_offset = rtg_index_offset(xs, sizeof(uint32_t));
+              uint32_t src_val = load_u32_be(&sptr[src_offset]);
+              uint32_t dst_val = load_u32_be(&dptr[dst_offset]);
               HANDLE_MINTERM_PIXEL(src_val, dst_val, format);
             }
             break;

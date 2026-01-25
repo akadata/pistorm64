@@ -757,12 +757,12 @@ reinit_raylib:;
       rtg_output_in_vblank = 1;
       cur_rtg_frame++;
       size_t frame_addr_offset = (size_t)current_addr;
-      size_t needed = (size_t)current_pitch * height;
+      size_t frame_needed = (size_t)current_pitch * height;
 
       if(current_pitch < row_bytes) {
         LOG_WARN("[RTG/RAYLIB] Frame pitch too small: pitch=%u row_bytes=%zu\n", current_pitch,
                  row_bytes);
-      } else if(frame_addr_offset >= rtg_mem_size || needed > rtg_mem_size - frame_addr_offset) {
+      } else if(frame_addr_offset >= rtg_mem_size || frame_needed > rtg_mem_size - frame_addr_offset) {
         LOG_WARN("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
                  needed, rtg_mem_size);
       } else if(current_format == RTGFMT_RGB565_BE || current_format == RTGFMT_RGB555_BE) {
