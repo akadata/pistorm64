@@ -127,7 +127,7 @@ static void reset_amiga(const char* tag) {
 static void __attribute__((unused)) ps_reinit(void) {
   reset_amiga("reinit");
 
-  write8(0xbfe201u, 0x0101u); // CIA OVL
+  write8(0xbfe201u, 0x01u); // CIA OVL
   write8(0xbfe001u, 0x0000u); // CIA OVL LOW
 }
 
@@ -231,7 +231,7 @@ int main(int argc, char* argv[]) {
   ps_setup_protocol();
   reset_amiga("startup");
 
-  write8(0xbfe201u, 0x0101u); // CIA OVL
+  write8(0xbfe201u, 0x01u); // CIA OVL
   write8(0xbfe001u, 0x0000u); // CIA OVL LOW
 
   if (size_arg != NULL) {
@@ -300,7 +300,7 @@ test_loop:;
     while (garbege_datas[i] == 0x00) {
       garbege_datas[i] = (uint8_t)(rand() % 0xFF);
     }
-    write8(addr_from_size(i), (unsigned int)garbege_datas[i]);
+    write8(addr_from_size(i), garbege_datas[i]);
   }
 
   printf("Reading back garbege datas, read8()...\n");
@@ -400,8 +400,8 @@ test_loop:;
   printf("[WORD] Writing garbege datas to Chip, unaligned...\n");
   for (size_t i = 1u; i < test_size - 2u; i += 2u) {
     uint16_t v = load_u16(&garbege_datas[i]);
-    write8(addr_from_size(i), (unsigned int)(v & 0x00FFu));
-    write8(addr_from_size(i + 1u), (unsigned int)(v >> 8));
+    write8(addr_from_size(i), (uint8_t)(v & 0x00FFu));
+    write8(addr_from_size(i + 1u), (uint8_t)(v >> 8));
   }
 
   sleep(1u);
@@ -432,9 +432,9 @@ test_loop:;
   for (size_t i = 1u; i < test_size - 4u; i += 4u) {
     uint32_t v = load_u32(&garbege_datas[i]);
     uint16_t mid = (uint16_t)((v & 0x00FFFF00u) >> 8);
-    write8(addr_from_size(i), (unsigned int)(v & 0x000000FFu));
-    write16(addr_from_size(i + 1u), (unsigned int)htobe16(mid));
-    write8(addr_from_size(i + 3u), (unsigned int)((v >> 24) & 0xFFu));
+    write8(addr_from_size(i), (uint8_t)(v & 0x000000FFu));
+    write16(addr_from_size(i + 1u), htobe16(mid));
+    write8(addr_from_size(i + 3u), (uint8_t)((v >> 24) & 0xFFu));
   }
 
   sleep(1u);
