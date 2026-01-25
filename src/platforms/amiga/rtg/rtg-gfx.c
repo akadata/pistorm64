@@ -1218,7 +1218,7 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
   uint8_t* bmp_data = bmp_data_src;
 
   cur_bit = base_bit = (0x80 >> (sx % 8));
-  cur_byte = base_byte = (uint16_t)((sx / 8) % src_line_pitch);
+  cur_byte = base_byte = (uint8_t)((sx / 8) % src_line_pitch);
 
   if (realtime_graphics_debug) {
     LOG_DEBUG("P2C: %d,%d - %d,%d (%dx%d) %d, %.2X\n", sx, sy, dx, dy, w, h, planes, layer_mask);
@@ -1234,7 +1234,7 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
     for (int i = 0; i < h; i++) {
       for (int k = 0; k < planes; k++) {
         for (int j = 0; j < src_line_pitch; j++) {
-          LOG_DEBUG("%.2X", (uint8_t)bmp_data_src[j + (i * src_line_pitch) + (plane_size * k)]);
+          LOG_DEBUG("%.2X", (uint8_t)bmp_data_src[(uint32_t)j + ((uint32_t)i * (uint32_t)src_line_pitch) + (plane_size * (uint32_t)k)]);
         }
         LOG_DEBUG("  ");
       }
@@ -1300,7 +1300,7 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
   uint8_t* bmp_data = bmp_data_src;
 
   cur_bit = base_bit = (0x80 >> (sx % 8));
-  cur_byte = base_byte = (uint16_t)((sx / 8) % src_line_pitch);
+  cur_byte = base_byte = (uint8_t)((sx / 8) % src_line_pitch);
 
   if (realtime_graphics_debug) {
     LOG_DEBUG("P2D: %d,%d - %d,%d (%dx%d) %d, %.2X\n", sx, sy, dx, dy, w, h, planes, layer_mask);
@@ -1316,7 +1316,7 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
     for (int i = 0; i < h; i++) {
       for (int k = 0; k < planes; k++) {
         for (int j = 0; j < src_line_pitch; j++) {
-          LOG_DEBUG("%.2X", (uint8_t)bmp_data_src[j + (i * src_line_pitch) + (plane_size * k)]);
+          LOG_DEBUG("%.2X", (uint8_t)bmp_data_src[(uint32_t)j + ((uint32_t)i * (uint32_t)src_line_pitch) + (plane_size * (uint32_t)k)]);
         }
         LOG_DEBUG("  ");
       }
@@ -1327,7 +1327,7 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
   uint32_t clut_array[256];
   for (int i = 0; i < 256; i++) {
     uint32_t temp_val;
-    memcpy(&temp_val, &bmp_data_src[i * sizeof(uint32_t)], sizeof(uint32_t));
+    memcpy(&temp_val, &bmp_data_src[(size_t)i * sizeof(uint32_t)], sizeof(uint32_t));
     clut_array[i] = be32toh(temp_val);
   }
   uint32_t* clut = clut_array;
@@ -1372,7 +1372,7 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
       if ((cur_bit >>= 1) == 0) {
         cur_bit = 0x80;
         cur_byte++;
-        cur_byte = (uint16_t)(cur_byte % src_line_pitch);
+        cur_byte = (uint8_t)(cur_byte % src_line_pitch);
       }
     }
     dptr += pitch;
