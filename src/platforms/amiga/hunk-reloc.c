@@ -256,9 +256,11 @@ int load_lseg(int fd, uint8_t** buf_p, struct hunk_info* i, struct hunk_reloc* r
   if (block_size == 0)
     block_size = 512;
 
-  uint8_t* block = malloc(block_size);
+  struct LoadSegBlock* lsb = malloc(block_size);
+  if (!lsb)
+    return -1;
+  uint8_t* block = (uint8_t*)lsb;
   uint32_t next_blk = 0;
-  struct LoadSegBlock* lsb = (struct LoadSegBlock*)block;
 
   read(fd, block, block_size);
   if (BE(lsb->lsb_ID) != LOADSEG_IDENTIFIER) {
@@ -266,7 +268,7 @@ int load_lseg(int fd, uint8_t** buf_p, struct hunk_info* i, struct hunk_reloc* r
     goto fail;
   }
 
-  char* filename = "data/lsegout.bin";
+  const char* filename = "data/lsegout.bin";
   FILE* out = fopen(filename, "wb+");
 
   DEBUG("[LOAD_LSEG] LSEG data:\n");
@@ -280,7 +282,15 @@ int load_lseg(int fd, uint8_t** buf_p, struct hunk_info* i, struct hunk_reloc* r
     read(fd, block, block_size);
   } while (next_blk != 0xFFFFFFFF);
 
-  uint32_t file_size = ftell(out);
+  long file_size_long = ftell(out);
+  uint32_t file_size = 0;
+  if (file_size_long > 0) {
+    if ((uint64_t)file_size_long > UINT32_MAX) {
+      file_size = UINT32_MAX;
+    } else {
+      file_size = (uint32_t)file_size_long;
+    }
+  }
   fseek(out, 0, SEEK_SET);
   uint8_t* buf = malloc(file_size + 1024);
   fread(buf, file_size, 1, out);

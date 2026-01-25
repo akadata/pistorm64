@@ -326,7 +326,7 @@ static void shutdown_server_socket()
     server_socket = -1;
 }
 
-static void create_and_send_msg(ClientConnection *cc, int type, int stream_id, const uint8_t *data, size_t length)
+static void create_and_send_msg(ClientConnection *cc, int type, uint32_t stream_id, const uint8_t *data, size_t length)
 {
     if (length > MAX_MESSAGE_SIZE)
     {
@@ -525,7 +525,7 @@ static void handle_msg_write_mem_req(ClientConnection *cc)
     create_and_send_msg(cc, MSG_WRITE_MEM_RES, 0, nullptr, 0);
 }
 
-static LogicalChannel *get_associated_channel_by_stream_id(ClientConnection *cc, int stream_id)
+static LogicalChannel *get_associated_channel_by_stream_id(ClientConnection *cc, uint32_t stream_id)
 {
     for (auto ch : cc->associations)
     {
@@ -700,7 +700,7 @@ static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, const ui
         memcpy(&pb.data[0], data, length);
 }
 
-static void handle_pkt_connect(int channel_id, uint8_t *data, int plen)
+static void handle_pkt_connect(int channel_id, uint8_t *data, size_t plen)
 {
     for (auto &ch : channels)
     {
@@ -723,7 +723,7 @@ static void handle_pkt_connect(int channel_id, uint8_t *data, int plen)
     ch.got_eos_from_ami = false;
     ch.got_eos_from_client = false;
 
-    std::string service_name((char *)data, plen);
+    std::string service_name(reinterpret_cast<const char *>(data), plen);
 
     for (auto &srv : services)
     {
@@ -768,32 +768,39 @@ static void handle_pkt_connect(int channel_id, uint8_t *data, int plen)
                 // FIXE: The user should be configurable.
                 setgid(1000);
                 setuid(1000);
-                putenv((char *)home_env.c_str());
+                char *env = strdup(home_env.c_str());
+                if (env)
+                    putenv(env);
 
                 std::vector<std::string> args(on_demand.arguments);
                 args.push_back("-ondemand");
                 args.push_back(std::to_string(fd));
-                std::vector<const char *> args_arr;
+                std::vector<char *> args_arr;
+                args_arr.reserve(args.size() + 1);
                 for (auto &arg : args)
-                    args_arr.push_back(arg.c_str());
+                    args_arr.push_back(strdup(arg.c_str()));
                 args_arr.push_back(nullptr);
 
-                execvp(on_demand.program.c_str(), (char* const*) &args_arr[0]);
+                execvp(on_demand.program.c_str(), args_arr.data());
+                for (auto ptr : args_arr)
+                    free(ptr);
+                if (env)
+                    free(env);
             }
             else
             {
                 close(fds[1]);
                 int fd = fds[0];
 
-                int status = fcntl(fd, F_SETFD, fcntl(fd, F_GETFD, 0) | FD_CLOEXEC);
-                if (status == -1)
+                int flag_status = fcntl(fd, F_SETFD, fcntl(fd, F_GETFD, 0) | FD_CLOEXEC);
+                if (flag_status == -1)
                 {
                     logger_error("Unexpectedly unable to set close-on-exec flag on client socket descriptor; errno = %d\n", errno);
                     exit(-1);
                 }
 
-                status = fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
-                if (status == -1)
+                int nonblock_status = fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+                if (nonblock_status == -1)
                 {
                     logger_error("Unexpectedly unable to set client socket to non blocking; errno = %d\n", errno);
                     exit(-1);
@@ -840,7 +847,7 @@ static void handle_pkt_connect(int channel_id, uint8_t *data, int plen)
     create_and_enqueue_packet(&ch, PKT_CONNECT_RESPONSE, &response, 1);
 }
 
-static void handle_pkt_data(int channel_id, uint8_t *data, int plen)
+static void handle_pkt_data(int channel_id, uint8_t *data, size_t plen)
 {
     for (auto &ch : channels)
     {
@@ -910,9 +917,9 @@ static void remove_channel_if_not_associated_and_empty_pq(int channel_id)
 static void handle_received_pkt(int ptype, int channel_id, uint8_t *data, int plen)
 {
     if (ptype == PKT_CONNECT)
-        handle_pkt_connect(channel_id, data, plen);
+        handle_pkt_connect(channel_id, data, static_cast<size_t>(plen));
     else if (ptype == PKT_DATA)
-        handle_pkt_data(channel_id, data, plen);
+        handle_pkt_data(channel_id, data, static_cast<size_t>(plen));
     else if (ptype == PKT_EOS)
         handle_pkt_eos(channel_id);
     else if (ptype == PKT_RESET)
@@ -923,9 +930,9 @@ static void handle_received_pkt(int ptype, int channel_id, uint8_t *data, int pl
 
 static bool receive_from_a2r()
 {
-    int head = channel_status[A2R_HEAD_OFFSET];
-    int tail = channel_status[A2R_TAIL_OFFSET];
-    int len = (tail - head) & 255;
+    size_t head = channel_status[A2R_HEAD_OFFSET];
+    size_t tail = channel_status[A2R_TAIL_OFFSET];
+    size_t len = (tail - head) & 255;
     if (len == 0)
         return false;
 
@@ -935,11 +942,12 @@ static bool receive_from_a2r()
     }
     else
     {
-        memcpy(recv_buf, &ca.a2r_buffer[head], 256 - head);
+        size_t first = std::min(len, 256 - head);
+        memcpy(recv_buf, &ca.a2r_buffer[head], first);
 
-        if (tail != 0)
+        if (len > first)
         {
-            memcpy(&recv_buf[len - tail], &ca.a2r_buffer[0], tail);
+            memcpy(&recv_buf[first], &ca.a2r_buffer[0], len - first);
         }
     }
 
@@ -960,27 +968,27 @@ static bool receive_from_a2r()
 
 static bool flush_send_queue()
 {
-    int tail = channel_status[R2A_TAIL_OFFSET];
-    int head = channel_status[R2A_HEAD_OFFSET];
-    int len = (tail - head) & 255;
-    int left = 255 - len;
+    size_t tail = channel_status[R2A_TAIL_OFFSET];
+    size_t head = channel_status[R2A_HEAD_OFFSET];
+    size_t len = (tail - head) & 255;
+    size_t left = 255 - len;
 
-    int pos = 0;
+    size_t pos = 0;
 
     while (!send_queue.empty())
     {
         LogicalChannel *ch = send_queue.front();
         PacketBuffer &pb = ch->packet_queue.front();
 
-        int ptype = pb.type;
-        int plen = 3 + pb.data.size();
+        uint8_t ptype = static_cast<uint8_t>(pb.type);
+        size_t plen = 3 + pb.data.size();
 
         if (left < plen)
             break;
 
-        send_buf[pos++] = pb.data.size();
+        send_buf[pos++] = static_cast<uint8_t>(pb.data.size());
         send_buf[pos++] = ptype;
-        send_buf[pos++] = ch->channel_id;
+        send_buf[pos++] = static_cast<uint8_t>(ch->channel_id);
         memcpy(&send_buf[pos], &pb.data[0], pb.data.size());
         pos += pb.data.size();
 
@@ -996,12 +1004,12 @@ static bool flush_send_queue()
         left -= plen;
     }
 
-    int to_write = pos;
+    size_t to_write = pos;
     if (!to_write)
         return false;
 
     uint8_t *p = send_buf;
-    int at_end = 256 - tail;
+    size_t at_end = 256 - tail;
     if (at_end < to_write)
     {
         memcpy(&ca.r2a_buffer[tail], p, at_end);
@@ -1013,7 +1021,7 @@ static bool flush_send_queue()
     memcpy(&ca.r2a_buffer[tail], p, to_write);
     tail = (tail + to_write) & 255;
 
-    channel_status[R2A_TAIL_OFFSET] = tail;
+    channel_status[R2A_TAIL_OFFSET] = static_cast<uint8_t>(tail);
     channel_status_updated |= A_EVENT_R2A_TAIL;
     return true;
 }
@@ -1105,13 +1113,19 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
 
             if (cc->payload.empty())
             {
-                left = sizeof(MessageHeader) - cc->bytes_read;
-                dst = (uint8_t *)&(cc->header) + cc->bytes_read;
+                int diff = static_cast<int>(sizeof(MessageHeader)) - cc->bytes_read;
+                if (diff <= 0)
+                    break;
+                left = static_cast<size_t>(diff);
+                dst = reinterpret_cast<uint8_t *>(&(cc->header)) + cc->bytes_read;
             }
             else
             {
-                left = static_cast<size_t>(cc->header.length) - cc->bytes_read;
-                dst = &cc->payload[cc->bytes_read];
+                size_t total_len = static_cast<size_t>(cc->header.length);
+                if (cc->bytes_read >= static_cast<int>(total_len))
+                    break;
+                left = total_len - static_cast<size_t>(cc->bytes_read);
+                dst = &cc->payload[static_cast<size_t>(cc->bytes_read)];
             }
 
             ssize_t r = read(cc->fd, dst, left);
