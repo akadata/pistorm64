@@ -157,13 +157,15 @@ static void piscsi_find_partitions(struct piscsi_dev *d) {
 next_partition:;
     read(fd, block, d->block_size);
 
-    uint32_t first = be32toh(*((uint32_t *)&block[0]));
+    uint32_t first_temp;
+    memcpy(&first_temp, &block[0], sizeof(first_temp));
+    uint32_t first = be32toh(first_temp);
     if (first != PART_IDENTIFIER) {
         DEBUG("Entry at block %d is not a valid partition. Aborting.\n", BE(d->rdb->rdb_PartitionList));
         return;
     }
 
-    struct PartitionBlock *pb = (struct PartitionBlock *)block;
+    struct PartitionBlock *pb = (struct PartitionBlock *)((char *)block);
     tmp = pb->pb_DriveName[0];
     pb->pb_DriveName[tmp + 1] = 0x00;
     printf("[PISCSI] Partition %d: %s (%d)\n", cur_partition, pb->pb_DriveName + 1, pb->pb_DriveName[0]);
@@ -209,13 +211,15 @@ static int piscsi_parse_rdb(struct piscsi_dev *d) {
     lseek(fd, 0, SEEK_SET);
     for (i = 0; i < RDB_BLOCK_LIMIT; i++) {
         read(fd, block, PISCSI_MAX_BLOCK_SIZE);
-        uint32_t first = be32toh(*((uint32_t *)&block[0]));
+        uint32_t first_temp;
+        memcpy(&first_temp, &block[0], sizeof(first_temp));
+        uint32_t first = be32toh(first_temp);
         if (first == RDB_IDENTIFIER)
             goto rdb_found;
     }
     goto no_rdb_found;
 rdb_found:;
-    struct RigidDiskBlock *rdb = (struct RigidDiskBlock *)block;
+    struct RigidDiskBlock *rdb = (struct RigidDiskBlock *)((char *)block);
     DEBUG("[PISCSI] RDB found at block %d.\n", i);
     d->c = be32toh(rdb->rdb_Cylinders);
     d->h = be32toh(rdb->rdb_Heads);
@@ -282,7 +286,7 @@ void piscsi_find_filesystems(struct piscsi_dev *d) {
 
     lseek64(d->fd, d->fshd_offs, SEEK_SET);
 
-    struct FileSysHeaderBlock *fhb = (struct FileSysHeaderBlock *)fhb_block;
+    struct FileSysHeaderBlock *fhb = (struct FileSysHeaderBlock *)((char *)fhb_block);
     read(d->fd, fhb_block, d->block_size);
 
     while (BE(fhb->fhb_ID) == FS_IDENTIFIER) {
@@ -341,7 +345,7 @@ skip_fs_load_lseg:;
         fs_found++;
         lseek64(d->fd, BE(fhb->fhb_Next) * d->block_size, SEEK_SET);
         fhb_block = malloc(d->block_size);
-        fhb = (struct FileSysHeaderBlock *)fhb_block;
+        fhb = (struct FileSysHeaderBlock *)((char *)fhb_block);
         read(d->fd, fhb_block, d->block_size);
     }
 
@@ -512,7 +516,7 @@ void piscsi_unmap_drive(uint8_t index) {
     }
 }
 
-static char *io_cmd_name(int index) {
+static const char *io_cmd_name(int index) {
     switch (index) {
         case CMD_INVALID: return "INVALID";
         case CMD_RESET: return "RESET";
@@ -554,7 +558,7 @@ static char *io_cmd_name(int index) {
 #define GETSCSINAME(a) case a: return ""#a"";
 #define SCSIUNHANDLED(a) return "[!!!PISCSI] Unhandled SCSI command "#a"";
 
-static char *scsi_cmd_name(int index) {
+static const char *scsi_cmd_name(int index) {
     switch(index) {
         GETSCSINAME(SCSICMD_TEST_UNIT_READY);
         GETSCSINAME(SCSICMD_INQUIRY);
@@ -578,40 +582,40 @@ static void print_piscsi_debug_message(int index) {
             DEBUG("[PISCSI] Initializing devices.\n");
             break;
         case DBG_OPENDEV:
-            if (piscsi_dbg[0] != 255) {
-                DEBUG("[PISCSI] Opening device %d (%d). Flags: %d (%.2X)\n", piscsi_dbg[0], piscsi_dbg[2], piscsi_dbg[1], piscsi_dbg[1]);
+            if ((int)piscsi_dbg[0] != 255) {
+                DEBUG("[PISCSI] Opening device %d (%d). Flags: %d (%.2X)\n", (int)piscsi_dbg[0], (int)piscsi_dbg[2], (int)piscsi_dbg[1], (int)piscsi_dbg[1]);
             }
             break;
         case DBG_CLEANUP:
             DEBUG("[PISCSI] Cleaning up.\n");
             break;
         case DBG_CHS:
-            DEBUG("[PISCSI] C/H/S: %d / %d / %d\n", piscsi_dbg[0], piscsi_dbg[1], piscsi_dbg[2]);
+            DEBUG("[PISCSI] C/H/S: %d / %d / %d\n", (int)piscsi_dbg[0], (int)piscsi_dbg[1], (int)piscsi_dbg[2]);
             break;
         case DBG_BEGINIO:
-            DEBUG("[PISCSI] BeginIO: io_Command: %d (%s) - io_Flags = %d - quick: %d\n", piscsi_dbg[0], io_cmd_name(piscsi_dbg[0]), piscsi_dbg[1], piscsi_dbg[2]);
+            DEBUG("[PISCSI] BeginIO: io_Command: %d (%s) - io_Flags = %d - quick: %d\n", (int)piscsi_dbg[0], io_cmd_name((int)piscsi_dbg[0]), (int)piscsi_dbg[1], (int)piscsi_dbg[2]);
             break;
         case DBG_ABORTIO:
             DEBUG("[PISCSI] AbortIO!\n");
             break;
         case DBG_SCSICMD:
-            DEBUG("[PISCSI] SCSI Command %d (%s)\n", piscsi_dbg[1], scsi_cmd_name(piscsi_dbg[1]));
-            DEBUG("Len: %d - %.2X %.2X %.2X - Command Length: %d\n", piscsi_dbg[0], piscsi_dbg[1], piscsi_dbg[2], piscsi_dbg[3], piscsi_dbg[4]);
+            DEBUG("[PISCSI] SCSI Command %d (%s)\n", (int)piscsi_dbg[1], scsi_cmd_name((int)piscsi_dbg[1]));
+            DEBUG("Len: %d - %.2X %.2X %.2X - Command Length: %d\n", (int)piscsi_dbg[0], (int)piscsi_dbg[1], (int)piscsi_dbg[2], (int)piscsi_dbg[3], (int)piscsi_dbg[4]);
             break;
         case DBG_SCSI_UNKNOWN_MODESENSE:
-            DEBUG("[!!!PISCSI] SCSI: Unknown modesense %.4X\n", piscsi_dbg[0]);
+            DEBUG("[!!!PISCSI] SCSI: Unknown modesense %.4X\n", (int)piscsi_dbg[0]);
             break;
         case DBG_SCSI_UNKNOWN_COMMAND:
-            DEBUG("[!!!PISCSI] SCSI: Unknown command %.4X\n", piscsi_dbg[0]);
+            DEBUG("[!!!PISCSI] SCSI: Unknown command %.4X\n", (int)piscsi_dbg[0]);
             break;
         case DBG_SCSIERR:
-            DEBUG("[!!!PISCSI] SCSI: An error occured: %.4X\n", piscsi_dbg[0]);
+            DEBUG("[!!!PISCSI] SCSI: An error occured: %.4X\n", (int)piscsi_dbg[0]);
             break;
         case DBG_IOCMD:
-            DEBUG_TRIVIAL("[PISCSI] IO Command %d (%s)\n", piscsi_dbg[0], io_cmd_name(piscsi_dbg[0]));
+            DEBUG_TRIVIAL("[PISCSI] IO Command %d (%s)\n", (int)piscsi_dbg[0], io_cmd_name((int)piscsi_dbg[0]));
             break;
         case DBG_IOCMD_UNHANDLED:
-            DEBUG("[!!!PISCSI] WARN: IO command %.4X (%s) is unhandled by driver.\n", piscsi_dbg[0], io_cmd_name(piscsi_dbg[0]));
+            DEBUG("[!!!PISCSI] WARN: IO command %.4X (%s) is unhandled by driver.\n", piscsi_dbg[0], io_cmd_name((int)piscsi_dbg[0]));
             break;
         case DBG_SCSI_FORMATDEVICE:
             DEBUG("[PISCSI] Get SCSI FormatDevice MODE SENSE.\n");
@@ -625,7 +629,7 @@ static void print_piscsi_debug_message(int index) {
             struct SCSICmd_RW10 *rwdat = NULL;
             uint8_t data[10];
             if (r != -1) {
-                uint32_t addr = piscsi_dbg[0] - cfg->map_offset[r];
+                uint32_t addr = (uint32_t)(piscsi_dbg[0] - cfg->map_offset[r]);
                 rwdat = (struct SCSICmd_RW10 *)(&cfg->map_data[r][addr]);
             }
             else {
@@ -649,7 +653,7 @@ static void print_piscsi_debug_message(int index) {
             r = get_mapped_item_by_address(cfg, piscsi_dbg[0]);
             if (r != -1) {
 #ifdef PISCSI_DEBUG
-                uint32_t addr = piscsi_dbg[0] - cfg->map_offset[r];
+                uint32_t addr = (uint32_t)(piscsi_dbg[0] - cfg->map_offset[r]);
                 struct SCSICmd_ModeSense6 *sense = (struct SCSICmd_ModeSense6 *)(&cfg->map_data[r][addr]);
                 DEBUG_TRIVIAL("[SenseData] CMD: %.2X\n", sense->opcode);
                 DEBUG_TRIVIAL("[SenseData] DBD: %d\n", sense->reserved_dbd & 0x04);
@@ -738,14 +742,14 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t block = src / d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:READBYTES io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%X to_addr:0x%.8X\n", val, src, piscsi_u32[1], block, src, piscsi_u32[2]);
-                lseek(d->fd, src, SEEK_SET);
+                lseek64(d->fd, (off64_t)src, SEEK_SET);
             }
             else if (cmd == PISCSI_CMD_READ) {
                 uint32_t block = piscsi_u32[0];
                 uint64_t file_offset = (uint64_t)block * d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:READ io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, block, piscsi_u32[1], block, (unsigned long long)file_offset, piscsi_u32[2]);
-                lseek(d->fd, file_offset, SEEK_SET);
+                lseek64(d->fd, (off64_t)file_offset, SEEK_SET);
             }
             else {
                 uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
@@ -755,6 +759,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 lseek64(d->fd, src, SEEK_SET);
             }
 
+            r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
             if (map) {
                 DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, r);
@@ -799,14 +804,14 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t block = src / d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:WRITEBYTES io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%X from_addr:0x%.8X\n", val, src, piscsi_u32[1], block, src, piscsi_u32[2]);
-                lseek(d->fd, src, SEEK_SET);
+                lseek64(d->fd, (off64_t)src, SEEK_SET);
             }
             else if (cmd == PISCSI_CMD_WRITE) {
                 uint32_t block = piscsi_u32[0];
                 uint64_t file_offset = (uint64_t)block * d->block_size;
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:WRITE io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, block, piscsi_u32[1], block, (unsigned long long)file_offset, piscsi_u32[2]);
-                lseek(d->fd, file_offset, SEEK_SET);
+                lseek64(d->fd, (off64_t)file_offset, SEEK_SET);
             }
             else {
                 uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
@@ -816,6 +821,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 lseek64(d->fd, src, SEEK_SET);
             }
 
+            r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
             if (map) {
                 DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Write comes from mapped range %d.\n", val, r);
@@ -836,7 +842,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                     c = m68k_read_memory_8(piscsi_u32[2] + i);
                     ssize_t result = write(d->fd, &c, 1);
                     if (result <= 0) {
-                        DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE WRITE failed at offset %d: result=%zd\n", val, i, result);
+                        DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE WRITE failed at offset %d: result=%zd\n", val, (int)i, result);
                         success = 0;
                         break;
                     }
@@ -856,14 +862,14 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 piscsi_cur_drive = 255;
             }
             else {
-                piscsi_cur_drive = val;
+                piscsi_cur_drive = (uint8_t)val;
             }
             if (piscsi_cur_drive != 255) {
                 DEBUG("[PISCSI] (%s) Drive number set to %d (%d)\n", op_type_names[type], piscsi_cur_drive, val);
             }
             break;
         case PISCSI_CMD_DRVNUMX:
-            piscsi_cur_drive = val;
+            piscsi_cur_drive = (uint8_t)val;
             DEBUG("[PISCSI] DRVNUMX: %d.\n", val);
             break;
         case PISCSI_CMD_DEBUGME:
@@ -873,7 +879,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             DEBUG("[PISCSI] Driver copy/patch called, destination address %.8X.\n", val);
             r = get_mapped_item_by_address(cfg, val);
             if (r != -1) {
-                uint32_t addr = val - cfg->map_offset[r];
+                uint32_t addr = (uint32_t)(val - cfg->map_offset[r]);
                 uint8_t *dst_data = cfg->map_data[r];
                 uint8_t cur_partition = 0;
                 memcpy(dst_data + addr, piscsi_rom_ptr + PISCSI_DRIVER_OFFSET, 0x4000 - PISCSI_DRIVER_OFFSET);
@@ -882,8 +888,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
 
                 reloc_hunks(piscsi_hreloc, dst_data + addr, &piscsi_hinfo);
 
-                #define PUTNODELONG(val) *(uint32_t *)&dst_data[p_offs] = htobe32(val); p_offs += 4;
-                #define PUTNODELONGBE(val) *(uint32_t *)&dst_data[p_offs] = val; p_offs += 4;
+                #define PUTNODELONG(val) do { uint32_t temp = htobe32(val); memcpy(&dst_data[p_offs], &temp, sizeof(temp)); p_offs += 4; } while(0)
+                #define PUTNODELONGBE(val) do { uint32_t temp = val; memcpy(&dst_data[p_offs], &temp, sizeof(temp)); p_offs += 4; } while(0)
 
                 for (int i = 0; i < 128; i++) {
                     rom_partitions[i] = 0;
@@ -913,7 +919,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             uint32_t nodesize = (be32toh(devs[i].pb[j]->pb_Environment[0]) + 1) * 4;
                             memcpy(dst_data + p_offs, devs[i].pb[j]->pb_Environment, nodesize);
 
-                            struct pihd_dosnode_data *dat = (struct pihd_dosnode_data *)(&dst_data[addr2+0x20]);
+                            struct pihd_dosnode_data *dat = (struct pihd_dosnode_data *)((char *)(&dst_data[addr2+0x20]));
 
                             if (BE(devs[i].pb[j]->pb_Flags) & 0x01) {
                                 DEBUG("Partition is bootable.\n");
@@ -921,7 +927,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             }
                             else {
                                 DEBUG("Partition is not bootable.\n");
-                                rom_partition_prio[cur_partition] = -128;
+                                rom_partition_prio[cur_partition] = (uint32_t)-128;
                             }
 
                             DEBUG("DOSNode Data:\n");
@@ -935,7 +941,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             DEBUG("Maxtransfer: %.8X Mask: %.8X\n", BE(dat->maxtransfer), BE(dat->transfer_mask));
                             DEBUG("DOSType: %.8X\n", BE(dat->dostype));
 
-                            rom_partitions[cur_partition] = addr2 + 0x20 + cfg->map_offset[r];
+                            rom_partitions[cur_partition] = (uint32_t)(addr2 + 0x20 + cfg->map_offset[r]);
                             rom_partition_dostype[cur_partition] = dat->dostype;
                             cur_partition++;
                             addr2 += 0x100;
@@ -957,29 +963,29 @@ skip_disk:;
             break;
         case PISCSI_CMD_COPYFS:
             DEBUG("[PISCSI] Copy file system %d to %.8X and reloc.\n", rom_cur_fs, piscsi_u32[2]);
-            r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
-            if (r != -1) {
-                uint32_t addr = piscsi_u32[2] - cfg->map_offset[r];
-                memcpy(cfg->map_data[r] + addr, filesystems[rom_cur_fs].binary_data, filesystems[rom_cur_fs].h_info.byte_size);
+            int32_t copy_r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
+            if (copy_r != -1) {
+                uint32_t addr = (uint32_t)(piscsi_u32[2] - cfg->map_offset[copy_r]);
+                memcpy(cfg->map_data[copy_r] + addr, filesystems[rom_cur_fs].binary_data, filesystems[rom_cur_fs].h_info.byte_size);
                 filesystems[rom_cur_fs].h_info.base_offset = piscsi_u32[2];
-                reloc_hunks(filesystems[rom_cur_fs].relocs, cfg->map_data[r] + addr, &filesystems[rom_cur_fs].h_info);
+                reloc_hunks(filesystems[rom_cur_fs].relocs, cfg->map_data[copy_r] + addr, &filesystems[rom_cur_fs].h_info);
                 filesystems[rom_cur_fs].handler = piscsi_u32[2];
             }
             break;
         case PISCSI_CMD_SETFSH: {
-            int i = 0;
+            int fs_idx = 0;
             DEBUG("[PISCSI] Set handler for partition %d (DeviceNode: %.8X)\n", rom_cur_partition, val);
-            r = get_mapped_item_by_address(cfg, val);
-            if (r != -1) {
-                uint32_t addr = val - cfg->map_offset[r];
-                struct DeviceNode *node = (struct DeviceNode *)(cfg->map_data[r] + addr);
+            int32_t setfsh_r = get_mapped_item_by_address(cfg, val);
+            if (setfsh_r != -1) {
+                uint32_t addr = (uint32_t)(val - cfg->map_offset[setfsh_r]);
+                struct DeviceNode *node = (struct DeviceNode *)((char *)(cfg->map_data[setfsh_r] + addr));
                 char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
 
                 DEBUG("[PISCSI] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
                 // First try exact match
-                for (i = 0; i < piscsi_num_fs; i++) {
-                    if (rom_partition_dostype[rom_cur_partition] == filesystems[i].FS_ID) {
-                        node->dn_SegList = htobe32((((filesystems[i].handler) + filesystems[i].h_info.header_size) >> 2));
+                for (fs_idx = 0; fs_idx < piscsi_num_fs; fs_idx++) {
+                    if (rom_partition_dostype[rom_cur_partition] == filesystems[fs_idx].FS_ID) {
+                        node->dn_SegList = htobe32((((filesystems[fs_idx].handler) + filesystems[fs_idx].h_info.header_size) >> 2));
                         node->dn_GlobalVec = 0xFFFFFFFF;
                         goto fs_found;
                     }
@@ -991,9 +997,9 @@ skip_disk:;
                 // Map DOS/3 (FFS International) to DOS/1 (FFS) handler since they use the same filesystem
                 if (fallback_dostype == 0x444F5303) { // DOS/3
                     fallback_dostype = 0x444F5301;   // DOS/1
-                    for (i = 0; i < piscsi_num_fs; i++) {
-                        if (fallback_dostype == filesystems[i].FS_ID) {
-                            node->dn_SegList = htobe32((((filesystems[i].handler) + filesystems[i].h_info.header_size) >> 2));
+                    for (fs_idx = 0; fs_idx < piscsi_num_fs; fs_idx++) {
+                        if (fallback_dostype == filesystems[fs_idx].FS_ID) {
+                            node->dn_SegList = htobe32((((filesystems[fs_idx].handler) + filesystems[fs_idx].h_info.header_size) >> 2));
                             node->dn_GlobalVec = 0xFFFFFFFF;
                             DEBUG("[PISCSI] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");
                             goto fs_found;
@@ -1009,15 +1015,15 @@ fs_found:;
                 DEBUG("[FS-HANDLER] Task: %d Lock: %d\n", BE(node->dn_Task), BE(node->dn_Lock));
                 DEBUG("[FS-HANDLER] Handler: %d Stacksize: %d\n", BE(node->dn_Handler), BE(node->dn_StackSize));
                 DEBUG("[FS-HANDLER] Priority: %d Startup: %d (%.8X)\n", BE(node->dn_Priority), BE(node->dn_Startup), BE(node->dn_Startup));
-                DEBUG("[FS-HANDLER] SegList: %.8X GlobalVec: %d\n", BE((uint32_t)node->dn_SegList), BE(node->dn_GlobalVec));
-                DEBUG("[PISCSI] Handler for partition %.8X set to %.8X (%.8X).\n", BE(node->dn_Name), filesystems[i].FS_ID, filesystems[i].handler);
+                DEBUG("[FS-HANDLER] SegList: %.8X GlobalVec: %d\n", BE((uint32_t)node->dn_SegList), (int)BE(node->dn_GlobalVec));
+                DEBUG("[PISCSI] Handler for partition %.8X set to %.8X (%.8X).\n", (uint32_t)BE(node->dn_Name), filesystems[fs_idx].FS_ID, filesystems[fs_idx].handler);
             }
             break;
         }
         case PISCSI_CMD_LOADFS: {
             DEBUG("[PISCSI] Attempt to load file system for partition %d from disk.\n", rom_cur_partition);
-            r = get_mapped_item_by_address(cfg, val);
-            if (r != -1) {
+            int32_t mapped_r = get_mapped_item_by_address(cfg, val);
+            if (mapped_r != -1) {
                 char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
                 filesystems[piscsi_num_fs].binary_data = NULL;
                 filesystems[piscsi_num_fs].fhb = NULL;
@@ -1042,10 +1048,10 @@ fs_found:;
             break;
         }
         case PISCSI_DBG_MSG:
-            print_piscsi_debug_message(val);
+            print_piscsi_debug_message((int)val);
             break;
         default:
-            DEBUG("[!!!PISCSI] WARN: Unhandled %s register write to %.8X: %d\n", op_type_names[type], addr, val);
+            DEBUG("[!!!PISCSI] WARN: Unhandled %s register write to %.8X: %d\n", op_type_names[type], addr, (int)val);
             break;
     }
 }
@@ -1065,14 +1071,20 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
                     v = piscsi_rom_ptr[romoffs - PIB];
                     //DEBUG("%.2X\n", v);
                     break;
-                case OP_TYPE_WORD:
-                    v = be16toh(*((uint16_t *)&piscsi_rom_ptr[romoffs - PIB]));
+                case OP_TYPE_WORD: {
+                    uint16_t temp_val;
+                    memcpy(&temp_val, &piscsi_rom_ptr[romoffs - PIB], sizeof(temp_val));
+                    v = be16toh(temp_val);
                     //DEBUG("%.4X\n", v);
                     break;
-                case OP_TYPE_LONGWORD:
-                    v = be32toh(*((uint32_t *)&piscsi_rom_ptr[romoffs - PIB]));
+                }
+                case OP_TYPE_LONGWORD: {
+                    uint32_t temp_val;
+                    memcpy(&temp_val, &piscsi_rom_ptr[romoffs - PIB], sizeof(temp_val));
+                    v = be32toh(temp_val);
                     //DEBUG("%.8X\n", v);
                     break;
+                }
             }
             return v;
         }
@@ -1109,7 +1121,7 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
             return devs[piscsi_cur_drive].s;
             break;
         case PISCSI_CMD_BLOCKS: {
-            uint32_t blox = devs[piscsi_cur_drive].fs / devs[piscsi_cur_drive].block_size;
+            uint32_t blox = (uint32_t)(devs[piscsi_cur_drive].fs / devs[piscsi_cur_drive].block_size);
             DEBUG("[PISCSI] %s Read from BLOCKS %d: %d\n", op_type_names[type], piscsi_cur_drive, (uint32_t)(devs[piscsi_cur_drive].fs / devs[piscsi_cur_drive].block_size));
             DEBUG("fs: %llu (%d)\n", (unsigned long long)devs[piscsi_cur_drive].fs, blox);
             return blox;
@@ -1134,7 +1146,7 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
             DEBUG("[PISCSI] Get block size of drive %d: %d\n", piscsi_cur_drive, devs[piscsi_cur_drive].block_size);
             return devs[piscsi_cur_drive].block_size;
         case PISCSI_CMD_GET_FS_INFO: {
-            int i = 0;
+            int fs_idx = 0;
             uint32_t val = piscsi_u32[1];
             int32_t r = get_mapped_item_by_address(cfg, val);
             if (r != -1) {
@@ -1143,8 +1155,8 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
                 DEBUG("[PISCSI-GET-FS-INFO] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
 #endif
                 // First try exact match
-                for (i = 0; i < piscsi_num_fs; i++) {
-                    if (rom_partition_dostype[rom_cur_partition] == filesystems[i].FS_ID) {
+                for (fs_idx = 0; fs_idx < piscsi_num_fs; fs_idx++) {
+                    if (rom_partition_dostype[rom_cur_partition] == filesystems[fs_idx].FS_ID) {
                         return 0;
                     }
                 }
@@ -1155,8 +1167,8 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
                 // Map DOS/3 (FFS International) to DOS/1 (FFS) handler since they use the same filesystem
                 if (fallback_dostype == 0x444F5303) { // DOS/3
                     fallback_dostype = 0x444F5301;   // DOS/1
-                    for (i = 0; i < piscsi_num_fs; i++) {
-                        if (fallback_dostype == filesystems[i].FS_ID) {
+                    for (fs_idx = 0; fs_idx < piscsi_num_fs; fs_idx++) {
+                        if (fallback_dostype == filesystems[fs_idx].FS_ID) {
                             DEBUG("[PISCSI-GET-FS-INFO] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");
                             return 0;
                         }

@@ -1,114 +1,151 @@
 # Workplan: Fix Format/Type Warnings (clang)
 
 ## Scope
-- Address clang warnings from `make.log` about mismatched printf/format types and unsafe narrowing between `uint8_t`/`uint16_t`/`uint32_t` and `char`/`int`/`uint`.
-- Ignore everything under `src/musashi/` for now.
-- Preserve emulator behavior; prefer localized, explicit fixes over refactors.
 
-## Build Command
-- `make full C=clang`
+* Fix clang warnings from `clang-build.log` about mismatched printf/format types and unsafe narrowing between `uint8_t`/`uint16_t`/`uint32_t` and `char`/`int`/`uint`.
+* Ignore everything under `src/musashi/` and `src/softfloat/`.
+* Preserve emulator behavior; prefer localized, explicit fixes over refactors.
+
+## Canonical build workflow
+
+### Build + capture logs
+
+Run:
+
+* `./rebuild.sh`
+
+`rebuild.sh` is the canonical entrypoint and should:
+
+* build with clang and verbose output
+* capture warnings into `clang-build.log`
+* refresh `core-warnings.log` via `./rebuildcount.sh`
+* optionally reload the kernel module
+
+Current `rebuild.sh` (reference):
+
+```sh
+make full C=clang V=1 2>clang-build.log
+. ./rebuildcount.sh
+
+sudo modprobe pistorm
+
+cp emulator emulator.last
+
+#timeout 30 ./emulator
+```
+
+### Count + triage warnings
+
+Run:
+
+* `./rebuildcount.sh`            → print per-file counts only
+* `./rebuildcount.sh 1`          → print counts + bottom-up warnings (newest-to-oldest) for all files
+* `./rebuildcount.sh piscsi.c`   → print counts + bottom-up warnings filtered to that file
+* `./rebuildcount.sh rtg.c`      → print counts + bottom-up warnings filtered to that file
+
+Notes:
+
+* `./rebuildcount.sh` rebuilds `core-warnings.log` by filtering `clang-build.log` and excluding `src/musashi/` and `src/softfloat/`.
+* Bottom-up output is intended for Qwen to fix warnings starting from the most recent compiler lines.
 
 ## Plan
-1. **Triage warnings (non-Musashi).**
-   - Create a filtered list:
-     - `rg -n "warning" make.log | rg -v "^.*src/musashi/" > make.nonmusashi.warnings`
-   - Group by file to prioritize hot spots:
-     - `cut -d: -f1 make.nonmusashi.warnings | sort | uniq -c | sort -nr`
+
+1. **Triage warnings (non-Musashi / non-softfloat).**
+
+   * Always start with `./rebuild.sh` then `./rebuildcount.sh`.
+   * For a focused pass on one file, use `./rebuildcount.sh <file>` to get bottom-up excerpts.
 
 2. **Fix printf/format mismatches first.**
-   - Include `<inttypes.h>` where `PRIu8`, `PRIu16`, `PRIu32`, `PRId8`, etc. are needed.
-   - Remember default promotions: `uint8_t`/`int8_t` promote to `int` in varargs; use casts or `PRI*` macros.
-   - Prefer changing log/print helpers to accept `const char *` when format strings are const.
+
+   * Include `<inttypes.h>` where `PRIu8`, `PRIu16`, `PRIu32`, `PRId8`, etc. are needed.
+   * Remember default promotions: `uint8_t`/`int8_t` promote to `int` in varargs.
+   * Use casts or `PRI*` macros; avoid changing behavior.
+   * Prefer changing log helpers to accept `const char *` where format strings are const.
 
 3. **Fix narrowing/sign conversions with explicit intent.**
-   - Add narrow-cast helpers (e.g., `u16_from_u32_checked`) in a shared header if repeated.
-   - Clamp or validate configuration-derived values before casting.
-   - Use explicit casts only when the range is known and safe.
+
+   * Clamp or validate configuration-derived values before casting.
+   * Use explicit casts only when the range is known and safe.
+   * Introduce small helper functions only when repeated across a file.
 
 4. **Iterate and recompile.**
-   - Re-run `make full C=clang` after each file group.
-   - Track remaining warnings in `make.nonmusashi.warnings`.
+
+   * Re-run `./rebuild.sh` after each group of fixes.
+   * Verify the file under focus reaches 0 warnings in `core-warnings.log` before moving on.
 
 5. **Emulation verification.**
-   - Run the emulator with existing configs on target hardware as usual.
-   - Keep changes strictly to formatting and type-safety to avoid behavior drift.
 
-## Out of Scope (for now)
-- `src/musashi/*` warnings.
-- Non-type warnings like missing prototypes or shadowing unless they are in files already being touched for type fixes.
+   * Keep changes strictly to formatting and type-safety.
+   * Run existing configs on target hardware as normal.
 
+## Out of scope
 
-# clang warning cleanup – RTG and friends
+* Any warnings under:
 
-Canonical build + log:
+  * `src/musashi/*`
+  * `src/softfloat/*`
+* Non-type warnings (missing prototypes, shadowing, etc.) unless already in a file being touched.
 
-  make full C=clang V=1 2>clang-build.log
-  rg "warning:" clang-build.log \
-    | rg -v 'src/musashi/' \
-    | rg -v 'src/softfloat/' \
-    > core-warnings.log
+# clang warning cleanup – RTG, PiSCSI, PiStorm-Dev, AHI
 
-Per-file counts:
+## Scope: files allowed to change
 
-  TOTAL=$(rg "warning:" core-warnings.log | wc -l || echo 0)
-  RTG=$(rg "rtg-gfx.c" core-warnings.log | wc -l || echo 0)
-  PISCSI=$(rg "piscsi.c" core-warnings.log | wc -l || echo 0)
-  PIDEV=$(rg "pistorm-dev.c" core-warnings.log | wc -l || echo 0)
-  PIAHI=$(rg "pi_ahi.c" core-warnings.log | wc -l || echo 0)
+Fix ONLY warnings in:
 
-Always report:
+* `src/platforms/amiga/rtg/rtg.c`
+* `src/platforms/amiga/rtg/rtg-output-raylib.c`
+* `src/platforms/amiga/rtg/rtg-gfx.c`
+* `src/platforms/amiga/piscsi/piscsi.c`
+* `src/platforms/amiga/pistorm-dev/pistorm-dev.c`
+* `src/platforms/amiga/pi-ahi/pi_ahi.c`
 
-  - total core warnings: TOTAL
-  - rtg-gfx.c: RTG
-  - piscsi.c: PISCSI
-  - pistorm-dev.c: PIDEV
-  - pi_ahi.c: PIAHI
+NEVER edit code under:
 
-Scope:
+* `src/musashi/*`
+* `src/softfloat/*`
 
-- Fix ONLY warnings in:
-  - src/platforms/amiga/rtg/rtg-gfx.c
-  - src/platforms/amiga/piscsi/piscsi.c
-  - src/platforms/amiga/pistorm-dev/pistorm-dev.c
-  - src/platforms/amiga/pi-ahi/pi_ahi.c
-- NEVER edit code under:
-  - src/musashi/*
-  - src/softfloat/*
+## Order of attack (updated) 
 
-Order:
+Priority is by current warning volume and hot-path risk:
 
-  1) rtg-gfx.c
-  2) piscsi.c
-  3) pistorm-dev.c
-  4) pi_ahi.c
+1. `piscsi.c`
+2. `pistorm-dev.c`
+3. `pi_ahi.c`
+4. `rtg.c` * complete
+5. `rtg-output-raylib.c` *complete
+6. `rtg-gfx.c` *complete 
 
-Do not advance to the next file until the current file has 0 warnings in core-warnings.log.
+Do not advance to the next file until the current file shows **0 warnings** in `core-warnings.log`.
 
-RTG rules:
+## RTG rules
 
-- Treat RTG framebuffers as `uint8_t *` plus offsets.
-- Pixel helpers/macros must not cast misaligned `uint8_t *` to `uint16_t *`/`uint32_t *`.
-- Safe patterns:
-  - Use `rtg_pixel_size[format]` and byte offsets.
-  - Use `memcpy` into local `uint16_t`/`uint32_t` when needed.
-  - Or explicit byte stores.
-- It is allowed to introduce helpers like:
+* Treat RTG framebuffers as `uint8_t *` plus byte offsets.
+* Pixel helpers/macros must not cast potentially-misaligned `uint8_t *` to `uint16_t *`/`uint32_t *`.
+* Safe patterns:
 
-    static inline void set_rtg_pixel(
-        uint8_t *base,
-        uint32_t offset,
-        uint32_t pix,
-        uint8_t  format);
+  * Use `rtg_pixel_size[format]` and byte offsets.
+  * Use `memcpy` into local `uint16_t`/`uint32_t` when needed.
+  * Or explicit byte stores.
+* Allowed: introduce a small helper such as:
 
-Reference:
+  ```c
+  static inline void set_rtg_pixel(uint8_t *base, uint32_t offset, uint32_t pix, uint8_t format);
+  ```
 
-- May *refer* to:
-  - ../zz9000-drivers/rtg/mntgfx-gcc.c
-  - ../zz9000-drivers/rtg/settings.h
-  - ../zz9000-drivers/rtg/rtg.h
-- Do NOT copy code verbatim. Use them only as behavioural references for formats and offsets.
+## Reference codebases (behavioral only)
 
-“Done” means:
+May *refer* to (do NOT copy verbatim):
 
-- `rg "<file>" core-warnings.log | wc -l` → 0 for that file, on a fresh build.
+* `../zz9000-drivers/rtg/mntgfx-gcc.c`
+* `../zz9000-drivers/rtg/settings.h`
+* `../zz9000-drivers/rtg/rtg.h`
+
+Also available for behavioral reference:
+
+* `../amiga2000-gfxcard/` (drivers and RTG-related code)
+
+## Definition of done
+
+* A fresh `./rebuild.sh` run produces updated `clang-build.log` and `core-warnings.log`.
+* `./rebuildcount.sh <current-file>` reports **0** warnings for that file.
 
