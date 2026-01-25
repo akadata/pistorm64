@@ -21,11 +21,6 @@ static inline uint16_t load_u16_be(const uint8_t *p) {
     return be16toh(v);
 }
 
-static inline uint16_t load_u16_le(const uint8_t *p) {
-    uint16_t v;
-    memcpy(&v, p, sizeof v);
-    return le16toh(v);
-}
 
 static inline uint32_t load_u32_be(const uint8_t *p) {
     uint32_t v;
@@ -33,11 +28,6 @@ static inline uint32_t load_u32_be(const uint8_t *p) {
     return be32toh(v);
 }
 
-static inline uint32_t load_u32_le(const uint8_t *p) {
-    uint32_t v;
-    memcpy(&v, p, sizeof v);
-    return le32toh(v);
-}
 
 static inline uint8_t* rtg_line_pixel_ptr(uint8_t* base, int32_t x, uint16_t format) {
   ptrdiff_t offset = (ptrdiff_t)x * (ptrdiff_t)rtg_pixel_size[format];
@@ -59,10 +49,6 @@ static inline void store_u32_be(uint8_t *p, uint32_t v) {
     memcpy(p, &v, sizeof v);
 }
 
-static inline void store_u32_le(uint8_t *p, uint32_t v) {
-    v = htole32(v);
-    memcpy(p, &v, sizeof v);
-}
 
 static inline size_t rtg_index_offset(int index, size_t element_size) {
     return (size_t)index * element_size;
@@ -991,7 +977,7 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
         }                                                                                         \
       }                                                                                           \
     }                                                                                             \
-  } while (0)                                                                                      \
+  } while (0);                                                                                     \
   if ((cur_bit >>= 1) == 0)                                                                        \
     cur_bit = 0x8000;
 
@@ -1130,7 +1116,7 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
   uint16_t cur_byte = 0, u8_fg = 0, u8_tmp = 0;
 
   cur_bit = base_bit = (0x80 >> (sx % 8));
-  cur_byte = base_byte = ((sx / 8) % src_pitch);
+  cur_byte = base_byte = (uint8_t)((sx / 8) % src_pitch);
 
   uint8_t* plane_ptr[8] = {0, 0, 0, 0, 0, 0, 0, 0};
   uint32_t plane_addr[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -1142,9 +1128,9 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
       if (!plane_ptr[i]) {
         plane_addr[i] = be32toh(bm->_p_Planes[i]);
         if (plane_addr[i] != 0)
-          plane_addr[i] += (sy * src_pitch);
+          plane_addr[i] += (uint32_t)(sy * src_pitch);
       } else {
-        plane_ptr[i] += (sy * src_pitch);
+        plane_ptr[i] += (uint32_t)(sy * src_pitch);
       }
     } else {
       plane_addr[i] = plane_address;
@@ -1187,7 +1173,7 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
       }
 
       if (mask == 0xFF && (draw_mode == MINTERM_SRC || draw_mode == MINTERM_NOTSRC)) {
-        dptr[x] = u8_fg;
+        dptr[x] = (uint8_t)u8_fg;
         goto skip;
       }
 
@@ -1271,7 +1257,7 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
       }
 
       if (mask == 0xFF && (draw_mode == MINTERM_SRC || draw_mode == MINTERM_NOTSRC)) {
-        dptr[x] = u8_fg;
+        dptr[x] = (uint8_t)u8_fg;
         goto skip;
       }
 
@@ -1281,11 +1267,11 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
       if ((cur_bit >>= 1) == 0) {
         cur_bit = 0x80;
         cur_byte++;
-        cur_byte %= src_line_pitch;
+        cur_byte = (uint8_t)(cur_byte % src_line_pitch);
       }
     }
     dptr += pitch;
-    if ((line_y + sy + 1) % h)
+    if ((((int16_t)(line_y + sy + 1)) % (int16_t)h) != 0)
       bmp_data += src_line_pitch;
     else
       bmp_data = bmp_data_src;
@@ -1343,7 +1329,13 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
     }
   }
 
-  uint32_t* clut = (uint32_t*)bmp_data_src;  // This is a special case where we need the cast
+  uint32_t clut_array[256];
+  for (int i = 0; i < 256; i++) {
+    uint32_t temp_val;
+    memcpy(&temp_val, &bmp_data_src[i * sizeof(uint32_t)], sizeof(uint32_t));
+    clut_array[i] = be32toh(temp_val);
+  }
+  uint32_t* clut = clut_array;
   bmp_data += (256 * 4);
   bmp_data_src += (256 * 4);
 
@@ -1356,7 +1348,7 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
         DECODE_PLANAR_PIXEL(u8_fg)
       }
 
-      uint32_t fg_color = load_u32_be((uint8_t*)&clut[u8_fg]);
+      uint32_t fg_color = clut[u8_fg];
 
       if (mask == 0xFF && (draw_mode == MINTERM_SRC || draw_mode == MINTERM_NOTSRC)) {
         switch (rtg_format) {
