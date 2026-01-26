@@ -13,12 +13,14 @@ static const char* platform_names[PLATFORM_NUM] = {
 };
 
 static int get_platform_index(const char* name) {
-  if (!name || strlen(name) == 0)
+  if (!name || strlen(name) == 0) {
     return -1;
+  }
 
   for (int i = 0; i < PLATFORM_NUM; i++) {
-    if (strcmp(name, platform_names[i]) == 0)
+    if (strcmp(name, platform_names[i]) == 0) {
       return i;
+    }
   }
   return -1;
 }
