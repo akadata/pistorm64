@@ -8,8 +8,9 @@ uint8_t rtc_emulation_enabled = 1;
 extern uint8_t gayle_emulation_enabled;
 
 void configure_rtc_emulation_amiga(uint8_t enabled) {
-  if (enabled == rtc_emulation_enabled)
+  if (enabled == rtc_emulation_enabled) {
     return;
+  }
 
   rtc_emulation_enabled = enabled;
   printf("Amiga RTC emulation is now %s.\n", (enabled) ? "enabled" : "disabled");

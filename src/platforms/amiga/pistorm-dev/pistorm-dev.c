@@ -32,7 +32,7 @@ static const char* op_type_names[4] = {
     "MEM",
 };
 #else
-#define DEBUG(...)
+  #define DEBUG(...)
 #endif
 
 #define PIDEV_SWREV 0x0105
@@ -41,7 +41,12 @@ extern uint32_t pistorm_dev_base;
 extern uint32_t do_reset;
 
 extern void adjust_ranges_amiga(struct emulator_config* cfg);
-extern uint8_t rtg_enabled, rtg_on, pinet_enabled, piscsi_enabled, load_new_config, end_signal;
+extern uint8_t rtg_enabled;
+extern uint8_t rtg_on;
+extern uint8_t pinet_enabled;
+extern uint8_t piscsi_enabled;
+extern uint8_t load_new_config;
+extern uint8_t end_signal;
 extern struct emulator_config* cfg;
 extern int cpu_emulation_running;
 
@@ -57,7 +62,8 @@ static uint32_t pi_ptr[32];
 static uint32_t pi_dbg_val[32];
 static uint32_t pi_dbg_string[32];
 
-static uint32_t pi_cmd_result = 0, shutdown_confirm = 0xFFFFFFFF;
+static uint32_t pi_cmd_result = 0;
+static uint32_t shutdown_confirm = 0xFFFFFFFF;
 static uint32_t janus_ring_ptr = 0;
 static uint16_t janus_ring_size = 0;
 static uint16_t janus_ring_flags = 0;
@@ -480,8 +486,9 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
       // DEBUG("[PISTORM-DEV] Copy %d bytes from $%.8X to $%.8X\n", val, pi_ptr[0], pi_ptr[1]);
       int32_t src = get_mapped_item_by_address(cfg, pi_ptr[0]);
       int32_t dst = get_mapped_item_by_address(cfg, pi_ptr[1]);
-      if (cfg->map_type[dst] == MAPTYPE_ROM)
+      if (cfg->map_type[dst] == MAPTYPE_ROM) {
         break;
+      }
       if (dst != -1 && src != -1) {
         // DEBUG("super memcpy\n");
         uint8_t* src_ptr = &cfg->map_data[src][(pi_ptr[0] - cfg->map_offset[src])];
@@ -493,26 +500,30 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
         uint16_t tmps = 0;
         for (uint32_t i = 0; i < val; i++) {
           while (i + 2 < val) {
-            if (src == -1)
+            if (src == -1) {
               tmps = (uint16_t)htobe16(m68k_read_memory_16(pi_ptr[0] + i));
-            else
+            } else {
               memcpy(&tmps, &cfg->map_data[src][pi_ptr[0] - cfg->map_offset[src] + i], 2);
+            }
 
-            if (dst == -1)
+            if (dst == -1) {
               m68k_write_memory_16(pi_ptr[1] + i, be16toh(tmps));
-            else
+            } else {
               memcpy(&cfg->map_data[dst][pi_ptr[1] - cfg->map_offset[dst] + i], &tmps, 2);
+            }
             i += 2;
           }
-          if (src == -1)
+          if (src == -1) {
             tmp = (uint8_t)m68k_read_memory_8(pi_ptr[0] + i);
-          else
+          } else {
             tmp = cfg->map_data[src][pi_ptr[0] - cfg->map_offset[src] + i];
+          }
 
-          if (dst == -1)
+          if (dst == -1) {
             m68k_write_memory_8(pi_ptr[1] + i, tmp);
-          else
+          } else {
             cfg->map_data[dst][pi_ptr[1] - cfg->map_offset[dst] + i] = tmp;
+          }
         }
       }
       // DEBUG("[PISTORM-DEV] Copied %d bytes from $%.8X to $%.8X\n", val, pi_ptr[0], pi_ptr[1]);
@@ -528,8 +539,9 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
       pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
     } else {
       int32_t dst = get_mapped_item_by_address(cfg, pi_ptr[0]);
-      if (cfg->map_type[dst] == MAPTYPE_ROM)
+      if (cfg->map_type[dst] == MAPTYPE_ROM) {
         break;
+      }
       if (dst != -1) {
         uint8_t* dst_ptr = &cfg->map_data[dst][(pi_ptr[0] - cfg->map_offset[dst])];
         memset(dst_ptr, pi_byte[0], val);
@@ -589,15 +601,17 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
 
         for (uint32_t y = 0; y < pi_word[3]; y++) {
           for (uint32_t x = 0; x < pi_word[2]; x++) {
-            if (src == -1)
+            if (src == -1) {
               tmp = (unsigned char)m68k_read_memory_8(pi_ptr[0] + src_offset + x);
-            else
+            } else {
               tmp = cfg->map_data[src][(pi_ptr[0] + src_offset + x) - cfg->map_offset[src]];
+            }
 
-            if (dst == -1)
+            if (dst == -1) {
               m68k_write_memory_8(pi_ptr[1] + dst_offset + x, tmp);
-            else
+            } else {
               cfg->map_data[dst][(pi_ptr[1] + dst_offset + x) - cfg->map_offset[dst]] = tmp;
+            }
           }
           src_offset += pi_word[0];
           dst_offset += pi_word[1];
@@ -648,16 +662,18 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
 
         for (uint32_t y = 0; y < pi_word[3]; y++) {
           for (uint32_t x = 0; x < pi_word[2]; x++) {
-            if (src == -1)
+            if (src == -1) {
               tmp = (unsigned char)m68k_read_memory_8(pi_ptr[0] + src_offset + x);
-            else
+            } else {
               tmp = cfg->map_data[src][(pi_ptr[0] + src_offset + x) - cfg->map_offset[src]];
+            }
 
             if (tmp != pi_byte[0]) {
-              if (dst == -1)
+              if (dst == -1) {
                 m68k_write_memory_8(pi_ptr[1] + dst_offset + x, tmp);
-              else
+              } else {
                 cfg->map_data[dst][(pi_ptr[1] + dst_offset + x) - cfg->map_offset[dst]] = tmp;
+              }
             }
           }
           src_offset += pi_word[0];
@@ -698,10 +714,11 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
 
         for (uint32_t y = 0; y < pi_word[3]; y++) {
           for (uint32_t x = 0; x < pi_word[2]; x++) {
-            if (dst == -1)
+            if (dst == -1) {
               m68k_write_memory_8(pi_ptr[1] + dst_offset + x, tmp);
-            else
+            } else {
               cfg->map_data[dst][(pi_ptr[1] + dst_offset + x) - cfg->map_offset[dst]] = tmp;
+            }
           }
           dst_offset += pi_word[1];
         }

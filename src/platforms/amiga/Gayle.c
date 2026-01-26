@@ -63,36 +63,43 @@ uint8_t ide_devctrl_w = 0, ide_cyl_low = 0, ide_error_r = 0, ide_status_r = 0, i
 
 uint8_t ide_read8(uint8_t* dummy, uint8_t ide_action) {
   if (dummy || ide_action) {
+    // do nothing 
   };
   return 0;
 }
 uint16_t ide_read16(uint8_t* dummy, uint8_t ide_action) {
   if (dummy || ide_action) {
+    // do nothing 
   };
   return 0;
 }
 
 void ide_write8(uint8_t* dummy, uint8_t ide_action, uint8_t value) {
   if (dummy || ide_action || value) {
+    // do nothing 
   };
 }
 void ide_write16(uint8_t* dummy, uint8_t ide_action, uint16_t value) {
   if (dummy || ide_action || value) {
+    // do nothing 
   };
 }
 void ide_reset_begin(uint8_t* dummy) {
   if (dummy) {
+    // do nothing 
   };
 }
 
 uint8_t* ide_allocate(const char* name) {
   if (name) {
+    // do nothing 
   };
   return NULL;
 }
 
 void ide_attach_hdf(uint8_t* dummy, uint32_t idx, int fd) {
   if (dummy || idx || fd) {
+    // do nothing 
   };
   printf("[!!!IDE] No IDE emulation layer available, HDF image not attached.\n");
   return;
@@ -100,6 +107,7 @@ void ide_attach_hdf(uint8_t* dummy, uint32_t idx, int fd) {
 
 void ide_attach(uint8_t* dummy, uint32_t idx, int fd) {
   if (dummy || idx || fd) {
+    // do nothing 
   };
   printf("[!!!IDE] No IDE emulation layer available, image not mounted.\n");
   return;
@@ -145,8 +153,9 @@ void adjust_gayle_1200(void) {
 }
 
 void set_hard_drive_image_file_amiga(uint8_t index, const char* filename) {
-  if (hdd_image_file[index] != NULL)
+  if (hdd_image_file[index] != NULL) {
     free(hdd_image_file[index]);
+  }
   hdd_image_file[index] = calloc(1, strlen(filename) + 1);
   strcpy(hdd_image_file[index], filename);
 }
@@ -158,8 +167,9 @@ void InitGayle(void) {
     if (hdd_image_file[i]) {
       fd = open(hdd_image_file[i], O_RDWR);
       if (fd != -1) {
-        if (!ide0)
+        if (!ide0) {
           ide0 = ide_allocate("cf");
+        }
       }
 
       if (fd == -1) {
@@ -179,8 +189,9 @@ void InitGayle(void) {
       }
     }
   }
-  if (ide0)
+  if (ide0) {
     ide_reset_begin(ide0);
+  }
 
   if (num_ide_drives == 0) {
     // No IDE drives mounted, disable IDE component of Gayle
