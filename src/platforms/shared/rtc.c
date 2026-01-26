@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include "rtc.h"
 
+#define U8(x) ((uint8_t)(x))
+
 static unsigned char rtc_mystery_reg[3];
 unsigned char ricoh_memory[0x0F];
 unsigned char ricoh_alarm[0x0F];
@@ -93,10 +95,10 @@ uint8_t get_rtc_byte(uint32_t address_, uint8_t rtc_type) {
     int rtc_bank = (rtc_mystery_reg[0] & 0x03);
     if ((rtc_bank & 0x02) && address < 0x0D) {
       // Get low/high nibble from memory (bank 2/3)
-      return ((ricoh_memory[address] >> (rtc_bank & 0x01) ? 4 : 0) & 0x0F);
+      return U8((ricoh_memory[address] >> (rtc_bank & 0x01) ? 4 : 0) & 0x0F);
     } else if ((rtc_bank & 0x01) && address < 0x0D) {
       // Get byte from alarm
-      return ricoh_alarm[address];
+      return U8(ricoh_alarm[address]);
     }
   }
 
@@ -104,72 +106,74 @@ uint8_t get_rtc_byte(uint32_t address_, uint8_t rtc_type) {
 
   switch (address) {
   case 0x00: // Seconds low?
-    return rtc_time->tm_sec % 10;
+    return U8(rtc_time->tm_sec % 10);
   case 0x01: // Seconds high?
-    return rtc_time->tm_sec / 10;
+    return U8(rtc_time->tm_sec / 10);
   case 0x02: // Minutes low?
-    return rtc_time->tm_min % 10;
+    return U8(rtc_time->tm_min % 10);
   case 0x03: // Minutes high?
-    return rtc_time->tm_min / 10;
+    return U8(rtc_time->tm_min / 10);
   case 0x04: // Hours low?
-    return rtc_time->tm_hour % 10;
+    return U8(rtc_time->tm_hour % 10);
   case 0x05: // Hours high?
     if (rtc_type == RTC_TYPE_MSM) {
       if (rtc_mystery_reg[2] & 4) {
-        return (((rtc_time->tm_hour % 12) / 10) | ((rtc_time->tm_hour >= 12) ? 0x04 : 0x00));
+        return U8(((rtc_time->tm_hour % 12) / 10) |
+                  ((rtc_time->tm_hour >= 12) ? 0x04 : 0x00));
       } else
-        return rtc_time->tm_hour / 10;
+        return U8(rtc_time->tm_hour / 10);
     } else {
       if (ricoh_alarm[10] & 0x01) {
-        return rtc_time->tm_hour / 10;
+        return U8(rtc_time->tm_hour / 10);
       } else {
-        return (((rtc_time->tm_hour % 12) / 10) | ((rtc_time->tm_hour >= 12) ? 0x02 : 0x00));
+        return U8(((rtc_time->tm_hour % 12) / 10) |
+                  ((rtc_time->tm_hour >= 12) ? 0x02 : 0x00));
       }
       break;
     }
   case 0x06: // Day low?
     if (rtc_type == RTC_TYPE_MSM)
-      return rtc_time->tm_mday % 10;
+      return U8(rtc_time->tm_mday % 10);
     else
-      return rtc_time->tm_wday;
+      return U8(rtc_time->tm_wday);
   case 0x07: // Day high?
     if (rtc_type == RTC_TYPE_MSM)
-      return rtc_time->tm_mday / 10;
+      return U8(rtc_time->tm_mday / 10);
     else
-      return rtc_time->tm_mday % 10;
+      return U8(rtc_time->tm_mday % 10);
   case 0x08: // Month low?
     if (rtc_type == RTC_TYPE_MSM)
-      return (rtc_time->tm_mon + 1) % 10;
+      return U8((rtc_time->tm_mon + 1) % 10);
     else
-      return rtc_time->tm_mday / 10;
+      return U8(rtc_time->tm_mday / 10);
   case 0x09: // Month high?
     if (rtc_type == RTC_TYPE_MSM)
-      return (rtc_time->tm_mon + 1) / 10;
+      return U8((rtc_time->tm_mon + 1) / 10);
     else
-      return (rtc_time->tm_mon + 1) % 10;
+      return U8((rtc_time->tm_mon + 1) % 10);
   case 0x0A: // Year low?
     if (rtc_type == RTC_TYPE_MSM)
-      return rtc_time->tm_year % 10;
+      return U8(rtc_time->tm_year % 10);
     else
-      return (rtc_time->tm_mon + 1) / 10;
+      return U8((rtc_time->tm_mon + 1) / 10);
   case 0x0B: // Year high?
     if (rtc_type == RTC_TYPE_MSM)
-      return rtc_time->tm_year / 10;
+      return U8(rtc_time->tm_year / 10);
     else
-      return rtc_time->tm_year % 10;
+      return U8(rtc_time->tm_year % 10);
   case 0x0C: // Day of week?
     if (rtc_type == RTC_TYPE_MSM)
-      return rtc_time->tm_wday;
+      return U8(rtc_time->tm_wday);
     else
-      return rtc_time->tm_year / 10;
+      return U8(rtc_time->tm_year / 10);
   case 0x0D: // Mystery register D-F?
   case 0x0E:
   case 0x0F:
     if (rtc_type == RTC_TYPE_MSM) {
-      return rtc_mystery_reg[address - 0x0D];
+      return U8(rtc_mystery_reg[address - 0x0D]);
     } else {
       if (address == 0x0D)
-        return rtc_mystery_reg[address - 0x0D];
+        return U8(rtc_mystery_reg[address - 0x0D]);
       return 0;
     }
   default:

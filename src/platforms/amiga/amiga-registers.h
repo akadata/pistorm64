@@ -1,11 +1,18 @@
 // SPDX-License-Identifier: MIT
 
+int handle_register_read_amiga(unsigned int addr, unsigned char type, unsigned int* val);
+int handle_register_write_amiga(unsigned int addr, unsigned int value, unsigned char type);
 void configure_rtc_emulation_amiga(uint8_t enabled);
-void set_hard_drive_image_file_amiga(uint8_t index, char* filename);
+void set_hard_drive_image_file_amiga(uint8_t index, const char* filename);
 int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
                       unsigned char type);
 int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int val,
                        unsigned char type);
+
+uint8_t cdtv_dmac_reg_idx_read(void);
+void cdtv_dmac_reg_idx_write(uint8_t value);
+uint32_t cdtv_dmac_read(uint32_t address, uint8_t type);
+void cdtv_dmac_write(uint32_t address, uint32_t value, uint8_t type);
 
 void adjust_gayle_4000(void);
 void adjust_gayle_1200(void);

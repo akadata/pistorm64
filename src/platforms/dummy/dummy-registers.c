@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+#include "platforms/platforms.h"
+
 int handle_register_read_dummy(unsigned int addr, unsigned char type, unsigned int* val) {
   if (addr) {
   }

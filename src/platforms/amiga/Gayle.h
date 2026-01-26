@@ -24,6 +24,16 @@ uint8_t readGayleB(unsigned int address);
 uint16_t readGayle(unsigned int address);
 uint32_t readGayleL(unsigned int address);
 
+// Prototypes for IDE functions
+uint8_t ide_read8(uint8_t* dummy, uint8_t ide_action);
+uint16_t ide_read16(uint8_t* dummy, uint8_t ide_action);
+void ide_write8(uint8_t* dummy, uint8_t ide_action, uint8_t value);
+void ide_write16(uint8_t* dummy, uint8_t ide_action, uint16_t value);
+void ide_reset_begin(uint8_t* dummy);
+uint8_t* ide_allocate(const char* name);
+void ide_attach_hdf(uint8_t* dummy, uint32_t idx, int fd);
+void ide_attach(uint8_t* dummy, uint32_t idx, int fd);
+
 // Gayle Addresses
 #define GAYLE_IDE_BASE_A1200 0xDA2000 // 16bit base
 #define GAYLE_IDE_BASE_A4000 0xDD2020

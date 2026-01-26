@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <endian.h>
 #include "platforms/platforms.h"
 #include "gpio/ps_protocol.h"
@@ -34,7 +35,8 @@ uint8_t* dump_range_to_memory(uint32_t addr, uint32_t size) {
   }
 
   for (uint32_t i = 0; i < size; i += 2) {
-    *(uint16_t*)&mem[i] = (uint16_t)be16toh(read16(addr + i));
+    uint16_t in = (uint16_t)be16toh(read16(addr + i));
+    memcpy(&mem[i], &in, sizeof(in));
   }
 
   printf("[SHARED-DUMP_RANGE_TO_FILE] Memory range copied to RAM.\n");

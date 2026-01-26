@@ -138,38 +138,41 @@ static int ps_busop(int is_read, int width, unsigned addr, unsigned *val, unsign
     return rc;
 }
 
-unsigned ps_read_8(unsigned addr)  { 
-    unsigned v = 0; 
-    ps_busop(1, PISTORM_W8, addr, &v, 0); 
-    return v & 0xff; 
+uint8_t ps_read_8(uint32_t addr)  {
+    uint32_t v = 0;
+    ps_busop(1, PISTORM_W8, addr, &v, 0);
+    return (uint8_t)(v & 0xff);
 }
 
-unsigned ps_read_16(unsigned addr) { 
-    unsigned v = 0; 
-    ps_busop(1, PISTORM_W16, addr, &v, 0); 
-    return v & 0xffff; 
+uint16_t ps_read_16(uint32_t addr) {
+    uint32_t v = 0;
+    ps_busop(1, PISTORM_W16, addr, &v, 0);
+    return (uint16_t)(v & 0xffff);
 }
 
-unsigned ps_read_32(unsigned addr) { 
-    unsigned v = 0; 
-    ps_busop(1, PISTORM_W32, addr, &v, 0); 
-    return v; 
+uint32_t ps_read_32(uint32_t addr) {
+    uint32_t v = 0;
+    ps_busop(1, PISTORM_W32, addr, &v, 0);
+    return v;
 }
 
-void ps_write_8(unsigned addr, unsigned v)  { 
-    ps_busop(0, PISTORM_W8, addr, &v, 0); 
+void ps_write_8(uint32_t addr, uint8_t v)  {
+    uint32_t temp_v = v;
+    ps_busop(0, PISTORM_W8, addr, &temp_v, 0);
 }
 
-void ps_write_16(unsigned addr, unsigned v) { 
-    ps_busop(0, PISTORM_W16, addr, &v, 0); 
+void ps_write_16(uint32_t addr, uint16_t v) {
+    uint32_t temp_v = v;
+    ps_busop(0, PISTORM_W16, addr, &temp_v, 0);
 }
 
-void ps_write_32(unsigned addr, unsigned v) { 
-    ps_busop(0, PISTORM_W32, addr, &v, 0); 
+void ps_write_32(uint32_t addr, uint32_t v) {
+    uint32_t temp_v = v;
+    ps_busop(0, PISTORM_W32, addr, &temp_v, 0);
 }
 
 // Additional functions that might be needed
-unsigned ps_read_status_reg(void) {
+uint16_t ps_read_status_reg(void) {
     struct pistorm_busop op = {
         .addr = 0,
         .value = 0,
@@ -179,14 +182,14 @@ unsigned ps_read_status_reg(void) {
     };
 
     if (ps_busop(op.is_read, op.width, op.addr, &op.value, op.flags) == 0)
-        return op.value & 0xffffu;
+        return (uint16_t)(op.value & 0xffffu);
     return 0;
 }
 
-void ps_write_status_reg(unsigned int value) {
+void ps_write_status_reg(uint16_t value) {
     struct pistorm_busop op = {
         .addr = 0,
-        .value = value,
+        .value = (unsigned int)value,
         .width = PISTORM_W16,
         .is_read = 0,
         .flags = PISTORM_BUSOP_F_STATUS,
@@ -221,7 +224,7 @@ int ps_flush_batch_queue(void) {
 #endif
 }
 
-void ps_update_irq(void) {
+static void __attribute__((unused)) ps_update_irq(void) {
     unsigned int ipl = 0;
 
     if (!ps_get_ipl_zero()) {
