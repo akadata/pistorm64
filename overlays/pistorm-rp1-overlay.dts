@@ -1,0 +1,69 @@
+/*
+ * Device Tree Overlay for PiStorm on Pi 5 (RP1)
+ * This overlay configures the PiStorm hardware bridge on Raspberry Pi 5
+ */
+
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "raspberrypi,5-model-b";
+
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			pistorm: pistorm@200000 {
+				compatible = "akadata,pistorm";
+				
+				reg = <0x200000 0x1000>;    /* RP1 GPIO registers */
+				reg-names = "gpio";
+				
+				clocks = <&rp1_gpclk 0>;     /* GPCLK from RP1 clock manager */
+				clock-names = "gpclk";
+				
+				pinctrl-names = "default", "bus-out", "bus-in";
+				pinctrl-0 = <&pistorm_rp1_default_pins>;
+				pinctrl-1 = <&pistorm_rp1_bus_out_pins>;
+				pinctrl-2 = <&pistorm_rp1_bus_in_pins>;
+				
+				txn-in-progress-gpios = <&gpio 0 GPIO_ACTIVE_HIGH>;
+				ipl-zero-gpios        = <&gpio 1 GPIO_ACTIVE_HIGH>;
+				a0-gpios              = <&gpio 2 GPIO_ACTIVE_HIGH>;
+				a1-gpios              = <&gpio 3 GPIO_ACTIVE_HIGH>;
+				reset-gpios           = <&gpio 5 GPIO_ACTIVE_HIGH>;
+				rd-gpios              = <&gpio 6 GPIO_ACTIVE_HIGH>;
+				wr-gpios              = <&gpio 7 GPIO_ACTIVE_HIGH>;
+				
+				data-gpios = <&gpio 8 GPIO_ACTIVE_HIGH>,  <&gpio 9 GPIO_ACTIVE_HIGH>,
+				             <&gpio 10 GPIO_ACTIVE_HIGH>, <&gpio 11 GPIO_ACTIVE_HIGH>,
+				             <&gpio 12 GPIO_ACTIVE_HIGH>, <&gpio 13 GPIO_ACTIVE_HIGH>,
+				             <&gpio 14 GPIO_ACTIVE_HIGH>, <&gpio 15 GPIO_ACTIVE_HIGH>,
+				             <&gpio 16 GPIO_ACTIVE_HIGH>, <&gpio 17 GPIO_ACTIVE_HIGH>,
+				             <&gpio 18 GPIO_ACTIVE_HIGH>, <&gpio 19 GPIO_ACTIVE_HIGH>,
+				             <&gpio 20 GPIO_ACTIVE_HIGH>, <&gpio 21 GPIO_ACTIVE_HIGH>,
+				             <&gpio 22 GPIO_ACTIVE_HIGH>, <&gpio 23 GPIO_ACTIVE_HIGH>;
+				
+				txn-timeout-ms = <500>;
+				reset-pulse-ms = <100>;
+			};
+			
+			pistorm_rp1_default_pins: pistorm-rp1-default-pins {
+				rpt,pins = <4>;                    /* GPIO4 */
+				rpt,function = <4>;                /* ALT0 for GPCLK0 */
+				rpt,pull = <0>;                    /* no pull */
+			};
+			
+			pistorm_rp1_bus_out_pins: pistorm-rp1-bus-out-pins {
+				rpt,pins = <8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23>; /* D0-D15 */
+				rpt,function = <1>;                /* OUTPUT */
+				rpt,pull = <0>;                    /* no pull */
+			};
+			
+			pistorm_rp1_bus_in_pins: pistorm-rp1-bus-in-pins {
+				rpt,pins = <8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23>; /* D0-D15 */
+				rpt,function = <0>;                /* INPUT */
+				rpt,pull = <0>;                    /* no pull */
+			};
+		};
+	};
+};

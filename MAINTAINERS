@@ -1,8 +1,6 @@
-PISTORM DRIVER
-M:      Andrew Smalley <andrew@akadata.ltd>
-S:      Maintained
-F:      drivers/misc/pistorm/
-F:      include/linux/pistorm.h
-F:      Documentation/devicetree/bindings/misc/akadata,pistorm.yaml
-F:      Documentation/ABI/testing/dev-pistorm
-
+M: kernel@akadata.ltd
+S: Supported
+F: drivers/misc/pistorm/
+F: include/uapi/linux/pistorm.h
+F: Documentation/devicetree/bindings/misc/akadata,pistorm.yaml
+F: Documentation/ABI/testing/dev-pistorm
