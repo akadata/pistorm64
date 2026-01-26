@@ -61,7 +61,8 @@ uint8_t *piscsi_rom_ptr;
 uint32_t rom_partitions[128];
 uint32_t rom_partition_prio[128];
 uint32_t rom_partition_dostype[128];
-uint32_t rom_cur_partition = 0, rom_cur_fs = 0;
+uint32_t rom_cur_partition = 0;
+uint32_t rom_cur_fs = 0;
 
 extern unsigned char ac_piscsi_rom[];
 
@@ -185,8 +186,9 @@ next_partition:;
             times_used[i]++;
             sprintf((char *)pb->pb_DriveName + 1 + pb->pb_DriveName[0], "_%d", times_used[i]);
             pb->pb_DriveName[0] += 2;
-            if (times_used[i] > 9)
+            if (times_used[i] > 9) {
                 pb->pb_DriveName[0]++;
+            }
             goto partition_renamed;
         }
     }
@@ -220,8 +222,9 @@ static int piscsi_parse_rdb(struct piscsi_dev *d) {
         uint32_t first_temp;
         memcpy(&first_temp, &block[0], sizeof(first_temp));
         uint32_t first = be32toh(first_temp);
-        if (first == RDB_IDENTIFIER)
+        if (first == RDB_IDENTIFIER) {
             goto rdb_found;
+        }
     }
     goto no_rdb_found;
 rdb_found:;
@@ -240,15 +243,17 @@ rdb_found:;
     DEBUG("[PISCSI] RDB - first partition at block %d.\n", be32toh(rdb->rdb_PartitionList));
     d->block_size = be32toh(rdb->rdb_BlockBytes);
     DEBUG("[PISCSI] Block size: %d. (%d)\n", be32toh(rdb->rdb_BlockBytes), d->block_size);
-    if (d->rdb)
+    if (d->rdb) {
         free(d->rdb);
+    }
     d->rdb = rdb;
     sprintf(d->rdb->rdb_DriveInitName, "pi-scsi.device");
     return 0;
 
 no_rdb_found:;
-    if (block)
+    if (block) {
         free(block);
+    }
 
     return -1;
 }
@@ -289,8 +294,9 @@ void piscsi_refresh_drives(void) {
 }
 
 void piscsi_find_filesystems(struct piscsi_dev *d) {
-    if (!d->num_partitions)
+    if (!d->num_partitions) {
         return;
+    }
 
     uint8_t fs_found = 0;
 
@@ -327,8 +333,9 @@ void piscsi_find_filesystems(struct piscsi_dev *d) {
         for (int i = 0; i < NUM_FILESYSTEMS; i++) {
             if (filesystems[i].FS_ID == fhb->fhb_DosType) {
                 DEBUG("[FSHD] File system %c%c%c/%d already loaded. Skipping.\n", dosID[0], dosID[1], dosID[2], dosID[3]);
-                if (BE(fhb->fhb_Next) == 0xFFFFFFFF)
+                if (BE(fhb->fhb_Next) == 0xFFFFFFFF) {
                     goto fs_done;
+                }
 
                 goto skip_fs_load_lseg;
             }
@@ -542,37 +549,68 @@ void piscsi_unmap_drive(uint8_t index) {
 
 static const char *io_cmd_name(int index) {
     switch (index) {
-        case CMD_INVALID: return "INVALID";
-        case CMD_RESET: return "RESET";
-        case CMD_READ: return "READ";
-        case CMD_WRITE: return "WRITE";
-        case CMD_UPDATE: return "UPDATE";
-        case CMD_CLEAR: return "CLEAR";
-        case CMD_STOP: return "STOP";
-        case CMD_START: return "START";
-        case CMD_FLUSH: return "FLUSH";
-        case TD_MOTOR: return "TD_MOTOR";
-        case TD_SEEK: return "SEEK";
-        case TD_FORMAT: return "FORMAT";
-        case TD_REMOVE: return "REMOVE";
-        case TD_CHANGENUM: return "CHANGENUM";
-        case TD_CHANGESTATE: return "CHANGESTATE";
-        case TD_PROTSTATUS: return "PROTSTATUS";
-        case TD_RAWREAD: return "RAWREAD";
-        case TD_RAWWRITE: return "RAWWRITE";
-        case TD_GETDRIVETYPE: return "GETDRIVETYPE";
-        case TD_GETNUMTRACKS: return "GETNUMTRACKS";
-        case TD_ADDCHANGEINT: return "ADDCHANGEINT";
-        case TD_REMCHANGEINT: return "REMCHANGEINT";
-        case TD_GETGEOMETRY: return "GETGEOMETRY";
-        case TD_EJECT: return "EJECT";
-        case TD_LASTCOMM: return "LASTCOMM/READ64";
-        case TD_WRITE64: return "WRITE64";
-        case HD_SCSICMD: return "HD_SCSICMD";
-        case NSCMD_DEVICEQUERY: return "NSCMD_DEVICEQUERY";
-        case NSCMD_TD_READ64: return "NSCMD_TD_READ64";
-        case NSCMD_TD_WRITE64: return "NSCMD_TD_WRITE64";
-        case NSCMD_TD_FORMAT64: return "NSCMD_TD_FORMAT64";
+        case CMD_INVALID: 
+            return "INVALID";
+        case CMD_RESET: 
+            return "RESET";
+        case CMD_READ: 
+            return "READ";
+        case CMD_WRITE: 
+            return "WRITE";
+        case CMD_UPDATE: 
+            return "UPDATE";
+        case CMD_CLEAR: 
+            return "CLEAR";
+        case CMD_STOP: 
+            return "STOP";
+        case CMD_START: 
+            return "START";
+        case CMD_FLUSH: 
+            return "FLUSH";
+        case TD_MOTOR: 
+            return "TD_MOTOR";
+        case TD_SEEK: 
+            return "SEEK";
+        case TD_FORMAT: 
+            return "FORMAT";
+        case TD_REMOVE: 
+            return "REMOVE";
+        case TD_CHANGENUM: 
+            return "CHANGENUM";
+        case TD_CHANGESTATE: 
+            return "CHANGESTATE";
+        case TD_PROTSTATUS: 
+            return "PROTSTATUS";
+        case TD_RAWREAD: 
+            return "RAWREAD";
+        case TD_RAWWRITE: 
+            return "RAWWRITE";
+        case TD_GETDRIVETYPE: 
+            return "GETDRIVETYPE";
+        case TD_GETNUMTRACKS: 
+            return "GETNUMTRACKS";
+        case TD_ADDCHANGEINT: 
+            return "ADDCHANGEINT";
+        case TD_REMCHANGEINT: 
+            return "REMCHANGEINT";
+        case TD_GETGEOMETRY: 
+            return "GETGEOMETRY";
+        case TD_EJECT: 
+            return "EJECT";
+        case TD_LASTCOMM: 
+            return "LASTCOMM/READ64";
+        case TD_WRITE64: 
+            return "WRITE64";
+        case HD_SCSICMD: 
+            return "HD_SCSICMD";
+        case NSCMD_DEVICEQUERY: 
+            return "NSCMD_DEVICEQUERY";
+        case NSCMD_TD_READ64: 
+            return "NSCMD_TD_READ64";
+        case NSCMD_TD_WRITE64: 
+            return "NSCMD_TD_WRITE64";
+        case NSCMD_TD_FORMAT64: 
+            return "NSCMD_TD_FORMAT64";
 
         default:
             return "[!!!PISCSI] Unhandled IO command";
@@ -655,8 +693,7 @@ static void print_piscsi_debug_message(int index) {
             if (r != -1) {
                 uint32_t addr = (uint32_t)(piscsi_dbg[0] - cfg->map_offset[r]);
                 rwdat = (struct SCSICmd_RW10 *)(&cfg->map_data[r][addr]);
-            }
-            else {
+            } else {
                 DEBUG_TRIVIAL("[RW10] scsiData: %.8X\n", piscsi_dbg[0]);
                 for (int i = 0; i < 10; i++) {
                     data[i] = read8((uint32_t)piscsi_dbg[0] + (uint32_t)i);
@@ -836,8 +873,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:WRITE io_Offset:0x%X io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, block, piscsi_u32[1], block, (unsigned long long)file_offset, piscsi_u32[2]);
                 lseek64(d->fd, (off64_t)file_offset, SEEK_SET);
-            }
-            else {
+            } else {
                 uint64_t src = ((uint64_t)piscsi_u32[3] << 32) | piscsi_u32[0];
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
@@ -884,8 +920,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
         case PISCSI_CMD_DRVNUM:
             if (val > 6) {
                 piscsi_cur_drive = 255;
-            }
-            else {
+            } else {
                 piscsi_cur_drive = (uint8_t)val;
             }
             if (piscsi_cur_drive != 255) {
@@ -926,8 +961,9 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 sprintf((char *)dst_data + data_addr, "pi-scsi.device");
                 uint32_t addr2 = addr + 0x4000;
                 for (int i = 0; i < NUM_UNITS; i++) {
-                    if (devs[i].fd == -1)
+                    if (devs[i].fd == -1) {
                         goto skip_disk;
+                    }
 
                     if (devs[i].num_partitions) {
                         uint32_t p_offs = addr2;
@@ -954,8 +990,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             if (BE(devs[i].pb[j]->pb_Flags) & 0x01) {
                                 DEBUG("Partition is bootable.\n");
                                 rom_partition_prio[cur_partition] = BE(dat->priority);
-                            }
-                            else {
+                            } else {
                                 DEBUG("Partition is not bootable.\n");
                                 rom_partition_prio[cur_partition] = (uint32_t)-128;
                             }
@@ -1033,6 +1068,7 @@ skip_disk:;
                 // Map DOS/3 (FFS International) to DOS/1 (FFS) handler since they use the same filesystem
                 if (fallback_dostype == 0x444F5303) { // DOS/3
                     fallback_dostype = 0x444F5301;   // DOS/1
+                    DEBUG("[PISCSI] DOS/3 Not Present: DOS/3 partition to DOS/1 filesystem handler, checking... line 1071 piscsi.c\n");
                     for (fs_idx = 0; fs_idx < piscsi_num_fs; fs_idx++) {
                         if (fallback_dostype == filesystems[fs_idx].FS_ID) {
                             node->dn_SegList = htobe32((((filesystems[fs_idx].handler) + filesystems[fs_idx].h_info.header_size) >> 2));
@@ -1077,8 +1113,14 @@ fs_found:;
             }
             break;
         }
-        case PISCSI_DBG_VAL1: case PISCSI_DBG_VAL2: case PISCSI_DBG_VAL3: case PISCSI_DBG_VAL4:
-        case PISCSI_DBG_VAL5: case PISCSI_DBG_VAL6: case PISCSI_DBG_VAL7: case PISCSI_DBG_VAL8: {
+        case PISCSI_DBG_VAL1: 
+        case PISCSI_DBG_VAL2: 
+        case PISCSI_DBG_VAL3: 
+        case PISCSI_DBG_VAL4:
+        case PISCSI_DBG_VAL5: 
+        case PISCSI_DBG_VAL6: 
+        case PISCSI_DBG_VAL7: 
+        case PISCSI_DBG_VAL8: {
             int i = ((addr & 0xFFFF) - PISCSI_DBG_VAL1) / 4;
             piscsi_dbg[i] = val;
             break;
@@ -1095,7 +1137,9 @@ fs_found:;
 #define PIB 0x00
 
 uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
-    if (type) {}
+    if (type) {
+        // do nothing 
+    }
 
     if ((addr & 0xFFFF) >= PISCSI_CMD_ROM) {
         uint32_t romoffs = (addr & 0xFFFF) - PISCSI_CMD_ROM;
@@ -1203,6 +1247,7 @@ uint32_t handle_piscsi_read(uint32_t addr, uint8_t type) {
                 // Map DOS/3 (FFS International) to DOS/1 (FFS) handler since they use the same filesystem
                 if (fallback_dostype == 0x444F5303) { // DOS/3
                     fallback_dostype = 0x444F5301;   // DOS/1
+                    DEBUG("[PISCSI-GET-FS-INFO] fallback_dostype: Redefined DOS/3 as DOS/1 filesystem handler. piscsi.c line 1250...\n");
                     for (fs_idx = 0; fs_idx < piscsi_num_fs; fs_idx++) {
                         if (fallback_dostype == filesystems[fs_idx].FS_ID) {
                             DEBUG("[PISCSI-GET-FS-INFO] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");

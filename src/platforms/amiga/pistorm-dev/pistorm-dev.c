@@ -409,6 +409,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     // TODO: Output debug message based on value written and data in val/str registers.
     DEBUG("[PISTORM-DEV] Write to DBG_MSG: %d (%.8X)\n", val, val);
     break;
+
   case PI_DBG_VAL1:
   case PI_DBG_VAL2:
   case PI_DBG_VAL3:
@@ -416,13 +417,14 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
   case PI_DBG_VAL5:
   case PI_DBG_VAL6:
   case PI_DBG_VAL7:
-  case PI_DBG_VAL8:
+  case PI_DBG_VAL8: 
     DEBUG("[PISTORM-DEV] Set DEBUG VALUE %d to %d ($%.8X)\n", (addr - PI_DBG_VAL1) / 4, val, val);
     pi_dbg_val[(addr - PI_DBG_VAL1) / 4] = val;
     if (addr == PI_DBG_VAL1) {
       janus_dump_ring();
     }
     break;
+
   case PI_DBG_STR1:
   case PI_DBG_STR2:
   case PI_DBG_STR3:
@@ -443,6 +445,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     // 0xFF));
     pi_byte[addr - PI_BYTE1] = (val & 0xFF);
     break;
+
   case PI_WORD1:
   case PI_WORD2:
   case PI_WORD3:
@@ -451,6 +454,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     // (val & 0xFFFF));
     pi_word[(addr - PI_WORD1) / 2] = (val & 0xFFFF);
     break;
+
   case PI_WORD5:
   case PI_WORD6:
   case PI_WORD7:
@@ -463,6 +467,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     // 0xFFFF), (val & 0xFFFF));
     pi_word[((addr - PI_WORD5) / 2) + 4] = (val & 0xFFFF);
     break;
+
   case PI_LONGWORD1:
   case PI_LONGWORD2:
   case PI_LONGWORD3:
@@ -470,6 +475,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     // DEBUG("[PISTORM-DEV] Set LONGWORD %d to %d ($%.8X)\n", (addr - PI_LONGWORD1) / 4, val, val);
     pi_longword[(addr - PI_LONGWORD1) / 4] = val;
     break;
+
   case PI_STR1:
   case PI_STR2:
   case PI_STR3:
@@ -477,6 +483,7 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
     // DEBUG("[PISTORM-DEV] Set STRING POINTER %d to $%.8X\n", (addr - PI_STR1) / 4, val);
     pi_string[(addr - PI_STR1) / 4] = val;
     break;
+    
   case PI_PTR1:
   case PI_PTR2:
   case PI_PTR3:
