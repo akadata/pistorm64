@@ -120,8 +120,9 @@ uint8_t get_rtc_byte(uint32_t address_, uint8_t rtc_type) {
       if (rtc_mystery_reg[2] & 4) {
         return U8(((rtc_time->tm_hour % 12) / 10) |
                   ((rtc_time->tm_hour >= 12) ? 0x04 : 0x00));
-      } else
+      } else {
         return U8(rtc_time->tm_hour / 10);
+      }
     } else {
       if (ricoh_alarm[10] & 0x01) {
         return U8(rtc_time->tm_hour / 10);
@@ -132,48 +133,57 @@ uint8_t get_rtc_byte(uint32_t address_, uint8_t rtc_type) {
       break;
     }
   case 0x06: // Day low?
-    if (rtc_type == RTC_TYPE_MSM)
+    if (rtc_type == RTC_TYPE_MSM) {
       return U8(rtc_time->tm_mday % 10);
-    else
+    }
+    else {
       return U8(rtc_time->tm_wday);
+    }
   case 0x07: // Day high?
-    if (rtc_type == RTC_TYPE_MSM)
+    if (rtc_type == RTC_TYPE_MSM) {
       return U8(rtc_time->tm_mday / 10);
-    else
+    } else {
       return U8(rtc_time->tm_mday % 10);
+    }
   case 0x08: // Month low?
-    if (rtc_type == RTC_TYPE_MSM)
+    if (rtc_type == RTC_TYPE_MSM) {
       return U8((rtc_time->tm_mon + 1) % 10);
-    else
+    } else {
       return U8(rtc_time->tm_mday / 10);
+    }
   case 0x09: // Month high?
-    if (rtc_type == RTC_TYPE_MSM)
+    if (rtc_type == RTC_TYPE_MSM) {
       return U8((rtc_time->tm_mon + 1) / 10);
-    else
+    } else {
       return U8((rtc_time->tm_mon + 1) % 10);
+    }
   case 0x0A: // Year low?
-    if (rtc_type == RTC_TYPE_MSM)
+    if (rtc_type == RTC_TYPE_MSM) {
       return U8(rtc_time->tm_year % 10);
-    else
+    } else {
       return U8((rtc_time->tm_mon + 1) / 10);
+    }
   case 0x0B: // Year high?
-    if (rtc_type == RTC_TYPE_MSM)
+    if (rtc_type == RTC_TYPE_MSM) {
       return U8(rtc_time->tm_year / 10);
-    else
+    } else {
       return U8(rtc_time->tm_year % 10);
+    }
   case 0x0C: // Day of week?
-    if (rtc_type == RTC_TYPE_MSM)
+    if (rtc_type == RTC_TYPE_MSM) {
       return U8(rtc_time->tm_wday);
-    else
+    } else {
       return U8(rtc_time->tm_year / 10);
+    }
   case 0x0D: // Mystery register D-F?
   case 0x0E:
   case 0x0F:
     if (rtc_type == RTC_TYPE_MSM) {
       return U8(rtc_mystery_reg[address - 0x0D]);
     } else {
-      if (address == 0x0D)
+      if (address == 0x0D) {
         return U8(rtc_mystery_reg[address - 0x0D]);
+      }
       return 0;
     }
   default:
