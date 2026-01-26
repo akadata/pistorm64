@@ -75,180 +75,24 @@ int __attribute__((no_reorder)) _start() {
   return -1;
 }
 
-asm("romtag:                                \n"
-    "       dc.w    " XSTR(
-        RTC_MATCHWORD) "   \n"
-                       "       dc.l    romtag                  \n"
-                       "       dc.l    endcode                 \n"
-                       "       dc.b    " XSTR(
-                           RTF_AUTOINIT) "    \n"
-                                         "       dc.b    " XSTR(
-                                             DEVICE_VERSION) "  \n"
-                                                             "       dc.b    " XSTR(
-                                                                 NT_DEVICE) "       \n"
-                                                                            "       dc.b    " XSTR(
-                                                                                DEVICE_PRIORITY) " "
-                                                                                                 "\n"
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 "d"
-                                                                                                 "c"
-                                                                                                 "."
-                                                                                                 "l"
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 "_"
-                                                                                                 "d"
-                                                                                                 "e"
-                                                                                                 "v"
-                                                                                                 "i"
-                                                                                                 "c"
-                                                                                                 "e"
-                                                                                                 "_"
-                                                                                                 "n"
-                                                                                                 "a"
-                                                                                                 "m"
-                                                                                                 "e"
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 "\n"
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 "d"
-                                                                                                 "c"
-                                                                                                 "."
-                                                                                                 "l"
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 "_"
-                                                                                                 "d"
-                                                                                                 "e"
-                                                                                                 "v"
-                                                                                                 "i"
-                                                                                                 "c"
-                                                                                                 "e"
-                                                                                                 "_"
-                                                                                                 "i"
-                                                                                                 "d"
-                                                                                                 "_"
-                                                                                                 "s"
-                                                                                                 "t"
-                                                                                                 "r"
-                                                                                                 "i"
-                                                                                                 "n"
-                                                                                                 "g"
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 "\n"
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 "d"
-                                                                                                 "c"
-                                                                                                 "."
-                                                                                                 "l"
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 "_"
-                                                                                                 "a"
-                                                                                                 "u"
-                                                                                                 "t"
-                                                                                                 "o"
-                                                                                                 "_"
-                                                                                                 "i"
-                                                                                                 "n"
-                                                                                                 "i"
-                                                                                                 "t"
-                                                                                                 "_"
-                                                                                                 "t"
-                                                                                                 "a"
-                                                                                                 "b"
-                                                                                                 "l"
-                                                                                                 "e"
-                                                                                                 "s"
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 "\n"
-                                                                                                 "e"
-                                                                                                 "n"
-                                                                                                 "d"
-                                                                                                 "c"
-                                                                                                 "o"
-                                                                                                 "d"
-                                                                                                 "e"
-                                                                                                 ":"
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 " "
-                                                                                                 "\n");
+#define ASM_LINE(x) x "\n"
+
+__asm__(
+    ASM_LINE("romtag:")
+    ASM_LINE("    dc.w    " XSTR(RTC_MATCHWORD))
+    ASM_LINE("    dc.l    romtag")
+    ASM_LINE("    dc.l    endcode")
+    ASM_LINE("    dc.b    " XSTR(RTF_AUTOINIT))
+    ASM_LINE("    dc.b    " XSTR(DEVICE_VERSION))
+    ASM_LINE("    dc.b    " XSTR(NT_DEVICE))
+    ASM_LINE("    dc.b    " XSTR(DEVICE_PRIORITY))
+    ASM_LINE("    dc.l    _device_name")
+    ASM_LINE("    dc.l    _device_id_string")
+    ASM_LINE("    dc.l    _auto_init_tables")
+    ASM_LINE("endcode:")
+);
+
+
 char device_name[] = DEVICE_NAME;
 char device_id_string[] = DEVICE_ID_STRING;
 
@@ -271,6 +115,7 @@ static struct Library __attribute__((used)) * init_device(struct Device* dev) {
 
   // Unused variables
   if (ok || i || p) {
+    // do nothing here......
   }
 
   SysBase = *(struct ExecBase**)4L;
@@ -308,6 +153,8 @@ static void __attribute__((used)) open(struct IORequest* io, uint32_t num, uint3
 
   // Unused variables
   if (bm || ok) {
+
+    // do nothing here... why? ...
   }
 
   if (num == 0 && dev_base->unit.unit_OpenCnt == 1) {
@@ -370,6 +217,8 @@ static void __attribute__((used)) begin_io(struct IORequest* io) {
 
   // Unused variables
   if (mtu || unit) {
+
+    // more do nothing here....
   }
 
   switch (ioreq->ios2_Req.io_Command) {
@@ -419,14 +268,18 @@ static void __attribute__((used)) begin_io(struct IORequest* io) {
     devquery->DevQueryFormat = 0;
     devquery->DeviceLevel = 0;
 
-    if (devquery->SizeAvailable >= 18)
+    if (devquery->SizeAvailable >= 18) {
       devquery->AddrFieldSize = ADDRFIELDSIZE * 8;
-    if (devquery->SizeAvailable >= 22)
+    }
+    if (devquery->SizeAvailable >= 22) {
       devquery->MTU = 1500;
-    if (devquery->SizeAvailable >= 26)
+    }
+    if (devquery->SizeAvailable >= 26) {
       devquery->BPS = 1000 * 1000 * 100;
-    if (devquery->SizeAvailable >= 30)
+    }
+    if (devquery->SizeAvailable >= 30) {
       devquery->HardwareType = S2WireType_Ethernet;
+    }
 
     devquery->SizeSupplied = (devquery->SizeAvailable < 30) ? devquery->SizeAvailable : 30;
     break;
@@ -439,6 +292,7 @@ static void __attribute__((used)) begin_io(struct IORequest* io) {
   default: {
     uint8_t cmd = ioreq->ios2_Req.io_Command;
     if (cmd) {
+        // more do nothing....
     }
     kprintf("Unknown/unhandled IO command %lx\n", cmd);
     ioreq->ios2_Req.io_Error = S2ERR_NOT_SUPPORTED;
@@ -459,8 +313,9 @@ static void __attribute__((used)) begin_io(struct IORequest* io) {
 static uint32_t __attribute__((used)) abort_io(struct IORequest* ioreq) {
   struct IOSana2Req* ios2 = (struct IOSana2Req*)ioreq;
 
-  if (!ioreq)
+  if (!ioreq) {
     return IOERR_NOCMD;
+  }
   ioreq->io_Error = IOERR_ABORTED;
   ios2->ios2_WireError = 0;
 
