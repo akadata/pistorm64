@@ -28,7 +28,7 @@ extern unsigned int ovl;
 
 uint32_t ovl_sysrom_pos = 0x400000;
 
-void adjust_ranges_mac68k(struct emulator_config* cfg) {
+static void adjust_ranges_mac68k(struct emulator_config* cfg) {
   cfg->mapped_high = 0;
   cfg->mapped_low = 0;
   cfg->custom_high = 0;
@@ -37,10 +37,12 @@ void adjust_ranges_mac68k(struct emulator_config* cfg) {
   // Set up the min/max ranges for mapped reads/writes
   for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
     if (cfg->map_type[i] != MAPTYPE_NONE) {
-      if ((cfg->map_offset[i] != 0 && cfg->map_offset[i] < cfg->mapped_low) || cfg->mapped_low == 0)
-        cfg->mapped_low = cfg->map_offset[i];
-      if (cfg->map_offset[i] + cfg->map_size[i] > cfg->mapped_high)
-        cfg->mapped_high = cfg->map_offset[i] + cfg->map_size[i];
+      uint32_t offset = (uint32_t)cfg->map_offset[i];
+      uint32_t high = offset + cfg->map_size[i];
+      if ((offset != 0 && offset < cfg->mapped_low) || cfg->mapped_low == 0)
+        cfg->mapped_low = offset;
+      if (high > cfg->mapped_high)
+        cfg->mapped_high = high;
     }
   }
 
@@ -48,7 +50,7 @@ void adjust_ranges_mac68k(struct emulator_config* cfg) {
   printf("[MAC68K] Platform mapped range: %.8X-%.8X\n", cfg->mapped_low, cfg->mapped_high);
 }
 
-int setup_platform_mac68k(struct emulator_config* cfg) {
+static int setup_platform_mac68k(struct emulator_config* cfg) {
   printf("Performing setup for Mac68k platform.\n");
 
   if (strlen(cfg->platform->subsys)) {
@@ -64,7 +66,7 @@ int setup_platform_mac68k(struct emulator_config* cfg) {
 
 #define CHKVAR(a) (strcmp(var, a) == 0)
 
-void setvar_mac68k(struct emulator_config* cfg, char* var, char* val) {
+static void setvar_mac68k(struct emulator_config* cfg, const char* var, const char* val) {
   if (!var)
     return;
 
@@ -116,7 +118,7 @@ void handle_ovl_mappings_mac68k(struct emulator_config* cfg) {
   adjust_ranges_mac68k(cfg);
 }
 
-void handle_reset_mac68k(struct emulator_config* cfg) {
+static void handle_reset_mac68k(struct emulator_config* cfg) {
   DEBUG("[MAC68K] Reset handler.\n");
 
   if (iscsi_enabled) {
@@ -126,7 +128,7 @@ void handle_reset_mac68k(struct emulator_config* cfg) {
   handle_ovl_mappings_mac68k(cfg);
 }
 
-void shutdown_platform_mac68k(struct emulator_config* cfg) {
+static void shutdown_platform_mac68k(struct emulator_config* cfg) {
   printf("[MAC68K] Performing Mac68k platform shutdown.\n");
   if (cfg) {
   }
@@ -146,7 +148,7 @@ void shutdown_platform_mac68k(struct emulator_config* cfg) {
   printf("[MAC68K] Platform shutdown completed.\n");
 }
 
-void create_platform_mac68k(struct platform_config* cfg, char* subsys) {
+void create_platform_mac68k(struct platform_config* cfg, const char* subsys) {
   cfg->register_read = NULL;
   cfg->register_write = NULL;
   cfg->custom_read = NULL;
@@ -162,7 +164,7 @@ void create_platform_mac68k(struct platform_config* cfg, char* subsys) {
     cfg->subsys = malloc(strlen(subsys) + 1);
     strcpy(cfg->subsys, subsys);
     for (unsigned int i = 0; i < strlen(cfg->subsys); i++) {
-      cfg->subsys[i] = tolower(cfg->subsys[i]);
+      cfg->subsys[i] = (char)tolower((unsigned char)cfg->subsys[i]);
     }
   }
 }

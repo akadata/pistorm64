@@ -8,6 +8,8 @@
 #include <string.h>
 #include <errno.h>
 
+#include "gpio/rpi_peri.h"
+
 static uint32_t be32(const uint8_t *p) {
     return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) |
            ((uint32_t)p[2] << 8)  |  (uint32_t)p[3];
@@ -73,4 +75,3 @@ volatile uint32_t *rpi_map_block(int mem_fd, uint32_t phys_addr, size_t len, uin
     if (page_off_out) *page_off_out = page_off;
     return (volatile uint32_t *)p;
 }
-

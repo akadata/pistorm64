@@ -65,16 +65,16 @@
 #define GPFSEL1_OUTPUT 0x09249249
 #define GPFSEL2_OUTPUT 0x00000249
 
-unsigned int ps_read_8(unsigned int address);
-unsigned int ps_read_16(unsigned int address);
-unsigned int ps_read_32(unsigned int address);
+uint8_t  ps_read_8 (uint32_t address);
+uint16_t ps_read_16(uint32_t address);
+uint32_t ps_read_32(uint32_t address);
 
-void ps_write_8(unsigned int address, unsigned int data);
-void ps_write_16(unsigned int address, unsigned int data);
-void ps_write_32(unsigned int address, unsigned int data);
+void ps_write_8 (uint32_t address, uint8_t  data);
+void ps_write_16(uint32_t address, uint16_t data);
+void ps_write_32(uint32_t address, uint32_t data);
 
-unsigned int ps_read_status_reg(void);
-void ps_write_status_reg(unsigned int value);
+uint16_t ps_read_status_reg(void);
+void     ps_write_status_reg(uint16_t value);
 
 void ps_setup_protocol(void);
 void ps_reset_state_machine(void);

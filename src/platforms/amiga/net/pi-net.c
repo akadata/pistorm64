@@ -19,7 +19,7 @@ static const char* op_type_names[4] = {
     "MEM",
 };
 
-void pinet_init(char* dev) {
+void pinet_init(const char* dev) {
   // Initialize them nets.
   (void)dev;
 }

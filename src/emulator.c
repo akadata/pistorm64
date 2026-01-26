@@ -133,6 +133,7 @@ static void configure_ipl_nops(void);
 static void print_help(const char* prog);
 static void print_about(const char* prog);
 
+
 #define CLI_MAX_LINES 32
 static char* cli_config_lines[CLI_MAX_LINES];
 static int cli_config_count;
@@ -151,7 +152,7 @@ extern int m68ki_remaining_cycles;
 
 #define M68K_SET_IRQ(i)                                                                            \
   old_level = CPU_INT_LEVEL;                                                                       \
-  CPU_INT_LEVEL = (i << 8);                                                                        \
+  CPU_INT_LEVEL = ((unsigned int)(i) << 8);                                                        \
   if (old_level != 0x0700 && CPU_INT_LEVEL == 0x0700)                                              \
     m68ki_cpu.nmi_pending = TRUE;
 #define M68K_END_TIMESLICE                                                                         \
@@ -166,6 +167,7 @@ extern int m68ki_remaining_cycles;
 #define NOP 	do { NOP1(); NOP1(); NOP1(); NOP1(); } while (0)
 
 #define DEBUG_EMULATOR
+
 #ifdef DEBUG_EMULATOR
 #define DEBUG printf
 #else
@@ -173,13 +175,13 @@ extern int m68ki_remaining_cycles;
 #endif
 
 // Configurable emulator options
-unsigned int cpu_type = M68K_CPU_TYPE_68000;
-unsigned int loop_cycles = 300;
+unsigned int cpu_type = M68K_CPU_TYPE_68030;
+unsigned int loop_cycles = 1024;
 static unsigned int ipl_nop_count = 8;
 static const unsigned int ipl_nop_count_default = 8;
 unsigned int irq_status = 0;
 
-static const unsigned int loop_cycles_cap = 10000; // cap slices to keep service latency reasonable
+static const unsigned int loop_cycles_cap = 2097152; // cap slices to keep service latency reasonable
 struct emulator_config* cfg = NULL;
 char keyboard_file[256] = "/dev/input/event1";
 
@@ -225,7 +227,7 @@ static void configure_ipl_nops(void) {
     unsigned long parsed = strtoul(env, NULL, 10);
     if (parsed > 4096ul) parsed = 4096ul;
     value = (unsigned int)parsed;
-  } else if (loop_cycles > 300) {
+  } else if (loop_cycles > 2097152) {
     unsigned long scaled = ((unsigned long)ipl_nop_count_default * (unsigned long)loop_cycles) / 300ul;
     if (scaled < ipl_nop_count_default) scaled = ipl_nop_count_default;
     if (scaled > 4096ul) scaled = 4096ul;
@@ -249,7 +251,7 @@ static inline uint64_t now_ns(void) {
 }
 #endif
 
-void* ipl_task(void* args) {
+static void* ipl_task(void* args) {
   printf("[IPL] Thread running\n");
   uint16_t old_irq = 0;
   uint32_t value;
@@ -350,7 +352,7 @@ void* ipl_task(void* args) {
 static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
   /* eat up any reset cycles */
   if (RESET_CYCLES) {
-    int rc = RESET_CYCLES;
+    int rc = (int)RESET_CYCLES;
     RESET_CYCLES = 0;
     num_cycles -= rc;
     if (num_cycles <= 0)
@@ -396,9 +398,9 @@ static inline void m68k_execute_bef(m68ki_cpu_core* state, int num_cycles) {
 #endif
 
       /* Read an instruction and call its handler */
-      REG_IR = m68ki_read_imm_16(state);
-      if (fpu_exec_hook && opcode_is_fpu(REG_IR)) {
-        fpu_exec_hook(state, REG_IR);
+      REG_IR = (uint16_t)m68ki_read_imm_16(state);
+      if (fpu_exec_hook && opcode_is_fpu((uint16_t)REG_IR)) {
+        fpu_exec_hook(state, (uint16_t)REG_IR);
       } else {
         m68ki_instruction_jump_table[REG_IR](state);
       }
@@ -472,7 +474,7 @@ static inline void cpu_backend_set_irq(int level) {
   }
 }
 
-void* cpu_task(void *arg) {
+static void* cpu_task(void *arg) {
   (void)arg;
   m68ki_cpu_core* state = &m68ki_cpu;
   state->ovl = ovl;
@@ -506,7 +508,7 @@ cpu_loop:
       if (irq) {
         cpu_backend_execute(state, 5);
       } else {
-        cpu_backend_execute(state, slice);
+        cpu_backend_execute(state, (int)slice);
       }
     }
   }
@@ -515,14 +517,14 @@ cpu_loop:
   ps_flush_batch_queue();
 
   if (irq) {
-    last_irq = ((ps_read_status_reg() & 0xe000) >> 13);
+    last_irq = (uint32_t)((ps_read_status_reg() & 0xe000) >> 13);
     uint8_t amiga_irq = amiga_emulated_ipl();
     if (amiga_irq >= last_irq) {
       last_irq = amiga_irq;
     }
     if (last_irq != 0 && last_irq != last_last_irq) {
       last_last_irq = last_irq;
-      cpu_backend_set_irq(last_irq);
+      cpu_backend_set_irq((int)last_irq);
     }
   }
 
@@ -577,7 +579,7 @@ stop_cpu_emulation:
   return (void*)NULL;
 }
 
-void* keyboard_task(void *arg) {
+static void* keyboard_task(void *arg) {
   (void)arg;
   struct pollfd kbdpoll[1];
   int kpollrc;
@@ -708,7 +710,7 @@ key_end:
   return (void*)NULL;
 }
 
-void* mouse_task(void *arg) {
+static void* mouse_task(void *arg) {
   (void)arg;
   struct pollfd mpoll[1];
   int mpollrc;
@@ -767,7 +769,7 @@ void stop_cpu_emulation(uint8_t disasm_cur) {
   do_disasm = 0;
 }
 
-void sigint_handler(int sig_num) {
+static void sigint_handler(int sig_num) {
   (void)sig_num;
   sigint_seen = 1;
   end_signal = 1;
@@ -938,7 +940,7 @@ int main(int argc, char* argv[]) {
   }
 
 switch_config:
-  srand(clock());
+  srand((unsigned int)clock());
 
   amiga_reset_and_wait("startup");
 
@@ -1183,7 +1185,7 @@ void cpu_pulse_reset(void) {
 
 unsigned int cpu_irq_ack(int level) {
   // printf( "cpu irq ack\n" );
-  return 24 + level;
+  return (unsigned int)(24 + level);
 }
 
 static unsigned int target = 0;
@@ -1199,20 +1201,20 @@ unsigned int garbage = 0;
 static inline uint32_t ps_read(uint8_t type, uint32_t addr) {
   switch (type) {
   case OP_TYPE_BYTE:
-    return ps_read_8(addr);
+    return (uint32_t)ps_read_8(addr);
   case OP_TYPE_WORD:
-    return ps_read_16(addr);
+    return (uint32_t)ps_read_16(addr);
   case OP_TYPE_LONGWORD:
     if (addr & 0x01) {
-      uint32_t c = ps_read_8(addr);
-      c |= (be16toh(ps_read_16(addr + 1)) << 8);
-      c |= (ps_read_8(addr + 3) << 24);
+      uint32_t c = (uint32_t)ps_read_8(addr);
+      c |= ((uint32_t)be16toh(ps_read_16(addr + 1)) << 8);
+      c |= ((uint32_t)ps_read_8(addr + 3) << 24);
       return htobe32(c);
     }
     {
-      uint16_t a = ps_read_16(addr);
-      uint16_t b = ps_read_16(addr + 2);
-      return ((uint32_t)a << 16) | b;
+      uint32_t a = (uint32_t)ps_read_16(addr);
+      uint32_t b = (uint32_t)ps_read_16(addr + 2);
+      return (a << 16) | b;
     }
   }
   // This shouldn't actually happen.
@@ -1222,20 +1224,20 @@ static inline uint32_t ps_read(uint8_t type, uint32_t addr) {
 static inline void ps_write(uint8_t type, uint32_t addr, uint32_t val) {
   switch (type) {
   case OP_TYPE_BYTE:
-    ps_write_8(addr, val);
+    ps_write_8(addr, (uint8_t)val);
     return;
   case OP_TYPE_WORD:
-    ps_write_16(addr, val);
+    ps_write_16(addr, (uint16_t)val);
     return;
   case OP_TYPE_LONGWORD:
     if (addr & 0x01) {
-      ps_write_8(addr, val & 0xFF);
-      ps_write_16(addr + 1, htobe16(((val >> 8) & 0xFFFF)));
-      ps_write_8(addr + 3, (val >> 24));
+      ps_write_8(addr, (uint8_t)(val & 0xFF));
+      ps_write_16(addr + 1, htobe16((uint16_t)((val >> 8) & 0xFFFF)));
+      ps_write_8(addr + 3, (uint8_t)(val >> 24));
       return;
     }
-    ps_write_16(addr, val >> 16);
-    ps_write_16(addr + 2, val);
+    ps_write_16(addr, (uint16_t)(val >> 16));
+    ps_write_16(addr + 2, (uint16_t)val);
     return;
   }
   // This shouldn't actually happen.
@@ -1276,7 +1278,7 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
         uint8_t c = 0, t = 0;
         pop_queued_key(&c, &t);
         t ^= 0x01;
-        rres = ((c << 1) | t) ^ 0xFF;
+        rres = (uint32_t)((((uint32_t)c << 1) | t) ^ 0xFFu);
         *res = rres;
         return 1;
       }
@@ -1284,8 +1286,8 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
       break;
     case JOY0DAT:
       if (mouse_hook_enabled) {
-        unsigned short result = (mouse_dy << 8) | (mouse_dx);
-        *res = (unsigned int)result;
+        uint16_t result = (uint16_t)(((uint16_t)mouse_dy << 8) | mouse_dx);
+        *res = (uint32_t)result;
         return 1;
       }
       return 0;
@@ -1294,7 +1296,7 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
       // This code is kind of strange and should probably be reworked/revoked.
       uint8_t enable = 1;
       rres = (uint16_t)ps_read(type, addr);
-      uint16_t val = rres;
+      uint16_t val = (uint16_t)rres;
       if (val & 0x0007) {
         ipl_enabled[1] = enable;
       }
@@ -1430,7 +1432,7 @@ unsigned int m68k_read_memory_16(unsigned int address) {
   }
 
   if (address & 0x01) {
-    return ((ps_read_8(address) << 8) | ps_read_8(address + 1));
+    return ((unsigned int)(ps_read_8(address) << 8) | (unsigned int)ps_read_8(address + 1));
   }
   return (unsigned int)ps_read_16((uint32_t)address);
 }
@@ -1445,9 +1447,9 @@ unsigned int m68k_read_memory_32(unsigned int address) {
   }
 
   if (address & 0x01) {
-    return ps_read(OP_TYPE_LONGWORD, address);
+    return (unsigned int)ps_read(OP_TYPE_LONGWORD, address);
   }
-  return ps_read(OP_TYPE_LONGWORD, address);
+  return (unsigned int)ps_read(OP_TYPE_LONGWORD, address);
 }
 
 static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t val) {
@@ -1605,7 +1607,7 @@ void m68k_write_memory_8(unsigned int address, unsigned int value) {
     return;
   }
 
-  ps_write_8((uint32_t)address, value);
+  ps_write_8((uint32_t)address, (uint8_t)value);
   return;
 }
 
@@ -1619,12 +1621,12 @@ void m68k_write_memory_16(unsigned int address, unsigned int value) {
   }
 
   if (address & 0x01) {
-    ps_write_8((uint32_t)address, value & 0xFF);
-    ps_write_8((uint32_t)address + 1, (value >> 8) & 0xFF);
+    ps_write_8((uint32_t)address, (uint8_t)(value & 0xFF));
+    ps_write_8((uint32_t)address + 1, (uint8_t)((value >> 8) & 0xFF));
     return;
   }
 
-  ps_write_16((uint32_t)address, value);
+  ps_write_16((uint32_t)address, (uint16_t)value);
   return;
 }
 
@@ -1638,11 +1640,11 @@ void m68k_write_memory_32(unsigned int address, unsigned int value) {
   }
 
   if (address & 0x01) {
-    ps_write(OP_TYPE_LONGWORD, address, value);
+    ps_write(OP_TYPE_LONGWORD, address, (uint32_t)value);
     return;
   }
 
-  ps_write(OP_TYPE_LONGWORD, address, value);
+  ps_write(OP_TYPE_LONGWORD, address, (uint32_t)value);
   return;
 }
 static void set_affinity_for(const char* name, int core_id) {
@@ -1689,7 +1691,7 @@ static int realtime_allowed(void) {
 }
 
 static void apply_affinity_from_env(const char* role, int default_core) {
-  int target = default_core;
+  int target_core = default_core;
   int fallback = -1;
   int matched = 0;
   const char* env = getenv(PI_AFFINITY_ENV);
@@ -1702,7 +1704,7 @@ static void apply_affinity_from_env(const char* role, int default_core) {
       int val = -1;
       if (sscanf(tok, "%15[^=]=%d", key, &val) == 2) {
         if (key_matches_role(role, key)) {
-          target = val;
+          target_core = val;
           matched = 1;
         }
         if (!matched && role_has_input_fallback(role) && strcasecmp(key, "input") == 0) {
@@ -1714,9 +1716,9 @@ static void apply_affinity_from_env(const char* role, int default_core) {
     free(dup);
   }
   if (!matched && fallback >= 0) {
-    target = fallback;
+    target_core = fallback;
   }
-  set_affinity_for(role, target);
+  set_affinity_for(role, target_core);
 }
 
 static void set_realtime_priority(const char* name, int prio) {
@@ -1744,7 +1746,7 @@ static void set_realtime_priority(const char* name, int prio) {
 static void apply_realtime_from_env(const char* role, int default_prio) {
   static int rt_warned;
   int allowed = realtime_allowed();
-  int target = default_prio;
+  int target_prio = default_prio;
   int fallback = -1;
   int matched = 0;
   const char* env = getenv(PI_RT_ENV);
@@ -1756,7 +1758,7 @@ static void apply_realtime_from_env(const char* role, int default_prio) {
       int val = -1;
       if (sscanf(tok, "%15[^=]=%d", key, &val) == 2) {
         if (key_matches_role(role, key)) {
-          target = val;
+          target_prio = val;
           matched = 1;
         }
         if (!matched && role_has_input_fallback(role) && strcasecmp(key, "input") == 0) {
@@ -1767,7 +1769,7 @@ static void apply_realtime_from_env(const char* role, int default_prio) {
     }
     free(dup);
     if (!matched && fallback >= 0) {
-      target = fallback;
+      target_prio = fallback;
     }
   } else if (!allowed) {
     return;
@@ -1781,8 +1783,8 @@ static void apply_realtime_from_env(const char* role, int default_prio) {
     return;
   }
 
-  if (target > 0) {
-    set_realtime_priority(role, target);
+  if (target_prio > 0) {
+    set_realtime_priority(role, target_prio);
   }
 }
 
@@ -1795,20 +1797,27 @@ static void cli_add_line(const char* fmt, ...) {
   char buf[512];
   va_list args;
   va_start(args, fmt);
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+#endif
   vsnprintf(buf, sizeof(buf), fmt, args);
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
   va_end(args);
 
   cli_config_lines[cli_config_count++] = strdup(buf);
 }
 
-static void apply_cli_overrides(struct emulator_config* cfg) {
-  if (!cfg || cli_config_count == 0) {
+static void apply_cli_overrides(struct emulator_config* cfg_local) {
+  if (!cfg_local || cli_config_count == 0) {
     return;
   }
 
   for (int i = 0; i < cli_config_count; i++) {
     if (strncmp(cli_config_lines[i], "platform ", 9) == 0) {
-      apply_config_line(cfg, cli_config_lines[i], 0);
+      apply_config_line(cfg_local, cli_config_lines[i], 0);
     }
   }
 
@@ -1822,7 +1831,7 @@ static void apply_cli_overrides(struct emulator_config* cfg) {
 
   for (int i = 0; i < cli_config_count; i++) {
     if (strncmp(cli_config_lines[i], "setvar ", 7) == 0) {
-      apply_config_line(cfg, cli_config_lines[i], 0);
+      apply_config_line(cfg_local, cli_config_lines[i], 0);
     }
   }
 }

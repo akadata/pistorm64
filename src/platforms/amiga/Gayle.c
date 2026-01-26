@@ -15,13 +15,14 @@
 #include <unistd.h>
 #include <time.h>
 #include <endian.h>
+#include <inttypes.h>
 
 #include "platforms/shared/rtc.h"
 #include "config_file/config_file.h"
 
 #include "amiga-registers.h"
 
-//#define DEBUG_GAYLE
+#define DEBUG_GAYLE
 #ifdef DEBUG_GAYLE
 #define DEBUG printf
 #else
@@ -90,14 +91,14 @@ uint8_t* ide_allocate(const char* name) {
   return NULL;
 }
 
-void ide_attach_hdf(uint8_t* dummy, uint32_t idx, uint32_t fd) {
+void ide_attach_hdf(uint8_t* dummy, uint32_t idx, int fd) {
   if (dummy || idx || fd) {
   };
   printf("[!!!IDE] No IDE emulation layer available, HDF image not attached.\n");
   return;
 }
 
-void ide_attach(uint8_t* dummy, uint32_t idx, uint32_t fd) {
+void ide_attach(uint8_t* dummy, uint32_t idx, int fd) {
   if (dummy || idx || fd) {
   };
   printf("[!!!IDE] No IDE emulation layer available, image not mounted.\n");
@@ -128,7 +129,7 @@ uint16_t gayle_a4k_irq = 0;
 uint8_t gayle_a4k_int = 0;
 uint8_t gayle_int = 0;
 
-uint32_t gayle_ide_mask = ~GDATA;
+uint32_t gayle_ide_mask = ~(uint32_t)GDATA;
 uint32_t gayle_ide_base = GDATA;
 uint8_t gayle_ide_enabled = 1;
 uint8_t gayle_emulation_enabled = 1;
@@ -143,7 +144,7 @@ void adjust_gayle_4000(void) {
 void adjust_gayle_1200(void) {
 }
 
-void set_hard_drive_image_file_amiga(uint8_t index, char* filename) {
+void set_hard_drive_image_file_amiga(uint8_t index, const char* filename) {
   if (hdd_image_file[index] != NULL)
     free(hdd_image_file[index]);
   hdd_image_file[index] = calloc(1, strlen(filename) + 1);
@@ -167,11 +168,11 @@ void InitGayle(void) {
         printf("[HDD%d] Attaching HDD image %s.\n", i, hdd_image_file[i]);
         if (strcmp(hdd_image_file[i] + (strlen(hdd_image_file[i]) - 3), "img") != 0) {
           printf("No header present on HDD image %s.\n", hdd_image_file[i]);
-          ide_attach_hdf(ide0, i, fd);
+          ide_attach_hdf(ide0, (uint32_t)i, fd);
           num_ide_drives++;
         } else {
           printf("Attaching HDD image with header.\n");
-          ide_attach(ide0, i, fd);
+          ide_attach(ide0, (uint32_t)i, fd);
           num_ide_drives++;
         }
         printf("[HDD%d] HDD Image %s attached\n", i, hdd_image_file[i]);
@@ -223,15 +224,15 @@ void writeGayleB(unsigned int address, unsigned int value) {
         ide_action = ide_devctrl_w;
         goto idewrite8;
       case GIRQ_4000_OFFSET:
-        gayle_a4k_irq = value;
+        gayle_a4k_irq = (uint16_t)value;
         // Fallthrough
       case GIRQ_OFFSET:
-        gayle_irq = (gayle_irq & value) | (value & (GAYLE_IRQ_RESET | GAYLE_IRQ_BERR));
+        gayle_irq = (uint8_t)((gayle_irq & value) | (value & (GAYLE_IRQ_RESET | GAYLE_IRQ_BERR)));
         return;
       }
       goto skip_idewrite8;
     idewrite8:;
-      ide_write8(ide0, ide_action, value);
+      ide_write8(ide0, ide_action, (uint8_t)value);
       return;
     skip_idewrite8:;
     }
@@ -248,19 +249,19 @@ void writeGayleB(unsigned int address, unsigned int value) {
     return;
   case GCONF:
     // printf("Write to GCONF: %d\n", gayle_cfg);
-    gayle_cfg = value;
+    gayle_cfg = (uint8_t)value;
     return;
   case RAMSEY_REG:
-    ramsey_cfg = value & 0x0F;
+    ramsey_cfg = (uint8_t)(value & 0x0F);
     return;
   case GINT:
-    gayle_int = value;
+    gayle_int = (uint8_t)value;
     return;
   case GCS:
-    gayle_cs_mask = value & ~3;
-    gayle_cs &= ~3;
-    gayle_cs |= value & 3;
-    printf("Write to GCS: %d\n", gayle_cs);
+    gayle_cs_mask = (uint8_t)(value & ~3u);
+    gayle_cs &= (uint8_t)~3u;
+    gayle_cs |= (uint8_t)(value & 3);
+    printf("Write to GCS: %d\n", (int)gayle_cs);
     // ide0->selected = gayle_cs;
     return;
   }
@@ -270,12 +271,12 @@ void writeGayleB(unsigned int address, unsigned int value) {
       if (cdtv_mode) {
         // printf("[CDTV] BYTE write to SRAM @%.8X (%.8X): %.2X\n", (address & CLOCKMASK) - 0x8000,
         // address, value);
-        cdtv_sram[(address & CLOCKMASK) - 0x8000] = value;
+        cdtv_sram[(address & CLOCKMASK) - 0x8000] = (uint8_t)value;
       }
       return;
     }
     // printf("Byte write to RTC.\n");
-    put_rtc_byte(address, value, rtc_type);
+    put_rtc_byte(address, (uint8_t)value, rtc_type);
     return;
   }
 
@@ -285,12 +286,12 @@ void writeGayleB(unsigned int address, unsigned int value) {
 void writeGayle(unsigned int address, unsigned int value) {
   if (ide0) {
     if (address - gayle_ide_base == GDATA_OFFSET) {
-      ide_write16(ide0, ide_data, value);
+      ide_write16(ide0, ide_data, (uint16_t)value);
       return;
     }
 
     if (address == GIRQ_A4000) {
-      gayle_a4k_irq = value;
+      gayle_a4k_irq = (uint16_t)value;
       return;
     }
   }
@@ -306,8 +307,8 @@ void writeGayle(unsigned int address, unsigned int value) {
       return;
     }
     // printf("Word write to RTC.\n");
-    put_rtc_byte(address + 1, (value & 0xFF), rtc_type);
-    put_rtc_byte(address, (value >> 8), rtc_type);
+    put_rtc_byte(address + 1, (uint8_t)(value & 0xFF), rtc_type);
+    put_rtc_byte(address, (uint8_t)((value >> 8) & 0xFF), rtc_type);
     return;
   }
 
@@ -326,10 +327,10 @@ void writeGayleL(unsigned int address, unsigned int value) {
       return;
     }
     // printf("Longword write to RTC.\n");
-    put_rtc_byte(address + 3, (value & 0xFF), rtc_type);
-    put_rtc_byte(address + 2, ((value & 0x0000FF00) >> 8), rtc_type);
-    put_rtc_byte(address + 1, ((value & 0x00FF0000) >> 16), rtc_type);
-    put_rtc_byte(address, (value >> 24), rtc_type);
+    put_rtc_byte(address + 3, (uint8_t)(value & 0xFF), rtc_type);
+    put_rtc_byte(address + 2, (uint8_t)((value >> 8) & 0xFF), rtc_type);
+    put_rtc_byte(address + 1, (uint8_t)((value >> 16) & 0xFF), rtc_type);
+    put_rtc_byte(address, (uint8_t)((value >> 24) & 0xFF), rtc_type);
     return;
   }
 
@@ -338,33 +339,33 @@ void writeGayleL(unsigned int address, unsigned int value) {
 
 uint8_t readGayleB(unsigned int address) {
   if (ide0) {
-    uint8_t ide_action = 0, ide_val = 0;
+    uint8_t ide_action_local = 0, ide_val = 0;
 
     if (address >= gayle_ide_base) {
       switch ((address - gayle_ide_base) - gayle_ide_adj) {
       case GERROR_OFFSET:
-        ide_action = ide_error_r;
+        ide_action_local = ide_error_r;
         goto ideread8;
       case GSTATUS_OFFSET:
-        ide_action = ide_status_r;
+        ide_action_local = ide_status_r;
         goto ideread8;
       case GSECTCOUNT_OFFSET:
-        ide_action = ide_sec_count;
+        ide_action_local = ide_sec_count;
         goto ideread8;
       case GSECTNUM_OFFSET:
-        ide_action = ide_sec_num;
+        ide_action_local = ide_sec_num;
         goto ideread8;
       case GCYLLOW_OFFSET:
-        ide_action = ide_cyl_low;
+        ide_action_local = ide_cyl_low;
         goto ideread8;
       case GCYLHIGH_OFFSET:
-        ide_action = ide_cyl_hi;
+        ide_action_local = ide_cyl_hi;
         goto ideread8;
       case GDEVHEAD_OFFSET:
-        ide_action = ide_dev_head;
+        ide_action_local = ide_dev_head;
         goto ideread8;
       case GCTRL_OFFSET:
-        ide_action = ide_altst_r;
+        ide_action_local = ide_altst_r;
         goto ideread8;
       case GIRQ_4000_OFFSET:
       case GIRQ_OFFSET:
@@ -373,7 +374,7 @@ uint8_t readGayleB(unsigned int address) {
       }
       goto skip_ideread8;
     ideread8:;
-      ide_val = ide_read8(ide0, ide_action);
+      ide_val = ide_read8(ide0, ide_action_local);
       return ide_val;
     skip_ideread8:;
     }
@@ -477,7 +478,7 @@ uint16_t readGayle(unsigned int address) {
       return 0;
     }
     // printf("Word read from RTC.\n");
-    return ((get_rtc_byte(address, rtc_type) << 8) | (get_rtc_byte(address + 1, rtc_type)));
+    return (uint16_t)((get_rtc_byte(address, rtc_type) << 8) | (get_rtc_byte(address + 1, rtc_type)));
   }
 
   DEBUG("Read Word From Gayle Space 0x%06x\n", address);
@@ -497,7 +498,7 @@ uint32_t readGayleL(unsigned int address) {
       return 0;
     }
     // printf("Longword read from RTC.\n");
-    return ((get_rtc_byte(address, rtc_type) << 24) | (get_rtc_byte(address + 1, rtc_type) << 16) |
+    return (uint32_t)((get_rtc_byte(address, rtc_type) << 24) | (get_rtc_byte(address + 1, rtc_type) << 16) |
             (get_rtc_byte(address + 2, rtc_type) << 8) | (get_rtc_byte(address + 3, rtc_type)));
   }
 

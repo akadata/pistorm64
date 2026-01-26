@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char* platform_names[PLATFORM_NUM] = {
+static const char* platform_names[PLATFORM_NUM] = {
     "none",
     "amiga",
     "mac68k",
     "x68000",
 };
 
-int get_platform_index(char* name) {
+static int get_platform_index(const char* name) {
   if (!name || strlen(name) == 0)
     return -1;
 
@@ -23,11 +23,11 @@ int get_platform_index(char* name) {
   return -1;
 }
 
-void create_platform_amiga(struct platform_config* cfg, char* subsys);
-void create_platform_mac68k(struct platform_config* cfg, char* subsys);
-void create_platform_dummy(struct platform_config* cfg, char* subsys);
+void create_platform_amiga(struct platform_config* cfg, const char* subsys);
+void create_platform_mac68k(struct platform_config* cfg, const char* subsys);
+void create_platform_dummy(struct platform_config* cfg, const char* subsys);
 
-struct platform_config* make_platform_config(char* name, char* subsys) {
+struct platform_config* make_platform_config(const char* name, const char* subsys) {
   struct platform_config* cfg = NULL;
   int platform_id = get_platform_index(name);
 

@@ -34,7 +34,7 @@ const char* mapcmd_names[MAPCMD_NUM] = {
     "file", "ovl",  "id",      "autodump_file", "autodump_mem",
 };
 
-int get_config_item_type(char* cmd) {
+static int get_config_item_type(char* cmd) {
   if (strcasecmp(cmd, "rt-prio") == 0) {
     return CONFITEM_RTPRIO;
   }
@@ -48,11 +48,11 @@ int get_config_item_type(char* cmd) {
   return CONFITEM_NONE;
 }
 
-unsigned int get_m68k_cpu_type(char* name) {
+unsigned int get_m68k_cpu_type(const char* name) {
   for (int i = 0; i < M68K_CPU_TYPES; i++) {
     if (strcmp(name, cpu_types[i]) == 0) {
       printf("[CFG] Set CPU type to %s.\n", cpu_types[i]);
-      return i + 1;
+      return (unsigned int)(i + 1);
     }
   }
 
@@ -60,36 +60,36 @@ unsigned int get_m68k_cpu_type(char* name) {
   return M68K_CPU_TYPE_68000;
 }
 
-unsigned int get_map_cmd(char* name) {
+static unsigned int get_map_cmd(char* name) {
   for (int i = 1; i < MAPCMD_NUM; i++) {
     if (strcmp(name, mapcmd_names[i]) == 0) {
-      return i;
+      return (unsigned int)i;
     }
   }
 
   return MAPCMD_UNKNOWN;
 }
 
-unsigned int get_map_type(char* name) {
+static unsigned int get_map_type(char* name) {
   for (int i = 1; i < MAPTYPE_NUM; i++) {
     if (strcmp(name, map_type_names[i]) == 0) {
-      return i;
+      return (unsigned int)i;
     }
   }
 
   return MAPTYPE_NONE;
 }
 
-void trim_whitespace(char* str) {
+static void trim_whitespace(char* str) {
   while (strlen(str) != 0 && (str[strlen(str) - 1] == ' ' || str[strlen(str) - 1] == '\t' ||
                               str[strlen(str) - 1] == 0x0A || str[strlen(str) - 1] == 0x0D)) {
     str[strlen(str) - 1] = '\0';
   }
 }
 
-unsigned int get_int(char* str) {
+unsigned int get_int(const char* str) {
   if (strlen(str) == 0)
-    return -1;
+    return (unsigned int)-1;
 
   unsigned int ret_int = 0;
 
@@ -157,7 +157,7 @@ unsigned int get_int(char* str) {
   }
 }
 
-void get_next_string(char* str, char* str_out, int* strpos, char separator) {
+static void get_next_string(char* str, char* str_out, int* strpos, char separator) {
   int str_pos = 0, out_pos = 0, startquote = 0, endstring = 0;
 
   if (!str_out)
@@ -399,9 +399,10 @@ mapid[sizeof(mapid) - 1] = '\0';  // Ensure null termination
 }
 
 void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int addr,
-                 unsigned int size, int mirr_addr, char* filename, char* map_id,
+                 unsigned int size, unsigned int mirr_addr, char* filename, const char* map_id,
                  unsigned int autodump) {
-  unsigned int index = 0, file_size = 0;
+  unsigned int index = 0;
+  long file_size = 0;
   FILE* in = NULL;
 
   while (index < MAX_NUM_MAPPED_ITEMS) {
@@ -415,7 +416,7 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
     return;
   }
 
-  cfg->map_type[index] = type;
+  cfg->map_type[index] = (unsigned char)type;
   cfg->map_offset[index] = addr;
   cfg->map_size[index] = size;
   cfg->map_high[index] = addr + size;
@@ -450,7 +451,8 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
     if (type == MAPTYPE_RAM_WTC) {
       // This may look a bit weird, but it adds a read range for the WTC RAM. Writes still go
       // through to the mapped read/write functions.
-      m68k_add_rom_range(cfg->map_offset[index], cfg->map_high[index], cfg->map_data[index]);
+      m68k_add_rom_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                         cfg->map_data[index]);
     }
     break;
   case MAPTYPE_ROM:
@@ -465,7 +467,7 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
         printf("[CFG] Could not open file %s for ROM mapping. Autodump flag is set, dumping to "
                "file.\n",
                filename);
-        dump_range_to_file(cfg->map_offset[index], cfg->map_size[index], filename);
+        dump_range_to_file((uint32_t)cfg->map_offset[index], cfg->map_size[index], filename);
         in = fopen(filename, "rb");
         if (in == NULL) {
           printf("[CFG] Could not open dumped file for reading. Using onboard ROM instead, if "
@@ -476,7 +478,8 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
         printf("[CFG] Could not open file %s for ROM mapping. Autodump flag is set, dumping to "
                "memory.\n",
                filename);
-        cfg->map_data[index] = dump_range_to_memory(cfg->map_offset[index], cfg->map_size[index]);
+        cfg->map_data[index] =
+            dump_range_to_memory((uint32_t)cfg->map_offset[index], cfg->map_size[index]);
         cfg->rom_size[index] = cfg->map_size[index];
         if (cfg->map_data[index] == NULL) {
           printf(
@@ -487,14 +490,20 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
       }
     }
     fseek(in, 0, SEEK_END);
-    file_size = (int)ftell(in);
+    file_size = ftell(in);
+    if (file_size < 0) {
+      printf("[CFG] Failed to determine file size for %s.\n", filename);
+      goto mapping_failed;
+    }
     if (size == 0) {
-      cfg->map_size[index] = file_size;
+      cfg->map_size[index] = (unsigned int)file_size;
       cfg->map_high[index] = addr + cfg->map_size[index];
     }
     fseek(in, 0, SEEK_SET);
     cfg->map_data[index] = (unsigned char*)calloc(1, cfg->map_size[index]);
-    cfg->rom_size[index] = (cfg->map_size[index] <= file_size) ? cfg->map_size[index] : file_size;
+    cfg->rom_size[index] =
+        (cfg->map_size[index] <= (unsigned long)file_size) ? cfg->map_size[index]
+                                                           : (unsigned int)file_size;
     if (!cfg->map_data[index]) {
       printf("[CFG] ERROR: Unable to allocate memory for mapped ROM!\n");
       goto mapping_failed;
@@ -506,7 +515,8 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
   skip_file_ops:
     displayRomInfo(cfg->map_data[index], cfg->rom_size[index]);
     if (cfg->map_size[index] == cfg->rom_size[index])
-      m68k_add_rom_range(cfg->map_offset[index], cfg->map_high[index], cfg->map_data[index]);
+      m68k_add_rom_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                         cfg->map_data[index]);
     if (cfg->map_data[index] && cfg->map_size[index]) {
       if (mlock(cfg->map_data[index], cfg->map_size[index]) != 0) {
         printf("[CFG] Warning: mlock on ROM mapping failed (%s)\n", strerror(errno));
@@ -568,7 +578,7 @@ void free_config_file(struct emulator_config* cfg) {
   printf("[CFG] Config file freed. Maybe.\n");
 }
 
-struct emulator_config* load_config_file(char* filename) {
+struct emulator_config* load_config_file(const char* filename) {
   FILE* in = fopen(filename, "rb");
   if (in == NULL) {
     printf("[CFG] Failed to open config file %s for reading.\n", filename);
@@ -618,7 +628,7 @@ load_successful:;
   return cfg;
 }
 
-int get_named_mapped_item(struct emulator_config* cfg, char* name) {
+int get_named_mapped_item(struct emulator_config* cfg, const char* name) {
   if (strlen(name) == 0)
     return -1;
 

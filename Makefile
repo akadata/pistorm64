@@ -24,23 +24,27 @@ PLATFORM=PI4_64BIT
 PISTORM_ENABLE_BATCH=1
 PISTORM_IPL_RATELIMIT_US=100  
 
-
-
 PISTORM_KMOD ?= 1
-EXTRA_CFLAGS ?=
-EXTRA_M68K_CFLAGS ?= -O3 -ffast-math
-EXTRA_LDFLAGS ?=
 
+# Default compilers (can still override with CC=... directly)
+CC  ?= gcc
+CXX ?= g++
 
+# Legacy shorthand: make C=clang or make C=gcc
 ifeq ($(C),clang)
-CC := clang
+CC  := clang
 CXX := clang++
 endif
 
 ifeq ($(C),gcc)
-CC := gcc
+CC  := gcc
 CXX := g++
 endif
+
+
+EXTRA_CFLAGS ?=
+EXTRA_M68K_CFLAGS ?= -O3 -ffast-math
+EXTRA_LDFLAGS ?=
 
 
 # Tunables: edit here instead of hunting through rule bodies.
@@ -60,7 +64,18 @@ endif
 # OMIT_FP    : set to 1 to omit frame pointers (-fomit-frame-pointer) for perf.
 # USE_PIPE   : set to 1 to add -pipe to compile steps.
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
-WARNINGS   ?= -Wall -Wextra -pedantic
+#
+# Base warnings
+WARNINGS      ?= -Wall -Wextra -pedantic
+
+# Extra-aggressive warnings for emulator / non-Musashi code
+EMU_WARNINGS  ?= \
+  $(WARNINGS) \
+  -Wformat=2 -Wwrite-strings -Wcast-qual -Wcast-align \
+  -Wpointer-arith -Wstrict-overflow=5 -Wstrict-prototypes -Wmissing-prototypes \
+  -Wswitch-enum -Wshadow \
+  -Wconversion -Wsign-conversion \
+  -Wundef -Wvla -Wredundant-decls
 OPT_LEVEL  ?= -O3 -ffast-math
 
 ifdef O
@@ -93,7 +108,20 @@ USE_PIPE   ?= 1
 PISTORM_KMOD ?= 1
 
 # Quiet noisy-but-benign warnings from the generated 68k core.
-M68K_WARN_SUPPRESS ?= -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable
+# Split into common + GCC-only; clang doesn't support every GCC flag.
+M68K_WARN_SUPPRESS_COMMON = \
+  -Wno-unused-variable \
+  -Wno-unused-parameter
+
+M68K_WARN_SUPPRESS_GCC = \
+  -Wno-unused-but-set-variable
+
+# Pick suppressions based on the actual compiler (CC), not C.
+ifeq ($(findstring clang,$(CC)),clang)
+  M68K_WARN_SUPPRESS ?= $(M68K_WARN_SUPPRESS_COMMON)
+else
+  M68K_WARN_SUPPRESS ?= $(M68K_WARN_SUPPRESS_COMMON) $(M68K_WARN_SUPPRESS_GCC)
+endif
 
 # Default CPU flags; overridden by PLATFORM selections below.
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
@@ -287,9 +315,9 @@ INCLUDES += -Iinclude -Iinclude/uapi
 DEFINES  += -DPISTORM_KMOD
 endif
 
-CFLAGS       = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
-CXXFLAGS     = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
-M68K_CFLAGS   = $(CFLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
+CFLAGS       = $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
+CXXFLAGS     = $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
+M68K_CFLAGS   = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
 LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS) $(EXTRA_LDFLAGS)
 
 LDLIBS   = $(RAYLIB_LIBS) $(LIBS) $(LDLIBS_VC) $(LDLIBS_ALSA)
@@ -341,7 +369,7 @@ src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
 
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
 
 buptest:
 	@if [ -f src/buptest/buptest.c ]; then \

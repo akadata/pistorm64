@@ -17,7 +17,7 @@ static void getDiagRom(uint8_t* address, struct romInfo* info) {
     return;
   }
   ptr++;
-  info->major = strtoul((const char*)ptr, &endptr, 10);
+  info->major = (uint16_t)strtoul((const char*)ptr, &endptr, 10);
   if (!endptr) {
     return;
   }
@@ -27,7 +27,7 @@ static void getDiagRom(uint8_t* address, struct romInfo* info) {
     return;
   }
   endptr++;
-  info->minor = strtoul(endptr, &endptr, 10);
+  info->minor = (uint16_t)strtoul(endptr, &endptr, 10);
   if (!endptr) {
     return;
   }
@@ -38,7 +38,7 @@ static void getDiagRom(uint8_t* address, struct romInfo* info) {
     return;
   }
   endptr++;
-  info->extra = strtoul(endptr, NULL, 10);
+  info->extra = (uint16_t)strtoul(endptr, NULL, 10);
 }
 
 static void swapRom(uint8_t* address, size_t length) {
@@ -92,9 +92,9 @@ static void getRomInfo(uint8_t* address, size_t length, struct romInfo* info) {
   // This is wrong endian for us
   uint16_t ver_read;
   memcpy(&ver_read, address + 12, 2);
-  info->major = (ver_read >> 8) | (ver_read << 8);
+  info->major = (uint16_t)((ver_read >> 8) | (ver_read << 8));
   memcpy(&ver_read, address + 14, 2);
-  info->minor = (ver_read >> 8) | (ver_read << 8);
+  info->minor = (uint16_t)((ver_read >> 8) | (ver_read << 8));
   // We hit part of a memory ptr for DiagROM, it will be > 200
   if (info->major > 100) {
     getDiagRom(address, info);
@@ -173,6 +173,9 @@ void displayRomInfo(uint8_t* address, size_t length) {
     }
   }
   switch (info.id) {
+  case ROM_TYPE_UNKNOWN:
+    size = "";
+    break;
   case ROM_TYPE_256:
     size = "256KB";
     break;

@@ -90,7 +90,7 @@ void ps_setup_protocol() {
   *(gpio + 2) = GPFSEL2_INPUT;
 }
 
-void ps_write_16(unsigned int address, unsigned int data) {
+void ps_write_16(uint32_t address, uint16_t data) {
   *(gpio + 0) = GPFSEL0_OUTPUT;
   *(gpio + 1) = GPFSEL1_OUTPUT;
   *(gpio + 2) = GPFSEL2_OUTPUT;
@@ -105,7 +105,7 @@ void ps_write_16(unsigned int address, unsigned int data) {
   *(gpio + 10) = 1 << PIN_WR;
   *(gpio + 10) = 0xffffec;
 
-  *(gpio + 7) = ((0x0000 | (address >> 16)) << 8) | (REG_ADDR_HI << PIN_A0);
+  *(gpio + 7) = ((0x0200 | (address >> 16)) << 8) | (REG_ADDR_HI << PIN_A0);
   *(gpio + 7) = 1 << PIN_WR;
   *(gpio + 10) = 1 << PIN_WR;
   *(gpio + 10) = 0xffffec;
@@ -118,17 +118,18 @@ void ps_write_16(unsigned int address, unsigned int data) {
     ;
 }
 
-void ps_write_8(unsigned int address, unsigned int data) {
+void ps_write_8(uint32_t address, uint8_t data) {
+  unsigned int data_temp = data;
   if ((address & 1) == 0)
-    data = data + (data << 8);  // EVEN, A0=0,UDS
+    data_temp = data_temp + (data_temp << 8);  // EVEN, A0=0,UDS
   else
-    data = data & 0xff;  // ODD , A0=1,LDS
+    data_temp = data_temp & 0xff;  // ODD , A0=1,LDS
 
   *(gpio + 0) = GPFSEL0_OUTPUT;
   *(gpio + 1) = GPFSEL1_OUTPUT;
   *(gpio + 2) = GPFSEL2_OUTPUT;
 
-  *(gpio + 7) = ((data & 0xffff) << 8) | (REG_DATA << PIN_A0);
+  *(gpio + 7) = ((data_temp & 0xffff) << 8) | (REG_DATA << PIN_A0);
   *(gpio + 7) = 1 << PIN_WR;
   *(gpio + 10) = 1 << PIN_WR;
   *(gpio + 10) = 0xffffec;
@@ -151,12 +152,12 @@ void ps_write_8(unsigned int address, unsigned int data) {
     ;
 }
 
-void ps_write_32(unsigned int address, unsigned int value) {
-  ps_write_16(address, value >> 16);
-  ps_write_16(address + 2, value);
+void ps_write_32(uint32_t address, uint32_t value) {
+  ps_write_16(address, (uint16_t)(value >> 16));
+  ps_write_16(address + 2, (uint16_t)value);
 }
 
-unsigned int ps_read_16(unsigned int address) {
+uint16_t ps_read_16(uint32_t address) {
   *(gpio + 0) = GPFSEL0_OUTPUT;
   *(gpio + 1) = GPFSEL1_OUTPUT;
   *(gpio + 2) = GPFSEL2_OUTPUT;
@@ -185,10 +186,10 @@ unsigned int ps_read_16(unsigned int address) {
 
   *(gpio + 10) = 0xffffec;
 
-  return (value >> 8) & 0xffff;
+  return (uint16_t)((value >> 8) & 0xffff);
 }
 
-unsigned int ps_read_8(unsigned int address) {
+uint8_t ps_read_8(uint32_t address) {
   *(gpio + 0) = GPFSEL0_OUTPUT;
   *(gpio + 1) = GPFSEL1_OUTPUT;
   *(gpio + 2) = GPFSEL2_OUTPUT;
@@ -220,18 +221,18 @@ unsigned int ps_read_8(unsigned int address) {
   value = (value >> 8) & 0xffff;
 
   if ((address & 1) == 0)
-    return (value >> 8) & 0xff;  // EVEN, A0=0,UDS
+    return (uint8_t)((value >> 8) & 0xff);  // EVEN, A0=0,UDS
   else
-    return value & 0xff;  // ODD , A0=1,LDS
+    return (uint8_t)(value & 0xff);  // ODD , A0=1,LDS
 }
 
-unsigned int ps_read_32(unsigned int address) {
-  unsigned int a = ps_read_16(address);
-  unsigned int b = ps_read_16(address + 2);
-  return (a << 16) | b;
+uint32_t ps_read_32(uint32_t address) {
+  uint16_t a = ps_read_16(address);
+  uint16_t b = ps_read_16(address + 2);
+  return ((uint32_t)a << 16) | b;
 }
 
-void ps_write_status_reg(unsigned int value) {
+void ps_write_status_reg(uint16_t value) {
   *(gpio + 0) = GPFSEL0_OUTPUT;
   *(gpio + 1) = GPFSEL1_OUTPUT;
   *(gpio + 2) = GPFSEL2_OUTPUT;
@@ -248,7 +249,7 @@ void ps_write_status_reg(unsigned int value) {
   *(gpio + 2) = GPFSEL2_INPUT;
 }
 
-unsigned int ps_read_status_reg() {
+uint16_t ps_read_status_reg() {
   *(gpio + 7) = (REG_STATUS << PIN_A0);
   *(gpio + 7) = 1 << PIN_RD;
   *(gpio + 7) = 1 << PIN_RD;
@@ -259,7 +260,7 @@ unsigned int ps_read_status_reg() {
 
   *(gpio + 10) = 0xffffec;
 
-  return (value >> 8) & 0xffff;
+  return (uint16_t)((value >> 8) & 0xffff);
 }
 
 void ps_reset_state_machine() {

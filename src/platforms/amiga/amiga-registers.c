@@ -17,8 +17,9 @@ void configure_rtc_emulation_amiga(uint8_t enabled) {
 
 int handle_register_read_amiga(unsigned int addr, unsigned char type, unsigned int* val) {
   if (gayle_emulation_enabled) {
-    if (!rtc_emulation_enabled && addr >= CLOCKBASE && addr < CLOCKBASE + CLOCKSIZE)
+    if (!rtc_emulation_enabled && addr >= CLOCKBASE && addr < CLOCKBASE + CLOCKSIZE) {
       return -1;
+    }
     if (addr >= GAYLEBASE && addr < GAYLEBASE + GAYLESIZE) {
       switch (type) {
       case OP_TYPE_BYTE:
@@ -44,8 +45,9 @@ int handle_register_read_amiga(unsigned int addr, unsigned char type, unsigned i
 
 int handle_register_write_amiga(unsigned int addr, unsigned int value, unsigned char type) {
   if (gayle_emulation_enabled) {
-    if (!rtc_emulation_enabled && addr >= CLOCKBASE && addr < CLOCKBASE + CLOCKSIZE)
+    if (!rtc_emulation_enabled && addr >= CLOCKBASE && addr < CLOCKBASE + CLOCKSIZE) {
       return -1;
+    }
     if (addr >= GAYLEBASE && addr < GAYLEBASE + GAYLESIZE) {
       switch (type) {
       case OP_TYPE_BYTE:
@@ -68,3 +70,4 @@ int handle_register_write_amiga(unsigned int addr, unsigned int value, unsigned 
   }
   return -1;
 }
+
