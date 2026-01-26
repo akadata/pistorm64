@@ -1007,7 +1007,9 @@ int InitPlatform(void)
     SetupFramebuffer(CORE.Window.display.width, CORE.Window.display.height);
 
     // There must be at least one frame displayed before the buffers are swapped
-    //eglSwapInterval(platform.device, 1);
+    // Enable VSync if the flag is set
+    if (CORE.Window.flags & FLAG_VSYNC_HINT) eglSwapInterval(platform.device, 1);
+    else eglSwapInterval(platform.device, 0);
 
     EGLBoolean result = eglMakeCurrent(platform.device, platform.surface, platform.surface, platform.context);
 

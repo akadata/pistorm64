@@ -466,7 +466,11 @@ void* rtgThread(void* args) {
     return args;
   }
   HideCursor();
-  SetTargetFPS(60);
+
+  // Enable VSync to synchronize with display refresh rate and reduce tearing
+  SetConfigFlags(FLAG_VSYNC_HINT);
+  // Set target FPS to 0 to let VSync control the frame rate
+  SetTargetFPS(0);
 
   Color bef = {0, 64, 128, 255};
   Color black = {0, 0, 0, 255};
