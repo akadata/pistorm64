@@ -24,7 +24,7 @@
 #include "amiga-platform.h"
 #include "a314/a314.h"
 
-//#define DEBUG_AMIGA_PLATFORM
+#define DEBUG_AMIGA_PLATFORM
 
 #ifdef DEBUG_AMIGA_PLATFORM
 #define DEBUG LOG_DEBUG
@@ -70,11 +70,18 @@ extern int force_move_slow_to_chip;
 #define min(a, b) (a < b) ? a : b
 #define max(a, b) (a > b) ? a : b
 
-uint8_t rtg_enabled = 0, piscsi_enabled = 0, pinet_enabled = 0, kick13_mode = 0,
-        pistorm_dev_enabled = 1, pi_ahi_enabled = 0, physical_z2_first = 0;
-uint8_t a314_emulation_enabled = 0, a314_initialized = 0;
+uint8_t rtg_enabled = 0;
+uint8_t piscsi_enabled = 0;
+uint8_t pinet_enabled = 0;
+uint8_t kick13_mode = 0;
+uint8_t pistorm_dev_enabled = 1;
+uint8_t pi_ahi_enabled = 0;
+uint8_t physical_z2_first = 0;
+uint8_t a314_emulation_enabled = 0;
+uint8_t a314_initialized = 0;
 
-extern uint32_t piscsi_base, pistorm_dev_base;
+extern uint32_t piscsi_base;
+extern uint32_t pistorm_dev_base;
 extern uint8_t rtg_dpms;
 
 extern void stop_cpu_emulation(uint8_t disasm_cur);
@@ -83,9 +90,9 @@ static uint32_t ac_waiting_for_physical_pic = 0;
 
 int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int* val,
                              unsigned char type) {
-  if (kick13_mode)
+  if (kick13_mode) {
     ac_z3_done = 1;
-
+  }
   if ((!ac_z2_done || !ac_z3_done) && addr >= AC_Z2_BASE && addr < AC_Z2_BASE + AC_SIZE) {
     if (physical_z2_first) {
       if (addr == AC_Z2_BASE) {
@@ -186,9 +193,9 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
 
 int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned int val,
                               unsigned char type) {
-  if (kick13_mode)
+  if (kick13_mode) {
     ac_z3_done = 1;
-
+  }
   if ((!ac_z2_done || !ac_z3_done) && addr >= AC_Z2_BASE && addr < AC_Z2_BASE + AC_SIZE) {
     if (physical_z2_first && ac_waiting_for_physical_pic) {
       return -1;
@@ -309,34 +316,38 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
       cfg->custom_high = max(cfg->custom_high, AC_Z3_BASE + AC_SIZE);
   }*/
   if (rtg_enabled) {
-    if (cfg->custom_low == 0)
+    if (cfg->custom_low == 0) {
       cfg->custom_low = PIGFX_RTG_BASE;
-    else
+    } else {
       cfg->custom_low = min(cfg->custom_low, PIGFX_RTG_BASE);
+    }
     cfg->custom_high = max(cfg->custom_high, PIGFX_UPPER);
   }
   if (piscsi_enabled) {
-    if (cfg->custom_low == 0)
+    if (cfg->custom_low == 0) {
       cfg->custom_low = PISCSI_OFFSET;
-    else
+    } else {
       cfg->custom_low = min(cfg->custom_low, PISCSI_OFFSET);
+    }
     cfg->custom_high = max(cfg->custom_high, PISCSI_UPPER);
     if (piscsi_base != 0) {
       cfg->custom_low = min(cfg->custom_low, piscsi_base);
     }
   }
   if (pi_ahi_enabled) {
-    if (cfg->custom_low == 0)
+    if (cfg->custom_low == 0) {
       cfg->custom_low = PI_AHI_OFFSET;
-    else
+    } else {
       cfg->custom_low = min(cfg->custom_low, PI_AHI_OFFSET);
+    }
     cfg->custom_high = max(cfg->custom_high, PI_AHI_UPPER);
   }
   if (pinet_enabled) {
-    if (cfg->custom_low == 0)
+    if (cfg->custom_low == 0) {
       cfg->custom_low = PINET_OFFSET;
-    else
+    } else {
       cfg->custom_low = min(cfg->custom_low, PINET_OFFSET);
+    }
     cfg->custom_high = max(cfg->custom_high, PINET_UPPER);
   }
 
