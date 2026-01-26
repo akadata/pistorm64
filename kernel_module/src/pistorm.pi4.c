@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 //
 // PiStorm kernel backend: owns GPIO/GPCLK and exposes /dev/pistorm
+// Legacy out-of-tree version - for upstream version see drivers/misc/pistorm/
 
 #include <linux/bitops.h>
 #include <linux/delay.h>
@@ -654,7 +655,7 @@ MODULE_INFO(url, "https://github.com/akadata/pistorm64");
 MODULE_INFO(known_working, "Pi Zero 2 W (BCM2837, Pi 3-class)");
 MODULE_INFO(tested, "Pi 4-class (BCM2711) and Pi 3-class on Linux 6.12.62+rpt-rpi-v8");
 MODULE_INFO(targets, "BCM2837 (Pi 3-class), BCM2711 (Pi 4-class)");
-MODULE_INFO(intree, "N"); /* out-of-tree */
+MODULE_INFO(intree, "N"); /* out-of-tree - see drivers/misc/pistorm for upstream version */
 MODULE_INFO(pistorm64, "GPIO/GPCLK backend only; userspace CPU stays userspace");
 MODULE_INFO(git, PISTORM64_GIT);
 MODULE_INFO(clock, "GPCLK0 alt0 on GPIO4, src/div configurable via module params gpclk_src/gpclk_div");

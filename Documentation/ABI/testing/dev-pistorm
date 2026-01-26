@@ -1,0 +1,53 @@
+What:		/dev/pistorm
+Date:		March 2024
+KernelVersion:	6.8
+Contact:	PiStorm Community <pistorm-devel@lists.example.com>
+Description:
+		The PiStorm device provides a character device interface
+		for communicating with a PiStorm hardware bridge that
+		connects an Amiga computer to a Raspberry Pi.
+
+		The device supports the following ioctls:
+
+		PISTORM_IOC_SETUP (no arguments)
+			Initialize the PiStorm protocol and configure
+			GPCLK0 for bus timing.
+
+		PISTORM_IOC_RESET_SM (no arguments)
+			Reset the state machine on the PiStorm CPLD.
+
+		PISTORM_IOC_PULSE_RESET (no arguments)
+			Send a reset pulse to the connected Amiga.
+
+		PISTORM_IOC_GET_PINS (_IOR(PISTORM_IOC_MAGIC, 0x03, struct pistorm_pins))
+			Read the current state of GPIO pins.
+			struct pistorm_pins {
+				__u32 gplev0;	GPIO level register 0
+				__u32 gplev1;	GPIO level register 1
+			};
+
+		PISTORM_IOC_QUERY (_IOR(PISTORM_IOC_MAGIC, 0x04, struct pistorm_query))
+			Query driver version and capabilities.
+			struct pistorm_query {
+				__u32 abi_version;	driver ABI version
+				__u32 capabilities;	bitmask of capabilities
+				__u32 reserved[8];	for future expansion
+			};
+
+		PISTORM_IOC_BUSOP (_IOWR(PISTORM_IOC_MAGIC, 0x10, struct pistorm_busop))
+			Perform a single bus operation.
+			struct pistorm_busop {
+				__u32 addr;		address to read/write
+				__u32 value;		data value (input for write, output for read)
+				__u8  width;		width (PISTORM_W8, PISTORM_W16, PISTORM_W32)
+				__u8  is_read;		operation type (1=read, 0=write)
+				__u16 flags;		flags (PISTORM_BUSOP_F_STATUS for status reg)
+			};
+
+		PISTORM_IOC_BATCH (_IOWR(PISTORM_IOC_MAGIC, 0x11, struct pistorm_batch))
+			Perform a batch of bus operations.
+			struct pistorm_batch {
+				__u64 ops_ptr;	userspace pointer to array of pistorm_busop
+				__u32 ops_count;	number of operations in array
+				__u32 reserved;	reserved for future use
+			};
