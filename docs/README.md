@@ -238,11 +238,8 @@ The authors are not responsible for any hardware damage resulting from improper 
 
 ## Faith
   • Pride comes before a fall and the fear of God is the begining of wisdom.
-  • 
   • In the beginning was the Word, and the Word was with God,
     and the Word was God. He was with God in the beginning.
     All things came to be through him, and without him nothing made had being.
     In him was life, and the life was the light of mankind.
     The light shines in the darkness, and the darkness has not suppressed it.
-
-
