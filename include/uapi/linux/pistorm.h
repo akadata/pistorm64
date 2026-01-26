@@ -26,18 +26,18 @@ struct pistorm_busop {
     __u8  width;   /* 1/2/4 */
     __u8  is_read; /* 1=read, 0=write */
     __u16 flags;   /* see PISTORM_BUSOP_F_* */
-};
+} __packed;
 
 struct pistorm_pins {
     __u32 gplev0;
     __u32 gplev1;
-};
+} __packed;
 
 struct pistorm_query {
     __u32 abi_version;    /* output: driver ABI version */
     __u32 capabilities;   /* output: bitmask of capabilities */
     __u32 reserved[8];    /* for future expansion */
-};
+} __packed;
 
 /* busop flags */
 #define PISTORM_BUSOP_F_STATUS 0x0001 /* operate on PiStorm status register */
@@ -57,7 +57,7 @@ struct pistorm_batch {
     __u64 ops_ptr;    /* userspace pointer to array of pistorm_busop */
     __u32 ops_count;
     __u32 reserved;
-};
+} __packed;
 #define PISTORM_IOC_BATCH          _IOWR(PISTORM_IOC_MAGIC, 0x11, struct pistorm_batch)
 
 #endif /* _UAPI_LINUX_PISTORM_H */

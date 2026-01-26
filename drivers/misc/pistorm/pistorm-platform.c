@@ -85,36 +85,49 @@ struct pistorm_dev {
 	bool gpclk_ready;
 };
 
-/* Set data bus direction using pinctrl states */
+/* Set data bus direction using pinctrl states if available, otherwise use gpiod */
 static int ps_set_bus_dir(struct pistorm_dev *ps, bool data_out)
 {
-	struct pinctrl_state *state;
-	int ret;
+	int ret = 0;
 
 	if (ps->data_out == data_out)
 		return 0;
 
-	if (data_out) {
-		state = ps->pinctrl_bus_out;
+	if (ps->pinctrl) {
+		/* Use pinctrl states if available */
+		struct pinctrl_state *state;
+
+		if (data_out) {
+			state = ps->pinctrl_bus_out;
+		} else {
+			state = ps->pinctrl_bus_in;
+		}
+
+		if (IS_ERR_OR_NULL(state)) {
+			dev_err(ps->dev, "Invalid pinctrl state for direction %s\n",
+			        data_out ? "out" : "in");
+			return -EINVAL;
+		}
+
+		ret = pinctrl_select_state(ps->pinctrl, state);
+		if (ret) {
+			dev_err(ps->dev, "Failed to set bus direction %s: %d\n",
+			        data_out ? "out" : "in", ret);
+			return ret;
+		}
 	} else {
-		state = ps->pinctrl_bus_in;
-	}
-
-	if (IS_ERR_OR_NULL(state)) {
-		dev_err(ps->dev, "Invalid pinctrl state for direction %s\n", 
-		        data_out ? "out" : "in");
-		return -EINVAL;
-	}
-
-	ret = pinctrl_select_state(ps->pinctrl, state);
-	if (ret) {
-		dev_err(ps->dev, "Failed to set bus direction %s: %d\n",
-		        data_out ? "out" : "in", ret);
-		return ret;
+		/* Fallback to gpiod direction setting */
+		for (int i = 0; i < 16; i++) {
+			if (data_out) {
+				gpiod_direction_output(ps->data_gpios->desc[i], 0);
+			} else {
+				gpiod_direction_input(ps->data_gpios->desc[i]);
+			}
+		}
 	}
 
 	ps->data_out = data_out;
-	return 0;
+	return ret;
 }
 
 /* Clear all control lines */
@@ -210,8 +223,8 @@ static int ps_setup_protocol(struct pistorm_dev *ps)
 {
 	int ret;
 
-	/* Set default pinctrl state */
-	if (ps->pinctrl_default) {
+	/* Set default pinctrl state if available */
+	if (ps->pinctrl && ps->pinctrl_default) {
 		ret = pinctrl_select_state(ps->pinctrl, ps->pinctrl_default);
 		if (ret) {
 			dev_err(ps->dev, "Failed to set default pinctrl state: %d\n", ret);
@@ -678,30 +691,34 @@ static int ps_probe(struct platform_device *pdev)
 		ps->gpclk = NULL;
 	}
 
-	/* Get pinctrl states - require them to be present for proper operation */
+	/* Get pinctrl states - optional but recommended for proper operation */
 	ps->pinctrl = devm_pinctrl_get(dev);
 	if (IS_ERR(ps->pinctrl)) {
 		ret = PTR_ERR(ps->pinctrl);
-		dev_err(dev, "Cannot get pinctrl: %d\n", ret);
-		return ret;
-	}
-
-	ps->pinctrl_default = pinctrl_lookup_state(ps->pinctrl, "default");
-	if (IS_ERR(ps->pinctrl_default)) {
-		dev_err(dev, "Cannot get default pinctrl state\n");
-		return PTR_ERR(ps->pinctrl_default);
-	}
-
-	ps->pinctrl_bus_out = pinctrl_lookup_state(ps->pinctrl, "bus-out");
-	if (IS_ERR(ps->pinctrl_bus_out)) {
-		dev_err(dev, "Cannot get bus-out pinctrl state\n");
-		return PTR_ERR(ps->pinctrl_bus_out);
-	}
-
-	ps->pinctrl_bus_in = pinctrl_lookup_state(ps->pinctrl, "bus-in");
-	if (IS_ERR(ps->pinctrl_bus_in)) {
-		dev_err(dev, "Cannot get bus-in pinctrl state\n");
-		return PTR_ERR(ps->pinctrl_bus_in);
+		if (ret == -EPROBE_DEFER) {
+			dev_err(dev, "Cannot get pinctrl: %d\n", ret);
+			return ret;
+		}
+		dev_warn(dev, "Cannot get pinctrl: %d (continuing without pinctrl)\n", ret);
+		ps->pinctrl = NULL;
+	} else {
+		ps->pinctrl_default = pinctrl_lookup_state(ps->pinctrl, "default");
+		if (IS_ERR(ps->pinctrl_default)) {
+			dev_warn(dev, "Cannot get default pinctrl state (continuing without pinctrl)\n");
+			ps->pinctrl = NULL; /* Disable pinctrl if states are missing */
+		} else {
+			ps->pinctrl_bus_out = pinctrl_lookup_state(ps->pinctrl, "bus-out");
+			if (IS_ERR(ps->pinctrl_bus_out)) {
+				dev_warn(dev, "Cannot get bus-out pinctrl state (continuing without pinctrl)\n");
+				ps->pinctrl = NULL;
+			} else {
+				ps->pinctrl_bus_in = pinctrl_lookup_state(ps->pinctrl, "bus-in");
+				if (IS_ERR(ps->pinctrl_bus_in)) {
+					dev_warn(dev, "Cannot get bus-in pinctrl state (continuing without pinctrl)\n");
+					ps->pinctrl = NULL;
+				}
+			}
+		}
 	}
 
 	/* Setup misc device */
