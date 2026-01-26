@@ -22,7 +22,7 @@
 
 #include "amiga-registers.h"
 
-//#define DEBUG_GAYLE
+#define DEBUG_GAYLE
 #ifdef DEBUG_GAYLE
 #define DEBUG printf
 #else
