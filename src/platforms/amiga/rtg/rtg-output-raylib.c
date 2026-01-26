@@ -86,12 +86,12 @@ static int16_t  mouse_cursor_x_adj  = 0;
 static int16_t  mouse_cursor_y_adj  = 0;
 
 
-static int32_t pi_screen_width      = 1280;
-static int32_t pi_screen_height     = 720;
+static int32_t pi_screen_width      = 1920;
+static int32_t pi_screen_height     = 1080;
 static uint8_t pi_screen_width_set  = 0;
 static uint8_t pi_screen_height_set = 0;
 
-static const size_t rtg_mem_size = 40u * SIZE_MEGA;
+static const size_t rtg_mem_size = 64u * SIZE_MEGA;  // was 40u   we have upto 512mb ram sensibly on a pi4 lets not be stingy
 
 struct rtg_shared_data {
   uint16_t *width;
@@ -131,6 +131,7 @@ extern void* rtgThread(void* args);
 extern void update_mouse_cursor(uint8_t* src);
 
 void rtg_update_screen(void) {
+  // doing nothing to update the screen here????
 }
 
 static int rtg_read_first_line(const char* path, char* buf, size_t buf_size) {
@@ -977,8 +978,8 @@ void rtg_set_clut_cursor(uint8_t* bmp, uint32_t* pal, int16_t offs_x, int16_t of
         }
       }
     }
-    while (rtg_on && !updating_screen)
-      usleep(0);
+    while (rtg_on && !updating_screen) usleep(0);
+
     cursor_image_updated = 1;
   }
 }
@@ -1020,8 +1021,8 @@ void update_mouse_cursor(uint8_t* src) {
     }
   }
 
-  while (rtg_on && !updating_screen)
-    usleep(0);
+  while (rtg_on && !updating_screen) usleep(0);
+
   cursor_image_updated = 1;
 }
 
@@ -1049,8 +1050,9 @@ void rtg_set_mouse_cursor_image(uint8_t* src, uint8_t w, uint8_t h) {
   mouse_cursor_w = w;
   mouse_cursor_h = h;
 
-  if(memcmp(src, old_mouse_data, (w / 8 * h)) != 0)
+  if(memcmp(src, old_mouse_data, (w / 8 * h)) != 0) {
     new_cursor_data = 1;
+  }
 
   if(old_mouse_w != w || old_mouse_h != h || new_cursor_data) {
     old_mouse_w = w;

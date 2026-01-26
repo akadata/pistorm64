@@ -53,7 +53,8 @@ extern uint32_t rtg_address[8];
 extern uint32_t rtg_address_adj[8];
 extern uint8_t* rtg_mem; // FIXME
 extern uint16_t rtg_user[8];
-extern uint16_t rtg_x[8], rtg_y[8];
+extern uint16_t rtg_x[8];
+extern uint16_t rtg_y[8];
 extern uint16_t rtg_format;
 extern uint16_t rtg_display_format;
 
@@ -361,10 +362,11 @@ void rtg_blitrect_solid(uint16_t x, uint16_t y, uint16_t dx, uint16_t dy, uint16
   }
 
   for (int ys = 0; ys < h; ys++) {
-    if (xdir)
+    if (xdir) {
       memcpy(dptr, sptr, w * rtg_pixel_size[format]);
-    else
+    } else {
       memmove(dptr, sptr, w * rtg_pixel_size[format]);
+    }
     sptr += pitchstep;
     dptr += pitchstep;
   }
@@ -375,6 +377,7 @@ void rtg_blitrect_nomask_complete(uint16_t sx, uint16_t sy, uint16_t dx, uint16_
                                   uint32_t src_addr, uint32_t dst_addr, uint16_t format,
                                   uint8_t minterm) {
   if (minterm) {
+    // do nothing here???? 
   }
   uint8_t* sptr = NULL;
   uint8_t* dptr = NULL;
@@ -973,13 +976,15 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
       }                                                                                           \
     }                                                                                             \
   } while (0);                                                                                     \
-  if ((cur_bit >>= 1) == 0)                                                                        \
-    cur_bit = 0x8000;
+  if ((cur_bit >>= 1) == 0) {                                                                       \
+    cur_bit = 0x8000;                                                                                \
+  }                                                                                               \
 
 void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t len,
                   uint16_t pattern, uint16_t pattern_offset, uint32_t fgcol, uint32_t bgcol,
                   uint16_t pitch, uint16_t format, uint8_t mask, uint8_t draw_mode) {
   if (pattern_offset) {
+    // do nothing...
   }
 
   int16_t x1 = x1_, y1 = y1_;
@@ -1049,8 +1054,9 @@ void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t l
   ix = dy_abs >> 1;
   iy = dx_abs >> 1;
 
-  if (draw_mode & DRAWMODE_INVERSVID)
+  if (draw_mode & DRAWMODE_INVERSVID) {
     pattern = ~pattern;
+  }
   if (draw_mode & DRAWMODE_COMPLEMENT) {
     invert = 1;
   }
@@ -1059,8 +1065,9 @@ void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t l
   DRAW_LINE_PIXEL;
 
   if (dx_abs >= dy_abs) {
-    if (!len)
+    if (!len) {
       len = (uint16_t)dx_abs;
+    }
     for (uint16_t i = 0; i < len; i++) {
       iy += dy_abs;
       if (iy >= dx_abs) {
@@ -1072,8 +1079,9 @@ void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t l
       DRAW_LINE_PIXEL;
     }
   } else {
-    if (!len)
+    if (!len) {
       len = (uint16_t)dy_abs;
+    }
     for (uint16_t i = 0; i < len; i++) {
       ix += dx_abs;
       if (ix >= dy_abs) {
@@ -1122,8 +1130,9 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
       plane_ptr[i] = get_mapped_data_pointer_by_address(cfg, be32toh(bm->_p_Planes[i]));
       if (!plane_ptr[i]) {
         plane_addr[i] = be32toh(bm->_p_Planes[i]);
-        if (plane_addr[i] != 0)
+        if (plane_addr[i] != 0) {
           plane_addr[i] += (uint32_t)(sy * src_pitch);
+        }
       } else {
         plane_ptr[i] += (uint32_t)(sy * src_pitch);
       }
@@ -1138,30 +1147,34 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
       if (minterm & 0x01) {
         for (int i = 0; i < bm->Depth; i++) {
           if (plane_ptr[i]) {
-            if (~plane_ptr[i][cur_byte] & cur_bit)
+            if (~plane_ptr[i][cur_byte] & cur_bit) {
               u8_fg |= (1 << i);
+            }
           } else {
             if (plane_addr[i] == 0xFFFFFFFF)
               u8_fg |= (1 << i);
             else if (plane_addr[i] != 0) {
               u8_tmp = (uint8_t)ps_read_8(plane_addr[i] + cur_byte);
-              if (~u8_tmp & cur_bit)
+              if (~u8_tmp & cur_bit) {
                 u8_fg |= (1 << i);
+              }
             }
           }
         }
       } else {
         for (int i = 0; i < bm->Depth; i++) {
           if (plane_ptr[i]) {
-            if (plane_ptr[i][cur_byte] & cur_bit)
+            if (plane_ptr[i][cur_byte] & cur_bit) {
               u8_fg |= (1 << i);
+            }
           } else {
             if (plane_addr[i] == 0xFFFFFFFF)
               u8_fg |= (1 << i);
             else if (plane_addr[i] != 0) {
               u8_tmp = (uint8_t)ps_read_8(plane_addr[i] + cur_byte);
-              if (u8_tmp & cur_bit)
+              if (u8_tmp & cur_bit) {
                 u8_fg |= (1 << i);
+              }
             }
           }
         }
@@ -1183,10 +1196,12 @@ void rtg_p2c_ex(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16
     }
     dptr += pitch;
     for (int i = 0; i < bm->Depth; i++) {
-      if (plane_ptr[i])
+      if (plane_ptr[i]) {
         plane_ptr[i] += src_pitch;
-      if (plane_addr[i] && plane_addr[i] != 0xFFFFFFFF)
+      }
+      if (plane_addr[i] && plane_addr[i] != 0xFFFFFFFF) {
         plane_addr[i] += src_pitch;
+      }
     }
     cur_bit = base_bit;
     cur_byte = base_byte;
@@ -1266,10 +1281,11 @@ void rtg_p2c(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
       }
     }
     dptr += pitch;
-    if ((((int16_t)(line_y + sy + 1)) % (int16_t)h) != 0)
+    if ((((int16_t)(line_y + sy + 1)) % (int16_t)h) != 0) {
       bmp_data += src_line_pitch;
-    else
+    } else {
       bmp_data = bmp_data_src;
+    }
     cur_bit = base_bit;
     cur_byte = base_byte;
   }
@@ -1376,10 +1392,11 @@ void rtg_p2d(int16_t sx, int16_t sy, int16_t dx, int16_t dy, int16_t w, int16_t 
       }
     }
     dptr += pitch;
-    if ((((int16_t)(line_y + sy + 1)) % (int16_t)h) != 0)
+    if ((((int16_t)(line_y + sy + 1)) % (int16_t)h) != 0) {
       bmp_data += src_line_pitch;
-    else
+    } else {
       bmp_data = bmp_data_src;
+    }
     cur_bit = base_bit;
     cur_byte = base_byte;
   }

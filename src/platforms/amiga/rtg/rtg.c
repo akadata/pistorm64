@@ -78,13 +78,13 @@ extern uint8_t rtg_output_in_vblank;
 
 #define DEBUG_RTG
 
-#ifdef DEBUG_RTG
-/*static const char *op_type_names[OP_TYPE_NUM] = {
+#ifdef DEBUG_RTG // static const below was commented out 
+static const char *op_type_names[OP_TYPE_NUM] = {
     "BYTE",
     "WORD",
     "LONGWORD",
     "MEM",
-};*/
+};
 
 #define DEBUG LOG_DEBUG
 #else
@@ -98,7 +98,7 @@ static const char* rtg_format_names[RTGFMT_NUM] = {
     "15BPP RGB (555 LE)", "15BPP BGR (555 LE)", "NONE/UNKNOWN",
 };
 
-static const unsigned int rtg_mem_size = 40u * SIZE_MEGA;
+static const unsigned int rtg_mem_size = 64u * SIZE_MEGA;
 
 int init_rtg_data(struct emulator_config* cfg_) {
   rtg_mem = calloc(1, rtg_mem_size);
@@ -170,8 +170,9 @@ unsigned int rtg_read(uint32_t address, uint8_t mode) {
       if (cur_rtg_frame != wait_rtg_frame && wait_vblank) {
         wait_vblank = 0;
         return 1;
-      } else
+      } else {
         return 0;
+      }
     }
     // fallthrough
   case RTG_INVBLANK:
@@ -344,7 +345,9 @@ static uint8_t cmd_mask;
 // Helper functions for safe aligned struct access
 static struct P96BoardInfo* safe_get_board_info(struct emulator_config* cfg_ptr, uint32_t addr) {
     uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-    if (!ptr) return NULL;
+    if (!ptr) {
+      return NULL;
+    }
     static struct P96BoardInfo temp;
     memcpy(&temp, ptr, sizeof(temp));
     return &temp;
@@ -352,7 +355,9 @@ static struct P96BoardInfo* safe_get_board_info(struct emulator_config* cfg_ptr,
 
 static struct P96RenderInfo* safe_get_render_info(struct emulator_config* cfg_ptr, uint32_t addr) {
     uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-    if (!ptr) return NULL;
+    if (!ptr) {
+      return NULL;
+    }
     static struct P96RenderInfo temp;
     memcpy(&temp, ptr, sizeof(temp));
     return &temp;
@@ -360,7 +365,9 @@ static struct P96RenderInfo* safe_get_render_info(struct emulator_config* cfg_pt
 
 static struct P96Line* safe_get_line(struct emulator_config* cfg_ptr, uint32_t addr) {
     uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-    if (!ptr) return NULL;
+    if (!ptr) {
+      return NULL;
+    }
     static struct P96Line temp;
     memcpy(&temp, ptr, sizeof(temp));
     return &temp;
@@ -368,8 +375,9 @@ static struct P96Line* safe_get_line(struct emulator_config* cfg_ptr, uint32_t a
 
 static struct BitMap* safe_get_bitmap(struct emulator_config* cfg_ptr, uint32_t addr) {
   uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-  if (!ptr)
+  if (!ptr) {
     return NULL;
+  }
   static struct BitMap temp;
   memcpy(&temp, ptr, sizeof(temp));
   return &temp;
@@ -377,8 +385,9 @@ static struct BitMap* safe_get_bitmap(struct emulator_config* cfg_ptr, uint32_t 
 
 static struct P96Template* safe_get_template(struct emulator_config* cfg_ptr, uint32_t addr) {
   uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-  if (!ptr)
+  if (!ptr) {
     return NULL;
+  }
   static struct P96Template temp;
   memcpy(&temp, ptr, sizeof(temp));
   return &temp;
@@ -386,8 +395,9 @@ static struct P96Template* safe_get_template(struct emulator_config* cfg_ptr, ui
 
 static struct P96Pattern* safe_get_pattern(struct emulator_config* cfg_ptr, uint32_t addr) {
   uint8_t* ptr = get_mapped_data_pointer_by_address(cfg_ptr, addr);
-  if (!ptr)
+  if (!ptr) {
     return NULL;
+  }
   static struct P96Pattern temp;
   memcpy(&temp, ptr, sizeof(temp));
   return &temp;
@@ -411,8 +421,9 @@ static void handle_irtg_command(uint32_t cmd) {
       LOG_DEBUG("BoardInfo Xoffs: %d Yoffs: %d\n", be16toh(b->XOffset), be16toh(b->YOffset));
     }
 #endif
-    if (!b)
+    if (!b) {
       break;
+    }
 
     b->XOffset = (int16_t)htobe16(M68KR(M68K_REG_D1));
     b->YOffset = (int16_t)htobe16(M68KR(M68K_REG_D2));
@@ -442,8 +453,9 @@ static void handle_irtg_command(uint32_t cmd) {
     gdebug("iDrawLine begin\n");
     ln = safe_get_line(cfg, M68KR(M68K_REG_A2));
 
-    if (!ln || !r)
+    if (!ln || !r) {
       break;
+    }
 
     cmd_mask = (uint8_t)M68KR(M68K_REG_D0);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
@@ -475,8 +487,9 @@ static void handle_irtg_command(uint32_t cmd) {
     }
 #endif
 
-    if (!b || !r)
+    if (!b || !r) {
       break;
+    }
 
     cmd_mask = (uint8_t)M68KR(M68K_REG_D5);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
@@ -498,8 +511,9 @@ static void handle_irtg_command(uint32_t cmd) {
     // D0 WORD x, D1: WORD y, D2: WORD w, D3: WORD h
     // D4: UBYTE mask, D7: RGBFTYPE format
     gdebug("iInvertRect begin\n");
-    if (!b || !r)
+    if (!b || !r) {
       break;
+    }
 
     cmd_mask = (uint8_t)M68KR(M68K_REG_D4);
     rtg_address_adj[0] = be32toh(r->_p_Memory) - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
@@ -541,8 +555,9 @@ static void handle_irtg_command(uint32_t cmd) {
 
     uint8_t minterm = (uint8_t)M68KR(M68K_REG_D6);
     struct P96RenderInfo* rt = safe_get_render_info(cfg, M68KR(M68K_REG_A2));
-    if (!rt)
+    if (!rt) {
       break;
+    }
 
     uint32_t src_addr = be32toh(r->_p_Memory);
     uint32_t dst_addr = be32toh(rt->_p_Memory);
@@ -560,13 +575,16 @@ static void handle_irtg_command(uint32_t cmd) {
     // A0: BoardInfo *b, A1: RenderInfo *r, A2: Template *t
     // D0: WORD x, D1: WORD y, D2: WORD w, D3: WORD h
     // D4: UBYTE mask, D7: RGBFTYPE format
-    if (!r || !M68KR(M68K_REG_A2))
+    if (!r || !M68KR(M68K_REG_A2)) {
       break;
+    }
     gdebug("iBlitTemplate begin\n");
 
-    uint16_t t_pitch = 0, x_offset = 0;
+    uint16_t t_pitch = 0;
+    uint16_t x_offset = 0;
     uint32_t src_addr = M68KR(M68K_REG_A2);
-    uint32_t fgcol = 0, bgcol = 0;
+    uint32_t fgcol = 0;
+    uint32_t bgcol = 0;
     uint8_t draw_mode = 0;
 
     struct P96Template* t = safe_get_template(cfg, M68KR(M68K_REG_A2));
@@ -600,8 +618,9 @@ static void handle_irtg_command(uint32_t cmd) {
     // A0: BoardInfo *b, A1: RenderInfo *r, A2: Pattern *p
     // D0: WORD x, D1: WORD y, D2: WORD w, D3: WORD h
     // D4: UBYTE mask, D7: RGBFTYPE format
-    if (!r || !M68KR(M68K_REG_A2))
+    if (!r || !M68KR(M68K_REG_A2)) {
       break;
+    }
     gdebug("iBlitPattern begin\n");
 
     uint16_t x_offset = 0, y_offset = 0;
@@ -645,8 +664,9 @@ static void handle_irtg_command(uint32_t cmd) {
     // D6: UBYTE minterm, D7: UBYTE mask
     r = safe_get_render_info(cfg, M68KR(M68K_REG_A2));
     struct BitMap* bm = safe_get_bitmap(cfg, M68KR(M68K_REG_A1));
-    if (!r || !bm)
+    if (!r || !bm) {
       break;
+    }
 
     gdebug("iP2C begin\n");
 
@@ -659,10 +679,12 @@ static void handle_irtg_command(uint32_t cmd) {
 
     if (realtime_graphics_debug) {
       LOG_DEBUG("bm: 0x%" PRIxPTR " r: 0x%" PRIxPTR "\n", (uintptr_t)bm, (uintptr_t)r);
-      if (bm)
+      if (bm) {
         LOG_DEBUG("bm pitch: %d\n", be16toh(bm->BytesPerRow));
-      if (r)
+      }
+      if (r) {
         LOG_DEBUG("r pitch: %d\n", be16toh(r->BytesPerRow));
+      }
     }
 
     uint16_t bmp_pitch = be16toh(bm->BytesPerRow);
@@ -751,10 +773,11 @@ static void handle_rtg_command(uint32_t cmd) {
     display_enabled = ((rtg_x[0]) & 0x01);
     if (display_enabled != rtg_on) {
       rtg_on = display_enabled;
-      if (rtg_on)
+      if (rtg_on) {
         rtg_init_display();
-      else
+      } else {
         rtg_shutdown_display();
+      }
     }
     break;
   case RTGCMD_FILLRECT:
@@ -805,13 +828,14 @@ static void handle_rtg_command(uint32_t cmd) {
     gdebug("BlitTemplate\n");
     break;
   case RTGCMD_DRAWLINE:
-    if (rtg_u8[0] == 0xFF && rtg_y[2] == 0xFFFF)
+    if (rtg_u8[0] == 0xFF && rtg_y[2] == 0xFFFF) {
       rtg_drawline_solid((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (uint16_t)rtg_x[2], rtg_rgb[0],
                          (uint16_t)rtg_x[3], rtg_format);
-    else
+    } else {
       rtg_drawline((int16_t)rtg_x[0], (int16_t)rtg_y[0], (int16_t)rtg_x[1], (int16_t)rtg_y[1], (uint16_t)rtg_x[2],
                    (uint16_t)rtg_y[2], (uint16_t)rtg_x[4], rtg_rgb[0], rtg_rgb[1], (uint16_t)rtg_x[3],
                    rtg_format, rtg_u8[0], rtg_u8[1]);
+    }
     gdebug("DrawLine\n");
     break;
   case RTGCMD_P2C:
