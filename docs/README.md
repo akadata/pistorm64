@@ -1,8 +1,8 @@
-# PiStorm64 - Enhanced PiStorm Emulator
+# Kernel PiStorm64 - Enhanced PiStorm Emulator
 
 ## Overview
 
-PiStorm64 is a fork and rework of the original PiStorm emulator, designed 
+Kernel PiStorm64 is a fork and rework of the original PiStorm emulator, designed 
 to provide enhanced compatibility and new features for connecting Raspberry Pi
 hardware to classic Amiga systems. This project maintains the core functionality
 of the original PiStorm while adding 64-bit awareness and expanded capabilities.
@@ -48,7 +48,7 @@ continuing the open-source tradition of the original project.
 ### 64-Bit Awareness
 
 - Full 64-bit compatibility for modern Raspberry Pi systems
-- Tested on Pi Zero 2 W with various Linux distributions
+- Tested on Pi4 8GB & Pi Zero 2 W with various Linux distributions
 - Maintains backward compatibility with 32-bit systems
 
 ### PiSCSI64
@@ -60,7 +60,7 @@ continuing the open-source tradition of the original project.
 ### Cross-Platform Compatibility
 
 - Works on both musl libc and glibc systems
-- Tested on Raspberry Pi Zero 2 W with:
+- Tested on Raspberry Pi4 8GB & Zero 2 W with:
   - Debian Trixie
   - Raspbian Buster
   - Alpine Linux
@@ -107,11 +107,13 @@ continuing the open-source tradition of the original project.
 
 ### Prerequisites
 
-- Raspberry Pi (Zero 2 W, 3 recommended)
+- Raspberry Pi (Zero 2 W, 3, Pi4B 8gb recommended)
 - Compatible FPGA board with PiStorm CPLD
 - Amiga computer (A500, A1000, or compatible)
 
-**Note:** Pi 4 and 400 are experimental but work is in progress (WIP).
+**Note:** 
+Latest code fully tested, developed and implimented on Pi 4 Model B+ 8GB, Should work on Pi400
+
 Suggestions and contributions welcome!
 
 ### Build Process
