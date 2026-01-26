@@ -66,11 +66,13 @@ The PiStorm is a hardware bridge that connects an Amiga computer to a Raspberry 
 
 - `drivers/misc/pistorm/` - New driver directory
 - `drivers/misc/pistorm/pistorm-platform.c` - Main driver implementation with platform driver, gpiod, clk, and pinctrl
+- `drivers/misc/pistorm/pistorm-main.c` - Alternative driver implementation with platform driver, gpiod, clk, and pinctrl
 - `drivers/misc/pistorm/Kconfig` - Kconfig entry
 - `drivers/misc/pistorm/Makefile` - Makefile for the driver
 - `Documentation/devicetree/bindings/misc/akadata,pistorm.yaml` - DT binding documentation
 - `Documentation/ABI/testing/dev-pistorm` - ABI documentation
 - `include/uapi/linux/pistorm.h` - Updated UAPI header with proper kernel conventions and versioning
+- `include/linux/pistorm.h` - Kernel-internal header wrapper
 - `MAINTAINERS` - Maintainers file entry
 - `pistorm-rp1-overlay.dts` - Sample device tree overlay for Pi 5 (RP1)
 - `pistorm-bcm-overlay.dts` - Sample device tree overlay for Pi 3/4 (BCM283x/BCM2711)
@@ -98,7 +100,6 @@ The driver requires proper device tree configuration. See the provided overlay e
 - `pistorm-bcm-overlay.dts` for Pi 3/4
 - `pistorm-rp1-overlay.dts` for Pi 5
 
-## Authors
+## Maintainer
 
-- Original implementation: AKADATA LIMITED (PiStorm64)
-- Upstream preparation: PiStorm Community
+- Andrew Smalley <andrew@akadata.ltd>

@@ -765,7 +765,7 @@ static struct platform_driver ps_platform_driver = {
 
 module_platform_driver(ps_platform_driver);
 
-MODULE_AUTHOR("AKADATA LIMITED (PiStorm64)");
+MODULE_AUTHOR("Andrew Smalley <andrew@akadata.ltd>");
 MODULE_DESCRIPTION("PiStorm64 kernel backend: GPIO + GPCLK bus engine for PiStorm CPLD");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("0.1.0");

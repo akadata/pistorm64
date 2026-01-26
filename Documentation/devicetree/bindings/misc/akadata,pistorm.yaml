@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: PiStorm - Amiga to Raspberry Pi bridge controller
 
 maintainers:
-  - PiStorm Development Team <pistorm-dev@example.com>
+  - Andrew Smalley <andrew@akadata.ltd> 
 
 description: |
   The PiStorm is a hardware bridge that connects an Amiga computer to a
