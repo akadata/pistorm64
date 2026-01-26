@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0041.html
-TITLE: Caveats Index
-
-Caveats Index ]" border=0> Caveats Boopsi - message, 293 , struct GadgetInfo, 316 Gadgets do not share knob imagery, 143 do not use image lists for knobs, 143 GimmeZeroZero window border, 136 imagery and the selection box, 124 mouse tracking with boolean gadgets, 136 GadTools GadTools enforces Intuition limits, 375 GADTOOL_TYPE bit, 401 GT_SetGadgetAttrs() and GT_BeginRefresh(), 386 PLACETEXT with GENERIC_KIND gadgets, 398 post-processing, 368 preserve bits set by CreatsGadget(), 398 refreshing the display, 382 restrictions on gadgets, 411 side effects, 412 keymap - key numbers over hex 67, 818 preferences - printer device, 334 Text - don't assume Topaz-8, 672 [Back to Amiga Developer Docs ]

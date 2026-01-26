@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node02C0.html
-TITLE: graphics.library/ClearRectRegion
-
-graphics.library/ClearRectRegion ]" border=0> NAME ClearRectRegion -- Perform 2d CLEAR operation of rectangle with region, leaving result in region. SYNOPSIS status = ClearRectRegion(region,rectangle) d0 a0 a1 BOOL ClearRectRegion(struct Region *, struct Rectangle * ); FUNCTION Clip away any portion of the region that exists inside of the rectangle. Leave the result in region. INPUTS region - pointer to Region structure rectangle - pointer to Rectangle structure RESULTS status - return TRUE if successful operation return FALSE if ran out of memory BUGS SEE ALSO AndRectRegion() graphics/regions.h [Back to Amiga Developer Docs ]

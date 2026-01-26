@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01DC.html
-TITLE: Glossary / data
-
-Glossary / data ]" border=0> The contents of a memory location. The main purpose of a bus cycle is to transfer data between two locations. The Zorro II bus is based on a 16-bit data path, the Zorro III bus is based on a 32-bit data path. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node01FC.html
-TITLE: Appendix A - IFF: Interchange File Format / IFF Source Code
-
-Appendix A - IFF: Interchange File Format / IFF Source Code ]" border=0> IFF Include Files Source listings of examples [Back to Amiga Developer Docs ]

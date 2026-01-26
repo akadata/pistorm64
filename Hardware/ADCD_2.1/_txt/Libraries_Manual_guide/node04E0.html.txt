@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04E0.html
-TITLE: B / frameiclass / Changed Methods: IM_DRAW
-
-B / frameiclass / Changed Methods: IM_DRAW ]" border=0> This method tells a frameiclass object to render itself using the position and dimensions of its Image structure. It supports two sets of drawing states (passes in the impDraw.imp_State field): [Back to Amiga Developer Docs ]

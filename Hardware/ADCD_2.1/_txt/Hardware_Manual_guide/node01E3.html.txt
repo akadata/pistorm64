@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01E3.html
-TITLE: Glossary / Direct Memory Access (DMA)
-
-Glossary / Direct Memory Access (DMA) ]" border=0> .nh An arrangement that allows coprocessors or other system devices to read or write memory directly, without having to interrupt the main processor. Devices that have direct access to Zorro III slaves are said to have DMA capability. These devices are also called masters. .hy 14 [Back to Amiga Developer Docs ]

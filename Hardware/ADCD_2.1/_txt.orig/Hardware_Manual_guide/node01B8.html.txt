@@ -1,1 +1,0 @@
-Glossary / asserted ]" border=0> The active state of a state, regardless of its logic sense. [Back to Amiga Developer Docs ]

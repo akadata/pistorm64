@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node02B1.html
-TITLE: dos.library/FreeDosEntry
-
-dos.library/FreeDosEntry ]" border=0> NAME FreeDosEntry -- Frees an entry created by MakeDosEntry (V36) SYNOPSIS FreeDosEntry(dlist) D1 void FreeDosEntry(struct DosList *) FUNCTION Frees an entry created by MakeDosEntry() . This routine should be eliminated and replaced by a value passed to FreeDosObject()! INPUTS dlist - DosList to free. SEE ALSO AddDosEntry() , RemDosEntry() , FindDosEntry() , LockDosList() , NextDosEntry() , MakeDosEntry() [Back to Amiga Developer Docs ]

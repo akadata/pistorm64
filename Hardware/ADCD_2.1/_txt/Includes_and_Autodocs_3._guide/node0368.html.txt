@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0368.html
-TITLE: iffparse.library/GoodID
-
-iffparse.library/GoodID ]" border=0> NAME GoodID -- test if an identifier follows the IFF 85 specification. (V36) SYNOPSIS isok = GoodID(id); D0 D0 LONG GoodID(LONG); FUNCTION Tests the given longword identifier to see if it meets all the EA IFF 85 specifications for a chunk ID. If so, it returns non-zero, otherwise 0. INPUTS id - potential 32 bit identifier. RESULT isok - non-zero if this is a valid ID, 0 otherwise. SEE ALSO GoodType() [Back to Amiga Developer Docs ]

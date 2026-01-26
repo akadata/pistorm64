@@ -1,1 +1,0 @@
-15 / GadTools Gadgets / Other GadTools Functions ]" border=0> This section discusses some additional support functions in the GadTools library that serve special needs. GT_FilterIMsg() and GT_PostFilterIMsg() DrawBevelBox() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0049.html
-TITLE: Copper Index
-
-Copper Index ]" border=0> Copper, 65 changing colors, 553 display instructions, 555 in drawing VSprites, 633 in interlaced displays, 579 MakeVPort(), 560 MrgCop(), 555 programming, 602 [Back to Amiga Developer Docs ]

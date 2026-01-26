@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node040F.html
-TITLE: keymap.doc
-
-keymap.doc ]" border=0> AskKeyMapDefault() MapANSI() MapRawKey() SetKeyMapDefault() [Back to Amiga Developer Docs ]

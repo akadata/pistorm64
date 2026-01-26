@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0042.html
-TITLE: icon.library (basename: _IconBase)
-
-icon.library (basename: _IconBase) ]" border=0> DeleteDiskObject(name)(a0) - Delete a Workbench disk object from disk. GetDefDiskObject(type)(d0) - Read default wb disk object from disk. (V36) GetDiskObjectNew(name)(a0) - Read in a Workbench disk object from disk. PutDefDiskObject(diskObject)(a0) - Write disk object as the default for its type. (V36) [Back to Amiga Developer Docs ]

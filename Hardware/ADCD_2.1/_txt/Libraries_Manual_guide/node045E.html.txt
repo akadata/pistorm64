@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node045E.html
-TITLE: 33 / IFF FORM Specifications / FORM ILBM
-
-33 / IFF FORM Specifications / FORM ILBM ]" border=0> The IFF file format for graphic images on the Amiga is called FORM ILBM (InterLeaved BitMap). It follows a standard parsable IFF format. ILBM.BMHD BitMapHeader Chunk Sample Hex Dump of an ILBM Interpreting ILBMs ILBM BODY Compression Interpreting the Scan Line Data Other ILBM Notes [Back to Amiga Developer Docs ]

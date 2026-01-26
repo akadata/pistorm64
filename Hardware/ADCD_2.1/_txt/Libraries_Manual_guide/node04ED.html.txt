@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04ED.html
-TITLE: B / fillrectclass / Changed Methods: IM_DRAWFRAME
-
-B / fillrectclass / Changed Methods: IM_DRAWFRAME ]" border=0> This method asks a fillrectclass object to render itself relative to the position in its embedded Image structure, but using the width and height passed in the message's Dimensions.Width and Dimensions.Height fields. See the imageclass description of IM_DRAWFRAME for more details. [Back to Amiga Developer Docs ]

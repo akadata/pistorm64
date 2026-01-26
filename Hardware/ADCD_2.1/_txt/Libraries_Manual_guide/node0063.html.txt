@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0063.html
-TITLE: GimmeZeroZero Index
-
-GimmeZeroZero Index ]" border=0> GimmeZeroZero, 133 attribute, 110 border rast port, 105 clipping alternative, 93 description, 93 gadget in border, 89 mouse position, 105 , 273 offset alternative, 89 opening, 93 requester limit, 204 requester positioning, 93 use of resources, 93 window type, 92 , 93 with borderless, 92 with superbitmap, 96 [Back to Amiga Developer Docs ]

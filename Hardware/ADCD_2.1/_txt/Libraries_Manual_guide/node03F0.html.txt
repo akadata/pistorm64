@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node03F0.html
-TITLE: 30 / / Creating and Using New Layers / Creating a Viewing Workspace
-
-30 / / Creating and Using New Layers / Creating a Viewing Workspace ]" border=0> A viewing workspace may be created by using the primitives InitVPort() , InitView() , MakeVPort() , MrgCop() , and LoadView() . Please reference the " Graphics Primitives " chapter for details on creating a low-level graphics display. Do not create Layers directly on Intuition screens. Windows are the only supported method of creating a layer on a screen. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0448.html
-TITLE: graphics.library/GetRGB4
-
-graphics.library/GetRGB4 ]" border=0> NAME GetRGB4 -- Inquire value of entry in ColorMap . SYNOPSIS value = GetRGB4( colormap, entry ) d0 a0 d0 ULONG GetRGB4(struct ColorMap *, LONG); FUNCTION Read and format a value from the ColorMap . INPUTS colormap - pointer to ColorMap structure entry - index into colormap RESULT returns -1 if no valid entry return UWORD RGB value 4 bits per gun right justified NOTE Intuition's DisplayBeep() changes color 0. Reading Color 0 during a DisplayBeep() will lead to incorrect results. BUGS SEE ALSO SetRGB4() LoadRGB4() GetColorMap() FreeColorMap() graphics/view.h [Back to Amiga Developer Docs ]

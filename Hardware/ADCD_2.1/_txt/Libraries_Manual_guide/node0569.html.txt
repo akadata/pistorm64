@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0569.html
-TITLE: E / Release 2 Changes That Can Affect Compatibility / Trackdisk Device
-
-E / Release 2 Changes That Can Affect Compatibility / Trackdisk Device ]" border=0> * Private trackdisk structures have changed. See trackdisk.doc for a compatible REMCHANGEINT . * Buffer is freeable, so low memory open failure is possible. * Do not disable interrupts (any of them), then expect trackdisk to function while they are disabled. [Back to Amiga Developer Docs ]

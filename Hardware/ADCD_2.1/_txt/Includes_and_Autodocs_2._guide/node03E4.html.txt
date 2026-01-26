@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node03E4.html
-TITLE: utility.library/UDivMod32
-
-utility.library/UDivMod32 ]" border=0> NAME UDivMod32 -- Unsigned 32 by 32 bit division and modulus. (V36) SYNOPSIS Quotient:Remainder = UDivMod32( Dividend, Divisor ) D0 D1 D0 D1 ULONG UDivMod32( ULONG, ULONG ); FUNCTION Divides the unsigned 32 bit dividend by the unsigned 32 bit divisor and returns a unsigned 32 bit quotient and remainder. INPUTS Dividend - unsigned 32 bit dividend. Divisor - unsigned 32 bit divisor. RESULTS Quotient - unsigned 32 quotient of the division. Remainder - unsigned 32 remainder of the division. NOTES SEE ALSO SDivMod32() , SMult32() , UMult32() BUGS [Back to Amiga Developer Docs ]

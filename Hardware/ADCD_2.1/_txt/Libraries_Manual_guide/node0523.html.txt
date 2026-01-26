@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0523.html
-TITLE: B / buttongclass / Attributes: GA_Image (IS)
-
-B / buttongclass / Attributes: GA_Image (IS) ]" border=0> This attribute points to the gadget's Boopsi image. Changing this attribute will cause the gadget to refresh its imagery. [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-F 8520 Complex Interface Adapters / Register Functional Description ]" border=0> I/O Ports (PRA, PRB, DDRA, DDRB) Handshaking Interval Timers (Timer A, Timer B) Input Modes Bit Names on Read-Register Bit Names on Write-Register [Back to Amiga Developer Docs ]

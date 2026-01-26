@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node047A.html
-TITLE: 34 Keymap Library / Function Reference
-
-34 Keymap Library / Function Reference ]" border=0> The following chart gives a brief desription of the functions covered in this chapter. All of these functions require Release 2 or a later version of the Amiga operating system. See the Amiga ROM Kernel Reference Manual: Includes and Autodocs for details on each function call. Table 34-7: Keymap Library Functions __________________________________________________________________ | | | Function Description | |==================================================================| | AskKeyMapDefault() Get a pointer to the current system default | | keymap | | MapANSI() Convert ANSII string to raw key events | | MapRawKey() Convert raw key events to ANSII | | SetKeyMapDefault() Set the system default keymap | |__________________________________________________________________| [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node030A.html
-TITLE: graphics.library/OrRectRegion
-
-graphics.library/OrRectRegion ]" border=0> NAME OrRectRegion -- Perform 2d OR operation of rectangle with region, leaving result in region. SYNOPSIS status = OrRectRegion(region,rectangle) d0 a0 a1 BOOL OrRectRegion( struct Region *, struct Rectangle * ); FUNCTION If any portion of rectangle is not in the region then add that portion to the region. INPUTS region - pointer to Region structure rectangle - pointer to Rectangle structure RESULTS status - return TRUE if successful operation return FALSE if ran out of memory BUGS SEE ALSO AndRectRegion() OrRegionRegion() graphics/regions.h [Back to Amiga Developer Docs ]

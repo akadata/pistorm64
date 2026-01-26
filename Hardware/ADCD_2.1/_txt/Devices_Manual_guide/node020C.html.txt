@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node020C.html
-TITLE: 8SVXSEQN.FADE.doc / Chunk Definitions
-
-8SVXSEQN.FADE.doc / Chunk Definitions ]" border=0> Optional Data Chunk SEQN Optional Data Chunk FADE [Back to Amiga Developer Docs ]

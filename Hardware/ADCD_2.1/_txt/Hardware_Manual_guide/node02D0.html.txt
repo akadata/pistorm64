@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node02D0.html
-TITLE: Hard_Pics/3-24.pic
-
-Hard_Pics/3-24.pic ]" border=0> [Back to Amiga Developer Docs ]

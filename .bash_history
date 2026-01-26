@@ -1,4 +1,0 @@
-dir
-exit
-dir
-exit

@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01D6.html
-TITLE: Glossary / controller
-
-Glossary / controller ]" border=0> Hardware device, such as a mouse, joystick, or light pen, used to move the pointer or furnish other input to the system. [Back to Amiga Developer Docs ]

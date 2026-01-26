@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0120.html
-TITLE: ddebug.lib/DPutFmt
-
-ddebug.lib/DPutFmt ]" border=0> NAME DPutFmt - print formatted data to the parallel port SYNOPSIS DPutFmt(format,values) A0 A1 FUNCTION print formatted data to the parallel port [Back to Amiga Developer Docs ]

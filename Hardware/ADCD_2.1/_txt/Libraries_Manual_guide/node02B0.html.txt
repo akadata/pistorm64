@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node02B0.html
-TITLE: 20 / / Summary of System Controlled Memory Handling Routines
-
-20 / / Summary of System Controlled Memory Handling Routines ]" border=0> AllocMem() and FreeMem() These are system-wide memory allocation and deallocation routines. They use a memory free-list owned and managed by the system. AvailMem() This routine returns the number of free bytes in a specified type of memory. TypeOfMem() This routine returns the memory attributes of a specified memory address. CopyMem() / CopyMemQuick() CopyMem() is a general purpose memory copy routine. CopyMemQuick() is an optimized version of CopyMemQuick(), but has restrictions on the size and alignment of the arguments. [Back to Amiga Developer Docs ]

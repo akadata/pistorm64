@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node047D.html
-TITLE: mathieeedoubbas.doc
-
-mathieeedoubbas.doc ]" border=0> IEEEDPAbs() IEEEDPAdd() IEEEDPCeil() IEEEDPCmp() IEEEDPDiv() IEEEDPFix() IEEEDPFloor() IEEEDPFlt() IEEEDPMul() IEEEDPNeg() IEEEDPSub() IEEEDPTst() [Back to Amiga Developer Docs ]

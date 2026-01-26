@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node007C.html
-TITLE: Library (Exec) Index
-
-Library (Exec) Index ]" border=0> Library (Exec), 435 Close vector, 437 Exec - OpenLibrary(), 435 Expunge vector, 437 Library Vector Offset - see LVO LVO, 436 , 437 Open vector, 437 OpenLibrary(), 435 Reserved vector, 437 version, 435 [Back to Amiga Developer Docs ]

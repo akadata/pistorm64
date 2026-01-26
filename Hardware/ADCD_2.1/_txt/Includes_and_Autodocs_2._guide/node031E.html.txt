@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node031E.html
-TITLE: rexxsyslib.library/IsRexxMsg
-
-rexxsyslib.library/IsRexxMsg ]" border=0> NAME IsRexxMsg - Function to determine if a message came from ARexx SYNOPSIS result = IsRexxMsg(msgptr) D0 A0 BOOL IsRexxMsg(struct RexxMsg *); FUNCTION This function can be used to determine if a message came from an ARexx program. INPUTS msgptr - A pointer to the suspected RexxMsg . RESULTS result - A boolean: TRUE if it is an ARexx message, FALSE if not. SEE ALSO CreateRexxMsg() BUGS [Back to Amiga Developer Docs ]

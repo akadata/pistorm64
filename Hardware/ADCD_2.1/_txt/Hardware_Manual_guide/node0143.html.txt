@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0143.html
-TITLE: F / Interrupt Control Register (ICR) / Read Interrupt Control Register
-
-F / Interrupt Control Register (ICR) / Read Interrupt Control Register ]" border=0> REG NAME D7 D6 D5 D4 D3 D2 D1 D0 --- ---- ---- ---- ---- ---- ---- ---- --- --- D ICR IR 0 0 FLG SP ALRM TB TA [Back to Amiga Developer Docs ]

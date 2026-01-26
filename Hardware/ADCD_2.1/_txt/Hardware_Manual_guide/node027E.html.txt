@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node027E.html
-TITLE: Priority Index
-
-Priority Index ]" border=0> Priority dual playfields, 71 playfield-sprite, 209 priority control register, 210 sprites, 207 [Back to Amiga Developer Docs ]

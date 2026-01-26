@@ -1,1 +1,0 @@
-reaction.lib/FreeChooserLabels ]" border=0> NAME FreeChooserLabels -- Free a linked list of chooser labels SYNOPSIS FreeChooserLabels( list ) void FreeChooserLabels( struct List * ) FUNCTION Free a linked list of chooser labels allocated with ChooserLabelsA() . INPUTS list -- the list to free RESULTS None [Back to Amiga Developer Docs ]

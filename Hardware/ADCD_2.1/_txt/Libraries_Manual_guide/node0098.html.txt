@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0098.html
-TITLE: Public Screen Index
-
-Public Screen Index ]" border=0> Public Screen, 52 , 53 access by name, 83 accessing, 50 and Intuition graphics, 225 cloning, 59 closing, 53 copying pens, 56 default, 52 , 59 , 82 display clip, 59 example, 56 , 83 font, 59 get default, 50 global modes, 52 , 83 jumping, 83 list, 54 locking, 50 , 51 making private, 53 making public, 53 mode, 59 name, 49 , 53 name collision, 45 next, 54 , 83 notification, 49 , 53 POPPUBSCREEN, 52 , 83 requesters, 219 , 219 set default, 50 SHANGHAI, 52 , 83 sharing, 65 status, 53 structures, 54 visitor window, 82 WA_PubScreen, 108 WA_PubScreenFallBack, 108 WA_PubScreenName, 108 window fallback, 83 windows on, 77 , 82 Workbench, 52 [Back to Amiga Developer Docs ]

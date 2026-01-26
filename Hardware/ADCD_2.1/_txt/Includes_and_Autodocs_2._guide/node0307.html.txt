@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0307.html
-TITLE: dos.library/UnLock
-
-dos.library/UnLock ]" border=0> NAME UnLock -- Unlock a directory or file SYNOPSIS UnLock( lock ) D1 void UnLock(BPTR) FUNCTION The filing system lock (obtained from Lock() , DupLock() , or CreateDir() ) is removed and deallocated. INPUTS lock - BCPL pointer to a lock NOTE passing zero to UnLock() is harmless SEE ALSO Lock() , DupLock() , ParentOfFH() , DupLockFromFH() [Back to Amiga Developer Docs ]

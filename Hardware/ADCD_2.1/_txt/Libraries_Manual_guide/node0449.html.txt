@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0449.html
-TITLE: 33 / Context Functions / The Default Context
-
-33 / Context Functions / The Default Context ]" border=0> When you first obtain an IFFHandle through AllocIFF() , a hidden default context node is created. You cannot get direct access to this node through CurrentChunk() or ParentChunk() . However, using StoreLocalItem() , you can store information in this context. [Back to Amiga Developer Docs ]

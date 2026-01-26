@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0144.html
-TITLE: Operating System Issues
-
-Operating System Issues ]" border=0> Kickstart 1.3 vs. 2.04 What Am I Running On? Memory [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node00DB.html
-TITLE: 6 Input Device / Additional Information on the Input Device
-
-6 Input Device / Additional Information on the Input Device ]" border=0> Additional programming information on the input device can be found in the include files and the autodocs for the input device. Both are contained in the Amiga ROM Kernel Reference Manual: Includes and Autodocs. Input Device Information ---------------------------------- INCLUDES devices/ input.h devices/ input.i devices/ inputevent.h devices/ inputevent.i AUTODOCS input.doc [Back to Amiga Developer Docs ]

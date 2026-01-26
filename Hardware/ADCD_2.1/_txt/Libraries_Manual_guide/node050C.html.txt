@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node050C.html
-TITLE: B / propgclass / Attributes: PGA_Freedom (IG)
-
-B / propgclass / Attributes: PGA_Freedom (IG) ]" border=0> This attribute tells a propgclass object on which axis the gadget's knob is free to move, the horizontal or the vertical. It is either FREEHORIZ or FREEVERT . The default is FREEVERT. [Back to Amiga Developer Docs ]

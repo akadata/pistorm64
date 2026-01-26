@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node039B.html
-TITLE: 28 / Using Bobs / Specifying the Size of a Bob
-
-28 / Using Bobs / Specifying the Size of a Bob ]" border=0> Bobs do not have the 16-pixel width limit that applies to VSprites. To specify the overall size of a Bob, use the Height and Width members of the root VSprite structure. Specify the Width as the number of 16-bit words it takes to fully contain the object. The number of lines is still specified with the Height member in the VSprite data structure. As an example, suppose the Bob is 24 pixels wide and 20 lines tall. Use statements like the following to specify the size: myVSprite.Height = 20; /* 20 lines tall. */ myVSprite.Width = 2; /* 24 bits fit into two words. */ Because Bobs are drawn into the background playfield, the pixels of the Bob are the same size as the background pixels, and share the color palette of the ViewPort . [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0445.html
-TITLE: listbrowser_gc/FreeListBrowserList
-
-listbrowser_gc/FreeListBrowserList ]" border=0> NAME FreeListBrowserList -- Free a list of ListBrowser nodes. SYNOPSIS VOID FreeListBrowserList(struct List *) FreeListBrowserList(List) FUNCTION Frees a list of ListBrowser nodes allocated. INPUTS list - The list of nodes to free. SEE ALSO FreeListBrowserNode() [Back to Amiga Developer Docs ]

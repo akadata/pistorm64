@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node01B5.html
-TITLE: ILBM IFF Interleaved Bitmap / Standard BODY Data Chunk
-
-ILBM IFF Interleaved Bitmap / Standard BODY Data Chunk ]" border=0> Raster Layout BODY [Back to Amiga Developer Docs ]

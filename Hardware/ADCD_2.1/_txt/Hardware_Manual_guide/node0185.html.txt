@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0185.html
-TITLE: 8 / / Reading Controllers / Reading Proportional Controller Buttons
-
-8 / / Reading Controllers / Reading Proportional Controller Buttons ]" border=0> For the paddle controllers, the left and right joystick direction lines serve as the fire buttons for the left and right paddles. [Back to Amiga Developer Docs ]

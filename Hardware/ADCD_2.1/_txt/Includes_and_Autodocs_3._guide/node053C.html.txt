@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node053C.html
-TITLE: realtime.library/UnlockRealTime
-
-realtime.library/UnlockRealTime ]" border=0> NAME UnlockRealTime -- unlock internal lists. (V37) SYNOPSIS UnlockRealTime(lockHandle); A0 VOID UnlockRealTime(APTR); FUNCTION Undoes the effects of LockRealTime() . INPUTS lockHandle - value returned by LockRealTime() . May be NULL. SEE ALSO LockRealTime() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node037B.html
-TITLE: iffparse.library/StopChunks
-
-iffparse.library/StopChunks ]" border=0> NAME StopChunks -- declare many stop chunks at once. (V36) SYNOPSIS error = StopChunks(iff, propArray, numPairs); D0 A0 A1 D0 LONG StopChunks(struct IFFHandle *, LONG *, LONG); FUNCTION (is to StopChunk() as PropChunks() is to PropChunk().) INPUTS iff - pointer to IFFHandle structure. propArray - pointer to array of longword chunk types and identifiers. numPairs - number of pairs in the array. RESULT error - 0 if successful or an IFFERR_#? error code if unsuccessful. SEE ALSO StopChunk() , [Back to Amiga Developer Docs ]

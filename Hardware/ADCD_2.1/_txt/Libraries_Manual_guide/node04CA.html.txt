@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04CA.html
-TITLE: B / icclass / Attributes: ICA_MAP (IS)
-
-B / icclass / Attributes: ICA_MAP (IS) ]" border=0> This attribute points to a tag list of attribute mappings which the icclass object uses to change the attribute IDs of an OM_UPDATE 's attribute/value pairs. For example, if an icclass object had the following ICA_MAP: struct TagItem map[] = { {PGA_Top, STRINGA_LongVal}, {MYATTR, MYNEWATTR}, {TAG_END, } }; before sending an OM_UPDATE to its ICA_TARGET , the icclass object scans through the OM_UPDATE message's attribute/value pairs looking for the PGA_Top and MYATTR attributes. If it finds the PGA_Top attribute, it changes PGA_Top to STRINGA_LongVal . Likewise, if the icclass object finds the MYATTR attribute, it changes MYATTR to MYNEWATTR. The icclass object does not disturb the attribute's value. [Back to Amiga Developer Docs ]

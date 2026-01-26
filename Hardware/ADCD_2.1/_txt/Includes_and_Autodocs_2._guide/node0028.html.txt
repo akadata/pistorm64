@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0028.html
-TITLE: Includes/clib/misc_protos.h
-
-Includes/clib/misc_protos.h ]" border=0> #ifndef CLIB_MISC_PROTOS_H #define CLIB_MISC_PROTOS_H /* ** $Filename: clib/misc_protos.h $ ** $Release: 2.04 Includes, V37.4 $ ** $Revision: 36.2 $ ** $Date: 90/11/07 $ ** ** C prototypes. For use with 32 bit integers only. ** ** (C) Copyright 1990-1999 Amiga, Inc. ** All Rights Reserved */ #ifndef EXEC_TYPES_H #include #endif UBYTE *AllocMiscResource( unsigned long unitNum, UBYTE *name ); void FreeMiscResource( unsigned long unitNum ); #endif /* CLIB_MISC_PROTOS_H */ [Back to Amiga Developer Docs ]

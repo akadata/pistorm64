@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node026B.html
-TITLE: I,J,K Index
-
-I,J,K Index ]" border=0> IBM PC, 6 , 7 , 241 Include Files, 10 , 22 , 373 INTEN, 218 INTENA, 217 INTENAR, 217 Interlaced mode, --> Interleaved Memory, 4 Internal Slots, 7 Interrupt, --> Interrupt Control Register, --> Interrupts - during vertical blanking, 219 INTF_BLIT, 187 INTREQ, 35 , 218 INTREQR, 218 Joy stick port, 323 JOY0DAT/JOY1DAT, --> Joystick, --> JOYxDAT, 229 Keyboard, --> Keyboard Port, 319 [Back to Amiga Developer Docs ]

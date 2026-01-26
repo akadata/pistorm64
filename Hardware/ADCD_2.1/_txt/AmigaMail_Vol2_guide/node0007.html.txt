@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0007.html
-TITLE: VII: IFF
-
-VII: IFF ]" border=0> VII-1 The DR2D FORM VII-17 ECS Display Modes and ILBM CAMG VII-21 Developing New IFF FORMs and Chunks VII-25 AmigaGuide 101 [Back to Amiga Developer Docs ]

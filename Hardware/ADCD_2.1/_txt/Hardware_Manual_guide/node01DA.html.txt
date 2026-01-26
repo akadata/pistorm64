@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01DA.html
-TITLE: Glossary / cursor keys
-
-Glossary / cursor keys ]" border=0> The four keys with directional arrows on them (found below the Del and Help keys on the Amiga). [Back to Amiga Developer Docs ]

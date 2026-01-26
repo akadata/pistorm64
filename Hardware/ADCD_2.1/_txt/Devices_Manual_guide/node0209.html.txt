@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0209.html
-TITLE: 8SVX.CHAN.PAN.doc / Optional Data Chunk PAN
-
-8SVX.CHAN.PAN.doc / Optional Data Chunk PAN ]" border=0> The optional data chunk PAN provides the neccessary information to create a stereo sound using a single array of data. It is neccessary to replay the sample simultaneously on two channels, at different volumes. #define ID_PAN MakeID('P','A','N',' ') typedef sposition Fixed; /* 0 [Back to Amiga Developer Docs ]

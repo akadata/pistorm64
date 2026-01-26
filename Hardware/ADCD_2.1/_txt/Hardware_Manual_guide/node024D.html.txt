@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node024D.html
-TITLE: Bitplanes Index
-
-Bitplanes Index ]" border=0> Bitplanes coloring, 55 DMA, 62 in dual-playfield mode, 68 setting the number of, 48 setting the pointers, 54 [Back to Amiga Developer Docs ]

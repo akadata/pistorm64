@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0286.html
-TITLE: Trackball Index
-
-Trackball Index ]" border=0> Trackball, 328 connections, 228 reading, 229 [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0564.html
-TITLE: sound_dtc.doc
-
-sound_dtc.doc ]" border=0> sound.datatype() [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-28 / Using Bobs / Other Items Influencing Bob Colors ]" border=0> The three other members in the VSprite structure that affect the color of Bob pixels are ImageShadow, PlanePick, and PlaneOnOff. ImageShadow PlanePick PlaneOnOff [Back to Amiga Developer Docs ]

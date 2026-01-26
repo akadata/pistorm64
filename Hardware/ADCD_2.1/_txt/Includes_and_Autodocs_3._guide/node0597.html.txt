@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0597.html
-TITLE: utility.library/ApplyTagChanges
-
-utility.library/ApplyTagChanges ]" border=0> NAME ApplyTagChanges -- change a tag list based on a second tag list. (V39) SYNOPSIS ApplyTagChanges(list,changeList); A0 A1 VOID ApplyTagChanges(struct TagItem *, struct TagItem *); FUNCTION For any tag that appears in both 'list' and 'changeList', this function will change the ti_Data field of the tag in 'list' to match the ti_Data field of the tag in 'changeList'. In effect, 'changeList' contains a series of new values for tags already in 'list'. Any tag in 'changeList' that is not in 'list' is ignored. INPUTS list - a list of existing tags (may be NULL) changeList - a list of tags to modify 'list' with (may be NULL) SEE ALSO , FilterTagChanges() [Back to Amiga Developer Docs ]

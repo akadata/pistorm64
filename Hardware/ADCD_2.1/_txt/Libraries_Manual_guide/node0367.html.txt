@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0367.html
-TITLE: 27 / / Performing Data Move Operations / Scaling Rectangular Areas
-
-27 / / Performing Data Move Operations / Scaling Rectangular Areas ]" border=0> BitMapScale() will scale a single bitmap any integral size up to 16,383 times its original size. This function is available only in Release 2 and later versions of the OS. It is called with the address of a BitScaleArgs structure (see scale.h >). void BitMapScale(struct BitScaleArgs *bsa) The bsa argument specifies the BitMap s to use, the source and destination rectangles, as well as the scaling factor. The source and destination may not overlap. The caller must ensure that the destination BitMap is large enough to receive the scaled-up copy of the source rectangle. The function ScalerDiv() is provided to help in the calculation of the destination BitMap's size. [Back to Amiga Developer Docs ]

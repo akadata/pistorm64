@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node040F.html
-TITLE: 31 Commodities Exchange Library / Debug CxObjects
-
-31 Commodities Exchange Library / Debug CxObjects ]" border=0> The final CxObject is the debug CxObject. When a debug CxObject receives a CxMessage , it sends debugging information to the serial port using KPrintF() . debugCxObj = CxObj *CxDebug(LONG ID); The debug CxObject will KPrintF() the following information about itself, the CxMsg , and the corresponding InputEvent structure: DEBUG NODE: 7CB5AB0, ID: 2 CxMsg: 7CA6EF2, type: 0, data 2007CA destination 6F1E07CB dump IE: 7CA6F1E Class 1 Code 40 Qualifier 8000 EventAddress 40001802 There has to be a terminal connected to the Amiga's serial port to receive this information. See the KPrintF() Autodoc (debug.lib) for more details. Note that the debug CxObject did not work before V37. [Back to Amiga Developer Docs ]

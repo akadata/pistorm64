@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0017.html
-TITLE: 1 / / The Custom Chips / Custom Chip Revisions
-
-1 / / The Custom Chips / Custom Chip Revisions ]" border=0> The custom chips have been revised as the Amiga platform has evolved and newer models of the Amiga developed. The latest revision of the Amiga custom chips is known as the Enhanced Chip Set, or ECS . Certain features of the Amiga operating system, such as higher resolution screens and special genlock modes , require the ECS version of the custom chips. In this book, features that require ECS are noted in the accompanying text. For more details about the special features of ECS, see Appendix C of the Amiga Hardware Reference Manual. [Back to Amiga Developer Docs ]

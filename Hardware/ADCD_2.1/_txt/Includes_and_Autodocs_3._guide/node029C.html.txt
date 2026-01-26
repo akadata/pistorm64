@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node029C.html
-TITLE: graphics.library/AddAnimOb
-
-graphics.library/AddAnimOb ]" border=0> NAME AddAnimOb -- Add an AnimOb to the linked list of AnimObs. SYNOPSIS AddAnimOb(anOb, anKey, rp) A0 A1 A2 void AddAnimOb(struct AnimOb *,struct AnimOb **, struct RastPort *); FUNCTION Links this AnimOb into the current list pointed to by animKey. Initializes all the Timers of the AnimOb's components. Calls AddBob with each component's Bob . rp->GelsInfo must point to an initialized GelsInfo structure. INPUTS anOb = pointer to the AnimOb structure to be added to the list anKey = address of a pointer to the first AnimOb in the list (anKey = NULL if there are no AnimObs in the list so far) rp = pointer to a valid RastPort RESULT BUGS SEE ALSO Animate() graphics/rastport.h graphics/gels.h [Back to Amiga Developer Docs ]

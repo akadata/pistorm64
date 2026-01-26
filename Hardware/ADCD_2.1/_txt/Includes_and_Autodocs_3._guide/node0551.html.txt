@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0551.html
-TITLE: rexxsyslib.library/UnlockRexxBase
-
-rexxsyslib.library/UnlockRexxBase ]" border=0> NAME UnlockRexxBase - Release a semaphore lock on the RexxBase structure SYNOPSIS UnlockRexxBase(resource) D0 VOID UnlockRexxBase(ULONG); FUNCTION Releases the specified resource in the ARexx library base. INPUTS resource - A manifest constant defining which resource to unlock. This value *MUST* match the value used in the matching LockRexxBase() call. NOTES Currently, only ZERO resource type is available. You *MUST* make sure that you do not call this function with an undefined value as it may become defined at some future date and cause unwanted behavior. You *MUST* make sure that you only call this function after a matching call to LockRexxBase() was made. SEE ALSO LockRexxBase() BUGS [Back to Amiga Developer Docs ]

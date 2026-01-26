@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node00DB.html
-TITLE: colorwheel_gc.doc
-
-colorwheel_gc.doc ]" border=0> colorwheel.gadget() ConvertHSBToRGB() ConvertRGBToHSB() [Back to Amiga Developer Docs ]

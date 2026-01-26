@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node02D5.html
-TITLE: 22 / The Signal System / Generating a Signal
-
-22 / The Signal System / Generating a Signal ]" border=0> Signals may be generated from both tasks and system interrupts with the Signal() function. VOID Signal( struct Task *task, ULONG signalSet ); For example Signal (tc,mask) would signal the task with the specified mask signals. More than one signal can be specified in the mask. The following example code illustrates Wait() and Signal(). signals.c [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0021.html
-TITLE: 2 / Device Interface / Scope Of Audio Commands
-
-2 / Device Interface / Scope Of Audio Commands ]" border=0> Most audio commands can operate on multiple channels. The exceptions are ADCMD_WAITCYCLE , CMD_WRITE and CMD_READ , which can only operate on one channel at a time. You specify the channel(s) that you want to use by setting the appropriate bits in the ioa_Request.io_Unit field of the IOAudio block. If you send a command for a channel that you do not own, your command will be ignored. For more details, see the section on " Allocation and Arbitration " below. [Back to Amiga Developer Docs ]

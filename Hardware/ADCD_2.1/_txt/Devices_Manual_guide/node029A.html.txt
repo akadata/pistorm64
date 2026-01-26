@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node029A.html
-TITLE: SAMP.doc / Interpreting the Playmode
-
-SAMP.doc / Interpreting the Playmode ]" border=0> PlayMode specifies how the bytes in the PlayMap are to be interpreted. Remember that a PlayMap byte of 0 means "No Wave to Play". #define INDEPENDANT 0 #define MULTI 1 #define STEREO 2 #define PAN 3 PlayMode types: INDEPENDANT(0)-The wave #s for a midi note are to be output on Amiga audio channels 0, 1, 2, and 3 respectively. If the NumOfChans is 1, the second PlayMap byte should be a defined wave number as well (even if it is deliberately set to the same value as the first byte). This insures that all 4 PlayModes will have some effect on a given SAMP file. Also, an application should allow the user to change the PlayMode at will. The PlayMode stored in the SAMP file is only a default or initial set-up condition. [Back to Amiga Developer Docs ]

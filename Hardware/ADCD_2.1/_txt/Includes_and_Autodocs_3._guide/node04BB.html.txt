@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node04BB.html
-TITLE: mathtrans.doc
-
-mathtrans.doc ]" border=0> SPAcos() SPAsin() SPAtan() SPCos() SPCosh() SPExp() SPFieee() SPLog() SPLog10() SPPow() SPSin() SPSincos() SPSinh() SPSqrt() SPTan() SPTanh() SPTieee() [Back to Amiga Developer Docs ]

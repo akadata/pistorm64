@@ -1,1 +1,0 @@
-Simple Sprite Index ]" border=0> Simple Sprite allocation, 619 colors, 618 - and ViewPorts, 618 functions, 619 GfxBase, 632 in Intuition, 619 position, 617 simple definition, 614 [Back to Amiga Developer Docs ]

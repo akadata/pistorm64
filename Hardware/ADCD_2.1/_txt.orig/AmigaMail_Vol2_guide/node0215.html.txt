@@ -1,1 +1,0 @@
-Developer Support Package / copybuff.doc ]" border=0> TABLE OF CONTENTS any_sana2_protocol/CopyFromBuff any_sana2_protocol/CopyToBuff [Back to Amiga Developer Docs ]

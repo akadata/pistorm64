@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node03D2.html
-TITLE: utility.library/CloneTagItems
-
-utility.library/CloneTagItems ]" border=0> NAME CloneTagItems -- Copies a TagItem list. (V36) SYNOPSIS newTagList = CloneTagItems( tagList ) D0 A0 struct TagItem *CloneTagItems( struct TagItem *tagList ); FUNCTION Copies the essential contents of a tagItem list. Internally, it uses AllocateTagItems() so that you can use FreeTagItems() . INPUTS tagList - TagItem list to clone. RESULT newTagList - resultant copy. BUGS SEE ALSO AllocateTagItems() , FreeTagItems() , RefreshTagItemClones() [Back to Amiga Developer Docs ]

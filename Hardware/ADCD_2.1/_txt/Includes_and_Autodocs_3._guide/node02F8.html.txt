@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node02F8.html
-TITLE: graphics.library/InitTmpRas
-
-graphics.library/InitTmpRas ]" border=0> NAME InitTmpRas -- Initialize area of local memory for usage by areafill, floodfill, text. SYNOPSIS InitTmpRas(tmpras, buffer, size) a0 a1 d0 void InitTmpRas( struct TmpRas *, void *, ULONG ); FUNCTION The area of memory pointed to by buffer is set up to be used by RastPort routines that may need to get some memory for intermediate operations in preparation to putting the graphics into the final BitMap . Tmpras is used to control the usage of buffer. INPUTS tmpras - pointer to a TmpRas structure to be linked into a RastPort buffer - pointer to a contiguous piece of chip memory. size - size in bytes of buffer RESULT makes buffer available for users of RastPort BUGS Would be nice if RastPorts could share one TmpRas . SEE ALSO AreaEnd() Flood() Text() graphics/rastport.h [Back to Amiga Developer Docs ]

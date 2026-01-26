@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node02C1.html
-TITLE: 21 Exec Tasks / Task Exclusion
-
-21 Exec Tasks / Task Exclusion ]" border=0> From time to time the advanced system program may find it necessary to access global system data structures. Because these structures are shared by the system and by other tasks that execute asynchronously to your task, a task must prevent other tasks from using these structures while it is reading from or writing to them. This can be accomplished by preventing the operating system from switching tasks by forbidding or disabling. A section of code that requires the use of either of these mechanisms to lock out access by others is termed a critical section. Use of these methods is discouraged. For arbitrating access to data between your tasks, semaphores are a superior solution. (See the " Exec Semaphores " chapter) Forbidding Task Switching Disabling Tasks Task Semaphores [Back to Amiga Developer Docs ]

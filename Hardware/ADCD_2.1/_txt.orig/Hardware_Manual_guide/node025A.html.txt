@@ -1,1 +1,0 @@
-Control register Index ]" border=0> Control Register, 348 register A, 348 bitmap, 349 register B, 349 bitmap, 350 [Back to Amiga Developer Docs ]

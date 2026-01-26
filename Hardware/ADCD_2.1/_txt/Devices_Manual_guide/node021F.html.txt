@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node021F.html
-TITLE: AIFF.doc / AIFF / The Marker Chunk
-
-AIFF.doc / AIFF / The Marker Chunk ]" border=0> The Marker Chunk contains markers that point to positions in the sound data. Markers can be used for whatever purposes an application desires. The Instrument Chunk, defined later in this Note, uses markers to mark loop beginning and end points. Markers Marker Chunk Format [Back to Amiga Developer Docs ]

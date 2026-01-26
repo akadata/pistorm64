@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0408.html
-TITLE: keyboard.doc
-
-keyboard.doc ]" border=0> CMD_CLEAR KBD_ADDRESETHANDLER KBD_READEVENT KBD_READMATRIX KBD_REMRESETHANDLER KBD_RESETHANDLERDONE [Back to Amiga Developer Docs ]

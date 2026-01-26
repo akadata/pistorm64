@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node054C.html
-TITLE: D / Errors / Fireworks
-
-D / Errors / Fireworks ]" border=0> A dazzling pyrotechnic video display is caused by trashing or freeing a copper list which is in use, or trashing the pointers to the copper list. If you aren't messing with copper lists, see above section called " Crashes and Memory Corruption ". [Back to Amiga Developer Docs ]

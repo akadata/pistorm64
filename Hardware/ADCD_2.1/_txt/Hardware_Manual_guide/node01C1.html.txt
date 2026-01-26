@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01C1.html
-TITLE: Glossary / bitmap
-
-Glossary / bitmap ]" border=0> An image made up of pixels. A bitmap is a complete definition for a video display consisting of one or more bitplanes stored in memory. [Back to Amiga Developer Docs ]

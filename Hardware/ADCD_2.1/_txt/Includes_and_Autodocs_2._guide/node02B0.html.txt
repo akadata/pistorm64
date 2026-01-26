@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node02B0.html
-TITLE: dos.library/FreeDeviceProc
-
-dos.library/FreeDeviceProc ]" border=0> NAME FreeDeviceProc -- Releases port returned by GetDeviceProc() (V36) SYNOPSIS FreeDeviceProc(devproc) D1 void FreeDeviceProc(struct DevProc *) FUNCTION Frees up the structure created by GetDeviceProc() , and any associated temporary locks. Decrements the counter incremented by GetDeviceProc() . The counter is in an extension to the 1.3 process structure. After calling FreeDeviceProc(), do not use the port or lock again! It is safe to call FreeDeviceProc(NULL). INPUTS devproc - A value returned by GetDeviceProc() BUGS Counter not currently active in 2.0. SEE ALSO GetDeviceProc() , DeviceProc() , AssignLock() , AssignLate() , AssignPath() [Back to Amiga Developer Docs ]

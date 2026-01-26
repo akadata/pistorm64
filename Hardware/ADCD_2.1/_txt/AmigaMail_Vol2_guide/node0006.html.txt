@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0006.html
-TITLE: VI: Sound and Music
-
-VI: Sound and Music ]" border=0> VI-1 Creating Virtual Voices with Amiga Audio [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node043F.html
-TITLE: 33 IFFParse Library / Writing IFF Files
-
-33 IFFParse Library / Writing IFF Files ]" border=0> IFFParse provides facilities for writing IFF files. Again, IFFParse makes no assumptions about the data you're writing, and concerns itself with verifying the syntax of your output. Creating Chunks In a File Writing Chunk Data A Note On Seekability [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node01AB.html
-TITLE: A / FORM Specs from Original EA Doc / ILBM IFF Interleaved Bitmap
-
-A / FORM Specs from Original EA Doc / ILBM IFF Interleaved Bitmap ]" border=0> Date: January 17, 1986 (CRNG data updated Oct, 1988 by Jerry Morrison) (Appendix E added and CAMG updated Oct, 1988 by Commodore-Amiga, Inc.) From: Jerry Morrison, Electronic Arts Status: Released and in use Introduction Standard Properties Standard BODY Data Chunk Non-standard Data Chunks Appendix A. ILBM Regular Expression Appendix B. ILBM Box Diagram Appendix C. IFF Hints Appendix D. ByteRun1 Encoding Appendix E. Standards Committee [Back to Amiga Developer Docs ]

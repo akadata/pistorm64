@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0152.html
-TITLE: 5 / / Mutual Exclude / Handling of Mutually Exclusive Gadgets
-
-5 / / Mutual Exclude / Handling of Mutually Exclusive Gadgets ]" border=0> Use RemoveGList() to remove the boolean gadget from the window or requester. Set or clear the GFLG_SELECTED flag to reflect the displayed state of the gadget. Replace the gadget using AddGList() and refresh its imagery with RefreshGList() . Of course, several gadgets may be processed with a single call to each of these functions. [Back to Amiga Developer Docs ]

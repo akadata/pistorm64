@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node03A1.html
-TITLE: layers.library/NewLayerInfo
-
-layers.library/NewLayerInfo ]" border=0> NAME NewLayerInfo -- Allocate and Initialize full Layer_Info structure. SYNOPSIS result = NewLayerInfo() d0 struct Layer_Info *NewLayerInfo( void ); FUNCTION Allocate memory required for full Layer_Info structure. Initialize Layer_Info structure in preparation to use other layer operations on this list of layers. Make the Layer_Info unlocked (open). INPUTS None RESULT result- pointer to Layer_Info structure if successful NULL if not enough memory BUGS SEE ALSO graphics/layers.h [Back to Amiga Developer Docs ]

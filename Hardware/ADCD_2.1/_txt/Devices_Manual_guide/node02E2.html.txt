@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node02E2.html
-TITLE: dev_pics/dr2d-2.pic
-
-dev_pics/dr2d-2.pic ]" border=0> [Back to Amiga Developer Docs ]

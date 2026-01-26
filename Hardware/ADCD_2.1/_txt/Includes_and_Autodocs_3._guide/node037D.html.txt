@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node037D.html
-TITLE: iffparse.library/StoreItemInContext
-
-iffparse.library/StoreItemInContext ]" border=0> NAME StoreItemInContext -- store local context item in given context node. (V36) SYNOPSIS StoreItemInContext(iff, localItem, contextNode); A0 A1 A2 VOID StoreItemInContext(struct IFFHandle *, struct LocalContextItem *, struct ContextNode *); FUNCTION Adds the LocalContextItem to the list of items for the given context node. If an LCI with the same Type, ID, and Ident is already present in the ContextNode , it will be purged and replaced with the new one. This is a raw form of StoreLocalItem() . INPUTS iff - pointer to IFFHandle structure for this context. localItem - pointer to a LocalContextItem to be stored. contextNode - pointer to context node in which to store item. SEE ALSO StoreLocalItem() , [Back to Amiga Developer Docs ]

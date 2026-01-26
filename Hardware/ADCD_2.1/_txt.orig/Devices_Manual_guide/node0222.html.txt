@@ -1,1 +1,0 @@
-AIFF.doc / AIFF / The Instrument Chunk ]" border=0> The Instrument Chunk defines basic parameters that an instrument, such as a sample, could use to play the sound data. Looping The Instrument Chunk Format [Back to Amiga Developer Docs ]

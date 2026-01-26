@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node03C6.html
-TITLE: 28 / / Specifying the Animation Object / Position of an AnimOb
-
-28 / / Specifying the Animation Object / Position of an AnimOb ]" border=0> To position the object and its component parts, use the AnimOb structure members AnX and AnY . The following figure illustrates how each component has its own offset from the AnimOb's common reference point. Figure 28-7: Specifying an AnimOb Position When you change the animation object's AnX and AnY , all of the component parts will be redrawn relative to it the next time DrawGList() is called. [Back to Amiga Developer Docs ]

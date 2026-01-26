@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0036.html
-TITLE: asl.library (basename: _AslBase) V36
-
-asl.library (basename: _AslBase) V36 ]" border=0> AllocAslRequest(type,tagList)(d0/a0) - Also stack-based amiga.lib stub AllocAslRequestTags() alloc an ASL requester, with TagItem modifiers (V36) AllocFileRequest()() - Allocates a FileRequester structure (V36) AslRequest(request,tagList)(a0/a1) - lso stack-based amiga.lib stub AslRequestTags(). Get input from user for an ASL requester (V36) FreeAslRequest(request)(a0) - Frees requester obtained from AllocAslRequest (V36) FreeFileRequest(fileReq)(a0) - Frees requester allocated by AllocFileRequest (V36) RequestFile(fileReq)(a0) - request user to select file(s) (V36) [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node014A.html
-TITLE: Q,R Index
-
-Q,R Index ]" border=0> Query_Serial.c, 341 Quick I/O, , 271 RastPort --> Read_BattClock.c, 326 Read_Keyboard_Matrix.c, 122 Read_Potinp.c, 343 Render() --> ReplyMsg(), 292 Reset Handlers, 124 Resources --> RigidDiskBlock --> Run Length Encoding, 205 [Back to Amiga Developer Docs ]

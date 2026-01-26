@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01B1.html
-TITLE: Glossary / aliasing distortion
-
-Glossary / aliasing distortion ]" border=0> A side effect of sound sampling, where two additional frequencies are produced, distorting the sound output. [Back to Amiga Developer Docs ]

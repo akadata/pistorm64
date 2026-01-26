@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04C7.html
-TITLE: B / icclass / Changed Methods: OM_SET
-
-B / icclass / Changed Methods: OM_SET ]" border=0> This method sets its attributes and returns 0. [Back to Amiga Developer Docs ]

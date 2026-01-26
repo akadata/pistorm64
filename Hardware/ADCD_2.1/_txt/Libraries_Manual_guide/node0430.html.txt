@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0430.html
-TITLE: 33 / Stream Management / Custom Streams
-
-33 / Stream Management / Custom Streams ]" border=0> A custom stream handler can allow you (and iffparse.library) to use your compiler's own file I/O functions such as fopen(), fread() and fwrite(), rather than the lower-level AmigaDOS equivalents Open() , Read() , and Write() . A custom stream handler could also be used to read or write IFF files from an Exec device or an unusual handler or filesystem. If you install your own stream handler function, iffparse.library will call your function whenever it needs to read, write, or seek on your file. Your stream handler function will then perform these stream actions for iffparse.library. See the " Custom Stream Handlers " section for more information on custom stream handlers. [Back to Amiga Developer Docs ]

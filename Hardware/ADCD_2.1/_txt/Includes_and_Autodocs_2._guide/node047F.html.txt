@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node047F.html
-TITLE: graphics.library/SortGList
-
-graphics.library/SortGList ]" border=0> NAME SortGList -- Sort the current gel list, ordering its y,x coordinates. SYNOPSIS SortGList(rp) A1 void SortGList(struct RastPort *); FUNCTION Sorts the current gel list according to the gels' y,x coordinates. This sorting is essential before calls to DrawGList or DoCollision . INPUTS rp = pointer to the RastPort structure containing the GelsInfo RESULT BUGS SEE ALSO InitGels() DoCollision() DrawGList() graphics/rastport.h [Back to Amiga Developer Docs ]

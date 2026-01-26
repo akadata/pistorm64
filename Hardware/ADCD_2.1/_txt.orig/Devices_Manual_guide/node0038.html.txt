@@ -1,1 +1,0 @@
-2 / Hardware Control Commands / ADCMD_WAITCYCLE ]" border=0> This is a single-channel command. ADCMD_WAITCYCLE is replied to when the current cycle has completed. If there is no CMD_WRITE in progress, it returns immediately. [Back to Amiga Developer Docs ]

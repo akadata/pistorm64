@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0495.html
-TITLE: Amiga® RKM Libraries: 37 Utility Library
-
-Amiga® RKM Libraries: 37 Utility Library ]" border=0> Utility library is the home for all the OS functions which don't fit in the other libraries. Among the calls in utility library are calls to manage tags and tag lists, callback hooks, and some generic 32-bit math functions, all discussed below. Tags International String Functions Callback Hooks Date Functions 32-bit Integer Math Functions Function Reference [Back to Amiga Developer Docs ]

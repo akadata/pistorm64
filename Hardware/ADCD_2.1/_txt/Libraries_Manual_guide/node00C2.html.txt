@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node00C2.html
-TITLE: Window Index
-
-Window Index ]" border=0> Window, 917 activate message, 261 advantages over menus, 170 automatic size adjust, 111 backdrop window type, 92 borderless window type, 93 borders, 932 change message, 263 close message, 259 defined, 27 dimensions, 85 Examples calculating window border size, 89 opening a window with tags, 80 superbitmap window, 99 using public screens, 83 window sized to the visible display, 86 GimmeZeroZero window type, 93 inactive message, 261 maximum height, 108 maximum width, 108 menus, 169 minimum height, 108 minimum width, 108 new size message, 260 pointer position, 273 position change notify, 91 positioning, 40 problems, 921 , 921 refresh message, 261 requester limit, 204 simple refresh, 94 size change notify, 91 size limits, 108 size verify message, 261 smart refresh, 94 super bit map, 94 user positioning, 77 [Back to Amiga Developer Docs ]

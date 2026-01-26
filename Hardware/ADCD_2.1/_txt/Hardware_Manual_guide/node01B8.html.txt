@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01B8.html
-TITLE: Glossary / asserted
-
-Glossary / asserted ]" border=0> The active state of a state, regardless of its logic sense. [Back to Amiga Developer Docs ]

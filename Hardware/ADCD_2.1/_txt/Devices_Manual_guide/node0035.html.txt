@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0035.html
-TITLE: 2 / Hardware Control Commands / ADCMD_PERVOL
-
-2 / Hardware Control Commands / ADCMD_PERVOL ]" border=0> ADCMD_PERVOL lets you change the volume and period of a CMD_WRITE that is in progress. The change can take place immediately or you can set the ADIOF_SYNCCYCLE flag to have the change occur at the end of the cycle. This is useful to produce vibratos, glissandos, tremolos, and volume envelopes in music or to change the volume of a sound. [Back to Amiga Developer Docs ]

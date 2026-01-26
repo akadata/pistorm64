@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node00ED.html
-TITLE: The Object Attribute Chunks
-
-The Object Attribute Chunks ]" border=0> ATTR (0x41545452) /* Object attributes */ BBOX (0x42424F48) /* Bounding box of next object in FORM */ XTRN (0x5854524E) /* Externally controlled object */ [Back to Amiga Developer Docs ]

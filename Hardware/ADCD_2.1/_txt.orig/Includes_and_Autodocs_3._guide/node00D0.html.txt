@@ -1,1 +1,0 @@
-clicktab_gc/FreeClickTabNode ]" border=0> NAME FreeClickTabNode -- Free a ClickTab node. SYNOPSIS VOID FreeClickTabNode(struct Node *) FreeClickTabNode(node) FUNCTION Frees a ClickTabNode allocated with AllocClickTabNodeA() . INPUTS node - The node to free. SEE ALSO AllocClickTabNodeA() [Back to Amiga Developer Docs ]

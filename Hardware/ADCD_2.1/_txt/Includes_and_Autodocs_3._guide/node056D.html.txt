@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node056D.html
-TITLE: string_gc.doc
-
-string_gc.doc ]" border=0> --datasheet-- STRING_GetClass() [Back to Amiga Developer Docs ]

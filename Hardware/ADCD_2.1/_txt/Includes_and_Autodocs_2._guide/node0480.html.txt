@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0480.html
-TITLE: graphics.library/StripFont
-
-graphics.library/StripFont ]" border=0> NAME StripFont -- remove the tf_Extension from a font (V36) SYNOPSIS StripFont(font) A0 VOID StripFont(struct TextFont *); [Back to Amiga Developer Docs ]

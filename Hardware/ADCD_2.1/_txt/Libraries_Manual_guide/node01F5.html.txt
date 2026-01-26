@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node01F5.html
-TITLE: Amiga® RKM Libraries: 11 Intuition Special Functions
-
-Amiga® RKM Libraries: 11 Intuition Special Functions ]" border=0> There are several Intuition topics which, while not large enough to fill chapters of their own, nontheless deserve to be discussed. The subjects covered here include locking IntuitionBase , the Intuition memory functions AllocRemember() and FreeRemember() , using sprites with Intuition, and Intuition's special internal functions. Locking IntuitionBase Easy Memory Allocation and Deallocation Current Time Values Using Sprites in Intuition Windows and Screens Intuition and Preferences Function Reference [Back to Amiga Developer Docs ]

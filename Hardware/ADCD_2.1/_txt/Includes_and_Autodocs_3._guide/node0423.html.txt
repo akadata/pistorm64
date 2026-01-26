@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0423.html
-TITLE: layers.library/InitLayers
-
-layers.library/InitLayers ]" border=0> NAME InitLayers -- Initialize Layer_Info structure OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE SYNOPSIS OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE InitLayers( li ) a0 void InitLayers( struct Layer_Info *); OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE FUNCTION Initialize Layer_Info structure in preparation to use other layer operations on this list of layers. Make the Layers unlocked (open), available to layer operations. INPUTS li - pointer to LayerInfo structure BUGS SEE ALSO NewLayerInfo() , DisposeLayerInfo() , graphics/layers.h [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node01B8.html
-TITLE: iffparse.library/AllocIFF
-
-iffparse.library/AllocIFF ]" border=0> NAME AllocIFF -- Create a new IFFHandle structure. SYNOPSIS iff = AllocIFF () d0 struct IFFHandle *iff; FUNCTION Allocates a new IFFHandle structure and initializes the basic values. This function is the only supported way to create an IFFHandle structure since there are private fields that need to be initialized. INPUTS RESULT iff - pointer to IFFHandle structure or NULL if the allocation failed. EXAMPLE NOTES BUGS SEE ALSO FreeIFF() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node00BA.html
-TITLE: cd.device/CloseDevice
-
-cd.device/CloseDevice ]" border=0> NAME CloseDevice - terminate access to the CD SYNOPSIS CloseDevice(IORequest); A1 FUNCTION This function will terminate access to the unit openned with OpenDevice() . INPUTS iORequest - pointer to a struct(IOStdReq) RESULTS NOTES SEE ALSO OpenDevice() [Back to Amiga Developer Docs ]

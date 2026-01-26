@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node01E6.html
-TITLE: Composite FORMs / ILBM
-
-Composite FORMs / ILBM ]" border=0> " ILBM " is an InterLeaved BitMap image with color map; a machine-independent format for raster images. FORM ILBM is the standard image file format for the Commodore-Amiga computer and is useful in other environments, too. See the supplemental document "ILBM" IFF Interleaved Bitmap. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0371.html
-TITLE: iffparse.library/ParentChunk
-
-iffparse.library/ParentChunk ]" border=0> NAME ParentChunk -- get the nesting context node for the given chunk. (V36) SYNOPSIS parent = ParentChunk(contextNode); D0 A0 struct ContextNode *ParentChunk(struct ContextNode *); FUNCTION Returns a context node for the chunk containing the chunk for the given context node. This function effectively moves down the context stack into previously pushed contexts. For example, to get a ContextNode pointer for the enclosing FORM chunk while reading a data chunk, use: ParentChunk(CurrentChunk(iff)) to find this pointer. The ContextNode structure contains information on the type of chunk and its size. INPUTS contextNode - pointer to a context node. RESULT parent - pointer to the enclosing context node or NULL if none. SEE ALSO CurrentChunk() , [Back to Amiga Developer Docs ]

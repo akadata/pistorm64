@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node005D.html
-TITLE: asl.library/FreeFileRequest
-
-asl.library/FreeFileRequest ]" border=0> NAME FreeFileRequest -- free file requester structure. (V36) SYNOPSIS FreeFileRequest(requester); A0 VOID FreeFileRequest(struct FileRequester *); NOTES This function is obsolete, please use AllocAslRequest() instead. SEE ALSO FreeAslRequest() [Back to Amiga Developer Docs ]

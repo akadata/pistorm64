@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0158.html
-TITLE: dos.library/EndNotify
-
-dos.library/EndNotify ]" border=0> NAME EndNotify -- Ends a notification request (V36) SYNOPSIS EndNotify(notifystructure) D1 VOID EndNotify(struct NotifyRequest *) FUNCTION Removes a notification request. Safe to call even if StartNotify() failed. For NRF_SEND_MESSAGE, it searches your port for any messages about the object in question and removes and replies them before returning. INPUTS notifystructure - a structure passed to StartNotify() SEE ALSO StartNotify() , [Back to Amiga Developer Docs ]

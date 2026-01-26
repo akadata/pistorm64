@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04AE.html
-TITLE: Amiga® RKM Libraries: A Linker Libraries
-
-Amiga® RKM Libraries: A Linker Libraries ]" border=0> This section describes the amiga.lib and debug.lib libraries. Unlike the libraries described in the other chapters of the manual, these are not shared run-time libraries. Code from the linker libraries is inserted by the linker into your final program. Only the functions you use are pulled into your code. These libraries are typically supplied by your language or compiler vendor. Amiga.lib Debug.lib [Back to Amiga Developer Docs ]

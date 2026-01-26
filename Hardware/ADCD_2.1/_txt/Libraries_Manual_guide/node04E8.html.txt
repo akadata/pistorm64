@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04E8.html
-TITLE: B / sysiclass / Attributes: SYSIA_DrawInfo (I)
-
-B / sysiclass / Attributes: SYSIA_DrawInfo (I) ]" border=0> This attribute contains a pointer to a DrawInfo structure (defined in screens.h >) describing the target screen. The class requires this attribute in order to generate the image into a bitmap cache. [Back to Amiga Developer Docs ]

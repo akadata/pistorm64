@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0554.html
-TITLE: D / Errors / Memory Loss--Workbench Only
-
-D / Errors / Memory Loss--Workbench Only ]" border=0> Commonly, this is caused by a failure of your code to unload after you exit. Make sure that your code is being linked with a standard correct startup module, and do not use the Exit (n) function to exit your program. This function will bypass your startup code's cleanup, including its ReplyMsg() of the WBStartup message (which would signal Workbench to unload your program from memory). You should exit via either exit(n) where n is a valid DOS error code such as RETURN_OK ( dos.h >), or via final "}" or return. Assembler programmers using startup code can JMP to _exit with a long return value on stack, or use the RTS instruction. [Back to Amiga Developer Docs ]

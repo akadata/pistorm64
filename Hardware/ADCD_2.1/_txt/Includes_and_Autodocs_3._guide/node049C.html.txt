@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node049C.html
-TITLE: mathieeesingbas.doc
-
-mathieeesingbas.doc ]" border=0> IEEESPAbs() IEEESPAdd() IEEESPCeil() IEEESPCmp() IEEESPDiv() IEEESPFix() IEEESPFloor() IEEESPFlt() IEEESPMul() IEEESPNeg() IEEESPSub() IEEESPTst() [Back to Amiga Developer Docs ]

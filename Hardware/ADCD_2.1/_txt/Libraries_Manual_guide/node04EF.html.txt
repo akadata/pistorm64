@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04EF.html
-TITLE: B / fillrectclass / Attributes: IA_Mode (IS)
-
-B / fillrectclass / Attributes: IA_Mode (IS) ]" border=0> This attribute contains the drawing mode for the pattern (JAM1, JAM2, etc.) [Back to Amiga Developer Docs ]

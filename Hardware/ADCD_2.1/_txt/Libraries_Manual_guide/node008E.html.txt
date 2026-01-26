@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node008E.html
-TITLE: Nodes Index
-
-Nodes Index ]" border=0> Nodes initialization, 489 inserting, 491 priority, 489 removing, 491 successor and predecessor, 488 text names, 489 type, 489 [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-SAD/WRITE_WORD ]" border=0> WRITE WORD - Write the given data to the address given Command: $AF $02 Data: $ww $xx $yy $zz $qq $rr Write the word to address Command will be ACK'ed when received. Command ACK: $00 $02 Command DONE: $1F $02 [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-2 / The WAIT Instruction / The Comparison Enable Bits ]" border=0> Bits 14-1 are normally set to all 1s. The use of the comparison enable bits is described later in the Advanced Topics section. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0281.html
-TITLE: Scrolling Index
-
-Scrolling Index ]" border=0> Scrolling data fetch, 82 delay, 85 horizontal, 82 in dual-playfield mode, 71 in high resolution mode, 82 modulo, 82 vertical, 81 [Back to Amiga Developer Docs ]

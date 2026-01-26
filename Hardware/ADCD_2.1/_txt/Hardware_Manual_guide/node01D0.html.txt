@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01D0.html
-TITLE: Glossary / color descriptor words
-
-Glossary / color descriptor words ]" border=0> Pairs of words that define each line of a sprite. [Back to Amiga Developer Docs ]

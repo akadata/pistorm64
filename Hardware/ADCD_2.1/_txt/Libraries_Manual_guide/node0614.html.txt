@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0614.html
-TITLE: lib_startup/Rstartup.i
-
-lib_startup/Rstartup.i ]" border=0> RSTARTUP SET 1 [Back to Amiga Developer Docs ]

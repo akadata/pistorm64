@@ -1,1 +1,0 @@
-B / frameiclass / Changed Methods: IDS_SELECTED, IDS_INACTIVESELECTED ]" border=0> In these states, the frame renders its edges using SHADOWPEN and SHINEPEN. If it is a filled frame the frame uses the FILLPEN for its interior. See the imageclass description for IM_DRAW for more details. [Back to Amiga Developer Docs ]

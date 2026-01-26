@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0236.html
-TITLE: Glossary / video display
-
-Glossary / video display ]" border=0> Everything that appears on the screen of a video monitor or television. [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-Glossary / overscan area ]" border=0> The normally unused area surrounding a standard-size computer display. The overscan area is important in video applications. [Back to Amiga Developer Docs ]

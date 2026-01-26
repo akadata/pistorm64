@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0143.html
-TITLE: dos.library/AttemptLockDosList
-
-dos.library/AttemptLockDosList ]" border=0> NAME AttemptLockDosList -- Attempt to lock the Dos Lists for use (V36) SYNOPSIS dlist = AttemptLockDosList(flags) D0 D1 struct DosList *AttemptLockDosList(ULONG) FUNCTION Locks the dos device list in preparation to walk the list. If the list is 'busy' then this routine will return NULL. See LockDosList() for more information. INPUTS flags - Flags stating which types of nodes you want to lock. RESULT dlist - Pointer to the beginning of the list or NULL. Not a valid node! BUGS In V36 through V39.23 dos, this would return NULL or 0x00000001 for failure. Fixed in V39.24 dos (after kickstart 39.106). SEE ALSO LockDosList() , UnLockDosList() , Forbid() , NextDosEntry() [Back to Amiga Developer Docs ]

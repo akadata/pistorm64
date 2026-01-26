@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node00A9.html
-TITLE: IM_ERASE
-
-IM_ERASE ]" border=0> The IM_ERASE method tells an image to erase itself. The Intuition function EraseImage() uses this method. IM_ERASE receives the following parameters: struct impErase { ULONG MethodID; struct RastPort *imp_RPort; struct { WORD X; WORD Y; } imp_Offset; }; The mytextlabelclass example doesn't know anything about this method, so it blindly passes this message on to the superclass. The superclass, imageclass, will call the graphics.library function EraseRect() using the dimensions found in the imageclass object's Image structure. [Back to Amiga Developer Docs ]

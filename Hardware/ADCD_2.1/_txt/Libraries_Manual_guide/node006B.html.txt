@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node006B.html
-TITLE: Image structure Index
-
-Image structure Index ]" border=0> Image structure, 180 , 190 , 191 , 192 , 223 , 224 , 224-225 , 225 , 353 bit-plane organization, 227 calculation of data size, 226 color computation, 228 Depth, 226 , 231 Height, 226 , 231 ImageData, 226 , 227 , 231 LeftEdge, 226 , 240 NextImage, 226 PlaneOnOff, 226 , 230-231 PlanePick, 226 , 230 TopEdge, 226 , 240 Width, 226 , 231 [Back to Amiga Developer Docs ]

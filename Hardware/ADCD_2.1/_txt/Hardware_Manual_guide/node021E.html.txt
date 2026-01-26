@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node021E.html
-TITLE: Glossary / read-only
-
-Glossary / read-only ]" border=0> Describes a register or memory area that can be read but not written. [Back to Amiga Developer Docs ]

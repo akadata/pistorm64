@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0034.html
-TITLE: amiga.lib/DeleteExtIO
-
-amiga.lib/DeleteExtIO ]" border=0> NAME DeleteExtIO - return memory allocated for extended IO request SYNOPSIS DeleteExtIO(ioReq); VOID DeleteExtIO(struct IORequest *); FUNCTION Frees up an IO request as allocated by CreateExtIO() . INPUTS ioReq - the IORequest block to be freed, or NULL. SEE ALSO CreateExtIO() [Back to Amiga Developer Docs ]

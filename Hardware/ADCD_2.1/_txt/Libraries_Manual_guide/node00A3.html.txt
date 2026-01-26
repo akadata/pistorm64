@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node00A3.html
-TITLE: Right Mouse Button Index
-
-Right Mouse Button Index ]" border=0> Right Mouse Button cancel window drag, 77 cancel window sizing, 78 disable menu, 110 information transfer, 266 trap, 268 with alert, 220 [Back to Amiga Developer Docs ]

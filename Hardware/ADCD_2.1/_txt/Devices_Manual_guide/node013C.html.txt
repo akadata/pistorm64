@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node013C.html
-TITLE: IFF Index
-
-IFF Index ]" border=0> IFF chunk, 352 color map chunk, 352 definition, 351 file contents, 351 file extensibility, 354 FORM and chunk registry, 429 FORM, 352 ILBM, 352 introduction, 351 [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0008.html
-TITLE: amigaguide.library/AmigaGuideSignal
-
-amigaguide.library/AmigaGuideSignal ]" border=0> NAME AmigaGuideSignal - Obtain aysnc AmigaGuide signal. (V34) SYNOPSIS signal = AmigaGuideSignal ( handle ); d0 a0 ULONG AmigaGuideSignal (AMIGAGUIDECONTEXT); FUNCTION This function returns the signal bit to Wait on for AmigaGuideMsg's for a particular AmigaGuide database. INPUTS handle -- Handle to a AmigaGuide system. EXAMPLE ULONG sigw, sigh; AMIGAGUIDECONTEXT handle; /* get the signal bit to wait on for a AmigaGuide message */ sigh = AmigaGuideSignal(handle); /* add the signal bit into the total signals to wait on */ sigw |= sigh; RETURNS signal -- Signal bit to Wait on. SEE ALSO OpenAmigaGuideAsyncA() , GetAmigaGuideMsg() , ReplyAmigaGuideMsg() [Back to Amiga Developer Docs ]

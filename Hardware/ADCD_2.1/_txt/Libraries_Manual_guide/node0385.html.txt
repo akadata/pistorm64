@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0385.html
-TITLE: 28 / Using Virtual Sprites / VSprite Image Size
-
-28 / Using Virtual Sprites / VSprite Image Size ]" border=0> A true VSprite is always one word (16 pixels) wide and may be any number of lines high. It can be made to appear thinner by making some pixels transparent. Like Simple Sprites, VSprite pixels are always the size of a pixel in low-resolution mode (320x200); regardless of the resolution the display is set to. To specify how many lines make up the VSprite image, the VSprite structure member, Height , is used. VSprites always have a Depth of two, allowing for three colors. The values may be set like this: myVSprite.Width = 1; /* ALWAYS 1 for true VSprites. */ myVSprite.Height = 5; /* The example height. */ myVSprite.Depth = 2; /* ALWAYS 2 for true VSprites. */ [Back to Amiga Developer Docs ]

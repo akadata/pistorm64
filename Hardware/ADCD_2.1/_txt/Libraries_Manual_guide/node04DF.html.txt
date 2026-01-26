@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04DF.html
-TITLE: B Boopsi Class Reference / frameiclass
-
-B Boopsi Class Reference / frameiclass ]" border=0> Class: frameiclass Superclass: imageclass Include File: imageclass.h > This is a class of framing image, which can optionally fill itself. Its purpose is to frame other display elements using an embossed or recessed rectangular frame. The frame renders itself using the appropriate DrawInfo pens (SHINEPEN, SHADOWPEN, etc.). This class is intelligent enough to bound or center its contents. New Methods: ------------ None. Changed Methods: ---------------- IM_DRAW IDS_NORMAL, IDS_INACTIVENORMAL, IDS_DISABLED IDS_SELECTED, IDS_INACTIVESELECTED IM_DRAWFRAME IM_FRAMEBOX Attributes: ----------- IA_Recessed (IS) IA_EdgesOnly (IS) [Back to Amiga Developer Docs ]

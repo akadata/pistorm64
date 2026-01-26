@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0566.html
-TITLE: E / Release 2 Changes That Can Affect Compatibility / Gameport Device
-
-E / Release 2 Changes That Can Affect Compatibility / Gameport Device ]" border=0> * Initial state of hardware lines may differ. [Back to Amiga Developer Docs ]

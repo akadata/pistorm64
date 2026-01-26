@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04C8.html
-TITLE: B / icclass / Changed Methods: OM_UPDATE/OM_NOTIFY
-
-B / icclass / Changed Methods: OM_UPDATE/OM_NOTIFY ]" border=0> These methods tell the object to notify its ICA_TARGET of attribute changes by sending the target an OM_UPDATE message. If the object has an ICA_MAP , it maps the attribute IDs it finds to new attribute IDs. See the rootclass descriptions of OM_NOTIFY and OM_UPDATE for more information. The return value for this method is not explicitly defined. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node048A.html
-TITLE: mathieeedoubtrans.doc
-
-mathieeedoubtrans.doc ]" border=0> IEEEDPAcos() IEEEDPAsin() IEEEDPAtan() IEEEDPCos() IEEEDPCosh() IEEEDPExp() IEEEDPFieee() IEEEDPLog() IEEEDPLog10() IEEEDPPow() IEEEDPSin() IEEEDPSincos() IEEEDPSinh() IEEEDPSqrt() IEEEDPTan() IEEEDPTanh() IEEEDPTieee() [Back to Amiga Developer Docs ]

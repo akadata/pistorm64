@@ -1,1 +1,0 @@
-Color registers Index ]" border=0> Color registers contents, 46 loading, 47 names of registers, 46 sprites, 130 [Back to Amiga Developer Docs ]

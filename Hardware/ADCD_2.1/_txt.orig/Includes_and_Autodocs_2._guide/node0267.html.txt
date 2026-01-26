@@ -1,1 +1,0 @@
-mathtrans.doc ]" border=0> SPAcos() SPExp() SPSin() SPTanh() SPAsin() SPFieee() SPSincos() SPTieee() SPAtan() SPLog() SPSinh() SPCos() SPLog10() SPSqrt() SPCosh() SPPow() SPTan() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0064.html
-TITLE: 10 Printer Device / Additional Information on the Printer Device
-
-10 Printer Device / Additional Information on the Printer Device ]" border=0> Additional programming information on the printer device can be found in the include files and the Autodocs for the printer device. Both are contained in the Amiga ROM Kernel Reference Manual: Includes and Autodocs. Printer Device Information --------------------------------- INCLUDES devices/ printer.h devices/ printer.i devices/ prtbase.h devices/ prtbase.i devices/ prtgfx.h devices/ prtgfx.i AUTODOCS printer.doc Additional printer drivers can be found on Fred Fish Disk #344 under RKMCompanion. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node022E.html
-TITLE: Glossary / task
-
-Glossary / task ]" border=0> A software function spawned by a process. Each task is an operating system module or application program which is running and that has full control over its own virtual 68000 machine. [Back to Amiga Developer Docs ]

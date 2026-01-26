@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node01FA.html
-TITLE: 11 / Easy Memory Allocation and Deallocation / The Remember Structure
-
-11 / Easy Memory Allocation and Deallocation / The Remember Structure ]" border=0> The Remember structure is defined in intuition > as follows: struct Remember { struct Remember *NextRemember; ULONG RememberSize; UBYTE *Memory; }; Generally, the Remember structure is handled only by the system. Here are its fields: NextRemember - The link to the next Remember structure. RememberSize - The size of the memory tracked by this node. Memory - A pointer to the memory tracked by this node. [Back to Amiga Developer Docs ]

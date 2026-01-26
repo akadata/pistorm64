@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node02A6.html
-TITLE: dos.library/FindCliProc
-
-dos.library/FindCliProc ]" border=0> NAME FindCliProc -- returns a pointer to the requested CLI process (V36) SYNOPSIS proc = FindCliProc(num) D0 D1 struct Process *FindCliProc(LONG) FUNCTION This routine returns a pointer to the CLI process associated with the given CLI number. If the process isn't an active CLI process, NULL is returned. NOTE: should normally be called inside a Forbid() , if you must use this function at all. INPUTS num - Task number of CLI process RESULT proc - Pointer to given CLI process SEE ALSO Cli() , Forbid() , MaxCli() [Back to Amiga Developer Docs ]

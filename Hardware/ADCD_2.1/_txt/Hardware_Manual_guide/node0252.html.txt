@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0252.html
-TITLE: BPLCON2 Index
-
-BPLCON2 Index ]" border=0> BPLCON2, 72 , 210 , 298 in dual-playfield priority, 71 [Back to Amiga Developer Docs ]

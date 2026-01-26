@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node018D.html
-TITLE: III-1/Diagram5.ilbm
-
-III-1/Diagram5.ilbm ]" border=0> [Back to Amiga Developer Docs ]

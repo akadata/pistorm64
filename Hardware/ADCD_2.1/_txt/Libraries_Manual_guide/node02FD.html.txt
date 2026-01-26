@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node02FD.html
-TITLE: 25 / / The Signal Semaphore / Releasing a SignalSemaphore
-
-25 / / The Signal Semaphore / Releasing a SignalSemaphore ]" border=0> Once you have obtained the semaphore and completed any operations on the semaphore protected object, you should release the semaphore. The ReleaseSemaphore() function does this. For each successful ObtainSemaphore() , ObtainSemaphoreShared() and AttemptSemaphore() call you make, you must have a matching ReleaseSemaphore() call. [Back to Amiga Developer Docs ]

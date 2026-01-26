@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0556.html
-TITLE: D / Errors / Out-of-Sync Response to Input
-
-D / Errors / Out-of-Sync Response to Input ]" border=0> Caused by failing to handle all received signals or all possible messages after a Wait() or WaitPort() call. More than one event or message may have caused your program to awakened. Check the signals returned by Wait() and act on every one that is set. At ports which may have more than one message (for instance, a window's IDCMP port), you must handle the messages in a while(msg=GetMsg(...)) loop. [Back to Amiga Developer Docs ]

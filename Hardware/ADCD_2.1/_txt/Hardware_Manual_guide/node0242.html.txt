@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0242.html
-TITLE: 68000 Index
-
-68000 Index ]" border=0> 68000, 2 , 187 normal cycle, 196 test-and-set instruction, 196 [Back to Amiga Developer Docs ]

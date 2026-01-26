@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0009.html
-TITLE: IX: Timer, Serial, and Parallel
-
-IX: Timer, Serial, and Parallel ]" border=0> IX-1 Four Can Play - Supporting Parallel Port Joysticks [Back to Amiga Developer Docs ]

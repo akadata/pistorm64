@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node05B9.html
-TITLE: wb.doc
-
-wb.doc ]" border=0> AddAppIconA() AddAppMenuItemA() AddAppWindowA() AddAppWindowDropZoneA() ChangeWorkbenchSelectionA() CloseWorkbenchObjectA() MakeWorkbenchObjectVisibleA() OpenWorkbenchObjectA() RemoveAppIcon() RemoveAppMenuItem() RemoveAppWindow() RemoveAppWindowDropZone() WBInfo() WorkbenchControlA() [Back to Amiga Developer Docs ]

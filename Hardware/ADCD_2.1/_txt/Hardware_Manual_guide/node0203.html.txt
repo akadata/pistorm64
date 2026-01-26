@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0203.html
-TITLE: Glossary / millisecond (ms)
-
-Glossary / millisecond (ms) ]" border=0> One thousandth of second (1/1,000). [Back to Amiga Developer Docs ]

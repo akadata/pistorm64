@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0258.html
-TITLE: SAD/WRITE_BYTE
-
-SAD/WRITE_BYTE ]" border=0> WRITE BYTE - Write the given data to the address given (V40 SAD) Command: $AF $01 Data: $ww $xx $yy $zz $qq Write the byte to address Command will be ACK'ed when received. Command ACK: $00 $01 Command DONE: $1F $01 BUGS This command does not exists in pre-V40 EXEC. This command can be emulated with the WRITE_ARRAY command with a length of 1. [Back to Amiga Developer Docs ]

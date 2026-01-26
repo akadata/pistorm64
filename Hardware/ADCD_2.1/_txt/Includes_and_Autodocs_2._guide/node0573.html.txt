@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0573.html
-TITLE: FD/battmem_lib.fd
-
-FD/battmem_lib.fd ]" border=0> * "battmem.resource" ##base _BattMemBase ##bias 6 ##public ObtainBattSemaphore()() ReleaseBattSemaphore()() ReadBattMem(buffer,offset,length)(a0,d0/d1) WriteBattMem(buffer,offset,length)(a0,d0/d1) ##end [Back to Amiga Developer Docs ]

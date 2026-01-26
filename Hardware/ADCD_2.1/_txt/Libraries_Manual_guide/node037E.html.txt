@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node037E.html
-TITLE: 28 / / Simple Sprite Functions / Relinquishing A Simple Sprite
-
-28 / / Simple Sprite Functions / Relinquishing A Simple Sprite ]" border=0> The FreeSprite() function returns a hardware sprite allocated with GetSprite() to the system so that GELs or other tasks can use it. After you call FreeSprite(), the GELs system can use it to allocate VSprites. The syntax of this function is: WORD sprite_number; FreeSprite(sprite_number); The sprite_number argument is the number (0-7) of the sprite to be returned to the system. [Back to Amiga Developer Docs ]

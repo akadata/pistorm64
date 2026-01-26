@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node00A5.html
-TITLE: cd.device/CD_CHANGESTATE
-
-cd.device/CD_CHANGESTATE ]" border=0> NAME CD_CHANGESTATE -- check if a "valid" disk is currently in a drive. FUNCTION This command checks to see if there is a "valid" disk in a drive. IO REQUEST INPUT io_Device preset by the call to OpenDevice() io_Unit preset by the call to OpenDevice() io_Command CD_CHANGESTATE IO REQUEST RESULT io_Error - 0 for success, or an error code as defined in io_Actual - 0 means there is a disk while anything else indicates there is no disk. NOTES A "valid" disk is a disk with a readable table of contents. [Back to Amiga Developer Docs ]

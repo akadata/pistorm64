@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node01C4.html
-TITLE: iffparse.library/FindPropContext
-
-iffparse.library/FindPropContext ]" border=0> NAME FindPropContext -- Get the property context for the current state. SYNOPSIS cn = FindPropContext (iff) d0 a0 struct ContextNode *cn; struct IFFHandle *iff; FUNCTION Locates the context node which would be the scoping chunk for properties in the current parsing state. (Huh?) This is used for locating the proper scoping context for property chunks i.e. the scope from which a property would apply. This is usually the FORM or LIST with the highest precedence in the context stack. If you don't understand this, read the IFF spec a couple more times. INPUTS iff - pointer to IFFHandle struct. RESULT cn - ContextNode of property scoping chunk. EXAMPLE NOTES BUGS SEE ALSO CurrentChunk() , ParentChunk() , StoreItemInContext() [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-Glossary / Digital-to-Analog Converter (DAC) ]" border=0> A device that converts a binary quantity to an analog level. [Back to Amiga Developer Docs ]

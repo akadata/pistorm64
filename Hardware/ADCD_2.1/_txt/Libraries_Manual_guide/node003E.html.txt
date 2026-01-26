@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node003E.html
-TITLE: Border structure Index
-
-Border structure Index ]" border=0> Border structure, 123 , 212 , 223 , 224 , 224 , 234-235 , 235 , 238 BackPen, 234 Count, 234 data organization, 237 definition, 234 DrawMode, 234 FrontPen, 234 , 237 LeftEdge, 234 , 235 , 238 , 238 NextBorder, 235 , 238 TopEdge, 234 , 235 , 238 , 238 XY 234, 235 , 237-238 [Back to Amiga Developer Docs ]

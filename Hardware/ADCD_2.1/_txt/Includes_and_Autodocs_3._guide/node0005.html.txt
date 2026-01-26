@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0005.html
-TITLE: amigaguide.library/--background--
-
-amigaguide.library/--background-- ]" border=0> PURPOSE The amigaguide.library provides a means whereby developers can easily add on-line help abilities to their applications. [Back to Amiga Developer Docs ]

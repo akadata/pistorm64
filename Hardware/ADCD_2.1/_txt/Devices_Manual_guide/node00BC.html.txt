@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node00BC.html
-TITLE: 5 Gameport Device / Additional Information on the Gameport Device
-
-5 Gameport Device / Additional Information on the Gameport Device ]" border=0> Additional programming information on the gameport device can be found in the include files and the Autodocs for the gameport and input devices. Both are contained in the Amiga ROM Kernel Reference Manual: Includes and Autodocs. Gameport Device Information ----------------------------------- INCLUDES devices/ gameport.h devices/ gameport.i devices/ inputevent.h devices/ inputevent.i AUTODOCS gameport.doc [Back to Amiga Developer Docs ]

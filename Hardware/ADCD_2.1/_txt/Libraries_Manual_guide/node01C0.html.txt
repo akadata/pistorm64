@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node01C0.html
-TITLE: 8 Intuition Images, Line Drawing and Text / Creating Borders
-
-8 Intuition Images, Line Drawing and Text / Creating Borders ]" border=0> This data type is called a Border since it was originally used to create border lines around display objects. It is actually a general purpose structure for drawing connected lines between any series of points. A Border is easier to use than an Image structure. Only the following need be specified to define a border: * An internal position component which is used in determining the final position of the border. * A set of coordinate pairs for each vertex. * A color for the lines. * One of several drawing modes. Border Structure Definition Border Colors and Drawing Modes Directly Drawing the Borders Border Coordinates Border Example Linking Borders [Back to Amiga Developer Docs ]

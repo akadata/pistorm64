@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node04A1.html
-TITLE: mathieeedoubtrans.library/IEEEDPTan
-
-mathieeedoubtrans.library/IEEEDPTan ]" border=0> NAME IEEEDPTan -- compute the tangent of a floating point number SYNOPSIS x = IEEEDPTan( y ); d0/d1 d0/d1 double x,y; FUNCTION Compute tangent of y in IEEE double precision INPUTS y - IEEE double precision floating point value RESULT x - IEEE double precision floating point value BUGS SEE ALSO IEEEDPAtan() , IEEEDPSin() , IEEEDPCos() [Back to Amiga Developer Docs ]

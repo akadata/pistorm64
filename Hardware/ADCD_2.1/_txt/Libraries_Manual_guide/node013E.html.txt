@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node013E.html
-TITLE: 5 Intuition Gadgets / Gadget Highlighting
-
-5 Intuition Gadgets / Gadget Highlighting ]" border=0> In general, the appearance of an active or selected gadget changes to inform the user the gadget state has changed. A highlighting method is specified by setting one of the highlighting flags in the Gadget structure's Flags field. Intuition supports three methods of activation or selection highlighting: * Highlighting by color complementing ( GFLG_GADGHCOMP ) * Highlighting by drawing a box ( GFLG_GADGHBOX ) * Highlighting by an alternate image or border ( GFLG_GADGHIMAGE ) * No highlighting ( GFLG_GADGHNONE ) One of the highlighting types or GFLG_GADGHNONE must be specified for each gadget. Highlighting by Color Complementing Highlighting by Drawing a Box Highlighting with an Alternate Image or Alternate Border [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-B / imageclass / Changed Methods: OM_SET ]" border=0> This method applies to all imageclass attributes. OM_SET returns 1. [Back to Amiga Developer Docs ]

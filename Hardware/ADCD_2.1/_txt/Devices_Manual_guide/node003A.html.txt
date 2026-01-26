@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node003A.html
-TITLE: 2 / Hardware Control Commands / CMD_START
-
-2 / Hardware Control Commands / CMD_START ]" border=0> CMD_START undoes the CMD_STOP command. Any cycles that were stopped by the CMD_STOP command are actually lost because of the impossibility of determining exactly where the DMA ceased. If the CMD_WRITE command was playing two cycles and the first one was playing when CMD_STOP was issued, the first one is lost and the second one will be played. This command is also useful when you are playing the same wave form with the same period out of multiple channels. If the channels are stopped when the CMD_WRITE commands are issued, CMD_START exactly synchronizes them, avoiding cancellation and distortion. When channels are allocated, they are effectively started by the CMD_START command. [Back to Amiga Developer Docs ]

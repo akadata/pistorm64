@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0279.html
-TITLE: Amiga® RKM Libraries: 16 ASL Library
-
-Amiga® RKM Libraries: 16 ASL Library ]" border=0> This chapter describes the asl.library. The sole purpose of this library is to provide standard file and font requesters for application programs. It is easier to understand the asl.library if you are familiar with some basic concepts of the Amiga operating system, especially TagItem arrays (described in the " Utility Library " chapter), Intuition screens and windows, graphics library font structures, and AmigaDOS pattern matching. About Requesters Calling Custom Functions from a Requester Creating a File Requester Function Reference Creating a Font Requester [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01FD.html
-TITLE: Glossary / low
-
-Glossary / low ]" border=0> A signal driven to a logical +0V state is said to be low. [Back to Amiga Developer Docs ]

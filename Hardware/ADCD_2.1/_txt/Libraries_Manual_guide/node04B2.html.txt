@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04B2.html
-TITLE: A / Amiga.lib / Math
-
-A / Amiga.lib / Math ]" border=0> afp() Converts ASCII string variable into fast floating-point. arnd() ASCII round-off of the provided floating-point string." dbf() Accepts a dual-binary format floating-point number and converts it to FFP format. fpa() Accepts an FFP number and the address of the ASCII string where its converted output is to be stored. The number is converted to a NULL terminated ASCII string and stored at the address provided. Additionally, the base ten (10) exponent in binary form is returned. [Back to Amiga Developer Docs ]

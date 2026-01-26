@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0282.html
-TITLE: gadtools.library/GT_RefreshWindow
-
-gadtools.library/GT_RefreshWindow ]" border=0> NAME GT_RefreshWindow -- refresh all GadTools gadgets in a window. (V36) SYNOPSIS GT_RefreshWindow(win, req) A0 A1 VOID GT_RefreshWindow(struct Window *, struct Requester *); FUNCTION Perform the initial refresh of all the GadTools gadgets you have created. After you have opened your window, you must call this function. Or, if you have opened your window without gadgets, you add the gadgets with intuition.library/AddGList() , refresh them using intuition.library/RefreshGList() , then call this function. You should not need this function at other times. INPUTS win - pointer to the Window containing GadTools gadgets. req - reserved for future use, should always be NULL SEE ALSO GT_BeginRefresh() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node055E.html
-TITLE: serial.device/CMD_STOP
-
-serial.device/CMD_STOP ]" border=0> NAME Stop -- pause all current I/O over the serial port FUNCTION This command halts all current I/O on the serial port by sending an xOFF to the "other side", and submitting a "logical xOFF" to "our side", if/when appropriate to current activity. IO REQUEST io_Message mn_ReplyPort initialized io_Device set by OpenDevice io_Unit set by OpenDevice io_Command CMD_STOP RESULTS SEE ALSO serial.device/CMD_START [Back to Amiga Developer Docs ]

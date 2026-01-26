@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0138.html
-TITLE: F / / Interval Timers (Timer A, Timer B) / Force load
-
-F / / Interval Timers (Timer A, Timer B) / Force load ]" border=0> A strobe bit (CRx4) allows the timer latch to be loaded into the timer counter at any time, whether the timer is running or not. [Back to Amiga Developer Docs ]

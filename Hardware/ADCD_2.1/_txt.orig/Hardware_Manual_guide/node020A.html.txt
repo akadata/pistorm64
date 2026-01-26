@@ -1,1 +1,0 @@
-Glossary / negated ]" border=0> The inactive state of a signal, regardless of its logic sense. [Back to Amiga Developer Docs ]

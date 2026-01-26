@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0038.html
-TITLE: BitMap Index
-
-BitMap Index ]" border=0> BitMap, 64 address, 552 and Intuition graphics, 223 , 224 custom for screen, 48 in requester, 205 initializing, 582 larger than layer, 706 menu items, 169 requester, 206 scaling, 598 software clipping, 590 with write mask, 583 [Back to Amiga Developer Docs ]

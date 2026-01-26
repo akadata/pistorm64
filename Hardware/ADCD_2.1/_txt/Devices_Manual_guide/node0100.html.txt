@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0100.html
-TITLE: 7 / Device Interface / Closing The Keyboard Device
-
-7 / Device Interface / Closing The Keyboard Device ]" border=0> An OpenDevice() must eventually be matched by a call to CloseDevice() . All I/O requests must be complete before CloseDevice(). If any requests are still pending, abort them with AbortIO() and remove them with WaitIO() . if (!(CheckIO(KeyIO))) { AbortIO(KeyIO); /* Ask device to abort request, if pending */ } WaitIO(KeyIO); /* Wait for abort, then clean up */ CloseDevice(KeyIO); [Back to Amiga Developer Docs ]

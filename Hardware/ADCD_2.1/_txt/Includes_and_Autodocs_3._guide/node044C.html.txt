@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node044C.html
-TITLE: listbrowser_gc/ShowAllListBrowserChildren
-
-listbrowser_gc/ShowAllListBrowserChildren ]" border=0> NAME ShowAllListBrowserChildren -- Show all children in a ListBrowser SYNOPSIS VOID ShowAllListBrowserChildren(struct List *); ShowAllListBrowserChildren(list); FUNCTION Shows all children in a hierarchical ListBrowser, no matter what generation they are in. Note that as with any modifications to a ListBrowser list, the list must NOT be attached to the listbrowser at the time of modification. INPUTS list - a list of ListBrowser nodes, not currently attached to a ListBrowser. [Back to Amiga Developer Docs ]

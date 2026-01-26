@@ -1,1 +1,0 @@
-2 Audio Device / Hardware Control Commands ]" border=0> The following commands change hardware registers and affect the actual sound output. CMD_WRITE CMD_FLUSH CMD_STOP ADCMD_FINISH CMD_RESET CMD_START ADCMD_PERVOL ADCMD_WAITCYCLE CMD_READ [Back to Amiga Developer Docs ]

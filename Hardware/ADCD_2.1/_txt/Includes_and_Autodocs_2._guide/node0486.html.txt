@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0486.html
-TITLE: graphics.library/UnlockLayerRom
-
-graphics.library/UnlockLayerRom ]" border=0> NAME UnlockLayerRom -- Unlock Layer structure by rom(gfx lib) code. SYNOPSIS UnlockLayerRom( layer ) a5 void UnlockLayerRom( struct Layer * ); FUNCTION Release the lock on this layer. If the same task has called LockLayerRom more than once than the same number of calls to UnlockLayerRom must happen before the layer is actually freed so that other tasks may use it. This call does destroy scratch registers. This call is identical to UnlockLayer (layers.library). INPUTS layer - pointer to Layer structure BUGS SEE ALSO LockLayerRom() layers.library/UnlockLayer() graphics/clip.h [Back to Amiga Developer Docs ]

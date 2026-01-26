@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node021D.html
-TITLE: Glossary / raster
-
-Glossary / raster ]" border=0> The area in memory that completely defines a bitmap display. [Back to Amiga Developer Docs ]

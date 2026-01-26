@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0153.html
-TITLE: Strip Printing Index
-
-Strip Printing Index ]" border=0> Strip Printing, 193 aspect-ratio-corrected image, 194 height of strip, 194 procedure, 194 smoothing, 194 [Back to Amiga Developer Docs ]

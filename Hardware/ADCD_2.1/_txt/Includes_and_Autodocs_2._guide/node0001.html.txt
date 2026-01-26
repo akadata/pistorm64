@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0001.html
-TITLE: System Header Files 2.0
-
-System Header Files 2.0 ]" border=0> clib (dir) graphics (dir) resources (dir) devices (dir) hardware (dir) rexx (dir) dos (dir) intuition (dir) utility (dir) exec (dir) libraries (dir) workbench (dir) [Back to Amiga Developer Docs ]

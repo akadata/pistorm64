@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node02C2.html
-TITLE: graphics.library/ClearScreen
-
-graphics.library/ClearScreen ]" border=0> NAME ClearScreen -- Clear from current position to end of RastPort . SYNOPSIS ClearScreen(rp) A1 void ClearScreen(struct RastPort *); FUNCTION Clear a rectangular swath from the current position to the right edge of the rastPort with ClearEOL , then clear the rest of the screen from just beneath the swath to the bottom of the rastPort. Clearing consists of setting the color of the swath to zero, or, if the DrawMode is 2, to the BgPen. INPUTS rp - pointer to RastPort structure NOTES o This function may use the blitter. SEE ALSO ClearEOL() Text() SetRast() graphics/text.h graphics/rastport.h [Back to Amiga Developer Docs ]

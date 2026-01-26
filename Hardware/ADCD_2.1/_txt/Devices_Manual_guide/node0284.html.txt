@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0284.html
-TITLE: A / IFF Third Party Public Form and Chunk Specification / MTRX.doc
-
-A / IFF Third Party Public Form and Chunk Specification / MTRX.doc ]" border=0> Numerical data storage (MathVision - Seven Seas) MTRX FORM, for matrix data storage 19-July-1990 Submitted by: Doug Houck Seven Seas Software Introduction Chunks [Back to Amiga Developer Docs ]

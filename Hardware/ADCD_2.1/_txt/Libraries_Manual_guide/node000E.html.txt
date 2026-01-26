@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node000E.html
-TITLE: 1 / / Libraries of Functions / Opening a Library in C
-
-1 / / Libraries of Functions / Opening a Library in C ]" border=0> Call OpenLibrary() to open an Amiga function library. OpenLibrary() returns the address of the library structure (or library base) which you must assign to a specific global system variable as specified in the table above (case is important). If the library cannot open for some reason, the OpenLibrary() function returns zero. Here's a brief example showing how it's used in C. easy.c [Back to Amiga Developer Docs ]

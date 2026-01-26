@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0174.html
-TITLE: dos.library/GetArgStr
-
-dos.library/GetArgStr ]" border=0> NAME GetArgStr -- Returns the arguments for the process (V36) SYNOPSIS ptr = GetArgStr() D0 STRPTR GetArgStr(void) FUNCTION Returns a pointer to the (null-terminated) arguments for the program (process). This is the same string passed in a0 on startup from CLI. RESULT ptr - pointer to arguments SEE ALSO SetArgStr() , RunCommand() [Back to Amiga Developer Docs ]

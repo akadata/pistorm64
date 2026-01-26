@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0178.html
-TITLE: dos.library/GetFileSysTask
-
-dos.library/GetFileSysTask ]" border=0> NAME GetFileSysTask -- Returns the default filesystem for the process (V36) SYNOPSIS port = GetFileSysTask() D0 struct MsgPort *GetFileSysTask(void) FUNCTION Returns the default filesystem task's port (pr_FileSystemTask) for the current process. RESULT port - The pr_MsgPort of the filesystem, or NULL. SEE ALSO SetFileSysTask() , Open() [Back to Amiga Developer Docs ]

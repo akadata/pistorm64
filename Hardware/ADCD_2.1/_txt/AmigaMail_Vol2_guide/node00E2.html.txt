@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node00E2.html
-TITLE: FORM (0x464F524D) / All drawings are a FORM /
-
-FORM (0x464F524D) / All drawings are a FORM / ]" border=0> struct FORMstruct { ULONG ID; /* DR2D */ ULONG Size; }; [Back to Amiga Developer Docs ]

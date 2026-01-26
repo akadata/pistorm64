@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01EA.html
-TITLE: Glossary / Enhanced Chip Set (ECS)
-
-Glossary / Enhanced Chip Set (ECS) ]" border=0> The upgraded versions of the Amiga's Agnus and Denise coprocessor chips. The ECS offers new display modes and expands the Amiga's graphic capabilities. Many of the benefits of the ECS are available only in conjunction with Release 2 of the operating system. [Back to Amiga Developer Docs ]

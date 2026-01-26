@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node02C0.html
-TITLE: Standard Data and Property Chunks / End-Mark SEvent
-
-Standard Data and Property Chunks / End-Mark SEvent ]" border=0> The SEvent type SID_Mark is reserved for an end marker in working memory. This event is never stored in a file. It may be useful if you decide to use the filed TRAK format intact in working memory. [Back to Amiga Developer Docs ]

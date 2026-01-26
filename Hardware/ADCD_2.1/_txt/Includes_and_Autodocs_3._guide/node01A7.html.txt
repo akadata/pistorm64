@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node01A7.html
-TITLE: dos.library/RemSegment
-
-dos.library/RemSegment ]" border=0> NAME RemSegment - Removes a resident segment from the resident list (V36) SYNOPSIS success = RemSegment(segment) D0 D1 BOOL RemSegment(struct Segment *) FUNCTION Removes a resident segment from the Dos resident segment list, unloads it, and does any other cleanup required. Will only succeed if the seg_UC (usecount) is 0. INPUTS segment - the segment to be removed RESULT success - success or failure. SEE ALSO FindSegment() , AddSegment() [Back to Amiga Developer Docs ]

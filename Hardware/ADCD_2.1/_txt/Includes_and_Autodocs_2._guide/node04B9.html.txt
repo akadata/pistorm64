@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node04B9.html
-TITLE: gameport.doc
-
-gameport.doc ]" border=0> GPD_ASKCTYPE GPD_READEVENT GPD_SETTRIGGER GPD_ASKTRIGGER GPD_SETCTYPE [Back to Amiga Developer Docs ]

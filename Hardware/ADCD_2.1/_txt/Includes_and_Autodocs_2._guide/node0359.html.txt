@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0359.html
-TITLE: exec.library/GetCC
-
-exec.library/GetCC ]" border=0> NAME GetCC -- get condition codes in a 68010 compatible way. SYNOPSIS conditions = GetCC() D0 UWORD GetCC(void); FUNCTION The 68000 processor has a "MOVE SR, " instruction which gets a copy of the processor condition codes. On the 68010,20 and 30 CPUs, "MOVE SR, " is privileged. User code will trap if it is attempted. These processors need to use the "MOVE CCR, " instruction instead. This function provides a means of obtaining the CPU condition codes in a manner that will make upgrades transparent. This function is VERY short and quick. RESULTS conditions - the 680XX condition codes NOTE This call is guaranteed to preserve all registers. This function may be implemented as code right in the jump table. [Back to Amiga Developer Docs ]

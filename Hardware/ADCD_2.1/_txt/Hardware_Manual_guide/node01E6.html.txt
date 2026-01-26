@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01E6.html
-TITLE: Glossary / display time
-
-Glossary / display time ]" border=0> The amount of time to produce one display field, approximately 1/60th of a second. [Back to Amiga Developer Docs ]

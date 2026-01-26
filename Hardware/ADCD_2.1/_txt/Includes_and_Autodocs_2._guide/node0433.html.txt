@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0433.html
-TITLE: graphics.library/DisownBlitter
-
-graphics.library/DisownBlitter ]" border=0> NAME DisownBlitter - return blitter to free state. SYNOPSIS DisownBlitter() void DisownBlitter( void ); FUNCTION Free blitter up for use by other blitter users. INPUTS RETURNS SEE ALSO OwnBlitter() [Back to Amiga Developer Docs ]

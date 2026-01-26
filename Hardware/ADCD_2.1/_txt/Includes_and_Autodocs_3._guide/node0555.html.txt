@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0555.html
-TITLE: serial.doc
-
-serial.doc ]" border=0> AbortIO() BeginIO() CloseDevice() CMD_CLEAR CMD_FLUSH CMD_READ CMD_RESET CMD_START CMD_STOP CMD_WRITE OpenDevice() SDCMD_BREAK SDCMD_QUERY SDCMD_SETPARAMS [Back to Amiga Developer Docs ]

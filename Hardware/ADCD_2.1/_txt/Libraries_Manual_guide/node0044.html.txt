@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0044.html
-TITLE: Clipping Index
-
-Clipping Index ]" border=0> Clipping in area fill, 590 in filling, 590 in line drawing, 588 requester, 204 [Back to Amiga Developer Docs ]

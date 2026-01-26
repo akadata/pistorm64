@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node020F.html
-TITLE: Glossary / paddle controller
-
-Glossary / paddle controller ]" border=0> A game controller that uses a potentiometer (variable resistor) to position objects on the screen. [Back to Amiga Developer Docs ]

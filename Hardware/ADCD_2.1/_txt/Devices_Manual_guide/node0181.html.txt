@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0181.html
-TITLE: Devices/Dev_examples/HP_Laserjet_Makefile
-
-Devices/Dev_examples/HP_Laserjet_Makefile ]" border=0> LC = lc:lc ASM = lc:asm CFLAGS = -iINCLUDE: -b0 -d0 -v ASMFLAGS = -iINCLUDE: LINK = lc:blink LIB = lib:amiga.lib+lib:lc.lib OBJ = printertag.o+init.o+data.o+dospecial.o+render.o+transfer.o+density.o TARGET = hp_laserjet @$(LC) $(CFLAGS) $* $(TARGET): printertag.o init.o data.o dospecial.o render.o density.o transfer.o @$(LINK) [Back to Amiga Developer Docs ]

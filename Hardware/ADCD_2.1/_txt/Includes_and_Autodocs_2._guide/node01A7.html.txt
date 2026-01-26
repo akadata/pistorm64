@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node01A7.html
-TITLE: commodities.library/CxObjType
-
-commodities.library/CxObjType ]" border=0> NAME CxObjType -- obtain the type of a commodity object. (V36) SYNOPSIS type = CxObjType(co); A0 ULONG CxObjType(CxObj *); FUNCTION This function should not really be necessary. It returns the type of a commodity object, which you should already know, since you created it in the first place. INPUTS co - the commodity object to inquire about RESULTS type - the type of the commodity object, possible values are defined in SEE ALSO CreateCxObj() [Back to Amiga Developer Docs ]

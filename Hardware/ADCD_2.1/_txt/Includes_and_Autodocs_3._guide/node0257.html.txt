@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0257.html
-TITLE: SAD/WRITE_ARRAY
-
-SAD/WRITE_ARRAY ]" border=0> WRITE ARRAY - Write a range of bytes Command: $AF $0E Data: $ww $xx $yy $zz $qq $rr $ss $tt Write a range of bytes to address for bytes After the computer sends the ACK, you must then send the byte stream... Command will be ACK'ed when received. Command ACK: $00 $0E Command DONE: $1F $0E [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node027D.html
-TITLE: POTGO / POTINP Index
-
-POTGO / POTINP Index ]" border=0> POTGO / POTINP as digital I/O, 240 as proportional inputs, 234 [Back to Amiga Developer Docs ]

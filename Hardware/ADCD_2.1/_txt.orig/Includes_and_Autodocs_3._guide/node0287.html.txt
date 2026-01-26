@@ -1,1 +1,0 @@
-gameport.doc ]" border=0> GPD_ASKCTYPE GPD_ASKTRIGGER GPD_READEVENT GPD_SETCTYPE GPD_SETTRIGGER [Back to Amiga Developer Docs ]

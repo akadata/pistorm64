@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node008B.html
-TITLE: button_gc.doc
-
-button_gc.doc ]" border=0> --datasheet-- BUTTON_GetClass() [Back to Amiga Developer Docs ]

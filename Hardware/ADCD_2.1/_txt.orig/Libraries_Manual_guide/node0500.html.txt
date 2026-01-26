@@ -1,1 +1,0 @@
-B / gadgetclass / Attributes: GA_Image (IS) ]" border=0> This attibute is a pointer to either a Boopsi image or a Release 1.3-compatible Intuition image. This attribute corresponds to the Gadget 's GadgetRender field. The gadgetclass dispatcher will not dispose of this image when it disposes of the gadget object. [Back to Amiga Developer Docs ]

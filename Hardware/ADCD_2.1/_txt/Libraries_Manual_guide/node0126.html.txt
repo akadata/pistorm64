@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0126.html
-TITLE: 4 Intuition Windows / Other Window Functions
-
-4 Intuition Windows / Other Window Functions ]" border=0> This section contains a brief overview of other Intuition functions that affect windows. For a complete description of all Intuition functions, see the Amiga ROM Kernel Reference Manual: Includes and Autodocs. Menus and the Active Window Requesters in the Window Program Control of Window Arrangement Changing the Window or Screen Title Changing Message Queue Limits Changing Pointer Position Reports Custom Pointers [Back to Amiga Developer Docs ]

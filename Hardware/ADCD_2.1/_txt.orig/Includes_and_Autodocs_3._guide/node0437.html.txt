@@ -1,1 +1,0 @@
-layout_gc.doc ]" border=0> --datasheet-- ActivateLayoutGadget() FlushLayoutDomainCache() LAYOUT_GetClass() LayoutLimits() RethinkLayout() [Back to Amiga Developer Docs ]

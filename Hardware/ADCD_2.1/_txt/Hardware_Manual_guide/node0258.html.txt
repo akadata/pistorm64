@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0258.html
-TITLE: Color registers Index
-
-Color registers Index ]" border=0> Color registers contents, 46 loading, 47 names of registers, 46 sprites, 130 [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-Dual Playfield Index ]" border=0> Dual Playfield, 44 bitplane assignment, 68 description, 67 enabling, 72 high resolution colors, 71 in high resolution mode, 71 low resolution colors, 70 priority, 71 scrolling, 71 [Back to Amiga Developer Docs ]

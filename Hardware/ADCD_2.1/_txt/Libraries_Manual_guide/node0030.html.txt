@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0030.html
-TITLE: Active Window Index
-
-Active Window Index ]" border=0> Active Window, 78 , 90 input focus, 248 menu verify, 186 notification, 82 , 91 [Back to Amiga Developer Docs ]

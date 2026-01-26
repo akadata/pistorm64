@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node001A.html
-TITLE: Includes/clib/macros.h
-
-Includes/clib/macros.h ]" border=0> #ifndef CLIB_MACROS_H #define CLIB_MACROS_H /* ** $Filename: clib/macros.h $ ** $Release: 2.04 Includes, V37.4 $ ** $Revision: 36.0 $ ** $Date: 90/11/30 $ ** ** C prototypes ** ** (C) Copyright 1990-1999 Amiga, Inc. ** All Rights Reserved */ #define MAX(a,b) ((a)>(b)?(a):(b)) #define MIN(a,b) ((a) #define ABS(x) ((x [Back to Amiga Developer Docs ]

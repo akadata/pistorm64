@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0074.html
-TITLE: battclock.doc
-
-battclock.doc ]" border=0> ReadBattClock() ResetBattClock() WriteBattClock() [Back to Amiga Developer Docs ]

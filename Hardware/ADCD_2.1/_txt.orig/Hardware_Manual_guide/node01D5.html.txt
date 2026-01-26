@@ -1,1 +1,0 @@
-Glossary / composite video ]" border=0> A video signal, transmitted over a single coaxial cable, which includes both picture and sync information. [Back to Amiga Developer Docs ]

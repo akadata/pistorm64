@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0137.html
-TITLE: Floppy Disk Index
-
-Floppy Disk Index ]" border=0> Floppy Disk, 306 floppy boot process, 571 floppy disk format, 572 floppy physical layout, 571 MFM encoding, 573 I/O, 306 [Back to Amiga Developer Docs ]

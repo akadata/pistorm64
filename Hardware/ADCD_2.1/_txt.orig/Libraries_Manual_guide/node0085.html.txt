@@ -1,1 +1,0 @@
-Menu Number Index ]" border=0> Menu Number, 177 , 178 , 185 construction, 178 conversion, 177 decoding, 178 disabling, 185 extraction, 178 terminator, 177 valid, 178 [Back to Amiga Developer Docs ]

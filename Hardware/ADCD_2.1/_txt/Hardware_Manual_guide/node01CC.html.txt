@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01CC.html
-TITLE: Glossary / clear
-
-Glossary / clear ]" border=0> 1. To change a bit or flag to 0, its off or disabled state. Opposite of set. 2. To erase a screen or window display. [Back to Amiga Developer Docs ]

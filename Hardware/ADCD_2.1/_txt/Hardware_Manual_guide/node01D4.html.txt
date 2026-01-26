@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01D4.html
-TITLE: Glossary / Command Line Interface (Shell or CLI)
-
-Glossary / Command Line Interface (Shell or CLI) ]" border=0> A means of communicating with a computer by typing commands at the keyboard. On the Amiga, this is called the Shell and, along with Workbench and ARexx, is one of the three built-in user interfaces. Before the Shell was available, this interface was called the CLI. [Back to Amiga Developer Docs ]

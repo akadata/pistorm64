@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0236.html
-TITLE: intuition.library/OnMenu
-
-intuition.library/OnMenu ]" border=0> NAME OnMenu -- Enable the given menu or menu item. SYNOPSIS OnMenu( Window , MenuNumber ) A0 D0 VOID OnMenu( struct Window *, UWORD ); FUNCTION This command enables a sub-item, an item, or a whole menu. This depends on the contents of the data packed into MenuNumber, which is described in the Intuition Reference Manual. INPUTS Window = pointer to the window MenuNumber = the menu piece to be enables RESULT None BUGS SEE ALSO OffMenu() , ResetMenuStrip() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0527.html
-TITLE: B / frbuttonclass / Changed Methods: GM_RENDER
-
-B / frbuttonclass / Changed Methods: GM_RENDER ]" border=0> For this method, the frbuttonclass object first draws the framing image by sending the image an IM_DRAWFRAME message. The object then draws its display element. [Back to Amiga Developer Docs ]

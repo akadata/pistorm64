@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node00F6.html
-TITLE: 14 Trackdisk Device / Commands for Low-Level Access
-
-14 Trackdisk Device / Commands for Low-Level Access ]" border=0> The trackdisk device provides commands to read and write raw flux changes on the disk. The data returned from a low-level read or sent via a low-level write should be encoded into some form of legal flux patterns. See the Amiga Hardware Reference Manual and books on magnetic media recording and reading. Proceed at your own risk with V1.3 and earlier versions. -------------------------------------------------------- In V1.3 Kickstart and earlier these functions are unreliable even though under certain configurations the commands may appear to work. Reading Raw Data From A Disk Writing Raw Data To A Disk Limitations For Synced Reads And Writes [Back to Amiga Developer Docs ]

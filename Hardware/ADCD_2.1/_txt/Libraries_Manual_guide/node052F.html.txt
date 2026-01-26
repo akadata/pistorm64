@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node052F.html
-TITLE: B / groupgclass / Changed Methods: OM_DISPOSE
-
-B / groupgclass / Changed Methods: OM_DISPOSE ]" border=0> This method disposes of the groupgclass object and all its member gadgets. [Back to Amiga Developer Docs ]

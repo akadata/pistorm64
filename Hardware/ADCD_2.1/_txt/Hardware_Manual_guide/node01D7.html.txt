@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01D7.html
-TITLE: Glossary / coordinates
-
-Glossary / coordinates ]" border=0> A pair of numbers shown in the form (x,y), where x is an offset from the left side of the display or display window and y is an offset from the top. [Back to Amiga Developer Docs ]

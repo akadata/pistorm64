@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0375.html
-TITLE: iffparse.library/PropChunks
-
-iffparse.library/PropChunks ]" border=0> NAME PropChunks -- declare many property chunks at once. (V36) SYNOPSIS error = PropChunks(iff, propArray, numPairs); D0 A0 A1 D0 LONG PropChunks(struct IFFHandle *, LONG *, LONG); FUNCTION Declares multiple property chunks from a list. The propArray argument if a pointer to an array of longwords arranged in pairs, and has the following format: TYPE1, ID1, TYPE2, ID2, ..., TYPEn, IDn The argument numPairs is the number of pairs. PropChunks() just calls PropChunk() numPairs times. INPUTS iff - pointer to IFFHandle structure. propArray - pointer to array of longword chunk types and identifiers. numPairs - number of pairs in the array. RESULT error - 0 if successful or an IFFERR_#? error code if unsuccessful. SEE ALSO PropChunk() , [Back to Amiga Developer Docs ]

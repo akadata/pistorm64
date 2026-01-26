@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04FA.html
-TITLE: B / gadgetclass / Attributes: GA_Previous (I)
-
-B / gadgetclass / Attributes: GA_Previous (I) ]" border=0> This attribute is used to insert a new gadget into a list of gadgets linked by their Gadget.NextGadget field. When the OM_NEW method creates the new gadget, it inserts the new gadget into the list following the GA_Previous gadget. This attribute is a pointer to the gadget (struct Gadget *) that the new gadget will follow. This attribute cannot be used to link new gadgets into the gadget list of an open window or requester, use AddGList() instead. [Back to Amiga Developer Docs ]

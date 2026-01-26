@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0459.html
-TITLE: locale.library/GetLocaleStr
-
-locale.library/GetLocaleStr ]" border=0> NAME GetLocaleStr -- get a standard string from a locale. (V38) SYNOPSIS string = GetLocaleStr(locale,stringNum); D0 A0 D0 STRPTR GetLocaleStr(struct Locale *,ULONG); FUNCTION This function returns a specific string associated with the given locale. INPUTS locale - a valid locale stringNum - the number of the string to get a pointer to. See the constants defined in for the possible values. RESULT string - a pointer to a NULL-terminated string, or NULL if the requested string number was out of bounds. The returned string is READ-ONLY, do NOT modify! This string pointer is valid only as long as the locale remains open. SEE ALSO OpenLocale() , CloseLocale() , [Back to Amiga Developer Docs ]

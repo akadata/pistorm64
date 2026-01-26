@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node008B.html
-TITLE: MrgCop() Index
-
-MrgCop() Index ]" border=0> MrgCop(), 66 , 610 , 709 in graphics display, 555 installing VSprites, 628 merging Copper lists, 560 [Back to Amiga Developer Docs ]

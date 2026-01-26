@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node04B4.html
-TITLE: mathieeesingtrans.library/IEEESPSin
-
-mathieeesingtrans.library/IEEESPSin ]" border=0> NAME IEEESPSin -- compute the sine of a floating point number SYNOPSIS x = IEEESPSin( y ); d0 d0 float x,y; FUNCTION Compute sine of y in IEEE single precision INPUTS y - IEEE single precision floating point value RESULT x - IEEE single precision floating point value BUGS SEE ALSO IEEESPAsin() , IEEESPTan() , IEEESPCos() [Back to Amiga Developer Docs ]

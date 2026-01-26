@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04CB.html
-TITLE: B / icclass / Attributes: ICSPECIAL_CODE ()
-
-B / icclass / Attributes: ICSPECIAL_CODE () ]" border=0> This is a dummy attribute for the ICA_MAP . If any attribute maps to ICSPECIAL_CODE and ICA_TARGET is ICTARGET_IDCMP, then the value of the mapped attribute will be copied into the IntuiMessage.Code field of the IDCMP_IDCMPUPDATE message (just the lower sixteen bits of the attribute value will fit). [Back to Amiga Developer Docs ]

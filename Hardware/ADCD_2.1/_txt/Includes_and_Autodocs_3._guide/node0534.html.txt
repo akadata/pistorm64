@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0534.html
-TITLE: realtime.library/DeletePlayer
-
-realtime.library/DeletePlayer ]" border=0> NAME DeletePlayer -- delete a player. (V37) SYNOPSIS DeletePlayer(player); A0 VOID DeletePlayer(struct Player *); FUNCTION Deletes the specified player. Flushes the conductor that the player was connected to if this is the last player connected to that conductor. INPUTS player - Player structure to delete, as allocated by CreatePlayer() . May be NULL, in which case this function does nothing. SEE ALSO CreatePlayer() [Back to Amiga Developer Docs ]

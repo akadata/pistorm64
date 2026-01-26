@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0022.html
-TITLE: 2 / Device Interface / Audio And System I/O Functions
-
-2 / Device Interface / Audio And System I/O Functions ]" border=0> BeginIO() Wait() and WaitPort() AbortIO() [Back to Amiga Developer Docs ]
