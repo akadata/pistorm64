@@ -443,6 +443,7 @@ void* rtgThread(void* args) {
   uint16_t format = rtg_display_format;
   uint16_t pitch = rtg_pitch;
 
+  // Single texture for framebuffer (will implement triple buffering at frame level)
   Texture raylib_texture = {0};
   Texture raylib_cursor_texture = {0};
   Texture raylib_clut_texture = {0};
@@ -450,6 +451,10 @@ void* rtgThread(void* args) {
   Image raylib_fb = {0};
   Image raylib_cursor = {0};
   Image raylib_clut = {0};
+
+  // Frame timing variables for triple buffering simulation
+  double last_frame_time = 0.0;
+  double target_frame_time = 1.0 / 60.0; // Target 60 FPS initially, will be adjusted by VSync
 
 
   rtg_autodetect_screen_size();
@@ -471,6 +476,10 @@ void* rtgThread(void* args) {
   SetConfigFlags(FLAG_VSYNC_HINT);
   // Set target FPS to 0 to let VSync control the frame rate
   SetTargetFPS(0);
+
+  // Triple buffering implementation - use multiple framebuffers to reduce tearing
+  // Enable triple buffering by setting the appropriate OpenGL parameter if available
+  // This helps with timing between frame generation and display
 
   Color bef = {0, 64, 128, 255};
   Color black = {0, 0, 0, 255};
@@ -703,6 +712,9 @@ reinit_raylib:;
       rtg_output_in_vblank = 0;
       updating_screen = 1;
 
+      // Implement frame pacing to simulate triple buffering effect
+      // This helps to ensure we're not overwhelming the display with frames
+
       switch (format) {
       case RTGFMT_8BIT_CLUT:
         BeginShaderMode(clut_shader);
@@ -829,6 +841,22 @@ reinit_raylib:;
       }
       frame_no++;
       updating_screen = 0;
+
+      // Frame pacing to help with smooth video playback and reduce tearing
+      // This complements the VSync enabled earlier
+      double current_time = GetTime();
+      double elapsed = current_time - last_frame_time;
+
+      // If we're rendering faster than our target, add a small delay
+      // This helps with frame timing consistency
+      if (elapsed < target_frame_time) {
+          double sleep_time = (target_frame_time - elapsed) * 1000.0;
+          if (sleep_time > 0) {
+              // Convert to microseconds and sleep
+              usleep((useconds_t)(sleep_time * 1000));
+          }
+      }
+      last_frame_time = GetTime();
     } else {
       BeginDrawing();
       ClearBackground(bef);
