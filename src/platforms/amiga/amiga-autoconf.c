@@ -123,33 +123,44 @@ uint32_t piscsi_base = 0, pistorm_dev_base = 0;
 extern uint8_t* piscsi_rom_ptr;
 
 static unsigned char get_autoconf_size(unsigned int size) {
-  if (size == 8 * SIZE_MEGA)
+  if (size == 8 * SIZE_MEGA) {
     return AC_MEM_SIZE_8MB;
-  if (size == 4 * SIZE_MEGA)
+  }
+  if (size == 4 * SIZE_MEGA) {
     return AC_MEM_SIZE_4MB;
-  if (size == 2 * SIZE_MEGA)
+  }
+  if (size == 2 * SIZE_MEGA) {
     return AC_MEM_SIZE_2MB;
-  else
+  }
+  else {
     return AC_MEM_SIZE_64KB;
+  }
 }
 
 static unsigned char get_autoconf_size_ext(unsigned int size) {
-  if (size == 16 * SIZE_MEGA)
+  if (size == 16 * SIZE_MEGA) {
     return AC_MEM_SIZE_EXT_16MB;
-  if (size == 32 * SIZE_MEGA)
+  }
+  if (size == 32 * SIZE_MEGA) {
     return AC_MEM_SIZE_EXT_32MB;
-  if (size == 64 * SIZE_MEGA)
+  }
+  if (size == 64 * SIZE_MEGA) {
     return AC_MEM_SIZE_EXT_64MB;
-  if (size == 128 * SIZE_MEGA)
+  }
+  if (size == 128 * SIZE_MEGA) {
     return AC_MEM_SIZE_EXT_128MB;
-  if (size == 256 * SIZE_MEGA)
+  }
+  if (size == 256 * SIZE_MEGA) {
     return AC_MEM_SIZE_EXT_256MB;
-  if (size == 512 * SIZE_MEGA)
+  }
+  if (size == 512 * SIZE_MEGA) {
     return AC_MEM_SIZE_EXT_512MB;
-  if (size == 1024 * SIZE_MEGA)
+  }
+  if (size == 1024 * SIZE_MEGA) {
     return AC_MEM_SIZE_EXT_1024MB;
-  else
+  } else {
     return AC_MEM_SIZE_EXT_64MB;
+  }
 }
 
 extern void adjust_ranges_amiga(struct emulator_config* cfg);
@@ -178,14 +189,18 @@ unsigned int autoconfig_read_memory_z3_8(struct emulator_config* cfg, unsigned i
     switch (address & 0xFF) {
     case AC_Z3_REG_ER_TYPE:
       val |= BOARDTYPE_Z3;
-      if (cfg->map_type[index] == MAPTYPE_RAM)
+      if (cfg->map_type[index] == MAPTYPE_RAM) {
         val |= BOARDTYPE_FREEMEM;
-      if (cfg->map_size[index] > 8 * SIZE_MEGA)
+      }
+      if (cfg->map_size[index] > 8 * SIZE_MEGA) {
         val |= get_autoconf_size_ext(cfg->map_size[index]);
-      else
+      }
+      else {
         val |= get_autoconf_size(cfg->map_size[index]);
-      if (ac_z3_current_pic + 1 < ac_z3_pic_count)
+      }
+      if (ac_z3_current_pic + 1 < ac_z3_pic_count) {
         val |= BOARDTYPE_LINKED;
+      }
       // Pre-invert this value, since it's the only value not physically complemented
       // for Zorro III.
       val ^= 0xFF;
@@ -195,10 +210,12 @@ unsigned int autoconfig_read_memory_z3_8(struct emulator_config* cfg, unsigned i
       val = 0x11;
       break;
     case AC_Z3_REG_ER_FLAGS:
-      if (cfg->map_type[index] == MAPTYPE_RAM)
+      if (cfg->map_type[index] == MAPTYPE_RAM) {
         val |= Z3_FLAGS_MEMORY;
-      if (cfg->map_size[index] > 8 * SIZE_MEGA)
+      }
+      if (cfg->map_size[index] > 8 * SIZE_MEGA) {
         val |= Z3_FLAGS_EXTENSION;
+      }
       val |= Z3_FLAGS_RESERVED;
       // Bottom four bits are zero, useless unles you want really odd RAM sizes.
       break;
@@ -253,9 +270,10 @@ void autoconfig_write_memory_z3_8(struct emulator_config* cfg, unsigned int addr
       ac_base[ac_z3_current_pic] =
           (ac_base[ac_z3_current_pic] & 0xFF0F0000) | ((unsigned int)(val & 0xF0) << 16);
       nib_latch = 0;
-    } else
+    } else {
       ac_base[ac_z3_current_pic] =
           (ac_base[ac_z3_current_pic] & 0xFF000000) | ((unsigned int)val << 16);
+    }
     break;
   case AC_Z3_REG_WR_ADDR_HI:
     if (nib_latch) {
@@ -352,6 +370,7 @@ void add_z2_pic(uint8_t type, uint8_t index) {
 void remove_z2_pic(uint8_t type, uint8_t index) {
   uint8_t pic_found = 0;
   if (index) {
+    // do nothing here 
   }
 
   for (uint32_t i = 0; i < ac_z2_pic_count; i++) {
@@ -398,16 +417,19 @@ unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int 
   if ((address & 1) == 0 && (address / 2) < (int)sizeof(ac_fast_ram_rom)) {
     if (ac_z2_type[ac_z2_current_pic] == ACTYPE_MAPFAST_Z2 && address / 2 == 1) {
       val = get_autoconf_size(cfg->map_size[ac_z2_index[ac_z2_current_pic]]);
-      if (ac_z2_current_pic + 1 < ac_z2_pic_count)
+      if (ac_z2_current_pic + 1 < ac_z2_pic_count) {
         val |= BOARDTYPE_LINKED;
-    } else
+      }
+    } else {
       val = rom[address / 2];
+    }
     // printf("Read byte %d from Z2 autoconf for PIC %d (%.2X).\n", address/2, ac_z2_current_pic,
     // val);
   }
   val <<= 4;
-  if (address != 0 && address != 2 && address != 0x40 && address != 0x42)
+  if (address != 0 && address != 2 && address != 0x40 && address != 0x42) {
     val ^= 0xff;
+  }
 
   return (unsigned int)val;
 }

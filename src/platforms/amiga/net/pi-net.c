@@ -26,6 +26,7 @@ void pinet_init(const char* dev) {
 
 void pinet_shutdown(void) {
   // Aaahh!
+  LOG_DEBUG("[PI-NET] Shutdown Unhandled......... fix this"); 
 }
 
 uint8_t PI_MAC[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};

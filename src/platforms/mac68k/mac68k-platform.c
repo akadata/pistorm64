@@ -39,10 +39,12 @@ static void adjust_ranges_mac68k(struct emulator_config* cfg) {
     if (cfg->map_type[i] != MAPTYPE_NONE) {
       uint32_t offset = (uint32_t)cfg->map_offset[i];
       uint32_t high = offset + cfg->map_size[i];
-      if ((offset != 0 && offset < cfg->mapped_low) || cfg->mapped_low == 0)
+      if ((offset != 0 && offset < cfg->mapped_low) || cfg->mapped_low == 0) {
         cfg->mapped_low = offset;
-      if (high > cfg->mapped_high)
+      }
+      if (high > cfg->mapped_high) {
         cfg->mapped_high = high;
+      }
     }
   }
 
@@ -67,8 +69,9 @@ static int setup_platform_mac68k(struct emulator_config* cfg) {
 #define CHKVAR(a) (strcmp(var, a) == 0)
 
 static void setvar_mac68k(struct emulator_config* cfg, const char* var, const char* val) {
-  if (!var)
+  if (!var) {
     return;
+  }
 
   // FIXME: Silence unused variable warnings.
   if (var || cfg || val) {

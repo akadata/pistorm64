@@ -722,6 +722,7 @@ void shutdown_platform_amiga(struct emulator_config* cfg) {
     rtg_enabled = 0;
   }
   if (pinet_enabled) {
+    pinet_shutdown();
     pinet_enabled = 0;
   }
   if (pi_ahi_enabled) {
@@ -729,6 +730,8 @@ void shutdown_platform_amiga(struct emulator_config* cfg) {
     pi_ahi_enabled = 0;
   }
   if (a314_emulation_enabled) {
+    //pi_a314_shutdown();
+    printf("No a314 shutdown - this came from amiga-platform.c line 734 ");
     a314_emulation_enabled = 0;
   }
 
