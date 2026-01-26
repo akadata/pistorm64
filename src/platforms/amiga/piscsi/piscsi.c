@@ -165,6 +165,12 @@ next_partition:;
         return;
     }
 
+    /*
+     * Cast alignment warning intentionally suppressed:
+     * PiSCSI interprets Amiga-side structures that arrive as byte streams.
+     * On the Pi side these are represented as C structs with 32-bit alignment.
+     * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
+     */
     struct PartitionBlock *pb = (struct PartitionBlock *)((char *)block);
     tmp = pb->pb_DriveName[0];
     pb->pb_DriveName[tmp + 1] = 0x00;
@@ -219,6 +225,12 @@ static int piscsi_parse_rdb(struct piscsi_dev *d) {
     }
     goto no_rdb_found;
 rdb_found:;
+    /*
+     * Cast alignment warning intentionally suppressed:
+     * PiSCSI interprets Amiga-side structures that arrive as byte streams.
+     * On the Pi side these are represented as C structs with 32-bit alignment.
+     * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
+     */
     struct RigidDiskBlock *rdb = (struct RigidDiskBlock *)((char *)block);
     DEBUG("[PISCSI] RDB found at block %d.\n", i);
     d->c = be32toh(rdb->rdb_Cylinders);
@@ -286,6 +298,12 @@ void piscsi_find_filesystems(struct piscsi_dev *d) {
 
     lseek64(d->fd, d->fshd_offs, SEEK_SET);
 
+    /*
+     * Cast alignment warning intentionally suppressed:
+     * PiSCSI interprets Amiga-side structures that arrive as byte streams.
+     * On the Pi side these are represented as C structs with 32-bit alignment.
+     * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
+     */
     struct FileSysHeaderBlock *fhb = (struct FileSysHeaderBlock *)((char *)fhb_block);
     read(d->fd, fhb_block, d->block_size);
 
@@ -345,6 +363,12 @@ skip_fs_load_lseg:;
         fs_found++;
         lseek64(d->fd, BE(fhb->fhb_Next) * d->block_size, SEEK_SET);
         fhb_block = malloc(d->block_size);
+        /*
+         * Cast alignment warning intentionally suppressed:
+         * PiSCSI interprets Amiga-side structures that arrive as byte streams.
+         * On the Pi side these are represented as C structs with 32-bit alignment.
+         * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
+         */
         fhb = (struct FileSysHeaderBlock *)((char *)fhb_block);
         read(d->fd, fhb_block, d->block_size);
     }
@@ -853,8 +877,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             }
             break;
         case PISCSI_CMD_ADDR1: case PISCSI_CMD_ADDR2: case PISCSI_CMD_ADDR3: case PISCSI_CMD_ADDR4: {
-            int i = ((addr & 0xFFFF) - PISCSI_CMD_ADDR1) / 4;
-            piscsi_u32[i] = val;
+            int addr_idx = ((addr & 0xFFFF) - PISCSI_CMD_ADDR1) / 4;
+            piscsi_u32[addr_idx] = val;
             break;
         }
         case PISCSI_CMD_DRVNUM:
@@ -919,6 +943,12 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             uint32_t nodesize = (be32toh(devs[i].pb[j]->pb_Environment[0]) + 1) * 4;
                             memcpy(dst_data + p_offs, devs[i].pb[j]->pb_Environment, nodesize);
 
+                            /*
+                             * Cast alignment warning intentionally suppressed:
+                             * PiSCSI interprets Amiga-side structures that arrive as byte streams.
+                             * On the Pi side these are represented as C structs with 32-bit alignment.
+                             * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
+                             */
                             struct pihd_dosnode_data *dat = (struct pihd_dosnode_data *)((char *)(&dst_data[addr2+0x20]));
 
                             if (BE(devs[i].pb[j]->pb_Flags) & 0x01) {
@@ -978,6 +1008,12 @@ skip_disk:;
             int32_t setfsh_r = get_mapped_item_by_address(cfg, val);
             if (setfsh_r != -1) {
                 uint32_t addr = (uint32_t)(val - cfg->map_offset[setfsh_r]);
+                /*
+                 * Cast alignment warning intentionally suppressed:
+                 * PiSCSI interprets Amiga-side structures that arrive as byte streams.
+                 * On the Pi side these are represented as C structs with 32-bit alignment.
+                 * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
+                 */
                 struct DeviceNode *node = (struct DeviceNode *)((char *)(cfg->map_data[setfsh_r] + addr));
                 char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
 
