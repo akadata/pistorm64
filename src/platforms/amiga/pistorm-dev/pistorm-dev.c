@@ -6,6 +6,10 @@
 #include <time.h>
 #include <stdbool.h>
 
+#include <dirent.h>
+#include <errno.h>
+#include <string.h>
+
 #include "pistorm-dev.h"
 #include "pistorm-dev-enums.h"
 #include "platforms/platforms.h"
@@ -244,50 +248,90 @@ static void janus_dump_ring(void) {
 }
 
 static uint32_t parse_temp_c(const char* buf) {
-  char* end = NULL;
-  long val = strtol(buf, &end, 10);
-  if (end == buf) {
+    char* end = NULL;
+    long val = strtol(buf, &end, 10);
+
+    if (end == buf) {
+        return 0;
+    }
+
+    if (val > 1000) {
+        val /= 1000;
+    }
+
+    if (val < 0) {
+        val = 0;
+    }
+
+    return (uint32_t)val;
+}
+
+
+
+
+static int read_first_line(const char *path, char *buf, size_t buflen) {
+    FILE *f = fopen(path, "r");
+    if (!f) return -1;
+    if (!fgets(buf, buflen, f)) { fclose(f); return -1; }
+    fclose(f);
+    // strip newline
+    buf[strcspn(buf, "\r\n")] = 0;
     return 0;
-  }
-  if (val > 1000) {
-    val /= 1000;
-  }
-  if (val < 0) {
-    return 0;
-  }
-  return (uint32_t)val;
 }
 
 static uint32_t grab_pi_temperature(void) {
-  static const char* base_paths[] = {
-      "/sys/class/thermal/thermal_zone%d/temp",
-      "/sys/devices/virtual/thermal/thermal_zone%d/temp",
-  };
-  char path[128];
-  char buf[64];
-
-  for (size_t p = 0; p < (sizeof(base_paths) / sizeof(base_paths[0])); p++) {
-    for (int i = 0; i < 8; i++) {
-      // Format string is intentionally stored in variable for flexibility
-      // Known-safe format strings: "/sys/class/thermal/thermal_zone%d/temp" and "/sys/devices/virtual/thermal/thermal_zone%d/temp"
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-      snprintf(path, sizeof(path), base_paths[p], i);
-#pragma GCC diagnostic pop
-      FILE* f = fopen(path, "r");
-      if (!f) {
-        continue;
-      }
-      if (fgets(buf, sizeof(buf), f)) {
-        fclose(f);
-        return parse_temp_c(buf);
-      }
-      fclose(f);
+    const char *thermal_dir = "/sys/class/thermal";
+    DIR *d = opendir(thermal_dir);
+    if (!d) {
+        DEBUG("Could not open %s: %s\n", thermal_dir, strerror(errno));
+        return 0;
     }
-  }
-  DEBUG("Could not read temperature from sysfs\n");
-  return 0;
+
+    char best_temp_path[256] = {0};
+    int  best_score = -1; // higher is better
+
+    struct dirent *de;
+    while ((de = readdir(d)) != NULL) {
+        if (strncmp(de->d_name, "thermal_zone", 12) != 0) continue;
+
+        char type_path[256], temp_path[256], type[64], tempbuf[64];
+        snprintf(type_path, sizeof(type_path), "%s/%s/type", thermal_dir, de->d_name);
+        snprintf(temp_path, sizeof(temp_path), "%s/%s/temp", thermal_dir, de->d_name);
+
+        // Must have temp readable
+        if (read_first_line(temp_path, tempbuf, sizeof(tempbuf)) != 0) continue;
+
+        int score = 0;
+        if (read_first_line(type_path, type, sizeof(type)) == 0) {
+            // Prefer CPU/SOC thermal zones when labeled
+            if (strstr(type, "cpu") || strstr(type, "CPU")) score = 3;
+            else if (strstr(type, "soc") || strstr(type, "SoC")) score = 2;
+            else score = 1;
+        } else {
+            // No type file? still usable
+            score = 0;
+        }
+
+        if (score > best_score) {
+            best_score = score;
+            strncpy(best_temp_path, temp_path, sizeof(best_temp_path) - 1);
+        }
+    }
+    closedir(d);
+
+    if (best_temp_path[0] == 0) {
+        DEBUG("Could not read temperature from sysfs\n");
+        return 0;
+    }
+
+    char buf[64];
+    if (read_first_line(best_temp_path, buf, sizeof(buf)) != 0) {
+        DEBUG("Could not read %s\n", best_temp_path);
+        return 0;
+    }
+    return parse_temp_c(buf);
 }
+
 
 static int32_t grab_amiga_string(uint32_t addr, uint8_t* dest, uint32_t str_max_len) {
   int32_t r = get_mapped_item_by_address(cfg, addr);
