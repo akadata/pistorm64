@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0354.html
-TITLE: exec.library/FreeEntry
-
-exec.library/FreeEntry ]" border=0> NAME FreeEntry -- free many regions of memory SYNOPSIS FreeEntry(memList) A0 void FreeEntry(struct MemList *); FUNCTION This function takes a memList structure (as returned by AllocEntry) and frees all the entries. INPUTS memList -- pointer to structure filled in with MemEntry structures SEE ALSO AllocEntry [Back to Amiga Developer Docs ]

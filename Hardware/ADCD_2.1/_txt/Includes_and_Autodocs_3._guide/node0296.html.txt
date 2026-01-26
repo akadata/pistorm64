@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0296.html
-TITLE: glyph_ic.doc
-
-glyph_ic.doc ]" border=0> --datasheet-- GLYPH_GetClass() [Back to Amiga Developer Docs ]

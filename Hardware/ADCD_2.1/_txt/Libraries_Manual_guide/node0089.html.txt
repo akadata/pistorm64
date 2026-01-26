@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0089.html
-TITLE: Messages Index
-
-Messages Index ]" border=0> Messages, 499 discarded by Intuition, 113 emergency, 220 Examples - skeleton of waiting for a signal, 434 GetMsg(), 434 getting, 505 IDCMP, 90 interprocess communication, 433 mouse, 268 putting, 503 queue limits, 113 replying, 505 waiting for, 504 waiting for messages and signals, 435 [Back to Amiga Developer Docs ]

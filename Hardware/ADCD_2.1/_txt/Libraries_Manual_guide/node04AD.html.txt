@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04AD.html
-TITLE: 37 / Function Reference / Date Function Reference
-
-37 / Function Reference / Date Function Reference ]" border=0> The following are brief descriptions of the utility library functions which pertain to date conversion. Table 37-10: Utility Date Functions ________________________________________________________________ | | | Function Description | |================================================================| | CheckDate() Check the legality of a date. | |----------------------------------------------------------------| | Amiga2Date() Calculate the date from a specified timestamp. | | Date2Amiga() Calculate the timestamp from a specified date. | |________________________________________________________________| [Back to Amiga Developer Docs ]

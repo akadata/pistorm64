@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node02D2.html
-TITLE: dos.library/NameFromFH
-
-dos.library/NameFromFH ]" border=0> NAME NameFromFH -- Get the name of an open filehandle (V36) SYNOPSIS success = NameFromFH(fh, buffer, len) D0 D1 D2 D3 BOOL NameFromFH(BPTR, STRPTR, LONG) FUNCTION Returns a fully qualified path for the filehandle. This routine is guaranteed not to write more than len characters into the buffer. The name will be null-terminated. See NameFromLock() for more information. INPUTS fh - Lock of object to be examined. buffer - Buffer to store name. len - Length of buffer. RESULT success - Success/failure indicator. SEE ALSO NameFromLock() [Back to Amiga Developer Docs ]

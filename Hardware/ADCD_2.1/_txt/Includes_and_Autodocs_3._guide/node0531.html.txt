@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0531.html
-TITLE: reaction.lib/RadioButtonsA
-
-reaction.lib/RadioButtonsA ]" border=0> NAME RadioButtonsA -- Make a linked list of radiobuttons RadioButtons -- varags stub for RadioButtonsA SYNOPSIS list = RadioButtonsA( array ) list = RadioButtons( label, ... ) struct List *RadioButtonsA( STRPTR * ) struct List *RadioButtons( STRPTR , ... ) FUNCTION Make a linked list of radiobutton nodes from the NULL terminated label array. The labels are not copied, so they must stay valid until the list is free'd. INPUTS array -- a NULL terminated array of string pointers. RESULTS list -- a linked list of radiobutton nodes [Back to Amiga Developer Docs ]

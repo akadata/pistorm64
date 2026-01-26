@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node039C.html
-TITLE: layers.library/LockLayerInfo
-
-layers.library/LockLayerInfo ]" border=0> NAME LockLayerInfo -- Lock the LayerInfo structure. SYNOPSIS LockLayerInfo( li ) a0 void LockLayerInfo( struct Layer_Info *); FUNCTION Before doing an operation that requires the LayerInfo structure, make sure that no other task is also using the LayerInfo structure. LockLayerInfo() returns when the LayerInfo belongs to this task. There should be an UnlockLayerInfo for every LockLayerInfo. Note: All layer routines presently LockLayerInfo() when they start up and UnlockLayerInfo() as they exit. Programmers will need to use these Lock/Unlock routines if they wish to do something with the LayerStructure that is not supported by the layer library. INPUTS li - pointer to Layer_Info structure BUGS SEE ALSO UnlockLayerInfo , graphics/layers.h [Back to Amiga Developer Docs ]

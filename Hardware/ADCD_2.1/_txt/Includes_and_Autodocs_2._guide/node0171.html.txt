@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0171.html
-TITLE: DPutStr
-
-DPutStr ]" border=0> NAME DPutStr - put a string to the parallel port SYNOPSIS DPutStr(string) A0 FUNCTION put a null terminated string to the parallel port. [Back to Amiga Developer Docs ]

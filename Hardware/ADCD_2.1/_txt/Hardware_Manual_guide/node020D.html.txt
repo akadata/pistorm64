@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node020D.html
-TITLE: Glossary / nybble
-
-Glossary / nybble ]" border=0> A collection of four bits; one half of a byte. AUTOCONFIG(TM) ROMs are physically nybble-wide. [Back to Amiga Developer Docs ]

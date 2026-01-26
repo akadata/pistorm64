@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node000C.html
-TITLE: amigaguide.library/GetAmigaGuideString
-
-amigaguide.library/GetAmigaGuideString ]" border=0> NAME GetAmigaGuideString - Get an AmigaGuide string. (V34) SYNOPSIS txt = GetAmigaGuideString (id); d0 d0 STRPTR GetAmigaGuideString (ULONG); FUNCTION This function is used to obtain a localized string given the ID. INPUTS ID -- Valid AmigaGuide string id. RETURNS A pointer to the string. NULL for an invalid string. SEE ALSO [Back to Amiga Developer Docs ]

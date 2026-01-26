@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node049A.html
-TITLE: 37 / / Advanced Tag Usage / Creating a New Tag List
-
-37 / / Advanced Tag Usage / Creating a New Tag List ]" border=0> The AllocateTagItems() function can be used to create a new tag array ready for use. The tag array should be passed to FreeTagItems() when the application is done with it. struct TagItem *tags; ULONG tags_needed; /* Indicate how many tags we need */ tags_needed = 10; /* Allocate a tag array */ if (tags = AllocateTagItems(tags_needed)) { /* ...do something with the array... */ /* Free the array when your done with it */ FreeTagItems (tags); } [Back to Amiga Developer Docs ]

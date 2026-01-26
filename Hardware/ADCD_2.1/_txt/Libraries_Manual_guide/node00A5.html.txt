@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node00A5.html
-TITLE: RyOffset Index
-
-RyOffset Index ]" border=0> RyOffset effect on display, 549 in RasInfo structure, 550 in ViewPort display memory, 549 [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0147.html
-TITLE: Phonemes Index
-
-Phonemes Index ]" border=0> Phonemes, 143 consonant groups, 145 consonants, 143 contraction and special symbols, 145 contractions, 144 digits and punctuation, 144 diphthongs, 143 , 145 example text, 149 glottal stop, 146 hints for intelligibility, 148 punctuation, 148 sentence length, 148 special symbols, 144 stress and intonation, 146 , 147 stress mark placement rules, 146 vowel groups, 145 vowels, 143 [Back to Amiga Developer Docs ]

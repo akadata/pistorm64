@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0463.html
-TITLE: graphics.library/OpenMonitor
-
-graphics.library/OpenMonitor ]" border=0> NAME OpenMonitor -- open a named MonitorSpec (V36) SYNOPSIS mspc = OpenMonitor( monitor_name , display_id) d0 a1 d0 struct MonitorSpec *OpenMonitor( char *, ULONG ); FUNCTION Locate and open a named MonitorSpec . INPUTS monitor_name - a pointer to a null terminated string. display_id - an optional 32 bit monitor/mode identifier RESULTS mspc - a pointer to an open MonitorSpec structure. NULL if MonitorSpec could not be opened. NOTE if monitor_name is non-NULL, the monitor will be opened by name. if monitor_name is NULL the monitor will be opened by optional ID. if both monitor_name and display_id are NULL returns default monitor. BUGS SEE ALSO CloseMonitor() graphics/monitor.h [Back to Amiga Developer Docs ]

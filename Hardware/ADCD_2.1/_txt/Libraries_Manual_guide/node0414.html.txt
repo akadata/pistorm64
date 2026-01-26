@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0414.html
-TITLE: Amiga® RKM Libraries: 32 Expansion Library
-
-Amiga® RKM Libraries: 32 Expansion Library ]" border=0> Amiga RAM expansion boards and other expansion bus peripherals are designed to reside at dynamically assigned address spaces within the system. The configuration and initialization of these expansion peripherals is performed by the expansion.library. AUTOCONFIG(TM) Expansion Board Drivers The Expansion Sequence Function Reference [Back to Amiga Developer Docs ]

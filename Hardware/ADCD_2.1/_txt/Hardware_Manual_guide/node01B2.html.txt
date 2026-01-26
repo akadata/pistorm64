@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01B2.html
-TITLE: Glossary / Alt keys
-
-Glossary / Alt keys ]" border=0> Two keys on the keyboard to the left and right of the Amiga keys. [Back to Amiga Developer Docs ]

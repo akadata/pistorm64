@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node040B.html
-TITLE: workbench.library/RemoveAppMenuItem
-
-workbench.library/RemoveAppMenuItem ]" border=0> NAME RemoveAppMenuItem - remove a menuitem from workbench's list (V36) of appmenuitems. SYNOPSIS error = RemoveAppMenuItem(AppMenuItem) D0 A0 BOOL RemoveAppMenuItem(struct AppMenuItem *); FUNCTION Attempt to remove an appmenuitem from workbench's list of appmenuitems. INPUTS AppMenuItem - pointer to an AppMenuItem structure returned by AddAppMenuItem. RESULTS error - Currently always TRUE... NOTES As with anything that deals with async operation, you will need to do a final check for messages on your App message port for messages that may have come in between the last time you checked and the call to removed the App. SEE ALSO AddAppMenuItemA() BUGS None [Back to Amiga Developer Docs ]

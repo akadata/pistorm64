@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node011A.html
-TITLE: ddebug_lib.doc
-
-ddebug_lib.doc ]" border=0> DDoFmt() DGetChar() DGetNum() DMayGetChar() DPutChar() DPutFmt() DPutStr() KCmpStr() [Back to Amiga Developer Docs ]

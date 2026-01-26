@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node040D.html
-TITLE: keyboard.device/KBD_REMRESETHANDLER
-
-keyboard.device/KBD_REMRESETHANDLER ]" border=0> NAME KBD_REMRESETHANDLER -- Remove a keyboard reset handler. FUNCTION Remove a function previously added to the list of reset handler functions with KBD_ADDRESETHANDLER . IO REQUEST io_Message mn_ReplyPort set io_Device preset by OpenDevice io_Unit preset by OpenDevice io_Command KBD_REMRESETHANDLER io_Data a pointer to the handler interrupt structure. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node00A8.html
-TITLE: Screens Index
-
-Screens Index ]" border=0> Screens aspect ratio, 20 autoscroll, 74 attributes, 46 color selection, 47 , 65 CON: on, 20 coordinate reference, 46 data structures, 39 defined, 27 display modes, 20 , 37 DisplayBeep(), 75 Examples cloning a public screen, 59 double buffered screen, 67 dual playfield screen, 70 finding the Workbench screen, 51 opening a new look screen, 42 opening screens compatibly, 44 using a public screen, 56 font, 59 from window, 105 hide title, 92 menu snap, 74 mode for alert, 220 MoveScreen(), 74 multiple screens, 38 positioning, 40 ShowTitle(), 65 tag items, 46 title bar, 49 , 65 , 75 using layers with, 65 Workbench, 75 [Back to Amiga Developer Docs ]

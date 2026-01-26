@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node003F.html
-TITLE: Borderless Index
-
-Borderless Index ]" border=0> Borderless advantages over screen, 93 attribute, 110 window type, 92 , 93 with backdrop, 93 [Back to Amiga Developer Docs ]

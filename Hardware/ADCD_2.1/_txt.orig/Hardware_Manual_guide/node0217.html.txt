@@ -1,1 +1,0 @@
-Glossary / playfield object ]" border=0> Subsection of a playfield that is used in playfield animation. [Back to Amiga Developer Docs ]

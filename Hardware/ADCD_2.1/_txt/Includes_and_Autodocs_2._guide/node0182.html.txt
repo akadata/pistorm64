@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0182.html
-TITLE: icon.doc
-
-icon.doc ]" border=0> AddFreeList() FreeDiskObject() GetDiskObjectNew() BumpRevision() FreeFreeList() MatchToolValue() DeleteDiskObject() GetDefDiskObject() PutDefDiskObject() FindToolType() GetDiskObject() PutDiskObject() [Back to Amiga Developer Docs ]

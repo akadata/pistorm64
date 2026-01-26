@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0471.html
-TITLE: graphics.library/RemVSprite
-
-graphics.library/RemVSprite ]" border=0> NAME RemVSprite -- Remove a VSprite from the current gel list. SYNOPSIS RemVSprite(vs) A0 void RemVSprite(struct VSprite *); FUNCTION Unlinks the VSprite from the current gel list. INPUTS vs = pointer to the VSprite structure to be removed from the gel list RESULT BUGS SEE ALSO InitGels() RemIBob() graphics/gels.h [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0615.html
-TITLE: lib_startup/RWstartup.i
-
-lib_startup/RWstartup.i ]" border=0> RWSTARTUP SET 1 [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0274.html
-TITLE: Line Drawing Index
-
-Line Drawing Index ]" border=0> Line Drawing, 4 , 189 length, 191 logic function, 191 octants, 189 registers, 191 [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0566.html
-TITLE: speedbar_gc.doc
-
-speedbar_gc.doc ]" border=0> --datasheet-- SPEEDBAR_GetClass() AllocSpeedButtonNodeA() FreeSpeedButtonNode() GetSpeedButtonNodeAttrsA() SetSpeedButtonNodeAttrsA() [Back to Amiga Developer Docs ]

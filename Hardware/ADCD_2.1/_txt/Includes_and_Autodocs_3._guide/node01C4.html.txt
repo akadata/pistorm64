@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node01C4.html
-TITLE: dos.library/StrToLong
-
-dos.library/StrToLong ]" border=0> NAME StrToLong -- string to long value (decimal) (V36) SYNOPSIS characters = StrToLong(string,value) D0 D1 D2 LONG StrToLong(STRPTR, LONG *) FUNCTION Converts decimal string into LONG value. Returns number of characters converted. Skips over leading spaces & tabs (included in count). If no decimal digits are found (after skipping leading spaces & tabs), StrToLong returns -1 for characters converted, and puts 0 into value. INPUTS string - Input string. value - Pointer to long value. Set to 0 if no digits are converted. RESULT result - Number of characters converted or -1. BUGS Before V39, if there were no convertible characters it returned the number of leading white-space characters (space and tab in this case). [Back to Amiga Developer Docs ]

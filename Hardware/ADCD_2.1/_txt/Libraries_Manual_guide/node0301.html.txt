@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0301.html
-TITLE: Amiga® RKM Libraries: 26 Exec Interrupts
-
-Amiga® RKM Libraries: 26 Exec Interrupts ]" border=0> Introduction Software Interrupts Function Reference Servicing Interrupts Disabling Interrupts [Back to Amiga Developer Docs ]

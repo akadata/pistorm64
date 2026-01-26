@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node05D5.html
-TITLE: lib_pics/6-1.pic
-
-lib_pics/6-1.pic ]" border=0> [Back to Amiga Developer Docs ]

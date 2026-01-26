@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node026B.html
-TITLE: 15 / GadTools / Functions for Setting Up GadTools Menus and Gadgets
-
-15 / GadTools / Functions for Setting Up GadTools Menus and Gadgets ]" border=0> This section gives all the details on the functions used to set up GadTools menus and gadgets that were mentioned briefly earlier in this chapter. GetVisualInfo() and FreeVisualInfo() CreateContext() [Back to Amiga Developer Docs ]

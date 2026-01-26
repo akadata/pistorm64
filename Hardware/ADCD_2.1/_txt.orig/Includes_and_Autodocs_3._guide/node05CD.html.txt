@@ -1,1 +1,0 @@
-window_cl/WM_ICONIFY ]" border=0> NAME WM_ICONIFY -- Hide this window to an icon SYNOPSIS DoMethod( winobj, WM_ICONIFY ); FUNCTION Close the window and put an icon on the Workbench for it. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node04D2.html
-TITLE: narrator.device/CloseDevice
-
-narrator.device/CloseDevice ]" border=0> NAME CloseDevice - terminates access to the narrator device SYNOPSIS CloseDevice(IORequest) A1 FUNCTION Close invalidates the IO_UNIT and IO_DEVICE fields in the IORequest block, preventing subsequent IO until another OpenDevice . CloseDevice also reduces the open count. If the count goes to 0 and the expunge bit is set, the device is expunged. If the open count goes to zero and the delayed expunge bit is not set, CloseDevice sets the expunge bit. INPUTS A valid IORequest block with its io_Message structure, and io_Device and io_Unit fields properly initialized. These fields are initialized by OpenDevice . RESULTS CloseDevice invalidates the unit and device pointers in the IORequest block. SEE ALSO [Back to Amiga Developer Docs ]

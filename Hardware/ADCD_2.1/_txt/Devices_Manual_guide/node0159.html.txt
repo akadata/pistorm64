@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0159.html
-TITLE: Amiga® RKM Devices: Appendix B Example Device
-
-Amiga® RKM Devices: Appendix B Example Device ]" border=0> This appendix contains source code for a sample device. The example code is an excellent starting point for those who want to create a custom device and add it to the Amiga's system software. The example is a complete four-unit, static-sized RAM disk that works under the old (standard) filing system, the new Fast Filing System (FFS), and has optional code to bind it to an AUTOCONFIG(TM) device. The examples have been assembled under the Metacomco assembler V11.0 and under the CAPE assembler V2.0. ramdev-mountlist ramdev.i asmsupp.i ramdev.device.asm [Back to Amiga Developer Docs ]

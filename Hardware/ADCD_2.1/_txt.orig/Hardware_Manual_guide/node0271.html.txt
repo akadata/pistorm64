@@ -1,1 +1,0 @@
-Keyboard Index ]" border=0> Keyboard, 251 , 357 Caps lock, 359 communications, 357 errors, 359 ghosting, 253 hard reset, 361 keycodes, 358 transmission, 358 matrix, 362 out-of-sync, 359 power up, 360 raw keycodes, 251 reading, 251 reset warning, 361 self test, 360 signals, 6 , 357 special codes, 364 timing diagram, 358 [Back to Amiga Developer Docs ]

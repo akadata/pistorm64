@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0180.html
-TITLE: asl.library/FreeFileRequest
-
-asl.library/FreeFileRequest ]" border=0> NAME FreeFileRequest -- frees requester allocated by AllocFileRequest (V36) SYNOPSIS FreeFileRequest( request ) A0 struct FileRequester *request; FUNCTION This function is identical to the FreeAslRequest() function, but is documented for source code compatability and ease of use. Applications may use either FreeAslRequest() or FreeFileRequest() to free the data structures allocated by AllocFileRequest() . INPUTS request = the return value from AllocFileRequest() . SEE ALSO FreeAslRequest() [Back to Amiga Developer Docs ]

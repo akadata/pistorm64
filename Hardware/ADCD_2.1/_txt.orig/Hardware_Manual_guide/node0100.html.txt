@@ -1,1 +1,0 @@
-E I/O Connectors And Interfaces / Explanation of Amiga I/O Connectors ]" border=0> Parallel Connector Interface Specification Serial Interface Connector Specification Game Controller Connector Interface Specification External Disk Interface Connector Specification [Back to Amiga Developer Docs ]

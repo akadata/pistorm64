@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0502.html
-TITLE: console.device/CD_ASKKEYMAP
-
-console.device/CD_ASKKEYMAP ]" border=0> NAME CD_ASKKEYMAP -- Get the current key map structure for this console. FUNCTION Fill the io_Data buffer with the current KeyMap structure in use by this console unit. IO REQUEST INPUT io_Message mn_ReplyPort set if quick I/O is not possible io_Device preset by the call to OpenDevice io_Unit preset by the call to OpenDevice io_Command CD_ASKKEYMAP io_Flags IOF_QUICK if quick I/O possible, else zero io_Length sizeof(*keyMap) io_Data struct KeyMap *keyMap pointer to a structure that describes the raw keycode to byte stream conversion. IO REQUEST RESULT This function sets the io_Error field in the IOStdReq , and fills the structure the structure pointed to by io_Data with the current key map. SEE ALSO exec/io.h , devices/keymap.h , devices/console.h [Back to Amiga Developer Docs ]

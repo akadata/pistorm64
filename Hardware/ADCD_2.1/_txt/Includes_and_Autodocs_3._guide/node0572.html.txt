@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0572.html
-TITLE: timer.doc
-
-timer.doc ]" border=0> --background-- AbortIO() AddTime() CmpTime() GetSysTime() ReadEClock() SubTime() TR_ADDREQUEST TR_GETSYSTIME TR_SETSYSTIME [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node024C.html
-TITLE: intuition.library/ScreenToBack
-
-intuition.library/ScreenToBack ]" border=0> NAME ScreenToBack -- Send the specified screen to the back of the display. SYNOPSIS ScreenToBack( Screen ) A0 VOID ScreenToBack( struct Screen * ); FUNCTION Sends the specified screen to the back of the display. INPUTS Screen = pointer to a Screen structure RESULT None BUGS SEE ALSO ScreenToFront() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0590.html
-TITLE: translator.doc
-
-translator.doc ]" border=0> Translate() [Back to Amiga Developer Docs ]

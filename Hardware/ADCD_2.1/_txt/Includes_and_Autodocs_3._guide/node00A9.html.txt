@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node00A9.html
-TITLE: cd.device/CD_INFO
-
-cd.device/CD_INFO ]" border=0> NAME CD_INFO -- Return information/status of device IO REQUEST io_Device preset by the call to OpenDevice() io_Unit preset by the call to OpenDevice() io_Command CD_INFO io_Data pointer to CDInfo structure io_Length sizeof(struct CDInfo) RESULTS io_Error 0 for success, or an error code as defined in io_Actual length of data transferred FUNCTION This command returns current configurations and status of the device driver. EXAMPLE struct CDInfo Info; ior->io_Command = CD_INFO; /* Retrieve drive info. */ ior->io_Data = (APTR)Info; /* Here's where we want it */ ior->io_Length = sizeof(struct CDInfo); /* Return whole structure */ DoIO(ior); if (!ior->io_Error) { /* Command succeeded */ if (Info.Status & CDSTSF_PLAYING) printf("Audio is playingn"); else printf("Audio not playingn"); } NOTES BUGS SEE ALSO [Back to Amiga Developer Docs ]

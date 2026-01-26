@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node00B4.html
-TITLE: Tags Index
-
-Tags Index ]" border=0> Tags, 867 advanced use, 871 function reference, 883 functions, 868 simple example, 869 simple usage, 868 structures, 867 with open screen, 43 with OpenWindow(), 80 [Back to Amiga Developer Docs ]

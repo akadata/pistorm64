@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0525.html
-TITLE: reaction.lib/ClickTabsA
-
-reaction.lib/ClickTabsA ]" border=0> NAME ClickTabsA -- Make a linked list of clicktab nodes ClickTabs -- varags stub for ClickTabsA SYNOPSIS list = ClickTabsA( array ) list = ClickTabs( label, ... ) struct List *ClickTabsA( STRPTR * ) struct List *ClickTabs( STRPTR , ... ) FUNCTION Make a linked list of clicktab nodes from the NULL terminated label array. The labels are not copied, so they must stay valid until the list is free'd. INPUTS array -- a NULL terminated array of string pointers. RESULTS list -- a linked list of clicktab nodes [Back to Amiga Developer Docs ]

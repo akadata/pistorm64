@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0116.html
-TITLE: datatypes.library/ReleaseDataType
-
-datatypes.library/ReleaseDataType ]" border=0> NAME ReleaseDataType - Release a DataType structure. (V39) SYNOPSIS ReleaseDataType (dtn); a0 VOID ReleaseDataType (struct DataType *); FUNCTION This function is used to release a DataType structure obtained by ObtainDataTypeA() . INPUTS dtn - DataType structure returned by ObtainDataTypeA() . NULL is a valid input. SEE ALSO ObtainDataTypeA() [Back to Amiga Developer Docs ]

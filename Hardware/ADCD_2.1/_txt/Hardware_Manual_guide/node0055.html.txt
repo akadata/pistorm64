@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0055.html
-TITLE: 2 Coprocessor Hardware / Starting and Stopping the Copper
-
-2 Coprocessor Hardware / Starting and Stopping the Copper ]" border=0> Starting the Copper After Reset Stopping the Copper [Back to Amiga Developer Docs ]

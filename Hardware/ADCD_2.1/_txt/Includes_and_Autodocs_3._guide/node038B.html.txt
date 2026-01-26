@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node038B.html
-TITLE: integer_gc.doc
-
-integer_gc.doc ]" border=0> --datasheet-- INTEGER_GetClass() [Back to Amiga Developer Docs ]

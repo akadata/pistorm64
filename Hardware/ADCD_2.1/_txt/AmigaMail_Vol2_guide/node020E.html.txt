@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node020E.html
-TITLE: XIII-17/1200_port.ilbm
-
-XIII-17/1200_port.ilbm ]" border=0> [Back to Amiga Developer Docs ]

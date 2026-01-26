@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node01CB.html
-TITLE: Appendix A / EA IFF 85: Standard for Interchange Format Files
-
-Appendix A / EA IFF 85: Standard for Interchange Format Files ]" border=0> Document Date: January 14, 1985 (Updated Oct, 1988 Commodore-Amiga, Inc.) From: Jerry Morrison, Electronic Arts Status: Released to the public domain, and in use Introduction LISTs, CATs and Shared Property Background for Designers Standard File Structure Primitive Data Types Standards Committee Data Sections Appendix A. Reference [Back to Amiga Developer Docs ]

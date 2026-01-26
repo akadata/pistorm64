@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0255.html
-TITLE: 15 / GadTools Menus / GadTools Menus and IntuiMessages
-
-15 / GadTools Menus / GadTools Menus and IntuiMessages ]" border=0> If the window uses GadTools menus and GadTools gadgets, then use the GT_GetIMsg() and GT_ReplyIMsg() functions described below (or GT_FilterIMsg() and GT_PostFilterIMsg() , if applicable). However, if the window has GadTools menus, but no GadTools gadgets, it is acceptable to use GetMsg() and ReplyMsg() in the usual manner. Additionally, no context need be created with CreateContext() if no GadTools gadgets are used. For more about these functions, see the section on " Other GadTools Functions " later in this chapter. [Back to Amiga Developer Docs ]

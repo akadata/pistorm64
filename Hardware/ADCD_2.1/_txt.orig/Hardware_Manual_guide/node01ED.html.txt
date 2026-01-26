@@ -1,1 +1,0 @@
-Glossary / Fast RAM ]" border=0> General-purpose memory used for programs and data; as opposed to Chip RAM. [Back to Amiga Developer Docs ]

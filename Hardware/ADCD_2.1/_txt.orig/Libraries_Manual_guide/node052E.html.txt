@@ -1,1 +1,0 @@
-B / groupgclass / Changed Methods: OM_REMMEMBER ]" border=0> This method removes a gadget added to the group object's list with OM_ADDMEMBER. Note that all members of the groupgclass object will be deleted by OM_DISPOSE . [Back to Amiga Developer Docs ]

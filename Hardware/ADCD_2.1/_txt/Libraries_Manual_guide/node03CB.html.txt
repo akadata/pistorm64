@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node03CB.html
-TITLE: 28 / Animation with GELs / Adding Animation Objects
-
-28 / Animation with GELs / Adding Animation Objects ]" border=0> Use the routine AddAnimOb() to add animation objects to the controlled object list. This routine will link the PrevOb and NextOb pointers to chain all the AnimOb s that the system is controlling. struct RastPort myRPort; struct AnimOb myAnimOb; struct AnimOb *animKey; /* Must be initialized with InitAnimate() */ AddAnimOb(&myAnimOb, &animKey, &myRPort); [Back to Amiga Developer Docs ]

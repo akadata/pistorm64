@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node03BC.html
-TITLE: expansion.library/ReleaseConfigBinding
-
-expansion.library/ReleaseConfigBinding ]" border=0> NAME ReleaseConfigBinding - allow others to bind to drivers SYNOPSIS ReleaseConfigBinding() FUNCTION This call should be used when you are done binding drivers to ConfigDev entries. It releases the SignalSemaphore; this allows others to bind their drivers to ConfigDev structures. SEE ALSO ObtainConfigBinding() [Back to Amiga Developer Docs ]

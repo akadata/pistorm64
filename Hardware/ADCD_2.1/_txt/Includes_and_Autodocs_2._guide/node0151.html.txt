@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0151.html
-TITLE: amiga.lib/dbf
-
-amiga.lib/dbf ]" border=0> NAME dbf - convert FFP dual-binary number to FFP format SYNOPSIS fnum = dbf(exp, mant); FUNCTION Accepts a dual-binary format (described below) floating point number and converts it to an FFP format floating point number. The dual-binary format is defined as: exp bit 16 = sign (0=>positive, 1=>negative) exp bits 15-0 = binary integer representing the base ten (10) exponent man = binary integer mantissa INPUTS exp - binary integer representing sign and exponent mant - binary integer representing the mantissa RESULT fnum - converted FFP floating point format number BUGS None [Back to Amiga Developer Docs ]

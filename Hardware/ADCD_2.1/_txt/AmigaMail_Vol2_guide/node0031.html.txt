@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0031.html
-TITLE: Additional Information
-
-Additional Information ]" border=0> Task Switching Intuition Gadgets and Window Borders Intuition Fonts [Back to Amiga Developer Docs ]

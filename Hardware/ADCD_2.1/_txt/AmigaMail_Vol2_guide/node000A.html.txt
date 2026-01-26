@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node000A.html
-TITLE: X: Output
-
-X: Output ]" border=0> No mail in ths directory [Back to Amiga Developer Docs ]

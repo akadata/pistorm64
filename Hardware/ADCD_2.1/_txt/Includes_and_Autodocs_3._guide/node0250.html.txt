@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0250.html
-TITLE: SAD/READ_BYTE
-
-SAD/READ_BYTE ]" border=0> READ BYTE - Read a byte from the given address Command: $AF $04 Data: $ww $xx $yy $zz Read a byte from address Returns as result Command will be ACK'ed when received. Command ACK: $00 $04 Command DONE: $1F $04 $qq [Back to Amiga Developer Docs ]

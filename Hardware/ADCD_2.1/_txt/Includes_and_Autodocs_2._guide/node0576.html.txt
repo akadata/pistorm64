@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0576.html
-TITLE: FD/cia_lib.fd
-
-FD/cia_lib.fd ]" border=0> * "CiaA.Resource" and "CiaB.Resource" ##bias 6 ##public AddICRVector(resource,iCRBit,interrupt)(a6,d0/a1) RemICRVector(resource,iCRBit,interrupt)(a6,d0/a1) AbleICR(resource,mask)(a6,d0) SetICR(resource,mask)(a6,d0) ##end [Back to Amiga Developer Docs ]

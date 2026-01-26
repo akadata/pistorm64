@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04B5.html
-TITLE: A / Amiga.lib / Timer
-
-A / Amiga.lib / Timer ]" border=0> TimeDelay() This function waits for a specified period of time before returning to the the caller. [Back to Amiga Developer Docs ]

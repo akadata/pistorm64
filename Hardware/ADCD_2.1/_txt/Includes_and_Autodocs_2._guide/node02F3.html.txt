@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node02F3.html
-TITLE: dos.library/SetConsoleTask
-
-dos.library/SetConsoleTask ]" border=0> NAME SetConsoleTask -- Sets the default console for the process (V36) SYNOPSIS oldport = SetConsoleTask(port) D0 D1 struct MsgPort *SetConsoleTask(struct MsgPort *) FUNCTION Sets the default console task's port (pr_ConsoleTask) for the current process. INPUTS port - The pr_MsgPort of the default console handler for the process RESULT oldport - The previous ConsoleTask value. SEE ALSO GetConsoleTask() , Open() [Back to Amiga Developer Docs ]

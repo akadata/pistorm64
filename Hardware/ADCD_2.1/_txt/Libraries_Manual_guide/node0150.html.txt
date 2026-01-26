@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0150.html
-TITLE: 5 / / Mutual Exclude / Gadget Type for Mutual Exclusion
-
-5 / / Mutual Exclude / Gadget Type for Mutual Exclusion ]" border=0> To implement mutual exclusion, gadgets must be hit-select (not GACT_TOGGLESELECT ) boolean gadgets, with the GACT_IMMEDIATE activation type (never GACT_RELVERIFY ). All state changes must be executed upon receiving the IDCMP_GADGETDOWN message for the gadgets. Failure to do this could introduce subtle out-of-phase imagery problems. [Back to Amiga Developer Docs ]

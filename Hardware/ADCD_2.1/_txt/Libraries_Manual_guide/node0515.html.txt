@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0515.html
-TITLE: B / strgclass / Attributes: STRINGA_BufferPos, STRINGA_DispPos (ISU)
-
-B / strgclass / Attributes: STRINGA_BufferPos, STRINGA_DispPos (ISU) ]" border=0> The attributes tell the object its cursor and scroll position. [Back to Amiga Developer Docs ]

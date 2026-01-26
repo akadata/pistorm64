@@ -1,1 +1,0 @@
-B / strgclass / Attributes: STRINGA_Font (IS) ]" border=0> This attributes points to an open TextFont structure that the string gadget uses for rendering its text. [Back to Amiga Developer Docs ]

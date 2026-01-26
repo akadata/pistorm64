@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04D1.html
-TITLE: B Boopsi Class Reference / imageclass
-
-B Boopsi Class Reference / imageclass ]" border=0> Class: imageclass Superclass: rootclass Include File: imageclass.h > This class is the base class for Boopsi Images. These images are backwards compatible with the conventional Intuition Images. Every Boopsi image has an Intuition Image structure embedded in it so Intuition can access the Boopsi image as a conventional Image structure when necessary. Normally there are no direct instances of this class, only instances of subclasses of imageclass. New Methods: ------------ IM_DRAW IM_ERASE IM_HITFRAME IM_FRAMEBOX IM_HITTEST IM_DRAWFRAME IM_ERASEFRAME Changed Methods: ---------------- OM_NEW OM_SET Attributes: ----------- IA_Left, IA_Top, IA_Width, IA_Height (ISG) IA_FGPen, IA_BGPen (ISG) IA_Data (ISG) IA_Pens () [Back to Amiga Developer Docs ]

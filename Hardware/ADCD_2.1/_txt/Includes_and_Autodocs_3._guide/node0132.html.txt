@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0132.html
-TITLE: diskfont.doc
-
-diskfont.doc ]" border=0> AvailFonts() DisposeFontContents() NewFontContents() NewScaledDiskFont() OpenDiskFont() [Back to Amiga Developer Docs ]

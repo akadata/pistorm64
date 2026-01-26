@@ -1,1 +1,0 @@
-Glossary / frequency ]" border=0> In audio applications, the number of times per second a waveform repeats. [Back to Amiga Developer Docs ]

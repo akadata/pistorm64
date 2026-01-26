@@ -1,1 +1,0 @@
-locale.doc ]" border=0> --environment_vars-- --rexxhost-- --structures-- CloseCatalog() CloseLocale() ConvToLower() ConvToUpper() FormatDate() FormatString() GetCatalogStr() GetLocaleStr() IsXXXX() OpenCatalog() OpenLocale() ParseDate() StrConvert() StrnCmp() [Back to Amiga Developer Docs ]

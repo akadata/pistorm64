@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node01C4.html
-TITLE: IV-125/Figure1.ilbm
-
-IV-125/Figure1.ilbm ]" border=0> [Back to Amiga Developer Docs ]

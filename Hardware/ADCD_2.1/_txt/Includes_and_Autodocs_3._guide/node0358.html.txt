@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0358.html
-TITLE: iffparse.doc
-
-iffparse.doc ]" border=0> AllocIFF() AllocLocalItem() CloseClipboard() CloseIFF() CollectionChunk() CollectionChunks() CurrentChunk() EntryHandler() ExitHandler() FindCollection() FindLocalItem() FindProp() FindPropContext() FreeIFF() FreeLocalItem() GoodID() GoodType() IDtoStr() InitIFF() InitIFFasClip() InitIFFasDOS() LocalItemData() OpenClipboard() OpenIFF() ParentChunk() ParseIFF() PopChunk() PropChunk() PropChunks() PushChunk() ReadChunkBytes() ReadChunkRecords() SetLocalItemPurge() StopChunk() StopChunks() StopOnExit() StoreItemInContext() StoreLocalItem() WriteChunkBytes() WriteChunkRecords() [Back to Amiga Developer Docs ]

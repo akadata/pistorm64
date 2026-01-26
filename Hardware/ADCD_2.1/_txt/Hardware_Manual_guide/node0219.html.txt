@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0219.html
-TITLE: Glossary / polarity
-
-Glossary / polarity ]" border=0> True or false state of a bit. [Back to Amiga Developer Docs ]

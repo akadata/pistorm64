@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0044.html
-TITLE: input.device (basename: _InputBase)
-
-input.device (basename: _InputBase) ]" border=0> PeekQualifier()() - Get the input device's current qualifiers (V36) [Back to Amiga Developer Docs ]

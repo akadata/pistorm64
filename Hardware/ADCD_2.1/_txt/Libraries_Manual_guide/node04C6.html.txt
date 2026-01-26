@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04C6.html
-TITLE: B Boopsi Class Reference / icclass
-
-B Boopsi Class Reference / icclass ]" border=0> Class: icclass (interconnection class) Superclass: rootclass Include File: icclass.h > Base class of simple OM_UPDATE forwarding objects. When an icclass object gets an OM_UPDATE message, it maps the attributes in the OM_UPDATE message according to its mapping list (its ICA_MAP attribute) and forwards the OM_UPDATE to its target (its ICA_TARGET attribute). New Methods: ------------ None. Changed Methods: ---------------- OM_SET OM_UPDATE/OM_NOTIFY Attributes: ----------- ICA_TARGET (IS) ICA_MAP (IS) ICSPECIAL_CODE (*) [Back to Amiga Developer Docs ]

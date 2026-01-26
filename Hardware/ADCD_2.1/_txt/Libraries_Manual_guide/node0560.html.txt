@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0560.html
-TITLE: E Compatibility / Release 2 Changes That Can Affect Compatibility
-
-E Compatibility / Release 2 Changes That Can Affect Compatibility ]" border=0> There are several areas where Relase 2 OS changes and enhancements can cause compatibility problems for some software. Exec Serial Device Preferences Expansion Timer Device Workbench Strap Trackdisk Device Layers DOS CIA Timers Graphics Audio Device Other Hardware Issues Fonts Gameport Device Intuition CLI/Shell [Back to Amiga Developer Docs ]

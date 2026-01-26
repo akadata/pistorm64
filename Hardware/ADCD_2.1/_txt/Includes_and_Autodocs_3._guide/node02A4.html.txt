@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node02A4.html
-TITLE: graphics.library/AndRectRegion
-
-graphics.library/AndRectRegion ]" border=0> NAME AndRectRegion -- Perform 2d AND operation of rectangle with region, leaving result in region. SYNOPSIS AndRectRegion(region,rectangle) a0 a1 void AndRectRegion( struct Region *, struct Rectangle * ); FUNCTION Clip away any portion of the region that exists outside of the rectangle. Leave the result in region. INPUTS region - pointer to Region structure rectangle - pointer to Rectangle structure NOTES Unlike the other rect-region primitives, AndRectRegion() cannot fail. BUGS SEE ALSO AndRegionRegion() OrRectRegion() graphics/regions.h [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-B / imageclass / Attributes: IA_Pens () ]" border=0> This attribute points to an alternative pen array for the image. Imageclass does not support this attribute, it is described here for subclasses to use. See the " Intuition Screens " chapter of the Amiga ROM Kernel Reference Manual: Libraries for more information on the pen array. [Back to Amiga Developer Docs ]

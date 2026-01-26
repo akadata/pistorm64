@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0142.html
-TITLE: 5 Intuition Gadgets / Gadget Refreshing
-
-5 Intuition Gadgets / Gadget Refreshing ]" border=0> Gadget imagery is redrawn by Intuition at appropriate times, e.g., when the user operates the gadget. The imagery can also be updated under application control. Gadget Refreshing by Intuition Gadget Refreshing by the Program [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node04EA.html
-TITLE: parallel.doc
-
-parallel.doc ]" border=0> CMD_CLEAR CMD_RESET CMD_WRITE PDCMD_SETPARAMS CMD_FLUSH CMD_START OpenDevice() CMD_READ CMD_STOP PDCMD_QUERY [Back to Amiga Developer Docs ]

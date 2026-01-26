@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0531.html
-TITLE: B / groupgclass / Changed Methods: GM_RENDER
-
-B / groupgclass / Changed Methods: GM_RENDER ]" border=0> This method sends a GM_HITTEST message to each of its members. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0579.html
-TITLE: timer.device/SubTime
-
-timer.device/SubTime ]" border=0> NAME SubTime -- Subtract one time request from another. SYNOPSIS SubTime( Dest, Source ) A0 A1 void SubTime( struct timeval *, struct timeval *); FUNCTION This routine subtracts one timeval structure from another. The results are stored in the destination (Dest - Source -> Dest) A0 and A1 will be left unchanged INPUTS Dest, Source -- pointers to timeval structures. NOTES This function may be called from interrupts. SEE ALSO timer.device/AddTime() , timer.device/CmpTime() BUGS [Back to Amiga Developer Docs ]

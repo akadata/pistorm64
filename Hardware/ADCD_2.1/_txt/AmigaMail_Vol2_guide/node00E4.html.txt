@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node00E4.html
-TITLE: The Global Drawing Attribute Chunks
-
-The Global Drawing Attribute Chunks ]" border=0> The following chunks describe global attributes of a DR2D document. DRHD (0x44524844) /* Drawing header */ PPRF (0x50505249) /* Page preferences */ CMAP (0x434D4150) /* Color map (Same as ILBM CMAP) */ FONS (0x464F4E53) /* Font chunk (Same as FTXT FONS chunk) */ DASH (0x44415348) /* Line dash pattern for edges */ AROW (0x41524F57) /* An arrow-head pattern */ FILL (0x46494C4C) /* Object-oriented fill pattern */ LAYR (0x4C415952) /* Define a layer */ [Back to Amiga Developer Docs ]

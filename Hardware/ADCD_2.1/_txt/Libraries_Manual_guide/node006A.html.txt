@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node006A.html
-TITLE: IFFParse Index
-
-IFFParse Index ]" border=0> IFFParse, 777 context stack, 789 custom chunk handler, 797 , 798 custom stream handler, 793-795 , 795 error handling, 792 examples examining IFF files, 807 parsing FTXT for the clipboard, 803 reading files, 784 streams, 781 struct ContextNode, 789 struct IFFHandle, 780 writing files, 787 [Back to Amiga Developer Docs ]

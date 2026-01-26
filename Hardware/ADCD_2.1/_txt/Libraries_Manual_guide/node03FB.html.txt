@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node03FB.html
-TITLE: 30 / Regions / Changing a Region
-
-30 / Regions / Changing a Region ]" border=0> Regions may be modified by performing logical operations with rectangles, or with other regions. Reuse Your Rectangles. ---------------------- In all of the rectangle and region routines the clipping rectangle is copied into the region. This means that a single clipping rectangle ( Rectangle structure) may be used many times by simply changing the x and y values. The application need not create a new instance of the Rectangle structure for each rectangle added to a region. For instance: extern struct Region *RowRegion; /* created elsewhere */ WORD ktr; struct Rectangle rect; for (ktr = 1; ktr Rectangles and Regions Regions and Regions [Back to Amiga Developer Docs ]

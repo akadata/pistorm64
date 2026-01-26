@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node04A9.html
-TITLE: mathieeesingtrans.doc
-
-mathieeesingtrans.doc ]" border=0> IEEESPAcos() IEEESPAsin() IEEESPAtan() IEEESPCos() IEEESPCosh() IEEESPExp() IEEESPFieee() IEEESPLog() IEEESPLog10() IEEESPPow() IEEESPSin() IEEESPSincos() IEEESPSinh() IEEESPSqrt() IEEESPTan() IEEESPTanh() IEEESPTieee() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0091.html
-TITLE: Output Index
-
-Output Index ]" border=0> Output and Intuition, 245 , 248 and the console device, 248 and the graphics library, 248 [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0545.html
-TITLE: disk.doc
-
-disk.doc ]" border=0> AllocUnit() GetUnit() GiveUnit() FreeUnit() GetUnitID() ReadUnitID() [Back to Amiga Developer Docs ]

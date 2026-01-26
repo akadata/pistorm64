@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0029.html
-TITLE: 2 Audio Device / Allocation and Arbitration Commands
-
-2 Audio Device / Allocation and Arbitration Commands ]" border=0> These commands allow the audio channels to be shared among different tasks and programs. None of these commands can be called from interrupt code. ADCMD_ALLOCATE ADCMD_FREE ADCMD_SETPREC ADCMD_LOCK [Back to Amiga Developer Docs ]

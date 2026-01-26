@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0529.html
-TITLE: reaction.lib/FreeRadioButtons
-
-reaction.lib/FreeRadioButtons ]" border=0> NAME FreeRadioButtons -- Free a linked list of radiobuttons SYNOPSIS FreeRadioButtons( list ) void FreeRadioButtons( struct List * ) FUNCTION Free a linked list of radiobuttons allocated with RadioButtonsA() . INPUTS list -- the list to free RESULTS None [Back to Amiga Developer Docs ]

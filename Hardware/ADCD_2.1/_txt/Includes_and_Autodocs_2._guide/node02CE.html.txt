@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node02CE.html
-TITLE: dos.library/MatchNext
-
-dos.library/MatchNext ]" border=0> NAME MatchNext - Finds the next file or directory that matches pattern (V36) SYNOPSIS error = MatchNext(AnchorPath) D0 D1 LONG MatchNext(struct AnchorPath *) FUNCTION Locates the next file or directory that matches a given pattern. See for more information. Various bits in the flags allow the application to control the operation of MatchNext(). See MatchFirst() for other notes. INPUTS AnchorPath - Place holder for search. MUST be longword aligned! RESULT error - 0 for success or error code. (Opposite of most Dos calls) BUGS See MatchFirst() . SEE ALSO MatchFirst() , ParsePattern() , Examine() , CurrentDir() , Examine() , MatchEnd() , ExNext() , [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node03B5.html
-TITLE: expansion.library/FreeConfigDev
-
-expansion.library/FreeConfigDev ]" border=0> NAME FreeConfigDev - free a ConfigDev structure SYNOPSIS FreeConfigDev( configDev ) A0 FUNCTION This routine frees a ConfigDev structure as returned by AllocConfigDev . INPUTS configDev - a valid ConfigDev structure. RESULTS EXCEPTIONS SEE ALSO AllocConfigDev BUGS [Back to Amiga Developer Docs ]

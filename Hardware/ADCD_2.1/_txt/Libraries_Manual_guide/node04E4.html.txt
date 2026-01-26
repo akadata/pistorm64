@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04E4.html
-TITLE: B / frameiclass / Changed Methods: IM_FRAMEBOX
-
-B / frameiclass / Changed Methods: IM_FRAMEBOX ]" border=0> This method asks a frameiclass image what its dimensions would be if it has to frame a specific rectangular area. See the imageclass description for IM_FRAMEBOX for more information. [Back to Amiga Developer Docs ]

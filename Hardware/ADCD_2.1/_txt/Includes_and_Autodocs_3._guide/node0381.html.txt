@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0381.html
-TITLE: input.doc
-
-input.doc ]" border=0> IND_ADDHANDLER IND_REMHANDLER IND_SETMPORT IND_SETMTRIG IND_SETMTYPE IND_SETPERIOD IND_SETTHRESH IND_WRITEEVENT PeekQualifier() [Back to Amiga Developer Docs ]

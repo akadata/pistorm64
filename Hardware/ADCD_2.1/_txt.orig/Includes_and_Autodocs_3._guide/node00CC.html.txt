@@ -1,1 +1,0 @@
-clicktab_gc.doc ]" border=0> --datasheet-- CLICKTAB_GetClass() AllocClickTabNodeA() FreeClickTabNode() GetClickTabNodeAttrsA() SetClickTabNodeAttrsA() [Back to Amiga Developer Docs ]

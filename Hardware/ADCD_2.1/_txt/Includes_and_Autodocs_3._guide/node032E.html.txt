@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node032E.html
-TITLE: graphics.library/SetWriteMask
-
-graphics.library/SetWriteMask ]" border=0> NAME SetWriteMask -- Set the pixel write mask value for a RastPort (V39). SYNOPSIS success=SetWriteMask ( rp, msk ) d0 a0 d0 ULONG SetWriteMask(struct RastPort *,ULONG) FUNCTION Set the current value of the bit write mask for the rastport. bits of the pixel with zeros in their mask will not be modified by subsequent drawing operations. INPUTS rp = a pointer to a valid RastPort structure. msk = a longword mask value. Graphics devices which do not support per-bit masking will return 0 (failure). BUGS NOTES SEE ALSO graphics/gfxmacros.h [Back to Amiga Developer Docs ]

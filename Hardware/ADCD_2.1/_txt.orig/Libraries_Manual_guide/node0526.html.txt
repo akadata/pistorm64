@@ -1,1 +1,0 @@
-B / frbuttonclass / Changed Methods: GM_HITTEST ]" border=0> The gadget delegates this method to the framing image's IM_HITFRAME method. [Back to Amiga Developer Docs ]

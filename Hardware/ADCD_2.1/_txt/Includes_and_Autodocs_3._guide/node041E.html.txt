@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node041E.html
-TITLE: layers.library/DeleteLayer
-
-layers.library/DeleteLayer ]" border=0> NAME DeleteLayer -- delete layer from layer list. SYNOPSIS result = DeleteLayer( dummy, l ) d0 a0, a1 LONG DeleteLayer( LONG , struct Layer *); FUNCTION Remove this layer from the list of layers. Release memory associated with it. Restore other layers that may have been obscured by it. Trigger refresh in those that may need it. If this is a superbitmap layer make sure SuperBitMap is current. The SuperBitMap is not removed from the system but is available for program use even though the rest of the layer information has been deallocated. INPUTS dummy - unused l - pointer to a layer RESULTS result - TRUE if this layer successfully deleted from the system FALSE if layer not deleted. (probably out of memory ) BUGS SEE ALSO graphics/layers.h , graphics/clip.h [Back to Amiga Developer Docs ]

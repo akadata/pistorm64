@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0250.html
-TITLE: BLTCON1 Index
-
-BLTCON1 Index ]" border=0> BLTCON1, 182 , 189 , 298 in area fill, 184 in blitter addressing, 182 in line drawing, 189-191 in shift control, 179 [Back to Amiga Developer Docs ]

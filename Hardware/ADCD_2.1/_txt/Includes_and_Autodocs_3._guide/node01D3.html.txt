@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node01D3.html
-TITLE: drawlist_ic.doc
-
-drawlist_ic.doc ]" border=0> --datasheet-- DRAWLIST_GetClass() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0058.html
-TITLE: asl.library/ActivateAslRequest
-
-asl.library/ActivateAslRequest ]" border=0> NAME ActivateAslRequest -- attempt to activate an asl requester. (V44) SYNOPSIS ActivateAslRequest(requester); A0 VOID ActivateAslRequest(APTR requester); FUNCTION The different types of asl requesters are modal (as of V44). Yet at times it may be necessary to activate a modal requester from a different task context. INPUTS requester - requester obtained from AllocAslRequest() , or NULL in which case this function does nothing. SEE ALSO AslRequest() [Back to Amiga Developer Docs ]

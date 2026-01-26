@@ -1,1 +1,0 @@
-B / frbuttonclass / Attributes:GA_Text,GA_IntuiText,GA_LabelImage (IS) ]" border=0> These attributes tell the frbuttonclass object what kind of imagery to use as its display element. See their description in the gadgetclass entry for more information. [Back to Amiga Developer Docs ]

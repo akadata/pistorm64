@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node02E8.html
-TITLE: graphics.library/GetOPen
-
-graphics.library/GetOPen ]" border=0> NAME GetOPen -- Get the O Pen value for a RastPort (V39). SYNOPSIS pen = GetOPen ( rp ) d0 a0 ULONG GetOPen(struct RastPort *) FUNCTION Return the current value of the O pen for the rastport. This function should be used instead of peeking the structure directly, because future graphics devices may store it differently, for instance, using more bits. INPUTS rp = a pointer to a valid RastPort structure. BUGS NOTES SEE ALSO SetOutlinePen() graphics/gfx.h [Back to Amiga Developer Docs ]

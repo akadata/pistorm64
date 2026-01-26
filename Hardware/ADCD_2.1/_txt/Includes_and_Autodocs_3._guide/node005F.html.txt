@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node005F.html
-TITLE: audio.doc
-
-audio.doc ]" border=0> AbortIO() ADCMD_ALLOCATE ADCMD_FINISH ADCMD_FREE ADCMD_LOCK ADCMD_PERVOL ADCMD_SETPREC ADCMD_WAITCYCLE BeginIO() CloseDevice() CMD_CLEAR CMD_FLUSH CMD_READ CMD_RESET CMD_START CMD_STOP CMD_UPDATE CMD_WRITE Expunge() OpenDevice() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01F9.html
-TITLE: Glossary / joystick
-
-Glossary / joystick ]" border=0> A controller device with a handle that swings up, down, left, or right, used to position something on the screen. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node036D.html
-TITLE: iffparse.library/InitIFFasDOS
-
-iffparse.library/InitIFFasDOS ]" border=0> NAME InitIFFasDOS -- initialize an IFFHandle as a DOS stream. (V36) SYNOPSIS InitIFFasDOS(iff) A0 InitIFFasDOS(struct IFFHandle *); FUNCTION The function initializes the given IFFHandle to operate on DOS streams. The iff_Stream field will need to be initialized as a BPTR returned from the DOS function Open() . INPUTS iff - pointer to IFFHandle structure. SEE ALSO InitIFF() [Back to Amiga Developer Docs ]

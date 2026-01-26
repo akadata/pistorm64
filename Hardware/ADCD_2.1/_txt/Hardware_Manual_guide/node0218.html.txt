@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0218.html
-TITLE: Glossary / pointer register
-
-Glossary / pointer register ]" border=0> Register that is continuously incremented to point to a series of memory locations. [Back to Amiga Developer Docs ]

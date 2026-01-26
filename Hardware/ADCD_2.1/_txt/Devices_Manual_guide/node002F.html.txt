@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node002F.html
-TITLE: 2 / Allocation and Arbitration Commands / ADCMD_FREE
-
-2 / Allocation and Arbitration Commands / ADCMD_FREE ]" border=0> ADCMD_FREE is the opposite of ADCMD_ALLOCATE . When you perform ADCMD_FREE on a channel, it does a CMD_RESET command on the hardware and "unlocks" the channel. It also checks to see if there are other pending allocation requests. You do not need to perform ADCMD_FREE on channels stolen from you. If you want channels back after they have been stolen, you must reallocate them with the same allocation key. [Back to Amiga Developer Docs ]

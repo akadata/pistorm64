@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node011D.html
-TITLE: ddebug.lib/DGetNum
-
-ddebug.lib/DGetNum ]" border=0> NAME DGetNum - get a number from the parallel port SYNOPSIS number = DGetNum() D0 FUNCTION get a signed decimal integer from the parallel port. [Back to Amiga Developer Docs ]

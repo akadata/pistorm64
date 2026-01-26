@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04B1.html
-TITLE: A / Amiga.lib / Clib
-
-A / Amiga.lib / Clib ]" border=0> FastRand() Generates a pseudo-random number. The seed value is taken from stack, shifted left one position, exclusive-or'ed with hex value $1D872B41 and returned. RangeRand() RangeRand() accepts a value from 1 to 65535, and returns a value within that range (a 16-bit integer). Note that this function is implemented in C. fclose() Closes a file. fgetc() Gets a character from a file. fprintf() Prints a formatted output line to a file. fputc() Puts character to file. fputs() Writes a string to file. getchar() Gets a character from stdin. printf() Puts format data to stdout. putchar() Puts character to stdout. puts() Puts a string to stdout, followed by newline. sprintf() Formats data into a string (see Exec RawDoFmt() ). [Back to Amiga Developer Docs ]

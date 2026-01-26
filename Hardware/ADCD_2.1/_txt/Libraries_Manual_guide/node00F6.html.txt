@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node00F6.html
-TITLE: 3 Intuition Screens / Advanced Screen Programming
-
-3 Intuition Screens / Advanced Screen Programming ]" border=0> This section discusses how to perform double-buffering of Intuition screens, how to create a dual-playfield Intuition screen and other advanced topics. Double Buffering Dual-Playfield Screen Example [Back to Amiga Developer Docs ]

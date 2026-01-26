@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01BF.html
-TITLE: Glossary / baud rate
-
-Glossary / baud rate ]" border=0> Rate of data transmission through a serial port. [Back to Amiga Developer Docs ]

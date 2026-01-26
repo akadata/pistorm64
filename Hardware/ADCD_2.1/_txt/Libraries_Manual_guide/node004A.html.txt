@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node004A.html
-TITLE: Copper list Index
-
-Copper list Index ]" border=0> Copper list, 603 deallocation, 560 merge screens, 66 update screen's, 66 user, 602 - clipping of, 603 [Back to Amiga Developer Docs ]

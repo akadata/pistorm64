@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0016.html
-TITLE: amigaguide.library/UnlockAmigaGuideBasemigaguide.library/UnlockAmigaGuideBase
-
-amigaguide.library/UnlockAmigaGuideBasemigaguide.library/UnlockAmigaGuideBase ]" border=0> NAME UnlockAmigaGuideBase - Unlock an AmigaGuide client. (V34) SYNOPSIS UnlockAmigaGuideBase (key); d0 VOID UnlockAmigaGuideBase (LONG); FUNCTION This function is used to release a lock obtained with LockAmigaGuideBase() . INPUTS key - Value returned by LockAmigaGuideBase() . SEE ALSO LockAmigaGuideBase() . [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0507.html
-TITLE: B Boopsi Class Reference / propgclass
-
-B Boopsi Class Reference / propgclass ]" border=0> Class: propgclass Superclass: gadgetclass Include File: gadgetclass.h > A Boopsi proportional ("prop") gadget. The Boopsi prop gadget is similar to the conventional prop gadget, but extends its function to make it easier to use. The Boopsi prop gadget keeps its current integer value in its PGA_Top attribute. New Methods: ------------ None. Changed Methods: ---------------- GM_HANDLEINPUT Attributes: ----------- GA_Image (I) PGA_Freedom (IG) PGA_Top (ISGNU) GA_Border (I) PGA_NewLook (I) PGA_Visible, PGA_Total (ISU) GA_Highlight (I) PGA_Borderless (I) [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-Glossary / transparent ]" border=0> In graphics, a special color register definition that allows a background color to show through. Used in dual-playfield mode. [Back to Amiga Developer Docs ]

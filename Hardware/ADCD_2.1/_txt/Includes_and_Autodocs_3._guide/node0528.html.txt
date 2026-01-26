@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0528.html
-TITLE: reaction.lib/FreeClickTabs
-
-reaction.lib/FreeClickTabs ]" border=0> NAME FreeClickTabs -- Free a linked list of chooser labels SYNOPSIS FreeClickTabs( list ) void FreeClickTabs( struct List * ) FUNCTION Free a linked list of chooser labels allocated with ClickTabsA() . INPUTS list -- the list to free RESULTS None [Back to Amiga Developer Docs ]

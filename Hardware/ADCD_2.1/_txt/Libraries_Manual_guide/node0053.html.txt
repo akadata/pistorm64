@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0053.html
-TITLE: Dual playfield Index
-
-Dual playfield Index ]" border=0> Dual playfield bitplanes, 578 color map, 554 colors, 545 priority, 578 with screens, 70 [Back to Amiga Developer Docs ]

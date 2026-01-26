@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node01FB.html
-TITLE: A / IFF: Interchange File Format / Third Party FORM and Chunk Specs.
-
-A / IFF: Interchange File Format / Third Party FORM and Chunk Specs. ]" border=0> IFF FORM and Chunk Registry Third Party Public FORM and Chunk Specifications Additional Documents [Back to Amiga Developer Docs ]

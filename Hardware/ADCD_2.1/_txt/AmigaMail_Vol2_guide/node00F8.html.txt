@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node00F8.html
-TITLE: The OFNT FORM
-
-The OFNT FORM ]" border=0> OFNT (0x4F464E54) /* ID of outline font file */ OFHD (0x4F464844) /* ID of OutlineFontHeaDer */ KERN (0x4B45524C) /* Kerning pair */ CHDF (0x43484446) /* Character definition */ [Back to Amiga Developer Docs ]

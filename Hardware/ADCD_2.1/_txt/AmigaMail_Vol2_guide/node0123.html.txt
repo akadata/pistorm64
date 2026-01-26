@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0123.html
-TITLE: Standard Commands
-
-Standard Commands ]" border=0> See the SANA-II Network Device Driver Autodocs for full details on each of the SANA-II device commands. Extended commands are explained in the sections below. Many of the Exec device standard commands are no-ops in SANA-II devices, but this may not always be the case. For example, CMD_RESET might someday be used for dynamically reconfiguring hardware. This should present no compatibility problems for properly written drivers. Broadcast and Multicast Configuration Stats On-line [Back to Amiga Developer Docs ]

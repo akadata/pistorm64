@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node02C1.html
-TITLE: graphics.library/ClearRegion
-
-graphics.library/ClearRegion ]" border=0> NAME ClearRegion -- Remove all rectangles from region. SYNOPSIS ClearRegion(region) a0 viod ClearRegion( struct Region * ); FUNCTION Clip away all rectangles in the region leaving nothing. INPUTS region - pointer to Region structure BUGS SEE ALSO NewRegion() graphics/regions.h [Back to Amiga Developer Docs ]

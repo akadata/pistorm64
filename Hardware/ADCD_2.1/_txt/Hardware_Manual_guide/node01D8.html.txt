@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01D8.html
-TITLE: Glossary / copper
-
-Glossary / copper ]" border=0> Display-synchronized coprocessor that resides on one of the Amiga custom chips and directs the graphics display. [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node04DA.html
-TITLE: nonvolatile.doc
-
-nonvolatile.doc ]" border=0> --background-- DeleteNV() FreeNVData() GetCopyNV() GetNVInfo() GetNVList() SetNVProtection() StoreNV() [Back to Amiga Developer Docs ]

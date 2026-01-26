@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node0046.html
-TITLE: A Register Summary / VSSTOP, VSSTRT, VTOTAL
-
-A Register Summary / VSSTOP, VSSTRT, VTOTAL ]" border=0> Agnus/ Read/ Denise/ Register Address Write Paula Function -------- ------- ----- ------- -------- VSSTOP 1CA W A( E ) Vertical line position for VSYNC stop VSSTRT 1E0 W A( E ) Vertical sync start (VARVSY) VTOTAL 1C8 W A( E ) Highest numbered vertical line (VARBEAMEN=1) [Back to Amiga Developer Docs ]

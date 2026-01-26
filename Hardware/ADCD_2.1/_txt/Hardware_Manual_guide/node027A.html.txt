@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node027A.html
-TITLE: Parallel Port Index
-
-Parallel Port Index ]" border=0> Parallel Port, 227 , 259 , 319 pin assignment, 324 specification, 324 timing - input, 325 ,output, 325 [Back to Amiga Developer Docs ]

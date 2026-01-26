@@ -1,1 +1,0 @@
-F 8520 Complex Interface Adapters / Control Registers ]" border=0> There are two control registers in the 8520, CRA and CRB. CRA is associated with Timer A and CRB is associated with Timer B . The format of the registers is as follows: Control Register A Bitmap of Register CRA Control Register B Bitmap of Register CRB [Back to Amiga Developer Docs ]

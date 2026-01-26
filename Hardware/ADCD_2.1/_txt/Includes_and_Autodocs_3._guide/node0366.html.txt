@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0366.html
-TITLE: iffparse.library/FreeIFF
-
-iffparse.library/FreeIFF ]" border=0> NAME FreeIFF -- deallocate an IFFHandle structure. (V36) SYNOPSIS FreeIFF(iff); A0 VOID FreeIFF(struct IFFHandle *); FUNCTION Deallocates all resources associated with this IFFHandle structure. The structure MUST have already been closed with CloseIFF() . INPUTS iff - pointer to IFFHandle structure to free. Starting with V39, this may be NULL. SEE ALSO AllocIFF() , CloseIFF() , [Back to Amiga Developer Docs ]

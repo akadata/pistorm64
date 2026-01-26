@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node04DD.html
-TITLE: nonvolatile.library/FreeNVData
-
-nonvolatile.library/FreeNVData ]" border=0> NAME FreeNVData -- release the memory allocated by a function of this library. (V40) SYNOPSIS FreeNVData(data); A0 VOID FreeNVData(APTR); FUNCTION Frees a block of memory that was allocated by any of the following: GetCopyNV() , GetNVInfo() , GetNVList() . INPUTS data - pointer to the memory block to be freed. If passed NULL, this function does nothing. SEE ALSO GetCopyNV() , GetNVInfo() , GetNVList() [Back to Amiga Developer Docs ]

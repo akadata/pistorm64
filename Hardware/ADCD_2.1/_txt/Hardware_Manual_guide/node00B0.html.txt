@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node00B0.html
-TITLE: 4 Sprite Hardware / Forming a Sprite
-
-4 Sprite Hardware / Forming a Sprite ]" border=0> To form a sprite, you must first define it and then create a formal data structure in memory. You define a sprite by specifying its characteristics: * On-screen width of up to 16 pixels. * Unlimited height. * Any shape. * A combination of three colors, plus transparent. * Any position on the screen. Screen Position Sprite Color Size of Sprites Designing a Sprite Shape of Sprites Building the Data Structure [Back to Amiga Developer Docs ]

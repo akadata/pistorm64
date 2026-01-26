@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node04E7.html
-TITLE: page_gc/SetPageGadgetAttrsA
-
-page_gc/SetPageGadgetAttrsA ]" border=0> NAME SetPageGadgetAttrsA -- Set gadget attributes in a paged layout SetPageGadgetAttrs -- Varargs stub for SetPageGadgetAttrsA SYNOPSIS value = SetPageGadgetAttrsA(gad, page, win, req, tags) D0 A0 A1 A2 A3 A4 ULONG SetPageGadgetAttrsA(struct Gadget *, Object *, struct Window *, struct Requester *, struct TagItem *) ULONG SetPageGadgetAttrs(struct Gadget *, Object *, struct Window *, struct Requester *, ULONG, ...) FUNCTION Like SetGadgetAttrs, but passes a NULL window and requester pointer if the gadget is not on the currently visible page. [Back to Amiga Developer Docs ]

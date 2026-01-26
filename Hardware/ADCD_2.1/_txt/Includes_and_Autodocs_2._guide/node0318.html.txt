@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0318.html
-TITLE: rexxsyslib.library/ClearRexxMsg
-
-rexxsyslib.library/ClearRexxMsg ]" border=0> NAME ClearRexxMsg - Releases and clears the argument array in a RexxMsg SYNOPSIS ClearRexxMsg(msgptr, count) A0 D0 VOID ClearRexxMsg(struct RexxMsg *,ULONG); FUNCTION This function will DeleteArgstring() one or more argstrings from the RexxMsg and clear the slot. The count is used to select the number of slots to clear. INPUTS msgptr - A pointer to a RexxMsg count - The number of slots to be cleared. The number can be from 1 to 16. (There are 16 slots) RESULTS All of the slots in the given count will be cleared and the argstring will have been released. SEE ALSO FillRexxMsg() , DeleteRexxMsg() , DeleteArgstring() , CreateArgstring() BUGS [Back to Amiga Developer Docs ]

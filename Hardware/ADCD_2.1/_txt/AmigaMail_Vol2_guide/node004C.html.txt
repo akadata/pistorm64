@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node004C.html
-TITLE: Timer.Device (basename: _TimerBase)
-
-Timer.Device (basename: _TimerBase) ]" border=0> GetSysTime(dest)(a0) - Get the system time. (V36) ReadEClock(dest)(a0) - Get the current value of the E-Clock. (V36) [Back to Amiga Developer Docs ]

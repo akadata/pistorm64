@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node043B.html
-TITLE: 33 / Parsing / Reading Chunk Data
-
-33 / Parsing / Reading Chunk Data ]" border=0> To read data from a chunk, use the functions ReadChunkBytes() and ReadChunkRecords() . Both calls truncate attempts to read past the end of a chunk. For odd-length chunks, the parser will skip over the pad bytes for you. Remember that for chunks which have been gathered using PropChunk() (or CollectionChunk() ), you may directly reference the data by using FindProp() (or FindCollection() ) to get a pointer to the data. ReadChunkBytes() is commonly used when loading and decompressing bitmap and sound sample data or sequentially reading in data chunks such as FTXT CHRS text chunks. See the code listing ClipFTXT.c for an example usage of ReadChunkBytes(). [Back to Amiga Developer Docs ]

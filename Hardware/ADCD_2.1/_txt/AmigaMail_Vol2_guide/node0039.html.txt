@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0039.html
-TITLE: clipboard.device (device commands)
-
-clipboard.device (device commands) ]" border=0> CBD_CHANGEHOOK - Add or remove a clip change hook. [Back to Amiga Developer Docs ]

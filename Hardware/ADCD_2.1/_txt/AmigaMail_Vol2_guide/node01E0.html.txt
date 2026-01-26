@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node01E0.html
-TITLE: Developer Support Package / sana2device.doc
-
-Developer Support Package / sana2device.doc ]" border=0> TABLE OF CONTENTS sana2.device/AbortIO sana2.device/CloseDevice sana2.device/CMD_CLEAR sana2.device/CMD_FLUSH sana2.device/CMD_INVALID sana2.device/CMD_READ sana2.device/CMD_RESET sana2.device/CMD_START sana2.device/CMD_STOP sana2.device/CMD_UPDATE sana2.device/CMD_WRITE sana2.device/OpenDevice sana2.device/S2_ADDMULTICASTADDRESS sana2.device/S2_BROADCAST sana2.device/S2_CONFIGINTERFACE sana2.device/S2_DELMULTICASTADDRESS sana2.device/S2_DEVICEQUERY sana2.device/S2_GETGLOBALSTATS sana2.device/S2_GETSPECIALSTATS sana2.device/S2_GETSTATIONADDRESS sana2.device/S2_GETTYPESTATS sana2.device/S2_MULTICAST sana2.device/S2_OFFLINE sana2.device/S2_ONEVENT sana2.device/S2_ONLINE sana2.device/S2_READORPHAN sana2.device/S2_TRACKTYPE sana2.device/S2_UNTRACKTYPE [Back to Amiga Developer Docs ]

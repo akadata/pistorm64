@@ -1,1 +1,0 @@
-2.0 IncludeXREF: Z ]" border=0> ZOOMED #define WFLG_ZOOMED = 0x10000000 intuition/iobsolete.h : *171 ZOOMIMAGE #define (0x01L) = 0x00000001 intuition/imageclass.h : *102 [Back to Amiga Developer Docs ]

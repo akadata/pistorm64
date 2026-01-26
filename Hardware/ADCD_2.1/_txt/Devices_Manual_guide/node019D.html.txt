@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node019D.html
-TITLE: hard_pics/8-11.pic
-
-hard_pics/8-11.pic ]" border=0> [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0511.html
-TITLE: B / strgclass / Changed Methods: OM_NEW
-
-B / strgclass / Changed Methods: OM_NEW ]" border=0> This method sets up the string gadget's StringInfo and StringExtend structures. It allocates a buffer if needed and will use shared data buffers for UndoBuffer and WorkBuffer if the MaxChars is less than SG_DEFAULTMAXCHARS (128). Default text pens are: Foreground = 1, Background = 0. See the rootclass description of the OM_NEW method for more details. [Back to Amiga Developer Docs ]

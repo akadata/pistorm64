@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node04FA.html
-TITLE: picture_dtc.doc
-
-picture_dtc.doc ]" border=0> picture.datatype() [Back to Amiga Developer Docs ]

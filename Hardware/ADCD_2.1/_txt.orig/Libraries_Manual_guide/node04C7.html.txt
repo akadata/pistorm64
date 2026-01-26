@@ -1,1 +1,0 @@
-B / icclass / Changed Methods: OM_SET ]" border=0> This method sets its attributes and returns 0. [Back to Amiga Developer Docs ]

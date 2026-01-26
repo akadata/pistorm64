@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node0244.html
-TITLE: ANIM.doc / Chunk Formats
-
-ANIM.doc / Chunk Formats ]" border=0> ANHD Chunk DLTA ChunK [Back to Amiga Developer Docs ]

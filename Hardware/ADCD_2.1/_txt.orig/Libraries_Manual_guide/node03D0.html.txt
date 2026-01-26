@@ -1,1 +1,0 @@
-28 / Animation with GELs / Animtools.h and Animtools.c ]" border=0> Here is the listing of the animtools.h header file and the animtools.c link file used by the examples in this chapter. The makeSeq() and makeComp() subroutines here demonstrate how to use the GELs animation system. animtools.h animtools.c [Back to Amiga Developer Docs ]

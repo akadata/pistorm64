@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0432.html
-TITLE: layers.library/UnlockLayer
-
-layers.library/UnlockLayer ]" border=0> NAME UnlockLayer -- Unlock layer and allow graphics routines to use it. SYNOPSIS UnlockLayer( l ) a0 void UnlockLayer( struct Layer *); FUNCTION When finished changing the ClipRects or whatever you were doing with this layer you must call UnlockLayer() to allow other tasks to proceed with graphic output to the layer. INPUTS l - pointer to a layer BUGS SEE ALSO graphics/layers.h , graphics/clip.h [Back to Amiga Developer Docs ]

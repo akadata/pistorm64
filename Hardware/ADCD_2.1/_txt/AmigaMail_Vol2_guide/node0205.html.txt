@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0205.html
-TITLE: XI-21/LoadKeyMap.h
-
-XI-21/LoadKeyMap.h ]" border=0> #ifndef LOADKEYMAP_H #define LOADKEYMAP_H /*****************************************************************************/ #ifndef EXEC_TYPES_H #include #endif #ifndef DEVICES_KEYMAP_H #include #endif /*****************************************************************************/ struct KeyMap *LoadKeyMap(STRPTR name); /*****************************************************************************/ #endif /* LOADKEYMAP_H */ [Back to Amiga Developer Docs ]

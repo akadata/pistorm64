@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node04ED.html
-TITLE: parallel.device/CMD_CLEAR
-
-parallel.device/CMD_CLEAR ]" border=0> NAME Clear -- clear the parallel port buffer FUNCTION This command just RTS's (no buffer to clear) IO REQUEST io_Message mn_ReplyPort initialized io_Device set by OpenDevice io_Unit set by OpenDevice io_Command CMD_CLEAR (05) [Back to Amiga Developer Docs ]

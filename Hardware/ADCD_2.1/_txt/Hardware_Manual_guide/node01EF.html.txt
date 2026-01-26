@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node01EF.html
-TITLE: Glossary / frequency
-
-Glossary / frequency ]" border=0> In audio applications, the number of times per second a waveform repeats. [Back to Amiga Developer Docs ]

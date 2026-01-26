@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node01CB.html
-TITLE: iffparse.library/InitIFFasClip
-
-iffparse.library/InitIFFasClip ]" border=0> NAME InitIFFasClip -- Initialize an IFFHandle as a clipboard stream. SYNOPSIS InitIFFasClip (iff) a0 struct IFFHandle *iff; FUNCTION Initializes the given IFFHandle to be a clipboard stream. The function initializes the stream processing vectors to operate on streams of the ClipboardHandle type. The iff_Stream field will still need to be initialized to point to a ClipboardHandle as returned from OpenClipboard() . INPUTS iff - pointer to IFFHandle struct. RESULT EXAMPLE NOTES BUGS SEE ALSO OpenClipboard() [Back to Amiga Developer Docs ]

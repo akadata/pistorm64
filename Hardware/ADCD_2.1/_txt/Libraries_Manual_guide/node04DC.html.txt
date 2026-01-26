@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04DC.html
-TITLE: B / imageclass / Attributes: IA_FGPen, IA_BGPen (ISG)
-
-B / imageclass / Attributes: IA_FGPen, IA_BGPen (ISG) ]" border=0> These attributes are copied into the Image structure's PlanePick and PlaneOnOff fields, respectively. [Back to Amiga Developer Docs ]

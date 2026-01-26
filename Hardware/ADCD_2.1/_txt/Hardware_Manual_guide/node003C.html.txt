@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node003C.html
-TITLE: A Register Summary / REFPTR
-
-A Register Summary / REFPTR ]" border=0> Agnus/ Read/ Denise/ Register Address Write Paula Function -------- ------- ----- ------- -------- REFPTR 028 W A Refresh pointer This register is used as a dynamic RAM refresh address generator. It is writeable for test purposes only, and should never be written by the microprocessor. [Back to Amiga Developer Docs ]

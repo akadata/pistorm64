@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0240.html
-TITLE: 14 / The Icon Library / Icon Library Data Structures
-
-14 / The Icon Library / Icon Library Data Structures ]" border=0> The preceding sections discussed how icons are used to pass file name arguments to an application run from the Workbench. Workbench allows other types of arguments to be passed in the Tool Types array of an icon. To examine the Tool Types array or find other characteristics of the icon such as its type, applications need to read in the .info file for the icon. The DiskObject Structure The Gadget Structure [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-Display window Index ]" border=0> Display window positioning, 57 size - maximum, 79 , 306 ,normal, 58 starting position - horizontal, 58 , 77 , 306 ,vertical, 58 , 77 , 306 stopping position - horizontal, 59 , 78 , 306 ,vertical, 59 , 79 , 306 [Back to Amiga Developer Docs ]

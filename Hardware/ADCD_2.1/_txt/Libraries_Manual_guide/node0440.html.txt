@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0440.html
-TITLE: 33 / Writing IFF Files / Creating Chunks In a File
-
-33 / Writing IFF Files / Creating Chunks In a File ]" border=0> Because the IFF specification has nesting and scoping rules, you can nest chunks inside one another. One instance is the BMHD chunk, which is commonly nested inside a FORM chunk. Thus, it is necessary for you to inform IFFParse when you are starting and ending chunks. PushChunk() PopChunk() [Back to Amiga Developer Docs ]

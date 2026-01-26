@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node01BC.html
-TITLE: 8 / Creating Images / Image Data
-
-8 / Creating Images / Image Data ]" border=0> Image data must be in Chip memory. The Image structure itself may be in any memory, but the actual data referenced by ImageData field must be in Chip memory. This may be done by using compiler specific options, such as the __chip keyword of SAS/C, or by allocating memory with the MEMF_CHIP attribute and copying the image data to that memory. Defining Image Data [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0215.html
-TITLE: Developer Support Package / copybuff.doc
-
-Developer Support Package / copybuff.doc ]" border=0> TABLE OF CONTENTS any_sana2_protocol/CopyFromBuff any_sana2_protocol/CopyToBuff [Back to Amiga Developer Docs ]

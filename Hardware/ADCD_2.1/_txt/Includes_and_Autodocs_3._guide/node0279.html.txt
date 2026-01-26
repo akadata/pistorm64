@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0279.html
-TITLE: gadtools.library/FreeMenus
-
-gadtools.library/FreeMenus ]" border=0> NAME FreeMenus -- frees memory allocated by CreateMenusA() . (V36) SYNOPSIS FreeMenus(menu) A0 VOID FreeMenus(struct Menu *); FUNCTION Frees the menus allocated by CreateMenusA() . It is safe to call this function with a NULL parameter. INPUTS menu - pointer to menu structure (or first MenuItem) obtained from CreateMenusA() . SEE ALSO CreateMenusA() [Back to Amiga Developer Docs ]

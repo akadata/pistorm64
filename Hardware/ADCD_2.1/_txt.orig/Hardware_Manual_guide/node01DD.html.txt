@@ -1,1 +1,0 @@
-Glossary / data fetch ]" border=0> The number of words fetched for each line of the display. [Back to Amiga Developer Docs ]

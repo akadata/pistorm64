@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0001.html
-TITLE: I: Programming Practices and Standards
-
-I: Programming Practices and Standards ]" border=0> I-1 Tag Items and Tag Lists I-3 2.0 Version Strings I-7 The ASL Library I-19 2.0 Compatibility Problem Areas I-35 Release 2.0 Specific Functions and Commands I-43 Callback Hooks I-47 Debugging with Enforcer and Mungwall [Back to Amiga Developer Docs ]

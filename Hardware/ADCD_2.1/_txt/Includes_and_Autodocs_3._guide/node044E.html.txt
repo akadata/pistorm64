@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node044E.html
-TITLE: locale.doc
-
-locale.doc ]" border=0> --environment_vars-- --rexxhost-- --structures-- CloseCatalog() CloseLocale() ConvToLower() ConvToUpper() FormatDate() FormatString() GetCatalogStr() GetLocaleStr() IsXXXX() OpenCatalog() OpenLocale() ParseDate() StrConvert() StrnCmp() [Back to Amiga Developer Docs ]

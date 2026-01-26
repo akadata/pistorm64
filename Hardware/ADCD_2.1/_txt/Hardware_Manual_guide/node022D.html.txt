@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node022D.html
-TITLE: Glossary / strobe address
-
-Glossary / strobe address ]" border=0> An address you put out to the bus in order to cause some other action to take place; the actual data written or read is ignored. [Back to Amiga Developer Docs ]

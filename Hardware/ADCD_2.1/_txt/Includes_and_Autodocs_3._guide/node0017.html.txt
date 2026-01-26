@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0017.html
-TITLE: amigaguide_dtc.doc
-
-amigaguide_dtc.doc ]" border=0> GetAGString() amigaguide.datatype() [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node048C.html
-TITLE: mathieeedoubtrans.library/IEEEDPAsin
-
-mathieeedoubtrans.library/IEEEDPAsin ]" border=0> NAME IEEEDPAsin -- compute the arcsine of a number SYNOPSIS x = IEEEDPAsin( y ); d0/d1 d0/d1 double x,y; FUNCTION Compute the arc sine of y in IEEE double precision INPUTS y - IEEE double precision floating point value RESULT x - IEEE double precision floating point value BUGS SEE ALSO IEEEDPSin() , IEEEDPAtan() , IEEEDPAcos() [Back to Amiga Developer Docs ]

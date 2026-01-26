@@ -1,1 +1,0 @@
-lib_startup/Astartup.i ]" border=0> ASTARTUP SET 1 [Back to Amiga Developer Docs ]

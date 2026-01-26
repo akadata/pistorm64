@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node022D.html
-TITLE: 13 / Preferences in Release 2 / FONT
-
-13 / Preferences in Release 2 / FONT ]" border=0> struct FontPrefs { LONG fp_Reserved[4]; UBYTE fp_FrontPen; /* Textcolor */ UBYTE fp_BackPen; /* Character background color */ UBYTE fp_DrawMode; struct TextAttr fp_TextAttr; BYTE fp_Name[FONTNAMESIZE]; /* Font name */ }; [Back to Amiga Developer Docs ]

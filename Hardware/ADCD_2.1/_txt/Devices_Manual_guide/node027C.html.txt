@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node027C.html
-TITLE: A / IFF Third Party Public Form and Chunk Specification / ILBM.DPPV.doc
-
-A / IFF Third Party Public Form and Chunk Specification / ILBM.DPPV.doc ]" border=0> DPaint perspective chunk (EA) IFF FORM / CHUNK DESCRIPTION Form/Chunk ID: Chunk DPPV (DPaint II ILBM perspective chunk) Date Submitted: 12/86 Submitted by: Dan Silva Chunk Description Chunk Specification Supporting Software [Back to Amiga Developer Docs ]

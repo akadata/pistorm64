@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0543.html
-TITLE: D / Errors / Disk Icon Won't Go Away
-
-D / Errors / Disk Icon Won't Go Away ]" border=0> This occurs when a program leaves a Lock() on one or more of a disk's files or directories. A memory loss of exactly 24 bytes is usually Lock() which has not been UnLock() ed. [Back to Amiga Developer Docs ]

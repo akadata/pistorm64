@@ -1,1 +1,0 @@
-amiga.lib/RemTOF ]" border=0> NAME RemTOF - remove a task from the VBlank interrupt server chain. SYNOPSIS RemTOF(i); VOID RemTOF(struct Isrvstr *); FUNCTION Removes a task from the vertical-blanking interval interrupt server chain. INPUTS i - pointer to an Isrvstr structure SEE ALSO AddTOF() , [Back to Amiga Developer Docs ]

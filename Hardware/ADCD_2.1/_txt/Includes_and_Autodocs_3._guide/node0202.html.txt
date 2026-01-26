@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0202.html
-TITLE: exec.library/DeletePool
-
-exec.library/DeletePool ]" border=0> NAME DeletePool -- Drain an entire memory pool (V39) SYNOPSIS DeletePool(poolHeader) a0 void DeletePool(void *); FUNCTION Frees all memory in all pudles of the specified pool header, then deletes the pool header. Individual free calls are not needed. INPUTS poolHeader - as returned by CreatePool() . SEE ALSO CreatePool() , AllocPooled() , FreePooled() [Back to Amiga Developer Docs ]

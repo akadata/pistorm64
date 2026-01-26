@@ -1,4 +1,0 @@
-SOURCE: Hardware_Manual_guide/node019C.html
-TITLE: 8 / / Type Of Data Received / RAW Keycodes -> 60-67 hex
-
-60-67 hex" INDEX="Hardware/Hard_Index/MAIN" --> 8 / / Type Of Data Received / RAW Keycodes -> 60-67 hex ]" border=0> Key codes for qualifier keys 60 Left Shift 61 Right Shift 62 Caps Lock 63 Control 64 Left Alt 65 Right Alt 66 Left Amiga (or Commodore key) 67 Right Amiga [Back to Amiga Developer Docs ]

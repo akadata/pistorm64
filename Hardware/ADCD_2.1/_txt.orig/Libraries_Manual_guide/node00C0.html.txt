@@ -1,1 +1,0 @@
-VSprite Index ]" border=0> VSprite building the Copper list, 628 changing, 627 color, 626 hardware Sprite assignment, 628 , 633 Playfield colors, 633 position, 624 shape, 625 simple definition, 614 size, 625 sorting the GEL list, 628 troubleshooting, 632 [Back to Amiga Developer Docs ]

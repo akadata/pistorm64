@@ -1,1 +1,0 @@
-The Object Chunks ]" border=0> The following chunks define the objects available in the DR2D FORM. VBM (0x56424D20) /* Virtual BitMap */ CPLY (0x43504C59) /* Closed polygon */ OPLY (0x4F504C59) /* Open polygon */ GRUP (0x47525550) /* Group */ STXT (0x53545854) /* Simple text */ TPTH (0x54505448) /* A text string along a path */ [Back to Amiga Developer Docs ]

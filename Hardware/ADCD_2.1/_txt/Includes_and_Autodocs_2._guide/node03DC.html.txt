@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node03DC.html
-TITLE: utility.library/RefreshTagItemClones
-
-utility.library/RefreshTagItemClones ]" border=0> NAME RefreshTagItemClones -- Rejuvenates a clone from the original. (V36) SYNOPSIS RefreshTagItemClones( cloneTagItems, originalTagItems ) A0 A1 void RefreshTagItemClones( struct TagItem *cloneTagItems, struct TagItem *originalTagItems ); FUNCTION If (and only if) the tag items 'cloneTagItems' were created from 'originalTagItems' by CloneTagItems() , and if originalTagItems has not been changed in any way, you can reset the clone list to its original state by using this function. INPUTS CloneTagItems - return value from CloneTagItems(originalTagItems). OriginalTagItems - a tag list that hasn't changed. RESULT None. EXAMPLE BUGS SEE ALSO CloneTagItems() , AllocateTagItems() , FreeTagItems() [Back to Amiga Developer Docs ]

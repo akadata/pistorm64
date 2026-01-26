@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node02A9.html
-TITLE: dos.library/FindVar
-
-dos.library/FindVar ]" border=0> NAME FindVar -- Finds a local variable (V36) SYNOPSIS var = FindVar( name, type ) D0 D1 D2 struct LocalVar * FindVar(STRPTR, ULONG ) FUNCTION Finds a local variable structure. INPUTS name - pointer to an variable name. Note variable names follow filesystem syntax and semantics. type - type of variable to be found (see ) RESULT var - pointer to a LocalVar structure or NULL SEE ALSO GetVar() , SetVar() , DeleteVar() , [Back to Amiga Developer Docs ]

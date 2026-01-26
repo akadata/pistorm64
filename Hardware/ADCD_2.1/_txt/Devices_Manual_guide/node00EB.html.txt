@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node00EB.html
-TITLE: 14 Trackdisk Device / Disk Status Commands
-
-14 Trackdisk Device / Disk Status Commands ]" border=0> Disk status commands return status on the current disk in the opened unit. These commands may be done with quick I/O and thus may be called within interrupt handlers (such as the trackdisk disk change handler). See the " Exec: Device Input/Output " chapter of the Amiga ROM Kernel Reference Manual: Libraries for more detailed information on quick I/O. Determining The Presence Of A Disk Determining The Write-Protect Status Of A Disk Determining The Drive Type Determining The Number Of Tracks Of A Drive Determining The Current Diskchange Number [Back to Amiga Developer Docs ]

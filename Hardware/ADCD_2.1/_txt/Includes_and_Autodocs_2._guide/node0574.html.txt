@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0574.html
-TITLE: FD/input_lib.fd
-
-FD/input_lib.fd ]" border=0> * "input.device" ##base _InputBase ##bias 42 ##public *--- functions in V36 or higher (distributed as Release 2.0) --- PeekQualifier()() ##end [Back to Amiga Developer Docs ]

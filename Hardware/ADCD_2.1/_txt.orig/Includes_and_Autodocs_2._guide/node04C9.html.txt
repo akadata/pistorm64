@@ -1,1 +1,0 @@
-serial.doc ]" border=0> AbortIO() CMD_FLUSH CMD_STOP SDCMD_QUERY BeginIO() CMD_READ CMD_WRITE SDCMD_SETPARAMS CloseDevice() CMD_RESET OpenDevice() CMD_CLEAR CMD_START SDCMD_BREAK [Back to Amiga Developer Docs ]

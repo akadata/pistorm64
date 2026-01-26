@@ -1,1 +1,0 @@
-RxOffset Index ]" border=0> RxOffset effect on display, 549 in RasInfo structure, 550 in ViewPort display memory, 549 [Back to Amiga Developer Docs ]

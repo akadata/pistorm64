@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node02FB.html
-TITLE: 25 / / The Signal Semaphore / Obtaining a Shared SignalSemaphore
-
-25 / / The Signal Semaphore / Obtaining a Shared SignalSemaphore ]" border=0> For read-only purposes, multiple tasks may have a shared lock on a signal semaphore. If a semaphore is already exclusively locked, all attempts to obtain the semaphore shared will be blocked until the exclusive lock is released . At that point, all shared locks will be obtained and the calling tasks will wake up. To obtain a shared semaphore, use: struct SignalSemaphore *semaphore; ObtainSemaphoreShared(semaphore); To obtain a public shared semaphore, the following code should be used: UBYTE *name; struct SignalSemaphore *semaphore; Forbid(); if (semaphore = FindSemaphore(name)) ObtainSemaphoreShared(semaphore); Permit(); [Back to Amiga Developer Docs ]

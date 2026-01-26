@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0043.html
-TITLE: Chip Memory Index
-
-Chip Memory Index ]" border=0> Chip Memory, 11 , 288 , 431 , 456 Image data, 227 in Border structure, 237 sprite data, 274 with Image data, 226 [Back to Amiga Developer Docs ]

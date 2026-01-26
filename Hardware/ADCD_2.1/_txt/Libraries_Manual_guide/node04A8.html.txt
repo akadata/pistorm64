@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node04A8.html
-TITLE: 37 Utility Library / Function Reference
-
-37 Utility Library / Function Reference ]" border=0> The tables which follow contain breif descriptions of the functions inside the utility library. All these functions require Release2 or a later version of the Amiga operating system. See the Amiga ROM Kernel Reference Manual: Includes and Autodocs for details on each function call. Tag Function Reference Callback Hook Function Reference 32-Bit Integer Math Function Reference International String Function Reference Date Function Reference [Back to Amiga Developer Docs ]

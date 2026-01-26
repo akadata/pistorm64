@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node005A.html
-TITLE: asl.library/AllocFileRequest
-
-asl.library/AllocFileRequest ]" border=0> NAME AllocFileRequest -- allocates an ASL FileRequester structure. (V36) SYNOPSIS requester = AllocFileRequest() D0 struct FileRequester *AllocFileRequest(VOID); NOTES This function is obsolete, please use AllocAslRequest() instead. SEE ALSO AllocAslRequest() [Back to Amiga Developer Docs ]

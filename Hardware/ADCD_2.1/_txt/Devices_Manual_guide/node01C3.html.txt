@@ -1,4 +1,0 @@
-SOURCE: Devices_Manual_guide/node01C3.html
-TITLE: General IFF Format Specifications / A Quick Introduction to IFF
-
-General IFF Format Specifications / A Quick Introduction to IFF ]" border=0> Jerry Morrison, Electronic Arts 10-17-88 IFF is the Amiga-standard "Interchange File Format", designed to work across many machines. Why IFF? How to read an IFF file What is IFF? File extensibility What is the Trick? Advanced Topics What does an IFF file look like? [Back to Amiga Developer Docs ]

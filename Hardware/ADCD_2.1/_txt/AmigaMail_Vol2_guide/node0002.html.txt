@@ -1,4 +1,0 @@
-SOURCE: AmigaMail_Vol2_guide/node0002.html
-TITLE: II: AmigaDOS
-
-II: AmigaDOS ]" border=0> II-1 Executing External Programs with Release 2.0 II-5 AmigaDOS Packet Interface Specification II-27 Standard Command Line Parsing II-31 Notification II-37 Using the AmigaDOS Pattern Matching Functions II-43 The 2.0 Dos.library Path Name Handling Functions II-49 Directory Scanning II-65 Writing a UserShell II-77 Fast AmigaDOS I/O II-87 Cooperative Record Locking with AmigaDOS II-95 Packet Level I/O under Release 2 II-107 Even Faster AmigaDOS I/O II-113 Handling Multiple Assigns with Conventional Directories [Back to Amiga Developer Docs ]

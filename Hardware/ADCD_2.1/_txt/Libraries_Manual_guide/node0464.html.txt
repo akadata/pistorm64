@@ -1,4 +1,0 @@
-SOURCE: Libraries_Manual_guide/node0464.html
-TITLE: 33 / / FORM ILBM / Other ILBM Notes
-
-33 / / FORM ILBM / Other ILBM Notes ]" border=0> Amiga ILBM s images must be stored as an even number of bytes in width. However, the ILBM BMHD field w (width) should describe the actual image width, not the rounded up width as stored. ILBM s created with Electronic Arts IBM or Amiga Deluxe Paint II packages are compatible (though you may have to use a `.lbm' filename extension on an IBM). The ILBM graphic files may be transferred between the machines (or between the Amiga and IBM sides your Amiga if you have a CBM Bridgeboard card installed) and loaded into either package. [Back to Amiga Developer Docs ]

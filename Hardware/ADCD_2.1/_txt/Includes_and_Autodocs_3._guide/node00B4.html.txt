@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node00B4.html
-TITLE: cd.device/CD_REMCHANGEINT
-
-cd.device/CD_REMCHANGEINT ]" border=0> NAME CD_REMCHANGEINT -- remove a disk change software interrupt handler. FUNCTION This command removes a disk change software interrupt added by a previous use of CD_ADDCHANGEINT . IO REQUEST INPUT The same IO request used for CD_ADDCHANGEINT . io_Device preset by the call to OpenDevice() io_Unit preset by the call to OpenDevice() io_Command CD_REMCHANGEINT io_Length sizeof(struct Interrupt) io_Data pointer to Interrupt structure IO REQUEST RESULT io_Error - 0 for success, or an error code as defined in SEE ALSO CD_ADDCHANGEINT , [Back to Amiga Developer Docs ]

@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node0526.html
-TITLE: reaction.lib/FreeBrowserNodes
-
-reaction.lib/FreeBrowserNodes ]" border=0> NAME FreeBrowserNodes -- Free a linked list of chooser labels SYNOPSIS FreeBrowserNodes( list ) void FreeBrowserNodes( struct List * ) FUNCTION Free a linked list of chooser labels allocated with BrowserNodesA() . INPUTS list -- the list to free RESULTS None [Back to Amiga Developer Docs ]

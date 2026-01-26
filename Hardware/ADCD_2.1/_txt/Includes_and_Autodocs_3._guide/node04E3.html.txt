@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_3._guide/node04E3.html
-TITLE: page_gc.doc
-
-page_gc.doc ]" border=0> --datasheet-- PAGE_GetClass() RefreshPageGadget() SetPageGadgetAttrsA() [Back to Amiga Developer Docs ]

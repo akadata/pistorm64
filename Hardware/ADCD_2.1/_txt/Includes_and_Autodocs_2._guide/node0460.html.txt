@@ -1,4 +1,0 @@
-SOURCE: Includes_and_Autodocs_2._guide/node0460.html
-TITLE: graphics.library/NewRegion
-
-graphics.library/NewRegion ]" border=0> NAME NewRegion -- Get an empty region. SYNOPSIS region = NewRegion() d0 struct Region *NewRegion(); FUNCTION Create a Region structure, initialize it to empty, and return a pointer it. RESULTS region - pointer to initialized region. If it could not allocate required memory region = NULL. INPUTS none BUGS SEE ALSO graphics/regions.h [Back to Amiga Developer Docs ]

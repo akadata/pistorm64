@@ -1,1 +1,0 @@
-B / strgclass / Attributes: STRINGA_AltKeyMap (IS) ]" border=0> This attribute corresponds to the StringInfo . AltKeyMap field. [Back to Amiga Developer Docs ]
