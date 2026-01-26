@@ -91,7 +91,7 @@ void piscsi_init(void) {
             return;
         }
         fseek(in, 0, SEEK_END);
-        piscsi_rom_size = ftell(in);
+        piscsi_rom_size = (uint32_t)ftell(in);
         fseek(in, 0, SEEK_SET);
         piscsi_rom_ptr = malloc(piscsi_rom_size);
         fread(piscsi_rom_ptr, piscsi_rom_size, 1, in);
@@ -191,14 +191,14 @@ partition_renamed:
     if (d->pb[cur_partition]->pb_Next != 0xFFFFFFFF) {
         uint64_t next = be32toh(pb->pb_Next);
         block = malloc(d->block_size);
-        lseek64(fd, next * d->block_size, SEEK_SET);
+        lseek64(fd, (off64_t)(next * d->block_size), SEEK_SET);
         cur_partition++;
         DEBUG("[PISCSI] Next partition at block %d.\n", be32toh(pb->pb_Next));
         goto next_partition;
     }
     DEBUG("[PISCSI] No more partitions on disk.\n");
-    d->num_partitions = cur_partition + 1;
-    d->fshd_offs = lseek64(fd, 0, SEEK_CUR);
+    d->num_partitions = (uint8_t)(cur_partition + 1);
+    d->fshd_offs = (uint32_t)lseek64(fd, 0, SEEK_CUR);
 
     return;
 }
@@ -222,8 +222,8 @@ rdb_found:;
     struct RigidDiskBlock *rdb = (struct RigidDiskBlock *)((char *)block);
     DEBUG("[PISCSI] RDB found at block %d.\n", i);
     d->c = be32toh(rdb->rdb_Cylinders);
-    d->h = be32toh(rdb->rdb_Heads);
-    d->s = be32toh(rdb->rdb_Sectors);
+    d->h = (uint16_t)be32toh(rdb->rdb_Heads);
+    d->s = (uint16_t)be32toh(rdb->rdb_Sectors);
     d->num_partitions = 0;
     DEBUG("[PISCSI] RDB - first partition at block %d.\n", be32toh(rdb->rdb_PartitionList));
     d->block_size = be32toh(rdb->rdb_BlockBytes);
@@ -387,7 +387,7 @@ void piscsi_map_drive(const char *filename, uint8_t index) {
 
     struct piscsi_dev *d = &devs[index];
 
-    uint64_t file_size = lseek(tmp_fd, 0, SEEK_END);
+    uint64_t file_size = (uint64_t)lseek(tmp_fd, 0, SEEK_END);
     d->fs = file_size;
     d->fd = tmp_fd;
     lseek(tmp_fd, 0, SEEK_SET);
@@ -397,7 +397,7 @@ void piscsi_map_drive(const char *filename, uint8_t index) {
         DEBUG("[PISCSI] No RDB found on disk, making up some CHS values.\n");
         d->h = 16;
         d->s = 63;
-        d->c = (file_size / 512) / (d->s * d->h);
+        d->c = (uint32_t)((file_size / 512) / (d->s * d->h));
         d->block_size = 512;
     }
     printf("[PISCSI] CHS: %d %d %d\n", d->c, d->h, d->s);
@@ -418,7 +418,7 @@ void piscsi_map_drive(const char *filename, uint8_t index) {
 }
 
 // HDF integrity validation function
-int piscsi_validate_hdf(struct piscsi_dev *d, char *filename) {
+int piscsi_validate_hdf(struct piscsi_dev *d, const char *filename) {
     if (!d || d->fd == -1) {
         printf("[PISCSI-SELFTEST] ERROR: Invalid device or file descriptor\n");
         return 0;
@@ -463,7 +463,7 @@ int piscsi_validate_hdf(struct piscsi_dev *d, char *filename) {
         }
 
         // Check for DOS boot block signature (starts with 0x444F5300 = "DOS\0")
-        uint32_t dos_sig = (boot_block[0] << 24) | (boot_block[1] << 16) | (boot_block[2] << 8) | boot_block[3];
+        uint32_t dos_sig = ((uint32_t)boot_block[0] << 24) | ((uint32_t)boot_block[1] << 16) | ((uint32_t)boot_block[2] << 8) | (uint32_t)boot_block[3];
         if (dos_sig == 0x444F5300) {
             printf("[PISCSI-SELFTEST] SUCCESS: Valid DOS boot block signature found in DH0\n");
         } else {
@@ -635,7 +635,7 @@ static void print_piscsi_debug_message(int index) {
             else {
                 DEBUG_TRIVIAL("[RW10] scsiData: %.8X\n", piscsi_dbg[0]);
                 for (int i = 0; i < 10; i++) {
-                    data[i] = read8(piscsi_dbg[0] + i);
+                    data[i] = read8((uint32_t)piscsi_dbg[0] + (uint32_t)i);
                 }
                 rwdat = (struct SCSICmd_RW10 *)data;
             }
@@ -756,7 +756,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:READ64 io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX to_addr:0x%.8X\n", val, (unsigned long long)src, piscsi_u32[1], block, (unsigned long long)src, piscsi_u32[2]);
-                lseek64(d->fd, src, SEEK_SET);
+                lseek64(d->fd, (off64_t)src, SEEK_SET);
             }
 
             r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
@@ -818,7 +818,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint32_t block = (uint32_t)(src / d->block_size);
                 d->lba = block;
                 DEBUG("[PISCSI-IO] Unit:%d CMD:WRITE64 io_Offset:0x%llX io_Length:%d LBA:0x%X file_offset:0x%llX from_addr:0x%.8X\n", val, (unsigned long long)src, piscsi_u32[1], block, (unsigned long long)src, piscsi_u32[2]);
-                lseek64(d->fd, src, SEEK_SET);
+                lseek64(d->fd, (off64_t)src, SEEK_SET);
             }
 
             r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
@@ -839,7 +839,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 uint8_t c = 0;
                 int success = 1;
                 for (uint32_t i = 0; i < piscsi_u32[1]; i++) {
-                    c = m68k_read_memory_8(piscsi_u32[2] + i);
+                    c = (uint8_t)m68k_read_memory_8(piscsi_u32[2] + i);
                     ssize_t result = write(d->fd, &c, 1);
                     if (result <= 0) {
                         DEBUG("[PISCSI-IO-ERROR] Unit:%d BYTE WRITE failed at offset %d: result=%zd\n", val, (int)i, result);
@@ -877,10 +877,10 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             break;
         case PISCSI_CMD_DRIVER:
             DEBUG("[PISCSI] Driver copy/patch called, destination address %.8X.\n", val);
-            r = get_mapped_item_by_address(cfg, val);
-            if (r != -1) {
-                uint32_t addr = (uint32_t)(val - cfg->map_offset[r]);
-                uint8_t *dst_data = cfg->map_data[r];
+            int32_t driver_r = get_mapped_item_by_address(cfg, val);
+            if (driver_r != -1) {
+                uint32_t addr = (uint32_t)(val - cfg->map_offset[driver_r]);
+                uint8_t *dst_data = cfg->map_data[driver_r];
                 uint8_t cur_partition = 0;
                 memcpy(dst_data + addr, piscsi_rom_ptr + PISCSI_DRIVER_OFFSET, 0x4000 - PISCSI_DRIVER_OFFSET);
 
@@ -912,8 +912,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             DEBUG("Partition %d: %s\n", j, devs[i].pb[j]->pb_DriveName + 1);
                             sprintf((char *)dst_data + p_offs, "%s", devs[i].pb[j]->pb_DriveName + 1);
                             p_offs += 0x20;
-                            PUTNODELONG(addr2 + cfg->map_offset[r]);
-                            PUTNODELONG(data_addr + cfg->map_offset[r]);
+                            PUTNODELONG(addr2 + cfg->map_offset[driver_r]);
+                            PUTNODELONG(data_addr + cfg->map_offset[driver_r]);
                             PUTNODELONG(i);
                             PUTNODELONG(0);
                             uint32_t nodesize = (be32toh(devs[i].pb[j]->pb_Environment[0]) + 1) * 4;
@@ -941,7 +941,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             DEBUG("Maxtransfer: %.8X Mask: %.8X\n", BE(dat->maxtransfer), BE(dat->transfer_mask));
                             DEBUG("DOSType: %.8X\n", BE(dat->dostype));
 
-                            rom_partitions[cur_partition] = (uint32_t)(addr2 + 0x20 + cfg->map_offset[r]);
+                            rom_partitions[cur_partition] = (uint32_t)(addr2 + 0x20 + cfg->map_offset[driver_r]);
                             rom_partition_dostype[cur_partition] = dat->dostype;
                             cur_partition++;
                             addr2 += 0x100;

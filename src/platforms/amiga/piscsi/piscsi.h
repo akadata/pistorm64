@@ -258,7 +258,7 @@ void piscsi_init(void);
 void piscsi_shutdown(void);
 void piscsi_map_drive(const char *filename, uint8_t index);
 void piscsi_unmap_drive(uint8_t index);
-int piscsi_validate_hdf(struct piscsi_dev *d, char *filename);
+int piscsi_validate_hdf(struct piscsi_dev *d, const char *filename);
 struct piscsi_dev *piscsi_get_dev(uint8_t index);
 
 void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type);
