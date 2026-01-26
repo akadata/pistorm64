@@ -1,7 +1,7 @@
 What:		/dev/pistorm
 Date:		March 2024
 KernelVersion:	6.8
-Contact:	PiStorm Community <pistorm-devel@lists.example.com>
+Contact:	PiStorm Community <kernel@akadata.ltd>
 Description:
 		The PiStorm device provides a character device interface
 		for communicating with a PiStorm hardware bridge that
