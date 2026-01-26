@@ -1,0 +1,4 @@
+dir
+exit
+dir
+exit

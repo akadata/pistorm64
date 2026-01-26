@@ -153,7 +153,7 @@ uint32_t pi_ahi_init(const char* dev) {
   }
 
   if (dev) {
-    int32_t res = 0;
+    int res = 0;
 
     res = snd_pcm_open(&pcm_handle, dev, SND_PCM_STREAM_PLAYBACK, 0);
     if (res < 0) {
@@ -257,7 +257,7 @@ static void pi_ahi_do_cmd(uint32_t val) {
     break;
   }
   case AHI_CMD_PLAY: {
-    int32_t res = 0;
+    snd_pcm_sframes_t res = 0;
     uint8_t* bufptr = get_mapped_data_pointer_by_address(cfg, ahi_addr[0]);
     // printf("[PI-AHI] Driver sent PLAY command: %d samples @$%.8X ($%.8X).\n", ahi_u32[0],
     // ahi_addr[0], (uint32_t)bufptr);
@@ -294,14 +294,15 @@ static void pi_ahi_do_cmd(uint32_t val) {
         // printf("Resampling from %d to %d (%d bytes to %d bytes).\n", ahi_u32[1], playback_rate,
         // bsize, dst_bsize);
         if (channels_u32 == 2) {
-          uint32_t* u32ptr = (uint32_t*)bufptr;
-          uint32_t* dstptr = (uint32_t*)&shitbuf[sndbuf_offset];
           float step = (float)bsize / (float)dst_bsize;
           float index_f = 0.0f;
           for (uint32_t i = 0; i < (dst_bsize / 4); i++) {
             uint32_t index = (uint32_t)index_f;
             index_f += step;
-            dstptr[i] = u32ptr[index];
+            // Use memcpy to avoid cast alignment issues
+            uint32_t src_val;
+            memcpy(&src_val, bufptr + (index * sizeof(uint32_t)), sizeof(src_val));
+            memcpy(&shitbuf[sndbuf_offset + (i * sizeof(uint32_t))], &src_val, sizeof(src_val));
           }
           bsize = dst_bsize;
         } else {
@@ -324,7 +325,7 @@ static void pi_ahi_do_cmd(uint32_t val) {
           // printf("PCM epipe.\n");
           snd_pcm_prepare(pcm_handle);
         } else if (res < 0) {
-          printf("ERROR. Can't write to PCM device. %s\n", snd_strerror(res));
+          printf("ERROR. Can't write to PCM device. %s\n", snd_strerror((int)res));
           snd_pcm_prepare(pcm_handle);
         }
         // snd_pcm_hw_params(pcm_handle, params);
@@ -363,8 +364,8 @@ void handle_pi_ahi_write(uint32_t addr_, uint32_t val, uint8_t type) {
   case AHI_U82:
   case AHI_U83:
   case AHI_U84: {
-    int i = (addr - AHI_U81);
-    ahi_u8[i] = val;
+    int i = (int)(addr - AHI_U81);
+    ahi_u8[i] = (uint8_t)val;
     break;
   }
   case AHI_U1:
@@ -373,8 +374,8 @@ void handle_pi_ahi_write(uint32_t addr_, uint32_t val, uint8_t type) {
   case AHI_U4:
   case AHI_U5:
   case AHI_U6: {
-    int i = (addr - AHI_U1) / 2;
-    ahi_u16[i] = val;
+    int i = (int)((addr - AHI_U1) / 2);
+    ahi_u16[i] = (uint16_t)val;
     break;
   }
   case AHI_ADDR1:
@@ -439,7 +440,7 @@ uint32_t handle_pi_ahi_read(uint32_t addr_, uint8_t type) {
   case AHI_U82:
   case AHI_U83:
   case AHI_U84: {
-    int i = (addr - AHI_U81);
+    int i = (int)(addr - AHI_U81);
     return ahi_u8[i];
     break;
   }
@@ -449,7 +450,7 @@ uint32_t handle_pi_ahi_read(uint32_t addr_, uint8_t type) {
   case AHI_U4:
   case AHI_U5:
   case AHI_U6: {
-    int i = (addr - AHI_U1) / 2;
+    int i = (int)((addr - AHI_U1) / 2);
     return ahi_u16[i];
     break;
   }

@@ -263,7 +263,11 @@ static uint32_t grab_pi_temperature(void) {
   for (size_t p = 0; p < (sizeof(base_paths) / sizeof(base_paths[0])); p++) {
     for (int i = 0; i < 8; i++) {
       // Format string is intentionally stored in variable for flexibility
+      // Known-safe format strings: "/sys/class/thermal/thermal_zone%d/temp" and "/sys/devices/virtual/thermal/thermal_zone%d/temp"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
       snprintf(path, sizeof(path), base_paths[p], i);
+#pragma GCC diagnostic pop
       FILE* f = fopen(path, "r");
       if (!f) {
         continue;
@@ -879,12 +883,12 @@ void handle_pistorm_dev_write(uint32_t addr_, uint32_t val, uint8_t type) {
       break;
     case PISCSI_CTRL_UNMAP:
       DEBUG("UNMAP\n");
-      if (pi_word[0] > 7) {
-        LOG_WARN("[PISTORM-DEV] Invalid drive ID %d for PISCSI unmap command.", pi_word[0]);
+      if ((uint8_t)pi_word[0] > 7) {
+        LOG_WARN("[PISTORM-DEV] Invalid drive ID %d for PISCSI unmap command.", (int)pi_word[0]);
         pi_cmd_result = (uint8_t)PI_RES_INVALIDVALUE;
       } else {
-        if (piscsi_get_dev(pi_word[0])->fd != -1) {
-          piscsi_unmap_drive(pi_word[0]);
+        if (piscsi_get_dev((uint8_t)pi_word[0])->fd != -1) {
+          piscsi_unmap_drive((uint8_t)pi_word[0]);
           pi_cmd_result = (uint8_t)PI_RES_OK;
         } else {
           pi_cmd_result = (uint8_t)PI_RES_NOCHANGE;
