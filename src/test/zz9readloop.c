@@ -53,8 +53,9 @@ uint8_t loop_tests = 0, total_errors = 0;
 void sigint_handler(int sig_num) {
   printf("Received sigint %d, exiting.\n", sig_num);
   printf("Total number of transaction errors occured: %d\n", total_errors);
-  if (mem_fd)
+  if (mem_fd) {
     close(mem_fd);
+  }
 
   exit(0);
 }
@@ -107,10 +108,11 @@ unsigned int dump_read_8(unsigned int address) {
     ps_reinit();
   }
 
-  if ((address & 1) == 0)
+  if ((address & 1) == 0) {
     return (value >> 8) & 0xff; // EVEN, A0=0,UDS
-  else
+  } else {
     return value & 0xff; // ODD , A0=1,LDS
+  }
 }
 
 int main(int argc, char* argv[]) {
