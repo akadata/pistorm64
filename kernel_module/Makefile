@@ -3,6 +3,10 @@
 obj-m += pistorm.o
 pistorm-objs := src/pistorm.o
 
+# For upstream version
+obj-$(CONFIG_PISTORM) += pistorm-platform.o
+pistorm-platform-objs := drivers/misc/pistorm/pistorm-main.o
+
 KDIR ?= /lib/modules/$(shell uname -r)/build
 PWD  := $(shell pwd)
 

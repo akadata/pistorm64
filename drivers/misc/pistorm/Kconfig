@@ -1,0 +1,15 @@
+#
+# PiStorm configuration
+#
+
+config PISTORM
+	tristate "PiStorm - Amiga to Raspberry Pi bridge support"
+	depends on ARCH_BCM2835 || ARCH_BCM2711 || COMPILE_TEST
+	select GPIOLIB
+	select PINCTRL
+	help
+	  Say Y or M here if you want to support the PiStorm hardware
+	  bridge that connects an Amiga computer to a Raspberry Pi,
+	  allowing the Pi to act as a co-processor for the Amiga.
+
+	  If you are not using this hardware, say N.

@@ -1,0 +1,8 @@
+PISTORM DRIVER
+M:	PiStorm Community <pistorm-devel@lists.example.com>
+L:	pistorm-users@lists.example.com
+S:	Maintained
+F:	drivers/misc/pistorm/
+F:	include/uapi/linux/pistorm.h
+F:	Documentation/devicetree/bindings/misc/pistorm.yaml
+F:	Documentation/ABI/testing/dev-pistorm
