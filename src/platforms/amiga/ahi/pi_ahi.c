@@ -41,9 +41,12 @@ static const char* op_type_names[4] = {
 void print_ahi_sample_type(uint16_t type);
 #endif
 
-uint32_t tmp, dir, buff_size;
+uint32_t tmp;
+uint32_t dir;
+uint32_t buff_size;
 uint32_t playback_rate = 48000;
-int32_t channels = 2, seconds;
+int32_t channels = 2;
+int32_t seconds;
 
 snd_pcm_t* pcm_handle;
 snd_pcm_hw_params_t* params;
@@ -57,9 +60,15 @@ int loops;
 extern struct emulator_config* cfg;
 char* shitbuf;
 
-uint32_t sndbuf_offset = 0, old_sndbuf_offset = 0, ahi_shutdown = 0, timing_enabled = 0,
-         ahi_interrupt_triggered = 0, irq_disabled = 1;
-uint32_t ahi_ints_triggered = 0, ahi_ints_handled = 0, ahi_ints_spurious = 0;
+uint32_t sndbuf_offset = 0;
+uint32_t old_sndbuf_offset = 0;
+uint32_t ahi_shutdown = 0;
+uint32_t timing_enabled = 0;
+uint32_t ahi_interrupt_triggered = 0;
+uint32_t irq_disabled = 1;
+uint32_t ahi_ints_triggered = 0;
+uint32_t ahi_ints_handled = 0;
+uint32_t ahi_ints_spurious = 0;
 
 static struct timespec diff(struct timespec start, struct timespec end) {
   struct timespec temp;
@@ -178,7 +187,8 @@ uint32_t pi_ahi_init(const char* dev) {
 
     res = snd_pcm_hw_params_set_channels(pcm_handle, params, (unsigned int)channels);
     if (res < 0) {
-      printf("[PI-AHI] Failed to set 16 channels: %s\n", snd_strerror(res));
+      printf("[PI-AHI] Failed to set %d channels: %s\n", channels, snd_strerror(res));
+
       goto pcm_init_fail;
     }
 

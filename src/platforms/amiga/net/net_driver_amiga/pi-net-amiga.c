@@ -287,14 +287,18 @@ void __BeginIO(struct IORequest* io) {
     devquery->DevQueryFormat = 0;
     devquery->DeviceLevel = 0;
 
-    if (devquery->SizeAvailable >= 18)
+    if (devquery->SizeAvailable >= 18) {
       devquery->AddrFieldSize = ADDRFIELDSIZE * 8;
-    if (devquery->SizeAvailable >= 22)
+    }
+    if (devquery->SizeAvailable >= 22) {
       devquery->MTU = 1500;
-    if (devquery->SizeAvailable >= 26)
+    }
+    if (devquery->SizeAvailable >= 26) {
       devquery->BPS = 1000 * 1000 * 100;
-    if (devquery->SizeAvailable >= 30)
+    }
+    if (devquery->SizeAvailable >= 30) {
       devquery->HardwareType = S2WireType_Ethernet;
+    }
 
     devquery->SizeSupplied = (devquery->SizeAvailable < 30) ? devquery->SizeAvailable : 30;
     break;
@@ -326,8 +330,9 @@ ADDTABL_1(__AbortIO, a1);
 void __AbortIO(struct IORequest* ioreq) {
   struct IOSana2Req* ios2 = (struct IOSana2Req*)ioreq;
 
-  if (!ioreq)
+  if (!ioreq) {
     return;
+  }
   ioreq->io_Error = IOERR_ABORTED;
   ios2->ios2_WireError = 0;
 }
