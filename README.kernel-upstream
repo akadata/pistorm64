@@ -57,10 +57,13 @@ The PiStorm is a hardware bridge that connects an Amiga computer to a Raspberry 
 
 ### 10. Device Tree Binding Fixes
 - Fixed YAML schema and indentation to pass dt_binding_check
-- Made pinctrl states mandatory for proper operation
-- Removed reg/reg-names as MMIO is optional in this driver
+- Made reg and pinctrl optional to match driver reality (gpiod-first approach)
 - Simplified examples to use generic GPIO controller references
 - Added proper maintainers section
+
+### 11. UAPI Header Improvements
+- Changed from __attribute__((packed)) to __packed for kernel convention compliance
+- Kept ABI versioning and capability bitmasks
 
 ## Files Added
 
