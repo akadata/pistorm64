@@ -78,16 +78,21 @@ extern uint8_t rtg_output_in_vblank;
 
 #define DEBUG_RTG
 
-#ifdef DEBUG_RTG // static const below was commented out 
+#ifdef DEBUG_RTG // static const below was commented out
 static const char *op_type_names[OP_TYPE_NUM] = {
     "BYTE",
     "WORD",
     "LONGWORD",
     "MEM",
 };
-
 #define DEBUG LOG_DEBUG
 #else
+static const char *op_type_names[OP_TYPE_NUM] = {
+    "BYTE",
+    "WORD",
+    "LONGWORD",
+    "MEM",
+};
 #define DEBUG(...)
 #endif
 

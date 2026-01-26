@@ -11,11 +11,36 @@
 #include <dirent.h>
 #include <math.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+// Frame buffer structure for asynchronous processing
+typedef struct {
+    uint8_t *data;
+    size_t size;
+    uint16_t width;
+    uint16_t height;
+    uint16_t pitch;
+    uint16_t format;
+    uint32_t addr;
+    int valid;
+} FrameBuffer;
+
+// Frame queue for asynchronous processing
+#define FRAME_QUEUE_SIZE 3
+typedef struct {
+    FrameBuffer buffers[FRAME_QUEUE_SIZE];
+    int front;
+    int rear;
+    int count;
+    pthread_mutex_t mutex;
+    sem_t available_slots;  // Count of available slots in the queue
+    sem_t available_items;  // Count of available items in the queue
+} FrameQueue;
 
 // Helper functions for safe unaligned memory access
 static inline uint16_t load_u16_be(const uint8_t *p) {
@@ -51,6 +76,11 @@ uint8_t emulator_exiting = 0;
 uint8_t rtg_output_in_vblank = 0;
 uint8_t rtg_dpms = 0;
 uint8_t shutdown = 0;
+
+// Frame queue for asynchronous processing
+static FrameQueue frame_queue;
+static pthread_t frame_processor_thread;
+static uint8_t frame_processor_running = 0;
 
 extern uint8_t *rtg_mem;
 extern uint8_t display_enabled;
@@ -129,6 +159,131 @@ extern void rtg_update_screen(void);
 extern void rtg_scale_output(uint16_t width, uint16_t height);
 extern void* rtgThread(void* args);
 extern void update_mouse_cursor(uint8_t* src);
+
+// Initialize the frame queue
+static int init_frame_queue(FrameQueue *queue) {
+    queue->front = 0;
+    queue->rear = 0;
+    queue->count = 0;
+
+    if (pthread_mutex_init(&queue->mutex, NULL) != 0) {
+        LOG_ERROR("[RTG/RAYLIB] Failed to initialize frame queue mutex\n");
+        return 0;
+    }
+
+    if (sem_init(&queue->available_slots, 0, FRAME_QUEUE_SIZE) != 0) {
+        LOG_ERROR("[RTG/RAYLIB] Failed to initialize available_slots semaphore\n");
+        pthread_mutex_destroy(&queue->mutex);
+        return 0;
+    }
+
+    if (sem_init(&queue->available_items, 0, 0) != 0) {
+        LOG_ERROR("[RTG/RAYLIB] Failed to initialize available_items semaphore\n");
+        pthread_mutex_destroy(&queue->mutex);
+        sem_destroy(&queue->available_slots);
+        return 0;
+    }
+
+    // Initialize all frame buffers
+    for (int i = 0; i < FRAME_QUEUE_SIZE; i++) {
+        queue->buffers[i].data = NULL;
+        queue->buffers[i].size = 0;
+        queue->buffers[i].valid = 0;
+    }
+
+    return 1;
+}
+
+// Destroy the frame queue
+static void destroy_frame_queue(FrameQueue *queue) {
+    for (int i = 0; i < FRAME_QUEUE_SIZE; i++) {
+        if (queue->buffers[i].data) {
+            free(queue->buffers[i].data);
+            queue->buffers[i].data = NULL;
+        }
+    }
+    pthread_mutex_destroy(&queue->mutex);
+    sem_destroy(&queue->available_slots);
+    sem_destroy(&queue->available_items);
+}
+
+// Add a frame to the queue
+static int enqueue_frame(FrameQueue *queue, uint8_t *src_data, size_t size, uint16_t width, uint16_t height, uint16_t pitch, uint16_t format, uint32_t addr) {
+    if (sem_wait(&queue->available_slots) != 0) {
+        return 0; // Error
+    }
+
+    if (pthread_mutex_lock(&queue->mutex) != 0) {
+        sem_post(&queue->available_slots);
+        return 0; // Error
+    }
+
+    int rear = queue->rear;
+
+    // Free old data if exists
+    if (queue->buffers[rear].data) {
+        free(queue->buffers[rear].data);
+    }
+
+    // Allocate new buffer and copy data
+    queue->buffers[rear].data = malloc(size);
+    if (queue->buffers[rear].data) {
+        memcpy(queue->buffers[rear].data, src_data, size);
+        queue->buffers[rear].size = size;
+        queue->buffers[rear].width = width;
+        queue->buffers[rear].height = height;
+        queue->buffers[rear].pitch = pitch;
+        queue->buffers[rear].format = format;
+        queue->buffers[rear].addr = addr;
+        queue->buffers[rear].valid = 1;
+
+        queue->rear = (queue->rear + 1) % FRAME_QUEUE_SIZE;
+        queue->count++;
+    } else {
+        // Failed to allocate memory, restore the slot
+        sem_post(&queue->available_slots);
+        pthread_mutex_unlock(&queue->mutex);
+        return 0;
+    }
+
+    pthread_mutex_unlock(&queue->mutex);
+    sem_post(&queue->available_items);
+
+    return 1;
+}
+
+// Remove a frame from the queue
+static int dequeue_frame(FrameQueue *queue, FrameBuffer *dest) {
+    if (sem_wait(&queue->available_items) != 0) {
+        return 0; // Error
+    }
+
+    if (pthread_mutex_lock(&queue->mutex) != 0) {
+        sem_post(&queue->available_items);
+        return 0; // Error
+    }
+
+    int front = queue->front;
+
+    if (queue->buffers[front].valid) {
+        *dest = queue->buffers[front];
+        // Reset the buffer in the queue (but keep the memory allocated for reuse)
+        queue->buffers[front].valid = 0;
+        queue->buffers[front].size = 0;
+
+        queue->front = (queue->front + 1) % FRAME_QUEUE_SIZE;
+        queue->count--;
+    } else {
+        sem_post(&queue->available_items);
+        pthread_mutex_unlock(&queue->mutex);
+        return 0; // No valid frame
+    }
+
+    pthread_mutex_unlock(&queue->mutex);
+    sem_post(&queue->available_slots);
+
+    return 1;
+}
 
 void rtg_update_screen(void) {
   // doing nothing to update the screen here????
@@ -411,6 +566,31 @@ void rtg_scale_output(uint16_t width, uint16_t height) {
         height, dstscale.width, dstscale.height, dstscale.x, dstscale.y);
 }
 
+// Frame processor thread function
+static void* frame_processor_thread_func(void* args) {
+    FrameBuffer frame;
+    (void)args; // Suppress unused parameter warning
+
+    LOG_INFO("[RTG] Frame processor thread running\n");
+
+    while (frame_processor_running) {
+        // Wait for a frame to be available in the queue
+        if (dequeue_frame(&frame_queue, &frame)) {
+            // Update the texture with the frame data on the main rendering thread
+            // Since we can't call OpenGL functions from this thread, we'll need to
+            // pass the data back to the main thread somehow
+            // For now, we'll just log that we received a frame
+            LOG_DEBUG("[RTG] Received frame for processing: %ux%u, format=%u\n", frame.width, frame.height, frame.format);
+        } else {
+            // Small delay to prevent busy waiting
+            usleep(1000); // 1ms
+        }
+    }
+
+    LOG_INFO("[RTG] Frame processor thread exiting\n");
+    return NULL;
+}
+
 void* rtgThread(void* args) {
 
   LOG_INFO("[RTG] Thread running\n");
@@ -455,6 +635,23 @@ void* rtgThread(void* args) {
   // Frame timing variables for triple buffering simulation
   double last_frame_time = 0.0;
   double target_frame_time = 1.0 / 60.0; // Target 60 FPS initially, will be adjusted by VSync
+
+  // Initialize frame queue for asynchronous processing
+  if (!init_frame_queue(&frame_queue)) {
+      LOG_ERROR("[RTG/RAYLIB] Failed to initialize frame queue; continuing without async processing\n");
+  } else {
+      LOG_INFO("[RTG/RAYLIB] Frame queue initialized for asynchronous processing\n");
+  }
+
+  // Start frame processor thread
+  frame_processor_running = 1;
+  int err = pthread_create(&frame_processor_thread, NULL, frame_processor_thread_func, (void*)data);
+  if (err != 0) {
+      LOG_ERROR("can't create frame processor thread :[%s]", strerror(err));
+      frame_processor_running = 0;
+  } else {
+      LOG_INFO("Frame processor thread created successfully\n");
+  }
 
 
   rtg_autodetect_screen_size();
@@ -804,7 +1001,13 @@ reinit_raylib:;
                 indexed_buf[x + (y * width)] = load_u16_be(src_ptr);
               }
             }
+
             UpdateTexture(raylib_texture, indexed_buf);
+
+            // Also add frame to queue for asynchronous processing if enabled
+            if (frame_processor_running) {
+                enqueue_frame(&frame_queue, (uint8_t*)indexed_buf, tight_size, width, height, current_pitch, current_format, current_addr);
+            }
           }
         }
       } else if(current_pitch != row_bytes) {
@@ -819,10 +1022,21 @@ reinit_raylib:;
         }
         if(tight_buf) {
           rtg_copy_tight_rows(tight_buf, data->memory + addr, row_bytes, current_pitch, height);
+
           UpdateTexture(raylib_texture, tight_buf);
+
+          // Also add frame to queue for asynchronous processing if enabled
+          if (frame_processor_running) {
+              enqueue_frame(&frame_queue, tight_buf, tight_size, width, height, current_pitch, current_format, current_addr);
+          }
         }
       } else {
         UpdateTexture(raylib_texture, data->memory + addr);
+
+        // Also add frame to queue for asynchronous processing if enabled
+        if (frame_processor_running) {
+            enqueue_frame(&frame_queue, data->memory + addr, tight_size, width, height, current_pitch, current_format, current_addr);
+        }
       }
       if(cursor_image_updated) {
         if(clut_cursor_enabled) {
@@ -893,6 +1107,15 @@ shutdown_raylib:;
   if(tight_buf) {
     free(tight_buf);
   }
+
+  // Stop and join frame processor thread
+  if (frame_processor_running) {
+      frame_processor_running = 0;
+      pthread_join(frame_processor_thread, NULL);
+  }
+
+  // Clean up frame queue
+  destroy_frame_queue(&frame_queue);
 
   UnloadTexture(raylib_texture);
   UnloadShader(clut_shader);
