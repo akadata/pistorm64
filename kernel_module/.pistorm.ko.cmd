@@ -1,1 +1,0 @@
-savedcmd_pistorm.ko := ld -r -EL  -maarch64elf -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T /usr/src/rpi-linux-6.18.6-v8+/scripts/module.lds -o pistorm.ko pistorm.o pistorm.mod.o .module-common.o
