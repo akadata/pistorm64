@@ -257,16 +257,16 @@ floatx80 getFloatInternalFloatx80(void);
 uint64_t getFloatInternalGRS(void);
 
 static inline void set_float_detect_tininess(int val, float_status* status) {
-  status->float_detect_tininess = val;
+  status->float_detect_tininess = (signed char)val;
 }
 static inline void set_float_rounding_mode(int val, float_status* status) {
-  status->float_rounding_mode = val;
+  status->float_rounding_mode = (signed char)val;
 }
 static inline void set_float_exception_flags(int val, float_status* status) {
-  status->float_exception_flags = val;
+  status->float_exception_flags = (uint8_t)val;
 }
 static inline void set_floatx80_rounding_precision(int val, float_status* status) {
-  status->floatx80_rounding_precision = val;
+  status->floatx80_rounding_precision = (signed char)val;
 }
 static inline void set_flush_to_zero(flag val, float_status* status) {
   status->flush_to_zero = val;
@@ -281,16 +281,16 @@ static inline void set_snan_bit_is_one(flag val, float_status* status) {
   status->snan_bit_is_one = val;
 }
 static inline int get_float_detect_tininess(float_status* status) {
-  return status->float_detect_tininess;
+  return (int)status->float_detect_tininess;
 }
 static inline int get_float_rounding_mode(float_status* status) {
-  return status->float_rounding_mode;
+  return (int)status->float_rounding_mode;
 }
 static inline int get_float_exception_flags(float_status* status) {
-  return status->float_exception_flags;
+  return (int)status->float_exception_flags;
 }
 static inline int get_floatx80_rounding_precision(float_status* status) {
-  return status->floatx80_rounding_precision;
+  return (int)status->floatx80_rounding_precision;
 }
 static inline flag get_flush_to_zero(float_status* status) {
   return status->flush_to_zero;

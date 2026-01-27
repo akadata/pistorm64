@@ -1,4 +1,4 @@
-make full C=clang V=1 2>clang-build.log
+make full C=clang V=1 -j4 2>clang-build.log
 . ./rebuildcount.sh
 
 sudo modprobe pistorm

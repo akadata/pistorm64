@@ -109,7 +109,7 @@ typedef uint32 uint64;
 
 /* Allow for architectures that don't have 8-bit sizes */
 #if UCHAR_MAX == 0xff
-	#define MAKE_INT_8(A) (sint8)(A)
+	#define MAKE_INT_8(A) (sint8)(int8_t)(A)
 #else
 	#undef  sint8
 	#define sint8  signed   int
@@ -124,7 +124,7 @@ typedef uint32 uint64;
 
 /* Allow for architectures that don't have 16-bit sizes */
 #if USHRT_MAX == 0xffff
-	#define MAKE_INT_16(A) (sint16)(A)
+	#define MAKE_INT_16(A) (sint16)(int16_t)(A)
 #else
 	#undef  sint16
 	#define sint16 signed   int
@@ -1128,7 +1128,7 @@ static inline void m68ki_ic_clear(m68ki_cpu_core *state)
 {
 	int i;
 	for (i=0; i< M68K_IC_SIZE; i++) {
-		state->ic_address[i] = ~0U;
+		state->ic_address[i] = ~0;
 	}
 }
 
