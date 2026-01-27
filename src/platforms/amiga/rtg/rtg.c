@@ -210,7 +210,7 @@ static struct timespec diff(struct timespec start, struct timespec end) {
     break;
 
 void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
-  // printf("%s write to RTG: %.8X (%.8X)\n", op_type_names[mode], address, value);
+  printf("%s write to RTG: %.8X (%.8X)\n", op_type_names[mode], address, value);
   if (address >= PIGFX_REG_SIZE) {
     /*if ((address - PIGFX_REG_SIZE) < framebuffer_addr) {// || (address - PIGFX_REG_SIZE) >
     framebuffer_addr + ((rtg_display_width << rtg_display_format) * rtg_display_height)) {
@@ -712,7 +712,7 @@ static void handle_irtg_command(uint32_t cmd) {
 }
 
 static void handle_rtg_command(uint32_t cmd) {
-  // printf("Handling RTG command %d (%.8X)\n", cmd, cmd);
+  printf("Handling RTG command %d (%.8X)\n", cmd, cmd);
   switch (cmd) {
   case RTGCMD_SETGC:
     gdebug("SetGC\n");
@@ -743,22 +743,21 @@ static void handle_rtg_command(uint32_t cmd) {
     }
     break;
   case RTGCMD_SETPAN:
-    // printf("Command: SetPan.\n");
+    printf("Command: SetPan.\n");
     rtg_offset_x = rtg_x[1];
     rtg_offset_y = rtg_y[1];
     rtg_pitch = (uint16_t)(rtg_x[0] * rtg_pixel_size[rtg_display_format]);
     framebuffer_addr = rtg_address[0] - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
     framebuffer_addr_adj = framebuffer_addr + (rtg_offset_x * rtg_pixel_size[rtg_display_format]) +
                            (rtg_offset_y * rtg_pitch);
-    // printf("PAN:\nPitch: %d\n", rtg_pitch);
-    // printf("Pixel format: %s (%d)\n", rtg_format_names[rtg_format], rtg_format);
-    // printf("Display pixel format: %s (%d)\n", rtg_format_names[rtg_display_format],
-    // rtg_display_format);
+    printf("PAN:\nPitch: %d\n", rtg_pitch);
+    printf("Pixel format: %s (%d)\n", rtg_format_names[rtg_format], rtg_format);
+    printf("Display pixel format: %s (%d)\n", rtg_format_names[rtg_display_format], rtg_display_format);
     break;
   case RTGCMD_SETCLUT: {
-    // printf("Command: SetCLUT.\n");
-    // printf("Set palette entry %d to %d, %d, %d\n", rtg_u8[0], rtg_u8[1], rtg_u8[2], rtg_u8[3]);
-    // printf("Set palette entry %d to 32-bit palette color: %.8X\n", rtg_u8[0], rtg_rgb[0]);
+    printf("Command: SetCLUT.\n");
+    printf("Set palette entry %d to %d, %d, %d\n", rtg_u8[0], rtg_u8[1], rtg_u8[2], rtg_u8[3]);
+    printf("Set palette entry %d to 32-bit palette color: %.8X\n", rtg_u8[0], rtg_rgb[0]);
     rtg_set_clut_entry(rtg_u8[0], rtg_rgb[0]);
     break;
   }

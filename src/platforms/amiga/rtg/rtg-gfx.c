@@ -976,9 +976,7 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
       }                                                                                           \
     }                                                                                             \
   } while (0);                                                                                     \
-  if ((cur_bit >>= 1) == 0) {                                                                       \
-    cur_bit = 0x8000;                                                                                \
-  }                                                                                               \
+  if ((cur_bit >>= 1) == 0) {   cur_bit = 0x8000;    }                                                                                               
 
 void rtg_drawline(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint16_t len,
                   uint16_t pattern, uint16_t pattern_offset, uint32_t fgcol, uint32_t bgcol,
