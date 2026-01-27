@@ -1,15 +1,3 @@
-# Copyrighted files that should not be committed
-Amiga/kickstart.rom
-Amiga/myamiga.cfg
-Amiga/BlankPFS3-*
-Amiga/amiga.cfg
-Amiga/Workbench2.04-PS3-8GB.hdf
-pistorm/amiga.cfg
-pistorm/myamiga.cfg
-pistorm/Workbench2.04-PS3-8GB.hdf
-pistorm/BlankPFS3-*
-data/a314-shared/*
-src/a314-upstream/
 # Build artifacts
 emulator
 m68kmake
