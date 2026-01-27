@@ -1,1 +1,0 @@
-Glossary / display mode ]" border=0> One of the basic types of display; for example, high or low resolution, interlaced or non-interlaced, single or dual playfield. [Back to Amiga Developer Docs ]

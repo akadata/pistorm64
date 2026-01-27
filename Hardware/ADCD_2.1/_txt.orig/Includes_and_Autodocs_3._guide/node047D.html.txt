@@ -1,1 +1,0 @@
-mathieeedoubbas.doc ]" border=0> IEEEDPAbs() IEEEDPAdd() IEEEDPCeil() IEEEDPCmp() IEEEDPDiv() IEEEDPFix() IEEEDPFloor() IEEEDPFlt() IEEEDPMul() IEEEDPNeg() IEEEDPSub() IEEEDPTst() [Back to Amiga Developer Docs ]

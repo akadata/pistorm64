@@ -1,1 +1,0 @@
-Utility Index ]" border=0> Utility, 867 32-bit math, 878 callback hooks, 875 date functions, 881 function reference, 883 international strings, 880 tags, 867 [Back to Amiga Developer Docs ]

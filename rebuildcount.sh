@@ -31,6 +31,10 @@ M68KCPUH=$(count "m68kcpu\.h")
 SOFTFLOATH=$(count "softfloat\.h")
 M68KH=$(count "m68k\.h")
 M68KC=$(count "m68k\.c")
+M68KDASM=$(count "m68kdasm\.c")
+M68KMMU=$(count "m68kmmu\.h")
+M68KC=$(count "m68k\.c")
+M68CONF=$(count "m68kconf\.h")
 SOFTFLOATFPSP=$(count "softfloat_fpsp\.c")
 SOFTFLOATSPECIALIZE=$(count "softfloat-specialize\.h")
 
@@ -50,7 +54,7 @@ echo "- fatal errors: $FATALS"
 echo
 echo "- src/musashi/: $MUSASHI"
 echo "- src/softfloat/: $SOFTFLOAT"
-echo 
+echo
 echo "- m68kmake.c: $M68KMAKE"
 echo "- m68kcpu.h: $M68KCPUH"
 echo "- m68k.h: $M68KH"
@@ -58,7 +62,11 @@ echo "- m68k.c: $M68KC"
 echo "- softfloat.h: $SOFTFLOATH"
 echo "- softfloat_fpsp.c: $SOFTFLOATFPSP"
 echo "- softfloat-specialize.h: $SOFTFLOATSPECIALIZE"
+echo "- m68kdasm.c: $M68KDASM"
+echo "- m68kmmu.h: $M68KMMU"
+echo "- m68kconf: $M68CONF"
 echo
+
 echo "- rtg.c: $RTG"
 echo "- rtg-output-raylib.c: $RTG_RAYLIB"
 echo "- rtg-gfx.c: $RTG_GFX"
@@ -73,12 +81,12 @@ echo "- pi_ahi.c: $PIAHI"
 #   ./rebuildcount.sh src/musashi/     -> only musashi diagnostics bottom-up
 #   ./rebuildcount.sh piscsi.c         -> only piscsi diagnostics bottom-up
 if [[ "$arg" == "1" ]]; then
-  echo
-  echo "---- diagnostics (bottom-up, all) ----"
-  tac "$OUT" | sed -n '1,200p'
+echo
+echo "---- diagnostics (bottom-up, all) ----"
+tac "$OUT" | sed -n '1,200p'
 elif [[ -n "$arg" ]]; then
-  echo
-  echo "---- diagnostics (bottom-up, filter: $arg) ----"
-  tac "$OUT" | rg -n --fixed-strings "$arg" | sed -n '1,200p' || true
+echo
+echo "---- diagnostics (bottom-up, filter: $arg) ----"
+tac "$OUT" | rg -n --fixed-strings "$arg" | sed -n '1,200p' || true
 fi
 

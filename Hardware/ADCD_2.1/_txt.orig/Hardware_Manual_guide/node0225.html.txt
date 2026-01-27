@@ -1,1 +1,0 @@
-Glossary / scroll ]" border=0> .nh To move a playfield smoothly in a vertical or horizontal direction. [Back to Amiga Developer Docs ]

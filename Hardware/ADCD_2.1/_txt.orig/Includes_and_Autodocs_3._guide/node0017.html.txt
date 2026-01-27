@@ -1,1 +1,0 @@
-amigaguide_dtc.doc ]" border=0> GetAGString() amigaguide.datatype() [Back to Amiga Developer Docs ]

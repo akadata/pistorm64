@@ -1,1 +1,0 @@
-Glossary / interlace mode ]" border=0> A vertical display mode where 400 lines are displayed from top to bottom of the video display in a normal-size display. [Back to Amiga Developer Docs ]

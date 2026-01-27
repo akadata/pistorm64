@@ -1,1 +1,0 @@
-B / groupgclass / Attributes: GA_Left, GA_Top (IS) ]" border=0> These attributes correspond to the embedded Gadget.LeftEdge and Gadget.TopEdge fields. Setting these attributes in groupgclass object causes it to change its position as well as the position of each of the gadgets that have been added to the group gadget. [Back to Amiga Developer Docs ]

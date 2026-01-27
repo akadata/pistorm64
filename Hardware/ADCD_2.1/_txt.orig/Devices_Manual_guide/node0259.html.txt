@@ -1,1 +1,0 @@
-The DR2D Chunks / The Object Chunks ]" border=0> The following chunks define the objects available in the DR2D FORM. VBM CPLY, OPLY GRUP STXT TPTH [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-E / Release 2 Changes That Can Affect Compatibility / Serial Device ]" border=0> * Clears io_Device on CloseDevice() (since 1.3.2) [Back to Amiga Developer Docs ]

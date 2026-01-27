@@ -1,1 +1,0 @@
-5 Intuition Gadgets / Gadget Imagery ]" border=0> Gadget imagery can be rendered with a series of straight lines, a bitmap image or no imagery at all. In addition to the line or bitmap imagery, gadgets may include a series of text strings. Hand Drawn Gadgets Gadget Text Line Drawn Gadgets Gadgets Without Imagery [Back to Amiga Developer Docs ]

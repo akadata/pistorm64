@@ -1,1 +1,0 @@
-Glossary / set ]" border=0> To change a bit or flag to 1, its on or enabled state.; as opposed to clear. [Back to Amiga Developer Docs ]

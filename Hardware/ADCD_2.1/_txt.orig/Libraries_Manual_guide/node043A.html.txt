@@ -1,1 +1,0 @@
-33 / / Other Chunk Management Functions / ExitHandler() ]" border=0> This is used to install your own custom chunk exit handler. See the " Custom Chunk Handlers " section below for more information. StopOnExit() is internally built on top of this. [Back to Amiga Developer Docs ]

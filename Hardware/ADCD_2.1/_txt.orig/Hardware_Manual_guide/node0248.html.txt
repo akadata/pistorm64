@@ -1,1 +1,0 @@
-ADKCON Index ]" border=0> ADKCON, 241 , 250 , 256 disk control bits, 249 in audio, 149-150 [Back to Amiga Developer Docs ]

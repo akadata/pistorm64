@@ -1,1 +1,0 @@
-Serial Shift Register Index ]" border=0> Serial Shift Register, 345 bidirectional feature, 346 input mode, 345 output mode, 345 [Back to Amiga Developer Docs ]

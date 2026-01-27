@@ -1,1 +1,0 @@
-9 / IDCMP Flags / Event Message Classes and Flags ]" border=0> Mouse Event Message Classes and Flags Gadget Event Message Classes and Flags Menu Event Message Classes and Flags Requester Event Message Classes and Flags Window Event Message Classes and Flags Other Event Message Classes and Flags [Back to Amiga Developer Docs ]

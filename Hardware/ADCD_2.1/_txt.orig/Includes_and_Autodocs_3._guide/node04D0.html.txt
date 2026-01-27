@@ -1,1 +1,0 @@
-narrator.doc ]" border=0> AbortIO() OpenDevice() CMD_FLUSH CMD_READ CMD_RESET CMD_START CMD_STOP CMD_WRITE CloseDevice() [Back to Amiga Developer Docs ]

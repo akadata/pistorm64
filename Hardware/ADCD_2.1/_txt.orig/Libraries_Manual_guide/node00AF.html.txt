@@ -1,1 +1,0 @@
-Stack Index ]" border=0> Stack, 477 Interrupt stack, 477 ISP, 477 Master stack, 477 MSP, 477 overflow, 916 SSP, 477 Supervisor stack, 477 User stack, 477 USP, 477 [Back to Amiga Developer Docs ]

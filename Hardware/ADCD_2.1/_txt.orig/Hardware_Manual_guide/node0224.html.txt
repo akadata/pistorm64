@@ -1,1 +1,0 @@
-Glossary / sampling period ]" border=0> The value that determines how many clock cycles it takes to play one data sample. [Back to Amiga Developer Docs ]
