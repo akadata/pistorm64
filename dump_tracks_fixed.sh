@@ -16,12 +16,12 @@ for track in $(seq 0 $MAX_TRACKS); do
     sleep 3
     
     # Start emulator
-    sudo timeout 60 /home/smalley/pistorm/emulator > /tmp/emulator_track_${track}.log 2>&1 &
+    sudo timeout 60 "$HOME/pistorm/emulator" > /tmp/emulator_track_${track}.log 2>&1 &
     sleep 8  # Give emulator time to initialize
     
     # Try to dump the track
     output_file="/tmp/disk_tracks/track_$(printf "%02d" $track)_fixed.raw"
-    result=$(sudo timeout 25 /home/smalley/pistorm/build/dumpdisk --out "$output_file" --drive $DRIVE --tracks 1 --sides 1 2>&1)
+    result=$(sudo timeout 25 "$HOME/pistorm/build/dumpdisk" --out "$output_file" --drive $DRIVE --tracks 1 --sides 1 2>&1)
     
     # Check if dump was successful by looking for "Track 0 side 0 dumped"
     if echo "$result" | grep -q "Track 0 side 0 dumped"; then

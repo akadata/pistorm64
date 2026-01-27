@@ -10,7 +10,9 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-DEFAULT_ADF_DIR = "/home/smalley/pistorm64/data/adfs"
+import os
+
+DEFAULT_ADF_DIR = os.path.join(os.path.expanduser("~"), "pistorm64", "data", "adfs")
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 23890
 
