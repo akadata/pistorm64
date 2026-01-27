@@ -1,1 +1,0 @@
-Sprite Index ]" border=0> Sprite and Intuition, 288 color, 546 data definition, 274 display, 543 in animation, 555 in Intuition windows & screens, 288 pairs, 618 reserving, 632 [Back to Amiga Developer Docs ]

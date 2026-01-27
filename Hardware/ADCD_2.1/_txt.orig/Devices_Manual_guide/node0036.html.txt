@@ -1,1 +1,0 @@
-2 / Hardware Control Commands / CMD_FLUSH ]" border=0> CMD_FLUSH aborts (calls AbortIO() ) all CMD_WRITE and all ADCMD_WAITCYCLE s that are queued up for the channel or channels. It does not abort ADCMD_LOCK s (only ADCMD_FREE clears locks). [Back to Amiga Developer Docs ]

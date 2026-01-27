@@ -1,1 +1,0 @@
-App.A EA IFF/ Standard File Structure ]" border=0> File Structure Overview Rules for Reader Programs Single Purpose Files Rules for Writer Programs Scrap Files [Back to Amiga Developer Docs ]

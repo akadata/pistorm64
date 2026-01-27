@@ -1,1 +1,0 @@
-Standard Data and Property Chunks / Instant Music Private SEvents ]" border=0> Sixteen SEvent s are used for private data for the Instant Music program. SID values 144 through 159 are reserved for this purpose. Other programs should skip over these SEvents. [Back to Amiga Developer Docs ]

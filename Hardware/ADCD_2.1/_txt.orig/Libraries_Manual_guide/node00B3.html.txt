@@ -1,1 +1,0 @@
-Tag lists Index ]" border=0> Tag lists copying, 871 creating, 871 filtering, 872 mapping, 874 reading, 873 boolean, 874 random access, 874 sequential, 873 [Back to Amiga Developer Docs ]

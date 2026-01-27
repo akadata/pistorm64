@@ -1,1 +1,0 @@
-Glossary / bitplane animation ]" border=0> A means of animating the display by moving around blocks of playfield data with the blitter. [Back to Amiga Developer Docs ]

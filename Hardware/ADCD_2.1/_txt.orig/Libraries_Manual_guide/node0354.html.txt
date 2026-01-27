@@ -1,1 +1,0 @@
-27 / / The RastPort Structure / Text Attributes ]" border=0> Text attributes and font information are stored in the RastPort fields Font , AlgoStyle , TxFlags , TxHeight , TxWidth , TxBaseline and TxSpacing . These are normally set by calls to the graphics font routines which are covered separately in the chapter on " Graphics Library and Text ". [Back to Amiga Developer Docs ]

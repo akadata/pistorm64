@@ -1,1 +1,0 @@
-Color selection Index ]" border=0> Color selection in high resolution mode, 94 in hold-and-modify mode, 95 in low resolution mode, 93 [Back to Amiga Developer Docs ]

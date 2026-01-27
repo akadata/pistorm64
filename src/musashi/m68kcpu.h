@@ -109,7 +109,7 @@ typedef uint32 uint64;
 
 /* Allow for architectures that don't have 8-bit sizes */
 #if UCHAR_MAX == 0xff
-	#define MAKE_INT_8(A) (sint8)(A)
+	#define MAKE_INT_8(A) (sint8)(int8_t)(A)
 #else
 	#undef  sint8
 	#define sint8  signed   int
@@ -124,7 +124,7 @@ typedef uint32 uint64;
 
 /* Allow for architectures that don't have 16-bit sizes */
 #if USHRT_MAX == 0xffff
-	#define MAKE_INT_16(A) (sint16)(A)
+	#define MAKE_INT_16(A) (sint16)(int16_t)(A)
 #else
 	#undef  sint16
 	#define sint16 signed   int
@@ -1155,7 +1155,7 @@ static inline uint32 m68ki_ic_readimm16(m68ki_cpu_core *state, uint32 address)
 					return m68k_read_immediate_16(state, address);
 				}
 
-				uint32 data = m68ki_read_32(state, address & ~3);
+				uint32 data = m68ki_read_32(state, address & ~3U);
 
 				//printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
 
@@ -1251,7 +1251,7 @@ static inline uint m68ki_read_imm_32(m68ki_cpu_core *state)
 	temp_val = MASK_OUT_ABOVE_32((temp_val << 16) | MASK_OUT_ABOVE_16(CPU_PREF_DATA));
 	REG_PC += 2;
 	CPU_PREF_DATA = m68ki_ic_readimm16(state, REG_PC);
-	CPU_PREF_ADDR = state->mmu_tmp_buserror_occurred ? ((uint32)~0) : REG_PC;
+	CPU_PREF_ADDR = state->mmu_tmp_buserror_occurred ? ((uint32)~0U) : REG_PC;
 
 	return temp_val;
 #else
@@ -2262,7 +2262,7 @@ static inline void m68ki_exception_trace(m68ki_cpu_core *state)
 	m68ki_jump_vector(state, EXCEPTION_TRACE);
 
 	/* Trace nullifies a STOP instruction */
-	CPU_STOPPED &= ~STOP_LEVEL_STOP;
+	CPU_STOPPED &= (uint)(~(int)STOP_LEVEL_STOP);
 
 	/* Use up some clock cycles */
 	USE_CYCLES(CYC_EXCEPTION[EXCEPTION_TRACE]);
@@ -2467,7 +2467,7 @@ static inline void m68ki_exception_interrupt(m68ki_cpu_core *state, uint int_lev
 	#endif /* M68K_EMULATE_ADDRESS_ERROR */
 
 	/* Turn off the stopped state */
-	CPU_STOPPED &= ~STOP_LEVEL_STOP;
+	CPU_STOPPED &= (uint)(~(int)STOP_LEVEL_STOP);
 
 	/* If we are halted, don't do anything */
 	if(CPU_STOPPED)

@@ -1,1 +1,0 @@
-2.0 IncludeXREF: Q ]" border=0> QUME_LP_20 #define 0x0A = 0x0000000a intuition/preferences.h : *202 Qualifier unsigned short int in struct IntuiMessage +0x001a intuition/intuition.h : *690 Quantum unsigned short int in struct ExecBase +0x0120 exec/execbase.h : *67 QueryHeader structure tag size 0x0010 graphics/displayinfo.h : *42, 52, 94, 111, 134 [Back to Amiga Developer Docs ]

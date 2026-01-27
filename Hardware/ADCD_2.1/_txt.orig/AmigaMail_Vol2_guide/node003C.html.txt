@@ -1,1 +1,0 @@
-diskfont.library (basename: _DiskfontBase) ]" border=0> NewScaledDiskFont(sourceFont,destTextAttr)(a0/a1) - Create a DiskFont scaled from another. (V36) [Back to Amiga Developer Docs ]

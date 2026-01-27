@@ -1,1 +1,0 @@
-disk.resource (basename: _DiskBase) ]" border=0> ReadUnitID(unitNum)(d0) - Reread and return the type of drive (V37) [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-Video Index ]" border=0> Video analog RGB, 260 beam position, 3 , 23 camera input, 7 composite, 260 digital RGB, 260 external sources, 89 interrupt, 3 laser disk input, 7 monitors, 7 monochrome, 260 output, 260 priority, 4 RF modulator, 260 RGB, 49 , 63 , 64 synchronization, 3 VCR input, 7 video slot, 260 [Back to Amiga Developer Docs ]

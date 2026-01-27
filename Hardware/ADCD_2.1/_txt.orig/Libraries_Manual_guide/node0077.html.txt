@@ -1,1 +1,0 @@
-Layer Structure Index ]" border=0> Layer Structure, 214 , 284 , 704 bounds, 704 DamageList, 711 , 719 Flags, 705 RastPort, 204 [Back to Amiga Developer Docs ]

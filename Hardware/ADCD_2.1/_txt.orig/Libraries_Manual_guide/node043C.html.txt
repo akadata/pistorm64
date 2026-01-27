@@ -1,1 +1,0 @@
-33 / Parsing / Other Parsing Modes ]" border=0> In addition to the mode IFFPARSE_SCAN , there are the modes IFFPARSE_STEP and IFFPARSE_RAWSTEP. IFFPARSE_RAWSTEP IFFPARSE_STEP [Back to Amiga Developer Docs ]

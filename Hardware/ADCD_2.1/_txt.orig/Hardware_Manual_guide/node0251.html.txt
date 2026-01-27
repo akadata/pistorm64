@@ -1,1 +1,0 @@
-BPLCON0 Index ]" border=0> BPLCON0, 87 , 229 , 298 , 300 enabling color, 63 in dual-playfield mode, 72 in hold-and-modify mode, 87 in interlacing, 51 in resolution mode, 49 in the Enhanced Chip Set, 300 selecting bitplanes, 48 setting bits, 48 with light pen, 239 [Back to Amiga Developer Docs ]

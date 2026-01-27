@@ -1,1 +1,0 @@
-lib_startup/AWstartup.i ]" border=0> AWSTARTUP SET 1 [Back to Amiga Developer Docs ]

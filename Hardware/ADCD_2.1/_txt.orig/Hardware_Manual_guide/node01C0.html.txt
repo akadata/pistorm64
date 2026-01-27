@@ -1,1 +1,0 @@
-Glossary / beam counters ]" border=0> Registers that keep track of the position of the video beam. [Back to Amiga Developer Docs ]

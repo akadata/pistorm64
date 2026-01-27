@@ -1,1 +1,0 @@
-B / strgclass / Attributes: STRINGA_EditModes (IS) ]" border=0> Value taken from flags defined in cghooks.h > for initial editing modes. [Back to Amiga Developer Docs ]

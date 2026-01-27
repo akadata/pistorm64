@@ -1,1 +1,0 @@
-Numbers Index ]" border=0> $00C00000, 5 60 Pin Edge Connector, 321 68000, --> 68010, 1 68020, 1 , 187 68030, 1 680x0, --> 8361, 5 8370, 5 8371, 5 8372A, 5 8520, --> 86 Pin Edge Connector, 322 [Back to Amiga Developer Docs ]

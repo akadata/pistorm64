@@ -1,1 +1,0 @@
-Pointer Index ]" border=0> Pointer, 272 active window, 79 ClearPointer(), 274 color, 274 custom, 273 data definition, 274 default, 114 hot spot, 266 , 274 keyboard control, 280 position, 114 , 272 resolution, 272 set, 114 , 273 SetPointer(), 273 , 274 [Back to Amiga Developer Docs ]

@@ -1,1 +1,0 @@
-5 / Gadget Highlighting / Highlighting by Drawing a Box ]" border=0> To highlight by drawing a simple border around the gadget's select box, set the GFLG_GADGHBOX bit in the Flags field. [Back to Amiga Developer Docs ]

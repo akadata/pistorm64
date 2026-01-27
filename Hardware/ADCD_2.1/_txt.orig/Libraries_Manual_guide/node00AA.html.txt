@@ -1,1 +1,0 @@
-Signals Index ]" border=0> Signals, 432 allocation, 482 coordination, 481 exception, 473 IDCMP, 250 on arrival of messages, 500 waiting for, 482 waiting for messages and signals, 435 [Back to Amiga Developer Docs ]
