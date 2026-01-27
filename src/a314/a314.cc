@@ -492,8 +492,9 @@ static void handle_msg_write_mem_req(ClientConnection *cc) {
 
 static LogicalChannel *get_associated_channel_by_stream_id(ClientConnection *cc, uint32_t stream_id) {
     for (auto ch : cc->associations) {
-        if (ch->stream_id == stream_id)
+        if (ch->stream_id == stream_id) {
             return ch;
+        }
     }
     return nullptr;
 }
@@ -595,9 +596,9 @@ static void close_and_remove_connection(ClientConnection *cc) {
     {
         auto it = services.begin();
         while (it != services.end()) {
-            if (it->cc == cc`
+            if (it->cc == cc)  {
                 it = services.erase(it);
-            } else {
+            }            else {
                 it++;
             }
         }
@@ -605,8 +606,7 @@ static void close_and_remove_connection(ClientConnection *cc) {
 
     {
         auto it = cc->associations.begin();
-        while (it != cc->associations.end())
-        {
+        while (it != cc->associations.end()) {
             auto ch = *it;
 
             clear_packet_queue(ch);
@@ -643,16 +643,18 @@ static void clear_packet_queue(LogicalChannel *ch) {
 }
 
 static void create_and_enqueue_packet(LogicalChannel *ch, uint8_t type, const uint8_t *data, size_t length) {
-    if (ch->packet_queue.empty())
+    if (ch->packet_queue.empty()) {
         send_queue.push_back(ch);
+    }
 
     ch->packet_queue.emplace_back();
 
     PacketBuffer &pb = ch->packet_queue.back();
     pb.type = type;
     pb.data.resize(length);
-    if (data && length)
+    if (data && length) {
         memcpy(&pb.data[0], data, length);
+    }
 }
 
 static void handle_pkt_connect(int channel_id, uint8_t *data, size_t plen) {
@@ -810,8 +812,9 @@ static void handle_pkt_eos(int channel_id) {
 
                 create_and_send_msg(ch.association, MSG_EOS, ch.stream_id, nullptr, 0);
 
-                if (ch.got_eos_from_client)
+                if (ch.got_eos_from_client) {
                     remove_association(&ch);
+                }
             }
             break;
         }
