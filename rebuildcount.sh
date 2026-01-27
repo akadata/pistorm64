@@ -89,4 +89,3 @@ echo
 echo "---- diagnostics (bottom-up, filter: $arg) ----"
 tac "$OUT" | rg -n --fixed-strings "$arg" | sed -n '1,200p' || true
 fi
-
