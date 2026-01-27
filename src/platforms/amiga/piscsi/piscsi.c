@@ -165,6 +165,8 @@ next_partition:;
         return;
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
     /*
      * Cast alignment warning intentionally suppressed:
      * PiSCSI interprets Amiga-side structures that arrive as byte streams.
@@ -172,6 +174,7 @@ next_partition:;
      * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
      */
     struct PartitionBlock *pb = (struct PartitionBlock *)((char *)block);
+#pragma GCC diagnostic pop
     tmp = pb->pb_DriveName[0];
     pb->pb_DriveName[tmp + 1] = 0x00;
     printf("[PISCSI] Partition %d: %s (%d)\n", cur_partition, pb->pb_DriveName + 1, pb->pb_DriveName[0]);
@@ -225,6 +228,8 @@ static int piscsi_parse_rdb(struct piscsi_dev *d) {
     }
     goto no_rdb_found;
 rdb_found:;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
     /*
      * Cast alignment warning intentionally suppressed:
      * PiSCSI interprets Amiga-side structures that arrive as byte streams.
@@ -232,6 +237,7 @@ rdb_found:;
      * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
      */
     struct RigidDiskBlock *rdb = (struct RigidDiskBlock *)((char *)block);
+#pragma GCC diagnostic pop
     DEBUG("[PISCSI] RDB found at block %d.\n", i);
     d->c = be32toh(rdb->rdb_Cylinders);
     d->h = (uint16_t)be32toh(rdb->rdb_Heads);
@@ -298,6 +304,8 @@ void piscsi_find_filesystems(struct piscsi_dev *d) {
 
     lseek64(d->fd, d->fshd_offs, SEEK_SET);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
     /*
      * Cast alignment warning intentionally suppressed:
      * PiSCSI interprets Amiga-side structures that arrive as byte streams.
@@ -305,6 +313,7 @@ void piscsi_find_filesystems(struct piscsi_dev *d) {
      * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
      */
     struct FileSysHeaderBlock *fhb = (struct FileSysHeaderBlock *)((char *)fhb_block);
+#pragma GCC diagnostic pop
     read(d->fd, fhb_block, d->block_size);
 
     while (BE(fhb->fhb_ID) == FS_IDENTIFIER) {
@@ -363,6 +372,8 @@ skip_fs_load_lseg:;
         fs_found++;
         lseek64(d->fd, BE(fhb->fhb_Next) * d->block_size, SEEK_SET);
         fhb_block = malloc(d->block_size);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
         /*
          * Cast alignment warning intentionally suppressed:
          * PiSCSI interprets Amiga-side structures that arrive as byte streams.
@@ -370,6 +381,7 @@ skip_fs_load_lseg:;
          * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
          */
         fhb = (struct FileSysHeaderBlock *)((char *)fhb_block);
+#pragma GCC diagnostic pop
         read(d->fd, fhb_block, d->block_size);
     }
 
@@ -943,6 +955,8 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             uint32_t nodesize = (be32toh(devs[i].pb[j]->pb_Environment[0]) + 1) * 4;
                             memcpy(dst_data + p_offs, devs[i].pb[j]->pb_Environment, nodesize);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
                             /*
                              * Cast alignment warning intentionally suppressed:
                              * PiSCSI interprets Amiga-side structures that arrive as byte streams.
@@ -950,6 +964,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                              * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
                              */
                             struct pihd_dosnode_data *dat = (struct pihd_dosnode_data *)((char *)(&dst_data[addr2+0x20]));
+#pragma GCC diagnostic pop
 
                             if (BE(devs[i].pb[j]->pb_Flags) & 0x01) {
                                 DEBUG("Partition is bootable.\n");
@@ -1008,6 +1023,8 @@ skip_disk:;
             int32_t setfsh_r = get_mapped_item_by_address(cfg, val);
             if (setfsh_r != -1) {
                 uint32_t addr = (uint32_t)(val - cfg->map_offset[setfsh_r]);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
                 /*
                  * Cast alignment warning intentionally suppressed:
                  * PiSCSI interprets Amiga-side structures that arrive as byte streams.
@@ -1015,6 +1032,7 @@ skip_disk:;
                  * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
                  */
                 struct DeviceNode *node = (struct DeviceNode *)((char *)(cfg->map_data[setfsh_r] + addr));
+#pragma GCC diagnostic pop
                 char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
 
                 DEBUG("[PISCSI] Partition DOSType is %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
