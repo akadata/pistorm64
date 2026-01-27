@@ -47,7 +47,7 @@
  *----------------------------------------------------------------------------*/
 
 static int32_t floatx80_make_compact(int32_t aExp, uint64_t aSig) {
-  return (aExp << 16) | (aSig >> 48);
+  return ((int32_t)aExp << 16) | (int32_t)(aSig >> 48);
 }
 
 /*----------------------------------------------------------------------------
@@ -510,7 +510,7 @@ floatx80 floatx80_cos(floatx80 a, float_status* status) {
         floatx80_sub(fp0, float32_to_floatx80(pi_tbl2[j], status), status); // FP0 IS R = (X-Y1)-Y2
 
   sincont:
-    if ((n + adjn) & 1) {
+    if ((flag)((n + adjn) & 1)) {
       // COSPOLY
       fp0 = floatx80_mul(fp0, fp0, status);                         // FP0 IS S
       fp1 = floatx80_mul(fp0, fp0, status);                         // FP1 IS T
@@ -521,7 +521,7 @@ floatx80 floatx80_cos(floatx80 a, float_status* status) {
       xExp = extractFloatx80Exp(fp0);
       xSig = extractFloatx80Frac(fp0);
 
-      if (((n + adjn) >> 1) & 1) {
+      if (((n + adjn) >> 1) & 1 ? 1 : 0) {
         xSign ^= 1;
         posneg1 = 0xBF800000; // -1
       } else {
@@ -566,7 +566,7 @@ floatx80 floatx80_cos(floatx80 a, float_status* status) {
       xExp = extractFloatx80Exp(fp0);
       xSig = extractFloatx80Frac(fp0);
 
-      xSign ^= ((n + adjn) >> 1) & 1; // X IS NOW R'= SGN*R
+      xSign ^= ((n + adjn) >> 1) & 1 ? 1 : 0; // X IS NOW R'= SGN*R
 
       fp0 = floatx80_mul(fp0, fp0, status);                         // FP0 IS S
       fp1 = floatx80_mul(fp0, fp0, status);                         // FP1 IS T
@@ -1530,7 +1530,7 @@ floatx80 floatx80_sin(floatx80 a, float_status* status) {
         floatx80_sub(fp0, float32_to_floatx80(pi_tbl2[j], status), status); // FP0 IS R = (X-Y1)-Y2
 
   sincont:
-    if ((n + adjn) & 1) {
+    if ((flag)((n + adjn) & 1)) {
       // COSPOLY
       fp0 = floatx80_mul(fp0, fp0, status);                         // FP0 IS S
       fp1 = floatx80_mul(fp0, fp0, status);                         // FP1 IS T
@@ -1541,7 +1541,7 @@ floatx80 floatx80_sin(floatx80 a, float_status* status) {
       xExp = extractFloatx80Exp(fp0);
       xSig = extractFloatx80Frac(fp0);
 
-      if (((n + adjn) >> 1) & 1) {
+      if (((n + adjn) >> 1) & 1 ? 1 : 0) {
         xSign ^= 1;
         posneg1 = 0xBF800000; // -1
       } else {
@@ -1586,7 +1586,7 @@ floatx80 floatx80_sin(floatx80 a, float_status* status) {
       xExp = extractFloatx80Exp(fp0);
       xSig = extractFloatx80Frac(fp0);
 
-      xSign ^= ((n + adjn) >> 1) & 1; // X IS NOW R'= SGN*R
+      xSign ^= ((n + adjn) >> 1) & 1 ? 1 : 0; // X IS NOW R'= SGN*R
 
       fp0 = floatx80_mul(fp0, fp0, status);                         // FP0 IS S
       fp1 = floatx80_mul(fp0, fp0, status);                         // FP1 IS T

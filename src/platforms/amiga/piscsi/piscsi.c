@@ -20,7 +20,7 @@
 #define BE16(val) be16toh(val)
 
 // Debug output is controlled at runtime via --log-level debug.
-#define PISCSI_DEBUG
+//#define PISCSI_DEBUG
 
 #ifdef PISCSI_DEBUG
 #define DEBUG LOG_DEBUG
