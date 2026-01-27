@@ -22,7 +22,7 @@ CAP_PID=$!
 amiga 'echo "CAPTURE_ARM '"$OUT_TAG"' $(date +%s.%N)" | nc 172.16.0.2 9009' || true
 
 # 4) start emulator (replace with your known command)
-amiga 'echo "EMU_START '"$OUT_TAG"' $(date +%s.%N)" | nc 172.16.0.2 9009; cd /home/smalley/pistorm && timeout 60s sudo ./emulator; echo "EMU_STOP '"$OUT_TAG"' $(date +%s.%N)" | nc 172.16.0.2 9009' || true
+amiga 'echo "EMU_START '"$OUT_TAG"' $(date +%s.%N)" | nc 172.16.0.2 9009; cd "$HOME/pistorm" && timeout 60s sudo ./emulator; echo "EMU_STOP '"$OUT_TAG"' $(date +%s.%N)" | nc 172.16.0.2 9009' || true
 
 wait "$CAP_PID" || true
 kill "$LISTEN_PID" 2>/dev/null || true

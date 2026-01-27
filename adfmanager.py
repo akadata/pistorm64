@@ -8,7 +8,7 @@ Features:
 - No external Python deps; uses stdlib only.
 
 Defaults:
-- ADF_DIR=/home/smalley/Amiga/adf
+- ADF_DIR=~/Amiga/adf
 - HOST=127.0.0.1
 - PORT=23890
 """
@@ -28,16 +28,16 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-DEFAULT_ADF_DIR = "/home/smalley/Amiga/adf"
+DEFAULT_ADF_DIR = os.path.join(os.path.expanduser("~"), "Amiga", "adf")
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 23890
-DEFAULT_CFG_PATH = "/home/smalley/pistorm64/default.cfg"
-DEFAULT_CFG_DIR = "/home/smalley/pistorm64"
-DEFAULT_KICK_DIR = "/home/smalley/Amiga/kick"
-DEFAULT_HDF_DIR = "/home/smalley/Amiga/hdf"
-DEFAULT_CSS_PATH = "/home/smalley/pistorm/web/adf.css"
+DEFAULT_CFG_PATH = os.path.join(os.path.expanduser("~"), "pistorm64", "default.cfg")
+DEFAULT_CFG_DIR = os.path.expanduser("~")
+DEFAULT_KICK_DIR = os.path.join(os.path.expanduser("~"), "Amiga", "kick")
+DEFAULT_HDF_DIR = os.path.join(os.path.expanduser("~"), "Amiga", "hdf")
+DEFAULT_CSS_PATH = os.path.join(os.path.expanduser("~"), "pistorm", "web", "adf.css")
 DEFAULT_XDFTOOL = "/usr/local/bin/xdftool"
-DEFAULT_A314_CONF = "/home/smalley/pistorm64/src/a314/files_pi/a314d.conf"
+DEFAULT_A314_CONF = os.path.join(os.path.expanduser("~"), "pistorm64", "src", "a314", "files_pi", "a314d.conf")
 
 
 def send_cmd(host: str, port: int, cmd: str, timeout: float = 2.0) -> str:

@@ -8,7 +8,7 @@ sudo pkill -f emulator 2>/dev/null || true
 sleep 3
 
 # Start emulator in background
-sudo timeout 120 /home/smalley/pistorm/emulator > /tmp/coordinated_emu.log 2>&1 &
+sudo timeout 120 "$HOME/pistorm/emulator" > /tmp/coordinated_emu.log 2>&1 &
 EMU_PID=$!
 
 echo "Emulator started with PID: $EMU_PID"
@@ -26,7 +26,7 @@ if kill -0 $EMU_PID 2>/dev/null; then
     
     # Try to dump track 0
     echo "Dumping track 0..."
-    if sudo timeout 30 /home/smalley/pistorm/build/dumpdisk --out /tmp/disk_tracks/track_00.raw --drive 0 --tracks 1 --sides 1; then
+    if sudo timeout 30 "$HOME/pistorm/build/dumpdisk" --out /tmp/disk_tracks/track_00.raw --drive 0 --tracks 1 --sides 1; then
         echo "Successfully dumped track 0"
         ls -la /tmp/disk_tracks/track_00.raw
     else

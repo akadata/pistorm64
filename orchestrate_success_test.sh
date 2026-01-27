@@ -22,10 +22,10 @@ sleep 2  # Give capture time to start
 amiga 'echo "CAPTURE_ARM '"$OUT_TAG"' $(date +%s.%N)" | nc 172.16.0.2 9009' || true
 
 # 4) ensure emulator is running
-amiga 'sudo pkill -f emulator 2>/dev/null || true; sleep 2; timeout 10s sudo /home/smalley/pistorm/emulator &'
+amiga 'sudo pkill -f emulator 2>/dev/null || true; sleep 2; timeout 10s sudo "$HOME/pistorm/emulator" &'
 
 # 5) run dumpdisk test with markers
-amiga 'echo "START_DUMPDISK '"$OUT_TAG"' $(date +%s.%N)" | nc 172.16.0.2 9009; timeout 25s sudo /home/smalley/pistorm/build/dumpdisk --out /tmp/dump_success.raw --drive 0 --tracks 1 --sides 1; echo "END_DUMPDISK '"$OUT_TAG"' $(date +%s.%N)" | nc 172.16.0.2 9009' || true
+amiga 'echo "START_DUMPDISK '"$OUT_TAG"' $(date +%s.%N)" | nc 172.16.0.2 9009; timeout 25s sudo "$HOME/pistorm/build/dumpdisk" --out /tmp/dump_success.raw --drive 0 --tracks 1 --sides 1; echo "END_DUMPDISK '"$OUT_TAG"' $(date +%s.%N)" | nc 172.16.0.2 9009' || true
 
 # Wait for capture to complete
 sleep 5
