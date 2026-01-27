@@ -46,6 +46,8 @@
 
 
 #include "m68kops.h"
+#include "emulator_fc.h"
+
 
 #define KEY_POLL_INTERVAL_MSEC 1000
 
