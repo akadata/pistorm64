@@ -21,10 +21,17 @@ logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(linen
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-import os
+PISTORM_ROOT = os.environ["PISTORM_ROOT"]
+A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
+A314_SHARED = os.environ.get("A314_SHARED", os.path.join(PISTORM_ROOT, "data", "a314-shared"))
 
-FS_CFG_FILE = '/opt/pistorm64/src/a314/files_pi/a314fs.conf'
-PICMD_CFG_FILE = '/opt/pistorm64/src/a314/files_pi/picmd.conf'
+def _expand_vars(value):
+    if isinstance(value, str):
+        return os.path.expandvars(value)
+    return value
+
+FS_CFG_FILE = os.environ.get("A314_FS_CONF", os.path.join(A314_ROOT, "a314fs.conf"))
+PICMD_CFG_FILE = os.path.join(A314_ROOT, "picmd.conf")
 
 volume_paths = {}
 search_path = ''
@@ -36,7 +43,7 @@ def load_cfg():
         cfg = json.load(f)
         devs = cfg['devices']
         for _, dev in devs.items():
-            volume_paths[dev['volume']] = dev['path']
+            volume_paths[dev['volume']] = _expand_vars(dev['path'])
 
     global search_path
     search_path = os.getenv('PATH')

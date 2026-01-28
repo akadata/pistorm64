@@ -107,3 +107,14 @@ See the `keyboard` command above for descriptions of the `grab` and `autoconnect
 SYNTAX: `setvar VARIABLE_NAME {argument 1} {argument 2} ...`  
 Example: `setvar swap-df0-df 1`  
 Last but not least is the `setvar` command. This allows setting variables specific to the `platform` to enable/disable certain optional functionality, such as the RTG on the Amiga. More information about platform-specific `setvar` options can (hopefully) be found in the `platforms/[system_name]` directories on the GitHub repo.
+
+## Amiga path variables (optional)
+
+These help launch A314 services without systemd by defining install locations in the `.cfg` file. Use them **before** `setvar a314`:
+
+- `setvar pistorm_root /opt/pistorm64`
+- `setvar pistorm_a314 /opt/pistorm64/a314`
+- `setvar pistorm_data /opt/pistorm64/data`
+- `setvar a314_shared /opt/pistorm64/data/a314-shared`
+- `setvar a314_conf /opt/pistorm64/a314/a314d.conf`
+- `setvar a314_fs_conf /opt/pistorm64/a314/a314fs.conf`

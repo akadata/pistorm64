@@ -21,6 +21,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -41,9 +42,6 @@
 #include "config_file/config_file.h"
 
 extern "C" emulator_config *cfg;
-
-
-const char* root = getenv("PISTORM_ROOT");
 
 #define LOGGER_TRACE    1
 #define LOGGER_DEBUG    2
@@ -222,13 +220,121 @@ struct OnDemandStart {
 
 std::vector<OnDemandStart> on_demand_services;
 
-std::string pistorm_root = root ? root : ".";
+static std::string pistorm_root;
+static std::string a314_root;
+static std::string a314_config_file;
+static std::string home_env;
+static bool a314_paths_initialized = false;
 
-std::string a314_config_file =
-    pistorm_root + "/a314/files_pi/a314d.conf";
+static bool path_exists(const std::string &path) {
+    struct stat st;
+    return stat(path.c_str(), &st) == 0;
+}
 
-std::string home_env =
-    "HOME=" + pistorm_root;
+static std::string expand_env_vars(const std::string &input) {
+    std::string out;
+    out.reserve(input.size());
+
+    for (size_t i = 0; i < input.size(); ++i) {
+        if (input[i] != '$') {
+            out.push_back(input[i]);
+            continue;
+        }
+
+        size_t start = i + 1;
+        std::string var;
+        if (start < input.size() && input[start] == '{') {
+            size_t end = input.find('}', start + 1);
+            if (end == std::string::npos) {
+                out.push_back(input[i]);
+                continue;
+            }
+            var = input.substr(start + 1, end - start - 1);
+            i = end;
+        } else {
+            size_t end = start;
+            while (end < input.size() && (isalnum(input[end]) || input[end] == '_')) {
+                end++;
+            }
+            if (end == start) {
+                out.push_back(input[i]);
+                continue;
+            }
+            var = input.substr(start, end - start);
+            i = end - 1;
+        }
+
+        const char *val = getenv(var.c_str());
+        if (val) {
+            out.append(val);
+        }
+    }
+
+    return out;
+}
+
+static void ensure_env_var(const char *key, const std::string &value) {
+    if (getenv(key) == nullptr) {
+        setenv(key, value.c_str(), 1);
+    }
+}
+
+static void init_a314_paths() {
+    if (a314_paths_initialized) {
+        return;
+    }
+
+    const char *root_env = getenv("PISTORM_ROOT");
+    if (root_env && *root_env) {
+        pistorm_root = root_env;
+    } else {
+        char cwd_buf[PATH_MAX];
+        if (getcwd(cwd_buf, sizeof(cwd_buf))) {
+            pistorm_root = cwd_buf;
+        } else {
+            pistorm_root = ".";
+        }
+    }
+
+    const char *a314_env = getenv("PISTORM_A314");
+    if (a314_env && *a314_env) {
+        a314_root = a314_env;
+    } else {
+        a314_root = pistorm_root + "/a314";
+        if (!path_exists(a314_root)) {
+            std::string dev_root = pistorm_root + "/src/a314/files_pi";
+            if (path_exists(dev_root)) {
+                a314_root = dev_root;
+            }
+        }
+    }
+
+    const char *data_env = getenv("PISTORM_DATA");
+    std::string pistorm_data = data_env && *data_env ? data_env : pistorm_root + "/data";
+
+    const char *shared_env = getenv("A314_SHARED");
+    std::string a314_shared = shared_env && *shared_env ? shared_env : pistorm_data + "/a314-shared";
+
+    ensure_env_var("PISTORM_ROOT", pistorm_root);
+    ensure_env_var("PISTORM_A314", a314_root);
+    ensure_env_var("PISTORM_DATA", pistorm_data);
+    ensure_env_var("A314_SHARED", a314_shared);
+
+    if (a314_config_file.empty()) {
+        const char *conf_env = getenv("A314_CONF");
+        if (conf_env && *conf_env) {
+            a314_config_file = expand_env_vars(conf_env);
+        } else {
+            a314_config_file = a314_root + "/a314d.conf";
+        }
+    }
+
+    ensure_env_var("A314_CONF", a314_config_file);
+    ensure_env_var("A314_FS_CONF", a314_root + "/a314fs.conf");
+
+    home_env = "HOME=" + pistorm_root;
+    a314_paths_initialized = true;
+}
     
 static void load_config_file(const char *filename) {
     FILE *f = fopen(filename, "rt");
@@ -273,9 +379,9 @@ static void load_config_file(const char *filename) {
             on_demand_services.emplace_back();
             auto &e = on_demand_services.back();
             e.service_name = parts[0];
-            e.program = parts[1];
+            e.program = expand_env_vars(parts[1]);
             for (size_t i = 1; i < parts.size(); i++) {
-                e.arguments.push_back(std::string(parts[i]));
+                e.arguments.push_back(expand_env_vars(parts[i]));
             }
         } else if (parts.size() != 0) {
             logger_warn("Invalid number of columns in configuration file line: %s\n", org_line);
@@ -1299,6 +1405,7 @@ static void write_r_events(uint8_t events) {
 }
 
 int a314_init() {
+    init_a314_paths();
     load_config_file(a314_config_file.c_str());
 
     int err = init_driver();
@@ -1402,6 +1509,9 @@ void a314_write_memory_32(unsigned int address, unsigned int value) {
 }
 
 void a314_set_config_file(const char *filename) {
-    printf ("[A314] Set A314 config filename to %s.\n", filename);
-    a314_config_file = std::string(filename);
+    init_a314_paths();
+    std::string expanded = expand_env_vars(filename ? filename : "");
+    printf ("[A314] Set A314 config filename to %s.\n", expanded.c_str());
+    a314_config_file = expanded;
+    setenv("A314_CONF", a314_config_file.c_str(), 1);
 }

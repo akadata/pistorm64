@@ -14,6 +14,9 @@ import sys
 import importlib.util
 import importlib.util
 
+PISTORM_ROOT = os.environ["PISTORM_ROOT"]
+A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
+
 MSG_REGISTER_REQ		= 1
 MSG_REGISTER_RES		= 2
 MSG_DEREGISTER_REQ		= 3
@@ -201,7 +204,7 @@ else:
         if mod and hasattr(mod, 'set_palette') and hasattr(mod, 'encode'):
             return mod
 
-        base_dir = os.path.join(os.path.dirname(__file__), 'bpls2gif')
+        base_dir = os.path.join(A314_ROOT, 'bpls2gif')
         if os.path.isdir(base_dir):
             for name in os.listdir(base_dir):
                 if name.startswith('bpls2gif') and name.endswith(('.so', '.pyd')):
