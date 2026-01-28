@@ -1246,7 +1246,7 @@ static inline void ps_write(uint8_t type, uint32_t addr, uint32_t val) {
   return;
 }
 
-// TEST FC 
+// TEST FC - this is only a test it is also an invalid test at the moment 
 uint8_t cpu_read_byte(uint32_t addr) {
     if (current_fc != 0) {
         // TEMP instrumentation
