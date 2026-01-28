@@ -17,20 +17,29 @@ logging.basicConfig(format = '%(levelname)s, %(asctime)s, %(name)s, line %(linen
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+PISTORM_ROOT = os.environ["PISTORM_ROOT"]
+A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
+A314_SHARED = os.environ.get("A314_SHARED", os.path.join(PISTORM_ROOT, "data", "a314-shared"))
+
+def _expand_vars(value):
+    if isinstance(value, str):
+        return os.path.expandvars(value)
+    return value
+
 try:
     idx = sys.argv.index('-conf-file')
     CONFIG_FILE_PATH = sys.argv[idx + 1]
 except (ValueError, IndexError):
-    CONFIG_FILE_PATH = os.path.join(os.path.dirname(__file__), 'a314fs.conf')
+    CONFIG_FILE_PATH = os.environ.get("A314_FS_CONF", os.path.join(A314_ROOT, "a314fs.conf"))
 
-SHARED_DIRECTORY = '/opt/pistorm64/data/a314-shared'
+SHARED_DIRECTORY = A314_SHARED
 METAFILE_EXTENSION = ':a314'
 
 with open(CONFIG_FILE_PATH, encoding='utf-8') as f:
     cfg = json.load(f)
     devs = cfg['devices']
     dev = devs['PI0']
-    SHARED_DIRECTORY = dev['path']
+    SHARED_DIRECTORY = _expand_vars(dev.get('path', SHARED_DIRECTORY))
 
 MSG_REGISTER_REQ        = 1
 MSG_REGISTER_RES        = 2

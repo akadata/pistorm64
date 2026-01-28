@@ -8,18 +8,22 @@ Restart=always
 RestartSec=1
 User=smalley
 #LimitCORE=0
-ExecStart=%h/pistorm64/emulator
-WorkingDirectory=%h/pistorm64
+ExecStart=${PISTORM_ROOT}/emulator
+WorkingDirectory=${PISTORM_ROOT}
 Nice=-10
 IOSchedulingClass=1
 IOSchedulingPriority=2
 CPUAffinity=1-3
 OOMScoreAdjust=-1000
 Environment=PISTORM_ROOT=/opt/pistorm64
+Environment=PISTORM_A314=/opt/pistorm64/a314
+Environment=PISTORM_DATA=/opt/pistorm64/data
+Environment=A314_SHARED=/opt/pistorm64/data/a314-shared
+Environment=A314_CONF=/opt/pistorm64/a314/a314d.conf
+Environment=A314_FS_CONF=/opt/pistorm64/a314/a314fs.conf
 Environment=RAYLIB_DRM_DEVICE=/dev/dri/card0
 Environment=RAYLIB_DRM_CONNECTOR=HDMI-A-1
 
 
 [Install]
 WantedBy=multi-user.target
-

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include "log.h"
 #include "amiga-autoconf.h"
 #include "amiga-registers.h"
@@ -480,11 +481,67 @@ more_z3_fast:;
 
 #define CHKVAR(a) (strcmp(var, a) == 0)
 
+static void set_env_if_value(const char *key, const char *val) {
+  if (!val || strlen(val) == 0) {
+    return;
+  }
+  setenv(key, val, 1);
+}
+
+static void set_env_if_unset(const char *key, const char *val) {
+  if (!val || strlen(val) == 0) {
+    return;
+  }
+  if (getenv(key) == NULL) {
+    setenv(key, val, 1);
+  }
+}
+
 void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val) {
   if (!var) {
     return;
   }
 
+  if CHKVAR ("pistorm_root") {
+    set_env_if_value("PISTORM_ROOT", val);
+    if (val && strlen(val) != 0) {
+      char path_buf[PATH_MAX];
+      snprintf(path_buf, sizeof(path_buf), "%s/a314", val);
+      set_env_if_unset("PISTORM_A314", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/data", val);
+      set_env_if_unset("PISTORM_DATA", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/data/a314-shared", val);
+      set_env_if_unset("A314_SHARED", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/a314/a314d.conf", val);
+      set_env_if_unset("A314_CONF", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/a314/a314fs.conf", val);
+      set_env_if_unset("A314_FS_CONF", path_buf);
+    }
+  }
+  if CHKVAR ("pistorm_a314") {
+    set_env_if_value("PISTORM_A314", val);
+    if (val && strlen(val) != 0) {
+      char path_buf[PATH_MAX];
+      snprintf(path_buf, sizeof(path_buf), "%s/a314d.conf", val);
+      set_env_if_unset("A314_CONF", path_buf);
+      snprintf(path_buf, sizeof(path_buf), "%s/a314fs.conf", val);
+      set_env_if_unset("A314_FS_CONF", path_buf);
+    }
+  }
+  if CHKVAR ("pistorm_data") {
+    set_env_if_value("PISTORM_DATA", val);
+    if (val && strlen(val) != 0) {
+      char path_buf[PATH_MAX];
+      snprintf(path_buf, sizeof(path_buf), "%s/a314-shared", val);
+      set_env_if_unset("A314_SHARED", path_buf);
+    }
+  }
+  if CHKVAR ("a314_shared") {
+    set_env_if_value("A314_SHARED", val);
+  }
+  if CHKVAR ("a314_fs_conf") {
+    set_env_if_value("A314_FS_CONF", val);
+  }
   if CHKVAR ("enable_rtc_emulation") {
     unsigned int rtc_enabled = 0;
     if (!val || strlen(val) == 0) {
@@ -769,4 +826,3 @@ void create_platform_amiga(struct platform_config* cfg, const char* subsys) {
     }
   }
 }
-

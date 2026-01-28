@@ -36,7 +36,16 @@ OP_RES_WRITE_PROTECTED = 2
 
 NUM_DRIVES = 4
 
-DEFAULT_CONF_FILE = os.path.join(os.path.dirname(__file__), 'disk.conf')
+PISTORM_ROOT = os.environ["PISTORM_ROOT"]
+A314_ROOT = os.environ.get("PISTORM_A314", os.path.join(PISTORM_ROOT, "a314"))
+PISTORM_DATA = os.environ.get("PISTORM_DATA", os.path.join(PISTORM_ROOT, "data"))
+
+def _expand_vars(value):
+    if isinstance(value, str):
+        return os.path.expandvars(value)
+    return value
+
+DEFAULT_CONF_FILE = os.path.join(A314_ROOT, 'disk.conf')
 try:
     idx = sys.argv.index('-conf-file')
     CONF_FILE = sys.argv[idx + 1]
@@ -109,7 +118,7 @@ class DiskService(object):
 
         for e in j.get('auto-insert', []):
             unit: int = e['unit']
-            filename: str = e['filename']
+            filename: str = _expand_vars(e['filename'])
             rw: bool = e.get('rw', False)
             self.auto_insert[unit] = (filename, rw)
 
