@@ -95,7 +95,10 @@ static const char* rtg_format_names[RTGFMT_NUM] = {
     "4BPP PLANAR",        "8BPP CLUT",          "16BPP RGB (565 BE)", "16BPP RGB (565 LE)",
     "16BPP BGR (565 LE)", "24BPP RGB",          "24BPP BGR",          "32BPP RGB (ARGB)",
     "32BPP RGB (ABGR)",   "32BPP RGB (RGBA)",   "32BPP RGB (BGRA)",   "15BPP RGB (555 BE)",
-    "15BPP RGB (555 LE)", "15BPP BGR (555 LE)", "NONE/UNKNOWN",
+    "15BPP RGB (555 LE)", "15BPP BGR (555 LE)", "YUV422 (CGX)",
+    "YUV411 (AccuPak)",   "YUV411 (AccuPak PC)", "YUV422",
+    "YUV422 (PC)",        "YUV422 (PA)",        "YUV422 (PAPC)",
+    "NONE/UNKNOWN",
 };
 
 static const unsigned int rtg_mem_size = 40u * SIZE_MEGA;
@@ -228,7 +231,44 @@ void rtg_write(uint32_t address, uint32_t value, uint8_t mode) {
       }
     }
   } else if (address == RTG_DEBUGME) {
-    LOG_DEBUG("RTG DEBUGME WRITE: %d.\n", value);
+    uint8_t tag = (uint8_t)((value >> 24) & 0xFF);
+    uint32_t payload = (uint32_t)(value & 0xFFFFFF);
+    switch (tag) {
+    case 0x10:
+      LOG_INFO("[RTG/DBG] SetGC width=%u\n", (unsigned int)payload);
+      break;
+    case 0x11:
+      LOG_INFO("[RTG/DBG] SetGC height=%u\n", (unsigned int)payload);
+      break;
+    case 0x12:
+      LOG_INFO("[RTG/DBG] SetGC RGBFormat=%u\n", (unsigned int)payload);
+      break;
+    case 0x13:
+      LOG_INFO("[RTG/DBG] SetPanning RGBFormat=%u\n", (unsigned int)payload);
+      break;
+    case 0x14:
+      LOG_INFO("[RTG/DBG] SetPanning x_offset=%u\n", (unsigned int)payload);
+      break;
+    case 0x15:
+      LOG_INFO("[RTG/DBG] SetPanning y_offset=%u\n", (unsigned int)payload);
+      break;
+    case 0x16:
+      LOG_INFO("[RTG/DBG] SetColorArray start=%u num=%u\n", (unsigned int)(payload >> 8),
+               (unsigned int)(payload & 0xFF));
+      break;
+    case 0x17:
+      LOG_INFO("[RTG/DBG] SetColorArray first_xrgb=0x%06X\n", (unsigned int)payload);
+      break;
+    case 0x18:
+      LOG_INFO("[RTG/DBG] P2C RGBFormat=%u\n", (unsigned int)payload);
+      break;
+    case 0x19:
+      LOG_INFO("[RTG/DBG] P2D RGBFormat=%u\n", (unsigned int)payload);
+      break;
+    default:
+      LOG_DEBUG("RTG DEBUGME WRITE: %u\n", (unsigned int)value);
+      break;
+    }
   } else {
     switch (mode) {
     case OP_TYPE_BYTE:

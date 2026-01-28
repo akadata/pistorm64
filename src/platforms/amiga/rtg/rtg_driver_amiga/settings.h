@@ -11,31 +11,29 @@ enum { PLANAR, CHUNKY, HICOLOR, TRUECOLOR, TRUEALPHA, MAXMODES };
 #define BOARDNAMEMAXCHARS 30
 
 struct P96MonitorInfo {
-  UBYTE Name[32]; // Name des Monitortyps, z.B. "NEC P750"
+  UBYTE Name[32]; // Monitor type name, e.g. "NEC P750"
 
-  ULONG HSyncMin; // Minimal unterst�tzte Horizontalfrequenz in Hz
-  ULONG HSyncMax; // Maximal unterst�tzte Horizontalfrequenz in Hz
+  ULONG HSyncMin; // Minimum supported horizontal frequency in Hz
+  ULONG HSyncMax; // Maximum supported horizontal frequency in Hz
 
-  UWORD VSyncMin; // Minimal unterst�tzte Vertikalfrequenz in Hz
-  UWORD VSyncMax; // Maximal unterst�tzte Vertikalfrequenz in Hz
+  UWORD VSyncMin; // Minimum supported vertical frequency in Hz
+  UWORD VSyncMax; // Maximum supported vertical frequency in Hz
 
-  ULONG Flags; // Siehe unten
+  ULONG Flags; // See below
 };
 
-#define MIB_DPMS_StandBy (0) // Monitor unterst�tzt DPMS-Level "stand-by".
-                             // Dieses Feature ist optional, nicht jeder
-                             // DPMS-f�hige Monitor mu� es unterst�tzen.
-                             // Aktivierung: hsync aus, vsync an
+#define MIB_DPMS_StandBy (0) // Monitor supports DPMS "stand-by" level.
+                             // This feature is optional; not every DPMS-capable
+                             // monitor must support it.
+                             // Activate: hsync off, vsync on
 
-#define MIB_DPMS_Suspend (1) // Monitor unterst�tzt DPMS-Level "suspend".
-                             // Dieses Feature ist Pflicht, jeder
-                             // DPMS-f�hige Monitor mu� es unterst�tzen.
-                             // Aktivierung: hsync an, vsync aus
+#define MIB_DPMS_Suspend (1) // Monitor supports DPMS "suspend" level.
+                             // This feature is required for DPMS-capable monitors.
+                             // Activate: hsync on, vsync off
 
-#define MIB_DPMS_ActiveOff (2) // Monitor unterst�tzt DPMS-Level "active off".
-                               // Dieses Feature ist Pflicht, jeder
-                               // DPMS-f�hige Monitor mu� es unterst�tzen.
-                               // Aktivierung: hsync aus, vsync aus
+#define MIB_DPMS_ActiveOff (2) // Monitor supports DPMS "active off" level.
+                               // This feature is required for DPMS-capable monitors.
+                               // Activate: hsync off, vsync off
 
 #define MIF_DPMS_StandBy (1UL << MIB_DPMS_StandBy)
 #define MIF_DPMS_Suspend (1UL << MIB_DPMS_Suspend)
@@ -45,8 +43,8 @@ struct Settings {
   struct Node Node;
   struct MinList Resolutions;
   ULONG BoardType;
-  // a value discribing assignment to nth board local to boardtype
-  // to be used for reassignment when boards are added or removed.
+  // Value describing assignment to the nth board local to boardtype,
+  // used for reassignment when boards are added or removed.
   UWORD LocalOrdering;
   WORD LastSelected;
   char NameField[SETTINGSNAMEMAXCHARS];
@@ -127,15 +125,15 @@ struct ModeInfo {
   UBYTE Depth;
   UBYTE Flags;
 
-  UWORD HorTotal;     // wichtig f�r aufziehen (beeinflu�t Timings)
-  UWORD HorBlankSize; // Rahmengr��e
-  UWORD HorSyncStart; // bestimmt Bildlage
-  UWORD HorSyncSize;  // mu� Spezifikation f�r Sync-L�cke erf�llen
+  UWORD HorTotal;     // Important for timing generation
+  UWORD HorBlankSize; // Blanking interval size
+  UWORD HorSyncStart; // Determines image position
+  UWORD HorSyncSize;  // Must match sync pulse specification
 
-  UBYTE HorSyncSkew;   // im Moment obsolet
+  UBYTE HorSyncSkew;   // Currently obsolete
   UBYTE HorEnableSkew; //
 
-  UWORD VerTotal; // analog zu horizontalen Werten
+  UWORD VerTotal; // Analog to horizontal values
   UWORD VerBlankSize;
   UWORD VerSyncStart;
   UWORD VerSyncSize;

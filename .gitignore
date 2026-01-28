@@ -43,3 +43,4 @@ core.*
 core
 core.*
 *.core
+src/platforms/amiga/rtg/_reference_

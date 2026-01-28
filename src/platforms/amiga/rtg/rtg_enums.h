@@ -70,6 +70,13 @@ enum rtg_formats {
   RTGFMT_RGB555_BE,
   RTGFMT_RGB555_LE,
   RTGFMT_BGR555_LE,
+  RTGFMT_YUV422_CGX,
+  RTGFMT_YUV411,
+  RTGFMT_YUV411_PC,
+  RTGFMT_YUV422,
+  RTGFMT_YUV422_PC,
+  RTGFMT_YUV422_PA,
+  RTGFMT_YUV422_PAPC,
   RTGFMT_NONE,
   RTGFMT_NUM,
 };
@@ -107,21 +114,21 @@ static const unsigned short rgbf_to_rtg[32] = {
     RTGFMT_BGR24,       // 0x03
     RTGFMT_RGB565_LE,   // 0x04
     RTGFMT_RGB555_LE,   // 0x05
-    RTGFMT_RGB32_ARGB,  // 0x08
-    RTGFMT_RGB32_ABGR,  // 0x09
-    RTGFMT_RGB32_RGBA,  // 0x06
-    RTGFMT_RGB32_BGRA,  // 0x07
+    RTGFMT_RGB32_ARGB,  // 0x06
+    RTGFMT_RGB32_ABGR,  // 0x07
+    RTGFMT_RGB32_RGBA,  // 0x08
+    RTGFMT_RGB32_BGRA,  // 0x09
     RTGFMT_RGB565_BE,   // 0x0A
     RTGFMT_RGB555_BE,   // 0x0B
     RTGFMT_BGR565_LE,   // 0x0C
     RTGFMT_BGR555_LE,   // 0x0D
-    RTGFMT_NONE,        // 0x0E
-    RTGFMT_NONE,        // 0x0F
-    RTGFMT_NONE,        // 0x10
-    RTGFMT_NONE,        // 0x11
-    RTGFMT_NONE,        // 0x12
-    RTGFMT_NONE,        // 0x13
-    RTGFMT_NONE,        // 0x14
+    RTGFMT_YUV422_CGX,  // 0x0E
+    RTGFMT_YUV411,      // 0x0F
+    RTGFMT_YUV411_PC,   // 0x10
+    RTGFMT_YUV422,      // 0x11
+    RTGFMT_YUV422_PC,   // 0x12
+    RTGFMT_YUV422_PA,   // 0x13
+    RTGFMT_YUV422_PAPC, // 0x14
     RTGFMT_NONE,        // 0x15
     RTGFMT_NONE,        // 0x16
     RTGFMT_NONE,        // 0x17
@@ -150,5 +157,12 @@ static const unsigned int rtg_pixel_size[RTGFMT_NUM] = {
     2, // RGB555_BE,
     2, // RGB555_LE,
     2, // BGR555_LE,
+    2, // YUV422_CGX,
+    1, // YUV411,
+    1, // YUV411_PC,
+    2, // YUV422,
+    2, // YUV422_PC,
+    2, // YUV422_PA,
+    2, // YUV422_PAPC,
     1, // NONE,
 };
