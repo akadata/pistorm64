@@ -42,6 +42,9 @@
 
 extern "C" emulator_config *cfg;
 
+
+const char* root = getenv("PISTORM_ROOT");
+
 #define LOGGER_TRACE    1
 #define LOGGER_DEBUG    2
 #define LOGGER_INFO     3
@@ -219,9 +222,14 @@ struct OnDemandStart {
 
 std::vector<OnDemandStart> on_demand_services;
 
-std::string a314_config_file = "./a314/files_pi/a314d.conf";
-std::string home_env = "HOME=./";
+std::string pistorm_root = root ? root : ".";
 
+std::string a314_config_file =
+    pistorm_root + "/a314/files_pi/a314d.conf";
+
+std::string home_env =
+    "HOME=" + pistorm_root;
+    
 static void load_config_file(const char *filename) {
     FILE *f = fopen(filename, "rt");
     if (f == nullptr) {

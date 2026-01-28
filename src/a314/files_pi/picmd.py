@@ -23,8 +23,8 @@ logger.setLevel(logging.DEBUG)
 
 import os
 
-FS_CFG_FILE = os.path.join(os.path.dirname(__file__), 'a314fs.conf')
-PICMD_CFG_FILE = os.path.join(os.path.dirname(__file__), 'picmd.conf')
+FS_CFG_FILE = '/opt/pistorm64/src/a314/files_pi/a314fs.conf'
+PICMD_CFG_FILE = '/opt/pistorm64/src/a314/files_pi/picmd.conf'
 
 volume_paths = {}
 search_path = ''

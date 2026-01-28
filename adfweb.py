@@ -12,7 +12,7 @@ from urllib.parse import parse_qs, urlparse
 
 import os
 
-DEFAULT_ADF_DIR = os.path.join(os.path.expanduser("~"), "pistorm64", "data", "adfs")
+DEFAULT_ADF_DIR = "/opt/pistorm64/data/adfs"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 23890
 
