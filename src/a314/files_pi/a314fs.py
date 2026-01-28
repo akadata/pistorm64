@@ -23,7 +23,7 @@ try:
 except (ValueError, IndexError):
     CONFIG_FILE_PATH = os.path.join(os.path.dirname(__file__), 'a314fs.conf')
 
-SHARED_DIRECTORY = os.path.join(os.path.expanduser("~"), "pistorm64", "data", "a314shared")
+SHARED_DIRECTORY = '/opt/pistorm64/data/a314-shared'
 METAFILE_EXTENSION = ':a314'
 
 with open(CONFIG_FILE_PATH, encoding='utf-8') as f:

@@ -147,8 +147,12 @@ endif
 MAINFILES =
 
 MAINFILES += src/emulator.c
+# TEST DOES FC EMIT 
+MAINFILES += src/emulator_fc.c
+
 MAINFILES += src/log.c
 MAINFILES += src/memory_mapped.c
+
 
 MAINFILES += src/config_file/config_file.c
 MAINFILES += src/config_file/rominfo.c

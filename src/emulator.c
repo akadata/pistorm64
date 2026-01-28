@@ -1246,6 +1246,26 @@ static inline void ps_write(uint8_t type, uint32_t addr, uint32_t val) {
   return;
 }
 
+// TEST FC 
+uint8_t cpu_read_byte(uint32_t addr) {
+    if (current_fc != 0) {
+        // TEMP instrumentation
+        // DO NOT branch behavior yet
+        // Just observe
+        static uint32_t last_fc = 0xFFFFFFFF;
+        if (current_fc != last_fc) {
+            printf("[FC] fc=%u addr=%08x\n", current_fc, addr);
+            last_fc = current_fc;
+        }
+    }
+
+//    ...
+}
+
+
+
+
+
 static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t* res) {
   switch (cfg->platform->id) {
   case PLATFORM_AMIGA:
