@@ -137,6 +137,12 @@ RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 PREFIX        ?= /opt/pistorm64
 DESTDIR       ?=
 INSTALL       ?= install
+AMIGA_TOOLCHAIN ?= /opt/amiga
+AMIGA_VBCC ?= $(AMIGA_TOOLCHAIN)/vbcc
+AMIGA_P96DEV ?= $(CURDIR)/amiga.dev/Picasso96Develop
+AMIGA_AHI_INC ?= $(AMIGA_TOOLCHAIN)/src/m68k-amigaos-gcc/build-Linux-m68k-amigaos/vbcc_target_m68k-amigaos/targets/m68k-amigaos/include
+AMIGA_HEADERS ?= $(CURDIR)/src/platforms/amiga/headers/include
+AMIGA_SUBMAKE = $(MAKE) AMIGA_TOOLCHAIN=$(AMIGA_TOOLCHAIN) VBCC=$(AMIGA_VBCC) P96DEV=$(AMIGA_P96DEV) AHI_INC=$(AMIGA_AHI_INC) AMIGA_HEADERS=$(AMIGA_HEADERS)
 
 PS_PROTOCOL_SRC := src/gpio/ps_protocol.c
 ifeq ($(PISTORM_KMOD),1)
@@ -337,6 +343,12 @@ HELP_TARGETS = \
 	"make"                             "Build emulator (kmod backend default)" \
 	"make PISTORM_KMOD=0"             "Build emulator with legacy userspace GPIO" \
 	"make clean"                      "Remove build artifacts" \
+	"make amiga-net"                  "Build Amiga net driver (.device)" \
+	"make amiga-piscsi"               "Build Amiga PiSCSI driver + bootrom" \
+	"make amiga-rtg"                  "Build Amiga RTG driver (.card)" \
+	"make amiga-ahi"                  "Build Amiga AHI driver (.audio)" \
+	"make amiga-all"                  "Build all Amiga-side drivers" \
+	"make amiga-clean"                "Clean Amiga-side driver build artifacts" \
 	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom, a314 files" \
 	"make uninstall [PREFIX=… DESTDIR=…]" "Remove installed tree" \
 	"make kernel_module"              "Build pistorm.ko (out-of-tree)" \
@@ -414,6 +426,8 @@ install: all
 	@if [ -d $(INSTALL_DIR)/data/a314-shared ] && [ "$$(ls -A $(INSTALL_DIR)/data/a314-shared 2>/dev/null)" ]; then \
 		echo "Warning: $(INSTALL_DIR)/data/a314-shared is not empty; Python code must not be installed there."; \
 	fi
+	$(INSTALL) -d $(INSTALL_DIR)/rtg
+	$(INSTALL) -m 644 src/platforms/amiga/rtg/*.shader $(INSTALL_DIR)/rtg/
 	[ -f pistorm.LICENSE ] && $(INSTALL) -m 644 pistorm.LICENSE $(INSTALL_DIR)/
 	if [ -f $(UDEV_RULES) ]; then \
 		$(INSTALL) -d /etc/udev/rules.d; \
@@ -441,6 +455,26 @@ kernel_install: kernel_module
 
 kernel_clean:
 	$(MAKE) -C kernel_module clean
+
+amiga-net:
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga
+
+amiga-piscsi:
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga
+
+amiga-rtg:
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga
+
+amiga-ahi:
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga
+
+amiga-all: amiga-net amiga-piscsi amiga-rtg
+
+amiga-clean:
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga clean
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga clean
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga clean
+	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga clean
 
 full:
 	-pkill -x emulator 2>/dev/null || true
@@ -475,4 +509,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d .d
 
-.PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_install kernel_clean
+.PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_install kernel_clean amiga-net amiga-piscsi amiga-rtg amiga-ahi amiga-all amiga-clean

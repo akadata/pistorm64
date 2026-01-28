@@ -9,6 +9,8 @@
 #include "raylib.h"
 
 #include <dirent.h>
+#include <endian.h>
+#include <limits.h>
 #include <math.h>
 #include <pthread.h>
 #include <stdint.h>
@@ -22,6 +24,83 @@ static inline uint16_t load_u16_be(const uint8_t *p) {
     uint16_t v;
     memcpy(&v, p, sizeof v);
     return be16toh(v);
+}
+static inline uint16_t load_u16_le(const uint8_t *p) {
+    uint16_t v;
+    memcpy(&v, p, sizeof v);
+    return le16toh(v);
+}
+
+static inline uint32_t load_u32_be(const uint8_t *p) {
+    uint32_t v;
+    memcpy(&v, p, sizeof v);
+    return be32toh(v);
+}
+
+static inline uint16_t rtg_rgb555_to_rgb565(uint16_t v) {
+    uint16_t r = (v >> 10) & 0x1F;
+    uint16_t g = (v >> 5) & 0x1F;
+    uint16_t b = v & 0x1F;
+    uint16_t g6 = (uint16_t)((g << 1) | (g >> 4));
+    return (uint16_t)((r << 11) | (g6 << 5) | b);
+}
+
+static inline uint16_t rtg_bgr565_to_rgb565(uint16_t v) {
+    uint16_t b = (v >> 11) & 0x1F;
+    uint16_t g = (v >> 5) & 0x3F;
+    uint16_t r = v & 0x1F;
+    return (uint16_t)((r << 11) | (g << 5) | b);
+}
+
+static inline uint16_t rtg_bgr555_to_rgb565(uint16_t v) {
+    uint16_t b = (v >> 10) & 0x1F;
+    uint16_t g = (v >> 5) & 0x1F;
+    uint16_t r = v & 0x1F;
+    uint16_t g6 = (uint16_t)((g << 1) | (g >> 4));
+    return (uint16_t)((r << 11) | (g6 << 5) | b);
+}
+
+static inline uint8_t clamp_u8(int v) {
+    if (v < 0) {
+        return 0;
+    }
+    if (v > 255) {
+        return 255;
+    }
+    return (uint8_t)v;
+}
+
+static inline uint32_t rtg_pack_rgba(uint8_t r, uint8_t g, uint8_t b) {
+    return 0xFF000000u | ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+}
+
+static inline uint32_t rtg_yuv601_to_rgba(uint8_t y, uint8_t u, uint8_t v) {
+    int c = (int)y - 16;
+    int d = (int)u - 128;
+    int e = (int)v - 128;
+    int r = (298 * c + 409 * e + 128) >> 8;
+    int g = (298 * c - 100 * d - 208 * e + 128) >> 8;
+    int b = (298 * c + 516 * d + 128) >> 8;
+    return rtg_pack_rgba(clamp_u8(r), clamp_u8(g), clamp_u8(b));
+}
+
+static const char* rtg_resolve_shader_path(const char* filename, char* buf, size_t buf_len) {
+    const char* root = getenv("PISTORM_ROOT");
+    if (root && *root) {
+        snprintf(buf, buf_len, "%s/rtg/%s", root, filename);
+        if (access(buf, R_OK) == 0) {
+            return buf;
+        }
+        snprintf(buf, buf_len, "%s/src/platforms/amiga/rtg/%s", root, filename);
+        if (access(buf, R_OK) == 0) {
+            return buf;
+        }
+    }
+    snprintf(buf, buf_len, "src/platforms/amiga/rtg/%s", filename);
+    if (access(buf, R_OK) == 0) {
+        return buf;
+    }
+    return filename;
 }
 
 // Default configuration for VideoCore / TV service support (Raspberry Pi only).
@@ -77,6 +156,8 @@ static uint8_t updating_screen      = 0;
 static uint8_t debug_palette        = 0;
 static uint8_t show_fps             = 0;
 static uint8_t palette_updated      = 0;
+static int clut_cpu_mode            = -1;
+static uint8_t yuv_log_once         = 0;
 
 static uint16_t mouse_cursor_w      = 16;
 static uint16_t mouse_cursor_h      = 16;
@@ -297,11 +378,33 @@ uint32_t rtg_to_raylib[RTGFMT_NUM] = {
     PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,  // RGB32_ABGR,
     PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,  // RGB32_RGBA,
     PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,  // RGB32_BGRA,
-    PIXELFORMAT_UNCOMPRESSED_R5G5B5A1,  // RGB555_BE,
-    PIXELFORMAT_UNCOMPRESSED_R5G5B5A1,  // RGB555_LE,
-    PIXELFORMAT_UNCOMPRESSED_R5G5B5A1,  // BGR555_LE,
+    PIXELFORMAT_UNCOMPRESSED_R5G6B5,    // RGB555_BE,
+    PIXELFORMAT_UNCOMPRESSED_R5G6B5,    // RGB555_LE,
+    PIXELFORMAT_UNCOMPRESSED_R5G6B5,    // BGR555_LE,
+    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,  // YUV422_CGX,
+    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,  // YUV411,
+    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,  // YUV411_PC,
+    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,  // YUV422,
+    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,  // YUV422_PC,
+    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,  // YUV422_PA,
+    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,  // YUV422_PAPC,
     PIXELFORMAT_UNCOMPRESSED_GRAYSCALE, // NONE,
 };
+
+static inline int rtg_format_is_yuv(uint16_t format) {
+  switch (format) {
+  case RTGFMT_YUV422_CGX:
+  case RTGFMT_YUV411:
+  case RTGFMT_YUV411_PC:
+  case RTGFMT_YUV422:
+  case RTGFMT_YUV422_PC:
+  case RTGFMT_YUV422_PA:
+  case RTGFMT_YUV422_PAPC:
+    return 1;
+  default:
+    return 0;
+  }
+}
 
 static void rtg_copy_tight_rows(uint8_t* dst, const uint8_t* src, size_t row_bytes, size_t pitch,
                                 size_t height) {
@@ -421,6 +524,10 @@ void* rtgThread(void* args) {
 
   uint16_t* indexed_buf = NULL;
   size_t indexed_buf_size = 0;
+  uint32_t* clut_buf = NULL;
+  size_t clut_buf_size = 0;
+  uint32_t* yuv_buf = NULL;
+  size_t yuv_buf_size = 0;
   uint8_t* tight_buf = NULL;
   size_t tight_buf_size = 0;
   uint32_t last_frame_addr = 0;
@@ -455,6 +562,7 @@ void* rtgThread(void* args) {
   LOG_INFO("[RTG/RAYLIB] Output resolution: %dx%d\n", pi_screen_width, pi_screen_height);
 
   InitWindow(pi_screen_width, pi_screen_height, "Pistorm RTG");
+  SetWindowState(FLAG_VSYNC_HINT);
 
   if(!IsWindowReady()) {
     LOG_ERROR("[RTG/RAYLIB] InitWindow failed for %dx%d; disabling RTG output.\n", pi_screen_width,
@@ -467,12 +575,29 @@ void* rtgThread(void* args) {
   HideCursor();
   SetTargetFPS(60);
 
+  if (clut_cpu_mode < 0) {
+    const char* env = getenv("PISTORM_RTG_CLUT_CPU");
+    clut_cpu_mode = (env && *env && atoi(env) != 0) ? 1 : 0;
+    if (clut_cpu_mode) {
+      LOG_INFO("[RTG/RAYLIB] CPU CLUT conversion enabled via PISTORM_RTG_CLUT_CPU.\n");
+    }
+  }
+
   Color bef = {0, 64, 128, 255};
   Color black = {0, 0, 0, 255};
 
-  Shader clut_shader = LoadShader(NULL, "src/platforms/amiga/rtg/clut.shader");
-  Shader bgra_swizzle_shader = LoadShader(NULL, "src/platforms/amiga/rtg/bgraswizzle.shader");
-  Shader argb_swizzle_shader = LoadShader(NULL, "src/platforms/amiga/rtg/argbswizzle.shader");
+  char shader_path[PATH_MAX];
+  Shader clut_shader = LoadShader(NULL, rtg_resolve_shader_path("clut.shader", shader_path,
+                                                                sizeof(shader_path)));
+  Shader bgra_swizzle_shader = LoadShader(NULL, rtg_resolve_shader_path("bgraswizzle.shader",
+                                                                        shader_path,
+                                                                        sizeof(shader_path)));
+  Shader argb_swizzle_shader = LoadShader(NULL, rtg_resolve_shader_path("argbswizzle.shader",
+                                                                        shader_path,
+                                                                        sizeof(shader_path)));
+  Shader abgr_swizzle_shader = LoadShader(NULL, rtg_resolve_shader_path("abgrswizzle.shader",
+                                                                        shader_path,
+                                                                        sizeof(shader_path)));
   int clut_loc = GetShaderLocation(clut_shader, "texture1");
 
   raylib_clut.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
@@ -550,7 +675,11 @@ reinit_raylib:;
   int pitch_ok = (pitch >= row_bytes);
   int addr_ok = pitch_ok && (addr < rtg_mem_size) && (addr + needed <= rtg_mem_size);
 
-  raylib_fb.format = (int)rtg_to_raylib[format];
+  if ((format == RTGFMT_8BIT_CLUT && clut_cpu_mode) || rtg_format_is_yuv(format)) {
+    raylib_fb.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+  } else {
+    raylib_fb.format = (int)rtg_to_raylib[format];
+  }
   raylib_fb.width = width;
   raylib_fb.height = height;
   raylib_fb.mipmaps = 1;
@@ -572,7 +701,23 @@ reinit_raylib:;
     }
     memset(tight_buf, 0, tight_size);
     raylib_fb.data = tight_buf;
-  } else if(format == RTGFMT_RGB565_BE || format == RTGFMT_RGB555_BE) {
+  } else if(rtg_format_is_yuv(format)) {
+    size_t yuv_bytes = (size_t)width * height * sizeof(uint32_t);
+    if(yuv_buf_size < yuv_bytes) {
+      void* resized = realloc(yuv_buf, yuv_bytes);
+      if(!resized) {
+        LOG_ERROR("[RTG/RAYLIB] Failed to allocate YUV buffer (%zu bytes)\n", yuv_bytes);
+        reinit = 1;
+        goto shutdown_raylib;
+      }
+      yuv_buf = resized;
+      yuv_buf_size = yuv_bytes;
+    }
+    memset(yuv_buf, 0, yuv_bytes);
+    raylib_fb.data = yuv_buf;
+  } else if(format == RTGFMT_RGB565_BE || format == RTGFMT_RGB555_BE ||
+            format == RTGFMT_RGB555_LE || format == RTGFMT_BGR565_LE ||
+            format == RTGFMT_BGR555_LE) {
     if((pitch % 2) != 0) {
       LOG_WARN("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", pitch);
       reinit = 1;
@@ -593,10 +738,52 @@ reinit_raylib:;
       for (uint16_t x = 0; x < width; x++) {
         size_t src_idx = (x + (y * src_stride)) * sizeof(uint16_t);
         const uint8_t* src_ptr = data->memory + addr + src_idx;
-        indexed_buf[x + (y * width)] = load_u16_be(src_ptr);
+        uint16_t raw = 0;
+        uint16_t rgb565 = 0;
+        switch (format) {
+        case RTGFMT_RGB565_BE:
+          raw = load_u16_be(src_ptr);
+          rgb565 = raw;
+          break;
+        case RTGFMT_RGB555_BE:
+          raw = load_u16_be(src_ptr);
+          rgb565 = rtg_rgb555_to_rgb565(raw);
+          break;
+        case RTGFMT_RGB555_LE:
+          raw = load_u16_le(src_ptr);
+          rgb565 = rtg_rgb555_to_rgb565(raw);
+          break;
+        case RTGFMT_BGR565_LE:
+          raw = load_u16_le(src_ptr);
+          rgb565 = rtg_bgr565_to_rgb565(raw);
+          break;
+        case RTGFMT_BGR555_LE:
+          raw = load_u16_le(src_ptr);
+          rgb565 = rtg_bgr555_to_rgb565(raw);
+          break;
+        default:
+          raw = load_u16_le(src_ptr);
+          rgb565 = raw;
+          break;
+        }
+        indexed_buf[x + (y * width)] = rgb565;
       }
     }
     raylib_fb.data = indexed_buf;
+  } else if(format == RTGFMT_8BIT_CLUT && clut_cpu_mode) {
+    size_t clut_bytes = tight_size * sizeof(uint32_t);
+    if(clut_buf_size < clut_bytes) {
+      void* resized = realloc(clut_buf, clut_bytes);
+      if(!resized) {
+        LOG_ERROR("[RTG/RAYLIB] Failed to allocate CLUT buffer (%zu bytes)\n", clut_bytes);
+        reinit = 1;
+        goto shutdown_raylib;
+      }
+      clut_buf = resized;
+      clut_buf_size = clut_bytes;
+    }
+    memset(clut_buf, 0, clut_bytes);
+    raylib_fb.data = clut_buf;
   } else if(pitch != row_bytes) {
     if(tight_buf_size < tight_size) {
       void* resized = realloc(tight_buf, tight_size);
@@ -700,14 +887,20 @@ reinit_raylib:;
 
       switch (format) {
       case RTGFMT_8BIT_CLUT:
-        BeginShaderMode(clut_shader);
-        SetShaderValueTexture(clut_shader, clut_loc, raylib_clut_texture);
+        if(!clut_cpu_mode) {
+          BeginShaderMode(clut_shader);
+          SetShaderValueTexture(clut_shader, clut_loc, raylib_clut_texture);
+        }
         break;
+      case RTGFMT_BGR24:
       case RTGFMT_RGB32_BGRA:
         BeginShaderMode(bgra_swizzle_shader);
         break;
       case RTGFMT_RGB32_ARGB:
         BeginShaderMode(argb_swizzle_shader);
+        break;
+      case RTGFMT_RGB32_ABGR:
+        BeginShaderMode(abgr_swizzle_shader);
         break;
       }
 
@@ -715,8 +908,14 @@ reinit_raylib:;
 
       switch (format) {
       case RTGFMT_8BIT_CLUT:
+        if(!clut_cpu_mode) {
+          EndShaderMode();
+        }
+        break;
+      case RTGFMT_BGR24:
       case RTGFMT_RGB32_BGRA:
       case RTGFMT_RGB32_ARGB:
+      case RTGFMT_RGB32_ABGR:
         EndShaderMode();
         break;
       }
@@ -757,6 +956,7 @@ reinit_raylib:;
       rtg_output_in_vblank = 1;
       cur_rtg_frame++;
       size_t frame_addr_offset = (size_t)current_addr;
+      size_t addr_offset = frame_addr_offset;
       size_t frame_needed = (size_t)current_pitch * height;
 
       if(current_pitch < row_bytes) {
@@ -764,8 +964,128 @@ reinit_raylib:;
                  row_bytes);
       } else if(frame_addr_offset >= rtg_mem_size || frame_needed > rtg_mem_size - frame_addr_offset) {
         LOG_WARN("[RTG/RAYLIB] Framebuffer OOB: addr=0x%08X needed=%zu limit=%zu\n", current_addr,
-                 needed, rtg_mem_size);
-      } else if(current_format == RTGFMT_RGB565_BE || current_format == RTGFMT_RGB555_BE) {
+                 frame_needed, rtg_mem_size);
+      } else if(rtg_format_is_yuv(current_format)) {
+        size_t yuv_bytes = (size_t)width * height * sizeof(uint32_t);
+        if(yuv_buf_size < yuv_bytes) {
+          void* resized = realloc(yuv_buf, yuv_bytes);
+          if(!resized) {
+            LOG_ERROR("[RTG/RAYLIB] Failed to allocate YUV buffer (%zu bytes)\n", yuv_bytes);
+          } else {
+            yuv_buf = resized;
+            yuv_buf_size = yuv_bytes;
+          }
+        }
+        if(yuv_buf) {
+          switch (current_format) {
+          case RTGFMT_YUV422_CGX:
+          case RTGFMT_YUV422:
+          case RTGFMT_YUV422_PC:
+          case RTGFMT_YUV422_PA:
+          case RTGFMT_YUV422_PAPC:
+            for (uint16_t y = 0; y < height; y++) {
+              const uint8_t* src = data->memory + addr_offset + (size_t)current_pitch * y;
+              uint32_t* dst = yuv_buf + (size_t)width * y;
+              uint16_t x = 0;
+              for (; x + 1 < width; x += 2) {
+                uint8_t b0 = src[0];
+                uint8_t b1 = src[1];
+                uint8_t b2 = src[2];
+                uint8_t b3 = src[3];
+                uint8_t y0 = 0;
+                uint8_t y1 = 0;
+                uint8_t u0 = 128;
+                uint8_t v0 = 128;
+                switch (current_format) {
+                case RTGFMT_YUV422_CGX: // Y0 V0 Y1 U0
+                  y0 = b0; v0 = b1; y1 = b2; u0 = b3;
+                  break;
+                case RTGFMT_YUV422: // Y1 U0 Y0 V0
+                  y1 = b0; u0 = b1; y0 = b2; v0 = b3;
+                  break;
+                case RTGFMT_YUV422_PC: // V0 Y0 U0 Y1
+                  v0 = b0; y0 = b1; u0 = b2; y1 = b3;
+                  break;
+                case RTGFMT_YUV422_PA: // Y0 Y1 V0 U0
+                  y0 = b0; y1 = b1; v0 = b2; u0 = b3;
+                  break;
+                case RTGFMT_YUV422_PAPC: // U0 V0 Y1 Y0
+                  u0 = b0; v0 = b1; y1 = b2; y0 = b3;
+                  break;
+                default:
+                  y0 = b0; v0 = b1; y1 = b2; u0 = b3;
+                  break;
+                }
+                dst[x] = rtg_yuv601_to_rgba(y0, u0, v0);
+                dst[x + 1] = rtg_yuv601_to_rgba(y1, u0, v0);
+                src += 4;
+              }
+              if(x < width) {
+                uint8_t y0 = src[0];
+                dst[x] = rtg_yuv601_to_rgba(y0, 128, 128);
+              }
+            }
+            break;
+          case RTGFMT_YUV411:
+          case RTGFMT_YUV411_PC:
+            for (uint16_t y = 0; y < height; y++) {
+              const uint8_t* src = data->memory + addr_offset + (size_t)current_pitch * y;
+              uint32_t* dst = yuv_buf + (size_t)width * y;
+              uint16_t x = 0;
+              for (; x + 3 < width; x += 4) {
+                uint32_t pack = load_u32_be(src);
+                if(current_format == RTGFMT_YUV411_PC) {
+                  pack = __builtin_bswap32(pack);
+                }
+                uint8_t u6 = (uint8_t)((pack >> 26) & 0x3F);
+                uint8_t y0 = (uint8_t)((pack >> 21) & 0x1F);
+                uint8_t y1 = (uint8_t)((pack >> 16) & 0x1F);
+                uint8_t v6 = (uint8_t)((pack >> 10) & 0x3F);
+                uint8_t y2 = (uint8_t)((pack >> 5) & 0x1F);
+                uint8_t y3 = (uint8_t)(pack & 0x1F);
+                uint8_t u0 = (uint8_t)((u6 << 2) | (u6 >> 4));
+                uint8_t v0 = (uint8_t)((v6 << 2) | (v6 >> 4));
+                uint8_t yy0 = (uint8_t)((y0 << 3) | (y0 >> 2));
+                uint8_t yy1 = (uint8_t)((y1 << 3) | (y1 >> 2));
+                uint8_t yy2 = (uint8_t)((y2 << 3) | (y2 >> 2));
+                uint8_t yy3 = (uint8_t)((y3 << 3) | (y3 >> 2));
+                dst[x] = rtg_yuv601_to_rgba(yy0, u0, v0);
+                dst[x + 1] = rtg_yuv601_to_rgba(yy1, u0, v0);
+                dst[x + 2] = rtg_yuv601_to_rgba(yy2, u0, v0);
+                dst[x + 3] = rtg_yuv601_to_rgba(yy3, u0, v0);
+                src += 4;
+              }
+              for (; x < width; x++) {
+                uint8_t y0 = src[0];
+                dst[x] = rtg_yuv601_to_rgba(y0, 128, 128);
+                src++;
+              }
+            }
+            break;
+          default:
+            break;
+          }
+          UpdateTexture(raylib_texture, yuv_buf);
+          if (!yuv_log_once) {
+            yuv_log_once = 1;
+            size_t sample_len = current_pitch;
+            if (sample_len > 16) {
+              sample_len = 16;
+            }
+            char sample_buf[64] = {0};
+            size_t cursor = 0;
+            const uint8_t* raw = data->memory + addr_offset;
+            for (size_t i = 0; i < sample_len && cursor + 3 < sizeof(sample_buf); ++i) {
+              cursor += snprintf(sample_buf + cursor, sizeof(sample_buf) - cursor, "%02X ",
+                                  raw[i]);
+            }
+            LOG_INFO("[RTG/DBG] YUV format %d width=%u height=%u pitch=%u sample=%s\n",
+                     current_format, width, height, current_pitch, sample_buf);
+          }
+        }
+      } else if(current_format == RTGFMT_RGB565_BE || current_format == RTGFMT_RGB555_BE ||
+                current_format == RTGFMT_RGB555_LE || current_format == RTGFMT_BGR565_LE ||
+                current_format == RTGFMT_BGR555_LE) {
         if((current_pitch % 2) != 0) {
           LOG_WARN("[RTG/RAYLIB] 16-bit pitch not aligned: pitch=%u\n", current_pitch);
         } else {
@@ -783,12 +1103,61 @@ reinit_raylib:;
             for (uint16_t y = 0; y < height; y++) {
               for (uint16_t x = 0; x < width; x++) {
                 size_t src_idx = (x + (y * src_stride)) * sizeof(uint16_t);
-                const uint8_t* src_ptr = data->memory + addr + src_idx;
-                indexed_buf[x + (y * width)] = load_u16_be(src_ptr);
+                const uint8_t* src_ptr = data->memory + addr_offset + src_idx;
+                uint16_t raw = 0;
+                uint16_t rgb565 = 0;
+                switch (current_format) {
+                case RTGFMT_RGB565_BE:
+                  raw = load_u16_be(src_ptr);
+                  rgb565 = raw;
+                  break;
+                case RTGFMT_RGB555_BE:
+                  raw = load_u16_be(src_ptr);
+                  rgb565 = rtg_rgb555_to_rgb565(raw);
+                  break;
+                case RTGFMT_RGB555_LE:
+                  raw = load_u16_le(src_ptr);
+                  rgb565 = rtg_rgb555_to_rgb565(raw);
+                  break;
+                case RTGFMT_BGR565_LE:
+                  raw = load_u16_le(src_ptr);
+                  rgb565 = rtg_bgr565_to_rgb565(raw);
+                  break;
+                case RTGFMT_BGR555_LE:
+                  raw = load_u16_le(src_ptr);
+                  rgb565 = rtg_bgr555_to_rgb565(raw);
+                  break;
+                default:
+                  raw = load_u16_le(src_ptr);
+                  rgb565 = raw;
+                  break;
+                }
+                indexed_buf[x + (y * width)] = rgb565;
               }
             }
             UpdateTexture(raylib_texture, indexed_buf);
           }
+        }
+      } else if(current_format == RTGFMT_8BIT_CLUT && clut_cpu_mode) {
+        if(clut_buf_size < tight_size * sizeof(uint32_t)) {
+          void* resized = realloc(clut_buf, tight_size * sizeof(uint32_t));
+          if(!resized) {
+            LOG_ERROR("[RTG/RAYLIB] Failed to allocate CLUT buffer (%zu bytes)\n",
+                      tight_size * sizeof(uint32_t));
+          } else {
+            clut_buf = resized;
+            clut_buf_size = tight_size * sizeof(uint32_t);
+          }
+        }
+        if(clut_buf) {
+          for (uint16_t y = 0; y < height; y++) {
+            const uint8_t* src = data->memory + addr_offset + (size_t)current_pitch * y;
+            uint32_t* dst = clut_buf + (size_t)width * y;
+            for (uint16_t x = 0; x < width; x++) {
+              dst[x] = palette[src[x]];
+            }
+          }
+          UpdateTexture(raylib_texture, clut_buf);
         }
       } else if(current_pitch != row_bytes) {
         if(tight_buf_size < tight_size) {
@@ -801,11 +1170,11 @@ reinit_raylib:;
           }
         }
         if(tight_buf) {
-          rtg_copy_tight_rows(tight_buf, data->memory + addr, row_bytes, current_pitch, height);
+          rtg_copy_tight_rows(tight_buf, data->memory + addr_offset, row_bytes, current_pitch, height);
           UpdateTexture(raylib_texture, tight_buf);
         }
       } else {
-        UpdateTexture(raylib_texture, data->memory + addr);
+        UpdateTexture(raylib_texture, data->memory + addr_offset);
       }
       if(cursor_image_updated) {
         if(clut_cursor_enabled) {
@@ -857,12 +1226,21 @@ shutdown_raylib:;
   if(indexed_buf) {
     free(indexed_buf);
   }
+  if(clut_buf) {
+    free(clut_buf);
+  }
+  if(yuv_buf) {
+    free(yuv_buf);
+  }
   if(tight_buf) {
     free(tight_buf);
   }
 
   UnloadTexture(raylib_texture);
   UnloadShader(clut_shader);
+  UnloadShader(bgra_swizzle_shader);
+  UnloadShader(argb_swizzle_shader);
+  UnloadShader(abgr_swizzle_shader);
 
   CloseWindow();
 
@@ -896,6 +1274,13 @@ void rtg_set_clut_entry(uint8_t index, uint32_t xrgb) {
   dst[1] = src[1];
   dst[2] = src[0];
   dst[3] = 0xFF;
+
+  static unsigned int clut_debug_count = 0;
+  if (rtg_display_format == RTGFMT_8BIT_CLUT && clut_debug_count < 8) {
+    LOG_INFO("[RTG/DBG] CLUT[%u] = %02X%02X%02X\n", (unsigned int)index,
+             (unsigned int)dst[0], (unsigned int)dst[1], (unsigned int)dst[2]);
+    clut_debug_count++;
+  }
 }
 
 void rtg_init_display(void) {

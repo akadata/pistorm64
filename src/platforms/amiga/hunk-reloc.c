@@ -29,6 +29,8 @@
   fread(&a, 2, 1, b);                                                                              \
   a = be16toh(a);
 
+#define LSEG_MAX_BYTES (64 * 1024 * 1024)
+
 uint32_t lw = 0;
 static uint32_t file_offset = 0, add_size = 0;
 
@@ -261,6 +263,9 @@ int load_lseg(int fd, uint8_t** buf_p, struct hunk_info* i, struct hunk_reloc* r
     return -1;
   uint8_t* block = (uint8_t*)lsb;
   uint32_t next_blk = 0;
+  uint8_t* lseg_buf = NULL;
+  size_t lseg_size = 0;
+  size_t lseg_capacity = 0;
 
   read(fd, block, block_size);
   if (BE(lsb->lsb_ID) != LOADSEG_IDENTIFIER) {
@@ -268,42 +273,77 @@ int load_lseg(int fd, uint8_t** buf_p, struct hunk_info* i, struct hunk_reloc* r
     goto fail;
   }
 
-  const char* filename = "data/lsegout.bin";
-  FILE* out = fopen(filename, "wb+");
-
   DEBUG("[LOAD_LSEG] LSEG data:\n");
   DEBUG("[LOAD_LSEG] Longs: %d HostID: %d\n", BE(lsb->lsb_SummedLongs), BE(lsb->lsb_HostID));
   DEBUG("[LOAD_LSEG] Next: %d LoadData: %p\n", BE(lsb->lsb_Next), (void*)lsb->lsb_LoadData);
-  next_blk = BE(lsb->lsb_Next);
   do {
     next_blk = BE(lsb->lsb_Next);
-    fwrite(lsb->lsb_LoadData, 1, block_size - 20, out);
+    size_t chunk_size = block_size - 20;
+    if (lseg_size + chunk_size > LSEG_MAX_BYTES) {
+      fprintf(stderr, "[LOAD_LSEG] LSEG exceeded max size (%d bytes); refusing to load.\n",
+              LSEG_MAX_BYTES);
+      goto fail;
+    }
+    if (lseg_size + chunk_size > lseg_capacity) {
+      size_t new_capacity = lseg_capacity ? lseg_capacity * 2 : 65536;
+      if (new_capacity < lseg_size + chunk_size) {
+        new_capacity = lseg_size + chunk_size;
+      }
+      if (new_capacity > LSEG_MAX_BYTES) {
+        new_capacity = LSEG_MAX_BYTES;
+      }
+      uint8_t* new_buf = realloc(lseg_buf, new_capacity);
+      if (!new_buf) {
+        goto fail;
+      }
+      lseg_buf = new_buf;
+      lseg_capacity = new_capacity;
+    }
+    memcpy(lseg_buf + lseg_size, lsb->lsb_LoadData, chunk_size);
+    lseg_size += chunk_size;
+
+    if (next_blk == 0xFFFFFFFF) {
+      break;
+    }
     lseek64(fd, next_blk * block_size, SEEK_SET);
-    read(fd, block, block_size);
+    if (read(fd, block, block_size) <= 0) {
+      goto fail;
+    }
   } while (next_blk != 0xFFFFFFFF);
 
-  long file_size_long = ftell(out);
-  uint32_t file_size = 0;
-  if (file_size_long > 0) {
-    if ((uint64_t)file_size_long > UINT32_MAX) {
-      file_size = UINT32_MAX;
-    } else {
-      file_size = (uint32_t)file_size_long;
+  uint32_t file_size = (lseg_size > UINT32_MAX) ? UINT32_MAX : (uint32_t)lseg_size;
+  FILE* mem = fmemopen(lseg_buf, file_size, "rb");
+  if (!mem) {
+    mem = tmpfile();
+    if (!mem) {
+      goto fail;
     }
+    if (file_size > 0 && fwrite(lseg_buf, 1, file_size, mem) != file_size) {
+      fclose(mem);
+      goto fail;
+    }
+    fseek(mem, 0, SEEK_SET);
   }
-  fseek(out, 0, SEEK_SET);
   uint8_t* buf = malloc(file_size + 1024);
-  fread(buf, file_size, 1, out);
-  fseek(out, 0, SEEK_SET);
-  process_hunks(out, i, relocs, 0x0);
-  fclose(out);
+  if (!buf) {
+    fclose(mem);
+    goto fail;
+  }
+  memcpy(buf, lseg_buf, file_size);
+  process_hunks(mem, i, relocs, 0x0);
+  fclose(mem);
+  free(lseg_buf);
+  lseg_buf = NULL;
   *buf_p = buf;
   i->byte_size = file_size;
   i->alloc_size = file_size + add_size;
 
+  free(block);
   return 0;
 
 fail:;
+  if (lseg_buf)
+    free(lseg_buf);
   if (block)
     free(block);
 

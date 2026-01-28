@@ -44,7 +44,29 @@
 //#define RTG_DEBUGME(...)
 #define IWRITECMD(val) *(volatile unsigned short*)(IRTGCMD_OFFSET) = val;
 
-#define CHIP_RAM_SIZE 0x00200000 // Chip RAM offset, 2MB
+#ifndef PIGFX_DEBUG
+#define PIGFX_DEBUG 0
+#endif
+
+#if PIGFX_DEBUG
+#define PIGFX_DEBUG_WRITE(tag, value)                                                              \
+  RTG_DEBUGME((((ULONG)(tag) & 0xFFU) << 24) | ((ULONG)(value) & 0xFFFFFFU))
+#else
+#define PIGFX_DEBUG_WRITE(tag, value)                                                              \
+  do {                                                                                             \
+  } while (0)
+#endif
+
+#ifndef PIGFX_CHIP_RAM_FALLBACK
+#define PIGFX_CHIP_RAM_FALLBACK 0x00200000
+#endif
+
+static inline ULONG pigfx_chip_ram_top(void) {
+  if (SysBase && SysBase->MaxLocMem != 0) {
+    return SysBase->MaxLocMem;
+  }
+  return PIGFX_CHIP_RAM_FALLBACK;
+}
 
 struct GFXBase {
   struct Library libNode;
@@ -276,7 +298,8 @@ int __attribute__((used)) InitCard(__REGA0(struct BoardInfo* b)) {
   b->GraphicsControllerType = GCT_S3ViRGE;
 
   b->Flags |= BIF_GRANTDIRECTACCESS | BIF_HARDWARESPRITE | BIF_FLICKERFIXER; // | BIF_BLITTER;
-  b->RGBFormats = RGBFF_HICOLOR | RGBFF_TRUECOLOR | RGBFF_TRUEALPHA | RGBFF_CLUT | RGBFF_NONE;
+  b->RGBFormats = RGBFF_HICOLOR | RGBFF_TRUECOLOR | RGBFF_TRUEALPHA | RGBFF_CLUT | RGBFF_NONE |
+                  RGBFF_Y4U2V2 | RGBFF_Y4U1V1;
   b->SoftSpriteFlags = 0;
   b->BitsPerCannon = 8;
 
@@ -365,6 +388,9 @@ void SetGC(__REGA0(struct BoardInfo* b), __REGA1(struct ModeInfo* mode_info),
            __REGD0(BOOL border)) {
   b->ModeInfo = mode_info;
   // Send width, height and format to the RaspberryPi Targetable Graphics.
+  PIGFX_DEBUG_WRITE(0x10, mode_info->Width);
+  PIGFX_DEBUG_WRITE(0x11, mode_info->Height);
+  PIGFX_DEBUG_WRITE(0x12, b->RGBFormat);
   WRITESHORT(RTG_X1, mode_info->Width);
   WRITESHORT(RTG_Y1, mode_info->Height);
   WRITESHORT(RTG_FORMAT, rgbf_to_rtg[b->RGBFormat]);
@@ -395,6 +421,9 @@ void SetPanning(__REGA0(struct BoardInfo* b), __REGA1(UBYTE* addr), __REGD0(UWOR
   b->XOffset = x_offset;
   b->YOffset = y_offset;
 
+  PIGFX_DEBUG_WRITE(0x13, format);
+  PIGFX_DEBUG_WRITE(0x14, (UWORD)x_offset);
+  PIGFX_DEBUG_WRITE(0x15, (UWORD)y_offset);
   WRITELONG(RTG_ADDR1, (unsigned long)addr);
   WRITESHORT(RTG_X1, width);
   WRITESHORT(RTG_FORMAT, rgbf_to_rtg[format]);
@@ -410,6 +439,18 @@ void SetColorArray(__REGA0(struct BoardInfo* b), __REGD0(UWORD start), __REGD1(U
   // Sets the color components of X color components for 8-bit paletted display modes.
   if (!b->CLUT)
     return;
+
+#if PIGFX_DEBUG
+  static UWORD dbg_clut_once = 0;
+  if (!dbg_clut_once) {
+    dbg_clut_once = 1;
+    PIGFX_DEBUG_WRITE(0x16, ((ULONG)start << 8) | (num & 0xFF));
+    if (start < 256) {
+      ULONG xrgb = 0 | (b->CLUT[start].Red << 16) | (b->CLUT[start].Green << 8) | (b->CLUT[start].Blue);
+      PIGFX_DEBUG_WRITE(0x17, xrgb);
+    }
+  }
+#endif
 
   int j = start + num;
 
@@ -434,6 +475,15 @@ UWORD CalculateBytesPerRow(__REGA0(struct BoardInfo* b), __REGD0(UWORD width),
   switch (format) {
   case RGBFB_CLUT:
     return pitch;
+  case RGBFB_Y4U2V2:
+  case RGBFB_YUV422:
+  case RGBFB_YUV422PC:
+  case RGBFB_YUV422PA:
+  case RGBFB_YUV422PAPC:
+    return (width * 2);
+  case RGBFB_YUV411:
+  case RGBFB_YUV411PC:
+    return width;
   default:
     return 128;
   case RGBFB_R5G6B5PC:
@@ -640,7 +690,7 @@ void BlitTemplate(__REGA0(struct BoardInfo* b), __REGA1(struct RenderInfo* r),
   WRITESHORT(RTG_Y2, h);
   WRITESHORT(RTG_Y3, 0);
 
-  if ((unsigned long)t->Memory > CHIP_RAM_SIZE) {
+  if ((unsigned long)t->Memory >= pigfx_chip_ram_top()) {
     WRITELONG(RTG_ADDR1, (unsigned long)t->Memory);
   } else {
     unsigned long dest = CARD_SCRATCH;
@@ -682,7 +732,7 @@ void BlitPattern(__REGA0(struct BoardInfo* b), __REGA1(struct RenderInfo* r),
   WRITESHORT(RTG_Y2, h);
   WRITESHORT(RTG_Y3, p->YOffset);
 
-  if ((unsigned long)p->Memory > CHIP_RAM_SIZE) {
+  if ((unsigned long)p->Memory >= pigfx_chip_ram_top()) {
     WRITELONG(RTG_ADDR1, (unsigned long)p->Memory);
   } else {
     unsigned long dest = CARD_SCRATCH;
@@ -765,6 +815,7 @@ void BlitPlanar2Chunky(__REGA0(struct BoardInfo* b), __REGA1(struct BitMap* bm),
   WRITESHORT(RTG_X5, line_size);
   WRITESHORT(RTG_FORMAT, rgbf_to_rtg[r->RGBFormat]);
 
+  PIGFX_DEBUG_WRITE(0x18, r->RGBFormat);
   WRITEBYTE(RTG_U81, mask);
   WRITEBYTE(RTG_U82, minterm);
 
@@ -830,6 +881,7 @@ void BlitPlanar2Direct(__REGA0(struct BoardInfo* b), __REGA1(struct BitMap* bm),
   WRITESHORT(RTG_X5, line_size);
   WRITESHORT(RTG_FORMAT, rgbf_to_rtg[r->RGBFormat]);
 
+  PIGFX_DEBUG_WRITE(0x19, r->RGBFormat);
   WRITEBYTE(RTG_U81, mask);
   WRITEBYTE(RTG_U82, minterm);
 
