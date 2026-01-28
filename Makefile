@@ -76,7 +76,7 @@ EMU_WARNINGS  ?= \
   -Wswitch-enum -Wshadow \
   -Wconversion -Wsign-conversion \
   -Wundef -Wvla -Wredundant-decls
-OPT_LEVEL  ?= -O3 -ffast-math
+OPT_LEVEL  ?= -Os -ffast-math
 
 ifdef O
 OPT_LEVEL := -O$(O)
