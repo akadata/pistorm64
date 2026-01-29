@@ -552,7 +552,7 @@ void piscsi_unmap_drive(uint8_t index) {
     }
 }
 
-static const char *io_cmd_name(int index) {
+static __attribute__((unused)) const char *io_cmd_name(int index) {
     switch (index) {
         case CMD_INVALID: return "INVALID";
         case CMD_RESET: return "RESET";
@@ -594,7 +594,7 @@ static const char *io_cmd_name(int index) {
 #define GETSCSINAME(a) case a: return ""#a"";
 #define SCSIUNHANDLED(a) return "[!!!PISCSI] Unhandled SCSI command "#a"";
 
-static const char *scsi_cmd_name(int index) {
+static __attribute__((unused)) const char *scsi_cmd_name(int index) {
     switch(index) {
         GETSCSINAME(SCSICMD_TEST_UNIT_READY);
         GETSCSINAME(SCSICMD_INQUIRY);
@@ -610,7 +610,7 @@ static const char *scsi_cmd_name(int index) {
     }
 }
 
-static void print_piscsi_debug_message(int index) {
+static __attribute__((unused)) void print_piscsi_debug_message(int index) {
     int32_t r = 0;
 
     switch (index) {
@@ -753,7 +753,6 @@ static void piscsi_debugme(uint32_t index) {
 }
 
 void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
-    int32_t r;
     uint8_t *map;
 #ifndef PISCSI_DEBUG
     if (type) {}
@@ -795,10 +794,12 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 lseek64(d->fd, (off64_t)src, SEEK_SET);
             }
 
-            r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
             if (map) {
-                DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, r);
+#ifdef PISCSI_DEBUG
+                int32_t debug_r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
+                DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, debug_r);
+#endif
                 ssize_t bytes_read = read(d->fd, map, piscsi_u32[1]);
                 if (bytes_read < 0) {
                     DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
@@ -857,10 +858,12 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 lseek64(d->fd, (off64_t)src, SEEK_SET);
             }
 
-            r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
             map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
             if (map) {
-                DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Write comes from mapped range %d.\n", val, r);
+#ifdef PISCSI_DEBUG
+                int32_t debug_r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
+                DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Write comes from mapped range %d.\n", val, debug_r);
+#endif
                 ssize_t bytes_written = write(d->fd, map, piscsi_u32[1]);
                 if (bytes_written < 0) {
                     DEBUG("[PISCSI-IO-ERROR] Unit:%d WRITE failed: bytes_requested=%d, bytes_written=%zd, errno=%d\n", val, piscsi_u32[1], bytes_written, errno);
@@ -915,14 +918,14 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
             DEBUG("[PISCSI] Driver copy/patch called, destination address %.8X.\n", val);
             int32_t driver_r = get_mapped_item_by_address(cfg, val);
             if (driver_r != -1) {
-                uint32_t addr = (uint32_t)(val - cfg->map_offset[driver_r]);
+                uint32_t driver_base_addr = (uint32_t)(val - cfg->map_offset[driver_r]);
                 uint8_t *dst_data = cfg->map_data[driver_r];
                 uint8_t cur_partition = 0;
-                memcpy(dst_data + addr, piscsi_rom_ptr + PISCSI_DRIVER_OFFSET, 0x4000 - PISCSI_DRIVER_OFFSET);
+                memcpy(dst_data + driver_base_addr, piscsi_rom_ptr + PISCSI_DRIVER_OFFSET, 0x4000 - PISCSI_DRIVER_OFFSET);
 
                 piscsi_hinfo.base_offset = val;
 
-                reloc_hunks(piscsi_hreloc, dst_data + addr, &piscsi_hinfo);
+                reloc_hunks(piscsi_hreloc, dst_data + driver_base_addr, &piscsi_hinfo);
 
                 #define PUTNODELONG(val) do { uint32_t temp = htobe32(val); memcpy(&dst_data[p_offs], &temp, sizeof(temp)); p_offs += 4; } while(0)
                 #define PUTNODELONGBE(val) do { uint32_t temp = val; memcpy(&dst_data[p_offs], &temp, sizeof(temp)); p_offs += 4; } while(0)
@@ -934,22 +937,22 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 }
                 rom_cur_partition = 0;
 
-                uint32_t data_addr = addr + 0x3F00;
-                sprintf((char *)dst_data + data_addr, "pi-scsi.device");
-                uint32_t addr2 = addr + 0x4000;
+                uint32_t driver_data_addr = driver_base_addr + 0x3F00;
+                sprintf((char *)dst_data + driver_data_addr, "pi-scsi.device");
+                uint32_t driver_addr2 = driver_base_addr + 0x4000;
                 for (int i = 0; i < NUM_UNITS; i++) {
                     if (devs[i].fd == -1)
                         goto skip_disk;
 
                     if (devs[i].num_partitions) {
-                        uint32_t p_offs = addr2;
+                        uint32_t p_offs = driver_addr2;
                         DEBUG("[PISCSI] Adding %d partitions for unit %d\n", devs[i].num_partitions, i);
                         for (uint32_t j = 0; j < devs[i].num_partitions; j++) {
                             DEBUG("Partition %d: %s\n", j, devs[i].pb[j]->pb_DriveName + 1);
                             sprintf((char *)dst_data + p_offs, "%s", devs[i].pb[j]->pb_DriveName + 1);
                             p_offs += 0x20;
-                            PUTNODELONG(addr2 + cfg->map_offset[driver_r]);
-                            PUTNODELONG(data_addr + cfg->map_offset[driver_r]);
+                            PUTNODELONG(driver_addr2 + cfg->map_offset[driver_r]);
+                            PUTNODELONG(driver_data_addr + cfg->map_offset[driver_r]);
                             PUTNODELONG(i);
                             PUTNODELONG(0);
                             uint32_t nodesize = (be32toh(devs[i].pb[j]->pb_Environment[0]) + 1) * 4;
@@ -963,7 +966,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                              * On the Pi side these are represented as C structs with 32-bit alignment.
                              * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
                              */
-                            struct pihd_dosnode_data *dat = (struct pihd_dosnode_data *)((char *)(&dst_data[addr2+0x20]));
+                            struct pihd_dosnode_data *dat = (struct pihd_dosnode_data *)((char *)(&dst_data[driver_addr2+0x20]));
 #pragma GCC diagnostic pop
 
                             if (BE(devs[i].pb[j]->pb_Flags) & 0x01) {
@@ -976,7 +979,7 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             }
 
                             DEBUG("DOSNode Data:\n");
-                            DEBUG("Name: %s Device: %s\n", dst_data + addr2, dst_data + data_addr);
+                            DEBUG("Name: %s Device: %s\n", dst_data + driver_addr2, dst_data + driver_data_addr);
                             DEBUG("Unit: %d Flags: %d Pad1: %d\n", BE(dat->unit), BE(dat->flags), BE(dat->pad1));
                             DEBUG("Node len: %d Block len: %d\n", BE(dat->node_len) * 4, BE(dat->block_len) * 4);
                             DEBUG("H: %d SPB: %d BPS: %d\n", BE(dat->surf), BE(dat->secs_per_block), BE(dat->blocks_per_track));
@@ -986,11 +989,11 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                             DEBUG("Maxtransfer: %.8X Mask: %.8X\n", BE(dat->maxtransfer), BE(dat->transfer_mask));
                             DEBUG("DOSType: %.8X\n", BE(dat->dostype));
 
-                            rom_partitions[cur_partition] = (uint32_t)(addr2 + 0x20 + cfg->map_offset[driver_r]);
+                            rom_partitions[cur_partition] = (uint32_t)(driver_addr2 + 0x20 + cfg->map_offset[driver_r]);
                             rom_partition_dostype[cur_partition] = dat->dostype;
                             cur_partition++;
-                            addr2 += 0x100;
-                            p_offs = addr2;
+                            driver_addr2 += 0x100;
+                            p_offs = driver_addr2;
                         }
                     }
 skip_disk:;
@@ -1010,10 +1013,10 @@ skip_disk:;
             DEBUG("[PISCSI] Copy file system %d to %.8X and reloc.\n", rom_cur_fs, piscsi_u32[2]);
             int32_t copy_r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
             if (copy_r != -1) {
-                uint32_t addr = (uint32_t)(piscsi_u32[2] - cfg->map_offset[copy_r]);
-                memcpy(cfg->map_data[copy_r] + addr, filesystems[rom_cur_fs].binary_data, filesystems[rom_cur_fs].h_info.byte_size);
+                uint32_t copy_base_addr = (uint32_t)(piscsi_u32[2] - cfg->map_offset[copy_r]);
+                memcpy(cfg->map_data[copy_r] + copy_base_addr, filesystems[rom_cur_fs].binary_data, filesystems[rom_cur_fs].h_info.byte_size);
                 filesystems[rom_cur_fs].h_info.base_offset = piscsi_u32[2];
-                reloc_hunks(filesystems[rom_cur_fs].relocs, cfg->map_data[copy_r] + addr, &filesystems[rom_cur_fs].h_info);
+                reloc_hunks(filesystems[rom_cur_fs].relocs, cfg->map_data[copy_r] + copy_base_addr, &filesystems[rom_cur_fs].h_info);
                 filesystems[rom_cur_fs].handler = piscsi_u32[2];
             }
             break;
@@ -1022,7 +1025,7 @@ skip_disk:;
             DEBUG("[PISCSI] Set handler for partition %d (DeviceNode: %.8X)\n", rom_cur_partition, val);
             int32_t setfsh_r = get_mapped_item_by_address(cfg, val);
             if (setfsh_r != -1) {
-                uint32_t addr = (uint32_t)(val - cfg->map_offset[setfsh_r]);
+                uint32_t setfsh_base_addr = (uint32_t)(val - cfg->map_offset[setfsh_r]);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
                 /*
@@ -1031,7 +1034,7 @@ skip_disk:;
                  * On the Pi side these are represented as C structs with 32-bit alignment.
                  * The external contract guarantees these blocks are properly aligned as expected by the Amiga.
                  */
-                struct DeviceNode *node = (struct DeviceNode *)((char *)(cfg->map_data[setfsh_r] + addr));
+                struct DeviceNode *node = (struct DeviceNode *)((char *)(cfg->map_data[setfsh_r] + setfsh_base_addr));
 #pragma GCC diagnostic pop
                 char *dosID = (char *)&rom_partition_dostype[rom_cur_partition];
 
@@ -1102,7 +1105,9 @@ fs_found:;
             break;
         }
         case PISCSI_DBG_MSG:
+#ifdef PISCSI_DEBUG
             print_piscsi_debug_message((int)val);
+#endif
             break;
         default:
             DEBUG("[!!!PISCSI] WARN: Unhandled %s register write to %.8X: %d\n", op_type_names[type], addr, (int)val);

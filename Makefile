@@ -18,7 +18,7 @@
 
 EXENAME          = emulator
 
-PLATFORM=PI4_64BIT
+PLATFORM ?= PI4_64BIT
 
 # Enable batching (set to 1) and/or IPL rate limiting (set to interval in us) 100us seems best in tests
 PISTORM_ENABLE_BATCH=1
@@ -76,7 +76,7 @@ EMU_WARNINGS  ?= \
   -Wswitch-enum -Wshadow \
   -Wconversion -Wsign-conversion \
   -Wundef -Wvla -Wredundant-decls
-OPT_LEVEL  ?= -Os -ffast-math
+OPT_LEVEL  ?= -O3 -ffast-math
 
 ifdef O
 OPT_LEVEL := -O$(O)
@@ -144,10 +144,7 @@ AMIGA_AHI_INC ?= $(AMIGA_TOOLCHAIN)/src/m68k-amigaos-gcc/build-Linux-m68k-amigao
 AMIGA_HEADERS ?= $(CURDIR)/src/platforms/amiga/headers/include
 AMIGA_SUBMAKE = $(MAKE) AMIGA_TOOLCHAIN=$(AMIGA_TOOLCHAIN) VBCC=$(AMIGA_VBCC) P96DEV=$(AMIGA_P96DEV) AHI_INC=$(AMIGA_AHI_INC) AMIGA_HEADERS=$(AMIGA_HEADERS)
 
-PS_PROTOCOL_SRC := src/gpio/ps_protocol.c
-ifeq ($(PISTORM_KMOD),1)
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
-endif
 
 
 MAINFILES =
@@ -269,6 +266,14 @@ RAYLIB_DIR := $(CURDIR)/src/raylib_drm
 RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
+
+else ifeq ($(PLATFORM),PI4_NATIVE)
+CPUFLAGS = -march=native
+RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_INC := -I$(RAYLIB_DIR)/src
+RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
+DEFINES      += -DRPI4_TEST
+OPT_LEVEL := -Ofast
 else ifeq ($(PLATFORM),PI4_64BIT_DEBUG)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
 RAYLIB_DIR := $(CURDIR)/src/raylib_drm
