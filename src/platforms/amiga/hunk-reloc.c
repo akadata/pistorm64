@@ -9,15 +9,14 @@
 #include "hunk-reloc.h"
 #include "piscsi/piscsi-enums.h"
 #include "piscsi/piscsi.h"
+#include "log.h"
 
 #ifdef FAKESTORM
 #define lseek64 lseek
 #endif
 
-#define DEBUG_SPAMMY(...)
-//#define DEBUG_SPAMMY printf
-#define DEBUG(...)
-//#define DEBUG printf
+#define DEBUG_SPAMMY LOG_DEBUG
+#define DEBUG LOG_DEBUG
 
 #define BE(val) be32toh(val)
 #define BE16(val) be16toh(val)
@@ -30,6 +29,7 @@
   a = be16toh(a);
 
 #define LSEG_MAX_BYTES (64 * 1024 * 1024)
+#define FS_ALLOC_MAX_BYTES (512 * 1024)
 
 uint32_t lw = 0;
 static uint32_t file_offset = 0, add_size = 0;
@@ -200,13 +200,57 @@ int process_hunk(uint32_t index, struct hunk_info* info, FILE* f, struct hunk_re
   return -1;
 }
 
-void reloc_hunk(struct hunk_reloc* h, uint8_t* buf, struct hunk_info* i) {
-  uint32_t rel = i->hunk_offsets[h->target_hunk];
-  uint32_t src = read_be32_unaligned(&buf[i->hunk_offsets[h->src_hunk] + h->offset]);
-  uint32_t dst = src + i->base_offset + rel;
-  DEBUG_SPAMMY("[HUNK-RELOC] %.8X -> %.8X\n", src, dst);
-  uint32_t dst_be = htobe32(dst);
-  memcpy(&buf[i->hunk_offsets[h->src_hunk] + h->offset], &dst_be, sizeof(dst_be));
+static int reloc_bounds_ok(const struct hunk_reloc* h, const struct hunk_info* i,
+                           uint32_t* src_off_out, uint32_t* rel_off_out) {
+  if (!h || !i || !i->hunk_offsets || i->alloc_size == 0 || i->num_hunks == 0) {
+    return 0;
+  }
+  if (h->src_hunk >= i->num_hunks || h->target_hunk >= i->num_hunks) {
+    return 0;
+  }
+  uint32_t src_off = i->hunk_offsets[h->src_hunk] + h->offset;
+  uint32_t rel_off = i->hunk_offsets[h->target_hunk];
+  if (src_off > i->alloc_size - sizeof(uint32_t)) {
+    return 0;
+  }
+  if (rel_off >= i->alloc_size) {
+    return 0;
+  }
+  if (src_off_out) {
+    *src_off_out = src_off;
+  }
+  if (rel_off_out) {
+    *rel_off_out = rel_off;
+  }
+  return 1;
+}
+
+int reloc_hunk(struct hunk_reloc* h, uint8_t* buf, struct hunk_info* i) {
+  uint32_t src_off = 0;
+  uint32_t rel = 0;
+  if (!reloc_bounds_ok(h, i, &src_off, &rel)) {
+    if (i) {
+      i->reloc_errors++;
+    }
+    LOG_ERROR("[HUNK-RELOC] Rejecting relocation: src_hunk=%u target_hunk=%u offset=0x%08X "
+              "alloc=0x%08X\n",
+              h ? h->src_hunk : 0, h ? h->target_hunk : 0, h ? h->offset : 0,
+              i ? i->alloc_size : 0);
+    return -1;
+  }
+  uint32_t src = read_be32_unaligned(&buf[src_off]);
+  uint64_t dst = (uint64_t)src + (uint64_t)i->base_offset + (uint64_t)rel;
+  if (dst < i->base_offset || (dst - i->base_offset) >= i->alloc_size) {
+    i->reloc_errors++;
+    LOG_ERROR("[HUNK-RELOC] Rejecting relocation: dst=0x%08X outside buffer (base=0x%08X "
+              "alloc=0x%08X src=0x%08X rel=0x%08X)\n",
+              (uint32_t)dst, i->base_offset, i->alloc_size, src, rel);
+    return -1;
+  }
+  DEBUG_SPAMMY("[HUNK-RELOC] %.8X -> %.8X\n", src, (uint32_t)dst);
+  uint32_t dst_be = htobe32((uint32_t)dst);
+  memcpy(&buf[src_off], &dst_be, sizeof(dst_be));
+  return 0;
 }
 
 void process_hunks(FILE* in, struct hunk_info* h_info, struct hunk_reloc* r, uint32_t offset) {
@@ -215,11 +259,23 @@ void process_hunks(FILE* in, struct hunk_info* h_info, struct hunk_reloc* r, uin
 
   file_offset = offset;
   add_size = 0;
+  if (h_info) {
+    h_info->parse_errors = 0;
+  }
+
+  if (lw == 0) {
+    DEBUG("[HUNK_RELOC] Reached end marker (0), stopping hunk parse.\n");
+    goto end_parse;
+  }
 
   while (!feof(in) && process_hunk(lw, h_info, in, r) != -1) {
     READLW(lw, in);
     if (feof(in))
       goto end_parse;
+    if (lw == 0) {
+      DEBUG("[HUNK_RELOC] Reached end marker (0), stopping hunk parse.\n");
+      goto end_parse;
+    }
     DEBUG("Hunk ID: %.8X (%s)\n", lw, hunk_id_name(lw));
     long pos_dbg = ftell(in);
     if (pos_dbg < 0) {
@@ -227,17 +283,33 @@ void process_hunks(FILE* in, struct hunk_info* h_info, struct hunk_reloc* r, uin
     }
     DEBUG("File pos: %.8lX\n", (unsigned long)pos_dbg - file_offset);
   }
+  if (h_info) {
+    h_info->parse_errors++;
+  }
 end_parse:;
+  if (h_info) {
+    h_info->bss_size = add_size;
+  }
   DEBUG("Done processing hunks.\n");
 }
 
-void reloc_hunks(struct hunk_reloc* r, uint8_t* buf, struct hunk_info* h_info) {
+int reloc_hunks(struct hunk_reloc* r, uint8_t* buf, struct hunk_info* h_info) {
+  if (!h_info || h_info->alloc_size == 0) {
+    LOG_ERROR("[HUNK-RELOC] Refusing to relocate: invalid alloc_size=%u\n",
+              h_info ? h_info->alloc_size : 0);
+    return -1;
+  }
+  h_info->reloc_errors = 0;
   DEBUG("[HUNK-RELOC] Relocating %d offsets.\n", h_info->reloc_hunks);
   for (uint32_t i = 0; i < h_info->reloc_hunks; i++) {
     DEBUG_SPAMMY("[HUNK-RELOC] Relocating offset %d.\n", i);
-    reloc_hunk(&r[i], buf, h_info);
+    if (reloc_hunk(&r[i], buf, h_info) != 0) {
+      LOG_ERROR("[HUNK-RELOC] Aborting relocation after %u errors.\n", h_info->reloc_errors);
+      return -1;
+    }
   }
   DEBUG("[HUNK-RELOC] Done relocating offsets.\n");
+  return 0;
 }
 
 struct LoadSegBlock {
@@ -264,6 +336,7 @@ int load_lseg(int fd, uint8_t** buf_p, struct hunk_info* i, struct hunk_reloc* r
   uint8_t* block = (uint8_t*)lsb;
   uint32_t next_blk = 0;
   uint8_t* lseg_buf = NULL;
+  uint8_t* buf = NULL;
   size_t lseg_size = 0;
   size_t lseg_capacity = 0;
 
@@ -324,7 +397,7 @@ int load_lseg(int fd, uint8_t** buf_p, struct hunk_info* i, struct hunk_reloc* r
     }
     fseek(mem, 0, SEEK_SET);
   }
-  uint8_t* buf = malloc(file_size + 1024);
+  buf = malloc(file_size + 1024);
   if (!buf) {
     fclose(mem);
     goto fail;
@@ -336,12 +409,28 @@ int load_lseg(int fd, uint8_t** buf_p, struct hunk_info* i, struct hunk_reloc* r
   lseg_buf = NULL;
   *buf_p = buf;
   i->byte_size = file_size;
-  i->alloc_size = file_size + add_size;
+  i->alloc_size = file_size + i->bss_size;
+  if (i->parse_errors != 0) {
+    LOG_ERROR("[LOAD_LSEG] Rejecting filesystem image: parse_errors=%u\n", i->parse_errors);
+    goto fail;
+  }
+  if (i->alloc_size == 0 || i->alloc_size > FS_ALLOC_MAX_BYTES) {
+    LOG_ERROR("[LOAD_LSEG] Rejecting filesystem image: alloc_size=%u (max=%u)\n", i->alloc_size,
+              FS_ALLOC_MAX_BYTES);
+    goto fail;
+  }
+  if (i->header_size >= i->alloc_size || (i->header_size & 3u) != 0) {
+    LOG_ERROR("[LOAD_LSEG] Rejecting filesystem image: invalid header_size=0x%08X alloc=0x%08X\n",
+              i->header_size, i->alloc_size);
+    goto fail;
+  }
 
   free(block);
   return 0;
 
 fail:;
+  if (buf)
+    free(buf);
   if (lseg_buf)
     free(lseg_buf);
   if (block)
@@ -372,7 +461,30 @@ int load_fs(struct piscsi_fs* fs, char* dosID) {
   fseek(in, 0, SEEK_SET);
   process_hunks(in, &fs->h_info, fs->relocs, 0x0);
   fs->h_info.byte_size = file_size;
-  fs->h_info.alloc_size = file_size + add_size;
+  fs->h_info.alloc_size = file_size + fs->h_info.bss_size;
+  if (fs->h_info.parse_errors != 0) {
+    LOG_ERROR("[LOAD_FS] Rejecting filesystem image: parse_errors=%u\n", fs->h_info.parse_errors);
+    free(fs->binary_data);
+    fs->binary_data = NULL;
+    fclose(in);
+    return -1;
+  }
+  if (fs->h_info.alloc_size == 0 || fs->h_info.alloc_size > FS_ALLOC_MAX_BYTES) {
+    LOG_ERROR("[LOAD_FS] Rejecting filesystem image: alloc_size=%u (max=%u)\n",
+              fs->h_info.alloc_size, FS_ALLOC_MAX_BYTES);
+    free(fs->binary_data);
+    fs->binary_data = NULL;
+    fclose(in);
+    return -1;
+  }
+  if (fs->h_info.header_size >= fs->h_info.alloc_size || (fs->h_info.header_size & 3u) != 0) {
+    LOG_ERROR("[LOAD_FS] Rejecting filesystem image: invalid header_size=0x%08X alloc=0x%08X\n",
+              fs->h_info.header_size, fs->h_info.alloc_size);
+    free(fs->binary_data);
+    fs->binary_data = NULL;
+    fclose(in);
+    return -1;
+  }
 
   fclose(in);
 

@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include "m68k.h"
 #include "config_file/config_file.h"
 #ifndef FAKESTORM
 #include "gpio/ps_protocol.h"

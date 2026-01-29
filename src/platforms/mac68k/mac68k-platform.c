@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "m68k.h"
 #include "platforms/platforms.h"
 #include "platforms/shared/rtc.h"
 

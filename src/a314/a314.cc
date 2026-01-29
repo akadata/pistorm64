@@ -41,6 +41,8 @@
 #undef _GNU_SOURCE
 #include "config_file/config_file.h"
 
+extern "C" void m68k_set_irq(unsigned int irq);
+
 extern "C" emulator_config *cfg;
 
 #define LOGGER_TRACE    1
@@ -181,7 +183,7 @@ struct ClientConnection {
 
     uint32_t next_stream_id;
 
-    int bytes_read;
+    size_t bytes_read;
     MessageHeader header;
     std::vector<uint8_t> payload;
 
@@ -1147,19 +1149,19 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
             uint8_t *dst;
 
             if (cc->payload.empty()) {
-                int diff = static_cast<int>(sizeof(MessageHeader)) - cc->bytes_read;
-                if (diff <= 0) {
+                size_t diff = sizeof(MessageHeader) - cc->bytes_read;
+                if (diff == 0) {
                     break;
                 }
-                left = static_cast<size_t>(diff);
+                left = diff;
                 dst = reinterpret_cast<uint8_t *>(&(cc->header)) + cc->bytes_read;
             } else {
                 size_t total_len = static_cast<size_t>(cc->header.length);
-                if (cc->bytes_read >= static_cast<int>(total_len)) {
+                if (cc->bytes_read >= total_len) {
                     break;
                 }
-                left = total_len - static_cast<size_t>(cc->bytes_read);
-                dst = &cc->payload[static_cast<size_t>(cc->bytes_read)];
+                left = total_len - cc->bytes_read;
+                dst = &cc->payload[cc->bytes_read];
             }
 
             ssize_t r = read(cc->fd, dst, left);
@@ -1177,7 +1179,7 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
                 close_and_remove_connection(cc);
                 return;
             } else {
-                cc->bytes_read += r;
+                cc->bytes_read += static_cast<size_t>(r);
                 left -= static_cast<size_t>(r);
                 if (!left) {
                     if (cc->payload.empty()) {

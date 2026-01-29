@@ -42,3 +42,16 @@ struct pistorm_batch {
     __u32 reserved;
 };
 #define PISTORM_IOC_BATCH          _IOWR(PISTORM_IOC_MAGIC, 0x11, struct pistorm_batch)
+
+/* Asynchronous queue interface */
+#define PISTORM_IOC_QUEUE_ENQUEUE  _IOW(PISTORM_IOC_MAGIC, 0x12, struct pistorm_busop)
+#define PISTORM_IOC_QUEUE_FLUSH    _IO(PISTORM_IOC_MAGIC, 0x13)
+
+struct pistorm_queue_stats {
+    __u64 enqueued;
+    __u64 drained;
+    __u32 max_depth;
+    __u32 current_depth;
+    __u32 reserved;
+};
+#define PISTORM_IOC_QUEUE_STATS    _IOR(PISTORM_IOC_MAGIC, 0x14, struct pistorm_queue_stats)
