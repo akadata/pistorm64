@@ -19,6 +19,8 @@ static const char* log_level_name(int level) {
     return "INFO";
   case LOG_LEVEL_DEBUG:
     return "DEBUG";
+  case LOG_LEVEL_VERBOSE:
+    return "VERBOSE";
   default:
     return "UNKNOWN";
   }
@@ -29,11 +31,15 @@ void log_set_level(int level) {
     log_level = LOG_LEVEL_ERROR;
     return;
   }
-  if (level > LOG_LEVEL_DEBUG) {
-    log_level = LOG_LEVEL_DEBUG;
+  if (level > LOG_LEVEL_VERBOSE) {
+    log_level = LOG_LEVEL_VERBOSE;
     return;
   }
   log_level = level;
+}
+
+int log_get_level(void) {
+  return log_level;
 }
 
 static int log_level_from_string(const char* level) {
@@ -54,6 +60,9 @@ static int log_level_from_string(const char* level) {
   }
   if (strcasecmp(level, "debug") == 0) {
     return LOG_LEVEL_DEBUG;
+  }
+  if (strcasecmp(level, "verbose") == 0) {
+    return LOG_LEVEL_VERBOSE;
   }
   return -1;
 }

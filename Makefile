@@ -21,7 +21,7 @@ EXENAME          = emulator
 PLATFORM ?= PI4_64BIT
 
 # Enable batching (set to 1) and/or IPL rate limiting (set to interval in us) 100us seems best in tests
-PISTORM_ENABLE_BATCH=1
+PISTORM_ENABLE_BATCH=0
 PISTORM_IPL_RATELIMIT_US=100  
 
 PISTORM_KMOD ?= 1
@@ -42,9 +42,12 @@ CXX := g++
 endif
 
 
-EXTRA_CFLAGS ?=
-EXTRA_M68K_CFLAGS ?= -O3 -ffast-math
-EXTRA_LDFLAGS ?=
+EXTRA_CFLAGS ?= -O3 
+#-g -O0
+EXTRA_M68K_CFLAGS ?= -O3
+#-g -O0
+EXTRA_LDFLAGS ?= 
+#-g -O0
 
 
 # Tunables: edit here instead of hunting through rule bodies.
@@ -330,8 +333,9 @@ INCLUDES += -Iinclude -Iinclude/uapi
 DEFINES  += -DPISTORM_KMOD
 endif
 
+CXX_WARNINGS = $(filter-out -Wstrict-prototypes -Wmissing-prototypes,$(EMU_WARNINGS))
 CFLAGS       = $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
-CXXFLAGS     = $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
+CXXFLAGS     = $(CXX_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
 M68K_CFLAGS   = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
 LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS) $(EXTRA_LDFLAGS)
 
@@ -392,9 +396,9 @@ src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
 
-buptest:
+buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/log.c
 	@if [ -f src/buptest/buptest.c ]; then \
-		$(CC) $(CFLAGS) -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/gpio/rpi_peri.c; \
+		$(CC) $(CFLAGS) -o $@ src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/log.c; \
 	else \
 		echo "buptest skipped (src/buptest/buptest.c missing)"; \
 	fi

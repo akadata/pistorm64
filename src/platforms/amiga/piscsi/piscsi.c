@@ -9,6 +9,7 @@
 #include <endian.h>
 #include <errno.h>
 
+#include "m68k.h"
 #include "config_file/config_file.h"
 #include "gpio/ps_protocol.h"
 #include "log.h"
@@ -19,8 +20,10 @@
 #define BE(val) be32toh(val)
 #define BE16(val) be16toh(val)
 
+extern struct emulator_config *cfg;
+
 // Debug output is controlled at runtime via --log-level debug.
-//#define PISCSI_DEBUG
+#define PISCSI_DEBUG
 
 #ifdef PISCSI_DEBUG
 #define DEBUG LOG_DEBUG
@@ -35,6 +38,77 @@ static const char *op_type_names[4] = {
     "LONGWORD",
     "MEM",
 };
+
+extern unsigned int cpu_type;
+static __thread char piscsi_disasm_buf[256];
+
+static void piscsi_dump_cpu_state(const char *tag) {
+    unsigned int pc = m68k_get_reg(NULL, M68K_REG_PC);
+    unsigned int ppc = m68k_get_reg(NULL, M68K_REG_PPC);
+    unsigned int sr = m68k_get_reg(NULL, M68K_REG_SR);
+    unsigned int a7 = m68k_get_reg(NULL, M68K_REG_A7);
+    int32_t map_idx = get_mapped_item_by_address(cfg, pc);
+    if (map_idx >= 0) {
+        LOG_ERROR("[PISCSI-CPU] PC map[%d] type=%u range=$%.8lX-$%.8lX id=%s\n",
+                  map_idx,
+                  (unsigned int)cfg->map_type[map_idx],
+                  cfg->map_offset[map_idx],
+                  cfg->map_high[map_idx] - 1,
+                  cfg->map_id[map_idx] ? cfg->map_id[map_idx] : "None");
+    } else {
+        LOG_ERROR("[PISCSI-CPU] PC map: unmapped\n");
+    }
+    LOG_ERROR("[PISCSI-CPU] %s PC=$%.8X PPC=$%.8X SR=$%.4X\n", tag ? tag : "state", pc, ppc, sr);
+    m68k_disassemble(piscsi_disasm_buf, pc, cpu_type);
+    LOG_ERROR("[PISCSI-CPU] %s\n", piscsi_disasm_buf);
+    LOG_ERROR("[PISCSI-CPU] REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
+              m68k_get_reg(NULL, M68K_REG_A0), m68k_get_reg(NULL, M68K_REG_A1),
+              m68k_get_reg(NULL, M68K_REG_A2), m68k_get_reg(NULL, M68K_REG_A3),
+              m68k_get_reg(NULL, M68K_REG_A4), m68k_get_reg(NULL, M68K_REG_A5),
+              m68k_get_reg(NULL, M68K_REG_A6), m68k_get_reg(NULL, M68K_REG_A7));
+    LOG_ERROR("[PISCSI-CPU] REGD: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
+              m68k_get_reg(NULL, M68K_REG_D0), m68k_get_reg(NULL, M68K_REG_D1),
+              m68k_get_reg(NULL, M68K_REG_D2), m68k_get_reg(NULL, M68K_REG_D3),
+              m68k_get_reg(NULL, M68K_REG_D4), m68k_get_reg(NULL, M68K_REG_D5),
+              m68k_get_reg(NULL, M68K_REG_D6), m68k_get_reg(NULL, M68K_REG_D7));
+
+    uint8_t pc_bytes[18];
+    for (int i = -8; i < 10; i++) {
+        pc_bytes[i + 8] = (uint8_t)m68k_read_memory_8(pc + (uint32_t)i);
+    }
+    char pc_line[128];
+    int pc_off = 0;
+    pc_off += snprintf(pc_line + pc_off, sizeof(pc_line) - (size_t)pc_off, "[PISCSI-CPU] PC bytes:");
+    for (int i = 0; i < 18; i++) {
+        pc_off += snprintf(pc_line + pc_off, sizeof(pc_line) - (size_t)pc_off, " %.2X", pc_bytes[i]);
+    }
+    LOG_ERROR("%s\n", pc_line);
+
+    LOG_ERROR("[PISCSI-CPU] A7=$%.8X stack longs:", a7);
+    for (int i = 0; i < 8; i++) {
+        uint32_t val = (uint32_t)m68k_read_memory_32(a7 + (uint32_t)(i * 4));
+        LOG_ERROR(" %.8X", val);
+    }
+    LOG_ERROR("\n");
+
+    if (pc_bytes[8] == 0x4C && pc_bytes[9] == 0xDF && pc_bytes[10] == 0x7F && pc_bytes[11] == 0xFF &&
+        pc_bytes[12] == 0x4E && pc_bytes[13] == 0x75) {
+        uint32_t a7_after = a7 + (15u * 4u);
+        uint32_t retaddr = (uint32_t)m68k_read_memory_32(a7_after);
+        LOG_ERROR("[PISCSI-CPU] movem.l (A7)+,D0-D7/A0-A6 -> A7=$%.8X RTS_ret=$%.8X\n", a7_after, retaddr);
+        int32_t ret_map = get_mapped_item_by_address(cfg, retaddr);
+        if (ret_map >= 0) {
+            LOG_ERROR("[PISCSI-CPU] RTS target map[%d] type=%u range=$%.8lX-$%.8lX id=%s\n",
+                      ret_map,
+                      (unsigned int)cfg->map_type[ret_map],
+                      cfg->map_offset[ret_map],
+                      cfg->map_high[ret_map] - 1,
+                      cfg->map_id[ret_map] ? cfg->map_id[ret_map] : "None");
+        } else {
+            LOG_ERROR("[PISCSI-CPU] RTS target map: unmapped\n");
+        }
+    }
+}
 #else
 #define DEBUG(...)
 #define DEBUG_TRIVIAL(...)
@@ -51,6 +125,122 @@ struct piscsi_dev devs[8];
 struct piscsi_fs filesystems[NUM_FILESYSTEMS];
 
 uint8_t piscsi_num_fs = 0;
+
+#define FS_ALLOC_MAX_BYTES (512 * 1024)
+
+static int fs_handler_valid(const struct piscsi_fs *fs, uint32_t handler_addr, uint8_t partition,
+                            const char *dosID) {
+    if (!fs || !fs->valid) {
+        LOG_ERROR("[PISCSI] Rejecting handler for %c%c%c/%d (partition %u): filesystem invalid\n",
+                  dosID[0], dosID[1], dosID[2], dosID[3], partition);
+        return 0;
+    }
+    if (fs->h_info.alloc_size == 0 || fs->h_info.alloc_size > FS_ALLOC_MAX_BYTES) {
+        LOG_ERROR("[PISCSI] Rejecting handler for %c%c%c/%d (partition %u): invalid alloc_size=%u\n",
+                  dosID[0], dosID[1], dosID[2], dosID[3], partition, fs->h_info.alloc_size);
+        return 0;
+    }
+    if ((handler_addr & 1u) != 0) {
+        LOG_ERROR("[PISCSI] Rejecting handler for %c%c%c/%d (partition %u): handler=0x%08X not aligned\n",
+                  dosID[0], dosID[1], dosID[2], dosID[3], partition, handler_addr);
+        return 0;
+    }
+    if (!fs->h_info.hunk_offsets || fs->h_info.num_hunks == 0 ||
+        fs->h_info.hunk_offsets[0] >= fs->h_info.alloc_size) {
+        LOG_ERROR("[PISCSI] Rejecting handler for %c%c%c/%d (partition %u): invalid hunk table\n",
+                  dosID[0], dosID[1], dosID[2], dosID[3], partition);
+        return 0;
+    }
+    if (fs->h_info.base_offset == 0 || handler_addr < fs->h_info.base_offset ||
+        (handler_addr - fs->h_info.base_offset) >= fs->h_info.alloc_size) {
+        LOG_ERROR("[PISCSI] Rejecting handler for %c%c%c/%d (partition %u): handler=0x%08X "
+                  "outside buffer base=0x%08X size=0x%08X\n",
+                  dosID[0], dosID[1], dosID[2], dosID[3], partition, handler_addr,
+                  fs->h_info.base_offset, fs->h_info.alloc_size);
+        return 0;
+    }
+    if (fs->h_info.header_size >= fs->h_info.alloc_size || (fs->h_info.header_size & 3u) != 0) {
+        LOG_ERROR("[PISCSI] Rejecting handler for %c%c%c/%d (partition %u): header_size=0x%08X "
+                  "invalid for alloc=0x%08X\n",
+                  dosID[0], dosID[1], dosID[2], dosID[3], partition, fs->h_info.header_size,
+                  fs->h_info.alloc_size);
+        return 0;
+    }
+    uint32_t seglist_addr = handler_addr + fs->h_info.header_size;
+    if (seglist_addr < fs->h_info.base_offset ||
+        (seglist_addr - fs->h_info.base_offset) >= fs->h_info.alloc_size) {
+        LOG_ERROR("[PISCSI] Rejecting handler for %c%c%c/%d (partition %u): seglist=0x%08X "
+                  "outside buffer base=0x%08X size=0x%08X\n",
+                  dosID[0], dosID[1], dosID[2], dosID[3], partition, seglist_addr,
+                  fs->h_info.base_offset, fs->h_info.alloc_size);
+        return 0;
+    }
+    return 1;
+}
+
+static int piscsi_get_map_bounds(struct emulator_config *cfg_local, uint32_t addr, uint32_t len,
+                                 uint8_t **map_out, uint32_t *avail_out) {
+    int32_t map_idx = get_mapped_item_by_address(cfg_local, addr);
+    if (map_idx < 0) {
+        if (map_out) {
+            *map_out = NULL;
+        }
+        if (avail_out) {
+            *avail_out = 0;
+        }
+        return -1;
+    }
+
+    uint32_t high = (uint32_t)cfg_local->map_high[map_idx];
+    if (addr >= high) {
+        if (map_out) {
+            *map_out = NULL;
+        }
+        if (avail_out) {
+            *avail_out = 0;
+        }
+        return -1;
+    }
+
+    uint32_t avail = high - addr;
+    if (map_out) {
+        *map_out = cfg_local->map_data[map_idx] + (addr - cfg_local->map_offset[map_idx]);
+    }
+    if (avail_out) {
+        *avail_out = avail;
+    }
+    if (len > avail) {
+        LOG_ERROR("[PISCSI] Refusing %u-byte DMA at 0x%08X: exceeds map end (avail=%u)\n",
+                  len, addr, avail);
+        return -2;
+    }
+
+    return 0;
+}
+
+static int piscsi_get_dma_window(struct emulator_config *cfg_local, uint8_t **buf_out,
+                                 uint32_t *size_out, int32_t *map_idx_out) {
+    int32_t idx = get_named_mapped_item(cfg_local, "piscsi_dma");
+    if (idx < 0 || !cfg_local->map_data[idx]) {
+        return -1;
+    }
+
+    uint32_t size = (uint32_t)(cfg_local->map_high[idx] - cfg_local->map_offset[idx]);
+    if (size == 0) {
+        return -1;
+    }
+
+    if (buf_out) {
+        *buf_out = cfg_local->map_data[idx];
+    }
+    if (size_out) {
+        *size_out = size;
+    }
+    if (map_idx_out) {
+        *map_idx_out = idx;
+    }
+    return 0;
+}
 
 uint8_t piscsi_cur_drive = 0;
 uint32_t piscsi_u32[4];
@@ -98,6 +288,9 @@ void piscsi_init(void) {
 
         fseek(in, PISCSI_DRIVER_OFFSET, SEEK_SET);
         process_hunks(in, &piscsi_hinfo, piscsi_hreloc, PISCSI_DRIVER_OFFSET);
+        uint32_t driver_size = 0x4000 - PISCSI_DRIVER_OFFSET;
+        piscsi_hinfo.byte_size = driver_size;
+        piscsi_hinfo.alloc_size = driver_size + piscsi_hinfo.bss_size;
 
         fclose(in);
 
@@ -131,6 +324,7 @@ void piscsi_shutdown(void) {
         filesystems[i].h_info.reloc_hunks = 0;
         filesystems[i].FS_ID = 0;
         filesystems[i].handler = 0;
+        filesystems[i].valid = 0;
     }
 }
 
@@ -275,6 +469,7 @@ void piscsi_refresh_drives(void) {
         filesystems[i].h_info.reloc_hunks = 0;
         filesystems[i].FS_ID = 0;
         filesystems[i].handler = 0;
+        filesystems[i].valid = 0;
     }
 
     rom_cur_fs = 0;
@@ -346,6 +541,7 @@ void piscsi_find_filesystems(struct piscsi_dev *d) {
         if (load_lseg(d->fd, &filesystems[piscsi_num_fs].binary_data, &filesystems[piscsi_num_fs].h_info, filesystems[piscsi_num_fs].relocs, d->block_size) != -1) {
             filesystems[piscsi_num_fs].FS_ID = fhb->fhb_DosType;
             filesystems[piscsi_num_fs].fhb = fhb;
+            filesystems[piscsi_num_fs].valid = 1;
             printf("[FSHD] Loaded and set up file system %d: %c%c%c/%d\n", piscsi_num_fs + 1, dosID[0], dosID[1], dosID[2], dosID[3]);
             {
                 char fs_save_filename[256];
@@ -366,6 +562,8 @@ void piscsi_find_filesystems(struct piscsi_dev *d) {
                 }
             }
             piscsi_num_fs++;
+        } else {
+            filesystems[piscsi_num_fs].valid = 0;
         }
 
 skip_fs_load_lseg:;
@@ -734,6 +932,7 @@ static void piscsi_debugme(uint32_t index) {
             break;
         case 32:
             DEBUG("AAAAHH!\n");
+            piscsi_dump_cpu_state("DEBUGME 32");
             break;
         case 35:
             DEBUG("[PISCSI-DEBUGME] stuff output\n");
@@ -794,20 +993,72 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 lseek64(d->fd, (off64_t)src, SEEK_SET);
             }
 
-            map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
-            if (map) {
+            uint32_t avail = 0;
+            map = NULL;
+            int map_rc_read = piscsi_get_map_bounds(cfg, piscsi_u32[2], piscsi_u32[1], &map, &avail);
+            if (map_rc_read == 0) {
 #ifdef PISCSI_DEBUG
                 int32_t debug_r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
                 DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Read goes to mapped range %d.\n", val, debug_r);
 #endif
-                ssize_t bytes_read = read(d->fd, map, piscsi_u32[1]);
-                if (bytes_read < 0) {
-                    DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
-                } else if (bytes_read != (ssize_t)piscsi_u32[1]) {
-                    DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
+                uint8_t *dma_buf = NULL;
+                uint32_t dma_size = 0;
+                int32_t dma_idx = -1;
+                if (piscsi_get_dma_window(cfg, &dma_buf, &dma_size, &dma_idx) == 0 &&
+                    get_mapped_item_by_address(cfg, piscsi_u32[2]) == dma_idx) {
+#ifdef PISCSI_DEBUG
+                    DEBUG_TRIVIAL("[PISCSI-%d] Using piscsi_dma window map %d (size=%u) for READ.\n",
+                                  val, dma_idx, dma_size);
+#endif
+                    uint32_t remaining = piscsi_u32[1];
+                    uint32_t dst_addr = piscsi_u32[2];
+                    ssize_t total_read = 0;
+                    int success = 1;
+                    while (remaining) {
+                        uint32_t chunk = remaining < dma_size ? remaining : dma_size;
+                        uint8_t *dst = NULL;
+                        uint32_t dst_avail = 0;
+                        int rc = piscsi_get_map_bounds(cfg, dst_addr, chunk, &dst, &dst_avail);
+                        if (rc != 0) {
+                            DEBUG("[PISCSI-IO-ERROR] Unit:%d READ refused: DMA range overflow at 0x%08X len=%u\n",
+                                  val, dst_addr, chunk);
+                            success = 0;
+                            break;
+                        }
+                        ssize_t bytes_read = read(d->fd, dma_buf, chunk);
+                        if (bytes_read < 0) {
+                            DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%u, bytes_read=%zd, errno=%d\n",
+                                  val, chunk, bytes_read, errno);
+                            success = 0;
+                            break;
+                        }
+                        memcpy(dst, dma_buf, (size_t)bytes_read);
+                        total_read += bytes_read;
+                        if ((uint32_t)bytes_read != chunk) {
+                            DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%u, actual=%zd\n",
+                                  val, chunk, bytes_read);
+                            break;
+                        }
+                        remaining -= chunk;
+                        dst_addr += chunk;
+                    }
+                    if (success) {
+                        DEBUG("[PISCSI-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, total_read);
+                    }
                 } else {
-                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, bytes_read);
+                    ssize_t bytes_read = read(d->fd, map, piscsi_u32[1]);
+                    if (bytes_read < 0) {
+                        DEBUG("[PISCSI-IO-ERROR] Unit:%d READ failed: bytes_requested=%d, bytes_read=%zd, errno=%d\n", val, piscsi_u32[1], bytes_read, errno);
+                    } else if (bytes_read != (ssize_t)piscsi_u32[1]) {
+                        DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL READ: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_read);
+                    } else {
+                        DEBUG("[PISCSI-IO-SUCCESS] Unit:%d READ: %zd bytes OK\n", val, bytes_read);
+                    }
                 }
+            }
+            else if (map_rc_read == -2) {
+                DEBUG("[PISCSI-IO-ERROR] Unit:%d READ refused: DMA range overflow at 0x%08X len=%u\n",
+                      val, piscsi_u32[2], piscsi_u32[1]);
             }
             else {
                 DEBUG_TRIVIAL("[PISCSI-%d] No mapped range found for read.\n", val);
@@ -858,20 +1109,72 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
                 lseek64(d->fd, (off64_t)src, SEEK_SET);
             }
 
-            map = get_mapped_data_pointer_by_address(cfg, piscsi_u32[2]);
-            if (map) {
+            uint32_t avail_w = 0;
+            map = NULL;
+            int map_rc_write = piscsi_get_map_bounds(cfg, piscsi_u32[2], piscsi_u32[1], &map, &avail_w);
+            if (map_rc_write == 0) {
 #ifdef PISCSI_DEBUG
                 int32_t debug_r = get_mapped_item_by_address(cfg, piscsi_u32[2]);
                 DEBUG_TRIVIAL("[PISCSI-%d] \"DMA\" Write comes from mapped range %d.\n", val, debug_r);
 #endif
-                ssize_t bytes_written = write(d->fd, map, piscsi_u32[1]);
-                if (bytes_written < 0) {
-                    DEBUG("[PISCSI-IO-ERROR] Unit:%d WRITE failed: bytes_requested=%d, bytes_written=%zd, errno=%d\n", val, piscsi_u32[1], bytes_written, errno);
-                } else if (bytes_written != (ssize_t)piscsi_u32[1]) {
-                    DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL WRITE: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_written);
+                uint8_t *dma_buf = NULL;
+                uint32_t dma_size = 0;
+                int32_t dma_idx = -1;
+                if (piscsi_get_dma_window(cfg, &dma_buf, &dma_size, &dma_idx) == 0 &&
+                    get_mapped_item_by_address(cfg, piscsi_u32[2]) == dma_idx) {
+#ifdef PISCSI_DEBUG
+                    DEBUG_TRIVIAL("[PISCSI-%d] Using piscsi_dma window map %d (size=%u) for WRITE.\n",
+                                  val, dma_idx, dma_size);
+#endif
+                    uint32_t remaining = piscsi_u32[1];
+                    uint32_t src_addr = piscsi_u32[2];
+                    ssize_t total_written = 0;
+                    int success = 1;
+                    while (remaining) {
+                        uint32_t chunk = remaining < dma_size ? remaining : dma_size;
+                        uint8_t *src_ptr = NULL;
+                        uint32_t src_avail = 0;
+                        int rc = piscsi_get_map_bounds(cfg, src_addr, chunk, &src_ptr, &src_avail);
+                        if (rc != 0) {
+                            DEBUG("[PISCSI-IO-ERROR] Unit:%d WRITE refused: DMA range overflow at 0x%08X len=%u\n",
+                                  val, src_addr, chunk);
+                            success = 0;
+                            break;
+                        }
+                        memcpy(dma_buf, src_ptr, chunk);
+                        ssize_t bytes_written = write(d->fd, dma_buf, chunk);
+                        if (bytes_written < 0) {
+                            DEBUG("[PISCSI-IO-ERROR] Unit:%d WRITE failed: bytes_requested=%u, bytes_written=%zd, errno=%d\n",
+                                  val, chunk, bytes_written, errno);
+                            success = 0;
+                            break;
+                        }
+                        total_written += bytes_written;
+                        if ((uint32_t)bytes_written != chunk) {
+                            DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL WRITE: requested=%u, actual=%zd\n",
+                                  val, chunk, bytes_written);
+                            break;
+                        }
+                        remaining -= chunk;
+                        src_addr += chunk;
+                    }
+                    if (success) {
+                        DEBUG("[PISCSI-IO-SUCCESS] Unit:%d WRITE: %zd bytes OK\n", val, total_written);
+                    }
                 } else {
-                    DEBUG("[PISCSI-IO-SUCCESS] Unit:%d WRITE: %zd bytes OK\n", val, bytes_written);
+                    ssize_t bytes_written = write(d->fd, map, piscsi_u32[1]);
+                    if (bytes_written < 0) {
+                        DEBUG("[PISCSI-IO-ERROR] Unit:%d WRITE failed: bytes_requested=%d, bytes_written=%zd, errno=%d\n", val, piscsi_u32[1], bytes_written, errno);
+                    } else if (bytes_written != (ssize_t)piscsi_u32[1]) {
+                        DEBUG("[PISCSI-IO-WARN] Unit:%d PARTIAL WRITE: requested=%d, actual=%zd\n", val, piscsi_u32[1], bytes_written);
+                    } else {
+                        DEBUG("[PISCSI-IO-SUCCESS] Unit:%d WRITE: %zd bytes OK\n", val, bytes_written);
+                    }
                 }
+            }
+            else if (map_rc_write == -2) {
+                DEBUG("[PISCSI-IO-ERROR] Unit:%d WRITE refused: DMA range overflow at 0x%08X len=%u\n",
+                      val, piscsi_u32[2], piscsi_u32[1]);
             }
             else {
                 DEBUG_TRIVIAL("[PISCSI-%d] No mapped range found for write.\n", val);
@@ -925,7 +1228,10 @@ void handle_piscsi_write(uint32_t addr, uint32_t val, uint8_t type) {
 
                 piscsi_hinfo.base_offset = val;
 
-                reloc_hunks(piscsi_hreloc, dst_data + driver_base_addr, &piscsi_hinfo);
+                if (reloc_hunks(piscsi_hreloc, dst_data + driver_base_addr, &piscsi_hinfo) != 0) {
+                    LOG_ERROR("[PISCSI] Driver relocation failed; aborting handler install\n");
+                    break;
+                }
 
                 #define PUTNODELONG(val) do { uint32_t temp = htobe32(val); memcpy(&dst_data[p_offs], &temp, sizeof(temp)); p_offs += 4; } while(0)
                 #define PUTNODELONGBE(val) do { uint32_t temp = val; memcpy(&dst_data[p_offs], &temp, sizeof(temp)); p_offs += 4; } while(0)
@@ -1016,8 +1322,25 @@ skip_disk:;
                 uint32_t copy_base_addr = (uint32_t)(piscsi_u32[2] - cfg->map_offset[copy_r]);
                 memcpy(cfg->map_data[copy_r] + copy_base_addr, filesystems[rom_cur_fs].binary_data, filesystems[rom_cur_fs].h_info.byte_size);
                 filesystems[rom_cur_fs].h_info.base_offset = piscsi_u32[2];
-                reloc_hunks(filesystems[rom_cur_fs].relocs, cfg->map_data[copy_r] + copy_base_addr, &filesystems[rom_cur_fs].h_info);
+                if (reloc_hunks(filesystems[rom_cur_fs].relocs, cfg->map_data[copy_r] + copy_base_addr,
+                                &filesystems[rom_cur_fs].h_info) != 0) {
+                    char *dosID = (char *)&filesystems[rom_cur_fs].FS_ID;
+                    LOG_ERROR("[PISCSI] Rejecting filesystem %c%c%c/%d: relocation failed\n",
+                              dosID[0], dosID[1], dosID[2], dosID[3]);
+                    filesystems[rom_cur_fs].handler = 0;
+                    filesystems[rom_cur_fs].valid = 0;
+                    break;
+                }
                 filesystems[rom_cur_fs].handler = piscsi_u32[2];
+                filesystems[rom_cur_fs].valid = 1;
+                {
+                    char *dosID = (char *)&filesystems[rom_cur_fs].FS_ID;
+                    if (!fs_handler_valid(&filesystems[rom_cur_fs], filesystems[rom_cur_fs].handler,
+                                          (uint8_t)rom_cur_partition, dosID)) {
+                        filesystems[rom_cur_fs].handler = 0;
+                        filesystems[rom_cur_fs].valid = 0;
+                    }
+                }
             }
             break;
         case PISCSI_CMD_SETFSH: {
@@ -1042,9 +1365,17 @@ skip_disk:;
                 // First try exact match
                 for (fs_idx = 0; fs_idx < piscsi_num_fs; fs_idx++) {
                     if (rom_partition_dostype[rom_cur_partition] == filesystems[fs_idx].FS_ID) {
-                        node->dn_SegList = htobe32((((filesystems[fs_idx].handler) + filesystems[fs_idx].h_info.header_size) >> 2));
-                        node->dn_GlobalVec = 0xFFFFFFFF;
-                        goto fs_found;
+                        if (fs_handler_valid(&filesystems[fs_idx], filesystems[fs_idx].handler,
+                                             (uint8_t)rom_cur_partition, dosID)) {
+                            node->dn_SegList = htobe32((((filesystems[fs_idx].handler) +
+                                                         filesystems[fs_idx].h_info.header_size) >>
+                                                        2));
+                            node->dn_GlobalVec = 0xFFFFFFFF;
+                            goto fs_found;
+                        }
+                        LOG_ERROR("[PISCSI] Handler rejected for %c%c%c/%d (partition %u)\n",
+                                  dosID[0], dosID[1], dosID[2], dosID[3], rom_cur_partition);
+                        goto fs_not_found;
                     }
                 }
 
@@ -1056,17 +1387,26 @@ skip_disk:;
                     fallback_dostype = 0x444F5301;   // DOS/1
                     for (fs_idx = 0; fs_idx < piscsi_num_fs; fs_idx++) {
                         if (fallback_dostype == filesystems[fs_idx].FS_ID) {
-                            node->dn_SegList = htobe32((((filesystems[fs_idx].handler) + filesystems[fs_idx].h_info.header_size) >> 2));
-                            node->dn_GlobalVec = 0xFFFFFFFF;
-                            DEBUG("[PISCSI] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");
-                            goto fs_found;
+                            if (fs_handler_valid(&filesystems[fs_idx], filesystems[fs_idx].handler,
+                                                 (uint8_t)rom_cur_partition, dosID)) {
+                                node->dn_SegList = htobe32((((filesystems[fs_idx].handler) +
+                                                             filesystems[fs_idx].h_info.header_size) >>
+                                                            2));
+                                node->dn_GlobalVec = 0xFFFFFFFF;
+                                DEBUG("[PISCSI] Fallback: Mapped DOS/3 partition to DOS/1 filesystem handler.\n");
+                                goto fs_found;
+                            }
+                            LOG_ERROR("[PISCSI] Handler rejected for %c%c%c/%d (partition %u)\n",
+                                      dosID[0], dosID[1], dosID[2], dosID[3], rom_cur_partition);
+                            goto fs_not_found;
                         }
                     }
                 }
 
                 node->dn_GlobalVec = 0xFFFFFFFF;
                 node->dn_SegList = 0;
-                printf("[!!!PISCSI] Found no handler for file system %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
+fs_not_found:
+                printf("[!!!PISCSI] Found no valid handler for file system %c%c%c/%d\n", dosID[0], dosID[1], dosID[2], dosID[3]);
 fs_found:;
                 DEBUG("[FS-HANDLER] Next: %d Type: %.8X\n", BE(node->dn_Next), BE(node->dn_Type));
                 DEBUG("[FS-HANDLER] Task: %d Lock: %d\n", BE(node->dn_Task), BE(node->dn_Lock));
@@ -1086,10 +1426,12 @@ fs_found:;
                 filesystems[piscsi_num_fs].fhb = NULL;
                 filesystems[piscsi_num_fs].FS_ID = rom_partition_dostype[rom_cur_partition];
                 filesystems[piscsi_num_fs].handler = 0;
+                filesystems[piscsi_num_fs].valid = 0;
                 if (load_fs(&filesystems[piscsi_num_fs], dosID) != -1) {
                     printf("[FSHD-Late] Loaded file system %c%c%c/%d from fs storage.\n", dosID[0], dosID[1], dosID[2], dosID[3]);
                     piscsi_u32[3] = piscsi_num_fs;
                     rom_cur_fs = piscsi_num_fs;
+                    filesystems[piscsi_num_fs].valid = 1;
                     piscsi_num_fs++;
                 } else {
                     printf("[FSHD-Late] Failed to load file system %c%c%c/%d from fs storage.\n", dosID[0], dosID[1], dosID[2], dosID[3]);

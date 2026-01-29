@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+#include "m68k.h"
 #include "platforms/platforms.h"
 #include "pistorm-dev/pistorm-dev-enums.h"
 #include "amiga-autoconf.h"
