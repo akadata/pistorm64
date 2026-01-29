@@ -15,6 +15,10 @@
 - `make kernel_module` / `make kernel_install` build/install the kernel module.
 - `./build_regtool.sh`, `./build_clkpeek.sh`, `./build_pimodplay.sh` build specific tools.
 
+## GPIO Backend Policy
+- Always build and run against `src/gpio/ps_protocol_kmod.c` (the `/dev/pistorm` kernel backend). The legacy `ps_protocol.c` should no longer be referenced or compiled in any emulator, daemon, or support tool unless you are explicitly working on the fallback userspace GPIO path and know exactly why.
+- Under no circumstances should new changes or experiments include `ps_protocol.c`; it is retired and must not be part of the build unless explicitly restoring the legacy userspace GPIO backend.
+
 ## Coding Style & Naming Conventions
 - Format C/C++ with `.clang-format` (LLVM base, 2-space indents, 100-column limit, spaces only).
 - Keep naming consistent with existing modules (snake_case files, `src/platforms/*`).

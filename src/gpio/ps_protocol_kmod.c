@@ -101,6 +101,11 @@ void ps_pulse_reset(void) {
         perror("PISTORM_IOC_PULSE_RESET");
 }
 
+void ps_protocol_dump_stats(void) {
+    // Kernel backend doesn't collect user-space queue stats.
+    fprintf(stderr, "[PS_PROTO] kmod backend: no stats available\n");
+}
+
 
 static int ps_busop(int is_read, int width, unsigned addr, unsigned *val, unsigned short flags) {
     if (ps_open_dev() < 0) return -1;

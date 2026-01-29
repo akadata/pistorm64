@@ -65,7 +65,7 @@
 /* ======================================================================== */
 
 /* Turn ON if you want to use the following M68K variants */
-#define M68K_EMULATE_010            OPT_ON
+#define M68K_EMULATE_010            OPT_OFF
 #define M68K_EMULATE_EC020          OPT_ON
 #define M68K_EMULATE_020            OPT_ON
 #define M68K_EMULATE_030            OPT_ON
@@ -76,7 +76,7 @@
  * and m68k_read_pcrelative_xx() for PC-relative addressing.
  * If off, all read requests from the CPU will be redirected to m68k_read_xx()
  */
-#define M68K_SEPARATE_READS         OPT_OFF
+#define M68K_SEPARATE_READS         OPT_ON
 
 /* If ON, the CPU will call m68k_write_32_pd() when it executes move.l with a
  * predecrement destination EA mode instead of m68k_write_32().
@@ -187,7 +187,8 @@
 #define M68K_LOG_FILEHANDLE         some_file_handle
 
 
-#define M68K_EMULATE_PMMU   OPT_OFF
+#define M68K_EMULATE_PMMU   OPT_OFF 
+// was off
 
 
 /* ----------------------------- COMPATIBILITY ---------------------------- */

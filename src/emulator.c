@@ -1165,6 +1165,8 @@ switch_config:
 #endif
   #endif
 
+  ps_protocol_dump_stats();
+
   return 0;
 }
 
@@ -1244,22 +1246,6 @@ static inline void ps_write(uint8_t type, uint32_t addr, uint32_t val) {
   }
   // This shouldn't actually happen.
   return;
-}
-
-// TEST FC - this is only a test it is also an invalid test at the moment 
-uint8_t cpu_read_byte(uint32_t addr) {
-    if (current_fc != 0) {
-        // TEMP instrumentation
-        // DO NOT branch behavior yet
-        // Just observe
-        static uint32_t last_fc = 0xFFFFFFFF;
-        if (current_fc != last_fc) {
-            printf("[FC] fc=%u addr=%08x\n", current_fc, addr);
-            last_fc = current_fc;
-        }
-    }
-
-//    ...
 }
 
 
