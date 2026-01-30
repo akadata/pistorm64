@@ -91,6 +91,14 @@ static void piscsi_dump_cpu_state(const char *tag) {
     }
     LOG_ERROR("\n");
 
+    uint32_t a0 = m68k_get_reg(NULL, M68K_REG_A0);
+    uint32_t a1 = m68k_get_reg(NULL, M68K_REG_A1);
+    uint32_t a2 = m68k_get_reg(NULL, M68K_REG_A2);
+    int32_t a0_map = get_mapped_item_by_address(cfg, a0);
+    int32_t a1_map = get_mapped_item_by_address(cfg, a1);
+    int32_t a2_map = get_mapped_item_by_address(cfg, a2);
+    LOG_ERROR("[PISCSI-CPU] A0 map: %d A1 map: %d A2 map: %d\n", a0_map, a1_map, a2_map);
+
     if (pc_bytes[8] == 0x4C && pc_bytes[9] == 0xDF && pc_bytes[10] == 0x7F && pc_bytes[11] == 0xFF &&
         pc_bytes[12] == 0x4E && pc_bytes[13] == 0x75) {
         uint32_t a7_after = a7 + (15u * 4u);
@@ -191,6 +199,17 @@ static int piscsi_get_map_bounds(struct emulator_config *cfg_local, uint32_t add
         return -1;
     }
 
+    if (cfg_local->map_type[map_idx] == MAPTYPE_ROM) {
+        if (map_out) {
+            *map_out = NULL;
+        }
+        if (avail_out) {
+            *avail_out = 0;
+        }
+        LOG_ERROR("[PISCSI] Refusing DMA into ROM map %d at 0x%08X\n", map_idx, addr);
+        return -2;
+    }
+
     uint32_t high = (uint32_t)cfg_local->map_high[map_idx];
     if (addr >= high) {
         if (map_out) {
@@ -247,6 +266,7 @@ uint32_t piscsi_u32[4];
 uint32_t piscsi_dbg[8];
 uint32_t piscsi_rom_size = 0;
 uint8_t *piscsi_rom_ptr;
+static uint32_t last_debugme_idx = 0xFFFFFFFFu;
 
 uint32_t rom_partitions[128];
 uint32_t rom_partition_prio[128];
@@ -910,6 +930,12 @@ static __attribute__((unused)) void print_piscsi_debug_message(int index) {
 #define DEBUGME_SIMPLE(i, s) case i: DEBUG(s); break;
 
 static void piscsi_debugme(uint32_t index) {
+    if (index != last_debugme_idx) {
+        last_debugme_idx = index;
+        if (index >= 30 && index <= 41) {
+            piscsi_dump_cpu_state("DEBUGME step");
+        }
+    }
     switch (index) {
         DEBUGME_SIMPLE(1, "[PISCSI-DEBUGME] Arrived at DiagEntry.\n");
         DEBUGME_SIMPLE(2, "[PISCSI-DEBUGME] Arrived at BootEntry, for some reason.\n");
@@ -931,7 +957,7 @@ static void piscsi_debugme(uint32_t index) {
             DEBUG("[PISCSI-DEBUGME] OpenResource result: %d\n", piscsi_u32[0]);
             break;
         case 32:
-            DEBUG("AAAAHH!\n");
+            DEBUG("[PISCSI-DEBUGME] DEBUGME 32 marker.\n");
             piscsi_dump_cpu_state("DEBUGME 32");
             break;
         case 35:
