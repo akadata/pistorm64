@@ -1,7 +1,17 @@
 # PiStorm kernel module
 
-obj-m += pistorm.o
+ifeq ($(MODULE),pistorm)
+obj-m := pistorm.o
 pistorm-objs := src/pistorm.o
+else ifeq ($(MODULE),z3bus)
+obj-m := z3bus.o
+z3bus-objs := src/z3bus.o
+else
+obj-m += pistorm.o
+obj-m += z3bus.o
+pistorm-objs := src/pistorm.o
+z3bus-objs := src/z3bus.o
+endif
 
 KDIR ?= /lib/modules/$(shell uname -r)/build
 PWD  := $(shell pwd)
@@ -14,8 +24,23 @@ all: module
 module:
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
+module_pistorm:
+	$(MAKE) -C $(KDIR) M=$(PWD) MODULE=pistorm modules
+
+module_z3bus:
+	$(MAKE) -C $(KDIR) M=$(PWD) MODULE=z3bus modules
+
 install:
 	sudo install -D -m 644 pistorm.ko /lib/modules/$(shell uname -r)/extra/pistorm.ko
+	sudo install -D -m 644 z3bus.ko /lib/modules/$(shell uname -r)/extra/z3bus.ko
+	sudo depmod -a
+
+install_pistorm:
+	sudo install -D -m 644 pistorm.ko /lib/modules/$(shell uname -r)/extra/pistorm.ko
+	sudo depmod -a
+
+install_z3bus:
+	sudo install -D -m 644 z3bus.ko /lib/modules/$(shell uname -r)/extra/z3bus.ko
 	sudo depmod -a
 
 load: module
@@ -28,4 +53,4 @@ unload:
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
 
-.PHONY: all module install load unload clean
+.PHONY: all module module_pistorm module_z3bus install install_pistorm install_z3bus load unload clean

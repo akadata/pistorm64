@@ -360,8 +360,12 @@ HELP_TARGETS = \
 	"make amiga-clean"                "Clean Amiga-side driver build artifacts" \
 	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom, a314 files" \
 	"make uninstall [PREFIX=… DESTDIR=…]" "Remove installed tree" \
-	"make kernel_module"              "Build pistorm.ko (out-of-tree)" \
-	"make kernel_install"             "Install pistorm.ko via kernel_module/Makefile" \
+	"make kernel_module"              "Build pistorm.ko + z3bus.ko (out-of-tree)" \
+	"make kernel_module_pistorm"      "Build pistorm.ko only (out-of-tree)" \
+	"make kernel_module_z3bus"        "Build z3bus.ko only (out-of-tree)" \
+	"make kernel_install"             "Install pistorm.ko + z3bus.ko via kernel_module/Makefile" \
+	"make kernel_install_pistorm"     "Install pistorm.ko only via kernel_module/Makefile" \
+	"make kernel_install_z3bus"       "Install z3bus.ko only via kernel_module/Makefile" \
 	"make kernel_clean"               "Clean kernel module build outputs" \
 	"make "            "Build interactive bus monitor" \
 	"make full"         "Stop emulator, rebuild kmod+userland, install"
@@ -459,8 +463,20 @@ uninstall:
 kernel_module:
 	$(MAKE) -C kernel_module module
 
+kernel_module_pistorm:
+	$(MAKE) -C kernel_module module_pistorm
+
+kernel_module_z3bus:
+	$(MAKE) -C kernel_module module_z3bus
+
 kernel_install: kernel_module
 	$(MAKE) -C kernel_module install
+
+kernel_install_pistorm: kernel_module_pistorm
+	$(MAKE) -C kernel_module install_pistorm
+
+kernel_install_z3bus: kernel_module_z3bus
+	$(MAKE) -C kernel_module install_z3bus
 
 kernel_clean:
 	$(MAKE) -C kernel_module clean
@@ -518,4 +534,4 @@ help:
 
 -include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d .d
 
-.PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_install kernel_clean amiga-net amiga-piscsi amiga-rtg amiga-ahi amiga-all amiga-clean
+.PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-piscsi amiga-rtg amiga-ahi amiga-all amiga-clean
