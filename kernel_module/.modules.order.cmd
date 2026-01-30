@@ -1,1 +1,1 @@
-savedcmd_modules.order := {   echo pistorm.o; :; } > modules.order
+savedcmd_modules.order := {   echo pistorm.o;   echo z3bus.o; :; } > modules.order
