@@ -7,13 +7,13 @@ This is a live task list for the Z3 bus migration. Keep it short and practical.
 - [x] Add z3bus.ko skeleton (device/driver registry, static device table)
 - [x] Add build targets for z3bus in top‑level Makefile
 - [x] Document roadmap + tasks
-- [ ] Add `docs/wiki/Home.md` link to z3bus roadmap + tasks
+- [x] Add `docs/wiki/Home.md` link to z3bus roadmap + tasks
 
 ## Phase 2 — Emulator ↔ Bus Link
 
-- [ ] Define uapi header for z3bus ioctl (read/write + enumerate)
-- [ ] Add userspace stub in emulator to open `/dev/z3bus`
-- [ ] Add demo autoconfig device backed by z3bus (read‑only ID ROM)
+- [x] Define uapi header for z3bus ioctl (enumerate only)
+- [x] Add userspace stub in emulator to open `/dev/z3bus`
+- [x] Add demo autoconfig device backed by z3bus (read‑only ID ROM)
 - [ ] Log z3bus reads/writes with card/offset/width
 
 ## Phase 3 — First Device Migration (PiSCSI)
@@ -34,4 +34,3 @@ This is a live task list for the Z3 bus migration. Keep it short and practical.
 - [ ] Add MJPEG / video card prototype
 - [ ] Add net card driver on z3bus
 - [ ] Optional: sysfs layout mirroring Zorro
-

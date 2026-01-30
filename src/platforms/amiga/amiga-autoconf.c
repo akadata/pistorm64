@@ -89,6 +89,31 @@ unsigned char ac_pistorm_rom[] = {
     0x0, // Optional BOOT ROM vector
 };
 
+// z3bus demo AutoConfig Device ROM
+unsigned char ac_z3bus_demo_rom[] = {
+    Z2_Z2 | Z2_BOOTROM,
+    AC_MEM_SIZE_64KB, // 00/01, Z2, bootrom, 64 KB
+    0x6,
+    0xC, // 06/0C, product id
+    0x0,
+    0x0, // 00/0a, any space where it fits
+    0x0,
+    0x0,                 // 0c/0e, reserved
+    PISTORM_AC_MANUF_ID, // Manufacturer ID
+    0x0,
+    0x0,
+    0x0,
+    0x0,
+    0x0,
+    0x4,
+    0x2,
+    0x3, // 18/.../26, serial
+    0x4,
+    0x0,
+    0x0,
+    0x0, // Optional BOOT ROM vector
+};
+
 // A314 Emulation ROM
 static unsigned char ac_a314_rom[] = {
     0xc, AC_MEM_SIZE_64KB, // 00/02, 64 kB
@@ -106,6 +131,7 @@ static unsigned char ac_a314_rom[] = {
 };
 
 extern unsigned int a314_base;
+extern uint32_t z3bus_demo_base;
 
 uint32_t ac_z2_current_pic = 0;
 uint32_t ac_z2_pic_count = 0;
@@ -391,6 +417,9 @@ unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int 
   case ACTYPE_PISTORM_DEV:
     rom = ac_pistorm_rom;
     break;
+  case ACTYPE_Z3BUS_DEMO:
+    rom = ac_z3bus_demo_rom;
+    break;
   default:
     return 0;
     break;
@@ -432,6 +461,9 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
     break;
   case ACTYPE_PISTORM_DEV:
     base = &pistorm_dev_base;
+    break;
+  case ACTYPE_Z3BUS_DEMO:
+    base = &z3bus_demo_base;
     break;
   default:
     break;
@@ -479,6 +511,9 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
       break;
     case ACTYPE_PISTORM_DEV:
       LOG_INFO("[AUTOCONF] PiStorm Interaction Z2 device assigned to $%.8X\n", pistorm_dev_base);
+      break;
+    case ACTYPE_Z3BUS_DEMO:
+      LOG_INFO("[AUTOCONF] z3bus demo device assigned to $%.8X\n", z3bus_demo_base);
       break;
     default:
       LOG_WARN("[AUTOCONF] Unknown Z2 device assigned to $%.8X?\n", *base);

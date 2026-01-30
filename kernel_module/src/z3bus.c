@@ -2,10 +2,14 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/list.h>
+#include <linux/miscdevice.h>
+#include <linux/fs.h>
+#include <linux/uaccess.h>
 #include <linux/mutex.h>
 #include <linux/string.h>
 
 #include "z3bus.h"
+#include "pistorm_z3bus.h"
 
 #define Z3BUS_NAME "z3bus"
 
@@ -33,6 +37,7 @@ static struct pistorm_z3_device z3bus_devices[] = {
     .driver_data = NULL,
   },
 };
+static const int z3bus_device_count = sizeof(z3bus_devices) / sizeof(z3bus_devices[0]);
 
 static bool z3_id_match(const struct pistorm_z3_id *want,
                         const struct pistorm_z3_id *have)
@@ -62,7 +67,7 @@ static void z3_probe_all(struct pistorm_z3_driver *drv)
 {
   int i;
 
-  for (i = 0; i < (int)(sizeof(z3bus_devices) / sizeof(z3bus_devices[0])); i++) {
+  for (i = 0; i < z3bus_device_count; i++) {
     struct pistorm_z3_device *dev = &z3bus_devices[i];
     const struct pistorm_z3_id *id = NULL;
 
@@ -108,15 +113,82 @@ void pistorm_z3_unregister_driver(struct pistorm_z3_driver *drv)
 }
 EXPORT_SYMBOL_GPL(pistorm_z3_unregister_driver);
 
+int pistorm_z3_get_device_count(void)
+{
+  return z3bus_device_count;
+}
+EXPORT_SYMBOL_GPL(pistorm_z3_get_device_count);
+
+const struct pistorm_z3_device *pistorm_z3_get_device(int index)
+{
+  if (index < 0 || index >= z3bus_device_count)
+    return NULL;
+  return &z3bus_devices[index];
+}
+EXPORT_SYMBOL_GPL(pistorm_z3_get_device);
+
+static long z3bus_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+{
+  struct pistorm_z3bus_enum req;
+  int i;
+
+  if (cmd != PISTORM_Z3BUS_IOC_ENUM)
+    return -ENOTTY;
+
+  if (copy_from_user(&req, (void __user *)arg, sizeof(req)))
+    return -EFAULT;
+
+  if (req.count > PISTORM_Z3BUS_MAX_DEVS)
+    req.count = PISTORM_Z3BUS_MAX_DEVS;
+
+  for (i = 0; i < (int)req.count && i < z3bus_device_count; i++) {
+    const struct pistorm_z3_device *dev = &z3bus_devices[i];
+    req.devs[i].vendor = dev->id.vendor;
+    req.devs[i].product = dev->id.product;
+    req.devs[i].revision = dev->id.revision;
+    req.devs[i].reserved = dev->id.reserved;
+    req.devs[i].slot = (u32)dev->slot;
+    req.devs[i].start = dev->res.start;
+    req.devs[i].size = dev->res.size;
+    req.devs[i].flags = dev->res.flags;
+  }
+
+  req.count = (z3bus_device_count < (int)req.count) ? z3bus_device_count : req.count;
+
+  if (copy_to_user((void __user *)arg, &req, sizeof(req)))
+    return -EFAULT;
+
+  return 0;
+}
+
+static const struct file_operations z3bus_fops = {
+  .owner = THIS_MODULE,
+  .unlocked_ioctl = z3bus_ioctl,
+  .compat_ioctl = z3bus_ioctl,
+};
+
+static struct miscdevice z3bus_miscdev = {
+  .minor = MISC_DYNAMIC_MINOR,
+  .name = "z3bus",
+  .fops = &z3bus_fops,
+};
+
 static int __init z3bus_init(void)
 {
+  int rc;
   pr_info(Z3BUS_NAME ": skeleton bus loaded (%zu devices)\n",
           sizeof(z3bus_devices) / sizeof(z3bus_devices[0]));
+  rc = misc_register(&z3bus_miscdev);
+  if (rc) {
+    pr_err(Z3BUS_NAME ": failed to register /dev/z3bus (%d)\n", rc);
+    return rc;
+  }
   return 0;
 }
 
 static void __exit z3bus_exit(void)
 {
+  misc_deregister(&z3bus_miscdev);
   pr_info(Z3BUS_NAME ": skeleton bus unloaded\n");
 }
 

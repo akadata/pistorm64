@@ -37,5 +37,7 @@ struct pistorm_z3_driver {
 
 int pistorm_z3_register_driver(struct pistorm_z3_driver *drv);
 void pistorm_z3_unregister_driver(struct pistorm_z3_driver *drv);
+int pistorm_z3_get_device_count(void);
+const struct pistorm_z3_device *pistorm_z3_get_device(int index);
 
 #endif /* _PISTORM_Z3BUS_H */
