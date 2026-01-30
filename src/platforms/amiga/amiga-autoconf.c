@@ -106,7 +106,16 @@ static unsigned char ac_a314_rom[] = {
 
 extern unsigned int a314_base;
 void autoconf_register_zorro_device(uint8_t zorro_index) {
-  add_z2_pic(ACTYPE_ZORRO_GENERIC, zorro_index);
+  zorro_device_t *dev = zorro_get_device_by_index(zorro_index);
+  if (!dev) {
+    LOG_WARN("[AUTOCONF] Tried to register missing Zorro device index %u\n", zorro_index);
+    return;
+  }
+  if (dev->bus == ZORRO_BUS_Z3) {
+    add_z3_pic(ACTYPE_ZORRO_GENERIC, zorro_index);
+  } else {
+    add_z2_pic(ACTYPE_ZORRO_GENERIC, zorro_index);
+  }
 }
 
 uint32_t ac_z2_current_pic = 0;
@@ -174,6 +183,68 @@ void autoconfig_reset_all(void) {
 unsigned int autoconfig_read_memory_z3_8(struct emulator_config* cfg, unsigned int address) {
   int index = ac_z3_index[ac_z3_current_pic];
   unsigned char val = 0;
+
+  if (ac_z3_type[ac_z3_current_pic] == ACTYPE_ZORRO_GENERIC) {
+    zorro_device_t *dev = zorro_get_device_by_index((uint8_t)index);
+    if (!dev) {
+      return 0;
+    }
+    if ((address & 0xFF) >= AC_Z3_REG_RES50 && (address & 0xFF) <= AC_Z3_REG_RES7C) {
+      val = 0;
+    } else {
+      switch (address & 0xFF) {
+      case AC_Z3_REG_ER_TYPE:
+        val |= BOARDTYPE_Z3;
+        if (dev->flags & Z3_FLAGS_MEMORY)
+          val |= BOARDTYPE_FREEMEM;
+        if (dev->size > 8 * SIZE_MEGA)
+          val |= get_autoconf_size_ext(dev->size);
+        else
+          val |= get_autoconf_size(dev->size);
+        if (ac_z3_current_pic + 1 < ac_z3_pic_count)
+          val |= BOARDTYPE_LINKED;
+        val ^= 0xFF;
+        break;
+      case AC_Z3_REG_ER_PRODUCT:
+        val = (unsigned char)(dev->product & 0xFF);
+        break;
+      case AC_Z3_REG_ER_FLAGS:
+        val |= (unsigned char)(dev->flags & 0xF0);
+        if (dev->size > 8 * SIZE_MEGA)
+          val |= Z3_FLAGS_EXTENSION;
+        val |= Z3_FLAGS_RESERVED;
+        break;
+      case AC_Z3_REG_MAN_LO:
+        val = (unsigned char)(dev->manufacturer & 0x00FF);
+        break;
+      case AC_Z3_REG_MAN_HI:
+        val = (unsigned char)(dev->manufacturer >> 8);
+        break;
+      case AC_Z3_REG_SER_BYTE0:
+      case AC_Z3_REG_SER_BYTE1:
+      case AC_Z3_REG_SER_BYTE2:
+      case AC_Z3_REG_SER_BYTE3:
+        val = 0;
+        break;
+      case AC_Z3_REG_INIT_DIAG_VEC_LO:
+      case AC_Z3_REG_INIT_DIAG_VEC_HI:
+        val = 0;
+        break;
+      case AC_Z3_REG_ER_RES03:
+      case AC_Z3_REG_ER_RES0D:
+      case AC_Z3_REG_ER_RES0E:
+      case AC_Z3_REG_ER_RES0F:
+      case AC_Z3_REG_ER_Z2_INT:
+        val = 0;
+        break;
+      default:
+        val = 0;
+        break;
+      }
+    }
+    return (address & 0x100) ? (unsigned int)((val << 4) ^ 0xFF)
+                             : (unsigned int)((val & 0xF0) ^ 0xFF);
+  }
 
   if ((address & 0xFF) >= AC_Z3_REG_RES50 && (address & 0xFF) <= AC_Z3_REG_RES7C) {
     val = 0;
@@ -249,6 +320,7 @@ void autoconfig_write_memory_z3_8(struct emulator_config* cfg, unsigned int addr
   int index = ac_z3_index[ac_z3_current_pic];
   unsigned char val = (unsigned char)value;
   int done = 0;
+  int is_zorro = (ac_z3_type[ac_z3_current_pic] == ACTYPE_ZORRO_GENERIC);
 
   switch (address & 0xFF) {
   case AC_Z3_REG_WR_ADDR_LO:
@@ -290,12 +362,21 @@ void autoconfig_write_memory_z3_8(struct emulator_config* cfg, unsigned int addr
 
   if (done) {
     nib_latch = 0;
-    LOG_INFO("[AUTOCONF] Address of Z3 autoconf RAM assigned to $%.8x [B]\n",
-             ac_base[ac_z3_current_pic]);
-    cfg->map_offset[index] = ac_base[ac_z3_current_pic];
-    cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
-    m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
-                       cfg->map_data[index]);
+    if (is_zorro) {
+      zorro_device_t *dev = zorro_get_device_by_index((uint8_t)index);
+      if (dev) {
+        dev->base = ac_base[ac_z3_current_pic];
+      }
+      LOG_INFO("[AUTOCONF] Address of Z3 autoconf device assigned to $%.8x\n",
+               ac_base[ac_z3_current_pic]);
+    } else {
+      LOG_INFO("[AUTOCONF] Address of Z3 autoconf RAM assigned to $%.8x [B]\n",
+               ac_base[ac_z3_current_pic]);
+      cfg->map_offset[index] = ac_base[ac_z3_current_pic];
+      cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
+      m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                         cfg->map_data[index]);
+    }
     ac_z3_current_pic++;
     if (ac_z3_current_pic == ac_z3_pic_count) {
       ac_z3_done = 1;
@@ -311,6 +392,7 @@ void autoconfig_write_memory_z3_16(struct emulator_config* cfg, unsigned int add
   int index = ac_z3_index[ac_z3_current_pic];
   unsigned short val = (unsigned short)value;
   int done = 0;
+  int is_zorro = (ac_z3_type[ac_z3_current_pic] == ACTYPE_ZORRO_GENERIC);
 
   switch (address & 0xFF) {
   case AC_Z3_REG_WR_ADDR_HI:
@@ -326,12 +408,21 @@ void autoconfig_write_memory_z3_16(struct emulator_config* cfg, unsigned int add
   }
 
   if (done) {
-    LOG_INFO("[AUTOCONF] Address of Z3 autoconf RAM assigned to $%.8x [W]\n",
-             ac_base[ac_z3_current_pic]);
-    cfg->map_offset[index] = ac_base[ac_z3_current_pic];
-    cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
-    m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
-                       cfg->map_data[index]);
+    if (is_zorro) {
+      zorro_device_t *dev = zorro_get_device_by_index((uint8_t)index);
+      if (dev) {
+        dev->base = ac_base[ac_z3_current_pic];
+      }
+      LOG_INFO("[AUTOCONF] Address of Z3 autoconf device assigned to $%.8x\n",
+               ac_base[ac_z3_current_pic]);
+    } else {
+      LOG_INFO("[AUTOCONF] Address of Z3 autoconf RAM assigned to $%.8x [W]\n",
+               ac_base[ac_z3_current_pic]);
+      cfg->map_offset[index] = ac_base[ac_z3_current_pic];
+      cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
+      m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+                         cfg->map_data[index]);
+    }
     ac_z3_current_pic++;
     if (ac_z3_current_pic == ac_z3_pic_count) {
       ac_z3_done = 1;
@@ -350,6 +441,16 @@ void add_z2_pic(uint8_t type, uint8_t index) {
     return;
   }
   LOG_WARN("[AUTOCONF] Failed to add Z2 PIC of type %d, limit exceeded.\n", type);
+}
+
+void add_z3_pic(uint8_t type, uint8_t index) {
+  if (ac_z3_pic_count < AC_PIC_LIMIT) {
+    ac_z3_type[ac_z3_pic_count] = type;
+    ac_z3_index[ac_z3_pic_count] = index;
+    ac_z3_pic_count++;
+    return;
+  }
+  LOG_WARN("[AUTOCONF] Failed to add Z3 PIC of type %d, limit exceeded.\n", type);
 }
 
 void remove_z2_pic(uint8_t type, uint8_t index) {

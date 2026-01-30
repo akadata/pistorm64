@@ -107,4 +107,5 @@ void autoconfig_write_memory_z3_16(struct emulator_config* cfg, unsigned int add
 void autoconfig_reset_all(void);
 
 void add_z2_pic(uint8_t type, uint8_t index);
+void add_z3_pic(uint8_t type, uint8_t index);
 void remove_z2_pic(uint8_t type, uint8_t index);

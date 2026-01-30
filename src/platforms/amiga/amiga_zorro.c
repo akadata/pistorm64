@@ -49,9 +49,7 @@ int zorro_register_device(zorro_device_t *dev) {
 
   zorro_devices[zorro_device_count++] = dev;
 
-  if (dev->bus == ZORRO_BUS_Z2) {
-    autoconf_register_zorro_device(zorro_device_count - 1);
-  }
+  autoconf_register_zorro_device(zorro_device_count - 1);
 
   LOG_INFO("[ZORRO] Registered %s (%s) size=0x%.8X base=0x%.8X\n",
            dev->name ? dev->name : "unnamed",
