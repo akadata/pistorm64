@@ -92,23 +92,31 @@ static void z2_serial_host_init(z2_serial_state_t *st) {
   }
   LOG_INFO("[ZORRO] Serial echo host PTY: %s\n", st->pty_name);
 
-  const char *runtime_dir = getenv("XDG_RUNTIME_DIR");
-  char runtime_buf[128];
-  if (!runtime_dir || runtime_dir[0] == '\0') {
-    snprintf(runtime_buf, sizeof(runtime_buf), "/run/user/%u", (unsigned)getuid());
+  char runtime_dir[256];
+  const char *env = getenv("XDG_RUNTIME_DIR");
+  if (env && env[0] != '\0') {
+    snprintf(runtime_dir, sizeof(runtime_dir), "%s", env);
+  } else {
+    snprintf(runtime_dir, sizeof(runtime_dir), "/run/user/%u", (unsigned)getuid());
     struct stat st_dir;
-    if (stat(runtime_buf, &st_dir) == 0 && S_ISDIR(st_dir.st_mode)) {
-      runtime_dir = runtime_buf;
-    } else {
-      runtime_dir = "/tmp";
+    if (stat(runtime_dir, &st_dir) != 0 || !S_ISDIR(st_dir.st_mode)) {
+      strlcpy(runtime_dir, "/tmp", sizeof(runtime_dir));
     }
   }
 
   char serial_dir[256];
   snprintf(serial_dir, sizeof(serial_dir), "%s/amiga/serial", runtime_dir);
   if (mkdir(serial_dir, 0700) != 0 && errno != EEXIST) {
-    LOG_WARN("[ZORRO] Unable to create %s: %s\n", serial_dir, strerror(errno));
-    return;
+    // try fallback /tmp if runtime path failed
+    strlcpy(serial_dir, "/tmp/amiga/serial", sizeof(serial_dir));
+    if (mkdir("/tmp/amiga", 0700) != 0 && errno != EEXIST) {
+      LOG_WARN("[ZORRO] Unable to create /tmp/amiga: %s\n", strerror(errno));
+      return;
+    }
+    if (mkdir(serial_dir, 0700) != 0 && errno != EEXIST) {
+      LOG_WARN("[ZORRO] Unable to create %s: %s\n", serial_dir, strerror(errno));
+      return;
+    }
   }
 
   char link_path[256];
