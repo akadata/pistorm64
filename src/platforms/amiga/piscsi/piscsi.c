@@ -121,6 +121,9 @@ static void piscsi_dump_cpu_state(const char *tag) {
 #define DEBUG(...)
 #define DEBUG_TRIVIAL(...)
 #define stop_cpu_emulation(...)
+static inline void piscsi_dump_cpu_state(const char *tag) {
+    (void)tag;
+}
 #endif
 
 #ifdef FAKESTORM
