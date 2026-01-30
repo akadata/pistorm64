@@ -5,18 +5,25 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <inttypes.h>
 
 // Include our UAPI header
 #include "ps_protocol.h"
 #include <linux/pistorm.h>
 #include "src/musashi/m68k.h"
+#include "log.h"
 
 // Compile-time toggle for batching - default to disabled to ensure stability
 #ifndef PISTORM_ENABLE_BATCH
 #define PISTORM_ENABLE_BATCH 0
+#endif
+
+#ifndef PISTORM_ENABLE_QUEUE
+#define PISTORM_ENABLE_QUEUE 0
 #endif
 
 #if PISTORM_ENABLE_BATCH
@@ -64,6 +71,20 @@ static int ps_fd = -1;
 static int backend_logged;
 static volatile unsigned int gpio_shadow[32];
 volatile unsigned int *gpio = gpio_shadow; /* legacy pointer */
+static bool ps_queue_enabled = (PISTORM_ENABLE_QUEUE != 0);
+static bool ps_queue_error_logged;
+static uint64_t ps_queue_full_events;
+static uint64_t ps_queue_full_fallbacks;
+
+#ifndef PS_QUEUE_BACKOFF_NS
+#define PS_QUEUE_BACKOFF_NS 200000
+#endif
+
+#ifndef PS_QUEUE_MAX_RETRIES
+#define PS_QUEUE_MAX_RETRIES 200
+#endif
+
+static int ps_busop(int is_read, int width, unsigned addr, unsigned *val, unsigned short flags);
 
 static int ps_open_dev(void) {
     if (ps_fd >= 0) return 0;
@@ -99,6 +120,129 @@ void ps_pulse_reset(void) {
     if (ps_open_dev() < 0) return;
     if (ioctl(ps_fd, PISTORM_IOC_PULSE_RESET) < 0)
         perror("PISTORM_IOC_PULSE_RESET");
+}
+
+void ps_protocol_dump_stats(void) {
+    struct pistorm_queue_stats stats;
+    if (!ps_queue_enabled) {
+        fprintf(stderr, "[PS_PROTO] queue disabled (PISTORM_ENABLE_QUEUE=0)\n");
+        return;
+    }
+    if (ps_open_dev() < 0) {
+        fprintf(stderr, "[PS_PROTO] queue stats unavailable (device offline)\n");
+        return;
+    }
+
+    if (ioctl(ps_fd, PISTORM_IOC_QUEUE_STATS, &stats) < 0) {
+        fprintf(stderr, "[PS_PROTO] queue stats unavailable (%s)\n", strerror(errno));
+        return;
+    }
+
+    fprintf(stderr, "[PS_PROTO] queue: enqueued=%llu drained=%llu depth=%u max=%u"
+                    " full_events=%" PRIu64 " fallbacks=%" PRIu64 "\n",
+            (unsigned long long)stats.enqueued,
+            (unsigned long long)stats.drained,
+            stats.current_depth, stats.max_depth,
+            ps_queue_full_events, ps_queue_full_fallbacks);
+}
+
+static void ps_queue_disable(const char *reason, int err)
+{
+    if (!ps_queue_enabled)
+        return;
+    ps_queue_enabled = false;
+    if (!ps_queue_error_logged) {
+        fprintf(stderr, "[ps_protocol] queue disabled (%s: %s)\n", reason,
+                strerror(err));
+        ps_queue_error_logged = true;
+    }
+}
+
+static void ps_queue_log_full_event(void)
+{
+    if (ps_queue_full_events != 1 && (ps_queue_full_events & 0xff) != 0) {
+        return;
+    }
+
+    struct pistorm_queue_stats stats;
+    if (ioctl(ps_fd, PISTORM_IOC_QUEUE_STATS, &stats) == 0) {
+        LOG_VERBOSE("[PS_QUEUE] full_events=%" PRIu64 " depth=%u max=%u\n",
+                    ps_queue_full_events, stats.current_depth, stats.max_depth);
+        return;
+    }
+
+    LOG_VERBOSE("[PS_QUEUE] full_events=%" PRIu64 " (stats unavailable: %s)\n",
+                ps_queue_full_events, strerror(errno));
+}
+
+static void ps_flush_queue_before_read(void)
+{
+    if (!ps_queue_enabled)
+        return;
+    if (ps_open_dev() < 0)
+        return;
+    if (ioctl(ps_fd, PISTORM_IOC_QUEUE_FLUSH) < 0)
+        ps_queue_disable("queue flush", errno);
+}
+
+static int ps_queue_enqueue_backpressure(const struct pistorm_busop *op)
+{
+    int tries = 0;
+
+    for (;;) {
+        if (ioctl(ps_fd, PISTORM_IOC_QUEUE_ENQUEUE, op) == 0)
+            return 0;
+
+        if (errno != ENOSPC) {
+            ps_queue_disable("queue enqueue", errno);
+            return -1;
+        }
+
+        ps_queue_full_events++;
+        ps_queue_log_full_event();
+
+        if (ioctl(ps_fd, PISTORM_IOC_QUEUE_FLUSH) < 0) {
+            ps_queue_disable("queue flush", errno);
+            return -1;
+        }
+
+        if (++tries >= PS_QUEUE_MAX_RETRIES)
+            return -2;
+
+        struct timespec ts = {
+            .tv_sec = 0,
+            .tv_nsec = PS_QUEUE_BACKOFF_NS,
+        };
+        nanosleep(&ts, NULL);
+    }
+}
+
+static void ps_queue_write(uint32_t addr, unsigned width, uint32_t value)
+{
+    uint32_t temp = value;
+    if (!ps_queue_enabled || ps_open_dev() < 0) {
+        ps_busop(0, (int)width, addr, &temp, 0);
+        return;
+    }
+
+    struct pistorm_busop op = {
+        .addr = addr,
+        .value = value,
+        .width = (unsigned char)width,
+        .is_read = 0,
+        .flags = 0,
+    };
+
+    int rc = ps_queue_enqueue_backpressure(&op);
+    if (rc == 0)
+        return;
+    if (rc == -2) {
+        ps_queue_full_fallbacks++;
+        LOG_VERBOSE("[PS_QUEUE] fallback sync write (full_events=%" PRIu64
+                    " fallbacks=%" PRIu64 ")\n",
+                    ps_queue_full_events, ps_queue_full_fallbacks);
+    }
+    ps_busop(0, (int)width, addr, &temp, 0);
 }
 
 
@@ -140,39 +284,40 @@ static int ps_busop(int is_read, int width, unsigned addr, unsigned *val, unsign
 
 uint8_t ps_read_8(uint32_t addr)  {
     uint32_t v = 0;
+    ps_flush_queue_before_read();
     ps_busop(1, PISTORM_W8, addr, &v, 0);
     return (uint8_t)(v & 0xff);
 }
 
 uint16_t ps_read_16(uint32_t addr) {
     uint32_t v = 0;
+    ps_flush_queue_before_read();
     ps_busop(1, PISTORM_W16, addr, &v, 0);
     return (uint16_t)(v & 0xffff);
 }
 
 uint32_t ps_read_32(uint32_t addr) {
     uint32_t v = 0;
+    ps_flush_queue_before_read();
     ps_busop(1, PISTORM_W32, addr, &v, 0);
     return v;
 }
 
 void ps_write_8(uint32_t addr, uint8_t v)  {
-    uint32_t temp_v = v;
-    ps_busop(0, PISTORM_W8, addr, &temp_v, 0);
+    ps_queue_write(addr, PISTORM_W8, (uint32_t)v);
 }
 
 void ps_write_16(uint32_t addr, uint16_t v) {
-    uint32_t temp_v = v;
-    ps_busop(0, PISTORM_W16, addr, &temp_v, 0);
+    ps_queue_write(addr, PISTORM_W16, (uint32_t)v);
 }
 
 void ps_write_32(uint32_t addr, uint32_t v) {
-    uint32_t temp_v = v;
-    ps_busop(0, PISTORM_W32, addr, &temp_v, 0);
+    ps_queue_write(addr, PISTORM_W32, v);
 }
 
 // Additional functions that might be needed
 uint16_t ps_read_status_reg(void) {
+    ps_flush_queue_before_read();
     struct pistorm_busop op = {
         .addr = 0,
         .value = 0,

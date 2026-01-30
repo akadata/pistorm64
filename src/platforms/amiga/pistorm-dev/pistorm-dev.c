@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <stdio.h>
+#include "m68k.h"
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -1179,4 +1180,3 @@ uint32_t handle_pistorm_dev_read(uint32_t addr_, uint8_t type) {
   }
   return 0;
 }
-

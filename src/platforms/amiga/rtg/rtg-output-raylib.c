@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+#define _GNU_SOURCE
+
 #include "config_file/config_file.h"
 #include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
 #include "emulator.h"
@@ -1076,8 +1078,12 @@ reinit_raylib:;
             size_t cursor = 0;
             const uint8_t* raw = data->memory + addr_offset;
             for (size_t i = 0; i < sample_len && cursor + 3 < sizeof(sample_buf); ++i) {
-              cursor += snprintf(sample_buf + cursor, sizeof(sample_buf) - cursor, "%02X ",
-                                  raw[i]);
+              int written = snprintf(sample_buf + cursor, sizeof(sample_buf) - cursor, "%02X ",
+                                     raw[i]);
+              if (written <= 0) {
+                break;
+              }
+              cursor += (size_t)written;
             }
             LOG_INFO("[RTG/DBG] YUV format %d width=%u height=%u pitch=%u sample=%s\n",
                      current_format, width, height, current_pitch, sample_buf);

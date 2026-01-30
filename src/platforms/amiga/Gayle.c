@@ -21,10 +21,11 @@
 #include "config_file/config_file.h"
 
 #include "amiga-registers.h"
+#include "log.h"
 
 #define DEBUG_GAYLE
 #ifdef DEBUG_GAYLE
-#define DEBUG printf
+#define DEBUG LOG_DEBUG
 #else
 #define DEBUG(...)
 #endif

@@ -10,12 +10,14 @@
 #include <pthread.h>
 #include "gpio/ps_protocol.h"
 #include "platforms/amiga/amiga-interrupts.h"
+#include "log.h"
 #include "pi_ahi.h"
 #include "pi-ahi-enums.h"
 
 #include <alsa/asoundlib.h>
 
-//#define AHI_DEBUG
+#define AHI_DEBUG
+#define DEBUG_AHI
 
 uint32_t ahi_u32[4];
 uint32_t ahi_addr[4];
@@ -31,7 +33,7 @@ static const char* op_type_names[4] = {
     "LONGWORD",
     "MEM",
 };
-#define DEBUG printf
+#define DEBUG LOG_DEBUG
 #define PRINT_AHI_DEBUGMSG print_ahi_debugmsg
 #define PRINT_AHI_SAMPLE_TYPE print_ahi_sample_type
 #else
@@ -410,7 +412,7 @@ void handle_pi_ahi_write(uint32_t addr_, uint32_t val, uint8_t type) {
     switch (val) {
     case 1:
       amiga_clear_emulating_irq();
-      DEBUG("Interrupt handler triggered. IRQ enabled: %d\n", irq_enabled);
+      DEBUG("Interrupt handler triggered. IRQ disabled count: %u\n", irq_disabled);
       break;
     case 2:
       ahi_ints_handled++;
