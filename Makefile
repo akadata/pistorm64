@@ -168,6 +168,7 @@ MAINFILES += $(PS_PROTOCOL_SRC)
 MAINFILES += src/gpio/rpi_peri.c
 
 MAINFILES += src/platforms/platforms.c
+MAINFILES += src/z3bus_iface.c
 
 MAINFILES += src/platforms/amiga/amiga-autoconf.c
 MAINFILES += src/platforms/amiga/amiga-platform.c

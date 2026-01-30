@@ -13,6 +13,8 @@ pistorm-objs := src/pistorm.o
 z3bus-objs := src/z3bus.o
 endif
 
+ccflags-y += -I$(PWD)/../include/uapi
+
 KDIR ?= /lib/modules/$(shell uname -r)/build
 PWD  := $(shell pwd)
 

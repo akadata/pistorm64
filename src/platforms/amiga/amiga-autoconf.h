@@ -32,6 +32,7 @@ enum autoconf_types {
   ACTYPE_A314,
   ACTYPE_PISCSI,
   ACTYPE_PISTORM_DEV,
+  ACTYPE_Z3BUS_DEMO,
   ACTYPE_NUM,
 };
 
