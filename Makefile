@@ -169,6 +169,12 @@ MAINFILES += src/gpio/rpi_peri.c
 
 MAINFILES += src/platforms/platforms.c
 MAINFILES += src/z3bus_iface.c
+MAINFILES += src/platforms/amiga/amiga_zorro.c
+MAINFILES += src/platforms/amiga/zorro/z3bus_demo/z3bus_demo.c
+MAINFILES += src/platforms/amiga/zorro/serial_echo/serial_echo.c
+MAINFILES += src/platforms/amiga/zorro/z2_rng/z2_rng.c
+MAINFILES += src/platforms/amiga/zorro/z2_pissa/z2_pissa.c
+MAINFILES += src/host/crypto/pi_crypto_openssl.c
 
 MAINFILES += src/platforms/amiga/amiga-autoconf.c
 MAINFILES += src/platforms/amiga/amiga-platform.c
@@ -316,7 +322,14 @@ endif
 
 
 RAYLIB_A := $(RAYLIB_LIB)
+OPENSSL_CFLAGS := $(shell pkg-config --cflags openssl 2>/dev/null)
+OPENSSL_LIBS := $(shell pkg-config --libs openssl 2>/dev/null)
+
 BASE_LIBS := -lm -ldl -lstdc++
+ifneq ($(OPENSSL_LIBS),)
+BASE_LIBS += $(OPENSSL_LIBS)
+INCLUDES += $(OPENSSL_CFLAGS)
+endif
 RAYLIB_LIBS := $(RAYLIB_A) -lEGL -lGLESv2 -ldrm -lgbm
 ifeq ($(USE_RAYLIB),0)
 RAYLIB_LIBS :=
@@ -516,6 +529,7 @@ full:
 	# Copy system configuration files
 	#sudo cp -f 10-hugepages.conf /etc/sysctl.d/10-hugepages.conf
 	sudo cp -f etc/modules-load.d/pistorm.conf /etc/modules-load.d/pistorm.conf
+	sudo cp -f etc/modules-load.d/z3bus.conf /etc/modules-load.d/z3bus.conf	
 	sudo cp -f etc/security/limits.d/pistorm-rt.conf /etc/security/limits.d/pistorm-rt.conf
 	sudo cp -f etc/udev/99-pistorm.rules /etc/udev/rules.d/99-pistorm.rules
 	sudo cp -f etc/systemd/system/kernelpistorm64.service /etc/systemd/system/kernelpistorm64.service
@@ -525,7 +539,7 @@ full:
 	# Apply sysctl settings (continue even if hugepages not supported)
 	sudo sysctl -p /etc/sysctl.d/10-hugepages.conf || echo "Note: Some hugepage settings may not be supported on this system"
 	# Enable and start the emulator service
-	#sudo systemctl enable kernelpistorm64.service
+	sudo systemctl enable kernelpistorm64.service
 	echo "Loading Kernel PiStorm64"
 	sudo modprobe pistorm 2>/dev/null || true
 
