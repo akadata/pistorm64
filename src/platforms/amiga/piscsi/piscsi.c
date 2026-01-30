@@ -43,30 +43,33 @@ extern unsigned int cpu_type;
 static __thread char piscsi_disasm_buf[256];
 
 static void piscsi_dump_cpu_state(const char *tag) {
+    if (log_get_level() < LOG_LEVEL_DEBUG) {
+        return;
+    }
     unsigned int pc = m68k_get_reg(NULL, M68K_REG_PC);
     unsigned int ppc = m68k_get_reg(NULL, M68K_REG_PPC);
     unsigned int sr = m68k_get_reg(NULL, M68K_REG_SR);
     unsigned int a7 = m68k_get_reg(NULL, M68K_REG_A7);
     int32_t map_idx = get_mapped_item_by_address(cfg, pc);
     if (map_idx >= 0) {
-        LOG_ERROR("[PISCSI-CPU] PC map[%d] type=%u range=$%.8lX-$%.8lX id=%s\n",
+        LOG_DEBUG("[PISCSI-CPU] PC map[%d] type=%u range=$%.8lX-$%.8lX id=%s\n",
                   map_idx,
                   (unsigned int)cfg->map_type[map_idx],
                   cfg->map_offset[map_idx],
                   cfg->map_high[map_idx] - 1,
                   cfg->map_id[map_idx] ? cfg->map_id[map_idx] : "None");
     } else {
-        LOG_ERROR("[PISCSI-CPU] PC map: unmapped\n");
+        LOG_DEBUG("[PISCSI-CPU] PC map: unmapped\n");
     }
-    LOG_ERROR("[PISCSI-CPU] %s PC=$%.8X PPC=$%.8X SR=$%.4X\n", tag ? tag : "state", pc, ppc, sr);
+    LOG_DEBUG("[PISCSI-CPU] %s PC=$%.8X PPC=$%.8X SR=$%.4X\n", tag ? tag : "state", pc, ppc, sr);
     m68k_disassemble(piscsi_disasm_buf, pc, cpu_type);
-    LOG_ERROR("[PISCSI-CPU] %s\n", piscsi_disasm_buf);
-    LOG_ERROR("[PISCSI-CPU] REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
+    LOG_DEBUG("[PISCSI-CPU] %s\n", piscsi_disasm_buf);
+    LOG_DEBUG("[PISCSI-CPU] REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
               m68k_get_reg(NULL, M68K_REG_A0), m68k_get_reg(NULL, M68K_REG_A1),
               m68k_get_reg(NULL, M68K_REG_A2), m68k_get_reg(NULL, M68K_REG_A3),
               m68k_get_reg(NULL, M68K_REG_A4), m68k_get_reg(NULL, M68K_REG_A5),
               m68k_get_reg(NULL, M68K_REG_A6), m68k_get_reg(NULL, M68K_REG_A7));
-    LOG_ERROR("[PISCSI-CPU] REGD: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
+    LOG_DEBUG("[PISCSI-CPU] REGD: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
               m68k_get_reg(NULL, M68K_REG_D0), m68k_get_reg(NULL, M68K_REG_D1),
               m68k_get_reg(NULL, M68K_REG_D2), m68k_get_reg(NULL, M68K_REG_D3),
               m68k_get_reg(NULL, M68K_REG_D4), m68k_get_reg(NULL, M68K_REG_D5),
@@ -82,14 +85,14 @@ static void piscsi_dump_cpu_state(const char *tag) {
     for (int i = 0; i < 18; i++) {
         pc_off += snprintf(pc_line + pc_off, sizeof(pc_line) - (size_t)pc_off, " %.2X", pc_bytes[i]);
     }
-    LOG_ERROR("%s\n", pc_line);
+    LOG_DEBUG("%s\n", pc_line);
 
-    LOG_ERROR("[PISCSI-CPU] A7=$%.8X stack longs:", a7);
+    LOG_DEBUG("[PISCSI-CPU] A7=$%.8X stack longs:", a7);
     for (int i = 0; i < 8; i++) {
         uint32_t val = (uint32_t)m68k_read_memory_32(a7 + (uint32_t)(i * 4));
-        LOG_ERROR(" %.8X", val);
+        LOG_DEBUG(" %.8X", val);
     }
-    LOG_ERROR("\n");
+    LOG_DEBUG("\n");
 
     uint32_t a0 = m68k_get_reg(NULL, M68K_REG_A0);
     uint32_t a1 = m68k_get_reg(NULL, M68K_REG_A1);
@@ -97,23 +100,23 @@ static void piscsi_dump_cpu_state(const char *tag) {
     int32_t a0_map = get_mapped_item_by_address(cfg, a0);
     int32_t a1_map = get_mapped_item_by_address(cfg, a1);
     int32_t a2_map = get_mapped_item_by_address(cfg, a2);
-    LOG_ERROR("[PISCSI-CPU] A0 map: %d A1 map: %d A2 map: %d\n", a0_map, a1_map, a2_map);
+    LOG_DEBUG("[PISCSI-CPU] A0 map: %d A1 map: %d A2 map: %d\n", a0_map, a1_map, a2_map);
 
     if (pc_bytes[8] == 0x4C && pc_bytes[9] == 0xDF && pc_bytes[10] == 0x7F && pc_bytes[11] == 0xFF &&
         pc_bytes[12] == 0x4E && pc_bytes[13] == 0x75) {
         uint32_t a7_after = a7 + (15u * 4u);
         uint32_t retaddr = (uint32_t)m68k_read_memory_32(a7_after);
-        LOG_ERROR("[PISCSI-CPU] movem.l (A7)+,D0-D7/A0-A6 -> A7=$%.8X RTS_ret=$%.8X\n", a7_after, retaddr);
+        LOG_DEBUG("[PISCSI-CPU] movem.l (A7)+,D0-D7/A0-A6 -> A7=$%.8X RTS_ret=$%.8X\n", a7_after, retaddr);
         int32_t ret_map = get_mapped_item_by_address(cfg, retaddr);
         if (ret_map >= 0) {
-            LOG_ERROR("[PISCSI-CPU] RTS target map[%d] type=%u range=$%.8lX-$%.8lX id=%s\n",
+            LOG_DEBUG("[PISCSI-CPU] RTS target map[%d] type=%u range=$%.8lX-$%.8lX id=%s\n",
                       ret_map,
                       (unsigned int)cfg->map_type[ret_map],
                       cfg->map_offset[ret_map],
                       cfg->map_high[ret_map] - 1,
                       cfg->map_id[ret_map] ? cfg->map_id[ret_map] : "None");
         } else {
-            LOG_ERROR("[PISCSI-CPU] RTS target map: unmapped\n");
+            LOG_DEBUG("[PISCSI-CPU] RTS target map: unmapped\n");
         }
     }
 }
