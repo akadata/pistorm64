@@ -377,7 +377,8 @@ HELP_TARGETS = \
 	"make kernel_module"              "Build pistorm.ko + z3bus.ko (out-of-tree)" \
 	"make kernel_module_pistorm"      "Build pistorm.ko only (out-of-tree)" \
 	"make kernel_module_z3bus"        "Build z3bus.ko only (out-of-tree)" \
-	"make kernel_install"             "Install pistorm.ko + z3bus.ko via kernel_module/Makefile" \
+	"make kernel_install"             "Install pistorm.ko + z3bus.ko via kernel_module/Makefile (no build)" \
+	"make kernel_install_build"       "Build + install pistorm.ko + z3bus.ko" \
 	"make kernel_install_pistorm"     "Install pistorm.ko only via kernel_module/Makefile" \
 	"make kernel_install_z3bus"       "Install z3bus.ko only via kernel_module/Makefile" \
 	"make kernel_clean"               "Clean kernel module build outputs" \
@@ -498,7 +499,10 @@ kernel_module_z3bus:
 	fi
 	$(MAKE) -C kernel_module module_z3bus
 
-kernel_install: kernel_module
+kernel_install:
+	$(MAKE) -C kernel_module install
+
+kernel_install_build: kernel_module
 	$(MAKE) -C kernel_module install
 
 kernel_install_pistorm: kernel_module_pistorm
