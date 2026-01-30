@@ -24,6 +24,13 @@ Example: `setvar enable_rtc_emulation VALUE`
 Mostly used to disable the RTC emulation by uncommenting the line `setvar enable_rtc_emulation 0`.  
 **Note:** There is not much point to disabling the PiStorm RTC emulation, unless you are using an actual A314 in your Amiga, or if you absolutely want to use a physical RTC in your Amiga instead of the emulated PiStorm one.
 
+# enable_fc
+
+Example: `setvar enable_fc stub`  
+Enables Function Code (FC) handling. Valid values: `stub`, `cpld`, or `off`.  
+`stub` only tracks/logs FC in the emulator.  
+`cpld` is intended for FC-aware CPLD builds (experimental).  
+
 # hdd0 / hdd1 - *Deprecated*
 
 Example: `setvar hdd0 ../hd0.img`  
