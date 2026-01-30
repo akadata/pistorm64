@@ -25,6 +25,11 @@
 #define AC_MEM_SIZE_EXT_1024MB 6
 #define AC_MEM_SIZE_EXT_RES 7
 
+// Z2 autoconfig helpers (shared with zorro devices)
+#define Z2_Z2 0xC
+#define Z2_FAST 0x2
+#define Z2_BOOTROM 0x1
+
 enum autoconf_types {
   ACTYPE_NONE,
   ACTYPE_MAPFAST_Z2,
@@ -33,6 +38,7 @@ enum autoconf_types {
   ACTYPE_PISCSI,
   ACTYPE_PISTORM_DEV,
   ACTYPE_Z3BUS_DEMO,
+  ACTYPE_ZORRO_GENERIC,
   ACTYPE_NUM,
 };
 
@@ -72,6 +78,8 @@ enum autoconfg_z3_regs {
   AC_Z3_REG_RES78 = 0x78,
   AC_Z3_REG_RES7C = 0x7C,
 };
+
+void autoconf_register_zorro_device(uint8_t zorro_index);
 
 #define BOARDTYPE_Z3 0x80
 #define BOARDTYPE_Z2 (0x80 | 0x40)

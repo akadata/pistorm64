@@ -4,15 +4,12 @@
 #include "platforms/platforms.h"
 #include "pistorm-dev/pistorm-dev-enums.h"
 #include "amiga-autoconf.h"
+#include "amiga_zorro.h"
 #include "a314/a314.h"
 #include "log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define Z2_Z2 0xC
-#define Z2_FAST 0x2
-#define Z2_BOOTROM 0x1
 
 // PiStorm Zorro II AutoConfig Fast RAM ROM
 static unsigned char ac_fast_ram_rom[] = {
@@ -89,30 +86,7 @@ unsigned char ac_pistorm_rom[] = {
     0x0, // Optional BOOT ROM vector
 };
 
-// z3bus demo AutoConfig Device ROM
-unsigned char ac_z3bus_demo_rom[] = {
-    Z2_Z2 | Z2_BOOTROM,
-    AC_MEM_SIZE_64KB, // 00/01, Z2, bootrom, 64 KB
-    0x6,
-    0xC, // 06/0C, product id
-    0x0,
-    0x0, // 00/0a, any space where it fits
-    0x0,
-    0x0,                 // 0c/0e, reserved
-    PISTORM_AC_MANUF_ID, // Manufacturer ID
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x4,
-    0x2,
-    0x3, // 18/.../26, serial
-    0x4,
-    0x0,
-    0x0,
-    0x0, // Optional BOOT ROM vector
-};
+// z3bus demo AutoConfig Device ROM moved into zorro device registration.
 
 // A314 Emulation ROM
 static unsigned char ac_a314_rom[] = {
@@ -131,7 +105,9 @@ static unsigned char ac_a314_rom[] = {
 };
 
 extern unsigned int a314_base;
-extern uint32_t z3bus_demo_base;
+void autoconf_register_zorro_device(uint8_t zorro_index) {
+  add_z2_pic(ACTYPE_ZORRO_GENERIC, zorro_index);
+}
 
 uint32_t ac_z2_current_pic = 0;
 uint32_t ac_z2_pic_count = 0;
@@ -401,31 +377,44 @@ void remove_z2_pic(uint8_t type, uint8_t index) {
 }
 
 unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int address) {
-  unsigned char* rom = NULL;
+  const unsigned char* rom = NULL;
+  size_t rom_size = sizeof(ac_fast_ram_rom);
   unsigned char val = 0;
 
   switch (ac_z2_type[ac_z2_current_pic]) {
   case ACTYPE_MAPFAST_Z2:
     rom = ac_fast_ram_rom;
+    rom_size = sizeof(ac_fast_ram_rom);
     break;
   case ACTYPE_A314:
     rom = ac_a314_rom;
+    rom_size = sizeof(ac_a314_rom);
     break;
   case ACTYPE_PISCSI:
     rom = ac_piscsi_rom;
+    rom_size = sizeof(ac_piscsi_rom);
     break;
   case ACTYPE_PISTORM_DEV:
     rom = ac_pistorm_rom;
+    rom_size = sizeof(ac_pistorm_rom);
     break;
-  case ACTYPE_Z3BUS_DEMO:
-    rom = ac_z3bus_demo_rom;
+  case ACTYPE_ZORRO_GENERIC: {
+    zorro_device_t *dev =
+        zorro_get_device_by_index((uint8_t)ac_z2_index[ac_z2_current_pic]);
+    if (dev && dev->ac_rom) {
+      rom = dev->ac_rom;
+      rom_size = dev->ac_rom_size;
+    } else {
+      return 0;
+    }
     break;
+  }
   default:
     return 0;
     break;
   }
 
-  if ((address & 1) == 0 && (address / 2) < (int)sizeof(ac_fast_ram_rom)) {
+  if ((address & 1) == 0 && (size_t)(address / 2) < rom_size) {
     if (ac_z2_type[ac_z2_current_pic] == ACTYPE_MAPFAST_Z2 && address / 2 == 1) {
       val = get_autoconf_size(cfg->map_size[ac_z2_index[ac_z2_current_pic]]);
       if (ac_z2_current_pic + 1 < ac_z2_pic_count)
@@ -448,6 +437,8 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
   int index = ac_z2_index[ac_z2_current_pic];
 
   unsigned int* base = NULL;
+  uint32_t zorro_temp_base = 0;
+  zorro_device_t *zorro_dev = NULL;
 
   switch (ac_z2_type[ac_z2_current_pic]) {
   case ACTYPE_MAPFAST_Z2:
@@ -462,8 +453,9 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
   case ACTYPE_PISTORM_DEV:
     base = &pistorm_dev_base;
     break;
-  case ACTYPE_Z3BUS_DEMO:
-    base = &z3bus_demo_base;
+  case ACTYPE_ZORRO_GENERIC:
+    zorro_dev = zorro_get_device_by_index((uint8_t)ac_z2_index[ac_z2_current_pic]);
+    base = &zorro_temp_base;
     break;
   default:
     break;
@@ -512,8 +504,12 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
     case ACTYPE_PISTORM_DEV:
       LOG_INFO("[AUTOCONF] PiStorm Interaction Z2 device assigned to $%.8X\n", pistorm_dev_base);
       break;
-    case ACTYPE_Z3BUS_DEMO:
-      LOG_INFO("[AUTOCONF] z3bus demo device assigned to $%.8X\n", z3bus_demo_base);
+    case ACTYPE_ZORRO_GENERIC:
+      if (zorro_dev) {
+        zorro_dev->base = zorro_temp_base;
+        LOG_INFO("[AUTOCONF] Zorro device %s assigned to $%.8X\n",
+                 zorro_dev->name ? zorro_dev->name : "unnamed", zorro_dev->base);
+      }
       break;
     default:
       LOG_WARN("[AUTOCONF] Unknown Z2 device assigned to $%.8X?\n", *base);

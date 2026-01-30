@@ -26,8 +26,7 @@
 #include "amiga-platform.h"
 #include "a314/a314.h"
 #include "emulator_fc.h"
-#include "z3bus_iface.h"
-#include "pistorm_z3bus.h"
+#include "amiga_zorro.h"
 
 #define DEBUG_AMIGA_PLATFORM
 
@@ -88,9 +87,6 @@ uint8_t a314_initialized = 0;
 extern uint32_t piscsi_base;
 extern uint32_t pistorm_dev_base;
 extern uint8_t rtg_dpms;
-
-uint32_t z3bus_demo_base = 0;
-static uint8_t z3bus_demo_enabled = 0;
 
 extern void stop_cpu_emulation(uint8_t disasm_cur);
 
@@ -175,10 +171,7 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
     return 1;
   }
 
-  if (z3bus_demo_enabled && addr >= z3bus_demo_base &&
-      addr < z3bus_demo_base + (64 * SIZE_KILO)) {
-    DEBUG("[Z3BUS] %s read from demo device @$%.8X.\n", op_type_names[type], addr);
-    *val = 0;
+  if (zorro_handle_read(addr, type, val) == 1) {
     return 1;
   }
 
@@ -275,9 +268,7 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
     return 1;
   }
 
-  if (z3bus_demo_enabled && addr >= z3bus_demo_base &&
-      addr < z3bus_demo_base + (64 * SIZE_KILO)) {
-    DEBUG("[Z3BUS] %s write to demo device @$%.8X: %.8X\n", op_type_names[type], addr, val);
+  if (zorro_handle_write(addr, type, val) == 1) {
     return 1;
   }
 
@@ -359,16 +350,13 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
       cfg->custom_low = min(cfg->custom_low, piscsi_base);
     }
   }
-  if (z3bus_demo_enabled) {
+  if (zorro_get_device_count() > 0) {
     if (cfg->custom_low == 0) {
       cfg->custom_low = AC_Z2_BASE;
     } else {
       cfg->custom_low = min(cfg->custom_low, AC_Z2_BASE);
     }
     cfg->custom_high = max(cfg->custom_high, AC_Z2_BASE + AC_SIZE);
-    if (z3bus_demo_base != 0) {
-      cfg->custom_low = min(cfg->custom_low, z3bus_demo_base);
-    }
   }
   if (pi_ahi_enabled) {
     if (cfg->custom_low == 0) {
@@ -655,21 +643,7 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
     }
   }
 
-  if (CHKVAR("z3bus-demo") && !z3bus_demo_enabled) {
-    struct pistorm_z3bus_dev devs[PISTORM_Z3BUS_MAX_DEVS];
-    uint32_t count = 0;
-    LOG_INFO("[AMIGA] z3bus demo device enabled.\n");
-    z3bus_demo_enabled = 1;
-    if (z3bus_enum(devs, PISTORM_Z3BUS_MAX_DEVS, &count) == 0) {
-      for (uint32_t i = 0; i < count; i++) {
-        LOG_INFO("[Z3BUS] dev%u vendor=0x%04X product=0x%04X rev=0x%04X slot=%u addr=0x%08X size=0x%08X\n",
-                 i, devs[i].vendor, devs[i].product, devs[i].revision, devs[i].slot,
-                 devs[i].start, devs[i].size);
-      }
-    }
-    add_z2_pic(ACTYPE_Z3BUS_DEMO, (uint8_t)0);
-    adjust_ranges_amiga(cfg);
-  }
+  zorro_setvar(cfg, var, val);
 
   // PiSCSI stuff
   if (CHKVAR("piscsi") && !piscsi_enabled) {
