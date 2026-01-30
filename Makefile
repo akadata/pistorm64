@@ -370,6 +370,8 @@ HELP_TARGETS = \
 	"make amiga-piscsi"               "Build Amiga PiSCSI driver + bootrom" \
 	"make amiga-rtg"                  "Build Amiga RTG driver (.card)" \
 	"make amiga-ahi"                  "Build Amiga AHI driver (.audio)" \
+	"make amiga-pissa"                "Build Amiga PISSA crypto tools" \
+	"make amiga-pissl"                "Build Amiga PISSL TLS tools" \
 	"make amiga-all"                  "Build all Amiga-side drivers" \
 	"make amiga-clean"                "Clean Amiga-side driver build artifacts" \
 	"make install [PREFIX=… DESTDIR=…]" "Install emulator, data/, configs, piscsi.rom, a314 files" \
@@ -526,13 +528,21 @@ amiga-rtg:
 amiga-ahi:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga
 
-amiga-all: amiga-net amiga-piscsi amiga-rtg
+amiga-pissa:
+	$(AMIGA_SUBMAKE) -C amiga/pissa
+
+amiga-pissl:
+	$(AMIGA_SUBMAKE) -C amiga/pissl
+
+amiga-all: amiga-net amiga-piscsi amiga-rtg amiga-pissa amiga-pissl
 
 amiga-clean:
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/net/net_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/piscsi/device_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/rtg/rtg_driver_amiga clean
 	$(AMIGA_SUBMAKE) -C src/platforms/amiga/ahi/ahi_driver_amiga clean
+	$(AMIGA_SUBMAKE) -C amiga/pissa clean
+	$(AMIGA_SUBMAKE) -C amiga/pissl clean
 
 full:
 	-pkill -x emulator 2>/dev/null || true
