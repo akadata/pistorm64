@@ -43,6 +43,31 @@ Python must use env-based paths only and must not use `~`, CWD, or hard-coded `/
 ## lsegout.bin Policy (Strict)
 `lsegout.bin` must be bounded (hard max ~64MB). Prefer tmpfs or anonymous RAM backing; otherwise preallocate and refuse growth beyond the limit, logging and failing safely.
 
+## AmigaDOS Primer (Project-Specific)
+AmigaDOS is not Unix. Use canonical Amiga paths and assigns in docs/scripts/tools.
+
+- **Volumes/devices:** `DF0:` floppy, `DH0:`/`DH1:` hard disk partitions, `SYS:` current boot volume.
+- **Assigns:** `C:`, `S:`, `LIBS:`, `DEVS:`, `L:`, `FONTS:`, `PREFS:`, `ENV:`, `ENVARC:`, `T:`. Use these in instructions instead of `/`.
+- **Boot scripts:** `S:Startup-Sequence` (system), `S:User-Startup` (third-party). Prefer appending to `S:User-Startup`.
+- **Binaries:** copy CLI tools to `C:`.
+- **Libraries:** copy `.library` files to `LIBS:`.
+- **Handlers / filesystems:** copy to `L:`; mountfiles go in `DEVS:DosDrivers/`.
+- **Monitors / RTG:** use `DEVS:Monitors/`.
+- **Network devices:** use `DEVS:Networks/`.
+- **Prefs tools:** `SYS:Prefs/` (GUI tools).
+- **Environment:** write persistent settings to `ENVARC:` (copied to `ENV:` at boot).
+- **Case:** AmigaDOS is case-insensitive, but the host filesystem is not. Use canonical names (`C`, `S`, `LIBS`, etc.) in repo paths and docs.
+
+## Host Serial Bridge (PiSide)
+The emulator runs unprivileged; do not assume it can write under `/dev/`.
+Serial devices should publish a stable user‑writable path:
+
+- Prefer: `$XDG_RUNTIME_DIR/amiga/serial/z2serial0`
+- Fallback: `/run/user/<uid>/amiga/serial/z2serial0`
+- Final fallback: `/tmp/amiga/serial/z2serial0`
+
+Always log the real PTY path and the published symlink path.
+
 ## Commit & Pull Request Guidelines
 - Use short, descriptive commit subjects (current history is informal, often lowercase).
 - PRs should note hardware/OS tested, config changes (`etc/`, `boot/`), and include logs/screenshots for hardware-visible changes.

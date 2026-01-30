@@ -4,3 +4,4 @@
 #   sudo usermod -aG pistorm <username>
 # Then reload udev rules: sudo udevadm control --reload && sudo udevadm trigger
 KERNEL=="pistorm", GROUP="pistorm", MODE="0660"
+KERNEL=="z3bus", GROUP="pistorm", MODE="0660"
