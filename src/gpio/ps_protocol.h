@@ -94,6 +94,12 @@ static inline void ps_flush_before_read(void) {
 unsigned int ps_get_ipl_zero(void);
 unsigned int ps_gpio_lev(void);
 
+#ifdef PISTORM_KMOD
+void ps_fc_write(uint8_t fc);
+#else
+static inline void ps_fc_write(uint8_t fc) { (void)fc; }
+#endif
+
 #define read8 ps_read_8
 #define read16 ps_read_16
 #define read32 ps_read_32

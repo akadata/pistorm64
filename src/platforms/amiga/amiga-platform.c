@@ -25,6 +25,7 @@
 #include "rtg/rtg.h"
 #include "amiga-platform.h"
 #include "a314/a314.h"
+#include "emulator_fc.h"
 
 #define DEBUG_AMIGA_PLATFORM
 
@@ -715,6 +716,20 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
   if CHKVAR ("move-slow-to-chip") {
     move_slow_to_chip = 1;
     LOG_INFO("[AMIGA] Slow ram moved to Chip.\n");
+  }
+
+  if CHKVAR ("enable_fc") {
+    if (!val || strlen(val) == 0 || strcmp(val, "stub") == 0) {
+      fc_set_mode(FC_MODE_STUB);
+    } else if (strcmp(val, "cpld") == 0) {
+      fc_set_mode(FC_MODE_CPLD);
+      LOG_WARN("[FC] CPLD mode selected; requires FC-enabled CPLD bitstream.\n");
+    } else if (strcmp(val, "off") == 0) {
+      fc_set_mode(FC_MODE_OFF);
+    } else {
+      LOG_WARN("[FC] Unknown enable_fc value '%s' (use off|stub|cpld)\n", val);
+      fc_set_mode(FC_MODE_OFF);
+    }
   }
 
   if CHKVAR ("force-move-slow-to-chip") {

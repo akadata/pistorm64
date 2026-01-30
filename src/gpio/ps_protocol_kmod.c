@@ -146,6 +146,14 @@ void ps_protocol_dump_stats(void) {
             ps_queue_full_events, ps_queue_full_fallbacks);
 }
 
+void ps_fc_write(uint8_t fc) {
+    if (ps_open_dev() < 0) return;
+    if (log_get_level() >= LOG_LEVEL_VERBOSE) {
+        LOG_VERBOSE("[FC] cpld stub (fc=%u)\n", fc);
+    }
+    /* TODO: implement CPLD FC signaling when kernel/CPLD support is wired up. */
+}
+
 static void ps_queue_disable(const char *reason, int err)
 {
     if (!ps_queue_enabled)

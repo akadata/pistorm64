@@ -53,6 +53,36 @@
 
 unsigned int ovl;
 
+static uint32_t fc_shadow = 0;
+static uint32_t fc_shadow_pc = 0;
+static uint32_t fc_shadow_addr = 0;
+static uint8_t fc_shadow_type = 0;
+static uint8_t fc_shadow_is_write = 0;
+
+static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write) {
+  if (fc_get_mode() == FC_MODE_OFF) {
+    return;
+  }
+  if (current_fc == fc_shadow) {
+    return;
+  }
+
+  fc_shadow = current_fc;
+  fc_shadow_pc = m68k_get_reg(NULL, M68K_REG_PC);
+  fc_shadow_addr = addr;
+  fc_shadow_type = type;
+  fc_shadow_is_write = is_write;
+
+  if (log_get_level() >= LOG_LEVEL_VERBOSE) {
+    LOG_DEBUG("[FC] shadow=%u %s type=%u addr=$%.8X PC=$%.8X\n",
+              fc_shadow,
+              is_write ? "W" : "R",
+              type,
+              addr,
+              fc_shadow_pc);
+  }
+}
+
 int kb_hook_enabled = 0;
 int mouse_hook_enabled = 0;
 int cpu_emulation_running = 1;
@@ -1500,6 +1530,7 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
 }
 
 unsigned int m68k_read_memory_8(unsigned int address) {
+  fc_shadow_touch(OP_TYPE_BYTE, address, 0);
   if (platform_read_check(OP_TYPE_BYTE, address, &platform_res)) {
     return platform_res;
   }
@@ -1512,6 +1543,7 @@ unsigned int m68k_read_memory_8(unsigned int address) {
 }
 
 unsigned int m68k_read_memory_16(unsigned int address) {
+  fc_shadow_touch(OP_TYPE_WORD, address, 0);
   if ((address & 0x01) && log_get_level() >= LOG_LEVEL_VERBOSE) {
     LOG_ERROR("[ALIGN] read16 addr=$%.8X PC=$%.8X\n",
               address, m68k_get_reg(NULL, M68K_REG_PC));
@@ -1531,6 +1563,7 @@ unsigned int m68k_read_memory_16(unsigned int address) {
 }
 
 unsigned int m68k_read_memory_32(unsigned int address) {
+  fc_shadow_touch(OP_TYPE_LONGWORD, address, 0);
   if ((address & 0x03) && log_get_level() >= LOG_LEVEL_VERBOSE) {
     LOG_ERROR("[ALIGN] read32 addr=$%.8X PC=$%.8X\n",
               address, m68k_get_reg(NULL, M68K_REG_PC));
@@ -1696,6 +1729,7 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
 }
 
 void m68k_write_memory_8(unsigned int address, unsigned int value) {
+  fc_shadow_touch(OP_TYPE_BYTE, address, 1);
   if (platform_write_check(OP_TYPE_BYTE, address, value)) {
     return;
   }
@@ -1709,6 +1743,7 @@ void m68k_write_memory_8(unsigned int address, unsigned int value) {
 }
 
 void m68k_write_memory_16(unsigned int address, unsigned int value) {
+  fc_shadow_touch(OP_TYPE_WORD, address, 1);
   if ((address & 0x01) && log_get_level() >= LOG_LEVEL_VERBOSE) {
     LOG_ERROR("[ALIGN] write16 addr=$%.8X val=$%.4X PC=$%.8X\n",
               address, value & 0xFFFF, m68k_get_reg(NULL, M68K_REG_PC));
@@ -1732,6 +1767,7 @@ void m68k_write_memory_16(unsigned int address, unsigned int value) {
 }
 
 void m68k_write_memory_32(unsigned int address, unsigned int value) {
+  fc_shadow_touch(OP_TYPE_LONGWORD, address, 1);
   if ((address & 0x03) && log_get_level() >= LOG_LEVEL_VERBOSE) {
     LOG_ERROR("[ALIGN] write32 addr=$%.8X val=$%.8X PC=$%.8X\n",
               address, value, m68k_get_reg(NULL, M68K_REG_PC));
