@@ -24,12 +24,27 @@ ccflags-y += -DPISTORM64_GIT=\"$(shell git rev-parse --short HEAD 2>/dev/null ||
 all: module
 
 module:
+	@if [ "$$(id -u)" = "0" ]; then \
+		echo "ERROR: build kernel_module as a normal user, not root."; \
+		echo "       (root-owned .d files will break subsequent builds)"; \
+		exit 1; \
+	fi
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 module_pistorm:
+	@if [ "$$(id -u)" = "0" ]; then \
+		echo "ERROR: build kernel_module as a normal user, not root."; \
+		echo "       (root-owned .d files will break subsequent builds)"; \
+		exit 1; \
+	fi
 	$(MAKE) -C $(KDIR) M=$(PWD) MODULE=pistorm modules
 
 module_z3bus:
+	@if [ "$$(id -u)" = "0" ]; then \
+		echo "ERROR: build kernel_module as a normal user, not root."; \
+		echo "       (root-owned .d files will break subsequent builds)"; \
+		exit 1; \
+	fi
 	$(MAKE) -C $(KDIR) M=$(PWD) MODULE=z3bus modules
 
 install:

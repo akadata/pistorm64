@@ -475,12 +475,27 @@ uninstall:
 	rm -rf $(INSTALL_DIR)
 
 kernel_module:
+	@if [ "$$(id -u)" = "0" ]; then \
+		echo "ERROR: build kernel_module as a normal user, not root."; \
+		echo "       (root-owned .d files will break subsequent builds)"; \
+		exit 1; \
+	fi
 	$(MAKE) -C kernel_module module
 
 kernel_module_pistorm:
+	@if [ "$$(id -u)" = "0" ]; then \
+		echo "ERROR: build kernel_module as a normal user, not root."; \
+		echo "       (root-owned .d files will break subsequent builds)"; \
+		exit 1; \
+	fi
 	$(MAKE) -C kernel_module module_pistorm
 
 kernel_module_z3bus:
+	@if [ "$$(id -u)" = "0" ]; then \
+		echo "ERROR: build kernel_module as a normal user, not root."; \
+		echo "       (root-owned .d files will break subsequent builds)"; \
+		exit 1; \
+	fi
 	$(MAKE) -C kernel_module module_z3bus
 
 kernel_install: kernel_module
