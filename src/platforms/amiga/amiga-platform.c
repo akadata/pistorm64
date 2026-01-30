@@ -5,6 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
+#include "m68k.h"
 #include "log.h"
 #include "amiga-autoconf.h"
 #include "amiga-registers.h"

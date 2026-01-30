@@ -79,6 +79,7 @@ void     ps_write_status_reg(uint16_t value);
 void ps_setup_protocol(void);
 void ps_reset_state_machine(void);
 void ps_pulse_reset(void);
+void ps_protocol_dump_stats(void);
 
 // Flush the batch queue of operations
 int ps_flush_batch_queue(void);

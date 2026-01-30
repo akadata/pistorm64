@@ -88,6 +88,8 @@ uint8_t ipl_enabled[8];
 
 uint8_t end_signal = 0;
 static volatile sig_atomic_t sigint_seen = 0;
+static volatile sig_atomic_t crash_signal = 0;
+static unsigned int last_pc_seen = 0;
 uint8_t load_new_config = 0;
 uint8_t enable_jit_backend = 0;
 uint8_t enable_fpu_jit_backend = 0;
@@ -134,6 +136,77 @@ static void amiga_warmup_bus(void);
 static void configure_ipl_nops(void);
 static void print_help(const char* prog);
 static void print_about(const char* prog);
+
+extern unsigned int cpu_type;
+extern struct emulator_config* cfg;
+
+static void dump_cpu_state(const char *reason, int opcode) {
+  unsigned int pc = m68k_get_reg(NULL, M68K_REG_PC);
+  unsigned int ppc = m68k_get_reg(NULL, M68K_REG_PPC);
+  unsigned int sr = m68k_get_reg(NULL, M68K_REG_SR);
+  if (reason) {
+    LOG_ERROR("[CPU] %s: PC=$%.8X PPC=$%.8X SR=$%.4X OPCODE=$%.4X\n",
+              reason, pc, ppc, sr, (unsigned int)(opcode & 0xFFFF));
+  } else {
+    LOG_ERROR("[CPU] PC=$%.8X PPC=$%.8X SR=$%.4X\n", pc, ppc, sr);
+  }
+
+  m68k_disassemble(disasm_buf, pc, cpu_type);
+  LOG_ERROR("[CPU] %s\n", disasm_buf);
+  LOG_ERROR("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
+            m68k_get_reg(NULL, M68K_REG_A0), m68k_get_reg(NULL, M68K_REG_A1),
+            m68k_get_reg(NULL, M68K_REG_A2), m68k_get_reg(NULL, M68K_REG_A3),
+            m68k_get_reg(NULL, M68K_REG_A4), m68k_get_reg(NULL, M68K_REG_A5),
+            m68k_get_reg(NULL, M68K_REG_A6), m68k_get_reg(NULL, M68K_REG_A7));
+  LOG_ERROR("REGD: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
+            m68k_get_reg(NULL, M68K_REG_D0), m68k_get_reg(NULL, M68K_REG_D1),
+            m68k_get_reg(NULL, M68K_REG_D2), m68k_get_reg(NULL, M68K_REG_D3),
+            m68k_get_reg(NULL, M68K_REG_D4), m68k_get_reg(NULL, M68K_REG_D5),
+            m68k_get_reg(NULL, M68K_REG_D6), m68k_get_reg(NULL, M68K_REG_D7));
+  if (last_pc_seen != 0 && last_pc_seen != pc) {
+    m68k_disassemble(disasm_buf, last_pc_seen, cpu_type);
+    LOG_ERROR("[CPU] last_pc=$%.8X %s\n", last_pc_seen, disasm_buf);
+  }
+
+  if (cfg) {
+    int32_t map_idx = get_mapped_item_by_address(cfg, pc);
+    if (map_idx >= 0) {
+      LOG_ERROR("[CPU] PC map[%d] type=%u range=$%.8lX-$%.8lX id=%s\n",
+                map_idx, (unsigned int)cfg->map_type[map_idx],
+                cfg->map_offset[map_idx], cfg->map_high[map_idx] - 1,
+                cfg->map_id[map_idx] ? cfg->map_id[map_idx] : "None");
+      if (cfg->map_type[map_idx] == MAPTYPE_ROM && cfg->map_data[map_idx]) {
+        uint32_t off = pc - (uint32_t)cfg->map_offset[map_idx];
+        unsigned char *base = cfg->map_data[map_idx];
+        char line[128];
+        int pos = snprintf(line, sizeof(line), "[CPU] ROM bytes:");
+        for (int i = -8; i < 10; i++) {
+          uint32_t idx = off + (uint32_t)i;
+          unsigned char b = base[idx % (uint32_t)cfg->rom_size[map_idx]];
+          pos += snprintf(line + pos, sizeof(line) - (size_t)pos, " %.2X", b);
+        }
+        LOG_ERROR("%s\n", line);
+      }
+    } else {
+      LOG_ERROR("[CPU] PC map: unmapped\n");
+    }
+  }
+}
+
+static void instr_hook_callback(unsigned int pc) {
+  last_pc_seen = pc;
+}
+
+static int illg_instr_callback(int opcode) {
+  dump_cpu_state("Illegal instruction", opcode);
+  return 0; // let Musashi raise the exception normally
+}
+
+static void crash_signal_handler(int sig_num) {
+  crash_signal = sig_num;
+  dump_cpu_state("Signal", -1);
+  _exit(128 + sig_num);
+}
 
 
 #define CLI_MAX_LINES 32
@@ -823,13 +896,14 @@ int main(int argc, char* argv[]) {
       } else {
         cli_add_line("rtprio %s", argv[++g]);
       }
-    } else if (strcmp(argv[g], "--log-level") == 0 || strcmp(argv[g], "-l") == 0) {
+    } else if (strcmp(argv[g], "--log-level") == 0 || strcmp(argv[g], "--debug-level") == 0 ||
+               strcmp(argv[g], "-l") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no log level specified.\n", argv[g]);
       } else {
         int level = log_parse_level(argv[++g]);
         if (level < 0) {
-          printf("Invalid log level %s ( use error|warn|info|debug ).\n", argv[g]);
+          printf("Invalid log level %s ( use error|warn|info|debug|verbose ).\n", argv[g]);
         } else {
           log_set_level(level);
         }
@@ -1062,12 +1136,19 @@ switch_config:
   InitGayle();
 
   signal(SIGINT, sigint_handler);
+  signal(SIGTERM, crash_signal_handler);
+  signal(SIGSEGV, crash_signal_handler);
+  signal(SIGBUS, crash_signal_handler);
+  signal(SIGILL, crash_signal_handler);
+  signal(SIGABRT, crash_signal_handler);
 
   amiga_reset_and_wait("pre-cpu");
 
   m68k_init();
   printf("Setting CPU type to %d.\n", cpu_type);
   m68k_set_cpu_type(&m68ki_cpu, cpu_type);
+  m68k_set_instr_hook_callback(instr_hook_callback);
+  m68k_set_illg_instr_callback(illg_instr_callback);
   cpu_pulse_reset();
 
   pthread_t ipl_tid = 0, cpu_tid, kbd_tid, mouse_tid = 0;
@@ -1165,6 +1246,8 @@ switch_config:
 #endif
   #endif
 
+  ps_protocol_dump_stats();
+
   return 0;
 }
 
@@ -1244,22 +1327,6 @@ static inline void ps_write(uint8_t type, uint32_t addr, uint32_t val) {
   }
   // This shouldn't actually happen.
   return;
-}
-
-// TEST FC - this is only a test it is also an invalid test at the moment 
-uint8_t cpu_read_byte(uint32_t addr) {
-    if (current_fc != 0) {
-        // TEMP instrumentation
-        // DO NOT branch behavior yet
-        // Just observe
-        static uint32_t last_fc = 0xFFFFFFFF;
-        if (current_fc != last_fc) {
-            printf("[FC] fc=%u addr=%08x\n", current_fc, addr);
-            last_fc = current_fc;
-        }
-    }
-
-//    ...
 }
 
 
@@ -1445,6 +1512,10 @@ unsigned int m68k_read_memory_8(unsigned int address) {
 }
 
 unsigned int m68k_read_memory_16(unsigned int address) {
+  if ((address & 0x01) && log_get_level() >= LOG_LEVEL_VERBOSE) {
+    LOG_ERROR("[ALIGN] read16 addr=$%.8X PC=$%.8X\n",
+              address, m68k_get_reg(NULL, M68K_REG_PC));
+  }
   if (platform_read_check(OP_TYPE_WORD, address, &platform_res)) {
     return platform_res;
   }
@@ -1460,6 +1531,10 @@ unsigned int m68k_read_memory_16(unsigned int address) {
 }
 
 unsigned int m68k_read_memory_32(unsigned int address) {
+  if ((address & 0x03) && log_get_level() >= LOG_LEVEL_VERBOSE) {
+    LOG_ERROR("[ALIGN] read32 addr=$%.8X PC=$%.8X\n",
+              address, m68k_get_reg(NULL, M68K_REG_PC));
+  }
   if (platform_read_check(OP_TYPE_LONGWORD, address, &platform_res)) {
     return platform_res;
   }
@@ -1634,6 +1709,10 @@ void m68k_write_memory_8(unsigned int address, unsigned int value) {
 }
 
 void m68k_write_memory_16(unsigned int address, unsigned int value) {
+  if ((address & 0x01) && log_get_level() >= LOG_LEVEL_VERBOSE) {
+    LOG_ERROR("[ALIGN] write16 addr=$%.8X val=$%.4X PC=$%.8X\n",
+              address, value & 0xFFFF, m68k_get_reg(NULL, M68K_REG_PC));
+  }
   if (platform_write_check(OP_TYPE_WORD, address, value)) {
     return;
   }
@@ -1653,6 +1732,10 @@ void m68k_write_memory_16(unsigned int address, unsigned int value) {
 }
 
 void m68k_write_memory_32(unsigned int address, unsigned int value) {
+  if ((address & 0x03) && log_get_level() >= LOG_LEVEL_VERBOSE) {
+    LOG_ERROR("[ALIGN] write32 addr=$%.8X val=$%.8X PC=$%.8X\n",
+              address, value, m68k_get_reg(NULL, M68K_REG_PC));
+  }
   if (platform_write_check(OP_TYPE_LONGWORD, address, value)) {
     return;
   }
@@ -1945,7 +2028,8 @@ static void print_help(const char* prog) {
   printf("  -h, --help                 Show this help and exit\n");
   printf("  -a, --about                Show about info and exit\n");
   printf("  --log [file]               Write log output to file (default: amiga.log)\n");
-  printf("  -l, --log-level <level>    Set log level (error|warn|info|debug)\n");
+  printf("  -l, --log-level <level>    Set log level (error|warn|info|debug|verbose)\n");
+  printf("  --debug-level <level>      Alias for --log-level\n");
   printf("  --affinity <spec>          Thread affinity (e.g., cpu=3,ipl=2,keyboard=1,mouse=1)\n");
   printf("  --rtprio <spec>            RT priorities (SCHED_RR, e.g., cpu=80,ipl=70,keyboard=90)\n");
   printf("\n");

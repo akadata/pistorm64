@@ -1,0 +1,139 @@
+[ps_protocol] backend=kmod (/dev/pistorm)
+[CFG] No config file specified. Trying to load default.cfg...
+[CFG] Set CPU type to 68030.
+[CFG] ROM identified: Kickstart 3.1 (40.68) 512KB
+[MUSASHI] Mapped read range 1: 00F80000-01000000 (0x7f950df010)
+[CFG] [MAP 0] Added rom mapping for range 00F80000-00FFFFFF ID: kickstart
+[CFG] Allocating 268435456 bytes for RAM mapping (256 MB)...
+[CFG] [MAP 1] Added ram mapping for range 50000000-5FFFFFFF ID: z3_autoconf_fast
+[CFG] Allocating 8388608 bytes for RAM mapping (8 MB)...
+[CFG] [MAP 2] Added ram mapping for range 00200000-009FFFFF ID: z2_autoconf_fast
+[CFG] [MAP 3] Added register mapping for range 00DC0000-00DCFFFF ID: None
+[CFG] Set CPU loop cycles to 100.
+[CFG] Set thread affinity: cpu=3,ipl=2,keyboard=1,mouse=1.
+[CFG] Set RT priorities: cpu=80,ipl=50,keyboard=50,mouse=50.
+[CFG] Setting platform to amiga
+[CFG] Creating platform config for amiga...
+[MUSASHI] Mapped read range 2: 70010000-72810000 (0x7f820dc010)
+[MUSASHI] Mapped write range 1: 70010000-72810000 (0x7f820dc010)
+[CFG] Adding 41943040 byte (40 MB) RAM mapping rtg_mem...
+[CFG] [MAP 4] Added ram_noalloc mapping for range 70010000-7280FFFF ID: rtg_mem
+[INFO] [AMIGA] RTG Enabled.
+[INFO] [AMIGA] Platform custom range: 70000000-72810000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[INFO] [AMIGA] RTG screen width set to 0.
+[INFO] [AMIGA] RTG screen height set to 0.
+[INFO] [AMIGA] PISCSI Interface Enabled.
+[PISCSI] Loaded Boot ROM.
+[INFO] [AMIGA] Platform custom range: 00E80000-80010000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[PISCSI] Map 0: [../Amiga/hdf/KernelPiStormBench.hdf] - 16139354112 bytes.
+[PISCSI] CHS: 31272 16 63
+Finding partitions.
+[PISCSI] Partition 0: PDH0 (4)
+[PISCSI] Partition 1: PDH1 (4)
+Finding file systems.
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 0...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ../Amiga/hdf/KernelPiStormBench.hdf
+[PISCSI-SELFTEST] Testing DH0 partition accessibility...
+[PISCSI-SELFTEST] INFO: No DOS boot block signature in DH0 (signature: 0x50415254)
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 0 (../Amiga/hdf/KernelPiStormBench.hdf)
+[PISCSI] Map 6: [./src/platforms/amiga/pistorm.hdf] - 2621440 bytes.
+[PISCSI] CHS: 160 1 32
+Finding partitions.
+[PISCSI] Partition 0: DH99 (4)
+Finding file systems.
+Done.
+[PISCSI-SELFTEST] Running HDF integrity validation for drive 6...
+[PISCSI-SELFTEST] INFO: Valid RDB signature found in ./src/platforms/amiga/pistorm.hdf
+[PISCSI-SELFTEST-SUCCESS] HDF validation passed for drive 6 (./src/platforms/amiga/pistorm.hdf)
+[INFO] [AMIGA] PI-NET Interface Enabled.
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[A314] Set A314 config filename to /opt/pistorm64/a314/a314d.conf.
+[INFO] [AMIGA] A314 emulation enabled.
+[CFG] IPL NOP count: 8
+[INFO] [AMIGA] Performing setup for Amiga platform.
+[INFO] [AMIGA] No sub system specified.
+[INFO] [AMIGA] 8MB of Z2 Fast RAM configured at $200000
+[INFO] [AMIGA] 256MB of Z3 Fast RAM configured at $50000000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+Failed to open keyboard event source.
+No IDE drives mounted, disabling Gayle IDE component.
+Setting CPU type to 6.
+[PISCSI] Partition 0: PDH0 (4)
+[PISCSI] Partition 1: PDH1 (4)
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[PISCSI] Partition 0: DH99 (4)
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[IPL] Thread running
+Amiga Reset is up...
+[IPL] Thread created successfully
+[AFF] ipl pinned to core 2
+[PRIO] ipl set to SCHED_RR priority 50
+[KBD] Keyboard thread started
+[AFF] keyboard pinned to core 1
+[PRIO] keyboard set to SCHED_RR priority 50
+[MAIN] Keyboard thread created successfully
+[AFF] input pinned to core 2
+[AFF] cpu pinned to core 3
+[PRIO] cpu set to SCHED_RR priority 80
+[MAIN] CPU thread created successfully
+OVL:0
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[MUSASHI] Mapped read range 3: 00200000-00A00000 (0x7f848dd010)
+[MUSASHI] Mapped write range 2: 00200000-00A00000 (0x7f848dd010)
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00A00000, Size: 8 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[MUSASHI] Mapped read range 4: 40000000-50000000 (0x7f850de010)
+[MUSASHI] Mapped write range 3: 40000000-50000000 (0x7f850de010)
+[INFO] [AMIGA] Platform custom range: 00E90000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[AFF] cpu pinned to core 3
+[PISCSI] Partition 0: PDH0 (4)
+[PISCSI] Partition 1: PDH1 (4)
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[PISCSI] Partition 0: DH99 (4)
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+OVL:0
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00A00000, Size: 8 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00E90000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[PISCSI] Partition 0: PDH0 (4)
+[PISCSI] Partition 1: PDH1 (4)
+[FSHD] Loaded and set up file system 1: PFS/3
+[FSHD] Loaded and set up file system 2: DOS/1
+[PISCSI] Partition 0: DH99 (4)
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+OVL:0
+[INFO] [AUTOCONF] PiSCSI Z2 device assigned to $00E90000
+[INFO] [AUTOCONF] A314 emulation device assigned to $00EA0000
+[INFO] [AUTOCONF] Address of Z2 autoconf RAM assigned to $00200000
+[INFO] [AUTOCONF] Z2 PIC 2 at $00200000-00A00000, Size: 8 MB
+[INFO] [AUTOCONF] PiStorm Interaction Z2 device assigned to $00EB0000
+[INFO] [AMIGA] Platform custom range: 00E80000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000
+[INFO] [AUTOCONF] Address of Z3 autoconf RAM assigned to $40000000 [W]
+[INFO] [AMIGA] Platform custom range: 00E90000-80020000
+[INFO] [AMIGA] Platform mapped range: 00200000-72810000

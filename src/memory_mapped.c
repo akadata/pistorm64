@@ -3,6 +3,7 @@
 #include "config_file/config_file.h"
 #include "m68k.h"
 #include "platforms/amiga/Gayle.h"
+#include "log.h"
 #include <endian.h>
 
 #define CHKRANGE(a, b, c) a >= (unsigned int)b&& a < (unsigned int)(b + c)
@@ -110,6 +111,9 @@ int handle_mapped_write(struct emulator_config* cfg, unsigned int addr, unsigned
     } else if (CHKRANGE_ABS(addr, cfg->map_offset[i], cfg->map_high[i])) {
       switch (cfg->map_type[i]) {
       case MAPTYPE_ROM:
+        LOG_ERROR("[MMAP] WRITE refused: ROM region addr=$%.8X map=%d range=$%.8lX-$%.8lX id=%s\n",
+                  addr, i, cfg->map_offset[i], cfg->map_high[i] - 1,
+                  cfg->map_id[i] ? cfg->map_id[i] : "None");
         return 1;
         break;
       case MAPTYPE_RAM:

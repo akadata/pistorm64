@@ -3,8 +3,7 @@
 #ifndef _CONFIG_FILE_H
 #define _CONFIG_FILE_H
 
-#include "m68k.h"
-
+#include <stdint.h>
 #include <unistd.h>
 
 #define MAX_NUM_MAPPED_ITEMS 8
