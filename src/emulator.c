@@ -138,6 +138,7 @@ static void print_help(const char* prog);
 static void print_about(const char* prog);
 
 extern unsigned int cpu_type;
+extern struct emulator_config* cfg;
 
 static void dump_cpu_state(const char *reason, int opcode) {
   unsigned int pc = m68k_get_reg(NULL, M68K_REG_PC);
@@ -165,6 +166,30 @@ static void dump_cpu_state(const char *reason, int opcode) {
   if (last_pc_seen != 0 && last_pc_seen != pc) {
     m68k_disassemble(disasm_buf, last_pc_seen, cpu_type);
     LOG_ERROR("[CPU] last_pc=$%.8X %s\n", last_pc_seen, disasm_buf);
+  }
+
+  if (cfg) {
+    int32_t map_idx = get_mapped_item_by_address(cfg, pc);
+    if (map_idx >= 0) {
+      LOG_ERROR("[CPU] PC map[%d] type=%u range=$%.8lX-$%.8lX id=%s\n",
+                map_idx, (unsigned int)cfg->map_type[map_idx],
+                cfg->map_offset[map_idx], cfg->map_high[map_idx] - 1,
+                cfg->map_id[map_idx] ? cfg->map_id[map_idx] : "None");
+      if (cfg->map_type[map_idx] == MAPTYPE_ROM && cfg->map_data[map_idx]) {
+        uint32_t off = pc - (uint32_t)cfg->map_offset[map_idx];
+        unsigned char *base = cfg->map_data[map_idx];
+        char line[128];
+        int pos = snprintf(line, sizeof(line), "[CPU] ROM bytes:");
+        for (int i = -8; i < 10; i++) {
+          uint32_t idx = off + (uint32_t)i;
+          unsigned char b = base[idx % (uint32_t)cfg->rom_size[map_idx]];
+          pos += snprintf(line + pos, sizeof(line) - (size_t)pos, " %.2X", b);
+        }
+        LOG_ERROR("%s\n", line);
+      }
+    } else {
+      LOG_ERROR("[CPU] PC map: unmapped\n");
+    }
   }
 }
 
