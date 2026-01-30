@@ -25,6 +25,7 @@ Development:
 - Tools.md
 - Janus-Bus-Engine.md
 - CPLD.md
+- Zorro-Devices.md
 - z3bus_roadmap.md
 - z3bus_tasks.md
 - Changes-and-Comparison.md
