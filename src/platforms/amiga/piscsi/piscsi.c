@@ -936,10 +936,12 @@ static __attribute__((unused)) void print_piscsi_debug_message(int index) {
 #define DEBUGME_SIMPLE(i, s) case i: DEBUG(s); break;
 
 static void piscsi_debugme(uint32_t index) {
-    if (index != last_debugme_idx) {
+        if (index != last_debugme_idx) {
         last_debugme_idx = index;
         if (index >= 30 && index <= 41) {
+            #ifdef PISCSI_DEBUG
             piscsi_dump_cpu_state("DEBUGME step");
+            #endif
         }
     }
     switch (index) {
@@ -964,7 +966,9 @@ static void piscsi_debugme(uint32_t index) {
             break;
         case 32:
             DEBUG("[PISCSI-DEBUGME] DEBUGME 32 marker.\n");
+#ifdef PISCSI_DEBUG
             piscsi_dump_cpu_state("DEBUGME 32");
+#endif
             break;
         case 35:
             DEBUG("[PISCSI-DEBUGME] stuff output\n");

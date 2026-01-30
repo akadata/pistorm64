@@ -6,7 +6,8 @@ is to move device logic into Linux drivers bound to `z3bus.ko`, while the emulat
 the 68k bus cycles and autoconfig behavior.
 
 Current status:
-- All new devices are **Z2** (64KB windows) for bring‑up and stability.
+- Z2 devices use 64KB windows for bring‑up and stability.
+- Z3 autoconfig is now supported for **Z3 bus devices** (separate from Z3 RAM).
 - Z2 space is limited to 8MB total ($00200000–$00A00000).
 - Devices register through `amiga_zorro.c` and are autoconfig‑visible to AmigaOS.
 
@@ -22,9 +23,9 @@ setvar zorro-pissa 1
 ```
 
 Notes:
-- Each `setvar` adds a Z2 autoconfig device.
-- You can enable any subset.
-- All devices currently live in Z2 space, so keep the total count modest.
+- `z3bus-demo` is a **Z3 autoconfig** demo device.
+- `zorro-serial`, `zorro-rng`, `zorro-pissa` are **Z2** devices.
+- You can enable any subset, but Z2 space is limited so keep Z2 devices modest in count.
 
 ## Device IDs
 
@@ -32,7 +33,7 @@ Manufacturer ID uses `PISTORM_AC_MANUF_ID` = `0x07DB`.
 
 | Device | Product ID | Notes |
 |---|---:|---|
-| z3bus demo | `0x060C` | Read‑only ID ROM demo |
+| z3bus demo | `0x060C` | Z3 autoconfig demo |
 | z2 serial echo | `0x0010` | Host PTY echo bridge |
 | z2 RNG | `0x0002` | Host RNG source |
 | z2 PISSA | `0x0003` | AES‑GCM crypto accelerator |
@@ -75,6 +76,7 @@ Crypto accelerator device:
 
 Amiga‑side plan:
 - `pissa.library` will expose AES‑GCM APIs (library name is fixed).
+- `pissl.library` (planned) will add TLS‑style session helpers once the core device is stable.
 
 ## z3bus.ko integration
 
@@ -103,4 +105,3 @@ Z3 devices will be enabled after:
 See:
 - `docs/wiki/z3bus_roadmap.md`
 - `docs/wiki/z3bus_tasks.md`
-

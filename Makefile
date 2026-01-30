@@ -545,6 +545,10 @@ amiga-clean:
 	$(AMIGA_SUBMAKE) -C amiga/pissl clean
 
 full:
+	@if [ "$$(id -u)" -eq 0 ]; then \
+		echo "ERROR: run 'make full' as a normal user (it calls sudo internally)."; \
+		exit 1; \
+	fi
 	-pkill -x emulator 2>/dev/null || true
 	-sudo rmmod pistorm 2>/dev/null || true
 	$(MAKE) clean

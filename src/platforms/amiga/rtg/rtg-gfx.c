@@ -871,8 +871,14 @@ void rtg_drawline_solid(int16_t x1_, int16_t y1_, int16_t x2_, int16_t y2_, uint
     return;
   }
   uint8_t* base_ptr = NULL;
-  uint16_t span_w = (uint16_t)(max_x - min_x + 1);
-  uint16_t span_h = (uint16_t)(max_y - min_y + 1);
+  int32_t span_w32 = max_x - min_x + 1;
+  int32_t span_h32 = max_y - min_y + 1;
+  if (span_w32 < 0)
+    span_w32 = 0;
+  if (span_h32 < 0)
+    span_h32 = 0;
+  uint16_t span_w = (uint16_t)span_w32;
+  uint16_t span_h = (uint16_t)span_h32;
   if (!rtg_get_ptr_checked(rtg_address_adj[0], (uint16_t)min_x, (uint16_t)min_y, span_w, span_h,
                            pitch, format, "drawline_solid", &base_ptr)) {
     return;
