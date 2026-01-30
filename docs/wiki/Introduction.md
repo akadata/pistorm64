@@ -1,18 +1,25 @@
 # Introduction
 
-Kernel PiStorm64 is a fork and rework of the original PiStorm emulator for
-classic Amiga systems. The focus is 64-bit awareness, improved integration of
-Pi-side services, and expanded tooling for direct hardware interaction.
+This repository contains the PiStorm64 emulator, platform glue, and Amiga-side integration assets. The core goals are:
 
-Key project statements (see `docs/README.md` for full context):
+- 680x0 emulation with a Pi-side bus backend.
+- Z2/Z3 memory maps with Pi-side services (PiSCSI, A314, RTG, AHI, networking).
+- Deterministic autoconfig and stable boot behavior.
+- A clean dev workflow, including an AmigaOS NDK toolchain installed under `/opt/amiga`.
 
-- 64-bit aware emulator path for modern Raspberry Pi systems
-- Enhanced PiSCSI support for 64-bit host environments
-- A314 services integrated for filesystem, RemoteWB and networking use cases
-- Direct register access tooling (regtool, clkpeek, pimodplay)
-- RTG/P96 support (raylib based) and Pi-side graphics tooling
+Key directories in this repo:
+- `emulator.c`, `emulator.h`: main entry point and platform dispatch.
+- `platforms/amiga/`: Amiga platform glue (PiSCSI, RTG, AHI, net, autoconfig).
+- `config_file/`: config parser and map syntax.
+- `a314/`: A314 host services and Amiga-side components.
+- `gpio/`: backend to `/dev/pistorm` (kernel module).
+- `data/`: runtime data (filesystems, a314 shared, etc.).
 
-License: MIT (inherits from upstream PiStorm, see `docs/README.md`).
-
-This wiki documents how to build, configure, and use the features added in this
-fork, plus the development environment conventions used in this repo.
+Related docs in-tree:
+- `README.md`
+- `platforms/amiga/readme.md`
+- `platforms/amiga/piscsi/readme.md`
+- `platforms/amiga/rtg/readme.md`
+- `platforms/amiga/ahi/readme.md`
+- `platforms/amiga/net/readme.md`
+- `config_file/readme.md`

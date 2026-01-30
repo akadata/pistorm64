@@ -1,36 +1,29 @@
-# Kernel PiStorm64 Wiki
+# PiStorm64 Wiki
 
-Welcome to the Kernel PiStorm64 wiki. This folder is formatted for a GitHub wiki
-mirror (plain `.md` pages). Use it to track how-to guides, build notes, and
-feature documentation for the PiStorm64 fork.
+Welcome to the PiStorm64 wiki for this repository. These pages document build, install, configuration, and platform features, plus how we integrated Pi-side services (A314, PiSCSI, RTG, AHI, networking) and the development environment under `/opt/amiga`.
 
-## Quick Links
+Start here:
+- Introduction.md
+- Quickstart.md
+- Build-and-Install.md
+- Configuration.md
+- Platform-Amiga.md
+- Compatibility.md
 
-- Introduction: `Introduction.md`
-- Quickstart: `Quickstart.md`
-- Build and Install: `Build-and-Install.md`
-- Configuration and Mapping: `Configuration.md`
-- Janus Bus Engine: `Janus-Bus-Engine.md`
-- PiSCSI (storage): `PiSCSI.md`
-- ADF Read/Write: `ADF-Read-Write.md`
-- A314 Services: `A314.md`
-- RemoteWB: `RemoteWB.md`
-- Pi0 Mounts: `Pi0-Mounts.md`
-- RTG/P96: `RTG.md`
-- Networking: `Networking.md`
-- Amiga Dev Environment (`/opt/amiga`): `Amiga-Dev-Environment.md`
-- Tooling (regtool/clkpeek/pimodplay): `Tooling.md`
-- Changes and Comparison: `Changes-and-Comparison.md`
-- Troubleshooting: `Troubleshooting.md`
-- Known Issues: `Known-Issues.md`
+Feature how-tos:
+- PiSCSI.md
+- A314.md
+- RemoteWB.md
+- RTG.md
+- Networking.md
+- Audio-AHI.md
+- ADF-Read-Write.md
+- Pi0-Mounts.md
 
-## Repo Docs
-
-Some topics already live in the main `docs/` folder:
-
-- `docs/README.md` (project overview)
-- `docs/DEBUGGING.md` (debug build notes, A314 issue details)
-- `docs/A314_UPSTREAM_PORT_README.md` (A314 build/run details)
-- `docs/BUILD_CHANGES.md` (build changes tracked)
-
-This wiki mirrors and expands those docs in a structured way.
+Development:
+- Dev-Environment.md
+- Tools.md
+- Janus-Bus-Engine.md
+- Changes-and-Comparison.md
+- Known-Issues.md
+- Troubleshooting.md
