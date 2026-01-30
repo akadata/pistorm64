@@ -33,3 +33,12 @@ Use the CLI to direct logs:
 ```
 
 For heavy tracing only enable debug briefly, as it slows performance.
+
+## Platform variables (setvar)
+
+These are applied in the platform-specific config (e.g. `default.cfg` under the Amiga platform):
+
+- `setvar enable_fc stub|cpld|off`
+  - `stub`: enables FC shadow logging without driving hardware (default when set with no value).
+  - `cpld`: enables FC mode intended for FC-capable CPLD bitstreams.
+  - `off`: disables FC tracking.

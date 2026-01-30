@@ -24,6 +24,7 @@ Development:
 - Dev-Environment.md
 - Tools.md
 - Janus-Bus-Engine.md
+- CPLD.md
 - Changes-and-Comparison.md
 - Known-Issues.md
 - Troubleshooting.md
