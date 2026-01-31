@@ -69,24 +69,43 @@ EXTRA_LDFLAGS ?=
 # M68K_WARN_SUPPRESS : extra warning suppressions for the generated Musashi core.
 #
 # Base warnings
-WARNINGS      ?= -Wall -Wextra -pedantic
+VERBOSE ?= 0
+WARNINGS_VERBOSE ?= -Wall -Wextra -pedantic
+WARNINGS_QUIET   ?= -Wall
+ifeq ($(VERBOSE),1)
+WARNINGS ?= $(WARNINGS_VERBOSE)
+else
+WARNINGS ?= $(WARNINGS_QUIET)
+endif
 
 # Extra-aggressive warnings for emulator / non-Musashi code
-EMU_WARNINGS  ?= \
-  $(WARNINGS) \
+ifeq ($(VERBOSE),1)
+EMU_WARNINGS_EXTRA = \
   -Wformat=2 -Wwrite-strings -Wcast-qual -Wcast-align \
   -Wpointer-arith -Wstrict-overflow=5 -Wstrict-prototypes -Wmissing-prototypes \
   -Wswitch-enum -Wshadow \
   -Wconversion -Wsign-conversion \
   -Wundef -Wvla -Wredundant-decls
-OPT_LEVEL  ?= -O3 -ffast-math
+else
+EMU_WARNINGS_EXTRA =
+endif
+
+EMU_WARNINGS  ?= $(WARNINGS) $(EMU_WARNINGS_EXTRA)
+
+ifeq ($(findstring clang,$(CC)),)
+OPT_LEVEL_DEFAULT ?= -Ofast -ffast-math
+else
+OPT_LEVEL_DEFAULT ?= -O3 -ffast-math
+endif
+
+OPT_LEVEL ?= $(OPT_LEVEL_DEFAULT)
 
 ifdef O
 OPT_LEVEL := -O$(O)
 endif
 
 # Set USE_GOLD=1 to link with gold if available.
-USE_GOLD   ?= 0
+USE_GOLD   ?= 1
 
 include config.mk
 
@@ -105,7 +124,7 @@ ARCH_FEATURES ?=
 # Toggle Pi host (/opt/vc) support for dev tools.
 USE_VC     ?= 0
 # Perf toggles
-USE_LTO    ?= 0
+USE_LTO    ?= 1
 USE_NO_PLT ?= 1 
 OMIT_FP    ?= 1
 USE_PIPE   ?= 1
@@ -259,7 +278,8 @@ PISTORM_IPL_RATELIMIT_US ?= 0
 PISTORM_USE_DIRECT_OPS ?= 0
 DEFINES  += -DPISTORM_ENABLE_BATCH=$(PISTORM_ENABLE_BATCH) -DPISTORM_IPL_RATELIMIT_US=$(PISTORM_IPL_RATELIMIT_US) -DPISTORM_USE_DIRECT_OPS=$(PISTORM_USE_DIRECT_OPS)
 LD_GOLD   = $(if $(filter 1,$(USE_GOLD)),-fuse-ld=gold,)
-LTO_FLAGS = $(if $(filter 1,$(USE_LTO)),-flto,)
+LTO_FLAGS = $(if $(filter 1,$(USE_LTO)),-flto=auto,)
+NO_LTO_FLAGS = $(if $(filter 1,$(USE_LTO)),-fno-lto,)
 PLT_FLAGS = $(if $(filter 1,$(USE_NO_PLT)),-fno-plt,)
 FP_FLAGS  = $(if $(filter 1,$(OMIT_FP)),-fomit-frame-pointer,)
 PIPE_FLAGS= $(if $(filter 1,$(USE_PIPE)),-pipe,)
@@ -278,13 +298,19 @@ RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
 
+else ifeq ($(PLATFORM),PI4_64BIT_NATIVE)
+CPUFLAGS = -mcpu=native -mtune=native -march=native
+RAYLIB_DIR := $(CURDIR)/src/raylib_drm
+RAYLIB_INC := -I$(RAYLIB_DIR)/src
+RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
+DEFINES      += -DRPI4_TEST
+
 else ifeq ($(PLATFORM),PI4_NATIVE)
 CPUFLAGS = -march=native
 RAYLIB_DIR := $(CURDIR)/src/raylib_drm
 RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
-OPT_LEVEL := -Ofast
 else ifeq ($(PLATFORM),PI4_64BIT_DEBUG)
 CPUFLAGS = -mcpu=cortex-a72 -mtune=cortex-a72 -march=armv8-a+crc
 RAYLIB_DIR := $(CURDIR)/src/raylib_drm
@@ -407,13 +433,19 @@ $(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) 
 
 # Explicit rules to keep the generated 68k core quiet on unused-temp warnings.
 src/musashi/m68kcpu.o: src/musashi/m68kcpu.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/musashi/m68kops.o: src/musashi/m68kops.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/musashi/m68kdasm.o: src/musashi/m68kdasm.c src/musashi/m68kops.h
-	$(CC) -MMD -MP $(M68K_CFLAGS) -c -o $@ $<
+	$(CC) -MMD -MP $(M68K_CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
+
+src/musashi/softfloat/softfloat.o: src/musashi/softfloat/softfloat.c
+	$(CC) -MMD -MP $(CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
+
+src/musashi/softfloat/softfloat_fpsp.o: src/musashi/softfloat/softfloat_fpsp.c
+	$(CC) -MMD -MP $(CFLAGS) $(NO_LTO_FLAGS) -c -o $@ $<
 
 src/emulator.o: src/emulator.c src/musashi/m68kops.h
 	$(CC) -MMD -MP $(CFLAGS) -c -o $@ $<
@@ -432,7 +464,7 @@ pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
 	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
-	$(CXX) -MMD -MP -c -o src/a314/a314.o $(CXXFLAGS) src/a314/a314.cc
+	$(CXX) -MMD -MP -c -o src/a314/a314.o $(CXXFLAGS) $(NO_LTO_FLAGS) src/a314/a314.cc
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f src/musashi/$(MUSASHIGENERATOR)$(EXE)
