@@ -16,13 +16,13 @@
 #   make USE_RAYLIB=0
 #   make PLATFORM=ZEROW2_64
 
-EXENAME          = emulator
+EXENAME          ?= emulator
 
 PLATFORM ?= PI4_64BIT
 
 # Enable batching (set to 1) and/or IPL rate limiting (set to interval in us) 100us seems best in tests
-PISTORM_ENABLE_BATCH=0
-PISTORM_IPL_RATELIMIT_US=100  
+PISTORM_ENABLE_BATCH ?= 1
+PISTORM_IPL_RATELIMIT_US ?= 100  
 
 PISTORM_KMOD ?= 1
 
@@ -88,9 +88,10 @@ endif
 # Set USE_GOLD=1 to link with gold if available.
 USE_GOLD   ?= 0
 
+include config.mk
+
 # Toggle RTG output backends: 1=raylib (default), 0=null stub.
 USE_RAYLIB ?= 1
-
 # Toggle ALSA-based audio (Pi AHI). If 0, drop pi_ahi and -lasound.
 USE_ALSA   ?= 1
 

@@ -15,6 +15,7 @@
 #include "rtg.h"
 #include "log.h"
 
+
 // Helper functions for safe unaligned memory access
 static inline uint16_t load_u16_be(const uint8_t *p) {
     uint16_t v;
@@ -63,7 +64,15 @@ extern uint32_t framebuffer_addr_adj;
 
 extern uint8_t realtime_graphics_debug;
 
-static const size_t rtg_mem_size = 40u * SIZE_MEGA;
+//static const size_t rtg_mem_size = 40u * SIZE_MEGA;
+//
+#ifndef RTG_MEM_MB
+#define RTG_MEM_MB 40u
+#endif
+
+static const size_t rtg_mem_size = (size_t)RTG_MEM_MB * SIZE_MEGA;
+
+
 static uint32_t rtg_oob_log_count = 0;
 
 static int rtg_calc_span(size_t x_bytes, uint16_t w, uint16_t h, uint16_t pitch, size_t bpp,

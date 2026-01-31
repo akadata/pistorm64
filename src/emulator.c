@@ -607,6 +607,10 @@ cpu_loop:
       do_disasm--;
     }
     cpu_backend_execute(state, 1);
+    // Check for end_signal immediately after CPU execution to be more responsive
+    if (end_signal) {
+      goto stop_cpu_emulation;
+    }
   } else {
     if (cpu_emulation_running) {
       unsigned int slice = loop_cycles > loop_cycles_cap ? loop_cycles_cap : loop_cycles;
@@ -616,6 +620,11 @@ cpu_loop:
         cpu_backend_execute(state, (int)slice);
       }
     }
+  }
+
+  // Check for end_signal immediately after CPU execution to be more responsive
+  if (end_signal) {
+    goto stop_cpu_emulation;
   }
 
   // Flush any pending batched operations before checking status
@@ -1165,12 +1174,28 @@ switch_config:
 
   InitGayle();
 
-  signal(SIGINT, sigint_handler);
-  signal(SIGTERM, crash_signal_handler);
-  signal(SIGSEGV, crash_signal_handler);
-  signal(SIGBUS, crash_signal_handler);
-  signal(SIGILL, crash_signal_handler);
-  signal(SIGABRT, crash_signal_handler);
+  struct sigaction sa_int, sa_term, sa_crash;
+
+  // Setup SIGINT handler for graceful shutdown
+  sa_int.sa_handler = sigint_handler;
+  sigemptyset(&sa_int.sa_mask);
+  sa_int.sa_flags = 0; // Don't restart system calls, allow interruption
+  sigaction(SIGINT, &sa_int, NULL);
+
+  // Setup SIGTERM handler for termination
+  sa_term.sa_handler = crash_signal_handler;
+  sigemptyset(&sa_term.sa_mask);
+  sa_term.sa_flags = 0; // Don't restart system calls, allow interruption
+  sigaction(SIGTERM, &sa_term, NULL);
+
+  // Setup crash signal handlers
+  sa_crash.sa_handler = crash_signal_handler;
+  sigemptyset(&sa_crash.sa_mask);
+  sa_crash.sa_flags = 0; // Don't restart system calls, allow interruption
+  sigaction(SIGSEGV, &sa_crash, NULL);
+  sigaction(SIGBUS, &sa_crash, NULL);
+  sigaction(SIGILL, &sa_crash, NULL);
+  sigaction(SIGABRT, &sa_crash, NULL);
 
   amiga_reset_and_wait("pre-cpu");
 
@@ -1228,7 +1253,20 @@ switch_config:
   }
 
   // wait for cpu task to end before closing up and finishing
-  pthread_join(cpu_tid, NULL);
+  // Use a polling approach to allow signal handling
+  while (!end_signal) {
+    // Sleep briefly to allow signal processing
+    usleep(50000); // Sleep 50ms
+
+    // Check if the CPU thread has finished by using pthread_kill
+    // If the thread is still running, pthread_kill will return 0
+    int kill_result = pthread_kill(cpu_tid, 0);
+    if (kill_result != 0) {
+      // Thread has probably finished (ESRCH error)
+      break;
+    }
+    // If thread is still running, continue loop to check end_signal
+  }
 
   if (sigint_seen) {
     printf("IRQs triggered: %lu\n", (unsigned long)trig_irq);
@@ -1256,14 +1294,19 @@ switch_config:
     goto switch_config;
   }
 
+  // Join other threads with timeouts
+  struct timespec other_timeout;
+  clock_gettime(CLOCK_REALTIME, &other_timeout);
+  other_timeout.tv_sec += 2; // 2 second timeout
+
   if (kbd_tid) {
-    pthread_join(kbd_tid, NULL);
+    pthread_timedjoin_np(kbd_tid, NULL, &other_timeout);
   }
-  if (mouse_tid) {
-    pthread_join(mouse_tid, NULL);
+  if (mouse_tid && mouse_fd != -1) {
+    pthread_timedjoin_np(mouse_tid, NULL, &other_timeout);
   }
   if (ipl_tid) {
-    pthread_join(ipl_tid, NULL);
+    pthread_timedjoin_np(ipl_tid, NULL, &other_timeout);
   }
 
   if (cfg->platform->shutdown) {
