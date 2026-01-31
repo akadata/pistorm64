@@ -24,27 +24,44 @@
 #define STR(s) #s
 #define XSTR(s) STR(s)
 
+/* ---------- Board address map ---------- */
 
+#ifndef CARD_OFFSET
+#define CARD_OFFSET     0x70000000
+#endif
+
+#ifndef CARD_REGSIZE
+#define CARD_REGSIZE    0x00010000
+#endif
+
+#ifndef CARD_MEMSIZE
+#define CARD_MEMSIZE    0x04000000  /* default: 64MB VRAM */
+#endif
+
+#ifndef CHIP_RAM_SIZE
+#define CHIP_RAM_SIZE   0x00100000  /* default: 1MB chip RAM offset */
+#endif
+
+#define IRTGCMD_OFFSET  (CARD_OFFSET + 0x60)
+#define CARD_SCRATCH    0x72010000  /* adjust if needed */
+
+/* ---------- MMIO helpers ---------- */
 #define CHECKRTG *((unsigned short *)(CARD_OFFSET))
 
-#define CARD_OFFSET   0x70000000
-#define IRTGCMD_OFFSET   0x70000060
-#define CARD_REGSIZE  0x00010000
-#define CARD_MEMSIZE  0x02000000 // 32MB "VRAM"
-#define CARD_SCRATCH  0x72010000
 
-#define WRITESHORT(cmd, val) *(unsigned short *)((unsigned long)(CARD_OFFSET+cmd)) = val;
-#define WRITELONG(cmd, val) *(unsigned long *)((unsigned long)(CARD_OFFSET+cmd)) = val;
-#define WRITEBYTE(cmd, val) *(unsigned char *)((unsigned long)(CARD_OFFSET+cmd)) = val;
+#define WRITESHORT(cmd, val)  *(volatile unsigned short *)(CARD_OFFSET + (cmd)) = (unsigned short)(val);
+#define WRITELONG(cmd, val)   *(volatile unsigned long  *)(CARD_OFFSET + (cmd)) = (unsigned long)(val);
+#define WRITEBYTE(cmd, val)   *(volatile unsigned char  *)(CARD_OFFSET + (cmd)) = (unsigned char)(val);
 
-#define READSHORT(cmd, var) var = *(volatile unsigned short *)(CARD_OFFSET + cmd);
-#define READLONG(cmd, var) var = *(volatile unsigned long *)(CARD_OFFSET + cmd);
+#define READSHORT(cmd, var)   (var) = *(volatile unsigned short *)(CARD_OFFSET + (cmd));
+#define READLONG(cmd, var)    (var) = *(volatile unsigned long  *)(CARD_OFFSET + (cmd));
 
-#define RTG_DEBUGME(val) *(volatile unsigned long *)((unsigned long)(CARD_OFFSET+RTG_DEBUGME)) = val;
+#define RTG_DEBUGME(val)      *(volatile unsigned long  *)(CARD_OFFSET + RTG_DEBUGME) = (unsigned long)(val);
+#define IWRITECMD(val)        *(volatile unsigned short *)(IRTGCMD_OFFSET) = (unsigned short)(val);
+
+
 //#define RTG_DEBUGME(...)
-#define IWRITECMD(val) *(volatile unsigned short *)(IRTGCMD_OFFSET) = val;
 
-#define CHIP_RAM_SIZE 0x00200000 // Chip RAM offset, 2MB
 
 struct GFXBase {
     struct Library libNode;

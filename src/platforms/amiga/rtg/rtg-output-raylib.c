@@ -174,7 +174,14 @@ static int32_t pi_screen_height     = 720;
 static uint8_t pi_screen_width_set  = 0;
 static uint8_t pi_screen_height_set = 0;
 
-static const size_t rtg_mem_size = 40u * SIZE_MEGA;
+//static const size_t rtg_mem_size = 40u * SIZE_MEGA;
+
+#ifndef RTG_MEM_MB
+#define RTG_MEM_MB 40u
+#endif
+
+static const size_t rtg_mem_size = (size_t)RTG_MEM_MB * SIZE_MEGA;
+
 
 struct rtg_shared_data {
   uint16_t *width;

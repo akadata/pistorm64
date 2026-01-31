@@ -101,7 +101,11 @@ static const char* rtg_format_names[RTGFMT_NUM] = {
     "NONE/UNKNOWN",
 };
 
-static const unsigned int rtg_mem_size = 40u * SIZE_MEGA;
+#ifndef RTG_MEM_MB
+#define RTG_MEM_MB 40u
+#endif
+
+static const unsigned int rtg_mem_size = (unsigned int)RTG_MEM_MB * SIZE_MEGA;
 
 int init_rtg_data(struct emulator_config* cfg_) {
   rtg_mem = calloc(1, rtg_mem_size);

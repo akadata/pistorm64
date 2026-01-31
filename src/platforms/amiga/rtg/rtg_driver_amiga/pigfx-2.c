@@ -24,27 +24,44 @@
 #define STR(s) #s
 #define XSTR(s) STR(s)
 
+/* ---------- Board address map ---------- */
 
+#ifndef CARD_OFFSET
+#define CARD_OFFSET     0x70000000
+#endif
+
+#ifndef CARD_REGSIZE
+#define CARD_REGSIZE    0x00010000
+#endif
+
+#ifndef CARD_MEMSIZE
+#define CARD_MEMSIZE    ((RTG_MEM_MB) * 0x00100000u)  /* default: 64MB VRAM */
+#endif
+
+#ifndef CHIP_RAM_SIZE
+#define CHIP_RAM_SIZE   0x00100000u  /* default: 1MB chip RAM offset */
+#endif
+
+#define IRTGCMD_OFFSET  (CARD_OFFSET + 0x60)
+#define CARD_SCRATCH    0x72010000  /* adjust if needed */
+
+/* ---------- MMIO helpers ---------- */
 #define CHECKRTG *((unsigned short *)(CARD_OFFSET))
 
-#define CARD_OFFSET   0x70000000
-#define IRTGCMD_OFFSET   0x70000060
-#define CARD_REGSIZE  0x00010000
-#define CARD_MEMSIZE  0x02000000 // 32MB "VRAM"
-#define CARD_SCRATCH  0x72010000
 
-#define WRITESHORT(cmd, val) *(unsigned short *)((unsigned long)(CARD_OFFSET+cmd)) = val;
-#define WRITELONG(cmd, val) *(unsigned long *)((unsigned long)(CARD_OFFSET+cmd)) = val;
-#define WRITEBYTE(cmd, val) *(unsigned char *)((unsigned long)(CARD_OFFSET+cmd)) = val;
+#define WRITESHORT(cmd, val)  *(volatile unsigned short *)(CARD_OFFSET + (cmd)) = (unsigned short)(val);
+#define WRITELONG(cmd, val)   *(volatile unsigned long  *)(CARD_OFFSET + (cmd)) = (unsigned long)(val);
+#define WRITEBYTE(cmd, val)   *(volatile unsigned char  *)(CARD_OFFSET + (cmd)) = (unsigned char)(val);
 
-#define READSHORT(cmd, var) var = *(volatile unsigned short *)(CARD_OFFSET + cmd);
-#define READLONG(cmd, var) var = *(volatile unsigned long *)(CARD_OFFSET + cmd);
+#define READSHORT(cmd, var)   (var) = *(volatile unsigned short *)(CARD_OFFSET + (cmd));
+#define READLONG(cmd, var)    (var) = *(volatile unsigned long  *)(CARD_OFFSET + (cmd));
 
-#define RTG_DEBUGME(val) *(volatile unsigned long *)((unsigned long)(CARD_OFFSET+RTG_DEBUGME)) = val;
+#define RTG_DEBUGME(val)      *(volatile unsigned long  *)(CARD_OFFSET + RTG_DEBUGME) = (unsigned long)(val);
+#define IWRITECMD(val)        *(volatile unsigned short *)(IRTGCMD_OFFSET) = (unsigned short)(val);
+
+
 //#define RTG_DEBUGME(...)
-#define IWRITECMD(val) *(volatile unsigned short *)(IRTGCMD_OFFSET) = val;
 
-#define CHIP_RAM_SIZE 0x00200000 // Chip RAM offset, 2MB
 
 struct GFXBase {
     struct Library libNode;
@@ -398,30 +415,48 @@ void SetColorArray (__REGA0(struct BoardInfo *b), __REGD0(UWORD start), __REGD1(
     }
 }
 
-UWORD CalculateBytesPerRow (__REGA0(struct BoardInfo *b), __REGD0(UWORD width), __REGD7(RGBFTYPE format)) {
+UWORD CalculateBytesPerRow(__REGA0(struct BoardInfo *b),
+                           __REGD0(UWORD width),
+                           __REGD7(RGBFTYPE format))
+{
     if (!b)
         return 0;
 
-    UWORD pitch = width;
+    switch (format) {
+    case RGBFB_CLUT:
+        /* 8-bit paletted: 1 byte per pixel */
+        return width;
 
-    switch(format) {
-        case RGBFB_CLUT:
-            return pitch;
-        default:
-            return 128;
-        case RGBFB_R5G6B5PC: case RGBFB_R5G5B5PC:
-        case RGBFB_R5G6B5: case RGBFB_R5G5B5:
-        case RGBFB_B5G6R5PC: case RGBFB_B5G5R5PC:
-            return (width * 2);
-        case RGBFB_R8G8B8: case RGBFB_B8G8R8:
-            // Should actually return width * 3, but I'm not sure if
-            // the Pi VC supports 24-bit color formats.
-            //return (width * 3);
-        case RGBFB_B8G8R8A8: case RGBFB_R8G8B8A8:
-        case RGBFB_A8B8G8R8: case RGBFB_A8R8G8B8:
-            return (width * 4);
+    case RGBFB_R5G6B5PC: case RGBFB_R5G5B5PC:
+    case RGBFB_R5G6B5:   case RGBFB_R5G5B5:
+    case RGBFB_B5G6R5PC: case RGBFB_B5G5R5PC:
+        /* 16-bit: 2 bytes per pixel */
+        return (UWORD)(width * 2u);
+
+    case RGBFB_R8G8B8:
+    case RGBFB_B8G8R8:
+        /*
+         * 24-bit packed. If the Pi side actually stores these as 32-bit,
+         * returning width * 4 is correct for what the hardware really does.
+         * If you ever add a true 24-bit mode, change this to width * 3.
+         */
+        return (UWORD)(width * 4u);
+
+    case RGBFB_B8G8R8A8: case RGBFB_R8G8B8A8:
+    case RGBFB_A8B8G8R8: case RGBFB_A8R8G8B8:
+        /* 32-bit: 4 bytes per pixel */
+        return (UWORD)(width * 4u);
+
+    default:
+        /*
+         * Safe-ish fallback: treat unknown formats as 16-bit instead of
+         * returning a bogus constant like 128.
+         */
+        return (UWORD)(width * 2u);
     }
 }
+
+
 
 APTR CalculateMemory (__REGA0(struct BoardInfo *b), __REGA1(unsigned long addr), __REGD7(RGBFTYPE format)) {
     /*if (!b)
