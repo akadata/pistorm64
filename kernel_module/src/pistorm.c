@@ -86,15 +86,15 @@ static struct pistorm_dev *ps_dev;
 /*
  * GPCLK tuning knobs.
  *
- * Default source = PLLC (5) and divisor = 12 matches Pi3/Zero2 behaviour (~100MHz).
+ * Default source = PLLC (5) and divisor = 6 matches Pi3/Zero2 behaviour (~200MHz).
  * On Pi4/BCM2711 firmware/clock trees can vary; these params allow tuning without code edits.
  */
 static unsigned int gpclk_src = 5;  /* 5 = PLLC on bcm2835 style clock manager */
-static unsigned int gpclk_div = 12; /* integer divider */
+static unsigned int gpclk_div = 6;  /* integer divider */
 module_param(gpclk_src, uint, 0644);
 MODULE_PARM_DESC(gpclk_src, "GPCLK0 clock source (bcm2835 style: 5=PLLC, 6=PLLD, etc.)");
 module_param(gpclk_div, uint, 0644);
-MODULE_PARM_DESC(gpclk_div, "GPCLK0 integer divider (default 12 ~100MHz on Pi3-class)");
+MODULE_PARM_DESC(gpclk_div, "GPCLK0 integer divider (default 6 ~200MHz on Pi3-class)");
 
 static bool berr_reset_input;
 module_param(berr_reset_input, bool, 0644);

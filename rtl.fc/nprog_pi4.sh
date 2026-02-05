@@ -10,7 +10,11 @@ if lsmod | grep -q '^pistorm'; then
 fi
 
 echo "Flashing..."
-sudo openocd -f ./pi4.cfg > nprog_log.txt 2>&1
+if [ -n "${OPENOCD_SPEED:-}" ]; then
+    sudo openocd -f ./pi4.cfg -c "adapter speed ${OPENOCD_SPEED}" > nprog_log.txt 2>&1
+else
+    sudo openocd -f ./pi4.cfg > nprog_log.txt 2>&1
+fi
 if [ $? -ne 0 ]
 then
     echo "Flashing failed, please see nprog_log.txt for details"
