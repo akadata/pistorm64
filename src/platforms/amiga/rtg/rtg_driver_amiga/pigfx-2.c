@@ -35,7 +35,10 @@
 #endif
 
 #ifndef CARD_MEMSIZE
-#define CARD_MEMSIZE    ((RTG_MEM_MB) * 0x00100000u)  /* default: 64MB VRAM */
+#ifndef RTG_GFX_MEM
+#define RTG_GFX_MEM 64u
+#endif
+#define CARD_MEMSIZE    ((RTG_GFX_MEM) * 0x00100000u)  /* default: 64MB VRAM */
 #endif
 
 #ifndef CHIP_RAM_SIZE

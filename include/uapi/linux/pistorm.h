@@ -16,6 +16,7 @@ struct pistorm_busop {
     __u8  width;   /* 1/2/4 */
     __u8  is_read; /* 1=read, 0=write */
     __u16 flags;   /* see PISTORM_BUSOP_F_* */
+    __u32 status;  /* output status; see PISTORM_BUSOP_ST_* */
 };
 
 struct pistorm_pins {
@@ -25,6 +26,33 @@ struct pistorm_pins {
 
 /* busop flags */
 #define PISTORM_BUSOP_F_STATUS 0x0001 /* operate on PiStorm status register */
+#define PISTORM_BUSOP_ST_BERR  0x0001 /* bus error observed */
+
+/* Newer per-op struct with FC + status */
+struct pistorm_busop_v2 {
+    __u8   op;      /* 0 = read, 1 = write */
+    __u8   width;   /* 1, 2, 4 bytes */
+    __u8   fc;      /* 0-7 function code */
+    __u8   flags;   /* reserved */
+
+    __u32  addr;    /* 32-bit bus address */
+    __u32  value;   /* IN: write data, OUT: read data */
+
+    __s32  status;  /* OUT: 0 OK, <0 errno, >0 bus status (PISTORM_BUSOP_ST_*) */
+};
+
+struct pistorm_run_batch {
+    __u32 count;    /* number of ops in ops[] */
+    __u32 flags;    /* batching hints */
+    __u64 ops_ptr;  /* userspace pointer to pistorm_busop_v2[] */
+};
+
+/* run_batch hints (optional) */
+#define PISTORM_RUN_BATCH_F_HINT_64    0x00000001
+#define PISTORM_RUN_BATCH_F_HINT_128   0x00000002
+#define PISTORM_RUN_BATCH_F_HINT_256   0x00000004
+#define PISTORM_RUN_BATCH_F_HINT_512   0x00000008
+#define PISTORM_RUN_BATCH_F_HINT_1024  0x00000010
 
 /* Small control ops */
 #define PISTORM_IOC_SETUP          _IO(PISTORM_IOC_MAGIC, 0x00)
@@ -55,3 +83,6 @@ struct pistorm_queue_stats {
     __u32 reserved;
 };
 #define PISTORM_IOC_QUEUE_STATS    _IOR(PISTORM_IOC_MAGIC, 0x14, struct pistorm_queue_stats)
+
+/* New v2 batch interface */
+#define PISTORM_IOC_RUN_BATCH      _IOWR(PISTORM_IOC_MAGIC, 0x15, struct pistorm_run_batch)

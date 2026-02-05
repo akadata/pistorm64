@@ -1,0 +1,835 @@
+Timing Analyzer report for pistorm_fc
+Thu Feb  5 07:14:42 2026
+Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Timing Analyzer Summary
+  3. Parallel Compilation
+  4. SDC File List
+  5. Clocks
+  6. Slow Model Fmax Summary
+  7. Slow Model Setup Summary
+  8. Slow Model Hold Summary
+  9. Slow Model Recovery Summary
+ 10. Slow Model Removal Summary
+ 11. Slow Model Minimum Pulse Width Summary
+ 12. Slow Model Setup: 'PI_CLK'
+ 13. Slow Model Hold: 'PI_CLK'
+ 14. Fast Model Setup Summary
+ 15. Fast Model Hold Summary
+ 16. Fast Model Recovery Summary
+ 17. Fast Model Removal Summary
+ 18. Fast Model Minimum Pulse Width Summary
+ 19. Fast Model Setup: 'PI_CLK'
+ 20. Fast Model Hold: 'PI_CLK'
+ 21. Multicorner Timing Analysis Summary
+ 22. Setup Transfers
+ 23. Hold Transfers
+ 24. Report TCCS
+ 25. Report RSKM
+ 26. Unconstrained Paths Summary
+ 27. Clock Status Summary
+ 28. Unconstrained Input Ports
+ 29. Unconstrained Output Ports
+ 30. Unconstrained Input Ports
+ 31. Unconstrained Output Ports
+ 32. Timing Analyzer Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 2025  Altera Corporation. All rights reserved.
+Your use of Altera Corporation's design tools, logic functions 
+and other software and tools, and any partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Altera Program License 
+Subscription Agreement, the Altera Quartus Prime License Agreement,
+the Altera IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Altera and sold by Altera or its authorized distributors.  Please
+refer to the Altera Software License Subscription Agreements 
+on the Quartus Prime software download page.
+
+
+
++---------------------------------------------------------------------------------+
+; Timing Analyzer Summary                                                         ;
++-----------------------+---------------------------------------------------------+
+; Quartus Prime Version ; Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
+; Timing Analyzer       ; Legacy Timing Analyzer                                  ;
+; Revision Name         ; pistorm_fc                                              ;
+; Device Family         ; MAX II                                                  ;
+; Device Name           ; EPM240T100C5                                            ;
+; Timing Models         ; Final                                                   ;
+; Delay Model           ; Combined                                                ;
+; Rise/Fall Delays      ; Unavailable                                             ;
++-----------------------+---------------------------------------------------------+
+
+
++------------------------------------------+
+; Parallel Compilation                     ;
++----------------------------+-------------+
+; Processors                 ; Number      ;
++----------------------------+-------------+
+; Number detected on machine ; 32          ;
+; Maximum allowed            ; 16          ;
+;                            ;             ;
+; Average used               ; 1.00        ;
+; Maximum used               ; 2           ;
+;                            ;             ;
+; Usage by Processor         ; % Time Used ;
+;     Processor 1            ; 100.0%      ;
+;     Processor 2            ;   0.0%      ;
++----------------------------+-------------+
+
+
++----------------------------------------------------+
+; SDC File List                                      ;
++----------------+--------+--------------------------+
+; SDC File Path  ; Status ; Read at                  ;
++----------------+--------+--------------------------+
+; pistorm_fc.sdc ; OK     ; Thu Feb  5 07:14:42 2026 ;
++----------------+--------+--------------------------+
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Clocks                                                                                                                                                                                 ;
++------------+------+---------+-----------+-------+---------+------------+-----------+-------------+-------+--------+-----------+------------+----------+--------+--------+--------------+
+; Clock Name ; Type ; Period  ; Frequency ; Rise  ; Fall    ; Duty Cycle ; Divide by ; Multiply by ; Phase ; Offset ; Edge List ; Edge Shift ; Inverted ; Master ; Source ; Targets      ;
++------------+------+---------+-----------+-------+---------+------------+-----------+-------------+-------+--------+-----------+------------+----------+--------+--------+--------------+
+; M68K_C1    ; Base ; 282.000 ; 3.55 MHz  ; 0.000 ; 141.000 ;            ;           ;             ;       ;        ;           ;            ;          ;        ;        ; { M68K_C1 }  ;
+; M68K_C3    ; Base ; 282.000 ; 3.55 MHz  ; 0.000 ; 141.000 ;            ;           ;             ;       ;        ;           ;            ;          ;        ;        ; { M68K_C3 }  ;
+; M68K_CLK   ; Base ; 141.000 ; 7.09 MHz  ; 0.000 ; 70.500  ;            ;           ;             ;       ;        ;           ;            ;          ;        ;        ; { M68K_CLK } ;
+; PI_CLK     ; Base ; 5.000   ; 200.0 MHz ; 0.000 ; 2.500   ;            ;           ;             ;       ;        ;           ;            ;          ;        ;        ; { PI_CLK }   ;
++------------+------+---------+-----------+-------+---------+------------+-----------+-------------+-------+--------+-----------+------------+----------+--------+--------+--------------+
+
+
++--------------------------------------------------+
+; Slow Model Fmax Summary                          ;
++------------+-----------------+------------+------+
+; Fmax       ; Restricted Fmax ; Clock Name ; Note ;
++------------+-----------------+------------+------+
+; 156.32 MHz ; 156.32 MHz      ; PI_CLK     ;      ;
++------------+-----------------+------------+------+
+This panel reports FMAX for every clock in the design, regardless of the user-specified clock periods.  FMAX is only computed for paths where the source and destination registers or ports are driven by the same clock.  Paths of different clocks, including generated clocks, are ignored.  For paths between a clock and its inversion, FMAX is computed as if the rising and falling edges are scaled along with FMAX, such that the duty cycle (in terms of a percentage) is maintained. Altera recommends that you always use clock constraints and other slack reports for sign-off analysis.
+
+
++---------------------------------+
+; Slow Model Setup Summary        ;
++--------+--------+---------------+
+; Clock  ; Slack  ; End Point TNS ;
++--------+--------+---------------+
+; PI_CLK ; -1.397 ; -12.782       ;
++--------+--------+---------------+
+
+
++--------------------------------+
+; Slow Model Hold Summary        ;
++--------+-------+---------------+
+; Clock  ; Slack ; End Point TNS ;
++--------+-------+---------------+
+; PI_CLK ; 1.238 ; 0.000         ;
++--------+-------+---------------+
+
+
+-------------------------------
+; Slow Model Recovery Summary ;
+-------------------------------
+No paths to report.
+
+
+------------------------------
+; Slow Model Removal Summary ;
+------------------------------
+No paths to report.
+
+
++----------------------------------------+
+; Slow Model Minimum Pulse Width Summary ;
++----------+---------+-------------------+
+; Clock    ; Slack   ; End Point TNS     ;
++----------+---------+-------------------+
+; PI_CLK   ; 1.711   ; 0.000             ;
+; M68K_CLK ; 137.711 ; 0.000             ;
+; M68K_C1  ; 278.711 ; 0.000             ;
+; M68K_C3  ; 278.711 ; 0.000             ;
++----------+---------+-------------------+
+
+
++------------------------------------------------------------------------------------------------------------------------------+
+; Slow Model Setup: 'PI_CLK'                                                                                                   ;
++--------+-----------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+; Slack  ; From Node       ; To Node                     ; Launch Clock ; Latch Clock ; Relationship ; Clock Skew ; Data Delay ;
++--------+-----------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+; -1.397 ; c7m_sync[2]     ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 6.064      ;
+; -1.397 ; c7m_sync[2]     ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 6.064      ;
+; -1.376 ; c7m_sync[2]     ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 6.043      ;
+; -1.328 ; c7m_sync[1]     ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.995      ;
+; -1.157 ; c7m_sync[2]     ; state.100                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.824      ;
+; -1.023 ; c7m_sync[2]     ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.690      ;
+; -0.939 ; c7m_sync[2]     ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.606      ;
+; -0.935 ; c7m_sync[2]     ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.602      ;
+; -0.919 ; state.011       ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.586      ;
+; -0.908 ; M68K_C1         ; c7m_sync[0]                 ; M68K_C1      ; PI_CLK      ; 1.000        ; 3.348      ; 4.923      ;
+; -0.908 ; M68K_C1         ; c7m_sync[0]                 ; M68K_C1      ; PI_CLK      ; 1.000        ; 3.348      ; 4.923      ;
+; -0.900 ; c7m_sync[1]     ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.567      ;
+; -0.885 ; c7m_sync[1]     ; state.100                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.552      ;
+; -0.792 ; M68K_C3         ; c7m_sync[0]                 ; M68K_C3      ; PI_CLK      ; 1.000        ; 3.348      ; 4.807      ;
+; -0.792 ; M68K_C3         ; c7m_sync[0]                 ; M68K_C3      ; PI_CLK      ; 1.000        ; 3.348      ; 4.807      ;
+; -0.772 ; c7m_sync[2]     ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.439      ;
+; -0.764 ; M68K_VMA_n~reg0 ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.431      ;
+; -0.764 ; M68K_VMA_n~reg0 ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.431      ;
+; -0.733 ; c7m_sync[1]     ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.400      ;
+; -0.667 ; c7m_sync[1]     ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.334      ;
+; -0.663 ; c7m_sync[1]     ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.330      ;
+; -0.623 ; state.011       ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.290      ;
+; -0.623 ; state.011       ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.290      ;
+; -0.602 ; state.011       ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.269      ;
+; -0.585 ; M68K_VMA_n~reg0 ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 5.252      ;
+; -0.311 ; c7m_sync[2]     ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.978      ;
+; -0.249 ; state.011       ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.916      ;
+; -0.208 ; state.010       ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.875      ;
+; -0.208 ; state.010       ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.875      ;
+; -0.182 ; c7m_sync[2]     ; ipl_2[1]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.849      ;
+; -0.182 ; c7m_sync[2]     ; ipl_1[1]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.849      ;
+; -0.182 ; c7m_sync[2]     ; ipl_1[0]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.849      ;
+; -0.182 ; c7m_sync[2]     ; ipl_2[0]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.849      ;
+; -0.182 ; c7m_sync[2]     ; ipl_1[2]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.849      ;
+; -0.182 ; c7m_sync[2]     ; ipl_2[2]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.849      ;
+; -0.137 ; state.100       ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.804      ;
+; -0.124 ; M68K_VMA_n~reg0 ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.791      ;
+; -0.019 ; wr_sync[0]      ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.686      ;
+; -0.009 ; state.101       ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.676      ;
+; 0.002  ; state.011       ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.665      ;
+; 0.007  ; state.110       ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.660      ;
+; 0.037  ; ipl_2[1]        ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.630      ;
+; 0.037  ; ipl_2[1]        ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.630      ;
+; 0.037  ; ipl_2[1]        ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.630      ;
+; 0.090  ; c7m_sync[1]     ; ipl_2[1]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.577      ;
+; 0.090  ; c7m_sync[1]     ; ipl_1[1]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.577      ;
+; 0.090  ; c7m_sync[1]     ; ipl_1[0]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.577      ;
+; 0.090  ; c7m_sync[1]     ; ipl_2[0]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.577      ;
+; 0.090  ; c7m_sync[1]     ; ipl_1[2]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.577      ;
+; 0.090  ; c7m_sync[1]     ; ipl_2[2]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.577      ;
+; 0.134  ; op_lds_n        ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.533      ;
+; 0.166  ; state.000       ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.501      ;
+; 0.173  ; c7m_sync[2]     ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.494      ;
+; 0.201  ; state.111       ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.466      ;
+; 0.201  ; state.111       ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.466      ;
+; 0.212  ; state.010       ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.455      ;
+; 0.222  ; ipl_1[0]        ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.445      ;
+; 0.222  ; ipl_1[0]        ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.445      ;
+; 0.222  ; ipl_1[0]        ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.445      ;
+; 0.232  ; state.010       ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.435      ;
+; 0.318  ; c7m_sync[1]     ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.349      ;
+; 0.318  ; c7m_sync[1]     ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.349      ;
+; 0.328  ; state.011       ; state.100                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.339      ;
+; 0.339  ; c7m_sync[1]     ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.328      ;
+; 0.378  ; M68K_VMA_n~reg0 ; state.100                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.289      ;
+; 0.388  ; M68K_VMA_n~reg0 ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.279      ;
+; 0.407  ; op_req          ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.260      ;
+; 0.438  ; state.100       ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.229      ;
+; 0.438  ; state.100       ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.229      ;
+; 0.447  ; c7m_sync[1]     ; state.110                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.220      ;
+; 0.449  ; c7m_sync[1]     ; state.111                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.218      ;
+; 0.463  ; state.011       ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.204      ;
+; 0.519  ; state.111       ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.148      ;
+; 0.547  ; rd_sync[0]      ; data_out[13]                ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.120      ;
+; 0.547  ; rd_sync[0]      ; data_out[14]                ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.120      ;
+; 0.547  ; rd_sync[0]      ; data_out[15]                ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.120      ;
+; 0.626  ; c7m_sync[1]     ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 4.041      ;
+; 0.713  ; ipl_1[2]        ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.954      ;
+; 0.713  ; ipl_1[2]        ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.954      ;
+; 0.713  ; ipl_1[2]        ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.954      ;
+; 0.737  ; ipl_1[1]        ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.930      ;
+; 0.737  ; ipl_1[1]        ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.930      ;
+; 0.737  ; ipl_1[1]        ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.930      ;
+; 0.757  ; c7m_sync[2]     ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.910      ;
+; 0.832  ; wr_sync[1]      ; op_rw                       ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.835      ;
+; 0.832  ; wr_sync[1]      ; op_fc[0]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.835      ;
+; 0.832  ; wr_sync[1]      ; op_fc[1]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.835      ;
+; 0.832  ; wr_sync[1]      ; op_fc[2]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.835      ;
+; 0.832  ; wr_sync[1]      ; op_uds_n                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.835      ;
+; 0.832  ; wr_sync[1]      ; op_lds_n                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.835      ;
+; 0.872  ; wr_sync[0]      ; a0                          ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.795      ;
+; 0.884  ; M68K_VMA_n~reg0 ; state.011                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.783      ;
+; 0.958  ; op_req          ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.709      ;
+; 0.984  ; M68K_VMA_n~reg0 ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.683      ;
+; 1.059  ; wr_sync[1]      ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.608      ;
+; 1.078  ; wr_sync[1]      ; op_req                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.589      ;
+; 1.098  ; state.010       ; LTCH_A_OE_n~reg0            ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.569      ;
+; 1.111  ; op_rw           ; M68K_RW~reg0                ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.556      ;
+; 1.122  ; op_rw           ; LTCH_D_WR_OE_n~reg0         ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.545      ;
+; 1.134  ; c7m_sync[1]     ; state.101                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 3.533      ;
++--------+-----------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------+
+; Slow Model Hold: 'PI_CLK'                                                                                                               ;
++-------+-----------------------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+; Slack ; From Node                   ; To Node                     ; Launch Clock ; Latch Clock ; Relationship ; Clock Skew ; Data Delay ;
++-------+-----------------------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+; 1.238 ; M68K_C3                     ; c7m_sync[0]                 ; M68K_C3      ; PI_CLK      ; 0.000        ; 3.348      ; 4.807      ;
+; 1.238 ; M68K_C3                     ; c7m_sync[0]                 ; M68K_C3      ; PI_CLK      ; 0.000        ; 3.348      ; 4.807      ;
+; 1.354 ; M68K_C1                     ; c7m_sync[0]                 ; M68K_C1      ; PI_CLK      ; 0.000        ; 3.348      ; 4.923      ;
+; 1.354 ; M68K_C1                     ; c7m_sync[0]                 ; M68K_C1      ; PI_CLK      ; 0.000        ; 3.348      ; 4.923      ;
+; 1.388 ; ipl_2[0]                    ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.609      ;
+; 1.404 ; ipl_1[2]                    ; ipl_2[2]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.625      ;
+; 1.406 ; rd_sync[0]                  ; rd_sync[1]                  ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.627      ;
+; 1.415 ; wr_sync[0]                  ; wr_sync[1]                  ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.636      ;
+; 1.646 ; wr_sync[1]                  ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.867      ;
+; 1.650 ; LTCH_D_RD_L~reg0            ; LTCH_D_RD_L~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.871      ;
+; 1.659 ; state.111                   ; state.000                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.880      ;
+; 1.669 ; op_req                      ; op_req                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.890      ;
+; 1.676 ; PI_TXN_IN_PROGRESS_delay[0] ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.897      ;
+; 1.679 ; ipl_2[1]                    ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.900      ;
+; 1.682 ; ipl_1[1]                    ; ipl_2[1]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.903      ;
+; 1.908 ; LTCH_A_OE_n~reg0            ; LTCH_A_OE_n~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.129      ;
+; 1.908 ; LTCH_D_WR_OE_n~reg0         ; LTCH_D_WR_OE_n~reg0         ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.129      ;
+; 1.966 ; c7m_sync[1]                 ; c7m_sync[2]                 ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.187      ;
+; 2.032 ; state.100                   ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.253      ;
+; 2.034 ; state.100                   ; state.101                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.255      ;
+; 2.042 ; state.100                   ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.263      ;
+; 2.052 ; ipl_2[2]                    ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.273      ;
+; 2.084 ; state.011                   ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.305      ;
+; 2.117 ; M68K_RW~reg0                ; M68K_RW~reg0                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.338      ;
+; 2.127 ; PI_TXN_IN_PROGRESS~reg0     ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.348      ;
+; 2.143 ; a0                          ; a0                          ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.364      ;
+; 2.145 ; pi_berr                     ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.366      ;
+; 2.150 ; state.011                   ; state.011                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.371      ;
+; 2.153 ; a0                          ; op_lds_n                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.374      ;
+; 2.154 ; a0                          ; op_uds_n                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.375      ;
+; 2.232 ; status[1]                   ; status[1]                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.453      ;
+; 2.240 ; PI_TXN_IN_PROGRESS_delay[0] ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.461      ;
+; 2.254 ; state.110                   ; state.110                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.475      ;
+; 2.259 ; state.110                   ; state.111                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.480      ;
+; 2.264 ; state.110                   ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.485      ;
+; 2.280 ; state.010                   ; state.011                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.501      ;
+; 2.320 ; ipl[2]                      ; data_out[15]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.541      ;
+; 2.362 ; state.100                   ; state.100                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.583      ;
+; 2.367 ; c7m_sync[2]                 ; state.110                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.588      ;
+; 2.368 ; state.100                   ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.589      ;
+; 2.370 ; c7m_sync[2]                 ; state.111                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.591      ;
+; 2.372 ; state.100                   ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.593      ;
+; 2.446 ; ipl_1[0]                    ; ipl_2[0]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.667      ;
+; 2.477 ; c7m_sync[1]                 ; state.011                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.698      ;
+; 2.496 ; wr_sync[1]                  ; a0                          ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.717      ;
+; 2.514 ; ipl[1]                      ; data_out[14]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.735      ;
+; 2.548 ; c7m_sync[0]                 ; c7m_sync[1]                 ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.769      ;
+; 2.553 ; state.101                   ; state.101                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.774      ;
+; 2.568 ; state.111                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.789      ;
+; 2.659 ; wr_sync[1]                  ; status[1]                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.880      ;
+; 2.666 ; ipl_2[2]                    ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.887      ;
+; 2.666 ; ipl_2[2]                    ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.887      ;
+; 2.668 ; state.000                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.889      ;
+; 2.676 ; rd_sync[1]                  ; data_out[13]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.897      ;
+; 2.676 ; rd_sync[1]                  ; data_out[14]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.897      ;
+; 2.676 ; rd_sync[1]                  ; data_out[15]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.897      ;
+; 2.709 ; state.000                   ; M68K_RW~reg0                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.930      ;
+; 2.715 ; state.001                   ; state.010                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.936      ;
+; 2.721 ; state.111                   ; LTCH_D_WR_OE_n~reg0         ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.942      ;
+; 2.722 ; state.111                   ; LTCH_A_OE_n~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.943      ;
+; 2.724 ; wr_sync[0]                  ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.945      ;
+; 2.735 ; c7m_sync[2]                 ; state.101                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 2.956      ;
+; 2.833 ; ipl[0]                      ; PI_IPL_ZERO~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.054      ;
+; 2.844 ; ipl[0]                      ; data_out[13]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.065      ;
+; 2.848 ; ipl[2]                      ; PI_IPL_ZERO~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.069      ;
+; 2.922 ; PI_TXN_IN_PROGRESS_delay[2] ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.143      ;
+; 2.945 ; state.001                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.166      ;
+; 3.018 ; wr_sync[0]                  ; status[1]                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.239      ;
+; 3.020 ; op_rw                       ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.241      ;
+; 3.025 ; op_rw                       ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.246      ;
+; 3.031 ; state.010                   ; M68K_RW~reg0                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.252      ;
+; 3.040 ; state.100                   ; LTCH_D_RD_L~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.261      ;
+; 3.042 ; c7m_sync[1]                 ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.263      ;
+; 3.043 ; wr_sync[0]                  ; op_req                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.264      ;
+; 3.077 ; wr_sync[0]                  ; op_rw                       ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.298      ;
+; 3.077 ; wr_sync[0]                  ; op_fc[0]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.298      ;
+; 3.077 ; wr_sync[0]                  ; op_fc[1]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.298      ;
+; 3.077 ; wr_sync[0]                  ; op_fc[2]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.298      ;
+; 3.077 ; wr_sync[0]                  ; op_uds_n                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.298      ;
+; 3.077 ; wr_sync[0]                  ; op_lds_n                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.298      ;
+; 3.148 ; c7m_sync[2]                 ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.369      ;
+; 3.155 ; c7m_sync[2]                 ; state.011                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.376      ;
+; 3.161 ; state.011                   ; op_req                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.382      ;
+; 3.171 ; ipl_2[0]                    ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.392      ;
+; 3.171 ; ipl_2[0]                    ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.392      ;
+; 3.176 ; state.101                   ; state.010                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.397      ;
+; 3.177 ; c7m_sync[1]                 ; state.100                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.398      ;
+; 3.178 ; PI_TXN_IN_PROGRESS_delay[1] ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.399      ;
+; 3.202 ; state.010                   ; LTCH_D_WR_OE_n~reg0         ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.423      ;
+; 3.237 ; M68K_VMA_n~reg0             ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.458      ;
+; 3.242 ; state.011                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.463      ;
+; 3.250 ; op_uds_n                    ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.471      ;
+; 3.254 ; ipl[1]                      ; PI_IPL_ZERO~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.475      ;
+; 3.268 ; state.101                   ; LTCH_D_RD_L~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.489      ;
+; 3.275 ; state.101                   ; state.110                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.496      ;
+; 3.293 ; state.111                   ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.514      ;
+; 3.297 ; state.111                   ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.518      ;
+; 3.307 ; c7m_sync[2]                 ; state.010                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.528      ;
+; 3.312 ; c7m_sync[1]                 ; state.101                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.533      ;
+; 3.324 ; op_rw                       ; LTCH_D_WR_OE_n~reg0         ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 3.545      ;
++-------+-----------------------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+
+
++--------------------------------+
+; Fast Model Setup Summary       ;
++--------+-------+---------------+
+; Clock  ; Slack ; End Point TNS ;
++--------+-------+---------------+
+; PI_CLK ; 0.131 ; 0.000         ;
++--------+-------+---------------+
+
+
++--------------------------------+
+; Fast Model Hold Summary        ;
++--------+-------+---------------+
+; Clock  ; Slack ; End Point TNS ;
++--------+-------+---------------+
+; PI_CLK ; 0.284 ; 0.000         ;
++--------+-------+---------------+
+
+
+-------------------------------
+; Fast Model Recovery Summary ;
+-------------------------------
+No paths to report.
+
+
+------------------------------
+; Fast Model Removal Summary ;
+------------------------------
+No paths to report.
+
+
++----------------------------------------+
+; Fast Model Minimum Pulse Width Summary ;
++----------+---------+-------------------+
+; Clock    ; Slack   ; End Point TNS     ;
++----------+---------+-------------------+
+; PI_CLK   ; 1.711   ; 0.000             ;
+; M68K_CLK ; 137.711 ; 0.000             ;
+; M68K_C1  ; 278.711 ; 0.000             ;
+; M68K_C3  ; 278.711 ; 0.000             ;
++----------+---------+-------------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------+
+; Fast Model Setup: 'PI_CLK'                                                                                                              ;
++-------+-----------------------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+; Slack ; From Node                   ; To Node                     ; Launch Clock ; Latch Clock ; Relationship ; Clock Skew ; Data Delay ;
++-------+-----------------------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+; 0.131 ; M68K_C1                     ; c7m_sync[0]                 ; M68K_C1      ; PI_CLK      ; 1.000        ; 0.862      ; 1.572      ;
+; 0.131 ; M68K_C1                     ; c7m_sync[0]                 ; M68K_C1      ; PI_CLK      ; 1.000        ; 0.862      ; 1.572      ;
+; 0.223 ; M68K_C3                     ; c7m_sync[0]                 ; M68K_C3      ; PI_CLK      ; 1.000        ; 0.862      ; 1.480      ;
+; 0.223 ; M68K_C3                     ; c7m_sync[0]                 ; M68K_C3      ; PI_CLK      ; 1.000        ; 0.862      ; 1.480      ;
+; 2.726 ; c7m_sync[2]                 ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 2.115      ;
+; 2.765 ; c7m_sync[2]                 ; state.100                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 2.076      ;
+; 2.815 ; c7m_sync[2]                 ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 2.026      ;
+; 2.833 ; c7m_sync[1]                 ; state.100                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 2.008      ;
+; 2.872 ; c7m_sync[2]                 ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.969      ;
+; 2.875 ; c7m_sync[2]                 ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.966      ;
+; 2.883 ; c7m_sync[1]                 ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.958      ;
+; 2.898 ; c7m_sync[1]                 ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.943      ;
+; 2.940 ; c7m_sync[1]                 ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.901      ;
+; 2.943 ; c7m_sync[1]                 ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.898      ;
+; 2.954 ; c7m_sync[2]                 ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.887      ;
+; 2.954 ; c7m_sync[2]                 ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.887      ;
+; 2.960 ; state.011                   ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.881      ;
+; 3.024 ; c7m_sync[1]                 ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.817      ;
+; 3.068 ; M68K_VMA_n~reg0             ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.773      ;
+; 3.068 ; M68K_VMA_n~reg0             ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.773      ;
+; 3.184 ; state.101                   ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.657      ;
+; 3.188 ; state.011                   ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.653      ;
+; 3.188 ; state.011                   ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.653      ;
+; 3.203 ; M68K_VMA_n~reg0             ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.638      ;
+; 3.259 ; c7m_sync[2]                 ; ipl_2[1]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.582      ;
+; 3.259 ; c7m_sync[2]                 ; ipl_1[1]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.582      ;
+; 3.259 ; c7m_sync[2]                 ; ipl_1[0]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.582      ;
+; 3.259 ; c7m_sync[2]                 ; ipl_2[0]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.582      ;
+; 3.259 ; c7m_sync[2]                 ; ipl_1[2]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.582      ;
+; 3.259 ; c7m_sync[2]                 ; ipl_2[2]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.582      ;
+; 3.266 ; wr_sync[0]                  ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.575      ;
+; 3.269 ; state.011                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.572      ;
+; 3.270 ; state.010                   ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.571      ;
+; 3.270 ; state.010                   ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.571      ;
+; 3.272 ; c7m_sync[1]                 ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.569      ;
+; 3.280 ; state.011                   ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.561      ;
+; 3.297 ; c7m_sync[2]                 ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.544      ;
+; 3.327 ; c7m_sync[1]                 ; ipl_2[1]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.514      ;
+; 3.327 ; c7m_sync[1]                 ; ipl_1[1]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.514      ;
+; 3.327 ; c7m_sync[1]                 ; ipl_1[0]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.514      ;
+; 3.327 ; c7m_sync[1]                 ; ipl_2[0]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.514      ;
+; 3.327 ; c7m_sync[1]                 ; ipl_1[2]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.514      ;
+; 3.327 ; c7m_sync[1]                 ; ipl_2[2]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.514      ;
+; 3.330 ; c7m_sync[1]                 ; state.110                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.511      ;
+; 3.332 ; c7m_sync[1]                 ; state.111                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.509      ;
+; 3.332 ; op_lds_n                    ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.509      ;
+; 3.366 ; state.111                   ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.475      ;
+; 3.366 ; state.111                   ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.475      ;
+; 3.369 ; state.011                   ; state.100                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.472      ;
+; 3.383 ; M68K_VMA_n~reg0             ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.458      ;
+; 3.388 ; state.100                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.453      ;
+; 3.449 ; op_req                      ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.392      ;
+; 3.477 ; c7m_sync[2]                 ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.364      ;
+; 3.500 ; c7m_sync[1]                 ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.341      ;
+; 3.500 ; c7m_sync[1]                 ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.341      ;
+; 3.512 ; state.110                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.329      ;
+; 3.524 ; M68K_VMA_n~reg0             ; state.100                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.317      ;
+; 3.531 ; state.011                   ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.310      ;
+; 3.542 ; ipl_2[1]                    ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.299      ;
+; 3.542 ; ipl_2[1]                    ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.299      ;
+; 3.542 ; ipl_2[1]                    ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.299      ;
+; 3.554 ; state.100                   ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.287      ;
+; 3.554 ; state.100                   ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.287      ;
+; 3.554 ; wr_sync[1]                  ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.287      ;
+; 3.559 ; state.000                   ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.282      ;
+; 3.565 ; c7m_sync[2]                 ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.276      ;
+; 3.567 ; c7m_sync[1]                 ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.274      ;
+; 3.598 ; rd_sync[0]                  ; data_out[13]                ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.243      ;
+; 3.598 ; rd_sync[0]                  ; data_out[14]                ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.243      ;
+; 3.598 ; rd_sync[0]                  ; data_out[15]                ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.243      ;
+; 3.605 ; state.010                   ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.236      ;
+; 3.612 ; ipl_1[0]                    ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.229      ;
+; 3.612 ; ipl_1[0]                    ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.229      ;
+; 3.612 ; ipl_1[0]                    ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.229      ;
+; 3.617 ; state.010                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.224      ;
+; 3.621 ; c7m_sync[1]                 ; state.101                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.220      ;
+; 3.634 ; wr_sync[1]                  ; op_rw                       ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.207      ;
+; 3.634 ; wr_sync[1]                  ; op_fc[0]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.207      ;
+; 3.634 ; wr_sync[1]                  ; op_fc[1]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.207      ;
+; 3.634 ; wr_sync[1]                  ; op_fc[2]                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.207      ;
+; 3.634 ; wr_sync[1]                  ; op_uds_n                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.207      ;
+; 3.634 ; wr_sync[1]                  ; op_lds_n                    ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.207      ;
+; 3.643 ; state.111                   ; state.010                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.198      ;
+; 3.658 ; wr_sync[0]                  ; a0                          ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.183      ;
+; 3.660 ; ipl_1[2]                    ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.181      ;
+; 3.660 ; ipl_1[2]                    ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.181      ;
+; 3.660 ; ipl_1[2]                    ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.181      ;
+; 3.664 ; PI_TXN_IN_PROGRESS_delay[1] ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.177      ;
+; 3.683 ; c7m_sync[2]                 ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.158      ;
+; 3.688 ; op_rw                       ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.153      ;
+; 3.691 ; M68K_VMA_n~reg0             ; state.001                   ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.150      ;
+; 3.692 ; op_rw                       ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.149      ;
+; 3.694 ; op_rw                       ; M68K_RW~reg0                ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.147      ;
+; 3.703 ; state.100                   ; LTCH_D_RD_L~reg0            ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.138      ;
+; 3.704 ; op_rw                       ; LTCH_D_WR_OE_n~reg0         ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.137      ;
+; 3.704 ; wr_sync[0]                  ; op_req                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.137      ;
+; 3.705 ; wr_sync[1]                  ; op_req                      ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.136      ;
+; 3.710 ; state.010                   ; M68K_RW~reg0                ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.131      ;
+; 3.711 ; state.011                   ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.130      ;
+; 3.712 ; state.010                   ; LTCH_A_OE_n~reg0            ; PI_CLK       ; PI_CLK      ; 5.000        ; 0.000      ; 1.129      ;
++-------+-----------------------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------+
+; Fast Model Hold: 'PI_CLK'                                                                                                               ;
++-------+-----------------------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+; Slack ; From Node                   ; To Node                     ; Launch Clock ; Latch Clock ; Relationship ; Clock Skew ; Data Delay ;
++-------+-----------------------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+; 0.284 ; wr_sync[1]                  ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.471      ;
+; 0.307 ; ipl_2[0]                    ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.494      ;
+; 0.312 ; ipl_1[2]                    ; ipl_2[2]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.499      ;
+; 0.312 ; rd_sync[0]                  ; rd_sync[1]                  ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.499      ;
+; 0.317 ; wr_sync[0]                  ; wr_sync[1]                  ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.504      ;
+; 0.364 ; LTCH_D_RD_L~reg0            ; LTCH_D_RD_L~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.551      ;
+; 0.367 ; state.111                   ; state.000                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.554      ;
+; 0.371 ; op_req                      ; op_req                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.558      ;
+; 0.376 ; ipl_2[1]                    ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.563      ;
+; 0.376 ; PI_TXN_IN_PROGRESS_delay[0] ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.563      ;
+; 0.379 ; ipl_1[1]                    ; ipl_2[1]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.566      ;
+; 0.408 ; M68K_RW~reg0                ; M68K_RW~reg0                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.595      ;
+; 0.412 ; PI_TXN_IN_PROGRESS~reg0     ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.599      ;
+; 0.419 ; a0                          ; a0                          ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.606      ;
+; 0.421 ; pi_berr                     ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.608      ;
+; 0.423 ; state.011                   ; state.011                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.610      ;
+; 0.426 ; a0                          ; op_lds_n                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.613      ;
+; 0.427 ; a0                          ; op_uds_n                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.614      ;
+; 0.431 ; M68K_C3                     ; c7m_sync[0]                 ; M68K_C3      ; PI_CLK      ; 0.000        ; 0.862      ; 1.480      ;
+; 0.431 ; M68K_C3                     ; c7m_sync[0]                 ; M68K_C3      ; PI_CLK      ; 0.000        ; 0.862      ; 1.480      ;
+; 0.488 ; status[1]                   ; status[1]                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.675      ;
+; 0.491 ; LTCH_A_OE_n~reg0            ; LTCH_A_OE_n~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.678      ;
+; 0.491 ; LTCH_D_WR_OE_n~reg0         ; LTCH_D_WR_OE_n~reg0         ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.678      ;
+; 0.492 ; PI_TXN_IN_PROGRESS_delay[0] ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.679      ;
+; 0.496 ; state.110                   ; state.110                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.683      ;
+; 0.499 ; state.110                   ; state.111                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.686      ;
+; 0.504 ; state.110                   ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.691      ;
+; 0.507 ; state.010                   ; state.011                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.694      ;
+; 0.523 ; M68K_C1                     ; c7m_sync[0]                 ; M68K_C1      ; PI_CLK      ; 0.000        ; 0.862      ; 1.572      ;
+; 0.523 ; M68K_C1                     ; c7m_sync[0]                 ; M68K_C1      ; PI_CLK      ; 0.000        ; 0.862      ; 1.572      ;
+; 0.533 ; ipl_2[2]                    ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.720      ;
+; 0.538 ; state.100                   ; state.100                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.725      ;
+; 0.543 ; state.100                   ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.730      ;
+; 0.546 ; state.011                   ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.733      ;
+; 0.547 ; state.100                   ; PI_TXN_IN_PROGRESS_delay[2] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.734      ;
+; 0.547 ; state.100                   ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.734      ;
+; 0.548 ; state.100                   ; state.101                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.735      ;
+; 0.553 ; state.100                   ; PI_TXN_IN_PROGRESS_delay[1] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.740      ;
+; 0.556 ; c7m_sync[1]                 ; c7m_sync[2]                 ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.743      ;
+; 0.569 ; state.001                   ; state.010                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.756      ;
+; 0.572 ; wr_sync[0]                  ; pi_berr                     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.759      ;
+; 0.591 ; state.101                   ; state.101                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.778      ;
+; 0.599 ; state.111                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.786      ;
+; 0.631 ; c7m_sync[1]                 ; PI_TXN_IN_PROGRESS_delay[0] ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.818      ;
+; 0.632 ; state.011                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.819      ;
+; 0.671 ; state.000                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.858      ;
+; 0.675 ; PI_TXN_IN_PROGRESS_delay[2] ; PI_TXN_IN_PROGRESS~reg0     ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.862      ;
+; 0.684 ; c7m_sync[2]                 ; state.110                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.871      ;
+; 0.686 ; c7m_sync[2]                 ; state.111                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.873      ;
+; 0.687 ; state.011                   ; op_req                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.874      ;
+; 0.687 ; ipl[2]                      ; data_out[15]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.874      ;
+; 0.699 ; c7m_sync[2]                 ; state.101                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.886      ;
+; 0.704 ; wr_sync[1]                  ; status[1]                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.891      ;
+; 0.708 ; wr_sync[1]                  ; a0                          ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.895      ;
+; 0.711 ; ipl_2[2]                    ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.898      ;
+; 0.711 ; ipl_2[2]                    ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.898      ;
+; 0.715 ; rd_sync[1]                  ; data_out[13]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.902      ;
+; 0.715 ; rd_sync[1]                  ; data_out[14]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.902      ;
+; 0.715 ; rd_sync[1]                  ; data_out[15]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.902      ;
+; 0.729 ; ipl_1[0]                    ; ipl_2[0]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.916      ;
+; 0.737 ; c7m_sync[1]                 ; state.011                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.924      ;
+; 0.751 ; c7m_sync[2]                 ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.938      ;
+; 0.755 ; c7m_sync[2]                 ; state.011                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.942      ;
+; 0.756 ; ipl[1]                      ; data_out[14]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.943      ;
+; 0.756 ; op_req                      ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.943      ;
+; 0.763 ; ipl_2[0]                    ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.950      ;
+; 0.763 ; ipl_2[0]                    ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.950      ;
+; 0.787 ; state.000                   ; M68K_RW~reg0                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.974      ;
+; 0.792 ; wr_sync[0]                  ; status[1]                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.979      ;
+; 0.795 ; c7m_sync[0]                 ; c7m_sync[1]                 ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.982      ;
+; 0.805 ; c7m_sync[2]                 ; state.010                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.992      ;
+; 0.809 ; state.111                   ; LTCH_A_OE_n~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.996      ;
+; 0.809 ; state.111                   ; LTCH_D_WR_OE_n~reg0         ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.996      ;
+; 0.811 ; c7m_sync[1]                 ; state.010                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 0.998      ;
+; 0.816 ; M68K_VMA_n~reg0             ; M68K_VMA_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.003      ;
+; 0.847 ; ipl[0]                      ; PI_IPL_ZERO~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.034      ;
+; 0.847 ; state.101                   ; state.010                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.034      ;
+; 0.847 ; state.010                   ; LTCH_D_WR_OE_n~reg0         ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.034      ;
+; 0.852 ; ipl[0]                      ; data_out[13]                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.039      ;
+; 0.864 ; ipl[1]                      ; PI_IPL_ZERO~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.051      ;
+; 0.866 ; c7m_sync[1]                 ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.053      ;
+; 0.869 ; op_uds_n                    ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.056      ;
+; 0.875 ; wr_sync[0]                  ; op_rw                       ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.062      ;
+; 0.875 ; wr_sync[0]                  ; op_fc[0]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.062      ;
+; 0.875 ; wr_sync[0]                  ; op_fc[1]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.062      ;
+; 0.875 ; wr_sync[0]                  ; op_fc[2]                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.062      ;
+; 0.875 ; wr_sync[0]                  ; op_uds_n                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.062      ;
+; 0.875 ; wr_sync[0]                  ; op_lds_n                    ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.062      ;
+; 0.878 ; ipl[2]                      ; PI_IPL_ZERO~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.065      ;
+; 0.896 ; state.101                   ; LTCH_D_RD_L~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.083      ;
+; 0.898 ; state.101                   ; state.110                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.085      ;
+; 0.908 ; state.001                   ; state.001                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.095      ;
+; 0.908 ; ipl_1[1]                    ; ipl[0]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.095      ;
+; 0.908 ; ipl_1[1]                    ; ipl[1]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.095      ;
+; 0.908 ; ipl_1[1]                    ; ipl[2]                      ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.095      ;
+; 0.916 ; M68K_VMA_n~reg0             ; state.011                   ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.103      ;
+; 0.931 ; state.111                   ; M68K_UDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.118      ;
+; 0.935 ; state.111                   ; M68K_LDS_n~reg0             ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.122      ;
+; 0.942 ; state.010                   ; LTCH_A_OE_n~reg0            ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.129      ;
+; 0.944 ; state.010                   ; M68K_RW~reg0                ; PI_CLK       ; PI_CLK      ; 0.000        ; 0.000      ; 1.131      ;
++-------+-----------------------------+-----------------------------+--------------+-------------+--------------+------------+------------+
+
+
++-------------------------------------------------------------------------------+
+; Multicorner Timing Analysis Summary                                           ;
++------------------+---------+-------+----------+---------+---------------------+
+; Clock            ; Setup   ; Hold  ; Recovery ; Removal ; Minimum Pulse Width ;
++------------------+---------+-------+----------+---------+---------------------+
+; Worst-case Slack ; -1.397  ; 0.284 ; N/A      ; N/A     ; 1.711               ;
+;  M68K_C1         ; N/A     ; N/A   ; N/A      ; N/A     ; 278.711             ;
+;  M68K_C3         ; N/A     ; N/A   ; N/A      ; N/A     ; 278.711             ;
+;  M68K_CLK        ; N/A     ; N/A   ; N/A      ; N/A     ; 137.711             ;
+;  PI_CLK          ; -1.397  ; 0.284 ; N/A      ; N/A     ; 1.711               ;
+; Design-wide TNS  ; -12.782 ; 0.0   ; 0.0      ; 0.0     ; 0.0                 ;
+;  M68K_C1         ; N/A     ; N/A   ; N/A      ; N/A     ; 0.000               ;
+;  M68K_C3         ; N/A     ; N/A   ; N/A      ; N/A     ; 0.000               ;
+;  M68K_CLK        ; N/A     ; N/A   ; N/A      ; N/A     ; 0.000               ;
+;  PI_CLK          ; -12.782 ; 0.000 ; N/A      ; N/A     ; 0.000               ;
++------------------+---------+-------+----------+---------+---------------------+
+
+
++-----------------------------------------------------------------------+
+; Setup Transfers                                                       ;
++------------+----------+------------+------------+----------+----------+
+; From Clock ; To Clock ; RR Paths   ; FR Paths   ; RF Paths ; FF Paths ;
++------------+----------+------------+------------+----------+----------+
+; M68K_C1    ; PI_CLK   ; 1          ; 1          ; 0        ; 0        ;
+; M68K_C3    ; PI_CLK   ; 1          ; 1          ; 0        ; 0        ;
+; M68K_CLK   ; PI_CLK   ; false path ; false path ; 0        ; 0        ;
+; PI_CLK     ; PI_CLK   ; 208        ; 0          ; 0        ; 0        ;
++------------+----------+------------+------------+----------+----------+
+Entries labeled "false path" only account for clock-to-clock false paths and not path-based false paths. As a result, actual path counts may be lower than reported.
+
+
++-----------------------------------------------------------------------+
+; Hold Transfers                                                        ;
++------------+----------+------------+------------+----------+----------+
+; From Clock ; To Clock ; RR Paths   ; FR Paths   ; RF Paths ; FF Paths ;
++------------+----------+------------+------------+----------+----------+
+; M68K_C1    ; PI_CLK   ; 1          ; 1          ; 0        ; 0        ;
+; M68K_C3    ; PI_CLK   ; 1          ; 1          ; 0        ; 0        ;
+; M68K_CLK   ; PI_CLK   ; false path ; false path ; 0        ; 0        ;
+; PI_CLK     ; PI_CLK   ; 208        ; 0          ; 0        ; 0        ;
++------------+----------+------------+------------+----------+----------+
+Entries labeled "false path" only account for clock-to-clock false paths and not path-based false paths. As a result, actual path counts may be lower than reported.
+
+
+---------------
+; Report TCCS ;
+---------------
+No dedicated SERDES Transmitter circuitry present in device or used in design
+
+
+---------------
+; Report RSKM ;
+---------------
+No non-DPA dedicated SERDES Receiver circuitry present in device or used in design
+
+
++------------------------------------------------+
+; Unconstrained Paths Summary                    ;
++---------------------------------+-------+------+
+; Property                        ; Setup ; Hold ;
++---------------------------------+-------+------+
+; Illegal Clocks                  ; 0     ; 0    ;
+; Unconstrained Clocks            ; 1     ; 1    ;
+; Unconstrained Input Ports       ; 3     ; 3    ;
+; Unconstrained Input Port Paths  ; 11    ; 11   ;
+; Unconstrained Output Ports      ; 1     ; 1    ;
+; Unconstrained Output Port Paths ; 3     ; 3    ;
++---------------------------------+-------+------+
+
+
++-----------------------------------------------+
+; Clock Status Summary                          ;
++-------------+----------+------+---------------+
+; Target      ; Clock    ; Type ; Status        ;
++-------------+----------+------+---------------+
+; M68K_C1     ; M68K_C1  ; Base ; Constrained   ;
+; M68K_C3     ; M68K_C3  ; Base ; Constrained   ;
+; M68K_CLK    ; M68K_CLK ; Base ; Constrained   ;
+; PI_CLK      ; PI_CLK   ; Base ; Constrained   ;
+; c7m_sync[2] ;          ; Base ; Unconstrained ;
++-------------+----------+------+---------------+
+
+
++-----------------------------------------------------------------------------------------------------+
+; Unconstrained Input Ports                                                                           ;
++--------------+--------------------------------------------------------------------------------------+
+; Input Port   ; Comment                                                                              ;
++--------------+--------------------------------------------------------------------------------------+
+; CLK_SEL      ; No input delay, min/max delays, false-path exceptions, or max skew assignments found ;
+; M68K_BERR_n  ; No input delay, min/max delays, false-path exceptions, or max skew assignments found ;
+; M68K_RESET_n ; No input delay, min/max delays, false-path exceptions, or max skew assignments found ;
++--------------+--------------------------------------------------------------------------------------+
+
+
++-----------------------------------------------------------------------------------------------------+
+; Unconstrained Output Ports                                                                          ;
++-------------+---------------------------------------------------------------------------------------+
+; Output Port ; Comment                                                                               ;
++-------------+---------------------------------------------------------------------------------------+
+; PI_RESET    ; No output delay, min/max delays, false-path exceptions, or max skew assignments found ;
++-------------+---------------------------------------------------------------------------------------+
+
+
++-----------------------------------------------------------------------------------------------------+
+; Unconstrained Input Ports                                                                           ;
++--------------+--------------------------------------------------------------------------------------+
+; Input Port   ; Comment                                                                              ;
++--------------+--------------------------------------------------------------------------------------+
+; CLK_SEL      ; No input delay, min/max delays, false-path exceptions, or max skew assignments found ;
+; M68K_BERR_n  ; No input delay, min/max delays, false-path exceptions, or max skew assignments found ;
+; M68K_RESET_n ; No input delay, min/max delays, false-path exceptions, or max skew assignments found ;
++--------------+--------------------------------------------------------------------------------------+
+
+
++-----------------------------------------------------------------------------------------------------+
+; Unconstrained Output Ports                                                                          ;
++-------------+---------------------------------------------------------------------------------------+
+; Output Port ; Comment                                                                               ;
++-------------+---------------------------------------------------------------------------------------+
+; PI_RESET    ; No output delay, min/max delays, false-path exceptions, or max skew assignments found ;
++-------------+---------------------------------------------------------------------------------------+
+
+
++--------------------------+
+; Timing Analyzer Messages ;
++--------------------------+
+Info: *******************************************************************
+Info: Running Quartus Prime Timing Analyzer
+    Info: Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
+    Info: Processing started: Thu Feb  5 07:14:42 2026
+Info: Command: quartus_sta pistorm_fc -c pistorm_fc
+Info: qsta_default_script.tcl version: #1
+Info (20030): Parallel compilation is enabled and will use 16 of the 24 processors detected
+Info (21077): Low junction temperature is 0 degrees C
+Info (21077): High junction temperature is 85 degrees C
+Info (334003): Started post-fitting delay annotation
+Info (334004): Delay annotation completed successfully
+Info (332104): Reading SDC File: 'pistorm_fc.sdc'
+Warning (332060): Node: c7m_sync[2] was determined to be a clock but was found without an associated clock assignment.
+    Info (13166): Register M68K_E~reg0 is being clocked by c7m_sync[2]
+Info: Found TIMING_ANALYZER_REPORT_SCRIPT_INCLUDE_DEFAULT_ANALYSIS = ON
+Info: Analyzing Slow Model
+Info: Can't run Report Timing Closure Recommendations. The current device family is not supported.
+Critical Warning (332148): Timing requirements not met
+Info (332146): Worst-case setup slack is -1.397
+    Info (332119):     Slack       End Point TNS Clock 
+    Info (332119): ========= =================== =====================
+    Info (332119):    -1.397             -12.782 PI_CLK 
+Info (332146): Worst-case hold slack is 1.238
+    Info (332119):     Slack       End Point TNS Clock 
+    Info (332119): ========= =================== =====================
+    Info (332119):     1.238               0.000 PI_CLK 
+Info (332140): No Recovery paths to report
+Info (332140): No Removal paths to report
+Info (332146): Worst-case minimum pulse width slack is 1.711
+    Info (332119):     Slack       End Point TNS Clock 
+    Info (332119): ========= =================== =====================
+    Info (332119):     1.711               0.000 PI_CLK 
+    Info (332119):   137.711               0.000 M68K_CLK 
+    Info (332119):   278.711               0.000 M68K_C1 
+    Info (332119):   278.711               0.000 M68K_C3 
+Info (332001): The selected device family is not supported by the report_metastability command.
+Info: Analyzing Fast Model
+Info (334003): Started post-fitting delay annotation
+Info (334004): Delay annotation completed successfully
+Warning (332060): Node: c7m_sync[2] was determined to be a clock but was found without an associated clock assignment.
+    Info (13166): Register M68K_E~reg0 is being clocked by c7m_sync[2]
+Info (332146): Worst-case setup slack is 0.131
+    Info (332119):     Slack       End Point TNS Clock 
+    Info (332119): ========= =================== =====================
+    Info (332119):     0.131               0.000 PI_CLK 
+Info (332146): Worst-case hold slack is 0.284
+    Info (332119):     Slack       End Point TNS Clock 
+    Info (332119): ========= =================== =====================
+    Info (332119):     0.284               0.000 PI_CLK 
+Info (332140): No Recovery paths to report
+Info (332140): No Removal paths to report
+Info (332146): Worst-case minimum pulse width slack is 1.711
+    Info (332119):     Slack       End Point TNS Clock 
+    Info (332119): ========= =================== =====================
+    Info (332119):     1.711               0.000 PI_CLK 
+    Info (332119):   137.711               0.000 M68K_CLK 
+    Info (332119):   278.711               0.000 M68K_C1 
+    Info (332119):   278.711               0.000 M68K_C3 
+Info (332001): The selected device family is not supported by the report_metastability command.
+Info (332102): Design is not fully constrained for setup requirements
+Info (332102): Design is not fully constrained for hold requirements
+Info: Quartus Prime Timing Analyzer was successful. 0 errors, 3 warnings
+    Info: Peak virtual memory: 336 megabytes
+    Info: Processing ended: Thu Feb  5 07:14:42 2026
+    Info: Elapsed time: 00:00:00
+    Info: Total CPU time (on all processors): 00:00:00
+
+

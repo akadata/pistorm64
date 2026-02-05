@@ -1,0 +1,19 @@
+if pgrep -x "emulator" > /dev/null; then
+    echo "PiStorm emulator is running, please stop it first"
+    exit 1
+fi
+
+if lsmod | grep -q '^pistorm'; then
+    echo "Unloading pistorm.ko to free GPIO/JTAG pins..."
+    sudo rmmod pistorm || true
+fi
+
+echo "Flashing upstream EPM240 bitstream..."
+sudo openocd -f ./68_240_upstream.cfg > nprog_log.txt 2>&1
+if [ $? -ne 0 ]
+then
+    echo "Flashing failed, please see nprog_log.txt for details"
+    exit 1
+else
+    echo "Flashing successful!"
+fi

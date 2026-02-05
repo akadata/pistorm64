@@ -32,6 +32,36 @@
 #define PISTORM_BATCH_MAX 256
 #endif
 
+static unsigned int ps_batch_max_ops = PISTORM_BATCH_MAX;
+static uint8_t ps_batch_last_fc = 0xff;
+
+static void ps_batch_init(void)
+{
+    const char *ops_env = getenv("PISTORM_BATCH_OPS");
+    if (ops_env && *ops_env) {
+        char *end = NULL;
+        unsigned long ops = strtoul(ops_env, &end, 10);
+        if (end && *end == '\0' && ops > 0) {
+            if (ops > PISTORM_BATCH_MAX) ops = PISTORM_BATCH_MAX;
+            ps_batch_max_ops = (unsigned int)ops;
+            return;
+        }
+    }
+
+    const char *bits_env = getenv("PISTORM_BATCH_BITS");
+    if (bits_env && *bits_env) {
+        char *end = NULL;
+        unsigned long bits = strtoul(bits_env, &end, 10);
+        if (end && *end == '\0' && bits >= 64) {
+            if (bits > 2560) bits = 2560;
+            unsigned long ops = bits / 32;
+            if (ops == 0) ops = 1;
+            if (ops > PISTORM_BATCH_MAX) ops = PISTORM_BATCH_MAX;
+            ps_batch_max_ops = (unsigned int)ops;
+        }
+    }
+}
+
 struct pistorm_busop_batch {
     uint32_t count;
     uint64_t ptr;   // userspace pointer to ops[]
@@ -62,7 +92,7 @@ static inline int ps_busopq_flush(int ps_fd)
 static inline int ps_busopq_push(int ps_fd, const struct pistorm_busop *op)
 {
     g_opsq[g_opsq_n++] = *op;
-    if (g_opsq_n >= PISTORM_BATCH_MAX) return ps_busopq_flush(ps_fd);
+    if (g_opsq_n >= ps_batch_max_ops) return ps_busopq_flush(ps_fd);
     return 0;
 }
 #endif // PISTORM_ENABLE_BATCH
@@ -101,6 +131,9 @@ static int ps_open_dev(void) {
         printf("[ps_protocol] backend=kmod (/dev/pistorm)\n");
         backend_logged = 1;
     }
+#if PISTORM_ENABLE_BATCH
+    ps_batch_init();
+#endif
     return 0;
 }
 
@@ -148,6 +181,12 @@ void ps_protocol_dump_stats(void) {
 
 void ps_fc_write(uint8_t fc) {
     if (ps_open_dev() < 0) return;
+#if PISTORM_ENABLE_BATCH
+    if (g_opsq_n && ps_batch_last_fc != fc) {
+        ps_busopq_flush(ps_fd);
+    }
+    ps_batch_last_fc = fc;
+#endif
     if (log_get_level() >= LOG_LEVEL_VERBOSE) {
         LOG_VERBOSE("[FC] cpld stub (fc=%u)\n", fc);
     }
@@ -286,7 +325,12 @@ static int ps_busop(int is_read, int width, unsigned addr, unsigned *val, unsign
         .flags  = flags,
     };
     int rc = ioctl(ps_fd, PISTORM_IOC_BUSOP, &op);
-    if (rc == 0 && is_read && val) *val = op.value;
+    if (rc == 0) {
+        if (is_read && val) *val = op.value;
+        if (op.status & PISTORM_BUSOP_ST_BERR) {
+            LOG_VERBOSE("[BERR] bus error observed addr=0x%08x\n", addr);
+        }
+    }
     return rc;
 }
 

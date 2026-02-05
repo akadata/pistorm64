@@ -38,3 +38,19 @@ Example layout:
 ## Build notes
 
 Some Amiga-side components expect the NDK layout above. Verify any hard-coded paths in scripts if the toolchain is installed elsewhere.
+
+## CPLD toolchain (Arch)
+
+To build the EPM240 CPLD bitstreams you need Quartus (ModelSim alone is not enough):
+
+```
+yay -S quartus-free-quartus quartus-free-devinfo-max
+```
+
+Optional:
+
+```
+yay -S quartus-free-help quartus-free-questa arrow-usb-blaster
+```
+
+Quartus should provide `quartus_sh`/`quartus_cpf` under `/opt/intelFPGA/.../quartus/bin`.
