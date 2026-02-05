@@ -86,7 +86,7 @@ extern "C" {
  * This happens in a real 68K if VPA or AVEC is asserted during an interrupt
  * acknowledge cycle instead of DTACK.
  */
-#define M68K_INT_ACK_AUTOVECTOR    0xffff //0xffffffff
+#define M68K_INT_ACK_AUTOVECTOR    0xffffffff
 
 /* Causes the spurious interrupt vector (0x18) to be taken
  * This happens in a real 68K if BERR is asserted during the interrupt
@@ -213,7 +213,7 @@ void m68k_write_memory_32(unsigned int address, unsigned int value);
 void m68k_add_ram_range(uint32_t addr, uint32_t upper, unsigned char *ptr);
 void m68k_add_rom_range(uint32_t addr, uint32_t upper, unsigned char *ptr);
 void m68k_remove_range(unsigned char *ptr);
-void m68k_clear_ranges();
+void m68k_clear_ranges(void);
 
 /* Special call to simulate undocumented 68k behavior when move.l with a
  * predecrement destination mode is executed.
@@ -246,7 +246,7 @@ void m68k_write_memory_32_pd(unsigned int address, unsigned int value);
  * services the interrupt.
  * Default behavior: return M68K_INT_ACK_AUTOVECTOR.
  */
-void m68k_set_int_ack_callback(uint16_t  (*callback)(int int_level));
+void m68k_set_int_ack_callback(int  (*callback)(int int_level));
 
 
 /* Set the callback for a breakpoint acknowledge (68010+).

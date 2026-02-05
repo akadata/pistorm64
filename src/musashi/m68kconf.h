@@ -150,9 +150,7 @@
  */
 #define M68K_EMULATE_FC             OPT_ON 
 // was OPT_OFF - added FC Line support however we need to update the CPLD to support this 
-// #define M68K_SET_FC_CALLBACK(A)     cpu_set_fc(A)
-// Use the callback approach instead
-#define M68K_EMULATE_FC             OPT_ON
+#define M68K_SET_FC_CALLBACK(A)     cpu_set_fc(A)
 
 /* If ON, CPU will call the pc changed callback when it changes the PC by a
  * large value.  This allows host programs to be nicer when it comes to

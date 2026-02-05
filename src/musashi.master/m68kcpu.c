@@ -44,23 +44,28 @@ extern void m68851_mmu_ops(struct m68ki_cpu_core *state);
 extern unsigned char m68ki_cycles[][0x10000];
 extern void m68ki_build_opcode_table(void);
 
-extern inline void m68ki_ic_clear(struct m68ki_cpu_core *state);
-
 #include "m68kops.h"
 #include "m68kcpu.h"
 
 #include "m68kfpu.c"
 #include "m68kmmu.h" // uses some functions from m68kfpu.c which are static !
 
-
-extern int FPU68020_SELECTED; /* cryptodad */
+#if M68K_EMULATE_PMMU 
+/* Stub implementation for pmmu_atc_flush to prevent build errors */ 
+void pmmu_atc_flush(m68ki_cpu_core *state) 
+{ 
+    (void)state; 
+    /* TODO: Implement real 68040/68851 ATC flush. 
+       For now this is a no-op so PFLUSHA/PFLUSHAN do not crash. */ 
+} 
+#endif
 
 /* ======================================================================== */
 /* ================================= DATA ================================= */
 /* ======================================================================== */
 
 int  m68ki_initial_cycles;
-volatile int  m68ki_remaining_cycles = 0;                     /* Number of clocks remaining */
+int  m68ki_remaining_cycles = 0;                     /* Number of clocks remaining */
 uint m68ki_tracing = 0;
 uint m68ki_address_space;
 
@@ -70,12 +75,14 @@ const char *const m68ki_cpu_names[] =
 	"Invalid CPU",
 	"M68000",
 	"M68010",
-	"Invalid CPU",
-	"M68EC020"
-	"Invalid CPU",
-	"Invalid CPU",
-	"Invalid CPU",
-	"M68020"
+	"M68EC020",
+	"M68020",
+	"M68EC030",
+	"M68030",
+	"M68EC040",
+	"M68LC040",
+	"M68040",
+	"SCC68070",
 };
 #endif /* M68K_LOG_ENABLE */
 
@@ -94,7 +101,7 @@ uint    m68ki_aerr_address;
 uint    m68ki_aerr_write_mode;
 uint    m68ki_aerr_fc;
 
-//jmp_buf m68ki_bus_error_jmp_buf;
+jmp_buf m68ki_bus_error_jmp_buf;
 
 /* Used by shift & rotate instructions */
 const uint8 m68ki_shift_8_table[65] =
@@ -537,7 +544,7 @@ const uint8 m68ki_ea_idx_cycle_table[64] =
 
 /* Interrupt acknowledge */
 static int default_int_ack_callback_data;
-static uint16_t default_int_ack_callback(int int_level)
+static int default_int_ack_callback(int int_level)
 {
 	default_int_ack_callback_data = int_level;
 	CPU_INT_LEVEL = 0;
@@ -578,7 +585,6 @@ static int default_tas_instr_callback(void)
 static int default_illg_instr_callback(int opcode)
 {
 	(void)opcode;
-	printf ( "Illegal Instruction - opcode 0x%X\n", opcode );
 	return 0; // not handled : exception will occur
 }
 
@@ -737,7 +743,7 @@ void m68k_set_reg(void *context, m68k_register_t regnum, unsigned int value)
 }
 
 /* Set the callbacks */
-void m68k_set_int_ack_callback(uint16_t  (*callback)(int int_level))
+void m68k_set_int_ack_callback(int  (*callback)(int int_level))
 {
 	CALLBACK_INT_ACK = callback ? callback : default_int_ack_callback;
 }
@@ -867,8 +873,7 @@ void m68k_set_cpu_type(struct m68ki_cpu_core *state, unsigned int cpu_type)
 			CYC_SHIFT        = 0;
 			CYC_RESET        = 518;
 			HAS_PMMU         = 0;
-			//HAS_FPU          = 0;
-			HAS_FPU          = FPU68020_SELECTED; /* cryptodad */
+			HAS_FPU          = 0;
 			return;
 		case M68K_CPU_TYPE_68030:
 			CPU_TYPE         = CPU_TYPE_030;
@@ -966,7 +971,7 @@ void m68k_set_cpu_type(struct m68ki_cpu_core *state, unsigned int cpu_type)
 uint m68k_get_address_mask(m68ki_cpu_core *state) {
 	return state->address_mask;
 }
-#if (0)
+
 /* Execute some instructions until we use up num_cycles clock cycles */
 /* ASG: removed per-instruction interrupt checks */
 int m68k_execute(m68ki_cpu_core *state, int num_cycles)
@@ -1038,7 +1043,7 @@ int m68k_execute(m68ki_cpu_core *state, int num_cycles)
 	/* return how many clocks we used */
 	return m68ki_initial_cycles - GET_CYCLES();
 }
-#endif
+
 
 int m68k_cycles_run(void)
 {
@@ -1076,7 +1081,7 @@ void m68k_set_irq(unsigned int int_level)
 
 	/* A transition from < 7 to 7 always interrupts (NMI) */
 	/* Note: Level 7 can also level trigger like a normal IRQ */
-	if ( old_level != 0x0700 && CPU_INT_LEVEL == 0x0700 )
+	if(old_level != 0x0700 && CPU_INT_LEVEL == 0x0700)
 		m68ki_cpu.nmi_pending = TRUE;
 }
 
@@ -1195,7 +1200,7 @@ void m68k_pulse_halt(void)
 
 /* Get and set the current CPU context */
 /* This is to allow for multiple CPUs */
-unsigned int m68k_context_size()
+unsigned int m68k_context_size(void)
 {
 	return sizeof(m68ki_cpu_core);
 }
@@ -1266,68 +1271,43 @@ inline unsigned int  m68k_read_pcrelative_32(m68ki_cpu_core *state, unsigned int
 }
 #endif
 
-
-
-
-extern volatile uint32_t g_buserr;
-
-//inline uint m68ki_read_imm16_addr_slowpath(m68ki_cpu_core *state, uint32_t pc, address_translation_cache *cache)
-inline uint m68ki_read_imm16_addr_slowpath ( m68ki_cpu_core *state, uint32_t pc )
+uint m68ki_read_imm16_addr_slowpath(m68ki_cpu_core *state, uint32_t pc, address_translation_cache *cache)
 {
     uint32_t address = ADDRESS_68K(pc);
-
-#ifdef CACHE_ON // cryptodad
-	address_translation_cache *cache = &state->code_translation_cache;
     uint32_t pc_address_diff = pc - address;
-
-	for (int i = 0; i < state->read_ranges; i++) 
-	{
-		if(address >= state->read_addr[i] && address < state->read_upper[i]) 
-		{
+	for (int i = 0; i < state->read_ranges; i++) {
+		if(address >= state->read_addr[i] && address < state->read_upper[i]) {
 			cache->lower = state->read_addr[i] + pc_address_diff;
 			cache->upper = state->read_upper[i] + pc_address_diff;
 			cache->offset = state->read_data[i] - cache->lower;
-
 			REG_PC += 2;
-
 			return be16toh(((unsigned short *)(state->read_data[i] + (address - state->read_addr[i])))[0]);
 		}
 	}
-#endif
+
 	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	//state->mmu_tmp_fc = FLAG_S | FUNCTION_CODE_USER_PROGRAM;
-	//state->mmu_tmp_rw = 1;
-	//state->mmu_tmp_sz = M68K_SZ_WORD;
-	//m68ki_check_address_error(state, REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
+	state->mmu_tmp_fc = FLAG_S | FUNCTION_CODE_USER_PROGRAM;
+	state->mmu_tmp_rw = 1;
+	state->mmu_tmp_sz = M68K_SZ_WORD;
+	m68ki_check_address_error(state, REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 
 #if M68K_EMULATE_PREFETCH
 {
 	uint result;
-	if ( REG_PC != CPU_PREF_ADDR )
+	if(REG_PC != CPU_PREF_ADDR)
 	{
 		CPU_PREF_DATA = m68ki_ic_readimm16(state, REG_PC);
-		//state->mmu_tmp_buserror_occurred = g_buserr;
-		//CPU_PREF_ADDR = state->mmu_tmp_buserror_occurred ? ((uint32)~0) : REG_PC;
-		CPU_PREF_ADDR = g_buserr ? ((uint32)~0) : REG_PC;
+		CPU_PREF_ADDR = state->mmu_tmp_buserror_occurred ? ((uint32)~0) : REG_PC;
 	}
-
 	result = MASK_OUT_ABOVE_16(CPU_PREF_DATA);
 	REG_PC += 2;
-	
-	//if (!state->mmu_tmp_buserror_occurred) {
-	if ( !g_buserr ) 
-	{
+	if (!state->mmu_tmp_buserror_occurred) {
 		// prefetch only if no bus error occurred in opcode fetch
 		CPU_PREF_DATA = m68ki_ic_readimm16(state, REG_PC);
-		//state->mmu_tmp_buserror_occurred = g_buserr;
-		//CPU_PREF_ADDR = state->mmu_tmp_buserror_occurred ? ((uint32)~0) : REG_PC;
-		CPU_PREF_ADDR = g_buserr ? ((uint32)~0) : REG_PC;
-
+		CPU_PREF_ADDR = state->mmu_tmp_buserror_occurred ? ((uint32)~0) : REG_PC;
 		// ignore bus error on prefetch
-		//state->mmu_tmp_buserror_occurred = 0;
-		//g_buserr = 0;
+		state->mmu_tmp_buserror_occurred = 0;
 	}
-
 	return result;
 }
 #else
@@ -1360,7 +1340,7 @@ void m68k_add_ram_range(uint32_t addr, uint32_t upper, unsigned char *ptr)
 				changed = 1;
 			}
 			if (changed) {
-				//DEBUG_PRINTF ("[MUSASHI] Adjusted mapped write range %d: %.8X-%.8X (%p)\n", m68ki_cpu.write_ranges, addr, upper, ptr);
+				printf("[MUSASHI] Adjusted mapped write range %d: %.8X-%.8X (%p)\n", m68ki_cpu.write_ranges, addr, upper, (void *)ptr);
 			}
 			return;
 		}
@@ -1371,20 +1351,20 @@ void m68k_add_ram_range(uint32_t addr, uint32_t upper, unsigned char *ptr)
 		m68ki_cpu.read_upper[m68ki_cpu.read_ranges] = upper;
 		m68ki_cpu.read_data[m68ki_cpu.read_ranges] = ptr;
 		m68ki_cpu.read_ranges++;
-		//DEBUG_PRINTF ("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, ptr);
+		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, (void *)ptr);
 	}
 	else {
-		//DEBUG_PRINTF ("Can't Musashi map more than eight RAM/ROM read ranges.\n");
+		printf("Can't Musashi map more than eight RAM/ROM read ranges.\n");
 	}
 	if (m68ki_cpu.write_ranges + 1 < 8) {
 		m68ki_cpu.write_addr[m68ki_cpu.write_ranges] = addr;
 		m68ki_cpu.write_upper[m68ki_cpu.write_ranges] = upper;
 		m68ki_cpu.write_data[m68ki_cpu.write_ranges] = ptr;
 		m68ki_cpu.write_ranges++;
-		//DEBUG_PRINTF ("[MUSASHI] Mapped write range %d: %.8X-%.8X (%p)\n", m68ki_cpu.write_ranges, addr, upper, ptr);
+		printf("[MUSASHI] Mapped write range %d: %.8X-%.8X (%p)\n", m68ki_cpu.write_ranges, addr, upper, (void *)ptr);
 	}
 	else {
-		//DEBUG_PRINTF ("Can't Musashi map more than eight RAM write ranges.\n");
+		printf("Can't Musashi map more than eight RAM write ranges.\n");
 	}
 }
 
@@ -1411,7 +1391,7 @@ void m68k_add_rom_range(uint32_t addr, uint32_t upper, unsigned char *ptr)
 				changed = 1;
 			}
 			if (changed) {
-				//DEBUG_PRINTF ("[MUSASHI] Adjusted mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, ptr);
+				printf("[MUSASHI] Adjusted mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, (void *)ptr);
 			}
 			return;
 		}
@@ -1422,10 +1402,10 @@ void m68k_add_rom_range(uint32_t addr, uint32_t upper, unsigned char *ptr)
 		m68ki_cpu.read_upper[m68ki_cpu.read_ranges] = upper;
 		m68ki_cpu.read_data[m68ki_cpu.read_ranges] = ptr;
 		m68ki_cpu.read_ranges++;
-		//DEBUG_PRINTF ("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, ptr);
+		printf("[MUSASHI] Mapped read range %d: %.8X-%.8X (%p)\n", m68ki_cpu.read_ranges, addr, upper, (void *)ptr);
 	}
 	else {
-		//DEBUG_PRINTF ("Can't Musashi map more than eight RAM/ROM read ranges.\n");
+		printf("Can't Musashi map more than eight RAM/ROM read ranges.\n");
 	}
 }
 
@@ -1443,7 +1423,7 @@ void m68k_remove_range(unsigned char *ptr) {
 			m68ki_cpu.read_data[i] = NULL;
 			m68ki_cpu.read_addr[i] = 0;
 			m68ki_cpu.read_upper[i] = 0;
-			//DEBUG_PRINTF ("[MUSASHI] Unmapped read range %d.\n", i);
+			printf("[MUSASHI] Unmapped read range %d.\n", i);
 			for (int j = i; j < 8 - 1; j++) {
 				m68ki_cpu.read_data[j] = m68ki_cpu.read_data[j + 1];
 				m68ki_cpu.read_addr[j] = m68ki_cpu.read_addr[j + 1];
@@ -1458,7 +1438,7 @@ void m68k_remove_range(unsigned char *ptr) {
 			m68ki_cpu.write_data[i] = NULL;
 			m68ki_cpu.write_addr[i] = 0;
 			m68ki_cpu.write_upper[i] = 0;
-			//DEBUG_PRINTF ("[MUSASHI] Unmapped write range %d.\n", i);
+			printf("[MUSASHI] Unmapped write range %d.\n", i);
 			for (int j = i; j < 8 - 1; j++) {
 				m68ki_cpu.write_data[j] = m68ki_cpu.write_data[j + 1];
 				m68ki_cpu.write_addr[j] = m68ki_cpu.write_addr[j + 1];
@@ -1472,9 +1452,9 @@ void m68k_remove_range(unsigned char *ptr) {
 	}
 }
 
-void m68k_clear_ranges()
+void m68k_clear_ranges(void)
 {
-	//DEBUG_PRINTF ("[MUSASHI] Clearing all reads/write memory ranges.\n");
+	printf("[MUSASHI] Clearing all reads/write memory ranges.\n");
 	for (int i = 0; i < 8; i++) {
 		m68ki_cpu.read_upper[i] = 0;
 		m68ki_cpu.read_addr[i] = 0;

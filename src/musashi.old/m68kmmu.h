@@ -645,7 +645,8 @@ uint32 pmmu_translate_addr_with_fc(m68ki_cpu_core *state, uint32 addr_in, uint8 
 // the 68040 is a subset of the 68851 and 68030 PMMUs - the page table sizes are fixed, there is no early termination, etc, etc.
 uint32 pmmu_translate_addr_with_fc_040(m68ki_cpu_core *state, uint32 addr_in, uint8 fc, uint8 ptest)
 {
-	uint32 addr_out, tt0, tt1;
+	uint32 addr_out, tt0 = 0, tt1 = 0;
+	//uint32 addr_out, tt0, tt1;
 
 	addr_out = addr_in;
 	state->mmu_tmp_sr = 0;
@@ -1292,6 +1293,7 @@ void m68851_mmu_ops(m68ki_cpu_core *state)
 
 
 /* Apple HMMU translation is much simpler */
+/*  THIS LAST APPLE HMMU WAS COMMENTED OUT */
 /*
 inline uint32 hmmu_translate_addr(uint32 addr_in)
 {
