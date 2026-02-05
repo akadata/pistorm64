@@ -48,6 +48,10 @@
 #include "m68kops.h"
 #include "emulator_fc.h"
 
+static void fc_callback_wrapper(unsigned int new_fc) {
+  cpu_set_fc((uint32_t)new_fc);
+}
+
 
 #define KEY_POLL_INTERVAL_MSEC 1000
 
@@ -1203,6 +1207,7 @@ switch_config:
   printf("Setting CPU type to %d.\n", cpu_type);
   m68k_set_cpu_type(&m68ki_cpu, cpu_type);
   m68k_set_instr_hook_callback(instr_hook_callback);
+  m68k_set_fc_callback(fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
   m68k_set_illg_instr_callback(illg_instr_callback);
   cpu_pulse_reset();
 

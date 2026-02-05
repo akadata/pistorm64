@@ -30,8 +30,7 @@ enum pistorm_dev_cmds {
                                 //     to another (PTR2).
   PI_CMD_GET_FB = 0x010C,       // [R] Get the current framebuffer address.
   PI_CMD_COPYRECT = 0x0110,     // [W] Generic memory copyrect with source and destination pitch.
-  PI_CMD_COPYRECT_EX =
-      0x0112, // [W] Extended memory copyrect with additional source/destination X/Y coordinates.
+  PI_CMD_COPYRECT_EX = 0x0112, // [W] Extended memory copyrect with additional source/destination X/Y coordinates.
   PI_CMD_MEMSET = 0x0114,       // [W] Accelerated memset functionality to quickly clear a region of
                                 // memory to a specific value.
   PI_CMD_SHOWFPS = 0x0118,      // [W] Enable/disable RTG FPS display.
@@ -44,8 +43,7 @@ enum pistorm_dev_cmds {
   PI_CMD_SHOW_CLUT_CURSOR = 0x0204, // [W] Show or hide CLUT mouse cursor
   PI_CMD_SET_CLUT_CURSOR = 0x0206,  // [W] Set CLUT mouse cursor data
 
-  PI_CMD_COPYRECT_EX_MASK =
-      0x0208, // [W] Same as copyrect_ex, except with a mask color for transparent pixels.
+  PI_CMD_COPYRECT_EX_MASK =  0x0208, // [W] Same as copyrect_ex, except with a mask color for transparent pixels.
   PI_CMD_FILLRECT = 0x020A,  // [W] Fills a memory rect with a color value.
   PI_CMD_BLIT_NBPP = 0x020C, // [W] Render an N bpp bitmap of the full specified width to the target
                              // offset with optional color map.

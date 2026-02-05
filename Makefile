@@ -185,7 +185,6 @@ MAINFILES += src/config_file/rominfo.c
 
 MAINFILES += src/input/input.c
 MAINFILES += $(PS_PROTOCOL_SRC)
-MAINFILES += src/gpio/rpi_peri.c
 
 MAINFILES += src/platforms/platforms.c
 MAINFILES += src/z3bus_iface.c
@@ -485,10 +484,10 @@ install: all
 	$(INSTALL) -d $(INSTALL_DIR)/a314
 	cp -a src/a314/files_pi/. $(INSTALL_DIR)/a314/
 	cp -a data $(INSTALL_DIR)/
-	$(INSTALL) -d $(INSTALL_DIR)/data/a314-shared
-	@if [ -d $(INSTALL_DIR)/data/a314-shared ] && [ "$$(ls -A $(INSTALL_DIR)/data/a314-shared 2>/dev/null)" ]; then \
-		echo "Warning: $(INSTALL_DIR)/data/a314-shared is not empty; Python code must not be installed there."; \
-	fi
+#	$(INSTALL) -d $(INSTALL_DIR)/data/a314-shared
+#	@if [ -d $(INSTALL_DIR)/data/a314-shared ] && [ "$$(ls -A $(INSTALL_DIR)/data/a314-shared 2>/dev/null)" ]; then \
+#		echo "Warning: $(INSTALL_DIR)/data/a314-shared is not empty; Python code must not be installed there."; \
+#	fi
 	$(INSTALL) -d $(INSTALL_DIR)/rtg
 	$(INSTALL) -m 644 src/platforms/amiga/rtg/*.shader $(INSTALL_DIR)/rtg/
 	[ -f pistorm.LICENSE ] && $(INSTALL) -m 644 pistorm.LICENSE $(INSTALL_DIR)/

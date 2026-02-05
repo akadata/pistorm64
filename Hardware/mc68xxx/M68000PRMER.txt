@@ -1,0 +1,185 @@
+Freescale Semiconductor
+Reference Manual Errata
+
+M68000PRMER
+Rev. 1, 03/2007
+
+68K Programmer’s Reference
+Manual Errata
+by: Microcontroller Division
+
+This errata document describes corrections to the 68K
+Programmer’s Reference Manual, order number
+M68000PRM. Please check our website at
+http://www.freescale.com/ for the latest updates.
+The current available version of the 68K Programmer’s
+Reference Manual is Revision 1.
+
+© Freescale Semiconductor, Inc., 2007. All rights reserved.
+
+Contents
+1
+2
+
+Errata for Revision 1 . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+Revision History. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+
+Errata for Revision 1
+
+1
+
+Errata for Revision 1
+Table 1. M68000 RM Rev 1 Errata
+
+2
+
+Location
+
+Description
+
+Page 5-35
+
+In the Instruction Fields section of the FDBcc instruction summary, the displacement field
+description should be: “Specifies the branch distance (from the address of the instruction plus
+four) to the destination in bytes.”
+
+Page 5-71
+
+In the Instruction Format figure of the FMOD instruction summary, bits 6:0 of the second word
+should be 0100001 (matching the figure on page 8-33), not 0101101.
+
+Page 5-78
+
+In the Instruction Format figure of the FMOVE instruction summary:
+• The COPROCESSOR ID field should be located in bits 9-11
+• Bit 12 has a fixed value of 1
+
+Page 6-12
+
+In the FRESTORE instruction summary, the description for the BUSY state frame should begin
+with “This state frame is 100 ($64) bytes long in the MC68040...”
+
+Revision History
+
+Table 2 provides a revision history for this document.
+Table 2. Revision History
+Rev. Number
+
+Substantive Changes
+
+Date of Release
+
+0.1
+
+Initial release as text document.
+
+07/2005
+
+1
+
+• Converted errata from text document to standard Freescale format
+• Added FMOD instruction errata to Table 1
+• Light edit for grammar, punctuation, and format
+
+03/2007
+
+68K Programmer’s Reference Manual Errata, Rev. 1
+2
+
+Freescale Semiconductor
+
+THIS PAGE IS INTENTIONALLY BLANK
+
+68K Programmer’s Reference Manual Errata, Rev. 1
+Freescale Semiconductor
+
+3
+
+How to Reach Us:
+Home Page:
+www.freescale.com
+Web Support:
+http://www.freescale.com/support
+USA/Europe or Locations Not Listed:
+Freescale Semiconductor, Inc.
+Technical Information Center, EL516
+2100 East Elliot Road
+Tempe, Arizona 85284
++1-800-521-6274 or +1-480-768-2130
+www.freescale.com/support
+Europe, Middle East, and Africa:
+Freescale Halbleiter Deutschland GmbH
+Technical Information Center
+Schatzbogen 7
+81829 Muenchen, Germany
++44 1296 380 456 (English)
++46 8 52200080 (English)
++49 89 92103 559 (German)
++33 1 69 35 48 48 (French)
+www.freescale.com/support
+Japan:
+Freescale Semiconductor Japan Ltd.
+Headquarters
+ARCO Tower 15F
+1-8-1, Shimo-Meguro, Meguro-ku,
+Tokyo 153-0064
+Japan
+0120 191014 or +81 3 5437 9125
+support.japan@freescale.com
+Asia/Pacific:
+Freescale Semiconductor Hong Kong Ltd.
+Technical Information Center
+2 Dai King Street
+Tai Po Industrial Estate
+Tai Po, N.T., Hong Kong
++800 2666 8080
+support.asia@freescale.com
+For Literature Requests Only:
+Freescale Semiconductor Literature Distribution Center
+P.O. Box 5405
+Denver, Colorado 80217
+1-800-441-2447 or 303-675-2140
+Fax: 303-675-2150
+LDCForFreescaleSemiconductor@hibbertgroup.com
+
+Document Number: M68000PRMER
+Rev. 1
+03/2007
+
+Information in this document is provided solely to enable system and software
+implementers to use Freescale Semiconductor products. There are no express or
+implied copyright licenses granted hereunder to design or fabricate any integrated
+circuits or integrated circuits based on the information in this document.
+Freescale Semiconductor reserves the right to make changes without further notice to
+any products herein. Freescale Semiconductor makes no warranty, representation or
+guarantee regarding the suitability of its products for any particular purpose, nor does
+Freescale Semiconductor assume any liability arising out of the application or use of any
+product or circuit, and specifically disclaims any and all liability, including without
+limitation consequential or incidental damages. “Typical” parameters that may be
+provided in Freescale Semiconductor data sheets and/or specifications can and do vary
+in different applications and actual performance may vary over time. All operating
+parameters, including “Typicals”, must be validated for each customer application by
+customer’s technical experts. Freescale Semiconductor does not convey any license
+under its patent rights nor the rights of others. Freescale Semiconductor products are
+not designed, intended, or authorized for use as components in systems intended for
+surgical implant into the body, or other applications intended to support or sustain life,
+or for any other application in which the failure of the Freescale Semiconductor product
+could create a situation where personal injury or death may occur. Should Buyer
+purchase or use Freescale Semiconductor products for any such unintended or
+unauthorized application, Buyer shall indemnify and hold Freescale Semiconductor and
+its officers, employees, subsidiaries, affiliates, and distributors harmless against all
+claims, costs, damages, and expenses, and reasonable attorney fees arising out of,
+directly or indirectly, any claim of personal injury or death associated with such
+unintended or unauthorized use, even if such claim alleges that Freescale
+Semiconductor was negligent regarding the design or manufacture of the part.
+RoHS-compliant and/or Pb-free versions of Freescale products have the functionality
+and electrical characteristics as their non-RoHS-compliant and/or non-Pb-free
+counterparts. For further information, see http://www.freescale.com or contact your
+Freescale sales representative.
+For information on Freescale’s Environmental Products program, go to
+http://www.freescale.com/epp.
+Freescale™ and the Freescale logo are trademarks of Freescale Semiconductor, Inc.
+All other product or service names are the property of their respective owners.
+© Freescale Semiconductor, Inc. 2007. All rights reserved.
+
+
