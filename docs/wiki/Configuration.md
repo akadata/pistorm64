@@ -42,3 +42,36 @@ These are applied in the platform-specific config (e.g. `default.cfg` under the 
   - `stub`: enables FC shadow logging without driving hardware (default when set with no value).
   - `cpld`: enables FC mode intended for FC-capable CPLD bitstreams.
   - `off`: disables FC tracking.
+
+## Kernel module parameters (pistorm.ko)
+
+These are set when loading the kernel module (e.g. `modprobe pistorm <param>=<value>`):
+
+- `gpclk_src` / `gpclk_div`
+  - GPCLK0 source and divider.
+- `berr_reset_input=0|1`
+  - `0`: GPIO5 is RESET output (legacy CPLD).
+  - `1`: GPIO5 is treated as RESET/BERR input (FC/BERR CPLD).
+- `run_batch_enable=0|1`
+  - Enables the v2 batch ioctl (`PISTORM_IOC_RUN_BATCH`).
+
+Example:
+```
+sudo modprobe pistorm berr_reset_input=1 run_batch_enable=1 gpclk_src=6 gpclk_div=12
+```
+
+## Userspace batch tuning (kmod backend)
+
+Batching is compile-time gated by `PISTORM_ENABLE_BATCH`. When enabled, you can
+cap the batch size at runtime using environment variables:
+
+- `PISTORM_BATCH_BITS`
+  - Batch size hint in bits. Values are clamped to a maximum of **2560**.
+  - Examples: `64`, `128`, `256`, `512`, `1024`, `2048`, `2560`.
+- `PISTORM_BATCH_OPS`
+  - Directly sets the maximum number of ops per batch (overrides `PISTORM_BATCH_BITS`).
+
+Example:
+```
+PISTORM_BATCH_BITS=2048 ./pistorm64 ...
+```

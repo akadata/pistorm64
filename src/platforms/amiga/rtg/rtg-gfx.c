@@ -66,11 +66,14 @@ extern uint8_t realtime_graphics_debug;
 
 //static const size_t rtg_mem_size = 40u * SIZE_MEGA;
 //
+#ifndef RTG_GFX_MEM
+#define RTG_GFX_MEM 40u
+#endif
 #ifndef RTG_MEM_MB
-#define RTG_MEM_MB 40u
+#define RTG_MEM_MB RTG_GFX_MEM
 #endif
 
-static const size_t rtg_mem_size = (size_t)RTG_MEM_MB * SIZE_MEGA;
+static const size_t rtg_mem_size = (size_t)RTG_GFX_MEM * SIZE_MEGA;
 
 
 static uint32_t rtg_oob_log_count = 0;

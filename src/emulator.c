@@ -77,8 +77,8 @@ static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write
   fc_shadow_type = type;
   fc_shadow_is_write = is_write;
 
-  if (log_get_level() >= LOG_LEVEL_VERBOSE) {
-    LOG_DEBUG("[FC] shadow=%u %s type=%u addr=$%.8X PC=$%.8X\n",
+  if (log_get_level() >= LOG_LEVEL_DEBUG) {
+    LOG_DEBUG("[FC] seen=%u %s type=%u addr=$%.8X PC=$%.8X\n",
               fc_shadow,
               is_write ? "W" : "R",
               type,

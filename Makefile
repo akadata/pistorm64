@@ -16,15 +16,7 @@
 #   make USE_RAYLIB=0
 #   make PLATFORM=ZEROW2_64
 
-EXENAME          ?= emulator
-
-PLATFORM ?= PI4_64BIT
-
-# Enable batching (set to 1) and/or IPL rate limiting (set to interval in us) 100us seems best in tests
-PISTORM_ENABLE_BATCH ?= 1
-PISTORM_IPL_RATELIMIT_US ?= 100  
-
-PISTORM_KMOD ?= 1
+# Build defaults live in config.mk (override there or via make VAR=...)
 
 # Default compilers (can still override with CC=... directly)
 CC  ?= gcc
@@ -128,7 +120,6 @@ USE_LTO    ?= 1
 USE_NO_PLT ?= 1 
 OMIT_FP    ?= 1
 USE_PIPE   ?= 1
-PISTORM_KMOD ?= 1
 
 # Quiet noisy-but-benign warnings from the generated 68k core.
 # Split into common + GCC-only; clang doesn't support every GCC flag.
@@ -272,10 +263,9 @@ CXX ?= g++
 
 DEFINES  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DINLINE_INTO_M68KCPU_H=1
 # Allow command-line override of batching and rate limiting for performance tuning
-PISTORM_ENABLE_BATCH ?= 0
-PISTORM_IPL_RATELIMIT_US ?= 0
 PISTORM_USE_DIRECT_OPS ?= 0
 DEFINES  += -DPISTORM_ENABLE_BATCH=$(PISTORM_ENABLE_BATCH) -DPISTORM_IPL_RATELIMIT_US=$(PISTORM_IPL_RATELIMIT_US) -DPISTORM_USE_DIRECT_OPS=$(PISTORM_USE_DIRECT_OPS)
+DEFINES  += -DRTG_GFX_MEM=$(RTG_GFX_MEM) -DRTG_WIDTH=$(RTG_WIDTH) -DRTG_HEIGHT=$(RTG_HEIGHT)
 LD_GOLD   = $(if $(filter 1,$(USE_GOLD)),-fuse-ld=gold,)
 LTO_FLAGS = $(if $(filter 1,$(USE_LTO)),-flto=auto,)
 NO_LTO_FLAGS = $(if $(filter 1,$(USE_LTO)),-fno-lto,)

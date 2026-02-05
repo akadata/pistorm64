@@ -1,6 +1,6 @@
 include ../../../../../config.mk
 
-RTG_CFLAGS += -DRTG_MEM_MB=$(RTG_MEM_MB)
+RTG_CFLAGS += -DRTG_GFX_MEM=$(RTG_GFX_MEM)
 
 AMIGA_TOOLCHAIN ?= /opt/amiga
 AMIGA_PATH := $(AMIGA_TOOLCHAIN)/bin:$(PATH)
@@ -35,8 +35,8 @@ CFLAGS ?= $(CPUFLAG) -O3 -Wall -Wextra -Wno-unused-parameter -fomit-frame-pointe
 ifneq ($(P96DEV),)
 CFLAGS += -I$(P96DEV)/Include
 endif
-ifneq ($(RTG_MEM_MB),)
-CFLAGS +=   -DRTG_MEM_MB=$(RTG_MEM_MB)
+ifneq ($(RTG_GFX_MEM),)
+CFLAGS +=   -DRTG_GFX_MEM=$(RTG_GFX_MEM)
 endif
 PIGFX_DEBUG ?= 0
 CFLAGS += -DPIGFX_DEBUG=$(PIGFX_DEBUG)
@@ -56,4 +56,3 @@ install:
 FORCE:
 
 .PHONY: all clean install FORCE
-

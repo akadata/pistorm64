@@ -169,18 +169,28 @@ static int16_t  mouse_cursor_x_adj  = 0;
 static int16_t  mouse_cursor_y_adj  = 0;
 
 
-static int32_t pi_screen_width      = 1280;
-static int32_t pi_screen_height     = 720;
+#ifndef RTG_WIDTH
+#define RTG_WIDTH 1280
+#endif
+#ifndef RTG_HEIGHT
+#define RTG_HEIGHT 720
+#endif
+
+static int32_t pi_screen_width      = RTG_WIDTH;
+static int32_t pi_screen_height     = RTG_HEIGHT;
 static uint8_t pi_screen_width_set  = 0;
 static uint8_t pi_screen_height_set = 0;
 
 //static const size_t rtg_mem_size = 40u * SIZE_MEGA;
 
+#ifndef RTG_GFX_MEM
+#define RTG_GFX_MEM 40u
+#endif
 #ifndef RTG_MEM_MB
-#define RTG_MEM_MB 40u
+#define RTG_MEM_MB RTG_GFX_MEM
 #endif
 
-static const size_t rtg_mem_size = (size_t)RTG_MEM_MB * SIZE_MEGA;
+static const size_t rtg_mem_size = (size_t)RTG_GFX_MEM * SIZE_MEGA;
 
 
 struct rtg_shared_data {

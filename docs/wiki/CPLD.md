@@ -15,8 +15,16 @@ It does **not** cover full hardware bring‑up or board‑specific jumper detail
 ## Requirements
 
 - Supported USB‑Blaster (or compatible) programmer.
-- Intel/Altera Quartus Lite tooling.
-- Access to the PiStorm FC RTL under:
+- Intel/Altera Quartus tooling (Quartus Prime Lite is fine).
+- Access to the PiStorm FC RTL.
+
+Primary EPM240 FC/BERR variant:
+
+```
+rtl.fc/
+```
+
+Legacy FC RTL (older flow):
 
 ```
 rtl/fc_amiga/fc_amiga/
@@ -24,16 +32,34 @@ rtl/fc_amiga/fc_amiga/
 
 ## Arch Linux install
 
-On Arch, install the Quartus Lite tooling using AUR:
+Quartus is required for compilation (`quartus_sh`, `quartus_cpf`). ModelSim alone is not enough.
+
+Recommended AUR packages:
 
 ```
-yay -S quartus-free-devinfo-arria_lite
+yay -S quartus-free-quartus quartus-free-devinfo-max
 ```
 
-This provides the Intel FPGA toolchain under `/opt/intelFPGA/20.1/` and ModelSim under:
+Optional packages:
 
 ```
+yay -S quartus-free-help quartus-free-questa arrow-usb-blaster
+```
+
+Alternative (older but known‑good for MAX II): `quartus-130` (Quartus II 13.0 SP1).
+
+Quartus typically installs under `/opt/intelFPGA/`:
+
+```
+/opt/intelFPGA/20.1/quartus/bin/
 /opt/intelFPGA/20.1/modelsim_ase/bin/
+```
+
+Quick check:
+
+```
+which quartus_sh
+find /opt -path "*/quartus/bin/quartus_sh" -o -path "*/quartus/bin64/quartus_sh"
 ```
 
 Example contents:
@@ -68,30 +94,67 @@ Optional: add a udev rule for USB‑Blaster so you don’t need sudo (example ru
 RTL source is here:
 
 ```
-rtl/fc_amiga/fc_amiga/
+rtl.fc/
 ```
 
 Files:
-- `pistorm_fc.v` – FC line logic.
-- `README.md` – notes on pins and behavior.
-- `build_svf.sh` – helper script to build an SVF.
+- `pistorm_fc.v` – FC/BERR logic (EPM240).
+- `pistorm_fc.qpf` / `pistorm_fc.qsf` – Quartus project.
+- `build_pistorm_fc.sh` – helper script to build an SVF.
 
-Start by reading:
+## Build an SVF (EPM240 FC/BERR)
 
-```
-rtl/fc_amiga/fc_amiga/README.md
-```
-
-## Build an SVF (example)
-
-From the repo root:
+Use the FC/BERR RTL in `rtl.fc/pistorm_fc.v` with the EPM240 project files, then:
 
 ```
-cd rtl/fc_amiga/fc_amiga
-./build_svf.sh
+cd rtl.fc
+./build_pistorm_fc.sh <project_name_without_ext>
 ```
 
-This script is expected to create an SVF for programming. If it fails, note the error and report it.
+The script expects a Quartus project (`.qpf`/`.qsf`) in the same directory and
+will produce an `.svf` from the compiled `.pof`.
+
+If Quartus is not on PATH, set:
+
+```
+export QUARTUS_ROOT=/opt/intelFPGA/20.1
+# or: export QUARTUS_BIN=/opt/intelFPGA/20.1/quartus/bin
+```
+
+## PI_CLK frequency (why 100 MHz)
+
+The CPLD state machine runs from **PI_CLK** (GPIO4 / GPCLK0). This clock is
+independent of the Amiga’s 7 MHz / 3.58 MHz clocks; it only drives the CPLD’s
+internal logic that sequences transactions and samples bus edges.
+
+We default to **100 MHz** for reliability on EPM240:
+- 100 MHz is already >10× the ~7 MHz bus cadence, which is enough to sample and
+  sequence bus signals safely.
+- Quartus can meet timing more easily at 100 MHz on MAX II parts; 200 MHz often
+  triggers worst‑case timing warnings even if it works in practice.
+
+If you want to run faster, you can set GPCLK to 125 MHz or 200 MHz and update
+the SDC PI_CLK period:
+
+- 100 MHz → 10.000 ns
+- 125 MHz → 8.000 ns
+- 200 MHz → 5.000 ns
+
+This is a policy choice: 100 MHz is “safe baseline,” while 125/200 MHz are
+“performance options” that should be validated on real hardware.
+
+## Quartus warnings (timing + c7m_sync)
+
+Common warnings you might see:
+- **“c7m_sync[2] was determined to be a clock…”**  
+  `c7m_sync` is a logic‑derived sampling of the 68k clock. Quartus can treat it
+  like a derived clock even though we don’t constrain it. This is expected.
+- **“Timing requirements not met” (slow model)**  
+  This usually refers to PI_CLK. If you run 100 MHz but the SDC is still set to
+  200 MHz, you will see negative slack. Always set the SDC to match your GPCLK.
+
+These warnings do not necessarily mean the CPLD will fail in hardware, but
+they are signals that your timing constraints and actual GPCLK should match.
 
 ## Programming (generic)
 
@@ -109,7 +172,6 @@ sudo /opt/intelFPGA/20.1/quartus/bin/jtagconfig
 
 ## Notes / Known Issues
 
-- **WIP**: FC mode is stubbed in software. The CPLD flow is not enabled by default.
 - Some systems need root for JTAG unless you add udev rules.
 - Dark GTK themes can make the Pin Planner unreadable; run Quartus with a light theme if needed.
 
