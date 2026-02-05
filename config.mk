@@ -6,7 +6,7 @@ PLATFORM ?= PI4_64BIT
 
 # Kernel backend is default; legacy userspace GPIO is optional
 PISTORM_KMOD ?= 1
-
+PISTORM_ENABLE_QUEUE ?= 1
 # Batching and IPL rate limiting defaults
 PISTORM_ENABLE_BATCH ?= 1
 PISTORM_IPL_RATELIMIT_US ?= 100
