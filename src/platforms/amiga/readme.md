@@ -31,6 +31,18 @@ Enables Function Code (FC) handling. Valid values: `stub`, `cpld`, or `off`.
 `stub` only tracks/logs FC in the emulator.  
 `cpld` is intended for FC-aware CPLD builds (experimental).  
 
+# queue
+
+Example: `setvar queue 1`  
+Enables the userspace batch queue (`PISTORM_ENABLE_QUEUE=1`).  
+Use `setvar queue 0` to disable it.
+
+# batch_bits
+
+Example: `setvar batch_bits 2048`  
+Sets the batch size hint (`PISTORM_BATCH_BITS`).  
+Use `setvar batch_bits 0` to disable, or `setvar batch_bits true` to default to 2048.
+
 # hdd0 / hdd1 - *Deprecated*
 
 Example: `setvar hdd0 ../hd0.img`  

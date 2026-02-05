@@ -516,6 +516,21 @@ static void set_env_if_unset(const char *key, const char *val) {
   }
 }
 
+static int parse_bool_flag(const char *val, int default_on) {
+  if (!val || strlen(val) == 0) {
+    return default_on;
+  }
+  if (strcasecmp(val, "1") == 0 || strcasecmp(val, "true") == 0 ||
+      strcasecmp(val, "yes") == 0 || strcasecmp(val, "on") == 0) {
+    return 1;
+  }
+  if (strcasecmp(val, "0") == 0 || strcasecmp(val, "false") == 0 ||
+      strcasecmp(val, "no") == 0 || strcasecmp(val, "off") == 0) {
+    return 0;
+  }
+  return -1;
+}
+
 void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val) {
   if (!var) {
     return;
@@ -560,6 +575,27 @@ void setvar_amiga(struct emulator_config* cfg, const char* var, const char* val)
   }
   if CHKVAR ("a314_fs_conf") {
     set_env_if_value("A314_FS_CONF", val);
+  }
+  if CHKVAR ("queue") {
+    int enabled = parse_bool_flag(val, 1);
+    if (enabled >= 0) {
+      setenv("PISTORM_ENABLE_QUEUE", enabled ? "1" : "0", 1);
+      LOG_INFO("[AMIGA] Queue %s via setvar.\n", enabled ? "enabled" : "disabled");
+    } else {
+      LOG_WARN("[AMIGA] Invalid setvar queue value: %s\n", val ? val : "(null)");
+    }
+  }
+  if CHKVAR ("batch_bits") {
+    if (!val || strlen(val) == 0 || strcasecmp(val, "true") == 0) {
+      setenv("PISTORM_BATCH_BITS", "2048", 1);
+      LOG_INFO("[AMIGA] Batch bits set to 2048 via setvar.\n");
+    } else if (strcasecmp(val, "false") == 0 || strcmp(val, "0") == 0) {
+      setenv("PISTORM_BATCH_BITS", "0", 1);
+      LOG_INFO("[AMIGA] Batch bits disabled via setvar.\n");
+    } else {
+      setenv("PISTORM_BATCH_BITS", val, 1);
+      LOG_INFO("[AMIGA] Batch bits set to %s via setvar.\n", val);
+    }
   }
   if CHKVAR ("enable_rtc_emulation") {
     unsigned int rtc_enabled = 0;
