@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: MIT
 
 /*
-    Code reorganized and rewritten by 
-    Niklas Ekström 2021 (https://github.com/niklasekstrom)
+Code reorganized and rewritten by
+Niklas Ekström 2021 (https://github.com/niklasekstrom)
+Further stripped down and enhanced by Andrew Smalley https://github.com/akadata/pistorm64
+Kernel Pistorm 64 now handles much of the ps_protocol bring up and communication with the pistorm device 
 */
 
 #ifndef _PS_PROTOCOL_H
 #define _PS_PROTOCOL_H
+
 
 #define PIN_TXN_IN_PROGRESS 0
 #define PIN_IPL_ZERO 1
@@ -23,47 +26,14 @@
 #define REG_ADDR_HI 2
 #define REG_STATUS 3
 
-#define STATUS_BIT_INIT 1
-#define STATUS_BIT_RESET 2
+// the status bit is not used now we have kernel pistorm
+//#define STATUS_BIT_INIT 1
+//#define STATUS_BIT_RESET 2
 
 #define STATUS_MASK_IPL 0xe000
 #define STATUS_SHIFT_IPL 13
+#include <stdint.h>
 
-//#define BCM2708_PERI_BASE 0x20000000  // pi0-1
-#define BCM2708_PERI_BASE 0xFE000000  // pi4
-
-//#define BCM2708_PERI_BASE 0x3F000000  // pi3  - pi zero w2
-
-#define BCM2708_PERI_SIZE 0x01000000
-
-#define GPIO_ADDR 0x200000 /* GPIO controller */
-#define GPCLK_ADDR 0x101000
-
-#define GPIO_BASE (BCM2708_PERI_BASE + 0x200000) /* GPIO controller */
-#define GPCLK_BASE (BCM2708_PERI_BASE + 0x101000)
-
-#define CLK_PASSWD 0x5a000000
-#define CLK_GP0_CTL 0x070
-#define CLK_GP0_DIV 0x074
-
-// GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or
-// SET_GPIO_ALT(x,y)
-#define INP_GPIO(g) *(gpio + ((g) / 10)) &= ~(7 << (((g) % 10) * 3))
-#define OUT_GPIO(g) *(gpio + ((g) / 10)) |= (1 << (((g) % 10) * 3))
-#define SET_GPIO_ALT(g, a)  \
-  *(gpio + (((g) / 10))) |= \
-      (((a) <= 3 ? (a) + 4 : (a) == 4 ? 3 : 2) << (((g) % 10) * 3))
-
-#define GPIO_PULL *(gpio + 37)      // Pull up/pull down
-#define GPIO_PULLCLK0 *(gpio + 38)  // Pull up/pull down clock
-
-#define GPFSEL0_INPUT 0x0024c240
-#define GPFSEL1_INPUT 0x00000000
-#define GPFSEL2_INPUT 0x00000000
-
-#define GPFSEL0_OUTPUT 0x0924c240
-#define GPFSEL1_OUTPUT 0x09249249
-#define GPFSEL2_OUTPUT 0x00000249
 
 uint8_t  ps_read_8 (uint32_t address);
 uint16_t ps_read_16(uint32_t address);
@@ -87,7 +57,7 @@ int ps_flush_batch_queue(void);
 // Helper function to flush before reads that need immediate results
 static inline void ps_flush_before_read(void) {
 #if PISTORM_ENABLE_BATCH
-    ps_flush_batch_queue();
+ps_flush_batch_queue();
 #endif
 }
 
@@ -113,4 +83,15 @@ static inline void ps_fc_write(uint8_t fc) { (void)fc; }
 
 #define gpio_get_irq ps_get_ipl_zero
 
-#endif /* _PS_PROTOCOL_H */
+static inline uint32_t read_long(uint32_t address) { return ps_read_32(address); }
+static inline uint16_t read_word(uint32_t address) { return ps_read_16(address); }
+static inline uint8_t read_byte(uint32_t address) { return ps_read_8(address); }
+
+static inline void write_long(uint32_t address, uint32_t value) { ps_write_32(address, value); }
+static inline void write_word(uint32_t address, uint16_t value) { ps_write_16(address, value); }
+static inline void write_byte(uint32_t address, uint8_t value) { ps_write_8(address, value); }
+
+#endif
+
+
+/* _PS_PROTOCOL_H */

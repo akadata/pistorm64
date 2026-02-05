@@ -1,0 +1,479 @@
+5a6,8
+>     output reg      PI_TXN_IN_PROGRESS, // GPIO0
+>     output reg      PI_IPL_ZERO,        // GPIO1
+>     input   [1:0]   PI_A,       // GPIO[3..2]
+7,12c10,13
+<     input   [2:0]   PI_SA,    // GPIO[5,3,2]
+<     inout   [15:0]  PI_SD,    // GPIO[23..8]
+<     input           PI_SOE_n, // GPIO6
+<     input           PI_SWE_n, // GPIO7
+<     output reg      PI_AUX0,  // GPIO0
+<     output reg      PI_AUX1,  // GPIO1
+---
+>     output reg      PI_RESET,   // GPIO5
+>     input           PI_RD,      // GPIO6
+>     input           PI_WR,      // GPIO7
+>     inout   [15:0]  PI_D,       // GPIO[23..8]
+50a52,59
+>   wire c200m = PI_CLK;
+>   wire c7m = M68K_CLK;
+> 
+>   localparam REG_DATA = 2'd0;
+>   localparam REG_ADDR_LO = 2'd1;
+>   localparam REG_ADDR_HI = 2'd2;
+>   localparam REG_STATUS = 2'd3;
+> 
+52,53c61,62
+<     PI_AUX0 <= 1'b0;
+<     PI_AUX1 <= 1'b0;
+---
+>     PI_TXN_IN_PROGRESS <= 1'b0;
+>     PI_IPL_ZERO <= 1'b0;
+55,65c64
+<     LTCH_A_0 <= 1'b0;
+<     LTCH_A_8 <= 1'b0;
+<     LTCH_A_16 <= 1'b0;
+<     LTCH_A_24 <= 1'b0;
+<     LTCH_A_OE_n <= 1'b1;
+<     LTCH_D_RD_U <= 1'b0;
+<     LTCH_D_RD_L <= 1'b0;
+<     LTCH_D_RD_OE_n <= 1'b1;
+<     LTCH_D_WR_U <= 1'b0;
+<     LTCH_D_WR_L <= 1'b0;
+<     LTCH_D_WR_OE_n <= 1'b1;
+---
+>     PI_RESET <= 1'b0;
+69,71d67
+<     M68K_AS_n <= 1'b1;
+<     M68K_UDS_n <= 1'b1;
+<     M68K_LDS_n <= 1'b1;
+80,81c76,77
+<   reg [1:0] soe_n_sync;
+<   reg [1:0] swe_n_sync;
+---
+>   reg [1:0] rd_sync;
+>   reg [1:0] wr_sync;
+84,85c80,81
+<     soe_n_sync <= {soe_n_sync[0], PI_SOE_n};
+<     swe_n_sync <= {swe_n_sync[0], PI_SWE_n};
+---
+>     rd_sync <= {rd_sync[0], PI_RD};
+>     wr_sync <= {wr_sync[0], PI_WR};
+88,91c84,85
+<   wire soe_n_falling = soe_n_sync[1] && !soe_n_sync[0];
+<   wire swe_n_falling = swe_n_sync[1] && !swe_n_sync[0];
+< 
+<   wire c200m = PI_CLK;
+---
+>   wire rd_rising = !rd_sync[1] && rd_sync[0];
+>   wire wr_rising = !wr_sync[1] && wr_sync[0];
+94,95c88,94
+<   reg data_out_oe = 1'b0;
+<   assign PI_SD = data_out_oe ? data_out : 16'bz;
+---
+>   assign PI_D = PI_A == REG_STATUS && PI_RD ? data_out : 16'bz;
+> 
+>   always @(posedge c200m) begin
+>     if (rd_rising && PI_A == REG_STATUS) begin
+>       data_out <= {ipl, 13'd0};
+>     end
+>   end
+98c97
+<   wire reset_n = status[1];
+---
+>   wire reset_out = !status[1];
+100,101c99,100
+<   assign M68K_RESET_n = !reset_n ? 1'b0 : 1'bz;
+<   assign M68K_HALT_n = !reset_n ? 1'b0 : 1'bz;
+---
+>   assign M68K_RESET_n = reset_out ? 1'b0 : 1'bz;
+>   assign M68K_HALT_n = reset_out ? 1'b0 : 1'bz;
+107d105
+<   reg op_res = 1'b0;
+109,110c107,109
+<   reg [1:0] pi_state = 2'd0;
+<   reg a0;
+---
+>   always @(*) begin
+>     LTCH_D_WR_U <= PI_A == REG_DATA && PI_WR;
+>     LTCH_D_WR_L <= PI_A == REG_DATA && PI_WR;
+112c111,112
+<   always @(posedge c200m) begin
+---
+>     LTCH_A_0 <= PI_A == REG_ADDR_LO && PI_WR;
+>     LTCH_A_8 <= PI_A == REG_ADDR_LO && PI_WR;
+114c114,115
+<     op_req <= 1'b0;
+---
+>     LTCH_A_16 <= PI_A == REG_ADDR_HI && PI_WR;
+>     LTCH_A_24 <= PI_A == REG_ADDR_HI && PI_WR;
+116,120c117
+<     if (swe_n_falling) begin
+<       if (PI_SA[2]) begin
+<         if (PI_SA == 3'd4) begin
+<           status <= PI_SD;
+<         end
+---
+>     LTCH_D_RD_OE_n <= !(PI_A == REG_DATA && PI_RD);
+122,124d118
+<       else begin // 68k access
+<         if (pi_state == 2'd0) begin
+<           a0 <= PI_SD[0];
+126,127c120,121
+<           LTCH_A_0 <= 1'b1;
+<           LTCH_A_8 <= 1'b1;
+---
+>   reg [2:0] s1_sync;
+>   reg [2:0] s7_sync;
+129,132c123,125
+<           LTCH_A_16 <= 1'b0;
+<           LTCH_A_24 <= 1'b0;
+< 
+<           pi_state <= 2'd1;
+---
+>   always @(posedge c200m) begin
+>     s1_sync <= {s1_sync[1:0], S1};
+>     s7_sync <= {s7_sync[1:0], S7};
+134,139d126
+<         else if (pi_state == 2'd1) begin
+<           LTCH_A_16 <= 1'b1;
+<           LTCH_A_24 <= 1'b1;
+< 
+<           LTCH_D_WR_U <= 1'b0;
+<           LTCH_D_WR_L <= 1'b0;
+141,145c128,129
+<           pi_state <= 2'd2;
+<         end
+<         else if (pi_state == 2'd2) begin
+<           LTCH_D_WR_U <= 1'b1;
+<           LTCH_D_WR_L <= 1'b1;
+---
+>   wire rising_s1 = !s1_sync[2] && s1_sync[1];
+>   wire rising_s7 = !s7_sync[2] && s7_sync[1];
+147,150c131
+<           op_req <= 1'b1;
+<           op_rw <= 1'b0;
+<           op_uds_n <= PI_SA[1] ? a0 : 1'b0;
+<           op_lds_n <= PI_SA[1] ? !a0 : 1'b0;
+---
+>   reg a0;
+152,153c133,135
+<           LTCH_A_0 <= 1'b0;
+<           LTCH_A_8 <= 1'b0;
+---
+>   always @(posedge c200m) begin
+>     if (rising_s1)
+>       op_req <= 1'b0;
+155,158c137,138
+<           pi_state <= 2'd0;
+<         end
+<       end
+<     end
+---
+>     if (rising_s7)
+>       PI_TXN_IN_PROGRESS <= 1'b0;
+160,168c140,144
+<     if (soe_n_sync[0]) begin
+<       data_out_oe <= 1'b0;
+<       LTCH_D_RD_OE_n <= 1'b1;
+<     end
+<     else if (soe_n_falling) begin
+<       if (PI_SA[2]) begin
+<         if (PI_SA == 3'd4) begin
+<           data_out <= {~ipl_n, status[12:0]};
+<           data_out_oe <= 1'b1;
+---
+>     if (wr_rising) begin
+>       case (PI_A)
+>         REG_ADDR_LO: begin
+>           a0 <= PI_D[0];
+>           PI_TXN_IN_PROGRESS <= 1'b1;
+170,171c146
+<       end
+<       else begin // 68k access
+---
+>         REG_ADDR_HI: begin
+173,182c148,153
+<         op_rw <= 1'b1;
+<         op_uds_n <= PI_SA[1] ? a0 : 1'b0;
+<         op_lds_n <= PI_SA[1] ? !a0 : 1'b0;
+< 
+<         LTCH_D_RD_OE_n <= 1'b0;
+< 
+<         LTCH_A_0 <= 1'b0;
+<         LTCH_A_8 <= 1'b0;
+< 
+<         pi_state <= 2'd0;
+---
+>           op_rw <= PI_D[9];
+>           op_uds_n <= PI_D[8] ? a0 : 1'b0;
+>           op_lds_n <= PI_D[8] ? !a0 : 1'b0;
+>         end
+>         REG_STATUS: begin
+>           status <= PI_D;
+183a155
+>       endcase
+188,189d159
+<   reg [2:0] dtack_n_sync;
+<   reg [2:0] vpa_n_sync;
+193,194d162
+<     dtack_n_sync <= {dtack_n_sync[1:0], M68K_DTACK_n};
+<     vpa_n_sync <= {vpa_n_sync[1:0], M68K_VPA_n};
+200c168,170
+<   reg [3:0] e_counter = 4'd0;
+---
+>   reg [2:0] ipl;
+>   reg [2:0] ipl_1;
+>   reg [2:0] ipl_2;
+204,215c174,175
+<       if (e_counter == 4'd9) begin
+<         M68K_E <= 1'b0;
+<         e_counter <= 4'd0;
+<       end
+<       else if (e_counter == 4'd5) begin
+<         M68K_E <= 1'b1;
+<         e_counter <= e_counter + 4'd1;
+<       end
+<       else begin
+<         e_counter <= e_counter + 4'd1;
+<       end
+<     end
+---
+>       ipl_1 <= ~M68K_IPL_n;
+>       ipl_2 <= ipl_1;
+218,220c178,179
+<   reg [2:0] ipl_n = 3'b111;
+<   reg [2:0] ipl_n_1;
+<   reg [2:0] ipl_n_2;
+---
+>     if (ipl_2 == ipl_1)
+>       ipl <= ipl_2;
+222,229c181
+<   always @(posedge c200m) begin
+<     if (c7m_falling) begin
+<       ipl_n_1 <= M68K_IPL_n;
+<       ipl_n_2 <= ipl_n_1;
+<     end
+<     if (ipl_n_1 == ipl_n_2)
+<       ipl_n <= ipl_n_1;
+<     PI_AUX1 <= ipl_n == 3'b111;
+---
+>     PI_IPL_ZERO <= ipl == 3'd0;
+232,236d183
+<   reg delayed_op_req;
+< 
+<   reg [2:0] state = 3'd0;
+<   reg [2:0] latch_data_delay;
+< 
+238,252c185
+<     op_res <= 1'b0;
+< 
+<     if (op_req)
+<       delayed_op_req <= 1'b1;
+< 
+<     case (state)
+< 
+<       3'd0: begin
+<         if (c7m_falling) begin // S0 -> S1
+<           if (delayed_op_req) begin
+<             delayed_op_req <= 1'b0;
+<             LTCH_A_OE_n <= 1'b0;
+<             state <= state + 3'd1;
+<           end
+<         end
+---
+>     PI_RESET <= reset_out ? 1'b1 : M68K_RESET_n;
+255,257c188
+<       3'd1: begin
+<         if (c7m_rising) begin // S1 -> S2
+<           M68K_AS_n <= 1'b0;
+---
+>   reg [3:0] e_counter = 4'd0;
+259,264c190,194
+<           if (op_rw) begin
+<             M68K_UDS_n <= op_uds_n;
+<             M68K_LDS_n <= op_lds_n;
+<           end
+<           else begin
+<             M68K_RW <= 1'b0;
+---
+>   always @(negedge c7m) begin
+>     if (e_counter == 4'd9)
+>       e_counter <= 4'd0;
+>     else
+>       e_counter <= e_counter + 4'd1;
+267,268c197,201
+<           state <= state + 3'd1;
+<         end
+---
+>   always @(negedge c7m) begin
+>     if (e_counter == 4'd9)
+>       M68K_E <= 1'b0;
+>     else if (e_counter == 4'd5)
+>       M68K_E <= 1'b1;
+271,274c204,228
+<       3'd2: begin
+<         if (c7m_falling) begin // S2 -> S3
+<           if (!op_rw) begin
+<             LTCH_D_WR_OE_n <= 1'b0;
+---
+>   reg [1:0] state = 2'd0;
+>   reg wait_req = 1'b1;
+>   reg wait_dtack = 1'b0;
+> 
+>   wire S0 = state == 2'd0 && c7m && !wait_req;
+>   wire Sr = state == 2'd0 && wait_req;
+>   wire S1 = state == 2'd1 && !c7m;
+>   wire S2 = state == 2'd1 && c7m;
+>   wire S3 = state == 2'd2 && !c7m && !wait_dtack;
+>   wire S4 = state == 2'd2 && c7m && !wait_dtack;
+>   wire Sw = state == 2'd2 && wait_dtack;
+>   wire S5 = state == 2'd3 && !c7m;
+>   wire S6 = state == 2'd3 && c7m;
+>   wire S7 = state == 2'd0 && !c7m && !wait_req;
+> 
+>   always @(*) begin
+>     LTCH_A_OE_n <= !(S1 || S2 || S3 || S4 || Sw || S5 || S6 || S7);
+>     LTCH_D_WR_OE_n <= !(!op_rw && (S3 || S4 || Sw || S5 || S6 || S7));
+> 
+>     LTCH_D_RD_U <= S7;
+>     LTCH_D_RD_L <= S7;
+> 
+>     M68K_AS_n <= !(S2 || S3 || S4 || Sw || S5 || S6);
+>     M68K_UDS_n <= (op_rw && (S2 || S3)) || (S4 || Sw || S5 || S6) ? op_uds_n : 1'b1;
+>     M68K_LDS_n <= (op_rw && (S2 || S3)) || (S4 || Sw || S5 || S6) ? op_lds_n : 1'b1;
+277c231,236
+<           state <= state + 3'd1;
+---
+>   always @(negedge c7m) begin
+>     case (state)
+>       2'd0: begin // S0|Sr -> S1|Sr
+>         if (op_req_sync) begin
+>           wait_req <= 1'b0;
+>           state <= state + 2'd1;
+278a238,239
+>         else begin
+>           wait_req <= 1'b1;
+280,285d240
+< 
+<       3'd3: begin
+<         if (c7m_rising) begin // S3 -> S4
+<           if (!op_rw) begin
+<             M68K_UDS_n <= op_uds_n;
+<             M68K_LDS_n <= op_lds_n;
+288,289c243,244
+<           state <= state + 3'd1;
+<         end
+---
+>       2'd1: begin // S2 -> S3
+>         state <= state + 2'd1;
+292,295c247,250
+<       3'd4: begin
+<         if (c7m_falling) begin // S4|Sw -> S5|Sw
+<           if (!dtack_n_sync[1]) begin
+<             state <= state + 3'd1;
+---
+>       2'd2: begin // S4|Sw -> S5|Sw
+>         if (!M68K_DTACK_n || (!M68K_VMA_n && e_counter == 4'd8)) begin
+>           wait_dtack <= 1'b0;
+>           state <= state + 2'd1;
+297c252,253
+<           else if (!vpa_n_sync[1] && e_counter == 4'd2) begin
+---
+>         else begin
+>           if (!M68K_VPA_n && e_counter == 4'd2) begin
+300,302c256
+<           else if (!M68K_VMA_n && e_counter == 4'd8) begin
+<             state <= state + 3'd1;
+<           end
+---
+>           wait_dtack <= 1'b1;
+306,321c260
+<       3'd5: begin
+<         if (c7m_rising) begin // S5 -> S6
+<           latch_data_delay <= 3'd7;
+<           state <= state + 3'd1;
+<         end
+<       end
+< 
+<       3'd6: begin
+<         if (latch_data_delay != 3'd0) begin
+<           latch_data_delay <= latch_data_delay - 3'd1;
+<         end
+<         if (latch_data_delay == 3'd1) begin
+<           LTCH_D_RD_U <= 1'b1;
+<           LTCH_D_RD_L <= 1'b1;
+<         end
+<         else if (c7m_falling) begin // S6 -> S7
+---
+>       2'd3: begin // S6 -> S7
+323,345c262
+< 
+<           M68K_AS_n <= 1'b1;
+<           M68K_UDS_n <= 1'b1;
+<           M68K_LDS_n <= 1'b1;
+< 
+<           state <= state + 3'd1;
+<         end
+<       end
+< 
+<       3'd7: begin
+<         if (c7m_rising) begin // S7 -> S0
+<           op_res <= 1'b1;
+< 
+<           LTCH_D_RD_U <= 1'b0;
+<           LTCH_D_RD_L <= 1'b0;
+< 
+<           LTCH_A_OE_n <= 1'b1;
+<           LTCH_D_WR_OE_n <= 1'b1;
+< 
+<           M68K_RW <= 1'b1;
+< 
+<           state <= state + 3'd1;
+<         end
+---
+>         state <= state + 2'd1;
+350c267
+<   reg [1:0] aux0_state = 2'd0;
+---
+>   reg op_req_sync;
+352,383c269,274
+<   always @(posedge c200m) begin
+<     case (aux0_state)
+<       2'd0: begin
+<         PI_AUX0 <= 1'b0;
+< 
+<         if (op_req) begin
+<           if (op_rw) begin
+<             aux0_state <= 2'd1;
+<           end
+<           else begin
+<             PI_AUX0 <= 1'b1;
+<             aux0_state <= 2'd2;
+<           end
+<         end
+<       end
+<       2'd1: begin
+<         if (op_res) begin
+<           PI_AUX0 <= 1'b1;
+<           aux0_state <= 2'd3;
+<         end
+<       end
+<       2'd2: begin
+<         if (op_res) begin
+<           PI_AUX0 <= 1'b0;
+<           aux0_state <= 2'd3;
+<         end
+<       end
+<       2'd3: begin
+<         if (soe_n_sync[0] && swe_n_sync[0]) begin
+<           aux0_state <= 2'd0;
+<         end
+<       end
+---
+>   always @(posedge c7m) begin
+>     op_req_sync <= op_req;
+> 
+>     case (state)
+>       2'd0: M68K_RW <= 1'b1; // S7 -> S0
+>       2'd1: M68K_RW <= op_rw; // S1 -> S2

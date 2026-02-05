@@ -1,0 +1,302 @@
+Freescale Semiconductor, Inc.
+Errata
+MC68020UMAD
+Rev. 2, 1/2003
+
+Freescale Semiconductor, Inc...
+
+Errata to MC68020 /
+MC68EC020
+Microprocessor User’s
+Manual
+
+This errata describes corrections to the MC68020/MC68EC020 Microprocessor User’s
+Manual, Motorola document order number MC68020UM/D. Please check the world wide
+web at http://motorola.com/semiconductors for the latest updates.
+
+For More Information On This Product,
+Go to: www.freescale.com
+
+Freescale Semiconductor, Inc.
+
+Errata 1
+
+1
+
+Errata 1
+
+AS
+DS
+GND
+GND
+R/W
+NC*
+
+HALT
+
+DSACK1
+BERR
+GND
+GND
+
+ECS
+CDIS
+AVEC
+DSACK0
+
+FC0
+FC1
+FC2
+SIZ0
+SIZ1
+DBEN
+
+VCC
+RMC
+
+RESET
+VCC
+
+GND
+CLK
+
+BG
+VCC
+GND
+
+1 132
+
+17
+18
+
+34
+
+117
+116
+
+100
+
+TOP
+VIEW
+
+50
+51
+
+84
+83
+
+NC*
+D31
+D30
+D29
+D28
+D27
+D26
+D25
+D24
+D23
+D22
+D21
+D20
+D19
+D18
+D17
+D16
+GND
+GND
+VCC
+VCC
+D15
+D14
+D13
+D12
+D11
+D10
+D9
+D8
+D7
+D6
+NC*
+NC*
+
+GND
+VCC
+VCC
+D5
+NC*
+NC*
+
+D3
+
+D4
+GND
+
+A2
+GND
+OCS
+IPEND
+VCC
+VCC
+GND
+GND
+IPL2
+IPL1
+IPL0
+D0
+D1
+D2
+
+67
+NC*
+A9
+A8
+A7
+A6
+A5
+A4
+A3
+
+NC*
+
+NC*
+BGACK
+BR
+A0
+A1
+A31
+A30
+A29
+A28
+A27
+A26
+A25
+A24
+A23
+A22
+A21
+A20
+A19
+A18
+A17
+VCC
+VCC
+GND
+GND
+A16
+A15
+A14
+A13
+A12
+A11
+A10
+NC*
+NC*
+
+NC*
+
+Freescale Semiconductor, Inc...
+
+NC*
+NC*
+GND
+
+Section 11.2.4: Figure 1 below shows the correct pin assignment for the FC and FE suffix devices.
+
+*NC—Do not connect to this pin.
+
+Figure 1. FC and FE Suffix Pin Assignment
+
+2
+
+Errata to MC68020 / MC68EC020 Microprocessor User’s Manual
+
+For More Information On This Product,
+Go to: www.freescale.com
+
+MOTOROLA
+
+Freescale Semiconductor, Inc.
+
+Freescale Semiconductor, Inc...
+
+THIS PAGE INTENTIONALLY LEFT BLANK
+
+MOTOROLA
+
+Errata to MC68020 / MC68EC020 Microprocessor User’s Manual
+
+For More Information On This Product,
+Go to: www.freescale.com
+
+3
+
+Freescale Semiconductor, Inc.
+
+HOW TO REACH US:
+USA/EUROPE/LOCATIONS NOT LISTED:
+Motorola Literature Distribution
+P.O. Box 5405, Denver, Colorado 80217
+1-303-675-2140 or 1-800-441-2447
+JAPAN:
+
+Freescale Semiconductor, Inc...
+
+Motorola Japan Ltd.
+SPS, Technical Information Center
+3-20-1, Minami-Azabu Minato-ku
+Tokyo 106-8573 Japan
+81-3-3440-3569
+
+Information in this document is provided solely to enable system and software implementers to use
+
+ASIA/PACIFIC:
+
+Motorola products. There are no express or implied copyright licenses granted hereunder to design
+
+Motorola Semiconductors H.K. Ltd.
+Silicon Harbour Centre, 2 Dai King Street
+Tai Po Industrial Estate, Tai Po, N.T., Hong Kong
+852-26668334
+
+or fabricate any integrated circuits or integrated circuits based on the information in this document.
+
+TECHNICAL INFORMATION CENTER:
+
+use of any product or circuit, and specifically disclaims any and all liability, including without
+
+1-800-521-6274
+
+limitation consequential or incidental damages. “Typical” parameters which may be provided in
+
+HOME PAGE:
+http://www.motorola.com/semiconductors
+
+Motorola reserves the right to make changes without further notice to any products herein.
+Motorola makes no warranty, representation or guarantee regarding the suitability of its products
+for any particular purpose, nor does Motorola assume any liability arising out of the application or
+
+Motorola data sheets and/or specifications can and do vary in different applications and actual
+performance may vary over time. All operating parameters, including “Typicals” must be validated
+for each customer application by customer’s technical experts. Motorola does not convey any
+license under its patent rights nor the rights of others. Motorola products are not designed,
+intended, or authorized for use as components in systems intended for surgical implant into the
+body, or other applications intended to support or sustain life, or for any other application in which
+the failure of the Motorola product could create a situation where personal injury or death may
+occur. Should Buyer purchase or use Motorola products for any such unintended or unauthorized
+application, Buyer shall indemnify and hold Motorola and its officers, employees, subsidiaries,
+affiliates, and distributors harmless against all claims, costs, damages, and expenses, and
+reasonable attorney fees arising out of, directly or indirectly, any claim of personal injury or death
+associated with such unintended or unauthorized use, even if such claim alleges that Motorola was
+negligent regarding the design or manufacture of the part.
+
+Motorola and the Stylized M Logo are registered in the U.S. Patent and Trademark Office.
+digital dna is a trademark of Motorola, Inc. All other product or service names are the property of
+their respective owners. Motorola, Inc. is an Equal Opportunity/Affirmative Action Employer.
+© Motorola, Inc. 2003
+
+MC68020UMAD
+
+For More Information On This Product,
+Go to: www.freescale.com
+
+

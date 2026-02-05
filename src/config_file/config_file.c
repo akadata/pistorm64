@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <ctype.h>
 #include <sys/mman.h>
 
 #include "rominfo.h"
@@ -16,23 +17,55 @@
 #define PI_RT_ENV "PISTORM_RT"
 
 const char* cpu_types[M68K_CPU_TYPES] = {
-    "68000", "68010",   "68EC020", "68020", "68EC030",
-    "68030", "68EC040", "68LC040", "68040", "SCC68070",
+    "68000", 
+    "68010",   
+    "68EC020", 
+    "68020", 
+    "68EC030",
+    "68030", 
+    "68EC040", 
+    "68LC040", 
+    "68040", 
+    "SCC68070",
 };
 
 const char* map_type_names[MAPTYPE_NUM] = {
-    "NONE", "rom", "ram", "register", "ram_noalloc", "wtcram",
+    "NONE", 
+    "rom", 
+    "ram", 
+    "register", 
+    "ram_noalloc", 
+    "wtcram",
+    "image",  /* cryptodad */
 };
 
 const char* config_item_names[CONFITEM_NUM] = {
-    "NONE",     "cpu",      "map",      "loopcycles", "jit",    "jitfpu",
-    "mouse",    "keyboard", "platform", "setvar",     "kbfile", "affinity",
+    "NONE",     
+    "cpu",      
+    "map",      
+    "loopcycles", 
+    "jit",    
+    "jitfpu",
+    "mouse",   
+    "keyboard", 
+    "platform", 
+    "setvar",     
+    "kbfile", 
+    "affinity",
     "rtprio",
 };
 
 const char* mapcmd_names[MAPCMD_NUM] = {
-    "NONE", "type", "address", "size",          "range",
-    "file", "ovl",  "id",      "autodump_file", "autodump_mem",
+    "NONE", 
+    "type", 
+    "address", 
+    "size",          
+    "range",
+    "file", 
+    "ovl",  
+    "id",      
+    "autodump_file", 
+    "autodump_mem",
 };
 
 static int get_config_item_type(char* cmd) {
@@ -48,6 +81,17 @@ static int get_config_item_type(char* cmd) {
 
   return CONFITEM_NONE;
 }
+
+char *uppercase ( char *str )
+{
+  for ( int n = 0; n < strlen ( str ); n++ )
+  {
+    str [n] = toupper ( str [n] );
+  }
+
+  return str;
+}
+
 
 unsigned int get_m68k_cpu_type(const char* name) {
   for (int i = 0; i < M68K_CPU_TYPES; i++) {

@@ -44,3 +44,5 @@ core
 core.*
 *.core
 src/platforms/amiga/rtg/_reference_
+captain-amygdala-pistorm/
+pistorm-atari/
