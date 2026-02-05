@@ -62,6 +62,40 @@ static uint32_t fc_shadow_pc = 0;
 static uint32_t fc_shadow_addr = 0;
 static uint8_t fc_shadow_type = 0;
 static uint8_t fc_shadow_is_write = 0;
+static int fc_boot_log_remaining = 0;
+
+static const char* fc_mode_name(enum fc_mode mode) {
+  switch (mode) {
+  case FC_MODE_OFF:
+    return "off";
+  case FC_MODE_STUB:
+    return "stub";
+  case FC_MODE_CPLD:
+    return "cpld";
+  default:
+    return "unknown";
+  }
+}
+
+static int read_kernel_param_bool(const char* name) {
+  char path[128];
+  char buf[8];
+  int fd;
+  ssize_t n;
+
+  snprintf(path, sizeof(path), "/sys/module/pistorm/parameters/%s", name);
+  fd = open(path, O_RDONLY);
+  if (fd == -1) {
+    return -1;
+  }
+  n = read(fd, buf, sizeof(buf) - 1);
+  close(fd);
+  if (n <= 0) {
+    return -1;
+  }
+  buf[n] = '\0';
+  return (buf[0] == '1' || buf[0] == 'Y' || buf[0] == 'y');
+}
 
 static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write) {
   if (fc_get_mode() == FC_MODE_OFF) {
@@ -77,7 +111,15 @@ static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write
   fc_shadow_type = type;
   fc_shadow_is_write = is_write;
 
-  if (log_get_level() >= LOG_LEVEL_DEBUG) {
+  if (fc_boot_log_remaining > 0) {
+    LOG_INFO("[FC] seen=%u %s type=%u addr=$%.8X PC=$%.8X\n",
+             fc_shadow,
+             is_write ? "W" : "R",
+             type,
+             addr,
+             fc_shadow_pc);
+    fc_boot_log_remaining--;
+  } else if (log_get_level() >= LOG_LEVEL_DEBUG) {
     LOG_DEBUG("[FC] seen=%u %s type=%u addr=$%.8X PC=$%.8X\n",
               fc_shadow,
               is_write ? "W" : "R",
@@ -704,6 +746,7 @@ static void* keyboard_task(void *arg) {
   char c = 0, c_code = 0, c_type = 0;
   char grab_message[] = "[KBD] Grabbing keyboard from input layer",
        ungrab_message[] = "[KBD] Ungrabbing keyboard";
+  static int keycode_samples_left = 5;
 
   printf("[KBD] Keyboard thread started\n");
   apply_affinity_from_env("keyboard", CORE_INPUT);
@@ -740,6 +783,11 @@ key_loop:
   }
 
   while (get_key_char(&c, &c_code, &c_type)) {
+    if (keycode_samples_left > 0 && c_type == KEYPRESS_PRESS) {
+      printf("[KBD] sample keycode=%u (0x%02X) type=%u char=%d\n",
+             (uint8_t)c_code, (uint8_t)c_code, (uint8_t)c_type, (int)(unsigned char)c);
+      keycode_samples_left--;
+    }
     if (c && c == cfg->keyboard_toggle_key && !kb_hook_enabled) {
       kb_hook_enabled = 1;
       printf("[KBD] Keyboard hook enabled.\n");
@@ -1127,6 +1175,24 @@ switch_config:
       cfg->platform = make_platform_config("none", "generic");
     }
     cfg->platform->platform_initial_setup(cfg);
+  }
+
+  if (fc_get_mode() != FC_MODE_OFF) {
+    fc_boot_log_remaining = 5;
+    LOG_INFO("[CPU] FC enabled (mode=%s)\n", fc_mode_name(fc_get_mode()));
+  } else {
+    LOG_INFO("[CPU] FC disabled\n");
+  }
+
+  {
+    int berr_enabled = read_kernel_param_bool("berr_reset_input");
+    if (berr_enabled == 1) {
+      LOG_INFO("[CPU][BERR] Reset enabled (berr_reset_input=1)\n");
+    } else if (berr_enabled == 0) {
+      LOG_INFO("[CPU][BERR] Reset disabled (berr_reset_input=0)\n");
+    } else {
+      LOG_INFO("[CPU][BERR] Reset status unknown (kernel param not readable)\n");
+    }
   }
 
   if (cfg->mouse_enabled) {
@@ -2084,6 +2150,7 @@ static void print_about(const char* prog) {
   printf("- A CLI front end for config, threading, and JIT control\n");
   printf("- Tightened types, memory ranges, and autoconf handling for large Z3 maps\n");
   printf("- Experiments with Pi-side co-processor style services (JANUS bus engine)\n");
+  printf("- FC/BERR plumbing for CPLD-aware bus cycles and reset handling\n");
   printf("\n");
   printf("Project goals:\n");
   printf("- Treat the Pi as a disciplined hardware companion, not just a blunt accelerator\n");
@@ -2139,4 +2206,5 @@ static void print_help(const char* prog) {
          PI_AFFINITY_ENV, PI_RT_ENV);
   printf("  - input=... acts as a fallback for keyboard/mouse if those are not set.\n");
   printf("  - RT priorities require CAP_SYS_NICE or a non-zero RLIMIT_RTPRIO.\n");
+  printf("  - FC: first few transitions are logged at info when enabled; use --log-level debug for ongoing.\n");
 }
