@@ -8512,9 +8512,9 @@ M68KMAKE_OP(pea, 32, ., .)
 
 M68KMAKE_OP(pflusha, 32, ., .)
 {
-	if (HAS_PMMU)
-	{
-		fprintf(stderr,"68040: unhandled PFLUSHA (ir=%04x)\n", REG_IR);
+	if (HAS_PMMU) {
+		pmmu_atc_flush(state);
+		USE_CYCLES(4); // Nominal cycle count for PFLUSHA
 		return;
 	}
 	m68ki_exception_1111(state);
@@ -8522,24 +8522,12 @@ M68KMAKE_OP(pflusha, 32, ., .)
 
 M68KMAKE_OP(pflushan, 32, ., .)
 {
-	if (HAS_PMMU)
-	{
-		fprintf(stderr,"68040: unhandled PFLUSHAN (ir=%04x)\n", REG_IR);
+	if (HAS_PMMU) {
+		pmmu_atc_flush(state);
+		USE_CYCLES(4); // Nominal cycle count for PFLUSHAN
 		return;
 	}
 	m68ki_exception_1111(state);
-}
-
-M68KMAKE_OP(pmmu, 32, ., .)
-{
-	if ((CPU_TYPE_IS_EC020_PLUS(CPU_TYPE)) && (HAS_PMMU))
-	{
-		m68851_mmu_ops(state);
-	}
-	else
-	{
-		m68ki_exception_1111(state);
-	}
 }
 
 M68KMAKE_OP(reset, 0, ., .)

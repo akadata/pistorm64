@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This report analyzes the Function Code (FC) enhancements required to bring Atari-level functionality to the Amiga PiStorm implementation. The FC lines are critical for proper 68000 bus operation, allowing the processor to indicate the type of bus cycle (supervisor/user, program/data, etc.).
+This report analyzes the Function Code (FC) enhancements required to bring Atari-level functionality to the Amiga PiStorm implementation. The FC lines are critical for proper 68000 bus operation, allowing the processor to indicate the type of bus cycle it's performing (supervisor/user, program/data, etc.).
 
 ## 1. High-Level Overview of FC Enhancements in CPLD
 
@@ -27,6 +27,7 @@ The Atari implementation adds:
 - Dynamic FC assignment from address register data (bits 15:13)
 - Conditional FC output based on bus grant status
 - Proper FC integration in address formation
+- Enhanced bus error handling with FC awareness
 
 ## 2. Kernel Module (pistorm.ko) Integration
 
@@ -53,8 +54,8 @@ Enhance the kernel module to track and set FC lines:
 
 #### 2.2.3 Address Operation Enhancement
 Modify address operations to include FC bits:
-- Update address high register writes to include FC bits
-- Ensure FC is set before initiating bus cycles
+- Update address high register writes to include FC bits: `(fc << 13) | (address >> 16)`
+- Ensure FC is properly set before initiating bus cycles
 
 ### 2.3 Why Add FC Support to Kernel Module
 
@@ -73,7 +74,7 @@ Modify address operations to include FC bits:
 
 ### 3.2 Step 2: Address Formation Enhancement
 1. Modify address high register writes to include FC bits
-2. Ensure FC is properly set before bus operations
+2. Ensure FC is set before bus operations
 3. Add validation for FC values
 
 ### 3.3 Step 3: Integration Testing
@@ -85,294 +86,30 @@ Modify address operations to include FC bits:
 
 ### 4.1 Proposed amiga_enhanced_fc_pistorm.v
 
+Based on the Atari implementation, the enhanced CPLD code should include:
+
 ```verilog
-/*
- * Enhanced Amiga PiStorm CPLD with FC support
- * Incorporates best features from Atari implementation
- */
+// Enhanced FC handling in address register processing
+REG_ADDR_HI: begin
+  op_rw <= PI_D[9];
+  op_uds_n <= PI_D[8] ? a0 : 1'b0;
+  op_lds_n <= PI_D[8] ? !a0 : 1'b0;
+  op_fc <= PI_D[15:13];  // Extract FC from upper bits (15:13)
+end
 
-module pistorm(
-    output reg      PI_TXN_IN_PROGRESS, // GPIO0
-    output reg      PI_IPL_ZERO,        // GPIO1
-    input   [1:0]   PI_A,       // GPIO[3..2]
-    input           PI_CLK,     // GPIO4
-    output reg      PI_RESET,   // GPIO5
-    input           PI_RD,      // GPIO6
-    input           PI_WR,      // GPIO7
-    inout   [15:0]  PI_D,       // GPIO[23..8]
+// Conditional FC output based on bus grant status
+assign M68K_FC = M68K_BGACK_n ? op_fc : 3'bzzz;
 
-    output reg      LTCH_A_0,
-    output reg      LTCH_A_8,
-    output reg      LTCH_A_16,
-    output reg      LTCH_A_24,
-    output reg      LTCH_A_OE_n,
-    output reg      LTCH_D_RD_U,
-    output reg      LTCH_D_RD_L,
-    output reg      LTCH_D_RD_OE_n,
-    output reg      LTCH_D_WR_U,
-    output reg      LTCH_D_WR_L,
-    output reg      LTCH_D_WR_OE_n,
-
-    input           M68K_CLK,
-    output  [2:0]   M68K_FC,    // Enhanced: No longer reg, conditional assignment
-
-    output reg      M68K_AS_n,
-    output reg      M68K_UDS_n,
-    output reg      M68K_LDS_n,
-    output reg      M68K_RW,
-
-    input           M68K_DTACK_n,
-    input           M68K_BERR_n,
-
-    input           M68K_VPA_n,
-    output reg      M68K_E,
-    output reg      M68K_VMA_n,
-
-    input   [2:0]   M68K_IPL_n,
-
-    inout           M68K_RESET_n,
-    inout           M68K_HALT_n,
-
-    input           M68K_BR_n,
-    output          M68K_BG_n,  // Enhanced: No longer reg
-    input           M68K_BGACK_n
-);
-
-  wire c200m = PI_CLK;
-  reg [2:0] c7m_sync;
-  //  wire c7m = M68K_CLK;
-  wire c7m = c7m_sync[2];
-  wire c1c3_clk = !(M68K_C1 ^ M68K_C3);  // Assuming these are defined elsewhere
-
-  localparam REG_DATA = 2'd0;
-  localparam REG_ADDR_LO = 2'd1;
-  localparam REG_ADDR_HI = 2'd2;
-  localparam REG_STATUS = 2'd3;
-
-  initial begin
-    PI_TXN_IN_PROGRESS <= 1'b0;
-    PI_IPL_ZERO <= 1'b0;
-
-    PI_RESET <= 1'b0;
-
-    M68K_FC <= 3'b000;  // Will be overridden by conditional assignment
-
-    M68K_RW <= 1'b1;
-
-    M68K_E <= 1'b0;
-    M68K_VMA_n <= 1'b1;
-
-    M68K_BG_n <= 1'b1;
-  end
-
-  reg [1:0] rd_sync;
-  reg [1:0] wr_sync;
-
-  always @(posedge c200m) begin
-    rd_sync <= {rd_sync[0], PI_RD};
-    wr_sync <= {wr_sync[0], PI_WR};
-  end
-
-  wire rd_rising = !rd_sync[1] && rd_sync[0];
-  wire wr_rising = !wr_sync[1] && wr_sync[0];
-
-  reg [15:0] data_out;
-  assign PI_D = PI_A == REG_STATUS && PI_RD ? data_out : 16'bz;
-
-  always @(posedge c200m) begin
-    if (rd_rising && PI_A == REG_STATUS) begin
-      data_out <= {ipl, 13'd0};
-    end
-  end
-
-  reg [15:0] status;
-  wire reset_out = !status[1];
-
-  assign M68K_RESET_n = reset_out ? 1'b0 : 1'bz;
-  assign M68K_HALT_n = reset_out ? 1'b0 : 1'bz;
-
-  reg op_req = 1'b0;
-  reg op_rw = 1'b1;
-  reg op_uds_n = 1'b1;
-  reg op_lds_n = 1'b1;
-
-  // Enhanced: FC storage and handling
-  reg [2:0] op_fc = 3'b111;  // Default to supervisor data access
-
-  always @(*) begin
-    LTCH_D_WR_U <= PI_A == REG_DATA && PI_WR;
-    LTCH_D_WR_L <= PI_A == REG_DATA && PI_WR;
-
-    LTCH_A_0 <= PI_A == REG_ADDR_LO && PI_WR;
-    LTCH_A_8 <= PI_A == REG_ADDR_LO && PI_WR;
-
-    LTCH_A_16 <= PI_A == REG_ADDR_HI && PI_WR;
-    LTCH_A_24 <= PI_A == REG_ADDR_HI && PI_WR;
-
-    LTCH_D_RD_OE_n <= !(PI_A == REG_DATA && PI_RD);
-  end
-
-  reg a0;
-
-  always @(posedge c200m) begin
-    c7m_sync <= {c7m_sync[1:0], (CLK_SEL?M68K_CLK:c1c3_clk)};
-  end
-
-  wire c7m_rising = !c7m_sync[2] && c7m_sync[1];
-  wire c7m_falling = c7m_sync[2] && !c7m_sync[1];
-
-  reg [2:0] ipl;
-  reg [2:0] ipl_1;
-  reg [2:0] ipl_2;
-
-  always @(posedge c200m) begin
-    if (c7m_falling) begin
-      ipl_1 <= ~M68K_IPL_n;
-      ipl_2 <= ipl_1;
-    end
-
-    if (ipl_2 == ipl_1)
-      ipl <= ipl_2;
-
-    PI_IPL_ZERO <= ipl == 3'd0;
-  end
-
-  always @(posedge c200m) begin
-    PI_RESET <= reset_out ? 1'b1 : M68K_RESET_n;
-  end
-
-  reg [3:0] e_counter = 4'd0;
-
-  always @(negedge c7m) begin
-    if (e_counter == 4'd9)
-      e_counter <= 4'd0;
-    else
-      e_counter <= e_counter + 4'd1;
-  end
-
-  always @(negedge c7m) begin
-    if (e_counter == 4'd9)
-      M68K_E <= 1'b0;
-    else if (e_counter == 4'd5)
-      M68K_E <= 1'b1;
-  end
-
-  reg [2:0] state = 3'd0;
-  reg [2:0] PI_TXN_IN_PROGRESS_delay;
-
-  always @(posedge c200m) begin
-
-    if (wr_rising) begin
-      case (PI_A)
-        REG_ADDR_LO: begin
-          a0 <= PI_D[0];
-          PI_TXN_IN_PROGRESS <= 1'b1;
-        end
-        REG_ADDR_HI: begin
-          op_req <= 1'b1;
-          op_rw <= PI_D[9];
-          op_uds_n <= PI_D[8] ? a0 : 1'b0;
-          op_lds_n <= PI_D[8] ? !a0 : 1'b0;
-          // Enhanced: Extract FC from upper bits of address high register
-          op_fc <= PI_D[15:13];  // FC bits come from bits 15:13 of address high
-        end
-        REG_STATUS: begin
-          status <= PI_D;
-        end
-      endcase
-    end
-
-    case (state)
-      3'd0: begin // S0
-        M68K_RW <= 1'b1; // S7 -> S0
-//        if (c7m_falling) begin
-//          if (op_req) begin
-            state <= 2'd1;
-//          end
-//        end
-      end
-
-      3'd1: begin // S1
-        if (op_req) begin
-          if(c7m_rising) begin
-            state <= 3'd2;
-          end
-        end
-      end
-      3'd2: begin // S2
-        M68K_RW <= op_rw; // S1 -> S2
-        LTCH_D_WR_OE_n <= op_rw;
-        LTCH_A_OE_n <= 1'b0;
-        M68K_AS_n <= 1'b0;
-        M68K_UDS_n <= op_rw ? op_uds_n : 1'b1;
-        M68K_LDS_n <= op_rw ? op_lds_n : 1'b1;
-        if (c7m_falling) begin
-          M68K_UDS_n <= op_uds_n;
-          M68K_LDS_n <= op_lds_n;
-          state <= 3'd3;
-        end
-      end
-
-      3'd3: begin // S3
-        op_req <= 1'b0;
-        if(c7m_rising) begin
-          if (!M68K_DTACK_n || (!M68K_VMA_n && e_counter == 4'd8)) begin
-            state <= 3'd4;
-            PI_TXN_IN_PROGRESS_delay[2:0] <= 3'b111;
-          end
-          else begin
-            if (!M68K_VPA_n && e_counter == 4'd2) begin
-              M68K_VMA_n <= 1'b0;
-            end
-          end
-        end
-      end
-      3'd4: begin // S4
-        PI_TXN_IN_PROGRESS_delay <= {PI_TXN_IN_PROGRESS_delay[1:0],1'b0};
-        PI_TXN_IN_PROGRESS <= PI_TXN_IN_PROGRESS_delay[2];
-        LTCH_D_RD_U <= 1'b1;
-        LTCH_D_RD_L <= 1'b1;
-        if (c7m_falling) begin
-          state <= 3'd5;
-          PI_TXN_IN_PROGRESS <= 1'b0;
-        end
-      end
-
-      3'd5: begin // S5
-        LTCH_D_RD_U <= 1'b0;
-        LTCH_D_RD_L <= 1'b0;
-        if (c7m_rising) begin
-          state <= 3'd6;
-        end
-      end
-
-      3'd6: begin // S6
-        if (c7m_falling) begin
-          M68K_VMA_n <= 1'b1;
-          state <= 3'd7;
-        end
-      end
-
-      3'd7: begin // S7
-        LTCH_D_WR_OE_n <= 1'b1;
-        LTCH_A_OE_n <= 1'b1;
-        M68K_AS_n <= 1'b1;
-        M68K_UDS_n <= 1'b1;
-        M68K_LDS_n <= 1'b1;
-//        if(c7m_rising) begin
-//          M68K_RW <= 1'b1; // S7 -> S0
-          state <= 3'd0;
-//        end
-      end
-    endcase
-  end
-
-  // Enhanced: Conditional FC assignment based on bus grant
-  assign M68K_FC = M68K_BGACK_n ? op_fc : 3'bzzz;
-  assign M68K_BG_n = M68K_BGACK_n ? 1'b1 : 1'bz;  // Enhanced: Tri-state when not granted
-
-endmodule
+// Initialize FC to supervisor data access (typical default)
+initial begin
+  // ... other initializations
+  op_fc <= 3'b111;  // Supervisor data access
+end
 ```
+
+### 4.2 Address Formation with FC Bits
+The address high register formation should include FC bits:
+- `(op_fc << 13) | (address >> 16)` instead of just `(address >> 16)`
 
 ## 5. Atari vs Current Source Code Comparison
 
@@ -412,7 +149,45 @@ The kernel module needs to:
 2. Modify address formation to include FC bits
 3. Update ps_protocol functions to handle FC
 
-## 7. Recommendations
+## 7. Enhanced Amiga Implementation Based on Atari
+
+### 7.1 Recommended Changes to amiga-pistorm.v
+
+```verilog
+// Add FC storage register
+reg [2:0] op_fc = 3'b111;  // Default to supervisor data access
+
+// Modify address register handling to extract FC
+REG_ADDR_HI: begin
+  op_rw <= PI_D[9];
+  op_uds_n <= PI_D[8] ? a0 : 1'b0;
+  op_lds_n <= PI_D[8] ? !a0 : 1'b0;
+  op_fc <= PI_D[15:13];  // Extract FC from upper bits
+end
+
+// Change FC output to conditional assignment
+assign M68K_FC = M68K_BGACK_n ? op_fc : 3'bzzz;
+```
+
+### 7.2 Userspace Protocol Updates
+- Modify address formation to include FC bits: `(fc << 13) | (address >> 16)`
+- Implement proper function code assignment based on operation type
+- Update FC tracking and management
+
+## 8. Atari Codebase Integration Points
+
+### 8.1 Key Atari Files to Reference
+- `pistorm-atari/gpio/ps_protocol.c` - Enhanced FC handling
+- `pistorm-atari/m68k_in.c` - FC instruction implementations
+- `pistorm-atari/m68kcpu.h` - FC-related macros and definitions
+- `pistorm-atari/m68kmmu.h` - MMU and FC handling
+
+### 8.2 FC Instruction Timing
+According to the MC68040 manual referenced in the Atari codebase:
+- PFLUSHA: 11 clocks total (1L + 10 clocks)
+- Proper timing integration is essential for accurate emulation
+
+## 9. Recommendations
 
 1. **Phase 1**: Enhance kernel module with FC support
 2. **Phase 2**: Update CPLD code with FC handling

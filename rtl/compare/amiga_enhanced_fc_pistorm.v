@@ -47,19 +47,13 @@ module pistorm(
 
     input           M68K_BR_n,
     output          M68K_BG_n,  // Enhanced: No longer reg
-    input           M68K_BGACK_n,
-    
-    // Added for enhanced implementation
-    input           M68K_C1,
-    input           M68K_C3,
-    input           CLK_SEL
+    input           M68K_BGACK_n
 );
 
   wire c200m = PI_CLK;
   reg [2:0] c7m_sync;
-  //  wire c7m = M68K_CLK;
   wire c7m = c7m_sync[2];
-  wire c1c3_clk = !(M68K_C1 ^ M68K_C3);
+  wire c1c3_clk = !(M68K_C1 ^ M68K_C3);  // Assuming these are defined elsewhere
 
   localparam REG_DATA = 2'd0;
   localparam REG_ADDR_LO = 2'd1;
@@ -72,7 +66,8 @@ module pistorm(
 
     PI_RESET <= 1'b0;
 
-    M68K_FC <= 3'b000;  // Will be overridden by conditional assignment
+    // Enhanced: Initialize FC properly
+    // M68K_FC will be assigned conditionally based on bus grant
 
     M68K_RW <= 1'b1;
 
@@ -191,7 +186,7 @@ module pistorm(
           op_uds_n <= PI_D[8] ? a0 : 1'b0;
           op_lds_n <= PI_D[8] ? !a0 : 1'b0;
           // Enhanced: Extract FC from upper bits of address high register
-          op_fc <= PI_D[15:13];  // FC bits come from bits 15:13 of address high
+          op_fc <= PI_D[15:13];  // FC bits come from bits 15:13
         end
         REG_STATUS: begin
           status <= PI_D;

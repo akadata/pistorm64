@@ -22,8 +22,19 @@
 | to the same as `int'.
 *----------------------------------------------------------------------------*/
 
-typedef uint64_t flag;
-typedef sint8 int8;
+#include <stdint.h>
+
+typedef int8_t   sint8;
+typedef uint8_t  uint8;
+typedef int16_t  sint16;
+typedef uint16_t uint16;
+typedef int32_t  sint32;
+typedef uint32_t uint32;
+typedef signed   long long sint64;
+typedef unsigned long long uint64;
+
+/* Legacy aliases the generated code expects */
+typedef sint8  int8;
 typedef sint16 int16;
 typedef sint32 int32;
 typedef sint64 int64;
@@ -51,7 +62,7 @@ typedef sint64 sbits64;
 | name for the 64-bit integer type.  Some compilers may allow `LIT64' to be
 | defined as the identity macro:  `#define LIT64( a ) a'.
 *----------------------------------------------------------------------------*/
-#define LIT64( a ) a##ULL
+#define LIT64(a) a##ULL
 
 /*----------------------------------------------------------------------------
 | The macro `INLINE' can be used before functions that should be inlined.  If
