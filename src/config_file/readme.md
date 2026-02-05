@@ -108,6 +108,17 @@ SYNTAX: `setvar VARIABLE_NAME {argument 1} {argument 2} ...`
 Example: `setvar swap-df0-df 1`  
 Last but not least is the `setvar` command. This allows setting variables specific to the `platform` to enable/disable certain optional functionality, such as the RTG on the Amiga. More information about platform-specific `setvar` options can (hopefully) be found in the `platforms/[system_name]` directories on the GitHub repo.
 
+## Amiga queue + batching (setvar)
+
+These are implemented by the Amiga platform code and map to environment
+variables used by the kernel backend.
+
+- `setvar queue 0|1`
+  - Enables the userspace batch queue (`PISTORM_ENABLE_QUEUE`).
+- `setvar batch_bits <n>|true|false`
+  - Sets `PISTORM_BATCH_BITS` (e.g. `2048`). `true` defaults to 2048, `false`
+    disables batching.
+
 ## Amiga path variables (optional)
 
 These help launch A314 services without systemd by defining install locations in the `.cfg` file. Use them **before** `setvar a314`:

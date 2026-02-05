@@ -1,0 +1,19 @@
+# -----------------------------------------------------------------------------
+# CPU and Platform
+# -----------------------------------------------------------------------------
+# Sets CPU type. Valid types are (probably) 68000, 68010, 68020, 68EC020, 68030,
+# 68EC030, 68040, 68EC040, 68LC040 and some STTTT thing.
+jit true
+cpu 68060
+#setvar no-pistorm-dev
+
+# Set the platform to Amiga to enable all the registers and stuff.
+platform amiga
+
+
+# -----------------------------------------------------------------------------
+# Kickstart / ROMs
+# -----------------------------------------------------------------------------
+# Map 512KB kickstart ROM to default offset.
+map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart autodump_mem
+

@@ -21,6 +21,7 @@
 # Default compilers (can still override with CC=... directly)
 CC  ?= gcc
 CXX ?= g++
+AR  ?= ar
 
 # Legacy shorthand: make C=clang or make C=gcc
 ifeq ($(C),clang)
@@ -108,6 +109,11 @@ USE_ALSA   ?= 1
 
 # Toggle PMMU emulation (68030/040). Default on; disable with USE_PMMU=0 if needed.
 USE_PMMU   ?= 1
+
+# Optional: build UAE/JIT objects (AArch64 JIT backend from Amiberry).
+# This does not replace Musashi in the main emulator yet; it builds a standalone
+# libuae.a for bring-up and integration work.
+USE_UAE_JIT ?= 0
 
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0
@@ -258,6 +264,45 @@ M68KFILES = $(MUSASHIFILES) $(MUSASHIGENCFILES)
 .CFILES   = $(MAINFILES) $(M68KFILES)
 .OFILES   = $(.CFILES:%.c=%.o) src/a314/a314.o
 
+# UAE/JIT build (optional, AArch64 only)
+UAE_SRCDIR   := src/uae
+UAE_BUILDDIR := build/uae
+UAE_INCLUDES := -Isrc -I$(UAE_SRCDIR) -I$(UAE_SRCDIR)/include -I$(UAE_SRCDIR)/include/uae \
+	-I$(UAE_SRCDIR)/machdep -I$(UAE_SRCDIR)/jit
+UAE_C_SRCS   :=
+UAE_CXX_SRCS :=
+UAE_OBJS     :=
+UAE_TARGET   := $(UAE_BUILDDIR)/libuae.a
+UAE_JIT_NO_PIE ?= 1
+UAE_PIE_FLAGS := $(if $(filter 1,$(UAE_JIT_NO_PIE)),-fno-pie,)
+UAE_CFLAGS   := $(CFLAGS) $(UAE_INCLUDES) $(UAE_PIE_FLAGS)
+UAE_CXXFLAGS := $(CXXFLAGS) $(UAE_INCLUDES) $(UAE_PIE_FLAGS) -fpermissive
+EXTRA_CXX_OBJS :=
+EXTRA_LINK_DEPS :=
+
+ifeq ($(USE_UAE_JIT),1)
+UAE_C_SRCS   := $(shell find $(UAE_SRCDIR) -type f -name "*.c")
+UAE_CXX_SRCS := $(shell find $(UAE_SRCDIR) -type f \( -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \))
+UAE_CXX_SRCS := $(filter-out \
+	$(UAE_SRCDIR)/uae_emulator.cc \
+	$(UAE_SRCDIR)/fpp.cc \
+	$(UAE_SRCDIR)/fpp_native.cc \
+	$(UAE_SRCDIR)/jit/compemu_fpp.cc \
+	$(UAE_SRCDIR)/jit/codegen_arm.cc \
+	$(UAE_SRCDIR)/jit/codegen_arm64.cpp \
+	$(UAE_SRCDIR)/jit/compemu_midfunc_arm.cc \
+	$(UAE_SRCDIR)/jit/compemu_midfunc_arm2.cc \
+	$(UAE_SRCDIR)/jit/compemu_midfunc_arm64.cpp \
+	$(UAE_SRCDIR)/jit/compemu_midfunc_arm64_2.cpp,$(UAE_CXX_SRCS))
+UAE_OBJS := $(patsubst $(UAE_SRCDIR)/%.c,$(UAE_BUILDDIR)/%.o,$(UAE_C_SRCS))
+UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cc,$(UAE_BUILDDIR)/%.o,$(filter %.cc,$(UAE_CXX_SRCS)))
+UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cpp,$(UAE_BUILDDIR)/%.o,$(filter %.cpp,$(UAE_CXX_SRCS)))
+UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cxx,$(UAE_BUILDDIR)/%.o,$(filter %.cxx,$(UAE_CXX_SRCS)))
+EXTRA_CXX_OBJS += src/uae/pistorm_uae_bridge.o src/uae/pistorm_uae_stubs.o
+EXTRA_LINK_DEPS += $(UAE_TARGET)
+DEFINES += -DUSE_UAE_JIT
+endif
+
 CC  ?= gcc
 CXX ?= g++
 
@@ -362,6 +407,9 @@ ifeq ($(PISTORM_KMOD),1)
 INCLUDES += -Iinclude -Iinclude/uapi
 DEFINES  += -DPISTORM_KMOD
 endif
+ifeq ($(USE_UAE_JIT),1)
+INCLUDES += $(UAE_INCLUDES)
+endif
 
 CXX_WARNINGS = $(filter-out -Wstrict-prototypes -Wmissing-prototypes,$(EMU_WARNINGS))
 CFLAGS       = $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
@@ -370,6 +418,9 @@ M68K_CFLAGS   = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(AC
 LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS) $(EXTRA_LDFLAGS)
 
 LDLIBS   = $(RAYLIB_LIBS) $(LIBS) $(LDLIBS_VC) $(LDLIBS_ALSA)
+ifeq ($(USE_UAE_JIT),1)
+LDLIBS   += $(UAE_TARGET)
+endif
 
 TARGET = $(EXENAME)$(EXE)
 INSTALL_DIR := $(DESTDIR)$(PREFIX)
@@ -401,12 +452,14 @@ HELP_TARGETS = \
 	"make kernel_install_z3bus"       "Install z3bus.ko only via kernel_module/Makefile" \
 	"make kernel_clean"               "Clean kernel module build outputs" \
 	"make "            "Build interactive bus monitor" \
-	"make full"         "Stop emulator, rebuild kmod+userland, install"
+	"make full"         "Stop emulator, rebuild kmod+userland, install" \
+	"make uae-jit"      "Build UAE AArch64 JIT objects (libuae.a)"
 
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
 
-DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest  .d pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE)
+DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest  .d pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE) \
+	$(UAE_TARGET) $(UAE_OBJS) $(UAE_OBJS:%.o=%.d) $(EXTRA_CXX_OBJS) $(EXTRA_CXX_OBJS:%.o=%.d)
 
 all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test 
 
@@ -417,8 +470,14 @@ clean:
 # Link is atomic: write to $@.tmp then move into place on success.
 OBJS_LINK = $(filter %.o,$^)
 
-$(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) src/a314/a314.o
+$(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) src/a314/a314.o $(EXTRA_CXX_OBJS) $(EXTRA_LINK_DEPS)
 	$(CC) $(LDFLAGS) -o $@.tmp $(OBJS_LINK) $(LDLIBS) && mv -f $@.tmp $@
+
+uae-jit: $(UAE_TARGET)
+
+$(UAE_TARGET): $(UAE_OBJS)
+	@mkdir -p $(UAE_BUILDDIR)
+	$(AR) rcs $@ $^
 
 # Explicit rules to keep the generated 68k core quiet on unused-temp warnings.
 src/musashi/m68kcpu.o: src/musashi/m68kcpu.c src/musashi/m68kops.h
@@ -454,6 +513,28 @@ pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
 	$(CXX) -MMD -MP -c -o src/a314/a314.o $(CXXFLAGS) $(NO_LTO_FLAGS) src/a314/a314.cc
+
+src/uae/pistorm_uae_bridge.o: src/uae/pistorm_uae_bridge.cc src/uae/pistorm_uae_bridge.h
+	$(CXX) -MMD -MP -c -o $@ $(CXXFLAGS) $(NO_LTO_FLAGS) $<
+
+src/uae/pistorm_uae_stubs.o: src/uae/pistorm_uae_stubs.cc
+	$(CXX) -MMD -MP -c -o $@ $(UAE_CXXFLAGS) $(NO_LTO_FLAGS) $<
+
+$(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) -MMD -MP $(UAE_CFLAGS) -c -o $@ $<
+
+$(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cc
+	@mkdir -p $(dir $@)
+	$(CXX) -MMD -MP $(UAE_CXXFLAGS) -c -o $@ $<
+
+$(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) -MMD -MP $(UAE_CXXFLAGS) -c -o $@ $<
+
+$(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cxx
+	@mkdir -p $(dir $@)
+	$(CXX) -MMD -MP $(UAE_CXXFLAGS) -c -o $@ $<
 
 $(MUSASHIGENCFILES) $(MUSASHIGENHFILES): $(MUSASHIGENERATOR)$(EXE)
 	cp $(MUSASHIGENERATOR)$(EXE) src/musashi/ && cd src/musashi && ./$(MUSASHIGENERATOR)$(EXE) && rm -f src/musashi/$(MUSASHIGENERATOR)$(EXE)
@@ -596,12 +677,13 @@ full:
 	# Enable and start the emulator service
 	sudo systemctl enable kernelpistorm64.service
 	echo "Loading Kernel PiStorm64"
-	sudo modprobe pistorm 2>/dev/null || true
+#	sudo modprobe pistorm run_batch_enable=1 berr_reset_input=1 2>/dev/null || true
+	sudo modprobe pistorm run_batch_enable=0 berr_reset_input=0 2>/dev/null || true
 
 help:
 	@printf "Available targets:\n"
 	@printf "  %-32s %s\n" $(HELP_TARGETS)
 
--include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d .d
+-include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d .d $(UAE_OBJS:%.o=%.d)
 
 .PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-piscsi amiga-rtg amiga-ahi amiga-all amiga-clean

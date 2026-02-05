@@ -42,22 +42,45 @@ These are applied in the platform-specific config (e.g. `default.cfg` under the 
   - `stub`: enables FC shadow logging without driving hardware (default when set with no value).
   - `cpld`: enables FC mode intended for FC-capable CPLD bitstreams.
   - `off`: disables FC tracking.
+- `setvar queue 0|1`
+  - Controls the userspace batch queue (`PISTORM_ENABLE_QUEUE`).
+- `setvar batch_bits <n>|true|false`
+  - Sets `PISTORM_BATCH_BITS` (e.g., 2048). `true` defaults to 2048.
+
+Common defaults (Amiga):
+```
+setvar queue true
+setvar batch_bits true
+```
 
 ## Kernel module parameters (pistorm.ko)
 
 These are set when loading the kernel module (e.g. `modprobe pistorm <param>=<value>`):
 
 - `gpclk_src` / `gpclk_div`
-  - GPCLK0 source and divider.
+  - GPCLK0 source and divider (default `gpclk_src=5`, `gpclk_div=6` ~200 MHz on Pi3-class).
 - `berr_reset_input=0|1`
   - `0`: GPIO5 is RESET output (legacy CPLD).
   - `1`: GPIO5 is treated as RESET/BERR input (FC/BERR CPLD).
 - `run_batch_enable=0|1`
   - Enables the v2 batch ioctl (`PISTORM_IOC_RUN_BATCH`).
 
-Example:
+Example (stable Pi4 setup):
 ```
-sudo modprobe pistorm berr_reset_input=1 run_batch_enable=1 gpclk_src=6 gpclk_div=12
+sudo modprobe pistorm gpclk_src=5 gpclk_div=6 berr_reset_input=1 run_batch_enable=1
+```
+
+You can verify module settings via:
+```
+modinfo pistorm
+```
+
+Typical `modinfo` fields to check:
+```
+parm: gpclk_src:GPCLK0 clock source (bcm2835 style: 5=PLLC, 6=PLLD, etc.) (uint)
+parm: gpclk_div:GPCLK0 integer divider (default 6 ~200MHz on Pi3-class) (uint)
+parm: berr_reset_input:Treat GPIO5 (RESET/BERR) as input to sample BERR when CPLD multiplexes it (bool)
+parm: run_batch_enable:Enable PISTORM_IOC_RUN_BATCH v2 batch interface (bool)
 ```
 
 ## Userspace batch tuning (kmod backend)
@@ -73,5 +96,5 @@ cap the batch size at runtime using environment variables:
 
 Example:
 ```
-PISTORM_BATCH_BITS=2048 ./pistorm64 ...
+PISTORM_ENABLE_QUEUE=1 PISTORM_BATCH_BITS=2048 ./emulator
 ```

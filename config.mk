@@ -4,11 +4,14 @@
 EXENAME ?= emulator
 PLATFORM ?= PI4_64BIT
 
+# Build JIT
+USE_UAE_JIT ?= 1
+
 # Kernel backend is default; legacy userspace GPIO is optional
 PISTORM_KMOD ?= 1
-PISTORM_ENABLE_QUEUE ?= 1
+PISTORM_ENABLE_QUEUE ?= 0
 # Batching and IPL rate limiting defaults
-PISTORM_ENABLE_BATCH ?= 1
+PISTORM_ENABLE_BATCH ?= 0
 PISTORM_IPL_RATELIMIT_US ?= 100
 PISTORM_USE_DIRECT_OPS ?= 0
 

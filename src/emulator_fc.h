@@ -4,6 +4,10 @@
 #pragma once
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Current Function Code (FC)
  * 0–7 as per 68k spec:
@@ -28,4 +32,7 @@ enum fc_mode fc_get_mode(void);
 uint32_t get_current_sfc(void);
 uint32_t get_current_dfc(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

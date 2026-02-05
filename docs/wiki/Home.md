@@ -8,6 +8,8 @@ Start here:
 - Build-and-Install.md
 - Configuration.md
 - Platform-Amiga.md
+- Amiga.md
+- Atari.md
 - Compatibility.md
 
 Feature how-tos:

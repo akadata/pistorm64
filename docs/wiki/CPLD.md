@@ -121,27 +121,29 @@ export QUARTUS_ROOT=/opt/intelFPGA/20.1
 # or: export QUARTUS_BIN=/opt/intelFPGA/20.1/quartus/bin
 ```
 
-## PI_CLK frequency (why 100 MHz)
+## PI_CLK frequency (200 MHz default)
 
 The CPLD state machine runs from **PI_CLK** (GPIO4 / GPCLK0). This clock is
 independent of the Amiga’s 7 MHz / 3.58 MHz clocks; it only drives the CPLD’s
 internal logic that sequences transactions and samples bus edges.
 
-We default to **100 MHz** for reliability on EPM240:
-- 100 MHz is already >10× the ~7 MHz bus cadence, which is enough to sample and
-  sequence bus signals safely.
-- Quartus can meet timing more easily at 100 MHz on MAX II parts; 200 MHz often
-  triggers worst‑case timing warnings even if it works in practice.
+We default to **200 MHz** (Pi4 `gpclk_src=5 gpclk_div=6`) for compatibility with
+current Pi4 setups and proven boot stability:
+- The CPLD logic was originally tuned around a fast PI_CLK, and lower GPCLK
+  divisors have proven unstable on some Pi4 boards.
+- 200 MHz keeps GPIO transactions and bus handshakes responsive on real
+  hardware, even if worst‑case timing reports are pessimistic.
 
-If you want to run faster, you can set GPCLK to 125 MHz or 200 MHz and update
-the SDC PI_CLK period:
+If you want to run slower (for experimentation), you can set GPCLK to 125 MHz or
+100 MHz and update the SDC PI_CLK period. Note that some boards do **not** boot
+reliably at 125/100 MHz.
 
 - 100 MHz → 10.000 ns
 - 125 MHz → 8.000 ns
 - 200 MHz → 5.000 ns
 
-This is a policy choice: 100 MHz is “safe baseline,” while 125/200 MHz are
-“performance options” that should be validated on real hardware.
+This is a policy choice: 200 MHz is the current “works on Pi4” default, while
+125/100 MHz are experimental options that may not boot on all boards.
 
 ## Quartus warnings (timing + c7m_sync)
 
@@ -150,8 +152,9 @@ Common warnings you might see:
   `c7m_sync` is a logic‑derived sampling of the 68k clock. Quartus can treat it
   like a derived clock even though we don’t constrain it. This is expected.
 - **“Timing requirements not met” (slow model)**  
-  This usually refers to PI_CLK. If you run 100 MHz but the SDC is still set to
-  200 MHz, you will see negative slack. Always set the SDC to match your GPCLK.
+  This usually refers to PI_CLK. If your GPCLK is 200 MHz but the SDC is set to
+  100/125 MHz (or vice‑versa), you will see misleading slack. Always set the SDC
+  to match your real GPCLK.
 
 These warnings do not necessarily mean the CPLD will fail in hardware, but
 they are signals that your timing constraints and actual GPCLK should match.

@@ -22,6 +22,15 @@
 #include "gpio/ps_protocol.h"
 #include "log.h"
 #include "cpu_backend.h"
+#ifdef USE_UAE_JIT
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "uae/pistorm_uae_bridge.h"
+#ifdef __cplusplus
+}
+#endif
+#endif
 
 #include <assert.h>
 #include <dirent.h>
@@ -63,6 +72,7 @@ static uint32_t fc_shadow_addr = 0;
 static uint8_t fc_shadow_type = 0;
 static uint8_t fc_shadow_is_write = 0;
 static int fc_boot_log_remaining = 0;
+static int use_uae_jit = 0;
 
 static const char* fc_mode_name(enum fc_mode mode) {
   switch (mode) {
@@ -97,6 +107,36 @@ static int read_kernel_param_bool(const char* name) {
   return (buf[0] == '1' || buf[0] == 'Y' || buf[0] == 'y');
 }
 
+static inline uint32_t cpu_backend_get_pc(void) {
+#ifdef USE_UAE_JIT
+  if (use_uae_jit) {
+    return uae_pistorm_get_pc();
+  }
+#endif
+  return m68k_get_reg(NULL, M68K_REG_PC);
+}
+
+static int uae_cpu_model_from_musashi(unsigned int type) {
+  switch (type) {
+  case M68K_CPU_TYPE_68000:
+    return 68000;
+  case M68K_CPU_TYPE_68010:
+    return 68010;
+  case M68K_CPU_TYPE_68EC020:
+  case M68K_CPU_TYPE_68020:
+    return 68020;
+  case M68K_CPU_TYPE_68EC030:
+  case M68K_CPU_TYPE_68030:
+    return 68030;
+  case M68K_CPU_TYPE_68EC040:
+  case M68K_CPU_TYPE_68LC040:
+  case M68K_CPU_TYPE_68040:
+    return 68040;
+  default:
+    return 68030;
+  }
+}
+
 static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write) {
   if (fc_get_mode() == FC_MODE_OFF) {
     return;
@@ -106,7 +146,7 @@ static inline void fc_shadow_touch(uint8_t type, uint32_t addr, uint8_t is_write
   }
 
   fc_shadow = current_fc;
-  fc_shadow_pc = m68k_get_reg(NULL, M68K_REG_PC);
+  fc_shadow_pc = cpu_backend_get_pc();
   fc_shadow_addr = addr;
   fc_shadow_type = type;
   fc_shadow_is_write = is_write;
@@ -437,6 +477,53 @@ static void* ipl_task(void* args) {
       goto noppers;
     }
 
+    if (use_uae_jit) {
+      if (!(value & (1 << PIN_IPL_ZERO)) || ipl_enabled[amiga_emulated_ipl()]) {
+        if (!irq) {
+          irq = 1;
+        }
+        last_irq = (uint32_t)((ps_read_status_reg() & 0xe000) >> 13);
+        uint8_t amiga_irq = amiga_emulated_ipl();
+        if (amiga_irq >= last_irq) {
+          last_irq = amiga_irq;
+        }
+        if (last_irq != 0 && last_irq != last_last_irq) {
+          last_last_irq = last_irq;
+          uae_pistorm_set_irq((int)last_irq);
+        }
+      } else {
+        if (irq) {
+          irq = 0;
+        }
+        if (last_last_irq != 0) {
+          uae_pistorm_set_irq(0);
+          last_last_irq = 0;
+        }
+      }
+
+      if (do_reset == 0) {
+        amiga_reset = (value & (1 << PIN_RESET));
+        if (amiga_reset != amiga_reset_last) {
+          amiga_reset_last = amiga_reset;
+          if (amiga_reset == 0) {
+            printf("Amiga Reset is down...\n");
+            do_reset = 1;
+          } else {
+            printf("Amiga Reset is up...\n");
+          }
+        }
+      }
+
+      if (do_reset) {
+        uae_pistorm_pulse_reset();
+        do_reset = 0;
+        rtg_on = 0;
+      }
+
+      ps_flush_batch_queue();
+      goto noppers;
+    }
+
     if (!(value & (1 << PIN_IPL_ZERO)) || ipl_enabled[amiga_emulated_ipl()]) {
       old_irq = irq_delay;
       // NOP
@@ -630,11 +717,19 @@ static void* cpu_task(void *arg) {
   m68ki_cpu_core* state = &m68ki_cpu;
   state->ovl = ovl;
   state->gpio = gpio;
-  m68k_pulse_reset(state);
+  if (!use_uae_jit) {
+    m68k_pulse_reset(state);
+  }
   apply_affinity_from_env("cpu", CORE_CPU);
   apply_realtime_from_env("cpu", RT_DEFAULT_CPU);
 
 cpu_loop:
+  if (use_uae_jit) {
+    while (!end_signal && !emulator_exiting) {
+      uae_pistorm_run();
+    }
+    goto stop_cpu_emulation;
+  }
   if (realtime_disassembly && (do_disasm || cpu_emulation_running)) {
     m68k_disassemble(disasm_buf, m68k_get_reg(NULL, M68K_REG_PC), cpu_type);
     printf("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",
@@ -1179,7 +1274,7 @@ switch_config:
 
   if (fc_get_mode() != FC_MODE_OFF) {
     fc_boot_log_remaining = 5;
-    LOG_INFO("[CPU] FC enabled (mode=%s)\n", fc_mode_name(fc_get_mode()));
+    LOG_INFO("[CPU] FC enabled and in use (mode=%s)\n", fc_mode_name(fc_get_mode()));
   } else {
     LOG_INFO("[CPU] FC disabled\n");
   }
@@ -1269,13 +1364,23 @@ switch_config:
 
   amiga_reset_and_wait("pre-cpu");
 
-  m68k_init();
-  printf("Setting CPU type to %d.\n", cpu_type);
-  m68k_set_cpu_type(&m68ki_cpu, cpu_type);
-  m68k_set_instr_hook_callback(instr_hook_callback);
-  m68k_set_fc_callback(fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
-  m68k_set_illg_instr_callback(illg_instr_callback);
-  cpu_pulse_reset();
+  #ifdef USE_UAE_JIT
+  if (enable_jit_backend) {
+    use_uae_jit = 1;
+    printf("[CPU] UAE JIT backend enabled\n");
+    uae_pistorm_init(uae_cpu_model_from_musashi(cpu_type), 1, enable_fpu_jit_backend ? 1 : 0);
+  }
+  #endif
+
+  if (!use_uae_jit) {
+    m68k_init();
+    printf("Setting CPU type to %d.\n", cpu_type);
+    m68k_set_cpu_type(&m68ki_cpu, cpu_type);
+    m68k_set_instr_hook_callback(instr_hook_callback);
+    m68k_set_fc_callback(fc_callback_wrapper);  // Use wrapper to call cpu_set_fc
+    m68k_set_illg_instr_callback(illg_instr_callback);
+    cpu_pulse_reset();
+  }
 
   pthread_t ipl_tid = 0, cpu_tid, kbd_tid, mouse_tid = 0;
   int err;
@@ -1660,7 +1765,7 @@ unsigned int m68k_read_memory_16(unsigned int address) {
   fc_shadow_touch(OP_TYPE_WORD, address, 0);
   if ((address & 0x01) && log_get_level() >= LOG_LEVEL_VERBOSE) {
     LOG_ERROR("[ALIGN] read16 addr=$%.8X PC=$%.8X\n",
-              address, m68k_get_reg(NULL, M68K_REG_PC));
+              address, cpu_backend_get_pc());
   }
   if (platform_read_check(OP_TYPE_WORD, address, &platform_res)) {
     return platform_res;
@@ -1680,7 +1785,7 @@ unsigned int m68k_read_memory_32(unsigned int address) {
   fc_shadow_touch(OP_TYPE_LONGWORD, address, 0);
   if ((address & 0x03) && log_get_level() >= LOG_LEVEL_VERBOSE) {
     LOG_ERROR("[ALIGN] read32 addr=$%.8X PC=$%.8X\n",
-              address, m68k_get_reg(NULL, M68K_REG_PC));
+              address, cpu_backend_get_pc());
   }
   if (platform_read_check(OP_TYPE_LONGWORD, address, &platform_res)) {
     return platform_res;
@@ -1860,7 +1965,7 @@ void m68k_write_memory_16(unsigned int address, unsigned int value) {
   fc_shadow_touch(OP_TYPE_WORD, address, 1);
   if ((address & 0x01) && log_get_level() >= LOG_LEVEL_VERBOSE) {
     LOG_ERROR("[ALIGN] write16 addr=$%.8X val=$%.4X PC=$%.8X\n",
-              address, value & 0xFFFF, m68k_get_reg(NULL, M68K_REG_PC));
+              address, value & 0xFFFF, cpu_backend_get_pc());
   }
   if (platform_write_check(OP_TYPE_WORD, address, value)) {
     return;
@@ -1884,7 +1989,7 @@ void m68k_write_memory_32(unsigned int address, unsigned int value) {
   fc_shadow_touch(OP_TYPE_LONGWORD, address, 1);
   if ((address & 0x03) && log_get_level() >= LOG_LEVEL_VERBOSE) {
     LOG_ERROR("[ALIGN] write32 addr=$%.8X val=$%.8X PC=$%.8X\n",
-              address, value, m68k_get_reg(NULL, M68K_REG_PC));
+              address, value, cpu_backend_get_pc());
   }
   if (platform_write_check(OP_TYPE_LONGWORD, address, value)) {
     return;
@@ -2152,6 +2257,10 @@ static void print_about(const char* prog) {
   printf("- Experiments with Pi-side co-processor style services (JANUS bus engine)\n");
   printf("- FC/BERR plumbing for CPLD-aware bus cycles and reset handling\n");
   printf("\n");
+  printf("Runtime hints:\n");
+  printf("- Kernel module: gpclk_src/gpclk_div, berr_reset_input, run_batch_enable\n");
+  printf("- Userspace queue: PISTORM_ENABLE_QUEUE=1 (optional PISTORM_BATCH_BITS=2048)\n");
+  printf("\n");
   printf("Project goals:\n");
   printf("- Treat the Pi as a disciplined hardware companion, not just a blunt accelerator\n");
   printf("- Make Fast RAM, RTG, and Pi-side services feel \"native\" to the Amiga\n");
@@ -2207,4 +2316,5 @@ static void print_help(const char* prog) {
   printf("  - input=... acts as a fallback for keyboard/mouse if those are not set.\n");
   printf("  - RT priorities require CAP_SYS_NICE or a non-zero RLIMIT_RTPRIO.\n");
   printf("  - FC: first few transitions are logged at info when enabled; use --log-level debug for ongoing.\n");
+  printf("  - Queue: set PISTORM_ENABLE_QUEUE=1 to enable batching (optional PISTORM_BATCH_BITS).\n");
 }
