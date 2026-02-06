@@ -7,6 +7,11 @@
 make
 ```
 
+- UAE JIT backend (experimental):
+```
+make USE_UAE_JIT=1 uae-jit
+```
+
 - Clean:
 ```
 make clean

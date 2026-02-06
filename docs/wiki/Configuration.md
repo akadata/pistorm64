@@ -1,7 +1,7 @@
 # Configuration
 
 The emulator uses a config file to define memory maps, ROMs, devices, and platform features.
-See `config_file/readme.md` for full syntax details.
+See `src/config_file/readme.md` for full syntax details.
 
 ## Map syntax
 
@@ -16,6 +16,11 @@ Key map types:
 - `register`: I/O / register range.
 - `ram_noalloc`: RAM backed by external buffer.
 - `wtcram`: Write-through cache region (writes go to bus).
+
+Common map options:
+- `range=LOW-HIGH` as an alternative to `address` + `size`.
+- `ovl=<addr>` for ROM overlay mirroring (e.g., Kickstart at `$00000000`).
+- `autodump_mem` / `autodump_file` to dump ROM contents when the file is missing.
 
 ## Typical Amiga maps
 
@@ -33,6 +38,37 @@ Use the CLI to direct logs:
 ```
 
 For heavy tracing only enable debug briefly, as it slows performance.
+
+## CPU/runtime control
+
+The config file supports core CPU tuning and runtime scheduling:
+
+- `cpu <type>` (e.g., `cpu 68020`).
+- `loopcycles <n>` to control how many 68k cycles run before service checks.
+- `affinity <spec>` to set thread affinity (e.g., `cpu=3,ipl=2,keyboard=1,mouse=1`).
+- `rtprio <spec>` to set SCHED_RR priorities (requires `CAP_SYS_NICE` or
+  `RLIMIT_RTPRIO`).
+
+You can also set these from the CLI:
+
+```
+./emulator --loopcycles 400 --affinity cpu=2,ipl=3 --rtprio cpu=80,ipl=70
+```
+
+## Input routing (Amiga)
+
+These config commands set up keyboard/mouse forwarding:
+
+- `keyboard {grab_key} {grab|nograb} {autoconnect|noautoconnect}`
+- `kbfile <event_device>`
+- `mouse <event_device> {grab_key} {grab|nograb} {autoconnect|noautoconnect}`
+
+## JIT vs non-JIT
+
+- **Non-JIT (default)**: Musashi core, launched with `./emulator`.
+- **UAE JIT (experimental)**: build with `make USE_UAE_JIT=1 uae-jit` and run
+  `./emulator --jit` (`--jit-fpu` for the FPU JIT). See `UAE-JIT-Status.md` for
+  the current bring-up state.
 
 ## Platform variables (setvar)
 
@@ -58,7 +94,8 @@ setvar batch_bits true
 These are set when loading the kernel module (e.g. `modprobe pistorm <param>=<value>`):
 
 - `gpclk_src` / `gpclk_div`
-  - GPCLK0 source and divider (default `gpclk_src=5`, `gpclk_div=6` ~200 MHz on Pi3-class).
+  - GPCLK0 source and divider (default `gpclk_src=5`, `gpclk_div=6` → ~200 MHz
+    on Pi4 with PLLC at 1.2 GHz).
 - `berr_reset_input=0|1`
   - `0`: GPIO5 is RESET output (legacy CPLD).
   - `1`: GPIO5 is treated as RESET/BERR input (FC/BERR CPLD).
