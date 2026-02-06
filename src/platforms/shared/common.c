@@ -8,12 +8,13 @@
 #include <endian.h>
 #include "platforms/platforms.h"
 #include "gpio/ps_protocol.h"
+#include "log.h"
 
 void dump_range_to_file(uint32_t addr, uint32_t size, char* filename) {
   FILE* out = fopen(filename, "wb+");
   if (out == NULL) {
-    printf("[SHARED-DUMP_RANGE_TO_FILE] Failed to open %s for writing.\n", filename);
-    printf("[SHARED-DUMP_RANGE_TO_FILE] Memory range has not been dumped to file.\n");
+    LOG_ERROR("[SHARED-DUMP_RANGE_TO_FILE] Failed to open %s for writing.\n", filename);
+    LOG_WARN("[SHARED-DUMP_RANGE_TO_FILE] Memory range has not been dumped to file.\n");
     return;
   }
 
@@ -23,14 +24,14 @@ void dump_range_to_file(uint32_t addr, uint32_t size, char* filename) {
   }
 
   fclose(out);
-  printf("[SHARED-DUMP_RANGE_TO_FILE] Memory range dumped to file %s.\n", filename);
+  LOG_INFO("[SHARED-DUMP_RANGE_TO_FILE] Memory range dumped to file %s.\n", filename);
 }
 
 uint8_t* dump_range_to_memory(uint32_t addr, uint32_t size) {
   uint8_t* mem = calloc(size, 1);
 
   if (mem == NULL) {
-    printf("[SHARED-DUMP_RANGE_TO_MEMORY] Failed to allocate memory for dumped range.\n");
+    LOG_ERROR("[SHARED-DUMP_RANGE_TO_MEMORY] Failed to allocate memory for dumped range.\n");
     return NULL;
   }
 
@@ -39,6 +40,6 @@ uint8_t* dump_range_to_memory(uint32_t addr, uint32_t size) {
     memcpy(&mem[i], &in, sizeof(in));
   }
 
-  printf("[SHARED-DUMP_RANGE_TO_FILE] Memory range copied to RAM.\n");
+  LOG_INFO("[SHARED-DUMP_RANGE_TO_FILE] Memory range copied to RAM.\n");
   return mem;
 }

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "platforms.h"
+#include "log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,15 +34,15 @@ struct platform_config* make_platform_config(const char* name, const char* subsy
 
   if (platform_id == -1) {
     // Display a warning if no match is found for the config name, in case it was mistyped.
-    printf("No match found for platform name \'%s\', defaulting to none/generic.\n", name);
+    LOG_WARN("No match found for platform name \'%s\', defaulting to none/generic.\n", name);
     platform_id = PLATFORM_NONE;
   } else {
-    printf("[CFG] Creating platform config for %s...\n", name);
+    LOG_INFO("[CFG] Creating platform config for %s...\n", name);
   }
 
   cfg = (struct platform_config*)malloc(sizeof(struct platform_config));
   if (!cfg) {
-    printf("Failed to allocate memory for new platform config!.\n");
+    LOG_ERROR("Failed to allocate memory for new platform config!.\n");
     return NULL;
   }
   memset(cfg, 0x00, sizeof(struct platform_config));

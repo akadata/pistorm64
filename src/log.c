@@ -5,9 +5,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
+#include <syslog.h>
 
 static int log_level = LOG_LEVEL_INFO;
 static FILE* log_fp = NULL;
+static int log_syslog_enabled_flag = 0;
 
 static const char* log_level_name(int level) {
   switch (level) {
@@ -92,37 +94,69 @@ int log_set_file(const char* path) {
   return 0;
 }
 
+static int log_syslog_priority(int level) {
+  switch (level) {
+  case LOG_LEVEL_ERROR:
+    return LOG_ERR;
+  case LOG_LEVEL_WARN:
+    return LOG_WARNING;
+  case LOG_LEVEL_INFO:
+    return LOG_INFO;
+  case LOG_LEVEL_DEBUG:
+  case LOG_LEVEL_VERBOSE:
+    return LOG_DEBUG;
+  default:
+    return LOG_NOTICE;
+  }
+}
+
+int log_set_syslog(int enable) {
+  if (enable) {
+    if (!log_syslog_enabled_flag) {
+      openlog("pistorm64", LOG_PID | LOG_CONS, LOG_USER);
+      log_syslog_enabled_flag = 1;
+    }
+    return 0;
+  }
+  if (log_syslog_enabled_flag) {
+    closelog();
+    log_syslog_enabled_flag = 0;
+  }
+  return 0;
+}
+
+int log_syslog_enabled(void) {
+  return log_syslog_enabled_flag;
+}
+
 void log_message(int level, const char* fmt, ...) {
   if (level > log_level) {
     return;
   }
 
+  char message[2048];
   va_list args;
+
   va_start(args, fmt);
-  fprintf(stdout, "[%s] ", log_level_name(level));
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wformat-nonliteral"
 #endif
-  vfprintf(stdout, fmt, args);
+  vsnprintf(message, sizeof(message), fmt, args);
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
   va_end(args);
+
+  if (log_syslog_enabled_flag) {
+    syslog(log_syslog_priority(level), "[%s] %s", log_level_name(level), message);
+  }
+
+  fprintf(stdout, "[%s] %s", log_level_name(level), message);
   fflush(stdout);
 
   if (log_fp) {
-    va_start(args, fmt);
-    fprintf(log_fp, "[%s] ", log_level_name(level));
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-nonliteral"
-#endif
-    vfprintf(log_fp, fmt, args);
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#endif
-    va_end(args);
+    fprintf(log_fp, "[%s] %s", log_level_name(level), message);
     fflush(log_fp);
   }
 }
