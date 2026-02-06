@@ -5,7 +5,7 @@
 This document records a **known-good, high-performance configuration** for PiStorm64 on a Raspberry Pi 4 using:
 
 * 64-bit userspace and kernel
-* Musashi 68030 / 68040 core (no JIT)
+* Musashi 68030 / 68040 core (non-JIT baseline)
 * Kernel module backend (`/dev/pistorm`)
 * RTG via raylib + DRM/KMS
 * Real Zorro II/III bus timing emulation
@@ -126,11 +126,14 @@ Typical launch for benchmarking:
 ```sh
 ./emulator \
   --loopcycles 400 \
-  --jit        # flag currently ignored (no JIT backend)\
-  --jit-fpu    # ditto \
   --rtprio cpu=95,ipl=95,keyboard=50 \
   --affinity cpu=2,ipl=3,keyboard=1
 ```
+
+These benchmarks use the non-JIT Musashi core. The UAE JIT backend is
+available for bring-up (`make USE_UAE_JIT=1 uae-jit`, `./emulator --jit`) but is
+not part of the validated benchmark path yet. See `UAE-JIT-Status.md` for the
+current state.
 
 The config file used in these tests sets:
 
@@ -305,4 +308,3 @@ The key takeaway: **Musashi 64-bit on a tuned Pi 4 with proper threading, affini
   * launches emulator with a fixed config
   * runs a SysInfo Dhrystone pass and `bustest fast chip rom`
   * logs results to a CSV for tracking changes between commits
-

@@ -25,7 +25,7 @@ Feature how-tos:
 Development:
 - Dev-Environment.md
 - Tools.md
-- UAE-JIT-Status.md
+- UAE-JIT-Status.md (experimental UAE JIT backend status)
 - Janus-Bus-Engine.md
 - CPLD.md
 - Zorro-Devices.md
