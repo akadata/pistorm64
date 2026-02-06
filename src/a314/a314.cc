@@ -281,7 +281,7 @@ static void ensure_env_var(const char *key, const std::string &value) {
     }
 }
 
-static void init_a314_paths() {
+static void init_a314_paths(void) {
     if (a314_paths_initialized) {
         return;
     }
@@ -399,7 +399,7 @@ static void load_a314_service_config(const char *filename) {
     }
 }
 
-static int init_server_socket() {
+static int init_server_socket(void) {
     server_socket = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (server_socket == -1) {
         logger_error("Failed to create server socket\n");
@@ -422,7 +422,7 @@ static int init_server_socket() {
     return 0;
 }
 
-static void shutdown_server_socket() {
+static void shutdown_server_socket(void) {
     if (server_socket != -1) {
         close(server_socket);
     }
@@ -978,7 +978,7 @@ static void handle_received_pkt(int ptype, int channel_id, uint8_t *data, int pl
     remove_channel_if_not_associated_and_empty_pq(channel_id);
 }
 
-static bool receive_from_a2r() {
+static bool receive_from_a2r(void) {
     size_t head = channel_status[A2R_HEAD_OFFSET];
     size_t tail = channel_status[A2R_TAIL_OFFSET];
     size_t len = (tail - head) & 255;
@@ -1011,7 +1011,7 @@ static bool receive_from_a2r() {
     return true;
 }
 
-static bool flush_send_queue() {
+static bool flush_send_queue(void) {
     size_t tail = channel_status[R2A_TAIL_OFFSET];
     size_t head = channel_status[R2A_HEAD_OFFSET];
     size_t len = (tail - head) & 255;
@@ -1071,7 +1071,7 @@ static bool flush_send_queue() {
     return true;
 }
 
-static void read_channel_status() {
+static void read_channel_status(void) {
     channel_status[A2R_TAIL_OFFSET] = ca.a2r_tail;
     channel_status[R2A_HEAD_OFFSET] = ca.r2a_head;
     channel_status[R2A_TAIL_OFFSET] = ca.r2a_tail;
@@ -1079,7 +1079,7 @@ static void read_channel_status() {
     channel_status_updated = 0;
 }
 
-static void write_channel_status() {
+static void write_channel_status(void) {
     if (channel_status_updated != 0) {
         ca.r2a_tail = channel_status[R2A_TAIL_OFFSET];
         ca.a2r_head = channel_status[A2R_HEAD_OFFSET];
@@ -1092,7 +1092,7 @@ static void write_channel_status() {
     }
 }
 
-static void close_all_logical_channels() {
+static void close_all_logical_channels(void) {
     send_queue.clear();
 
     auto it = channels.begin();
@@ -1236,7 +1236,7 @@ static void handle_client_connection_event(ClientConnection *cc, struct epoll_ev
     }
 }
 
-static void handle_server_socket_ready() {
+static void handle_server_socket_ready(void) {
     struct sockaddr_in address;
     int alen = sizeof(struct sockaddr_in);
 
@@ -1277,7 +1277,7 @@ static void handle_server_socket_ready() {
     }
 }
 
-static void main_loop() {
+static void main_loop(void) {
     bool shutting_down = false;
     bool done = false;
 
@@ -1353,7 +1353,7 @@ static void main_loop() {
     }
 }
 
-static int init_driver() {
+static int init_driver(void) {
     if (init_server_socket() != 0) {
         return -1;
     }
@@ -1385,7 +1385,9 @@ static int init_driver() {
     return 0;
 }
 
-static void shutdown_driver() {
+
+
+static void shutdown_driver(void) {
     if (epfd != -1) {
         close(epfd);
     }
@@ -1406,7 +1408,7 @@ static void write_r_events(uint8_t events) {
     }
 }
 
-int a314_init() {
+int a314_init(void) {
     init_a314_paths();
     load_a314_service_config(a314_config_file.c_str());
 
@@ -1430,7 +1432,7 @@ void a314_set_mem_base_size(unsigned int base, unsigned int size) {
     ca.mem_size = htobe32(size);
 }
 
-void a314_process_events() {
+void a314_process_events(void) {
     if (ca.a_events & ca.a_enable) {
         ps_write_16(0xdff09c, 0x8008);
         m68k_set_irq(2);
@@ -1497,7 +1499,7 @@ void a314_write_memory_8(unsigned int address, unsigned int value) {
         }
     }
 }
-
+/*
 void a314_write_memory_16(unsigned int address, unsigned int value) {
     (void)address;  // Parameter intentionally unused
     (void)value;    // Parameter intentionally unused
@@ -1509,6 +1511,34 @@ void a314_write_memory_32(unsigned int address, unsigned int value) {
     (void)value;    // Parameter intentionally unused
     // Not implemented.
 }
+*/
+void a314_write_memory_16(unsigned int address, unsigned int value) {
+    // Refuse the whole write when it would touch outside the com area.
+    if (address + 1u >= sizeof(ca)) {
+        return;
+    }
+
+    uint16_t v = (uint16_t)value;
+
+    // Big-endian: high byte at lowest address
+    a314_write_memory_8(address + 0u, (unsigned int)((v >> 8) & 0xFFu));
+    a314_write_memory_8(address + 1u, (unsigned int)( v       & 0xFFu));
+}
+
+void a314_write_memory_32(unsigned int address, unsigned int value) {
+    // Refuse the whole write when it would touch outside the com area.
+    if (address + 3u >= sizeof(ca)) {
+        return;
+    }
+
+    uint32_t v = (uint32_t)value;
+
+    // Big-endian: most-significant byte at lowest address
+    a314_write_memory_8(address + 0u, (unsigned int)((v >> 24) & 0xFFu));
+    a314_write_memory_8(address + 1u, (unsigned int)((v >> 16) & 0xFFu));
+    a314_write_memory_8(address + 2u, (unsigned int)((v >>  8) & 0xFFu));
+    a314_write_memory_8(address + 3u, (unsigned int)( v        & 0xFFu));
+}
 
 void a314_set_config_file(const char *filename) {
     init_a314_paths();
@@ -1516,4 +1546,11 @@ void a314_set_config_file(const char *filename) {
     printf ("[A314] Set A314 config filename to %s.\n", expanded.c_str());
     a314_config_file = expanded;
     setenv("A314_CONF", a314_config_file.c_str(), 1);
+}
+
+
+void a314_shutdown(void) {
+    shutdown_driver();
+    // optional: reset globals so re-init works cleanly
+    epfd = -1;
 }

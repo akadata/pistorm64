@@ -490,14 +490,30 @@ static void* ipl_task(void* args) {
         }
         if (last_irq != 0 && last_irq != last_last_irq) {
           last_last_irq = last_irq;
-          uae_pistorm_set_irq((int)last_irq);
+#ifdef USE_UAE_JIT
+          if (use_uae_jit) {
+            uae_pistorm_set_irq((int)last_irq);
+          } else {
+            M68K_SET_IRQ((int)last_irq);
+          }
+#else
+          M68K_SET_IRQ((int)last_irq);
+#endif
         }
       } else {
         if (irq) {
           irq = 0;
         }
         if (last_last_irq != 0) {
-          uae_pistorm_set_irq(0);
+#ifdef USE_UAE_JIT
+          if (use_uae_jit) {
+            uae_pistorm_set_irq(0);
+          } else {
+            M68K_SET_IRQ(0);
+          }
+#else
+          M68K_SET_IRQ(0);
+#endif
           last_last_irq = 0;
         }
       }
@@ -516,7 +532,15 @@ static void* ipl_task(void* args) {
       }
 
       if (do_reset) {
-        uae_pistorm_pulse_reset();
+#ifdef USE_UAE_JIT
+        if (use_uae_jit) {
+          uae_pistorm_pulse_reset();
+        } else {
+          m68k_pulse_reset(NULL);
+        }
+#else
+        m68k_pulse_reset(NULL);
+#endif
         do_reset = 0;
         rtg_on = 0;
       }
@@ -717,7 +741,11 @@ static void* cpu_task(void *arg) {
   (void)arg;
   m68ki_cpu_core* state = &m68ki_cpu;
   state->ovl = ovl;
+#ifdef PISTORM_KMOD
   state->gpio = gpio;
+#else
+  state->gpio = NULL; // When kernel module is disabled, use NULL for gpio
+#endif
   if (!use_uae_jit) {
     m68k_pulse_reset(state);
   }
@@ -725,12 +753,14 @@ static void* cpu_task(void *arg) {
   apply_realtime_from_env("cpu", RT_DEFAULT_CPU);
 
 cpu_loop:
+#ifdef USE_UAE_JIT
   if (use_uae_jit) {
     while (!end_signal && !emulator_exiting) {
       uae_pistorm_run();
     }
     goto stop_cpu_emulation;
   }
+#endif
   if (realtime_disassembly && (do_disasm || cpu_emulation_running)) {
     m68k_disassemble(disasm_buf, m68k_get_reg(NULL, M68K_REG_PC), cpu_type);
     printf("REGA: 0:$%.8X 1:$%.8X 2:$%.8X 3:$%.8X 4:$%.8X 5:$%.8X 6:$%.8X 7:$%.8X\n",

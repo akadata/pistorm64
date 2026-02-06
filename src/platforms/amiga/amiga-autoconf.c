@@ -353,7 +353,7 @@ void autoconfig_write_memory_z3_8(struct emulator_config* cfg, unsigned int addr
     nib_latch = 1;
     break;
   case AC_Z3_REG_SHUTUP:
-    // printf("Write to Z3 shutup register for PIC %d.\n", ac_z3_current_pic);
+    printf("Write to Z3 shutup register for PIC %d.\n", ac_z3_current_pic);
     done = 1;
     break;
   default:
@@ -522,8 +522,7 @@ unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int 
         val |= BOARDTYPE_LINKED;
     } else
       val = rom[address / 2];
-    // printf("Read byte %d from Z2 autoconf for PIC %d (%.2X).\n", address/2, ac_z2_current_pic,
-    // val);
+      printf("Read byte %d from Z2 autoconf for PIC %d (%.2X).\n", address/2, ac_z2_current_pic, val);
   }
   val <<= 4;
   if (address != 0 && address != 2 && address != 0x40 && address != 0x42)
@@ -531,6 +530,22 @@ unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int 
 
   return (unsigned int)val;
 }
+
+unsigned int autoconfig_read_memory_16(struct emulator_config* cfg, unsigned int address) {
+  unsigned int hi = autoconfig_read_memory_8(cfg, address + 0);
+  unsigned int lo = autoconfig_read_memory_8(cfg, address + 1);
+  return ((hi & 0xFFu) << 8) | (lo & 0xFFu);
+}
+
+unsigned int autoconfig_read_memory_32(struct emulator_config* cfg, unsigned int address) {
+  unsigned int b0 = autoconfig_read_memory_8(cfg, address + 0);
+  unsigned int b1 = autoconfig_read_memory_8(cfg, address + 1);
+  unsigned int b2 = autoconfig_read_memory_8(cfg, address + 2);
+  unsigned int b3 = autoconfig_read_memory_8(cfg, address + 3);
+  return ((b0 & 0xFFu) << 24) | ((b1 & 0xFFu) << 16) | ((b2 & 0xFFu) << 8) | (b3 & 0xFFu);
+}
+
+
 
 void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address,
                                unsigned int value) {
@@ -563,7 +578,7 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
   }
 
   if (!base) {
-    // printf("Failed to set up the base for autoconfig PIC %d.\n", ac_z2_current_pic);
+     printf("Failed to set up the base for autoconfig PIC %d.\n", ac_z2_current_pic);
     done = 1;
   } else {
     if (address == 0x4a) { // base[19:16]
@@ -577,7 +592,7 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
       }
       done = 1;
     } else if (address == 0x4c) { // shut up
-      // printf("Write to Z2 shutup register for PIC %d.\n", ac_z2_current_pic);
+       printf("Write to Z2 shutup register for PIC %d.\n", ac_z2_current_pic);
       done = 1;
     }
   }
@@ -596,8 +611,7 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
       break;
     case ACTYPE_PISCSI:
       LOG_INFO("[AUTOCONF] PiSCSI Z2 device assigned to $%.8X\n", piscsi_base);
-      // m68k_add_rom_range(piscsi_base + (16 * SIZE_KILO), piscsi_base + (32 * SIZE_KILO),
-      // piscsi_rom_ptr);
+      // m68k_add_rom_range(piscsi_base + (16 * SIZE_KILO), piscsi_base + (32 * SIZE_KILO), piscsi_rom_ptr);
       break;
     case ACTYPE_A314:
       LOG_INFO("[AUTOCONF] A314 emulation device assigned to $%.8X\n", a314_base);

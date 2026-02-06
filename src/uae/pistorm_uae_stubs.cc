@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 extern "C" {
 unsigned int read_long(unsigned int address);
@@ -119,6 +120,8 @@ static inline void trace_mem(const char* op, uintptr_t raw, uae_u32 val, const c
 
 // CPU indirect memory helpers used by UAE.
 uae_u32 do_get_mem_long(uae_u32* a) {
+  // The pointer 'a' might be an emulator address cast to a pointer
+  // If it's within the 32-bit address space, treat it as an emulator address
   if (ptr_is_emu_addr(a)) {
     unsigned int addr = (unsigned int)(uintptr_t)a;
     unsigned int val = 0;
@@ -131,6 +134,7 @@ uae_u32 do_get_mem_long(uae_u32* a) {
     trace_mem("R32", (uintptr_t)a, v, "addr-bus");
     return v;
   }
+
   uae_u32 tmp;
   memcpy(&tmp, a, sizeof(tmp));
   uae_u32 v = be32toh(tmp);
@@ -139,6 +143,8 @@ uae_u32 do_get_mem_long(uae_u32* a) {
 }
 
 uint16_t do_get_mem_word(uint16_t* a) {
+  // The pointer 'a' might be an emulator address cast to a pointer
+  // If it's within the 32-bit address space, treat it as an emulator address
   if (ptr_is_emu_addr(a)) {
     unsigned int addr = (unsigned int)(uintptr_t)a;
     unsigned int val = 0;
@@ -151,6 +157,7 @@ uint16_t do_get_mem_word(uint16_t* a) {
     trace_mem("R16", (uintptr_t)a, (uae_u32)v, "addr-bus");
     return v;
   }
+
   uint16_t tmp;
   memcpy(&tmp, a, sizeof(tmp));
   uint16_t v = be16toh(tmp);
@@ -159,6 +166,8 @@ uint16_t do_get_mem_word(uint16_t* a) {
 }
 
 uint8_t do_get_mem_byte(uint8_t* a) {
+  // The pointer 'a' might be an emulator address cast to a pointer
+  // If it's within the 32-bit address space, treat it as an emulator address
   if (ptr_is_emu_addr(a)) {
     unsigned int addr = (unsigned int)(uintptr_t)a;
     unsigned int val = 0;
@@ -171,6 +180,7 @@ uint8_t do_get_mem_byte(uint8_t* a) {
     trace_mem("R08", (uintptr_t)a, (uae_u32)v, "addr-bus");
     return v;
   }
+
   uint8_t v = *a;
   trace_mem("R08", (uintptr_t)a, (uae_u32)v, "ptr");
   return v;
@@ -188,6 +198,7 @@ void do_put_mem_long(uae_u32* a, uae_u32 v) {
     }
     return;
   }
+
   uae_u32 tmp = htobe32(v);
   memcpy(a, &tmp, sizeof(tmp));
   trace_mem("W32", (uintptr_t)a, v, "ptr");
@@ -205,6 +216,7 @@ void do_put_mem_word(uint16_t* a, uint16_t v) {
     }
     return;
   }
+
   uint16_t tmp = htobe16(v);
   memcpy(a, &tmp, sizeof(tmp));
   trace_mem("W16", (uintptr_t)a, (uae_u32)v, "ptr");
@@ -222,6 +234,7 @@ void do_put_mem_byte(uint8_t* a, uint8_t v) {
     }
     return;
   }
+
   *a = v;
   trace_mem("W08", (uintptr_t)a, (uae_u32)v, "ptr");
 }
@@ -245,6 +258,9 @@ extern "C" int read_irq;
 extern "C" int intlev(void) {
   return read_irq;
 }
+
+// Logging function needed by UAE JIT - this is just a placeholder since the actual
+// log_message function will be provided by the main executable
 
 bool is_cycle_ce(uaecptr) {
   return false;

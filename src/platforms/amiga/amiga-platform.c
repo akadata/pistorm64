@@ -40,16 +40,19 @@ int handle_register_read_amiga(unsigned int addr, unsigned char type, unsigned i
 int handle_register_write_amiga(unsigned int addr, unsigned int value, unsigned char type);
 
 extern uint32_t ac_z2_current_pic;
-extern int ac_z2_done;
 extern uint32_t ac_z2_pic_count;
+
+extern int ac_z2_done;
 extern int ac_z2_type[AC_PIC_LIMIT];
 extern int ac_z2_index[AC_PIC_LIMIT];
 
 extern uint32_t ac_z3_current_pic;
 extern uint32_t ac_z3_pic_count;
+
 extern int ac_z3_done;
 extern int ac_z3_type[AC_PIC_LIMIT];
 extern int ac_z3_index[AC_PIC_LIMIT];
+
 extern uint8_t gayle_emulation_enabled;
 
 const char* z2_autoconf_id = "z2_autoconf_fast";
@@ -275,7 +278,7 @@ int custom_read_amiga(struct emulator_config* cfg, unsigned int addr, unsigned i
   }
 
   if (a314_emulation_enabled && addr >= a314_base && addr < a314_base + (64 * SIZE_KILO)) {
-    // printf("%s read from A314 @$%.8X\n", op_type_names[type], addr);
+    printf("%s read from A314 @$%.8X\n", op_type_names[type], addr);
     switch (type) {
     case OP_TYPE_BYTE:
       *val = a314_read_memory_8(addr - a314_base);
@@ -338,8 +341,7 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
   }
 
   if (piscsi_enabled && addr >= piscsi_base && addr < piscsi_base + (64 * SIZE_KILO)) {
-    // printf("[Amiga-Custom] %s write to PISCSI base @$%.8x: %.8X\n", op_type_names[type], addr,
-    // val);
+    printf("[Amiga-Custom] %s write to PISCSI base @$%.8x: %.8X\n", op_type_names[type], addr, val);
     handle_piscsi_write(addr, val, type);
     return 1;
   }
@@ -348,27 +350,32 @@ int custom_write_amiga(struct emulator_config* cfg, unsigned int addr, unsigned 
     return 1;
   }
 
-  if (a314_emulation_enabled && addr >= a314_base && addr < a314_base + (64 * SIZE_KILO)) {
-    // printf("%s write to A314 @$%.8X: %d\n", op_type_names[type], addr, val);
+  if (a314_emulation_enabled &&
+    addr >= a314_base &&
+    addr <  a314_base + (64 * SIZE_KILO)) {
+
+    printf("%s write to A314 @$%.8X: %d\n", op_type_names[type], addr, val);
+
+    unsigned int off = (unsigned int)(addr - a314_base);
+
     switch (type) {
-    case OP_TYPE_BYTE:
-      a314_write_memory_8(addr - a314_base, val);
-      return 1;
-      break;
-    case OP_TYPE_WORD:
-      // Not implemented in a314.cc
-      // a314_write_memory_16(addr, val);
-      return -1;
-      break;
-    case OP_TYPE_LONGWORD:
-      // Not implemented in a314.cc
-      // a314_write_memory_32(addr, val);
-      return -1;
-      break;
-    default:
-      break;
+      case OP_TYPE_BYTE:
+        a314_write_memory_8(off, (unsigned int)val);
+        return 1;
+
+      case OP_TYPE_WORD:
+        a314_write_memory_16(off, (unsigned int)val);
+        return 1;
+
+      case OP_TYPE_LONGWORD:
+        a314_write_memory_32(off, (unsigned int)val);
+        return 1;
+
+      default:
+        break;
     }
-  }
+}
+
 
   return -1;
 }

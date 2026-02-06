@@ -13,6 +13,7 @@ void uae_pistorm_set_irq(int level);
 void uae_pistorm_pulse_reset(void);
 uint32_t uae_pistorm_get_pc(void);
 
+
 #ifdef __cplusplus
 }
 #endif

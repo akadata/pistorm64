@@ -37,8 +37,7 @@ struct tBitstreamCmd {
 	tBitstreamCmd(std::ifstream &FileIn);
 };
 
-tBitstream::tBitstream(const std::string &FilePath)
-{
+tBitstream::tBitstream(const std::string &FilePath) {
 	std::ifstream FileIn;
 	FileIn.open(FilePath.c_str(), std::ifstream::in | std::ifstream::binary);
 	if(!FileIn.good()) {

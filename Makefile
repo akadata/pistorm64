@@ -35,12 +35,9 @@ CXX := g++
 endif
 
 
-EXTRA_CFLAGS ?= -O3 
-#-g -O0
-EXTRA_M68K_CFLAGS ?= -O3
-#-g -O0
-EXTRA_LDFLAGS ?= 
-#-g -O0
+EXTRA_CFLAGS ?= -g -O0
+EXTRA_M68K_CFLAGS ?= -g -O0
+EXTRA_LDFLAGS ?= -g -O0
 
 
 # Tunables: edit here instead of hunting through rule bodies.
@@ -98,7 +95,7 @@ OPT_LEVEL := -O$(O)
 endif
 
 # Set USE_GOLD=1 to link with gold if available.
-USE_GOLD   ?= 1
+USE_GOLD   ?= 0
 
 include config.mk
 
@@ -108,7 +105,7 @@ USE_RAYLIB ?= 1
 USE_ALSA   ?= 1
 
 # Toggle PMMU emulation (68030/040). Default on; disable with USE_PMMU=0 if needed.
-USE_PMMU   ?= 1
+USE_PMMU   ?= 0
 
 # Optional: build UAE/JIT objects (AArch64 JIT backend from Amiberry).
 # This does not replace Musashi in the main emulator yet; it builds a standalone
@@ -122,9 +119,9 @@ ARCH_FEATURES ?=
 # Toggle Pi host (/opt/vc) support for dev tools.
 USE_VC     ?= 0
 # Perf toggles
-USE_LTO    ?= 1
-USE_NO_PLT ?= 1 
-OMIT_FP    ?= 1
+USE_LTO    ?= 0
+USE_NO_PLT ?= 0 
+OMIT_FP    ?= 0
 USE_PIPE   ?= 1
 
 # Quiet noisy-but-benign warnings from the generated 68k core.
@@ -168,7 +165,11 @@ PISTORM_GPCLK_SRC ?= 6
 PISTORM_GPCLK_DIV ?= 6
 PISTORM_KMOD_PARAMS ?= run_batch_enable=0 berr_reset_input=0 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
 
+ifeq ($(PISTORM_KMOD),1)
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
+else
+PS_PROTOCOL_SRC := src/gpio/ps_protocol_userspace.c
+endif
 
 
 MAINFILES =
@@ -283,13 +284,13 @@ UAE_PIE_FLAGS := $(if $(filter 1,$(UAE_JIT_NO_PIE)),-fno-pie,)
 # UAE objects must include DEFINES (USE_UAE_JIT) but stay non-LTO/static-friendly.
 UAE_OPT_LEVEL ?= -O2
 UAE_WARN_SUPPRESS = -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable \
-	-Wno-sign-compare -Wno-misleading-indentation
+	-Wno-sign-compare -Wno-misleading-indentation -Wno-format -Wno-int-to-pointer-cast
 UAE_EXTRA_CFLAGS ?=
 UAE_CFLAGS   = $(EMU_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
-	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(UAE_EXTRA_CFLAGS) $(NO_LTO_FLAGS)
+	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(UAE_EXTRA_CFLAGS) $(NO_LTO_FLAGS) -fPIC
 UAE_CXXFLAGS = $(CXX_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
 	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(UAE_EXTRA_CFLAGS) \
-	$(NO_LTO_FLAGS) -fpermissive $(UAE_WARN_SUPPRESS)
+	$(NO_LTO_FLAGS) -fpermissive $(UAE_WARN_SUPPRESS) -fPIC
 EXTRA_CXX_OBJS :=
 EXTRA_LINK_DEPS :=
 
