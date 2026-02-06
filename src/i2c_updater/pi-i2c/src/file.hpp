@@ -11,22 +11,19 @@
 namespace nFile {
 
 template<typename t_tStream, typename t_tData>
-t_tStream readLittleEndian(t_tStream &File, t_tData &Data)
-{
+t_tStream readLittleEndian(t_tStream &File, t_tData &Data) {
 	File.read(reinterpret_cast<char*>(&Data), sizeof(Data));
 	Data = nEndian::littleToNative(Data);
 }
 
 template<typename t_tStream, typename t_tData>
-void readBigEndian(t_tStream &File, t_tData &Data)
-{
+void readBigEndian(t_tStream &File, t_tData &Data) {
 	File.read(reinterpret_cast<char*>(&Data), sizeof(Data));
 	Data = nEndian::bigToNative(Data);
 }
 
 template<typename t_tStream, typename t_tData>
-void readData(t_tStream &File, t_tData *pData, size_t ElementCount)
-{
+void readData(t_tStream &File, t_tData *pData, size_t ElementCount) {
 	File.read(reinterpret_cast<char*>(pData), ElementCount * sizeof(*pData));
 }
 

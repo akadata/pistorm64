@@ -3,7 +3,7 @@
 #include "z3bus_iface.h"
 #include "log.h"
 
-#include "pistorm_z3bus.h"
+#include "include/uapi/pistorm_z3bus.h"
 
 #include <errno.h>
 #include <fcntl.h>

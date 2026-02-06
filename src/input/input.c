@@ -82,10 +82,10 @@ static int handle_modifier(struct input_event* ev) {
       target_modifier = &altgr;
       break;
     case KEY_LEFTCTRL:
-      target_modifier = &lshift;
+      target_modifier = &lctrl;
       break;
     case KEY_RIGHTCTRL:
-      target_modifier = &rshift;
+      target_modifier = &rctrl;
       break;
     }
     *target_modifier = (ev->value == KEYPRESS_RELEASE) ? 0 : 1;

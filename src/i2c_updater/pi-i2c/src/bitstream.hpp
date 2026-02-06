@@ -9,6 +9,8 @@
 #include <vector>
 #include <array>
 #include <fstream>
+#include <cstdint>
+
 
 struct tBitstream {
 	tBitstream(const std::string &FilePath);
