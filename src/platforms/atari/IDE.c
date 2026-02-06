@@ -21,19 +21,20 @@
 #include "config_file/config_file.h"
 #include "atari-registers.h"
 #include "platforms/atari/idedriver.h"
+#include "log.h"
 
 #define DEBUGPRINT 0
 #if DEBUGPRINT
-#define DEBUG_PRINTF(fmt, ...) fprintf(stderr, fmt, ##__VA_ARGS__)
+#define DEBUG_PRINTF(...) LOG_DEBUG(__VA_ARGS__)
 #else
-#define DEBUG_PRINTF(fmt, ...) ;
+#define DEBUG_PRINTF(...) do { } while (0)
 #endif
 
 #define DEBUG_IDE
 #ifdef DEBUG_IDE
-#define DEBUG ; // printf
+#define DEBUG(...) LOG_DEBUG(__VA_ARGS__)
 #else
-#define DEBUG(...)
+#define DEBUG(...) do { } while (0)
 #endif
 
 

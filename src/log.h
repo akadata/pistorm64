@@ -17,6 +17,8 @@ void log_set_level(int level);
 int log_get_level(void);
 int log_parse_level(const char* level);
 int log_set_file(const char* path);
+int log_set_syslog(int enable);
+int log_syslog_enabled(void);
 void log_message(int level, const char* fmt, ...);
 
 #define LOG_ERROR(...) log_message(LOG_LEVEL_ERROR, __VA_ARGS__)

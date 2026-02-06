@@ -45,6 +45,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <stdarg.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -360,7 +361,7 @@ extern int m68ki_remaining_cycles;
 #define DEBUG_EMULATOR
 
 #ifdef DEBUG_EMULATOR
-#define DEBUG printf
+#define DEBUG LOG_DEBUG
 #else
 #define DEBUG(...)
 #endif
@@ -1056,6 +1057,13 @@ int main(int argc, char* argv[]) {
   ps_setup_protocol();
 
   log_set_level(LOG_LEVEL_INFO);
+  const char* syslog_env = getenv("PISTORM_SYSLOG");
+  if (syslog_env && syslog_env[0] != '\0' &&
+      strcasecmp(syslog_env, "0") != 0 &&
+      strcasecmp(syslog_env, "false") != 0 &&
+      strcasecmp(syslog_env, "no") != 0) {
+    log_set_syslog(1);
+  }
 
   // const struct sched_param priority = {99};
 
@@ -1070,6 +1078,8 @@ int main(int argc, char* argv[]) {
       if (log_set_file(path) != 0) {
         printf("Failed to open log file %s.\n", path);
       }
+    } else if (strcmp(argv[g], "--syslog") == 0) {
+      log_set_syslog(1);
     } else if (strcmp(argv[g], "--affinity") == 0) {
       if (g + 1 >= argc) {
         printf("%s switch found, but no affinity spec provided.\n", argv[g]);
@@ -2288,6 +2298,7 @@ static void print_help(const char* prog) {
   printf("  -h, --help                 Show this help and exit\n");
   printf("  -a, --about                Show about info and exit\n");
   printf("  --log [file]               Write log output to file (default: amiga.log)\n");
+  printf("  --syslog                   Send log output to syslog/systemd\n");
   printf("  -l, --log-level <level>    Set log level (error|warn|info|debug|verbose)\n");
   printf("  --debug-level <level>      Alias for --log-level\n");
   printf("  --affinity <spec>          Thread affinity (e.g., cpu=3,ipl=2,keyboard=1,mouse=1)\n");
@@ -2313,6 +2324,7 @@ static void print_help(const char* prog) {
   printf("  - For complex setvar or multi-arg values, use a .cfg file.\n");
   printf("  - You can also set %s and %s environment variables for the same specs.\n",
          PI_AFFINITY_ENV, PI_RT_ENV);
+  printf("  - Set PISTORM_SYSLOG=1 to enable syslog logging for services.\n");
   printf("  - input=... acts as a fallback for keyboard/mouse if those are not set.\n");
   printf("  - RT priorities require CAP_SYS_NICE or a non-zero RLIMIT_RTPRIO.\n");
   printf("  - FC: first few transitions are logged at info when enabled; use --log-level debug for ongoing.\n");

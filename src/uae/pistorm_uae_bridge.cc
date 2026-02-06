@@ -13,6 +13,7 @@
 
 #include "../emulator_fc.h"
 #include "../config_file/config_file.h"
+#include "../log.h"
 #include "../memory_mapped.h"
 
 #include <stdarg.h>
@@ -42,10 +43,12 @@ extern addrbank* thread_mem_banks[MEMORY_BANKS];
 extern int m68k_pc_indirect;
 
 extern "C" void z3660_printf(const TCHAR* format, ...) {
+  char buffer[2048];
   va_list args;
   va_start(args, format);
-  vfprintf(stderr, format, args);
+  vsnprintf(buffer, sizeof(buffer), format, args);
   va_end(args);
+  log_message(LOG_LEVEL_INFO, "%s", buffer);
 }
 
 static void pistorm_force_rom_overlay(void) {
@@ -136,16 +139,16 @@ static inline void uae_jit_trace_access(const char* kind, uaecptr addr, uae_u32 
     return;
   }
   (*budget)--;
-  printf("[UAE-JIT] %s %-6s addr=%08X val=%08X fc=%u\n", mapped ? "MAP" : "BUS", kind,
-         (unsigned int)addr, (unsigned int)val,
-         (unsigned int)(ifetch ? (regs.sfc & 0x7) : (regs.dfc & 0x7)));
+  LOG_DEBUG("[UAE-JIT] %s %-6s addr=%08X val=%08X fc=%u\n", mapped ? "MAP" : "BUS", kind,
+            (unsigned int)addr, (unsigned int)val,
+            (unsigned int)(ifetch ? (regs.sfc & 0x7) : (regs.dfc & 0x7)));
 }
 
 static inline void uae_jit_trace_reset_vec(const char* src, unsigned int addr, unsigned int val) {
   if (!g_jit_trace) {
     return;
   }
-  printf("[UAE-JIT] RESETV %-8s addr=%08X val=%08X\n", src, addr, val);
+  LOG_INFO("[UAE-JIT] RESETV %-8s addr=%08X val=%08X\n", src, addr, val);
 }
 
 static inline bool bridge_read_rom_data(unsigned int addr, unsigned char type, unsigned int* val) {
@@ -526,7 +529,7 @@ static void uae_pistorm_apply_reset_vectors(void) {
   regs.t0 = regs.t1 = 0;
   regs.intmask = 7;
   regs.sr = 0x2700;
-  printf("[UAE] reset vectors: SP=%08X PC=%08X\n", sp, pc);
+  LOG_INFO("[UAE] reset vectors: SP=%08X PC=%08X\n", sp, pc);
 }
 
 extern "C" int uae_pistorm_init(int cpu_model, int enable_jit, int enable_fpu) {
@@ -536,7 +539,7 @@ extern "C" int uae_pistorm_init(int cpu_model, int enable_jit, int enable_fpu) {
   g_jit_trace_ifetch_left = 128;
   g_jit_trace_data_left = 128;
   if (g_jit_trace) {
-    printf("[UAE-JIT] trace enabled (PISTORM_UAE_JIT_TRACE=1)\n");
+    LOG_INFO("[UAE-JIT] trace enabled (PISTORM_UAE_JIT_TRACE=1)\n");
   }
   // Force ROM overlay on at reset so vectors are visible at 0x000000.
   ovl = 1;

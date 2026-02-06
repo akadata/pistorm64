@@ -10,6 +10,7 @@
 
 #include "config_file/config_file.h"
 #include "gpio/ps_protocol.h"
+#include "log.h"
 #include "piscsi-enums.h"
 #include "piscsi.h"
 #include "platforms/atari/hunk-reloc.h"
@@ -21,8 +22,8 @@
 //#define PISCSI_DEBUG
 
 #ifdef PISCSI_DEBUG
-#define DEBUG printf
-//#define DEBUG_TRIVIAL printf
+#define DEBUG LOG_DEBUG
+//#define DEBUG_TRIVIAL LOG_DEBUG
 #define DEBUG_TRIVIAL(...)
 
 //extern void stop_cpu_emulation(uint8_t disasm_cur);
