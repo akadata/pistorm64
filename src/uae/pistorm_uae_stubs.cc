@@ -135,11 +135,10 @@ uae_u32 do_get_mem_long(uae_u32* a) {
     return v;
   }
 
-  uae_u32 tmp;
-  memcpy(&tmp, a, sizeof(tmp));
-  uae_u32 v = be32toh(tmp);
-  trace_mem("R32", (uintptr_t)a, v, "ptr");
-  return v;
+  // If we reach here, the pointer is not in the emulator address space
+  // This is likely an error in the JIT translation - fail loudly
+  fprintf(stderr, "[UAE-MEM] Invalid longword read from non-emulator address 0x%p\n", (void*)a);
+  abort(); // Fail loudly to indicate the real issue
 }
 
 uint16_t do_get_mem_word(uint16_t* a) {
@@ -158,11 +157,10 @@ uint16_t do_get_mem_word(uint16_t* a) {
     return v;
   }
 
-  uint16_t tmp;
-  memcpy(&tmp, a, sizeof(tmp));
-  uint16_t v = be16toh(tmp);
-  trace_mem("R16", (uintptr_t)a, (uae_u32)v, "ptr");
-  return v;
+  // If we reach here, the pointer is not in the emulator address space
+  // This is likely an error in the JIT translation - fail loudly
+  fprintf(stderr, "[UAE-MEM] Invalid word read from non-emulator address 0x%p\n", (void*)a);
+  abort(); // Fail loudly to indicate the real issue
 }
 
 uint8_t do_get_mem_byte(uint8_t* a) {
@@ -181,9 +179,10 @@ uint8_t do_get_mem_byte(uint8_t* a) {
     return v;
   }
 
-  uint8_t v = *a;
-  trace_mem("R08", (uintptr_t)a, (uae_u32)v, "ptr");
-  return v;
+  // If we reach here, the pointer is not in the emulator address space
+  // This is likely an error in the JIT translation - fail loudly
+  fprintf(stderr, "[UAE-MEM] Invalid byte read from non-emulator address 0x%p\n", (void*)a);
+  abort(); // Fail loudly to indicate the real issue
 }
 
 void do_put_mem_long(uae_u32* a, uae_u32 v) {
@@ -199,9 +198,10 @@ void do_put_mem_long(uae_u32* a, uae_u32 v) {
     return;
   }
 
-  uae_u32 tmp = htobe32(v);
-  memcpy(a, &tmp, sizeof(tmp));
-  trace_mem("W32", (uintptr_t)a, v, "ptr");
+  // If we reach here, the pointer is not in the emulator address space
+  // This is likely an error in the JIT translation - fail loudly
+  fprintf(stderr, "[UAE-MEM] Invalid longword write to non-emulator address 0x%p\n", (void*)a);
+  abort(); // Fail loudly to indicate the real issue
 }
 
 void do_put_mem_word(uint16_t* a, uint16_t v) {
@@ -217,9 +217,10 @@ void do_put_mem_word(uint16_t* a, uint16_t v) {
     return;
   }
 
-  uint16_t tmp = htobe16(v);
-  memcpy(a, &tmp, sizeof(tmp));
-  trace_mem("W16", (uintptr_t)a, (uae_u32)v, "ptr");
+  // If we reach here, the pointer is not in the emulator address space
+  // This is likely an error in the JIT translation - fail loudly
+  fprintf(stderr, "[UAE-MEM] Invalid word write to non-emulator address 0x%p\n", (void*)a);
+  abort(); // Fail loudly to indicate the real issue
 }
 
 void do_put_mem_byte(uint8_t* a, uint8_t v) {
@@ -235,8 +236,10 @@ void do_put_mem_byte(uint8_t* a, uint8_t v) {
     return;
   }
 
-  *a = v;
-  trace_mem("W08", (uintptr_t)a, (uae_u32)v, "ptr");
+  // If we reach here, the pointer is not in the emulator address space
+  // This is likely an error in the JIT translation - fail loudly
+  fprintf(stderr, "[UAE-MEM] Invalid byte write to non-emulator address 0x%p\n", (void*)a);
+  abort(); // Fail loudly to indicate the real issue
 }
 
 // FPU stubs for now (JIT backend without 68k FPU emulation enabled).
