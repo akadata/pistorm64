@@ -5,13 +5,14 @@
 #include <string.h>
 #include <ctype.h>
 #include "m68k.h"
+#include "log.h"
 #include "platforms/platforms.h"
 #include "platforms/shared/rtc.h"
 
 //#define DEBUG_MAC_PLATFORM
 
 #ifdef DEBUG_MAC_PLATFORM
-#define DEBUG printf
+#define DEBUG LOG_DEBUG
 #else
 #define DEBUG(...)
 #endif
@@ -47,18 +48,18 @@ static void adjust_ranges_mac68k(struct emulator_config* cfg) {
     }
   }
 
-  printf("[MAC68K] Platform custom range: %.8X-%.8X\n", cfg->custom_low, cfg->custom_high);
-  printf("[MAC68K] Platform mapped range: %.8X-%.8X\n", cfg->mapped_low, cfg->mapped_high);
+  LOG_INFO("[MAC68K] Platform custom range: %.8X-%.8X\n", cfg->custom_low, cfg->custom_high);
+  LOG_INFO("[MAC68K] Platform mapped range: %.8X-%.8X\n", cfg->mapped_low, cfg->mapped_high);
 }
 
 static int setup_platform_mac68k(struct emulator_config* cfg) {
-  printf("Performing setup for Mac68k platform.\n");
+  LOG_INFO("Performing setup for Mac68k platform.\n");
 
   if (strlen(cfg->platform->subsys)) {
-    printf("Sub system %sd specified, but no handler is available for this.\n",
-           cfg->platform->subsys);
+    LOG_WARN("Sub system %sd specified, but no handler is available for this.\n",
+             cfg->platform->subsys);
   } else
-    printf("No sub system specified.\n");
+    LOG_INFO("No sub system specified.\n");
 
   handle_ovl_mappings_mac68k(cfg);
 
@@ -77,7 +78,7 @@ static void setvar_mac68k(struct emulator_config* cfg, const char* var, const ch
 
   if (CHKVAR("sysrom_pos") && val) {
     ovl_sysrom_pos = get_int(val);
-    printf("[MAC68K] System ROM/RAM OVL position set to %.8X\n", ovl_sysrom_pos);
+    LOG_INFO("[MAC68K] System ROM/RAM OVL position set to %.8X\n", ovl_sysrom_pos);
   }
 
   if (CHKVAR("iscsi") && !iscsi_enabled) {

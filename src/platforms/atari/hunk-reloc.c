@@ -9,15 +9,16 @@
 #include "hunk-reloc.h"
 #include "piscsi/piscsi-enums.h"
 #include "piscsi/piscsi.h"
+#include "log.h"
 
 #ifdef FAKESTORM
 #define lseek64 lseek
 #endif
 
 #define DEBUG_SPAMMY(...)
-//#define DEBUG_SPAMMY printf
+//#define DEBUG_SPAMMY LOG_DEBUG
 #define DEBUG(...)
-//#define DEBUG printf
+//#define DEBUG LOG_DEBUG
 
 #define BE(val) be32toh(val)
 #define BE16(val) be16toh(val)
