@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "config_file/config_file.h"
+#include "memory_mapped.h"
 #include "m68k.h"
 #include "platforms/amiga/Gayle.h"
 #include "log.h"
@@ -23,16 +24,24 @@ int handle_mapped_read(struct emulator_config* cfg, unsigned int addr, unsigned 
                        unsigned char type) {
   unsigned char* read_addr = NULL;
 
-  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
-    if (cfg->map_type[i] == MAPTYPE_NONE)
-      continue;
-    else if (ovl && (cfg->map_type[i] == MAPTYPE_ROM || cfg->map_type[i] == MAPTYPE_RAM_WTC)) {
+  // OVL remap must win over base mappings (for example chip RAM at 0x000000).
+  if (ovl) {
+    for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+      if (cfg->map_type[i] == MAPTYPE_NONE)
+        continue;
+      if (cfg->map_type[i] != MAPTYPE_ROM && cfg->map_type[i] != MAPTYPE_RAM_WTC)
+        continue;
       if (cfg->map_mirror[i] != ((unsigned int)-1) &&
           CHKRANGE(addr, cfg->map_mirror[i], cfg->map_size[i])) {
         read_addr = cfg->map_data[i] + ((addr - cfg->map_mirror[i]) % cfg->rom_size[i]);
         goto read_value;
       }
     }
+  }
+
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE)
+      continue;
     if (CHKRANGE_ABS(addr, cfg->map_offset[i], cfg->map_high[i])) {
       switch (cfg->map_type[i]) {
       case MAPTYPE_ROM:
@@ -98,17 +107,26 @@ int handle_mapped_write(struct emulator_config* cfg, unsigned int addr, unsigned
   int res = -1;
   unsigned char* write_addr = NULL;
 
-  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
-    if (cfg->map_type[i] == MAPTYPE_NONE)
-      continue;
-    else if (ovl && cfg->map_type[i] == MAPTYPE_RAM_WTC) {
+  // OVL write-through remap must win over base mappings.
+  if (ovl) {
+    for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+      if (cfg->map_type[i] == MAPTYPE_NONE)
+        continue;
+      if (cfg->map_type[i] != MAPTYPE_RAM_WTC)
+        continue;
       if (cfg->map_mirror[i] != ((unsigned int)-1) &&
           CHKRANGE(addr, cfg->map_mirror[i], cfg->map_size[i])) {
         write_addr = cfg->map_data[i] + ((addr - cfg->map_mirror[i]) % cfg->rom_size[i]);
         res = -1;
         goto write_value;
       }
-    } else if (CHKRANGE_ABS(addr, cfg->map_offset[i], cfg->map_high[i])) {
+    }
+  }
+
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE)
+      continue;
+    if (CHKRANGE_ABS(addr, cfg->map_offset[i], cfg->map_high[i])) {
       switch (cfg->map_type[i]) {
       case MAPTYPE_ROM:
         LOG_ERROR("[MMAP] WRITE refused: ROM region addr=$%.8X map=%d range=$%.8lX-$%.8lX id=%s\n",

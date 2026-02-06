@@ -96,6 +96,9 @@ int read_reset_last=1;
 extern "C" void cpu_emulator_reset_core0(void);
 extern "C" void reset_autoconfig(void);
 extern int ovl;
+#ifdef USE_UAE_JIT
+extern "C" unsigned int read_long(unsigned int address);
+#endif
 void fill_prefetch_quick (void);
 void custom_reset_cpu(bool hardreset, bool keyboardreset);
 #ifdef JIT
@@ -899,6 +902,12 @@ void build_cpufunctbl (void)
       mode = 1;
       m68k_pc_indirect = 0;
    }
+#ifdef USE_UAE_JIT
+   if (currprefs.cachesize) {
+      // PiStorm JIT backend routes opcode/data fetches via custom addrbank handlers.
+      m68k_pc_indirect = 1;
+   }
+#endif
    printf("[Core1] Emulation mode %d m68k_pc_indirect %d\n",mode,m68k_pc_indirect);
    lvl = (currprefs.cpu_model - 68000) / 10;
    if (lvl >= 5)
@@ -2153,9 +2162,33 @@ void m68k_reset_newcpu(bool hardreset)
    }
 #endif
    regs.s = 1;
+   // Ensure ROM overlay is active when fetching reset vectors.
+   ovl = 1;
+#ifdef USE_UAE_JIT
+   // In PiStorm JIT mode, route reset vectors through bridge/mapped memory.
+   v = (uae_u32)read_long(4);
+#else
    v = get_long (4);
+#endif
+#ifdef USE_UAE_JIT
+   if (v == 0 || v == 0xFFFFFFFF) {
+      // Bridge fallback: if overlay fetch fails, use Kickstart base directly.
+      v = (uae_u32)read_long(0x00F80004);
+   }
+#endif
    printf("Read PC from address 4 : 0x%08X\n",v);
-   m68k_areg (regs, 7) = get_long (0);
+   uae_u32 ssp = 0;
+#ifdef USE_UAE_JIT
+   ssp = (uae_u32)read_long(0);
+#else
+   ssp = get_long(0);
+#endif
+#ifdef USE_UAE_JIT
+   if (ssp == 0 || ssp == 0xFFFFFFFF) {
+      ssp = (uae_u32)read_long(0x00F80000);
+   }
+#endif
+   m68k_areg(regs, 7) = ssp;
 
    m68k_setpc_normal(v);
    regs.m = 0;

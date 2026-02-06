@@ -71,3 +71,18 @@ If still 0, the overlay is still not forced early enough and must be applied bef
 2. If PC still drops to 0, move overlay forcing earlier (or patch UAE get_long to check `ovl`/ROM mirror).
 3. Once reset vectors are stable, re-enable devices incrementally (Z2/Z3, RTG, PISCSI, A314).
 
+### Current observed runtime (latest)
+- JIT init succeeds:
+  - valid reset vectors (`PC=00F800D2`)
+  - `m68k_pc_indirect=1`
+  - translation cache allocated (32 MB)
+- Runtime still reaches `OVL:0` after startup and does not yet reach stable
+  Workbench boot in JIT mode.
+- Z2 autoconfig WORD probes can generate high warning volume under JIT.
+
+### Pause/resume point
+- Use `docs/wiki/UAE-JIT-Status.md` as the primary session handoff.
+- Start each new session with:
+  1. `make USE_UAE_JIT=1 uae-jit`
+  2. `PISTORM_ENABLE_QUEUE=0 ./emulator --jit`
+  3. only then re-add devices/features incrementally.

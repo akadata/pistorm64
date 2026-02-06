@@ -6,6 +6,12 @@
 #include "memory.h"
 #include "newcpu.h"
 #include "machdep/maccess.h"
+#include "../config_file/config_file.h"
+#include "../memory_mapped.h"
+#include <endian.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 extern "C" {
 unsigned int read_long(unsigned int address);
@@ -15,6 +21,9 @@ void m68k_write_memory_8(unsigned int address, unsigned int value);
 void m68k_write_memory_16(unsigned int address, unsigned int value);
 void m68k_write_memory_32(unsigned int address, unsigned int value);
 }
+
+extern struct emulator_config* cfg;
+extern int ovl;
 
 // Minimal dummy bank to satisfy references from UAE core.
 static uae_u32 REGPARAM2 dummy_lget(uaecptr) { return 0; }
@@ -48,29 +57,146 @@ addrbank dmmy_bank = {
 // Provide thread_mem_banks for non-threaded builds (newcpu expects it).
 addrbank* thread_mem_banks[MEMORY_BANKS];
 
+static int g_mem_trace = -1;
+static int g_mem_trace_budget = 128;
+
+static inline bool mem_trace_enabled(void) {
+  if (g_mem_trace == -1) {
+    const char* e = getenv("PISTORM_UAE_MEM_TRACE");
+    g_mem_trace = (e && atoi(e) != 0) ? 1 : 0;
+  }
+  return g_mem_trace != 0;
+}
+
+static inline bool ptr_is_emu_addr(const void* p) {
+  uintptr_t u = (uintptr_t)p;
+  return u <= 0xFFFFFFFFu;
+}
+
+// Keep low memory on the real Amiga bus. Only allow read-only overlay-at-0 fetches during reset.
+static inline bool uae_stub_allow_mapped_access(unsigned int addr, bool is_write) {
+  if (addr < 0x00200000) {
+    return (!is_write && ovl);
+  }
+  return true;
+}
+
+static inline void trace_mem(const char* op, uintptr_t raw, uae_u32 val, const char* mode) {
+  if (!mem_trace_enabled() || g_mem_trace_budget <= 0) {
+    return;
+  }
+  g_mem_trace_budget--;
+  printf("[UAE-MEM] %s %s raw=%016lX val=%08X\n", op, mode, (unsigned long)raw,
+         (unsigned int)val);
+}
+
 // CPU indirect memory helpers used by UAE.
 uae_u32 do_get_mem_long(uae_u32* a) {
-  return (uae_u32)read_long((unsigned int)a);
+  if (ptr_is_emu_addr(a)) {
+    unsigned int addr = (unsigned int)(uintptr_t)a;
+    unsigned int val = 0;
+    if (cfg && uae_stub_allow_mapped_access(addr, false) &&
+        handle_mapped_read(cfg, addr, &val, OP_TYPE_LONGWORD) != -1) {
+      trace_mem("R32", (uintptr_t)a, (uae_u32)val, "addr-map");
+      return (uae_u32)val;
+    }
+    uae_u32 v = (uae_u32)read_long(addr);
+    trace_mem("R32", (uintptr_t)a, v, "addr-bus");
+    return v;
+  }
+  uae_u32 tmp;
+  memcpy(&tmp, a, sizeof(tmp));
+  uae_u32 v = be32toh(tmp);
+  trace_mem("R32", (uintptr_t)a, v, "ptr");
+  return v;
 }
 
 uint16_t do_get_mem_word(uint16_t* a) {
-  return (uint16_t)read_word((unsigned int)a);
+  if (ptr_is_emu_addr(a)) {
+    unsigned int addr = (unsigned int)(uintptr_t)a;
+    unsigned int val = 0;
+    if (cfg && uae_stub_allow_mapped_access(addr, false) &&
+        handle_mapped_read(cfg, addr, &val, OP_TYPE_WORD) != -1) {
+      trace_mem("R16", (uintptr_t)a, (uae_u32)(val & 0xFFFF), "addr-map");
+      return (uint16_t)val;
+    }
+    uint16_t v = (uint16_t)read_word(addr);
+    trace_mem("R16", (uintptr_t)a, (uae_u32)v, "addr-bus");
+    return v;
+  }
+  uint16_t tmp;
+  memcpy(&tmp, a, sizeof(tmp));
+  uint16_t v = be16toh(tmp);
+  trace_mem("R16", (uintptr_t)a, (uae_u32)v, "ptr");
+  return v;
 }
 
 uint8_t do_get_mem_byte(uint8_t* a) {
-  return (uint8_t)read_byte((unsigned int)a);
+  if (ptr_is_emu_addr(a)) {
+    unsigned int addr = (unsigned int)(uintptr_t)a;
+    unsigned int val = 0;
+    if (cfg && uae_stub_allow_mapped_access(addr, false) &&
+        handle_mapped_read(cfg, addr, &val, OP_TYPE_BYTE) != -1) {
+      trace_mem("R08", (uintptr_t)a, (uae_u32)(val & 0xFF), "addr-map");
+      return (uint8_t)val;
+    }
+    uint8_t v = (uint8_t)read_byte(addr);
+    trace_mem("R08", (uintptr_t)a, (uae_u32)v, "addr-bus");
+    return v;
+  }
+  uint8_t v = *a;
+  trace_mem("R08", (uintptr_t)a, (uae_u32)v, "ptr");
+  return v;
 }
 
 void do_put_mem_long(uae_u32* a, uae_u32 v) {
-  m68k_write_memory_32((unsigned int)a, (unsigned int)v);
+  if (ptr_is_emu_addr(a)) {
+    unsigned int addr = (unsigned int)(uintptr_t)a;
+    if (!cfg || !uae_stub_allow_mapped_access(addr, true) ||
+        handle_mapped_write(cfg, addr, (unsigned int)v, OP_TYPE_LONGWORD) == -1) {
+      m68k_write_memory_32(addr, (unsigned int)v);
+      trace_mem("W32", (uintptr_t)a, v, "addr-bus");
+    } else {
+      trace_mem("W32", (uintptr_t)a, v, "addr-map");
+    }
+    return;
+  }
+  uae_u32 tmp = htobe32(v);
+  memcpy(a, &tmp, sizeof(tmp));
+  trace_mem("W32", (uintptr_t)a, v, "ptr");
 }
 
 void do_put_mem_word(uint16_t* a, uint16_t v) {
-  m68k_write_memory_16((unsigned int)a, (unsigned int)v);
+  if (ptr_is_emu_addr(a)) {
+    unsigned int addr = (unsigned int)(uintptr_t)a;
+    if (!cfg || !uae_stub_allow_mapped_access(addr, true) ||
+        handle_mapped_write(cfg, addr, (unsigned int)v, OP_TYPE_WORD) == -1) {
+      m68k_write_memory_16(addr, (unsigned int)v);
+      trace_mem("W16", (uintptr_t)a, (uae_u32)v, "addr-bus");
+    } else {
+      trace_mem("W16", (uintptr_t)a, (uae_u32)v, "addr-map");
+    }
+    return;
+  }
+  uint16_t tmp = htobe16(v);
+  memcpy(a, &tmp, sizeof(tmp));
+  trace_mem("W16", (uintptr_t)a, (uae_u32)v, "ptr");
 }
 
 void do_put_mem_byte(uint8_t* a, uint8_t v) {
-  m68k_write_memory_8((unsigned int)a, (unsigned int)v);
+  if (ptr_is_emu_addr(a)) {
+    unsigned int addr = (unsigned int)(uintptr_t)a;
+    if (!cfg || !uae_stub_allow_mapped_access(addr, true) ||
+        handle_mapped_write(cfg, addr, (unsigned int)v, OP_TYPE_BYTE) == -1) {
+      m68k_write_memory_8(addr, (unsigned int)v);
+      trace_mem("W08", (uintptr_t)a, (uae_u32)v, "addr-bus");
+    } else {
+      trace_mem("W08", (uintptr_t)a, (uae_u32)v, "addr-map");
+    }
+    return;
+  }
+  *a = v;
+  trace_mem("W08", (uintptr_t)a, (uae_u32)v, "ptr");
 }
 
 // FPU stubs for now (JIT backend without 68k FPU emulation enabled).

@@ -9,6 +9,28 @@
 
 - Check for ROM write attempts or DMA into unmapped regions.
 
+## UAE JIT bring-up stuck after init
+
+- Current state and handoff checklist:
+  - `UAE-JIT-Status.md`
+- Build only the JIT integration target:
+```
+make USE_UAE_JIT=1 uae-jit
+```
+- Run minimal JIT test:
+```
+PISTORM_ENABLE_QUEUE=0 ./emulator --jit
+```
+- If needed, enable bridge trace:
+```
+PISTORM_UAE_JIT_TRACE=1 PISTORM_ENABLE_QUEUE=0 ./emulator --jit
+```
+- If build/link state looks stale:
+```
+make clean
+make USE_UAE_JIT=1 uae-jit
+```
+
 ## No A314 services
 
 - Verify env vars (`PISTORM_ROOT`, `PISTORM_A314`, `PISTORM_DATA`, `A314_SHARED`).

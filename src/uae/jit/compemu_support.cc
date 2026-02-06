@@ -158,53 +158,35 @@ blockinfo* active;
 blockinfo* dormant;
 
 #if !defined (WIN32) || !defined(ANDROID)
-//#include <sys/mman.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 static void cache_free (uae_u8 *cache, int size)
 {
-//  munmap(cache, size);
-   if (cache)
+   if (!cache)
+      return;
+   // JIT cache is mmap()ed on Linux/Unix; fall back to free() if needed.
+   if (munmap(cache, size) != 0)
       free((void *)cache);
-}
-int getpagesize(void)
-{
-   return(1024*1024);
 }
 
 static uae_u8 *cache_alloc (int size)
 {
-   /*
-  size = size < getpagesize() ? getpagesize() : size;
-// Mac OS sets MAP_FAILED if things fail so we need to check for that error code on Mac OS
-// In addition, the only way we get to have both WRITE and EXEC on the same process is by enabling MAP_JIT and there are further limitations as to how we can use that
-// Mainly that we're not allowed to have both WRITE and EXEC active at the same time, we need to call pthread_jit_write_protect with true/false to either enable WRITE
-// or Exec (but never both at the same time)
-#ifdef __MACH__
-  void *cache = mmap(0, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_JIT | MAP_PRIVATE | MAP_ANON, -1, 0);
-  if (cache == MAP_FAILED) {
-#else
-  void *cache = mmap(0, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0);
-  if (!cache) {
-#endif
-    printf ("Cache_Alloc of %d failed. ERR=%d\n", size, errno);
-  } else {
-#ifdef __MACH__
-  // Disable write protect on the JIT before we memset it on OS X, this would work on x86-64 Mac OS x as well, but is a no-op
-  pthread_jit_write_protect_np(false);
-#endif
-    memset(cache, 0, size);
-  }
-  return (uae_u8 *) cache;
-    */
-   size = size < getpagesize() ? getpagesize() : size;
-   void *cache = malloc(size);
-   if (!cache) {
+   long page = sysconf(_SC_PAGESIZE);
+   if (page <= 0)
+      page = 4096;
+   size = size < page ? (int)page : size;
+
+   void *cache = mmap(NULL, size, PROT_READ | PROT_WRITE | PROT_EXEC,
+                      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+   if (cache == MAP_FAILED) {
       printf ("Cache_Alloc of %d failed. ERR=%d\n", size, errno);
-   } else {
-      memset(cache, 0, size);
-      printf ("Cache_Alloc of %d at %p.\n", size, cache);
+      return NULL;
    }
-   return (uae_u8 *) cache;
+
+   memset(cache, 0, size);
+   printf ("Cache_Alloc of %d at %p.\n", size, cache);
+   return (uae_u8 *)cache;
 }
 
 #endif
@@ -1913,41 +1895,12 @@ static void calc_checksum(blockinfo* bi, uae_u32* c1, uae_u32* c2)
       pos = (uae_u32*)tmp;
 
       if (len >= 0 && len <= MAX_CHECKSUM_LEN) {
-         if(get_mem_bank(pos).baseaddr_direct_r!=0 &&
-               get_mem_bank(pos+len).baseaddr_direct_r!=0)
-         {
-            while (len > 0) {
-               k1 += *pos;
-               k2 ^= *pos;
-               pos++;
-               len -= 4;
-            }
-         }
-         else
-         {
-            if((int)(((uaecptr)pos)>>16) == (int)(((uaecptr)pos+len)>>16))
-            {
-               addrbank ab=get_mem_bank(pos);
-               while (len > 0) {
-                  uint32_t data=call_mem_get_func(ab.lget, (uae_u32)pos);
-                  k1 += data;
-                  k2 ^= data;
-                  pos++;
-                  len -= 4;
-               }
-            }
-            else
-            {
-               //               printf("Checksum Xbanking ab = 0x%04X ab2 = 0x%04X\n",(int)(((uaecptr)pos)>>16),(int)(((uaecptr)pos+len)>>16));
-               while (len > 0) {
-                  addrbank ab=get_mem_bank(pos);
-                  uint32_t data=call_mem_get_func(ab.lget, (uae_u32)pos);
-                  k1 += data;
-                  k2 ^= data;
-                  pos++;
-                  len -= 4;
-               }
-            }
+         while (len > 0) {
+            uae_u32 data = do_get_mem_long(pos);
+            k1 += data;
+            k2 ^= data;
+            pos++;
+            len -= 4;
          }
       }
       csi = csi->next;
@@ -2451,7 +2404,7 @@ STATIC_INLINE unsigned int get_opcode_cft_map(unsigned int f)
    return ((f >> 8) & 255) | ((f & 255) << 8);
 }
 //#define DO_GET_OPCODE(a) (get_opcode_cft_map((uae_u16)*(a)))
-#define DO_GET_OPCODE(a) (memory_get_word((uint32_t)a))
+#define DO_GET_OPCODE(a) (do_get_mem_word((uae_u16*)(a)))
 
 void compile_block(cpu_history* pc_hist, int blocklen, int totcycles)
 {
