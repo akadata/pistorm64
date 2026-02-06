@@ -68,10 +68,36 @@ static inline bool uae_jit_invalid_addr(uaecptr addr) {
 // Do not let JIT consume host-side low-memory maps (chip/custom space):
 // those addresses belong to the real Amiga bus. Reset vectors are handled
 // explicitly in read_long/read_word/read_byte.
-static inline bool uae_jit_allow_mapped_access(uaecptr addr, bool is_write) {
-  (void)is_write;
-  if (addr < 0x00200000) {
+static inline bool uae_jit_has_lowmem_map(uaecptr addr, bool is_write) {
+  if (!cfg) {
     return false;
+  }
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE) {
+      continue;
+    }
+    if (ovl && cfg->map_mirror[i] != ((unsigned int)-1) &&
+        addr >= cfg->map_mirror[i] &&
+        addr < (cfg->map_mirror[i] + cfg->map_size[i])) {
+      if (!is_write) {
+        return cfg->map_type[i] == MAPTYPE_ROM || cfg->map_type[i] == MAPTYPE_RAM_WTC;
+      }
+      return cfg->map_type[i] == MAPTYPE_RAM_WTC;
+    }
+    if (addr >= cfg->map_offset[i] && addr < cfg->map_high[i]) {
+      if (cfg->map_type[i] == MAPTYPE_ROM) {
+        return !is_write;
+      }
+      return cfg->map_type[i] == MAPTYPE_RAM || cfg->map_type[i] == MAPTYPE_RAM_WTC ||
+             cfg->map_type[i] == MAPTYPE_RAM_NOALLOC;
+    }
+  }
+  return false;
+}
+
+static inline bool uae_jit_allow_mapped_access(uaecptr addr, bool is_write) {
+  if (addr < 0x00200000) {
+    return uae_jit_has_lowmem_map(addr, is_write);
   }
   return true;
 }

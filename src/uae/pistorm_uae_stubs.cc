@@ -74,9 +74,36 @@ static inline bool ptr_is_emu_addr(const void* p) {
 }
 
 // Keep low memory on the real Amiga bus. Only allow read-only overlay-at-0 fetches during reset.
+static inline bool uae_stub_has_lowmem_map(unsigned int addr, bool is_write) {
+  if (!cfg) {
+    return false;
+  }
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE) {
+      continue;
+    }
+    if (ovl && cfg->map_mirror[i] != ((unsigned int)-1) &&
+        addr >= cfg->map_mirror[i] &&
+        addr < (cfg->map_mirror[i] + cfg->map_size[i])) {
+      if (!is_write) {
+        return cfg->map_type[i] == MAPTYPE_ROM || cfg->map_type[i] == MAPTYPE_RAM_WTC;
+      }
+      return cfg->map_type[i] == MAPTYPE_RAM_WTC;
+    }
+    if (addr >= cfg->map_offset[i] && addr < cfg->map_high[i]) {
+      if (cfg->map_type[i] == MAPTYPE_ROM) {
+        return !is_write;
+      }
+      return cfg->map_type[i] == MAPTYPE_RAM || cfg->map_type[i] == MAPTYPE_RAM_WTC ||
+             cfg->map_type[i] == MAPTYPE_RAM_NOALLOC;
+    }
+  }
+  return false;
+}
+
 static inline bool uae_stub_allow_mapped_access(unsigned int addr, bool is_write) {
   if (addr < 0x00200000) {
-    return (!is_write && ovl);
+    return uae_stub_has_lowmem_map(addr, is_write);
   }
   return true;
 }
