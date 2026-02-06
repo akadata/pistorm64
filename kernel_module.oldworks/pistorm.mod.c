@@ -38,7 +38,6 @@ __used __section("__versions") = {
 	{ 0x66ae298a, "misc_register" },
 	{ 0x15ba50a6, "jiffies" },
 	{ 0x3213f038, "mutex_unlock" },
-	{ 0xdc78f59a, "param_ops_bool" },
 	{ 0xeae3dfd6, "__const_udelay" },
 	{ 0x5cb09293, "__kmalloc_cache_noprof" },
 	{ 0x12a4e128, "__arch_copy_from_user" },
@@ -51,4 +50,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "90B7DC041100C86FE68D754");
+MODULE_INFO(srcversion, "71F562AC8F62805E37C3109");

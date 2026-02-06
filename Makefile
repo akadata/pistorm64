@@ -35,9 +35,9 @@ CXX := g++
 endif
 
 
-EXTRA_CFLAGS ?= -g -O0
-EXTRA_M68K_CFLAGS ?= -g -O0
-EXTRA_LDFLAGS ?= -g -O0
+#EXTRA_CFLAGS ?= -g -O0
+#EXTRA_M68K_CFLAGS ?= -g -O0
+#EXTRA_LDFLAGS ?= -g -O0
 
 
 # Tunables: edit here instead of hunting through rule bodies.
@@ -83,7 +83,7 @@ endif
 EMU_WARNINGS  ?= $(WARNINGS) $(EMU_WARNINGS_EXTRA)
 
 ifeq ($(findstring clang,$(CC)),)
-OPT_LEVEL_DEFAULT ?= -Ofast -ffast-math
+OPT_LEVEL_DEFAULT ?= -O3 -ffast-math
 else
 OPT_LEVEL_DEFAULT ?= -O3 -ffast-math
 endif
@@ -95,7 +95,7 @@ OPT_LEVEL := -O$(O)
 endif
 
 # Set USE_GOLD=1 to link with gold if available.
-USE_GOLD   ?= 0
+USE_GOLD   ?= 1
 
 include config.mk
 
@@ -105,12 +105,12 @@ USE_RAYLIB ?= 1
 USE_ALSA   ?= 1
 
 # Toggle PMMU emulation (68030/040). Default on; disable with USE_PMMU=0 if needed.
-USE_PMMU   ?= 0
+USE_PMMU   ?= 1
 
 # Optional: build UAE/JIT objects (AArch64 JIT backend from Amiberry).
 # This does not replace Musashi in the main emulator yet; it builds a standalone
 # libuae.a for bring-up and integration work.
-USE_UAE_JIT ?= 0
+USE_UAE_JIT ?= 1
 
 # Force FPU on EC/020/EC040/LC040 for 68881/68882 emulation (optional).
 USE_EC_FPU ?= 0
@@ -119,9 +119,9 @@ ARCH_FEATURES ?=
 # Toggle Pi host (/opt/vc) support for dev tools.
 USE_VC     ?= 0
 # Perf toggles
-USE_LTO    ?= 0
-USE_NO_PLT ?= 0 
-OMIT_FP    ?= 0
+USE_LTO    ?= 1
+USE_NO_PLT ?= 1 
+OMIT_FP    ?= 1
 USE_PIPE   ?= 1
 
 # Quiet noisy-but-benign warnings from the generated 68k core.
