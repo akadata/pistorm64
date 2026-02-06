@@ -10,6 +10,7 @@
 #include "pistorm-dev-enums.h"
 #include "platforms/platforms.h"
 #include "gpio/ps_protocol.h"
+#include "log.h"
 //#include "platforms/amiga/rtg/rtg.h"
 #include "platforms/atari/piscsi/piscsi.h"
 //#include "platforms/amiga/net/pi-net.h"
@@ -23,7 +24,7 @@
 #define DEBUG_PISTORM_DEVICE
 
 #ifdef DEBUG_PISTORM_DEVICE
-#define DEBUG printf
+#define DEBUG LOG_DEBUG
 
 static const char *op_type_names[4] = {
     "BYTE",

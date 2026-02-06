@@ -18,6 +18,7 @@ OOMScoreAdjust=-1000
 Environment=PISTORM_ROOT=/opt/pistorm64
 Environment=PISTORM_A314=/opt/pistorm64/a314
 Environment=PISTORM_DATA=/opt/pistorm64/data
+Environment=PISTORM_SYSLOG=1
 Environment=A314_SHARED=/opt/pistorm64/data/a314-shared
 Environment=A314_CONF=/opt/pistorm64/a314/a314d.conf
 Environment=A314_FS_CONF=/opt/pistorm64/a314/a314fs.conf

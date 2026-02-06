@@ -19,6 +19,7 @@
 #include "pistorm-dev/pistorm-dev-enums.h"
 #include "pistorm-dev/pistorm-dev.h"
 #include "platforms/platforms.h"
+#include "log.h"
 //#include "platforms/shared/rtc.h"
 //#include "rtg/rtg.h"
 //#include "a314/a314.h"
@@ -26,13 +27,13 @@
 
 #define DEBUGPRINT 0
 #if DEBUGPRINT
-#define DEBUG_PRINTF(fmt, ...) fprintf(stderr, fmt, ##__VA_ARGS__)
+#define DEBUG_PRINTF(...) LOG_DEBUG(__VA_ARGS__)
 #else
-#define DEBUG_PRINTF(fmt, ...) ;
+#define DEBUG_PRINTF(...) do { } while (0)
 #endif
 
 #ifdef DEBUG_ATARI_PLATFORM
-#define DEBUG printf
+#define DEBUG LOG_DEBUG
 #else
 #define DEBUG(...)
 #endif
