@@ -39,13 +39,15 @@ set_time_format -unit ns -decimal_places 3
 # Create Clock
 #**************************************************************
 
-# PI_CLK (GPIO4 GPCLK0) default is 100 MHz. Adjust if you change GPCLK.
-# 100 MHz -> 10.000 ns, 125 MHz -> 8.000 ns, 200 MHz -> 5.000 ns
-create_clock -name {PI_CLK} -period 10.000 [get_ports {PI_CLK}]
+create_clock -name {PI_CLK} -period 5.000 [get_ports {PI_CLK}]
+
+# These are *observed* clocks/phase references from the Amiga side.
+# They are not phase-related to PI_CLK.
 create_clock -name {M68K_CLK} -period 141.000 [get_ports {M68K_CLK}]
-create_clock -name {M68K_C1} -period 282.000 [get_ports {M68K_C1}]
-create_clock -name {M68K_C3} -period 282.000 [get_ports {M68K_C3}]
-# c7m_sync[2] is logic-derived; avoid treating it as a separate clock domain.
+create_clock -name {M68K_C1}  -period 282.000 [get_ports {M68K_C1}]
+create_clock -name {M68K_C3}  -period 282.000 [get_ports {M68K_C3}]
+
+# c7m_sync[2] is logic-derived from sampling Amiga clocks; keep it out of clock-domain analysis.
 set_false_path -to [get_registers *c7m_sync[2]*]
 
 #**************************************************************
@@ -81,6 +83,9 @@ set_false_path -to [get_registers *c7m_sync[2]*]
 #**************************************************************
 # Set Clock Groups
 #**************************************************************
+set_clock_groups -asynchronous \
+  -group [get_clocks {PI_CLK}] \
+  -group [get_clocks {M68K_CLK M68K_C1 M68K_C3}]
 
 
 

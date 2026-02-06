@@ -55,7 +55,6 @@ module pistorm(
 
   wire c200m = PI_CLK;
   reg [2:0] c7m_sync;
-  wire c7m = c7m_sync[2];
   wire c1c3_clk = !(M68K_C1 ^ M68K_C3);
 
   localparam REG_DATA = 2'd0;
@@ -167,18 +166,19 @@ module pistorm(
 
   reg [3:0] e_counter = 4'd0;
 
-  always @(negedge c7m) begin
-    if (e_counter == 4'd9)
-      e_counter <= 4'd0;
-    else
-      e_counter <= e_counter + 4'd1;
-  end
+  // Keep all sequential logic in the PI clock domain and use a strobe.
+  always @(posedge c200m) begin
+    if (c7m_falling) begin
+      if (e_counter == 4'd9)
+        e_counter <= 4'd0;
+      else
+        e_counter <= e_counter + 4'd1;
 
-  always @(negedge c7m) begin
-    if (e_counter == 4'd9)
-      M68K_E <= 1'b0;
-    else if (e_counter == 4'd5)
-      M68K_E <= 1'b1;
+      if (e_counter == 4'd9)
+        M68K_E <= 1'b0;
+      else if (e_counter == 4'd5)
+        M68K_E <= 1'b1;
+    end
   end
 
   reg [2:0] state = 3'd0;
