@@ -7,6 +7,10 @@ regtool
 *.d
 *.a
 
+# Allow modprobe.d configs (directory name ends in .d)
+!etc/modprobe.d/
+!etc/modprobe.d/*.conf
+
 # Generated files
 m68kops.c
 m68kops.h

@@ -164,6 +164,10 @@ AMIGA_AHI_INC ?= $(AMIGA_TOOLCHAIN)/src/m68k-amigaos-gcc/build-Linux-m68k-amigao
 AMIGA_HEADERS ?= $(CURDIR)/src/platforms/amiga/headers/include
 AMIGA_SUBMAKE = $(MAKE) AMIGA_TOOLCHAIN=$(AMIGA_TOOLCHAIN) VBCC=$(AMIGA_VBCC) P96DEV=$(AMIGA_P96DEV) AHI_INC=$(AMIGA_AHI_INC) AMIGA_HEADERS=$(AMIGA_HEADERS)
 
+PISTORM_GPCLK_SRC ?= 6
+PISTORM_GPCLK_DIV ?= 6
+PISTORM_KMOD_PARAMS ?= run_batch_enable=0 berr_reset_input=0 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
+
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
 
 
@@ -438,6 +442,7 @@ INSTALL_BINS := $(TARGET) buptest pistorm_truth_test #
 UDEV_RULES := etc/udev/99-pistorm.rules
 LIMITS_CONF := etc/security/limits.d/pistorm-rt.conf
 MODULES_LOAD := etc/modules-load.d/pistorm.conf
+MODPROBE_CONF := etc/modprobe.d/pistorm.conf
 HELP_TARGETS = \
 	"make"                             "Build emulator (kmod backend default)" \
 	"make PISTORM_KMOD=0"             "Build emulator with legacy userspace GPIO" \
@@ -473,7 +478,10 @@ DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%
 all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test 
 
 clean:
-	rm -f $(DELETEFILES)
+	rm -f $(DELETEFILES) $(TARGET).tmp
+	$(MAKE) kernel_clean
+	rm -rf kernel_module/.tmp_versions
+	find . \( -name '*.o' -o -name '*.tmp' \) -print0 | xargs -0 -r rm -f --
 
 # Ensure generated m68k files are built before other files that depend on them
 # Link is atomic: write to $@.tmp then move into place on success.
@@ -586,6 +594,10 @@ install: all
 		$(INSTALL) -d /etc/modules-load.d; \
 		$(INSTALL) -m 644 $(MODULES_LOAD) /etc/modules-load.d/pistorm.conf; \
 	fi
+	if [ -f $(MODPROBE_CONF) ]; then \
+		$(INSTALL) -d /etc/modprobe.d; \
+		$(INSTALL) -m 644 $(MODPROBE_CONF) /etc/modprobe.d/pistorm.conf; \
+	fi
 
 uninstall:
 	rm -rf $(INSTALL_DIR)
@@ -665,10 +677,11 @@ full:
 	-pkill -x emulator 2>/dev/null || true
 	-sudo rmmod pistorm 2>/dev/null || true
 	$(MAKE) clean
-	$(MAKE) PISTORM_KMOD=$(PISTORM_KMOD)
+	$(MAKE) USE_UAE_JIT=1 uae-jit
+	$(MAKE) USE_UAE_JIT=1 PISTORM_KMOD=$(PISTORM_KMOD)
 	$(MAKE) kernel_module
 	sudo $(MAKE) kernel_install
-	sudo $(MAKE) PISTORM_KMOD=$(PISTORM_KMOD) install
+	sudo $(MAKE) USE_UAE_JIT=1 PISTORM_KMOD=$(PISTORM_KMOD) install
 	# Copy boot configuration files
 	#sudo cp -f boot/firmware/config.txt /boot/firmware/config.txt
 	#sudo cp -f boot/firmware/cmdline.txt /boot/firmware/cmdline.txt
@@ -676,6 +689,7 @@ full:
 	#sudo cp -f 10-hugepages.conf /etc/sysctl.d/10-hugepages.conf
 	sudo cp -f etc/modules-load.d/pistorm.conf /etc/modules-load.d/pistorm.conf
 	sudo cp -f etc/modules-load.d/z3bus.conf /etc/modules-load.d/z3bus.conf	
+	sudo cp -f $(MODPROBE_CONF) /etc/modprobe.d/pistorm.conf
 	sudo cp -f etc/security/limits.d/pistorm-rt.conf /etc/security/limits.d/pistorm-rt.conf
 	sudo cp -f etc/udev/99-pistorm.rules /etc/udev/rules.d/99-pistorm.rules
 	sudo cp -f etc/systemd/system/kernelpistorm64.service /etc/systemd/system/kernelpistorm64.service
@@ -687,8 +701,8 @@ full:
 	# Enable and start the emulator service
 	sudo systemctl enable kernelpistorm64.service
 	echo "Loading Kernel PiStorm64"
-#	sudo modprobe pistorm run_batch_enable=1 berr_reset_input=1 2>/dev/null || true
-	sudo modprobe pistorm run_batch_enable=0 berr_reset_input=0 2>/dev/null || true
+#	sudo modprobe pistorm run_batch_enable=1 berr_reset_input=1 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV) 2>/dev/null || true
+	sudo modprobe pistorm $(PISTORM_KMOD_PARAMS) 2>/dev/null || true
 
 help:
 	@printf "Available targets:\n"
