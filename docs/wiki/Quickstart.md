@@ -1,13 +1,13 @@
 # Quickstart
 
-This assumes a Pi 4/5 with the kernel module installed and `/dev/pistorm` present.
+This assumes a Pi 4 with the kernel module installed and `/dev/pistorm` present.
 
 1) Build
 ```
 make
 ```
 
-2) Run with default config
+2) Run with default config (Musashi, non-JIT)
 ```
 ./emulator
 ```
@@ -17,7 +17,13 @@ make
 ./emulator --config amiga.cfg
 ```
 
-4) Kernel module (if needed)
+4) Optional: UAE JIT (experimental)
+```
+make USE_UAE_JIT=1 uae-jit
+PISTORM_ENABLE_QUEUE=0 ./emulator --jit
+```
+
+5) Kernel module (if needed)
 ```
 make kernel_module
 make kernel_install
