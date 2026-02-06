@@ -1,5 +1,5 @@
 Analysis & Synthesis report for pistorm_fc
-Fri Feb  6 02:21:16 2026
+Fri Feb  6 02:54:52 2026
 Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
 
 
@@ -45,7 +45,7 @@ on the Quartus Prime software download page.
 +-------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                  ;
 +-----------------------------+-------------------------------------------------+
-; Analysis & Synthesis Status ; Successful - Fri Feb  6 02:21:16 2026           ;
+; Analysis & Synthesis Status ; Successful - Fri Feb  6 02:54:52 2026           ;
 ; Quartus Prime Version       ; 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
 ; Revision Name               ; pistorm_fc                                      ;
 ; Top-level Entity Name       ; pistorm                                         ;
@@ -165,8 +165,8 @@ on the Quartus Prime software download page.
 ;     -- Combinational with a register        ; 39     ;
 ;                                             ;        ;
 ; Logic element usage by number of LUT inputs ;        ;
-;     -- 4 input functions                    ; 36     ;
-;     -- 3 input functions                    ; 19     ;
+;     -- 4 input functions                    ; 37     ;
+;     -- 3 input functions                    ; 18     ;
 ;     -- 2 input functions                    ; 8      ;
 ;     -- 1 input functions                    ; 9      ;
 ;     -- 0 input functions                    ; 0      ;
@@ -182,9 +182,9 @@ on the Quartus Prime software download page.
 ; Total registers                             ; 54     ;
 ; I/O pins                                    ; 59     ;
 ; Maximum fan-out node                        ; PI_CLK ;
-; Maximum fan-out                             ; 49     ;
-; Total fan-out                               ; 366    ;
-; Average fan-out                             ; 2.51   ;
+; Maximum fan-out                             ; 54     ;
+; Total fan-out                               ; 371    ;
+; Average fan-out                             ; 2.54   ;
 +---------------------------------------------+--------+
 
 
@@ -240,7 +240,7 @@ Encoding Type:  One-Hot
 ; Number of registers using Synchronous Load   ; 0     ;
 ; Number of registers using Asynchronous Clear ; 0     ;
 ; Number of registers using Asynchronous Load  ; 0     ;
-; Number of registers using Clock Enable       ; 22    ;
+; Number of registers using Clock Enable       ; 26    ;
 ; Number of registers using Preset             ; 0     ;
 +----------------------------------------------+-------+
 
@@ -253,7 +253,7 @@ Encoding Type:  One-Hot
 ; status[1]                               ; 4       ;
 ; pi_berr                                 ; 2       ;
 ; M68K_RW~reg0                            ; 2       ;
-; M68K_VMA_n~reg0                         ; 4       ;
+; M68K_VMA_n~reg0                         ; 3       ;
 ; op_rw                                   ; 4       ;
 ; op_fc[0]                                ; 1       ;
 ; op_fc[1]                                ; 1       ;
@@ -282,7 +282,7 @@ Encoding Type:  One-Hot
 Info: *******************************************************************
 Info: Running Quartus Prime Analysis & Synthesis
     Info: Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
-    Info: Processing started: Fri Feb  6 02:21:12 2026
+    Info: Processing started: Fri Feb  6 02:54:49 2026
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off pistorm_fc -c pistorm_fc
 Info (20030): Parallel compilation is enabled and will use 16 of the 24 processors detected
 Info (12021): Found 1 design units, including 1 entities, in source file pistorm_fc.v
@@ -296,8 +296,8 @@ Info (21057): Implemented 146 device resources after synthesis - the final resou
     Info (21061): Implemented 87 logic cells
 Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 0 warnings
     Info: Peak virtual memory: 328 megabytes
-    Info: Processing ended: Fri Feb  6 02:21:16 2026
-    Info: Elapsed time: 00:00:04
+    Info: Processing ended: Fri Feb  6 02:54:52 2026
+    Info: Elapsed time: 00:00:03
     Info: Total CPU time (on all processors): 00:00:15
 
 
