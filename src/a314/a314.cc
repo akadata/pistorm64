@@ -338,7 +338,7 @@ static void init_a314_paths() {
     a314_paths_initialized = true;
 }
     
-static void load_config_file(const char *filename) {
+static void load_a314_service_config(const char *filename) {
     FILE *f = fopen(filename, "rt");
     if (f == nullptr) {
         return;
@@ -1408,7 +1408,7 @@ static void write_r_events(uint8_t events) {
 
 int a314_init() {
     init_a314_paths();
-    load_config_file(a314_config_file.c_str());
+    load_a314_service_config(a314_config_file.c_str());
 
     int err = init_driver();
     if (err < 0) {

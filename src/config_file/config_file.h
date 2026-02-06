@@ -133,9 +133,9 @@ struct platform_config {
 };
 
 #ifdef __cplusplus
-extern "C" int get_mapped_item_by_address(struct emulator_config* cfg, 
-  uint32_t address);
-#else
+extern "C" {
+#endif
+
 unsigned int get_m68k_cpu_type(const char* name);
 struct emulator_config* load_config_file(const char* filename);
 void free_config_file(struct emulator_config* cfg);
@@ -172,7 +172,8 @@ void add_mapping(struct emulator_config* cfg,
   unsigned int autodump);
 unsigned int get_int(const char* str);
 
-
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* _CONFIG_FILE_H */

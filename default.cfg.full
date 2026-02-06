@@ -4,13 +4,13 @@
 # Sets CPU type. Valid types are (probably) 68000, 68010, 68020, 68EC020, 68030,
 # 68EC030, 68040, 68EC040, 68LC040 and some STTTT thing.
 
-cpu 68000
+cpu 680ec20
 #setvar no-pistorm-dev
 
 # Set the platform to Amiga to enable all the registers and stuff.
 platform amiga
 
-map type=ram address=0x00000000 size=0x100000 id=chipram
+#map type=ram address=0x00C00000 size=0x100000 id=chipram
 
 # -----------------------------------------------------------------------------
 # Kickstart / ROMs
@@ -52,7 +52,7 @@ map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40
 # Enabling Z3 fast requires at least Kickstart 2.0.
 # If for some reason you need more than 128MB, you can change the size=128M to a
 # valid supported Z3 PIC size, like 256M, 512M, 1024M, or add additional map lines.
-map type=ram address=0x10000000 size=256M id=z3_autoconf_fast
+#map type=ram address=0x10000000 size=256M id=z3_autoconf_fast
 #map type=ram address=0x10000000 size=1024M id=z3_autoconf_fast
 #map type=ram address=0x50000000 size=256M id=z3_autoconf_fast
 

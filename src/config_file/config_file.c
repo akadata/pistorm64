@@ -94,8 +94,28 @@ char *uppercase ( char *str )
 
 
 unsigned int get_m68k_cpu_type(const char* name) {
+  if (!name) {
+    printf("[CFG] Invalid CPU type (null) specified, defaulting to 68000.\n");
+    return M68K_CPU_TYPE_68000;
+  }
+
+  // Accept common shorthand aliases seen in existing configs/tools.
+  if (strcasecmp(name, "680ec20") == 0)
+    name = "68EC020";
+  else if (strcasecmp(name, "680ec30") == 0)
+    name = "68EC030";
+  else if (strcasecmp(name, "680ec40") == 0)
+    name = "68EC040";
+  else if (strcasecmp(name, "68060") == 0 || strcasecmp(name, "68EC060") == 0 ||
+           strcasecmp(name, "68LC060") == 0) {
+    // Current core set tops out at 68040 tables; keep user intent ("high-end CPU")
+    // without silently dropping all the way to 68000.
+    printf("[CFG] CPU type %s requested; mapping to 68040 (68060 tables not present).\n", name);
+    name = "68040";
+  }
+
   for (int i = 0; i < M68K_CPU_TYPES; i++) {
-    if (strcmp(name, cpu_types[i]) == 0) {
+    if (strcasecmp(name, cpu_types[i]) == 0) {
       printf("[CFG] Set CPU type to %s.\n", cpu_types[i]);
       return (unsigned int)(i + 1);
     }

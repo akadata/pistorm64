@@ -273,10 +273,19 @@ UAE_C_SRCS   :=
 UAE_CXX_SRCS :=
 UAE_OBJS     :=
 UAE_TARGET   := $(UAE_BUILDDIR)/libuae.a
+UAE_LINK_FLAGS :=
 UAE_JIT_NO_PIE ?= 1
 UAE_PIE_FLAGS := $(if $(filter 1,$(UAE_JIT_NO_PIE)),-fno-pie,)
-UAE_CFLAGS   := $(CFLAGS) $(UAE_INCLUDES) $(UAE_PIE_FLAGS)
-UAE_CXXFLAGS := $(CXXFLAGS) $(UAE_INCLUDES) $(UAE_PIE_FLAGS) -fpermissive
+# UAE objects must include DEFINES (USE_UAE_JIT) but stay non-LTO/static-friendly.
+UAE_OPT_LEVEL ?= -O2
+UAE_WARN_SUPPRESS = -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable \
+	-Wno-sign-compare -Wno-misleading-indentation
+UAE_EXTRA_CFLAGS ?=
+UAE_CFLAGS   = $(EMU_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
+	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(UAE_EXTRA_CFLAGS) $(NO_LTO_FLAGS)
+UAE_CXXFLAGS = $(CXX_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
+	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(UAE_EXTRA_CFLAGS) \
+	$(NO_LTO_FLAGS) -fpermissive $(UAE_WARN_SUPPRESS)
 EXTRA_CXX_OBJS :=
 EXTRA_LINK_DEPS :=
 
@@ -285,6 +294,8 @@ UAE_C_SRCS   := $(shell find $(UAE_SRCDIR) -type f -name "*.c")
 UAE_CXX_SRCS := $(shell find $(UAE_SRCDIR) -type f \( -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \))
 UAE_CXX_SRCS := $(filter-out \
 	$(UAE_SRCDIR)/uae_emulator.cc \
+	$(UAE_SRCDIR)/pistorm_uae_bridge.cc \
+	$(UAE_SRCDIR)/pistorm_uae_stubs.cc \
 	$(UAE_SRCDIR)/fpp.cc \
 	$(UAE_SRCDIR)/fpp_native.cc \
 	$(UAE_SRCDIR)/jit/compemu_fpp.cc \
@@ -300,6 +311,7 @@ UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cpp,$(UAE_BUILDDIR)/%.o,$(filter %.cpp,$(
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cxx,$(UAE_BUILDDIR)/%.o,$(filter %.cxx,$(UAE_CXX_SRCS)))
 EXTRA_CXX_OBJS += src/uae/pistorm_uae_bridge.o src/uae/pistorm_uae_stubs.o
 EXTRA_LINK_DEPS += $(UAE_TARGET)
+UAE_LINK_FLAGS := -Wl,--whole-archive $(UAE_TARGET) -Wl,--no-whole-archive
 DEFINES += -DUSE_UAE_JIT
 endif
 
@@ -418,9 +430,6 @@ M68K_CFLAGS   = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(AC
 LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS) $(EXTRA_LDFLAGS)
 
 LDLIBS   = $(RAYLIB_LIBS) $(LIBS) $(LDLIBS_VC) $(LDLIBS_ALSA)
-ifeq ($(USE_UAE_JIT),1)
-LDLIBS   += $(UAE_TARGET)
-endif
 
 TARGET = $(EXENAME)$(EXE)
 INSTALL_DIR := $(DESTDIR)$(PREFIX)
@@ -458,7 +467,7 @@ HELP_TARGETS = \
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
 
-DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest  .d pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE) \
+DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE) \
 	$(UAE_TARGET) $(UAE_OBJS) $(UAE_OBJS:%.o=%.d) $(EXTRA_CXX_OBJS) $(EXTRA_CXX_OBJS:%.o=%.d)
 
 all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test 
@@ -471,12 +480,16 @@ clean:
 OBJS_LINK = $(filter %.o,$^)
 
 $(TARGET): $(MUSASHIGENHFILES) $(MUSASHIGENCFILES:%.c=%.o) $(MAINFILES:%.c=%.o) $(MUSASHIFILES:%.c=%.o) src/a314/a314.o $(EXTRA_CXX_OBJS) $(EXTRA_LINK_DEPS)
-	$(CC) $(LDFLAGS) -o $@.tmp $(OBJS_LINK) $(LDLIBS) && mv -f $@.tmp $@
+	$(CC) $(LDFLAGS) -o $@.tmp $(OBJS_LINK) $(UAE_LINK_FLAGS) $(LDLIBS) && mv -f $@.tmp $@
 
 uae-jit: $(UAE_TARGET)
+ifeq ($(USE_UAE_JIT),1)
+uae-jit: $(TARGET)
+endif
 
 $(UAE_TARGET): $(UAE_OBJS)
 	@mkdir -p $(UAE_BUILDDIR)
+	rm -f $@
 	$(AR) rcs $@ $^
 
 # Explicit rules to keep the generated 68k core quiet on unused-temp warnings.
@@ -506,9 +519,6 @@ buptest: src/buptest/buptest.c $(PS_PROTOCOL_SRC) src/log.c
 	fi
 
 pistorm_truth_test: tools/pistorm_truth_test.c include/uapi/linux/pistorm.h
-	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
-
-: tools/.c include/uapi/linux/pistorm.h
 	$(CC) -MMD -MP $(CFLAGS) -Iinclude -Iinclude/uapi -o $@ $<
 
 src/a314/a314.o: src/a314/a314.cc src/a314/a314.h
@@ -684,6 +694,6 @@ help:
 	@printf "Available targets:\n"
 	@printf "  %-32s %s\n" $(HELP_TARGETS)
 
--include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d .d $(UAE_OBJS:%.o=%.d)
+-include $(.CFILES:%.c=%.d) $(MUSASHIGENCFILES:%.c=%.d) src/a314/a314.d src/musashi/$(MUSASHIGENERATOR).d pistorm_truth_test.d $(UAE_OBJS:%.o=%.d)
 
 .PHONY: all clean buptest pistorm_truth_test  install uninstall kernel_module kernel_module_pistorm kernel_module_z3bus kernel_install kernel_install_pistorm kernel_install_z3bus kernel_clean amiga-net amiga-piscsi amiga-rtg amiga-ahi amiga-all amiga-clean

@@ -30,5 +30,7 @@ performance.
 - FC is treated as a full 3‑bit value end‑to‑end (0–7).
 - BERR is multiplexed onto GPIO5 when `berr_reset_input=1`.
 - Pi4 stability is currently best at GPCLK div=6 (~200 MHz).
+- UAE JIT backend is experimental; see `UAE-JIT-Status.md` for current bring-up
+  state and known limitations.
 
 Only the Amiga Makes it Possible.
