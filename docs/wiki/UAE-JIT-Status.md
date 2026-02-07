@@ -17,6 +17,24 @@ Current build path:
 make USE_UAE_JIT=1 uae-jit
 ```
 
+## Opcode regeneration (CPU/JIT tables)
+
+Opcode generation inputs now live in-tree:
+
+- `src/uae/gen/table68k` is the authoritative opcode specification input.
+- `src/uae/gencpu.cpp` and `src/uae/jit/gencomp.cpp` are the authoritative
+  generators for `cpuemu_*.cpp`, `cpustbl.cpp`, and JIT `compstbl.cpp`.
+
+To regenerate the opcode outputs, run:
+
+```bash
+make uae-opcodes
+```
+
+This builds the host generators under `build/uae/gen/` and emits refreshed
+`cpuemu_*.cpp`, `cpustbl.cpp`, and `cputbl.h` in `src/uae/`, plus `compemu.cpp`,
+`compstbl.cpp`, and `comptbl.h` in `src/uae/jit/`.
+
 Notes:
 
 - `uae-jit` is incremental. It rebuilds only changed files and then links
