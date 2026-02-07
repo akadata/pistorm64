@@ -3396,7 +3396,12 @@ MIDFUNC(3,jff_DIVLS32,(RW4 d, RR4 s1, W4 rem))
 	MOV_wi(REG_WORK1, 5);
 	uintptr idx = (uintptr)(&regs.jit_exception) - (uintptr)(&regs);
 	STR_wXi(REG_WORK1, R_REGSTRUCT, idx);
-	B_i(8);        // end_of_op
+	// JIT_DEBUG_BRANCH_INDEX: verify the branch index matches the emitted block size.
+	static constexpr uae_u32 kJffDivls32BranchIndex = 8;
+#ifdef JIT_DEBUG_BRANCH_INDEX
+	uae_u32* jff_divls32_branch = (uae_u32*)get_target();
+#endif
+	B_i(kJffDivls32BranchIndex);        // end_of_op
 
 	// src is not 0
 	SDIV_www(REG_WORK1, d, s1);
@@ -3412,6 +3417,15 @@ MIDFUNC(3,jff_DIVLS32,(RW4 d, RR4 s1, W4 rem))
 	TST_ww(d, d);
 
 	// end_of_op
+#ifdef JIT_DEBUG_BRANCH_INDEX
+	{
+		uae_u32 branch_delta = ((uintptr)get_target() - (uintptr)jff_divls32_branch) >> 2;
+		if (branch_delta != kJffDivls32BranchIndex) {
+			jit_abort("JIT: jff_DIVLS32 branch index mismatch (expected %u, got %u)\n",
+			          kJffDivls32BranchIndex, branch_delta);
+		}
+	}
+#endif
 
 	flags_carry_inverted = false;
 	unlock2(rem);
@@ -7893,4 +7907,3 @@ MIDFUNC(3,jnf_MEM_WRITEMEMBANK,(RR4 adr, RR4 source, IM8 offset))
 	compemu_raw_call_r(REG_WORK3);
 }
 MENDFUNC(3,jnf_MEM_WRITEMEMBANK,(RR4 adr, RR4 source, IM8 offset))
-
