@@ -64,16 +64,19 @@ static void pistorm_force_rom_overlay(void) {
 }
 
 static uae_u8* pistorm_compute_natmem_offset(void) {
-  if (!cfg) {
-    return (uae_u8*)0;
-  }
-  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
-    if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
-      continue;
-    }
-    uintptr_t hi = ((uintptr_t)cfg->map_data[i]) & 0xFFFFFFFF00000000ull;
-    if (hi != 0) {
-      return (uae_u8*)hi;
+  // PiStorm mappings are fragmented; a synthetic NATMEM base can make JIT emit
+  // direct host accesses into unmapped space (for example 0x7f00000xxx).
+  // Keep NATMEM disabled unless explicitly requested for experiments.
+  const char* force_natmem = getenv("PISTORM_UAE_FORCE_NATMEM");
+  if (force_natmem && atoi(force_natmem) != 0 && cfg) {
+    for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+      if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
+        continue;
+      }
+      uintptr_t hi = ((uintptr_t)cfg->map_data[i]) & 0xFFFFFFFF00000000ull;
+      if (hi != 0) {
+        return (uae_u8*)hi;
+      }
     }
   }
   return (uae_u8*)0;
@@ -144,6 +147,14 @@ static int g_jit_trace = 0;
 static int g_jit_trace_ifetch_left = 0;
 static int g_jit_trace_data_left = 0;
 
+static inline uint32_t pistorm_fc_data(void) {
+  return regs.s ? 5u : 1u;  // Supervisor/User Data
+}
+
+static inline uint32_t pistorm_fc_ifetch(void) {
+  return regs.s ? 6u : 2u;  // Supervisor/User Program
+}
+
 static inline void uae_jit_trace_access(const char* kind, uaecptr addr, uae_u32 val,
                                         bool mapped, bool ifetch) {
   if (!g_jit_trace) {
@@ -156,7 +167,7 @@ static inline void uae_jit_trace_access(const char* kind, uaecptr addr, uae_u32 
   (*budget)--;
   printf("[UAE-JIT] %s %-6s addr=%08X val=%08X fc=%u\n", mapped ? "MAP" : "BUS", kind,
             (unsigned int)addr, (unsigned int)val,
-            (unsigned int)(ifetch ? (regs.sfc & 0x7) : (regs.dfc & 0x7)));
+            (unsigned int)(ifetch ? pistorm_fc_ifetch() : pistorm_fc_data()));
 }
 
 static inline void uae_jit_trace_reset_vec(const char* src, unsigned int addr, unsigned int val) {
@@ -195,6 +206,119 @@ static inline bool bridge_read_rom_data(unsigned int addr, unsigned char type, u
         }
         *val = ((unsigned int)p[0] << 24) | ((unsigned int)p[1] << 16) |
                ((unsigned int)p[2] << 8) | (unsigned int)p[3];
+        return true;
+      default:
+        return false;
+    }
+  }
+  return false;
+}
+
+static inline bool bridge_read_host_alias(unsigned int addr, unsigned char type, unsigned int* val) {
+  if (!cfg || !val) {
+    return false;
+  }
+  const unsigned int width = (type == OP_TYPE_LONGWORD) ? 4u : (type == OP_TYPE_WORD ? 2u : 1u);
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
+      continue;
+    }
+    unsigned int span = 0;
+    switch (cfg->map_type[i]) {
+      case MAPTYPE_ROM:
+      case MAPTYPE_RAM_WTC:
+        span = cfg->rom_size[i];
+        break;
+      case MAPTYPE_RAM:
+      case MAPTYPE_RAM_NOALLOC:
+        span = cfg->map_size[i];
+        break;
+      default:
+        continue;
+    }
+    if (span < width || span == 0) {
+      continue;
+    }
+    uintptr_t host_base = (uintptr_t)cfg->map_data[i];
+    unsigned int base32 = (unsigned int)host_base;
+    if (addr < base32) {
+      continue;
+    }
+    unsigned int off = addr - base32;
+    if (off > span - width) {
+      continue;
+    }
+    unsigned char* p = cfg->map_data[i] + off;
+    switch (type) {
+      case OP_TYPE_BYTE:
+        *val = p[0];
+        return true;
+      case OP_TYPE_WORD:
+        *val = ((unsigned int)p[0] << 8) | (unsigned int)p[1];
+        return true;
+      case OP_TYPE_LONGWORD:
+        *val = ((unsigned int)p[0] << 24) | ((unsigned int)p[1] << 16) |
+               ((unsigned int)p[2] << 8) | (unsigned int)p[3];
+        return true;
+      default:
+        return false;
+    }
+  }
+  return false;
+}
+
+static inline bool bridge_write_host_alias(unsigned int addr, unsigned int v, unsigned char type) {
+  if (!cfg) {
+    return false;
+  }
+  const unsigned int width = (type == OP_TYPE_LONGWORD) ? 4u : (type == OP_TYPE_WORD ? 2u : 1u);
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
+      continue;
+    }
+    unsigned int span = 0;
+    switch (cfg->map_type[i]) {
+      case MAPTYPE_ROM:
+      case MAPTYPE_RAM_WTC:
+        span = cfg->rom_size[i];
+        break;
+      case MAPTYPE_RAM:
+      case MAPTYPE_RAM_NOALLOC:
+        span = cfg->map_size[i];
+        break;
+      default:
+        continue;
+    }
+    if (span < width || span == 0) {
+      continue;
+    }
+    uintptr_t host_base = (uintptr_t)cfg->map_data[i];
+    unsigned int base32 = (unsigned int)host_base;
+    if (addr < base32) {
+      continue;
+    }
+    unsigned int off = addr - base32;
+    if (off > span - width) {
+      continue;
+    }
+    if (cfg->map_type[i] == MAPTYPE_ROM) {
+      // Real ROM writes are acknowledged but not stored.
+      return true;
+    }
+    unsigned char* p = cfg->map_data[i] + off;
+    switch (type) {
+      case OP_TYPE_BYTE:
+        p[0] = (unsigned char)(v & 0xFFu);
+        return true;
+      case OP_TYPE_WORD:
+        p[0] = (unsigned char)((v >> 8) & 0xFFu);
+        p[1] = (unsigned char)(v & 0xFFu);
+        return true;
+      case OP_TYPE_LONGWORD:
+        p[0] = (unsigned char)((v >> 24) & 0xFFu);
+        p[1] = (unsigned char)((v >> 16) & 0xFFu);
+        p[2] = (unsigned char)((v >> 8) & 0xFFu);
+        p[3] = (unsigned char)(v & 0xFFu);
         return true;
       default:
         return false;
@@ -264,7 +388,11 @@ static uae_u32 REGPARAM2 pistorm_lget(uaecptr addr) {
     uae_jit_trace_access("D32R", addr, (uae_u32)val, true, false);
     return (uae_u32)val;
   }
-  cpu_set_fc(regs.dfc & 0x7);
+  if (bridge_read_host_alias((unsigned int)addr, OP_TYPE_LONGWORD, &val)) {
+    uae_jit_trace_access("D32R", addr, (uae_u32)val, true, false);
+    return (uae_u32)val;
+  }
+  cpu_set_fc(pistorm_fc_data());
   uae_u32 v = (uae_u32)m68k_read_memory_32((unsigned int)addr);
   uae_jit_trace_access("D32R", addr, v, false, false);
   return v;
@@ -280,7 +408,11 @@ static uae_u32 REGPARAM2 pistorm_wget(uaecptr addr) {
     uae_jit_trace_access("D16R", addr, (uae_u32)val, true, false);
     return (uae_u32)val;
   }
-  cpu_set_fc(regs.dfc & 0x7);
+  if (bridge_read_host_alias((unsigned int)addr, OP_TYPE_WORD, &val)) {
+    uae_jit_trace_access("D16R", addr, (uae_u32)val, true, false);
+    return (uae_u32)val;
+  }
+  cpu_set_fc(pistorm_fc_data());
   uae_u32 v = (uae_u32)m68k_read_memory_16((unsigned int)addr);
   uae_jit_trace_access("D16R", addr, v, false, false);
   return v;
@@ -296,7 +428,11 @@ static uae_u32 REGPARAM2 pistorm_bget(uaecptr addr) {
     uae_jit_trace_access("D08R", addr, (uae_u32)val, true, false);
     return (uae_u32)val;
   }
-  cpu_set_fc(regs.dfc & 0x7);
+  if (bridge_read_host_alias((unsigned int)addr, OP_TYPE_BYTE, &val)) {
+    uae_jit_trace_access("D08R", addr, (uae_u32)val, true, false);
+    return (uae_u32)val;
+  }
+  cpu_set_fc(pistorm_fc_data());
   uae_u32 v = (uae_u32)m68k_read_memory_8((unsigned int)addr);
   uae_jit_trace_access("D08R", addr, v, false, false);
   return v;
@@ -311,7 +447,11 @@ static void REGPARAM2 pistorm_lput(uaecptr addr, uae_u32 v) {
     uae_jit_trace_access("D32W", addr, v, true, false);
     return;
   }
-  cpu_set_fc(regs.dfc & 0x7);
+  if (bridge_write_host_alias((unsigned int)addr, (unsigned int)v, OP_TYPE_LONGWORD)) {
+    uae_jit_trace_access("D32W", addr, v, true, false);
+    return;
+  }
+  cpu_set_fc(pistorm_fc_data());
   uae_jit_trace_access("D32W", addr, v, false, false);
   m68k_write_memory_32((unsigned int)addr, (unsigned int)v);
 }
@@ -325,7 +465,11 @@ static void REGPARAM2 pistorm_wput(uaecptr addr, uae_u32 v) {
     uae_jit_trace_access("D16W", addr, v, true, false);
     return;
   }
-  cpu_set_fc(regs.dfc & 0x7);
+  if (bridge_write_host_alias((unsigned int)addr, (unsigned int)v, OP_TYPE_WORD)) {
+    uae_jit_trace_access("D16W", addr, v, true, false);
+    return;
+  }
+  cpu_set_fc(pistorm_fc_data());
   uae_jit_trace_access("D16W", addr, v, false, false);
   m68k_write_memory_16((unsigned int)addr, (unsigned int)v);
 }
@@ -339,7 +483,11 @@ static void REGPARAM2 pistorm_bput(uaecptr addr, uae_u32 v) {
     uae_jit_trace_access("D08W", addr, v, true, false);
     return;
   }
-  cpu_set_fc(regs.dfc & 0x7);
+  if (bridge_write_host_alias((unsigned int)addr, (unsigned int)v, OP_TYPE_BYTE)) {
+    uae_jit_trace_access("D08W", addr, v, true, false);
+    return;
+  }
+  cpu_set_fc(pistorm_fc_data());
   uae_jit_trace_access("D08W", addr, v, false, false);
   m68k_write_memory_8((unsigned int)addr, (unsigned int)v);
 }
@@ -354,7 +502,11 @@ static uae_u32 REGPARAM2 pistorm_lgeti(uaecptr addr) {
     uae_jit_trace_access("I32R", addr, (uae_u32)val, true, true);
     return (uae_u32)val;
   }
-  cpu_set_fc(regs.sfc & 0x7);
+  if (bridge_read_host_alias((unsigned int)addr, OP_TYPE_LONGWORD, &val)) {
+    uae_jit_trace_access("I32R", addr, (uae_u32)val, true, true);
+    return (uae_u32)val;
+  }
+  cpu_set_fc(pistorm_fc_ifetch());
   uae_u32 v = (uae_u32)m68k_read_memory_32((unsigned int)addr);
   uae_jit_trace_access("I32R", addr, v, false, true);
   return v;
@@ -370,7 +522,11 @@ static uae_u32 REGPARAM2 pistorm_wgeti(uaecptr addr) {
     uae_jit_trace_access("I16R", addr, (uae_u32)val, true, true);
     return (uae_u32)val;
   }
-  cpu_set_fc(regs.sfc & 0x7);
+  if (bridge_read_host_alias((unsigned int)addr, OP_TYPE_WORD, &val)) {
+    uae_jit_trace_access("I16R", addr, (uae_u32)val, true, true);
+    return (uae_u32)val;
+  }
+  cpu_set_fc(pistorm_fc_ifetch());
   uae_u32 v = (uae_u32)m68k_read_memory_16((unsigned int)addr);
   uae_jit_trace_access("I16R", addr, v, false, true);
   return v;
@@ -406,7 +562,10 @@ extern "C" unsigned int read_long(unsigned int address) {
   if (bridge_mapped_read((uaecptr)address, OP_TYPE_LONGWORD, &val)) {
     return val;
   }
-  cpu_set_fc(regs.sfc & 0x7);
+  if (bridge_read_host_alias(address, OP_TYPE_LONGWORD, &val)) {
+    return val;
+  }
+  cpu_set_fc(pistorm_fc_ifetch());
   val = m68k_read_memory_32(address);
   if (address < 8) {
     uae_jit_trace_reset_vec("bus-low", address, val);
@@ -436,7 +595,10 @@ extern "C" unsigned int read_word(unsigned int address) {
   if (bridge_mapped_read((uaecptr)address, OP_TYPE_WORD, &val)) {
     return val;
   }
-  cpu_set_fc(regs.sfc & 0x7);
+  if (bridge_read_host_alias(address, OP_TYPE_WORD, &val)) {
+    return val;
+  }
+  cpu_set_fc(pistorm_fc_ifetch());
   val = m68k_read_memory_16(address);
   if (address < 8) {
     uae_jit_trace_reset_vec("bus-low", address, val);
@@ -466,7 +628,10 @@ extern "C" unsigned int read_byte(unsigned int address) {
   if (bridge_mapped_read((uaecptr)address, OP_TYPE_BYTE, &val)) {
     return val;
   }
-  cpu_set_fc(regs.sfc & 0x7);
+  if (bridge_read_host_alias(address, OP_TYPE_BYTE, &val)) {
+    return val;
+  }
+  cpu_set_fc(pistorm_fc_ifetch());
   val = m68k_read_memory_8(address);
   if (address < 8) {
     uae_jit_trace_reset_vec("bus-low", address, val);
@@ -491,9 +656,21 @@ static void uae_pistorm_set_defaults(int cpu_model, int enable_jit, int enable_f
   currprefs.comptrustbyte = changed_prefs.comptrustbyte = 1;
 
   const char* force_nojit = getenv("PISTORM_UAE_FORCE_NOJIT");
+  const char* cache_kb_env = getenv("PISTORM_UAE_CACHESIZE_KB");
   int jit_enabled = enable_jit && !(force_nojit && atoi(force_nojit) != 0);
   if (jit_enabled) {
-    currprefs.cachesize = changed_prefs.cachesize = 32 * 1024;
+    int cache_kb = 32 * 1024;
+    if (cache_kb_env && *cache_kb_env) {
+      int v = atoi(cache_kb_env);
+      if (v < 0) {
+        v = 0;
+      }
+      if (v > 256 * 1024) {
+        v = 256 * 1024;
+      }
+      cache_kb = v;
+    }
+    currprefs.cachesize = changed_prefs.cachesize = cache_kb;
     currprefs.compfpu = changed_prefs.compfpu = enable_fpu ? true : false;
   } else {
     currprefs.cachesize = changed_prefs.cachesize = 0;
@@ -608,12 +785,19 @@ extern "C" void uae_pistorm_pulse_reset(void) {
 }
 
 extern "C" void uae_pistorm_overlay_changed(int ovl_state) {
+  const char* lock_ovl = getenv("PISTORM_UAE_LOCK_OVL");
+  if (lock_ovl && atoi(lock_ovl) != 0 && !ovl_state) {
+    ovl = 1;
+    pistorm_force_rom_overlay();
+    printf("[UAE] OVL lock active: keeping OVL=1\n");
+    set_special(SPCFLAG_MODE_CHANGE | SPCFLAG_CHECK);
+    return;
+  }
   ovl = ovl_state ? 1 : 0;
   if (ovl) {
     pistorm_force_rom_overlay();
   }
-  // OVL flips change effective low-memory mapping.
-  // Request core mode/mapping refresh and let normal execution path handle PC state.
+  // OVL flips change effective low-memory mapping; request core mode refresh.
   set_special(SPCFLAG_MODE_CHANGE | SPCFLAG_CHECK);
 }
 
