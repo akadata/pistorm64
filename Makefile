@@ -35,9 +35,9 @@ CXX := g++
 endif
 
 
-EXTRA_CFLAGS ?= -g -O0
-EXTRA_M68K_CFLAGS ?= -g -O0
-EXTRA_LDFLAGS ?= -g -O0
+#EXTRA_CFLAGS ?= -g -O0
+#EXTRA_M68K_CFLAGS ?= -g -O0
+#EXTRA_LDFLAGS ?= -g -O0
 
 
 # Tunables: edit here instead of hunting through rule bodies.
@@ -95,7 +95,7 @@ OPT_LEVEL := -O$(O)
 endif
 
 # Set USE_GOLD=1 to link with gold if available.
-USE_GOLD   ?= 0
+USE_GOLD   ?= 1
 
 include config.mk
 
@@ -119,7 +119,7 @@ ARCH_FEATURES ?=
 # Toggle Pi host (/opt/vc) support for dev tools.
 USE_VC     ?= 0
 # Perf toggles
-USE_LTO    ?= 0
+USE_LTO    ?= 1
 USE_NO_PLT ?= 1 
 OMIT_FP    ?= 1
 USE_PIPE   ?= 1
