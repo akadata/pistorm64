@@ -5706,6 +5706,7 @@ void send_interrupt(int num, int delay)
 	}
 }
 #endif
+#if UAE_DELAY_IRQS
 static void doint_delay_do(uae_u32 v)
 {
 	doint();
@@ -5719,6 +5720,7 @@ static void doint_delay(void)
 		doint();
 //	}
 }
+#endif
 #if 0
 static void INTENA(uae_u16 v)
 {
