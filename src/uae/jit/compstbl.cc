@@ -870,7 +870,7 @@ extern const struct comptbl op_smalltbl_0_comp_ff[] = {
 { op_4c3a_0_comp_ff, COMP_OPCODE_LONG_OPCODE, 19514 }, /* MULL */
 { op_4c3b_0_comp_ff, COMP_OPCODE_LONG_OPCODE, 19515 }, /* MULL */
 { op_4c3c_0_comp_ff, COMP_OPCODE_LONG_OPCODE, 19516 }, /* MULL */
-{ op_4c40_0_comp_ff, COMP_BAD|COMP_OPCODE_LONG_OPCODE, 19520 }, /* DIVL */ // shapeshifter grey text background
+{ op_4c40_0_comp_ff, COMP_OPCODE_LONG_OPCODE, 19520 }, /* DIVL */ // shapeshifter grey text background
 { op_4c50_0_comp_ff, COMP_OPCODE_LONG_OPCODE, 19536 }, /* DIVL */
 { op_4c58_0_comp_ff, COMP_OPCODE_LONG_OPCODE, 19544 }, /* DIVL */
 { op_4c60_0_comp_ff, COMP_OPCODE_LONG_OPCODE, 19552 }, /* DIVL */
@@ -1366,8 +1366,8 @@ extern const struct comptbl op_smalltbl_0_comp_ff[] = {
 { op_9170_0_comp_ff, COMP_OPCODE_LONG_OPCODE, 37232 }, /* SUB */
 { op_9178_0_comp_ff, COMP_OPCODE_LONG_OPCODE, 37240 }, /* SUB */
 { op_9179_0_comp_ff, COMP_OPCODE_LONG_OPCODE, 37241 }, /* SUB */
-{ op_9180_0_comp_ff, COMP_BAD|COMP_OPCODE_CMOV|COMP_OPCODE_ISADDX, 37248 }, /* SUBX */ // povray
-{ op_9188_0_comp_ff, COMP_BAD|COMP_OPCODE_CMOV|COMP_OPCODE_ISADDX, 37256 }, /* SUBX */
+{ op_9180_0_comp_ff, COMP_OPCODE_CMOV|COMP_OPCODE_ISADDX, 37248 }, /* SUBX */ // povray
+{ op_9188_0_comp_ff, COMP_OPCODE_CMOV|COMP_OPCODE_ISADDX, 37256 }, /* SUBX */
 { op_9190_0_comp_ff, 0, 37264 }, /* SUB */
 { op_9198_0_comp_ff, 0, 37272 }, /* SUB */
 { op_91a0_0_comp_ff, 0, 37280 }, /* SUB */
