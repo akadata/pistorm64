@@ -4688,13 +4688,12 @@ bool cpureset (void)
 
       ins = get_word (pc);
       custom_reset_cpu(false, false);
+      // On Amiga reset handling, keep ROM overlay visible at low vectors.
+      // If OVL stays low here, subsequent exception/reset vectors can resolve to empty RAM.
+      ovl = 1;
       m68k_setpc_normal (ksboot);
       cpu_emulator_reset_core0();
       reset_autoconfig();
-      // did memory disappear under us?
-//      if (ab == &get_mem_bank (pc))
-//         return false;
-      // it did
       if ((ins & ~7) == 0x4ed0) {
          int reg = ins & 7;
          uae_u32 addr = m68k_areg (regs, reg);
@@ -4710,6 +4709,11 @@ bool cpureset (void)
 //         }
          return false;
       }
+      // did memory disappear under us?
+//      if (ab == &get_mem_bank (pc))
+//         return false;
+      // it did
+      return false;
    }
 
    // the best we can do, jump directly to ROM entrypoint

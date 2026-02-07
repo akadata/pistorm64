@@ -74,6 +74,38 @@ static uint8_t fc_shadow_type = 0;
 static uint8_t fc_shadow_is_write = 0;
 static int fc_boot_log_remaining = 0;
 static int use_uae_jit = 0;
+static int lowvec_trace = -1;
+
+static inline int lowvec_trace_enabled(void) {
+  if (lowvec_trace == -1) {
+    const char* e = getenv("PISTORM_UAE_LOWVEC_TRACE");
+    lowvec_trace = (e && atoi(e) != 0) ? 1 : 0;
+  }
+  return lowvec_trace;
+}
+
+static inline void lowvec_trace_log(const char* op, uint32_t addr, uint32_t val) {
+#ifdef USE_UAE_JIT
+  if (!use_uae_jit || !lowvec_trace_enabled()) {
+    return;
+  }
+  if (!(addr < 0x00000200u || (addr >= 0x00F80000u && addr < 0x00F90000u))) {
+    return;
+  }
+  printf("[UAE-LOWVEC] %s addr=%08X val=%08X pc=%08X regs_pc=%08X regs_pc_p=%08X ovl=%u\n",
+         op,
+         addr,
+         val,
+         uae_pistorm_get_pc(),
+         uae_pistorm_get_regs_pc(),
+         uae_pistorm_get_regs_pc_p(),
+         ovl);
+#else
+  (void)op;
+  (void)addr;
+  (void)val;
+#endif
+}
 
 static const char* fc_mode_name(enum fc_mode mode) {
   switch (mode) {
@@ -206,6 +238,8 @@ uint8_t ipl_enabled[8];
 uint8_t end_signal = 0;
 static volatile sig_atomic_t sigint_seen = 0;
 static volatile sig_atomic_t crash_signal = 0;
+static volatile uintptr_t crash_fault_addr = 0;
+static volatile sig_atomic_t crash_si_code = 0;
 static unsigned int last_pc_seen = 0;
 uint8_t load_new_config = 0;
 uint8_t enable_jit_backend = 0;
@@ -267,6 +301,10 @@ static void dump_cpu_state(const char *reason, int opcode) {
   } else {
     LOG_ERROR("[CPU] PC=$%.8X PPC=$%.8X SR=$%.4X\n", pc, ppc, sr);
   }
+  if (crash_signal) {
+    LOG_ERROR("[CPU] Signal detail: signo=%d si_code=%d fault_addr=%p\n",
+              (int)crash_signal, (int)crash_si_code, (void*)crash_fault_addr);
+  }
 
   m68k_disassemble(disasm_buf, pc, cpu_type);
   LOG_ERROR("[CPU] %s\n", disasm_buf);
@@ -321,6 +359,17 @@ static int illg_instr_callback(int opcode) {
 
 static void crash_signal_handler(int sig_num) {
   crash_signal = sig_num;
+  crash_fault_addr = 0;
+  crash_si_code = 0;
+  dump_cpu_state("Signal", -1);
+  _exit(128 + sig_num);
+}
+
+static void crash_signal_handler_siginfo(int sig_num, siginfo_t* info, void* uctx) {
+  (void)uctx;
+  crash_signal = sig_num;
+  crash_fault_addr = info ? (uintptr_t)info->si_addr : 0;
+  crash_si_code = info ? info->si_code : 0;
   dump_cpu_state("Signal", -1);
   _exit(128 + sig_num);
 }
@@ -1388,15 +1437,15 @@ switch_config:
   sigaction(SIGINT, &sa_int, NULL);
 
   // Setup SIGTERM handler for termination
-  sa_term.sa_handler = crash_signal_handler;
+  sa_term.sa_handler = sigint_handler;
   sigemptyset(&sa_term.sa_mask);
   sa_term.sa_flags = 0; // Don't restart system calls, allow interruption
   sigaction(SIGTERM, &sa_term, NULL);
 
   // Setup crash signal handlers
-  sa_crash.sa_handler = crash_signal_handler;
+  sa_crash.sa_sigaction = crash_signal_handler_siginfo;
   sigemptyset(&sa_crash.sa_mask);
-  sa_crash.sa_flags = 0; // Don't restart system calls, allow interruption
+  sa_crash.sa_flags = SA_SIGINFO; // Include fault address/code details
   sigaction(SIGSEGV, &sa_crash, NULL);
   sigaction(SIGBUS, &sa_crash, NULL);
   sigaction(SIGILL, &sa_crash, NULL);
@@ -1834,14 +1883,18 @@ static inline int32_t platform_read_check(uint8_t type, uint32_t addr, uint32_t*
 unsigned int m68k_read_memory_8(unsigned int address) {
   fc_shadow_touch(OP_TYPE_BYTE, address, 0);
   if (platform_read_check(OP_TYPE_BYTE, address, &platform_res)) {
+    lowvec_trace_log("R08 platform", address, platform_res & 0xFF);
     return platform_res;
   }
 
   if (address & 0xFF000000) {
+    lowvec_trace_log("R08 highmask", address, 0);
     return 0;
   }
 
-  return (unsigned int)ps_read_8((uint32_t)address);
+  unsigned int v = (unsigned int)ps_read_8((uint32_t)address);
+  lowvec_trace_log("R08 ps", address, v & 0xFF);
+  return v;
 }
 
 unsigned int m68k_read_memory_16(unsigned int address) {
@@ -1851,17 +1904,24 @@ unsigned int m68k_read_memory_16(unsigned int address) {
               address, cpu_backend_get_pc());
   }
   if (platform_read_check(OP_TYPE_WORD, address, &platform_res)) {
+    lowvec_trace_log("R16 platform", address, platform_res & 0xFFFF);
     return platform_res;
   }
 
   if (address & 0xFF000000) {
+    lowvec_trace_log("R16 highmask", address, 0);
     return 0;
   }
 
+  unsigned int v;
   if (address & 0x01) {
-    return ((unsigned int)(ps_read_8(address) << 8) | (unsigned int)ps_read_8(address + 1));
+    v = ((unsigned int)(ps_read_8(address) << 8) | (unsigned int)ps_read_8(address + 1));
+    lowvec_trace_log("R16 ps-odd", address, v & 0xFFFF);
+    return v;
   }
-  return (unsigned int)ps_read_16((uint32_t)address);
+  v = (unsigned int)ps_read_16((uint32_t)address);
+  lowvec_trace_log("R16 ps", address, v & 0xFFFF);
+  return v;
 }
 
 unsigned int m68k_read_memory_32(unsigned int address) {
@@ -1871,17 +1931,24 @@ unsigned int m68k_read_memory_32(unsigned int address) {
               address, cpu_backend_get_pc());
   }
   if (platform_read_check(OP_TYPE_LONGWORD, address, &platform_res)) {
+    lowvec_trace_log("R32 platform", address, platform_res);
     return platform_res;
   }
 
   if (address & 0xFF000000) {
+    lowvec_trace_log("R32 highmask", address, 0);
     return 0;
   }
 
+  unsigned int v;
   if (address & 0x01) {
-    return (unsigned int)ps_read(OP_TYPE_LONGWORD, address);
+    v = (unsigned int)ps_read(OP_TYPE_LONGWORD, address);
+    lowvec_trace_log("R32 ps-odd", address, v);
+    return v;
   }
-  return (unsigned int)ps_read(OP_TYPE_LONGWORD, address);
+  v = (unsigned int)ps_read(OP_TYPE_LONGWORD, address);
+  lowvec_trace_log("R32 ps", address, v);
+  return v;
 }
 
 static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t val) {
@@ -1915,6 +1982,7 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
         printf("OVL:%x", ovl);
 #ifdef USE_UAE_JIT
         if (use_uae_jit) {
+          uae_pistorm_overlay_changed((int)ovl);
           printf(" (uae_pc=%08X regs.pc=%08X regs.pc_p=%08X)",
                  uae_pistorm_get_pc(),
                  uae_pistorm_get_regs_pc(),
@@ -2041,62 +2109,76 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
 
 void m68k_write_memory_8(unsigned int address, unsigned int value) {
   fc_shadow_touch(OP_TYPE_BYTE, address, 1);
+  lowvec_trace_log("W08 req", address, value & 0xFF);
   if (platform_write_check(OP_TYPE_BYTE, address, value)) {
+    lowvec_trace_log("W08 platform", address, value & 0xFF);
     return;
   }
 
   if (address & 0xFF000000) {
+    lowvec_trace_log("W08 highmask", address, value & 0xFF);
     return;
   }
 
   ps_write_8((uint32_t)address, (uint8_t)value);
+  lowvec_trace_log("W08 ps", address, value & 0xFF);
   return;
 }
 
 void m68k_write_memory_16(unsigned int address, unsigned int value) {
   fc_shadow_touch(OP_TYPE_WORD, address, 1);
+  lowvec_trace_log("W16 req", address, value & 0xFFFF);
   if ((address & 0x01) && log_get_level() >= LOG_LEVEL_VERBOSE) {
     LOG_ERROR("[ALIGN] write16 addr=$%.8X val=$%.4X PC=$%.8X\n",
               address, value & 0xFFFF, cpu_backend_get_pc());
   }
   if (platform_write_check(OP_TYPE_WORD, address, value)) {
+    lowvec_trace_log("W16 platform", address, value & 0xFFFF);
     return;
   }
 
   if (address & 0xFF000000) {
+    lowvec_trace_log("W16 highmask", address, value & 0xFFFF);
     return;
   }
 
   if (address & 0x01) {
     ps_write_8((uint32_t)address, (uint8_t)(value & 0xFF));
     ps_write_8((uint32_t)address + 1, (uint8_t)((value >> 8) & 0xFF));
+    lowvec_trace_log("W16 ps-odd", address, value & 0xFFFF);
     return;
   }
 
   ps_write_16((uint32_t)address, (uint16_t)value);
+  lowvec_trace_log("W16 ps", address, value & 0xFFFF);
   return;
 }
 
 void m68k_write_memory_32(unsigned int address, unsigned int value) {
   fc_shadow_touch(OP_TYPE_LONGWORD, address, 1);
+  lowvec_trace_log("W32 req", address, value);
   if ((address & 0x03) && log_get_level() >= LOG_LEVEL_VERBOSE) {
     LOG_ERROR("[ALIGN] write32 addr=$%.8X val=$%.8X PC=$%.8X\n",
               address, value, cpu_backend_get_pc());
   }
   if (platform_write_check(OP_TYPE_LONGWORD, address, value)) {
+    lowvec_trace_log("W32 platform", address, value);
     return;
   }
 
   if (address & 0xFF000000) {
+    lowvec_trace_log("W32 highmask", address, value);
     return;
   }
 
   if (address & 0x01) {
     ps_write(OP_TYPE_LONGWORD, address, (uint32_t)value);
+    lowvec_trace_log("W32 ps-odd", address, value);
     return;
   }
 
   ps_write(OP_TYPE_LONGWORD, address, (uint32_t)value);
+  lowvec_trace_log("W32 ps", address, value);
   return;
 }
 static void set_affinity_for(const char* name, int core_id) {

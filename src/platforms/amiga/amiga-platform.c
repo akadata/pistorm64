@@ -385,16 +385,18 @@ void adjust_ranges_amiga(struct emulator_config* cfg) {
   cfg->mapped_low = 0;
   cfg->custom_high = 0;
   cfg->custom_low = 0;
+  int have_mapped_range = 0;
 
   // Set up the min/max ranges for mapped reads/writes
   for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
     if (cfg->map_type[i] != MAPTYPE_NONE) {
-      if ((cfg->map_offset[i] != 0 && cfg->map_offset[i] < cfg->mapped_low) || cfg->mapped_low == 0) {
+      if (!have_mapped_range || cfg->map_offset[i] < cfg->mapped_low) {
         cfg->mapped_low = (unsigned int)cfg->map_offset[i];
       }
-      if (cfg->map_offset[i] + cfg->map_size[i] > cfg->mapped_high) {
+      if (!have_mapped_range || cfg->map_offset[i] + cfg->map_size[i] > cfg->mapped_high) {
         cfg->mapped_high = (unsigned int)(cfg->map_offset[i] + cfg->map_size[i]);
       }
+      have_mapped_range = 1;
     }
   }
 
