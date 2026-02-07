@@ -15,7 +15,8 @@ platform amiga
 # Kickstart / ROMs
 # -----------------------------------------------------------------------------
 # Map 512KB kickstart ROM to default offset.
-map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart autodump_mem
+map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart
+# autodump_mem
 
 # Comment out the line above and uncomment the line below to automatically copy
 # the ROM contents to Pi RAM if the file isn't found

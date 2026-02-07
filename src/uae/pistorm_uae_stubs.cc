@@ -58,32 +58,36 @@ addrbank* thread_mem_banks[MEMORY_BANKS];
 
 static int g_mem_trace = -1;
 static int g_mem_trace_budget = 128;
-static int g_mem_trace_ea_only = -1;
 
 static inline bool mem_trace_enabled(void) {
   if (g_mem_trace == -1) {
     const char* e = getenv("PISTORM_UAE_MEM_TRACE");
     const char* b = getenv("PISTORM_UAE_MEM_TRACE_BUDGET");
-    const char* ea_only = getenv("PISTORM_UAE_MEM_TRACE_EA_ONLY");
     g_mem_trace = (e && atoi(e) != 0) ? 1 : 0;
     if (b && atoi(b) > 0) {
       g_mem_trace_budget = atoi(b);
     }
-    g_mem_trace_ea_only = (ea_only && atoi(ea_only) != 0) ? 1 : 0;
   }
   return g_mem_trace != 0;
 }
 
-enum class ptr_mode {
-  ptr,
-  ptr32,
-  ea
+static inline void trace_mem(const char* op, uintptr_t raw, uae_u32 val) {
+  if (!mem_trace_enabled() || g_mem_trace_budget <= 0) {
+    return;
+  }
+  g_mem_trace_budget--;
+  printf("[UAE-MEM] %s ptr=%016lX val=%08X\n", op, (unsigned long)raw, (unsigned int)val);
+}
+
+enum class mem_ptr_mode {
+  host_ptr,
+  ea32
 };
 
-struct ptr_resolve_result {
-  ptr_mode mode;
+struct mem_ptr_ref {
+  mem_ptr_mode mode;
   uintptr_t raw;
-  unsigned int ea;
+  uae_u32 ea;
   uae_u8* host;
 };
 
@@ -104,89 +108,72 @@ static inline bool host_ptr_in_maps(uintptr_t p, uae_u32 size) {
   return false;
 }
 
-static inline ptr_resolve_result resolve_mem_ptr(const void* p, uae_u32 size) {
+static inline mem_ptr_ref resolve_mem_ptr(const void* p, uae_u32 size) {
   uintptr_t raw = (uintptr_t)p;
-  unsigned int ea = (unsigned int)(raw & 0xFFFFFFFFu);
-  bool low32 = ((raw >> 32) == 0) || ((raw & 0xFFFFFFFF00000000ull) == 0xFFFFFFFF00000000ull);
+  uae_u32 ea = (uae_u32)(raw & 0xFFFFFFFFu);
 
-  if (!low32) {
-    if (host_ptr_in_maps(raw, size)) {
-      return {ptr_mode::ptr, raw, ea, (uae_u8*)raw};
-    }
-    if (regs.natmem_offset) {
-      uintptr_t nat_hi = ((uintptr_t)regs.natmem_offset) & 0xFFFFFFFF00000000ull;
-      if ((raw & 0xFFFFFFFF00000000ull) == nat_hi) {
-        return {ptr_mode::ea, raw, ea, nullptr};
-      }
-    }
-    return {ptr_mode::ptr, raw, ea, (uae_u8*)raw};
+  if (host_ptr_in_maps(raw, size)) {
+    return {mem_ptr_mode::host_ptr, raw, ea, (uae_u8*)raw};
   }
+
+  if ((raw >> 32) == 0 || (raw >> 32) == 0xFFFFFFFFu) {
+    return {mem_ptr_mode::ea32, raw, ea, nullptr};
+  }
+
   if (regs.natmem_offset) {
-    uintptr_t full = (uintptr_t)regs.natmem_offset + (uintptr_t)ea;
-    if (host_ptr_in_maps(full, size)) {
-      return {ptr_mode::ptr32, raw, ea, (uae_u8*)full};
+    uintptr_t base = (uintptr_t)regs.natmem_offset;
+    if (raw >= base && (raw - base) <= 0xFFFFFFFFu) {
+      return {mem_ptr_mode::ea32, raw, (uae_u32)(raw - base), nullptr};
     }
   }
-  return {ptr_mode::ea, raw, ea, nullptr};
+
+  return {mem_ptr_mode::host_ptr, raw, ea, (uae_u8*)raw};
 }
 
-static inline void trace_mem(const char* op, uintptr_t raw, uae_u32 val, const char* mode) {
-  if (!mem_trace_enabled() || g_mem_trace_budget <= 0) {
-    return;
-  }
-  if (g_mem_trace_ea_only > 0 && strcmp(mode, "ea") != 0) {
-    return;
-  }
-  g_mem_trace_budget--;
-  printf("[UAE-MEM] %s %s raw=%016lX val=%08X\n", op, mode, (unsigned long)raw,
-         (unsigned int)val);
-}
-
-// CPU indirect memory helpers used by UAE - these should work with host pointers as expected by JIT
-// The JIT core passes host pointers to emulator memory, not 68k bus addresses
+// UAE JIT passes host pointers here. Use direct host-pointer accesses.
 uae_u32 do_get_mem_long(uae_u32* a) {
-  ptr_resolve_result r = resolve_mem_ptr(a, 4);
-  if (r.mode == ptr_mode::ea) {
-    uae_u32 v = (uae_u32)read_long(r.ea);
-    trace_mem("R32", r.raw, v, "ea");
+  mem_ptr_ref r = resolve_mem_ptr(a, 4);
+  if (r.mode == mem_ptr_mode::ea32) {
+    uae_u32 v = (uae_u32)read_long((unsigned int)r.ea);
+    trace_mem("R32-EA", r.raw, v);
     return v;
   }
   uae_u8* b = r.host;
   uae_u32 v = (b[0] << 24) | (b[1] << 16) | (b[2] << 8) | (b[3]);
-  trace_mem("R32", r.raw, v, r.mode == ptr_mode::ptr32 ? "ptr32" : "ptr");
+  trace_mem("R32", r.raw, v);
   return v;
 }
 
 uint16_t do_get_mem_word(uint16_t* a) {
-  ptr_resolve_result r = resolve_mem_ptr(a, 2);
-  if (r.mode == ptr_mode::ea) {
-    uint16_t v = (uint16_t)read_word(r.ea);
-    trace_mem("R16", r.raw, (uae_u32)v, "ea");
+  mem_ptr_ref r = resolve_mem_ptr(a, 2);
+  if (r.mode == mem_ptr_mode::ea32) {
+    uint16_t v = (uint16_t)read_word((unsigned int)r.ea);
+    trace_mem("R16-EA", r.raw, (uae_u32)v);
     return v;
   }
   uae_u8* b = r.host;
   uint16_t v = (b[0] << 8) | (b[1]);
-  trace_mem("R16", r.raw, (uae_u32)v, r.mode == ptr_mode::ptr32 ? "ptr32" : "ptr");
+  trace_mem("R16", r.raw, (uae_u32)v);
   return v;
 }
 
 uint8_t do_get_mem_byte(uint8_t* a) {
-  ptr_resolve_result r = resolve_mem_ptr(a, 1);
-  if (r.mode == ptr_mode::ea) {
-    uint8_t v = (uint8_t)read_byte(r.ea);
-    trace_mem("R08", r.raw, (uae_u32)v, "ea");
+  mem_ptr_ref r = resolve_mem_ptr(a, 1);
+  if (r.mode == mem_ptr_mode::ea32) {
+    uint8_t v = (uint8_t)read_byte((unsigned int)r.ea);
+    trace_mem("R08-EA", r.raw, (uae_u32)v);
     return v;
   }
   uint8_t v = *r.host;
-  trace_mem("R08", r.raw, (uae_u32)v, r.mode == ptr_mode::ptr32 ? "ptr32" : "ptr");
+  trace_mem("R08", r.raw, (uae_u32)v);
   return v;
 }
 
 void do_put_mem_long(uae_u32* a, uae_u32 v) {
-  ptr_resolve_result r = resolve_mem_ptr(a, 4);
-  if (r.mode == ptr_mode::ea) {
-    m68k_write_memory_32(r.ea, (unsigned int)v);
-    trace_mem("W32", r.raw, v, "ea");
+  mem_ptr_ref r = resolve_mem_ptr(a, 4);
+  if (r.mode == mem_ptr_mode::ea32) {
+    m68k_write_memory_32((unsigned int)r.ea, (unsigned int)v);
+    trace_mem("W32-EA", r.raw, v);
     return;
   }
   uae_u8* b = r.host;
@@ -194,31 +181,31 @@ void do_put_mem_long(uae_u32* a, uae_u32 v) {
   b[1] = (v >> 16) & 0xFF;
   b[2] = (v >>  8) & 0xFF;
   b[3] = (v >>  0) & 0xFF;
-  trace_mem("W32", r.raw, v, r.mode == ptr_mode::ptr32 ? "ptr32" : "ptr");
+  trace_mem("W32", r.raw, v);
 }
 
 void do_put_mem_word(uint16_t* a, uint16_t v) {
-  ptr_resolve_result r = resolve_mem_ptr(a, 2);
-  if (r.mode == ptr_mode::ea) {
-    m68k_write_memory_16(r.ea, (unsigned int)v);
-    trace_mem("W16", r.raw, (uae_u32)v, "ea");
+  mem_ptr_ref r = resolve_mem_ptr(a, 2);
+  if (r.mode == mem_ptr_mode::ea32) {
+    m68k_write_memory_16((unsigned int)r.ea, (unsigned int)v);
+    trace_mem("W16-EA", r.raw, (uae_u32)v);
     return;
   }
   uae_u8* b = r.host;
   b[0] = (v >> 8) & 0xFF;
   b[1] = (v >> 0) & 0xFF;
-  trace_mem("W16", r.raw, (uae_u32)v, r.mode == ptr_mode::ptr32 ? "ptr32" : "ptr");
+  trace_mem("W16", r.raw, (uae_u32)v);
 }
 
 void do_put_mem_byte(uint8_t* a, uint8_t v) {
-  ptr_resolve_result r = resolve_mem_ptr(a, 1);
-  if (r.mode == ptr_mode::ea) {
-    m68k_write_memory_8(r.ea, (unsigned int)v);
-    trace_mem("W08", r.raw, (uae_u32)v, "ea");
+  mem_ptr_ref r = resolve_mem_ptr(a, 1);
+  if (r.mode == mem_ptr_mode::ea32) {
+    m68k_write_memory_8((unsigned int)r.ea, (unsigned int)v);
+    trace_mem("W08-EA", r.raw, (uae_u32)v);
     return;
   }
   *r.host = v;
-  trace_mem("W08", r.raw, (uae_u32)v, r.mode == ptr_mode::ptr32 ? "ptr32" : "ptr");
+  trace_mem("W08", r.raw, (uae_u32)v);
 }
 
 // FPU stubs for now (JIT backend without 68k FPU emulation enabled).
@@ -234,10 +221,23 @@ void fpu_reset(void) {}
 // Z3660-specific hook (unused on PiStorm64 path).
 extern "C" void cpu_emulator_reset_core0(void) {}
 
+static inline bool softreset_no_sidefx_enabled(void) {
+  const char* e = getenv("PISTORM_SOFTRESET_NO_SIDEFX");
+  return e && atoi(e) != 0;
+}
+
 extern "C" void reset_autoconfig(void) {
   if (cfg && cfg->platform && cfg->platform->handle_reset) {
     cfg->platform->handle_reset(cfg);
   }
+}
+
+void custom_reset(bool hardreset, bool keyboardreset) {
+  printf("custom_reset\n");
+  if (!hardreset && !keyboardreset && softreset_no_sidefx_enabled()) {
+    return;
+  }
+  reset_autoconfig();
 }
 
 // Provide a minimal intlev() to satisfy newcpu references.

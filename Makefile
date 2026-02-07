@@ -95,7 +95,7 @@ OPT_LEVEL := -O$(O)
 endif
 
 # Set USE_GOLD=1 to link with gold if available.
-USE_GOLD   ?= 1
+USE_GOLD   ?= 0
 
 include config.mk
 
@@ -119,10 +119,12 @@ ARCH_FEATURES ?=
 # Toggle Pi host (/opt/vc) support for dev tools.
 USE_VC     ?= 0
 # Perf toggles
-USE_LTO    ?= 1
+USE_LTO    ?= 0
 USE_NO_PLT ?= 1 
 OMIT_FP    ?= 1
 USE_PIPE   ?= 1
+# Keep loop transforms conservative while debugging JIT bring-up.
+NO_UNROLL_FLAGS ?= -fno-unroll-loops
 
 # Quiet noisy-but-benign warnings from the generated 68k core.
 # Split into common + GCC-only; clang doesn't support every GCC flag.
@@ -161,7 +163,7 @@ AMIGA_AHI_INC ?= $(AMIGA_TOOLCHAIN)/src/m68k-amigaos-gcc/build-Linux-m68k-amigao
 AMIGA_HEADERS ?= $(CURDIR)/src/platforms/amiga/headers/include
 AMIGA_SUBMAKE = $(MAKE) AMIGA_TOOLCHAIN=$(AMIGA_TOOLCHAIN) VBCC=$(AMIGA_VBCC) P96DEV=$(AMIGA_P96DEV) AHI_INC=$(AMIGA_AHI_INC) AMIGA_HEADERS=$(AMIGA_HEADERS)
 
-PISTORM_GPCLK_SRC ?= 6
+PISTORM_GPCLK_SRC ?= 5
 PISTORM_GPCLK_DIV ?= 6
 PISTORM_KMOD_PARAMS ?= run_batch_enable=0 berr_reset_input=0 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
 
@@ -283,9 +285,10 @@ UAE_WARN_SUPPRESS = -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-s
 	-Wno-sign-compare -Wno-misleading-indentation -Wno-format -Wno-int-to-pointer-cast
 UAE_EXTRA_CFLAGS ?=
 UAE_CFLAGS   = $(EMU_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
-	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(UAE_EXTRA_CFLAGS) $(NO_LTO_FLAGS) -fPIC
+	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS) \
+	$(UAE_EXTRA_CFLAGS) $(NO_LTO_FLAGS) -fPIC
 UAE_CXXFLAGS = $(CXX_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
-	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(UAE_EXTRA_CFLAGS) \
+	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS) $(UAE_EXTRA_CFLAGS) \
 	$(NO_LTO_FLAGS) -fpermissive $(UAE_WARN_SUPPRESS) -fPIC
 EXTRA_CXX_OBJS :=
 EXTRA_LINK_DEPS :=
@@ -425,9 +428,9 @@ INCLUDES += $(UAE_INCLUDES)
 endif
 
 CXX_WARNINGS = $(filter-out -Wstrict-prototypes -Wmissing-prototypes,$(EMU_WARNINGS))
-CFLAGS       = $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
-CXXFLAGS     = $(CXX_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(EXTRA_CFLAGS)
-M68K_CFLAGS   = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
+CFLAGS       = $(EMU_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS) $(EXTRA_CFLAGS)
+CXXFLAGS     = $(CXX_WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS) $(EXTRA_CFLAGS)
+M68K_CFLAGS   = $(WARNINGS) $(OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(INCLUDES) $(ACFLAGS) $(LTO_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS) $(M68K_WARN_SUPPRESS) $(EXTRA_M68K_CFLAGS)
 LDFLAGS      = $(WARNINGS) $(LD_GOLD) $(LDSEARCH) $(LTO_FLAGS) $(EXTRA_LDFLAGS)
 
 LDLIBS   = $(RAYLIB_LIBS) $(LIBS) $(LDLIBS_VC) $(LDLIBS_ALSA)

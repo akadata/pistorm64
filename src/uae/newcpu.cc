@@ -95,6 +95,7 @@ extern volatile int read_reset;
 int read_reset_last=1;
 extern "C" void cpu_emulator_reset_core0(void);
 extern "C" void reset_autoconfig(void);
+void custom_reset(bool hardreset, bool keyboardreset) __attribute__((weak));
 extern int ovl;
 #ifdef USE_UAE_JIT
 extern "C" unsigned int read_long(unsigned int address);
@@ -3503,15 +3504,24 @@ void custom_reset_cpu(bool hardreset, bool keyboardreset)
 {
 #ifdef WITH_THREADED_CPU
    if (cpu_thread_tid != uae_thread_get_id(nullptr)) {
-      custom_reset(hardreset, keyboardreset);
+      if (custom_reset) {
+         custom_reset(hardreset, keyboardreset);
+      } else {
+         printf("custom_reset\n");
+         reset_autoconfig();
+      }
       return;
    }
    cpu_thread_reset = 1 | (hardreset ? 2 : 0) | (keyboardreset ? 4 : 0);
    uae_sem_post(&cpu_wakeup_sema);
    uae_sem_wait(&cpu_in_sema);
 #else
-//   custom_reset(hardreset, keyboardreset);
-   printf("custom_reset\n");
+   if (custom_reset) {
+      custom_reset(hardreset, keyboardreset);
+   } else {
+      printf("custom_reset\n");
+      reset_autoconfig();
+   }
 #endif
 }
 
@@ -3588,7 +3598,9 @@ void execute_normal(void)
       /* Take note: This is the do-it-normal loop */
       r->opcode = get_jit_opcode();
 
-      special_mem = DISTRUST_CONSISTENT_MEM;
+      // PiStorm64 UAE-JIT uses banked callbacks for memory; avoid emitting
+      // direct NATMEM-based accesses against a non-contiguous host map.
+      special_mem = special_mem_default;
       pc_hist[blocklen].location = (uae_u16*)r->pc_p;
       cpu_cycles = (*cpufunctbl[r->opcode])(r->opcode);
 
@@ -4634,6 +4646,27 @@ void exception2_fetch(uae_u32 opcode, int offset, int pcoffset)
 }
 
 int reset_loop_counter=0;
+
+static int get_reset_jmp_pc_bias(void)
+{
+   static int init = 0;
+   static int bias = -2;
+   if (!init) {
+      const char* e = getenv("PISTORM_RESET_JMP_PC_BIAS");
+      if (e && *e) {
+         int v = atoi(e);
+         if (v < -8)
+            v = -8;
+         if (v > 8)
+            v = 8;
+         bias = v;
+      }
+      init = 1;
+      write_log(_T("[CPU] RESET/JMP PC bias=%d\n"), bias);
+   }
+   return bias;
+}
+
 void hard_reboot(void)
 {
 #define PS_RST_CTRL_REG         (XPS_SYS_CTRL_BASEADDR + 0x244)
@@ -4659,8 +4692,6 @@ bool cpureset (void)
    uaecptr ksboot = 0xf80002 - 2;
    uae_u16 ins;
    addrbank *ab;
-   bool extreset = false;
-
    maybe_disable_fpu();
    m68k_reset_delay = currprefs.reset_delay;
    set_special(SPCFLAG_CHECK);
@@ -4687,20 +4718,20 @@ bool cpureset (void)
       write_log (_T("CPU reset PC=%x\n"), pc - 2);
 
       ins = get_word (pc);
-      custom_reset_cpu(false, false);
-      // On Amiga reset handling, keep ROM overlay visible at low vectors.
-      // If OVL stays low here, subsequent exception/reset vectors can resolve to empty RAM.
-      ovl = 1;
-      m68k_setpc_normal (ksboot);
-      cpu_emulator_reset_core0();
-      reset_autoconfig();
       if ((ins & ~7) == 0x4ed0) {
          int reg = ins & 7;
          uae_u32 addr = m68k_areg (regs, reg);
+         custom_reset_cpu(false, false);
+         // Keep ROM visible while jumping into Kickstart reset trampoline.
+         ovl = 1;
          if (addr < 0x80000)
             addr += 0xf80000;
-         write_log (_T("reset/jmp (ax) combination at %08x emulated -> %x\n"), pc, addr+2);
-         m68k_setpc_normal (addr +2 - 2);
+         // Match upstream UAE reset trampoline behavior (addr - 2).
+         int bias = get_reset_jmp_pc_bias();
+         uae_u32 jmp_pc = addr + bias;
+         write_log (_T("reset/jmp (ax) combination at %08x emulated raw=%x bias=%d -> %x\n"),
+            pc, addr, bias, jmp_pc);
+         m68k_setpc_normal (jmp_pc);
 //         reset_loop_counter++;
 //         if(reset_loop_counter>=5)
 //         {
@@ -4709,6 +4740,9 @@ bool cpureset (void)
 //         }
          return false;
       }
+      custom_reset_cpu(false, false);
+      ovl = 1;
+      m68k_setpc_normal (ksboot);
       // did memory disappear under us?
 //      if (ab == &get_mem_bank (pc))
 //         return false;
@@ -4723,8 +4757,6 @@ bool cpureset (void)
    write_log (_T("CPU Reset PC=%x, invalid memory -> %x.\n"), pc, ksboot + 2);
    custom_reset_cpu(false, false);
    m68k_setpc_normal (ksboot);
-   cpu_emulator_reset_core0();
-   reset_autoconfig();
    return false;
 }
 
