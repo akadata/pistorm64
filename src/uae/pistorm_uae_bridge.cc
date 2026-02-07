@@ -192,6 +192,172 @@ static inline void uae_jit_trace_reset_vec(const char* src, unsigned int addr, u
   printf("[UAE-JIT] RESETV %-8s addr=%08X val=%08X\n", src, addr, val);
 }
 
+#ifdef PISTORM_UAE_RESET_VEC_TRACE
+struct reset_vec_access {
+  uae_u32 addr;
+  uae_u8 val;
+  const char* source;
+  int map_index;
+  const char* map_kind;
+  const char* map_id;
+};
+
+static const char* pistorm_map_type_name(unsigned int map_type) {
+  switch (map_type) {
+    case MAPTYPE_ROM:
+      return "ROM";
+    case MAPTYPE_RAM:
+      return "RAM";
+    case MAPTYPE_RAM_WTC:
+      return "RAM-WTC";
+    case MAPTYPE_RAM_NOALLOC:
+      return "RAM-NOALLOC";
+    case MAPTYPE_REGISTER:
+      return "REG";
+    default:
+      return "NONE";
+  }
+}
+
+static int pistorm_find_map_for_mirror_addr(uaecptr addr) {
+  if (!cfg) {
+    return -1;
+  }
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
+      continue;
+    }
+    if (cfg->map_mirror[i] == (unsigned int)-1) {
+      continue;
+    }
+    if (addr >= cfg->map_mirror[i] && addr < (cfg->map_mirror[i] + cfg->map_size[i])) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+static int pistorm_find_map_for_host_alias(unsigned int host_addr, unsigned int width) {
+  if (!cfg) {
+    return -1;
+  }
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
+      continue;
+    }
+    unsigned int span = 0;
+    switch (cfg->map_type[i]) {
+      case MAPTYPE_ROM:
+      case MAPTYPE_RAM_WTC:
+        span = cfg->rom_size[i];
+        break;
+      case MAPTYPE_RAM:
+      case MAPTYPE_RAM_NOALLOC:
+        span = cfg->map_size[i];
+        break;
+      default:
+        continue;
+    }
+    if (span < width || span == 0) {
+      continue;
+    }
+    uintptr_t host_base = (uintptr_t)cfg->map_data[i];
+    unsigned int base32 = (unsigned int)host_base;
+    if (host_addr < base32) {
+      continue;
+    }
+    unsigned int off = host_addr - base32;
+    if (off > span - width) {
+      continue;
+    }
+    return i;
+  }
+  return -1;
+}
+
+static void pistorm_fill_reset_vec_map(reset_vec_access* info, const char* source, int map_index) {
+  info->source = source;
+  info->map_index = map_index;
+  if (cfg && map_index >= 0) {
+    info->map_kind = pistorm_map_type_name(cfg->map_type[map_index]);
+    info->map_id = cfg->map_id[map_index] ? cfg->map_id[map_index] : "None";
+  } else {
+    info->map_kind = "BUS";
+    info->map_id = "None";
+  }
+}
+
+static uae_u8 pistorm_read_reset_vec_byte(uaecptr addr, reset_vec_access* info) {
+  unsigned int val = 0;
+  info->addr = addr;
+  if (ovl && addr < 8 &&
+      bridge_read_rom_data(0x00F80000u + addr, OP_TYPE_BYTE, &val)) {
+    int map_index = get_mapped_item_by_address(cfg, 0x00F80000u + addr);
+    pistorm_fill_reset_vec_map(info, "rom-data", map_index);
+    info->val = (uae_u8)val;
+    return (uae_u8)val;
+  }
+  if (ovl && addr < 8 && cfg &&
+      handle_mapped_read(cfg, 0x00F80000u + addr, &val, OP_TYPE_BYTE) != -1) {
+    int map_index = get_mapped_item_by_address(cfg, 0x00F80000u + addr);
+    pistorm_fill_reset_vec_map(info, "map-read", map_index);
+    info->val = (uae_u8)val;
+    return (uae_u8)val;
+  }
+  if (ovl && addr < 8) {
+    val = m68k_read_memory_8(0x00F80000u + addr);
+    int map_index = pistorm_find_map_for_mirror_addr(addr);
+    pistorm_fill_reset_vec_map(info, "bus-f8", map_index);
+    info->val = (uae_u8)val;
+    return (uae_u8)val;
+  }
+  if (bridge_mapped_read(addr, OP_TYPE_BYTE, &val)) {
+    int map_index = get_mapped_item_by_address(cfg, (unsigned int)addr);
+    if (map_index < 0 && ovl) {
+      map_index = pistorm_find_map_for_mirror_addr(addr);
+    }
+    pistorm_fill_reset_vec_map(info, "map", map_index);
+    info->val = (uae_u8)val;
+    return (uae_u8)val;
+  }
+  if (bridge_read_host_alias((unsigned int)addr, OP_TYPE_BYTE, &val)) {
+    int map_index = pistorm_find_map_for_host_alias((unsigned int)addr, 1u);
+    pistorm_fill_reset_vec_map(info, "alias", map_index);
+    info->val = (uae_u8)val;
+    return (uae_u8)val;
+  }
+  cpu_set_fc(pistorm_fc_ifetch());
+  val = m68k_read_memory_8((unsigned int)addr);
+  int map_index = get_mapped_item_by_address(cfg, (unsigned int)addr);
+  if (map_index < 0 && ovl) {
+    map_index = pistorm_find_map_for_mirror_addr(addr);
+  }
+  pistorm_fill_reset_vec_map(info, "bus-low", map_index);
+  info->val = (uae_u8)val;
+  return (uae_u8)val;
+}
+
+static void pistorm_trace_reset_vectors(void) {
+  reset_vec_access accesses[8];
+  uae_u8 bytes[8];
+  for (int i = 0; i < 8; i++) {
+    bytes[i] = pistorm_read_reset_vec_byte((uaecptr)i, &accesses[i]);
+  }
+  uae_u32 sp = ((uae_u32)bytes[0] << 24) | ((uae_u32)bytes[1] << 16) |
+               ((uae_u32)bytes[2] << 8) | (uae_u32)bytes[3];
+  uae_u32 pc = ((uae_u32)bytes[4] << 24) | ((uae_u32)bytes[5] << 16) |
+               ((uae_u32)bytes[6] << 8) | (uae_u32)bytes[7];
+  printf("[UAE-JIT] RESETV TRACE ovl=%d bytes=%02X %02X %02X %02X %02X %02X %02X %02X SP=%08X PC=%08X\n",
+         ovl, bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+         sp, pc);
+  for (int i = 0; i < 8; i++) {
+    printf("[UAE-JIT] RESETV BYTE addr=%08X val=%02X src=%s map=%s id=%s idx=%d\n",
+           accesses[i].addr, accesses[i].val, accesses[i].source,
+           accesses[i].map_kind, accesses[i].map_id, accesses[i].map_index);
+  }
+}
+#endif
+
 static inline bool bridge_read_rom_data(unsigned int addr, unsigned char type, unsigned int* val) {
   if (!cfg || !val) {
     return false;
@@ -711,6 +877,10 @@ static void uae_pistorm_apply_reset_vectors(void) {
   unsigned int pc_m = 0;
   uae_u32 sp = 0;
   uae_u32 pc = 0;
+
+#ifdef PISTORM_UAE_RESET_VEC_TRACE
+  pistorm_trace_reset_vectors();
+#endif
 
   sp = (uae_u32)read_long(0x00000000);
   pc = (uae_u32)read_long(0x00000004);
