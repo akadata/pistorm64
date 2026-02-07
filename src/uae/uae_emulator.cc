@@ -8,7 +8,7 @@
 #include "../main.h"
 #include "sysconfig.h"
 #include "xgpiops.h"
-#include "maccess.h"
+#include "machdep/maccess.h"
 #include "memory.h"
 #include "../memorymap.h"
 
