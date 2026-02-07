@@ -58,6 +58,7 @@ addrbank* thread_mem_banks[MEMORY_BANKS];
 
 static int g_mem_trace = -1;
 static int g_mem_trace_budget = 128;
+static int g_reset_trace = -1;
 
 static inline bool mem_trace_enabled(void) {
   if (g_mem_trace == -1) {
@@ -77,6 +78,23 @@ static inline void trace_mem(const char* op, uintptr_t raw, uae_u32 val) {
   }
   g_mem_trace_budget--;
   printf("[UAE-MEM] %s ptr=%016lX val=%08X\n", op, (unsigned long)raw, (unsigned int)val);
+}
+
+static inline bool reset_trace_enabled(void) {
+  if (g_reset_trace == -1) {
+    const char* e = getenv("PISTORM_UAE_RESET_TRACE");
+    g_reset_trace = (e && atoi(e) != 0) ? 1 : 0;
+  }
+  return g_reset_trace != 0;
+}
+
+// Return-address hint for reset callers when supported by the compiler.
+static inline void* reset_caller_hint(void) {
+#if defined(__GNUC__) || defined(__clang__)
+  return __builtin_extract_return_addr(__builtin_return_address(0));
+#else
+  return nullptr;
+#endif
 }
 
 enum class mem_ptr_mode {
@@ -233,6 +251,16 @@ extern "C" void reset_autoconfig(void) {
 }
 
 void custom_reset(bool hardreset, bool keyboardreset) {
+  if (reset_trace_enabled()) {
+    uaecptr pc = m68k_getpc();
+    uae_u16 opcode = (uae_u16)read_word((unsigned int)pc);
+    const char* kind = hardreset ? "hard" : (keyboardreset ? "keyboard" : "soft");
+    printf("[UAE-RESET] kind=%s pc=%08X opcode=%04X caller=%p\n",
+           kind,
+           (unsigned int)pc,
+           (unsigned int)opcode,
+           reset_caller_hint());
+  }
   printf("custom_reset\n");
   if (!hardreset && !keyboardreset && softreset_no_sidefx_enabled()) {
     return;
