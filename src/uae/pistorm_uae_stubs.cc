@@ -231,9 +231,14 @@ void fpuop_save(uae_u32) {}
 void fpuop_restore(uae_u32) {}
 void fpu_reset(void) {}
 
-// Z3660-specific hooks (no-ops here).
+// Z3660-specific hook (unused on PiStorm64 path).
 extern "C" void cpu_emulator_reset_core0(void) {}
-extern "C" void reset_autoconfig(void) {}
+
+extern "C" void reset_autoconfig(void) {
+  if (cfg && cfg->platform && cfg->platform->handle_reset) {
+    cfg->platform->handle_reset(cfg);
+  }
+}
 
 // Provide a minimal intlev() to satisfy newcpu references.
 extern "C" int read_irq;

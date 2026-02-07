@@ -490,7 +490,9 @@ static void uae_pistorm_set_defaults(int cpu_model, int enable_jit, int enable_f
   currprefs.m68k_speed = changed_prefs.m68k_speed = -1;
   currprefs.comptrustbyte = changed_prefs.comptrustbyte = 1;
 
-  if (enable_jit) {
+  const char* force_nojit = getenv("PISTORM_UAE_FORCE_NOJIT");
+  int jit_enabled = enable_jit && !(force_nojit && atoi(force_nojit) != 0);
+  if (jit_enabled) {
     currprefs.cachesize = changed_prefs.cachesize = 32 * 1024;
     currprefs.compfpu = changed_prefs.compfpu = enable_fpu ? true : false;
   } else {
@@ -603,6 +605,16 @@ extern "C" void uae_pistorm_pulse_reset(void) {
   set_cycles(start_cycles);
   regs.stopped = false;
   set_special(0);
+}
+
+extern "C" void uae_pistorm_overlay_changed(int ovl_state) {
+  ovl = ovl_state ? 1 : 0;
+  if (ovl) {
+    pistorm_force_rom_overlay();
+  }
+  // OVL flips change effective low-memory mapping.
+  // Request core mode/mapping refresh and let normal execution path handle PC state.
+  set_special(SPCFLAG_MODE_CHANGE | SPCFLAG_CHECK);
 }
 
 extern "C" uint32_t uae_pistorm_get_pc(void) {

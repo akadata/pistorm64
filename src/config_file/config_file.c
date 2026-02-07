@@ -586,16 +586,22 @@ void add_mapping(struct emulator_config* cfg, unsigned int type, unsigned int ad
       if (mlock(cfg->map_data[index], cfg->map_size[index]) != 0) {
         printf("[CFG] Warning: mlock on ROM mapping failed (%s)\n", strerror(errno));
       }
+      const char* rom_rw_env = getenv("PISTORM_JIT_ROM_WRITABLE");
+      int keep_rom_writable = (rom_rw_env && atoi(rom_rw_env) != 0);
       long page_size = sysconf(_SC_PAGESIZE);
       if (page_size > 0) {
         uintptr_t base = (uintptr_t)cfg->map_data[index];
         uintptr_t aligned_base = base & ~((uintptr_t)page_size - 1u);
         size_t len = cfg->map_size[index] + (size_t)(base - aligned_base);
         len = (len + (size_t)page_size - 1u) & ~((size_t)page_size - 1u);
-        if (mprotect((void *)aligned_base, len, PROT_READ) != 0) {
-          printf("[CFG] Warning: mprotect ROM mapping failed (%s)\n", strerror(errno));
+        if (keep_rom_writable) {
+          printf("[CFG] ROM mapping left writable (PISTORM_JIT_ROM_WRITABLE=1).\n");
         } else {
-          printf("[CFG] ROM mapping set read-only (mprotect).\n");
+          if (mprotect((void *)aligned_base, len, PROT_READ) != 0) {
+            printf("[CFG] Warning: mprotect ROM mapping failed (%s)\n", strerror(errno));
+          } else {
+            printf("[CFG] ROM mapping set read-only (mprotect).\n");
+          }
         }
       }
     }

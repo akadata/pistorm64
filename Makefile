@@ -35,9 +35,9 @@ CXX := g++
 endif
 
 
-#EXTRA_CFLAGS ?= -g -O0
-#EXTRA_M68K_CFLAGS ?= -g -O0
-#EXTRA_LDFLAGS ?= -g -O0
+EXTRA_CFLAGS ?= -g -O0
+EXTRA_M68K_CFLAGS ?= -g -O0
+EXTRA_LDFLAGS ?= -g -O0
 
 
 # Tunables: edit here instead of hunting through rule bodies.
