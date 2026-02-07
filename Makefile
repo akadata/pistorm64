@@ -296,19 +296,20 @@ EXTRA_LINK_DEPS :=
 ifeq ($(USE_UAE_JIT),1)
 UAE_C_SRCS   := $(shell find $(UAE_SRCDIR) -type f -name "*.c")
 UAE_CXX_SRCS := $(shell find $(UAE_SRCDIR) -type f \( -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \))
+UAE_JIT_SRCS := \
+	$(UAE_SRCDIR)/jit/codegen_armA64.cpp \
+	$(UAE_SRCDIR)/jit/compemu_midfunc_armA64.cpp \
+	$(UAE_SRCDIR)/jit/compemu_midfunc_armA64_2.cpp \
+	$(UAE_SRCDIR)/jit/codegen_x86.cpp \
+	$(UAE_SRCDIR)/jit/compemu_midfunc_x86.cpp \
+	$(UAE_SRCDIR)/jit/gencomp.cpp
 UAE_CXX_SRCS := $(filter-out \
 	$(UAE_SRCDIR)/uae_emulator.cc \
 	$(UAE_SRCDIR)/pistorm_uae_bridge.cc \
 	$(UAE_SRCDIR)/pistorm_uae_stubs.cc \
 	$(UAE_SRCDIR)/fpp.cc \
-	$(UAE_SRCDIR)/fpp_native.cc \
-	$(UAE_SRCDIR)/jit/compemu_fpp.cc \
-	$(UAE_SRCDIR)/jit/codegen_arm.cc \
-	$(UAE_SRCDIR)/jit/codegen_arm64.cpp \
-	$(UAE_SRCDIR)/jit/compemu_midfunc_arm.cc \
-	$(UAE_SRCDIR)/jit/compemu_midfunc_arm2.cc \
-	$(UAE_SRCDIR)/jit/compemu_midfunc_arm64.cpp \
-	$(UAE_SRCDIR)/jit/compemu_midfunc_arm64_2.cpp,$(UAE_CXX_SRCS))
+	$(UAE_SRCDIR)/fpp_native.cc,$(UAE_CXX_SRCS))
+UAE_CXX_SRCS := $(sort $(UAE_CXX_SRCS) $(UAE_JIT_SRCS))
 UAE_OBJS := $(patsubst $(UAE_SRCDIR)/%.c,$(UAE_BUILDDIR)/%.o,$(UAE_C_SRCS))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cc,$(UAE_BUILDDIR)/%.o,$(filter %.cc,$(UAE_CXX_SRCS)))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cpp,$(UAE_BUILDDIR)/%.o,$(filter %.cpp,$(UAE_CXX_SRCS)))

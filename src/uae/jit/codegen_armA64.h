@@ -2,7 +2,7 @@
  * compiler/codegen_armA64.h - AARCH64 code generator
  *
  * Copyright (c) 2019 TomB
- *
+ * 
  * This file is part of the UAE4ARM project.
  *
  * JIT compiler m68k -> ARMv8.1
@@ -65,7 +65,7 @@
 
 
 /*----------------------------------------
- * branch instructions
+ * branch instructions 
  *----------------------------------------*/
 // i is the number of instructions, i.e. 4 bytes
 #define B_i(i)            _W((0b000101 << 26) | ((i) & 0x03ffffff))
@@ -147,7 +147,7 @@
 #define STURH_wXi(Wt,Xn,i)        _W((0b01111000000 << 21) | ((i & 0x1ff) << 12) | ((Xn) << 5) | (Wt))
 
 /*----------------------------------------
- * move immediate/register
+ * move immediate/register 
  *----------------------------------------*/
 #define MOV_wi(Wd,i16)            _W((0b01010010100 << 21) | (((i16) & 0xffff) << 5) | (Wd))
 #define MOV_xi(Xd,i16)            _W((0b11010010100 << 21) | (((i16) & 0xffff) << 5) | (Xd))
