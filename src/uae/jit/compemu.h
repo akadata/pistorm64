@@ -143,8 +143,8 @@ extern void alloc_cache(void);
 extern void compile_block(cpu_history* pc_hist, int blocklen, int totcyles);
 extern int check_for_cache_miss(void);
 
-//#define scaled_cycles(x) (currprefs.m68k_speed<0?(((x)/SCALE)?(((x)/SCALE<MAXCYCLES?((x)/SCALE):MAXCYCLES)):1):(x))
-#define scaled_cycles(x) (currprefs.m68k_speed<0?(((x)>>1)?((((x)>>1)<MAXCYCLES?((x)>>1):MAXCYCLES)):1):(x))
+#define scaled_cycles(x) (currprefs.m68k_speed<0?(((x)/SCALE)?(((x)/SCALE<MAXCYCLES?((x)/SCALE):MAXCYCLES)):1):(x))
+
 /* JIT FPU compilation */
 extern void comp_fpp_opp (uae_u32 opcode, uae_u16 extra);
 extern void comp_fbcc_opp (uae_u32 opcode);
@@ -281,6 +281,10 @@ typedef struct {
 #if defined(CPU_arm)
 #include "compemu_midfunc_arm.h"
 #include "compemu_midfunc_arm2.h"
+#endif
+
+#if defined(CPU_i386) || defined(CPU_x86_64)
+#include "compemu_midfunc_x86.h"
 #endif
 
 #undef DECLARE_MIDFUNC
