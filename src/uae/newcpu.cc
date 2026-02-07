@@ -1222,18 +1222,6 @@ void REGPARAM2 MakeSR (void)
 
 }
 
-static void SetSR (uae_u16 sr)
-{
-   regs.sr &= 0xff00;
-   regs.sr |= sr;
-
-   SET_XFLG ((regs.sr >> 4) & 1);
-   SET_NFLG ((regs.sr >> 3) & 1);
-   SET_ZFLG ((regs.sr >> 2) & 1);
-   SET_VFLG ((regs.sr >> 1) & 1);
-   SET_CFLG (regs.sr & 1);
-}
-
 static void MakeFromSR_x(int t0trace)
 {
    int oldm = regs.m;
@@ -2587,6 +2575,7 @@ void mmu_op (uae_u32 opcode, uae_u32 extra)
 
 #endif
 
+#ifdef WITH_THREADED_CPU
 static void do_trace (void)
 {
    // need to store PC because of branch instructions
@@ -2599,6 +2588,7 @@ static void do_trace (void)
       activate_trace();
    }
 }
+#endif
 const uae_atomic uae_int_requested=0;
 extern int read_irq;
 #include "../main.h"
@@ -2990,7 +2980,6 @@ static int do_specialties (int cycles)
          break;
       }
       m68k_unset_stop();
-   isstopped:
       check_uae_int_request();
 /*
       {
@@ -3792,12 +3781,6 @@ static void m68k_run_jit(void)
    }
 }
 #endif /* JIT */
-
-static void check_halt(void)
-{
-   if (regs.halted)
-      do_specialties (0);
-}
 
 void cpu_inreset(void)
 {
