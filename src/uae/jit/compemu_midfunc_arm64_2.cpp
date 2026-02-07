@@ -3409,9 +3409,10 @@ MIDFUNC(3,jff_DIVLS32,(RW4 d, RR4 s1, W4 rem))
 	// Here we have to calc remainder
 	MSUB_wwww(rem, s1, REG_WORK1, d);
 
-	EOR_www(REG_WORK3, rem, d);	// If sign of remainder and first operand differs, change sign of remainder
+	EOR_www(REG_WORK3, rem, d);	// If sign of remainder and first operand differs, change sign of remainder.
 	TBZ_wii(REG_WORK3, 31, 2);
-	NEG_ww(REG_WORK2, REG_WORK2);
+	// WinUAE AArch64 adjusts the remainder sign based on the dividend; negate the remainder register.
+	NEG_ww(rem, rem);
 
 	MOV_ww(d, REG_WORK1);
 	TST_ww(d, d);
