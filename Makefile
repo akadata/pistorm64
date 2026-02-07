@@ -309,7 +309,16 @@ UAE_CXX_SRCS := $(filter-out \
 	$(UAE_SRCDIR)/uae_emulator.cc \
 	$(UAE_SRCDIR)/pistorm_uae_bridge.cc \
 	$(UAE_SRCDIR)/pistorm_uae_stubs.cc \
+	$(UAE_SRCDIR)/cpudefs.cc \
+	$(UAE_SRCDIR)/cpustbl.cc \
+	$(UAE_SRCDIR)/cpuemu_0.cc \
+	$(UAE_SRCDIR)/cpuemu_4.cc \
+	$(UAE_SRCDIR)/cpuemu_11.cc \
+	$(UAE_SRCDIR)/cpuemu_13.cc \
+	$(UAE_SRCDIR)/cpuemu_40.cc \
+	$(UAE_SRCDIR)/cpuemu_44.cc \
 	$(UAE_SRCDIR)/fpp.cc \
+	$(UAE_SRCDIR)/memory.cc \
 	$(UAE_SRCDIR)/fpp_native.cc,$(UAE_CXX_SRCS))
 UAE_CXX_SRCS := $(sort $(UAE_CXX_SRCS) $(UAE_JIT_SRCS) $(UAE_FPP_NATIVE_CPP))
 UAE_OBJS := $(patsubst $(UAE_SRCDIR)/%.c,$(UAE_BUILDDIR)/%.o,$(UAE_C_SRCS))
