@@ -2604,7 +2604,7 @@ static inline void check_uae_int_request(void)
          read_reset=(read1>>(n040RSTI   ))&1;
       }while(read_reset==0);
       uaecptr ksboot = 0xf80002 - 2;
-      custom_reset_cpu(false, false);
+      custom_reset_cpu_trace(false, false, "gpio_reset", 0);
       m68k_setpc_normal (ksboot);
       ovl=1;
       m68k_reset_newcpu(1);
@@ -3524,6 +3524,29 @@ void custom_reset_cpu(bool hardreset, bool keyboardreset)
    }
 #endif
 }
+
+#ifdef JIT_RESET_TRACE
+static uae_u16 get_reset_trace_opcode(uaecptr pc)
+{
+   addrbank *ab = &get_mem_bank(pc);
+   if (ab->check(pc, 2)) {
+      return get_word(pc);
+   }
+   return 0xffff;
+}
+
+static void custom_reset_cpu_trace(bool hardreset, bool keyboardreset, const char* caller, uaecptr jmp_pc)
+{
+   uaecptr pc = m68k_getpc();
+   uae_u16 opcode = get_reset_trace_opcode(pc);
+   write_log(_T("[CPU] custom_reset_cpu caller=%s pc=%08x opcode=%04x jmp_pc=%08x cpu_model=%d\n"),
+      caller ? caller : "unknown", pc, opcode, jmp_pc, currprefs.cpu_model);
+   custom_reset_cpu(hardreset, keyboardreset);
+}
+#else
+#define custom_reset_cpu_trace(hardreset, keyboardreset, caller, jmp_pc) \
+   custom_reset_cpu(hardreset, keyboardreset)
+#endif
 
 #ifdef JIT  /* Completely different run_2 replacement */
 
@@ -4649,9 +4672,9 @@ int reset_loop_counter=0;
 
 static int get_reset_jmp_pc_bias(void)
 {
-   static int init = 0;
-   static int bias = -2;
-   if (!init) {
+   static int override_init = 0;
+   static int override_bias = -2;
+   if (!override_init) {
       const char* e = getenv("PISTORM_RESET_JMP_PC_BIAS");
       if (e && *e) {
          int v = atoi(e);
@@ -4659,10 +4682,29 @@ static int get_reset_jmp_pc_bias(void)
             v = -8;
          if (v > 8)
             v = 8;
-         bias = v;
+         override_bias = v;
+      } else {
+         override_bias = 0x7fffffff;
       }
-      init = 1;
-      write_log(_T("[CPU] RESET/JMP PC bias=%d\n"), bias);
+      override_init = 1;
+   }
+   static int last_bias = 0x7fffffff;
+   if (override_bias != 0x7fffffff) {
+      if (last_bias != override_bias) {
+         write_log(_T("[CPU] RESET/JMP PC bias override=%d\n"), override_bias);
+         last_bias = override_bias;
+      }
+      return override_bias;
+   }
+   int bias = -2;
+   if (currprefs.cpu_model >= 68040) {
+      bias = 0;
+   } else if (currprefs.cpu_model <= 68010) {
+      bias = -2;
+   }
+   if (last_bias != bias) {
+      write_log(_T("[CPU] RESET/JMP PC bias=%d cpu_model=%d\n"), bias, currprefs.cpu_model);
+      last_bias = bias;
    }
    return bias;
 }
@@ -4700,14 +4742,14 @@ bool cpureset (void)
    warpmode_reset();
 #ifndef AMIBERRY
    if (cpuboard_forced_hardreset()) {
-      custom_reset_cpu(false, false);
+      custom_reset_cpu_trace(false, false, "cpureset:forced_hardreset", 0);
       m68k_reset();
       return true;
    }
 #endif
 #endif
    if ((currprefs.cpu_compatible || currprefs.cpu_memory_cycle_exact) && currprefs.cpu_model <= 68020) {
-      custom_reset_cpu(false, false);
+      custom_reset_cpu_trace(false, false, "cpureset:compatible", 0);
       return false;
    }
    pc = m68k_getpc () + 2;
@@ -4721,14 +4763,14 @@ bool cpureset (void)
       if ((ins & ~7) == 0x4ed0) {
          int reg = ins & 7;
          uae_u32 addr = m68k_areg (regs, reg);
-         custom_reset_cpu(false, false);
-         // Keep ROM visible while jumping into Kickstart reset trampoline.
-         ovl = 1;
          if (addr < 0x80000)
             addr += 0xf80000;
          // Match upstream UAE reset trampoline behavior (addr - 2).
          int bias = get_reset_jmp_pc_bias();
          uae_u32 jmp_pc = addr + bias;
+         custom_reset_cpu_trace(false, false, "cpureset:reset_jmp", jmp_pc);
+         // Keep ROM visible while jumping into Kickstart reset trampoline.
+         ovl = 1;
          write_log (_T("reset/jmp (ax) combination at %08x emulated raw=%x bias=%d -> %x\n"),
             pc, addr, bias, jmp_pc);
          m68k_setpc_normal (jmp_pc);
@@ -4740,7 +4782,7 @@ bool cpureset (void)
 //         }
          return false;
       }
-      custom_reset_cpu(false, false);
+      custom_reset_cpu_trace(false, false, "cpureset:valid_mem", ksboot);
       ovl = 1;
       m68k_setpc_normal (ksboot);
       // did memory disappear under us?
@@ -4755,7 +4797,7 @@ bool cpureset (void)
 //   write_log (_T("CPU Reset PC=%x (%s), invalid memory -> %x.\n"), pc, ab->name, ksboot + 2);
 
    write_log (_T("CPU Reset PC=%x, invalid memory -> %x.\n"), pc, ksboot + 2);
-   custom_reset_cpu(false, false);
+   custom_reset_cpu_trace(false, false, "cpureset:invalid_mem", ksboot);
    m68k_setpc_normal (ksboot);
    return false;
 }
