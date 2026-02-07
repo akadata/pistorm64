@@ -1,7 +1,7 @@
 /*
 * UAE - The Un*x Amiga Emulator
 *
-* Read 68000 CPU specs from file "table68k"
+* Read 68000 CPU specs from file "gen/table68k"
 *
 * Copyright 1995,1996 Bernd Schmidt
 */

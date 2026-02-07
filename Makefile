@@ -270,6 +270,10 @@ M68KFILES = $(MUSASHIFILES) $(MUSASHIGENCFILES)
 # UAE/JIT build (optional, AArch64 only)
 UAE_SRCDIR   := src/uae
 UAE_BUILDDIR := build/uae
+UAE_GEN_DIR  := $(UAE_SRCDIR)/gen
+UAE_GENTOOL_DIR := $(UAE_BUILDDIR)/gen
+UAE_GENCPU   := $(UAE_GENTOOL_DIR)/gencpu
+UAE_GENCOMP  := $(UAE_GENTOOL_DIR)/gencomp
 UAE_INCLUDES := -Isrc -I$(UAE_SRCDIR) -I$(UAE_SRCDIR)/include -I$(UAE_SRCDIR)/include/uae \
 	-I$(UAE_SRCDIR)/machdep -I$(UAE_SRCDIR)/jit -Iamiberry-lite/src/include
 UAE_C_SRCS   :=
@@ -293,6 +297,9 @@ UAE_CFLAGS   = $(EMU_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INC
 UAE_CXXFLAGS = $(CXX_WARNINGS) $(UAE_OPT_LEVEL) $(CPUFLAGS) $(DEFINES) $(UAE_INCLUDES) \
 	$(UAE_PIE_FLAGS) $(PLT_FLAGS) $(FP_FLAGS) $(PIPE_FLAGS) $(NO_UNROLL_FLAGS) $(UAE_EXTRA_CFLAGS) \
 	$(NO_LTO_FLAGS) -fpermissive $(UAE_WARN_SUPPRESS) -fPIC
+UAE_TOOL_INCLUDES := -Isrc -I$(UAE_SRCDIR) -I$(UAE_SRCDIR)/include -I$(UAE_SRCDIR)/include/uae \
+	-I$(UAE_SRCDIR)/machdep -I$(UAE_SRCDIR)/jit
+UAE_TOOL_CXXFLAGS := -O2 -g -std=c++11 -DUAE $(UAE_TOOL_INCLUDES)
 EXTRA_CXX_OBJS :=
 EXTRA_LINK_DEPS :=
 
@@ -315,6 +322,7 @@ UAE_CXX_SRCS := $(filter-out \
 	$(UAE_SRCDIR)/pistorm_uae_stubs.cc \
 	$(UAE_SRCDIR)/cpudefs.cc \
 	$(UAE_SRCDIR)/cpustbl.cc \
+	$(UAE_SRCDIR)/gencpu.cpp \
 	$(UAE_SRCDIR)/cpuemu_0.cc \
 	$(UAE_SRCDIR)/cpuemu_4.cc \
 	$(UAE_SRCDIR)/cpuemu_11.cc \
@@ -484,7 +492,8 @@ HELP_TARGETS = \
 	"make kernel_clean"               "Clean kernel module build outputs" \
 	"make "            "Build interactive bus monitor" \
 	"make full"         "Stop emulator, rebuild kmod+userland, install" \
-	"make uae-jit"      "Build UAE AArch64 JIT objects (libuae.a)"
+	"make uae-jit"      "Build UAE AArch64 JIT objects (libuae.a)" \
+	"make uae-opcodes"  "Regenerate UAE CPU/JIT opcode tables"
 
 # Safety: never leave partial outputs
 .DELETE_ON_ERROR:
@@ -512,6 +521,19 @@ uae-jit: $(UAE_TARGET)
 ifeq ($(USE_UAE_JIT),1)
 uae-jit: $(TARGET)
 endif
+
+$(UAE_GENTOOL_DIR):
+	mkdir -p $@
+
+$(UAE_GENCPU): $(UAE_SRCDIR)/gencpu.cpp $(UAE_SRCDIR)/readcpu.cc $(UAE_SRCDIR)/cpudefs.cpp | $(UAE_GENTOOL_DIR)
+	$(CXX) $(UAE_TOOL_CXXFLAGS) $^ -o $@
+
+$(UAE_GENCOMP): $(UAE_SRCDIR)/jit/gencomp.cpp $(UAE_SRCDIR)/readcpu.cc $(UAE_SRCDIR)/cpudefs.cpp | $(UAE_GENTOOL_DIR)
+	$(CXX) $(UAE_TOOL_CXXFLAGS) $^ -o $@
+
+uae-opcodes: $(UAE_GENCPU) $(UAE_GENCOMP)
+	cd $(UAE_SRCDIR) && $(abspath $(UAE_GENCPU))
+	cd $(UAE_SRCDIR) && $(abspath $(UAE_GENCOMP))
 
 $(UAE_TARGET): $(UAE_OBJS)
 	@mkdir -p $(UAE_BUILDDIR)
