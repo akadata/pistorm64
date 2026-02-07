@@ -102,6 +102,7 @@
 #else
 #define GEN_PATH "jit/"
 #endif
+/* table68k input lives under src/uae/gen; run generators from src/uae. */
 #define RETURN "return 0;"
 #define RETTYPE "uae_u32"
 #define NEXT_CPU_LEVEL 5
