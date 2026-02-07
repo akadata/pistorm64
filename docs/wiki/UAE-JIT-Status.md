@@ -67,6 +67,15 @@ make USE_UAE_JIT=1 uae-jit
 PISTORM_ENABLE_QUEUE=0 ./emulator --jit
 ```
 
+If the system drops to `OVL:0` too early (yellow screen flashing white) try
+delaying the first overlay drop with:
+
+```bash
+PISTORM_UAE_OVL_HOLDOFF=1 PISTORM_ENABLE_QUEUE=0 ./emulator --jit
+```
+
+Increase the holdoff count if needed (each count defers one `OVL:0` request).
+
 Keep initial tests minimal (ROM + chipram + platform) before re-adding Z2/Z3,
 RTG, PiSCSI, and A314 one by one.
 
