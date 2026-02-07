@@ -165,11 +165,7 @@ PISTORM_GPCLK_SRC ?= 6
 PISTORM_GPCLK_DIV ?= 6
 PISTORM_KMOD_PARAMS ?= run_batch_enable=0 berr_reset_input=0 gpclk_src=$(PISTORM_GPCLK_SRC) gpclk_div=$(PISTORM_GPCLK_DIV)
 
-ifeq ($(PISTORM_KMOD),1)
 PS_PROTOCOL_SRC := src/gpio/ps_protocol_kmod.c
-else
-PS_PROTOCOL_SRC := src/gpio/ps_protocol_userspace.c
-endif
 
 
 MAINFILES =

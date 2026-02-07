@@ -118,128 +118,59 @@ static inline void trace_mem(const char* op, uintptr_t raw, uae_u32 val, const c
          (unsigned int)val);
 }
 
-// CPU indirect memory helpers used by UAE.
+// CPU indirect memory helpers used by UAE - these should work with host pointers as expected by JIT
+// The JIT core passes host pointers to emulator memory, not 68k bus addresses
 uae_u32 do_get_mem_long(uae_u32* a) {
-  // The pointer 'a' might be an emulator address cast to a pointer
-  // If it's within the 32-bit address space, treat it as an emulator address
-  if (ptr_is_emu_addr(a)) {
-    unsigned int addr = (unsigned int)(uintptr_t)a;
-    unsigned int val = 0;
-    if (cfg && uae_stub_allow_mapped_access(addr, false) &&
-        handle_mapped_read(cfg, addr, &val, OP_TYPE_LONGWORD) != -1) {
-      trace_mem("R32", (uintptr_t)a, (uae_u32)val, "addr-map");
-      return (uae_u32)val;
-    }
-    uae_u32 v = (uae_u32)read_long(addr);
-    trace_mem("R32", (uintptr_t)a, v, "addr-bus");
-    return v;
-  }
-
-  // If we reach here, the pointer is not in the emulator address space
-  // This is likely an error in the JIT translation - fail loudly
-  fprintf(stderr, "[UAE-MEM] Invalid longword read from non-emulator address 0x%p\n", (void*)a);
-  abort(); // Fail loudly to indicate the real issue
+  // This function receives a host pointer to emulator memory, not a 68k address
+  // Simply dereference the pointer directly as per upstream UAE implementation
+  uae_u8* b = (uae_u8*)a;
+  uae_u32 v = (b[0] << 24) | (b[1] << 16) | (b[2] << 8) | (b[3]);
+  trace_mem("R32", (uintptr_t)a, v, "ptr");
+  return v;
 }
 
 uint16_t do_get_mem_word(uint16_t* a) {
-  // The pointer 'a' might be an emulator address cast to a pointer
-  // If it's within the 32-bit address space, treat it as an emulator address
-  if (ptr_is_emu_addr(a)) {
-    unsigned int addr = (unsigned int)(uintptr_t)a;
-    unsigned int val = 0;
-    if (cfg && uae_stub_allow_mapped_access(addr, false) &&
-        handle_mapped_read(cfg, addr, &val, OP_TYPE_WORD) != -1) {
-      trace_mem("R16", (uintptr_t)a, (uae_u32)(val & 0xFFFF), "addr-map");
-      return (uint16_t)val;
-    }
-    uint16_t v = (uint16_t)read_word(addr);
-    trace_mem("R16", (uintptr_t)a, (uae_u32)v, "addr-bus");
-    return v;
-  }
-
-  // If we reach here, the pointer is not in the emulator address space
-  // This is likely an error in the JIT translation - fail loudly
-  fprintf(stderr, "[UAE-MEM] Invalid word read from non-emulator address 0x%p\n", (void*)a);
-  abort(); // Fail loudly to indicate the real issue
+  // This function receives a host pointer to emulator memory, not a 68k address
+  // Simply dereference the pointer directly as per upstream UAE implementation
+  uae_u8* b = (uae_u8*)a;
+  uint16_t v = (b[0] << 8) | (b[1]);
+  trace_mem("R16", (uintptr_t)a, (uae_u32)v, "ptr");
+  return v;
 }
 
 uint8_t do_get_mem_byte(uint8_t* a) {
-  // The pointer 'a' might be an emulator address cast to a pointer
-  // If it's within the 32-bit address space, treat it as an emulator address
-  if (ptr_is_emu_addr(a)) {
-    unsigned int addr = (unsigned int)(uintptr_t)a;
-    unsigned int val = 0;
-    if (cfg && uae_stub_allow_mapped_access(addr, false) &&
-        handle_mapped_read(cfg, addr, &val, OP_TYPE_BYTE) != -1) {
-      trace_mem("R08", (uintptr_t)a, (uae_u32)(val & 0xFF), "addr-map");
-      return (uint8_t)val;
-    }
-    uint8_t v = (uint8_t)read_byte(addr);
-    trace_mem("R08", (uintptr_t)a, (uae_u32)v, "addr-bus");
-    return v;
-  }
-
-  // If we reach here, the pointer is not in the emulator address space
-  // This is likely an error in the JIT translation - fail loudly
-  fprintf(stderr, "[UAE-MEM] Invalid byte read from non-emulator address 0x%p\n", (void*)a);
-  abort(); // Fail loudly to indicate the real issue
+  // This function receives a host pointer to emulator memory, not a 68k address
+  // Simply dereference the pointer directly as per upstream UAE implementation
+  uint8_t v = *a;
+  trace_mem("R08", (uintptr_t)a, (uae_u32)v, "ptr");
+  return v;
 }
 
 void do_put_mem_long(uae_u32* a, uae_u32 v) {
-  if (ptr_is_emu_addr(a)) {
-    unsigned int addr = (unsigned int)(uintptr_t)a;
-    if (!cfg || !uae_stub_allow_mapped_access(addr, true) ||
-        handle_mapped_write(cfg, addr, (unsigned int)v, OP_TYPE_LONGWORD) == -1) {
-      m68k_write_memory_32(addr, (unsigned int)v);
-      trace_mem("W32", (uintptr_t)a, v, "addr-bus");
-    } else {
-      trace_mem("W32", (uintptr_t)a, v, "addr-map");
-    }
-    return;
-  }
-
-  // If we reach here, the pointer is not in the emulator address space
-  // This is likely an error in the JIT translation - fail loudly
-  fprintf(stderr, "[UAE-MEM] Invalid longword write to non-emulator address 0x%p\n", (void*)a);
-  abort(); // Fail loudly to indicate the real issue
+  // This function receives a host pointer to emulator memory, not a 68k address
+  // Simply write to the pointer directly as per upstream UAE implementation
+  uae_u8* b = (uae_u8*)a;
+  b[0] = (v >> 24) & 0xFF;
+  b[1] = (v >> 16) & 0xFF;
+  b[2] = (v >>  8) & 0xFF;
+  b[3] = (v >>  0) & 0xFF;
+  trace_mem("W32", (uintptr_t)a, v, "ptr");
 }
 
 void do_put_mem_word(uint16_t* a, uint16_t v) {
-  if (ptr_is_emu_addr(a)) {
-    unsigned int addr = (unsigned int)(uintptr_t)a;
-    if (!cfg || !uae_stub_allow_mapped_access(addr, true) ||
-        handle_mapped_write(cfg, addr, (unsigned int)v, OP_TYPE_WORD) == -1) {
-      m68k_write_memory_16(addr, (unsigned int)v);
-      trace_mem("W16", (uintptr_t)a, (uae_u32)v, "addr-bus");
-    } else {
-      trace_mem("W16", (uintptr_t)a, (uae_u32)v, "addr-map");
-    }
-    return;
-  }
-
-  // If we reach here, the pointer is not in the emulator address space
-  // This is likely an error in the JIT translation - fail loudly
-  fprintf(stderr, "[UAE-MEM] Invalid word write to non-emulator address 0x%p\n", (void*)a);
-  abort(); // Fail loudly to indicate the real issue
+  // This function receives a host pointer to emulator memory, not a 68k address
+  // Simply write to the pointer directly as per upstream UAE implementation
+  uae_u8* b = (uae_u8*)a;
+  b[0] = (v >> 8) & 0xFF;
+  b[1] = (v >> 0) & 0xFF;
+  trace_mem("W16", (uintptr_t)a, (uae_u32)v, "ptr");
 }
 
 void do_put_mem_byte(uint8_t* a, uint8_t v) {
-  if (ptr_is_emu_addr(a)) {
-    unsigned int addr = (unsigned int)(uintptr_t)a;
-    if (!cfg || !uae_stub_allow_mapped_access(addr, true) ||
-        handle_mapped_write(cfg, addr, (unsigned int)v, OP_TYPE_BYTE) == -1) {
-      m68k_write_memory_8(addr, (unsigned int)v);
-      trace_mem("W08", (uintptr_t)a, (uae_u32)v, "addr-bus");
-    } else {
-      trace_mem("W08", (uintptr_t)a, (uae_u32)v, "addr-map");
-    }
-    return;
-  }
-
-  // If we reach here, the pointer is not in the emulator address space
-  // This is likely an error in the JIT translation - fail loudly
-  fprintf(stderr, "[UAE-MEM] Invalid byte write to non-emulator address 0x%p\n", (void*)a);
-  abort(); // Fail loudly to indicate the real issue
+  // This function receives a host pointer to emulator memory, not a 68k address
+  // Simply write to the pointer directly as per upstream UAE implementation
+  *a = v;
+  trace_mem("W08", (uintptr_t)a, (uae_u32)v, "ptr");
 }
 
 // FPU stubs for now (JIT backend without 68k FPU emulation enabled).
