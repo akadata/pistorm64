@@ -1069,6 +1069,7 @@ static void sigint_handler(int sig_num) {
 }
 
 int main(int argc, char* argv[]) {
+  int use_single_thread = 0; // For JIT mode, we'll use single-threaded execution
   int g;
 
   for (g = 1; g < argc; g++) {
@@ -1424,64 +1425,84 @@ switch_config:
 
   pthread_t ipl_tid = 0, cpu_tid, kbd_tid, mouse_tid = 0;
   int err;
-  if (ipl_tid == 0) {
-    err = pthread_create(&ipl_tid, NULL, &ipl_task, NULL);
-    if (err != 0) {
-      printf("[ERROR] Cannot create IPL thread: [%s]", strerror(err));
-    } else {
-      pthread_setname_np(ipl_tid, "pistorm64: ipl");
-      printf("[IPL] Thread created successfully\n");
-      apply_affinity_from_env("ipl", CORE_IPL);
-      apply_realtime_from_env("ipl", RT_DEFAULT_IPL);
+
+  // When JIT is enabled, run in single-threaded mode to avoid threading issues
+  if (use_uae_jit) {
+    printf("[CPU] UAE JIT enabled: running in single-threaded mode\n");
+
+    // Initialize keyboard task in main thread
+    keyboard_task(NULL);
+
+    // Initialize mouse task in main thread if mouse is enabled
+    if (mouse_fd != -1) {
+      mouse_task(NULL);
     }
-  }
 
-  // create keyboard task
-  err = pthread_create(&kbd_tid, NULL, &keyboard_task, NULL);
-  if (err != 0) {
-    printf("[ERROR] Cannot create keyboard thread: [%s]", strerror(err));
+    // Initialize IPL task in main thread
+    ipl_task(NULL);
+
+    // Run CPU task in main thread (this will be the only thread doing CPU emulation)
+    cpu_task(NULL);
   } else {
-    pthread_setname_np(kbd_tid, "pistorm64: kbd");
-    printf("[MAIN] Keyboard thread created successfully\n");
-    apply_affinity_from_env("input", CORE_INPUT);
-  }
+    if (ipl_tid == 0) {
+      err = pthread_create(&ipl_tid, NULL, &ipl_task, NULL);
+      if (err != 0) {
+        printf("[ERROR] Cannot create IPL thread: [%s]", strerror(err));
+      } else {
+        pthread_setname_np(ipl_tid, "pistorm64: ipl");
+        printf("[IPL] Thread created successfully\n");
+        apply_affinity_from_env("ipl", CORE_IPL);
+        apply_realtime_from_env("ipl", RT_DEFAULT_IPL);
+      }
+    }
 
-  // create mouse task if mouse is enabled
-  if (mouse_fd != -1) {
-    err = pthread_create(&mouse_tid, NULL, &mouse_task, NULL);
+    // create keyboard task
+    err = pthread_create(&kbd_tid, NULL, &keyboard_task, NULL);
     if (err != 0) {
-      printf("[ERROR] Cannot create mouse thread: [%s]", strerror(err));
+      printf("[ERROR] Cannot create keyboard thread: [%s]", strerror(err));
     } else {
-      pthread_setname_np(mouse_tid, "pistorm64: mouse");
-      printf("[MAIN] Mouse thread created successfully\n");
+      pthread_setname_np(kbd_tid, "pistorm64: kbd");
+      printf("[MAIN] Keyboard thread created successfully\n");
       apply_affinity_from_env("input", CORE_INPUT);
     }
-  }
 
-  // create cpu task
-  err = pthread_create(&cpu_tid, NULL, &cpu_task, NULL);
-  if (err != 0) {
-    printf("[ERROR] Cannot create CPU thread: [%s]", strerror(err));
-  } else {
-    pthread_setname_np(cpu_tid, "pistorm64: cpu");
-    printf("[MAIN] CPU thread created successfully\n");
-    apply_affinity_from_env("cpu", CORE_CPU);
-  }
-
-  // wait for cpu task to end before closing up and finishing
-  // Use a polling approach to allow signal handling
-  while (!end_signal) {
-    // Sleep briefly to allow signal processing
-    usleep(50000); // Sleep 50ms
-
-    // Check if the CPU thread has finished by using pthread_kill
-    // If the thread is still running, pthread_kill will return 0
-    int kill_result = pthread_kill(cpu_tid, 0);
-    if (kill_result != 0) {
-      // Thread has probably finished (ESRCH error)
-      break;
+    // create mouse task if mouse is enabled
+    if (mouse_fd != -1) {
+      err = pthread_create(&mouse_tid, NULL, &mouse_task, NULL);
+      if (err != 0) {
+        printf("[ERROR] Cannot create mouse thread: [%s]", strerror(err));
+      } else {
+        pthread_setname_np(mouse_tid, "pistorm64: mouse");
+        printf("[MAIN] Mouse thread created successfully\n");
+        apply_affinity_from_env("input", CORE_INPUT);
+      }
     }
-    // If thread is still running, continue loop to check end_signal
+
+    // create cpu task
+    err = pthread_create(&cpu_tid, NULL, &cpu_task, NULL);
+    if (err != 0) {
+      printf("[ERROR] Cannot create CPU thread: [%s]", strerror(err));
+    } else {
+      pthread_setname_np(cpu_tid, "pistorm64: cpu");
+      printf("[MAIN] CPU thread created successfully\n");
+      apply_affinity_from_env("cpu", CORE_CPU);
+    }
+
+    // wait for cpu task to end before closing up and finishing
+    // Use a polling approach to allow signal handling
+    while (!end_signal) {
+      // Sleep briefly to allow signal processing
+      usleep(50000); // Sleep 50ms
+
+      // Check if the CPU thread has finished by using pthread_kill
+      // If the thread is still running, pthread_kill will return 0
+      int kill_result = pthread_kill(cpu_tid, 0);
+      if (kill_result != 0) {
+        // Thread has probably finished (ESRCH error)
+        break;
+      }
+      // If thread is still running, continue loop to check end_signal
+    }
   }
 
   if (sigint_seen) {

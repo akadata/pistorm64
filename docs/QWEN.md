@@ -269,3 +269,14 @@ Qwen’s role is to:
 
 That is the contract.
 
+---
+
+## 11. Important: Default to PISTORM_KMOD=1
+
+* The emulator defaults to using the kernel module (pistorm.ko) for hardware access
+* Do not create or use userspace GPIO implementations (ps_protocol_userspace.c)
+* All real hardware access must go through the kernel module interface
+* The UAE JIT backend must work with the kernel module interface, not fake userspace implementations
+* When JIT is enabled (--jit flag), run in single-threaded mode to avoid threading issues
+* When JIT is disabled (default), run in multi-threaded mode as before
+

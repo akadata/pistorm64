@@ -522,7 +522,7 @@ unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int 
         val |= BOARDTYPE_LINKED;
     } else
       val = rom[address / 2];
-      printf("Read byte %d from Z2 autoconf for PIC %d (%.2X).\n", address/2, ac_z2_current_pic, val);
+      //printf("Read byte %d from Z2 autoconf for PIC %d (%.2X).\n", address/2, ac_z2_current_pic, val);
   }
   val <<= 4;
   if (address != 0 && address != 2 && address != 0x40 && address != 0x42)
