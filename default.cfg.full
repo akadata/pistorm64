@@ -72,11 +72,11 @@ map type=ram address=0x200000 size=8M id=z2_autoconf_fast
 #map type=ram address=0x200000 size=2M id=z2_autoconf_fast
 #map type=ram address=0x400000 size=4M id=z2_autoconf_fast
 
-# This is fake Chip RAM, may be used on a real Amiga 500 OCS Denise ECS Agnus 8372A
-# 
+# Chip RAM lives on the Amiga side (Agnus), not Pi RAM. Do not map it unless
+# you are explicitly faking extra chip RAM for testing.
 # For A500 tests, an extra 1MB can be faked at 0x00C00000; with a 8371A/8372A
 # Fat Agnus and RTG enabled, this has been observed to work.
-map type=ram address=0x00C00000 size=1M
+#map type=ram address=0x00C00000 size=1M id=chipram_extra
 
 # Map Gayle as a register range.
 # NOTE: Gayle emulation is currently non-functional. Do not enable this.

@@ -54,12 +54,28 @@ make USE_UAE_JIT=1 uae-jit
 
 ## Memory map rules for this bring-up
 
+- Chip RAM lives on the Amiga side (Agnus/8372A). Do not map Pi-side RAM as
+  chip RAM unless you are explicitly faking it for controlled tests.
 - Do not place "chipram" at `$00C00000` for this path.
-- Keep chip RAM at `$00000000` when used.
 - Keep Kickstart ROM at `$00F80000` and let reset overlay force vectors at low
   memory during reset.
 - `$00C00000` is trapdoor/slow expansion territory on A500-class mapping, not
   primary chip RAM.
+
+## Source parity notes (Z3660_emu vs Amiberry/WinUAE)
+
+- **Reference source**: Z3660_emu (from `z3660/.../Z3660_emu/src/uae`) is the
+  canonical reference set for this integration. Our `src/uae` tree matches that
+  file list exactly.
+- **Amiberry/WinUAE extras**: Amiberry ships additional CPU emulation tables and
+  helpers (`cpuemu_20..35`, `cpuemu_50`, `cpummu*.cpp`, `cpu_thread.cpp`,
+  `cpuboard.cpp`, etc.) that are **not** present in Z3660_emu. These are not
+  required for the current JIT bring-up path, but should be evaluated if we
+  decide to expand beyond the Z3660_emu feature envelope.
+- **A9/Z-TURN features**: Z-TURN platform specifics (e.g. A9 GIC, XGpioPs,
+  Zynq MMU wiring) must remain excluded from PiStorm64. Keep the UAE core free
+  of those platform dependencies and continue to route all bus/memory via the
+  PiStorm bridge.
 
 ## Current recommended test run
 
