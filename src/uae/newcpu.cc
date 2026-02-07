@@ -2159,6 +2159,40 @@ void m68k_reset_newcpu(bool hardreset)
    regs.s = 1;
    // Ensure ROM overlay is active when fetching reset vectors.
    ovl = 1;
+#ifdef JIT_RESET_TRACE
+   // Debug trace: dump reset vector bytes via the same path as vector fetch.
+   uae_u32 trace_sp = 0;
+   uae_u32 trace_pc = 0;
+#ifdef USE_UAE_JIT
+   trace_sp = (uae_u32)read_long(0);
+   if (trace_sp == 0 || trace_sp == 0xFFFFFFFF) {
+      // Bridge fallback: if overlay fetch fails, use Kickstart base directly.
+      trace_sp = (uae_u32)read_long(0x00F80000);
+   }
+   trace_pc = (uae_u32)read_long(4);
+   if (trace_pc == 0 || trace_pc == 0xFFFFFFFF) {
+      // Bridge fallback: if overlay fetch fails, use Kickstart base directly.
+      trace_pc = (uae_u32)read_long(0x00F80004);
+   }
+#else
+   trace_sp = get_long(0);
+   trace_pc = get_long(4);
+#endif
+   uae_u8 trace_bytes[8] = {
+      (uae_u8)((trace_sp >> 24) & 0xFF),
+      (uae_u8)((trace_sp >> 16) & 0xFF),
+      (uae_u8)((trace_sp >> 8) & 0xFF),
+      (uae_u8)(trace_sp & 0xFF),
+      (uae_u8)((trace_pc >> 24) & 0xFF),
+      (uae_u8)((trace_pc >> 16) & 0xFF),
+      (uae_u8)((trace_pc >> 8) & 0xFF),
+      (uae_u8)(trace_pc & 0xFF),
+   };
+   printf("JIT_RESET_TRACE bytes [0..7]: %02X %02X %02X %02X %02X %02X %02X %02X\n",
+          trace_bytes[0], trace_bytes[1], trace_bytes[2], trace_bytes[3],
+          trace_bytes[4], trace_bytes[5], trace_bytes[6], trace_bytes[7]);
+   printf("JIT_RESET_TRACE SP=0x%08X PC=0x%08X\n", trace_sp, trace_pc);
+#endif
 #ifdef USE_UAE_JIT
    // In PiStorm JIT mode, route reset vectors through bridge/mapped memory.
    v = (uae_u32)read_long(4);
