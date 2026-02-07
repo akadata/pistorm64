@@ -1069,7 +1069,6 @@ static void sigint_handler(int sig_num) {
 }
 
 int main(int argc, char* argv[]) {
-  int use_single_thread = 0; // For JIT mode, we'll use single-threaded execution
   int g;
 
   for (g = 1; g < argc; g++) {
@@ -1426,20 +1425,43 @@ switch_config:
   pthread_t ipl_tid = 0, cpu_tid, kbd_tid, mouse_tid = 0;
   int err;
 
-  // When JIT is enabled, run in single-threaded mode to avoid threading issues
+  // When UAE JIT is enabled, keep CPU execution in the main thread.
+  // I/O and IRQ service loops still need their own threads; otherwise we block
+  // forever in keyboard/mouse polling before the CPU loop starts.
   if (use_uae_jit) {
     printf("[CPU] UAE JIT enabled: running in single-threaded mode\n");
 
-    // Initialize keyboard task in main thread
-    keyboard_task(NULL);
-
-    // Initialize mouse task in main thread if mouse is enabled
-    if (mouse_fd != -1) {
-      mouse_task(NULL);
+    if (ipl_tid == 0) {
+      err = pthread_create(&ipl_tid, NULL, &ipl_task, NULL);
+      if (err != 0) {
+        printf("[ERROR] Cannot create IPL thread: [%s]", strerror(err));
+      } else {
+        pthread_setname_np(ipl_tid, "pistorm64: ipl");
+        printf("[IPL] Thread created successfully\n");
+        apply_affinity_from_env("ipl", CORE_IPL);
+        apply_realtime_from_env("ipl", RT_DEFAULT_IPL);
+      }
     }
 
-    // Initialize IPL task in main thread
-    ipl_task(NULL);
+    err = pthread_create(&kbd_tid, NULL, &keyboard_task, NULL);
+    if (err != 0) {
+      printf("[ERROR] Cannot create keyboard thread: [%s]", strerror(err));
+    } else {
+      pthread_setname_np(kbd_tid, "pistorm64: kbd");
+      printf("[MAIN] Keyboard thread created successfully\n");
+      apply_affinity_from_env("input", CORE_INPUT);
+    }
+
+    if (mouse_fd != -1) {
+      err = pthread_create(&mouse_tid, NULL, &mouse_task, NULL);
+      if (err != 0) {
+        printf("[ERROR] Cannot create mouse thread: [%s]", strerror(err));
+      } else {
+        pthread_setname_np(mouse_tid, "pistorm64: mouse");
+        printf("[MAIN] Mouse thread created successfully\n");
+        apply_affinity_from_env("input", CORE_INPUT);
+      }
+    }
 
     // Run CPU task in main thread (this will be the only thread doing CPU emulation)
     cpu_task(NULL);
@@ -1890,7 +1912,16 @@ static inline int32_t platform_write_check(uint8_t type, uint32_t addr, uint32_t
       if (ovl != (val & (1 << 0))) {
         ovl = (val & (1 << 0));
         m68ki_cpu.ovl = ovl;
-        printf("OVL:%x\n", ovl);
+        printf("OVL:%x", ovl);
+#ifdef USE_UAE_JIT
+        if (use_uae_jit) {
+          printf(" (uae_pc=%08X regs.pc=%08X regs.pc_p=%08X)",
+                 uae_pistorm_get_pc(),
+                 uae_pistorm_get_regs_pc(),
+                 uae_pistorm_get_regs_pc_p());
+        }
+#endif
+        printf("\n");
       }
       return 0;
       break;

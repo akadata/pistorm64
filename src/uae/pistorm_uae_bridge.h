@@ -12,6 +12,8 @@ void uae_pistorm_run(void);
 void uae_pistorm_set_irq(int level);
 void uae_pistorm_pulse_reset(void);
 uint32_t uae_pistorm_get_pc(void);
+uint32_t uae_pistorm_get_regs_pc(void);
+uint32_t uae_pistorm_get_regs_pc_p(void);
 
 
 #ifdef __cplusplus
