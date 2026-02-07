@@ -3559,24 +3559,61 @@ void custom_reset_cpu(bool hardreset, bool keyboardreset)
 #endif
 }
 
-#ifdef JIT_RESET_TRACE
-static uae_u16 get_reset_trace_opcode(uaecptr pc)
+#if defined(JIT_RESET_TRACE) || defined(PISTORM_UAE_RESET_TRACE)
+static bool get_reset_trace_opcode(uaecptr pc, uae_u16 *opcode0, uae_u16 *opcode1)
 {
-   addrbank *ab = &get_mem_bank(pc);
-   if (ab->check(pc, 2)) {
-      return get_word(pc);
+   bool found = false;
+
+   if (opcode0) {
+      *opcode0 = 0xffff;
    }
-   return 0xffff;
+   if (opcode1) {
+      *opcode1 = 0xffff;
+   }
+
+   addrbank *ab0 = &get_mem_bank(pc);
+   if (ab0->check(pc, 2)) {
+      if (opcode0) {
+         *opcode0 = get_word(pc);
+      }
+      found = true;
+   }
+
+   addrbank *ab1 = &get_mem_bank(pc + 2);
+   if (ab1->check(pc + 2, 2)) {
+      if (opcode1) {
+         *opcode1 = get_word(pc + 2);
+      }
+      found = true;
+   }
+
+   return found;
 }
 
-static void custom_reset_cpu_trace(bool hardreset, bool keyboardreset, const char* caller, uaecptr jmp_pc)
+static const void* reset_trace_return_address(void)
+{
+#if defined(__GNUC__) || defined(__clang__)
+   return __builtin_extract_return_addr(__builtin_return_address(0));
+#else
+   return nullptr;
+#endif
+}
+
+static void custom_reset_cpu_trace_internal(bool hardreset, bool keyboardreset, const char* caller, uaecptr jmp_pc,
+   const char* callsite_file, int callsite_line, const void* callsite_ra)
 {
    uaecptr pc = m68k_getpc();
-   uae_u16 opcode = get_reset_trace_opcode(pc);
-   write_log(_T("[CPU] custom_reset_cpu caller=%s pc=%08x opcode=%04x jmp_pc=%08x cpu_model=%d\n"),
-      caller ? caller : "unknown", pc, opcode, jmp_pc, currprefs.cpu_model);
+   uae_u16 opcode0 = 0xffff;
+   uae_u16 opcode1 = 0xffff;
+   get_reset_trace_opcode(pc, &opcode0, &opcode1);
+   write_log(_T("[CPU] custom_reset_cpu caller=%s pc=%08x op=%04x/%04x sr=%04x a7=%08x vbr=%08x jmp_pc=%08x cpu_model=%d site=%s:%d ra=%p\n"),
+      caller ? caller : "unknown", pc, opcode0, opcode1, regs.sr, regs.regs[15], regs.vbr, jmp_pc,
+      currprefs.cpu_model, callsite_file ? callsite_file : "unknown", callsite_line, callsite_ra);
    custom_reset_cpu(hardreset, keyboardreset);
 }
+
+#define custom_reset_cpu_trace(hardreset, keyboardreset, caller, jmp_pc) \
+   custom_reset_cpu_trace_internal(hardreset, keyboardreset, caller, jmp_pc, __FILE__, __LINE__, reset_trace_return_address())
 #else
 #define custom_reset_cpu_trace(hardreset, keyboardreset, caller, jmp_pc) \
    custom_reset_cpu(hardreset, keyboardreset)
