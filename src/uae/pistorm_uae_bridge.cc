@@ -109,8 +109,11 @@ static inline bool uae_jit_has_lowmem_map(uaecptr addr, bool is_write) {
       if (cfg->map_type[i] == MAPTYPE_ROM) {
         return !is_write;
       }
-      return cfg->map_type[i] == MAPTYPE_RAM || cfg->map_type[i] == MAPTYPE_RAM_WTC ||
-             cfg->map_type[i] == MAPTYPE_RAM_NOALLOC;
+      if (cfg->map_type[i] == MAPTYPE_RAM_WTC) {
+        return true;
+      }
+      // Real Amiga chip RAM should be accessed via the bus, not Pi-side maps.
+      return false;
     }
   }
   return false;
@@ -658,7 +661,9 @@ static void uae_pistorm_set_defaults(int cpu_model, int enable_jit, int enable_f
   currprefs.cpu_model = changed_prefs.cpu_model = cpu_model;
   currprefs.mmu_model = changed_prefs.mmu_model = 0;
   currprefs.cpu_compatible = changed_prefs.cpu_compatible = true;
-  currprefs.address_space_24 = changed_prefs.address_space_24 = false;
+  // 24-bit address space for 68000/68010 class CPUs (A500/A2000 era).
+  bool addr_24bit = cpu_model < 68020;
+  currprefs.address_space_24 = changed_prefs.address_space_24 = addr_24bit;
   currprefs.cpu_cycle_exact = changed_prefs.cpu_cycle_exact = false;
   currprefs.cpu_memory_cycle_exact = changed_prefs.cpu_memory_cycle_exact = false;
   currprefs.int_no_unimplemented = changed_prefs.int_no_unimplemented = false;
