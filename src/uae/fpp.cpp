@@ -20,22 +20,21 @@
 #include "options.h"
 #include "memory.h"
 //#include "uae/attributes.h"
-//#include "uae/vm.h"
-//#include "custom.h"
+#include "uae/vm.h"
+#include "custom.h"
 #include "events.h"
 #include "newcpu.h"
 #include "fpp.h"
-//#include "savestate.h"
-//#include "uae/string.h"
+#include "savestate.h"
 
 static uae_u32 fpcr_mask;
 static const uae_u32 fpsr_mask = 0x0ffffff8;
 static void fpsr_set_exception(uae_u32 exception);
 
-#include <fpp_native.cc>
+#include "fpp_native.cpp.in"
 
-#define	fp_to_exten_fmovem fp_to_exten
-#define fpp_from_exten_fmovem fp_from_exten
+#define	fpp_to_exten_fmovem fpp_to_exten
+#define fpp_from_exten_fmovem fpp_from_exten
 
 struct fpp_cr_entry {
 	uae_u32 val[3];
@@ -228,11 +227,11 @@ static void reset_fsave_data(void)
 
 static uae_u32 get_ftag(fpdata *src, int size)
 {
-	if (fp_is_zero(src)) {
+	if (fpp_is_zero(src)) {
 		return 1; // ZERO
-	} else if  (fp_is_nan(src)) {
+	} else if  (fpp_is_nan(src)) {
 		return 3; // NAN
-	} else if (fp_is_infinity(src)) {
+	} else if (fpp_is_infinity(src)) {
 		return 2; // INF
 	}
 	return 0; // NORMAL
@@ -299,7 +298,7 @@ static void fpsr_set_result_always(fpdata *result)
 	regs.fp_result = *result;
 #endif
 	regs.fpsr &= 0x00fffff8; // clear cc
-	if (fp_is_neg(result)) {
+	if (fpp_is_neg(result)) {
 		regs.fpsr |= FPSR_CC_N;
 	}
 }
@@ -308,11 +307,11 @@ static void fpsr_set_result_always(fpdata *result)
 static void fpsr_set_result(fpdata *result)
 {
 	// condition code byte
-	if (fp_is_nan (result)) {
+	if (fpp_is_nan (result)) {
 		regs.fpsr |= FPSR_CC_NAN;
-	} else if (fp_is_zero(result)) {
+	} else if (fpp_is_zero(result)) {
 		regs.fpsr |= FPSR_CC_Z;
-	} else if (fp_is_infinity (result)) {
+	} else if (fpp_is_infinity (result)) {
 		regs.fpsr |= FPSR_CC_I;
 	}
 }
@@ -369,14 +368,14 @@ static uae_u32 fpp_get_fpsr (void)
 #ifdef JIT
 	if (currprefs.cachesize && currprefs.compfpu) {
 		regs.fpsr &= 0x00fffff8; // clear cc
-		if (fp_is_nan(&regs.fp_result)) {
+		if (fpp_is_nan(&regs.fp_result)) {
 			regs.fpsr |= FPSR_CC_NAN;
-		} else if (fp_is_zero(&regs.fp_result)) {
+		} else if (fpp_is_zero(&regs.fp_result)) {
 			regs.fpsr |= FPSR_CC_Z;
-		} else if (fp_is_infinity(&regs.fp_result)) {
+		} else if (fpp_is_infinity(&regs.fp_result)) {
 			regs.fpsr |= FPSR_CC_I;
 		}
-		if (fp_is_neg(&regs.fp_result))
+		if (fpp_is_neg(&regs.fp_result))
 			regs.fpsr |= FPSR_CC_N;
 	}
 #endif
@@ -390,18 +389,18 @@ static uae_u32 fpp_get_fpcr(void)
 
 static void fpp_set_fpcr (uae_u32 val)
 {
-	fp_set_mode(val);
+	fpp_set_mode(val);
 	regs.fpcr = val & fpcr_mask;
 }
 
 static void fpnan (fpdata *fpd)
 {
-	fp_to_exten(fpd, xhex_nan[0], xhex_nan[1], xhex_nan[2]);
+	fpp_to_exten(fpd, xhex_nan[0], xhex_nan[1], xhex_nan[2]);
 }
 
 static void fpset (fpdata *fpd, uae_s32 val)
 {
-	fp_from_int(fpd, val);
+	fpp_from_int(fpd, val);
 }
 
 static void fpp_set_fpsr (uae_u32 val)
@@ -560,16 +559,16 @@ static bool fpu_get_constant(fpdata *fpd, int cr)
 					}
 				}
 			}
-			fp_to_exten_fmovem(fpd, f[0], f[1], f[2]);
+			fpp_to_exten_fmovem(fpd, f[0], f[1], f[2]);
 			if (prec == 1)
-				fp_round32(fpd);
+				fpp_round32(fpd);
 			if (prec >= 2)
-				fp_round64(fpd);
+				fpp_round64(fpd);
 
 			if (f1_adjust) {
 				fpp_from_exten_fmovem(fpd, &f[0], &f[1], &f[2]);
 				f[1] += f1_adjust * 0x80;
-				fp_to_exten_fmovem(fpd, f[0], f[1], f[2]);
+				fpp_to_exten_fmovem(fpd, f[0], f[1], f[2]);
 			}
 
 			fpsr_set_result_always(fpd);
@@ -589,12 +588,12 @@ static bool fpu_get_constant(fpdata *fpd, int cr)
 		f[2] += fpp_cr[entry].rndoff[mode];
 	}
 
-	fp_to_exten_fmovem(fpd, f[0], f[1], f[2]);
+	fpp_to_exten_fmovem(fpd, f[0], f[1], f[2]);
 	
 	if (prec == 1)
-		fp_round32(fpd);
+		fpp_round32(fpd);
 	if (prec >= 2)
-		fp_round64(fpd);
+		fpp_round64(fpd);
 	
 	fpsr_set_result_always(fpd);
 	fpsr_set_result(fpd);
@@ -901,7 +900,6 @@ static bool fault_if_unimplemented_680x0 (uae_u16 opcode, uae_u16 extra, uaecptr
 			if(currprefs.cpu_model != 68040) {
 				return false;
 			}
-			/* no break */
 			default:
 			fp_unimp_instruction(opcode, extra, ea, easet, oldpc, src, reg, -1);
 			return true;
@@ -1084,7 +1082,7 @@ static int get_fp_value(uae_u32 opcode, uae_u16 extra, fpdata *src, uaecptr oldp
 					fpset(src, (uae_s32) m68k_dreg (regs, reg));
 					break;
 				case 1: // S
-					fp_to_single (src, m68k_dreg (regs, reg));
+					fpp_to_single (src, m68k_dreg (regs, reg));
 					break;
 				case 3: // P
 					return 0;
@@ -1197,7 +1195,7 @@ static int get_fp_value(uae_u32 opcode, uae_u16 extra, fpdata *src, uaecptr oldp
 			fpset(src, (uae_s32) (doext ? exts[0] : x_cp_get_long (ad)));
 			break;
 		case 1: // S
-			fp_to_single (src, (doext ? exts[0] : x_cp_get_long (ad)));
+			fpp_to_single (src, (doext ? exts[0] : x_cp_get_long (ad)));
 			break;
 		case 2: // X
 			{
@@ -1207,7 +1205,7 @@ static int get_fp_value(uae_u32 opcode, uae_u16 extra, fpdata *src, uaecptr oldp
 				wrd2 = (doext ? exts[1] : x_cp_get_long (ad));
 				ad += 4;
 				wrd3 = (doext ? exts[2] : x_cp_get_long (ad));
-				fp_to_exten (src, wrd1, wrd2, wrd3);
+				fpp_to_exten (src, wrd1, wrd2, wrd3);
 			}
 			break;
 		case 3: // P
@@ -1220,7 +1218,7 @@ static int get_fp_value(uae_u32 opcode, uae_u16 extra, fpdata *src, uaecptr oldp
 				wrd[2] = (doext ? exts[2] : x_cp_get_long (ad));
 				if (fault_if_no_packed_support (opcode, extra, adold, adset, oldpc, NULL, wrd))
 					return 1;
-				fp_to_pack (src, wrd, 0);
+				fpp_to_pack (src, wrd, 0);
 				return 1;
 			}
 			break;
@@ -1233,7 +1231,7 @@ static int get_fp_value(uae_u32 opcode, uae_u16 extra, fpdata *src, uaecptr oldp
 				wrd1 = (doext ? exts[0] : x_cp_get_long (ad));
 				ad += 4;
 				wrd2 = (doext ? exts[1] : x_cp_get_long (ad));
-				fp_to_double (src, wrd1, wrd2);
+				fpp_to_double (src, wrd1, wrd2);
 			}
 			break;
 		case 6: // B
@@ -1265,18 +1263,18 @@ static int put_fp_value2(fpdata *value, uae_u32 opcode, uae_u16 extra, uaecptr o
 			switch (size)
 			{
 				case 6: // B
-					m68k_dreg (regs, reg) = (uae_u32)(((fp_to_int (value, 0) & 0xff)
+					m68k_dreg (regs, reg) = (uae_u32)(((fpp_to_int (value, 0) & 0xff)
 						| (m68k_dreg (regs, reg) & ~0xff)));
 					break;
 				case 4: // W
-					m68k_dreg (regs, reg) = (uae_u32)(((fp_to_int (value, 1) & 0xffff)
+					m68k_dreg (regs, reg) = (uae_u32)(((fpp_to_int (value, 1) & 0xffff)
 						| (m68k_dreg (regs, reg) & ~0xffff)));
 					break;
 				case 0: // L
-					m68k_dreg (regs, reg) = (uae_u32)fp_to_int (value, 2);
+					m68k_dreg (regs, reg) = (uae_u32)fpp_to_int (value, 2);
 					break;
 				case 1: // S
-					m68k_dreg (regs, reg) = fp_from_single (value);
+					m68k_dreg (regs, reg) = fpp_from_single (value);
 					break;
 				case 3: // packed
 				case 7: // packed
@@ -1288,7 +1286,7 @@ static int put_fp_value2(fpdata *value, uae_u32 opcode, uae_u16 extra, uaecptr o
 						kfactor &= 127;
 						if (kfactor & 64)
 							kfactor |= ~63;
-						fp_from_pack(value, wrd, kfactor);
+						fpp_from_pack(value, wrd, kfactor);
 					}
 					return -2;
 				}
@@ -1354,15 +1352,15 @@ static int put_fp_value2(fpdata *value, uae_u32 opcode, uae_u16 extra, uaecptr o
 	switch (size)
 	{
 		case 0: // L
-			x_cp_put_long(ad, (uae_u32)fp_to_int(value, 2));
+			x_cp_put_long(ad, (uae_u32)fpp_to_int(value, 2));
 			break;
 		case 1: // S
-			x_cp_put_long(ad, fp_from_single(value));
+			x_cp_put_long(ad, fpp_from_single(value));
 			break;
 		case 2: // X
 			{
 				uae_u32 wrd1, wrd2, wrd3;
-				fp_from_exten(value, &wrd1, &wrd2, &wrd3);
+				fpp_from_exten(value, &wrd1, &wrd2, &wrd3);
 				x_cp_put_long (ad, wrd1);
 				ad += 4;
 				x_cp_put_long (ad, wrd2);
@@ -1381,7 +1379,7 @@ static int put_fp_value2(fpdata *value, uae_u32 opcode, uae_u16 extra, uaecptr o
 				kfactor &= 127;
 				if (kfactor & 64)
 					kfactor |= ~63;
-				fp_from_pack(value, wrd, kfactor);
+				fpp_from_pack(value, wrd, kfactor);
 				x_cp_put_long (ad, wrd[0]);
 				ad += 4;
 				x_cp_put_long (ad, wrd[1]);
@@ -1390,19 +1388,19 @@ static int put_fp_value2(fpdata *value, uae_u32 opcode, uae_u16 extra, uaecptr o
 			}
 			break;
 		case 4: // W
-			x_cp_put_word(ad, (uae_s16)fp_to_int(value, 1));
+			x_cp_put_word(ad, (uae_s16)fpp_to_int(value, 1));
 			break;
 		case 5: // D
 			{
 				uae_u32 wrd1, wrd2;
-				fp_from_double(value, &wrd1, &wrd2);
+				fpp_from_double(value, &wrd1, &wrd2);
 				x_cp_put_long (ad, wrd1);
 				ad += 4;
 				x_cp_put_long (ad, wrd2);
 			}
 			break;
 		case 6: // B
-			x_cp_put_byte(ad, (uae_s8)fp_to_int(value, 0));
+			x_cp_put_byte(ad, (uae_s8)fpp_to_int(value, 0));
 			break;
 		default:
 			return 0;
@@ -1538,10 +1536,10 @@ static int fpp_cond(int condition)
 #ifdef JIT
 	if (currprefs.cachesize && currprefs.compfpu) {
 		// JIT reads and writes regs.fpu_result
-		int NotANumber = fp_is_nan(&regs.fp_result);
-		int I = fp_is_infinity(&regs.fp_result);
-		int Z = fp_is_zero(&regs.fp_result);
-		int N = fp_is_neg(&regs.fp_result);
+		int NotANumber = fpp_is_nan(&regs.fp_result);
+		int I = fpp_is_infinity(&regs.fp_result);
+		int Z = fpp_is_zero(&regs.fp_result);
+		int N = fpp_is_neg(&regs.fp_result);
 		int control = (N << 3) | (Z << 2) | (I << 1) | (NotANumber << 0);
 		return condition_table[control * 32 + condition];
 	} else
@@ -1931,8 +1929,8 @@ retry:
 				
 				if (cusavepc == 0xFE) {
 					if (opclass == 0 || opclass == 2) {
-						fp_to_exten_fmovem(&dst, fsave_data.fpt[0], fsave_data.fpt[1], fsave_data.fpt[2]);
-						fp_to_exten_fmovem(&src, fsave_data.et[0], fsave_data.et[1], fsave_data.et[2]);
+						fpp_to_exten_fmovem(&dst, fsave_data.fpt[0], fsave_data.fpt[1], fsave_data.fpt[2]);
+						fpp_to_exten_fmovem(&src, fsave_data.et[0], fsave_data.et[1], fsave_data.et[2]);
 						fpsr_clear_status();
 						
 						v = fp_arithmetic(&src, &dst, cmdreg1b);
@@ -2080,7 +2078,7 @@ static uaecptr fmovem2fpp (uaecptr ad, uae_u32 list, int incr, int regdir)
 			wrd3 = x_cp_get_long (ad + 8);
 			if (incr > 0)
 				ad += 3 * 4;
-			fp_to_exten (&regs.fp[reg], wrd1, wrd2, wrd3);
+			fpp_to_exten (&regs.fp[reg], wrd1, wrd2, wrd3);
 		}
 		list <<= 1;
 	}
@@ -2091,163 +2089,164 @@ static bool fp_arithmetic(fpdata *src, fpdata *dst, int extra)
 {
 	uae_u64 q = 0;
 	uae_u8 s = 0;
+
 	switch (extra & 0x7f)
 	{
 		case 0x00: /* FMOVE */
-			fp_move(dst, src, PREC_NORMAL);
+			fpp_move(dst, src, PREC_NORMAL);
 			break;
 		case 0x40: /* FSMOVE */
-			fp_move(dst, src, PREC_FLOAT);
+			fpp_move(dst, src, PREC_FLOAT);
 			break;
 		case 0x44: /* FDMOVE */
-			fp_move(dst, src, PREC_DOUBLE);
+			fpp_move(dst, src, PREC_DOUBLE);
 			break;
 		case 0x01: /* FINT */
-			fp_int(dst, src);
+			fpp_int(dst, src);
 			break;
 		case 0x02: /* FSINH */
-			fp_sinh(dst, src);
+			fpp_sinh(dst, src);
 			break;
-		case 0x03: /* FINTRZ */ // 34
-			fp_intrz(dst, src);
+		case 0x03: /* FINTRZ */
+			fpp_intrz(dst, src);
 			break;
-		case 0x04: /* FSQRT */  // 5
+		case 0x04: /* FSQRT */
 		case 0x05:
-			fp_sqrt(dst, src, PREC_NORMAL);
+			fpp_sqrt(dst, src, PREC_NORMAL);
 			break;
 		case 0x41: /* FSSQRT */
-			fp_sqrt(dst, src, PREC_FLOAT);
+			fpp_sqrt(dst, src, PREC_FLOAT);
 			break;
 		case 0x45: /* FDSQRT */
-			fp_sqrt(dst, src, PREC_DOUBLE);
+			fpp_sqrt(dst, src, PREC_DOUBLE);
 			break;
 		case 0x06: /* FLOGNP1 */
 		case 0x07:
-			fp_lognp1(dst, src);
+			fpp_lognp1(dst, src);
 			break;
 		case 0x08: /* FETOXM1 */
-			fp_etoxm1(dst, src);
+			fpp_etoxm1(dst, src);
 			break;
 		case 0x09: /* FTANH */
-			fp_tanh(dst, src);
+			fpp_tanh(dst, src);
 			break;
 		case 0x0a: /* FATAN */
 		case 0x0b:
-			fp_atan(dst, src);
+			fpp_atan(dst, src);
 			break;
 		case 0x0c: /* FASIN */
-			fp_asin(dst, src);
+			fpp_asin(dst, src);
 			break;
 		case 0x0d: /* FATANH */
-			fp_atanh(dst, src);
+			fpp_atanh(dst, src);
 			break;
-		case 0x0e: /* FSIN */ //5
-			fp_sin(dst, src);
+		case 0x0e: /* FSIN */
+			fpp_sin(dst, src);
 			break;
 		case 0x0f: /* FTAN */
-			fp_tan(dst, src);
+			fpp_tan(dst, src);
 			break;
 		case 0x10: /* FETOX */
-			fp_etox(dst, src);
+			fpp_etox(dst, src);
 			break;
 		case 0x11: /* FTWOTOX */
-			fp_twotox(dst, src);
+			fpp_twotox(dst, src);
 			break;
 		case 0x12: /* FTENTOX */
 		case 0x13:
-			fp_tentox(dst, src);
+			fpp_tentox(dst, src);
 			break;
 		case 0x14: /* FLOGN */
-			fp_logn(dst, src);
+			fpp_logn(dst, src);
 			break;
 		case 0x15: /* FLOG10 */
-			fp_log10(dst, src);
+			fpp_log10(dst, src);
 			break;
 		case 0x16: /* FLOG2 */
 		case 0x17:
-			fp_log2(dst, src);
+			fpp_log2(dst, src);
 			break;
-		case 0x18: /* FABS */ // 5
-			fp_abs(dst, src, PREC_NORMAL);
+		case 0x18: /* FABS */
+			fpp_abs(dst, src, PREC_NORMAL);
 			break;
 		case 0x58: /* FSABS */
-			fp_abs(dst, src, PREC_FLOAT);
+			fpp_abs(dst, src, PREC_FLOAT);
 			break;
 		case 0x5c: /* FDABS */
-			fp_abs(dst, src, PREC_DOUBLE);
+			fpp_abs(dst, src, PREC_DOUBLE);
 			break;
 		case 0x19: /* FCOSH */
-			fp_cosh(dst, src);
+			fpp_cosh(dst, src);
 			break;
-		case 0x1a: /* FNEG */ //28
+		case 0x1a: /* FNEG */
 		case 0x1b:
-			fp_neg(dst, src, PREC_NORMAL);
+			fpp_neg(dst, src, PREC_NORMAL);
 			break;
 		case 0x5a: /* FSNEG */
-			fp_neg(dst, src, PREC_FLOAT);
+			fpp_neg(dst, src, PREC_FLOAT);
 			break;
 		case 0x5e: /* FDNEG */
-			fp_neg(dst, src, PREC_DOUBLE);
+			fpp_neg(dst, src, PREC_DOUBLE);
 			break;
 		case 0x1c: /* FACOS */
-			fp_acos(dst, src);
+			fpp_acos(dst, src);
 			break;
 		case 0x1d: /* FCOS */
-			fp_cos(dst, src);
+			fpp_cos(dst, src);
 			break;
 		case 0x1e: /* FGETEXP */
-			fp_getexp(dst, src);
+			fpp_getexp(dst, src);
 			break;
 		case 0x1f: /* FGETMAN */
-			fp_getman(dst, src);
+			fpp_getman(dst, src);
 			break;
-		case 0x20: /* FDIV */ //30
-			fp_div(dst, src, PREC_NORMAL);
+		case 0x20: /* FDIV */
+			fpp_div(dst, src, PREC_NORMAL);
 			break;
 		case 0x60: /* FSDIV */
-			fp_div(dst, src, PREC_FLOAT);
+			fpp_div(dst, src, PREC_FLOAT);
 			break;
 		case 0x64: /* FDDIV */
-			fp_div(dst, src, PREC_DOUBLE);
+			fpp_div(dst, src, PREC_DOUBLE);
 			break;
 		case 0x21: /* FMOD */
 			fpsr_get_quotient(&q, &s);
-			fp_mod(dst, src, &q, &s);
+			fpp_mod(dst, src, &q, &s);
 			fpsr_set_quotient(q, s);
 			break;
-		case 0x22: /* FADD */ //814
-			fp_add(dst, src, PREC_NORMAL);
+		case 0x22: /* FADD */
+			fpp_add(dst, src, PREC_NORMAL);
 			break;
 		case 0x62: /* FSADD */
-			fp_add(dst, src, PREC_FLOAT);
+			fpp_add(dst, src, PREC_FLOAT);
 			break;
 		case 0x66: /* FDADD */
-			fp_add(dst, src, PREC_DOUBLE);
+			fpp_add(dst, src, PREC_DOUBLE);
 			break;
-		case 0x23: /* FMUL */ //1214
-			fp_mul(dst, src, PREC_NORMAL);
+		case 0x23: /* FMUL */
+			fpp_mul(dst, src, PREC_NORMAL);
 			break;
 		case 0x63: /* FSMUL */
-			fp_mul(dst, src, PREC_FLOAT);
+			fpp_mul(dst, src, PREC_FLOAT);
 			break;
 		case 0x67: /* FDMUL */
-			fp_mul(dst, src, PREC_DOUBLE);
+			fpp_mul(dst, src, PREC_DOUBLE);
 			break;
 		case 0x24: /* FSGLDIV */
-			fp_sgldiv(dst, src);
+			fpp_sgldiv(dst, src);
 			break;
 		case 0x25: /* FREM */
 			fpsr_get_quotient(&q, &s);
-			fp_rem(dst, src, &q, &s);
+			fpp_rem(dst, src, &q, &s);
 			fpsr_set_quotient(q, s);
 			break;
 		case 0x26: /* FSCALE */
-			fp_scale(dst, src);
+			fpp_scale(dst, src);
 			break;
 		case 0x27: /* FSGLMUL */
-			fp_sglmul(dst, src);
+			fpp_sglmul(dst, src);
 			break;
-		case 0x28: /* FSUB */ //143
+		case 0x28: /* FSUB */
 		case 0x29:
 		case 0x2a:
 		case 0x2b:
@@ -2255,13 +2254,13 @@ static bool fp_arithmetic(fpdata *src, fpdata *dst, int extra)
 		case 0x2d:
 		case 0x2e:
 		case 0x2f:
-			fp_sub(dst, src, PREC_NORMAL);
+			fpp_sub(dst, src, PREC_NORMAL);
 			break;
 		case 0x68: /* FSSUB */
-			fp_sub(dst, src, PREC_FLOAT);
+			fpp_sub(dst, src, PREC_FLOAT);
 			break;
 		case 0x6c: /* FDSUB */
-			fp_sub(dst, src, PREC_DOUBLE);
+			fpp_sub(dst, src, PREC_DOUBLE);
 			break;
 		case 0x30: /* FSINCOS */
 		case 0x31: /* FSINCOS */
@@ -2271,16 +2270,16 @@ static bool fp_arithmetic(fpdata *src, fpdata *dst, int extra)
 		case 0x35: /* FSINCOS */
 		case 0x36: /* FSINCOS */
 		case 0x37: /* FSINCOS */
-			fp_cos(dst, src);
+			fpp_cos(dst, src);
 			regs.fp[extra & 7] = *dst;
-			fp_sin(dst, src);
+			fpp_sin(dst, src);
 			break;
-		case 0x38: /* FCMP */ //435
+		case 0x38: /* FCMP */
 		case 0x39:
 		case 0x3c:
 		case 0x3d:
 		{
-			fp_cmp(dst, src);
+			fpp_cmp(dst, src);
 			fpsr_make_status();
 			fpsr_set_result_always(dst);
 			fpsr_set_result(dst);
@@ -2291,7 +2290,7 @@ static bool fp_arithmetic(fpdata *src, fpdata *dst, int extra)
 		case 0x3e:
 		case 0x3f:
 		{
-			fp_tst(dst, src);
+			fpp_tst(dst, src);
 			fpsr_make_status();
 			fpsr_set_result_always(dst);
 			fpsr_set_result(dst);
@@ -2628,7 +2627,7 @@ static void fpuop_arithmetic2 (uae_u32 opcode, uae_u16 extra)
 
 		case 0:
 		case 2: /* Extremely common */
-			regs.fpiar = pc;
+
 			reg = (extra >> 7) & 7;
 			if ((extra & 0xfc00) == 0x5c00) {
 				// FMOVECR
@@ -2741,10 +2740,10 @@ void fpu_reset (void)
 	fpp_set_fpsr (0);
 	fpp_set_fpiar (0);
 	// reset precision
-	fp_set_mode(0x00000080 | 0x00000010);
-	fp_set_mode(0x00000000);
+	fpp_set_mode(0x00000080 | 0x00000010);
+	fpp_set_mode(0x00000000);
 }
-#if 0
+
 uae_u8 *restore_fpu (uae_u8 *src)
 {
 	uae_u32 w1, w2, w3;
@@ -2758,7 +2757,7 @@ uae_u8 *restore_fpu (uae_u8 *src)
 		w1 = restore_u16 () << 16;
 		w2 = restore_u32 ();
 		w3 = restore_u32 ();
-		fp_to_exten_fmovem(&regs.fp[i], w1, w2, w3);
+		fpp_to_exten_fmovem(&regs.fp[i], w1, w2, w3);
 	}
 	regs.fpcr = restore_u32 ();
 	regs.fpsr = restore_u32 ();
@@ -2878,4 +2877,3 @@ uae_u8 *save_fpu(size_t *len, uae_u8 *dstptr)
 	*len = dst - dstbak;
 	return dstbak;
 }
-#endif
