@@ -146,6 +146,18 @@ static inline bool bridge_mapped_write(uaecptr addr, unsigned int v, unsigned ch
 static int g_jit_trace = 0;
 static int g_jit_trace_ifetch_left = 0;
 static int g_jit_trace_data_left = 0;
+static int g_ovl_holdoff = 0;
+static int g_ovl_holdoff_left = 0;
+
+static void pistorm_init_ovl_holdoff(void) {
+  // Allow delaying the first few overlay drops while JIT is stabilizing.
+  const char* holdoff = getenv("PISTORM_UAE_OVL_HOLDOFF");
+  g_ovl_holdoff = (holdoff && atoi(holdoff) > 0) ? atoi(holdoff) : 0;
+  g_ovl_holdoff_left = g_ovl_holdoff;
+  if (g_ovl_holdoff > 0) {
+    printf("[UAE] OVL holdoff active: delaying %d overlay drop(s)\n", g_ovl_holdoff);
+  }
+}
 
 static inline uint32_t pistorm_fc_data(void) {
   return regs.s ? 5u : 1u;  // Supervisor/User Data
@@ -738,6 +750,7 @@ extern "C" int uae_pistorm_init(int cpu_model, int enable_jit, int enable_fpu) {
     printf("[UAE-JIT] trace enabled (PISTORM_UAE_JIT_TRACE=1 ifetch=%d data=%d)\n",
            g_jit_trace_ifetch_left, g_jit_trace_data_left);
   }
+  pistorm_init_ovl_holdoff();
   // Force ROM overlay on at reset so vectors are visible at 0x000000.
   ovl = 1;
   pistorm_force_rom_overlay();
@@ -776,6 +789,7 @@ extern "C" void uae_pistorm_pulse_reset(void) {
   m68k_reset_newcpu(true);
   ovl = 1;
   pistorm_force_rom_overlay();
+  pistorm_init_ovl_holdoff();
   uae_pistorm_apply_reset_vectors();
   m68k_setpc_normal(regs.pc);
   fill_prefetch_quick();
@@ -790,6 +804,14 @@ extern "C" void uae_pistorm_overlay_changed(int ovl_state) {
     ovl = 1;
     pistorm_force_rom_overlay();
     printf("[UAE] OVL lock active: keeping OVL=1\n");
+    set_special(SPCFLAG_MODE_CHANGE | SPCFLAG_CHECK);
+    return;
+  }
+  if (!ovl_state && g_ovl_holdoff_left > 0) {
+    g_ovl_holdoff_left--;
+    ovl = 1;
+    pistorm_force_rom_overlay();
+    printf("[UAE] OVL holdoff: keeping OVL=1 (%d remaining)\n", g_ovl_holdoff_left);
     set_special(SPCFLAG_MODE_CHANGE | SPCFLAG_CHECK);
     return;
   }
