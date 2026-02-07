@@ -275,10 +275,9 @@ UAE_GENTOOL_DIR := $(UAE_BUILDDIR)/gen
 UAE_GENCPU   := $(UAE_GENTOOL_DIR)/gencpu
 UAE_GENCOMP  := $(UAE_GENTOOL_DIR)/gencomp
 UAE_INCLUDES := -Isrc -I$(UAE_SRCDIR) -I$(UAE_SRCDIR)/include -I$(UAE_SRCDIR)/include/uae \
-	-I$(UAE_SRCDIR)/machdep -I$(UAE_SRCDIR)/jit -Iamiberry-lite/src/include
+	-I$(UAE_SRCDIR)/machdep -I$(UAE_SRCDIR)/jit
 UAE_C_SRCS   :=
 UAE_CXX_SRCS :=
-UAE_AMIBERRY_SRCS :=
 UAE_OBJS     :=
 UAE_TARGET   := $(UAE_BUILDDIR)/libuae.a
 UAE_FPP_NATIVE_IN := $(UAE_SRCDIR)/fpp_native.cpp.in
@@ -306,9 +305,6 @@ EXTRA_LINK_DEPS :=
 ifeq ($(USE_UAE_JIT),1)
 UAE_C_SRCS   := $(shell find $(UAE_SRCDIR) -type f -name "*.c")
 UAE_CXX_SRCS := $(shell find $(UAE_SRCDIR) -type f \( -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \))
-UAE_AMIBERRY_SRCS := \
-	amiberry-lite/src/zfile.cpp \
-	amiberry-lite/src/zfile_archive.cpp
 UAE_JIT_SRCS := \
 	$(UAE_SRCDIR)/jit/codegen_armA64.cpp \
 	$(UAE_SRCDIR)/jit/compemu_midfunc_armA64.cpp \
@@ -337,7 +333,6 @@ UAE_OBJS := $(patsubst $(UAE_SRCDIR)/%.c,$(UAE_BUILDDIR)/%.o,$(UAE_C_SRCS))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cc,$(UAE_BUILDDIR)/%.o,$(filter %.cc,$(UAE_CXX_SRCS)))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cpp,$(UAE_BUILDDIR)/%.o,$(filter %.cpp,$(UAE_CXX_SRCS)))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cxx,$(UAE_BUILDDIR)/%.o,$(filter %.cxx,$(UAE_CXX_SRCS)))
-UAE_OBJS += $(patsubst %.cpp,$(UAE_BUILDDIR)/%.o,$(UAE_AMIBERRY_SRCS))
 EXTRA_CXX_OBJS += src/uae/pistorm_uae_bridge.o src/uae/pistorm_uae_stubs.o
 EXTRA_LINK_DEPS += $(UAE_TARGET)
 UAE_LINK_FLAGS := -Wl,--whole-archive $(UAE_TARGET) -Wl,--no-whole-archive
@@ -606,10 +601,6 @@ $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cpp
 	$(CXX) -MMD -MP $(UAE_CXXFLAGS) -c -o $@ $<
 
 $(UAE_BUILDDIR)/%.o: $(UAE_SRCDIR)/%.cxx
-	@mkdir -p $(dir $@)
-	$(CXX) -MMD -MP $(UAE_CXXFLAGS) -c -o $@ $<
-
-$(UAE_BUILDDIR)/amiberry-lite/src/%.o: amiberry-lite/src/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) -MMD -MP $(UAE_CXXFLAGS) -c -o $@ $<
 
