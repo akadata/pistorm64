@@ -276,6 +276,8 @@ UAE_C_SRCS   :=
 UAE_CXX_SRCS :=
 UAE_OBJS     :=
 UAE_TARGET   := $(UAE_BUILDDIR)/libuae.a
+UAE_FPP_NATIVE_IN := $(UAE_SRCDIR)/fpp_native.cpp.in
+UAE_FPP_NATIVE_CPP := $(UAE_SRCDIR)/fpp_native.cpp
 UAE_LINK_FLAGS :=
 UAE_JIT_NO_PIE ?= 1
 UAE_PIE_FLAGS := $(if $(filter 1,$(UAE_JIT_NO_PIE)),-fno-pie,)
@@ -309,7 +311,7 @@ UAE_CXX_SRCS := $(filter-out \
 	$(UAE_SRCDIR)/pistorm_uae_stubs.cc \
 	$(UAE_SRCDIR)/fpp.cc \
 	$(UAE_SRCDIR)/fpp_native.cc,$(UAE_CXX_SRCS))
-UAE_CXX_SRCS := $(sort $(UAE_CXX_SRCS) $(UAE_JIT_SRCS))
+UAE_CXX_SRCS := $(sort $(UAE_CXX_SRCS) $(UAE_JIT_SRCS) $(UAE_FPP_NATIVE_CPP))
 UAE_OBJS := $(patsubst $(UAE_SRCDIR)/%.c,$(UAE_BUILDDIR)/%.o,$(UAE_C_SRCS))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cc,$(UAE_BUILDDIR)/%.o,$(filter %.cc,$(UAE_CXX_SRCS)))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cpp,$(UAE_BUILDDIR)/%.o,$(filter %.cpp,$(UAE_CXX_SRCS)))
@@ -475,6 +477,7 @@ HELP_TARGETS = \
 
 DELETEFILES = $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(.OFILES) $(.OFILES:%.o=%.d) $(TARGET) buptest pistorm_truth_test pistorm_truth_test.d $(MUSASHIGENERATOR)$(EXE) \
 	$(UAE_TARGET) $(UAE_OBJS) $(UAE_OBJS:%.o=%.d) $(EXTRA_CXX_OBJS) $(EXTRA_CXX_OBJS:%.o=%.d)
+DELETEFILES += $(UAE_FPP_NATIVE_CPP)
 
 all: $(MUSASHIGENCFILES) $(MUSASHIGENHFILES) $(TARGET) buptest pistorm_truth_test 
 
@@ -500,6 +503,21 @@ $(UAE_TARGET): $(UAE_OBJS)
 	@mkdir -p $(UAE_BUILDDIR)
 	rm -f $@
 	$(AR) rcs $@ $^
+
+$(UAE_FPP_NATIVE_CPP): $(UAE_FPP_NATIVE_IN)
+	@{ \
+		printf '%s\n' '/* Auto-generated from fpp_native.cpp.in; do not edit. */'; \
+		printf '%s\n' '' \
+			'#include "sysconfig.h"' \
+			'#include "sysdeps.h"' \
+			'#include "options.h"' \
+			'#include "memory.h"' \
+			'#include "events.h"' \
+			'#include "newcpu.h"' \
+			'#include "fpp.h"' \
+			'' \
+			'#include "fpp_native.cpp.in"'; \
+	} > $@
 
 # Explicit rules to keep the generated 68k core quiet on unused-temp warnings.
 src/musashi/m68kcpu.o: src/musashi/m68kcpu.c src/musashi/m68kops.h
