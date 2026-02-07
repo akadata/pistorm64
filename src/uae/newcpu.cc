@@ -900,14 +900,8 @@ void build_cpufunctbl (void)
       m68k_pc_indirect = mode != 0 ? 1 : 0;
    } else {
       mode = 1;
-      m68k_pc_indirect = 0;
-   }
-#ifdef USE_UAE_JIT
-   if (currprefs.cachesize) {
-      // PiStorm JIT backend routes opcode/data fetches via custom addrbank handlers.
       m68k_pc_indirect = 1;
    }
-#endif
    printf("[Core1] Emulation mode %d m68k_pc_indirect %d\n",mode,m68k_pc_indirect);
    lvl = (currprefs.cpu_model - 68000) / 10;
    if (lvl >= 5)

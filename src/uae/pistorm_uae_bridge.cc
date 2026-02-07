@@ -63,6 +63,22 @@ static void pistorm_force_rom_overlay(void) {
   }
 }
 
+static uae_u8* pistorm_compute_natmem_offset(void) {
+  if (!cfg) {
+    return (uae_u8*)0;
+  }
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE || !cfg->map_data[i]) {
+      continue;
+    }
+    uintptr_t hi = ((uintptr_t)cfg->map_data[i]) & 0xFFFFFFFF00000000ull;
+    if (hi != 0) {
+      return (uae_u8*)hi;
+    }
+  }
+  return (uae_u8*)0;
+}
+
 static inline bool uae_jit_invalid_addr(uaecptr addr) {
   return ((uae_u32)addr) == 0xFFFFFFFFu;
 }
@@ -534,18 +550,23 @@ static void uae_pistorm_apply_reset_vectors(void) {
 extern "C" int uae_pistorm_init(int cpu_model, int enable_jit, int enable_fpu) {
   uae_pistorm_set_defaults(cpu_model, enable_jit, enable_fpu);
   const char* trace = getenv("PISTORM_UAE_JIT_TRACE");
+  const char* trace_ifetch = getenv("PISTORM_UAE_JIT_TRACE_IFETCH");
+  const char* trace_data = getenv("PISTORM_UAE_JIT_TRACE_DATA");
   g_jit_trace = (trace && atoi(trace) != 0) ? 1 : 0;
-  g_jit_trace_ifetch_left = 128;
-  g_jit_trace_data_left = 128;
+  g_jit_trace_ifetch_left = (trace_ifetch && atoi(trace_ifetch) > 0) ? atoi(trace_ifetch) : 128;
+  g_jit_trace_data_left = (trace_data && atoi(trace_data) > 0) ? atoi(trace_data) : 128;
   if (g_jit_trace) {
-    printf("[UAE-JIT] trace enabled (PISTORM_UAE_JIT_TRACE=1)\n");
+    printf("[UAE-JIT] trace enabled (PISTORM_UAE_JIT_TRACE=1 ifetch=%d data=%d)\n",
+           g_jit_trace_ifetch_left, g_jit_trace_data_left);
   }
   // Force ROM overlay on at reset so vectors are visible at 0x000000.
   ovl = 1;
   pistorm_force_rom_overlay();
-  m68k_pc_indirect = 1;
 
-  regs.natmem_offset = (uae_u8*)0;
+  regs.natmem_offset = pistorm_compute_natmem_offset();
+  if (regs.natmem_offset) {
+    printf("[UAE] natmem_offset=%p\n", regs.natmem_offset);
+  }
   for (int i = 0; i < MEMORY_BANKS; i++) {
     mem_banks[i] = &pistorm_bank;
     thread_mem_banks[i] = &pistorm_bank;
@@ -555,8 +576,6 @@ extern "C" int uae_pistorm_init(int cpu_model, int enable_jit, int enable_fpu) {
   uae_pistorm_apply_reset_vectors();
   init_m68k();
   build_cpufunctbl();
-  // Force indirect PC mode so opcode fetches go through addrbank helpers.
-  m68k_pc_indirect = 1;
   m68k_setpc_normal(regs.pc);
   doint();
   fill_prefetch_quick();
@@ -567,8 +586,6 @@ extern "C" int uae_pistorm_init(int cpu_model, int enable_jit, int enable_fpu) {
 }
 
 extern "C" void uae_pistorm_run(void) {
-  // Ensure indirect PC mode stays enabled for Pistorm memory accessors.
-  m68k_pc_indirect = 1;
   m68k_go(1);
 }
 
@@ -580,7 +597,6 @@ extern "C" void uae_pistorm_pulse_reset(void) {
   m68k_reset_newcpu(true);
   ovl = 1;
   pistorm_force_rom_overlay();
-  m68k_pc_indirect = 1;
   uae_pistorm_apply_reset_vectors();
   m68k_setpc_normal(regs.pc);
   fill_prefetch_quick();
@@ -591,4 +607,12 @@ extern "C" void uae_pistorm_pulse_reset(void) {
 
 extern "C" uint32_t uae_pistorm_get_pc(void) {
   return (uint32_t)m68k_getpc();
+}
+
+extern "C" uint32_t uae_pistorm_get_regs_pc(void) {
+  return (uint32_t)regs.pc;
+}
+
+extern "C" uint32_t uae_pistorm_get_regs_pc_p(void) {
+  return (uint32_t)(uintptr_t)regs.pc_p;
 }
