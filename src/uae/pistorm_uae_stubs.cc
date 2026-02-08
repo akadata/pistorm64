@@ -5,6 +5,7 @@
 #include "uae/types.h"
 #include "memory.h"
 #include "newcpu.h"
+#include "events.h"
 #include "machdep/maccess.h"
 #include "../config_file/config_file.h"
 #include "../memory_mapped.h"
@@ -12,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 extern "C" {
 unsigned int read_long(unsigned int address);
@@ -23,6 +25,7 @@ void m68k_write_memory_32(unsigned int address, unsigned int value);
 }
 
 extern struct emulator_config* cfg;
+extern int ovl;
 
 // Minimal dummy bank to satisfy references from UAE core.
 static uae_u32 REGPARAM2 dummy_lget(uaecptr) { return 0; }
@@ -55,6 +58,110 @@ addrbank dmmy_bank = {
 
 // Provide thread_mem_banks for non-threaded builds (newcpu expects it).
 addrbank* thread_mem_banks[MEMORY_BANKS];
+addrbank* mem_banks[MEMORY_BANKS];
+uae_u8* baseaddr[MEMORY_BANKS];
+int special_mem = 0;
+int special_mem_default = 0;
+int jit_n_addr_unsafe = 0;
+bool canbang = false;
+bool jit_direct_compatible_memory = false;
+uaecptr highest_ram = 0;
+
+static inline addrbank* bank_for_addr(uaecptr addr) {
+  addrbank* b = mem_banks[bankindex(addr)];
+  return b ? b : &dmmy_bank;
+}
+
+uae_u32 memory_get_long(uaecptr addr) {
+  return bank_for_addr(addr)->lget(addr);
+}
+
+uae_u32 memory_get_word(uaecptr addr) {
+  return bank_for_addr(addr)->wget(addr);
+}
+
+uae_u32 memory_get_byte(uaecptr addr) {
+  return bank_for_addr(addr)->bget(addr);
+}
+
+uae_u32 memory_get_longi(uaecptr addr) {
+  addrbank* b = bank_for_addr(addr);
+  return b->lgeti ? b->lgeti(addr) : b->lget(addr);
+}
+
+uae_u32 memory_get_wordi(uaecptr addr) {
+  addrbank* b = bank_for_addr(addr);
+  return b->wgeti ? b->wgeti(addr) : b->wget(addr);
+}
+
+void memory_put_long(uaecptr addr, uae_u32 v) {
+  bank_for_addr(addr)->lput(addr, v);
+}
+
+void memory_put_word(uaecptr addr, uae_u32 v) {
+  bank_for_addr(addr)->wput(addr, v);
+}
+
+void memory_put_byte(uaecptr addr, uae_u32 v) {
+  bank_for_addr(addr)->bput(addr, v);
+}
+
+uae_u8* memory_get_real_address(uaecptr addr) {
+  if (!cfg) {
+    return nullptr;
+  }
+  for (int i = 0; i < MAX_NUM_MAPPED_ITEMS; i++) {
+    if (cfg->map_type[i] == MAPTYPE_NONE) {
+      continue;
+    }
+    if (ovl && (cfg->map_type[i] == MAPTYPE_ROM || cfg->map_type[i] == MAPTYPE_RAM_WTC)) {
+      if (cfg->map_mirror[i] != ((unsigned int)-1) &&
+          addr >= cfg->map_mirror[i] &&
+          addr < (cfg->map_mirror[i] + cfg->map_size[i])) {
+        return cfg->map_data[i] + ((addr - cfg->map_mirror[i]) % cfg->rom_size[i]);
+      }
+    }
+    if (addr >= cfg->map_offset[i] && addr < cfg->map_high[i]) {
+      switch (cfg->map_type[i]) {
+        case MAPTYPE_ROM:
+          return cfg->map_data[i] + ((addr - cfg->map_offset[i]) % cfg->rom_size[i]);
+        case MAPTYPE_RAM:
+        case MAPTYPE_RAM_WTC:
+        case MAPTYPE_RAM_NOALLOC:
+          return cfg->map_data[i] + (addr - cfg->map_offset[i]);
+        default:
+          break;
+      }
+    }
+  }
+  return nullptr;
+}
+
+int memory_valid_address(uaecptr addr, uae_u32 size) {
+  if (!size) {
+    return 1;
+  }
+  uae_u8* a0 = memory_get_real_address(addr);
+  uae_u8* a1 = memory_get_real_address(addr + size - 1);
+  return (a0 && a1) ? 1 : 0;
+}
+
+void do_cycles_ce(int cycles) {
+  do_cycles_cpu_norm(cycles);
+}
+
+void do_cycles_ce020(int cycles) {
+  do_cycles_cpu_norm(cycles);
+}
+
+void jit_abort(const TCHAR* format, ...) {
+  va_list ap;
+  va_start(ap, format);
+  vfprintf(stderr, format, ap);
+  va_end(ap);
+  fputc('\n', stderr);
+  abort();
+}
 
 static int g_mem_trace = -1;
 static int g_mem_trace_budget = 128;
@@ -273,9 +380,6 @@ extern "C" int read_irq;
 extern "C" int intlev(void) {
   return read_irq;
 }
-
-// Logging function needed by UAE JIT - this is just a placeholder since the actual
-// log_message function will be provided by the main executable
 
 bool is_cycle_ce(uaecptr) {
   return false;

@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+#define _POSIX_C_SOURCE 199309L
+
 #include "m68k.h"
 #include "emulator.h"
 #include "platforms/platforms.h"
@@ -52,6 +54,7 @@ extern "C" {
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <time.h>
 #include <unistd.h>
 
 
@@ -487,7 +490,7 @@ static void configure_ipl_nops(void) {
 // Helper function for rate limiting
 static inline uint64_t now_ns(void) {
     struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    clock_gettime(CLOCK_MONOTONIC, &ts);
     return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
 }
 #endif
@@ -1291,7 +1294,9 @@ int main(int argc, char* argv[]) {
   }
 
 switch_config:
-  srand((unsigned int)clock());
+  struct timespec ts_seed;
+  clock_gettime(CLOCK_MONOTONIC, &ts_seed);
+  srand((unsigned int)(ts_seed.tv_sec ^ ts_seed.tv_nsec));
 
   amiga_reset_and_wait("startup");
 
@@ -1604,7 +1609,7 @@ switch_config:
 
   // Join other threads with timeouts
   struct timespec other_timeout;
-  clock_gettime(CLOCK_REALTIME, &other_timeout);
+  clock_gettime(CLOCK_MONOTONIC, &other_timeout);
   other_timeout.tv_sec += 2; // 2 second timeout
 
   if (kbd_tid) {

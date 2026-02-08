@@ -44,6 +44,28 @@
 #include "cpu_prefetch.h"
 #include "uae/uaestring.h"
 
+#ifdef WITH_PPC
+#include "uae/ppc.h"
+#endif
+
+// Stub implementations for amiberry-lite compatibility
+#ifndef WITH_PPC
+int ppc_interrupt(int new_m68k_ipl) {
+    return 0; // Return 0 indicating no PPC interrupt
+}
+void uae_ppc_execute_check(void) {
+    // Empty implementation
+}
+void uae_ppc_interrupt(bool active) {
+    // Empty implementation
+}
+
+// Stub for notify_user function
+void notify_user(int msg) {
+    // Empty implementation
+}
+#endif
+
 #if defined(__has_include)
 #if __has_include(<xil_cache_l.h>)
 #include <xil_cache_l.h>
@@ -2116,7 +2138,9 @@ void m68k_reset_newcpu(bool hardreset)
 {
    uae_u32 v;
 
+#ifdef JIT
    regs.pissoff = 0;
+#endif
 
    regs.halted = 0;
 //   gui_data.cpu_halted = 0;
@@ -2616,7 +2640,9 @@ static inline void check_uae_int_request(void)
    {
       set_special(SPCFLAG_DOINT);
       if(pissoff_int!=0)
+#ifdef JIT
          regs.pissoff=pissoff_int;
+#endif
    }
 #endif
 #if 1
@@ -2694,7 +2720,6 @@ int cpu_sleep_millis(int ms)
 //   return sleep_millis_main(ms);
    return(0);
 }
-#if 0
 static bool haltloop_do(int vsynctimeline, frame_time_t rpt_end, int lines)
 {
    int ovpos = vpos;
@@ -2707,6 +2732,11 @@ static bool haltloop_do(int vsynctimeline, frame_time_t rpt_end, int lines)
 #ifdef WITH_PPC
          ppc_interrupt(intlev());
          uae_ppc_execute_check();
+#else
+         // Without PPC, just check interrupts normally
+         if (regs.intmask < intlev()) {
+             regs.intmask = intlev();
+         }
 #endif
          if (regs.spcflags & SPCFLAG_COPPER)
             do_copper();
@@ -2728,6 +2758,11 @@ static bool haltloop_do(int vsynctimeline, frame_time_t rpt_end, int lines)
 #ifdef WITH_PPC
          ppc_interrupt(intlev());
          uae_ppc_execute_check();
+#else
+         // Without PPC, just check interrupts normally
+         if (regs.intmask < intlev()) {
+             regs.intmask = intlev();
+         }
 #endif
          if (event_wait)
             break;
@@ -2738,7 +2773,6 @@ static bool haltloop_do(int vsynctimeline, frame_time_t rpt_end, int lines)
    }
    return false;
 }
-#endif
 static bool haltloop(void)
 {
 #ifdef WITH_PPC
@@ -2756,12 +2790,12 @@ static bool haltloop(void)
          // Dialog must be opened from main thread.
          if (regs.halted == -2) {
             regs.halted = -1;
-            notify_user (NUMSG_UAEBOOTROM_PPC);
+            // notify_user (NUMSG_UAEBOOTROM_PPC);  // Commented out due to amiberry-lite incompatibility
          }
 
-         if (currprefs.ppc_cpu_idle) {
+         if (0) { // Disable PPC idle code since ppc_cpu_idle doesn't exist
 
-            int maxlines = 100 - (currprefs.ppc_cpu_idle - 1) * 10;
+            int maxlines = 100 - (0 - 1) * 10; // (currprefs.ppc_cpu_idle - 1) * 10;
             int i;
 
             event_wait = false;
@@ -2775,11 +2809,13 @@ static bool haltloop(void)
                if (eventtab[i].evtime - currcycle < maxlines * maxhpos * CYCLE_UNIT)
                   break;
             }
-            if (currprefs.ppc_cpu_idle >= 10 || (i == ev_max && vpos > 0 && vpos < maxvpos - maxlines)) {
+            if (i == ev_max && vpos > 0 && vpos < maxvpos - maxlines) {
                cpu_sleep_millis(1);
             }
             check_uae_int_request();
+#ifdef WITH_PPC
             uae_ppc_execute_check();
+#endif
 
             lines = (int)(read_processor_time() - rpt_scanline) / vsynctimeline + 1;
 
@@ -2849,6 +2885,11 @@ void doint(void)
    if (ppc_state) {
       if (!ppc_interrupt(intlev()))
          return;
+   }
+#else
+   // Without PPC, just check if we have interrupts
+   if (regs.intmask < intlev()) {
+       regs.intmask = intlev();
    }
 #endif
    if (m68k_interrupt_delay) {
@@ -3015,6 +3056,10 @@ static int do_specialties (int cycles)
             if (ppc_state) {
                m68kint = ppc_interrupt(intr);
             }
+            if (m68kint) {
+#else
+            // Without PPC, just check if interrupt should happen
+            bool m68kint = (intr > regs.intmask);
             if (m68kint) {
 #endif
                if (intr > 0 && intr > regs.intmask) {
@@ -3654,6 +3699,11 @@ void exec_nostats (void)
 #ifdef WITH_PPC
          if (ppc_state)
             ppc_interrupt(intlev());
+#else
+         // Without PPC, just check if we have interrupts
+         if (ppc_state && regs.intmask < intlev()) {
+             regs.intmask = intlev();
+         }
 #endif
 //      }
 

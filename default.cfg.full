@@ -15,8 +15,7 @@ platform amiga
 # Kickstart / ROMs
 # -----------------------------------------------------------------------------
 # Map 512KB kickstart ROM to default offset.
-map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart
-# autodump_mem
+map type=rom address=0xF80000 size=0x80000 file=../Amiga/kick/Kickstart-v3.1-r40.068.rom ovl=0 id=kickstart autodump_mem
 
 # Comment out the line above and uncomment the line below to automatically copy
 # the ROM contents to Pi RAM if the file isn't found
@@ -58,7 +57,9 @@ map type=ram address=0x10000000 size=256M id=z3_autoconf_fast
 #map type=ram address=0x50000000 size=256M id=z3_autoconf_fast
 
 # Dedicated Z3 DMA window for PiSCSI (keeps Z2 at 8 MB)
-map type=ram address=0x60000000 size=16M id=piscsi_dma
+#
+# this overlaps with Z3 ram
+# map type=ram address=0x60000000 size=16M id=piscsi_dma
 
 #map type=ram address=0x90000000 size=256M id=z3_autoconf_fast
 map type=ram address=0xD0000000 size=256M id=z3_autoconf_fast
@@ -68,15 +69,15 @@ map type=ram address=0xD0000000 size=256M id=z3_autoconf_fast
 # Do not map Zorro II Fast RAM unless you absolutely need it, as Z2 address space
 # is very limited. Cases where you may need Zorro II Fast may include emulating a
 # 68000, 68010 or 68EC020, and/or if you are using Kickstart 1.3.
-map type=ram address=0x200000 size=8M id=z2_autoconf_fast
+#map type=ram address=0x200000 size=8M id=z2_autoconf_fast
 #map type=ram address=0x200000 size=2M id=z2_autoconf_fast
-#map type=ram address=0x400000 size=4M id=z2_autoconf_fast
+map type=ram address=0x400000 size=4M id=z2_autoconf_fast
 
 # Chip RAM lives on the Amiga side (Agnus), not Pi RAM. Do not map it unless
 # you are explicitly faking extra chip RAM for testing.
 # For A500 tests, an extra 1MB can be faked at 0x00C00000; with a 8371A/8372A
 # Fat Agnus and RTG enabled, this has been observed to work.
-#map type=ram address=0x00C00000 size=1M id=chipram_extra
+map type=ram address=0x00C00000 size=1M id=chipram_extra
 
 # Map Gayle as a register range.
 # NOTE: Gayle emulation is currently non-functional. Do not enable this.
@@ -96,17 +97,17 @@ map type=register address=0xDC0000 size=0x10000
 # Threads / Timing
 # -----------------------------------------------------------------------------
 # Number of instructions to run every main loop.
-loopcycles 200
+loopcycles 400
 # Thread affinity/priority hints (host-side scheduling).
 affinity cpu=2,ipl=3,keyboard=1,mouse=1
-rtprio cpu=95,ipl=95,keyboard=50,mouse=50
+rtprio cpu=90,ipl=90,keyboard=50,mouse=50
 
 
 # -----------------------------------------------------------------------------
 # FC Lines
 # -----------------------------------------------------------------------------
 # Optional: enable FC line shadow logging (stub or cpld).
-setvar enable_fc stub
+setvar enable_fc cpld
 setvar z3bus-demo 1
 setvar zorro-serial 1
 setvar zorro-rng 1

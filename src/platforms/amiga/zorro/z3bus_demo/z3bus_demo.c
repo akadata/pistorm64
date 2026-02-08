@@ -34,5 +34,8 @@ static zorro_device_t z3bus_demo_device = {
 
 void z3bus_demo_register(void) {
   LOG_INFO("[Z3BUS] Registering z3bus demo device.\n");
-  zorro_register_device(&z3bus_demo_device);
+  int slot = zorro_register_device(&z3bus_demo_device);
+  if (slot < 0) {
+    LOG_INFO("[Z3BUS] Failed to register z3bus demo device.\n");
+  }
 }

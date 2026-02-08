@@ -3,8 +3,15 @@
 #include "m68k.h"
 #include "platforms/platforms.h"
 #include "pistorm-dev/pistorm-dev-enums.h"
-#include "amiga-autoconf.h"
-#include "amiga_zorro.h"
+#include "platforms/amiga/amiga-autoconf.h"
+#include "platforms/amiga/amiga-platform.h"
+#include "platforms/amiga/amiga_zorro.h"
+
+/* Sanity check: PIC list must be at least as large as Zorro device table. */
+#if AC_PIC_LIMIT < MAX_ZORRO_DEVICES
+#error "AC_PIC_LIMIT must be >= MAX_ZORRO_DEVICES"
+#endif
+
 #include "a314/a314.h"
 #include "log.h"
 #include <stdio.h>
@@ -104,81 +111,132 @@ static unsigned char ac_a314_rom[] = {
     0x0, 0x0, // Optional BOOT ROM vector
 };
 
-extern unsigned int a314_base;
 void autoconf_register_zorro_device(uint8_t zorro_index) {
   zorro_device_t *dev = zorro_get_device_by_index(zorro_index);
   if (!dev) {
     LOG_WARN("[AUTOCONF] Tried to register missing Zorro device index %u\n", zorro_index);
     return;
   }
+
+  bool ok;
   if (dev->bus == ZORRO_BUS_Z3) {
-    add_z3_pic(ACTYPE_ZORRO_GENERIC, zorro_index);
+    ok = add_z3_pic(ACTYPE_ZORRO_GENERIC, zorro_index);
   } else {
-    add_z2_pic(ACTYPE_ZORRO_GENERIC, zorro_index);
+    ok = add_z2_pic(ACTYPE_ZORRO_GENERIC, zorro_index);
+  }
+
+  if (!ok) {
+    LOG_WARN("[AUTOCONF] Zorro device index %u not registered, PIC table full.\n",
+             zorro_index);
   }
 }
 
-uint32_t ac_z2_current_pic = 0;
-uint32_t ac_z2_pic_count = 0;
-int ac_z2_done = 0;
+
+
 int ac_z2_type[AC_PIC_LIMIT];
 int ac_z2_index[AC_PIC_LIMIT];
 unsigned int ac_base[AC_PIC_LIMIT];
 
-uint32_t ac_z3_current_pic = 0;
-uint32_t ac_z3_pic_count = 0;
-int ac_z3_done = 0;
 int ac_z3_type[AC_PIC_LIMIT];
 int ac_z3_index[AC_PIC_LIMIT];
 
-uint32_t piscsi_base = 0, pistorm_dev_base = 0;
+uint32_t ac_z2_pic_count = 0;
+uint32_t ac_z3_pic_count = 0;
+
+uint32_t ac_z2_current_pic = 0;
+uint32_t ac_z3_current_pic = 0;
+
+int ac_z2_done = 0;
+int ac_z3_done = 0;
+
+// why put special cases in global code, commented them out  and fixed in the switch.
+//uint32_t piscsi_base = 0;
+//uint32_t pistorm_dev_base = 0;
+
 extern uint8_t* piscsi_rom_ptr;
+extern uint32_t piscsi_base;
+extern uint32_t pistorm_dev_base;
 
-static unsigned char get_autoconf_size(unsigned int size) {
-  if (size == 8 * SIZE_MEGA)
-    return AC_MEM_SIZE_8MB;
-  if (size == 4 * SIZE_MEGA)
-    return AC_MEM_SIZE_4MB;
-  if (size == 2 * SIZE_MEGA)
-    return AC_MEM_SIZE_2MB;
-  else
-    return AC_MEM_SIZE_64KB;
+typedef struct {
+    unsigned int mbytes;     /* size in megabytes */
+    unsigned char code;      /* AC_MEM_SIZE_* constant */
+} autoconf_size_entry;
+
+static const autoconf_size_entry autoconf_sizes[] = {
+    {  2u, AC_MEM_SIZE_2MB   },
+    {  4u, AC_MEM_SIZE_4MB   },
+    {  8u, AC_MEM_SIZE_8MB   },
+};
+
+static const autoconf_size_entry autoconf_sizes_ext[] = {
+    {  16u,   AC_MEM_SIZE_EXT_16MB   },
+    {  32u,   AC_MEM_SIZE_EXT_32MB   },
+    {  64u,   AC_MEM_SIZE_EXT_64MB   },
+    { 128u,   AC_MEM_SIZE_EXT_128MB  },
+    { 256u,   AC_MEM_SIZE_EXT_256MB  },
+    { 512u,   AC_MEM_SIZE_EXT_512MB  },
+    { 1024u,  AC_MEM_SIZE_EXT_1024MB },
+};
+
+static unsigned char lookup_autoconf_size(unsigned int size,
+                     const autoconf_size_entry *table,
+                     size_t count,
+                     unsigned char default_code) {
+    /* Reject non-MB multiples early */
+    if (size % SIZE_MEGA != 0) {
+        return default_code;
+    }
+
+    unsigned int mbytes = size / SIZE_MEGA;
+
+    for (size_t i = 0; i < count; ++i) {
+        if (table[i].mbytes == mbytes) {
+            return table[i].code;
+        }
+    }
+
+    return default_code;
+}
+static unsigned char get_autoconf_size(unsigned int size)
+{
+    return lookup_autoconf_size(
+        size,
+        autoconf_sizes,
+        sizeof autoconf_sizes / sizeof autoconf_sizes[0],
+        AC_MEM_SIZE_64KB  /* fallback */
+    );
 }
 
-static unsigned char get_autoconf_size_ext(unsigned int size) {
-  if (size == 16 * SIZE_MEGA)
-    return AC_MEM_SIZE_EXT_16MB;
-  if (size == 32 * SIZE_MEGA)
-    return AC_MEM_SIZE_EXT_32MB;
-  if (size == 64 * SIZE_MEGA)
-    return AC_MEM_SIZE_EXT_64MB;
-  if (size == 128 * SIZE_MEGA)
-    return AC_MEM_SIZE_EXT_128MB;
-  if (size == 256 * SIZE_MEGA)
-    return AC_MEM_SIZE_EXT_256MB;
-  if (size == 512 * SIZE_MEGA)
-    return AC_MEM_SIZE_EXT_512MB;
-  if (size == 1024 * SIZE_MEGA)
-    return AC_MEM_SIZE_EXT_1024MB;
-  else
-    return AC_MEM_SIZE_EXT_64MB;
+static unsigned char get_autoconf_size_ext(unsigned int size)
+{
+    return lookup_autoconf_size(
+        size,
+        autoconf_sizes_ext,
+        sizeof autoconf_sizes_ext / sizeof autoconf_sizes_ext[0],
+        AC_MEM_SIZE_EXT_64MB  /* old “else” default */
+    );
 }
+
 
 extern void adjust_ranges_amiga(struct emulator_config* cfg);
 
 void autoconfig_reset_all(void) {
   LOG_INFO("[AUTOCONF] Resetting all autoconf data.\n");
   for (int i = 0; i < AC_PIC_LIMIT; i++) {
-    ac_z2_type[i] = ACTYPE_NONE;
-    ac_z3_type[i] = ACTYPE_NONE;
-    ac_z2_index[i] = 0;
-    ac_z3_index[i] = 0;
+    ac_z2_type[i]   = ACTYPE_NONE;
+    ac_z3_type[i]   = ACTYPE_NONE;
+    ac_z2_index[i]  = 0;
+    ac_z3_index[i]  = 0;
   }
-  ac_z3_pic_count = 0;
-  ac_z2_pic_count = 0;
-  ac_z2_current_pic = 0;
-  ac_z3_current_pic = 0;
+
+  ac_z2_pic_count    = 0;
+  ac_z3_pic_count    = 0;
+  ac_z2_current_pic  = 0;
+  ac_z3_current_pic  = 0;
+  ac_z2_done         = 0;
+  ac_z3_done         = 0;
 }
+
 
 unsigned int autoconfig_read_memory_z3_8(struct emulator_config* cfg, unsigned int address) {
   int index = ac_z3_index[ac_z3_current_pic];
@@ -433,25 +491,39 @@ void autoconfig_write_memory_z3_16(struct emulator_config* cfg, unsigned int add
   return;
 }
 
-void add_z2_pic(uint8_t type, uint8_t index) {
-  if (ac_z2_pic_count < AC_PIC_LIMIT) {
-    ac_z2_type[ac_z2_pic_count] = type;
-    ac_z2_index[ac_z2_pic_count] = index;
-    ac_z2_pic_count++;
-    return;
+// Common helper for Z2/Z3 PIC tables
+static bool add_pic(int        *type_arr,
+                    int        *index_arr,
+                    uint32_t   *counter_ptr,
+                    const char *bus_name,
+                    int         type,
+                    int         index) {
+  const uint32_t count = *counter_ptr;
+
+  if (count < AC_PIC_LIMIT) {
+    type_arr[count]  = type;
+    index_arr[count] = index;
+    (*counter_ptr)++;
+    return true;
+  } else {
+    LOG_WARN("[AUTOCONF] Failed to add %s PIC of type %d, limit %d exceeded.\n",
+             bus_name, type, AC_PIC_LIMIT);
+    return false;
   }
-  LOG_WARN("[AUTOCONF] Failed to add Z2 PIC of type %d, limit exceeded.\n", type);
 }
 
-void add_z3_pic(uint8_t type, uint8_t index) {
-  if (ac_z3_pic_count < AC_PIC_LIMIT) {
-    ac_z3_type[ac_z3_pic_count] = type;
-    ac_z3_index[ac_z3_pic_count] = index;
-    ac_z3_pic_count++;
-    return;
-  }
-  LOG_WARN("[AUTOCONF] Failed to add Z3 PIC of type %d, limit exceeded.\n", type);
+
+bool add_z2_pic(uint8_t type, uint8_t index)
+{
+  return add_pic(ac_z2_type, ac_z2_index, &ac_z2_pic_count, "Z2", type, index);
 }
+
+bool add_z3_pic(uint8_t type, uint8_t index)
+{
+  return add_pic(ac_z3_type, ac_z3_index, &ac_z3_pic_count, "Z3", type, index);
+}
+
+
 
 void remove_z2_pic(uint8_t type, uint8_t index) {
   uint8_t pic_found = 0;
@@ -598,42 +670,73 @@ void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address
   }
 
   if (done) {
-    switch (ac_z2_type[ac_z2_current_pic]) {
+  switch (ac_z2_type[ac_z2_current_pic]) {
     case ACTYPE_MAPFAST_Z2:
       cfg->map_offset[index] = ac_base[ac_z2_current_pic];
-      cfg->map_high[index] = cfg->map_offset[index] + cfg->map_size[index];
+      cfg->map_high[index]   = cfg->map_offset[index] + cfg->map_size[index];
+
       LOG_INFO("[AUTOCONF] Address of Z2 autoconf RAM assigned to $%.8X\n",
                ac_base[ac_z2_current_pic]);
-      m68k_add_ram_range((uint32_t)cfg->map_offset[index], (uint32_t)cfg->map_high[index],
+
+      m68k_add_ram_range((uint32_t)cfg->map_offset[index],
+                         (uint32_t)cfg->map_high[index],
                          cfg->map_data[index]);
-      LOG_INFO("[AUTOCONF] Z2 PIC %d at $%.8lX-%.8lX, Size: %d MB\n", ac_z2_current_pic,
-               cfg->map_offset[index], cfg->map_high[index], cfg->map_size[index] / SIZE_MEGA);
+
+      LOG_INFO("[AUTOCONF] Z2 PIC %d at $%.8lX-%.8lX, Size: %d MB\n",
+               ac_z2_current_pic,
+               cfg->map_offset[index],
+               cfg->map_high[index],
+               cfg->map_size[index] / SIZE_MEGA);
       break;
+
     case ACTYPE_PISCSI:
-      LOG_INFO("[AUTOCONF] PiSCSI Z2 device assigned to $%.8X\n", piscsi_base);
-      // m68k_add_rom_range(piscsi_base + (16 * SIZE_KILO), piscsi_base + (32 * SIZE_KILO), piscsi_rom_ptr);
+      LOG_INFO("[AUTOCONF] PiSCSI Z2 device assigned to $%.8X\n", *base);
+
+      // When ready to actually map the ROM:
+      // m68k_add_rom_range(
+      //     *base + (16 * SIZE_KILO),
+      //     *base + (32 * SIZE_KILO),
+      //     ac_piscsi_rom
+      // );
       break;
+
     case ACTYPE_A314:
       LOG_INFO("[AUTOCONF] A314 emulation device assigned to $%.8X\n", a314_base);
       break;
+
     case ACTYPE_PISTORM_DEV:
-      LOG_INFO("[AUTOCONF] PiStorm Interaction Z2 device assigned to $%.8X\n", pistorm_dev_base);
+      LOG_INFO("[AUTOCONF] PiStorm Interaction Z2 device assigned to $%.8X\n", *base);
+
+      // Similar pattern once that ROM wants mapping:
+      // m68k_add_rom_range(
+      //     *base + (16 * SIZE_KILO),
+      //     *base + (16 * SIZE_KILO) + sizeof(ac_pistorm_rom),
+      //     ac_pistorm_rom
+      // );
       break;
+
     case ACTYPE_ZORRO_GENERIC:
       if (zorro_dev) {
         zorro_dev->base = zorro_temp_base;
         LOG_INFO("[AUTOCONF] Zorro device %s assigned to $%.8X\n",
-                 zorro_dev->name ? zorro_dev->name : "unnamed", zorro_dev->base);
+                 zorro_dev->name ? zorro_dev->name : "unnamed",
+                 zorro_dev->base);
       }
       break;
+
+
+
     default:
-      LOG_WARN("[AUTOCONF] Unknown Z2 device assigned to $%.8X?\n", *base);
+      LOG_WARN("[AUTOCONF] Unknown Z2 device assigned to $%.8X?\n",
+               base ? *base : 0);
       break;
-    }
-    ac_z2_current_pic++;
-    if (ac_z2_current_pic == ac_z2_pic_count) {
-      ac_z2_done = 1;
-      adjust_ranges_amiga(cfg);
-    }
   }
+
+  ac_z2_current_pic++;
+  if (ac_z2_current_pic == ac_z2_pic_count) {
+    ac_z2_done = 1;
+    adjust_ranges_amiga(cfg);
+  }
+}
+
 }

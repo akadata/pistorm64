@@ -99,6 +99,19 @@ USE_GOLD   ?= 1
 
 include config.mk
 
+# Detect host CPU and adjust defaults for homer (x86_64)
+CPU ?= $(shell uname -m)
+CPU_UPPER := $(shell echo $(CPU) | tr a-z A-Z)
+
+ifeq ($(CPU_UPPER),X86_64)
+  # On homer: build a native test binary by default
+  PLATFORM := NATIVE
+  EXENAME  := emulator.homer
+endif
+
+
+
+
 # Toggle RTG output backends: 1=raylib (default), 0=null stub.
 USE_RAYLIB ?= 1
 # Toggle ALSA-based audio (Pi AHI). If 0, drop pi_ahi and -lasound.
@@ -143,6 +156,7 @@ else
 endif
 
 # Default CPU flags; overridden by PLATFORM selections below.
+DEFINES += -D_GNU_SOURCE
 CPUFLAGS   ?= -march=armv8-a+crc -mtune=cortex-a53
 
 # Raylib paths can be swapped if you use a custom build.
@@ -246,9 +260,11 @@ VC_INC    :=
 VC_LIBDIR :=
 LDLIBS_VC :=
 
+
 ifeq ($(USE_PMMU),1)
 DEFINES += -DPISTORM_EXPERIMENT_PMMU
 endif
+
 
 ifeq ($(USE_EC_FPU),1)
 DEFINES += -DPISTORM_ENABLE_020_FPU -DPISTORM_ENABLE_EC040_FPU
@@ -303,33 +319,24 @@ EXTRA_CXX_OBJS :=
 EXTRA_LINK_DEPS :=
 
 ifeq ($(USE_UAE_JIT),1)
-UAE_C_SRCS   := $(shell find $(UAE_SRCDIR) -type f -name "*.c")
-UAE_CXX_SRCS := $(shell find $(UAE_SRCDIR) -type f \( -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \))
-UAE_JIT_SRCS := \
-	$(UAE_SRCDIR)/jit/codegen_armA64.cpp \
-	$(UAE_SRCDIR)/jit/compemu_midfunc_armA64.cpp \
-	$(UAE_SRCDIR)/jit/compemu_midfunc_armA64_2.cpp \
-	$(UAE_SRCDIR)/jit/codegen_x86.cpp \
-	$(UAE_SRCDIR)/jit/compemu_midfunc_x86.cpp \
-	$(UAE_SRCDIR)/jit/gencomp.cpp
-UAE_CXX_SRCS := $(filter-out \
-	$(UAE_SRCDIR)/uae_emulator.cc \
-	$(UAE_SRCDIR)/pistorm_uae_bridge.cc \
-	$(UAE_SRCDIR)/pistorm_uae_stubs.cc \
-	$(UAE_SRCDIR)/cpudefs.cc \
-	$(UAE_SRCDIR)/cpustbl.cc \
-	$(UAE_SRCDIR)/gencpu.cpp \
-	$(UAE_SRCDIR)/cpuemu_0.cc \
-	$(UAE_SRCDIR)/cpuemu_4.cc \
-	$(UAE_SRCDIR)/cpuemu_11.cc \
-	$(UAE_SRCDIR)/cpuemu_13.cc \
-	$(UAE_SRCDIR)/cpuemu_40.cc \
-	$(UAE_SRCDIR)/cpuemu_44.cc \
-	$(UAE_SRCDIR)/fpp.cc \
-	$(UAE_SRCDIR)/memory.cc \
-	$(UAE_SRCDIR)/fpp_native.cc,$(UAE_CXX_SRCS))
-UAE_CXX_SRCS := $(sort $(UAE_CXX_SRCS) $(UAE_JIT_SRCS) $(UAE_FPP_NATIVE_CPP))
-UAE_OBJS := $(patsubst $(UAE_SRCDIR)/%.c,$(UAE_BUILDDIR)/%.o,$(UAE_C_SRCS))
+UAE_C_SRCS   :=
+UAE_CXX_SRCS := \
+	$(UAE_SRCDIR)/cpudefs.cpp \
+	$(UAE_SRCDIR)/cpustbl.cpp \
+	$(UAE_SRCDIR)/cpuemu_0.cpp \
+	$(UAE_SRCDIR)/cpuemu_4.cpp \
+	$(UAE_SRCDIR)/cpuemu_11.cpp \
+	$(UAE_SRCDIR)/cpuemu_13.cpp \
+	$(UAE_SRCDIR)/cpuemu_40.cpp \
+	$(UAE_SRCDIR)/cpuemu_44.cpp \
+	$(UAE_SRCDIR)/readcpu.cc \
+	$(UAE_SRCDIR)/newcpu.cc \
+	$(UAE_SRCDIR)/newcpu_common.cc \
+	$(UAE_SRCDIR)/events.cc \
+	$(UAE_SRCDIR)/jit/compemu.cpp \
+	$(UAE_SRCDIR)/jit/compemu_support.cpp \
+	$(UAE_SRCDIR)/jit/compstbl.cpp
+UAE_OBJS :=
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cc,$(UAE_BUILDDIR)/%.o,$(filter %.cc,$(UAE_CXX_SRCS)))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cpp,$(UAE_BUILDDIR)/%.o,$(filter %.cpp,$(UAE_CXX_SRCS)))
 UAE_OBJS += $(patsubst $(UAE_SRCDIR)/%.cxx,$(UAE_BUILDDIR)/%.o,$(filter %.cxx,$(UAE_CXX_SRCS)))
@@ -422,7 +429,7 @@ RAYLIB_A := $(RAYLIB_LIB)
 OPENSSL_CFLAGS := $(shell pkg-config --cflags openssl 2>/dev/null)
 OPENSSL_LIBS := $(shell pkg-config --libs openssl 2>/dev/null)
 
-BASE_LIBS := -lm -ldl -lstdc++
+BASE_LIBS := -lm -ldl -lstdc++ -lrt
 ifneq ($(OPENSSL_LIBS),)
 BASE_LIBS += $(OPENSSL_LIBS)
 INCLUDES += $(OPENSSL_CFLAGS)

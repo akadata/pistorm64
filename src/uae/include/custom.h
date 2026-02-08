@@ -10,10 +10,8 @@
 #define UAE_CUSTOM_H
 
 #include "uae/types.h"
-//#include "machdep/rpt.h"
-extern "C" int intlev(void);
+#include "machdep/rpt.h"
 
-#if 0
 extern bool aga_mode;
 extern bool direct_rgb;
 
@@ -42,10 +40,6 @@ extern void dumpcustom (void);
 
 extern void do_copper (void);
 
-#ifdef AMIBERRY
-extern void check_copperlist_write(uaecptr addr);
-#endif
-
 extern void notice_new_xcolors (void);
 extern void notice_screen_contents_lost(int monid);
 extern void init_row_map (void);
@@ -66,11 +60,11 @@ extern int vpos, lof_store;
 
 extern int n_frames;
 
-STATIC_INLINE int dmaen(unsigned int dmamask)
+STATIC_INLINE int dmaen (unsigned int dmamask)
 {
 	return (dmamask & dmacon) && (dmacon & 0x200);
 }
-#endif
+
 #define SPCFLAG_STOP 2
 #define SPCFLAG_COPPER 4
 #define SPCFLAG_INT 8
@@ -88,7 +82,7 @@ STATIC_INLINE int dmaen(unsigned int dmamask)
 #define SPCFLAG_END_COMPILE 16384
 #endif
 #define SPCFLAG_CHECK 32768
-#if 0
+
 extern uae_u16 adkcon;
 
 extern unsigned int joy0dir, joy1dir;
@@ -97,7 +91,7 @@ extern int joy0button, joy1button;
 extern void INTREQ(uae_u16);
 extern bool INTREQ_0(uae_u16);
 extern void INTREQ_f(uae_u16);
-extern void send_interrupt(int num, int delay);
+extern void INTREQ_INT(int num, int delay);
 extern void rethink_uae_int(void);
 extern uae_u16 INTREQR(void);
 
@@ -207,16 +201,20 @@ extern int xbluecolor_s, xbluecolor_b, xbluecolor_m;
 /* get resolution from bplcon0 */
 STATIC_INLINE int GET_RES_DENISE(uae_u16 con0)
 {
+#ifdef ECS_AGNUS
 	if (!(currprefs.chipset_mask & CSMASK_ECS_DENISE)) {
 		con0 &= ~0x40; // SUPERHIRES
 	}
+#endif
 	return ((con0) & 0x40) ? RES_SUPERHIRES : ((con0) & 0x8000) ? RES_HIRES : RES_LORES;
 }
 STATIC_INLINE int GET_RES_AGNUS(uae_u16 con0)
 {
+#ifdef ECS_AGNUS
 	if (!(currprefs.chipset_mask & CSMASK_ECS_AGNUS)) {
 		con0 &= ~0x40; // SUPERHIRES
 	}
+#endif
 	return ((con0) & 0x40) ? RES_SUPERHIRES : ((con0) & 0x8000) ? RES_HIRES : RES_LORES;
 }
 /* get sprite width from FMODE */
@@ -231,7 +229,7 @@ STATIC_INLINE int GET_PLANES(uae_u16 bplcon0)
 	return (bplcon0 >> 12) & 7; // normal planes bits
 }
 
-extern void fpscounter_reset(void);
+extern void fpscounter_reset (void);
 extern frame_time_t idletime;
 extern int lightpen_x[2], lightpen_y[2];
 extern int lightpen_cx[2], lightpen_cy[2], lightpen_active, lightpen_enabled, lightpen_enabled2;
@@ -242,15 +240,15 @@ struct customhack {
 };
 void customhack_put (struct customhack *ch, uae_u16 v, int hpos);
 uae_u16 customhack_get (struct customhack *ch, int hpos);
-extern void alloc_cycle_ext(int, int);
-extern void alloc_cycle_blitter(int hpos, uaecptr *ptr, int);
-extern bool ispal(void);
-extern bool isvga(void);
-extern int current_maxvpos(void);
-extern struct chipset_refresh *get_chipset_refresh(struct uae_prefs*);
-extern void compute_framesync(void);
+extern void alloc_cycle_ext (int, int);
+extern void alloc_cycle_blitter (int hpos, uaecptr *ptr, int);
+extern bool ispal (void);
+extern bool isvga (void);
+extern int current_maxvpos (void);
+extern struct chipset_refresh *get_chipset_refresh (struct uae_prefs*);
+extern void compute_framesync (void);
 extern void getsyncregisters(uae_u16 *phsstrt, uae_u16 *phsstop, uae_u16 *pvsstrt, uae_u16 *pvsstop);
-int is_bitplane_dma(int hpos);
+int is_bitplane_dma (int hpos);
 void custom_cpuchange(void);
 
 struct custom_store
@@ -259,5 +257,5 @@ struct custom_store
 	uae_u32 pc;
 };
 extern struct custom_store custom_storage[256];
-#endif
+
 #endif /* UAE_CUSTOM_H */

@@ -24,7 +24,7 @@
 
 //extern frame_time_t vsyncmintime, vsyncmintimepre;
 //extern frame_time_t vsyncmaxtime, vsyncwaittime;
-//extern frame_time_t vsynctimebase, syncbase;
+extern frame_time_t vsynctimebase, syncbase;
 extern void reset_frame_rate_hack(void);
 extern evt_t vsync_cycles;
 extern evt_t start_cycles;
@@ -82,9 +82,15 @@ enum {
 };
 
 extern int pissoff_value;
-//extern int pissoff;
+#ifdef JIT
+extern int pissoff;
+#endif
 
+#ifdef JIT
 #define countdown regs.pissoff
+#else
+#define countdown 0
+#endif
 
 extern struct ev eventtab[ev_max];
 extern struct ev2 eventtab2[ev2_max];
@@ -99,15 +105,17 @@ STATIC_INLINE void cycles_do_special (void)
 		if (regs.pissoff >= 0)
 			regs.pissoff = -1;
 	} else
-#endif
 	{
 		regs.pissoff = 0;
 	}
+#endif
 }
 
 STATIC_INLINE void do_extra_cycles(int cycles_to_add)
 {
+#ifdef JIT
 	regs.pissoff -= cycles_to_add;
+#endif
 }
 
 STATIC_INLINE evt_t get_cycles(void)

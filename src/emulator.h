@@ -8,7 +8,6 @@
 #define _EMULATOR_H
 
 // see feature_set_macros(7)
-#define _GNU_SOURCE
 
 #include <stdint.h>
 

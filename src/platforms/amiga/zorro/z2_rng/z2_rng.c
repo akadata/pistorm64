@@ -139,5 +139,8 @@ static zorro_device_t z2_rng_device = {
 
 void z2_rng_register(void) {
   LOG_INFO("[ZORRO] Registering Z2 RNG device.\n");
-  zorro_register_device(&z2_rng_device);
+  int slot = zorro_register_device(&z2_rng_device);
+  if (slot < 0) {
+    LOG_INFO("[ZORRO] Failed to register Z2 RNG device.\n");
+  }
 }

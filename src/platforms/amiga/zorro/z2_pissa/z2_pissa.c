@@ -303,5 +303,8 @@ static zorro_device_t z2_pissa_device = {
 
 void z2_pissa_register(void) {
   LOG_INFO("[ZORRO] Registering Z2 PISSA crypto device.\n");
-  zorro_register_device(&z2_pissa_device);
+  int slot = zorro_register_device(&z2_pissa_device);
+  if (slot < 0) {
+    LOG_INFO("[ZORRO] Failed to register Z2 PISSA crypto device.\n");
+  }
 }

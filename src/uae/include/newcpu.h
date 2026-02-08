@@ -154,7 +154,6 @@ struct regstruct
 	uintptr mem_banks;
 	uintptr cache_tags;
 	int pissoff;
-
 #endif
 };
 

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "config_file/config_file.h"
+#include <stdbool.h>
 
 #define AC_Z2_BASE 0xE80000
 #define AC_Z3_BASE 0xFF000000
@@ -92,7 +93,12 @@ void autoconf_register_zorro_device(uint8_t zorro_index);
 #define Z3_FLAGS_EXTENSION 0x20
 #define Z3_FLAGS_RESERVED 0x10
 
-#define PISTORM_MANUF_ID 0xDEBE
+#define PISTORM_MANUF_ID     0xDEBE     // existing
+#define PISTORM_PRODUCT_ID   0x0001     // example
+
+#define PISTORM64_MANUF_ID   0xBABE     // new
+#define PISTORM64_PRODUCT_ID 0x0001     // or 0x0002, etc.
+
 
 unsigned int autoconfig_read_memory_8(struct emulator_config* cfg, unsigned int address);
 void autoconfig_write_memory_8(struct emulator_config* cfg, unsigned int address,
@@ -113,8 +119,8 @@ void autoconfig_write_memory_z3_32(struct emulator_config* cfg, unsigned int add
                                    unsigned int value);
 void autoconfig_reset_all(void);
 
-void add_z2_pic(uint8_t type, uint8_t index);
-void add_z3_pic(uint8_t type, uint8_t index);
+bool add_z2_pic(uint8_t type, uint8_t index);
+bool add_z3_pic(uint8_t type, uint8_t index);
 
 void remove_z2_pic(uint8_t type, uint8_t index);
 void remove_z3_pic(uint8_t type, uint8_t index);

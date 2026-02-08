@@ -223,5 +223,8 @@ static zorro_device_t z2_serial_device = {
 void z2_serial_echo_register(void) {
   LOG_INFO("[ZORRO] Registering Z2 serial echo device.\n");
   z2_serial_host_init(&serial_state);
-  zorro_register_device(&z2_serial_device);
+  int slot = zorro_register_device(&z2_serial_device);
+  if (slot < 0) {
+    LOG_INFO("[ZORRO] Failed to register Z2 serial echo device.\n");
+  }
 }

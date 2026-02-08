@@ -570,6 +570,13 @@ struct uae_prefs
    int fpu_model;
    bool fpu_no_unimplemented;
    int comptrustbyte;
+   int comptrustword;
+   int comptrustlong;
+   int comptrustnaddr;
+   bool compnf;
+   bool comp_hardflush;
+   bool comp_constjump;
+   bool illegal_mem;
    bool cpu_compatible;
    int mmu_model;
    bool cpu_cycle_exact;

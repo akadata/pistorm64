@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 #include <string.h>
+#include <assert.h>
 
 #include "amiga_zorro.h"
 #include "config_file/config_file.h"
@@ -10,9 +11,11 @@
 #include "zorro/z3bus_demo/z3bus_demo.h"
 #include "log.h"
 
-#define MAX_ZORRO_DEVICES 16
+#define MAX_ZORRO_DEVICES AC_PIC_LIMIT
 
 static zorro_device_t *zorro_devices[MAX_ZORRO_DEVICES];
+static_assert(AC_PIC_LIMIT >= MAX_ZORRO_DEVICES, "PIC list smaller than Zorro device table");
+
 static uint8_t zorro_device_count;
 
 static uint32_t z2_next_base = 0x00200000;
@@ -26,7 +29,9 @@ void zorro_bus_init(void) {
   zorro_initialized = 1;
 }
 
-uint8_t zorro_get_device_count(void) { return zorro_device_count; }
+uint8_t zorro_get_device_count(void) { 
+  return zorro_device_count; 
+}
 
 zorro_device_t *zorro_get_device_by_index(uint8_t index) {
   if (index >= zorro_device_count) {
@@ -37,27 +42,32 @@ zorro_device_t *zorro_get_device_by_index(uint8_t index) {
 
 int zorro_register_device(zorro_device_t *dev) {
   if (!dev || zorro_device_count >= MAX_ZORRO_DEVICES) {
-    LOG_WARN("[ZORRO] Device registration failed (full or null).\n");
+    LOG_WARN("[ZORRO] Device registration failed (full or null). count=%d max=%d\n",
+             zorro_device_count, MAX_ZORRO_DEVICES);
     return -1;
   }
 
-  if (dev->bus == ZORRO_BUS_Z2) {
-    dev->base = 0;
-  } else {
-    dev->base = 0;
-  }
+  const uint8_t slot = zorro_device_count;
 
-  zorro_devices[zorro_device_count++] = dev;
+  dev->slot = slot;
+  dev->base = 0;  // autoconfig will assign a real base later
 
-  autoconf_register_zorro_device(zorro_device_count - 1);
+  zorro_devices[slot] = dev;
+  zorro_device_count++;
 
-  LOG_INFO("[ZORRO] Registered %s (%s) size=0x%.8X base=0x%.8X\n",
+  autoconf_register_zorro_device(slot);
+
+  LOG_INFO("[ZORRO] Registered %s (%s) size=0x%.8X base=0x%.8X slot=%u\n",
            dev->name ? dev->name : "unnamed",
            dev->bus == ZORRO_BUS_Z2 ? "Z2" : "Z3",
-           dev->size, dev->base);
+           dev->size, dev->base, dev->slot);
 
-  return 0;
+  return slot;
 }
+
+
+
+
 
 void zorro_setvar(struct emulator_config *cfg, const char *var, const char *val) {
   (void)cfg;

@@ -837,6 +837,13 @@ static void uae_pistorm_set_defaults(int cpu_model, int enable_jit, int enable_f
   currprefs.crash_auto_reset = changed_prefs.crash_auto_reset = true;
   currprefs.m68k_speed = changed_prefs.m68k_speed = -1;
   currprefs.comptrustbyte = changed_prefs.comptrustbyte = 1;
+  currprefs.comptrustword = changed_prefs.comptrustword = 1;
+  currprefs.comptrustlong = changed_prefs.comptrustlong = 1;
+  currprefs.comptrustnaddr = changed_prefs.comptrustnaddr = 1;
+  currprefs.compnf = changed_prefs.compnf = false;
+  currprefs.comp_hardflush = changed_prefs.comp_hardflush = false;
+  currprefs.comp_constjump = changed_prefs.comp_constjump = false;
+  currprefs.illegal_mem = changed_prefs.illegal_mem = false;
 
   const char* force_nojit = getenv("PISTORM_UAE_FORCE_NOJIT");
   const char* cache_kb_env = getenv("PISTORM_UAE_CACHESIZE_KB");

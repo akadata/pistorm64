@@ -24,6 +24,10 @@
 #endif
 //#include "audio.h"
 //#include "cia.h"
+int pissoff_value = 0;
+#ifdef JIT
+int pissoff = 0;
+#endif
 
 static const int pissoff_nojit_value = 256 * CYCLE_UNIT;
 
@@ -101,10 +105,12 @@ static bool event_check_vsync(void)
 				uae_ppc_execute_quick();
 			}
 #endif
+#ifdef JIT
 			if (currprefs.cachesize)
 				pissoff = pissoff_value;
 			else
 				pissoff = pissoff_nojit_value;
+#endif
 			return true;
 		}
 		vsync_clear();
@@ -130,10 +136,12 @@ static bool event_check_vsync(void)
 				uae_ppc_execute_quick();
 			}
 #endif
+#ifdef JIT
 			if (currprefs.cachesize)
 				pissoff = pissoff_value;
 			else
 				pissoff = pissoff_nojit_value;
+#endif
 			return true;
 		}
 		vsync_clear();
@@ -153,10 +161,12 @@ static bool event_check_vsync(void)
 				uae_ppc_execute_quick();
 			}
 #endif
+#ifdef JIT
 			if (currprefs.cachesize)
 				pissoff = pissoff_value;
 			else
 				pissoff = pissoff_nojit_value;
+#endif
 			return true;
 		}
 		vsync_clear();
@@ -177,10 +187,12 @@ static bool event_check_vsync(void)
 				uae_ppc_execute_check();
 			}
 #endif
+#ifdef JIT
 			if (currprefs.cachesize)
 				pissoff = pissoff_value;
 			else
 				pissoff = pissoff_nojit_value;
+#endif
 			return true;
 		}
 		vsync_event_done();
@@ -201,10 +213,12 @@ static bool event_check_vsync(void)
 				uae_ppc_execute_check();
 			}
 #endif
+#ifdef JIT
 			if (currprefs.cachesize)
 				pissoff = pissoff_value;
 			else
 				pissoff = pissoff_nojit_value;
+#endif
 			return true;
 		}
 		vsync_event_done();
@@ -221,10 +235,12 @@ static bool event_check_vsync(void)
 					uae_ppc_execute_check();
 				}
 #endif
+#ifdef JIT
 				if (currprefs.cachesize)
 					pissoff = pissoff_value;
 				else
 					pissoff = pissoff_nojit_value;
+#endif
 				return true;
 			}
 		}
@@ -250,10 +266,12 @@ static bool event_check_vsync(void)
 					}
 				}
 #endif
+#ifdef JIT
 				if (currprefs.cachesize)
 					pissoff = pissoff_value;
 				else
 					pissoff = pissoff_nojit_value;
+#endif
 				return true;
 			}
 		}
@@ -272,6 +290,7 @@ void do_cycles_cpu_fastest(int cycles_to_add)
 #endif
 #endif
 
+#ifdef JIT
 	if (!currprefs.cpu_thread) {
 		if ((regs.pissoff -= cycles_to_add) >= 0)
 			return;
@@ -281,6 +300,7 @@ void do_cycles_cpu_fastest(int cycles_to_add)
 	} else {
 	   regs.pissoff = 0x40000000;
 	}
+#endif
 
 	currcycle += cycles_to_add;
 }

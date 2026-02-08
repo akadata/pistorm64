@@ -41,7 +41,15 @@
 #include "custom.h"
 #include "comptbl.h"
 #include "compemu.h"
+#if defined(__has_include)
+#if __has_include(<SDL.h>)
 #include <SDL.h>
+#elif __has_include(<SDL2/SDL.h>)
+#include <SDL2/SDL.h>
+#endif
+#else
+#include <SDL.h>
+#endif
 
 
 #ifdef __MACH__
@@ -1547,8 +1555,11 @@ static void freescratch(void)
 
 STATIC_INLINE int isinrom(uintptr addr)
 {
-    return (addr >= (uintptr)kickmem_bank.baseaddr &&
-        addr < (uintptr)(kickmem_bank.baseaddr + 8 * 65536));
+    uae_u8* rom_base = memory_get_real_address(kickmem_start_addr);
+    if (!rom_base)
+        return 0;
+    return (addr >= (uintptr)rom_base &&
+        addr < (uintptr)(rom_base + 8 * 65536));
 }
 
 static void flush_all(void)
