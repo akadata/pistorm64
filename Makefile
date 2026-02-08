@@ -395,7 +395,7 @@ RAYLIB_INC := -I$(RAYLIB_DIR)/src
 RAYLIB_LIB := $(RAYLIB_DIR)/build/raylib/libraylib.a
 DEFINES      += -DRPI4_TEST
 OPT_LEVEL := -O0 
-EXTRA_CFLAGS += -fno-omit-frame-pointer
+EXTRA_CFLAGS += -fno-omit-frame-pointer -D_POSIX_C_SOURCE=199309L
 EXTRA_LDFLAGS += 
 else ifeq ($(PLATFORM),PI3_BULLSEYE)
 CPUFLAGS = -mcpu=cortex-a53 -mtune=cortex-a53 -march=armv8-a+crc
